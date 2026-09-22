@@ -1,0 +1,243 @@
+import type { LayerPatch } from "../core/commands";
+import type { Point } from "../core/drawing";
+import { measureTextBounds } from "../core/model";
+
+/**
+ * Triggers a browser file download using an ephemeral object URL anchor.
+ */
+export function download(blob: Blob, name: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/**
+ * Sanitizes a document name for safe filesystem usage.
+ */
+export function fileName(name: string): string {
+  return name.replace(/[<>:"/\\|?*]/g, "_") || "Untitled";
+}
+
+export interface ResizeDragState {
+  handle: "nw" | "ne" | "sw" | "se";
+  layerX: number;
+  layerY: number;
+  layerWidth: number;
+  layerHeight: number;
+  layerFontSize?: number;
+  layerText?: string;
+  layerFontFamily?: string;
+  layerLineHeight?: number;
+  layerKind: "raster" | "text";
+}
+
+/**
+ * Computes layer position and dimension patch during corner resize handle dragging.
+ */
+export function computeResizePatch(
+  drag: ResizeDragState,
+  dx: number,
+  dy: number,
+  shiftKey: boolean,
+): LayerPatch {
+  const {
+    handle,
+    layerX,
+    layerY,
+    layerWidth,
+    layerHeight,
+    layerFontSize,
+    layerText,
+    layerFontFamily,
+    layerLineHeight,
+    layerKind,
+  } = drag;
+
+  let effectiveDx = dx;
+  let effectiveDy = dy;
+  if (handle === "nw") {
+    effectiveDx = -dx;
+    effectiveDy = -dy;
+  } else if (handle === "ne") {
+    effectiveDx = dx;
+    effectiveDy = -dy;
+  } else if (handle === "sw") {
+    effectiveDx = -dx;
+    effectiveDy = dy;
+  } else if (handle === "se") {
+    effectiveDx = dx;
+    effectiveDy = dy;
+  }
+
+  let newWidth: number;
+  let newHeight: number;
+
+  if (shiftKey && layerWidth > 0 && layerHeight > 0) {
+    const scale =
+      Math.abs(effectiveDx) > Math.abs(effectiveDy)
+        ? (layerWidth + effectiveDx) / layerWidth
+        : (layerHeight + effectiveDy) / layerHeight;
+    const clampedScale = Math.max(1 / Math.min(layerWidth, layerHeight), scale);
+    newWidth = Math.max(1, Math.round(layerWidth * clampedScale));
+    newHeight = Math.max(1, Math.round(layerHeight * clampedScale));
+  } else {
+    newWidth = Math.max(1, Math.round(layerWidth + effectiveDx));
+    newHeight = Math.max(1, Math.round(layerHeight + effectiveDy));
+  }
+
+  let newX = layerX;
+  let newY = layerY;
+
+  if (handle === "nw" || handle === "sw") {
+    newX = layerX + layerWidth - newWidth;
+  }
+  if (handle === "nw" || handle === "ne") {
+    newY = layerY + layerHeight - newHeight;
+  }
+
+  newX = Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, newX));
+  newY = Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, newY));
+  newWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newWidth));
+  newHeight = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newHeight));
+
+  if (layerKind === "text" && layerFontSize && layerText) {
+    const scale =
+      Math.abs(effectiveDx) > Math.abs(effectiveDy)
+        ? (layerWidth + effectiveDx) / layerWidth
+        : (layerHeight + effectiveDy) / layerHeight;
+    const clampedScale = Math.max(0.05, scale);
+    const newFontSize = Math.max(
+      1,
+      Math.min(Number.MAX_SAFE_INTEGER, Math.round(layerFontSize * clampedScale)),
+    );
+    const newBounds = measureTextBounds(
+      layerText,
+      newFontSize,
+      layerFontFamily ?? "sans-serif",
+      layerLineHeight ?? 1.2,
+    );
+    let textX = layerX;
+    let textY = layerY;
+    if (handle === "nw" || handle === "sw") {
+      textX = layerX + layerWidth - newBounds.width;
+    }
+    if (handle === "nw" || handle === "ne") {
+      textY = layerY + layerHeight - newBounds.height;
+    }
+    return {
+      x: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, Math.round(textX))),
+      y: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, Math.round(textY))),
+      fontSize: newFontSize,
+    };
+  }
+
+  return {
+    x: newX,
+    y: newY,
+    width: newWidth,
+    height: newHeight,
+  };
+}
+
+/**
+ * Transforms pointer client coordinates into document canvas coordinates.
+ */
+export function canvasPoint(
+  event: { clientX: number; clientY: number },
+  rect: { left: number; top: number },
+  zoom: number,
+): Point {
+  return {
+    x: (event.clientX - rect.left) / zoom,
+    y: (event.clientY - rect.top) / zoom,
+  };
+}
+
+export interface ToolModifier {
+  alt: boolean;
+  shift: boolean;
+  pressure: number;
+}
+
+/**
+ * Extracts modifier keys and pressure from pointer/mouse events.
+ */
+export function modifiers(event: {
+  altKey: boolean;
+  shiftKey: boolean;
+  pointerType?: string;
+  pressure?: number;
+}): ToolModifier {
+  return {
+    alt: event.altKey,
+    shift: event.shiftKey,
+    pressure: event.pointerType === "pen" ? event.pressure || 0.05 : 1,
+  };
+}
+
+export interface Region {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Computes the visible bounding region of the document within the current viewport and pan/zoom state.
+ */
+export function computeVisibleRegion(
+  documentSize: { width: number; height: number },
+  viewportSize: { width: number; height: number },
+  pan: { x: number; y: number },
+  zoom: number,
+): Region {
+  const x = Math.max(
+    0,
+    Math.min(
+      documentSize.width - 1,
+      Math.floor(documentSize.width / 2 - (viewportSize.width / 2 + pan.x) / zoom),
+    ),
+  );
+  const y = Math.max(
+    0,
+    Math.min(
+      documentSize.height - 1,
+      Math.floor(documentSize.height / 2 - (viewportSize.height / 2 + pan.y) / zoom),
+    ),
+  );
+  const right = Math.min(
+    documentSize.width,
+    Math.ceil(documentSize.width / 2 + (viewportSize.width / 2 - pan.x) / zoom),
+  );
+  const bottom = Math.min(
+    documentSize.height,
+    Math.ceil(documentSize.height / 2 + (viewportSize.height / 2 - pan.y) / zoom),
+  );
+  return {
+    x,
+    y,
+    width: Math.max(1, right - x),
+    height: Math.max(1, bottom - y),
+  };
+}
+
+/**
+ * Calculates the zoom level required to fit the document comfortably inside the viewport box.
+ */
+export function calculateFitZoom(
+  documentSize: { width: number; height: number },
+  boxSize: { width: number; height: number },
+  padding = 120,
+): number {
+  return Math.max(
+    Number.MIN_VALUE,
+    Math.min(
+      1,
+      (boxSize.width - padding) / documentSize.width,
+      (boxSize.height - padding) / documentSize.height,
+    ),
+  );
+}

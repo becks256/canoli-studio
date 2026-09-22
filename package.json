@@ -1,0 +1,43 @@
+{
+  "name": "luma-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm run build:engine && vite --host 127.0.0.1",
+    "dev:api": "tsx watch server/index.ts",
+    "start:api": "tsx server/index.ts",
+    "build:runtime": "node scripts/build-scripting.mjs",
+    "build:docs": "node --import tsx scripts/build-docs.mjs",
+    "build:engine": "npm run build:wasm && npm run build:runtime && npm run build:docs",
+    "build:wasm": "asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
+    "build": "npm run build:engine && tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "npm run build:wasm && vitest run",
+    "test:e2e": "playwright test",
+    "test:production": "playwright test --config playwright.production.config.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource/dm-mono": "5.3.0",
+    "highlight.js": "11.12.0",
+    "lucide-react": "1.47.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@webgpu/types": "^0.1.74",
+    "assemblyscript": "0.28.20",
+    "esbuild": "0.28.2",
+    "marked": "18.0.13",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
+  }
+}

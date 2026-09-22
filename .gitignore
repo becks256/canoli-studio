@@ -1,0 +1,10 @@
+node_modules/
+dist/
+public/wasm/*.wasm
+*.tsbuildinfo
+test-results/
+playwright-report/
+.env*
+!.env.example
+src/generated/
+public/developer/
