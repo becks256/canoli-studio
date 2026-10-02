@@ -7,7 +7,11 @@ const subscribe = (notify: () => void) => {
 const snapshot = () => document.documentElement.dataset.appearance ?? "system";
 
 /** Shares the early appearance bootstrap with static docs (no React hydration needed). */
-export function AppearanceSelect({ staticPage = false }: { staticPage?: boolean }) {
+export function AppearanceSelect({
+  staticPage = false,
+}: {
+  staticPage?: boolean;
+}) {
   const preference = useSyncExternalStore(subscribe, snapshot, () => "system");
   return (
     <label className="appearance-select">
@@ -17,7 +21,13 @@ export function AppearanceSelect({ staticPage = false }: { staticPage?: boolean 
         value={preference}
         disabled={staticPage}
         data-static-appearance={staticPage ? "" : undefined}
-        onChange={event => window.dispatchEvent(new CustomEvent("luma:set-appearance", { detail: event.target.value }))}
+        onChange={(event) =>
+          window.dispatchEvent(
+            new CustomEvent("luma:set-appearance", {
+              detail: event.target.value,
+            }),
+          )
+        }
       >
         <option value="system">System</option>
         <option value="light">Light</option>

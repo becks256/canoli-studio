@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "corpusVersion": 1,
+  "fixture": {
+    "id": "raster-50mp",
+    "width": 10000,
+    "height": 5000,
+    "groups": 0,
+    "textLayers": 0
+  },
+  "measuredAt": "2026-09-30T21:13:15.890Z",
+  "browser": "153.0.8010.12",
+  "host": {
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+    "logicalCpus": 24,
+    "totalMemoryBytes": 33604415488
+  },
+  "samples": [
+    {
+      "sourceHash": "6009171d145551f86a252e46e83826099108984386a78334a98a04eae837765c",
+      "sourceBytes": 951923,
+      "outputBytes": 210687,
+      "dimensions": [10000, 5000],
+      "timingsMs": {
+        "import": 251.90000000037253,
+        "editCommand": 6.5,
+        "editedViewportRender": 71,
+        "export": 3144.0999999996275
+      },
+      "resourceDiagnostics": {
+        "jsHeapUsedBytes": 72049300,
+        "jsHeapLimitBytes": 4395630592,
+        "hardwareConcurrency": 24,
+        "webgpuAvailable": true
+      },
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+    },
+    {
+      "sourceHash": "6009171d145551f86a252e46e83826099108984386a78334a98a04eae837765c",
+      "sourceBytes": 951923,
+      "outputBytes": 210687,
+      "dimensions": [10000, 5000],
+      "timingsMs": {
+        "import": 214.7999999988824,
+        "editCommand": 3.900000000372529,
+        "editedViewportRender": 65.59999999962747,
+        "export": 3168.5
+      },
+      "resourceDiagnostics": {
+        "jsHeapUsedBytes": 31164346,
+        "jsHeapLimitBytes": 4395630592,
+        "hardwareConcurrency": 24,
+        "webgpuAvailable": true
+      },
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+    },
+    {
+      "sourceHash": "6009171d145551f86a252e46e83826099108984386a78334a98a04eae837765c",
+      "sourceBytes": 951923,
+      "outputBytes": 210687,
+      "dimensions": [10000, 5000],
+      "timingsMs": {
+        "import": 228.30000000074506,
+        "editCommand": 4.199999999254942,
+        "editedViewportRender": 55,
+        "export": 3110.9000000003725
+      },
+      "resourceDiagnostics": {
+        "jsHeapUsedBytes": 52185933,
+        "jsHeapLimitBytes": 4395630592,
+        "hardwareConcurrency": 24,
+        "webgpuAvailable": true
+      },
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36"
+    }
+  ],
+  "medianMs": {
+    "import": 228.30000000074506,
+    "editCommand": 4.199999999254942,
+    "editedViewportRender": 65.59999999962747,
+    "export": 3144.0999999996275
+  },
+  "limitations": [
+    "Synthetic corpus; not a photo quality benchmark.",
+    "JS heap diagnostics exclude decoded image, GPU, WASM and total process memory.",
+    "Fresh page per sample; browser/OS caches may remain warm.",
+    "No hardware-independent pass/fail timing threshold."
+  ]
+}

@@ -1,0 +1,57 @@
+dialog.command-palette {
+  width: min(560px, calc(100vw - 32px));
+}
+.command-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.command-search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-field);
+  color: var(--color-text);
+}
+.command-results {
+  max-height: min(420px, 55vh);
+  overflow-y: auto;
+  margin-top: 12px;
+}
+.command-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.command-result[aria-selected="true"] {
+  background: var(--color-panel-raised);
+  outline: 1px solid var(--color-accent);
+  outline-offset: -1px;
+}
+.command-result[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
+}
+.command-result span {
+  display: grid;
+  gap: 3px;
+}
+.command-result small,
+.command-hint {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+.command-result small {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.command-hint {
+  margin-bottom: 0;
+}

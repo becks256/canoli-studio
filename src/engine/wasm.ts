@@ -1,5 +1,18 @@
+import {
+  hslAdjustmentSchema,
+  type HslAdjustmentData,
+} from "../core/adjustments";
+import {
+  gaussianWeights,
+  spatialFilterSupport,
+  type SpatialFilterOptions,
+} from "../core/smart/spatial-filter";
+import type { DonorValidity } from "../core/retouch/donor";
+import { selectionRegionTransform } from "../core/drawing";
+import type { PoissonLinearSolver } from "../core/retouch/poisson-solver";
 import type { ToneEffectData } from "../core/model";
 import type { SelectionData } from "../core/drawing";
+import type { HistogramData } from "../core/histogram";
 
 export interface SelectionTile {
   selection: SelectionData;
@@ -9,11 +22,65 @@ export interface SelectionTile {
   y: number;
   stepX: number;
   stepY: number;
+  /** Change in local X per output row, and local Y per output column. */
+  stepXY?: number;
+  stepYX?: number;
 }
 
 export interface PixelKernel {
+  adjustHsl(
+    ptr: number,
+    length: number,
+    hue: number,
+    saturation: number,
+    lightness: number,
+  ): void;
+  spatialFilter(
+    ptr: number,
+    scratch: number,
+    weightsX: number,
+    weightsY: number,
+    width: number,
+    height: number,
+    radiusX: number,
+    radiusY: number,
+    unsharp: boolean,
+    amount: number,
+    threshold: number,
+  ): void;
+  poissonSolve(
+    matrix: number,
+    diagonal: number,
+    x: number,
+    b: number,
+    scratch: number,
+    report: number,
+    n: number,
+    tolerance: number,
+    limit: number,
+  ): void;
   memory: WebAssembly.Memory;
+  donorValidity(
+    blocked: number,
+    support: number,
+    count: number,
+    stride: number,
+    minX: number,
+    maxX: number,
+    minY: number,
+    maxY: number,
+    output: number,
+  ): void;
   bufferOffset(): number;
+  featherAlpha(
+    ptr: number,
+    scratchA: number,
+    scratchB: number,
+    width: number,
+    height: number,
+    radiusX: number,
+    radiusY: number,
+  ): void;
   selectionMask(
     ptr: number,
     regions: number,
@@ -24,6 +91,8 @@ export interface PixelKernel {
     y: number,
     stepX: number,
     stepY: number,
+    stepXY: number,
+    stepYX: number,
   ): void;
   blendIf(
     ptr: number,
@@ -46,6 +115,74 @@ export interface PixelKernel {
     contrast: number,
     saturation: number,
   ): void;
+  applyLut(ptr: number, length: number, lutPtr: number): void;
+  blendAdjustment(
+    targetPtr: number,
+    adjustedPtr: number,
+    maskPtr: number,
+    length: number,
+    hasMask: boolean,
+    opacity: number,
+  ): void;
+  mixFiltered(
+    originalPtr: number,
+    filteredPtr: number,
+    maskPtr: number,
+    length: number,
+    density: number,
+    inverted: boolean,
+  ): void;
+  histogram(ptr: number, length: number, outPtr: number): void;
+}
+
+/** Reuses the worker's linear memory; no per-iteration allocation or host calls. */
+export function wasmPoissonSolver(kernel: PixelKernel): PoissonLinearSolver {
+  return (neighbors, diagonal, x, b, tolerance, limit) => {
+    const n = x.length;
+    const matrixPtr = Math.ceil(kernel.bufferOffset() / 8) * 8;
+    const diagonalPtr = matrixPtr + n * 16,
+      xPtr = diagonalPtr + n * 8,
+      bPtr = xPtr + n * 8;
+    const scratchPtr = bPtr + n * 8,
+      reportPtr = scratchPtr + n * 32,
+      required = reportPtr + 16;
+    if (
+      !Number.isSafeInteger(required) ||
+      required > 0x100000000 ||
+      limit > 0x7fffffff ||
+      neighbors.length !== n * 4 ||
+      diagonal.length !== n ||
+      b.length !== n
+    ) {
+      throw new Error(
+        "Poisson working buffers or iteration budget exceed the WASM addressable range.",
+      );
+    }
+    if (required > kernel.memory.buffer.byteLength)
+      kernel.memory.grow(
+        Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
+      );
+    new Int32Array(kernel.memory.buffer, matrixPtr, n * 4).set(neighbors);
+    new Float64Array(kernel.memory.buffer, diagonalPtr, n).set(diagonal);
+    new Float64Array(kernel.memory.buffer, xPtr, n).set(x);
+    new Float64Array(kernel.memory.buffer, bPtr, n).set(b);
+    kernel.poissonSolve(
+      matrixPtr,
+      diagonalPtr,
+      xPtr,
+      bPtr,
+      scratchPtr,
+      reportPtr,
+      n,
+      tolerance,
+      limit,
+    );
+    x.set(new Float64Array(kernel.memory.buffer, xPtr, n));
+    return {
+      residual: new Float64Array(kernel.memory.buffer, reportPtr, 1)[0],
+      iterations: new Int32Array(kernel.memory.buffer, reportPtr + 8, 1)[0],
+    };
+  };
 }
 
 export async function instantiateKernel(
@@ -69,14 +206,23 @@ export function renderSelection(
     length = tile.width * tile.height * 4;
   const regionsOffset = Math.ceil((offset + length) / 8) * 8;
   const values = new Float64Array(
-    tile.selection.regions.flatMap((r) => [
-      ["add", "subtract", "intersect"].indexOf(r.operation),
-      r.shape === "ellipse" ? 1 : 0,
-      r.x,
-      r.y,
-      r.width,
-      r.height,
-    ]),
+    tile.selection.regions.flatMap((r) => {
+      const inverse = selectionRegionTransform(r).inverse();
+      return [
+        ["add", "subtract", "intersect"].indexOf(r.operation),
+        r.shape === "ellipse" ? 1 : 0,
+        r.x,
+        r.y,
+        r.width,
+        r.height,
+        inverse.a,
+        inverse.b,
+        inverse.c,
+        inverse.d,
+        inverse.e,
+        inverse.f,
+      ];
+    }),
   );
   const required = regionsOffset + values.byteLength;
   if (required > kernel.memory.buffer.byteLength)
@@ -96,6 +242,8 @@ export function renderSelection(
     tile.y,
     tile.stepX,
     tile.stepY,
+    tile.stepXY ?? 0,
+    tile.stepYX ?? 0,
   );
   return new Uint8ClampedArray(kernel.memory.buffer, offset, length).slice();
 }
@@ -169,5 +317,453 @@ export function applyBlendIf(
     kernel.memory.buffer,
     offset,
     pixels.byteLength,
+  ).slice();
+}
+
+export interface FeatherTile {
+  width: number;
+  height: number;
+  radiusX: number;
+  radiusY: number;
+}
+export function featherAlpha(
+  kernel: PixelKernel,
+  pixels: Uint8ClampedArray,
+  tile: FeatherTile,
+): Uint8ClampedArray {
+  const { width, height, radiusX, radiusY } = tile;
+  if (
+    !Number.isSafeInteger(width) ||
+    !Number.isSafeInteger(height) ||
+    width < 1 ||
+    height < 1 ||
+    width * height > 4_000_000 ||
+    pixels.length !== width * height * 4 ||
+    !Number.isFinite(radiusX) ||
+    !Number.isFinite(radiusY) ||
+    radiusX < 0 ||
+    radiusY < 0 ||
+    radiusX > 4096 ||
+    radiusY > 4096
+  ) {
+    throw new Error("Invalid mask feather working tile.");
+  }
+  const offset = Math.ceil(kernel.bufferOffset() / 4) * 4;
+  const required = offset + pixels.byteLength * 3;
+  if (required > kernel.memory.buffer.byteLength)
+    kernel.memory.grow(
+      Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
+    );
+  new Uint8ClampedArray(kernel.memory.buffer, offset, pixels.length).set(
+    pixels,
+  );
+  kernel.featherAlpha(
+    offset,
+    offset + pixels.byteLength,
+    offset + pixels.byteLength * 2,
+    width,
+    height,
+    radiusX,
+    radiusY,
+  );
+  return new Uint8ClampedArray(
+    kernel.memory.buffer,
+    offset,
+    pixels.length,
+  ).slice();
+}
+
+export function applyLut(
+  kernel: PixelKernel,
+  pixels: Uint8ClampedArray,
+  luts: Uint8Array, // 768 bytes
+): Uint8ClampedArray {
+  if (luts.byteLength !== 768) {
+    throw new Error("applyLut expects 768-byte combined RGB LUTs.");
+  }
+  const offset = Math.ceil(kernel.bufferOffset() / 4) * 4;
+  const lutOffset = Math.ceil((offset + pixels.byteLength) / 4) * 4;
+  const required = lutOffset + 768;
+  if (required > kernel.memory.buffer.byteLength) {
+    kernel.memory.grow(
+      Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
+    );
+  }
+  new Uint8ClampedArray(kernel.memory.buffer, offset, pixels.byteLength).set(
+    pixels,
+  );
+  new Uint8Array(kernel.memory.buffer, lutOffset, 768).set(luts);
+  kernel.applyLut(offset, pixels.byteLength, lutOffset);
+  return new Uint8ClampedArray(
+    kernel.memory.buffer,
+    offset,
+    pixels.byteLength,
+  ).slice();
+}
+
+export function blendAdjustment(
+  kernel: PixelKernel,
+  target: Uint8ClampedArray,
+  adjusted: Uint8ClampedArray,
+  mask: Uint8ClampedArray | null,
+  opacity: number,
+): Uint8ClampedArray {
+  if (target.byteLength !== adjusted.byteLength || target.byteLength % 4) {
+    throw new Error("blendAdjustment requires matching RGBA buffers.");
+  }
+  if (mask && mask.byteLength !== target.byteLength) {
+    throw new Error("Mask buffer size must match target buffer size.");
+  }
+  const offset = Math.ceil(kernel.bufferOffset() / 4) * 4;
+  const adjustedOffset = offset + target.byteLength;
+  const maskOffset = adjustedOffset + adjusted.byteLength;
+  const totalLength = maskOffset + (mask ? mask.byteLength : 0);
+  if (totalLength > kernel.memory.buffer.byteLength) {
+    kernel.memory.grow(
+      Math.ceil((totalLength - kernel.memory.buffer.byteLength) / 65536),
+    );
+  }
+  new Uint8ClampedArray(kernel.memory.buffer, offset, target.byteLength).set(
+    target,
+  );
+  new Uint8ClampedArray(
+    kernel.memory.buffer,
+    adjustedOffset,
+    adjusted.byteLength,
+  ).set(adjusted);
+  if (mask) {
+    new Uint8ClampedArray(
+      kernel.memory.buffer,
+      maskOffset,
+      mask.byteLength,
+    ).set(mask);
+  }
+  kernel.blendAdjustment(
+    offset,
+    adjustedOffset,
+    maskOffset,
+    target.byteLength,
+    !!mask,
+    opacity,
+  );
+  return new Uint8ClampedArray(
+    kernel.memory.buffer,
+    offset,
+    target.byteLength,
+  ).slice();
+}
+
+export function computeWasmHistogram(
+  kernel: PixelKernel,
+  pixels: Uint8ClampedArray,
+): HistogramData {
+  const offset = Math.ceil(kernel.bufferOffset() / 4) * 4;
+  const outOffset = Math.ceil((offset + pixels.byteLength) / 4) * 4;
+  const required = outOffset + 4096; // 1024 u32s
+  if (required > kernel.memory.buffer.byteLength) {
+    kernel.memory.grow(
+      Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
+    );
+  }
+  new Uint8ClampedArray(kernel.memory.buffer, offset, pixels.byteLength).set(
+    pixels,
+  );
+  kernel.histogram(offset, pixels.byteLength, outOffset);
+
+  const u32s = new Uint32Array(kernel.memory.buffer, outOffset, 1024);
+  const red = new Uint32Array(u32s.subarray(0, 256));
+  const green = new Uint32Array(u32s.subarray(256, 512));
+  const blue = new Uint32Array(u32s.subarray(512, 768));
+  const luminance = new Uint32Array(u32s.subarray(768, 1024));
+
+  let totalPixels = 0;
+  let maxCount = 0;
+  let sumLuminance = 0;
+  let minLum = 255;
+  let maxLum = 0;
+
+  for (let i = 0; i < 256; i++) {
+    if (red[i] > maxCount) maxCount = red[i];
+    if (green[i] > maxCount) maxCount = green[i];
+    if (blue[i] > maxCount) maxCount = blue[i];
+    if (luminance[i] > maxCount) maxCount = luminance[i];
+
+    const count = luminance[i];
+    totalPixels += count;
+    sumLuminance += i * count;
+    if (count > 0) {
+      if (i < minLum) minLum = i;
+      if (i > maxLum) maxLum = i;
+    }
+  }
+
+  if (totalPixels === 0) {
+    return {
+      red,
+      green,
+      blue,
+      luminance,
+      totalPixels: 0,
+      maxCount: 0,
+      mean: 0,
+      median: 0,
+      stdDev: 0,
+      min: 0,
+      max: 0,
+    };
+  }
+
+  const mean = sumLuminance / totalPixels;
+  let varianceSum = 0;
+  for (let val = 0; val < 256; val++) {
+    const count = luminance[val];
+    if (count > 0) {
+      const diff = val - mean;
+      varianceSum += diff * diff * count;
+    }
+  }
+  const stdDev = Math.sqrt(varianceSum / totalPixels);
+
+  const half = Math.floor(totalPixels / 2);
+  let accumulated = 0;
+  let median = 0;
+  for (let val = 0; val < 256; val++) {
+    accumulated += luminance[val];
+    if (accumulated >= half) {
+      median = val;
+      break;
+    }
+  }
+
+  return {
+    red,
+    green,
+    blue,
+    luminance,
+    totalPixels,
+    maxCount,
+    mean: Math.round(mean * 100) / 100,
+    median,
+    stdDev: Math.round(stdDev * 100) / 100,
+    min: minLum,
+    max: maxLum,
+  };
+}
+
+/** Internal validated packed-mask ABI; numerical scoring remains in the host. */
+export function wasmDonorValidity(kernel: PixelKernel): DonorValidity {
+  return ({ blocked, support, stride, minX, maxX, minY, maxY }) => {
+    const columns = maxX - minX + 1,
+      rows = maxY - minY + 1;
+    const count = columns * rows;
+    if (
+      ![stride, minX, maxX, minY, maxY, columns, rows, count].every(
+        Number.isSafeInteger,
+      ) ||
+      stride <= 0 ||
+      columns <= 0 ||
+      rows <= 0 ||
+      blocked.length % stride ||
+      [
+        stride,
+        Math.abs(minX),
+        Math.abs(maxX),
+        Math.abs(minY),
+        Math.abs(maxY),
+        support.length,
+      ].some((value) => value > 0x7fffffff)
+    )
+      throw new Error("Invalid donor validity geometry.");
+    const height = blocked.length / stride;
+    const packed = new Uint32Array(support.length * 3);
+    support.forEach((word, i) => {
+      if (
+        ![word.row, word.column, word.bits].every(Number.isSafeInteger) ||
+        word.column < 0 ||
+        word.column > 0x7fffffff ||
+        word.row + minY < 0 ||
+        word.row + maxY >= height ||
+        word.bits < 0 ||
+        word.bits > 0xffffffff
+      )
+        throw new Error("Invalid donor support coordinates.");
+      packed.set([word.row, word.column, word.bits], i * 3);
+    });
+    const base = Math.ceil(kernel.bufferOffset() / 4) * 4;
+    const supportPtr = base + blocked.byteLength,
+      output = supportPtr + packed.byteLength,
+      required = output + count;
+    if (!Number.isSafeInteger(required) || required > 0xffffffff)
+      throw new Error("Donor working buffers exceed WASM address space.");
+    const pages = Math.ceil(required / 65536);
+    if (pages > kernel.memory.buffer.byteLength / 65536)
+      kernel.memory.grow(pages - kernel.memory.buffer.byteLength / 65536);
+    new Uint32Array(kernel.memory.buffer, base, blocked.length).set(blocked);
+    new Uint32Array(kernel.memory.buffer, supportPtr, packed.length).set(
+      packed,
+    );
+    kernel.donorValidity(
+      base,
+      supportPtr,
+      support.length,
+      stride,
+      minX,
+      maxX,
+      minY,
+      maxY,
+      output,
+    );
+    return new Uint8Array(kernel.memory.buffer, output, count).slice();
+  };
+}
+
+/** Internal spatial-filter worker ABI. Input ownership and hidden source pixels remain untouched. */
+export function applySpatialFilter(
+  kernel: PixelKernel,
+  pixels: Uint8ClampedArray,
+  width: number,
+  height: number,
+  options: SpatialFilterOptions,
+): Uint8ClampedArray {
+  const support = spatialFilterSupport(options);
+  const count = width * height;
+  if (
+    ![width, height, count].every(
+      (value) => Number.isSafeInteger(value) && value > 0,
+    ) ||
+    width > 0x7fffffff ||
+    height > 0x7fffffff ||
+    count * 4 !== pixels.length
+  )
+    throw new Error("Invalid spatial-filter tile geometry.");
+  if (
+    (!support.x && !support.y) ||
+    (options.kind === "unsharp-mask" && options.amount === 0)
+  )
+    return pixels.slice();
+  const wx = gaussianWeights(options.sigmaX),
+    wy = gaussianWeights(options.sigmaY ?? options.sigmaX);
+  const ptr = Math.ceil(kernel.bufferOffset() / 8) * 8;
+  const scratch = Math.ceil((ptr + pixels.length) / 8) * 8;
+  const weightsX = scratch + count * 32,
+    weightsY = weightsX + wx.byteLength,
+    required = weightsY + wy.byteLength;
+  if (!Number.isSafeInteger(required) || required > 0x7fffffff)
+    throw new Error(
+      "Spatial-filter working buffers exceed the WASM addressable range.",
+    );
+  if (required > kernel.memory.buffer.byteLength)
+    kernel.memory.grow(
+      Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
+    );
+  new Uint8Array(kernel.memory.buffer, ptr, pixels.length).set(pixels);
+  new Float64Array(kernel.memory.buffer, weightsX, wx.length).set(wx);
+  new Float64Array(kernel.memory.buffer, weightsY, wy.length).set(wy);
+  kernel.spatialFilter(
+    ptr,
+    scratch,
+    weightsX,
+    weightsY,
+    width,
+    height,
+    support.x,
+    support.y,
+    options.kind === "unsharp-mask",
+    options.kind === "unsharp-mask" ? options.amount : 0,
+    options.kind === "unsharp-mask" ? (options.threshold ?? 0) : 0,
+  );
+  return new Uint8ClampedArray(
+    kernel.memory.buffer,
+    ptr,
+    pixels.length,
+  ).slice();
+}
+
+/** Encoded-sRGB premultiplied interpolation; mask alpha is filter coverage. */
+export function mixFiltered(
+  kernel: PixelKernel,
+  original: Uint8ClampedArray,
+  filtered: Uint8ClampedArray,
+  mask: Uint8ClampedArray,
+  density = 1,
+  inverted = false,
+): Uint8ClampedArray {
+  const length = original.byteLength;
+  if (
+    length % 4 ||
+    length !== filtered.byteLength ||
+    length !== mask.byteLength ||
+    length > 0x7ffffffc
+  )
+    throw new Error(
+      "Filtered mixing requires matching RGBA buffers within the WASM ABI range.",
+    );
+  if (
+    !Number.isFinite(density) ||
+    density < 0 ||
+    density > 1 ||
+    typeof inverted !== "boolean"
+  )
+    throw new Error(
+      "Filtered mixing requires density between zero and one and a boolean inversion flag.",
+    );
+  const offset = Math.ceil(kernel.bufferOffset() / 4) * 4;
+  const filteredOffset = offset + length,
+    maskOffset = filteredOffset + length;
+  const required = maskOffset + length;
+  if (required > 0x100000000)
+    throw new Error("Filtered mixing exceeds WASM address space.");
+  if (required > kernel.memory.buffer.byteLength)
+    kernel.memory.grow(
+      Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
+    );
+  new Uint8ClampedArray(kernel.memory.buffer, offset, length).set(original);
+  new Uint8ClampedArray(kernel.memory.buffer, filteredOffset, length).set(
+    filtered,
+  );
+  new Uint8ClampedArray(kernel.memory.buffer, maskOffset, length).set(mask);
+  kernel.mixFiltered(
+    offset,
+    filteredOffset,
+    maskOffset,
+    length,
+    density,
+    inverted,
+  );
+  return new Uint8ClampedArray(kernel.memory.buffer, offset, length).slice();
+}
+
+/** Private snapshots remain valid when growing WASM memory or reusing its scratch region. */
+export function applyHsl(
+  kernel: PixelKernel,
+  pixels: Uint8ClampedArray,
+  adjustment: HslAdjustmentData,
+): Uint8ClampedArray {
+  const settings = hslAdjustmentSchema.parse(adjustment);
+  if (pixels.length % 4 || pixels.length > 0x7fffffff)
+    throw new Error(
+      "HSL requires complete RGBA pixels within the kernel tile range.",
+    );
+  const input = pixels.slice();
+  const offset = Math.ceil(kernel.bufferOffset() / 4) * 4,
+    required = offset + input.byteLength;
+  if (required > kernel.memory.buffer.byteLength)
+    kernel.memory.grow(
+      Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
+    );
+  new Uint8ClampedArray(kernel.memory.buffer, offset, input.byteLength).set(
+    input,
+  );
+  kernel.adjustHsl(
+    offset,
+    input.byteLength,
+    settings.hue,
+    settings.saturation,
+    settings.lightness,
+  );
+  return new Uint8ClampedArray(
+    kernel.memory.buffer,
+    offset,
+    input.byteLength,
   ).slice();
 }

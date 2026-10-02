@@ -36,7 +36,21 @@ export function useCanvasRenderer({
   onError,
 }: UseCanvasRendererOptions): UseCanvasRendererResult {
   const [rendering, setRendering] = useState(false);
-  const [renderBackend, setRenderBackend] = useState<"webgpu" | "canvas2d" | null>(null);
+  const [fontRevision, setFontRevision] = useState(0);
+  useEffect(() => {
+    const fonts = document.fonts;
+    const changed = () => setFontRevision((value) => value + 1);
+    fonts?.addEventListener("loadingdone", changed);
+    fonts?.addEventListener("loadingerror", changed);
+    return () => {
+      fonts?.removeEventListener("loadingdone", changed);
+      fonts?.removeEventListener("loadingerror", changed);
+    };
+  }, []);
+
+  const [renderBackend, setRenderBackend] = useState<
+    "webgpu" | "canvas2d" | null
+  >(null);
   const [paintedRegion, setPaintedRegion] = useState<RenderRegion>({
     x: 0,
     y: 0,
@@ -82,7 +96,9 @@ export function useCanvasRenderer({
       try {
         while (latestRender.current) {
           // Collapse pending work to one newest snapshot per display frame.
-          await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+          await new Promise<void>((resolve) =>
+            requestAnimationFrame(() => resolve()),
+          );
           if (!latestRender.current) break;
           const job = latestRender.current;
           latestRender.current = null;
@@ -100,6 +116,10 @@ export function useCanvasRenderer({
               job.options.paintPreview &&
               target.options.paintPreview?.stroke.id ===
                 job.options.paintPreview.stroke.id &&
+              target.options.paintPreview.layerId ===
+                job.options.paintPreview.layerId &&
+              target.options.paintPreview.maskMode ===
+                job.options.paintPreview.maskMode &&
               target.document === job.document &&
               target.assets === job.assets &&
               target.region === job.region &&
@@ -140,10 +160,7 @@ export function useCanvasRenderer({
                   job.assets,
                   job.options,
                 );
-                if (
-                  job.key !== renderVersion.current ||
-                  !displayHost.current
-                ) {
+                if (job.key !== renderVersion.current || !displayHost.current) {
                   continue;
                 }
                 present();
@@ -177,16 +194,20 @@ export function useCanvasRenderer({
     zoom,
     paintPreview,
     backendState,
+    fontRevision,
     displayHost,
   ]);
 
-  useEffect(() => () => {
-    renderVersion.current++;
-    latestRender.current = null;
-    renderTarget.current = null;
-    onCleanupCursorRef.current?.();
-    editor.tools.cancel();
-  }, [editor]);
+  useEffect(
+    () => () => {
+      renderVersion.current++;
+      latestRender.current = null;
+      renderTarget.current = null;
+      onCleanupCursorRef.current?.();
+      editor.tools.cancel();
+    },
+    [editor],
+  );
 
   return {
     rendering,

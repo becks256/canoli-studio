@@ -1,3 +1,6 @@
+import { AffineTransform } from "./affine";
+import type { AffineData } from "./affine";
+import { affineSchema } from "./transform-schema";
 import { z } from "zod";
 
 export interface Point {
@@ -13,6 +16,7 @@ export interface Rect extends Point {
 }
 export type SelectionOperation = "add" | "subtract" | "intersect";
 export interface SelectionRegion extends Rect {
+  transform?: AffineData;
   shape: "rectangle" | "ellipse";
   operation: SelectionOperation;
 }
@@ -44,11 +48,15 @@ export interface CloneTile extends Rect {
 }
 export interface BrushStrokeData {
   id: string;
-  kind: "brush" | "pencil" | "clone";
+  kind: "brush" | "pencil" | "clone" | "eraser";
   points: StrokePoint[];
   size: number;
   hardness: number;
   opacity: number;
+  flow?: number;
+  spacing?: number;
+  pressureSize?: boolean;
+  pressureOpacity?: boolean;
   color: string;
   clip: SelectionData | null;
   tiles: CloneTile[];
@@ -96,6 +104,7 @@ export const selectionSchema: z.ZodType<SelectionData> = z
         rect.extend({
           shape: z.enum(["rectangle", "ellipse"]),
           operation: z.enum(["add", "subtract", "intersect"]),
+          transform: affineSchema.optional(),
         }),
       )
       .max(128),
@@ -143,7 +152,7 @@ export const paintOperationSchema: z.ZodType<PaintOperationData> =
     z
       .object({
         id: identifier,
-        kind: z.enum(["brush", "pencil", "clone"]),
+        kind: z.enum(["brush", "pencil", "clone", "eraser"]),
         points: z
           .array(point.extend({ pressure: unit }))
           .min(1)
@@ -151,6 +160,10 @@ export const paintOperationSchema: z.ZodType<PaintOperationData> =
         size: z.number().min(0.1).max(2048),
         hardness: unit,
         opacity: unit,
+        flow: unit.optional(),
+        spacing: z.number().min(0.01).max(10).optional(),
+        pressureSize: z.boolean().optional(),
+        pressureOpacity: z.boolean().optional(),
         color: colorSchema,
         clip: selectionSchema.nullable(),
         tiles: z.array(rect.extend({ assetId: identifier })).max(4096),
@@ -209,16 +222,48 @@ export function translateSelection(
   x: number,
   y: number,
 ): SelectionData | null {
-  return selection
-    ? {
-        regions: selection.regions.map((r) => ({
-          ...r,
-          x: r.x + x,
-          y: r.y + y,
-        })),
-      }
-    : null;
+  return transformSelection(selection, AffineTransform.translation(x, y));
 }
+
+export function selectionRegionTransform(
+  region: SelectionRegion,
+): AffineTransform {
+  return region.transform
+    ? AffineTransform.fromJSON(region.transform)
+    : new AffineTransform();
+}
+
+export function transformSelection(
+  selection: SelectionData | null | undefined,
+  transform: AffineTransform,
+): SelectionData | null {
+  transform.inverse();
+  if (!selection) return null;
+  return selectionSchema.parse({
+    regions: selection.regions.map((region) => {
+      // Preserve the compact translation-only representation for old callers.
+      if (
+        !region.transform &&
+        transform.a === 1 &&
+        transform.b === 0 &&
+        transform.c === 0 &&
+        transform.d === 1
+      )
+        return {
+          ...region,
+          x: region.x + transform.e,
+          y: region.y + transform.f,
+        };
+      return {
+        ...region,
+        transform: transform
+          .multiply(selectionRegionTransform(region))
+          .toJSON(),
+      };
+    }),
+  });
+}
+
 export function containsSelection(
   selection: SelectionData | null,
   x: number,
@@ -227,14 +272,17 @@ export function containsSelection(
   if (!selection) return true;
   let inside = false;
   for (const region of selection.regions) {
+    const point = selectionRegionTransform(region).inverse().point({ x, y });
+    const sx = point.x,
+      sy = point.y;
     const hit =
       region.shape === "rectangle"
-        ? x >= region.x &&
-          x <= region.x + region.width &&
-          y >= region.y &&
-          y <= region.y + region.height
-        : ((x - region.x - region.width / 2) / (region.width / 2)) ** 2 +
-            ((y - region.y - region.height / 2) / (region.height / 2)) ** 2 <=
+        ? sx >= region.x &&
+          sx <= region.x + region.width &&
+          sy >= region.y &&
+          sy <= region.y + region.height
+        : ((sx - region.x - region.width / 2) / (region.width / 2)) ** 2 +
+            ((sy - region.y - region.height / 2) / (region.height / 2)) ** 2 <=
           1;
     inside =
       region.operation === "add"
@@ -252,7 +300,11 @@ export function strokeBounds(stroke: PaintOperationData): Rect {
     right = -Infinity,
     bottom = -Infinity;
   for (const p of stroke.points) {
-    const r = (stroke.size * Math.max(0.05, p.pressure)) / 2 + 1;
+    const r =
+      (stroke.size *
+        (stroke.pressureSize === false ? 1 : Math.max(0.05, p.pressure))) /
+        2 +
+      1;
     left = Math.min(left, p.x - r);
     top = Math.min(top, p.y - r);
     right = Math.max(right, p.x + r);

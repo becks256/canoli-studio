@@ -1,6 +1,12 @@
 import {
+  Search,
+  Sun,
+  Moon,
   BookOpen,
+  History,
   Code2,
+  Crop,
+  Eraser,
   FilePlus2,
   Frame,
   Hand,
@@ -14,6 +20,8 @@ import {
   Puzzle,
   Scan,
   Stamp,
+  Bandage,
+  WandSparkles,
   Type,
 } from "lucide-react";
 import { AppearanceToggle } from "./AppearanceToggle";
@@ -29,7 +37,9 @@ export interface ToolRailProps {
   onNewDocument(): void;
   onOpenScripts(): void;
   onOpenPlugins(): void;
+  onOpenPalette(): void;
   onOpenHelp(): void;
+  onOpenRecovery(): void;
   docsUrl?: string;
 }
 
@@ -42,12 +52,23 @@ export function ToolRail({
   onNewDocument,
   onOpenScripts,
   onOpenPlugins,
+  onOpenPalette,
   onOpenHelp,
+  onOpenRecovery,
   docsUrl = `${import.meta.env.BASE_URL}developer/scripting-api.html`,
 }: ToolRailProps) {
   return (
     <nav className="tool-rail" aria-label="Editor tools">
       <IconButton
+        shortcutId="command-palette"
+        label="Find a command (Mod+K)"
+        disabled={busy}
+        onClick={onOpenPalette}
+      >
+        <Search size={19} />
+      </IconButton>
+      <IconButton
+        shortcutId="move"
         label="Move tool (V)"
         aria-pressed={tool === "move" && !spacePan}
         className={`tool-button ${tool === "move" && !spacePan ? "active" : ""}`}
@@ -56,6 +77,7 @@ export function ToolRail({
         <MousePointer2 size={19} />
       </IconButton>
       <IconButton
+        shortcutId="hand"
         label="Hand tool (H)"
         aria-pressed={tool === "hand" || spacePan}
         className={`tool-button ${tool === "hand" || spacePan ? "active" : ""}`}
@@ -68,15 +90,22 @@ export function ToolRail({
           ["marquee", "Marquee tool (M)", Scan],
           ["fill", "Paint bucket (G)", PaintBucket],
           ["brush", "Brush tool (B)", Paintbrush],
+          ["dodge", "Dodge tool (O)", Sun],
+          ["burn", "Burn tool (Shift+O)", Moon],
           ["pencil", "Pencil tool (N)", Pencil],
+          ["eraser", "Eraser tool (E)", Eraser],
           ["pen", "Vector pen (P)", PenTool],
           ["text", "Text tool (T)", Type],
           ["clone", "Clone brush (S)", Stamp],
+          ["patch", "Patch tool (J)", Bandage],
+          ["heal", "Spot Healing (Shift+J)", WandSparkles],
           ["artboard", "Artboard editor (A)", Frame],
+          ["crop", "Crop canvas (C)", Crop],
         ] as const
       ).map(([key, label, Icon]) => (
         <IconButton
           key={key}
+          shortcutId={key}
           label={label}
           aria-pressed={tool === key}
           className={`tool-button ${tool === key ? "active" : ""}`}
@@ -88,6 +117,7 @@ export function ToolRail({
       ))}
       <span className="rail-divider" />
       <IconButton
+        shortcutId="import"
         label="Import image (Mod+O)"
         className="tool-button"
         disabled={busy}
@@ -104,6 +134,7 @@ export function ToolRail({
         <FilePlus2 size={19} />
       </IconButton>
       <IconButton
+        shortcutId="scripts"
         label="Scripts (Mod+Shift+K)"
         className="tool-button"
         disabled={busy}
@@ -112,6 +143,7 @@ export function ToolRail({
         <Code2 size={19} />
       </IconButton>
       <IconButton
+        shortcutId="plugins"
         label="Plugins (Mod+Shift+L)"
         className="tool-button"
         disabled={busy}
@@ -120,6 +152,13 @@ export function ToolRail({
         <Puzzle size={19} />
       </IconButton>
       <div className="rail-bottom">
+        <IconButton
+          label="Recover work"
+          className="tool-button"
+          onClick={onOpenRecovery}
+        >
+          <History size={18} />
+        </IconButton>
         <AppearanceToggle />
         <a
           className="tool-button docs-link"
@@ -132,6 +171,7 @@ export function ToolRail({
           <BookOpen size={18} />
         </a>
         <IconButton
+          shortcutId="help"
           label="Keyboard shortcuts (?)"
           className="tool-button"
           onClick={onOpenHelp}

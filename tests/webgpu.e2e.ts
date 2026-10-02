@@ -17,6 +17,179 @@ test.use({
   },
 });
 
+test("GPU reference uploads preserve a complete layer matrix without double transformation", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const gpuPath = "/src/engine/gpu/renderer.ts",
+      matrixPath = "/src/core/affine.ts",
+      assetPath = "/src/core/assets.ts";
+    const { WebGpuRenderer } = await import(gpuPath),
+      { AffineTransform } = await import(matrixPath),
+      { AssetStore } = await import(assetPath);
+    const { editor, Document, VectorLayer, VectorPath } = window.luma;
+    const assets = new AssetStore(),
+      doc = new Document({ width: 64, height: 64 });
+    const layer = doc.layers.add(new VectorLayer({ x: 500, y: 600 }));
+    layer.paths.add(
+      new VectorPath({
+        closed: true,
+        fill: "#ffffff",
+        stroke: null,
+        points: [
+          { x: 0, y: 0 },
+          { x: 15, y: 0 },
+          { x: 0, y: 20 },
+        ],
+      }),
+    );
+    layer.transform = new AffineTransform(2, 0.4, 0.2, 3, 500, 600);
+    const matrix = new AffineTransform(0, 1, -1, 0.3, 35, 10);
+    const gpu = new WebGpuRenderer(editor.renderer, {
+      allowSoftwareAdapter: true,
+    });
+    if (!(await gpu.ready)) throw new Error("WebGPU unavailable");
+    const space = { x: 0, y: 0, width: 64, height: 64, sx: 1, sy: 1 };
+    try {
+      const surface = await gpu.reference(
+        layer.toJSON(),
+        doc.toJSON(),
+        assets,
+        space,
+        0,
+        0,
+        matrix,
+      );
+      const expected = document.createElement("canvas");
+      expected.width = expected.height = 64;
+      const context = expected.getContext("2d")!;
+      context.setTransform(0, 1, -1, 0.3, 35, 10);
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.bezierCurveTo(0, 0, 15, 0, 15, 0);
+      context.bezierCurveTo(15, 0, 0, 20, 0, 20);
+      context.bezierCurveTo(0, 20, 0, 0, 0, 0);
+      context.closePath();
+      context.fillStyle = "white";
+      context.fill();
+      const reference = context.getImageData(0, 0, 64, 64).data;
+      const device = gpu.device,
+        buffer = device.createBuffer({
+          size: 16384,
+          usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+        });
+      try {
+        const encoder = device.createCommandEncoder();
+        encoder.copyTextureToBuffer(
+          { texture: surface.texture },
+          { buffer, bytesPerRow: 256 },
+          [64, 64],
+        );
+        device.queue.submit([encoder.finish()]);
+        await buffer.mapAsync(GPUMapMode.READ);
+        const actual = new Uint8Array(buffer.getMappedRange());
+        let max = 0,
+          coverage = 0;
+        for (let i = 3; i < actual.length; i += 4) {
+          max = Math.max(max, Math.abs(actual[i] - reference[i]));
+          coverage += actual[i];
+        }
+        return { max, coverage };
+      } finally {
+        buffer.destroy();
+      }
+    } finally {
+      gpu.dispose();
+    }
+  });
+  expect(result.max).toBe(0);
+  expect(result.coverage).toBeGreaterThan(0);
+});
+
+test("GPU mask uploads preserve affine coverage and invalidate on matrix changes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const gpuPath = "/src/engine/gpu/renderer.ts",
+      matrixPath = "/src/core/affine.ts";
+    const { WebGpuRenderer } = await import(gpuPath);
+    const { AffineTransform } = await import(matrixPath);
+    const { editor, LayerMask, MarqueeSelection } = window.luma;
+    const gpu = new WebGpuRenderer(editor.renderer, {
+      allowSoftwareAdapter: true,
+    });
+    if (!(await gpu.ready)) throw new Error("WebGPU unavailable");
+    const mask = new LayerMask({
+      selection: new MarqueeSelection({
+        shape: "rectangle",
+        x: 0,
+        y: 0,
+        width: 12,
+        height: 20,
+      }),
+    }).toJSON();
+    const space = { x: 0, y: 0, width: 64, height: 64, sx: 1, sy: 1 };
+    const first = new AffineTransform(0, 1, -1, 0, 30, 5);
+    const second = new AffineTransform(1, 0.5, 0.2, 1, 30, 5);
+    try {
+      const a = await gpu.layerMask("fixture", mask, space, first);
+      const reused = await gpu.layerMask("fixture", mask, space, first);
+      const changed = await gpu.layerMask("fixture", mask, space, second);
+      const reference = await editor.renderer.renderMaskCoverage(
+        mask,
+        space,
+        0,
+        0,
+        "reference",
+        false,
+        second,
+      );
+      const expected = reference
+        .getContext("2d")!
+        .getImageData(0, 0, 64, 64).data;
+      const device = gpu.device;
+      const buffer = device.createBuffer({
+        size: 64 * 64 * 4,
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+      });
+      try {
+        const encoder = device.createCommandEncoder();
+        encoder.copyTextureToBuffer(
+          { texture: changed.texture },
+          { buffer, bytesPerRow: 256 },
+          [64, 64],
+        );
+        device.queue.submit([encoder.finish()]);
+        await buffer.mapAsync(GPUMapMode.READ);
+        const actual = new Uint8Array(buffer.getMappedRange());
+        let maxAlpha = 0,
+          coverage = 0;
+        for (let i = 3; i < actual.length; i += 4) {
+          maxAlpha = Math.max(maxAlpha, Math.abs(actual[i] - expected[i]));
+          coverage += actual[i];
+        }
+        return {
+          reused: a === reused,
+          changed: a !== changed,
+          maxAlpha,
+          coverage,
+        };
+      } finally {
+        buffer.destroy();
+        reference.width = 0;
+      }
+    } finally {
+      gpu.dispose();
+    }
+  });
+  expect(result.reused).toBe(true);
+  expect(result.changed).toBe(true);
+  expect(result.maxAlpha).toBe(0);
+  expect(result.coverage).toBeGreaterThan(0);
+});
+
 test("WebGPU executes real shaders, retains textures, and renders brush/pencil previews", async ({
   page,
 }) => {
@@ -499,14 +672,12 @@ test("GPU presentation pipeline writes the canvas format without a CPU readback"
     });
     if (!(await gpu.ready)) throw new Error(JSON.stringify(gpu.diagnostics));
     const doc = new Document({ width: 32, height: 32 });
-    doc.layers
-      .add(new PaintLayer())
-      .strokes.add(
-        new PaintFill({
-          bounds: { x: 0, y: 0, width: 32, height: 32 },
-          color: "#336699",
-        }),
-      );
+    doc.layers.add(new PaintLayer()).strokes.add(
+      new PaintFill({
+        bounds: { x: 0, y: 0, width: 32, height: 32 },
+        color: "#336699",
+      }),
+    );
     const frame = await gpu.prepare(
       doc.getSnapshot().document,
       editor.assetStore,
@@ -569,4 +740,897 @@ test("GPU presentation pipeline writes the canvas format without a CPU readback"
     readbacks: 0,
     error: null,
   });
+});
+
+test("GPU layer masks match Canvas for nested groups, holes, inversion and density", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const path = "/src/engine/gpu/renderer.ts";
+    const { WebGpuRenderer } = await import(path);
+    const {
+      editor,
+      Document,
+      LayerGroup,
+      PaintLayer,
+      PaintFill,
+      LayerMask,
+      MarqueeSelection,
+      TextLayer,
+      VectorPath,
+      BrushStroke,
+      PencilStroke,
+    } = window.luma;
+    const gpu = new WebGpuRenderer(editor.renderer, {
+      allowSoftwareAdapter: true,
+    });
+    const ready = await gpu.ready;
+    if (!ready) return { ready, differences: [] };
+    const doc = new Document({ width: 160, height: 120 });
+    const group = doc.layers.add(new LayerGroup({ x: 8, y: 4 }));
+    const layer = group.layers.add(new PaintLayer({ x: 3, y: 2 }));
+    layer.strokes.add(
+      new PaintFill({
+        bounds: { x: 0, y: 0, width: 140, height: 110 },
+        color: "#e49245",
+      }),
+    );
+    const shape = new MarqueeSelection({
+      shape: "ellipse",
+      x: 10,
+      y: 10,
+      width: 100,
+      height: 90,
+    }).combine(
+      new MarqueeSelection({
+        shape: "rectangle",
+        x: 35,
+        y: 20,
+        width: 15,
+        height: 60,
+      }),
+      "subtract",
+    );
+    group.mask = new LayerMask({
+      selection: new MarqueeSelection({
+        shape: "rectangle",
+        x: 0,
+        y: 20,
+        width: 130,
+        height: 65,
+      }),
+      density: 0.7,
+    });
+    const text = group.layers.add(
+      new TextLayer({ text: "Mask", x: 20, y: 40, fontSize: 20 }),
+    );
+    text.mask = new LayerMask({ selection: shape, density: 0.5 });
+    const differences: number[] = [];
+    try {
+      const paths = [
+        new VectorPath({
+          closed: true,
+          points: [
+            { x: 10, y: 50, in: { x: 10, y: 5 }, out: { x: 10, y: 100 } },
+            { x: 110, y: 50, in: { x: 110, y: 100 }, out: { x: 110, y: 5 } },
+          ],
+        }),
+        new VectorPath({
+          closed: true,
+          points: [
+            { x: 40, y: 30 },
+            { x: 70, y: 30 },
+            { x: 70, y: 70 },
+            { x: 40, y: 70 },
+          ],
+        }),
+      ];
+      for (const kind of ["selection", "evenodd", "nonzero", "paint"] as const)
+        for (const refined of [false, true])
+          for (const feather of [0, 9.5])
+            for (const inverted of [false, true])
+              for (const density of [0, 0.4, 1]) {
+                layer.mask =
+                  kind === "paint"
+                    ? new LayerMask({ base: 1, inverted, density, feather })
+                        .paint(
+                          new BrushStroke({
+                            points: [
+                              { x: 30, y: 20 },
+                              { x: 85, y: 80 },
+                            ],
+                            size: 40,
+                            opacity: 0.7,
+                            clip: shape,
+                          }),
+                          "hide",
+                        )
+                        .paint(
+                          new PencilStroke({
+                            points: [{ x: 55, y: 50 }],
+                            size: 10,
+                          }),
+                          "reveal",
+                        )
+                    : kind === "selection"
+                      ? new LayerMask({
+                          selection: shape,
+                          inverted,
+                          density,
+                          feather,
+                        })
+                      : new LayerMask({
+                          paths,
+                          fillRule: kind,
+                          inverted,
+                          density,
+                          feather,
+                        });
+                if (refined)
+                  layer.mask = layer.mask
+                    .paint(
+                      new BrushStroke({
+                        points: [
+                          { x: 25, y: 25 },
+                          { x: 95, y: 70 },
+                        ],
+                        size: 20,
+                        opacity: 0.7,
+                      }),
+                      "hide",
+                    )
+                    .paint(
+                      new PencilStroke({ points: [{ x: 80, y: 40 }], size: 6 }),
+                      "reveal",
+                    );
+                layer.mask = layer.mask.with({
+                  linked: kind !== "nonzero",
+                  x: 7,
+                  y: -3,
+                });
+                const frame = await gpu.prepare(
+                  doc.getSnapshot().document,
+                  editor.assetStore,
+                );
+                if (!frame) throw new Error(JSON.stringify(gpu.diagnostics));
+                const actual = await frame.readPixels();
+                frame.dispose();
+                if (kind !== "selection" && density > 0) {
+                  const uploads = gpu.diagnostics.uploads;
+                  const repeated = await gpu.prepare(
+                    doc.getSnapshot().document,
+                    editor.assetStore,
+                  );
+                  if (!repeated)
+                    throw new Error("Repeated vector mask frame unavailable");
+                  repeated.dispose();
+                  if (gpu.diagnostics.uploads !== uploads)
+                    throw new Error(
+                      "Unchanged vector mask coverage was uploaded again",
+                    );
+                }
+                const canvas = await editor.renderer.render(
+                  doc.toJSON(),
+                  editor.assetStore,
+                  { cache: false },
+                );
+                const expected = canvas
+                  .getContext("2d")!
+                  .getImageData(0, 0, 160, 120).data;
+                let maxAlpha = 0;
+                for (let i = 0; i < expected.length; i += 4) {
+                  maxAlpha = Math.max(
+                    maxAlpha,
+                    Math.abs(actual[i + 3] - expected[i + 3]),
+                  );
+                  // GPU readback is premultiplied; Canvas ImageData is straight RGBA.
+                  for (let c = 0; c < 3; c++)
+                    maxAlpha = Math.max(
+                      maxAlpha,
+                      Math.abs(
+                        actual[i + c] -
+                          (expected[i + c] * expected[i + 3]) / 255,
+                      ),
+                    );
+                }
+                differences.push(maxAlpha);
+                canvas.width = canvas.height = 1;
+              }
+      return { ready, differences };
+    } finally {
+      gpu.dispose();
+    }
+  });
+  expect(result.ready).toBe(true);
+  expect(result.differences).toHaveLength(96);
+  for (const difference of result.differences)
+    expect(difference).toBeLessThanOrEqual(2);
+});
+
+test("GPU transient mask previews preserve source textures and match committed coverage", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const path = "/src/engine/gpu/renderer.ts",
+      { WebGpuRenderer } = await import(path);
+    const {
+      editor,
+      Document,
+      LayerGroup,
+      PaintLayer,
+      TextLayer,
+      PaintFill,
+      LayerMask,
+      BrushStroke,
+    } = window.luma;
+    const gpu = new WebGpuRenderer(editor.renderer, {
+      allowSoftwareAdapter: true,
+    });
+    if (!(await gpu.ready))
+      return { ready: false, differences: [], uploads: [] };
+    const differences: number[] = [],
+      uploads: number[] = [];
+    try {
+      for (const kind of ["group", "text", "paint"] as const)
+        for (const mode of ["hide", "reveal"] as const) {
+          const doc = new Document({ width: 180, height: 100 });
+          const parent = doc.layers.add(new LayerGroup({ x: 4, y: 3 }));
+          const paint = parent.layers.add(new PaintLayer());
+          paint.strokes.add(
+            new PaintFill({
+              bounds: { x: 0, y: 0, width: 170, height: 90 },
+              color: "#ee8866",
+            }),
+          );
+          const text = parent.layers.add(
+            new TextLayer({ text: "Mask", fontSize: 50 }),
+          );
+          const target =
+            kind === "group" ? parent : kind === "text" ? text : paint;
+          target.mask = new LayerMask({
+            base: mode === "hide" ? 1 : 0,
+            feather: 4,
+          });
+          const stroke = new BrushStroke({
+            points: [
+              { x: 30, y: 30 },
+              { x: 120, y: 60 },
+            ],
+            size: 45,
+            opacity: 0.6,
+          });
+          const read = async (paintPreview?: unknown) => {
+            const frame = await gpu.prepare(
+              doc.getSnapshot().document,
+              editor.assetStore,
+              { paintPreview },
+            );
+            if (!frame) throw Error(JSON.stringify(gpu.diagnostics));
+            try {
+              return await frame.readPixels();
+            } finally {
+              frame.dispose();
+            }
+          };
+          const initial = await read(),
+            before = gpu.diagnostics.uploads;
+          const preview = await read({
+            layerId: target.id,
+            stroke: stroke.toJSON(),
+            maskMode: mode,
+          });
+          uploads.push(gpu.diagnostics.uploads - before);
+          let changed = false;
+          for (let i = 0; i < initial.length; i++)
+            if (initial[i] !== preview[i]) changed = true;
+          if (!changed) throw Error("Mask preview was not visible");
+          target.mask = target.mask!.paint(stroke, mode);
+          const beforeCommit = gpu.diagnostics.uploads,
+            committed = await read();
+          uploads.push(gpu.diagnostics.uploads - beforeCommit);
+          let max = 0;
+          for (let i = 0; i < preview.length; i++)
+            max = Math.max(max, Math.abs(preview[i] - committed[i]));
+          differences.push(max);
+        }
+      return { ready: true, differences, uploads };
+    } finally {
+      gpu.dispose();
+    }
+  });
+  expect(result.ready).toBe(true);
+  expect(result.differences).toEqual(Array(6).fill(0));
+  expect(result.uploads).toEqual(
+    Array.from({ length: 6 }, () => [1, 0]).flat(),
+  );
+});
+
+test("GPU AdjustmentLayer HSL, master levels, tone, and fallback curves agree with the reference renderer and preserve backdrop alpha", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const path = "/src/engine/gpu/renderer.ts";
+    const { WebGpuRenderer } = await import(path);
+    const { editor, Document, RasterLayer, AdjustmentLayer } = window.luma;
+    const gpu = new WebGpuRenderer(editor.renderer, {
+      allowSoftwareAdapter: true,
+    });
+    if (!(await gpu.ready)) throw new Error(JSON.stringify(gpu.diagnostics));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 64;
+    canvas.height = 48;
+    const c = canvas.getContext("2d")!;
+    // Create a half-transparent backdrop: left alpha 0, center alpha 0.5, right alpha 1
+    const imgData = c.createImageData(64, 48);
+    for (let y = 0; y < 48; y++) {
+      for (let x = 0; x < 64; x++) {
+        const idx = (y * 64 + x) * 4;
+        imgData.data[idx] = (x * 4) % 256;
+        imgData.data[idx + 1] = (y * 5) % 256;
+        imgData.data[idx + 2] = ((x + y) * 3) % 256;
+        imgData.data[idx + 3] = x < 20 ? 0 : x < 40 ? 128 : 255;
+      }
+    }
+    c.putImageData(imgData, 0, 0);
+    const blob = await new Promise<Blob>((resolve) =>
+      canvas.toBlob((b) => resolve(b!)),
+    );
+    const asset = await editor.assetStore.add(blob, "backdrop");
+
+    const doc = new Document({ width: 64, height: 48 });
+    doc.layers.add(
+      new RasterLayer({
+        assetId: asset.id,
+        width: 64,
+        height: 48,
+      }),
+    );
+    const adj = doc.layers.add(new AdjustmentLayer());
+
+    const compare = async () => {
+      const frame = await gpu.prepare(
+        doc.getSnapshot().document,
+        editor.assetStore,
+      );
+      if (!frame) throw new Error(JSON.stringify(gpu.diagnostics));
+      const actual = await frame.readPixels();
+      frame.dispose();
+      const reference = await editor.renderer.render(
+        doc.getSnapshot().document,
+        editor.assetStore,
+        { cache: false, readback: true },
+      );
+      const expected = reference
+        .getContext("2d")!
+        .getImageData(0, 0, 64, 48).data;
+      let maxDiff = 0,
+        totalDiff = 0,
+        alphaMismatch = 0;
+      for (let i = 0; i < expected.length; i += 4) {
+        const deltaA = Math.abs(actual[i + 3] - expected[i + 3]);
+        if (deltaA > 0) alphaMismatch++;
+        const a = expected[i + 3] / 255;
+        for (let ch = 0; ch < 3; ch++) {
+          // WebGPU textures store premultiplied RGB; 2D canvas getImageData returns straight RGB
+          const expectedPremul = Math.round(expected[i + ch] * a);
+          const delta = Math.abs(actual[i + ch] - expectedPremul);
+          maxDiff = Math.max(maxDiff, delta);
+          totalDiff += delta;
+        }
+        totalDiff += deltaA;
+      }
+      reference.width = reference.height = 0;
+      return { maxDiff, meanDiff: totalDiff / expected.length, alphaMismatch };
+    };
+
+    // Test 1: Tone adjustment
+    adj.setTone({ exposure: 0.4, contrast: 20, saturation: -30 });
+    const toneResult = await compare();
+
+    // Test 2: Master Levels adjustment
+    adj.setLevels({
+      inputBlack: 15,
+      inputWhite: 235,
+      gamma: 1.15,
+      outputBlack: 25,
+      outputWhite: 240,
+    });
+    const levelsResult = await compare();
+
+    const blendResults = [];
+    for (const mode of ["normal", "multiply", "screen", "color"] as const) {
+      adj.blendMode = mode;
+      adj.styles.update({
+        blendIf: {
+          enabled: true,
+          source: [10, 40, 130, 180],
+          underlying: [0, 20, 210, 255],
+        },
+      });
+      blendResults.push(await compare());
+    }
+    adj.blendMode = "normal";
+    adj.styles.update({ blendIf: { enabled: false } });
+
+    const hslResults = [];
+    for (const hue of [-180, -120, 0, 60, 180]) {
+      for (const opacity of [1, 0.5]) {
+        adj.adjustment = { kind: "hsl", hue, saturation: 35, lightness: -15 };
+        adj.opacity = opacity;
+        hslResults.push(await compare());
+      }
+    }
+    const { LayerMask, MarqueeSelection } = window.luma;
+    adj.mask = new LayerMask({
+      selection: new MarqueeSelection({
+        shape: "rectangle",
+        x: 8,
+        y: 8,
+        width: 40,
+        height: 24,
+      }),
+    });
+    hslResults.push(await compare());
+    adj.mask = null;
+    adj.opacity = 1;
+
+    // Test 3: Curves adjustment (cleanly falls back to Canvas reference renderer)
+    adj.setCurves([
+      { x: 0, y: 0 },
+      { x: 64, y: 32 },
+      { x: 192, y: 224 },
+      { x: 255, y: 255 },
+    ]);
+    const curvesGpuFrame = await gpu.prepare(
+      doc.getSnapshot().document,
+      editor.assetStore,
+    );
+    const curvesFallsBack = curvesGpuFrame === null;
+
+    const adaptivePath = "/src/engine/adaptive.ts";
+    const { AdaptiveRenderer } = await import(adaptivePath);
+    const adaptive = new AdaptiveRenderer({ allowSoftwareAdapter: true });
+    await adaptive.gpu.ready;
+    const adaptiveFrame = await adaptive.prepareViewport(
+      doc.getSnapshot().document,
+      editor.assetStore,
+    );
+    const adaptiveBackend = adaptiveFrame.backend;
+    adaptiveFrame.dispose();
+    adaptive.dispose();
+
+    gpu.dispose();
+    return {
+      toneResult,
+      levelsResult,
+      blendResults,
+      hslResults,
+      curvesFallsBack,
+      adaptiveBackend,
+    };
+  });
+
+  expect(result.toneResult.alphaMismatch).toBe(0);
+  expect(result.toneResult.maxDiff).toBeLessThanOrEqual(2);
+  expect(result.toneResult.meanDiff).toBeLessThan(1);
+
+  expect(result.levelsResult.alphaMismatch).toBe(0);
+  expect(result.levelsResult.maxDiff).toBeLessThanOrEqual(3);
+  expect(result.levelsResult.meanDiff).toBeLessThan(1);
+
+  for (const comparison of result.blendResults) {
+    expect(comparison.alphaMismatch).toBe(0);
+    expect(comparison.maxDiff).toBeLessThanOrEqual(4);
+  }
+  for (const comparison of result.hslResults) {
+    expect(comparison.alphaMismatch).toBe(0);
+    expect(comparison.maxDiff).toBeLessThanOrEqual(3);
+    expect(comparison.meanDiff).toBeLessThan(1);
+  }
+  expect(result.curvesFallsBack).toBe(true);
+  expect(result.adaptiveBackend).toBe("canvas2d");
+});
+
+test("GPU affine brush and pencil stamps preserve clips, pressure, cache invalidation and incremental replay", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const results = await page.evaluate(async () => {
+    const { WebGpuRenderer } = await import(
+      /* @vite-ignore */ String("/src/engine/gpu/renderer.ts")
+    );
+    const { AffineTransform } = await import(
+      /* @vite-ignore */ String("/src/core/affine.ts")
+    );
+    const { CanvasRenderer } = await import(
+      /* @vite-ignore */ String("/src/engine/renderer.ts")
+    );
+    const {
+      editor,
+      Document,
+      PaintLayer,
+      BrushStroke,
+      PencilStroke,
+      MarqueeSelection,
+    } = window.luma;
+    const renderer = new CanvasRenderer();
+    const gpu = new WebGpuRenderer(renderer, { allowSoftwareAdapter: true });
+    if (!(await gpu.ready)) throw new Error("WebGPU unavailable");
+    const doc = new Document({ width: 64, height: 64 });
+    const layer = doc.layers.add(new PaintLayer());
+    const space = { x: 1e12, y: -1e12, width: 64, height: 64, sx: 1, sy: 1 };
+    const matrices = [
+      new AffineTransform(0, 1, -1, 0, space.x + 45, space.y + 5),
+      new AffineTransform(-1.2, 0.3, 0.4, 0.8, space.x + 42, space.y + 10),
+    ];
+    const read = async (surface: any) => {
+      const device = gpu.device;
+      const buffer = device.createBuffer({
+        size: 16384,
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+      });
+      try {
+        const encoder = device.createCommandEncoder();
+        encoder.copyTextureToBuffer(
+          { texture: surface.texture },
+          { buffer, bytesPerRow: 256 },
+          [64, 64],
+        );
+        device.queue.submit([encoder.finish()]);
+        await buffer.mapAsync(GPUMapMode.READ);
+        return new Uint8Array(buffer.getMappedRange()).slice();
+      } finally {
+        buffer.destroy();
+      }
+    };
+    const cases = [];
+    try {
+      for (const kind of ["brush", "pencil"])
+        for (const world of matrices) {
+          const Constructor = kind === "brush" ? BrushStroke : PencilStroke;
+          const stroke = new Constructor({
+            size: 12,
+            hardness: 0.55,
+            color: "#ffffff",
+            opacity: 1,
+            flow: 0.6,
+            pressureSize: false,
+            pressureOpacity: true,
+            points: [
+              { x: 6, y: 8, pressure: 0.3 },
+              { x: 14, y: 14, pressure: 0.8 },
+              { x: 22, y: 18, pressure: 0.5 },
+            ],
+            clip: new MarqueeSelection({
+              shape: "ellipse",
+              x: 3,
+              y: 4,
+              width: 22,
+              height: 23,
+            }),
+          }).toJSON();
+          if (stroke.kind === "fill")
+            throw new Error("Expected a brush stroke");
+          const prefix = { ...stroke, points: stroke.points.slice(0, 2) };
+          gpu.stroke(prefix, space, 0, 0, true, world);
+          const appended = await read(
+            gpu.stroke(stroke, space, 0, 0, true, world),
+          );
+          const stampsBefore = gpu.diagnostics.stamps;
+          const repeated = await read(
+            gpu.stroke(stroke, space, 0, 0, true, world),
+          );
+          const stampsAfter = gpu.diagnostics.stamps;
+          const full = await read(
+            gpu.stroke(stroke, space, 0, 0, false, world),
+          );
+          const data = { ...layer.toJSON(), strokes: [stroke] };
+          const reference = await renderer.render(
+            { ...doc.toJSON(), children: [data] },
+            editor.assetStore,
+            {
+              region: { x: space.x, y: space.y, width: 64, height: 64 },
+              rootTransform: world,
+              cache: false,
+              readback: true,
+            },
+          );
+          const expected = reference
+            .getContext("2d")!
+            .getImageData(0, 0, 64, 64).data;
+          let max = 0,
+            sum = 0,
+            coverage = 0;
+          for (let i = 3; i < expected.length; i += 4) {
+            const delta = Math.abs(full[i] - expected[i]);
+            max = Math.max(max, delta);
+            sum += delta;
+            coverage += full[i];
+          }
+          const changed = world.multiply(AffineTransform.rotation(0.3));
+          const transformed = await read(
+            gpu.stroke(stroke, space, 0, 0, true, changed),
+          );
+          cases.push({
+            kind,
+            max,
+            mean: sum / 4096,
+            coverage,
+            appendEqual: appended.every((v, i) => v === full[i]),
+            repeatEqual: repeated.every((v, i) => v === full[i]),
+            newStamps: stampsAfter - stampsBefore,
+            changed: transformed.some((v, i) => v !== full[i]),
+          });
+          reference.width = reference.height = 0;
+        }
+      let subpixel = "";
+      try {
+        gpu.stroke(
+          new BrushStroke({ size: 4, points: [{ x: 10, y: 10 }] }).toJSON(),
+          space,
+          0,
+          0,
+          false,
+          new AffineTransform(0.01, 0, 0, 1, space.x + 20, space.y + 20),
+        );
+      } catch (e) {
+        subpixel = String(e);
+      }
+      return { cases, subpixel };
+    } finally {
+      gpu.dispose();
+      renderer.dispose();
+    }
+  });
+  for (const result of results.cases) {
+    expect(result.coverage).toBeGreaterThan(0);
+    expect(result.appendEqual, JSON.stringify(result)).toBe(true);
+    expect(result.repeatEqual).toBe(true);
+    expect(result.newStamps).toBe(0);
+    expect(result.changed).toBe(true);
+    expect(result.mean, JSON.stringify(result)).toBeLessThan(0.5);
+    expect(result.max, JSON.stringify(result)).toBeLessThanOrEqual(24);
+  }
+  expect(results.subpixel).toContain("reference coverage");
+});
+
+test("GPU eraser preview and commit remove existing paint with pressure, flow and one-step undo", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const { WebGpuRenderer } = await import(
+      /* @vite-ignore */ String("/src/engine/gpu/renderer.ts")
+    );
+    const { EraserStroke } = await import(
+      /* @vite-ignore */ String("/src/dom/index.ts")
+    );
+    const { editor, Document, PaintLayer, PaintFill, MarqueeSelection } =
+      window.luma;
+    const doc = new Document({ width: 64, height: 64 });
+    const paint = doc.layers.add(new PaintLayer());
+    paint.strokes.add(
+      new PaintFill({
+        bounds: { x: 0, y: 0, width: 64, height: 64 },
+        color: "#ffffff",
+      }),
+    );
+    const stroke = new EraserStroke({
+      size: 20,
+      hardness: 1,
+      opacity: 0.7,
+      flow: 0.65,
+      pressureSize: false,
+      pressureOpacity: true,
+      points: [
+        { x: 20, y: 30, pressure: 0.3 },
+        { x: 36, y: 30, pressure: 0.8 },
+      ],
+      clip: new MarqueeSelection({
+        shape: "rectangle",
+        x: 24,
+        y: 0,
+        width: 40,
+        height: 64,
+      }),
+    });
+    const gpu = new WebGpuRenderer(editor.renderer, {
+      allowSoftwareAdapter: true,
+    });
+    if (!(await gpu.ready)) throw new Error("WebGPU unavailable");
+    const read = async (options = {}) => {
+      const frame = await gpu.prepare(doc.toJSON(), editor.assetStore, options);
+      if (!frame) throw new Error(JSON.stringify(gpu.diagnostics));
+      try {
+        return await frame.readPixels();
+      } finally {
+        frame.dispose();
+      }
+    };
+    try {
+      const preview = await read({
+        paintPreview: { layerId: paint.id, stroke: stroke.toJSON() },
+      });
+      paint.strokes.add(stroke);
+      const committed = await read();
+      const reference = await editor.renderer.render(
+        doc.toJSON(),
+        editor.assetStore,
+        { cache: false, readback: true },
+      );
+      const expected = reference
+        .getContext("2d")!
+        .getImageData(0, 0, 64, 64).data;
+      let max = 0,
+        sum = 0,
+        worst: number[] = [];
+      for (let i = 3; i < expected.length; i += 4) {
+        const delta = Math.abs(expected[i] - committed[i]);
+        if (delta > max)
+          worst = [
+            (i >> 2) % 64,
+            Math.floor((i >> 2) / 64),
+            committed[i],
+            expected[i],
+          ];
+        max = Math.max(max, delta);
+        sum += delta;
+      }
+      // Independently integrate circular area at the worst edge pixel. Canvas and
+      // WGSL use different hard-edge rasterizers; geometry must still be correct.
+      const { visitStrokeStamps } = await import(
+        /* @vite-ignore */ String("/src/engine/drawing.ts")
+      );
+      let coverage = 0;
+      visitStrokeStamps(
+        (point: { x: number; y: number; pressure: number }) => {
+          let hits = 0;
+          for (let y = 0; y < 64; y++)
+            for (let x = 0; x < 64; x++) {
+              if (
+                (37 + (x + 0.5) / 64 - point.x) ** 2 +
+                  (39 + (y + 0.5) / 64 - point.y) ** 2 <=
+                100
+              )
+                hits++;
+            }
+          const alpha = (hits / 4096) * 0.65 * point.pressure;
+          coverage = alpha + coverage * (1 - alpha);
+        },
+        stroke.toJSON(),
+        { x: 0, y: 0, width: 64, height: 64 },
+      );
+      const independentAlpha = Math.round(255 * (1 - coverage * 0.7));
+      doc.undo();
+      const undone = await read();
+      return {
+        previewMatches: preview.every(
+          (v: number, i: number) => v === committed[i],
+        ),
+        max,
+        worst,
+        independentAlpha,
+        edgeAlpha: committed[(39 * 64 + 37) * 4 + 3],
+        mean: sum / 4096,
+        center: committed[(30 * 64 + 32) * 4 + 3],
+        protected: committed[(30 * 64 + 20) * 4 + 3],
+        undoOpaque: undone.every((v: number) => v === 255),
+      };
+    } finally {
+      gpu.dispose();
+    }
+  });
+  expect(result.previewMatches).toBe(true);
+  expect(result.center).toBeLessThan(200);
+  expect(result.protected).toBe(255);
+  expect(
+    Math.abs(result.edgeAlpha - result.independentAlpha),
+  ).toBeLessThanOrEqual(2);
+  // Hard-edge Canvas rasterization differs from integrated circular coverage.
+  expect(result.max, JSON.stringify(result)).toBeLessThanOrEqual(40);
+  expect(result.mean).toBeLessThan(0.5);
+  expect(result.undoOpaque).toBe(true);
+});
+
+test("GPU text textures refresh after a late font load without changing the document", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const { AdaptiveRenderer } = await import(
+      /* @vite-ignore */ String("/src/engine/adaptive.ts")
+    );
+    const { editor, Document, TextLayer } = window.luma;
+    const renderer = new AdaptiveRenderer({ allowSoftwareAdapter: true });
+    if (!(await renderer.gpu.ready)) throw new Error("WebGPU unavailable");
+    const doc = new Document({ width: 400, height: 120 });
+    doc.layers.add(
+      new TextLayer({
+        text: "iiii WWWW",
+        fontFamily: "Luma GPU Late Font",
+        fontSize: 32,
+        x: 10,
+        y: 10,
+      }),
+    );
+    const before = JSON.stringify(doc.toJSON()),
+      history = doc.getSnapshot().past.length;
+    const read = async () => {
+      const frame = await renderer.prepareViewport(
+        doc.toJSON(),
+        editor.assetStore,
+      );
+      try {
+        if (frame.backend !== "webgpu" || !frame.readPixels)
+          throw new Error("Expected a real GPU frame");
+        return await frame.readPixels();
+      } finally {
+        frame.dispose();
+      }
+    };
+    const face = new FontFace(
+      "Luma GPU Late Font",
+      "url(/node_modules/@fontsource/dm-mono/files/dm-mono-latin-400-normal.woff2)",
+    );
+    try {
+      const fallback = await read();
+      await read();
+      const loaded = new Promise<void>((resolve) =>
+        document.fonts.addEventListener("loadingdone", () => resolve(), {
+          once: true,
+        }),
+      );
+      document.fonts.add(face);
+      await document.fonts.load('32px "Luma GPU Late Font"');
+      await loaded;
+      const refreshed = await read();
+      renderer.clearCache();
+      const uncached = await read();
+      const reference = await renderer.render(doc.toJSON(), editor.assetStore, {
+        cache: false,
+        readback: true,
+      });
+      const expected = reference
+        .getContext("2d")!
+        .getImageData(0, 0, 400, 120).data;
+      let max = 0;
+      for (let i = 0; i < expected.length; i += 4) {
+        for (let c = 0; c < 3; c++)
+          max = Math.max(
+            max,
+            Math.abs(
+              refreshed[i + c] -
+                Math.round((expected[i + c] * expected[i + 3]) / 255),
+            ),
+          );
+        max = Math.max(max, Math.abs(refreshed[i + 3] - expected[i + 3]));
+      }
+      reference.width = reference.height = 0;
+      return {
+        changed: refreshed.some(
+          (value: number, index: number) => value !== fallback[index],
+        ),
+        equal: refreshed.every(
+          (value: number, index: number) => value === uncached[index],
+        ),
+        max,
+        unchanged: JSON.stringify(doc.toJSON()) === before,
+        history: doc.getSnapshot().past.length - history,
+      };
+    } finally {
+      renderer.dispose();
+      document.fonts.delete(face);
+    }
+  });
+  expect(result).toMatchObject({
+    changed: true,
+    equal: true,
+    unchanged: true,
+    history: 0,
+  });
+  expect(result.max).toBeLessThanOrEqual(1);
 });

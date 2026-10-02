@@ -1,0 +1,535 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-10-01T17:28:41.470Z",
+  "browser": "153.0.8010.12",
+  "host": {
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+    "logicalCpus": 24,
+    "totalMemoryBytes": 33604415488
+  },
+  "results": [
+    {
+      "fixture": {
+        "name": "512-square-two-filters",
+        "width": 512,
+        "height": 512,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 512
+        },
+        "output": {
+          "width": 512,
+          "height": 512
+        },
+        "count": 2
+      },
+      "sourceDimensions": [512, 512],
+      "sourceBytes": 7212,
+      "sourceHash": "72bf32c0d3e032a173d947da06da52aca11e24960d1c004113468e72c34b2013",
+      "coldMs": 113.8999999910593,
+      "cachedStages": [
+        {
+          "spatialMs": 0,
+          "mixMs": 1.6000000089406967,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 1.7999999970197678,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 1,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "uncachedStages": [
+        {
+          "spatialMs": 80.09999999403954,
+          "mixMs": 0.6000000089406967,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 82.39999997615814,
+          "mixMs": 0.7999999970197678,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 81.30000001192093,
+          "mixMs": 0.7999999970197678,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "cachedMs": [10.399999991059303, 8.800000011920929, 9.5],
+      "uncachedMs": [94.1000000089407, 97.19999998807907, 96.29999999701977],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [8, 8, 8],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [1, 1, 1],
+      "cachedMedianMs": 9.5,
+      "uncachedMedianMs": 96.29999999701977,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-fit-four-filters",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 2860.3999999910593,
+      "cachedStages": [
+        {
+          "spatialMs": 0,
+          "mixMs": 4.299999997019768,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 2.7000000029802322,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 2.9000000059604645,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "uncachedStages": [
+        {
+          "spatialMs": 2587.500000014901,
+          "mixMs": 2.2000000029802322,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 2646.300000101328,
+          "mixMs": 2.2999999970197678,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 2573.0999999940395,
+          "mixMs": 3.4000000059604645,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "cachedMs": [37.29999999701977, 35.3999999910593, 34.80000001192093],
+      "uncachedMs": [
+        2762.1000000089407, 2813.2000000029802, 2750.3999999910593
+      ],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [1, 1, 1],
+      "cachedMedianMs": 35.3999999910593,
+      "uncachedMedianMs": 2762.1000000089407,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-dense-feather-0",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4,
+        "dense": true,
+        "feather": 0
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 3141.2000000029802,
+      "cachedStages": [
+        {
+          "spatialMs": 0,
+          "mixMs": 6.5999999940395355,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 4.199999988079071,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 3.800000011920929,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "uncachedStages": [
+        {
+          "spatialMs": 2651.6999999433756,
+          "mixMs": 73.19999997317791,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 2626.1999999582767,
+          "mixMs": 66.59999999403954,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 2568.599999964237,
+          "mixMs": 72.79999996721745,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "cachedMs": [56.5, 52.79999999701977, 51.8999999910593],
+      "uncachedMs": [3178.4000000059605, 3157.7999999970198, 3096.300000011921],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [16, 16, 16],
+      "cachedMedianMs": 52.79999999701977,
+      "uncachedMedianMs": 3157.7999999970198,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-dense-feather-12",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4,
+        "dense": true,
+        "feather": 12
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 3375.2000000029802,
+      "cachedStages": [
+        {
+          "spatialMs": 0,
+          "mixMs": 3.7000000029802322,
+          "featherMs": 13.599999994039536,
+          "featherCalls": 1
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 9.600000008940697,
+          "featherMs": 11.5,
+          "featherCalls": 1
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 10.200000002980232,
+          "featherMs": 12.299999997019768,
+          "featherCalls": 1
+        }
+      ],
+      "uncachedStages": [
+        {
+          "spatialMs": 2550.299999937415,
+          "mixMs": 70.19999998807907,
+          "featherMs": 188.59999997913837,
+          "featherCalls": 16
+        },
+        {
+          "spatialMs": 2609.7999999672174,
+          "mixMs": 87.39999997615814,
+          "featherMs": 199.7999999821186,
+          "featherCalls": 16
+        },
+        {
+          "spatialMs": 2717.300000026822,
+          "mixMs": 86.79999995231628,
+          "featherMs": 202.6000000089407,
+          "featherCalls": 16
+        }
+      ],
+      "cachedMs": [66.5, 73.3999999910593, 76.5],
+      "uncachedMs": [
+        3334.1000000089407, 3430.7000000029802, 3564.2000000029802
+      ],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [16, 16, 16],
+      "cachedMedianMs": 73.3999999910593,
+      "uncachedMedianMs": 3430.7000000029802,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-full-frame-feather-0",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4,
+        "dense": true,
+        "feather": 0,
+        "fullFrame": true
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 3171.2000000029802,
+      "cachedStages": [
+        {
+          "spatialMs": 0,
+          "mixMs": 74.40000002086163,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 73.69999995827675,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 85.7000000178814,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "uncachedStages": [
+        {
+          "spatialMs": 2597.6000000089407,
+          "mixMs": 74.79999996721745,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 2631.300000011921,
+          "mixMs": 58.29999998211861,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 2531.600000023842,
+          "mixMs": 65.29999999701977,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "cachedMs": [549.8999999910593, 597.2999999970198, 723.6000000089407],
+      "uncachedMs": [3165.5, 3238.2000000029802, 3201.5],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [16, 16, 16],
+      "uncachedMixCalls": [16, 16, 16],
+      "cachedMedianMs": 597.2999999970198,
+      "uncachedMedianMs": 3201.5,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-full-frame-feather-12",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4,
+        "dense": true,
+        "feather": 12,
+        "fullFrame": true
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 3495.5,
+      "cachedStages": [
+        {
+          "spatialMs": 0,
+          "mixMs": 74.7999999821186,
+          "featherMs": 206.8000000268221,
+          "featherCalls": 16
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 69.40000000596046,
+          "featherMs": 207.29999999701977,
+          "featherCalls": 16
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 73.6000000089407,
+          "featherMs": 202.60000002384186,
+          "featherCalls": 16
+        }
+      ],
+      "uncachedStages": [
+        {
+          "spatialMs": 2552.7000000178814,
+          "mixMs": 74.29999996721745,
+          "featherMs": 196.30000001192093,
+          "featherCalls": 16
+        },
+        {
+          "spatialMs": 2568.2000000178814,
+          "mixMs": 81.1000000089407,
+          "featherMs": 197.69999998807907,
+          "featherCalls": 16
+        },
+        {
+          "spatialMs": 2607.3999999910593,
+          "mixMs": 79.40000000596046,
+          "featherMs": 193.80000001192093,
+          "featherCalls": 16
+        }
+      ],
+      "cachedMs": [830.4000000059605, 879.7000000029802, 923.2000000029802],
+      "uncachedMs": [3400.300000011921, 3486.5999999940395, 3545.2999999970198],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [16, 16, 16],
+      "uncachedMixCalls": [16, 16, 16],
+      "cachedMedianMs": 879.7000000029802,
+      "uncachedMedianMs": 3486.5999999940395,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "50mp-native-crop-four-filters",
+        "width": 10000,
+        "height": 5000,
+        "region": {
+          "x": 4096,
+          "y": 2048,
+          "width": 1024,
+          "height": 768
+        },
+        "output": {
+          "width": 1024,
+          "height": 768
+        },
+        "count": 4
+      },
+      "sourceDimensions": [10000, 5000],
+      "sourceBytes": 951872,
+      "sourceHash": "0740b39eb6beef66a045d1e0dc5961507605441aa75e128e44d867c1a2f8b2dc",
+      "coldMs": 681.2999999970198,
+      "cachedStages": [
+        {
+          "spatialMs": 0,
+          "mixMs": 1.2000000029802322,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 1.2000000029802322,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 0,
+          "mixMs": 1.2000000029802322,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "uncachedStages": [
+        {
+          "spatialMs": 623.4999999850988,
+          "mixMs": 0.3999999910593033,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 652.5000000596046,
+          "mixMs": 1,
+          "featherMs": 0,
+          "featherCalls": 0
+        },
+        {
+          "spatialMs": 656.5000000149012,
+          "mixMs": 1.1000000089406967,
+          "featherMs": 0,
+          "featherCalls": 0
+        }
+      ],
+      "cachedMs": [11.800000011920929, 15.600000008940697, 16],
+      "uncachedMs": [666.6999999880791, 699.7999999970198, 706.7999999970198],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [48, 48, 48],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [1, 1, 1],
+      "cachedMedianMs": 15.600000008940697,
+      "uncachedMedianMs": 699.7999999970198,
+      "maxPixelDifference": 0
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 24,
+  "limitations": [
+    "Worker stage timings are host round trips, including queueing/transfer/scheduling, not isolated WASM CPU time.",
+    "Synthetic stripe corpus; not photo-quality evaluation.",
+    "Production renderer timings exclude pointer dispatch, React, presentation and readback verification.",
+    "Three paired samples per case; cached measurement always precedes uncached.",
+    "50 MP case samples a native crop, not fit-to-window or full-document export.",
+    "Shared headless host; not a hardware-independent latency guarantee."
+  ]
+}

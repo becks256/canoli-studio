@@ -110,7 +110,7 @@ test("brush and pencil gestures, clipping, shortcuts, undo, and reopen", async (
   ]);
   await page.evaluate(async () => {
     const e = window.luma.editor,
-      blob = e.saveProject();
+      blob = await e.saveProject();
     e.newDocument();
     await e.openProject(new File([blob], "drawing.luma"));
   });
@@ -160,8 +160,12 @@ test("pen creates and edits Bézier paths, closed fills, anchors and handles", a
   await click(page, 320, 160);
   await click(page, 280, 100);
   await click(page, 80, 70);
-  await page.getByRole("spinbutton", { name: "Path stroke width value", exact: true }).fill("7");
-  await page.getByRole("spinbutton", { name: "Path stroke width value", exact: true }).press("Enter");
+  await page
+    .getByRole("spinbutton", { name: "Path stroke width value", exact: true })
+    .fill("7");
+  await page
+    .getByRole("spinbutton", { name: "Path stroke width value", exact: true })
+    .press("Enter");
   expect((await data())!.strokeWidth).toBe(7);
   await page.screenshot({ path: "test-results/luma-vector-tools.png" });
 });
@@ -213,7 +217,7 @@ test("clone samples visible composition, clips, retains snapshots and reopens", 
   await page.evaluate(async () => {
     const { editor } = window.luma;
     editor.document.layers.at(0)!.visible = false;
-    const blob = editor.saveProject();
+    const blob = await editor.saveProject();
     editor.newDocument();
     await editor.openProject(new File([blob], "clone.luma"));
   });

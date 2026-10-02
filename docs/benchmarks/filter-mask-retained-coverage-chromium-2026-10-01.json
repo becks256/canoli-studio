@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-10-01T16:56:37.920Z",
+  "browser": "153.0.8010.12",
+  "host": {
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+    "logicalCpus": 24,
+    "totalMemoryBytes": 33604415488
+  },
+  "results": [
+    {
+      "fixture": {
+        "name": "512-square-two-filters",
+        "width": 512,
+        "height": 512,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 512
+        },
+        "output": {
+          "width": 512,
+          "height": 512
+        },
+        "count": 2
+      },
+      "sourceDimensions": [512, 512],
+      "sourceBytes": 7212,
+      "sourceHash": "72bf32c0d3e032a173d947da06da52aca11e24960d1c004113468e72c34b2013",
+      "coldMs": 113.1000000089407,
+      "cachedMs": [13.799999997019768, 10.300000011920929, 12.600000008940697],
+      "uncachedMs": [92.90000000596046, 92.19999998807907, 97.5],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [8, 8, 8],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [1, 1, 1],
+      "cachedMedianMs": 12.600000008940697,
+      "uncachedMedianMs": 92.90000000596046,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-fit-four-filters",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 2746.5,
+      "cachedMs": [93.29999999701977, 85.1000000089407, 94.20000000298023],
+      "uncachedMs": [2770.9000000059605, 2684.5, 2710.2000000029802],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [1, 1, 1],
+      "cachedMedianMs": 93.29999999701977,
+      "uncachedMedianMs": 2710.2000000029802,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-dense-feather-0",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4,
+        "dense": true,
+        "feather": 0
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 3316.8999999910593,
+      "cachedMs": [559.5, 365.79999999701977, 374.79999999701977],
+      "uncachedMs": [3200.5, 3205.7999999970198, 3188.2000000029802],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [16, 16, 16],
+      "uncachedMixCalls": [16, 16, 16],
+      "cachedMedianMs": 374.79999999701977,
+      "uncachedMedianMs": 3200.5,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-dense-feather-12",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4,
+        "dense": true,
+        "feather": 12
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 3654.4000000059605,
+      "cachedMs": [921.7999999970198, 932.7999999970198, 975.7999999970198],
+      "uncachedMs": [3526.1000000089407, 3472.9000000059605, 3663.800000011921],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMixCalls": [16, 16, 16],
+      "uncachedMixCalls": [16, 16, 16],
+      "cachedMedianMs": 932.7999999970198,
+      "uncachedMedianMs": 3526.1000000089407,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "50mp-native-crop-four-filters",
+        "width": 10000,
+        "height": 5000,
+        "region": {
+          "x": 4096,
+          "y": 2048,
+          "width": 1024,
+          "height": 768
+        },
+        "output": {
+          "width": 1024,
+          "height": 768
+        },
+        "count": 4
+      },
+      "sourceDimensions": [10000, 5000],
+      "sourceBytes": 951872,
+      "sourceHash": "0740b39eb6beef66a045d1e0dc5961507605441aa75e128e44d867c1a2f8b2dc",
+      "coldMs": 658.9000000059605,
+      "cachedMs": [21, 25.099999994039536, 25.700000002980232],
+      "uncachedMs": [707.5, 718.2999999970198, 730.3999999910593],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [48, 48, 48],
+      "cachedMixCalls": [1, 1, 1],
+      "uncachedMixCalls": [1, 1, 1],
+      "cachedMedianMs": 25.099999994039536,
+      "uncachedMedianMs": 718.2999999970198,
+      "maxPixelDifference": 0
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 24,
+  "limitations": [
+    "Synthetic stripe corpus; not photo-quality evaluation.",
+    "Production renderer timings exclude pointer dispatch, React, presentation and readback verification.",
+    "Three paired samples per case; cached measurement always precedes uncached.",
+    "50 MP case samples a native crop, not fit-to-window or full-document export.",
+    "Shared headless host; not a hardware-independent latency guarantee."
+  ]
+}

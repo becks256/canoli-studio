@@ -1,4 +1,5 @@
 import type { DocumentData, LayerData } from "./model";
+import { AffineTransform } from "./affine";
 import { pathBounds, strokeBounds } from "./drawing";
 import type { Point } from "./drawing";
 export interface Bounds {
@@ -22,36 +23,56 @@ export function unionBounds(rects: Bounds[]): Bounds | undefined {
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
 export function localBounds(node: LayerData): Bounds | undefined {
-  if (node.kind === "raster" || node.kind === "text")
+  if (
+    node.kind === "raster" ||
+    node.kind === "text" ||
+    node.kind === "smart-object"
+  )
     return { x: 0, y: 0, width: node.width, height: node.height };
   if (node.kind === "paint") return unionBounds(node.strokes.map(strokeBounds));
   if (node.kind === "vector") return unionBounds(node.paths.map(pathBounds));
-  return unionBounds(
-    node.children.flatMap((child) => {
-      const b = localBounds(child);
-      return b ? [{ ...b, x: b.x + child.x, y: b.y + child.y }] : [];
-    }),
+  if (node.kind === "group") {
+    return unionBounds(
+      node.children.flatMap((child) => {
+        const b = localBounds(child);
+        return b ? [localTransform(child).bounds(b)] : [];
+      }),
+    );
+  }
+  return undefined;
+}
+/** x/y remain translation aliases; schema 6 adds an optional invertible linear basis. */
+export function localTransform(node: LayerData): AffineTransform {
+  return AffineTransform.translation(node.x, node.y).multiply(
+    node.transform
+      ? AffineTransform.fromJSON(node.transform)
+      : new AffineTransform(),
   );
+}
+export function layerTransform(
+  document: DocumentData,
+  targetId: string,
+): AffineTransform | undefined {
+  const walk = (
+    nodes: LayerData[],
+    parent: AffineTransform,
+  ): AffineTransform | undefined => {
+    for (const node of nodes) {
+      const transform = parent.multiply(localTransform(node));
+      if (node.id === targetId) return transform;
+      if (node.kind === "group") {
+        const result = walk(node.children, transform);
+        if (result) return result;
+      }
+    }
+  };
+  return walk(document.children, new AffineTransform());
 }
 export function layerOrigin(
   document: DocumentData,
   targetId: string,
 ): Point | undefined {
-  const walk = (
-    nodes: LayerData[],
-    x: number,
-    y: number,
-  ): Point | undefined => {
-    for (const node of nodes) {
-      const origin = { x: x + node.x, y: y + node.y };
-      if (node.id === targetId) return origin;
-      if (node.kind === "group") {
-        const result = walk(node.children, origin.x, origin.y);
-        if (result) return result;
-      }
-    }
-  };
-  return walk(document.children, 0, 0);
+  return layerTransform(document, targetId)?.point({ x: 0, y: 0 });
 }
 export function layerBounds(
   document: DocumentData,
@@ -69,8 +90,8 @@ export function layerBounds(
   const node = walk(document.children);
   if (!node) return;
   const b = localBounds(node),
-    origin = layerOrigin(document, targetId)!;
-  return b ? { ...b, x: b.x + origin.x, y: b.y + origin.y } : undefined;
+    transform = layerTransform(document, targetId)!;
+  return b ? transform.bounds(b) : undefined;
 }
 export function parentId(
   document: DocumentData,
@@ -95,27 +116,43 @@ export function hitTest(
   x: number,
   y: number,
 ): string | null {
-  const walk = (nodes: LayerData[], ox: number, oy: number): string | null => {
+  const walk = (nodes: LayerData[], parent: AffineTransform): string | null => {
     for (const node of [...nodes].reverse()) {
       if (!node.visible || node.opacity === 0) continue;
-      const nx = ox + node.x,
-        ny = oy + node.y;
+      const transform = parent.multiply(localTransform(node));
       if (node.kind === "group") {
-        const hit = walk(node.children, nx, ny);
+        const hit = walk(node.children, transform);
         if (hit) return hit;
       } else {
         const b = localBounds(node);
+        const point = transform.inverse().point({ x, y });
         if (
           b &&
-          x >= nx + b.x &&
-          y >= ny + b.y &&
-          x <= nx + b.x + b.width &&
-          y <= ny + b.y + b.height
+          point.x >= b.x &&
+          point.y >= b.y &&
+          point.x <= b.x + b.width &&
+          point.y <= b.y + b.height
         )
           return node.id;
       }
     }
     return null;
   };
-  return walk(document.children, 0, 0);
+  return walk(document.children, new AffineTransform());
+}
+
+/** Convert a canvas-space displacement to a layer's parent-coordinate displacement. */
+export function parentSpaceDelta(
+  document: DocumentData,
+  layerId: string,
+  delta: Point,
+): Point {
+  const parent = parentId(document, layerId);
+  const inverse = parent
+    ? layerTransform(document, parent)!.inverse()
+    : new AffineTransform();
+  return {
+    x: inverse.a * delta.x + inverse.c * delta.y,
+    y: inverse.b * delta.x + inverse.d * delta.y,
+  };
 }

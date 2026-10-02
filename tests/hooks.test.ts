@@ -156,10 +156,16 @@ function setupMockDOM() {
   (globalThis as unknown as { window: MockWindow }).window = win;
   (globalThis as unknown as { document: MockDocument }).document = doc;
   (globalThis as unknown as { Element: unknown }).Element = MockNode;
-  (globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
-  (globalThis as unknown as { requestAnimationFrame: unknown }).requestAnimationFrame = (cb: FrameRequestCallback) =>
+  (
+    globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true;
+  (
+    globalThis as unknown as { requestAnimationFrame: unknown }
+  ).requestAnimationFrame = (cb: FrameRequestCallback) =>
     setTimeout(cb, 0) as unknown as number;
-  (globalThis as unknown as { cancelAnimationFrame: unknown }).cancelAnimationFrame = (id: number) =>
+  (
+    globalThis as unknown as { cancelAnimationFrame: unknown }
+  ).cancelAnimationFrame = (id: number) =>
     clearTimeout(id as unknown as NodeJS.Timeout);
 
   activeDOM = { doc, win };
@@ -301,7 +307,10 @@ describe("UI Custom Hooks", () => {
       const removeSpy = vi.spyOn(hook.win, "removeEventListener");
 
       hook.unmount();
-      expect(removeSpy).toHaveBeenCalledWith("beforeunload", expect.any(Function));
+      expect(removeSpy).toHaveBeenCalledWith(
+        "beforeunload",
+        expect.any(Function),
+      );
     });
   });
 
@@ -500,7 +509,8 @@ describe("UI Custom Hooks", () => {
       const shortcuts = new ShortcutRegistry([]);
 
       const inputElement = new MockNode(1, "INPUT");
-      inputElement.closest = (sel: string) => (sel.includes("input") ? inputElement : null);
+      inputElement.closest = (sel: string) =>
+        sel.includes("input") ? inputElement : null;
 
       const { win } = renderHook(() =>
         useEditorShortcuts({
@@ -606,7 +616,9 @@ describe("UI Custom Hooks", () => {
         useCanvasRenderer({
           editor,
           viewDocument: dom.toJSON(),
-          assets: {} as unknown as Parameters<typeof useCanvasRenderer>[0]["assets"],
+          assets: {} as unknown as Parameters<
+            typeof useCanvasRenderer
+          >[0]["assets"],
           renderRegion: { x: 0, y: 0, width: 800, height: 600 },
           zoom: 1,
           paintPreview: undefined,

@@ -11,6 +11,8 @@ Read these files before changing product behavior or architecture:
 7. `docs/PLUGINS.md` — versioned package format, permissions, lifecycle, local persistence and extension boundaries.
 8. `docs/SYSTEM_DESIGN.md` — comprehensive system design, module boundaries, core invariants, and decision matrix.
 
+For feature planning or expansion, also read `docs/FEATURE_STRATEGY.md`, `docs/COMPETITIVE_RESEARCH.md`, `docs/AI_FEATURE_SPECS.md`, and `docs/IMPLEMENTATION_ROADMAP.md`. These are proposed scope and release gates, not evidence that features or API signatures exist. Update the planning work/decision log as slices are implemented; retain the broad professional-editor objective while making staged delivery claims.
+
 Keep the public document model object-oriented. Use `Document`, `RasterLayer`, `LayerGroup`, and adjustment constructors; route attached mutations through commands so UI, keyboard shortcuts, and API clients share validation and undo behavior. Plain data objects are for serialization, snapshots, and workers, not an alternative public mutation API.
 
 Keep keyboard bindings in `src/ui/shortcuts.ts` and action registration in the UI command registry; update documented shortcuts when bindings change. Do not intercept typing shortcuts in editable fields.

@@ -4,16 +4,31 @@ import { createCanvas, release } from "./canvas";
  * Reads and writes copy synchronously: async render jobs never borrow buffers
  * that another job (or session replacement) can evict underneath them. */
 export class CanvasCache {
-  private entries = new Map<string, { signature: string; canvas: HTMLCanvasElement; bytes: number }>();
+  private entries = new Map<
+    string,
+    { signature: string; canvas: HTMLCanvasElement; bytes: number }
+  >();
   private bytes = 0;
   constructor(readonly budget = 64 * 1024 * 1024) {}
-  get byteLength() { return this.bytes; }
+  get byteLength() {
+    return this.bytes;
+  }
   read(key: string, signature: string, target: HTMLCanvasElement) {
+    return this.draw(key, signature, target.getContext("2d")!);
+  }
+  /** Synchronous presentation only: retained surfaces never escape cache ownership. */
+  draw(
+    key: string,
+    signature: string,
+    context: CanvasRenderingContext2D,
+    x = 0,
+    y = 0,
+  ) {
     const entry = this.entries.get(key);
     if (!entry || entry.signature !== signature) return false;
     this.entries.delete(key);
     this.entries.set(key, entry);
-    target.getContext("2d")!.drawImage(entry.canvas, 0, 0);
+    context.drawImage(entry.canvas, x, y);
     return true;
   }
   write(key: string, signature: string, source: HTMLCanvasElement) {

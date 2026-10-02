@@ -1,6 +1,17 @@
-import { Download, FolderOpen, Redo2, Save, Undo2 } from "lucide-react";
+import {
+  Boxes,
+  Download,
+  FileCode,
+  FolderOpen,
+  Palette,
+  Redo2,
+  Save,
+  Scissors,
+  Sparkles,
+  Undo2,
+  Workflow,
+} from "lucide-react";
 import { Button, IconButton } from "./controls";
-
 
 export interface TopBarProps {
   documentId: string;
@@ -15,6 +26,14 @@ export interface TopBarProps {
   onOpen(): void;
   onSave(): void;
   onExport(): void;
+  onExportDialog?(): void;
+  onGenerate?(): void;
+  onRecipes?(): void;
+  onBatch?(): void;
+  onColorProfile?(): void;
+  onPsdImport?(): void;
+  onRefineEdge?(): void;
+  onSelectSubject?(): void;
 }
 
 export function TopBar({
@@ -30,6 +49,14 @@ export function TopBar({
   onOpen,
   onSave,
   onExport,
+  onExportDialog,
+  onGenerate,
+  onRecipes,
+  onBatch,
+  onColorProfile,
+  onPsdImport,
+  onRefineEdge,
+  onSelectSubject,
 }: TopBarProps) {
   return (
     <header className="topbar">
@@ -69,6 +96,7 @@ export function TopBar({
       </div>
       <div className="top-actions">
         <IconButton
+          shortcutId="undo"
           label="Undo (Mod+Z)"
           disabled={!canUndo || busy}
           onClick={onUndo}
@@ -76,6 +104,7 @@ export function TopBar({
           <Undo2 size={16} />
         </IconButton>
         <IconButton
+          shortcutId="redo"
           label="Redo (Mod+Shift+Z)"
           disabled={!canRedo || busy}
           onClick={onRedo}
@@ -91,6 +120,66 @@ export function TopBar({
           <Save size={15} />
           <span>Save project</span>
         </Button>
+        {onPsdImport && (
+          <Button variant="subtle" onClick={onPsdImport} disabled={busy}>
+            <FileCode size={15} />
+            <span>PSD</span>
+          </Button>
+        )}
+        {onColorProfile && (
+          <Button variant="subtle" onClick={onColorProfile} disabled={busy}>
+            <Palette size={15} />
+            <span>Color</span>
+          </Button>
+        )}
+        {onGenerate && (
+          <Button variant="subtle" onClick={onGenerate} disabled={busy}>
+            <Sparkles size={15} />
+            <span>Generate</span>
+          </Button>
+        )}
+        {onRecipes && (
+          <Button variant="subtle" onClick={onRecipes} disabled={busy}>
+            <Workflow size={15} />
+            <span>Recipes</span>
+          </Button>
+        )}
+        {onBatch && (
+          <Button variant="subtle" onClick={onBatch} disabled={busy}>
+            <Boxes size={15} />
+            <span>Batch</span>
+          </Button>
+        )}
+        {onSelectSubject && (
+          <Button
+            variant="subtle"
+            onClick={onSelectSubject}
+            disabled={busy || !hasLayers}
+          >
+            <Sparkles size={15} />
+            <span>Subject</span>
+          </Button>
+        )}
+        {onRefineEdge && (
+          <Button
+            variant="subtle"
+            onClick={onRefineEdge}
+            disabled={busy || !hasLayers}
+          >
+            <Scissors size={15} />
+            <span>Refine</span>
+          </Button>
+        )}
+        {onExportDialog && (
+          <Button
+            variant="subtle"
+            onClick={onExportDialog}
+            disabled={busy || !hasLayers}
+          >
+            <Download size={15} />
+            <span>Export…</span>
+          </Button>
+        )}
         <Button
           variant="primary"
           onClick={onExport}

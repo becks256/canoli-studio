@@ -1,3 +1,4 @@
+import { AffineTransform } from "../core/affine";
 import { id } from "../core/model";
 import {
   blendIfSchema,
@@ -5,6 +6,7 @@ import {
   paintOperationSchema,
   selectionSchema,
   translateSelection,
+  transformSelection,
 } from "../core/drawing";
 import type {
   BlendIfData,
@@ -70,6 +72,11 @@ export class MarqueeSelection {
       regions: [...this.regions, { ...selection.regions[0], operation }],
     });
   }
+  transformed(transform: AffineTransform): MarqueeSelection {
+    if (!(transform instanceof AffineTransform))
+      throw new Error("Use an AffineTransform value.");
+    return new MarqueeSelection(transformSelection(this.data, transform)!);
+  }
   translated(x: number, y: number) {
     return new MarqueeSelection(translateSelection(this.data, x, y)!);
   }
@@ -83,9 +90,13 @@ export interface BrushOptions {
   size?: number;
   hardness?: number;
   opacity?: number;
+  flow?: number;
+  spacing?: number;
+  pressureSize?: boolean;
+  pressureOpacity?: boolean;
   color?: string;
   clip?: MarqueeSelection | SelectionData | null;
-  kind?: "brush" | "pencil" | "clone";
+  kind?: "brush" | "pencil" | "clone" | "eraser";
   tiles?: CloneTile[];
 }
 export abstract class PaintOperation {
@@ -111,7 +122,9 @@ export abstract class PaintOperation {
           ? new PencilStroke(data)
           : data.kind === "clone"
             ? new CloneStroke(data)
-            : new BrushStroke(data);
+            : data.kind === "eraser"
+              ? new EraserStroke(data)
+              : new BrushStroke(data);
     result.data = paintOperationSchema.parse(data);
     return result;
   }
@@ -128,6 +141,10 @@ export class BrushStroke extends PaintOperation {
       size: options.size ?? 24,
       hardness: options.hardness ?? 0.7,
       opacity: options.opacity ?? 1,
+      flow: options.flow ?? 1,
+      spacing: options.spacing ?? 0.25,
+      pressureSize: options.pressureSize,
+      pressureOpacity: options.pressureOpacity,
       color: options.color ?? "#d5e79b",
       clip:
         options.clip instanceof MarqueeSelection
@@ -148,6 +165,18 @@ export class BrushStroke extends PaintOperation {
   get opacity() {
     return this.data.opacity;
   }
+  get flow() {
+    return (this.data as BrushStrokeData).flow ?? 1;
+  }
+  get spacing() {
+    return (this.data as BrushStrokeData).spacing ?? 0.25;
+  }
+  get pressureSize() {
+    return (this.data as BrushStrokeData).pressureSize ?? true;
+  }
+  get pressureOpacity() {
+    return (this.data as BrushStrokeData).pressureOpacity ?? false;
+  }
   get color() {
     return this.data.color;
   }
@@ -155,6 +184,11 @@ export class BrushStroke extends PaintOperation {
 export class PencilStroke extends BrushStroke {
   constructor(options: BrushOptions) {
     super({ ...options, kind: "pencil", hardness: 1, size: options.size ?? 1 });
+  }
+}
+export class EraserStroke extends BrushStroke {
+  constructor(options: BrushOptions) {
+    super({ ...options, kind: "eraser" });
   }
 }
 export class CloneStroke extends BrushStroke {

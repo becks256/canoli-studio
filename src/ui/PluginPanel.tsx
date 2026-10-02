@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import type { EditorApplication } from "../editor";
 import { examplePlugin, parsePlugin } from "../plugins";
-import type { PluginManifest } from "../plugins";
+import type { PluginManifest, PluginPermission } from "../plugins";
 import { Dialog } from "./Dialog";
 import { Button, IconButton } from "./controls";
 
@@ -21,7 +21,7 @@ export function PluginPanel({
   editor: EditorApplication;
   onClose(): void;
 }) {
-  const { plugins, storageMessage } = useSyncExternalStore(
+  const { plugins, grantedPermissions, storageMessage } = useSyncExternalStore(
     editor.plugins.subscribe,
     editor.plugins.getSnapshot,
   );
@@ -218,11 +218,62 @@ export function PluginPanel({
                 </IconButton>
               </div>
               <p>{plugin.description}</p>
-              <small>
-                {plugin.permissions.includes("document:write")
-                  ? "Read and edit document"
-                  : "Read document only"}
-              </small>
+              <div
+                className="plugin-permissions-list"
+                aria-label={`Permissions for ${plugin.name}`}
+              >
+                <span className="plugin-perm-label">Permissions</span>
+                <div className="plugin-perm-chips">
+                  {plugin.permissions.map((perm: PluginPermission) => {
+                    const granted = (
+                      grantedPermissions?.[plugin.id] ?? plugin.permissions
+                    ).includes(perm);
+                    const isRequired = perm === "document:read";
+                    return (
+                      <span
+                        key={perm}
+                        className={`plugin-perm-badge ${granted ? "granted" : "revoked"}`}
+                        title={
+                          granted
+                            ? `Permission '${perm}' is active`
+                            : `Permission '${perm}' has been revoked by user`
+                        }
+                      >
+                        <code>{perm}</code>
+                        {isRequired ? (
+                          <small className="perm-tag">required</small>
+                        ) : (
+                          <button
+                            type="button"
+                            className="perm-toggle-btn"
+                            aria-label={
+                              granted ? `Revoke ${perm}` : `Grant ${perm}`
+                            }
+                            disabled={!!running}
+                            onClick={() => {
+                              attempt(() => {
+                                if (granted) {
+                                  editor.plugins.revokePermission(
+                                    plugin.id,
+                                    perm,
+                                  );
+                                } else {
+                                  editor.plugins.grantPermission(
+                                    plugin.id,
+                                    perm,
+                                  );
+                                }
+                              });
+                            }}
+                          >
+                            {granted ? "Revoke" : "Grant"}
+                          </button>
+                        )}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
               {plugin.commands.map((command) => (
                 <div className="plugin-command" key={command.id}>
                   <div>
@@ -247,10 +298,7 @@ export function PluginPanel({
         )}
       </div>
       {running && (
-        <Button
-          variant="subtle"
-          onClick={() => editor.scripts.cancel()}
-        >
+        <Button variant="subtle" onClick={() => editor.scripts.cancel()}>
           <Square size={13} />
           Stop plugin
         </Button>

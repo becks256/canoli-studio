@@ -1,3 +1,20 @@
+import { layerCompSchema, type LayerCompData } from "./layer-comps";
+import { smartFiltersSchema } from "./smart/filters";
+import { ComponentRegistry } from "./smart/manager";
+import type {
+  SmartComponentDefinition,
+  SmartObjectInstanceData,
+} from "./smart/types";
+import { TONE_LIMITS } from "./tone";
+import { guidesSchema, type GuideData } from "./guides";
+import { affineSchema } from "./transform-schema";
+import type { AffineData } from "./affine";
+import { adjustmentSchema, defaultCurvesAdjustment } from "./adjustments";
+import type { AdjustmentData } from "./adjustments";
+import { layerMaskSchema } from "./masks";
+import type { LayerMaskData } from "./masks";
+import { authoredMetadataSchema } from "./metadata";
+import type { AuthoredMetadataData } from "./metadata";
 import {
   styleSchema,
   selectionSchema,
@@ -10,7 +27,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 15;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -44,6 +61,9 @@ export interface ToneEffectData {
 }
 
 export interface LayerBaseData {
+  transform?: AffineData;
+  mask?: LayerMaskData | null;
+  metadata?: AuthoredMetadataData | null;
   id: string;
   name: string;
   visible: boolean;
@@ -85,26 +105,54 @@ export interface TextLayerData extends LayerBaseData {
   color: string;
   align: "left" | "center" | "right";
   lineHeight: number;
+  letterSpacing?: number;
+  fontWeight?: string;
+  fontStyle?: "normal" | "italic";
+  direction?: "ltr" | "rtl";
   width: number;
   height: number;
+}
+export interface AdjustmentLayerData extends LayerBaseData {
+  kind: "adjustment";
+  adjustment: AdjustmentData;
 }
 export type LayerData =
   | RasterLayerData
   | GroupLayerData
   | PaintLayerData
   | VectorLayerData
-  | TextLayerData;
+  | TextLayerData
+  | AdjustmentLayerData
+  | SmartObjectInstanceData;
 
 // The editor DOM is serializable data, independent of React, Canvas, and WASM.
 // Children are stored back-to-front. IDs, not object references, identify nodes.
 export interface DocumentData {
-  schemaVersion: typeof SCHEMA_VERSION;
+  schemaVersion:
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | typeof SCHEMA_VERSION;
   id: string;
   name: string;
   width: number;
   height: number;
   colorSpace: "srgb";
   selection?: SelectionData | null;
+  guides?: GuideData[];
+  components?: SmartComponentDefinition[];
+  layerComps?: LayerCompData[];
   children: LayerData[];
 }
 
@@ -164,15 +212,18 @@ export function createGroup(name = "Group"): GroupLayerData {
 }
 
 let measureCtx:
-  | CanvasRenderingContext2D
-  | OffscreenCanvasRenderingContext2D
-  | null = null;
+  CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null = null;
 
 export function measureTextBounds(
   text: string,
   fontSize: number,
   fontFamily: string,
   lineHeight: number,
+  options: {
+    letterSpacing?: number;
+    fontWeight?: string;
+    fontStyle?: "normal" | "italic";
+  } = {},
 ): { width: number; height: number } {
   const lines = text.split("\n");
   const lineHeightPx = fontSize * lineHeight;
@@ -193,12 +244,23 @@ export function measureTextBounds(
     }
   }
 
+  const weight = options.fontWeight ?? "normal";
+  const style = options.fontStyle ?? "normal";
+  const letterSpacing = options.letterSpacing ?? 0;
+
   if (measureCtx) {
     try {
-      measureCtx.font = `${fontSize}px ${fontFamily}`;
+      measureCtx.font = `${style} ${weight} ${fontSize}px ${fontFamily}`;
+      if ("letterSpacing" in measureCtx) {
+        (measureCtx as any).letterSpacing = `${letterSpacing}px`;
+      }
       for (const line of lines) {
         const metrics = measureCtx.measureText(line);
-        maxWidth = Math.max(maxWidth, metrics.width);
+        const spacingAdjustment =
+          "letterSpacing" in measureCtx
+            ? 0
+            : Math.max(0, line.length - 1) * letterSpacing;
+        maxWidth = Math.max(maxWidth, metrics.width + spacingAdjustment);
       }
     } catch {
       maxWidth = 0;
@@ -207,7 +269,11 @@ export function measureTextBounds(
 
   if (maxWidth === 0) {
     for (const line of lines) {
-      maxWidth = Math.max(maxWidth, (line.length || 1) * fontSize * 0.6);
+      maxWidth = Math.max(
+        maxWidth,
+        (line.length || 1) * fontSize * 0.6 +
+          Math.max(0, line.length - 1) * letterSpacing,
+      );
     }
   }
 
@@ -224,6 +290,10 @@ export function createText(
     color?: string;
     align?: "left" | "center" | "right";
     lineHeight?: number;
+    letterSpacing?: number;
+    fontWeight?: string;
+    fontStyle?: "normal" | "italic";
+    direction?: "ltr" | "rtl";
   } = {},
 ): TextLayerData {
   const fontSize = options.fontSize ?? 32;
@@ -231,7 +301,15 @@ export function createText(
   const color = options.color ?? "#ffffff";
   const align = options.align ?? "left";
   const lineHeight = options.lineHeight ?? 1.2;
-  const bounds = measureTextBounds(text, fontSize, fontFamily, lineHeight);
+  const letterSpacing = options.letterSpacing;
+  const fontWeight = options.fontWeight;
+  const fontStyle = options.fontStyle;
+  const direction = options.direction;
+  const bounds = measureTextBounds(text, fontSize, fontFamily, lineHeight, {
+    letterSpacing,
+    fontWeight,
+    fontStyle,
+  });
   return {
     ...base(name),
     kind: "text",
@@ -241,8 +319,23 @@ export function createText(
     color,
     align,
     lineHeight,
+    letterSpacing,
+    fontWeight,
+    fontStyle,
+    direction,
     width: bounds.width,
     height: bounds.height,
+  };
+}
+
+export function createAdjustmentLayer(
+  name = "Adjustment",
+  adjustment: AdjustmentData = defaultCurvesAdjustment(),
+): AdjustmentLayerData {
+  return {
+    ...base(name),
+    kind: "adjustment",
+    adjustment,
   };
 }
 
@@ -320,6 +413,7 @@ export function toneOf(layer: RasterLayerData): ToneEffectData {
 // types fail explicitly instead of silently disappearing on load or export.
 export function validateDocument(
   value: unknown,
+  checkComponents = true,
 ): asserts value is DocumentData {
   const record = (v: unknown): v is Record<string, unknown> =>
     typeof v === "object" && v !== null && !Array.isArray(v);
@@ -331,7 +425,21 @@ export function validateDocument(
     number(v, 1, MAX_COORDINATE) && Number.isSafeInteger(v);
   if (
     !record(value) ||
-    value.schemaVersion !== 1 ||
+    (value.schemaVersion !== 1 &&
+      value.schemaVersion !== 2 &&
+      value.schemaVersion !== 3 &&
+      value.schemaVersion !== 4 &&
+      value.schemaVersion !== 5 &&
+      value.schemaVersion !== 6 &&
+      value.schemaVersion !== 7 &&
+      value.schemaVersion !== 8 &&
+      value.schemaVersion !== 9 &&
+      value.schemaVersion !== 10 &&
+      value.schemaVersion !== 11 &&
+      value.schemaVersion !== 12 &&
+      value.schemaVersion !== 13 &&
+      value.schemaVersion !== 14 &&
+      value.schemaVersion !== 15) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -339,10 +447,39 @@ export function validateDocument(
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use schema version 1, sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–15), sRGB, and positive, safely representable integer dimensions.",
     );
   }
-  if (value.selection != null) selectionSchema.parse(value.selection);
+  const checkSelection = (selection: unknown) => {
+    if (selection == null) return;
+    const parsed = selectionSchema.parse(selection);
+    if (
+      Number(value.schemaVersion) < 5 &&
+      parsed.regions.some((region) => region.transform !== undefined)
+    )
+      throw new Error(
+        "Affine selection regions require document schema version 5 or later.",
+      );
+  };
+  if (value.guides !== undefined) {
+    if (Number(value.schemaVersion) < 7)
+      throw new Error("Document guides require schema version 7.");
+    guidesSchema.parse(value.guides);
+  }
+  if (value.layerComps !== undefined) {
+    if (Number(value.schemaVersion) < 14)
+      throw new Error("Layer comps require schema version 14.");
+    if (!Array.isArray(value.layerComps))
+      throw new Error("Invalid layer comps.");
+    const compIds = new Set<string>();
+    for (const entry of value.layerComps) {
+      const comp = layerCompSchema.parse(entry);
+      if (comp.documentId !== value.id || compIds.has(comp.id))
+        throw new Error("Invalid layer comp ownership or duplicate identity.");
+      compIds.add(comp.id);
+    }
+  }
+  checkSelection(value.selection);
   const ids = new Set<string>();
   let count = 0;
   const walk = (nodes: unknown, depth: number) => {
@@ -366,12 +503,57 @@ export function validateDocument(
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
+      if (node.transform !== undefined) {
+        if (Number(value.schemaVersion) < 6)
+          throw new Error("Layer transforms require schema version 6.");
+        const transform = affineSchema.parse(node.transform);
+        if (transform.e !== 0 || transform.f !== 0)
+          throw new Error("Layer transform translation must use x/y.");
+      }
+      if (node.mask != null) {
+        if ((value as any).schemaVersion < 3)
+          throw new Error(
+            "Layer masks require document schema version 3 or later.",
+          );
+        const mask = layerMaskSchema.parse(node.mask);
+        if (mask.basis && Number(value.schemaVersion) < 6)
+          throw new Error("Mask bases require schema version 6.");
+        if (mask.kind === "selection") checkSelection(mask.selection);
+        for (const paint of mask.strokes ?? [])
+          checkSelection(paint.stroke.clip);
+      }
+      if (node.metadata != null) {
+        if (value.schemaVersion === 1)
+          throw new Error(
+            "Authored metadata requires document schema version 2 or later.",
+          );
+        authoredMetadataSchema.parse(node.metadata);
+      }
       ids.add(node.id as string);
       if (node.fillOpacity !== undefined && !number(node.fillOpacity, 0, 1))
         throw new Error("Fill opacity must be between 0 and 1.");
       if (node.styles !== undefined) styleSchema.parse(node.styles);
       if (node.kind === "group") walk(node.children, depth + 1);
-      else if (node.kind === "raster") {
+      else if (node.kind === "smart-object") {
+        if (Number(value.schemaVersion) < 10)
+          throw new Error("Smart objects require schema version 10.");
+        if (node.filterMask != null) {
+          if (Number(value.schemaVersion) < 12)
+            throw new Error("Smart-filter masks require schema version 12.");
+          layerMaskSchema.parse(node.filterMask);
+        }
+        if (node.smartFilters !== undefined) {
+          if (Number(value.schemaVersion) < 11)
+            throw new Error("Smart filters require schema version 11.");
+          smartFiltersSchema.parse(node.smartFilters);
+        }
+        if (
+          !text(node.componentId) ||
+          !number(node.width, 1, MAX_COORDINATE) ||
+          !number(node.height, 1, MAX_COORDINATE)
+        )
+          throw new Error("Invalid smart-object instance.");
+      } else if (node.kind === "raster") {
         if (
           !text(node.assetId) ||
           !number(node.width, 1, MAX_COORDINATE) ||
@@ -388,9 +570,21 @@ export function validateDocument(
             !text(effect.id) ||
             effectIds.has(effect.id as string) ||
             typeof effect.enabled !== "boolean" ||
-            !number(effect.exposure, -3, 3) ||
-            !number(effect.contrast, -100, 100) ||
-            !number(effect.saturation, -100, 100)
+            !number(
+              effect.exposure,
+              TONE_LIMITS.exposure.min,
+              TONE_LIMITS.exposure.max,
+            ) ||
+            !number(
+              effect.contrast,
+              TONE_LIMITS.contrast.min,
+              TONE_LIMITS.contrast.max,
+            ) ||
+            !number(
+              effect.saturation,
+              TONE_LIMITS.saturation.min,
+              TONE_LIMITS.saturation.max,
+            )
           ) {
             throw new Error("Invalid or unsupported image adjustment.");
           }
@@ -408,6 +602,7 @@ export function validateDocument(
             node.kind === "paint"
               ? paintOperationSchema.parse(entry)
               : pathSchema.parse(entry);
+          if ("clip" in parsed) checkSelection(parsed.clip);
           if (entryIds.has(parsed.id))
             throw new Error("Duplicate drawing object ID.");
           entryIds.add(parsed.id);
@@ -422,20 +617,69 @@ export function validateDocument(
           !["left", "center", "right"].includes(node.align as string) ||
           !number(node.lineHeight, 0.5, 10) ||
           !number(node.width, 1, MAX_COORDINATE) ||
-          !number(node.height, 1, MAX_COORDINATE)
+          !number(node.height, 1, MAX_COORDINATE) ||
+          (node.letterSpacing !== undefined &&
+            !number(node.letterSpacing, -50, 500)) ||
+          (node.fontWeight !== undefined && !text(node.fontWeight)) ||
+          (node.fontStyle !== undefined &&
+            !["normal", "italic"].includes(node.fontStyle as string)) ||
+          (node.direction !== undefined &&
+            !["ltr", "rtl"].includes(node.direction as string))
         ) {
           throw new Error("Invalid text layer.");
         }
+      } else if (node.kind === "adjustment") {
+        if ((value as any).schemaVersion < 4)
+          throw new Error(
+            "Adjustment layers require document schema version 4 or later.",
+          );
+        if (!record(node.adjustment))
+          throw new Error("Invalid adjustment layer.");
+        if (node.adjustment.kind === "tonal" && Number(value.schemaVersion) < 8)
+          throw new Error("Tonal strokes require schema version 8.");
+        if (node.adjustment.kind === "patch" && Number(value.schemaVersion) < 9)
+          throw new Error("Patch adjustments require schema version 9.");
+        if (node.adjustment.kind === "hsl" && Number(value.schemaVersion) < 15)
+          throw new Error("HSL adjustments require schema version 15.");
+        adjustmentSchema.parse(node.adjustment);
       } else throw new Error("Unsupported layer type.");
     }
   };
   walk(value.children, 0);
+  if (value.components !== undefined && Number(value.schemaVersion) < 10)
+    throw new Error("Component definitions require schema version 10.");
+  if (checkComponents) {
+    if (value.components !== undefined && !Array.isArray(value.components))
+      throw new Error("Invalid component definitions.");
+    const registry = new ComponentRegistry(
+      (value.components ?? []) as SmartComponentDefinition[],
+    );
+    if (
+      Number(value.schemaVersion) < 13 &&
+      registry
+        .values()
+        .some(
+          (definition) =>
+            definition.source.kind === "asset" && definition.source.link,
+        )
+    )
+      throw new Error("Linked image files require schema version 13.");
+    for (const layer of allLayers(value.children as LayerData[]))
+      if (layer.kind === "smart-object") registry.get(layer.componentId);
+  }
 }
 
 export function referencedAssets(document: DocumentData): Set<string> {
-  const assets = new Set<string>();
+  const assets = document.components
+    ? new ComponentRegistry(document.components).assetIds()
+    : new Set<string>();
   for (const layer of allLayers(document.children)) {
     if (layer.kind === "raster") assets.add(layer.assetId);
+    if (layer.kind === "adjustment" && layer.adjustment.kind === "patch")
+      assets.add(layer.adjustment.assetId);
+    if (layer.kind === "smart-object" && layer.filterMask?.kind === "bitmap")
+      assets.add(layer.filterMask.assetId);
+    if (layer.mask?.kind === "bitmap") assets.add(layer.mask.assetId);
     if (layer.kind === "paint")
       for (const stroke of layer.strokes)
         if (stroke.kind === "clone")

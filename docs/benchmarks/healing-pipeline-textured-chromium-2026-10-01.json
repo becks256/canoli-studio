@@ -1,0 +1,291 @@
+{
+  "measuredAt": "2026-10-01T12:11:49.613Z",
+  "browser": "153.0.8010.12",
+  "host": {
+    "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "fixture": "Flat gray and periodic 8px texture images, central 3x3 red blemish, one hard circular brush, all-layer sampling, every output pixel checked against clean reference (RGB tolerance 1/255, exact alpha); one warm-up then three samples per size.",
+  "scope": "Production host healing call including fresh worker startup, brush coverage, native sampling, search, solve, PNG encoding/decoding, installation and history commit. Validation/render/undo excluded from timed interval.",
+  "limitations": [
+    "Flat and periodic synthetic contexts are not a representative real-photo quality evaluation.",
+    "Phase durations are round-trip wall time and may overlap; do not sum them.",
+    "Warm browser/OS caches; dedicated numerical worker is new for each stroke.",
+    "128px maximum measured diameter; the entire under-256px performance gate is not established."
+  ],
+  "results": [
+    {
+      "texture": "flat",
+      "brushDiameter": 16,
+      "imageEdge": 64,
+      "searchRadius": 16,
+      "samples": [
+        {
+          "totalMs": 48.399999998509884,
+          "phasesMs": {
+            "renderSampling": 1.2000000029802322,
+            "donorSearch": 4.299999997019768,
+            "poissonSolve": 1.8000000044703484
+          }
+        },
+        {
+          "totalMs": 43.79999999701977,
+          "phasesMs": {
+            "renderSampling": 1.2999999970197678,
+            "donorSearch": 4.100000001490116,
+            "poissonSolve": 1.4000000059604645
+          }
+        },
+        {
+          "totalMs": 42.80000000447035,
+          "phasesMs": {
+            "renderSampling": 1.3999999910593033,
+            "donorSearch": 4,
+            "poissonSolve": 1.3000000044703484
+          }
+        }
+      ],
+      "medianMs": 43.79999999701977,
+      "meets50ms": true
+    },
+    {
+      "texture": "flat",
+      "brushDiameter": 32,
+      "imageEdge": 128,
+      "searchRadius": 32,
+      "samples": [
+        {
+          "totalMs": 55.20000000298023,
+          "phasesMs": {
+            "renderSampling": 1.3000000044703484,
+            "donorSearch": 12.699999995529652,
+            "poissonSolve": 3.9000000059604645
+          }
+        },
+        {
+          "totalMs": 54.29999999701977,
+          "phasesMs": {
+            "renderSampling": 1.7000000029802322,
+            "donorSearch": 12,
+            "poissonSolve": 3.2999999970197678
+          }
+        },
+        {
+          "totalMs": 54.30000000447035,
+          "phasesMs": {
+            "renderSampling": 1.5,
+            "donorSearch": 12.100000001490116,
+            "poissonSolve": 3.6999999955296516
+          }
+        }
+      ],
+      "medianMs": 54.30000000447035,
+      "meets50ms": false
+    },
+    {
+      "texture": "flat",
+      "brushDiameter": 64,
+      "imageEdge": 256,
+      "searchRadius": 64,
+      "samples": [
+        {
+          "totalMs": 89.60000000149012,
+          "phasesMs": {
+            "renderSampling": 12.900000005960464,
+            "donorSearch": 40.600000001490116,
+            "poissonSolve": 10.5
+          }
+        },
+        {
+          "totalMs": 88.79999999701977,
+          "phasesMs": {
+            "renderSampling": 17.80000001192093,
+            "donorSearch": 36.5,
+            "poissonSolve": 11.600000001490116
+          }
+        },
+        {
+          "totalMs": 85.60000000149012,
+          "phasesMs": {
+            "renderSampling": 2.6999999955296516,
+            "donorSearch": 36.19999999552965,
+            "poissonSolve": 10.5
+          }
+        }
+      ],
+      "medianMs": 88.79999999701977,
+      "meets50ms": false
+    },
+    {
+      "texture": "flat",
+      "brushDiameter": 128,
+      "imageEdge": 512,
+      "searchRadius": 128,
+      "samples": [
+        {
+          "totalMs": 252.70000000298023,
+          "phasesMs": {
+            "renderSampling": 4.799999989569187,
+            "donorSearch": 161.19999999552965,
+            "poissonSolve": 43.80000000447035
+          }
+        },
+        {
+          "totalMs": 253.39999999850988,
+          "phasesMs": {
+            "renderSampling": 4.700000002980232,
+            "donorSearch": 161.60000000149012,
+            "poissonSolve": 44.599999994039536
+          }
+        },
+        {
+          "totalMs": 254.69999999552965,
+          "phasesMs": {
+            "renderSampling": 4.5,
+            "donorSearch": 159.29999999701977,
+            "poissonSolve": 48.5
+          }
+        }
+      ],
+      "medianMs": 253.39999999850988,
+      "meets50ms": false
+    },
+    {
+      "texture": "periodic",
+      "brushDiameter": 16,
+      "imageEdge": 64,
+      "searchRadius": 16,
+      "samples": [
+        {
+          "totalMs": 42.70000000298023,
+          "phasesMs": {
+            "renderSampling": 1.1000000014901161,
+            "donorSearch": 4.100000001490116,
+            "poissonSolve": 1.3000000044703484
+          }
+        },
+        {
+          "totalMs": 37,
+          "phasesMs": {
+            "renderSampling": 1.1000000014901161,
+            "donorSearch": 4.0999999940395355,
+            "poissonSolve": 1.3999999985098839
+          }
+        },
+        {
+          "totalMs": 39.600000001490116,
+          "phasesMs": {
+            "renderSampling": 1.3000000044703484,
+            "donorSearch": 4.199999995529652,
+            "poissonSolve": 1.5
+          }
+        }
+      ],
+      "medianMs": 39.600000001490116,
+      "meets50ms": true
+    },
+    {
+      "texture": "periodic",
+      "brushDiameter": 32,
+      "imageEdge": 128,
+      "searchRadius": 32,
+      "samples": [
+        {
+          "totalMs": 56.899999998509884,
+          "phasesMs": {
+            "renderSampling": 1.3999999910593033,
+            "donorSearch": 14.399999998509884,
+            "poissonSolve": 3.100000001490116
+          }
+        },
+        {
+          "totalMs": 51.80000000447035,
+          "phasesMs": {
+            "renderSampling": 1.8000000044703484,
+            "donorSearch": 13.899999998509884,
+            "poissonSolve": 3.5
+          }
+        },
+        {
+          "totalMs": 55,
+          "phasesMs": {
+            "renderSampling": 1.6000000014901161,
+            "donorSearch": 14.399999998509884,
+            "poissonSolve": 3.7999999970197678
+          }
+        }
+      ],
+      "medianMs": 55,
+      "meets50ms": false
+    },
+    {
+      "texture": "periodic",
+      "brushDiameter": 64,
+      "imageEdge": 256,
+      "searchRadius": 64,
+      "samples": [
+        {
+          "totalMs": 87.10000000149012,
+          "phasesMs": {
+            "renderSampling": 13.199999995529652,
+            "donorSearch": 38.29999999701977,
+            "poissonSolve": 11.399999998509884
+          }
+        },
+        {
+          "totalMs": 84,
+          "phasesMs": {
+            "renderSampling": 12.099999994039536,
+            "donorSearch": 38,
+            "poissonSolve": 10.799999997019768
+          }
+        },
+        {
+          "totalMs": 80.5,
+          "phasesMs": {
+            "renderSampling": 1.0999999940395355,
+            "donorSearch": 35,
+            "poissonSolve": 10.700000002980232
+          }
+        }
+      ],
+      "medianMs": 84,
+      "meets50ms": false
+    },
+    {
+      "texture": "periodic",
+      "brushDiameter": 128,
+      "imageEdge": 512,
+      "searchRadius": 128,
+      "samples": [
+        {
+          "totalMs": 253.80000000447035,
+          "phasesMs": {
+            "renderSampling": 4.600000008940697,
+            "donorSearch": 165.79999999701977,
+            "poissonSolve": 45.5
+          }
+        },
+        {
+          "totalMs": 255.5,
+          "phasesMs": {
+            "renderSampling": 4.399999998509884,
+            "donorSearch": 166.69999999552965,
+            "poissonSolve": 42.80000000447035
+          }
+        },
+        {
+          "totalMs": 252.39999999850988,
+          "phasesMs": {
+            "renderSampling": 3.9000000059604645,
+            "donorSearch": 166.5,
+            "poissonSolve": 44.79999999701977
+          }
+        }
+      ],
+      "medianMs": 253.80000000447035,
+      "meets50ms": false
+    }
+  ]
+}

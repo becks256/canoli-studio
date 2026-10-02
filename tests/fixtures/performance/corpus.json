@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "description": "Generated geometric fixtures, not representative photographs. Timings exclude fixture generation and hashing.",
+  "cases": [
+    {
+      "id": "raster-50mp",
+      "width": 10000,
+      "height": 5000,
+      "groups": 0,
+      "textLayers": 0
+    },
+    {
+      "id": "complex-layers",
+      "width": 2048,
+      "height": 2048,
+      "groups": 6,
+      "textLayers": 36
+    }
+  ]
+}

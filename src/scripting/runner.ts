@@ -6,7 +6,18 @@ import { parseCommands } from "../core/validation";
 export interface ScriptResult {
   commands: EditorCommand[];
   selectedId: string | null;
+  selectedIds: string[];
   logs: string[];
+}
+
+export interface ScriptRunnerOptions {
+  hostBridge?: {
+    dispatch(
+      service: string,
+      method: string,
+      args: unknown[],
+    ): Promise<unknown>;
+  };
 }
 
 export class ScriptRunner {
@@ -15,7 +26,11 @@ export class ScriptRunner {
     this.cancelCurrent?.();
   }
 
-  run(document: Document, code: string): Promise<ScriptResult> {
+  run(
+    document: Document,
+    code: string,
+    options?: ScriptRunnerOptions,
+  ): Promise<ScriptResult> {
     this.cancel();
     if (code.length > 50_000)
       return Promise.reject(
@@ -23,6 +38,7 @@ export class ScriptRunner {
       );
     const snapshot = document.toJSON();
     const selectedId = document.selectedLayer?.id ?? null;
+    const selectedIds = document.selectedLayers.map((layer) => layer.id);
     const iframe = window.document.createElement("iframe");
     iframe.setAttribute("sandbox", "allow-scripts");
     iframe.setAttribute("aria-hidden", "true");
@@ -70,11 +86,46 @@ export class ScriptRunner {
       );
       this.cancelCurrent = () =>
         fail(new Error("Script stopped. No edits were applied."));
-      channel.port1.onmessage = (event) => {
+      channel.port1.onmessage = async (event) => {
         if (finished) return;
         const data = event.data;
         if (data?.type === "ready") {
-          channel.port1.postMessage({ document: snapshot, selectedId, code });
+          channel.port1.postMessage({
+            document: snapshot,
+            selectedId,
+            selectedIds,
+            code,
+          });
+          return;
+        }
+        if (data?.type === "host:call") {
+          const { id, service, method, args } = data;
+          if (!options?.hostBridge) {
+            channel.port1.postMessage({
+              type: "host:call:error",
+              id,
+              error: "Host services are not available.",
+            });
+            return;
+          }
+          try {
+            const result = await options.hostBridge.dispatch(
+              String(service),
+              String(method),
+              Array.isArray(args) ? args : [],
+            );
+            channel.port1.postMessage({
+              type: "host:call:result",
+              id,
+              result,
+            });
+          } catch (error) {
+            channel.port1.postMessage({
+              type: "host:call:error",
+              id,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
           return;
         }
         if (data?.type === "error") {
@@ -102,9 +153,19 @@ export class ScriptRunner {
             typeof data.selectedId === "string" && data.selectedId.length <= 240
               ? data.selectedId
               : null;
+          if (
+            !Array.isArray(data.selectedIds) ||
+            !data.selectedIds.every(
+              (id: unknown) => typeof id === "string" && id.length <= 240,
+            )
+          )
+            throw new Error("Invalid selected layer IDs.");
+          const selectedIds = [...new Set<string>(data.selectedIds)];
+          if ((selectedIds.at(-1) ?? null) !== selectedId)
+            throw new Error("Inconsistent active layer.");
           finished = true;
           cleanup();
-          resolve({ commands, selectedId, logs });
+          resolve({ commands, selectedId, selectedIds, logs });
         } catch {
           fail(
             new Error(

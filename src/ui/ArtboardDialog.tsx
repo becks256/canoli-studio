@@ -69,7 +69,11 @@ export function ArtboardDialog({
   };
 
   return (
-    <Dialog titleId="artboard-title" className="artboard-dialog" onClose={onClose}>
+    <Dialog
+      titleId="artboard-title"
+      className="artboard-dialog"
+      onClose={onClose}
+    >
       <div className="dialog-heading">
         <div>
           <span className="section-caption">CANVAS & ARTBOARD</span>
@@ -81,7 +85,8 @@ export function ArtboardDialog({
       </div>
 
       <p className="script-description">
-        Change canvas dimensions and pixel bounds. Existing artwork and layers preserve their coordinates and contents.
+        Change canvas dimensions and pixel bounds. Existing artwork and layers
+        preserve their coordinates and contents.
       </p>
 
       <form onSubmit={handleSubmit} className="artboard-form">
@@ -134,10 +139,13 @@ export function ArtboardDialog({
         </div>
 
         <div className="artboard-info">
-          <span>Current size: {currentWidth} × {currentHeight} px</span>
+          <span>
+            Current size: {currentWidth} × {currentHeight} px
+          </span>
           {isValid && (width !== currentWidth || height !== currentHeight) && (
             <span className="artboard-change-badge">
-              {width} × {height} px ({Math.round((width * height) / 1000000 * 10) / 10} MP)
+              {width} × {height} px (
+              {Math.round(((width * height) / 1000000) * 10) / 10} MP)
             </span>
           )}
         </div>
@@ -197,8 +205,7 @@ export function ArtboardDialog({
             type="submit"
             variant="primary"
             disabled={
-              !isValid ||
-              (width === currentWidth && height === currentHeight)
+              !isValid || (width === currentWidth && height === currentHeight)
             }
           >
             Apply resize

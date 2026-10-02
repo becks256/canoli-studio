@@ -1,0 +1,36 @@
+.layer-filter-bar {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+.layer-filter-bar input,
+.layer-filter-bar select {
+  min-width: 0;
+  width: 100%;
+  padding: 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-text);
+  background: var(--color-field);
+  font-size: 11px;
+}
+.layer-filter-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+}
+.layer-filter-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.layer-filter-summary button {
+  color: var(--color-accent);
+}
+.layer-row.filter-context .layer-name {
+  color: var(--color-text-muted);
+}

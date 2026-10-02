@@ -1,3 +1,4 @@
+import type { AffineTransform } from "../core/affine";
 import type { LayerPatch } from "../core/commands";
 import type { Point } from "../core/drawing";
 import { measureTextBounds } from "../core/model";
@@ -42,7 +43,30 @@ export function computeResizePatch(
   dx: number,
   dy: number,
   shiftKey: boolean,
+  transforms?: { world: AffineTransform; local: AffineTransform },
 ): LayerPatch {
+  if (transforms) {
+    const inverse = transforms.world.inverse();
+    const patch = computeResizePatch(
+      drag,
+      inverse.a * dx + inverse.c * dy,
+      inverse.b * dx + inverse.d * dy,
+      shiftKey,
+    );
+    const offsetX = (patch.x ?? drag.layerX) - drag.layerX;
+    const offsetY = (patch.y ?? drag.layerY) - drag.layerY;
+    return {
+      ...patch,
+      x:
+        drag.layerX +
+        transforms.local.a * offsetX +
+        transforms.local.c * offsetY,
+      y:
+        drag.layerY +
+        transforms.local.b * offsetX +
+        transforms.local.d * offsetY,
+    };
+  }
   const {
     handle,
     layerX,
@@ -98,8 +122,14 @@ export function computeResizePatch(
     newY = layerY + layerHeight - newHeight;
   }
 
-  newX = Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, newX));
-  newY = Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, newY));
+  newX = Math.max(
+    -Number.MAX_SAFE_INTEGER,
+    Math.min(Number.MAX_SAFE_INTEGER, newX),
+  );
+  newY = Math.max(
+    -Number.MAX_SAFE_INTEGER,
+    Math.min(Number.MAX_SAFE_INTEGER, newY),
+  );
   newWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newWidth));
   newHeight = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newHeight));
 
@@ -111,7 +141,10 @@ export function computeResizePatch(
     const clampedScale = Math.max(0.05, scale);
     const newFontSize = Math.max(
       1,
-      Math.min(Number.MAX_SAFE_INTEGER, Math.round(layerFontSize * clampedScale)),
+      Math.min(
+        Number.MAX_SAFE_INTEGER,
+        Math.round(layerFontSize * clampedScale),
+      ),
     );
     const newBounds = measureTextBounds(
       layerText,
@@ -128,8 +161,14 @@ export function computeResizePatch(
       textY = layerY + layerHeight - newBounds.height;
     }
     return {
-      x: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, Math.round(textX))),
-      y: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, Math.round(textY))),
+      x: Math.max(
+        -Number.MAX_SAFE_INTEGER,
+        Math.min(Number.MAX_SAFE_INTEGER, Math.round(textX)),
+      ),
+      y: Math.max(
+        -Number.MAX_SAFE_INTEGER,
+        Math.min(Number.MAX_SAFE_INTEGER, Math.round(textY)),
+      ),
       fontSize: newFontSize,
     };
   }
@@ -198,14 +237,18 @@ export function computeVisibleRegion(
     0,
     Math.min(
       documentSize.width - 1,
-      Math.floor(documentSize.width / 2 - (viewportSize.width / 2 + pan.x) / zoom),
+      Math.floor(
+        documentSize.width / 2 - (viewportSize.width / 2 + pan.x) / zoom,
+      ),
     ),
   );
   const y = Math.max(
     0,
     Math.min(
       documentSize.height - 1,
-      Math.floor(documentSize.height / 2 - (viewportSize.height / 2 + pan.y) / zoom),
+      Math.floor(
+        documentSize.height / 2 - (viewportSize.height / 2 + pan.y) / zoom,
+      ),
     ),
   );
   const right = Math.min(
@@ -214,7 +257,9 @@ export function computeVisibleRegion(
   );
   const bottom = Math.min(
     documentSize.height,
-    Math.ceil(documentSize.height / 2 + (viewportSize.height / 2 - pan.y) / zoom),
+    Math.ceil(
+      documentSize.height / 2 + (viewportSize.height / 2 - pan.y) / zoom,
+    ),
   );
   return {
     x,

@@ -1,3 +1,14 @@
+import { LayerCompsPanel } from "./LayerCompsPanel";
+import { SmartFilterMaskPanel } from "./SmartFilterMaskPanel";
+import { SmartFiltersPanel } from "./SmartFiltersPanel";
+import { GuidesPanel } from "./GuidesPanel";
+import { AffineTransform } from "../core/affine";
+import { layerBounds, layerTransform, parentId } from "../core/spatial";
+import { CanvasRenderer } from "../engine/renderer";
+import { useEffect, useState } from "react";
+import { LayerMaskPanel } from "./LayerMaskPanel";
+import { AssetInfoPanel } from "./AssetInfoPanel";
+import type { AssetStore } from "../core/assets";
 import {
   ChevronRight,
   LockKeyhole,
@@ -9,27 +20,38 @@ import {
   Document,
   LayerGroup,
   RasterLayer,
+  SmartObjectLayer,
   VectorLayer,
   TextLayer,
   LayerStyle,
+  AdjustmentLayer,
 } from "../dom";
 import type { Layer } from "../dom";
 import type { BlendMode, DocumentData, LayerData } from "../core/model";
 import { BLEND_MODES, allLayers, findParent, toneOf } from "../core/model";
 import { defaultStyle } from "../core/drawing";
 import type { EditorCommand } from "../core/commands";
-import {
-  IconButton,
-  NumberField,
-  Select,
-  Slider,
-  TextInput,
-} from "./controls";
+import { IconButton, NumberField, Select, Slider, TextInput } from "./controls";
+import { InspectorSection } from "./InspectorSection";
 import { PathProperties } from "./ToolOptions";
 import { LayerStylesPanel } from "./LayerStylesPanel";
 import { TextProperties } from "./TypographyPanel";
+import { CurvesEditor } from "./CurvesEditor";
+import { LevelsEditor } from "./LevelsEditor";
+import { HistogramView } from "./HistogramView";
+import {
+  defaultCurvesAdjustment,
+  defaultHslAdjustment,
+  defaultLevelsAdjustment,
+  defaultToneAdjustment,
+} from "../core/adjustments";
+import { computeHistogram, adjustmentBackdrop } from "../core/histogram";
+import type { HistogramData } from "../core/histogram";
 
 export interface InspectorPanelProps {
+  guidesVisible: boolean;
+  onGuidesVisible(value: boolean): void;
+  assets: AssetStore;
   document: Document;
   viewDocument: DocumentData;
   selected: LayerData | undefined;
@@ -46,6 +68,9 @@ export interface InspectorPanelProps {
 }
 
 export function InspectorPanel({
+  guidesVisible,
+  onGuidesVisible,
+  assets,
   document: dom,
   viewDocument,
   selected,
@@ -61,6 +86,80 @@ export function InspectorPanel({
   onOpenHelp,
 }: InspectorPanelProps) {
   const tone = selected?.kind === "raster" ? toneOf(selected) : null;
+  const selectedWorld = selected
+    ? layerTransform(viewDocument, selected.id)
+    : undefined;
+  const rotation = selectedWorld
+    ? (Math.atan2(selectedWorld.b, selectedWorld.a) * 180) / Math.PI
+    : 0;
+  const rotationBounds = selected
+    ? layerBounds(viewDocument, selected.id)
+    : undefined;
+  const rotationPatch = (degrees: number) => {
+    if (!selected) throw new Error("Select a layer to rotate.");
+    const snapshot = dom.toJSON();
+    const world = layerTransform(snapshot, selected.id)!;
+    const bounds = layerBounds(snapshot, selected.id);
+    if (!bounds) throw new Error("This layer has no geometry to rotate.");
+    const delta = (degrees * Math.PI) / 180 - Math.atan2(world.b, world.a);
+    const rotated = AffineTransform.rotation(delta)
+      .around({
+        x: bounds.x + bounds.width / 2,
+        y: bounds.y + bounds.height / 2,
+      })
+      .multiply(world);
+    const parent = parentId(snapshot, selected.id);
+    const local = parent
+      ? layerTransform(snapshot, parent)!.inverse().multiply(rotated)
+      : rotated;
+    return {
+      x: local.e,
+      y: local.f,
+      transform: { ...local.toJSON(), e: 0, f: 0 },
+    };
+  };
+
+  const [histogram, setHistogram] = useState<HistogramData | null>(null);
+
+  useEffect(() => {
+    if (selected?.kind !== "adjustment") {
+      setHistogram(null);
+      return;
+    }
+    setHistogram(null);
+    const backdrop = adjustmentBackdrop(viewDocument, selected.id);
+    if (!backdrop) return;
+    const renderer = new CanvasRenderer();
+    let cancelled = false;
+    void renderer
+      .render(backdrop, assets, {
+        cache: false,
+        readback: true,
+        maxDimension: 256,
+        maxPixels: 65536,
+      })
+      .then((canvas) => {
+        try {
+          if (!cancelled)
+            setHistogram(
+              computeHistogram(
+                canvas
+                  .getContext("2d")!
+                  .getImageData(0, 0, canvas.width, canvas.height).data,
+              ),
+            );
+        } finally {
+          canvas.width = canvas.height = 0;
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setHistogram(null);
+      })
+      .finally(() => renderer.dispose());
+    return () => {
+      cancelled = true;
+    };
+  }, [selected?.id, selected?.kind, viewDocument, assets]);
 
   return (
     <aside className="inspector">
@@ -78,7 +177,19 @@ export function InspectorPanel({
       </div>
       {selected ? (
         <div className="inspector-scroll">
-          <section>
+          {selected.kind === "raster" && selectedObject && (
+            <AssetInfoPanel
+              key={selected.assetId}
+              asset={assets.get(selected.assetId)}
+              service={assets.metadata}
+              analysis={assets.analysis}
+              layer={selectedObject}
+              document={dom}
+              disabled={locked || busy}
+              onAttempt={onAttempt}
+            />
+          )}
+          <InspectorSection title="Layer">
             <TextInput
               label="Layer name"
               layout="stacked"
@@ -98,9 +209,8 @@ export function InspectorPanel({
                 Unlock the layer or its group to edit.
               </div>
             )}
-          </section>
-          <section>
-            <h2>Layout</h2>
+          </InspectorSection>
+          <InspectorSection title="Layout">
             <div className="field-grid">
               <NumberField
                 label="X"
@@ -136,8 +246,7 @@ export function InspectorPanel({
                     disabled={locked || busy}
                     onCommit={(width) =>
                       onSelectedAction((layer) => {
-                        if (layer instanceof RasterLayer)
-                          layer.width = width;
+                        if (layer instanceof RasterLayer) layer.width = width;
                       })
                     }
                   />
@@ -149,14 +258,35 @@ export function InspectorPanel({
                     disabled={locked || busy}
                     onCommit={(height) =>
                       onSelectedAction((layer) => {
-                        if (layer instanceof RasterLayer)
-                          layer.height = height;
+                        if (layer instanceof RasterLayer) layer.height = height;
                       })
                     }
                   />
                 </>
               )}
             </div>
+            <Slider
+              label="Rotation"
+              value={Math.round(rotation * 1000) / 1000}
+              min={-180}
+              max={180}
+              step={0.1}
+              suffix="°"
+              disabled={locked || busy || !rotationBounds}
+              onPreview={(value) =>
+                onAttempt(() =>
+                  onPreview({
+                    type: "layer.update",
+                    id: selected.id,
+                    patch: rotationPatch(value),
+                  }),
+                )
+              }
+              onCommit={(value) => {
+                onPreview(null);
+                onSelectedAction((layer) => layer.update(rotationPatch(value)));
+              }}
+            />
             <Select
               label="Parent group"
               layout="stacked"
@@ -190,9 +320,8 @@ export function InspectorPanel({
                 })
               }
             />
-          </section>
-          <section>
-            <h2>Appearance</h2>
+          </InspectorSection>
+          <InspectorSection title="Appearance">
             <Select
               label="Blend mode"
               hideLabel
@@ -202,8 +331,7 @@ export function InspectorPanel({
               options={BLEND_MODES.map((mode) => ({
                 value: mode,
                 label:
-                  mode[0].toUpperCase() +
-                  mode.slice(1).replaceAll("-", " "),
+                  mode[0].toUpperCase() + mode.slice(1).replaceAll("-", " "),
               }))}
               onChange={(val) =>
                 onSelectedAction((layer) => {
@@ -232,8 +360,6 @@ export function InspectorPanel({
                 });
               }}
             />
-          </section>
-          <section>
             <Slider
               label="Fill opacity"
               value={(selected.fillOpacity ?? 1) * 100}
@@ -254,38 +380,89 @@ export function InspectorPanel({
                 })
               }
             />
-          </section>
+          </InspectorSection>
+          {selected.kind === "smart-object" &&
+            selectedObject instanceof SmartObjectLayer && (
+              <SmartFiltersPanel
+                key={`${dom.id}:${selected.id}`}
+                document={dom}
+                layer={selectedObject}
+                value={selected.smartFilters ?? []}
+                disabled={locked || busy || !wasmReady}
+                onPreview={onPreview}
+                onAttempt={onAttempt}
+              />
+            )}
+          {selected.kind === "smart-object" &&
+            selectedObject instanceof SmartObjectLayer && (
+              <SmartFilterMaskPanel
+                key={`filter-mask:${dom.id}:${selected.id}`}
+                document={dom}
+                layer={selectedObject}
+                value={selected.filterMask ?? null}
+                disabled={locked || busy || !wasmReady}
+                onPreview={onPreview}
+                onAttempt={onAttempt}
+              />
+            )}
+          {selectedObject && (
+            <LayerMaskPanel
+              document={dom}
+              layer={selectedObject}
+              value={selected.mask ?? null}
+              disabled={locked || busy}
+              onAttempt={onAttempt}
+              onPreview={(mask) =>
+                onPreview(
+                  mask
+                    ? { type: "layer.update", id: selected.id, patch: { mask } }
+                    : null,
+                )
+              }
+            />
+          )}
           {selectedObject instanceof VectorLayer && (
             <PathProperties
               layer={selectedObject}
               path={
-                selectedObject.paths.get(
-                  selectedPathId ?? "",
-                ) ??
+                selectedObject.paths.get(selectedPathId ?? "") ??
                 selectedObject.paths.at(selectedObject.paths.length - 1)
               }
               disabled={locked || busy}
-              onAction={(action) => onAttempt(() => { onPreview(null); action(); })}
+              onAction={(action) =>
+                onAttempt(() => {
+                  onPreview(null);
+                  action();
+                })
+              }
               onPreview={onPreview}
-              previewStrokeWidth={preview?.type === "path.update" && preview.id === selected.id ? preview.patch.strokeWidth : undefined}
+              previewStrokeWidth={
+                preview?.type === "path.update" && preview.id === selected.id
+                  ? preview.patch.strokeWidth
+                  : undefined
+              }
             />
           )}
           {selectedObject instanceof TextLayer && (
             <TextProperties
               layer={selectedObject}
               disabled={locked || busy}
-              onAction={(action) => onAttempt(() => { onPreview(null); action(); })}
+              onAction={(action) =>
+                onAttempt(() => {
+                  onPreview(null);
+                  action();
+                })
+              }
               onPreview={onPreview}
             />
           )}
           {selected.kind === "paint" && (
-            <section>
-              <h2>Paint operations</h2>
+            <InspectorSection title="Paint operations">
               <p className="section-description">
                 {selected.strokes.length} editable strokes and fills. Source
                 images stay untouched.
               </p>
-            </section>
+            </InspectorSection>
           )}
           <LayerStylesPanel
             value={selected.styles ?? defaultStyle()}
@@ -303,10 +480,221 @@ export function InspectorPanel({
               })
             }
           />
+          {selected.kind === "adjustment" &&
+            selectedObject instanceof AdjustmentLayer && (
+              <InspectorSection
+                title="Adjustment"
+                className="adjustment-inspector-section"
+                actions={
+                  <IconButton
+                    label="Reset adjustment"
+                    disabled={locked || busy}
+                    onClick={() =>
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer) {
+                          const kind = layer.adjustmentKind;
+                          layer.update({
+                            adjustment:
+                              kind === "curves"
+                                ? defaultCurvesAdjustment()
+                                : kind === "levels"
+                                  ? defaultLevelsAdjustment()
+                                  : kind === "hsl"
+                                    ? defaultHslAdjustment()
+                                    : defaultToneAdjustment(),
+                          });
+                        }
+                      })
+                    }
+                  >
+                    <RotateCcw size={13} />
+                  </IconButton>
+                }
+              >
+                <p className="section-description">
+                  Modifies preceding backdrop non-destructively.
+                  <br />
+                  Original pixels stay untouched.
+                </p>
+
+                <Select
+                  label="Adjustment type"
+                  value={selected.adjustment.kind}
+                  disabled={locked || busy}
+                  options={[
+                    { value: "tonal", label: "Tonal strokes", disabled: true },
+                    { value: "patch", label: "Retouch patch", disabled: true },
+                    { value: "hsl", label: "Hue / Saturation / Lightness" },
+                    { value: "curves", label: "Curves" },
+                    { value: "levels", label: "Levels" },
+                    { value: "tone", label: "Tone (Exposure / Contrast)" },
+                  ]}
+                  onChange={(kind) => {
+                    onSelectedAction((layer) => {
+                      if (layer instanceof AdjustmentLayer) {
+                        if (kind === "hsl")
+                          layer.adjustment = defaultHslAdjustment();
+                        else if (kind === "curves")
+                          layer.setCurves(defaultCurvesAdjustment());
+                        else if (kind === "levels")
+                          layer.setLevels(defaultLevelsAdjustment());
+                        else if (kind === "tone")
+                          layer.setTone(defaultToneAdjustment());
+                      }
+                    });
+                  }}
+                />
+
+                {selected.adjustment.kind === "tonal" && (
+                  <p>
+                    {selected.adjustment.strokes.length} editable tonal strokes
+                  </p>
+                )}
+                {selected.adjustment.kind === "curves" && (
+                  <CurvesEditor
+                    value={selected.adjustment}
+                    histogram={histogram}
+                    disabled={locked || busy}
+                    onPreview={(adjustment) =>
+                      onPreview({
+                        type: "layer.update",
+                        id: selected.id,
+                        patch: { adjustment },
+                      })
+                    }
+                    onCommit={(adjustment) => {
+                      onPreview(null);
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer) {
+                          layer.update({ adjustment });
+                        }
+                      });
+                    }}
+                  />
+                )}
+
+                {selected.adjustment.kind === "levels" && (
+                  <LevelsEditor
+                    value={selected.adjustment}
+                    histogram={histogram}
+                    disabled={locked || busy}
+                    onPreview={(adjustment) =>
+                      onPreview({
+                        type: "layer.update",
+                        id: selected.id,
+                        patch: { adjustment },
+                      })
+                    }
+                    onCommit={(adjustment) => {
+                      onPreview(null);
+                      onSelectedAction((layer) => {
+                        if (layer instanceof AdjustmentLayer) {
+                          layer.update({ adjustment });
+                        }
+                      });
+                    }}
+                  />
+                )}
+
+                {selected.adjustment.kind === "hsl" &&
+                  (["hue", "saturation", "lightness"] as const).map((key) => (
+                    <Slider
+                      key={key}
+                      label={
+                        key === "hue"
+                          ? "Hue"
+                          : key === "saturation"
+                            ? "HSL saturation"
+                            : "Lightness"
+                      }
+                      value={
+                        selected.adjustment.kind === "hsl"
+                          ? selected.adjustment[key]
+                          : 0
+                      }
+                      min={key === "hue" ? -180 : -100}
+                      max={key === "hue" ? 180 : 100}
+                      step={1}
+                      suffix={key === "hue" ? "°" : "%"}
+                      disabled={locked || busy}
+                      onPreview={(value) =>
+                        onPreview({
+                          type: "layer.update",
+                          id: selected.id,
+                          patch: {
+                            adjustment: {
+                              ...selected.adjustment,
+                              [key]: value,
+                            },
+                          },
+                        })
+                      }
+                      onCommit={(value) => {
+                        onPreview(null);
+                        onSelectedAction((layer) => {
+                          if (layer instanceof AdjustmentLayer)
+                            layer.adjustment = {
+                              ...selected.adjustment,
+                              [key]: value,
+                            };
+                        });
+                      }}
+                    />
+                  ))}
+
+                {selected.adjustment.kind === "tone" && (
+                  <div className="adjustment-tone-controls">
+                    <HistogramView histogram={histogram} compact height={80} />
+                    {(["exposure", "contrast", "saturation"] as const).map(
+                      (key) => {
+                        const toneVal = (selected.adjustment as any)[key];
+                        return (
+                          <Slider
+                            key={key}
+                            label={key[0].toUpperCase() + key.slice(1)}
+                            value={toneVal}
+                            min={key === "exposure" ? -3 : -100}
+                            max={key === "exposure" ? 3 : 100}
+                            step={key === "exposure" ? 0.05 : 1}
+                            suffix={key === "exposure" ? " EV" : ""}
+                            disabled={locked || busy}
+                            onPreview={(val) =>
+                              onPreview({
+                                type: "layer.update",
+                                id: selected.id,
+                                patch: {
+                                  adjustment: {
+                                    ...selected.adjustment,
+                                    [key]: val,
+                                  },
+                                },
+                              })
+                            }
+                            onCommit={(val) => {
+                              onPreview(null);
+                              onSelectedAction((layer) => {
+                                if (layer instanceof AdjustmentLayer) {
+                                  layer.update({
+                                    adjustment: {
+                                      ...selected.adjustment,
+                                      [key]: val,
+                                    },
+                                  });
+                                }
+                              });
+                            }}
+                          />
+                        );
+                      },
+                    )}
+                  </div>
+                )}
+              </InspectorSection>
+            )}
           {tone && (
-            <section>
-              <h2>
-                Adjustments
+            <InspectorSection
+              title="Adjustments"
+              actions={
                 <IconButton
                   label="Reset adjustments"
                   disabled={
@@ -325,60 +713,70 @@ export function InspectorPanel({
                 >
                   <RotateCcw size={13} />
                 </IconButton>
-              </h2>
+              }
+            >
               <p className="section-description">
                 Explore a different tone.
                 <br />
                 Your original image stays untouched.
               </p>
-              {(["exposure", "contrast", "saturation"] as const).map(
-                (key) => (
-                  <Slider
-                    key={key}
-                    label={key[0].toUpperCase() + key.slice(1)}
-                    value={tone[key]}
-                    min={key === "exposure" ? -3 : -100}
-                    max={key === "exposure" ? 3 : 100}
-                    step={key === "exposure" ? 0.05 : 1}
-                    suffix={key === "exposure" ? " EV" : ""}
-                    disabled={locked || busy || !wasmReady}
-                    onPreview={(value) =>
-                      onPreview({
-                        type: "effect.tone",
-                        id: selected.id,
-                        values: { [key]: value },
-                      })
-                    }
-                    onCommit={(value) => {
-                      onPreview(null);
-                      onSelectedAction((layer) => {
-                        if (
-                          layer instanceof RasterLayer &&
-                          toneOf(
-                            layer.toJSON() as Extract<
-                              LayerData,
-                              { kind: "raster" }
-                            >,
-                          )[key] !== value
-                        )
-                          layer.setTone({ [key]: value });
-                      });
-                    }}
-                  />
-                ),
-              )}
-            </section>
+              {(["exposure", "contrast", "saturation"] as const).map((key) => (
+                <Slider
+                  key={key}
+                  label={key[0].toUpperCase() + key.slice(1)}
+                  value={tone[key]}
+                  min={key === "exposure" ? -3 : -100}
+                  max={key === "exposure" ? 3 : 100}
+                  step={key === "exposure" ? 0.05 : 1}
+                  suffix={key === "exposure" ? " EV" : ""}
+                  disabled={locked || busy || !wasmReady}
+                  onPreview={(value) =>
+                    onPreview({
+                      type: "effect.tone",
+                      id: selected.id,
+                      values: { [key]: value },
+                    })
+                  }
+                  onCommit={(value) => {
+                    onPreview(null);
+                    onSelectedAction((layer) => {
+                      if (
+                        layer instanceof RasterLayer &&
+                        toneOf(
+                          layer.toJSON() as Extract<
+                            LayerData,
+                            { kind: "raster" }
+                          >,
+                        )[key] !== value
+                      )
+                        layer.setTone({ [key]: value });
+                    });
+                  }}
+                />
+              ))}
+            </InspectorSection>
           )}
         </div>
       ) : (
         <div className="inspector-empty">
           <MousePointer2 size={24} />
           <h3>A closer look.</h3>
-          <p>
-            Select a layer to adjust its position, appearance, and tone.
-          </p>
+          <p>Select a layer to adjust its position, appearance, and tone.</p>
         </div>
       )}
+      <LayerCompsPanel
+        key={dom.id}
+        document={dom}
+        disabled={busy}
+        onAttempt={onAttempt}
+      />
+      <GuidesPanel
+        document={dom}
+        visible={guidesVisible}
+        onVisible={onGuidesVisible}
+        disabled={busy}
+        onAttempt={onAttempt}
+      />
       <div className="inspector-bottom">
         <span>Made for a little experimentation.</span>
         <button onClick={onOpenHelp}>

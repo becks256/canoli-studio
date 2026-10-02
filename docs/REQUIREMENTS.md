@@ -8,25 +8,25 @@ The owner is a full-stack engineer with image-processing and home-decor experien
 
 ## Confirmed requirements
 
-| ID  | Requirement                              | Acceptance                                                                                                                                                                                                                             |
-| --- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1  | Browser-based application                | Runs in a modern desktop browser with no desktop installation.                                                                                                                                                                         |
-| R2  | Use WebAssembly                          | At least one real image operation executes in a compiled WASM module.                                                                                                                                                                  |
-| R3  | Start bare-bones; preserve extensibility | Document model, UI, rendering, image processing, and persistence have separate boundaries.                                                                                                                                             |
-| R4  | Photoshop-inspired document object model | Documents own ordered layers; groups own child layers; image layers refer to source assets and adjustments. This is not a claim of Photoshop API/file compatibility.                                                                   |
-| R5  | Object-oriented design                   | Public DOM objects use constructors and methods/properties. The application uses the same DOM API intended for future integrations.                                                                                                    |
-| R6  | Public API uses DOM constructors         | `new Document`, `new RasterLayer`, `new LayerGroup`, `new TextLayer`, and `new ToneAdjustment` work today; attached mutations are validated and undoable.                                                                                               |
-| R7  | Keyboard shortcuts from the start        | A central registry drives shortcut handling and discoverable help; text entry is protected.                                                                                                                                            |
-| R8  | Document requirements                    | This file records scope, acceptance criteria, decisions, limitations, and open questions.                                                                                                                                              |
-| R9  | Product brief for future agents          | The application objective, intended experience, constraints, and unvalidated decisions are recorded in `PRODUCT_BRIEF.md`; `AGENTS.md` links the documents.                                                                            |
-| R10 | Distinct custom design system            | Professional, modern visual language appealing to artists/designers, with reusable components and tokens. No shadcn. See `DESIGN_SYSTEM.md`.                                                                                           |
-| R11 | REST API                                 | Local versioned document creation/query/commands/history endpoint, runtime validation and revision conflicts; current limitations documented.                                                                                          |
-| R12 | Scripting API                            | Users run custom JavaScript with DOM constructors from a Scripts panel; successful edits apply atomically with shared undo. Constructor/member reference and runnable examples are maintained in [SCRIPTING_API.md](SCRIPTING_API.md). |
-| R13 | Preserve high-resolution images          | No fixed MP, image-file-size or dimension cutoff; keep original dimensions/data, separate working-buffer budgets, test 50 MP end to end. Browser/device constraints must be reported honestly.                                         |
+| ID  | Requirement                              | Acceptance                                                                                                                                                                                                                                                                                                                                                  |
+| --- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1  | Browser-based application                | Runs in a modern desktop browser with no desktop installation.                                                                                                                                                                                                                                                                                              |
+| R2  | Use WebAssembly                          | At least one real image operation executes in a compiled WASM module.                                                                                                                                                                                                                                                                                       |
+| R3  | Start bare-bones; preserve extensibility | Document model, UI, rendering, image processing, and persistence have separate boundaries.                                                                                                                                                                                                                                                                  |
+| R4  | Photoshop-inspired document object model | Documents own ordered layers; groups own child layers; image layers refer to source assets and adjustments. This is not a claim of Photoshop API/file compatibility.                                                                                                                                                                                        |
+| R5  | Object-oriented design                   | Public DOM objects use constructors and methods/properties. The application uses the same DOM API intended for future integrations.                                                                                                                                                                                                                         |
+| R6  | Public API uses DOM constructors         | `new Document`, `new RasterLayer`, `new LayerGroup`, `new TextLayer`, and `new ToneAdjustment` work today; attached mutations are validated and undoable.                                                                                                                                                                                                   |
+| R7  | Keyboard shortcuts from the start        | A central registry drives shortcut handling and discoverable help; text entry is protected.                                                                                                                                                                                                                                                                 |
+| R8  | Document requirements                    | This file records scope, acceptance criteria, decisions, limitations, and open questions.                                                                                                                                                                                                                                                                   |
+| R9  | Product brief for future agents          | The application objective, intended experience, constraints, and unvalidated decisions are recorded in `PRODUCT_BRIEF.md`; `AGENTS.md` links the documents.                                                                                                                                                                                                 |
+| R10 | Distinct custom design system            | Professional, modern visual language appealing to artists/designers, with reusable components and tokens. No shadcn. See `DESIGN_SYSTEM.md`.                                                                                                                                                                                                                |
+| R11 | REST API                                 | Local versioned document creation/query/commands/history endpoint, Bearer/X-API-Key authentication, binary asset management, asynchronous generation jobs and polling, and atomic candidate application with revision conflict checks and single-transaction undo/redo.                                                                                     |
+| R12 | Scripting API                            | Users run custom JavaScript with DOM constructors from a Scripts panel; versioned host scripting bridge for non-blocking asynchronous jobs and asset inspection without sandbox credentials; successful edits apply atomically with shared undo. Constructor/member reference and runnable examples are maintained in [SCRIPTING_API.md](SCRIPTING_API.md). |
+| R13 | Preserve high-resolution images          | No fixed MP, image-file-size or dimension cutoff; keep original dimensions/data, separate working-buffer budgets, test 50 MP end to end. Browser/device constraints must be reported honestly.                                                                                                                                                              |
 
 ## Plugin extensions
 
-R14: Support plugins/extensions. The first implementation installs versioned JSON packages with named JavaScript commands, explicit document read/write permissions, source review, local browser persistence, export/update/remove actions and sandboxed execution. Each successful editing command shares the DOM and one history entry. See [PLUGINS.md](PLUGINS.md) for the current contract and future extension boundaries. Plugin UI panels, network capabilities, background hooks and a marketplace are not part of this first slice.
+R14: Support plugins/extensions. The implementation installs versioned JSON packages (apiVersion 1 and 2) with named JavaScript commands, fine-grained capability permissions (`document:read`, `document:write`, `jobs:run`, `ai:generate`, `assets:read`, `assets:write`, `assets:analyze`), source review, interactive UI permission grant/revocation, local browser persistence, export/update/remove actions and sandboxed execution. Each successful editing command shares the DOM and one history entry, and revoked permissions are strictly rejected at the host boundary. See [PLUGINS.md](PLUGINS.md) for the current contract and future extension boundaries. Plugin UI panels, network capabilities, background hooks and a marketplace are not part of this first slice.
 
 ## First usable slice
 
@@ -37,7 +37,7 @@ R14: Support plugins/extensions. The first implementation installs versioned JSO
 | M3  | Canvas navigation           | Zoom, fit, hand pan, temporary Space pan, and drag an unlocked layer.                                                                                                          |
 | M4  | Non-destructive adjustments | Exposure, contrast, and saturation are stored on the layer; original source pixels remain unchanged.                                                                           |
 | M5  | Undo/redo                   | UI and constructor-API changes share one history; a transaction is one undo entry; invalid transactions roll back. A continuous drag/slider gesture creates one history entry. |
-| M6  | Portable project files      | Save/open versioned `.luma` JSON containing document data and referenced images; reopen reproduces the composition.                                                            |
+| M6  | Portable project files      | Save/open versioned `.luma` binary container containing document data and original image blobs; import legacy JSON; reopen reproduces the composition.                         |
 | M7  | Export                      | PNG uses the same compositing path as the editor, without selection outlines or viewport zoom.                                                                                 |
 | M8  | Local operation             | Browser editing requires no server backend, account, paid API, or image upload to an external service. The REST service is optional.                                           |
 | M9  | Responsive processing       | WASM pixel loops run in a Web Worker; stale preview results cannot replace a newer document revision.                                                                          |
@@ -66,39 +66,47 @@ R17: Prefer hardware WebGPU for supported viewport rendering, with automatic Can
 
 `Mod` means Command on macOS and Control on Windows/Linux. Shortcuts are suspended while typing in inputs, textareas, selects, or editable content. Escape can close a dialog or cancel a gesture.
 
-| Action                                 | Shortcut                                                  |
-| -------------------------------------- | --------------------------------------------------------- |
-| Move tool                              | V                                                         |
-| Hand tool                              | H                                                         |
-| Artboard editor                        | A                                                         |
-| Text tool                              | T                                                         |
-| Paint bucket (Fill)                    | G                                                         |
-| Brush / Pencil / Pen / Marquee / Clone | B / N / P / M / S                                         |
-| Brush/pencil/clone diameter            | [ / ]                                                     |
-| Finish active path                     | Enter                                                     |
-| Remove last active path anchor         | Delete / Backspace while drawing with Pen                 |
-| Select entire canvas / deselect pixels | Mod+A / Mod+D                                             |
-| Clear selected paint                   | Delete / Backspace with a pixel selection and paint layer |
-| Temporary hand tool                    | Hold Space                                                |
-| Import image                           | Mod+O                                                     |
-| Open project                           | Mod+Shift+O                                               |
-| Save project                           | Mod+S                                                     |
-| Export PNG                             | Mod+Shift+E                                               |
-| Undo                                   | Mod+Z                                                     |
-| Redo                                   | Mod+Shift+Z, Ctrl+Y                                       |
-| Duplicate selected layer               | Mod+J                                                     |
-| Delete selected layer                  | Delete / Backspace                                        |
-| New empty layer                        | Mod+Shift+N                                               |
-| Add group containing selection         | Mod+G                                                     |
-| Move selected layer forward/backward   | Mod+] / Mod+[                                             |
-| Nudge selection                        | Arrow keys; Shift for 10 px                               |
-| Fit canvas                             | Mod+0                                                     |
-| Actual size                            | Mod+1                                                     |
-| Zoom                                   | + / −                                                     |
-| Keyboard help                          | ?                                                         |
-| Plugins                                | Mod+Shift+L                                               |
-| Scripts                                | Mod+Shift+K                                               |
-| Run script in code editor              | Mod+Enter                                                 |
+| Action                                          | Shortcut                                                  |
+| ----------------------------------------------- | --------------------------------------------------------- |
+| Move tool                                       | V                                                         |
+| Hand tool                                       | H                                                         |
+| Crop canvas                                     | C                                                         |
+| Artboard editor                                 | A                                                         |
+| Text tool                                       | T                                                         |
+| Paint bucket (Fill)                             | G                                                         |
+| Brush / Pencil / Eraser / Pen / Marquee / Clone | B / N / E / P / M / S                                     |
+| Dodge / Burn                                    | O / Shift+O                                               |
+| Brush/pencil/clone diameter                     | [ / ]                                                     |
+| Finish active path / Apply crop                 | Enter                                                     |
+| Clear crop frame                                | Delete / Backspace in Crop mode                           |
+| Remove last active path anchor                  | Delete / Backspace while drawing with Pen                 |
+| Select entire canvas / deselect pixels          | Mod+A / Mod+D                                             |
+| Clear selected paint                            | Delete / Backspace with a pixel selection and paint layer |
+| Temporary hand tool                             | Hold Space                                                |
+| Find a command                                  | Mod+K                                                     |
+| Import image                                    | Mod+O                                                     |
+| Open project                                    | Mod+Shift+O                                               |
+| Save project                                    | Mod+S                                                     |
+| Export Dialog (PNG, JPEG, WebP, SVG)            | Mod+Shift+E                                               |
+| Undo                                            | Mod+Z                                                     |
+| Redo                                            | Mod+Shift+Z, Ctrl+Y                                       |
+| Duplicate selected layer                        | Mod+J                                                     |
+| Delete selected layer                           | Delete / Backspace                                        |
+| New empty layer                                 | Mod+Shift+N                                               |
+| Add group containing selection                  | Mod+G                                                     |
+| Move selected layer forward/backward            | Mod+] / Mod+[                                             |
+| Nudge layer, mask, anchor or crop frame         | Arrow keys; Shift for 10 px                               |
+| Fit canvas                                      | Mod+0                                                     |
+| Actual size                                     | Mod+1                                                     |
+| Zoom                                            | + / −                                                     |
+| Keyboard help                                   | ?                                                         |
+| Plugins                                         | Mod+Shift+L                                               |
+| Scripts                                         | Mod+Shift+K                                               |
+| Recipes & Automation                            | Mod+Shift+R                                               |
+| Batch Runner & Delivery Manifest                | Mod+Shift+B                                               |
+| Color Settings & Soft-Proofing                  | Mod+Alt+K                                                 |
+| Import PSD / PSB                                | Mod+Alt+P                                                 |
+| Run script in code editor                       | Mod+Enter                                                 |
 
 Buttons remain available for browser/OS-reserved shortcuts. Only handled shortcuts prevent the browser default. Runtime shortcut rebinding is a future feature; definitions must remain centralized to make it possible.
 
@@ -114,22 +122,22 @@ Buttons remain available for browser/OS-reserved shortcuts. Only handled shortcu
 
 ## Current practical limits
 
-- Desktop browsers; PNG/JPEG/WebP imports and PNG exports.
-- sRGB, 8-bit RGBA. The initial exposure/tone operator works on encoded channels; it is not a color-managed photographic pipeline.
+- Desktop browsers; PNG/JPEG/WebP/PSD imports and PNG/JPEG/WebP/SVG/PSD exports.
+- Working color spaces: sRGB, Display P3, Adobe RGB 1998, Linear sRGB. Bradford chromatic adaptation, CIELAB/CIEXYZ/DeviceCMYK conversions, Delta E 2000 calculations, and soft-proofing gamut warnings are supported. 16-bit float and native CMYK printing channels remain future work.
 - No fixed source/canvas megapixel cap. Positive safe-integer document dimensions; 64 layers, 8 group nesting levels, 60 undo entries.
-- No fixed image/project byte-size cutoff. Browser decoding, memory and JSON/base64 string allocation still impose real practical constraints; there is no infinite-size guarantee. Original sources remain resident.
-- Manual project saves; the UI must not claim durable autosave. Source assets retained for undo are released when changing documents.
-- Rectangular layer hit testing and isolated groups. No alpha hit testing, arbitrary layer masks, rotation, text layers, PSD, RAW, CMYK, or multi-document workspace yet.
+- No fixed image/project byte-size cutoff. Browser decoding, memory and document-manifest allocation (plus JSON/base64 for legacy input) still impose real practical constraints; there is no infinite-size guarantee. Original sources remain resident.
+- Manual external project saves plus local atomic recovery checkpoints; see [STORAGE_FORMAT.md](STORAGE_FORMAT.md). Browser recovery is not an external backup or a power-loss guarantee. Source assets retained for undo are released when changing documents.
+- Rectangular layer hit testing and isolated groups. Basic text layers and single-canvas artboard resizing are implemented. Prototype PSD/PSB interchange and preflight capability inspection are delivered under ticket T17; arbitrary rotation, RAW, and multi-document workspace remain future work.
 - Drawing limits: 2048 operations or paths per layer; 20,000 points per stroke/path; 128 marquee regions; 4096 clone tiles per stroke. These bound metadata complexity, not image dimensions. Paint operations can be removed/replaced through scripting; there is no individual stroke inspector yet.
 - Marquee displays component outlines rather than a traced combined contour. Clone displays its stroke trail until sampling completes on release. Canvas 2D uses encoded sRGB blending and browser antialiasing; Photoshop parity is not claimed.
-- Reparenting uses the destination group's coordinate system; preservation of world position is future behavior.
+- Low-level `layer.reparent` uses the destination group's coordinate system; UI placement through `layer.place` preserves world position. General affine transforms remain future work.
 
 ## Future scope — not implemented commitments
 
 - AI-assisted edits, provider choice, credentials, generation budgets, and product-specific workflows.
-- Arbitrary masks, richer adjustment stacks, transforms, text nodes, disk-backed/lazy source decoding, streaming binary project persistence, GPU acceleration, color management, and more formats.
+- Arbitrary masks, richer adjustment stacks, transforms, advanced typography, disk-backed/lazy source decoding, streaming binary project persistence, expanded GPU coverage, color management, and more formats.
 - Public plugin/automation SDK packaging, persisted keyboard customization.
-- Autosave/recovery, cloud storage, authentication, collaboration, and billing.
+- Versioned recovery journals and stronger storage diagnostics, cloud storage, authentication, collaboration, and billing.
 
 ## Verification
 
@@ -145,3 +153,215 @@ Automated tests should cover DOM constructor ownership, live handles after undo/
 ### Appearance modes
 
 The editor and all developer docs support Light, Dark, and System. The editor exposes a compact sun/moon toggle at the bottom of the tool rail, with System available in its right-click/keyboard appearance popover; docs retain the labeled selector. Default to the OS preference, persist explicit choices locally, synchronize tabs, and respond to OS changes while System is selected. Apply the preference before first paint. Theme changes affect UI chrome and syntax highlighting only; rendered artwork, exported pixels, document data, and undo history must be unchanged. Storage failure must not prevent switching for the current page. Docs remain readable and follow the OS with JavaScript disabled.
+
+## Professional editor and AI roadmap — planned, not implemented
+
+R18 (planning requirement): maintain a feature-rich professional-editor roadmap that competes with Photoshop-level workflows while differentiating through intelligent assets, inspectable AI, protected source content and repeatable production. The owner explicitly requested automatic metadata extraction and generating image assets as layers. The plan must cover manual editing fundamentals as well as AI; it does not authorize claiming parity or running paid services merely by documenting them.
+
+Acceptance for this planning deliverable: a source-backed competitive review, a baseline audit, a prioritized tool catalog, detailed metadata/generation contracts, OOP/REST/scripting/plugin integration boundaries, privacy/cost/error controls, phased implementation tickets, measurable release gates and a recorded work log. See [FEATURE_STRATEGY.md](FEATURE_STRATEGY.md), [COMPETITIVE_RESEARCH.md](COMPETITIVE_RESEARCH.md), [AI_FEATURE_SPECS.md](AI_FEATURE_SPECS.md), and [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md). Feature acceptance in those files remains future work.
+
+### Local metadata extraction — initial implementation
+
+Raster imports automatically analyze original blobs locally in a worker. Properties → Asset info distinguishes decoded file facts from embedded declarations, preserves namespaces, reports parsing failures, and exports JSON sidecars with explicit attribution/private-field controls. Source bytes are unchanged; no inference or network service is involved. Reopening a project regenerates derived analysis. See [ASSET_METADATA.md](ASSET_METADATA.md) for tested coverage and limits. Authored descriptions, attribution and keywords now use command-backed layer metadata with locks, undo/redo, schema-v2 persistence, constructor scripting and REST patches. Sidecar exports exclude private authored fields by default. Human review states, OCR/semantic analysis and embedded metadata writing remain planned.
+
+### Layer masks — first T06 slice
+
+Every layer/group supports a non-destructive mask captured from the current rectangle/ellipse selection, including Boolean holes. Properties offers create/replace, enable, invert, paired density slider/number input and remove actions; controls obey locks and support keyboard focus. Changes share constructor scripting, strict REST patches, undo/redo and schema-v3 persistence. Layer-local geometry moves with layers, and masking applies before styles in Canvas/WASM export and WebGPU composition. Closed Bézier paths can also be copied from an attached vector layer; compound masks support even-odd holes and nonzero winding, with detached path editing through scripting. Selection and vector masks now include 0–128 px fractional feathering through the WASM worker, with complete filter halos across export boundaries and a paired slider/input. Masks support independent x/y translation and linking/unlinking with position-preserving toggles; unlinked masks stay fixed through ancestor motion and reparenting. Bézier masks support direct pen anchor/handle editing; mask rotation/scaling, bitmap-mask import and edge refinement remain planned. See [LayerMask](SCRIPTING_API.md#layermask) for exact current behavior.
+
+### Direct mask movement
+
+The Move tool offers a **Move target** selector. Choose Mask to drag the selected layer’s mask anywhere on the canvas without hit-selecting another layer or moving source content. Drag deltas use document pixels in either linked or unlinked mode; linking is unchanged. Arrow keys nudge by 1 px, Shift+Arrow by 10 px. Pointer movement previews, release commits once, and Escape/pointer cancellation discards the preview. Layer/ancestor locks apply. Selecting another layer/document or choosing a tool resets the target to Layer. Mask mode hides layer resize handles; mask rotation and scaling remain planned.
+
+### Mask painting
+
+Properties offers Add painted mask (initially reveal-all), or an explicit Replace with painted mask action for other mask kinds. Brush/Pencil options offer these targets for every mask kind: Layer, Mask · Hide, Mask · Reveal. Strokes obey the existing size/hardness/opacity controls, pointer pressure, selection clipping, locks, cancellation and one commit per gesture. Selection/Bézier masks retain their editable geometry beneath ordered paint refinements. Strokes modify mask coverage only, preserve source content, and persist through project/recovery serialization. Existing inversion/density/feather/link/position controls apply. Mask painting uses transient renderer previews without document-command construction per frame, reuses finished coverage and incrementally appends active points within bounded working caches; disk-backed bitmap masks remain future work.
+
+### Direct Bézier mask editing
+
+With a Bézier mask selected, choose Pen → Pen target → Mask paths. Existing contour outlines, anchors and control handles appear in the resolved mask coordinate plane. Drag an anchor to move its handles with it; dragging a handle mirrors its counterpart unless Alt/Option is held. Release commits one validated mask update; Escape/pointer cancellation discards previews. Click an anchor, then use arrows (Shift for 10 px) to nudge or Delete/Backspace to remove it. Removing a contour’s last anchor removes that contour, leaving the layer, mask settings and paint refinements intact. Empty clicks create no paths and Delete without a selected mask anchor does not delete the layer. Source-path/layer geometry is unchanged, locks apply, and save/reopen/undo use the existing mask contract. Select an anchor and choose Insert midpoint to subdivide its outgoing segment without changing the curve; the new anchor becomes selected and the operation is one undo entry. Click a contour away from existing anchors/handles to insert a control point at the nearby curve location. The curve is subdivided without changing its shape; the inserted anchor becomes selected after release. Hit tolerance is seven screen pixels at any zoom, and existing anchors/handles take priority. Insertion previews without changing history, commits once on release, and Escape/pointer cancellation discards it. Clicking elsewhere remains a no-op unless New contour is active.
+
+### Drawing Bézier mask contours
+
+Properties → Add Bézier mask creates an empty vector mask on an unmasked layer. An empty mask hides content; the adjacent instruction explains how to reveal it by drawing a contour. Pen → Mask paths → New contour starts an explicit draft so empty clicks in normal anchor-edit mode remain harmless. Click adds a corner, dragging sets mirrored Bézier handles, and Delete/Backspace removes the last draft anchor. Enter or Close contour closes and commits; clicking the first anchor closes after at least two anchors exist. A single-anchor contour can be finished with Enter and edited afterward. The draft previews a closed contour and uses a dashed outline; it does not modify document history or saved project content until completion. Each completed contour is one undo entry, and existing geometry, mask settings and paint refinements remain intact. Even-odd nested contours make holes; nonzero follows winding direction.
+
+Escape, Cancel contour, pointer cancellation, tool/target changes and document/selection changes discard the draft. Revisions and locks are checked before commit, and contour/anchor bounds apply before accepting more points. Existing linked/unlinked coordinate rules apply. Arrow nudging is for committed anchors; drawing drafts use pointer placement and last-anchor removal. Undo cancels a draft before applying the normal document undo. Controls preserve their footprint when entering/leaving drawing mode so the canvas does not shift. Project persistence/export uses the existing vector-mask contract.
+
+### Non-destructive canvas crop — first T07 slice
+
+Crop canvas (C) enters on-canvas crop mode. Drag a new frame or start from a single additive rectangular selection, rounded outward to whole pixels. Precise bounds opens the numeric X/Y/width/height dialog using the current frame when present. Reset and Use rectangular selection actions are explicit; compound/elliptical selections do not masquerade as a rectangular crop. Applying creates one undo entry; cancelling or rejecting a stale dialog changes no artwork. Bounds may extend outside the old canvas. Rotation, straightening and affine transforms remain planned.
+
+Crop translates root layers and pixel selections into the new coordinate plane. Linked masks follow their layers; every unlinked mask origin is rebased, including masks inside groups. Locked content participates in this global coordinate change without losing its locks. Source bytes, source resolution, local path/stroke geometry, effects and off-canvas content remain intact. Save/reopen and PNG output use the new dimensions; a later negative-origin crop can recover the previous framing. Crop/resize and their undo/redo clear transient pen/clone coordinates. No arbitrary image resolution limit is added. UI, constructor scripting and strict REST commands share validation, history and failure atomicity.
+
+### On-canvas crop frames
+
+A crop frame is transient until Enter or Apply crop. Drag inside it to move; drag an edge or any of eight screen-sized handles to resize, with a one-pixel minimum. Drag outside the existing frame or choose New frame to draw another. Shift draws a square or preserves the original aspect ratio when dragging a corner, rounded to whole pixels. Edges resize one axis. Frames may extend beyond the current canvas; the overlay dims the excluded part of the current canvas and draws a thirds grid and pixel dimensions.
+
+Arrows nudge a frame; focused handle buttons use arrows to resize their corresponding edges. Shift increases keyboard increments to 10 px. Delete/Backspace clears the frame without deleting artwork. Escape, Cancel crop, pointer cancellation, window blur, tool changes and document revision/replacement changes discard the frame. Undo first cancels the draft, then performs normal document undo. Numeric-dialog Cancel retains the prior frame; applying the dialog uses the same crop command. Pointer updates are scheduled once per animation frame and the final pointer endpoint is retained even before a scheduled frame runs. No document preview mutation, asset rewrite or history entry occurs before Apply.
+
+## Generation and batch review corrections (2026-09-30)
+
+Generation must reject unconfigured providers. Procedural providers belong exclusively in test fixtures; no synthetic fallback is permitted in job execution, reference capture, source-image loading, or batch export. The provider bakeoff remains incomplete and must not infer real scores from fixture images or profile constants.
+
+Encoded candidate images must decode successfully, match declared dimensions, and have their transparency verified from decoded pixels. Invalid candidates cannot be promoted into project assets. Masked edits use reference-rendered document pixels, including groups, masks, text, paint and adjustments; capture errors prevent submission. Synchronous recipes reject `ai.generate` before applying any commands.
+
+Batch runs persist source bytes and completed variant checkpoints. Reload recovery resumes interrupted work and skips successful items; completed variant bytes are hash-checked before reuse. Missing or undecodable sources and rendering/encoding failures fail the item explicitly. PNG, JPEG and WebP deliverables must contain the requested format and dimensions, independent of viewport allocation defaults.
+
+Delivery variant IDs must be unique within a batch; creation and resume reject duplicates before writing outputs. Archive filenames preserve the format extension when truncating long stems, and colliding names receive distinct suffixes without losing that extension.
+
+Batch delivery variants apply contain/cover/fill to the complete source artboard composition. Nested layers, text, masks and effects must share the fit mapping; the source document and its editable geometry remain unchanged. Contain margins are transparent and cannot reveal artwork outside the original artboard. Streamed PNG tiles and full-frame rendering must agree.
+
+The command palette opens with Mod+K outside text inputs or from the search icon in the tool rail. It searches shared action labels/categories with exact-word, substring and abbreviation ranking. Arrow keys, Home/End, Enter and Escape navigate, execute and dismiss; unavailable actions remain discoverable but cannot run. The palette must retain search focus while typing, restore the previous control when dismissed, and close before an action opens another modal. It uses the same action callbacks and availability checks as keyboard shortcuts, including shared document undo. Multi-document tabs, layer filtering and multi-selection remain separate unfinished T22 work.
+
+Layer search/filtering combines case-insensitive name words, layer type, effective visibility and effective lock state. Effective state includes ancestors' visibility/locking; opacity is not treated as the visibility switch. Matching descendants retain ancestor rows for context and temporarily expand those groups. Clearing filters restores the previous collapsed state. Filtering changes no document content, selection or undo history; an excluded active layer remains selected and is named in the panel. Filters reset when the active document ID changes. Empty results and a clear-filters action remain keyboard accessible.
+
+Layer multi-selection: Ctrl/Cmd/Shift-click layer rows or canvas hits toggles membership; a normal layer-row click replaces the set. Selected rows remain pressed and the canvas shows union bounds. With Move and layer targeting, arrows nudge all selected roots; dragging an already selected member previews and commits their common translation once. Escape/pointer cancellation discards the preview; an intervening document revision rejects the multi-drag commit. The Layers panel offers six alignments and selected-root deletion in one undo transaction. Selecting both parent and descendant does not double-transform the descendant. Pixel marquee and active-layer inspector/tool properties remain independent. Multi-layer resize/rotation and richer range-selection semantics remain planned.
+
+Document tabs support drag-and-drop ordering and Alt+Left/Right while the tab is focused. Ordering preserves keyboard focus, active document and undo state. Normal Left/Right/Home/End continue to navigate tabs. Tab ordering is session-only.
+
+When another document tab is open, the Layers panel offers a keyboard-accessible “Copy selection to” destination selector. It is disabled during operations or with no selected layers. Copy preserves the source tab and source artwork, selects the copies in the destination, and creates one undo entry there. Destination choices use session identity and numbered labels so documents with identical names remain distinct.
+
+Recover work includes explicit Save workspace and Restore workspace actions. Workspace saving captures all open documents and their tab order, active document, selections and zoom/pan. Restore preserves current edited tabs and opens restored copies only after all project snapshots validate. This manual checkpoint is separate from automatic workspace and per-document recovery; workspace snapshots do not retain undo history.
+
+Recover work includes an opt-in “Restore saved workspace on startup” setting, off by default. Startup restores this browser tab’s latest automatic workspace checkpoint, falling back to the explicit Save workspace checkpoint when none exists. It restores once per app mount and reports failures through the normal editor error state. Manual checkpoints remain independent. Disabling the setting returns to normal blank startup.
+
+Recover work supports named workspace milestones: enter a label, save an immutable version, and restore a listed version as copies beside existing work. Duplicate labels retain separate timestamped versions; saving a milestone does not replace the current startup checkpoint. Versions remain local to this browser.
+
+The Layout inspector provides a shared Rotation slider and precise numeric input (-180° to 180°). The value is the layer's canvas-space x-axis angle; edits rotate around the center of its geometric canvas bounds, preserving its existing scale/shear. Parent transforms are accounted for. Pointer preview commits through shared layer updates, keyboard adjustment uses the reusable slider bindings, and undo reverses one committed adjustment. Locked or geometry-free layers disable rotation.
+
+Generation recovery UI: the generation dialog includes a keyboard-operable expandable list of unfinished saved requests, with provider, request ID, timestamp and reserved amount. Users can refresh accounting and cancel undispatched requests. Dispatched requests remain reserved until confirmed host reconciliation; the UI does not guess charges or automatically resubmit work. Cancellation failures are visible and preserve accounting. Saved candidate pixels, provenance and protected references now restore to the review shelf with integrity/decode checks and explicit placement approval. Full job reconstruction and automatic queued resumption remain planned.
+
+### On-canvas layer rotation
+
+A single unlocked layer with geometry exposes a rotation handle above its selection bounds. Dragging previews canvas-space rotation around the geometric center; hold Shift to snap the rotation delta to 15° increments. Release commits one shared undoable layer update. Escape cancels the preview without changing the document. The Layout Rotation slider/input remains the keyboard-accessible precise adjustment path. Multi-layer rotation and guide snapping remain planned.
+
+### Shared-center selected-layer rotation
+
+The Layers panel offers 90° clockwise/counterclockwise and 180° rotation for multiple selected layers. Selected roots rotate together around the center of their combined geometric bounds in canvas space; selecting a group and its child does not transform the child twice. Parent scale/shear is respected. The operation rejects locked roots and missing geometry and commits in one undo transaction. Scripts can supply arbitrary finite angles through `document.layerSelection.rotate(degrees)`. Multi-layer pointer rotation and scaling remain planned.
+
+The on-canvas rotation handle also supports multiple selected layers: it uses the shared geometric center and transforms selected roots, excluding descendants of selected ancestors. Drag preview leaves document revision unchanged; release commits every root together. Shift snaps the shared rotation delta, Escape cancels, and document revision changes invalidate commit. Any locked or geometry-free selected root suppresses the handle. Multi-layer scaling and guides/snapping remain planned.
+
+### Shared-center selected-layer scaling
+
+The Layers panel offers 50% and 200% scale actions for multiple selected layers. Scaling operates in canvas space around the shared geometric center and preserves editable source contents. Parent transforms, inherited locks, geometric-bounds validation, descendant exclusion and one-step undo match shared-center rotation. Arbitrary positive horizontal/vertical factors are available through `document.layerSelection.scale(x, y = x)`. Pointer scaling and paired slider/numeric UI controls remain outstanding.
+
+Multi-layer scale also has a paired reusable slider/numeric input in the Layers panel (1–400%, 0.1% steps). The percentage is relative to the current selection and remains staged until Apply selection scale, which commits once and resets the control to 100%. Changing documents or layer selection resets the draft. These UI control bounds are not document or API scale limits; scripts accept other positive representable factors. Keyboard slider adjustment and precise typed values use the existing reusable control behavior.
+
+### Multi-layer corner scaling
+
+Multiple selected layers with editable geometry expose four corner handles. Dragging scales the selected roots in canvas space about the opposite corner; Shift uses a uniform factor. The gesture preserves editable source content, previews without changing document revision, and commits once on release. Escape cancels. Crossing the opposite corner clamps to a positive scale rather than reflecting the artwork. Locked or geometry-free roots suppress these handles. Single-layer resize behavior remains unchanged.
+
+### Move-tool canvas snapping
+
+Snap to canvas is an opt-in checkbox in Move tool options. Layer dragging aligns the moving geometric union's edges or center to canvas edges/center within six screen pixels, independent of zoom. Horizontal and vertical matches are chosen independently and displayed as temporary guide lines. Alt bypasses snapping during the gesture. Pointer release commits the snapped movement through existing commands; preview and cancellation do not add history. Mask movement and keyboard nudges are unchanged. The toggle is session-local; custom persistent guides and snapping to other artwork remain planned.
+
+With Snap to canvas enabled, Include artwork optionally adds visible stationary artwork edges and centers as snap targets. Hidden/zero-opacity subtrees, selected moving roots and descendants, and groups containing moving roots are excluded. Bounds are geometric rather than shadow/effect extents. Targets share the same screen-space tolerance, transient guides and Alt bypass; both options remain session-local. Persistent user-authored guides remain planned.
+
+Focused guide controls: Left/Right nudges vertical guides; Up/Down nudges horizontal guides by one document pixel, or ten with Shift. Escape cancels a guide drag without history. These focus-local controls consume their events so layer nudging does not also run.
+
+Rulers: drag the horizontal ruler into the canvas to create a horizontal guide, or the vertical ruler for a vertical guide. Drop outside the document or press Escape to cancel. Enter on a focused ruler creates a centered guide. Creation is one undoable document edit.
+
+### Dodge and burn tools
+
+Dodge (`O`) and Burn (`Shift+O`) create editable tonal strokes on a separate tonal adjustment layer, or append to the selected tonal layer. The layer processes its live preceding backdrop within the same group; current-layer/all-layer sampling options are not implemented. Controls expose shadows/midtones/highlights, exposure and tone protection, plus shared brush size, hardness, opacity, flow, spacing, smoothing and pressure controls. Numeric settings use sliders beside precise inputs. The tools share brush-size memory and bracket shortcuts. Paint color is not used. Strokes capture the active pixel selection, preview before release, and commit as one named undo entry. Escape cancels the stroke. Original image bytes remain unchanged; layer/stroke data persists through project files using schema v8. Rendering currently uses the Canvas/CPU-worker path, without a GPU retouch or performance guarantee.
+
+### Interactive patch retouching
+
+Patch (`J`) uses an existing marquee selection. Drag on the canvas toward the donor region; a translated selection outline shows donor placement. Release to solve and add one alpha-preserving patch adjustment, with one undo entry. Zero-distance drags do not commit. Escape cancels the gesture or pending operation. Sampling options are current layer, current and below, or all layers (default); detail options are donor gradients (default) or stronger mixed gradients. Invalid donors, changed document/selection, allocation failure or solver nonconvergence report an error without committing. The current preview indicates geometry, not a live solved pixel result. Automatic donor selection and live solved previews remain planned.
+
+### Spot Healing brush
+
+Spot Healing (`Shift+J`) accumulates a brush path and repairs it on release using local donor search and Poisson blending. Size, hardness, opacity, flow, spacing, smoothing and pressure dynamics use the shared brush controls; an existing selection clips coverage. Sampling and source/mixed detail controls are shared with Patch. Search radius defaults to 64 document pixels and is adjustable. Successful strokes create separate alpha-preserving adjustment layers with one undo entry; source images remain unchanged. Escape aborts pending work. The overlay indicates stroke extent, not the solved result. No-donor/nonconverged/stale/cancelled operations do not commit. Donor choice is currently a local boundary heuristic; automatic semantic quality and the performance release gate remain unverified.
+
+The Patch tool (`J`) supports Source and Destination placement modes. Source selects the repair region and drags toward a donor. Destination selects donor artwork and drags it to the repair region. Both retain original selection geometry and source assets, commit a new patch adjustment in one undo step, and support Escape cancellation. Source/mixed gradient guidance remains an independent “Patch detail” control. The translated outline indicates donor location in Source mode and repair location in Destination mode; it is not a solved-pixel preview.
+
+Automatic workspace checkpoints now preserve open-document content, tab order, active tab, layer selection, color/proof settings and zoom/pan. Changes are coalesced on a two-second timer and published atomically after encoding. Recovery displays pending/saving/saved/error state, allows flushing pending changes, and can restore the automatic checkpoint as copies beside existing work. Reload restoration remains opt-in. A sessionStorage identity associates reloads with the same browser tab; browser Web Locks prevent simultaneous tabs from writing the same identity. A duplicated tab forks its identity while the original remains open. Named/manual checkpoints and per-document recovery remain separate. Pending edits can be lost if a crash occurs before the asynchronous checkpoint completes; the retained undo/redo window is persisted with the completed workspace checkpoint. A new browser session without the tab identity falls back to the manual checkpoint; Recovery lists saved browser workspaces across tab identities for explicit copy restoration and confirmed cleanup.
+
+Recovery’s “Saved browser workspaces” list shows automatic checkpoints across browser-tab identities, including document names and save times. “Open workspace copy” restores validated projects beside current edited documents. Checkpoint removal requires a second confirmation click and is refused while any browser tab holds its autosave writer lock. Users can close that originating tab and retry. Damaged checkpoint metadata remains listed with restoration disabled and removal available. Listing checks metadata; complete project/source validation still occurs during restore. Startup selection remains unchanged: this tab’s automatic checkpoint, then the manual fallback. Other automatic checkpoints are chosen explicitly from Recovery.
+
+Workspace checkpoints must retain each document's existing undo/redo window (60 combined entries), including image assets referenced only by those entries. Reloaded Undo/Redo must reproduce original pixels and new edits must discard the redo branch. Validate all histories and assets before installing any restored workspace documents. Automatic, manual and named workspace checkpoints share this behavior; ordinary project files and per-document recovery remain content snapshots. Edits after the last completed checkpoint remain subject to the documented recovery limitations.
+
+Recovery displays browser-reported storage usage, quota, estimated remaining capacity and persistence status. These are origin-wide estimates, not per-project measurements or a guarantee of successful saves. Users can refresh estimates and explicitly request persistent storage; opening Recovery must never request it automatically. Unsupported APIs, failed estimates and declined persistence must leave editing, project downloads and recovery actions usable. Browser persistence does not replace external backups or protect against clearing site data.
+
+Quota failures must report an actionable storage-full message, retain the latest failed capture for explicit retry without requiring another edit, preserve earlier completed checkpoints and keep project downloads available. Newer edits supersede a retained failed capture. Recovery provides Retry document recovery; retry must not run in a tight automatic loop or prevent other queued sessions from saving.
+
+Recipe condition operands must be validated before executing any step, including direct service execution without JSON import. Invalid conditions reject the entire transaction, preserving document content and history. Every accepted variant ID must survive delivery manifest validation and ZIP export. ZIP export emits ZIP64 records when counts, entry sizes or offsets reach classic sentinel values, without truncating fields. UTF-8 filenames remain subject to the ZIP format’s 65,535-byte limit. Large-payload memory and responsiveness validation remain outstanding.
+
+Smart objects use schema 14 and shared master definitions with independently transformed instances. Constructor-based scripting and REST command arrays must support creation, replacement and undo. Master edits update all dependent instances and reject if an affected placement is locked. Detached contents edits do not commit automatically. Save/reopen must preserve component identities, original source bytes and rendered appearance; missing references and cyclic graphs fail atomically. The current viewport uses Canvas fallback for visible smart objects. Linked local-image snapshots support explicit relinking; automatic external change detection remains unimplemented.
+
+Raster-to-smart conversion must retain the original source, stack position, mask, styles, metadata, blend, opacity and affine placement. Existing tone effects remain editable in the embedded master. Conversion commits as one undoable command and rejects locked ancestry. Layers exposes a keyboard-accessible action for one selected raster; multi-layer and non-raster conversion remain outstanding.
+
+**New smart object via copy** must create independently editable root and nested masters while preserving repeated references within the copied graph. Unrelated definitions and image bytes must not be duplicated. The operation uses shared DOM/REST commands, honors ancestor locks, and restores stable copied identities on redo. Ordinary Duplicate continues to create an instance of the existing shared master.
+
+Interactive smart-object contents must open in an independently owned document tab and commit only through explicit **Apply to source**. Apply updates all instances and nested definitions in one parent undo entry, preserves original image bytes, and rejects changed/closed sessions or affected locks before publishing assets. **Keep as document** retains conflicted/orphaned work without an apply link. Reopening an already edited master activates its existing tab. Recovered contents remain ordinary independent documents; persistence of owner links is still outstanding.
+
+Copying selected smart objects to another open document must transfer their complete reachable master graph and source assets with independent destination identities and ownership. Shared references within the selection remain shared, and unrelated masters/images are excluded. The copied artwork must retain rendered appearance, support one-step undo/redo and portable save/reopen, and remain usable after source closure. Destination changes during decoding must leave no copied definitions, layers or images installed.
+
+Smart-object filter stacks support ordered Gaussian blur, unsharp mask and tone constructors through scripting and shared REST commands. Each instance owns its settings; shared masters/source bytes remain unchanged. Apply in native master pixels before affine placement, layer masks and styles, with cumulative halos preventing export seams. Stack replacement, reordering and disabling must round-trip through history and project saves. Filter masks remain outstanding; interactive stack controls are available in the Inspector.
+
+The Smart filters Inspector section provides add, enable/disable, reorder and remove actions for the active smart-object instance. All settings pair sliders with precise inputs. Pointer and keyboard previews do not mutate history; committed gestures create one undo entry, preserve keyboard focus and reject stale document/selection targets. Lock/busy/readiness states disable mutations. Controls preserve source bytes, independent instance settings and project round trips, and remain usable in light/dark modes without new global shortcuts.
+
+### Generation and recording input fidelity (2026-10-01)
+
+- Mutating a returned job request/options snapshot, including nested input pixels, must not alter approved dispatch, billing allocation, provenance or idempotency.
+- Generated output dimensions must match the request. Reject mismatches before successful candidate publication; preserve reported charges for accounting. This constrains generation results, not document import resolution.
+- Recorded layer names containing `*`, `?` or `${...}` must replay against the literal name, survive recipe serialization, and retain one-step undo. Existing intentional wildcard targets remain supported.
+
+### Smart-filter mask data and rendering (schema 12)
+
+Smart objects support per-instance filter-stack masks through constructors, scripts and REST commands, including linked native-master and unlinked containing-document geometry. Masking must blend retained original and filtered premultiplied RGBA, preserve shared masters, survive undo/project reopening, and retain/remap bitmap assets in nested masters and cross-document copies. Ordinary masks remain independent. The Filter mask Inspector provides reveal-all/hide-all, selection capture, enable/invert, density/feather sliders and removal. Previews do not mutate history; each committed gesture is one undo step and stale target/revision changes cancel or reject it. The Follow artwork toggle preserves filter-mask placement across linking changes, including parent transforms and native-master scaling. Brush, Pencil and Eraser support Filter mask targets as described below.
+
+Filter-mask paint targets support brush/pencil hide and reveal, eraser hide, mask-space input transforms, selection clipping, live previews, cancellation, one-stroke undo and project persistence. Target switches cancel pending strokes; external revisions and changed selections cannot commit stale work. Ordinary layer masks remain independent. Large-filter-stack brush latency still requires measurement and optimization.
+
+Recipe parameter defaults and required checks must ignore inherited JavaScript properties, including when a parameter has a prototype-related name. Delivery packages must preserve distinct files after UTF-8 encoding: truncate filename stems only at complete Unicode scalar boundaries within 180 bytes, repair lone surrogates before collision resolution, and reserve suffix space while retaining format extensions.
+
+Batch delivery export must offer cancellation without deleting persisted outputs. Packaging yields between bounded CRC chunks, reports completed archive entries, and rejects cancelled work before initiating the download. Full-output SHA-256 and final archive assembly retain their browser memory and scheduling limitations.
+
+Smart-object conversion accepts distinct contiguous sibling selections, preserves their stack order and editable contents, and commits one undo entry. Invalid ownership, locks, duplicates, mixed parents or noncontiguous spans reject atomically. Conversion isolates blending within the new master and retains original source assets, off-canvas geometry and captured mask placement. UI, constructor-based scripts and REST share the operation.
+
+Smart-object rasterization must bake current transformed contents and filters at document-pixel resolution into a fresh raster asset while preserving original sources, sibling position, editable outer compositing properties and undo/redo. Preparation failure, cancellation, source-document edits or closure must not publish a replacement or prepared asset. Scripts await rasterization and commit it atomically with other script edits. Browser memory/decoding and existing render-tile limits remain applicable; no megapixel import cap is introduced.
+
+Workspace recovery must retain contents-to-owner editing links when both tabs are captured, including nested sessions, unapplied contents and stale-source conflicts. Restore must not permit a stale apply merely because revision counters restart. Links target the owner copies from the same checkpoint. Malformed relationships or unchanged-source links with missing masters reject before any tabs install. Legacy checkpoints, ordinary project files and contents whose owner was already closed restore as independent documents.
+
+Linked local-image sources retain a verified cached snapshot for offline rendering and project portability. Explicit relinking must update the shared master in one undoable edit while preserving instance transforms, masks, styles and filters. Changed documents or locked dependent instances reject without asset publication. Missing external files must not break cached rendering; users can choose a replacement or embed the snapshot. Source fingerprints must match cached bytes and dimensions on project save/load. File watching and persisted filesystem permissions are not yet implemented.
+
+Recipe `layerExists` conditions test whether at least one layer matches. Multiple matches satisfy existence even when mutation target resolution would require explicit disambiguation. A missing target skips the conditional step without creating history.
+
+Generation submission validates provider output width/height bounds, decimal megapixel ceiling, pixel step and discrete size pairs, plus unsupported alpha requests, before budget reservation or dispatch. These provider limits do not restrict document imports. Aspect-ratio labels are descriptive presets; explicit pixel constraints govern acceptance. Durable idempotent recovery remains available without revalidating current provider capabilities.
+
+Layer comps persist category-selective presentation snapshots in document schema 14. Constructor scripting and REST commands support save, restore, recapture/replacement, rename and removal through shared undo. Missing targets are reported/skipped; new layers stay intact. Position restoration rejects changed coordinate parents; locked changes reject atomically. The Properties inspector exposes a collapsible Layer comps panel, category-selective capture, rename, apply, update and remove, with missing-target warnings and keyboard-accessible controls.
+
+### Custom keyboard shortcuts
+
+The documented keyboard map lists defaults. Keyboard shortcuts help supports Change (capture the next chord), Clear, Reset per action and Restore default shortcuts. Conflicts across actions are rejected, including overlapping Ctrl/Mod combinations. Escape cancels capture, Tab leaves capture and Space stays reserved for temporary panning. Modifier-only events do not commit. Preferences persist locally across reloads; writes must succeed before active bindings change. Malformed saved settings use defaults and expose recovery in the dialog. Tool/layer hints, context-menu hints and the command palette reflect active bindings. Typing fields and modal suppression retain the existing shortcut boundary. Native browser/OS interception can prevent some chords from reaching the application. No live synchronization between open tabs is promised.
+
+### Adjustable side panels
+
+Layers and Properties have focusable vertical resize handles. Pointer dragging previews width and release saves locally; Escape, pointer cancellation or lost focus cancels the draft. Arrow keys resize by 10 pixels (Shift: 50), Home/End choose bounds and double-click restores the responsive default. Panel widths stay within usable bounds while retaining at least 200 CSS pixels for the canvas column at the application's supported minimum width. Resizing does not edit documents or add undo entries. Failed storage writes restore the prior saved layout and report the failure. Saved widths apply on reload; tabs do not live-sync preferences.
+
+Multi-layer distribution supports horizontal/vertical equal gaps and centers via Layers controls, constructors/scripts and REST. It preserves endpoint placement, stacking order, parent coordinates and original source bytes, with one-step undo and atomic rejection for invalid/locked selections.
+
+For `layerExists` conditions targeting a prior step result or output alias, existence means at least one bound output still exists, including `childPath` descendant bindings. Deleting the last-created output must not hide earlier survivors. Missing all outputs skips the conditional step. Mutation targets retain strict missing-output validation.
+
+Layer selections support horizontal and vertical flips around their shared canvas-space geometric center through the Layers panel, DOM scripting and REST commands. Single-layer selections qualify. Flips preserve raster source bytes and dimensions, respect parent transforms and locks, avoid double-transforming selected descendants, and round-trip through project persistence with one-step undo.
+
+HSL adjustment layers expose precise numeric inputs and sliders for hue (-180…180 degrees), saturation and lightness (-100…100). They remain editable, maskable, reorderable and undoable through the shared adjustment-layer command model. Encoded-sRGB HSL processing preserves source assets and backdrop alpha. Reference rendering, PNG export and project persistence must agree. Supported GPU compositions process HSL in a shader; Canvas fallback uses WASM in the pixel worker. GPU/reference tests require exact alpha and at most three premultiplied RGB byte levels of difference. Large-document latency and hardware-device performance remain follow-up gates.
+
+The command palette exposes New Curves, Levels, Tone and HSL adjustment layer actions, with no default shortcut assignments and support for user-customized bindings. HSL is also directly available in the canvas context menu. Creation cancels active tool previews and uses the existing selection-aware insertion, naming and undo behavior.
+
+HSL production workflows include a built-in “Recolor with HSL” recipe for the complete root composition, numeric parameter preflight, recorder/replay support and deterministic batch delivery. Invalid parameter values must leave the document unchanged; persisted batch output pixels must reflect the chosen parameters.
+
+High Contrast Monochrome preset version 2 uses the tone engine's percentage scale: saturation -100 and configurable contrast 0…100 (default 45). Exposure remains EV (default 0.1). It must render grayscale RGB while preserving alpha and original source bytes, with one-step undo. Existing saved recipe/batch snapshots retain their recorded values; they are not silently rewritten to the updated preset.
+
+The Product Drop Shadow preset must render a black silhouette, rather than colored duplicate artwork, behind the subject. Source transparency and holes remain transparent; the original subject and source asset are unchanged. Opacity/offset remain editable and replay is one undo step. Version 2 resets only the duplicate's styles and fill opacity to define the silhouette; it adds no blur.
+
+The Warm Tone & Contrast preset must produce a measurable warm cast on neutral midtones through explicit red/blue curves. Contrast/saturation parameters use the tone engine's -100…100 scale. It must not claim to produce a vignette. The selected raster receives tone edits and the root composition receives an editable warm curve; replay remains one undo step.
+
+Typography checks the selected family against loaded FontFace entries and a network-free `local()` FontFace probe; `FontFaceSet.check()` is not proof that a font exists. Generic families are accepted. Failed local probes show “could not be loaded locally” and warn that fallback may be in use; privacy restrictions can prevent verification. Unknown font stacks are not claimed as verified. Font-load events refresh the result, stale probes cannot replace current-family status, and detection never changes the document. A missing/custom family remains visible in the Font selector so the user can explicitly choose a replacement and undo it.
+
+Font loading completion/failure invalidates reference and GPU render caches and schedules a fresh viewport frame. Late-loaded font pixels must agree with uncached rendering without mutating document data or history. This refresh does not automatically reflow stored text bounds; explicit layout reflow, font-file embedding and glyph coverage remain separate typography work.
+
+Text layers expose an explicit Reflow text inspector action and DOM method to recalculate stored geometry with current font metrics. It preserves content/appearance, honors locks, commits changed bounds as one undo entry and leaves unchanged bounds without extra history. Automatic font-event redraw remains read-only. Cross-environment font parity and font embedding remain separate gates.
+
+Users can enter a font family name directly in Typography, beyond the preset list. Commit uses the shared text-layer setter and history; Escape cancels without edits. The family string survives project persistence, but actual font availability remains local to the browser/device. Font file import and portable embedding are not provided by this control.
+
+Recorded automation must preserve literal action strings, including parameter-like text, through save/reload and replay. Deliberately parameterized tone actions remain adjustable. Recipe steps use optional `literalValues` to distinguish captured literals from interpolated values; omission preserves existing recipe semantics.

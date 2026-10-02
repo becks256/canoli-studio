@@ -2,6 +2,7 @@ import { RotateCcw } from "lucide-react";
 import type { BlendChannel, BlendRange, LayerStyleData } from "../core/drawing";
 import { defaultStyle } from "../core/drawing";
 import { IconButton, Slider } from "./controls";
+import { InspectorSection } from "./InspectorSection";
 
 function RangeWindow({
   label,
@@ -110,9 +111,10 @@ export function LayerStylesPanel({
   const blend = value.blendIf;
   return (
     <>
-      <section className="styles-section">
-        <h2>
-          Blend If
+      <InspectorSection
+        title="Blend If"
+        className="styles-section"
+        actions={
           <IconButton
             label="Reset layer styles"
             disabled={disabled}
@@ -120,7 +122,8 @@ export function LayerStylesPanel({
           >
             <RotateCcw size={13} />
           </IconButton>
-        </h2>
+        }
+      >
         <label className="check-field">
           <input
             type="checkbox"
@@ -173,9 +176,8 @@ export function LayerStylesPanel({
           Top handles set cutoffs. Lower handles feather the transition. Pixels
           outside the range become transparent.
         </p>
-      </section>
-      <section>
-        <h2>Color overlay</h2>
+      </InspectorSection>
+      <InspectorSection title="Color overlay">
         <div className="style-color-row">
           <label className="check-field">
             <input
@@ -228,9 +230,8 @@ export function LayerStylesPanel({
             })
           }
         />
-      </section>
-      <section>
-        <h2>Drop shadow</h2>
+      </InspectorSection>
+      <InspectorSection title="Drop shadow">
         <div className="style-color-row">
           <label className="check-field">
             <input
@@ -272,7 +273,12 @@ export function LayerStylesPanel({
               max={key === "blur" ? 128 : 256}
               value={value.dropShadow[key]}
               disabled={disabled || !value.dropShadow.enabled}
-              onPreview={(next) => onPreview({ ...value, dropShadow: { ...value.dropShadow, [key]: next } })}
+              onPreview={(next) =>
+                onPreview({
+                  ...value,
+                  dropShadow: { ...value.dropShadow, [key]: next },
+                })
+              }
               suffix="px"
               onCommit={(next) =>
                 onCommit({
@@ -303,7 +309,7 @@ export function LayerStylesPanel({
             })
           }
         />
-      </section>
+      </InspectorSection>
     </>
   );
 }

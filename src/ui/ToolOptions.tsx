@@ -1,26 +1,58 @@
 import type { Tool, ToolController, ToolSettings } from "../tools";
 import type { VectorLayer, VectorPath } from "../dom";
 import type { EditorCommand } from "../core/commands";
-import { Slider } from "./controls";
+import { Slider, Select } from "./controls";
+import { InspectorSection } from "./InspectorSection";
 
 export function ToolOptions({
   tool,
+  moveTarget,
+  hasMask,
+  hasPaintMask,
+  hasFilterMask = false,
+  hasVectorMask,
+  onMoveTarget,
+  snapEnabled = false,
+  onSnapEnabled,
+  snapArtwork = false,
+  onSnapArtwork,
   controller,
   settings,
   hasSelection,
   disabled,
   onAction,
   onOpenArtboard,
+  onOpenCrop,
+  documentBusy,
 }: {
   tool: Tool;
+  moveTarget: "layer" | "mask";
+  hasMask: boolean;
+  hasPaintMask: boolean;
+  hasFilterMask?: boolean;
+  hasVectorMask: boolean;
+  snapArtwork?: boolean;
+  onSnapArtwork?(enabled: boolean): void;
+  snapEnabled?: boolean;
+  onSnapEnabled?(enabled: boolean): void;
+  onMoveTarget(target: "layer" | "mask"): void;
   controller: ToolController;
   settings: ToolSettings;
   hasSelection: boolean;
   disabled: boolean;
   onAction(action: () => void): void;
   onOpenArtboard?(): void;
+  onOpenCrop?(): void;
+  documentBusy: boolean;
 }) {
-  const brush = tool === "brush" || tool === "pencil" || tool === "clone";
+  const tonal = tool === "dodge" || tool === "burn";
+  const brush =
+    tonal ||
+    tool === "heal" ||
+    tool === "brush" ||
+    tool === "pencil" ||
+    tool === "clone" ||
+    tool === "eraser";
   return (
     <div className="tool-options" aria-label="Tool options">
       <strong>
@@ -29,17 +61,147 @@ export function ToolOptions({
             move: "Move",
             hand: "Hand",
             artboard: "Artboard",
+            crop: "Crop",
             brush: "Brush",
+            dodge: "Dodge",
+            burn: "Burn",
             pencil: "Pencil",
+            eraser: "Eraser",
             pen: "Pen",
             marquee: "Marquee",
             clone: "Clone",
+            patch: "Patch",
+            heal: "Spot Healing",
             text: "Text",
             fill: "Paint bucket",
           }[tool]
         }
       </strong>
-      {(brush || tool === "pen" || tool === "marquee" || tool === "fill") && (
+      {(tool === "patch" || tool === "heal") && (
+        <>
+          {tool === "patch" && (
+            <Select
+              label="Patch mode"
+              value={settings.patchDirection}
+              disabled={disabled || documentBusy}
+              options={[
+                { value: "source", label: "Source" },
+                { value: "destination", label: "Destination" },
+              ]}
+              onChange={(value) =>
+                controller.configure({
+                  patchDirection: value as ToolSettings["patchDirection"],
+                })
+              }
+            />
+          )}
+          <Select
+            label="Patch sampling"
+            value={settings.patchSampling}
+            disabled={disabled || documentBusy}
+            options={[
+              { value: "all-layers", label: "All layers" },
+              { value: "current-and-below", label: "Current and below" },
+              { value: "current-layer", label: "Current layer" },
+            ]}
+            onChange={(e) =>
+              controller.configure({
+                patchSampling: e as ToolSettings["patchSampling"],
+              })
+            }
+          />
+          <Select
+            label="Patch detail"
+            value={settings.patchMode}
+            disabled={disabled || documentBusy}
+            options={[
+              { value: "source", label: "Donor detail" },
+              { value: "mixed", label: "Preserve stronger detail" },
+            ]}
+            onChange={(e) =>
+              controller.configure({
+                patchMode: e as ToolSettings["patchMode"],
+              })
+            }
+          />
+          {tool === "heal" && (
+            <Slider
+              label="Search radius"
+              value={settings.healingRadius}
+              min={1}
+              max={1024}
+              step={1}
+              suffix="px"
+              disabled={disabled || documentBusy}
+              onPreview={(value) =>
+                controller.configure({ healingRadius: value })
+              }
+              onCommit={(value) =>
+                controller.configure({ healingRadius: value })
+              }
+            />
+          )}
+          {tool === "patch" && (
+            <span>
+              {hasSelection
+                ? settings.patchDirection === "destination"
+                  ? "Drag the selected donor to the repair region. Escape cancels."
+                  : "Drag toward the donor region; release to patch. Escape cancels."
+                : "Create a marquee selection first (M)."}
+            </span>
+          )}
+        </>
+      )}
+      {tool === "move" && (
+        <>
+          <Select
+            label="Move target"
+            value={moveTarget}
+            disabled={disabled}
+            options={
+              hasMask
+                ? [
+                    { value: "layer", label: "Layer" },
+                    { value: "mask", label: "Mask" },
+                  ]
+                : [{ value: "layer", label: "Layer" }]
+            }
+            onChange={(value) => onMoveTarget(value as "layer" | "mask")}
+          />
+          {moveTarget === "layer" && onSnapEnabled && (
+            <label
+              className="tool-snap-toggle"
+              title="Snap to canvas edges, center and document guides; hold Alt to bypass"
+            >
+              <input
+                type="checkbox"
+                checked={snapEnabled}
+                onChange={(event) => onSnapEnabled(event.target.checked)}
+              />
+              Snap to canvas and guides
+            </label>
+          )}
+          {moveTarget === "layer" && snapEnabled && onSnapArtwork && (
+            <label className="tool-snap-toggle">
+              <input
+                type="checkbox"
+                checked={snapArtwork}
+                onChange={(event) => onSnapArtwork(event.target.checked)}
+              />
+              Include artwork
+            </label>
+          )}
+          {moveTarget === "mask" && (
+            <span className="section-caption">
+              Drag to move the selected mask · Arrow keys to nudge
+            </span>
+          )}
+        </>
+      )}
+      {((brush && !tonal && tool !== "eraser" && tool !== "heal") ||
+        (tool === "pen" && settings.penEditTarget === "layer") ||
+        tool === "marquee" ||
+        tool === "fill") && (
         <label className="tool-color">
           <input
             type="color"
@@ -50,6 +212,81 @@ export function ToolOptions({
           />
           <span>{settings.color.toUpperCase()}</span>
         </label>
+      )}
+      {(tool === "brush" || tool === "pencil" || tool === "eraser") &&
+        (hasPaintMask || hasFilterMask) && (
+          <Select
+            label="Paint target"
+            value={settings.paintTarget}
+            disabled={disabled}
+            options={[
+              { value: "layer", label: "Layer" },
+              ...(hasPaintMask
+                ? [
+                    { value: "mask-hide", label: "Mask · Hide" },
+                    { value: "mask-reveal", label: "Mask · Reveal" },
+                  ]
+                : []),
+              ...(hasFilterMask
+                ? [
+                    { value: "filter-mask-hide", label: "Filter mask · Hide" },
+                    {
+                      value: "filter-mask-reveal",
+                      label: "Filter mask · Reveal",
+                    },
+                  ]
+                : []),
+            ]}
+            onChange={(value) =>
+              controller.configure({
+                paintTarget: value as ToolSettings["paintTarget"],
+              })
+            }
+          />
+        )}
+      {tonal && (
+        <>
+          <Select
+            label="Tonal range"
+            value={settings.tonalRange}
+            disabled={disabled}
+            options={[
+              { value: "shadows", label: "Shadows" },
+              { value: "midtones", label: "Midtones" },
+              { value: "highlights", label: "Highlights" },
+            ]}
+            onChange={(value) =>
+              controller.configure({
+                tonalRange: value as ToolSettings["tonalRange"],
+              })
+            }
+          />
+          <Slider
+            label="Exposure"
+            suffix="%"
+            value={settings.tonalExposure * 100}
+            min={0}
+            max={100}
+            disabled={disabled}
+            onPreview={(value) =>
+              controller.configure({ tonalExposure: value / 100 })
+            }
+            onCommit={(value) =>
+              controller.configure({ tonalExposure: value / 100 })
+            }
+          />
+          <label className="check-field">
+            <input
+              type="checkbox"
+              checked={settings.protectTones}
+              disabled={disabled}
+              onChange={(event) =>
+                controller.configure({ protectTones: event.target.checked })
+              }
+            />
+            Protect tones
+          </label>
+        </>
       )}
       {brush && (
         <>
@@ -87,6 +324,60 @@ export function ToolOptions({
             onPreview={(v) => controller.configure({ opacity: v / 100 })}
             onCommit={(v) => controller.configure({ opacity: v / 100 })}
           />
+          {(tonal || tool === "brush" || tool === "eraser") && (
+            <Slider
+              label="Flow"
+              suffix="%"
+              value={settings.flow * 100}
+              min={1}
+              max={100}
+              disabled={disabled}
+              onPreview={(v) => controller.configure({ flow: v / 100 })}
+              onCommit={(v) => controller.configure({ flow: v / 100 })}
+            />
+          )}
+          <Slider
+            label="Spacing"
+            suffix="%"
+            value={Math.round(settings.spacing * 100)}
+            min={1}
+            max={200}
+            disabled={disabled}
+            onPreview={(v) => controller.configure({ spacing: v / 100 })}
+            onCommit={(v) => controller.configure({ spacing: v / 100 })}
+          />
+          <Slider
+            label="Smoothing"
+            suffix="%"
+            value={Math.round(settings.smoothing * 100)}
+            min={0}
+            max={90}
+            disabled={disabled}
+            onPreview={(v) => controller.configure({ smoothing: v / 100 })}
+            onCommit={(v) => controller.configure({ smoothing: v / 100 })}
+          />
+          <label className="check-field">
+            <input
+              type="checkbox"
+              aria-label="Pressure controls size"
+              checked={settings.pressureSize}
+              onChange={(e) =>
+                controller.configure({ pressureSize: e.target.checked })
+              }
+            />
+            Pressure size
+          </label>
+          <label className="check-field">
+            <input
+              type="checkbox"
+              aria-label="Pressure controls opacity"
+              checked={settings.pressureOpacity}
+              onChange={(e) =>
+                controller.configure({ pressureOpacity: e.target.checked })
+              }
+            />
+            Pressure opacity
+          </label>
           {tool === "clone" && (
             <label className="check-field">
               <input
@@ -114,7 +405,59 @@ export function ToolOptions({
           onCommit={(v) => controller.configure({ opacity: v / 100 })}
         />
       )}
-      {tool === "pen" && (
+      {tool === "pen" && hasVectorMask && (
+        <Select
+          label="Pen target"
+          value={settings.penEditTarget}
+          disabled={disabled}
+          options={[
+            { value: "layer", label: "Layer paths" },
+            { value: "mask", label: "Mask paths" },
+          ]}
+          onChange={(value) =>
+            controller.configure({ penEditTarget: value as "layer" | "mask" })
+          }
+        />
+      )}
+      {tool === "pen" && settings.penEditTarget === "mask" && (
+        <div className="mask-contour-actions">
+          {controller.drawingMaskContour ? (
+            <>
+              <button
+                className="button subtle compact"
+                disabled={disabled || !controller.maskContourPointCount}
+                onClick={() => onAction(() => controller.finishPath())}
+              >
+                Close contour
+              </button>
+              <button
+                className="button subtle compact"
+                onClick={() => controller.cancel()}
+              >
+                Cancel contour
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="button subtle compact"
+                disabled={disabled}
+                onClick={() => onAction(() => controller.startMaskContour())}
+              >
+                New contour
+              </button>
+              <button
+                className="button subtle compact"
+                disabled={disabled || !controller.selectedMaskAnchor}
+                onClick={() => onAction(() => controller.insertMaskAnchor())}
+              >
+                Insert midpoint
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      {tool === "pen" && settings.penEditTarget === "layer" && (
         <>
           <Slider
             label="Pen width"
@@ -144,6 +487,27 @@ export function ToolOptions({
             onClick={() => controller.finishPath()}
           >
             Finish path ↵
+          </button>
+          <button
+            className="button subtle compact"
+            disabled={disabled}
+            onClick={() => onAction(() => controller.addShape("rectangle"))}
+          >
+            + Rectangle
+          </button>
+          <button
+            className="button subtle compact"
+            disabled={disabled}
+            onClick={() => onAction(() => controller.addShape("ellipse"))}
+          >
+            + Ellipse
+          </button>
+          <button
+            className="button subtle compact"
+            disabled={disabled}
+            onClick={() => onAction(() => controller.addShape("polygon"))}
+          >
+            + Polygon
           </button>
         </>
       )}
@@ -178,7 +542,7 @@ export function ToolOptions({
           </select>
         </>
       )}
-      {hasSelection && (
+      {hasSelection && tool !== "crop" && (
         <button
           className="button subtle compact"
           disabled={disabled}
@@ -186,6 +550,38 @@ export function ToolOptions({
         >
           Fill selection
         </button>
+      )}
+      {tool === "crop" && (
+        <div className="crop-actions">
+          <button
+            className="button subtle compact"
+            disabled={documentBusy}
+            onClick={() => onAction(() => controller.crop.start(null))}
+          >
+            New frame
+          </button>
+          <button
+            className="button subtle compact"
+            disabled={documentBusy}
+            onClick={onOpenCrop}
+          >
+            Precise bounds…
+          </button>
+          <button
+            className="button primary compact"
+            disabled={documentBusy || !controller.crop.bounds}
+            onClick={() => onAction(() => controller.crop.apply())}
+          >
+            Apply crop
+          </button>
+          <button
+            className="button subtle compact"
+            disabled={documentBusy || !controller.crop.active}
+            onClick={() => controller.cancel()}
+          >
+            Cancel crop
+          </button>
+        </div>
       )}
       {tool === "artboard" && onOpenArtboard && (
         <button
@@ -198,23 +594,29 @@ export function ToolOptions({
         </button>
       )}
       <span className="tool-hint">
-        {tool === "artboard"
-          ? "Set canvas dimensions and scale proportionally"
-          : tool === "text"
-            ? "Click on the canvas to place a text layer"
-            : tool === "move"
-              ? "Drag artwork or layer rows"
-            : tool === "hand"
-              ? "Drag to pan · Scroll to zoom"
-              : tool === "clone"
-                ? "Alt/Option-click to sample"
-                : tool === "pen"
-                  ? "Click anchors · Drag curves · Click start to close"
-                  : tool === "marquee"
-                    ? "Shift adds · Alt subtracts"
-                    : tool === "fill"
-                      ? "Click to fill canvas or active selection"
-                      : "Drag to draw · [ ] size"}
+        {tool === "crop"
+          ? "Drag a frame or its handles · Enter applies · Esc cancels · Shift constrains corners"
+          : tool === "artboard"
+            ? "Set canvas dimensions and scale proportionally"
+            : tool === "text"
+              ? "Click on the canvas to place a text layer"
+              : tool === "move"
+                ? "Drag artwork or layer rows"
+                : tool === "hand"
+                  ? "Drag to pan · Scroll to zoom"
+                  : tool === "clone"
+                    ? "Alt/Option-click to sample"
+                    : tool === "pen"
+                      ? settings.penEditTarget === "mask"
+                        ? controller.drawingMaskContour
+                          ? "Click/drag anchors · Enter or first anchor closes · Esc cancels"
+                          : "Click curve to add · Alt frees handles · Arrows nudge"
+                        : "Click anchors · Drag curves · Click start to close"
+                      : tool === "marquee"
+                        ? "Shift adds · Alt subtracts"
+                        : tool === "fill"
+                          ? "Click to fill canvas or active selection"
+                          : "Drag to draw · [ ] size"}
       </span>
     </div>
   );
@@ -236,19 +638,19 @@ export function PathProperties({
 }) {
   if (!path)
     return (
-      <section>
-        <h2>Vector paths</h2>
+      <InspectorSection title="Vector paths">
         <p className="section-description">
           Choose the Pen tool to draw a path.
         </p>
-      </section>
+      </InspectorSection>
     );
   return (
-    <section>
-      <h2>
-        Vector path{" "}
+    <InspectorSection
+      title="Vector path"
+      badge={
         <span className="section-caption">{layer.paths.length} PATHS</span>
-      </h2>
+      }
+    >
       <label className="check-field">
         <input
           type="checkbox"
@@ -323,11 +725,18 @@ export function PathProperties({
         value={previewStrokeWidth ?? path.strokeWidth}
         min={0}
         max={1024}
-            step={0.1}
-            suffix="px"
-            scale="quadratic"
+        step={0.1}
+        suffix="px"
+        scale="quadratic"
         disabled={disabled}
-        onPreview={(value) => onPreview({ type: "path.update", id: layer.id, pathId: path.id, patch: { strokeWidth: value } })}
+        onPreview={(value) =>
+          onPreview({
+            type: "path.update",
+            id: layer.id,
+            pathId: path.id,
+            patch: { strokeWidth: value },
+          })
+        }
         onCommit={(value) =>
           onAction(() => {
             path.strokeWidth = value;
@@ -345,6 +754,6 @@ export function PathProperties({
       >
         Delete path
       </button>
-    </section>
+    </InspectorSection>
   );
 }

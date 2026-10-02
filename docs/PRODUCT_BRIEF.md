@@ -6,7 +6,9 @@ Luma is a working name, not an approved brand. This brief is the source of truth
 
 Build a capable browser-based image editor in which people can combine precise visual editing with AI-assisted operations. Begin with a small, dependable editor and grow it through an extensible object-oriented document model. Users should be able to describe an outcome, inspect and refine the resulting changes, and reuse useful operations without losing control of their source artwork.
 
-The long-term ambition is an AI-native alternative for selected Photoshop workflows. The initial product must earn that role by doing a small set of real editing tasks well. Feature parity with Photoshop is not the initial delivery target.
+The long-term ambition is a professional, AI-native Photoshop alternative that competes on editing breadth and improves control, repeatability and time to a finished result. The owner has explicitly requested “Photoshop, but better,” including automatic metadata extraction and image-asset generation as layers. Broad professional parity is a staged objective, not a claim about the current prototype or the first release. The initial product must earn adoption through verified workflows.
+
+The maintained plan is [FEATURE_STRATEGY.md](FEATURE_STRATEGY.md), supported by [competitive evidence](COMPETITIVE_RESEARCH.md), [detailed AI specifications](AI_FEATURE_SPECS.md), and the [implementation roadmap and work log](IMPLEMENTATION_ROADMAP.md). These documents specify proposed functionality; they do not imply model integration has shipped.
 
 ## Why this product
 
@@ -77,6 +79,8 @@ This milestone has no model API calls, billing, or cloud upload. The optional RE
 The next requested slice adds paint brush, pencil, visible-composite clone brush, editable Bézier pen paths, rectangular/elliptical marquee, layer dragging/reparenting, fill opacity, color overlay, drop shadow and tonal/channel Blend If. These remain local operations with shared undo, source preservation and constructor-based automation. A Developer docs link exposes the maintained scripting guide in the app. See [TOOLS_MILESTONE.md](TOOLS_MILESTONE.md) for acceptance evidence and limitations.
 
 ## Suggested evolution (subject to evidence)
+
+The phased feature portfolio and implementation gates are now maintained in [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md); the principles below remain applicable.
 
 1. **Editor foundation:** finish and verify the first milestone.
 2. **Precision primitives:** selections, masks, richer transforms, and adjustment behavior needed by the first validated task.

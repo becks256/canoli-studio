@@ -100,7 +100,7 @@ test("editing, constructors in scripts, keyboard focus, and project round trip",
   const roundTrip = await page.evaluate(async () => {
     const { editor } = window.luma;
     const before = editor.document.toJSON();
-    const project = editor.saveProject();
+    const project = await editor.saveProject();
     editor.newDocument();
     await editor.openProject(new File([project], "Roundtrip.luma"));
     return { before, after: editor.document.toJSON() };
@@ -191,7 +191,7 @@ test("50 MP import retains originals, edits in WASM, saves, reopens, and exports
     const context = sample.getContext("2d")!;
     context.drawImage(source.bitmap, 0, 0, 1, 1, 0, 0, 1, 1);
     const original = [...context.getImageData(0, 0, 1, 1).data];
-    const project = editor.saveProject();
+    const project = await editor.saveProject();
     editor.newDocument();
     await editor.openProject(new File([project], "50MP.luma"));
     const start = performance.now();
@@ -351,7 +351,9 @@ test("text tool creates text layers, edits content in inspector, and undoes", as
 
   // Redo brings back the edit
   await page.keyboard.press("Control+Shift+z");
-  await expect(page.getByLabel("Text content")).toHaveValue("Awesome Typography");
+  await expect(page.getByLabel("Text content")).toHaveValue(
+    "Awesome Typography",
+  );
 
   // Verify font size input is not capped at 256 and accepts large values like 480
   const fontSizeInput = page.getByLabel("Font size", { exact: true });
@@ -408,7 +410,12 @@ test("layer can be resized by dragging corner handles with live preview and undo
     const { editor, RasterLayer } = window.luma;
     const selected = editor.document.selectedLayer;
     if (selected instanceof RasterLayer) {
-      return { width: selected.width, height: selected.height, x: selected.x, y: selected.y };
+      return {
+        width: selected.width,
+        height: selected.height,
+        x: selected.x,
+        y: selected.y,
+      };
     }
     return null;
   });
@@ -420,7 +427,10 @@ test("layer can be resized by dragging corner handles with live preview and undo
   await page.mouse.move(seBox.x + seBox.width / 2, seBox.y + seBox.height / 2);
   await page.mouse.down();
   // Drag by +60px X, +40px Y
-  await page.mouse.move(seBox.x + seBox.width / 2 + 60, seBox.y + seBox.height / 2 + 40);
+  await page.mouse.move(
+    seBox.x + seBox.width / 2 + 60,
+    seBox.y + seBox.height / 2 + 40,
+  );
   await page.mouse.up();
 
   // Verify dimensions increased in DOM
@@ -428,7 +438,12 @@ test("layer can be resized by dragging corner handles with live preview and undo
     const { editor, RasterLayer } = window.luma;
     const selected = editor.document.selectedLayer;
     if (selected instanceof RasterLayer) {
-      return { width: selected.width, height: selected.height, x: selected.x, y: selected.y };
+      return {
+        width: selected.width,
+        height: selected.height,
+        x: selected.x,
+        y: selected.y,
+      };
     }
     return null;
   });
@@ -438,8 +453,12 @@ test("layer can be resized by dragging corner handles with live preview and undo
   expect(resizedDims!.y).toBe(initY);
 
   // Inspector fields match
-  await expect(page.getByLabel("Width", { exact: true })).toHaveValue(String(resizedDims!.width));
-  await expect(page.getByLabel("Height", { exact: true })).toHaveValue(String(resizedDims!.height));
+  await expect(page.getByLabel("Width", { exact: true })).toHaveValue(
+    String(resizedDims!.width),
+  );
+  await expect(page.getByLabel("Height", { exact: true })).toHaveValue(
+    String(resizedDims!.height),
+  );
 
   // Undo restores initial dimensions
   await page.keyboard.press("Control+z");
@@ -460,7 +479,12 @@ test("layer can be resized by dragging corner handles with live preview and undo
     const { editor, RasterLayer } = window.luma;
     const selected = editor.document.selectedLayer;
     if (selected instanceof RasterLayer) {
-      return { width: selected.width, height: selected.height, x: selected.x, y: selected.y };
+      return {
+        width: selected.width,
+        height: selected.height,
+        x: selected.x,
+        y: selected.y,
+      };
     }
     return null;
   });
@@ -471,14 +495,22 @@ test("layer can be resized by dragging corner handles with live preview and undo
   const nwBox = (await handleNW.boundingBox())!;
   await page.mouse.move(nwBox.x + nwBox.width / 2, nwBox.y + nwBox.height / 2);
   await page.mouse.down();
-  await page.mouse.move(nwBox.x + nwBox.width / 2 + 50, nwBox.y + nwBox.height / 2 + 50);
+  await page.mouse.move(
+    nwBox.x + nwBox.width / 2 + 50,
+    nwBox.y + nwBox.height / 2 + 50,
+  );
   await page.mouse.up();
 
   const nwDims = await page.evaluate(() => {
     const { editor, RasterLayer } = window.luma;
     const selected = editor.document.selectedLayer;
     if (selected instanceof RasterLayer) {
-      return { width: selected.width, height: selected.height, x: selected.x, y: selected.y };
+      return {
+        width: selected.width,
+        height: selected.height,
+        x: selected.x,
+        y: selected.y,
+      };
     }
     return null;
   });
@@ -490,9 +522,15 @@ test("layer can be resized by dragging corner handles with live preview and undo
 
   // Test Escape cancellation during resize
   const seBox2 = (await handleSE.boundingBox())!;
-  await page.mouse.move(seBox2.x + seBox2.width / 2, seBox2.y + seBox2.height / 2);
+  await page.mouse.move(
+    seBox2.x + seBox2.width / 2,
+    seBox2.y + seBox2.height / 2,
+  );
   await page.mouse.down();
-  await page.mouse.move(seBox2.x + seBox2.width / 2 + 80, seBox2.y + seBox2.height / 2 + 80);
+  await page.mouse.move(
+    seBox2.x + seBox2.width / 2 + 80,
+    seBox2.y + seBox2.height / 2 + 80,
+  );
   await page.keyboard.press("Escape");
   await page.mouse.up();
 
@@ -500,7 +538,12 @@ test("layer can be resized by dragging corner handles with live preview and undo
     const { editor, RasterLayer } = window.luma;
     const selected = editor.document.selectedLayer;
     if (selected instanceof RasterLayer) {
-      return { width: selected.width, height: selected.height, x: selected.x, y: selected.y };
+      return {
+        width: selected.width,
+        height: selected.height,
+        x: selected.x,
+        y: selected.y,
+      };
     }
     return null;
   });
@@ -510,10 +553,16 @@ test("layer can be resized by dragging corner handles with live preview and undo
   // Test Shift key proportional aspect ratio resize
   const currentRatio = nwDims!.width / nwDims!.height;
   const seBox3 = (await handleSE.boundingBox())!;
-  await page.mouse.move(seBox3.x + seBox3.width / 2, seBox3.y + seBox3.height / 2);
+  await page.mouse.move(
+    seBox3.x + seBox3.width / 2,
+    seBox3.y + seBox3.height / 2,
+  );
   await page.keyboard.down("Shift");
   await page.mouse.down();
-  await page.mouse.move(seBox3.x + seBox3.width / 2 + 100, seBox3.y + seBox3.height / 2 + 30);
+  await page.mouse.move(
+    seBox3.x + seBox3.width / 2 + 100,
+    seBox3.y + seBox3.height / 2 + 30,
+  );
   await page.mouse.up();
   await page.keyboard.up("Shift");
 
@@ -559,7 +608,8 @@ test("add empty layer button and shortcut create paint layers and support undo/r
     return {
       isPaintLayer: selected instanceof PaintLayer,
       name: selected?.name,
-      strokeCount: selected instanceof PaintLayer ? selected.strokes.length : -1,
+      strokeCount:
+        selected instanceof PaintLayer ? selected.strokes.length : -1,
       totalLayers: editor.document.layers.length,
     };
   });
@@ -570,7 +620,9 @@ test("add empty layer button and shortcut create paint layers and support undo/r
 
   // Verify layer row in the panel
   const layerRows = page.locator(".layer-row");
-  await expect(layerRows.filter({ hasText: "Layer 1" })).toHaveClass(/selected/);
+  await expect(layerRows.filter({ hasText: "Layer 1" })).toHaveClass(
+    /selected/,
+  );
 
   // Use keyboard shortcut to create a second layer
   await page.keyboard.press("Control+Shift+n");
@@ -612,7 +664,9 @@ test("add empty layer button and shortcut create paint layers and support undo/r
   expect(afterRedo.totalLayers).toBe(2);
 
   // Select Layer 2 before grouping
-  await page.getByRole("button", { name: "Select Layer 2", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Select Layer 2", exact: true })
+    .click();
 
   // Test creating inside a group: group Layer 2
   const addGroupBtn = page.getByRole("button", { name: "Add group (Mod+G)" });
@@ -648,6 +702,3 @@ test("add empty layer button and shortcut create paint layers and support undo/r
 
   expect(errors).toEqual([]);
 });
-
-
-

@@ -1,27 +1,147 @@
-import { BlendIf, MarqueeSelection, PaintOperation } from "./values";
+import { LayerCompCollection } from "./layer-comps";
+export { LayerComp, LayerCompCollection } from "./layer-comps";
+import { parseRetainedHistory } from "../core/history";
+import { SmartFilter } from "./smart-filters";
+export {
+  SmartFilter,
+  GaussianBlurFilter,
+  UnsharpMaskFilter,
+  SmartToneFilter,
+} from "./smart-filters";
+import {
+  smartFiltersSchema,
+  type SmartFilterData,
+} from "../core/smart/filters";
+import { ComponentRegistry } from "../core/smart/manager";
+import type { SmartObjectInstanceData } from "../core/smart/types";
+import { PatchAdjustment, TonalStroke } from "./retouch";
+import {
+  healSpotRequestSchema,
+  type HealSpotRequest,
+  type HealSpotOptions,
+} from "../core/retouch/heal-spot";
+import { isLocked } from "../core/model";
+export type { HealSpotOptions } from "../core/retouch/heal-spot";
+import {
+  patchRegionRequestSchema,
+  type PatchRegionRequest,
+  type PatchRegionOptions,
+} from "../core/retouch/patch-region";
+export type { PatchRegionOptions } from "../core/retouch/patch-region";
+export { PatchAdjustment, TonalStroke } from "./retouch";
+import { GuideCollection } from "./guides";
+export { Guide, GuideCollection } from "./guides";
+import { maskTransform } from "../core/masks";
+import { LayerSelection } from "./layer-selection";
+export { LayerSelection } from "./layer-selection";
+export { AffineTransform } from "../core/affine";
+import type { CropBounds } from "../core/crop";
+export type { CropBounds } from "../core/crop";
+import { splitPathSegment } from "../core/bezier";
+import { layerOrigin, layerTransform } from "../core/spatial";
+import { LayerMask } from "./masks";
+export { LayerMask } from "./masks";
+import { LayerMetadata } from "./metadata";
+export { LayerMetadata } from "./metadata";
+import {
+  BlendIf,
+  BrushStroke,
+  MarqueeSelection,
+  PaintOperation,
+} from "./values";
+import {
+  tonalSculptSchema,
+  type TonalSculptOptions,
+} from "../core/retouch/tonal-sculpt";
+import type { DodgeBurnMode, DodgeBurnRange } from "../core/retouch/types";
+export type { TonalSculptOptions } from "../core/retouch/tonal-sculpt";
 import { defaultStyle, pathSchema, styleSchema } from "../core/drawing";
 import type {
   BlendIfData,
   LayerStyleData,
   PathAnchor,
   Point,
+  Rect,
   VectorPathData,
+  SelectionData,
 } from "../core/drawing";
+export type { SelectionData } from "../core/drawing";
 export {
   BlendIf,
   MarqueeSelection,
   PaintOperation,
   BrushStroke,
+  EraserStroke,
   PencilStroke,
   CloneStroke,
   PaintFill,
 } from "./values";
 export type { BrushOptions } from "./values";
+import {
+  KAPPA,
+  createRectanglePath,
+  createEllipsePath,
+  createPolygonPath,
+  formatSvgPathD,
+  exportPathSvg,
+  exportVectorLayerSvg,
+  parseSvgPath,
+} from "../core/shapes";
+import type { ShapeOptions } from "../core/shapes";
+export {
+  KAPPA,
+  createRectanglePath,
+  createEllipsePath,
+  createPolygonPath,
+  formatSvgPathD,
+  exportPathSvg,
+  exportVectorLayerSvg,
+  parseSvgPath,
+};
+import type { AssetStore } from "../core/assets";
+import {
+  detectSalientSubject,
+  generateTrimapFromMask,
+  maskToSelectionData,
+} from "../intelligence/matting/segmentation";
+import { solveAlphaMatte } from "../intelligence/matting/engine";
+import type {
+  SelectSubjectOptions,
+  RefineEdgeOptions,
+  MattingResult,
+} from "../intelligence/matting/types";
+import { rasterizeSelection } from "../ai/diff/engine";
+import { encodeRgbaPng } from "../engine/png";
+import { createCanvas, release } from "../engine/canvas";
+import { paintedMask } from "../engine/drawing";
+import { AffineTransform } from "../core/affine";
+export * from "../intelligence/matting";
+export type { ShapeOptions };
+import {
+  defaultCurvesAdjustment,
+  defaultHslAdjustment,
+  defaultLevelsAdjustment,
+  defaultToneAdjustment,
+} from "../core/adjustments";
+import type {
+  AdjustmentData,
+  CurvePoint,
+  LevelChannelData,
+} from "../core/adjustments";
+export {
+  defaultCurvesAdjustment,
+  defaultHslAdjustment,
+  defaultLevelsAdjustment,
+  defaultToneAdjustment,
+};
+export type { AdjustmentData, CurvePoint, LevelChannelData };
 import { execute } from "../core/commands";
 import type { EditorCommand, LayerPatch } from "../core/commands";
 import {
+  SCHEMA_VERSION,
   allLayers,
   base,
+  createAdjustmentLayer,
   createDocument,
   createGroup,
   createRaster,
@@ -32,6 +152,7 @@ import {
   validateDocument,
 } from "../core/model";
 import type {
+  AdjustmentLayerData,
   BlendMode,
   DocumentData,
   GroupLayerData,
@@ -48,6 +169,7 @@ export interface DocumentOptions {
   name?: string;
   width?: number;
   height?: number;
+  assets?: AssetStore;
 }
 export interface LayerOptions {
   name?: string;
@@ -71,6 +193,10 @@ export interface TextLayerOptions extends LayerOptions {
   color?: string;
   align?: "left" | "center" | "right";
   lineHeight?: number;
+  letterSpacing?: number;
+  fontWeight?: string;
+  fontStyle?: "normal" | "italic";
+  direction?: "ltr" | "rtl";
 }
 export interface ToneOptions {
   exposure?: number;
@@ -84,24 +210,159 @@ export interface ToneOptions {
  * properties resolve by ID against the current document, never stale snapshots.
  */
 export class Document {
+  /** Register or replace an embedded master; source edits remain detached until this call. */
+  defineComponent(
+    source: Document,
+    options: { id?: string; name?: string } = {},
+  ): string {
+    if (!(source instanceof Document))
+      throw new Error("A component source must be a Document.");
+    const { components: _nestedDefinitions, ...data } = source.toJSON();
+    const componentId = options.id ?? id();
+    this._dispatch({
+      type: "component.set",
+      definition: {
+        id: componentId,
+        name: options.name ?? source.name,
+        source: { kind: "document", document: data },
+      },
+    });
+    return componentId;
+  }
+  getComponent(componentId: string): Document {
+    const definition = new ComponentRegistry(this._read().components).get(
+      componentId,
+    );
+    const source = definition.source;
+    const data =
+      source.kind === "document"
+        ? structuredClone(source.document)
+        : {
+            ...createDocument(definition.name, source.width, source.height),
+            children: [
+              createRaster(
+                definition.name,
+                source.assetId,
+                source.width,
+                source.height,
+              ),
+            ],
+          };
+    const document = Document.fromJSON({
+      ...data,
+      schemaVersion: SCHEMA_VERSION,
+      components: structuredClone(this._read().components ?? []),
+    });
+    document.assetStore = this.assetStore;
+    return document;
+  }
+  removeComponent(componentId: string): void {
+    this._dispatch({ type: "component.remove", id: componentId });
+  }
+  createSmartObject(layers: Layer[]): SmartObjectLayer {
+    for (const layer of layers)
+      if (
+        !(layer instanceof Layer) ||
+        layer.document !== this ||
+        !layer.isAttached
+      )
+        throw new Error(
+          "Conversion requires attached layers from this document.",
+        );
+    if (layers.length === 1 && layers[0] instanceof RasterLayer)
+      return layers[0].convertToSmartObject();
+    const instanceId = id();
+    this._dispatch({
+      type: "smartObject.convertLayers",
+      ids: layers.map((layer) => layer.id),
+      componentId: id(),
+      instanceId,
+    });
+    const instance = this.getLayer(instanceId) as SmartObjectLayer;
+    this.selectedLayer = instance;
+    return instance;
+  }
+  placeSmartObject(
+    componentId: string,
+    options: LayerOptions & { width?: number; height?: number } = {},
+  ): SmartObjectLayer {
+    const source = new ComponentRegistry(this._read().components).get(
+      componentId,
+    ).source;
+    const width =
+      source.kind === "asset" ? source.width : source.document.width;
+    const height =
+      source.kind === "asset" ? source.height : source.document.height;
+    return this.layers.add(
+      new SmartObjectLayer({
+        ...options,
+        componentId,
+        width: options.width ?? width,
+        height: options.height ?? height,
+      }),
+    );
+  }
+
+  /** @internal Asynchronous host operation; no renderer or credentials enter isolated scripts. */
+  _rasterizeSmartObject?: (layerId: string) => Promise<RasterLayer>;
+  async _rasterize(layerId: string): Promise<RasterLayer> {
+    if (this.batch)
+      throw new Error(
+        "Rasterization cannot run inside a synchronous transaction.",
+      );
+    if (!this._rasterizeSmartObject)
+      throw new Error("Rasterization requires a configured application host.");
+    return this._rasterizeSmartObject(layerId);
+  }
   private store: EditorStore;
   private handles = new Map<string, Layer>();
   private staged: DocumentData | null = null;
   private batch: EditorCommand[] | null = null;
-  private commandListeners = new Set<(command: EditorCommand) => void>();
+  private commandListeners = new Set<
+    (command: EditorCommand, before: DocumentData, after: DocumentData) => void
+  >();
+  private historyListeners = new Set<(direction: "undo" | "redo") => void>();
+  private _assetStore: AssetStore | null = null;
+  /** @internal Host preparation only; returned data is committed through normal DOM commands. */
+  _preparePatch?: (request: PatchRegionRequest) => Promise<AdjustmentLayerData>;
+  /** @internal */
+  _prepareHeal?: (request: HealSpotRequest) => Promise<AdjustmentLayerData>;
+  readonly layerComps: LayerCompCollection;
+  readonly guides: GuideCollection;
   readonly layers: LayerCollection;
+  readonly layerSelection: LayerSelection;
 
   constructor(options: DocumentOptions = {}) {
     this.store = new EditorStore(
       createDocument(options.name, options.width, options.height),
     );
+    if (options.assets) {
+      this._assetStore = options.assets;
+    }
+    this.layerComps = new LayerCompCollection(this);
+    this.guides = new GuideCollection(this);
     this.layers = new LayerCollection(this);
+    this.layerSelection = new LayerSelection(this);
   }
 
   static fromJSON(data: unknown): Document {
     validateDocument(data);
     const document = new Document();
-    document.store = new EditorStore(data);
+    document.store = new EditorStore({
+      ...structuredClone(data),
+      schemaVersion: SCHEMA_VERSION,
+    });
+    return document;
+  }
+  /** @internal Workspace restoration validates retained history before exposing the session. */
+  static _fromWorkspace(data: unknown, history?: unknown): Document {
+    const document = Document.fromJSON(data);
+    if (history !== undefined) {
+      const retained = parseRetainedHistory(history, document._read());
+      for (const entry of [...retained.past, ...retained.future])
+        entry.document.schemaVersion = SCHEMA_VERSION;
+      document.store = new EditorStore(document._read(), retained);
+    }
     return document;
   }
 
@@ -126,8 +387,17 @@ export class Document {
   set height(value: number) {
     this.resize(this.width, value);
   }
+  crop(bounds: CropBounds) {
+    this._dispatch({ type: "document.crop", bounds });
+  }
   resize(width: number, height: number) {
     this._dispatch({ type: "document.resize", width, height });
+  }
+  get assetStore(): AssetStore | null {
+    return this._assetStore;
+  }
+  set assetStore(store: AssetStore | null) {
+    this._assetStore = store;
   }
   get selectedLayer() {
     return this.getLayer(this.store.getSnapshot().selectedId);
@@ -136,6 +406,41 @@ export class Document {
     if (layer && layer.document !== this)
       throw new Error("Layer belongs to another document.");
     this.store.select(layer?.id ?? null);
+  }
+  get selectedLayers(): Layer[] {
+    return this.store
+      .getSnapshot()
+      .selectedIds.map((id) => this.getLayer(id)!)
+      .filter(Boolean);
+  }
+  selectLayers(
+    layers: Layer[],
+    mode: "replace" | "add" | "remove" = "replace",
+  ) {
+    if (!["replace", "add", "remove"].includes(mode))
+      throw new Error("Unknown layer selection mode.");
+    for (const layer of layers)
+      if (
+        !(layer instanceof Layer) ||
+        layer.document !== this ||
+        !layer.isAttached
+      )
+        throw new Error("Selected layers must belong to this document.");
+    const current = this.store.getSnapshot().selectedIds;
+    const ids = layers.map((layer) => layer.id);
+    this.store.selectMany(
+      mode === "replace"
+        ? ids
+        : mode === "add"
+          ? [...current.filter((id) => !ids.includes(id)), ...ids]
+          : current.filter((id) => !ids.includes(id)),
+    );
+  }
+  get activeLayer(): Layer | null {
+    return this.selectedLayer;
+  }
+  set activeLayer(layer: Layer | null) {
+    this.selectedLayer = layer;
   }
   get selection(): MarqueeSelection | null {
     return this._read().selection
@@ -147,6 +452,104 @@ export class Document {
       type: "selection.set",
       selection: value?.toJSON() ?? null,
     });
+  }
+  async patchRegion(
+    targetRegion: MarqueeSelection | SelectionData,
+    sourceOffset: Point,
+    options: PatchRegionOptions = {},
+  ): Promise<AdjustmentLayer> {
+    if (this.batch)
+      throw new Error(
+        "Patch preparation cannot run inside a synchronous transaction.",
+      );
+    if (!this._preparePatch)
+      throw new Error(
+        "Patch preparation requires a configured application host.",
+      );
+    const request = patchRegionRequestSchema.parse({
+      selection:
+        targetRegion instanceof MarqueeSelection
+          ? targetRegion.toJSON()
+          : targetRegion,
+      offset: sourceOffset,
+      options: {
+        ...options,
+        layerId: options.layerId ?? this.selectedLayer?.id,
+      },
+    });
+    const revision = this.getSnapshot().revision;
+    const layer = await this._preparePatch(request);
+    if (this.getSnapshot().revision !== revision)
+      throw new Error("Document changed during patch preparation.");
+    return this.layers.add(new AdjustmentLayer(layer));
+  }
+  /** @internal Invoked by attached Layer handles. */
+  async _healSpot(
+    layerId: string,
+    center: Point,
+    radius: number,
+    options: HealSpotOptions,
+  ): Promise<AdjustmentLayer> {
+    if (this.batch)
+      throw new Error("Healing cannot run inside a synchronous transaction.");
+    if (!this._prepareHeal)
+      throw new Error("Healing requires a configured application host.");
+    if (!this.getLayer(layerId) || isLocked(this._read(), layerId))
+      throw new Error("Healing requires an attached unlocked layer.");
+    const request = healSpotRequestSchema.parse({
+      layerId,
+      center,
+      radius,
+      options,
+      selection:
+        options.clipSelection === false
+          ? null
+          : (this.selection?.toJSON() ?? null),
+    });
+    const revision = this.getSnapshot().revision;
+    const layer = await this._prepareHeal(request);
+    if (this.getSnapshot().revision !== revision)
+      throw new Error("Document changed during healing preparation.");
+    return this.layers.add(new AdjustmentLayer(layer));
+  }
+  applyTonalSculpt(
+    path: (Point & { pressure?: number })[],
+    mode: DodgeBurnMode,
+    range: DodgeBurnRange,
+    exposure: number,
+    options: TonalSculptOptions = {},
+  ): AdjustmentLayer {
+    const parsed = tonalSculptSchema.parse({
+      path,
+      mode,
+      range,
+      exposure,
+      options,
+    });
+    const {
+      name,
+      clipSelection = true,
+      protectTones = true,
+      ...brush
+    } = parsed.options!;
+    const stroke = new TonalStroke({
+      brush: new BrushStroke({
+        ...brush,
+        points: parsed.path,
+        clip: clipSelection ? this.selection : null,
+      }),
+      mode: parsed.mode,
+      range: parsed.range,
+      exposure: parsed.exposure,
+      protectTones,
+    });
+    // One validated layer.add command also composes inside a caller's transaction.
+    return this.layers.add(
+      new AdjustmentLayer({
+        name: name ?? (mode === "dodge" ? "Dodge" : "Burn"),
+        adjustment: { kind: "tonal", strokes: [stroke.toJSON()] },
+      }),
+    );
   }
   selectAll() {
     this.selection = new MarqueeSelection({
@@ -160,6 +563,61 @@ export class Document {
   deselect() {
     this.selection = null;
   }
+  async selectSubject(options?: SelectSubjectOptions): Promise<SelectionData> {
+    const layer = this.selectedLayer;
+    let targetImageData: ImageData | null = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (
+      layer instanceof RasterLayer &&
+      this._assetStore &&
+      this._assetStore.has(layer.assetId)
+    ) {
+      const asset = this._assetStore.get(layer.assetId);
+      offsetX = layer.x;
+      offsetY = layer.y;
+      const canvas = createCanvas(asset.width, asset.height);
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(asset.bitmap, 0, 0);
+      targetImageData = ctx.getImageData(0, 0, asset.width, asset.height);
+      release(canvas);
+    } else {
+      const canvas = createCanvas(this.width, this.height);
+      const ctx = canvas.getContext("2d")!;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, this.width, this.height);
+      targetImageData = ctx.getImageData(0, 0, this.width, this.height);
+      release(canvas);
+    }
+
+    const segmentation = detectSalientSubject(targetImageData, options);
+    const selection = maskToSelectionData(
+      segmentation.mask,
+      targetImageData.width,
+      targetImageData.height,
+      {
+        x: segmentation.bounds.x + offsetX,
+        y: segmentation.bounds.y + offsetY,
+        width: segmentation.bounds.width,
+        height: segmentation.bounds.height,
+      },
+    );
+
+    this.selection = new MarqueeSelection(selection);
+    return selection;
+  }
+  async removeBackground(
+    targetLayer?: RasterLayer,
+    options?: RefineEdgeOptions,
+  ): Promise<RasterLayer> {
+    const layer = targetLayer ?? this.selectedLayer;
+    if (!(layer instanceof RasterLayer)) {
+      throw new Error("Select a raster layer to remove its background.");
+    }
+    await layer.refineEdge(options);
+    return layer;
+  }
   get canUndo() {
     return this.store.getSnapshot().past.length > 0;
   }
@@ -167,10 +625,25 @@ export class Document {
     return this.store.getSnapshot().future.length > 0;
   }
   subscribe = (listener: () => void) => this.store.subscribe(listener);
-  onCommand(listener: (command: EditorCommand) => void) {
+  onCommand(
+    listener: (
+      command: EditorCommand,
+      before: DocumentData,
+      after: DocumentData,
+    ) => void,
+  ) {
     this.commandListeners.add(listener);
     return () => {
       this.commandListeners.delete(listener);
+    };
+  }
+  /** Host observer for completed history navigation; no-op undo/redo emits nothing. */
+  onHistoryNavigation(
+    listener: (direction: "undo" | "redo") => void,
+  ): () => void {
+    this.historyListeners.add(listener);
+    return () => {
+      this.historyListeners.delete(listener);
     };
   }
   getSnapshot = () => this.store.getSnapshot();
@@ -179,11 +652,15 @@ export class Document {
   }
   undo() {
     if (this.batch) throw new Error("Finish the transaction first.");
+    if (!this.canUndo) return;
     this.store.undo();
+    this.historyListeners.forEach((listener) => listener("undo"));
   }
   redo() {
     if (this.batch) throw new Error("Finish the transaction first.");
+    if (!this.canRedo) return;
     this.store.redo();
+    this.historyListeners.forEach((listener) => listener("redo"));
   }
 
   getLayer(layerId: string | null): Layer | null {
@@ -227,10 +704,16 @@ export class Document {
       this.staged = execute(this._read(), command);
       this.batch.push(command);
     } else {
-      this.store.dispatch(command);
-      this.commandListeners.forEach((listener) =>
-        listener(structuredClone(command)),
-      );
+      if (this.commandListeners.size > 0) {
+        const before = this.toJSON();
+        this.store.dispatch(command);
+        const after = this.toJSON();
+        this.commandListeners.forEach((listener) =>
+          listener(structuredClone(command), before, after),
+        );
+      } else {
+        this.store.dispatch(command);
+      }
     }
   }
   /** @internal */
@@ -240,6 +723,16 @@ export class Document {
 }
 
 export abstract class Layer {
+  async healSpot(
+    center: Point,
+    radius: number,
+    options: HealSpotOptions = {},
+  ): Promise<AdjustmentLayer> {
+    const document = this.document;
+    if (!document || !this.isAttached)
+      throw new Error("Healing requires an attached layer.");
+    return document._healSpot(this.id, center, radius, options);
+  }
   protected data: LayerData;
   private owner: Document | null = null;
   /** @internal */ _parent: LayerGroup | null = null;
@@ -276,6 +769,23 @@ export abstract class Layer {
   set y(value: number) {
     this.update({ y: value });
   }
+  get transform(): AffineTransform {
+    const data = this._read();
+    return AffineTransform.translation(data.x, data.y).multiply(
+      data.transform
+        ? AffineTransform.fromJSON(data.transform)
+        : new AffineTransform(),
+    );
+  }
+  set transform(value: AffineTransform) {
+    value.inverse();
+    const matrix = value.toJSON();
+    this.update({
+      x: matrix.e,
+      y: matrix.f,
+      transform: { ...matrix, e: 0, f: 0 },
+    });
+  }
   get opacity() {
     return this._read().opacity;
   }
@@ -287,6 +797,75 @@ export abstract class Layer {
   }
   set fillOpacity(value: number) {
     this.update({ fillOpacity: value });
+  }
+  get mask(): LayerMask | null {
+    const value = this._read().mask;
+    return value ? LayerMask._fromJSON(value) : null;
+  }
+  set mask(value: LayerMask | null) {
+    this.update({ mask: value?.toJSON() ?? null });
+  }
+  /** Toggle coordinate planes while preserving the mask's current world position. */
+  setMaskLinked(linked: boolean) {
+    if (typeof linked !== "boolean")
+      throw new Error("Mask link state must be a boolean.");
+    const document = this.requireDocument();
+    const mask = this.mask;
+    if (!mask) throw new Error("This layer has no mask to link.");
+    if (mask.linked === linked) return;
+    const layerWorld = layerTransform(document._read(), this.id)!;
+    const world = maskTransform(mask.toJSON(), layerWorld);
+    const local = linked ? layerWorld.inverse().multiply(world) : world;
+    this.mask = mask.with({
+      linked,
+      x: local.e,
+      y: local.f,
+      basis: new AffineTransform(local.a, local.b, local.c, local.d, 0, 0),
+    });
+  }
+  /** Capture a document-space selection as a mask that moves with this layer. */
+  maskFromSelection(selection: MarqueeSelection) {
+    const document = this.requireDocument();
+    const inverse = layerTransform(document._read(), this.id)!.inverse();
+    this.mask = new LayerMask({
+      selection: selection.transformed(inverse),
+    });
+  }
+  /** Copy closed paths from an attached vector layer without altering their world position. */
+  maskFromPaths(source: VectorLayer) {
+    const document = this.requireDocument();
+    if (source.document !== document || !source.isAttached)
+      throw new Error("Mask source must belong to the same document.");
+    const target = layerTransform(document._read(), this.id)!;
+    const origin = layerTransform(document._read(), source.id)!;
+    const mapping = target.inverse().multiply(origin);
+    const paths = [...source.paths].map(
+      (path) =>
+        new VectorPath({
+          closed: path.closed,
+          points: path.points.map((p) => ({
+            ...mapping.point(p),
+            in: mapping.point(p.in),
+            out: mapping.point(p.out),
+          })),
+        }),
+    );
+    if (!paths.length)
+      throw new Error("The vector layer has no paths to copy.");
+    this.mask = new LayerMask({ paths });
+  }
+  /** Create a bitmap mask referencing an asset in the document's AssetStore. */
+  maskFromBitmap(assetId: string) {
+    this.mask = LayerMask.fromBitmap(assetId);
+  }
+  async refineEdge(_options: RefineEdgeOptions = {}): Promise<LayerMask> {
+    throw new Error("Refine edge is only supported on raster layers.");
+  }
+  get metadata(): LayerMetadata {
+    return LayerMetadata._attached(this);
+  }
+  set metadata(value: LayerMetadata) {
+    this.update({ metadata: value.toJSON() });
   }
   get styles(): LayerStyle {
     return LayerStyle._attached(this);
@@ -323,6 +902,7 @@ export abstract class Layer {
       const updated = execute(
         { ...createDocument(), children: [this.data] },
         { type: "layer.update", id: this.id, patch },
+        false,
       );
       Object.assign(this.data, updated.children[0]);
     }
@@ -428,12 +1008,24 @@ export abstract class Layer {
             ? new VectorLayer({ name: data.name })
             : data.kind === "text"
               ? new TextLayer({ name: data.name, text: data.text })
-              : new RasterLayer({
-                  name: data.name,
-                  assetId: data.assetId,
-                  width: data.width,
-                  height: data.height,
-                });
+              : data.kind === "smart-object"
+                ? new SmartObjectLayer({
+                    name: data.name,
+                    componentId: data.componentId,
+                    width: data.width,
+                    height: data.height,
+                  })
+                : data.kind === "adjustment"
+                  ? new AdjustmentLayer({
+                      name: data.name,
+                      adjustment: data.adjustment,
+                    })
+                  : new RasterLayer({
+                      name: data.name,
+                      assetId: data.assetId,
+                      width: data.width,
+                      height: data.height,
+                    });
     layer.data = copy ? structuredClone(data) : data;
     return layer;
   }
@@ -446,7 +1038,201 @@ function allIds(nodes: LayerData[]): string[] {
   ]);
 }
 
+export class SmartObjectLayer extends Layer {
+  constructor(
+    options: LayerOptions & {
+      componentId: string;
+      width: number;
+      height: number;
+    },
+  ) {
+    super({
+      ...createRaster(
+        options.name ?? "Smart object",
+        "unused",
+        options.width,
+        options.height,
+      ),
+      ...options,
+      kind: "smart-object",
+    } as SmartObjectInstanceData);
+    delete (this.data as unknown as Record<string, unknown>).assetId;
+    delete (this.data as unknown as Record<string, unknown>).effects;
+    validateDocument({ ...createDocument(), children: [this.data] }, false);
+  }
+  get componentId(): string {
+    return (this._read() as SmartObjectInstanceData).componentId;
+  }
+  get width(): number {
+    return (this._read() as SmartObjectInstanceData).width;
+  }
+  set width(value: number) {
+    this.update({ width: value });
+  }
+  get height(): number {
+    return (this._read() as SmartObjectInstanceData).height;
+  }
+  set height(value: number) {
+    this.update({ height: value });
+  }
+  get filterMask(): LayerMask | null {
+    const value = (this._read() as SmartObjectInstanceData).filterMask;
+    return value ? LayerMask._fromJSON(value) : null;
+  }
+  set filterMask(value: LayerMask | null) {
+    if (value !== null && !(value instanceof LayerMask))
+      throw new Error("Use a LayerMask constructor.");
+    const command: EditorCommand = {
+      type: "smartObject.filterMask",
+      id: this.id,
+      mask: value?.toJSON() ?? null,
+    };
+    if (this.document) this.document._dispatch(command);
+    else
+      Object.assign(
+        this.data,
+        execute({ ...createDocument(), children: [this.data] }, command, false)
+          .children[0],
+      );
+  }
+  /** Switch filter-mask coordinate planes without moving its current coverage. */
+  setFilterMaskLinked(linked: boolean): void {
+    if (typeof linked !== "boolean")
+      throw new Error("Filter-mask link state must be a boolean.");
+    const document = this.requireDocument();
+    const mask = this.filterMask;
+    if (!mask) throw new Error("This smart object has no filter mask to link.");
+    if (mask.linked === linked) return;
+    const source = new ComponentRegistry(document._read().components).get(
+      this.componentId,
+    ).source;
+    const master = source.kind === "asset" ? source : source.document;
+    const nativeWorld = layerTransform(document._read(), this.id)!.multiply(
+      AffineTransform.scale(
+        this.width / master.width,
+        this.height / master.height,
+      ),
+    );
+    const world = maskTransform(mask.toJSON(), nativeWorld);
+    const local = linked ? nativeWorld.inverse().multiply(world) : world;
+    this.filterMask = mask.with({
+      linked,
+      x: local.e,
+      y: local.f,
+      basis: new AffineTransform(local.a, local.b, local.c, local.d, 0, 0),
+    });
+  }
+  /** Detached snapshots in execution order; use setFilters to update/reorder/disable. */
+  get smartFilters() {
+    return structuredClone(
+      (this._read() as SmartObjectInstanceData).smartFilters ?? [],
+    );
+  }
+  setFilters(filters: readonly SmartFilter[]): void {
+    const data = smartFiltersSchema.parse(
+      filters.map((filter) => {
+        if (!(filter instanceof SmartFilter))
+          throw new Error("Use smart-filter constructors.");
+        return filter.toJSON();
+      }),
+    );
+    this.writeFilters(data);
+  }
+  addFilter(filter: SmartFilter): void {
+    if (!(filter instanceof SmartFilter))
+      throw new Error("Use a smart-filter constructor.");
+    const filters = smartFiltersSchema.parse([
+      ...this.smartFilters,
+      filter.toJSON(),
+    ]);
+    this.writeFilters(filters);
+  }
+  private writeFilters(filters: SmartFilterData[]): void {
+    const command: EditorCommand = {
+      type: "smartObject.filters",
+      id: this.id,
+      filters,
+    };
+    if (this.document) this.document._dispatch(command);
+    else
+      Object.assign(
+        this.data,
+        execute({ ...createDocument(), children: [this.data] }, command, false)
+          .children[0],
+      );
+  }
+  /** Copy the complete embedded master graph; ordinary duplicate() keeps shared masters. */
+  duplicateIndependent(): SmartObjectLayer {
+    const document = this.requireDocument();
+    const registry = new ComponentRegistry(document._read().components);
+    const componentIds = Object.fromEntries(
+      [...registry.reachableFrom(this.componentId)].map((key) => [key, id()]),
+    );
+    const instanceId = id();
+    document._dispatch({
+      type: "smartObject.duplicateIndependent",
+      id: this.id,
+      instanceId,
+      componentIds,
+    });
+    const copy = document.getLayer(instanceId) as SmartObjectLayer;
+    document.selectedLayer = copy;
+    return copy;
+  }
+  get linkedSource(): import("../core/smart/types").LinkedImageFile | null {
+    const document = this.requireDocument();
+    const source = new ComponentRegistry(document._read().components).get(
+      this.componentId,
+    ).source;
+    return source.kind === "asset" ? (source.link ?? null) : null;
+  }
+  embedSource(): void {
+    const document = this.requireDocument();
+    const definition = new ComponentRegistry(document._read().components).get(
+      this.componentId,
+    );
+    if (definition.source.kind !== "asset" || !definition.source.link) return;
+    const { link: _link, ...source } = definition.source;
+    document._dispatch({
+      type: "component.set",
+      definition: { ...definition, source },
+    });
+  }
+  async rasterize(): Promise<RasterLayer> {
+    return this.requireDocument()._rasterize(this.id);
+  }
+  editContents(): Document {
+    if (!this.document || !this.isAttached)
+      throw new Error(
+        "Editing component contents requires an attached instance.",
+      );
+    return this.document.getComponent(this.componentId);
+  }
+  replaceContents(source: Document): void {
+    if (!this.document || !this.isAttached)
+      throw new Error(
+        "Replacing component contents requires an attached instance.",
+      );
+    this.document.defineComponent(source, { id: this.componentId });
+  }
+}
+
 export class RasterLayer extends Layer {
+  /** Convert without changing original source bytes or the layer's stack position. */
+  convertToSmartObject(): SmartObjectLayer {
+    const document = this.requireDocument();
+    const instanceId = id();
+    document._dispatch({
+      type: "smartObject.convertRaster",
+      id: this.id,
+      componentId: id(),
+      instanceId,
+    });
+    const instance = document.getLayer(instanceId) as SmartObjectLayer;
+    document.selectedLayer = instance;
+    return instance;
+  }
+
   readonly adjustments: AdjustmentCollection;
   constructor(options: RasterLayerOptions) {
     const { assetId, width, height, ...base } = options;
@@ -482,6 +1268,106 @@ export class RasterLayer extends Layer {
     if (this.document)
       this.document._dispatch({ type: "effect.reset", id: this.id });
     else (this.data as RasterLayerData).effects = [];
+  }
+  override async refineEdge(
+    options: RefineEdgeOptions = {},
+  ): Promise<LayerMask> {
+    const document = this.requireDocument();
+    const assets = document.assetStore;
+    if (!assets) throw new Error("Document asset store is not available.");
+    if (!assets.has(this.assetId))
+      throw new Error(`Missing image asset: ${this.assetId}`);
+
+    const asset = assets.get(this.assetId);
+    const canvas = createCanvas(asset.width, asset.height);
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(asset.bitmap, 0, 0);
+    const imageData = ctx.getImageData(0, 0, asset.width, asset.height);
+    release(canvas);
+
+    let matte: MattingResult;
+
+    if (options.trimap) {
+      matte = solveAlphaMatte(
+        imageData,
+        {
+          width: asset.width,
+          height: asset.height,
+          data: options.trimap,
+        },
+        options,
+      );
+    } else {
+      let initialMask: Uint8Array;
+      if (this.mask) {
+        const maskData = this.mask.toJSON();
+        const origin = layerOrigin(document._read(), this.id) ?? { x: 0, y: 0 };
+        const space = {
+          x: 0,
+          y: 0,
+          width: asset.width,
+          height: asset.height,
+          sx: 1,
+          sy: 1,
+        };
+        const maskCanvas = await paintedMask(
+          maskData,
+          space,
+          origin.x,
+          origin.y,
+          { feather: async (data: Uint8ClampedArray) => data } as any,
+          new AffineTransform(),
+          asset.bitmap,
+        );
+        const maskCtx = maskCanvas.getContext("2d")!;
+        const maskImg = maskCtx.getImageData(0, 0, asset.width, asset.height);
+        release(maskCanvas);
+        initialMask = new Uint8Array(asset.width * asset.height);
+        for (let i = 0; i < initialMask.length; i++) {
+          initialMask[i] = maskImg.data[i * 4 + 3];
+        }
+      } else if (document.selection) {
+        const selData = document.selection
+          .translated(-this.x, -this.y)
+          .toJSON();
+        initialMask = rasterizeSelection(selData, asset.width, asset.height);
+      } else {
+        const segmentation = detectSalientSubject(imageData);
+        initialMask = segmentation.mask;
+      }
+
+      const trimap = generateTrimapFromMask(
+        initialMask,
+        asset.width,
+        asset.height,
+        options.radius ?? 10,
+      );
+      matte = solveAlphaMatte(imageData, trimap, options);
+    }
+
+    const maskRgba = new Uint8Array(asset.width * asset.height * 4);
+    for (let i = 0; i < matte.alpha.length; i++) {
+      maskRgba[i * 4] = 255;
+      maskRgba[i * 4 + 1] = 255;
+      maskRgba[i * 4 + 2] = 255;
+      maskRgba[i * 4 + 3] = matte.alpha[i];
+    }
+    const blob = await encodeRgbaPng(maskRgba, asset.width, asset.height);
+    const maskAssetId = id();
+    await assets.add(
+      blob,
+      `${this.name} - Alpha Matte Mask`,
+      maskAssetId,
+      false,
+    );
+    const mask = LayerMask.fromBitmap(maskAssetId);
+
+    document._dispatch({
+      type: "mask.setFromMatting",
+      id: this.id,
+      mask: mask.toJSON(),
+    });
+    return mask;
   }
   /** @internal */
   _effectCommand(command: EditorCommand) {
@@ -555,7 +1441,7 @@ export class LayerCollection implements Iterable<Layer> {
       layer._attach(document);
     } else {
       const prospective = [...this.data, layer.toJSON()];
-      validateDocument({ ...createDocument(), children: prospective });
+      validateDocument({ ...createDocument(), children: prospective }, false);
       // Preserve detached object identity until the subtree is attached.
       this.data.push(layer._read());
       layer._parent = this.owner as LayerGroup;
@@ -832,6 +1718,13 @@ export class VectorLayer extends Layer {
           .children[0],
       );
   }
+  toSvg(docWidth = 1920, docHeight = 1080): string {
+    return exportVectorLayerSvg(
+      this._read() as VectorLayerData,
+      docWidth,
+      docHeight,
+    );
+  }
 }
 export interface VectorPathOptions {
   points: (Point & { in?: Point; out?: Point })[];
@@ -929,6 +1822,12 @@ export class VectorPath {
     points[index] = { ...points[index], ...patch };
     this.update({ points });
   }
+  splitSegment(index: number, t = 0.5): number {
+    this.update({
+      points: splitPathSegment(this.points, this.closed, index, t),
+    });
+    return index + 1;
+  }
   removePoint(index: number) {
     const points = this.points;
     if (!points[index]) throw new Error("Anchor not found.");
@@ -941,6 +1840,41 @@ export class VectorPath {
       type: "path.remove",
       id: this._owner.id,
       pathId: this.id,
+    });
+  }
+  toSvgPath(): string {
+    return formatSvgPathD(this.read());
+  }
+  static rectangle(
+    rect: Rect,
+    cornerRadius = 0,
+    options: ShapeOptions = {},
+  ): VectorPath {
+    return VectorPath._fromData(
+      createRectanglePath(rect, cornerRadius, options),
+    );
+  }
+  static ellipse(rect: Rect, options: ShapeOptions = {}): VectorPath {
+    return VectorPath._fromData(createEllipsePath(rect, options));
+  }
+  static polygon(
+    center: Point,
+    radius: number,
+    sides: number,
+    options: ShapeOptions = {},
+  ): VectorPath {
+    return VectorPath._fromData(
+      createPolygonPath(center, radius, sides, options),
+    );
+  }
+  static fromSvgPath(d: string, options: ShapeOptions = {}): VectorPath {
+    const anchors = parseSvgPath(d);
+    return new VectorPath({
+      points: anchors,
+      closed: /z\s*$/i.test(d.trim()),
+      fill: options.fill,
+      stroke: options.stroke,
+      strokeWidth: options.strokeWidth,
     });
   }
   /** @internal */ static _fromData(data: VectorPathData) {
@@ -997,6 +1931,10 @@ export class TextLayer extends Layer {
       color = "#ffffff",
       align = "left",
       lineHeight = 1.2,
+      letterSpacing,
+      fontWeight,
+      fontStyle,
+      direction,
       ...baseOpts
     } = options;
     super({
@@ -1006,12 +1944,20 @@ export class TextLayer extends Layer {
         color,
         align,
         lineHeight,
+        letterSpacing,
+        fontWeight,
+        fontStyle,
+        direction,
       }),
       ...baseOpts,
     });
     validateDocument({ ...createDocument(), children: [this.data] });
   }
 
+  /** Recalculate bounds with fonts available to this execution environment. */
+  reflow(): void {
+    this.update({ text: this.text });
+  }
   get text(): string {
     return (this._read() as TextLayerData).text;
   }
@@ -1054,11 +2000,187 @@ export class TextLayer extends Layer {
     this.update({ lineHeight: value });
   }
 
+  get letterSpacing(): number | undefined {
+    return (this._read() as TextLayerData).letterSpacing;
+  }
+  set letterSpacing(value: number | undefined) {
+    this.update({ letterSpacing: value });
+  }
+
+  get fontWeight(): string | undefined {
+    return (this._read() as TextLayerData).fontWeight;
+  }
+  set fontWeight(value: string | undefined) {
+    this.update({ fontWeight: value });
+  }
+
+  get fontStyle(): "normal" | "italic" | undefined {
+    return (this._read() as TextLayerData).fontStyle;
+  }
+  set fontStyle(value: "normal" | "italic" | undefined) {
+    this.update({ fontStyle: value });
+  }
+
+  get direction(): "ltr" | "rtl" | undefined {
+    return (this._read() as TextLayerData).direction;
+  }
+  set direction(value: "ltr" | "rtl" | undefined) {
+    this.update({ direction: value });
+  }
+
   get width(): number {
     return (this._read() as TextLayerData).width;
   }
 
   get height(): number {
     return (this._read() as TextLayerData).height;
+  }
+}
+
+export interface AdjustmentLayerOptions extends LayerOptions {
+  adjustment?: AdjustmentData | PatchAdjustment;
+}
+
+export class AdjustmentLayer extends Layer {
+  constructor(options: AdjustmentLayerOptions = {}) {
+    const { adjustment = defaultCurvesAdjustment(), ...base } = options;
+    super({
+      ...createAdjustmentLayer(
+        options.name ?? "Adjustment",
+        adjustment instanceof PatchAdjustment
+          ? adjustment.toJSON()
+          : adjustment,
+      ),
+      ...base,
+    });
+    validateDocument({ ...createDocument(), children: [this.data] });
+  }
+
+  get adjustment(): AdjustmentData {
+    return structuredClone((this._read() as AdjustmentLayerData).adjustment);
+  }
+
+  set adjustment(value: AdjustmentData) {
+    this.update({ adjustment: value });
+  }
+
+  get adjustmentKind(): AdjustmentData["kind"] {
+    return (this._read() as AdjustmentLayerData).adjustment.kind;
+  }
+
+  setPatch(patch: PatchAdjustment): void {
+    if (!(patch instanceof PatchAdjustment))
+      throw new Error("Expected a PatchAdjustment.");
+    this.adjustment = patch.toJSON();
+  }
+
+  addTonalStroke(stroke: TonalStroke): void {
+    if (!(stroke instanceof TonalStroke))
+      throw new Error("Expected a TonalStroke.");
+    const adjustment = this.adjustment;
+    if (adjustment.kind !== "tonal")
+      throw new Error("Tonal strokes require a tonal adjustment layer.");
+    this.adjustment = {
+      kind: "tonal",
+      strokes: [...adjustment.strokes, stroke.toJSON()],
+    };
+  }
+
+  setCurves(
+    rgbOrData:
+      | CurvePoint[]
+      | {
+          rgb: CurvePoint[];
+          red?: CurvePoint[];
+          green?: CurvePoint[];
+          blue?: CurvePoint[];
+        },
+    channels?: {
+      red?: CurvePoint[];
+      green?: CurvePoint[];
+      blue?: CurvePoint[];
+    },
+  ) {
+    if (Array.isArray(rgbOrData)) {
+      this.update({
+        adjustment: {
+          kind: "curves",
+          rgb: rgbOrData,
+          red: channels?.red,
+          green: channels?.green,
+          blue: channels?.blue,
+        },
+      });
+    } else {
+      this.update({
+        adjustment: {
+          kind: "curves",
+          rgb: rgbOrData.rgb,
+          red: rgbOrData.red,
+          green: rgbOrData.green,
+          blue: rgbOrData.blue,
+        },
+      });
+    }
+  }
+
+  setLevels(
+    rgbOrData:
+      | LevelChannelData
+      | {
+          rgb: LevelChannelData;
+          red?: LevelChannelData;
+          green?: LevelChannelData;
+          blue?: LevelChannelData;
+        },
+    channels?: {
+      red?: LevelChannelData;
+      green?: LevelChannelData;
+      blue?: LevelChannelData;
+    },
+  ) {
+    if ("rgb" in rgbOrData) {
+      this.update({
+        adjustment: {
+          kind: "levels",
+          rgb: rgbOrData.rgb,
+          red: rgbOrData.red,
+          green: rgbOrData.green,
+          blue: rgbOrData.blue,
+        },
+      });
+    } else {
+      this.update({
+        adjustment: {
+          kind: "levels",
+          rgb: rgbOrData,
+          red: channels?.red,
+          green: channels?.green,
+          blue: channels?.blue,
+        },
+      });
+    }
+  }
+
+  setTone(values: {
+    exposure?: number;
+    contrast?: number;
+    saturation?: number;
+  }) {
+    const current =
+      (this._read() as AdjustmentLayerData).adjustment.kind === "tone"
+        ? ((this._read() as AdjustmentLayerData).adjustment as Extract<
+            AdjustmentData,
+            { kind: "tone" }
+          >)
+        : defaultToneAdjustment();
+    this.update({
+      adjustment: {
+        kind: "tone",
+        exposure: values.exposure ?? current.exposure,
+        contrast: values.contrast ?? current.contrast,
+        saturation: values.saturation ?? current.saturation,
+      },
+    });
   }
 }

@@ -1,3 +1,5 @@
+import { MetadataService } from "../intelligence/metadata/service";
+import { AnalysisService } from "../intelligence/candidates/service";
 import { id } from "./model";
 
 export interface SerializedAsset {
@@ -7,82 +9,129 @@ export interface SerializedAsset {
   height: number;
   dataUrl: string;
 }
-export interface ImageAsset extends SerializedAsset {
+export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
+  readonly blob: Blob;
   bitmap: ImageBitmap;
   thumbnail: string;
 }
 
 export class AssetStore {
+  readonly metadata = new MetadataService();
+  readonly analysis = new AnalysisService();
   private assets = new Map<string, ImageAsset>();
+  private generation = 0;
+  private pending = new Set<string>();
+  /** Guards asynchronous ownership transfers against disposal of their target store. */
+  captureLifetime(): () => void {
+    const generation = this.generation;
+    return () => {
+      if (generation !== this.generation)
+        throw new Error(
+          "The target asset store was disposed during the operation.",
+        );
+    };
+  }
   get(assetId: string): ImageAsset {
     const asset = this.assets.get(assetId);
     if (!asset) throw new Error(`Missing image asset: ${assetId}`);
     return asset;
   }
+  has(assetId: string): boolean {
+    return this.assets.has(assetId);
+  }
   values() {
     return [...this.assets.values()];
+  }
+
+  install(asset: ImageAsset, analyzeMetadata = true): ImageAsset {
+    if (this.assets.has(asset.id)) throw new Error("Duplicate asset ID.");
+    this.assets.set(asset.id, asset);
+    if (analyzeMetadata) {
+      this.metadata.analyze(asset.id, {
+        blob: asset.blob,
+        name: asset.name,
+        width: asset.width,
+        height: asset.height,
+      });
+    }
+    return asset;
   }
 
   async add(
     blob: Blob,
     name: string,
     assetId: string = id(),
+    analyzeMetadata = true,
   ): Promise<ImageAsset> {
     if (!["image/png", "image/jpeg", "image/webp"].includes(blob.type))
       throw new Error("Use a PNG, JPEG, or WebP image.");
-    if (this.assets.has(assetId)) throw new Error("Duplicate asset ID.");
+    if (this.assets.has(assetId) || this.pending.has(assetId))
+      throw new Error("Duplicate asset ID.");
+    const generation = this.generation;
+    this.pending.add(assetId);
     let bitmap: ImageBitmap;
     try {
-      bitmap = await createImageBitmap(blob);
+      if (typeof createImageBitmap !== "undefined") {
+        bitmap = await createImageBitmap(blob);
+      } else {
+        bitmap = {
+          width: 512,
+          height: 512,
+          close: () => {},
+        } as unknown as ImageBitmap;
+      }
     } catch {
+      this.pending.delete(assetId);
       throw new Error(
         "The browser could not decode this image. Check the file format and available device memory.",
       );
     }
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(new Error("Could not read the image."));
-        reader.readAsDataURL(blob);
-      });
-      const thumbnail = document.createElement("canvas");
-      const factor = Math.min(1, 96 / bitmap.width, 96 / bitmap.height);
-      thumbnail.width = Math.max(1, Math.round(bitmap.width * factor));
-      thumbnail.height = Math.max(1, Math.round(bitmap.height * factor));
-      thumbnail
-        .getContext("2d")!
-        .drawImage(bitmap, 0, 0, thumbnail.width, thumbnail.height);
+      if (generation !== this.generation)
+        throw new Error("The asset store changed during import.");
+      let thumbnailDataUrl = "data:image/png;base64,";
+      if (
+        typeof document !== "undefined" &&
+        typeof document.createElement === "function"
+      ) {
+        const thumbnail = document.createElement("canvas");
+        const factor = Math.min(1, 96 / bitmap.width, 96 / bitmap.height);
+        thumbnail.width = Math.max(1, Math.round(bitmap.width * factor));
+        thumbnail.height = Math.max(1, Math.round(bitmap.height * factor));
+        thumbnail
+          .getContext("2d")!
+          .drawImage(bitmap, 0, 0, thumbnail.width, thumbnail.height);
+        thumbnailDataUrl = thumbnail.toDataURL();
+        thumbnail.width = thumbnail.height = 0;
+      }
       const asset: ImageAsset = {
         id: assetId,
-        name: name.slice(0, 240),
+        name,
         width: bitmap.width,
         height: bitmap.height,
-        dataUrl,
+        blob,
         bitmap,
-        thumbnail: thumbnail.toDataURL(),
+        thumbnail: thumbnailDataUrl,
       };
-      thumbnail.width = thumbnail.height = 0;
       this.assets.set(assetId, asset);
+      if (analyzeMetadata)
+        this.metadata.analyze(assetId, {
+          blob,
+          name: asset.name,
+          width: asset.width,
+          height: asset.height,
+        });
       return asset;
     } catch (error) {
       bitmap.close();
       throw error;
+    } finally {
+      this.pending.delete(assetId);
     }
   }
 
-  serialize(ids: Set<string>): SerializedAsset[] {
-    return [...ids].map((assetId) => {
-      const {
-        bitmap: _bitmap,
-        thumbnail: _thumbnail,
-        ...data
-      } = this.get(assetId);
-      return data;
-    });
-  }
-
   remove(assetId: string) {
+    this.metadata.remove(assetId);
     const asset = this.assets.get(assetId);
     if (asset) {
       asset.bitmap.close();
@@ -91,6 +140,8 @@ export class AssetStore {
   }
 
   dispose() {
+    this.generation++;
+    this.metadata.dispose();
     this.assets.forEach((asset) => asset.bitmap.close());
     this.assets.clear();
   }

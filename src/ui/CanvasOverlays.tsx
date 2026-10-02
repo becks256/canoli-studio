@@ -1,6 +1,7 @@
 import type { DocumentData, LayerData } from "../core/model";
 import type { Point } from "../core/drawing";
-import { layerOrigin } from "../core/spatial";
+import { maskTransform } from "../core/masks";
+import { layerTransform } from "../core/spatial";
 import type { Tool, ToolController } from "../tools";
 
 export function CanvasOverlays({
@@ -19,8 +20,32 @@ export function CanvasOverlays({
   cursor: Point | null;
 }) {
   const state = controller.getSnapshot();
-  const origin = selected ? layerOrigin(document, selected.id) : null;
+  const world = selected ? layerTransform(document, selected.id) : null;
   const pending = controller.pendingStroke;
+  const editingMask = state.settings.penEditTarget === "mask";
+  const mask = selected?.mask;
+  const pathTransform =
+    editingMask && mask && world ? maskTransform(mask, world) : world;
+  const localPaths = editingMask
+    ? mask?.kind === "vector"
+      ? mask.paths.map((path, index) => ({ ...path, id: `mask-${index}` }))
+      : []
+    : selected?.kind === "vector"
+      ? selected.paths
+      : [];
+  // Transform geometry, not the SVG control group: handles retain screen size.
+  const paths = pathTransform
+    ? localPaths.map((path) => ({
+        ...path,
+        points: path.points.map((point) => ({
+          ...point,
+          ...pathTransform.point(point),
+          in: pathTransform.point(point.in),
+          out: pathTransform.point(point.out),
+        })),
+      }))
+    : [];
+  const selectedAnchor = controller.selectedMaskAnchor;
   return (
     <svg
       className="drawing-overlay"
@@ -45,6 +70,11 @@ export function CanvasOverlays({
         r.shape === "rectangle" ? (
           <rect
             key={index}
+            transform={
+              r.transform
+                ? `matrix(${r.transform.a} ${r.transform.b} ${r.transform.c} ${r.transform.d} ${r.transform.e} ${r.transform.f})`
+                : undefined
+            }
             x={r.x}
             y={r.y}
             width={r.width}
@@ -59,6 +89,11 @@ export function CanvasOverlays({
         ) : (
           <ellipse
             key={index}
+            transform={
+              r.transform
+                ? `matrix(${r.transform.a} ${r.transform.b} ${r.transform.c} ${r.transform.d} ${r.transform.e} ${r.transform.f})`
+                : undefined
+            }
             cx={r.x + r.width / 2}
             cy={r.y + r.height / 2}
             rx={r.width / 2}
@@ -72,9 +107,103 @@ export function CanvasOverlays({
           />
         ),
       )}
-      {tool === "pen" && selected?.kind === "vector" && origin && (
-        <g transform={`translate(${origin.x} ${origin.y})`}>
-          {selected.paths.flatMap((path) =>
+      {tool === "heal" && state.healingStroke && (
+        <g data-testid="healing-stroke-preview" opacity={0.35}>
+          <circle
+            cx={state.healingStroke.points[0].x}
+            cy={state.healingStroke.points[0].y}
+            r={
+              (state.healingStroke.size / 2) *
+              (state.healingStroke.pressureSize === false
+                ? 1
+                : state.healingStroke.points[0].pressure)
+            }
+            fill="var(--color-accent)"
+          />
+          <polyline
+            points={state.healingStroke.points
+              .map((point) => `${point.x},${point.y}`)
+              .join(" ")}
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth={state.healingStroke.size}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </g>
+      )}
+      {tool === "patch" && state.patchOffset && (
+        <g
+          data-testid={
+            state.settings.patchDirection === "destination"
+              ? "patch-destination-outline"
+              : "patch-donor-outline"
+          }
+          transform={`translate(${state.patchOffset.x} ${state.patchOffset.y})`}
+        >
+          {document.selection?.regions.map((r, index) => (
+            <g
+              key={index}
+              transform={
+                r.transform
+                  ? `matrix(${r.transform.a} ${r.transform.b} ${r.transform.c} ${r.transform.d} ${r.transform.e} ${r.transform.f})`
+                  : undefined
+              }
+            >
+              {r.shape === "rectangle" ? (
+                <rect
+                  x={r.x}
+                  y={r.y}
+                  width={r.width}
+                  height={r.height}
+                  fill="none"
+                  stroke="var(--color-accent)"
+                  strokeWidth={2 / zoom}
+                  strokeDasharray={`${4 / zoom} ${3 / zoom}`}
+                />
+              ) : (
+                <ellipse
+                  cx={r.x + r.width / 2}
+                  cy={r.y + r.height / 2}
+                  rx={r.width / 2}
+                  ry={r.height / 2}
+                  fill="none"
+                  stroke="var(--color-accent)"
+                  strokeWidth={2 / zoom}
+                  strokeDasharray={`${4 / zoom} ${3 / zoom}`}
+                />
+              )}
+            </g>
+          ))}
+        </g>
+      )}
+      {tool === "pen" && pathTransform && paths.length > 0 && (
+        <g data-testid="pen-controls">
+          {editingMask &&
+            paths.map((path, pathIndex) => (
+              <path
+                key={`outline-${path.id}`}
+                fill="none"
+                stroke="#d5e79b"
+                strokeWidth={1 / zoom}
+                strokeDasharray={
+                  pathIndex === controller.maskContourIndex
+                    ? `${4 / zoom} ${3 / zoom}`
+                    : undefined
+                }
+                d={
+                  `M ${path.points[0].x} ${path.points[0].y} ` +
+                  path.points
+                    .map((p, i) => {
+                      const next = path.points[(i + 1) % path.points.length];
+                      return `C ${p.out.x} ${p.out.y} ${next.in.x} ${next.in.y} ${next.x} ${next.y}`;
+                    })
+                    .join(" ") +
+                  " Z"
+                }
+              />
+            ))}
+          {paths.flatMap((path, pathIndex) =>
             path.points.map((p, index) => (
               <g key={`${path.id}:${index}`}>
                 <line
@@ -106,7 +235,17 @@ export function CanvasOverlays({
                   y={p.y - 4 / zoom}
                   width={8 / zoom}
                   height={8 / zoom}
-                  fill={index === 0 ? "#d5e79b" : "#202523"}
+                  fill={
+                    (
+                      editingMask
+                        ? selectedAnchor?.layerId === selected?.id &&
+                          selectedAnchor?.pathIndex === pathIndex &&
+                          selectedAnchor?.index === index
+                        : index === 0
+                    )
+                      ? "#d5e79b"
+                      : "#202523"
+                  }
                   stroke="#d5e79b"
                   strokeWidth={1 / zoom}
                 />
@@ -139,26 +278,29 @@ export function CanvasOverlays({
           strokeLinejoin="round"
         />
       )}
-      {cursor && ["brush", "pencil", "clone"].includes(tool) && (
-        <g>
-          <circle
-            cx={cursor.x}
-            cy={cursor.y}
-            r={state.settings.size / 2}
-            fill="none"
-            stroke="#101810"
-            strokeWidth={2 / zoom}
-          />
-          <circle
-            cx={cursor.x}
-            cy={cursor.y}
-            r={state.settings.size / 2}
-            fill="none"
-            stroke="white"
-            strokeWidth={1 / zoom}
-          />
-        </g>
-      )}
+      {cursor &&
+        ["brush", "pencil", "clone", "heal", "dodge", "burn"].includes(
+          tool,
+        ) && (
+          <g>
+            <circle
+              cx={cursor.x}
+              cy={cursor.y}
+              r={state.settings.size / 2}
+              fill="none"
+              stroke="#101810"
+              strokeWidth={2 / zoom}
+            />
+            <circle
+              cx={cursor.x}
+              cy={cursor.y}
+              r={state.settings.size / 2}
+              fill="none"
+              stroke="white"
+              strokeWidth={1 / zoom}
+            />
+          </g>
+        )}
     </svg>
   );
 }

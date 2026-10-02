@@ -1,3 +1,5 @@
+import { AffineTransform } from "../core/affine";
+
 export interface RenderSpace {
   x: number;
   y: number;
@@ -6,7 +8,11 @@ export interface RenderSpace {
   sx: number;
   sy: number;
 }
-export function createCanvas(width: number, height: number, readback = false): HTMLCanvasElement {
+export function createCanvas(
+  width: number,
+  height: number,
+  readback = false,
+): HTMLCanvasElement {
   const result = document.createElement("canvas");
   result.width = width;
   result.height = height;
@@ -39,12 +45,36 @@ export function transform(
   x = 0,
   y = 0,
 ) {
+  applyTransform(context, space, AffineTransform.translation(x, y));
+}
+
+/** Rebase in double precision before scaling or passing coordinates to Canvas/GPU. */
+export function renderTransform(
+  space: RenderSpace,
+  world: AffineTransform,
+): AffineTransform {
+  return new AffineTransform(
+    space.sx * world.a,
+    space.sy * world.b,
+    space.sx * world.c,
+    space.sy * world.d,
+    (world.e - space.x) * space.sx,
+    (world.f - space.y) * space.sy,
+  );
+}
+
+export function applyTransform(
+  context: CanvasRenderingContext2D,
+  space: RenderSpace,
+  world: AffineTransform,
+) {
+  const matrix = renderTransform(space, world);
   context.setTransform(
-    space.sx,
-    0,
-    0,
-    space.sy,
-    (x - space.x) * space.sx,
-    (y - space.y) * space.sy,
+    matrix.a,
+    matrix.b,
+    matrix.c,
+    matrix.d,
+    matrix.e,
+    matrix.f,
   );
 }

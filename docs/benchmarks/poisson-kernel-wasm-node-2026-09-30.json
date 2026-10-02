@@ -1,0 +1,44 @@
+{
+  "measuredAt": "2026-10-01T02:24:04.092Z",
+  "runtime": "v24.0.1",
+  "backend": "wasm-ic0",
+  "platform": "linux",
+  "arch": "x64",
+  "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+  "fixture": "Padded RGB texture with known illumination-offset solution; source guidance; tolerance 0.001; 500 iterations maximum",
+  "results": [
+    {
+      "size": 64,
+      "samplesMs": [
+        9.350239999999985, 8.009859000000006, 8.531055000000038,
+        8.193148000000008, 9.057322
+      ],
+      "medianMs": 8.531055000000038,
+      "iterations": 28,
+      "residual": 0.0007515950016312445,
+      "meets50ms": true
+    },
+    {
+      "size": 128,
+      "samplesMs": [
+        47.93010300000003, 52.067994999999996, 51.30807100000004,
+        49.96013900000003, 51.44154000000003
+      ],
+      "medianMs": 51.30807100000004,
+      "iterations": 51,
+      "residual": 0.0008608981614628419,
+      "meets50ms": false
+    },
+    {
+      "size": 256,
+      "samplesMs": [
+        368.0332470000001, 400.48318900000004, 394.405798, 416.6751250000002,
+        430.6440769999999
+      ],
+      "medianMs": 400.48318900000004,
+      "iterations": 97,
+      "residual": 0.0009774708732379622,
+      "meets50ms": false
+    }
+  ]
+}

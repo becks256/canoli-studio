@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-10-01T16:48:05.534Z",
+  "browser": "153.0.8010.12",
+  "host": {
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+    "logicalCpus": 24,
+    "totalMemoryBytes": 33604415488
+  },
+  "results": [
+    {
+      "fixture": {
+        "name": "512-square-two-filters",
+        "width": 512,
+        "height": 512,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 512
+        },
+        "output": {
+          "width": 512,
+          "height": 512
+        },
+        "count": 2
+      },
+      "sourceDimensions": [512, 512],
+      "sourceBytes": 7212,
+      "sourceHash": "72bf32c0d3e032a173d947da06da52aca11e24960d1c004113468e72c34b2013",
+      "coldMs": 109.09999999403954,
+      "cachedMs": [12.100000008940697, 12.600000008940697, 14.200000002980232],
+      "uncachedMs": [90.59999999403954, 93.59999999403954, 100.6000000089407],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [8, 8, 8],
+      "cachedMedianMs": 12.600000008940697,
+      "uncachedMedianMs": 93.59999999403954,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "2048-fit-four-filters",
+        "width": 2048,
+        "height": 2048,
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 2048,
+          "height": 2048
+        },
+        "output": {
+          "width": 1024,
+          "height": 1024
+        },
+        "count": 4
+      },
+      "sourceDimensions": [2048, 2048],
+      "sourceBytes": 89689,
+      "sourceHash": "bf2f0de3c1021708fd53567714a838f0aed905636862a55f6aa89e8eaa27d4b1",
+      "coldMs": 2830.4000000059605,
+      "cachedMs": [109.70000000298023, 81.69999998807907, 86.79999999701977],
+      "uncachedMs": [
+        2673.5999999940395, 2684.2000000029802, 2716.2000000029802
+      ],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [64, 64, 64],
+      "cachedMedianMs": 86.79999999701977,
+      "uncachedMedianMs": 2684.2000000029802,
+      "maxPixelDifference": 0
+    },
+    {
+      "fixture": {
+        "name": "50mp-native-crop-four-filters",
+        "width": 10000,
+        "height": 5000,
+        "region": {
+          "x": 4096,
+          "y": 2048,
+          "width": 1024,
+          "height": 768
+        },
+        "output": {
+          "width": 1024,
+          "height": 768
+        },
+        "count": 4
+      },
+      "sourceDimensions": [10000, 5000],
+      "sourceBytes": 951872,
+      "sourceHash": "0740b39eb6beef66a045d1e0dc5961507605441aa75e128e44d867c1a2f8b2dc",
+      "coldMs": 687,
+      "cachedMs": [25.799999997019768, 26.299999997019768, 25.299999997019768],
+      "uncachedMs": [662.2000000029802, 707.6000000089407, 699.9000000059605],
+      "cachedFilterCalls": [0, 0, 0],
+      "uncachedFilterCalls": [48, 48, 48],
+      "cachedMedianMs": 25.799999997019768,
+      "uncachedMedianMs": 699.9000000059605,
+      "maxPixelDifference": 0
+    }
+  ],
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 24,
+  "limitations": [
+    "Synthetic stripe corpus; not photo-quality evaluation.",
+    "Production renderer timings exclude pointer dispatch, React, presentation and readback verification.",
+    "Three paired samples per case; cached measurement always precedes uncached.",
+    "50 MP case samples a native crop, not fit-to-window or full-document export.",
+    "Shared headless host; not a hardware-independent latency guarantee."
+  ]
+}

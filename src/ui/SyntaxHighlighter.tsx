@@ -32,13 +32,21 @@ export interface SyntaxHighlighterProps {
 }
 
 /** Static/SSR compatible. Load SyntaxHighlighter.css alongside the host's tokens. */
-export function SyntaxHighlighter({ code, language = "", label, className = "" }: SyntaxHighlighterProps) {
+export function SyntaxHighlighter({
+  code,
+  language = "",
+  label,
+  className = "",
+}: SyntaxHighlighterProps) {
   const key = language.trim().toLowerCase().split(/\s+/)[0];
   const syntax = Object.hasOwn(languages, key) ? languages[key] : undefined;
   const title = label ?? syntax?.label ?? "Plain text";
   // Only library-escaped source markup enters innerHTML; never accept HTML props.
   const highlighted = syntax
-    ? highlighter.highlight(code, { language: syntax.grammar, ignoreIllegals: true }).value
+    ? highlighter.highlight(code, {
+        language: syntax.grammar,
+        ignoreIllegals: true,
+      }).value
     : undefined;
 
   return (
@@ -48,7 +56,10 @@ export function SyntaxHighlighter({ code, language = "", label, className = "" }
         {highlighted === undefined ? (
           <code>{code}</code>
         ) : (
-          <code className={`language-${syntax!.grammar}`} dangerouslySetInnerHTML={{ __html: highlighted }} />
+          <code
+            className={`language-${syntax!.grammar}`}
+            dangerouslySetInnerHTML={{ __html: highlighted }}
+          />
         )}
       </pre>
     </div>

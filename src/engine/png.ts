@@ -99,3 +99,62 @@ export async function exportPng(
   parts.push(chunk("IEND", new Uint8Array()));
   return new Blob(parts, { type: "image/png" });
 }
+
+/**
+ * Encodes an uncompressed RGBA pixel buffer directly into a compressed PNG Blob.
+ */
+export async function encodeRgbaPng(
+  rgba: Uint8Array,
+  width: number,
+  height: number,
+): Promise<Blob> {
+  if (width > 0x7fffffff || height > 0x7fffffff)
+    throw new Error("These dimensions exceed the PNG file format.");
+  const header = new Uint8Array(13);
+  const view = new DataView(header.buffer);
+  view.setUint32(0, width);
+  view.setUint32(4, height);
+  header[8] = 8; // bit depth
+  header[9] = 6; // color type RGBA
+
+  const parts: BlobPart[] = [
+    new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk("IHDR", header),
+    chunk("sRGB", new Uint8Array([0])),
+  ];
+
+  const rowBytes = width * 4 + 1;
+  const filtered = new Uint8Array(rowBytes * height);
+  for (let y = 0; y < height; y++) {
+    filtered[y * rowBytes] = 0; // Filter: None
+    filtered.set(
+      rgba.subarray(y * width * 4, (y + 1) * width * 4),
+      y * rowBytes + 1,
+    );
+  }
+
+  const compression = new CompressionStream("deflate");
+  const writer = compression.writable.getWriter();
+  const reader = compression.readable.getReader();
+  const collect = (async () => {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      parts.push(chunk("IDAT", value));
+    }
+  })();
+  void collect.catch(() => {});
+
+  try {
+    await writer.write(filtered);
+    await writer.close();
+    await collect;
+  } catch (error) {
+    await writer.abort(error).catch(() => {});
+    await reader.cancel().catch(() => {});
+    throw error;
+  }
+
+  parts.push(chunk("IEND", new Uint8Array()));
+  return new Blob(parts, { type: "image/png" });
+}

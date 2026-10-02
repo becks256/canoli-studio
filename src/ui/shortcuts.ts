@@ -19,7 +19,13 @@ export function matchesShortcut(
   event: KeyboardEvent,
   shortcut: string,
 ): boolean {
-  const parts = shortcut === "+" ? ["+"] : shortcut.toLowerCase().split("+");
+  const normalized = shortcut.toLowerCase();
+  const parts =
+    normalized === "+"
+      ? ["+"]
+      : normalized.endsWith("++")
+        ? [...normalized.slice(0, -2).split("+"), "+"]
+        : normalized.split("+");
   const key = parts.pop()!;
   const mod = parts.includes("mod");
   const ctrl = parts.includes("ctrl");
@@ -60,21 +66,37 @@ export class ShortcutRegistry {
 }
 
 export function formatShortcut(shortcut: string): string {
-  if (shortcut === "+") return "+";
   const mac = /Mac|iPhone|iPad/.test(navigator.platform);
-  return shortcut
-    .replace("Mod", mac ? "⌘" : "Ctrl")
-    .replace("Shift", "⇧")
-    .replace("Arrow", "")
-    .replaceAll("+", " ");
+  const value = shortcut.toLowerCase();
+  const parts =
+    value === "+"
+      ? ["+"]
+      : value.endsWith("++")
+        ? [...value.slice(0, -2).split("+"), "+"]
+        : value.split("+");
+  return parts
+    .map((part) => {
+      if (part === "mod") return mac ? "⌘" : "Ctrl";
+      if (part === "ctrl") return "Ctrl";
+      if (part === "shift") return "⇧";
+      if (part === "alt") return "Alt";
+      if (part.startsWith("arrow")) part = part.slice(5);
+      return part.length === 1
+        ? part.toUpperCase()
+        : part[0].toUpperCase() + part.slice(1);
+    })
+    .join(" ");
 }
 
 // Binding definitions are shared by action registration and keyboard help.
 export const SHORTCUT_BINDINGS: Record<string, string[]> = {
+  "command-palette": ["Mod+k"],
   plugins: ["Mod+Shift+l"],
   artboard: ["a"],
+  crop: ["c"],
   move: ["v"],
   hand: ["h"],
+  eraser: ["e"],
   text: ["t"],
   fill: ["g"],
   "select-all": ["Mod+a"],
@@ -97,19 +119,38 @@ export const SHORTCUT_BINDINGS: Record<string, string[]> = {
   "zoom-in": ["+", "="],
   "zoom-out": ["-"],
   scripts: ["Mod+Shift+k"],
+  recipes: ["Mod+Shift+r"],
+  batch: ["Mod+Shift+b"],
+  generate: ["Mod+Shift+g"],
+  colorSettings: ["Mod+Alt+k"],
+  psd: ["Mod+Alt+p"],
+  refineEdge: ["Mod+Alt+r"],
+  selectSubject: ["Mod+Alt+s"],
   help: ["?"],
 };
 export const TOOL_SHORTCUTS = [
   ["artboard", "Artboard editor", "a"],
+  ["crop", "Crop canvas", "c"],
   ["brush", "Brush", "b"],
+  ["dodge", "Dodge", "o"],
+  ["burn", "Burn", "Shift+o"],
   ["pencil", "Pencil", "n"],
+  ["eraser", "Eraser", "e"],
   ["pen", "Vector pen", "p"],
   ["text", "Text tool", "t"],
   ["fill", "Paint bucket", "g"],
   ["marquee", "Marquee", "m"],
   ["clone", "Clone brush", "s"],
+  ["patch", "Patch", "j"],
+  ["heal", "Spot Healing", "Shift+j"],
 ] as const;
 export const brushSizeKeys = (direction: number) => [direction < 0 ? "[" : "]"];
 export const nudgeKeys = (direction: string, distance: number) => [
   `${distance === 10 ? "Shift+" : ""}Arrow${direction}`,
 ];
+
+/** Tab-widget ordering; Alt modifier, scoped to the focused document tab. */
+export const TAB_REORDER_KEYS = {
+  previous: "ArrowLeft",
+  next: "ArrowRight",
+} as const;

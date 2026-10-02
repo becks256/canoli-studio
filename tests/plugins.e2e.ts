@@ -130,3 +130,60 @@ test("plugin host enforces read permission, rollback, network isolation, cancell
   expect(result.conflict.error).toContain("changed");
   expect(result.name).toBe("New edit");
 });
+
+test("dynamic permission revocation in UI blocks command execution until re-granted", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Plugins (Mod+Shift+L)" }).click();
+  await page.getByRole("button", { name: "Load example", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Install plugin", exact: true })
+    .click();
+
+  // Inspect permissions list
+  const permList = page.getByLabel("Permissions for Studio utilities");
+  await expect(permList).toBeVisible();
+  await expect(permList).toContainText("document:read");
+  await expect(permList).toContainText("document:write");
+
+  // Revoke document:write permission
+  const revokeBtn = page.getByRole("button", { name: "Revoke document:write" });
+  await expect(revokeBtn).toBeVisible();
+  await revokeBtn.click();
+
+  // Try running Add guide frame while document:write is revoked
+  await page
+    .getByRole("button", { name: "Run Add guide frame", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "document:read permission. No edits were applied.",
+  );
+
+  // Document layers must remain 0
+  expect(
+    await page.evaluate(() => window.luma.editor.document.layers.length),
+  ).toBe(0);
+
+  // Re-grant document:write permission
+  const grantBtn = page.getByRole("button", { name: "Grant document:write" });
+  await expect(grantBtn).toBeVisible();
+  await grantBtn.click();
+
+  // Run Add guide frame again with granted write permission
+  await page
+    .getByRole("button", { name: "Run Add guide frame", exact: true })
+    .click();
+  await expect(page.getByLabel("Plugin output")).toContainText("Finished.");
+
+  // Document now has 1 layer
+  expect(
+    await page.evaluate(() => window.luma.editor.document.layers.length),
+  ).toBe(1);
+
+  // Close plugins dialog
+  await page
+    .getByRole("button", { name: "Close plugins", exact: true })
+    .click();
+  await expect(page.locator(".layer-row")).toHaveCount(1);
+});

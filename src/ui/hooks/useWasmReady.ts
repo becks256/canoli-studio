@@ -17,7 +17,9 @@ export function useWasmReady(
       })
       .catch((cause) => {
         if (active && onErrorRef.current) {
-          onErrorRef.current(cause instanceof Error ? cause.message : String(cause));
+          onErrorRef.current(
+            cause instanceof Error ? cause.message : String(cause),
+          );
         }
       });
     return () => {

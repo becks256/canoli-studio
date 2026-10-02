@@ -20,12 +20,19 @@
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
-aside > .appearance-select { margin-top: 28px; flex-wrap: wrap; }
+aside > .appearance-select {
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
 @media (max-width: 1200px) {
-  .topbar .appearance-select > span { display: none; }
+  .topbar .appearance-select > span {
+    display: none;
+  }
 }
 
-.appearance-toggle { display: flex; }
+.appearance-toggle {
+  display: flex;
+}
 .appearance-popover {
   position: fixed;
   margin: 0;

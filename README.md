@@ -11,11 +11,13 @@ npm install
 npm run dev
 ```
 
-Open http://127.0.0.1:5173. Import a PNG/JPEG/WebP or open the sample composition. Save editable work as `.luma`; export PNG. The browser editor runs locally without an account, paid service or image upload. Changes are not autosaved.
+Open http://127.0.0.1:5173. Import a PNG/JPEG/WebP or open the sample composition. Save editable work as `.luma`; export PNG. The browser editor runs locally without an account, paid service or image upload. Committed edits are checkpointed locally for recovery; use the rail’s Recover work action to reopen them. Download project files as backups.
 
 For the separate local REST service, run `npm run dev:api` in another terminal. Default: http://127.0.0.1:8787/api/v1/health.
 
 ## What works
+
+- Local metadata extraction in a worker, an Asset info inspector, and JSON sidecars with explicit privacy choices.
 
 - Image layers/groups; move, scale, opacity, 16 blend modes, visibility, locking, duplication and ordering.
 - Paint brush, pixel pencil, visible-composite clone, editable Bézier pen paths, and rectangular/elliptical marquee with Boolean operations.
@@ -25,15 +27,22 @@ For the separate local REST service, run `npm run dev:api` in another terminal. 
 - Non-destructive exposure/contrast/saturation; GPU viewport shaders and a real WASM worker for reference/export processing.
 - OOP document/layer/stroke/path/selection/style constructors, transactions and undo/redo.
 - Central keyboard shortcuts, custom studio styling, and a JavaScript Scripts panel.
-- Save/open portable project files and tiled, full-resolution PNG export.
+- Save/open binary project files (legacy JSON imports supported), local recovery checkpoints, and tiled full-resolution PNG export.
 - No fixed megapixel import cap. Viewport regions and adjustment tiles bound working buffers independently of source resolution. Browser decode and device memory still matter.
 - Local REST creation/query/commands/history with validation and revision conflicts. Server sessions are currently separate from the browser document and contain metadata only.
 
-This is not yet an AI-integrated or commercial product. No model calls, PSD/RAW support, arbitrary layer masks, account/billing infrastructure, durable autosave or collaboration is implemented. The current raster pipeline is 8-bit encoded sRGB. Project files still use JSON/base64; source decoding and persistence need further work for very large production documents.
+This is not yet an AI-integrated or commercial product. No model calls, PSD/RAW support, arbitrary layer masks, account/billing infrastructure, versioned recovery history or collaboration is implemented. The current raster pipeline is 8-bit encoded sRGB. New project files store original blobs directly; source decoding and manifest allocation still need further work for very large production documents.
 
 ## Documentation
 
+- [Local asset metadata and sidecar policy](docs/ASSET_METADATA.md)
+- [Project storage format and local recovery](docs/STORAGE_FORMAT.md)
+
 - [Product brief and objective](docs/PRODUCT_BRIEF.md)
+- [Professional editor feature strategy and catalog](docs/FEATURE_STRATEGY.md)
+- [Competitive research and source evidence](docs/COMPETITIVE_RESEARCH.md)
+- [Planned metadata, AI generation and automation specifications](docs/AI_FEATURE_SPECS.md)
+- [Implementation roadmap, gates and planning work log](docs/IMPLEMENTATION_ROADMAP.md)
 - [Requirements and keyboard map](docs/REQUIREMENTS.md)
 - [Architecture and memory strategy](docs/ARCHITECTURE.md)
 - [Scripting API guide, reference and examples](docs/SCRIPTING_API.md)

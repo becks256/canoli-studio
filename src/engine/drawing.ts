@@ -1,3 +1,4 @@
+import { AffineTransform } from "../core/affine";
 import type { PixelProcessor } from "./processor";
 import type { AssetStore } from "../core/assets";
 import type {
@@ -13,9 +14,10 @@ import type {
   StrokePoint,
   VectorPathData,
 } from "../core/drawing";
-import { createCanvas, release, transform } from "./canvas";
+import { createCanvas, release, applyTransform } from "./canvas";
 import type { RenderSpace } from "./canvas";
 import type { CanvasCache } from "./cache";
+import type { LayerMaskData } from "../core/masks";
 
 function overlaps(bounds: Rect, space: RenderSpace, x: number, y: number) {
   return (
@@ -31,7 +33,9 @@ export async function selectionMask(
   x: number,
   y: number,
   processor: PixelProcessor,
+  world = AffineTransform.translation(x, y),
 ): Promise<HTMLCanvasElement> {
+  const inverse = world.inverse();
   const canvas = createCanvas(space.width, space.height),
     c = canvas.getContext("2d")!;
   try {
@@ -39,14 +43,21 @@ export async function selectionMask(
       for (let tx = 0; tx < space.width; tx += 1024) {
         const width = Math.min(1024, space.width - tx),
           height = Math.min(1024, space.height - ty);
+        const base = inverse.point({ x: space.x, y: space.y });
+        const origin = {
+          x: base.x + (inverse.a * tx) / space.sx + (inverse.c * ty) / space.sy,
+          y: base.y + (inverse.b * tx) / space.sx + (inverse.d * ty) / space.sy,
+        };
         const data = await processor.selection({
           selection,
           width,
           height,
-          x: space.x - x + tx / space.sx,
-          y: space.y - y + ty / space.sy,
-          stepX: 1 / space.sx,
-          stepY: 1 / space.sy,
+          x: origin.x,
+          y: origin.y,
+          stepX: inverse.a / space.sx,
+          stepY: inverse.d / space.sy,
+          stepXY: inverse.c / space.sy,
+          stepYX: inverse.b / space.sx,
         });
         const tile = c.createImageData(width, height);
         tile.data.set(data);
@@ -63,8 +74,26 @@ function stamp(
   stroke: BrushStrokeData,
   point: StrokePoint,
 ) {
-  const size = stroke.size * Math.max(0.05, point.pressure),
-    radius = size / 2;
+  const usePressureSize = stroke.pressureSize ?? true;
+  const usePressureOpacity = stroke.pressureOpacity ?? false;
+
+  const size = usePressureSize
+    ? stroke.size * Math.max(0.05, point.pressure)
+    : stroke.size;
+  const radius = size / 2;
+
+  const flow = stroke.flow ?? 1;
+  const prevAlpha = context.globalAlpha;
+  let alpha = prevAlpha;
+  if (flow < 1) {
+    alpha *= Math.max(0.01, flow);
+  }
+  if (usePressureOpacity) {
+    alpha *= Math.max(0.01, point.pressure);
+  }
+  if (alpha !== prevAlpha) {
+    context.globalAlpha = alpha;
+  }
   if (stroke.kind === "pencil") {
     const width = Math.max(1, Math.round(size));
     context.fillStyle = stroke.color;
@@ -74,9 +103,13 @@ function stamp(
       width,
       width,
     );
+    if (alpha !== prevAlpha) context.globalAlpha = prevAlpha;
     return;
   }
-  const color = stroke.kind === "clone" ? "#ffffff" : stroke.color;
+  const color =
+    stroke.kind === "clone" || stroke.kind === "eraser"
+      ? "#000000"
+      : stroke.color;
   if (stroke.hardness >= 0.999) context.fillStyle = color;
   else {
     const gradient = context.createRadialGradient(
@@ -94,6 +127,7 @@ function stamp(
   context.beginPath();
   context.arc(point.x, point.y, radius, 0, Math.PI * 2);
   context.fill();
+  if (alpha !== prevAlpha) context.globalAlpha = prevAlpha;
 }
 export function visitStrokeStamps(
   visit: (point: StrokePoint) => void,
@@ -117,13 +151,14 @@ export function visitStrokeStamps(
       stroke.kind === "pencil"
         ? Math.max(Math.abs(dx), Math.abs(dy))
         : Math.hypot(dx, dy);
+    const spacingFactor = stroke.spacing ?? 0.12;
     const spacing =
       stroke.kind === "pencil"
         ? 1
         : Math.max(
             0.5,
             stroke.size *
-              0.12 *
+              spacingFactor *
               Math.max(0.05, Math.min(a.pressure, b.pressure)),
           );
     const count = Math.max(1, Math.ceil(length / spacing));
@@ -161,8 +196,27 @@ export function visitStrokeStamps(
     }
   }
 }
-function drawStroke(context: CanvasRenderingContext2D, stroke: BrushStrokeData, visible: Rect, from = 0) {
-  visitStrokeStamps((point) => stamp(context, stroke, point), stroke, visible, from);
+function drawStroke(
+  context: CanvasRenderingContext2D,
+  stroke: BrushStrokeData,
+  visible: Rect,
+  from = 0,
+) {
+  visitStrokeStamps(
+    (point) => stamp(context, stroke, point),
+    stroke,
+    visible,
+    from,
+  );
+}
+
+function visibleLocalBounds(space: RenderSpace, world: AffineTransform): Rect {
+  return world.inverse().bounds({
+    x: space.x,
+    y: space.y,
+    width: space.width / space.sx,
+    height: space.height / space.sy,
+  });
 }
 
 /** One append-only gesture surface. Never apply clip/opacity to this surface:
@@ -171,29 +225,50 @@ export class ActiveStrokeRaster {
   private canvas: HTMLCanvasElement | null = null;
   private signature = "";
   private points: StrokePoint[] = [];
+  appendedPoints = 0;
   clear() {
     if (this.canvas) release(this.canvas);
     this.canvas = null;
     this.points = [];
     this.signature = "";
   }
-  draw(stroke: BrushStrokeData, target: HTMLCanvasElement, space: RenderSpace, x: number, y: number) {
+  draw(
+    stroke: BrushStrokeData,
+    target: HTMLCanvasElement,
+    space: RenderSpace,
+    x: number,
+    y: number,
+    world = AffineTransform.translation(x, y),
+  ) {
     const { points, ...settings } = stroke;
-    const signature = JSON.stringify([settings, space, x, y]);
-    const reusable = signature === this.signature && points.length >= this.points.length &&
-      this.points.every((p, i) => p === points[i] ||
-        (p.x === points[i].x && p.y === points[i].y && p.pressure === points[i].pressure));
+    const signature = JSON.stringify([settings, space, world]);
+    const reusable =
+      signature === this.signature &&
+      points.length >= this.points.length &&
+      this.points.every(
+        (p, i) =>
+          p === points[i] ||
+          (p.x === points[i].x &&
+            p.y === points[i].y &&
+            p.pressure === points[i].pressure),
+      );
     if (!reusable) this.clear();
     // Oversized effect halos use the normal ephemeral path rather than retain
     // an unbounded canvas. The source/document is never resized or rejected.
     const retain = space.width * space.height * 4 <= 16 * 1024 * 1024;
-    const canvas = retain ? (this.canvas ??= createCanvas(space.width, space.height)) : target;
+    const canvas = retain
+      ? (this.canvas ??= createCanvas(space.width, space.height))
+      : target;
     const c = canvas.getContext("2d")!;
-    transform(c, space, x, y);
-    drawStroke(c, stroke, {
-      x: space.x - x, y: space.y - y,
-      width: space.width / space.sx, height: space.height / space.sy,
-    }, retain ? this.points.length : 0);
+    applyTransform(c, space, world);
+    this.appendedPoints +=
+      stroke.points.length - (retain ? this.points.length : 0);
+    drawStroke(
+      c,
+      stroke,
+      visibleLocalBounds(space, world),
+      retain ? this.points.length : 0,
+    );
     c.resetTransform();
     if (retain) {
       this.signature = signature;
@@ -208,8 +283,7 @@ export async function drawPaint(
   assets: AssetStore,
   target: HTMLCanvasElement,
   space: RenderSpace,
-  x: number,
-  y: number,
+  world: AffineTransform,
   processor: PixelProcessor,
   active?: ActiveStrokeRaster,
   masks?: CanvasCache,
@@ -217,11 +291,11 @@ export async function drawPaint(
 ) {
   const targetContext = target.getContext("2d")!;
   for (const stroke of layer.strokes) {
-    if (!overlaps(strokeBounds(stroke), space, x, y)) continue;
+    if (!overlaps(world.bounds(strokeBounds(stroke)), space, 0, 0)) continue;
     let surface = createCanvas(space.width, space.height);
     try {
       const context = surface.getContext("2d")!;
-      transform(context, space, x, y);
+      applyTransform(context, space, world);
       if (stroke.kind === "fill") {
         context.fillStyle = stroke.color;
         context.fillRect(
@@ -232,21 +306,15 @@ export async function drawPaint(
         );
       } else if (active && stroke.kind !== "clone") {
         context.resetTransform();
-        active.draw(stroke, surface, space, x, y);
-      } else
-        drawStroke(context, stroke, {
-          x: space.x - x,
-          y: space.y - y,
-          width: space.width / space.sx,
-          height: space.height / space.sy,
-        });
+        active.draw(stroke, surface, space, 0, 0, world);
+      } else drawStroke(context, stroke, visibleLocalBounds(space, world));
       context.resetTransform();
       if (stroke.kind === "clone") {
         const clone = createCanvas(space.width, space.height);
         const c = clone.getContext("2d")!;
-        transform(c, space, x, y);
+        applyTransform(c, space, world);
         for (const tile of stroke.tiles)
-          if (overlaps(tile, space, x, y))
+          if (overlaps(world.bounds(tile), space, 0, 0))
             c.drawImage(
               assets.get(tile.assetId).bitmap,
               tile.x,
@@ -261,23 +329,32 @@ export async function drawPaint(
         surface = clone;
       }
       if (stroke.clip) {
-        const signature = JSON.stringify([stroke.clip, space, x, y]);
+        const signature = JSON.stringify([stroke.clip, space, world]);
         let mask = createCanvas(space.width, space.height);
         try {
           if (!masks?.read("selection", signature, mask)) {
             release(mask);
-            mask = await selectionMask(stroke.clip, space, x, y, processor);
+            mask = await selectionMask(
+              stroke.clip,
+              space,
+              0,
+              0,
+              processor,
+              world,
+            );
             if (canCache()) masks?.write("selection", signature, mask);
           }
           const c = surface.getContext("2d")!;
           c.globalCompositeOperation = "destination-in";
           c.drawImage(mask, 0, 0);
-        } finally { release(mask); }
+        } finally {
+          release(mask);
+        }
       }
       targetContext.save();
       targetContext.globalAlpha = stroke.opacity;
       targetContext.globalCompositeOperation =
-        stroke.kind === "fill" && stroke.erase
+        (stroke.kind === "fill" && stroke.erase) || stroke.kind === "eraser"
           ? "destination-out"
           : "source-over";
       targetContext.drawImage(surface, 0, 0);
@@ -289,10 +366,11 @@ export async function drawPaint(
 }
 export function tracePath(
   context: CanvasRenderingContext2D,
-  path: VectorPathData,
+  path: Pick<VectorPathData, "points" | "closed">,
+  begin = true,
 ) {
   const first = path.points[0];
-  context.beginPath();
+  if (begin) context.beginPath();
   context.moveTo(first.x, first.y);
   const count = path.points.length;
   for (let i = 1; i < count + (path.closed ? 1 : 0); i++) {
@@ -309,18 +387,85 @@ export function tracePath(
   }
   if (path.closed) context.closePath();
 }
+/** Compound Bézier coverage. Fill/stroke styling from source paths is irrelevant. */
+export function vectorMask(
+  mask: Extract<LayerMaskData, { kind: "vector" }>,
+  space: RenderSpace,
+  x: number,
+  y: number,
+  world = AffineTransform.translation(x, y),
+): HTMLCanvasElement {
+  // Rasterize on a fixed document-pixel grid. Canvas curve coverage can vary
+  // with clipping bounds, so short export strips must crop the same tiles used
+  // for viewport coverage rather than tessellate their own clipped curves.
+  const canvas = createCanvas(space.width, space.height);
+  const tileSize = 256,
+    halo = 2;
+  let tile: HTMLCanvasElement | undefined;
+  try {
+    tile = createCanvas(tileSize + halo * 2, tileSize + halo * 2, true);
+    const output = canvas.getContext("2d")!;
+    const context = tile.getContext("2d")!;
+    const offset = (origin: number, scale: number) =>
+      -Math.floor((((origin * scale) % tileSize) + tileSize) % tileSize);
+    for (
+      let dy = offset(space.y, space.sy);
+      dy < space.height;
+      dy += tileSize
+    ) {
+      for (
+        let dx = offset(space.x, space.sx);
+        dx < space.width;
+        dx += tileSize
+      ) {
+        context.resetTransform();
+        context.clearRect(0, 0, tile.width, tile.height);
+        applyTransform(
+          context,
+          {
+            ...space,
+            x: space.x + (dx - halo) / space.sx,
+            y: space.y + (dy - halo) / space.sy,
+          },
+          world,
+        );
+        context.beginPath();
+        for (const path of mask.paths)
+          tracePath(context, { points: path.points, closed: true }, false);
+        context.fillStyle = "#ffffff";
+        context.fill(mask.fillRule);
+        output.drawImage(
+          tile,
+          halo,
+          halo,
+          tileSize,
+          tileSize,
+          dx,
+          dy,
+          tileSize,
+          tileSize,
+        );
+      }
+    }
+    return canvas;
+  } catch (error) {
+    release(canvas);
+    throw error;
+  } finally {
+    if (tile) release(tile);
+  }
+}
 export function drawVectors(
   layer: VectorLayerData,
   target: HTMLCanvasElement,
   space: RenderSpace,
-  x: number,
-  y: number,
+  world: AffineTransform,
 ) {
   const context = target.getContext("2d")!;
   context.save();
-  transform(context, space, x, y);
+  applyTransform(context, space, world);
   for (const path of layer.paths) {
-    if (!overlaps(pathBounds(path), space, x, y)) continue;
+    if (!overlaps(world.bounds(pathBounds(path)), space, 0, 0)) continue;
     tracePath(context, path);
     if (path.fill && path.closed) {
       context.fillStyle = path.fill;
@@ -341,13 +486,20 @@ export function drawText(
   layer: TextLayerData,
   target: HTMLCanvasElement,
   space: RenderSpace,
-  x: number,
-  y: number,
+  world: AffineTransform,
 ) {
   const context = target.getContext("2d")!;
   context.save();
-  transform(context, space, x, y);
-  context.font = `${layer.fontSize}px ${layer.fontFamily}`;
+  applyTransform(context, space, world);
+  const fontStyle = layer.fontStyle ?? "normal";
+  const fontWeight = layer.fontWeight ?? "normal";
+  context.font = `${fontStyle} ${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+  if (layer.letterSpacing !== undefined && "letterSpacing" in context) {
+    (context as any).letterSpacing = `${layer.letterSpacing}px`;
+  }
+  if (layer.direction && "direction" in context) {
+    (context as any).direction = layer.direction;
+  }
   context.fillStyle = layer.color;
   context.textAlign = layer.align;
   context.textBaseline = "top";
@@ -363,4 +515,125 @@ export function drawText(
     context.fillText(lines[i], lineX, i * lineHeightPx);
   }
   context.restore();
+}
+
+/** Composite one mask stroke from an unmodified coverage surface. */
+export async function drawMaskStroke(
+  entry: Extract<LayerMaskData, { kind: "paint" }>["strokes"][number],
+  output: HTMLCanvasElement,
+  space: RenderSpace,
+  x: number,
+  y: number,
+  processor: PixelProcessor,
+  active?: ActiveStrokeRaster,
+  world = AffineTransform.translation(x, y),
+  scratch?: HTMLCanvasElement,
+) {
+  const { stroke, mode } = entry;
+  if (!overlaps(world.bounds(strokeBounds(stroke)), space, 0, 0)) return;
+  const surface = scratch ?? createCanvas(space.width, space.height);
+  const context = surface.getContext("2d")!;
+  context.save();
+  try {
+    context.resetTransform();
+    context.clearRect(0, 0, surface.width, surface.height);
+    const white = { ...stroke, color: "#ffffff" };
+    if (active) active.draw(white, surface, space, x, y, world);
+    else {
+      applyTransform(context, space, world);
+      drawStroke(context, white, visibleLocalBounds(space, world));
+      context.resetTransform();
+    }
+    if (stroke.clip) {
+      const clip = await selectionMask(
+        stroke.clip,
+        space,
+        x,
+        y,
+        processor,
+        world,
+      );
+      try {
+        context.globalCompositeOperation = "destination-in";
+        context.drawImage(clip, 0, 0);
+      } finally {
+        release(clip);
+      }
+    }
+    const target = output.getContext("2d")!;
+    target.save();
+    target.globalAlpha = stroke.opacity;
+    target.globalCompositeOperation =
+      mode === "hide" ? "destination-out" : "source-over";
+    target.drawImage(surface, 0, 0);
+    target.restore();
+  } finally {
+    context.restore();
+    if (!scratch) release(surface);
+  }
+}
+
+export function bitmapMask(
+  bitmap: ImageBitmap | HTMLCanvasElement,
+  space: RenderSpace,
+  x: number,
+  y: number,
+  world = AffineTransform.translation(x, y),
+): HTMLCanvasElement {
+  const canvas = createCanvas(space.width, space.height);
+  const context = canvas.getContext("2d")!;
+  applyTransform(context, space, world);
+  context.drawImage(bitmap, 0, 0);
+  context.resetTransform();
+  return canvas;
+}
+
+/** Replay mask coverage, not artwork color. Opacity applies once per stroke. */
+export async function paintedMask(
+  mask: LayerMaskData,
+  space: RenderSpace,
+  x: number,
+  y: number,
+  processor: PixelProcessor,
+  world = AffineTransform.translation(x, y),
+  bitmap?: ImageBitmap | HTMLCanvasElement,
+): Promise<HTMLCanvasElement> {
+  const output =
+    mask.kind === "selection"
+      ? await selectionMask(mask.selection, space, x, y, processor, world)
+      : mask.kind === "vector"
+        ? vectorMask(mask, space, x, y, world)
+        : mask.kind === "bitmap" && bitmap
+          ? bitmapMask(bitmap, space, x, y, world)
+          : createCanvas(space.width, space.height);
+  const scratch = mask.strokes?.length
+    ? createCanvas(space.width, space.height)
+    : undefined;
+  try {
+    const target = output.getContext("2d")!;
+    if (mask.kind === "paint") {
+      target.fillStyle = "#ffffff";
+      target.globalAlpha = mask.base;
+      target.fillRect(0, 0, space.width, space.height);
+      target.globalAlpha = 1;
+    }
+    for (const entry of mask.strokes ?? [])
+      await drawMaskStroke(
+        entry,
+        output,
+        space,
+        x,
+        y,
+        processor,
+        undefined,
+        world,
+        scratch,
+      );
+    return output;
+  } catch (error) {
+    release(output);
+    throw error;
+  } finally {
+    if (scratch) release(scratch);
+  }
 }

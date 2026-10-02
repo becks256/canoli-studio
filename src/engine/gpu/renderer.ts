@@ -1,16 +1,20 @@
+import { AffineTransform } from "../../core/affine";
+import { localTransform } from "../../core/spatial";
+import { maskTransform, maskGeometry } from "../../core/masks";
 import type { AssetStore } from "../../core/assets";
 import { BLEND_MODES } from "../../core/model";
 import type { DocumentData, LayerData, PaintLayerData } from "../../core/model";
-import { defaultStyle } from "../../core/drawing";
+import { defaultStyle, selectionRegionTransform } from "../../core/drawing";
 import type {
   BrushStrokeData,
   SelectionData,
   StrokePoint,
 } from "../../core/drawing";
-import { release } from "../canvas";
+import { release, renderTransform } from "../canvas";
 import type { RenderSpace } from "../canvas";
 import { visitStrokeStamps } from "../drawing";
-import { workingSize } from "../renderer";
+import type { LayerMaskData } from "../../core/masks";
+import { workingSize, previewMask } from "../renderer";
 import type { CanvasRenderer, RenderOptions } from "../renderer";
 import { processing, selection, stamps } from "./shaders";
 
@@ -153,10 +157,11 @@ export class WebGpuRenderer {
           entryPoint: "vertex",
           buffers: [
             {
-              arrayStride: 16,
+              arrayStride: 20,
               stepMode: "instance",
               attributes: [
                 { shaderLocation: 0, offset: 0, format: "float32x4" },
+                { shaderLocation: 1, offset: 16, format: "float32" },
               ],
             },
           ],
@@ -337,34 +342,94 @@ export class WebGpuRenderer {
   private signature(layer: LayerData) {
     const existing = this.signatures.get(layer);
     if (existing) return existing;
-    const value = JSON.stringify(layer);
+    const value = JSON.stringify({ ...layer, mask: null });
     if (Object.isFrozen(layer)) this.signatures.set(layer, value);
     return value;
   }
-  private mask(clip: SelectionData, space: RenderSpace, x: number, y: number) {
-    const signature = JSON.stringify([clip, space, x, y]);
+  private async layerMask(
+    id: string,
+    mask: LayerMaskData,
+    space: RenderSpace,
+    world: AffineTransform,
+    assets?: AssetStore,
+  ) {
+    const { x, y } = world.point({ x: 0, y: 0 });
+    const translationOnly =
+      world.a === 1 && world.b === 0 && world.c === 0 && world.d === 1;
+    if (
+      translationOnly &&
+      mask.kind === "selection" &&
+      !mask.feather &&
+      !mask.strokes?.length
+    )
+      return this.mask(mask.selection, space, x, y);
+    const signature = JSON.stringify([
+      maskGeometry(mask),
+      mask.feather ?? 0,
+      space,
+      world,
+    ]);
+    const key = `layer-mask:${id}`;
+    const cached = this.get(key, signature);
+    if (cached) return cached;
+    const canvas = await this.fallback.renderMaskCoverage(
+      mask,
+      space,
+      x,
+      y,
+      `gpu:${this.namespace}:${id}`,
+      true,
+      world,
+      assets,
+    );
+    try {
+      const result = this.upload(canvas);
+      this.retain(key, signature, result);
+      return result;
+    } finally {
+      release(canvas);
+    }
+  }
+  private mask(
+    clip: SelectionData,
+    space: RenderSpace,
+    x: number,
+    y: number,
+    world = AffineTransform.translation(x, y),
+  ) {
+    const signature = JSON.stringify([clip, space, world]);
     const cached = this.get("selection", signature);
     if (cached) return cached;
-    const values = new Float32Array(Math.max(8, clip.regions.length * 8));
+    const values = new Float32Array(Math.max(16, clip.regions.length * 16));
+    const matrix = renderTransform(space, world);
     clip.regions.forEach((r, i) => {
-      const rect = [
-        (r.x + x - space.x) * space.sx,
-        (r.y + y - space.y) * space.sy,
-        r.width * space.sx,
-        r.height * space.sy,
+      const region = matrix
+        .multiply(selectionRegionTransform(r))
+        .multiply(AffineTransform.translation(r.x, r.y))
+        .multiply(AffineTransform.scale(r.width, r.height));
+      const bounds = region.bounds({ x: 0, y: 0, width: 1, height: 1 });
+      const inverse = region.inverse();
+      const params = [
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+        r.shape === "ellipse" ? 1 : 0,
+        r.operation === "subtract" ? 1 : r.operation === "intersect" ? 2 : 0,
+        0,
+        0,
+        inverse.a,
+        inverse.b,
+        inverse.c,
+        inverse.d,
+        inverse.e,
+        inverse.f,
+        0,
+        0,
       ];
-      if (rect.some((n) => Math.abs(n) > 1e7))
+      if (params.some((n) => !Number.isFinite(n) || Math.abs(n) > 1e7))
         throw new Error("Selection requires double-precision fallback.");
-      values.set(
-        [
-          ...rect,
-          r.shape === "ellipse" ? 1 : 0,
-          r.operation === "subtract" ? 1 : r.operation === "intersect" ? 2 : 0,
-          0,
-          0,
-        ],
-        i * 8,
-      );
+      values.set(params, i * 16);
     });
     const storage = this.buffer(values, GPUBufferUsage.STORAGE),
       uniform = this.buffer(
@@ -407,7 +472,44 @@ export class WebGpuRenderer {
     x: number,
     y: number,
     from: number,
+    world = AffineTransform.translation(x, y),
   ) {
+    const matrix = renderTransform(space, world);
+    const linearInverse = new AffineTransform(
+      matrix.a,
+      matrix.b,
+      matrix.c,
+      matrix.d,
+    ).inverse();
+    const magnitude = Math.max(
+      Math.abs(matrix.a),
+      Math.abs(matrix.b),
+      Math.abs(matrix.c),
+      Math.abs(matrix.d),
+    );
+    const a = matrix.a / magnitude,
+      b = matrix.b / magnitude;
+    const c = matrix.c / magnitude,
+      d = matrix.d / magnitude;
+    const largest = (Math.hypot(a + d, b - c) + Math.hypot(a - d, b + c)) / 2;
+    const minimumScale = (Math.abs(a * d - b * c) / largest) * magnitude;
+    const sampled =
+      stroke.kind !== "pencil" || matrix.b !== 0 || matrix.c !== 0;
+    if (
+      sampled &&
+      stroke.points.some(
+        (point) =>
+          stroke.size *
+            (stroke.pressureSize === false
+              ? 1
+              : Math.max(0.05, point.pressure)) *
+            minimumScale <
+          2,
+      )
+    )
+      throw new Error(
+        "Transformed subpixel stroke requires reference coverage.",
+      );
     const device = this.device!,
       color = this.color(stroke.color);
     const uniform = this.buffer(
@@ -418,6 +520,14 @@ export class WebGpuRenderer {
         stroke.kind === "pencil" ? 1 : 0,
         ...color,
         1,
+        matrix.a,
+        matrix.b,
+        matrix.c,
+        matrix.d,
+        linearInverse.a,
+        linearInverse.b,
+        linearInverse.c,
+        linearInverse.d,
       ]),
     );
     const group = device.createBindGroup({
@@ -444,16 +554,18 @@ export class WebGpuRenderer {
       pass.setPipeline(this.stampPipeline);
       pass.setBindGroup(0, group);
       pass.setVertexBuffer(0, instances);
-      pass.draw(6, values.length / 4);
+      pass.draw(6, values.length / 5);
       pass.end();
       device.queue.submit([encoder.finish()]);
       instances.destroy();
-      this.counters.stamps += values.length / 4;
+      this.counters.stamps += values.length / 5;
       values = [];
     };
     visitStrokeStamps(
       (p) => {
-        let size = stroke.size * Math.max(0.05, p.pressure),
+        let size =
+            stroke.size *
+            (stroke.pressureSize === false ? 1 : Math.max(0.05, p.pressure)),
           cx = p.x,
           cy = p.y;
         if (stroke.kind === "pencil") {
@@ -461,21 +573,21 @@ export class WebGpuRenderer {
           cx = Math.floor(cx - size / 2) + size / 2;
           cy = Math.floor(cy - size / 2) + size / 2;
         }
+        const center = matrix.point({ x: cx, y: cy });
         values.push(
-          (cx + x - space.x) * space.sx,
-          (cy + y - space.y) * space.sy,
-          (size * space.sx) / 2,
-          (size * space.sy) / 2,
+          center.x,
+          center.y,
+          size / 2,
+          size / 2,
+          Math.max(0.01, stroke.flow ?? 1) *
+            (stroke.pressureOpacity ? Math.max(0.01, p.pressure) : 1),
         );
-        if (values.length >= 4096 * 4) flush();
+        if (values.length >= 4096 * 5) flush();
       },
       stroke,
-      {
-        x: space.x - x,
-        y: space.y - y,
-        width: space.width / space.sx,
-        height: space.height / space.sy,
-      },
+      matrix
+        .inverse()
+        .bounds({ x: 0, y: 0, width: space.width, height: space.height }),
       from,
     );
     flush();
@@ -490,9 +602,10 @@ export class WebGpuRenderer {
     x: number,
     y: number,
     incremental: boolean,
+    world = AffineTransform.translation(x, y),
   ) {
     const { points, ...settings } = stroke;
-    const signature = JSON.stringify([settings, space, x, y]);
+    const signature = JSON.stringify([settings, space, world]);
     const previous = incremental ? this.active : null;
     const reuse =
       previous &&
@@ -517,13 +630,14 @@ export class WebGpuRenderer {
       x,
       y,
       reuse ? previous.points.length : 0,
+      world,
     );
     if (incremental && raw.bytes <= 16 * 1024 * 1024) {
       this.active = { signature, points, surface: raw };
       this.owned.delete(raw);
     }
     if (!stroke.clip) return raw;
-    return this.pass(raw, this.mask(stroke.clip, space, x, y), [3])!;
+    return this.pass(raw, this.mask(stroke.clip, space, x, y, world), [3])!;
   }
   private async paintLayer(
     layer: PaintLayerData,
@@ -532,13 +646,18 @@ export class WebGpuRenderer {
     space: RenderSpace,
     x: number,
     y: number,
+    world = AffineTransform.translation(x, y),
   ) {
     let content = this.make(space.width, space.height);
     for (const stroke of layer.strokes) {
       const previousOwned = new Set(this.owned);
       let source: Surface;
-      if (stroke.kind === "brush" || stroke.kind === "pencil")
-        source = this.stroke(stroke, space, x, y, false);
+      if (
+        stroke.kind === "brush" ||
+        stroke.kind === "pencil" ||
+        stroke.kind === "eraser"
+      )
+        source = this.stroke(stroke, space, x, y, false, world);
       else {
         // Clone/fill retain the reference rasterization, uploaded once per change.
         source = await this.reference(
@@ -555,12 +674,15 @@ export class WebGpuRenderer {
           space,
           x,
           y,
+          world,
         );
       }
       const result = this.pass(source, content, [
         0,
         stroke.opacity,
-        stroke.kind === "fill" && stroke.erase ? 16 : 0,
+        (stroke.kind === "fill" && stroke.erase) || stroke.kind === "eraser"
+          ? 16
+          : 0,
       ])!;
       this.destroy(content);
       content = result;
@@ -579,11 +701,15 @@ export class WebGpuRenderer {
     space: RenderSpace,
     x: number,
     y: number,
+    world = AffineTransform.translation(x, y),
   ) {
     const neutral = {
       ...layer,
-      x,
-      y,
+      mask: null,
+      // The supplied world matrix already includes the layer basis.
+      transform: undefined,
+      x: 0,
+      y: 0,
       opacity: 1,
       fillOpacity: 1,
       styles: defaultStyle(),
@@ -598,6 +724,7 @@ export class WebGpuRenderer {
       assets,
       {
         cache: false,
+        rootTransform: world,
         region: {
           x: space.x,
           y: space.y,
@@ -621,9 +748,15 @@ export class WebGpuRenderer {
     // A fixed sampling grid must not silently drop subpixel brush marks.
     // Pixel-aligned pencil coverage is analytic and does not need this fallback.
     return (
-      stroke.kind !== "brush" ||
+      (stroke.kind !== "brush" && stroke.kind !== "eraser") ||
       stroke.points.every(
-        (point) => stroke.size * Math.max(0.05, point.pressure) * scale >= 2,
+        (point) =>
+          stroke.size *
+            (stroke.pressureSize === false
+              ? 1
+              : Math.max(0.05, point.pressure)) *
+            scale >=
+          2,
       )
     );
   }
@@ -632,7 +765,15 @@ export class WebGpuRenderer {
       (node) =>
         !node.visible ||
         node.opacity === 0 ||
-        (!node.styles?.dropShadow.enabled &&
+        (node.kind !== "smart-object" &&
+          !node.styles?.dropShadow.enabled &&
+          (node.kind !== "adjustment" ||
+            node.adjustment.kind === "hsl" ||
+            node.adjustment.kind === "tone" ||
+            (node.adjustment.kind === "levels" &&
+              !node.adjustment.red &&
+              !node.adjustment.green &&
+              !node.adjustment.blue)) &&
           (node.kind !== "group" || this.supported(node.children, scale)) &&
           (node.kind !== "paint" ||
             node.strokes.every(
@@ -663,7 +804,10 @@ export class WebGpuRenderer {
       this.namespace = document.id;
       this.assets = assets;
     }
-    if (!options.paintPreview && this.active) {
+    if (
+      (!options.paintPreview || options.paintPreview.maskMode) &&
+      this.active
+    ) {
       this.destroy(this.active.surface);
       this.active = null;
     }
@@ -674,9 +818,9 @@ export class WebGpuRenderer {
       height: document.height,
     };
     const size = workingSize(
-      region.width,
-      region.height,
-      options.scale,
+      options.outputSize?.width ?? region.width,
+      options.outputSize?.height ?? region.height,
+      options.outputSize ? 1 : options.scale,
       options.maxPixels,
       options.maxDimension,
     );
@@ -691,6 +835,7 @@ export class WebGpuRenderer {
     if (
       !this.supported(document.children, scale) ||
       (options.paintPreview &&
+        !options.paintPreview.maskMode &&
         !this.preciseStroke(options.paintPreview.stroke, scale))
     )
       return null;
@@ -707,20 +852,50 @@ export class WebGpuRenderer {
     };
     const compose = async (
       nodes: LayerData[],
-      ox: number,
-      oy: number,
+      parent: AffineTransform,
     ): Promise<Surface> => {
       let target = this.make(size.width, size.height);
       for (const layer of nodes) {
         if (!layer.visible || layer.opacity === 0) continue;
         check();
-        const x = ox + layer.x,
-          y = oy + layer.y;
-        const location = JSON.stringify([space, x, y]);
+        const world = parent.multiply(localTransform(layer));
+        const { x, y } = world.point({ x: 0, y: 0 });
+        const location = JSON.stringify([space, world]);
         let source: Surface;
         if (layer.kind === "group")
-          source = await compose(layer.children, x, y);
-        else {
+          source = await compose(layer.children, world);
+        else if (layer.kind === "adjustment") {
+          if (layer.adjustment.kind === "hsl") {
+            const effect = layer.adjustment;
+            source = this.pass(target, target, [
+              8,
+              effect.hue,
+              effect.saturation,
+              effect.lightness,
+            ])!;
+          } else if (layer.adjustment.kind === "tone") {
+            const effect = layer.adjustment;
+            source = this.pass(target, target, [
+              1,
+              2 ** effect.exposure,
+              2 ** (effect.contrast / 100),
+              1 + effect.saturation / 100,
+            ])!;
+          } else if (layer.adjustment.kind === "levels") {
+            const rgb = layer.adjustment.rgb;
+            source = this.pass(target, target, [
+              6,
+              rgb.inputBlack,
+              rgb.inputWhite,
+              rgb.gamma,
+              rgb.outputBlack,
+              rgb.outputWhite,
+              0,
+            ])!;
+          } else {
+            source = this.make(size.width, size.height);
+          }
+        } else {
           const signature =
             layer.kind === "raster"
               ? JSON.stringify([
@@ -740,6 +915,7 @@ export class WebGpuRenderer {
                 space,
                 x,
                 y,
+                world,
               );
             else if (layer.kind === "paint")
               source = await this.paintLayer(
@@ -749,6 +925,7 @@ export class WebGpuRenderer {
                 space,
                 x,
                 y,
+                world,
               );
             else
               source = await this.reference(
@@ -758,6 +935,7 @@ export class WebGpuRenderer {
                 space,
                 x,
                 y,
+                world,
               );
             check();
             this.retain(layer.id, signature, source);
@@ -781,16 +959,17 @@ export class WebGpuRenderer {
           }
           if (
             layer.kind === "paint" &&
+            !options.paintPreview?.maskMode &&
             layer.id === options.paintPreview?.layerId
           ) {
             const stroke = options.paintPreview.stroke;
             if (stroke.kind === "clone")
               throw new Error("Clone preview uses the reference renderer.");
-            const overlay = this.stroke(stroke, space, x, y, true);
+            const overlay = this.stroke(stroke, space, x, y, true, world);
             const combined = this.pass(overlay, source, [
               0,
               stroke.opacity,
-              0,
+              stroke.kind === "eraser" ? 16 : 0,
             ])!;
             if (this.owned.has(source)) this.destroy(source);
             if (this.owned.has(overlay)) this.destroy(overlay);
@@ -799,6 +978,24 @@ export class WebGpuRenderer {
         }
         check();
         const style = layer.styles ?? defaultStyle();
+        const maskData = previewMask(layer, options.paintPreview);
+        if (maskData?.enabled && maskData.density > 0) {
+          const coverage = await this.layerMask(
+            layer.id,
+            maskData,
+            space,
+            maskTransform(maskData, world),
+            assets,
+          );
+          check();
+          const next = this.pass(source, coverage, [
+            5,
+            maskData.density,
+            maskData.inverted ? 1 : 0,
+          ])!;
+          if (this.owned.has(source)) this.destroy(source);
+          source = next;
+        }
         if ((layer.fillOpacity ?? 1) !== 1 || style.colorOverlay.enabled) {
           const next = this.pass(source, source, [
             2,
@@ -810,6 +1007,24 @@ export class WebGpuRenderer {
           ])!;
           if (this.owned.has(source)) this.destroy(source);
           source = next;
+        }
+        if (layer.kind === "adjustment") {
+          const result = this.pass(source, target, [
+            7,
+            layer.opacity,
+            BLEND_MODES.indexOf(layer.blendMode),
+            0,
+            0,
+            style.blendIf.enabled ? 1 : 0,
+            ["red", "green", "blue"].indexOf(style.blendIf.channel),
+            0,
+            ...style.blendIf.source,
+            ...style.blendIf.underlying,
+          ])!;
+          this.destroy(target);
+          if (this.owned.has(source)) this.destroy(source);
+          target = result;
+          continue;
         }
         const blend = style.blendIf;
         const result = this.pass(source, target, [
@@ -833,7 +1048,7 @@ export class WebGpuRenderer {
     let output: Surface | null = null,
       failed = false;
     try {
-      output = await compose(document.children, 0, 0);
+      output = await compose(document.children, new AffineTransform());
       check();
     } catch (error) {
       failed = true;

@@ -83,10 +83,7 @@ export function ScriptPanel({
       <div className="script-actions">
         <span>JavaScript · Mod+Enter to run</span>
         {running ? (
-          <Button
-            variant="subtle"
-            onClick={() => editor.scripts.cancel()}
-          >
+          <Button variant="subtle" onClick={() => editor.scripts.cancel()}>
             <Square size={13} />
             Stop script
           </Button>

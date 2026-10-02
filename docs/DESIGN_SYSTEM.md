@@ -35,23 +35,23 @@ Source: `src/ui/tokens.css`. Use semantic variables for new components instead o
 
 Implemented controls are in `src/ui/controls.tsx`; styles are in `src/ui/styles.css`.
 
-| Component                 | Rules                                                                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Button                    | Citron for the primary action; quiet text/surface for secondary actions; danger for destructive. Real actions only.     |
-| IconButton                | Consistent target size, title, accessible name, visible keyboard focus, and disabled state.                              |
-| NumberField               | Labeled numerical entry, bounded validation, commit on blur/Enter.                                                       |
-| TextInput / Input         | Labeled input entry, draft editing, optional unit suffix, commit on blur/Enter, Escape to revert, inline/stacked layout.  |
-| TextArea                  | Multiline text input, accessible label, auto-commit on blur.                                                             |
-| Select                    | Accessible dropdown with option values and labels, inline or stacked layout, semantic border/focus tokens.                |
-| ColorField                | Color swatch beside label, native color picker integration, accessible color names.                                      |
-| SegmentedControl          | Grouped toggle buttons with accessible role, pressed state, and keyboard navigation for mutually exclusive choices.     |
-| Slider                    | Labeled track beside exact numeric entry; shared bounds/units, live preview, one commit per gesture, keyboard support.   |
-| Layer row                 | Thumbnail/type, name, selection edge, visibility, lock state, nesting. Meaning must not depend on color alone.           |
-| Inspector section         | Short heading, grouped related controls, subtle separator.                                                               |
-| Floating viewport control | Compact surface for zoom and fit, separated from document content.                                                       |
+| Component                 | Rules                                                                                                                       |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Button                    | Citron for the primary action; quiet text/surface for secondary actions; danger for destructive. Real actions only.         |
+| IconButton                | Consistent target size, title, accessible name, visible keyboard focus, and disabled state.                                 |
+| NumberField               | Labeled numerical entry, bounded validation, commit on blur/Enter.                                                          |
+| TextInput / Input         | Labeled input entry, draft editing, optional unit suffix, commit on blur/Enter, Escape to revert, inline/stacked layout.    |
+| TextArea                  | Multiline text input, accessible label, auto-commit on blur.                                                                |
+| Select                    | Accessible dropdown with option values and labels, inline or stacked layout, semantic border/focus tokens.                  |
+| ColorField                | Color swatch beside label, native color picker integration, accessible color names.                                         |
+| SegmentedControl          | Grouped toggle buttons with accessible role, pressed state, and keyboard navigation for mutually exclusive choices.         |
+| Slider                    | Labeled track beside exact numeric entry; shared bounds/units, live preview, one commit per gesture, keyboard support.      |
+| Layer row                 | Thumbnail/type, name, selection edge, visibility, lock state, nesting. Meaning must not depend on color alone.              |
+| Inspector section         | Short heading, grouped related controls, subtle separator.                                                                  |
+| Floating viewport control | Compact surface for zoom and fit, separated from document content.                                                          |
 | Dialogs                   | Unified structure: `dialog-heading` (caption + h2 + close `IconButton`), editorial subtitle, content, and action `Button`s. |
-| Shortcut dialog           | Registry-backed key labels, keyboard focus containment, Escape to dismiss, return focus to trigger.                      |
-| Feedback                  | Nonblocking status for success; actionable, dismissible errors. Do not hide failures behind optimistic success messages. |
+| Shortcut dialog           | Registry-backed key labels, keyboard focus containment, Escape to dismiss, return focus to trigger.                         |
+| Feedback                  | Nonblocking status for success; actionable, dismissible errors. Do not hide failures behind optimistic success messages.    |
 
 ## Composition
 
@@ -122,3 +122,97 @@ Reusable design system controls reside in `src/ui/controls.tsx` and consume vari
 The editor uses `AppearanceToggle`, a single sun/moon icon at the bottom of the tool rail. Clicking switches to the opposite resolved theme and saves an explicit preference. Its icon and accessible name describe the next action. Right-click, Arrow Down, or Shift+F10 opens a small appearance popover containing `AppearanceSelect`, including System mode; Escape closes it and returns focus. Developer docs retain the labeled selector. Both surfaces share Light / Dark / System modes. System is the initial default. `public/appearance.js` runs synchronously in the page head before styles or React, resolves the preference to `html[data-theme]`, and sets the native control color scheme. It stores a validated choice under `luma.appearance.v1`, synchronizes same-origin tabs via storage events, and follows live OS changes only in System mode. If storage is blocked, the current page still responds. Static docs without JavaScript follow the OS through CSS; their manual selector remains disabled.
 
 Both palettes use semantic tokens in `src/ui/tokens.css`, including separate light syntax colors. Light mode uses warm paper surfaces, dark mineral text, and a darker green accent. Use tokens for UI chrome rather than fixed dark colors. The canvas surround, checkerboard, selection overlays and tonal reference ramps stay consistent between themes. Document backgrounds, actual artwork, exports, and undo history are independent of this preference. Custom themes and a separate canvas-surround preference remain future work.
+
+## Planned intelligence and generation UX — not implemented
+
+Future A01/A02 asset intelligence belongs in a contextual Asset info inspector, not permanent rail buttons for every metadata operation. Visually distinguish embedded declarations, computed values, model suggestions and user-authored corrections with text labels, not color alone. Support per-field accept/edit/reject, keyboard traversal, unknown values and disclosure of analysis input scope.
+
+Future A03 generation opens a focused prompt/reference panel with target bounds, output type, preview and cost/transfer disclosure. Candidates appear in a collapsible shelf; completed jobs must not steal focus or automatically replace the artwork. Accepting a candidate is one undoable insertion. The job indicator remains compact until expanded and provides meaningful progress, cancellation and recoverable errors. Do not use fabricated percentage progress for a provider that only reports queued/running states.
+
+Future protected-edit review shows before/after and changed-region overlays, plus clearly labeled protected regions; all are optional inspection views, never baked into export. Recipe/batch review presents per-image state and exceptions before bulk acceptance. Manual tools and exact controls remain available alongside AI suggestions. Use the existing light/dark tokens, focus rules, paired numerical controls and constructor-backed action model. See [AI_FEATURE_SPECS.md](AI_FEATURE_SPECS.md) for behavior and [FEATURE_STRATEGY.md](FEATURE_STRATEGY.md) for scope.
+
+## Local recovery
+
+The rail’s Recover work action opens a native dialog listing local checkpoints by document and time. Restore opens an editable copy; Download current project supplies an external backup. Removing an inactive checkpoint requires a second confirm action. The footer reports actual pending/saving/saved/error recovery states and exposes the full message as a tooltip. Keep recovery separate from external file-save status and never describe browser storage as a backup.
+
+## Asset info inspector
+
+Raster Properties now includes an expandable Asset info section. File facts and file declarations have explicit origin labels; private fields are labeled. Extraction is asynchronous and local, with pending/error messages. Sidecar export shows separate attribution and private-field checkboxes. The inspector is read-only in this slice; accepting/editing AI suggestions remains planned. Metadata text must stay inert and wrap without widening the inspector.
+
+### Authored metadata controls
+
+Asset info separates editable **Authored description** fields from read-only **Original file declarations** using headings and explanatory text. Use existing stacked text inputs/text areas, disabled when the layer or an ancestor is locked. Keyword entry is comma-separated. Clear authored metadata is an undoable action. Sidecar attribution and private-field checkboxes explicitly govern both authored and extracted values; private authored descriptions remain excluded by default. Review/accept/reject UI is still planned.
+
+### Layer mask controls
+
+Use a contextual Layer mask section in Properties for the selected layer/group. Create/replace from selection is disabled without a nonempty marquee; reveal-all remains available. Enable and invert use labeled checkboxes. Density uses the shared slider with adjacent exact percentage input and one undo entry per committed gesture. Removal reveals retained source content and is undoable. Locked layers/ancestors disable all mutations. Creation and toggles remain keyboard accessible without adding global shortcuts that compete with existing tools.
+
+For Bézier masks, offer a labeled **Mask path source** selector of vector layers containing only closed paths and a create/replace action. Explain that paths are copied and later source edits do not change the mask. Label the active mask type and offer a fill-rule selector for vector masks. Never auto-hide or mutate the source layer during capture; the user controls source visibility.
+
+Mask feather uses the same paired slider/number control as density, labeled in document pixels (0–128, slider step 0.1; exact input supports fractions). Commit one history entry per gesture and honor mask/layer locks. Rendering errors at extreme zoom/radius combinations must explain the working-buffer limit and leave original content intact.
+
+Layer mask position uses exact **Mask X/Y** number fields, following existing layer-position controls. These are coordinate origins, not shape bounds. A labeled **Link mask to layer** checkbox preserves visible mask position on toggle. Explain whether the mask moves with its layer or remains fixed on the canvas; disable all mutations for locked layers/ancestors. Do not treat a raw flag change as a position-preserving toggle.
+
+The Move tool’s labeled **Move target** selector distinguishes Layer from Mask, with Mask offered only when the selected layer has a mask. A short instruction explains dragging and arrow-key nudging in mask mode. Hide layer bounds/resize handles in mask mode so they do not imply a layer transform. Exact Mask X/Y fields continue to show the live preview.
+
+Uniform painted masks use an explicit creation/replacement button in Layer mask properties. Every selected mask, including selection/Bézier masks, exposes the Brush/Pencil **Paint target** selector with labels Layer, Mask · Hide and Mask · Reveal. Mask painting uses existing paired adjustment controls; stroke color does not affect coverage. Changing the selected layer or mask kind resets the paint target to Layer. The mask kind caption directs users to Brush/Pencil. Replacing mask geometry is an ordinary undoable action.
+
+The Pen tool offers **Pen target: Layer paths / Mask paths** when a Bézier mask is selected. Mask mode hides stroke/fill creation controls, displays mask contour outlines and highlights the selected anchor. Anchor/handle sizes and hit tolerance stay constant in screen pixels; coordinates include mask linking and parent translation. Inline instructions explain dragging, Alt/Option, nudging and deletion. Selecting another layer/document or changing the mask kind resets the pen target to Layer paths.
+
+In Pen → Mask paths, Insert midpoint stays beside the tool options and is disabled until an anchor is selected. It splits the selected anchor’s outgoing segment, including the closing segment, and selects the inserted anchor for subsequent edits. For placement along a curve, users can click a nearby contour directly. Existing anchors and handles take priority; the click previews a newly selected anchor, and release inserts it without altering the curve. Escape discards it. The footer explains this interaction without adding another mode or toolbar button.
+
+Mask contour creation uses explicit New contour / Close contour / Cancel contour controls. Their button group keeps the same width while drawing, with compact instructions in the existing hint row, preventing canvas movement as mode changes. The draft contour has a dashed outline, while existing contours keep solid outlines. Empty-mask creation explains that artwork is hidden until an outline is drawn; no vector source layer is required. Escape discards the entire draft, Enter closes it, and Delete removes the last draft anchor. No global shortcut is added.
+
+Crop canvas uses the custom Crop icon in the rail and the C shortcut to enter frame editing. Precise bounds opens a dialog reusing numeric fields, dialog focus handling, and primary/subtle buttons for Apply/Cancel. Four pixel fields define the frame; a single rectangular marquee provides an optional starting frame. Supporting copy explains retained off-canvas artwork and outside-canvas bounds. Apply is disabled for invalid or unchanged bounds; stale-document errors remain inside the dialog. Escape in a numeric draft restores that field; Escape outside the field closes the dialog. Crop is a document action and remains available with locked layers.
+
+On-canvas crop frames use a white border with a dark outline, a subtle thirds grid, an absolute-positioned dimensions label, and eight focusable handle buttons that stay the same size on screen. A noninteractive SVG shade dims the excluded current-canvas area without changing rendered artwork. New frame, Precise bounds, Apply crop and Cancel crop stay in the options bar with stable labels, so drawing a frame does not move the canvas. Handle cursors communicate resize direction; handles support arrows and Shift+arrows as well as pointer dragging. The Crop tool suppresses the unrelated Fill selection button, and its Delete shortcut is labeled Clear crop frame.
+
+The command palette is a compact native modal using the existing surface, accent, focus and text tokens in both color modes. Its search field is an accessible combobox controlling a scrollable listbox; rows show a category, command label and shortcut hint. A single outlined active row follows keyboard navigation. Unavailable rows stay discoverable with disabled semantics. Empty queries show available registry actions; unmatched queries show an explicit empty state. No separate component framework is introduced.
+
+The Layers panel provides a compact search field with native type, visibility and lock-state selectors, styled with existing semantic field/border/text tokens. Active filters show a live match count and Clear filters. Ancestor context rows retain the tree indentation with muted names. The panel explicitly identifies an active layer outside the filter rather than silently changing selection. Group disclosure is temporarily disabled while results are expanded; clearing filters restores the prior disclosure state.
+
+Multiple selected layer rows use the existing selected state, with a count and alignment selector in the panel. A union outline represents the set on canvas; resize handles remain reserved for a single resizable layer until group-transform behavior is implemented. Ctrl/Cmd/Shift-click toggles membership. Active-layer inspector fields remain a single-target surface, separate from explicit multi-layer movement/alignment/deletion actions.
+
+The Recovery storage diagnostics section uses existing text/border tokens, a two-column definition list with tabular numeric values, wrapping secondary action buttons, and live status text. Estimates and persistence status remain separate from checkpoint save status; API failures do not disable the rest of Recovery.
+
+For a single selected raster, the Layers panel offers a labeled **Convert to smart object** button using the existing Button component. Disable it while busy, with multiple selection or locked ancestry. The resulting selected instance uses the component badge. Conversion errors use the panel's existing action error reporting; no new global shortcut is assigned.
+
+For one selected smart object, the Layers panel offers **New smart object via copy** using the existing Button component and action-error handling. It is disabled while busy, with multiple selection, or when the layer/ancestor is locked. Ordinary Duplicate remains available for shared instances. Both actions select their new instance; the independent action does not introduce a new global shortcut.
+
+A selected smart object offers **Edit contents** in Layers. Its editing tab uses normal tools and a compact wrapping banner above the canvas toolbar, styled with existing panel/border tokens. The banner names the source composition, distinguishes pending/applied edits, and exposes **Apply to source** and **Keep as document**. Disable apply without changes or after source closure. Errors use the standard application error display and leave the tab intact. No new global shortcuts or automatic commits are introduced.
+
+A selected smart object exposes a collapsible **Smart filters** section in Properties. Use a labeled Filter type selector and Add filter button, followed by numbered cards in execution order. Each card has an Enabled checkbox and accessible earlier/later/remove icon buttons; first/last movement controls disable at their respective boundaries. Gaussian blur exposes Blur size; unsharp mask exposes Sharpen size, Amount and Threshold; tone exposes Exposure, Contrast and Saturation. Every numeric control uses the existing paired Slider/exact NumberField, with quadratic size sliders for useful small-radius precision. Size fields map to Gaussian sigma in master pixels and follow instance scaling. Use existing panel, border, text and accent tokens in both color modes; no additional component framework or global shortcut is introduced.
+
+Slider changes preview without adding history and commit once per gesture. Escape restores the pre-gesture value. Keyboard commits retain focus, allowing repeated arrow adjustments. Exact inputs commit on Enter/blur and restore invalid drafts. Disabled filters retain their values while disabling numeric adjustments; locked ancestry, busy state or unavailable WASM disables all mutations. The 32-entry stack limit disables adding. Selection/session changes cancel transient previews; external document edits cannot commit an older slider draft. All committed actions use smart-filter constructors and the shared command/history path. Filter masks remain a separate unfinished control surface.
+
+### Filter mask Inspector
+
+Use a separate Filter mask section beside Smart filters and Layer mask. Explain white/black coverage in artwork terms. Group reveal/hide presets, provide selection capture, and show whether geometry follows artwork or stays fixed on the canvas. Use existing checkboxes, paired Slider/number inputs for density and feather, and a quiet removal action. Disable editing for locked/busy targets; disabled masks keep enable/remove controls available. Live previews cancel on Escape and target changes and commit once per gesture. Both themes use existing semantic tokens.
+
+The Filter mask section includes a Follow artwork checkbox. Changing it preserves current mask placement and switches future movement behavior. Keep this control available for disabled masks so placement can be prepared without applying the filter, while respecting layer locks and busy state.
+
+Paint target offers Filter mask · Hide/Reveal only when the selected smart object has a filter mask. Keep ordinary Mask · Hide/Reveal choices distinct. Reuse brush/pencil/eraser controls and paired sliders; do not introduce duplicate shortcut bindings.
+
+Layers → Convert to smart object applies to the current selection, including text, vectors, groups and multiple contiguous siblings. It disables for locked selected ancestry and reports validation errors for incompatible selections through the existing error surface. The result becomes the selected instance; Edit contents exposes the retained editable layers. No new keyboard binding is introduced.
+
+Layers → Rasterize smart object appears for one selected smart instance, disables for locked ancestry or a busy operation, and runs through the standard asynchronous task/error surface. Successful rasterization selects the replacement raster. Outer masks, opacity, blend and styles remain editable; contents and filters become pixels. Undo restores the editable instance.
+
+For one selected smart object, Layers offers Link image file or Relink image file through the native file chooser. The selected target is captured when the chooser opens. Linked sources display their filename and an explicit saved-snapshot/choose-file-to-refresh status. Embed source snapshot removes the link while retaining pixels, and enables editable contents. Refresh is explicit; the UI must not imply background watching or verified current file availability.
+
+Asset display filenames retain their complete string through import, copying and project persistence. Linked-source labels ellipsize long names and expose the full name in their title; saved-snapshot status stays separate. Layer-name and linked-source metadata validation remain independent of asset display names.
+
+Layer comps use a collapsed-by-default Properties section with a count badge. Capture has a name and Visibility/Position/Appearance checkboxes; at least one category is required. Saved rows expose name, captured categories and Apply/Update/Remove controls. Update explicitly recaptures the current presentation and has an explanatory title. Missing layers show a warning before application and a live status afterward. All actions use shared constructor commands and existing error handling; keyboard focus and native Enter/Space behavior remain available.
+
+Keyboard shortcuts use a scrollable row list with action name, active binding, Change/Clear/Reset controls and a global defaults action. Capture is focus-bound: Escape cancels it without closing the dialog; Tab or blur leaves capture. Conflict and persistence failures appear as an accessible alert. Empty bindings read “Unassigned.” Customized hints update in toolbar/layer buttons, context menus and command search. Escape and Space remain dedicated global interactions.
+
+Side-panel resize handles occupy a 6-pixel divider, use the column-resize cursor and accent hover/focus feedback, and expose separator orientation/value labels to assistive technology. Keyboard and pointer resizing share bounds. Layers use a 190-pixel minimum, Properties 230, and both have a 480-pixel maximum; viewport constraints retain canvas room. Double-click resets to the responsive default.
+
+The multi-selection controls include Distribute alongside Align. A select offers horizontal/vertical gaps and centers; it resets after each action and is disabled for fewer than three independent roots, locked selections or busy operations. Distribution cancels transient tools/previews before committing.
+
+The Layers panel exposes one keyboard-accessible “Flip selected layers” select for any nonempty selection, with Horizontal and Vertical actions. It resets after execution and is disabled while busy or when a selected root or ancestor is locked. It cancels active tool previews before committing the shared command.
+
+HSL appears in the adjustment-type selector as “Hue / Saturation / Lightness”. Hue, HSL saturation and Lightness use the shared Slider component with paired exact inputs, transient previews and one commit on release/entry. Hue displays degrees; saturation/lightness display percent. Reset retains HSL type and restores zero values. Locks and busy state disable edits.
+
+Curves, Levels, Tone and HSL creation are searchable command-palette actions. They have no default shortcut chord, but can receive custom bindings through Keyboard shortcuts. The canvas context menu also exposes HSL directly. Creation uses the shared constructor, selects the new layer, generates an unused numbered name and adds one undo entry.
+
+Typography retains a Font preset selector and adds a Font family text field for locally installed/custom family names. Enter or blur commits one edit; Escape discards the draft. The field follows shared text-input validation and disabled states. A failed local-font probe remains visible beside the controls. This does not request font enumeration, download fonts or embed font files.

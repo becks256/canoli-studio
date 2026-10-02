@@ -33,10 +33,22 @@ export function AppearanceToggle() {
         className="tool-button"
         aria-haspopup="dialog"
         aria-expanded={open}
-        onClick={() => window.dispatchEvent(new CustomEvent("luma:set-appearance", { detail: theme === "dark" ? "light" : "dark" }))}
-        onContextMenu={event => { event.preventDefault(); showSettings(); }}
-        onKeyDown={event => {
-          if (event.key === "ArrowDown" || (event.shiftKey && event.key === "F10")) {
+        onClick={() =>
+          window.dispatchEvent(
+            new CustomEvent("luma:set-appearance", {
+              detail: theme === "dark" ? "light" : "dark",
+            }),
+          )
+        }
+        onContextMenu={(event) => {
+          event.preventDefault();
+          showSettings();
+        }}
+        onKeyDown={(event) => {
+          if (
+            event.key === "ArrowDown" ||
+            (event.shiftKey && event.key === "F10")
+          ) {
             event.preventDefault();
             showSettings();
           }
@@ -50,8 +62,10 @@ export function AppearanceToggle() {
         role="dialog"
         aria-label="Appearance settings"
         className="appearance-popover"
-        onToggle={() => setOpen(settings.current?.matches(":popover-open") ?? false)}
-        onKeyDown={event => {
+        onToggle={() =>
+          setOpen(settings.current?.matches(":popover-open") ?? false)
+        }
+        onKeyDown={(event) => {
           if (event.key === "Escape") {
             event.preventDefault();
             event.stopPropagation();

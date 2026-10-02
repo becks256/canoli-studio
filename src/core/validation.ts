@@ -1,3 +1,13 @@
+import { layerCompSchema } from "./layer-comps";
+import { smartFiltersSchema } from "./smart/filters";
+import { componentDefinitionSchema } from "./smart/manager";
+import { TONE_LIMITS } from "./tone";
+import { guidesSchema } from "./guides";
+import { affineSchema } from "./transform-schema";
+import { cropBoundsSchema } from "./crop";
+import { layerMaskSchema } from "./masks";
+import { authoredMetadataSchema } from "./metadata";
+import { adjustmentSchema } from "./adjustments";
 import { BLEND_MODES } from "./model";
 import {
   selectionSchema,
@@ -20,13 +30,28 @@ const dimension = z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER);
 const toneValues = z
   .object({
     enabled: z.boolean().optional(),
-    exposure: z.number().min(-3).max(3).optional(),
-    contrast: z.number().min(-100).max(100).optional(),
-    saturation: z.number().min(-100).max(100).optional(),
+    exposure: z
+      .number()
+      .min(TONE_LIMITS.exposure.min)
+      .max(TONE_LIMITS.exposure.max)
+      .optional(),
+    contrast: z
+      .number()
+      .min(TONE_LIMITS.contrast.min)
+      .max(TONE_LIMITS.contrast.max)
+      .optional(),
+    saturation: z
+      .number()
+      .min(TONE_LIMITS.saturation.min)
+      .max(TONE_LIMITS.saturation.max)
+      .optional(),
   })
   .strict();
 const patch = z
   .object({
+    transform: affineSchema.optional(),
+    mask: layerMaskSchema.nullable().optional(),
+    metadata: authoredMetadataSchema.nullable().optional(),
     name: identifier.optional(),
     x: position.optional(),
     y: position.optional(),
@@ -44,11 +69,16 @@ const patch = z
     color: identifier.optional(),
     align: z.enum(["left", "center", "right"]).optional(),
     lineHeight: z.number().min(0.5).max(10).optional(),
+    letterSpacing: z.number().min(-50).max(500).optional(),
+    fontWeight: identifier.optional(),
+    fontStyle: z.enum(["normal", "italic"]).optional(),
+    direction: z.enum(["ltr", "rtl"]).optional(),
+    adjustment: adjustmentSchema.optional(),
   })
   .strict();
 const layer = z.unknown().transform((value, context) => {
   try {
-    validateDocument({ ...createDocument(), children: [value] });
+    validateDocument({ ...createDocument(), children: [value] }, false);
     return value as LayerData;
   } catch {
     context.addIssue({ code: "custom", message: "Invalid layer tree." });
@@ -58,6 +88,91 @@ const layer = z.unknown().transform((value, context) => {
 
 const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
   z.discriminatedUnion("type", [
+    z
+      .object({
+        type: z.literal("layer.flip"),
+        ids: z.array(identifier).min(1),
+        axis: z.enum(["horizontal", "vertical"]),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("layer.distribute"),
+        ids: z.array(identifier).min(3),
+        axis: z.enum(["horizontal", "vertical"]),
+        mode: z.enum(["gaps", "centers"]),
+      })
+      .strict(),
+    z
+      .object({ type: z.literal("layerComp.set"), comp: layerCompSchema })
+      .strict(),
+    z.object({ type: z.literal("layerComp.remove"), id: identifier }).strict(),
+    z.object({ type: z.literal("layerComp.apply"), id: identifier }).strict(),
+    z
+      .object({
+        type: z.literal("smartObject.filterMask"),
+        id: identifier,
+        mask: layerMaskSchema.nullable(),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("smartObject.filters"),
+        id: identifier,
+        filters: smartFiltersSchema,
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("component.set"),
+        definition: componentDefinitionSchema as z.ZodType<
+          import("./smart/types").SmartComponentDefinition
+        >,
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("component.replaceAll"),
+        definitions: z.array(componentDefinitionSchema) as z.ZodType<
+          import("./smart/types").SmartComponentDefinition[]
+        >,
+      })
+      .strict(),
+    z.object({ type: z.literal("component.remove"), id: identifier }).strict(),
+    z
+      .object({
+        type: z.literal("smartObject.duplicateIndependent"),
+        id: identifier,
+        instanceId: identifier,
+        componentIds: z.record(identifier, identifier),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("smartObject.convertLayers"),
+        ids: z.array(identifier).min(1),
+        componentId: identifier,
+        instanceId: identifier,
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("smartObject.convertToRaster"),
+        id: identifier,
+        layer: layer.refine(
+          (value) => value.kind === "raster",
+          "Rasterization requires raster data",
+        ),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("smartObject.convertRaster"),
+        id: identifier,
+        componentId: identifier,
+        instanceId: identifier,
+      })
+      .strict(),
     z
       .object({
         type: z.literal("selection.set"),
@@ -105,7 +220,13 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
         pathId: identifier,
       })
       .strict(),
+    z
+      .object({ type: z.literal("document.guides"), guides: guidesSchema })
+      .strict(),
     z.object({ type: z.literal("document.rename"), name: identifier }).strict(),
+    z
+      .object({ type: z.literal("document.crop"), bounds: cropBoundsSchema })
+      .strict(),
     z
       .object({
         type: z.literal("document.resize"),
@@ -175,6 +296,13 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
         type: z.literal("effect.remove"),
         id: identifier,
         effectId: identifier,
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal("mask.setFromMatting"),
+        id: identifier,
+        mask: layerMaskSchema,
       })
       .strict(),
     z

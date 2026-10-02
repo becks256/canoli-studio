@@ -1,0 +1,151 @@
+{
+  "measuredAt": "2026-10-01T12:08:33.822Z",
+  "browser": "153.0.8010.12",
+  "host": {
+    "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "fixture": "Opaque gray image, central 3x3 red blemish, one hard circular brush, all-layer sampling, exact expected gray center; one warm-up then three samples per size.",
+  "scope": "Production host healing call including fresh worker startup, brush coverage, native sampling, search, solve, PNG encoding/decoding, installation and history commit. Validation/render/undo excluded from timed interval.",
+  "limitations": [
+    "Synthetic flat context is not a texture quality evaluation.",
+    "Phase durations are round-trip wall time and may overlap; do not sum them.",
+    "Warm browser/OS caches; dedicated numerical worker is new for each stroke.",
+    "128px maximum measured diameter; the entire under-256px performance gate is not established."
+  ],
+  "results": [
+    {
+      "brushDiameter": 16,
+      "imageEdge": 64,
+      "searchRadius": 16,
+      "samples": [
+        {
+          "totalMs": 49.80000000447035,
+          "phasesMs": {
+            "renderSampling": 1.6000000014901161,
+            "donorSearch": 6.899999998509884,
+            "poissonSolve": 1.5
+          }
+        },
+        {
+          "totalMs": 43.599999994039536,
+          "phasesMs": {
+            "renderSampling": 1.6000000089406967,
+            "donorSearch": 6.899999998509884,
+            "poissonSolve": 1.3999999985098839
+          }
+        },
+        {
+          "totalMs": 53.30000000447035,
+          "phasesMs": {
+            "renderSampling": 1.3000000044703484,
+            "donorSearch": 6.5,
+            "poissonSolve": 1.7000000029802322
+          }
+        }
+      ],
+      "medianMs": 49.80000000447035,
+      "meets50ms": true
+    },
+    {
+      "brushDiameter": 32,
+      "imageEdge": 128,
+      "searchRadius": 32,
+      "samples": [
+        {
+          "totalMs": 56.399999998509884,
+          "phasesMs": {
+            "renderSampling": 1.3999999910593033,
+            "donorSearch": 17.899999998509884,
+            "poissonSolve": 3.5
+          }
+        },
+        {
+          "totalMs": 66.19999999552965,
+          "phasesMs": {
+            "renderSampling": 1.1999999955296516,
+            "donorSearch": 24.5,
+            "poissonSolve": 3.6999999955296516
+          }
+        },
+        {
+          "totalMs": 62.600000001490116,
+          "phasesMs": {
+            "renderSampling": 1.6000000089406967,
+            "donorSearch": 18.099999994039536,
+            "poissonSolve": 3.399999998509884
+          }
+        }
+      ],
+      "medianMs": 62.600000001490116,
+      "meets50ms": false
+    },
+    {
+      "brushDiameter": 64,
+      "imageEdge": 256,
+      "searchRadius": 64,
+      "samples": [
+        {
+          "totalMs": 114.90000000596046,
+          "phasesMs": {
+            "renderSampling": 2.500000014901161,
+            "donorSearch": 60.80000000447035,
+            "poissonSolve": 11.299999997019768
+          }
+        },
+        {
+          "totalMs": 111.29999999701977,
+          "phasesMs": {
+            "renderSampling": 14.99999999254942,
+            "donorSearch": 62.600000001490116,
+            "poissonSolve": 12
+          }
+        },
+        {
+          "totalMs": 107.10000000149012,
+          "phasesMs": {
+            "renderSampling": 1.8000000044703484,
+            "donorSearch": 59.400000005960464,
+            "poissonSolve": 10.399999998509884
+          }
+        }
+      ],
+      "medianMs": 111.29999999701977,
+      "meets50ms": false
+    },
+    {
+      "brushDiameter": 128,
+      "imageEdge": 512,
+      "searchRadius": 128,
+      "samples": [
+        {
+          "totalMs": 322.5,
+          "phasesMs": {
+            "renderSampling": 4.799999997019768,
+            "donorSearch": 222.30000000447035,
+            "poissonSolve": 46.29999999701977
+          }
+        },
+        {
+          "totalMs": 317,
+          "phasesMs": {
+            "renderSampling": 29.400000005960464,
+            "donorSearch": 226.5,
+            "poissonSolve": 42.80000000447035
+          }
+        },
+        {
+          "totalMs": 305.8999999985099,
+          "phasesMs": {
+            "renderSampling": 4.600000001490116,
+            "donorSearch": 220.70000000298023,
+            "poissonSolve": 45.30000000447035
+          }
+        }
+      ],
+      "medianMs": 317,
+      "meets50ms": false
+    }
+  ]
+}

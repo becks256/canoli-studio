@@ -1,3 +1,4 @@
+import { useShortcutLabel } from "./ShortcutHints";
 import { useEffect, useRef, useState } from "react";
 import type {
   ButtonHTMLAttributes,
@@ -41,13 +42,16 @@ export function Button({
 }
 
 export function IconButton({
-  label,
+  label: originalLabel,
+  shortcutId,
   children,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   label: string;
+  shortcutId?: string;
   children: ReactNode;
 }) {
+  const label = useShortcutLabel(shortcutId, originalLabel);
   return (
     <button
       type="button"
@@ -113,12 +117,7 @@ export function NumberField({
     dirty.current = false;
     const trimmed = draft.trim();
     const parsed = Number(trimmed);
-    if (
-      trimmed &&
-      Number.isFinite(parsed) &&
-      parsed >= min &&
-      parsed <= max
-    ) {
+    if (trimmed && Number.isFinite(parsed) && parsed >= min && parsed <= max) {
       if (parsed !== value) {
         onCommit?.(parsed);
         onChange?.(parsed);
@@ -152,11 +151,7 @@ export function NumberField({
               const trimmed = event.target.value.trim();
               if (trimmed) {
                 const parsed = Number(trimmed);
-                if (
-                  Number.isFinite(parsed) &&
-                  parsed >= min &&
-                  parsed <= max
-                ) {
+                if (Number.isFinite(parsed) && parsed >= min && parsed <= max) {
                   onPreview?.(parsed);
                   onChange?.(parsed);
                 }
@@ -203,11 +198,7 @@ export function NumberField({
           const trimmed = event.target.value.trim();
           if (trimmed) {
             const parsed = Number(trimmed);
-            if (
-              Number.isFinite(parsed) &&
-              parsed >= min &&
-              parsed <= max
-            ) {
+            if (Number.isFinite(parsed) && parsed >= min && parsed <= max) {
               onPreview?.(parsed);
               onChange?.(parsed);
             }
@@ -234,7 +225,9 @@ export function NumberField({
 function formatNumber(value: number) {
   // Keep safe-integer document coordinates exact; trim only floating-point
   // display noise such as 28.999999999999996 in percentage controls.
-  return Number.isInteger(value) ? String(value) : String(Number(value.toPrecision(15)));
+  return Number.isInteger(value)
+    ? String(value)
+    : String(Number(value.toPrecision(15)));
 }
 
 export function Slider({
@@ -735,4 +728,3 @@ export function SegmentedControl<T extends string = string>({
     </div>
   );
 }
-

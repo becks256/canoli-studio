@@ -134,7 +134,8 @@ describe("constructor DOM", () => {
     expect(paint.strokes.at(0)?.kind).toBe("fill");
     const storedFill = paint.strokes.at(0);
     expect(storedFill).toBeInstanceOf(PaintFill);
-    if (!(storedFill instanceof PaintFill)) throw new Error("Expected a paint fill");
+    if (!(storedFill instanceof PaintFill))
+      throw new Error("Expected a paint fill");
     expect(storedFill.color).toBe("#ff0000");
     expect(storedFill.opacity).toBe(0.8);
 
