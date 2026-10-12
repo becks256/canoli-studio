@@ -19,6 +19,7 @@ import {
   PenTool,
   Puzzle,
   Scan,
+  Lasso,
   Stamp,
   Bandage,
   WandSparkles,
@@ -88,6 +89,8 @@ export function ToolRail({
       {(
         [
           ["marquee", "Marquee tool (M)", Scan],
+          ["lasso", "Lasso tool (L)", Lasso],
+          ["wand", "Magic wand tool (W)", WandSparkles],
           ["fill", "Paint bucket (G)", PaintBucket],
           ["brush", "Brush tool (B)", Paintbrush],
           ["dodge", "Dodge tool (O)", Sun],

@@ -1,3 +1,4 @@
+import { CanvasCursor } from "./CanvasCursor";
 import { PanelResizeHandle } from "./PanelResizeHandle";
 import { usePanelLayout } from "./hooks/usePanelLayout";
 import { ShortcutHints } from "./ShortcutHints";
@@ -32,7 +33,7 @@ import {
   X,
 } from "lucide-react";
 import { EditorApplication } from "../editor";
-import { AdjustmentLayer, LayerGroup, PaintLayer, TextLayer } from "../dom";
+import { AdjustmentLayer, LayerGroup, PaintLayer, RasterLayer, TextLayer } from "../dom";
 import {
   defaultCurvesAdjustment,
   defaultHslAdjustment,
@@ -163,17 +164,30 @@ export function App({ editor }: { editor: EditorApplication }) {
   const toolSizes = useRef({ brush: 24, pencil: 1, eraser: 24 });
   const toolState = useSyncExternalStore(
     editor.tools.subscribe,
-    editor.tools.getSnapshot,
+    editor.tools.getUiSnapshot,
   );
-  const [cursor, setCursor] = useState<Point | null>(null);
+  const [customCursors, setCustomCursors] = useState(() => {
+    try { return localStorage.getItem("luma.custom-cursors.v1") !== "false"; } catch { return true; }
+  });
+  useEffect(() => { try { localStorage.setItem("luma.custom-cursors.v1", String(customCursors)); } catch { /* Session-only preference. */ } }, [customCursors]);
+  const [cursorStore] = useState(() => {
+    let point: Point | null = null;
+    const listeners = new Set<() => void>();
+    return {
+      getSnapshot: () => point,
+      subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
+      set: (next: Point | null) => { point = next; listeners.forEach(listener => listener()); },
+    };
+  });
   const pendingCursor = useRef<Point | null>(null);
   const cursorFrame = useRef<number | null>(null);
   function updateCursor(point: Point | null) {
+    if (customCursors && point) return;
     pendingCursor.current = point;
     if (cursorFrame.current === null)
       cursorFrame.current = requestAnimationFrame(() => {
         cursorFrame.current = null;
-        setCursor(pendingCursor.current);
+        cursorStore.set(pendingCursor.current);
       });
   }
   const [spacePan, setSpacePan] = useState(false);
@@ -204,6 +218,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   });
   const [showScripts, setShowScripts] = useState(false);
   const [showPlugins, setShowPlugins] = useState(false);
+  const [showImageSizeDialog, setShowImageSizeDialog] = useState(false);
   const [showArtboardDialog, setShowArtboardDialog] = useState(false);
   const [showCropDialog, setShowCropDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -407,6 +422,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       );
     }
   }
+  const pendingCopy = useRef<{ pastes: number; cancelled: boolean } | null>(null);
   async function task(action: () => Promise<void>) {
     if (busy) return;
     setBusy(true);
@@ -439,9 +455,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     setPan({ x: 0, y: 0 });
   }
   function changeZoom(factor: number) {
-    setZoom((current) =>
-      Math.max(Number.MIN_VALUE, Math.min(4, current * factor)),
-    );
+    setZoom((current) => {
+      const next = current * factor;
+      // No arbitrary magnification ceiling; reject overflow and underflow.
+      return next > 0 && Number.isFinite(next * Math.max(dom.width, dom.height, 100))
+        ? next : current;
+    });
   }
   function clearPreview() {
     editor.tools.cancel();
@@ -583,7 +602,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           }),
         );
       } else {
-        const delta = parentSpaceDelta(dom.toJSON(), layer.id, { x, y });
+        const delta = parentSpaceDelta(dom.getSnapshot().document, layer.id, { x, y });
         layer.update({ x: layer.x + delta.x, y: layer.y + delta.y });
       }
     });
@@ -620,6 +639,55 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: [binding],
       run: () => chooseTool(key),
     })),
+    {
+      id: "copy-pixels", label: "Copy selected image pixels", keys: SHORTCUT_BINDINGS["copy-pixels"],
+      enabled: () => !busy && !pendingCopy.current && selected?.kind === "raster",
+      run: () => {
+        editor.tools.cancel();
+        void task(async () => {
+          const job = { pastes: 0, cancelled: false };
+          pendingCopy.current = job;
+          const document = editor.document;
+          let revision = document.getSnapshot().revision;
+          try {
+            await editor.pixels.copy();
+            while (job.pastes > 0 && !job.cancelled) {
+              if (editor.document !== document || document.getSnapshot().revision !== revision)
+                throw new Error("The document changed before queued paste. Try again.");
+              job.pastes--;
+              await editor.pixels.paste();
+              revision = document.getSnapshot().revision;
+            }
+          } finally {
+            pendingCopy.current = null;
+          }
+        });
+      },
+    },
+    {
+      id: "paste-pixels", label: "Paste pixels as new layer", keys: SHORTCUT_BINDINGS["paste-pixels"],
+      allowWhileBusy: true,
+      enabled: () => pendingCopy.current ? !pendingCopy.current.cancelled : !busy && editor.pixels.canPaste,
+      run: () => {
+        if (pendingCopy.current) { pendingCopy.current.pastes++; return; }
+        editor.tools.cancel();
+        void task(() => editor.pixels.paste());
+      },
+    },
+    {
+      id: "image-size", label: "Image size…", keys: SHORTCUT_BINDINGS["image-size"],
+      enabled: () => !busy,
+      run: () => { editor.tools.cancel(); setShowImageSizeDialog(true); },
+    },
+    {
+      id: "canvas-cursors", label: customCursors ? "Use system canvas cursors" : "Use custom canvas cursors", keys: [],
+      run: () => setCustomCursors(value => !value),
+    },
+    {
+      id: "load-transparency", label: "Load layer transparency as selection", keys: [],
+      enabled: () => !busy && (selected?.kind === "raster" || selected?.kind === "paint"),
+      run: () => { editor.tools.cancel(); void task(() => editor.pixels.loadTransparency()); },
+    },
     {
       id: "select-all",
       label: "Select canvas",
@@ -736,7 +804,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             return;
           }
           if (tool === "pen" && editor.tools.removeLastAnchor()) return;
-          if (dom.selection && selectedObject instanceof PaintLayer)
+          if (state.document.selection && (selectedObject instanceof PaintLayer || selectedObject instanceof RasterLayer))
             editor.tools.fillSelection(true);
           else if (dom.selectedLayers.length > 1) dom.layerSelection.remove();
           else selectedObject?.remove();
@@ -973,6 +1041,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       showHelp ||
       showScripts ||
       showPlugins ||
+      showImageSizeDialog ||
       showArtboardDialog ||
       showCropDialog ||
       showExportDialog ||
@@ -988,6 +1057,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       setShowHelp(false);
       setShowScripts(false);
       setShowPlugins(false);
+      setShowImageSizeDialog(false);
       setShowArtboardDialog(false);
       setShowCropDialog(false);
       setShowExportDialog(false);
@@ -1002,6 +1072,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     onSetSpacePan: setSpacePan,
     onClearPreview: clearPreview,
     onResetGestures: () => {
+      if (pendingCopy.current) pendingCopy.current.cancelled = true;
       capturedPointer.current = null;
       gesture.current = null;
       setResizingCursor(null);
@@ -1014,7 +1085,9 @@ export function App({ editor }: { editor: EditorApplication }) {
     assets,
     renderRegion,
     zoom,
-    paintPreview: toolState.paintPreview,
+    paintPreview: editor.tools.getSnapshot().paintPreview,
+    previewGesture: preview && activePreview === preview ? gesture.current : null,
+    gestureRef: gesture,
     backendState,
     displayHost,
     onCleanupCursor: () => {
@@ -1184,6 +1257,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     const point = toCanvasPoint(event);
     updateCursor(point);
     if (tool !== "move") {
+      if (tool === "wand") {
+        const settings = editor.tools.getSnapshot().settings;
+        const operation = event.shiftKey && event.altKey ? "intersect" : event.shiftKey ? "add" : event.altKey ? "subtract" : settings.selectionMode;
+        void task(() => editor.pixels.wand(point, { tolerance: settings.wandTolerance, contiguous: settings.wandContiguous, operation }));
+        return;
+      }
       if (tool === "text") {
         attempt(() => {
           const textLayer = new TextLayer({
@@ -1420,7 +1499,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     dy: number;
     mask?: LayerMaskData;
   }): LayerPatch {
-    const snapshot = dom.toJSON();
+    const snapshot = dom.getSnapshot().document;
     let delta = { x: drag.dx, y: drag.dy };
     if (!drag.mask) delta = parentSpaceDelta(snapshot, drag.id, delta);
     else if (drag.mask.linked !== false) {
@@ -1684,6 +1763,8 @@ export function App({ editor }: { editor: EditorApplication }) {
             onOpenRecovery={() => setShowRecovery(true)}
           />
           <LayersPanel
+            deferThumbnails={toolState.drawing}
+            onLoadTransparency={id => { editor.tools.cancel(); void task(() => editor.pixels.loadTransparency(id)); }}
             onRelinkSmartObject={(layer, file) => {
               void task(async () => {
                 await editor.relinkSmartObject(layer, file);
@@ -1718,6 +1799,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             busy={busy}
             historyPast={state.past}
             historyFuture={state.future}
+            pixels={editor.pixels}
             getThumbnail={(assetId) => assets.get(assetId).thumbnail}
             onCancelTools={() => editor.tools.cancel()}
             onClearPreview={clearPreview}
@@ -1868,9 +1950,10 @@ export function App({ editor }: { editor: EditorApplication }) {
               onSnapArtwork={setSnapArtwork}
               controller={editor.tools}
               settings={toolState.settings}
-              hasSelection={!!dom.selection}
+              hasSelection={!!state.document.selection}
               disabled={busy || locked}
               onAction={attempt}
+              onOpenImageSize={() => { editor.tools.cancel(); setShowImageSizeDialog(true); }}
               onOpenArtboard={() => setShowArtboardDialog(true)}
               onOpenCrop={() => {
                 if (!busy) setShowCropDialog(true);
@@ -1960,7 +2043,9 @@ export function App({ editor }: { editor: EditorApplication }) {
                   tool={tool}
                   zoom={zoom}
                   controller={editor.tools}
-                  cursor={cursor}
+                  cursorStore={cursorStore}
+                  showBrushCursor={!customCursors}
+                  onError={setError}
                 />
                 {previewCandidate && (
                   <div
@@ -2113,6 +2198,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                     </div>
                   )}
               </div>
+              <CanvasCursor viewport={viewport} enabled={customCursors} tool={tool} spacePan={spacePan} size={toolState.settings.size} zoom={zoom} />
               {!dom.layers.length &&
                 !dom.guides.length &&
                 (tool === "move" || tool === "hand") && (
@@ -2302,6 +2388,11 @@ export function App({ editor }: { editor: EditorApplication }) {
             onClose={() => setShowCropDialog(false)}
           />
         )}
+        {showImageSizeDialog && (
+          <ArtboardDialog mode="image" currentWidth={dom.width} currentHeight={dom.height}
+            onResize={(width, height) => { editor.tools.cancel(); dom.resizeImage(width, height); notify(`Resized image to ${width} × ${height} px`); }}
+            onClose={() => setShowImageSizeDialog(false)} />
+        )}
         {showArtboardDialog && (
           <ArtboardDialog
             currentWidth={dom.width}
@@ -2367,9 +2458,12 @@ export function App({ editor }: { editor: EditorApplication }) {
             document={dom.toJSON()}
             busy={busy}
             onClose={() => setShowExportDialog(false)}
-            onExport={async (options) => {
+            onExport={async (options, control) => {
               await task(async () => {
-                const result = await editor.export(options);
+                let result;
+                try { result = await editor.export(options, control); }
+                catch (error) { if (control?.signal?.aborted) return; throw error; }
+                if (control?.signal?.aborted) return;
                 download(
                   result.blob,
                   `${fileName(dom.name)}.${result.extension}`,
@@ -2437,7 +2531,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             settings={toolState.settings}
             controller={editor.tools}
             disabled={busy || locked}
-            hasSelection={!!dom.selection}
+            hasSelection={!!state.document.selection}
             hasMask={!!selected?.mask}
             hasVectorMask={selected?.mask?.kind === "vector"}
             moveTarget={movingMask ? "mask" : "layer"}

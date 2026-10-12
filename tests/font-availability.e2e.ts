@@ -201,3 +201,83 @@ test("custom font family entry commits once, cancels with Escape and persists wi
     fontSize: 24,
   });
 });
+
+test("system font discovery is explicit, deduplicated, refreshable and preserves undo", async ({ page }) => {
+  await page.addInitScript(() => {
+    let calls = 0;
+    Object.defineProperty(window, "queryLocalFonts", { configurable: true, value: async () => {
+      calls++;
+      if (calls === 1) throw new DOMException("Denied", "NotAllowedError");
+      return [{family:"DejaVu Sans"}, {family:"DejaVu Sans"}, {family:"DejaVu Serif"}];
+    }});
+  });
+  await page.goto("/");
+  const before = await page.evaluate(() => {
+    const {editor, TextLayer} = window.luma;
+    editor.newDocument({width:200,height:100});
+    editor.document.selectedLayer = editor.document.layers.add(new TextLayer({text:"Fonts",fontFamily:"serif"}));
+    return JSON.stringify(editor.document.toJSON());
+  });
+  const picker = page.getByLabel("Font", {exact:true});
+  await expect(picker.locator('option[value="DejaVu Sans"]')).toHaveCount(0);
+  await page.getByRole("button", {name:"Access system fonts"}).click();
+  await expect(page.getByText("System fonts could not be accessed.", {exact:false})).toBeVisible();
+  await page.getByRole("button", {name:"Access system fonts"}).click();
+  await expect(picker.locator('option[value="DejaVu Sans"]')).toHaveCount(1);
+  expect(await page.evaluate(() => JSON.stringify(window.luma.editor.document.toJSON()))).toBe(before);
+  await picker.selectOption("DejaVu Sans");
+  await page.evaluate(() => window.luma.editor.document.undo());
+  await expect(picker).toHaveValue("serif");
+  await page.getByRole("button", {name:"Refresh system fonts"}).click();
+  await expect(picker.locator('option[value="DejaVu Serif"]')).toHaveCount(1);
+});
+
+test("unsupported font enumeration retains manual family entry", async ({ page }) => {
+  await page.addInitScript(() => { delete (window as unknown as {queryLocalFonts?: unknown}).queryLocalFonts; });
+  await page.goto("/");
+  await page.evaluate(() => {
+    const {editor, TextLayer} = window.luma;
+    editor.document.selectedLayer = editor.document.layers.add(new TextLayer({text:"Fonts"}));
+  });
+  await expect(page.getByText("This browser cannot list installed fonts.", {exact:false})).toBeVisible();
+  await expect(page.getByRole("textbox", {name:"Font family", exact:true})).toBeEnabled();
+});
+
+
+test("real installed fonts populate the picker and change rendered text", async ({ page, context }) => {
+  const cdp = await context.newCDPSession(page);
+  await cdp.send("Browser.setPermission", {
+    permission: { name: "local-fonts" },
+    setting: "granted",
+    origin: "http://127.0.0.1:5173",
+  });
+  await page.goto("/");
+  await page.evaluate(() => {
+    const { editor, TextLayer } = window.luma;
+    editor.newDocument({ width: 400, height: 120 });
+    editor.document.selectedLayer = editor.document.layers.add(new TextLayer({
+      text: "iiii WWWW", fontFamily: "monospace", fontSize: 32,
+    }));
+  });
+  const pixels = () => page.evaluate(async () => {
+    const { editor } = window.luma;
+    const canvas = await editor.renderer.render(editor.document.getSnapshot().document,
+      editor.assetStore, { cache: false, readback: true });
+    const data = Array.from(canvas.getContext("2d")!.getImageData(0, 0, 400, 120).data);
+    canvas.width = canvas.height = 0;
+    return data;
+  });
+  const before = await pixels();
+  await page.getByRole("button", { name: "Access system fonts", exact: true }).click();
+  const picker = page.getByLabel("Font", { exact: true });
+  const empty = page.getByText("No fonts were shared.", { exact: false });
+  await expect(page.getByRole("status").filter({ hasText: /installed font families available|No fonts were shared/ })).toBeVisible();
+  test.skip(await empty.isVisible(), "This Chromium environment returns no local fonts, even with permission granted.");
+  // This family is installed in the Linux browser test environment.
+  await expect(picker.locator('option[value="DejaVu Serif"]')).toHaveCount(1);
+  await picker.selectOption("DejaVu Serif");
+  expect(await pixels()).not.toEqual(before);
+  await page.evaluate(() => window.luma.editor.document.undo());
+  expect(await pixels()).toEqual(before);
+  await cdp.detach();
+});

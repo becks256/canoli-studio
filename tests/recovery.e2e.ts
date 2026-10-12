@@ -359,3 +359,31 @@ test("recovery dialog reports when it restores an older intact checkpoint", asyn
     "Intact older work",
   );
 });
+
+test("recovery captures mutable callers and immutable revisions independently of later edits", async ({page}) => {
+  await page.goto('/');
+  const result = await page.evaluate(async () => {
+    const {editor:e,TextLayer}=window.luma;
+    e.newDocument({width:200,height:100});
+    const layer=e.document.layers.add(new TextLayer({text:'Original'}));
+    const repository=e.recovery.repository;
+    const mutable=e.document.toJSON();
+    const first=repository.save('mutable-capture',mutable,e.assetStore);
+    mutable.name='Changed caller';
+    if(mutable.children[0].kind==='text') mutable.children[0].text='Changed caller';
+    const shallow=Object.freeze(e.document.toJSON());
+    const third=repository.save('shallow-frozen-capture',shallow,e.assetStore);
+    if(shallow.children[0].kind==='text') shallow.children[0].text='Changed nested caller';
+    const immutable=e.document.getSnapshot().document;
+    const second=repository.save('immutable-capture',immutable,e.assetStore);
+    layer.text='Later revision';
+    e.document.name='Changed live';
+    await Promise.all([first,second,third]);
+    const entries=await repository.list();
+    return ['mutable-capture','immutable-capture','shallow-frozen-capture'].map(id=>{
+      const entry=entries.find(entry=>entry.id===id)!;
+      return {name:entry.document.name, layer:entry.document.children[0], originalName:immutable.name};
+    });
+  });
+  for(const entry of result){expect(entry.name).toBe(entry.originalName);expect(entry.layer).toMatchObject({kind:'text',text:'Original'});}
+});

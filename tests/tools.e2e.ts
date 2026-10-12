@@ -639,3 +639,44 @@ test("developer docs link, anchors and documented scripts work in the actual san
     expect(result.error, name).toBeUndefined();
   }
 });
+
+test("dense Pen hit testing avoids point copies and preserves preview, cancellation and undo", async ({page}) => {
+  await page.goto("/");
+  await page.getByRole("button",{name:"Move tool (V)",exact:true}).click();
+  await page.evaluate(()=>{
+    const {editor,VectorLayer,VectorPath}=window.luma;
+    editor.newDocument({width:800,height:600});
+    const layer=editor.document.layers.add(new VectorLayer());
+    layer.paths.add(new VectorPath({points:Array.from({length:8000},(_,i)=>({x:20+i%20*30,y:20+Math.floor(i/20)*30}))}));
+    editor.document.selectedLayer=layer;
+    const descriptor=Object.getOwnPropertyDescriptor(VectorPath.prototype,"points")!;
+    (window as any).pointReads=0;
+    Object.defineProperty(VectorPath.prototype,"points",{...descriptor,get(){(window as any).pointReads++;return descriptor.get!.call(this);}});
+  });
+  await page.getByRole("button",{name:"Vector pen (P)",exact:true}).click();
+  await page.keyboard.press("Control+1");
+  await expect(page.getByText("8000 anchors",{exact:false})).toBeVisible();
+  const box=(await page.locator(".canvas-wrap").boundingBox())!;
+  await page.mouse.move(box.x+590,box.y+290);
+  await page.mouse.down();
+  await page.mouse.move(box.x+580,box.y+280);
+  expect(await page.evaluate(()=>{
+    const layer=window.luma.editor.document.getSnapshot().document.children[0];
+    return layer.kind==="vector" ? layer.paths[0].points[199].x : null;
+  })).toBe(590);
+  await page.mouse.up();
+  await expect.poll(()=>page.evaluate(()=>{
+    const layer=window.luma.editor.document.selectedLayer!.toJSON();
+    return layer.kind==="vector" ? layer.paths[0].points[199].x : null;
+  })).toBe(580);
+  expect(await page.evaluate(()=>(window as any).pointReads)).toBe(0);
+  await page.keyboard.press("Control+z");
+  await expect(page.getByText("8000 anchors",{exact:false})).toBeVisible();
+  const beforeCancel=await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()));
+  await page.mouse.move(box.x+590,box.y+290);
+  await page.mouse.down();
+  await page.mouse.move(box.x+570,box.y+270);
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+  expect(await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()))).toBe(beforeCancel);
+});

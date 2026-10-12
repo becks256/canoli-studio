@@ -1,3 +1,4 @@
+import { ColorInput } from "./ColorInput";
 import { RotateCcw } from "lucide-react";
 import type { BlendChannel, BlendRange, LayerStyleData } from "../core/drawing";
 import { defaultStyle } from "../core/drawing";
@@ -102,9 +103,11 @@ export function LayerStylesPanel({
   disabled,
   onPreview,
   onCommit,
+  onCancel,
 }: {
   value: LayerStyleData;
   disabled: boolean;
+  onCancel(): void;
   onPreview(value: LayerStyleData): void;
   onCommit(value: LayerStyleData): void;
 }) {
@@ -197,17 +200,13 @@ export function LayerStylesPanel({
             />
             Color overlay
           </label>
-          <input
-            type="color"
-            aria-label="Overlay color"
+          <ColorInput
+            label="Overlay color"
             value={value.colorOverlay.color}
             disabled={disabled || !value.colorOverlay.enabled}
-            onChange={(e) =>
-              onCommit({
-                ...value,
-                colorOverlay: { ...value.colorOverlay, color: e.target.value },
-              })
-            }
+            onPreview={color => onPreview({ ...value, colorOverlay: { ...value.colorOverlay, color } })}
+            onCommit={color => onCommit({ ...value, colorOverlay: { ...value.colorOverlay, color } })}
+            onCancel={onCancel}
           />
         </div>
         <Slider
@@ -251,17 +250,13 @@ export function LayerStylesPanel({
             />
             Drop shadow
           </label>
-          <input
-            type="color"
-            aria-label="Shadow color"
+          <ColorInput
+            label="Shadow color"
             value={value.dropShadow.color}
             disabled={disabled || !value.dropShadow.enabled}
-            onChange={(e) =>
-              onCommit({
-                ...value,
-                dropShadow: { ...value.dropShadow, color: e.target.value },
-              })
-            }
+            onPreview={color => onPreview({ ...value, dropShadow: { ...value.dropShadow, color } })}
+            onCommit={color => onCommit({ ...value, dropShadow: { ...value.dropShadow, color } })}
+            onCancel={onCancel}
           />
         </div>
         <div className="style-sliders">

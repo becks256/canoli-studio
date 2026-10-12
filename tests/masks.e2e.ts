@@ -820,7 +820,7 @@ test("painted-mask prefixes and active stamps are reused without changing previe
       increments: number[] = [],
       replayCounts: number[] = [];
     try {
-      for (const feather of [0, 9.5]) {
+      for (const feather of [0, 9.5]) for (const clipped of [false, true]) for (const mode of ["hide", "reveal"] as const) {
         renderer.clearCache();
         const doc = new Document({ width: 600, height: 90 });
         const group = doc.layers.add(new LayerGroup());
@@ -853,11 +853,12 @@ test("painted-mask prefixes and active stamps are reused without changing previe
           ],
           size: 38,
           opacity: 0.6,
-          clip,
+          hardness: 0.35,
+          ...(clipped ? { clip } : {}),
         });
-        let base = new LayerMask({ base: 1, feather })
-          .paint(finished, "hide")
-          .paint(live, "hide")
+        let base = new LayerMask({ base: mode === "hide" ? 1 : 0, feather })
+          .paint(finished, mode)
+          .paint(live, mode)
           .toJSON();
         if (base.kind !== "paint") throw Error("paint mask expected");
         const draw = async (cache = true) => {
@@ -918,9 +919,9 @@ test("painted-mask prefixes and active stamps are reused without changing previe
       renderer.dispose();
     }
   });
-  expect(result.differences).toEqual([0, 0, 0, 0]);
-  expect(result.increments).toEqual([1, 1]);
-  expect(result.replayCounts).toEqual([0, 0]);
+  expect(result.differences).toEqual(Array(16).fill(0));
+  expect(result.increments).toEqual(Array(8).fill(1));
+  expect(result.replayCounts).toEqual(Array(8).fill(0));
   expect(result.retained).toBeGreaterThan(0);
   expect(result.retained).toBeLessThanOrEqual(16 * 1024 * 1024);
   expect(result.cleared).toBe(0);
@@ -1243,6 +1244,9 @@ test("Pen mask target edits anchors and handles with keyboard, cancellation and 
   });
   await expect(insert).toBeDisabled();
   await page.mouse.click(box.x + 60, box.y + 60);
+  const controls = page.getByTestId("pen-controls");
+  await expect(controls.locator("rect").first()).toHaveAttribute("fill", "#d5e79b");
+  await expect(controls.locator("rect").nth(1)).toHaveAttribute("fill", "#202523");
   await insert.click();
   expect((await read()).count).toBe(5);
   expect((await read()).strokes).toBe(1);
@@ -1259,6 +1263,10 @@ test("Pen mask target edits anchors and handles with keyboard, cancellation and 
   };
   // Accumulated layer origin 25,15 plus mask offset 5,5.
   await drag([60, 60], [70, 65]);
+  await expect(controls.locator("rect").first()).toHaveAttribute("x", "66");
+  await expect(controls.locator("rect").first()).toHaveAttribute("y", "61");
+  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cx", "85");
+  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cy", "65");
   expect(await read()).toEqual(before);
   await page.mouse.up();
   expect(await read()).toEqual({
@@ -1271,10 +1279,14 @@ test("Pen mask target edits anchors and handles with keyboard, cancellation and 
   await page.keyboard.press("Control+Shift+z");
   const moved = await read();
   await drag([85, 65], [95, 75]);
+  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cx", "95");
+  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cy", "75");
   await page.keyboard.press("Escape");
   await page.mouse.up();
   expect(await read()).toEqual(moved);
   await drag([85, 65], [95, 75]);
+  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cx", "95");
+  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cy", "75");
   await page.mouse.up();
   expect((await read()).anchor).toEqual({
     x: 40,

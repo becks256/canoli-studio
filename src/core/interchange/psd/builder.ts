@@ -1,3 +1,4 @@
+import { blendColors } from "./blend";
 /**
  * Binary PSD builder: serializes Luma document and layer pixels into a valid,
  * specification-compliant Adobe Photoshop (8BPS) file.
@@ -279,24 +280,31 @@ export async function buildPsd(
         const outA = srcA + dstA * (1 - srcA);
 
         if (outA > 0) {
-          compPixels[dstIdx] = Math.round(
-            (lData[srcIdx] * srcA + compPixels[dstIdx] * dstA * (1 - srcA)) /
-              outA,
-          );
-          compPixels[dstIdx + 1] = Math.round(
-            (lData[srcIdx + 1] * srcA +
-              compPixels[dstIdx + 1] * dstA * (1 - srcA)) /
-              outA,
-          );
-          compPixels[dstIdx + 2] = Math.round(
-            (lData[srcIdx + 2] * srcA +
-              compPixels[dstIdx + 2] * dstA * (1 - srcA)) /
-              outA,
-          );
+          const source: [number, number, number] = [lData[srcIdx]/255, lData[srcIdx+1]/255, lData[srcIdx+2]/255];
+          const backdrop: [number, number, number] = [compPixels[dstIdx]/255, compPixels[dstIdx+1]/255, compPixels[dstIdx+2]/255];
+          const blended = blendColors(backdrop, source, l.blendMode);
+          for (let channel = 0; channel < 3; channel++) {
+            const premultiplied = srcA * ((1-dstA)*source[channel] + dstA*blended[channel]) +
+              dstA*(1-srcA)*backdrop[channel];
+            compPixels[dstIdx+channel] = Math.round(255*premultiplied/outA);
+          }
           compPixels[dstIdx + 3] = Math.round(outA * 255);
         }
       }
     }
+  }
+
+  // Compression is a file export option: apply it to the merged image as
+  // well as each layer. Raw composite data is channel-planar, not RGBA.
+  if (options.compression === "raw") {
+    writer.writeUint16(PsdCompression.Raw);
+    for (let channel = 0; channel < 4; channel++) {
+      const plane = new Uint8Array(width * height);
+      for (let pixel = 0; pixel < plane.length; pixel++)
+        plane[pixel] = compPixels[pixel * 4 + channel];
+      writer.writeBytes(plane);
+    }
+    return writer.getBuffer();
   }
 
   // Encode composite channels with PackBits

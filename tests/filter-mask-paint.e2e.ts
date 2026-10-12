@@ -246,3 +246,88 @@ test("eraser also commits valid hide refinements to ordinary masks", async ({
   });
   expect(result.filter.strokes ?? []).toHaveLength(0);
 });
+
+test("superseded filter-mask renders stop before processing another tile", async ({ page }) => {
+  await setup(page);
+  const result = await page.evaluate(async () => {
+    const { editor, LayerMask } = window.luma;
+    const { CanvasRenderer } = await import(/* @vite-ignore */ String("/src/engine/renderer.ts"));
+    const layer = editor.document.selectedLayer as InstanceType<typeof window.luma.SmartObjectLayer>;
+    layer.width = 800; layer.height = 600; layer.x = layer.y = 0;
+    editor.document.resize(800, 600);
+    layer.filterMask = new LayerMask({ base: 0, density: 0.5 });
+    const renderer = new CanvasRenderer();
+    let cancelled = false, calls = 0;
+    const original = renderer.processor.mixFilteredOwned.bind(renderer.processor);
+    renderer.processor.mixFilteredOwned = async (...args: Parameters<typeof original>) => {
+      calls++;
+      const pixels = await original(...args);
+      cancelled = true;
+      return pixels;
+    };
+    try {
+      await renderer.render(editor.document.getSnapshot().document, editor.assetStore, {
+        outputSize: { width: 800, height: 600 }, isCancelled: () => cancelled,
+      });
+      return { calls, error: "none" };
+    } catch (error) {
+      return { calls, error: (error as Error).name };
+    } finally { renderer.dispose(); }
+  });
+  expect(result).toEqual({ calls: 1, error: "AbortError" });
+});
+
+test("transient filter-mask preview matches committed coverage and leaves ordinary masks untouched", async ({ page }) => {
+  await setup(page);
+  await page.evaluate(() => {
+    const { editor, LayerMask } = window.luma;
+    editor.document.selectedLayer!.mask = new LayerMask({ base: 0.8 });
+  });
+  await page.getByRole("combobox", { name: "Paint target", exact: true }).selectOption("filter-mask-hide");
+  await page.getByRole("button", { name: "Brush tool (B)", exact: true }).click();
+  const box = (await page.locator(".canvas-wrap").boundingBox())!;
+  await page.mouse.move(box.x + 45, box.y + 40);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 70, box.y + 45, { steps: 8 });
+  const result = await page.evaluate(async () => {
+    const { editor } = window.luma;
+    const { CanvasRenderer } = await import(/* @vite-ignore */ String("/src/engine/renderer.ts"));
+    const { execute } = await import(/* @vite-ignore */ String("/src/core/commands.ts"));
+    const snapshot = editor.document.getSnapshot(), preview = editor.tools.getSnapshot().paintPreview!;
+    const layer = editor.document.selectedLayer as InstanceType<typeof window.luma.SmartObjectLayer>;
+    const mask = layer.filterMask!.toJSON();
+    const expected = execute(snapshot.document, { type: "smartObject.filterMask", id: layer.id,
+      mask: { ...mask, strokes: [...(mask.strokes ?? []), { mode: preview.maskMode!, stroke: preview.stroke }] } });
+    const renderer = new CanvasRenderer();
+    let fullWrites = 0;
+    const cache = renderer.cache;
+    const write = cache.write.bind(cache);
+    cache.write = (key: string, ...args: unknown[]) => {
+      if (key.startsWith("painted:filter-mask:") && key.endsWith(":full")) fullWrites++;
+      return write(key, ...args);
+    };
+    const pixels = async (document: typeof snapshot.document, active = false, cache = true) => {
+      const canvas = await renderer.render(document, editor.assetStore, { cache, readback: true, ...(active ? { paintPreview: preview } : {}) });
+      try { return Array.from(canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data); }
+      finally { canvas.width = canvas.height = 0; }
+    };
+    try {
+      const before = await pixels(snapshot.document);
+      const actual = await pixels(snapshot.document, true);
+      const previewFullWrites = fullWrites;
+      const reference = await pixels(expected, false, false);
+      const restored = await pixels(snapshot.document);
+      // A completed filtered tile can satisfy commit without rasterizing its mask.
+      // Clear it to exercise finished-mask retention itself.
+      renderer.clearCache();
+      await pixels(expected);
+      const committedFullWrites = fullWrites;
+      return { previewFullWrites, committedFullWrites, exact: actual.every((v, i) => v === reference[i]), changed: actual.some((v, i) => v !== before[i]), restored: restored.every((v, i) => v === before[i]), unchanged: editor.document.getSnapshot().revision === snapshot.revision, filterPreview: preview.filterMask, commandPreview: editor.tools.getSnapshot().preview };
+    } finally { renderer.dispose(); }
+  });
+  expect(result.previewFullWrites).toBe(0);
+  expect(result.committedFullWrites).toBeGreaterThan(0);
+  expect(result).toMatchObject({ exact: true, changed: true, restored: true, unchanged: true, filterPreview: true, commandPreview: null });
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+});

@@ -228,6 +228,11 @@ test("Chromium-enforced origin quota rejects checkpoints, preserves originals an
       await editor.importImage(
         new File([blob], "New artwork.png", { type: "image/png" }),
       );
+      // Large metadata takes the transferable worker persistence path.
+      const { PaintLayer, BrushStroke } = window.luma;
+      const paint = new PaintLayer({ visible: false });
+      paint.strokes.add(new BrushStroke({ points: Array.from({length: 10000}, (_, i) => ({x: i % 698, y: i % 396, pressure: 1})) }));
+      editor.document.layers.add(paint);
       editor.document.name = "Not yet checkpointed";
       await editor.recovery.flush();
       let errorName = "";

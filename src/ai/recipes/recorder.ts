@@ -425,12 +425,13 @@ export class RecipeRecorder {
         break;
       }
 
+      case "document.resizeImage":
       case "document.resize": {
         this.steps.push({
           id: `step-${id()}`,
-          name: `Resize Artboard`,
+          name: command.type === "document.resizeImage" ? "Resize Image" : "Resize Artboard",
           action: {
-            type: "document.resize",
+            type: command.type,
             width: command.width,
             height: command.height,
           },

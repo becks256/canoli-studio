@@ -13,6 +13,8 @@ export interface ComponentExpansionBudget {
   maxNodes?: number;
   maxDepth?: number;
   preserveFiltered?: boolean;
+  /** @internal Renderer-only read view; public defaults remain defensive. */
+  retainImmutable?: boolean;
 }
 /** Ephemeral render tree only. Never replace authored definitions with this expansion. */
 export function resolveSmartDocument(
@@ -28,7 +30,7 @@ export function resolveSmartDocument(
     )
   )
     throw new Error("Invalid component expansion budget.");
-  const document = registry.validatePlacements(input);
+  const document = budget.retainImmutable ? registry.validatedView(input) : registry.validatePlacements(input);
   const used = new Set<string>();
   const reserve = (layers: SmartLayerData[]) => {
     for (const layer of layers) {

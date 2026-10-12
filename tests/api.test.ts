@@ -307,7 +307,7 @@ it("round-trips authored metadata through REST with revision validation and undo
     ],
   });
   expect(changed.status).toBe(200);
-  expect(changed.body.document.schemaVersion).toBe(15);
+  expect(changed.body.document.schemaVersion).toBe(16);
   expect(changed.body.document.children[0].metadata).toEqual(metadata);
   const invalid = await request(path + "/commands", {
     expectedRevision: 1,
@@ -1036,7 +1036,7 @@ it("persists a linked image declaration through REST component commands and undo
     ],
   });
   expect(result.status).toBe(200);
-  expect(result.body.document.schemaVersion).toBe(15);
+  expect(result.body.document.schemaVersion).toBe(16);
   expect(result.body.document.components[0].source).toEqual(source);
   const undo = await request(path + "/undo", { expectedRevision: 1 });
   expect(undo.body.document.components).toBeUndefined();

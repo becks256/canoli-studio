@@ -1,5 +1,6 @@
+import { featherRegion } from "./feather-region";
 import { AffineTransform } from "../core/affine";
-import { maskGeometry } from "../core/masks";
+import { maskGeometrySignature } from "./mask-signature";
 import type { LayerMaskData } from "../core/masks";
 import type { PixelProcessor } from "./processor";
 import type { RenderSpace } from "./canvas";
@@ -72,16 +73,16 @@ export class PaintedMaskRaster {
     canCache: () => boolean,
     world = AffineTransform.translation(x, y),
     bitmap?: ImageBitmap | HTMLCanvasElement,
+    retainFull = true,
+    readback = false,
   ) {
     if (!mask.strokes?.length || !canCache())
       return paintedMask(mask, space, x, y, processor, world, bitmap);
     const location = JSON.stringify([space, world]);
     const cacheKey = `painted:${key}:${location}`;
     const prefix = mask.strokes.slice(0, -1);
-    const prefixSignature = JSON.stringify(
-      maskGeometry({ ...mask, strokes: prefix }),
-    );
-    let output = createCanvas(space.width, space.height);
+    const prefixSignature = maskGeometrySignature({ ...mask, strokes: prefix });
+    let output = createCanvas(space.width, space.height, readback);
     try {
       const cachedPrefix = this.cache.read(
         cacheKey + ":prefix",
@@ -123,10 +124,10 @@ export class PaintedMaskRaster {
         world,
       );
       if (active) this.appended += active.appendedPoints - before;
-      if (canCache())
+      if (canCache() && retainFull)
         this.cache.write(
           cacheKey + ":full",
-          JSON.stringify(maskGeometry(mask)),
+          maskGeometrySignature(mask),
           output,
         );
       return output;
@@ -140,6 +141,8 @@ interface MaskRetention {
   paint: PaintedMaskRaster;
   key: string;
   canCache(): boolean;
+  retainFull?: boolean;
+  readback?: boolean;
 }
 const rawCoverage = (
   mask: LayerMaskData,
@@ -163,6 +166,8 @@ const rawCoverage = (
           retention.canCache,
           world,
           bitmap,
+          retention.retainFull,
+          retention.readback,
         )
       : paintedMask(mask, space, x, y, processor, world, bitmap)
     : mask.kind === "selection"
@@ -223,6 +228,21 @@ export async function maskCoverage(
           width: width + haloX * 2,
           height: height + haloY * 2,
         };
+        if (mask.kind === "selection" && !mask.strokes?.length) {
+          const inverse = world.inverse();
+          const origin = inverse.point({ x: padded.x, y: padded.y });
+          const pixels = await processor.featheredSelection({
+            selection: mask.selection, width: padded.width, height: padded.height,
+            x: origin.x, y: origin.y,
+            stepX: inverse.a / padded.sx, stepY: inverse.d / padded.sy,
+            stepXY: inverse.c / padded.sy, stepYX: inverse.b / padded.sx,
+          }, radiusX, radiusY);
+          const image = context.createImageData(padded.width, padded.height);
+          image.data.set(pixels);
+          context.putImageData(image, left - haloX, top - haloY,
+            haloX, haloY, width, height);
+          continue;
+        }
         const source = await rawCoverage(
           mask,
           padded,
@@ -235,13 +255,17 @@ export async function maskCoverage(
         );
         try {
           const c = source.getContext("2d")!;
-          const softened = await processor.feather(
+          const region = featherRegion(
             c.getImageData(0, 0, padded.width, padded.height).data,
             { width: padded.width, height: padded.height, radiusX, radiusY },
           );
-          const image = c.createImageData(padded.width, padded.height);
-          image.data.set(softened);
-          c.putImageData(image, 0, 0);
+          if (region) {
+            const softened = await processor.feather(region.pixels,
+              { width: region.width, height: region.height, radiusX, radiusY });
+            const image = c.createImageData(region.width, region.height);
+            image.data.set(softened);
+            c.putImageData(image, region.x, region.y);
+          }
           context.drawImage(
             source,
             haloX,

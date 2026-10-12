@@ -21,6 +21,7 @@ export function AssetInfoPanel({
   service,
   analysis,
   layer,
+  hasAuthoredMetadata,
   document,
   disabled,
   onAttempt,
@@ -29,6 +30,7 @@ export function AssetInfoPanel({
   service: MetadataService;
   analysis?: AnalysisService;
   layer: Layer;
+  hasAuthoredMetadata: boolean;
   document?: Document;
   disabled: boolean;
   onAttempt(action: () => void): void;
@@ -119,7 +121,7 @@ export function AssetInfoPanel({
           }
         />
         <Button
-          disabled={disabled || !layer.toJSON().metadata}
+          disabled={disabled || !hasAuthoredMetadata}
           variant="subtle"
           onClick={() => onAttempt(() => layer.metadata.reset())}
         >

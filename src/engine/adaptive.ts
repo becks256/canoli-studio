@@ -1,3 +1,4 @@
+import { checkRenderCurrent } from "./render-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
 import { CanvasRenderer } from "./renderer";
@@ -28,10 +29,16 @@ export class AdaptiveRenderer extends CanvasRenderer {
     assets: AssetStore,
     options: RenderOptions = {},
   ): Promise<ViewportFrame> {
+    checkRenderCurrent(options.isCancelled);
     try {
       const gpu = await this.gpu.prepare(document, assets, options);
+      if (options.isCancelled?.()) {
+        gpu?.dispose();
+        checkRenderCurrent(options.isCancelled);
+      }
       if (gpu) return gpu;
     } catch {
+      checkRenderCurrent(options.isCancelled);
       // Device loss, failed context creation and driver errors are recoverable.
       this.gpu.clearCache();
     }
@@ -59,8 +66,8 @@ export class AdaptiveRenderer extends CanvasRenderer {
       },
     };
   }
-  override clearCache() {
-    super.clearCache();
+  override resetView() {
+    super.resetView();
     this.gpu.clearCache();
   }
   override dispose() {

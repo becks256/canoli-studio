@@ -9,6 +9,7 @@
     "start:api": "tsx server/index.ts",
     "build:runtime": "node scripts/build-scripting.mjs",
     "build:docs": "node --import tsx scripts/build-docs.mjs",
+    "build:seo-assets": "node scripts/generate-seo-assets.mjs",
     "build:engine": "npm run build:wasm && npm run build:runtime && npm run build:docs",
     "build:wasm": "asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
     "build": "npm run build:engine && tsc -b && vite build",

@@ -97,7 +97,7 @@ export function InspectorPanel({
     : undefined;
   const rotationPatch = (degrees: number) => {
     if (!selected) throw new Error("Select a layer to rotate.");
-    const snapshot = dom.toJSON();
+    const snapshot = dom.getSnapshot().document;
     const world = layerTransform(snapshot, selected.id)!;
     const bounds = layerBounds(snapshot, selected.id);
     if (!bounds) throw new Error("This layer has no geometry to rotate.");
@@ -184,6 +184,7 @@ export function InspectorPanel({
               service={assets.metadata}
               analysis={assets.analysis}
               layer={selectedObject}
+              hasAuthoredMetadata={!!selected.metadata}
               document={dom}
               disabled={locked || busy}
               onAttempt={onAttempt}
@@ -424,6 +425,8 @@ export function InspectorPanel({
           {selectedObject instanceof VectorLayer && (
             <PathProperties
               layer={selectedObject}
+              anchorCount={selected.kind === "vector" ?
+                (selected.paths.find(path => path.id === selectedPathId) ?? selected.paths.at(-1))?.points.length ?? 0 : 0}
               path={
                 selectedObject.paths.get(selectedPathId ?? "") ??
                 selectedObject.paths.at(selectedObject.paths.length - 1)
@@ -465,6 +468,8 @@ export function InspectorPanel({
             </InspectorSection>
           )}
           <LayerStylesPanel
+            key={selected.id}
+            onCancel={() => onPreview(null)}
             value={selected.styles ?? defaultStyle()}
             disabled={locked || busy}
             onPreview={(styles) =>

@@ -1,3 +1,6 @@
+import { persistRecovery, listRecoverySummaries, restoreRecovery } from "./recovery-persistence";
+import { encodeJsonData } from "./json-encoding";
+import { isImmutable } from "./immutable";
 import type { ProjectAssetSource } from "./project";
 import { referencedAssets, validateDocument } from "./model";
 import type { DocumentData } from "./model";
@@ -12,7 +15,14 @@ export interface RecoveryEntry {
   checksum?: string;
   previous?: RecoveryEntry[];
 }
-interface RecoveryAsset {
+export interface RecoveryRestoration { blob: Blob; savedAt: number; skipped: number }
+
+export interface RecoverySummary {
+  id: string;
+  savedAt: number;
+  document: Pick<DocumentData, "name" | "width" | "height">;
+}
+export interface RecoveryAsset {
   id: string;
   name: string;
   width: number;
@@ -25,17 +35,14 @@ const digest = async (bytes: BufferSource) =>
     new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
     (byte) => byte.toString(16).padStart(2, "0"),
   ).join("");
-const checkpointDigest = (entry: RecoveryEntry) =>
-  digest(
-    new TextEncoder().encode(
-      JSON.stringify({
-        id: entry.id,
-        document: entry.document,
-        savedAt: entry.savedAt,
-        assetKeys: entry.assetKeys,
-      }),
-    ),
-  );
+const checkpointBytes = (entry: RecoveryEntry) =>
+  encodeJsonData({
+    id: entry.id,
+    document: entry.document,
+    savedAt: entry.savedAt,
+    assetKeys: entry.assetKeys,
+  });
+const checkpointDigest = async (entry: RecoveryEntry) => digest(await checkpointBytes(entry));
 const blobHashes = new WeakMap<Blob, Promise<string>>();
 function blobDigest(blob: Blob): Promise<string> {
   let hash = blobHashes.get(blob);
@@ -124,13 +131,40 @@ export class RecoveryRepository {
     ).sort((a, b) => b.savedAt - a.savedAt);
   }
 
+  /** Lightweight display data; full documents stay off the UI thread. */
+  summaries(): Promise<RecoverySummary[]> {
+    return typeof Worker !== "undefined" ? listRecoverySummaries() : this.readSummaries();
+  }
+
+  /** @internal Cursor bounds retained memory to one checkpoint plus display records. */
+  async readSummaries(): Promise<RecoverySummary[]> {
+    const db = await this.open();
+    const tx = db.transaction("checkpoints", "readonly");
+    const done = complete(tx);
+    const summaries: RecoverySummary[] = [];
+    const cursor = tx.objectStore("checkpoints").openCursor();
+    cursor.onsuccess = () => {
+      const row = cursor.result;
+      if (!row) return;
+      const entry = row.value as RecoveryEntry;
+      summaries.push({ id: entry.id, savedAt: entry.savedAt, document: {
+        name: entry.document.name, width: entry.document.width, height: entry.document.height,
+      } });
+      row.continue();
+    };
+    await done;
+    return summaries.sort((a, b) => b.savedAt - a.savedAt);
+  }
+
   async save(
     id: string,
     document: DocumentData,
     assets: ProjectAssetSource,
   ): Promise<number> {
     validateDocument(document);
-    document = structuredClone(document);
+    // Store-owned revisions already remain stable across awaits and later edits.
+    // External callers still require an owned snapshot, even if shallow-frozen.
+    if (!isImmutable(document)) document = structuredClone(document);
     // Capture original blobs before yielding: switching documents can dispose the live store.
     const originals = [...referencedAssets(document)].map((assetId) => {
       const asset = assets.get(assetId);
@@ -157,7 +191,17 @@ export class RecoveryRepository {
       assetKeys,
       savedAt,
     };
-    entry.checksum = await checkpointDigest(entry);
+    const bytes = await checkpointBytes(entry);
+    entry.checksum = await digest(bytes);
+    // Transfer the existing encoding, never clone the large document graph on the UI thread.
+    if (bytes.byteLength >= 256 * 1024 && typeof Worker !== "undefined")
+      return persistRecovery(bytes, entry.checksum, checked);
+    return this.persist(entry, checked);
+  }
+
+  /** @internal Shared atomic storage path for the UI and persistence worker. */
+  async persist(entry: RecoveryEntry, checked: RecoveryAsset[]): Promise<number> {
+    const { id, assetKeys, savedAt } = entry;
     const db = await this.open();
     const tx = db.transaction(["checkpoints", "assets"], "readwrite", {
       durability: "strict",
@@ -196,9 +240,12 @@ export class RecoveryRepository {
     return (await this.restore(id)).blob;
   }
 
-  async restore(
-    id: string,
-  ): Promise<{ blob: Blob; savedAt: number; skipped: number }> {
+  restore(id: string): Promise<RecoveryRestoration> {
+    return typeof Worker !== "undefined" ? restoreRecovery(id) : this.readRestoration(id);
+  }
+
+  /** @internal Integrity checks and project encoding execute within the recovery worker. */
+  async readRestoration(id: string): Promise<RecoveryRestoration> {
     const db = await this.open();
     const tx = db.transaction(["checkpoints", "assets"], "readonly");
     const done = complete(tx);

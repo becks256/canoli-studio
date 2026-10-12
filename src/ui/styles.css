@@ -383,6 +383,9 @@ select {
   border-radius: var(--radius-sm);
   background: var(--color-app);
 }
+.pixel-thumb {
+  background: repeating-conic-gradient(var(--color-app) 0% 25%, var(--color-panel) 0% 50%) 50% / 8px 8px;
+}
 .group-thumb {
   display: grid;
   place-items: center;
@@ -1584,6 +1587,8 @@ input[type="color"] {
   gap: 10px;
 }
 .drawing-overlay {
+  /* This inert subtree must not inherit cursor changes across thousands of handles. */
+  cursor: default;
   position: absolute;
   inset: 0;
   overflow: visible;
@@ -6105,4 +6110,29 @@ input[type="color"] {
 }
 .panel-resize-handle[aria-disabled="true"] {
   cursor: default;
+}
+
+/* App-drawn cursor dimensions stay in CSS pixels regardless of OS pointer size. */
+.viewport[data-custom-cursor-active],
+.viewport[data-custom-cursor-active] :is([data-handle], [data-crop-handle], [data-rotate], .crop-frame, .document-guide) { cursor: none !important; }
+.canvas-custom-cursor {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  pointer-events: none;
+  will-change: transform;
+}
+.canvas-custom-cursor svg { display: block; overflow: visible; }
+
+.export-progress {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+}
+.export-progress progress {
+  width: 100%;
+  accent-color: var(--color-accent);
 }

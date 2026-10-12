@@ -3,7 +3,7 @@ import { StorageHealthPanel } from "./StorageHealthPanel";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { X } from "lucide-react";
 import type { EditorApplication } from "../editor";
-import type { RecoveryEntry } from "../core/recovery";
+import type { RecoverySummary } from "../core/recovery";
 import type { AutomaticWorkspaceEntry } from "../workspace/repository";
 import { download, fileName } from "./utils";
 import { Dialog } from "./Dialog";
@@ -32,7 +32,7 @@ export function RecoveryPanel({
   const [restoreOnStartup, setRestoreOnStartup] = useState(
     editor.workspaceRepository.restoreOnStartup,
   );
-  const [entries, setEntries] = useState<RecoveryEntry[]>([]);
+  const [entries, setEntries] = useState<RecoverySummary[]>([]);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -60,7 +60,7 @@ export function RecoveryPanel({
       });
     editor.recovery
       .flush()
-      .then(() => editor.recovery.repository.list())
+      .then(() => editor.recovery.repository.summaries())
       .then((value) => {
         if (active) setEntries(value);
       })
@@ -74,7 +74,7 @@ export function RecoveryPanel({
       active = false;
     };
   }, [editor]);
-  async function restore(entry: RecoveryEntry) {
+  async function restore(entry: RecoverySummary) {
     setBusy(true);
     try {
       await editor.recovery.flush();
@@ -129,7 +129,7 @@ export function RecoveryPanel({
               setError("");
               try {
                 await editor.recovery.flush();
-                setEntries(await editor.recovery.repository.list());
+                setEntries(await editor.recovery.repository.summaries());
               } catch (cause) {
                 setError(storageErrorMessage(cause));
               } finally {
@@ -442,7 +442,7 @@ export function RecoveryPanel({
                   setBusy(true);
                   try {
                     await editor.recovery.repository.remove(entry.id);
-                    setEntries(await editor.recovery.repository.list());
+                    setEntries(await editor.recovery.repository.summaries());
                     setRemoveId(null);
                   } catch (cause) {
                     setError(storageErrorMessage(cause));

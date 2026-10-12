@@ -1,15 +1,9 @@
 import { changesCanvasSpace, describe, execute } from "./commands";
 import type { EditorCommand } from "./commands";
-import { createDocument, findLayer, validateDocument } from "./model";
+import { createDocument, findLayer, validateDocument, SCHEMA_VERSION } from "./model";
 import type { DocumentData } from "./model";
 import { parseRetainedHistory, type HistoryEntry } from "./history";
-function freeze<T>(value: T): T {
-  if (value && typeof value === "object" && !Object.isFrozen(value)) {
-    Object.values(value).forEach(freeze);
-    Object.freeze(value);
-  }
-  return value;
-}
+import { freeze, shareUnchanged, isImmutable } from "./immutable";
 export interface EditorState {
   document: DocumentData;
   selectedId: string | null;
@@ -24,18 +18,39 @@ export class EditorStore {
   private listeners = new Set<() => void>();
   private state: EditorState;
 
-  constructor(document = createDocument(), history?: unknown) {
-    validateDocument(document);
+  constructor(
+    document: unknown = createDocument(),
+    history?: unknown,
+    options: { migrateSchema?: boolean } = {},
+  ) {
+    // Validate the exact owned snapshot, before migration. Getter-backed input
+    // cannot change between validation and the copy installed in the store.
+    // Only registry-proven deep immutability permits sharing caller data.
+    // Migration owns a new root; mutable and shallow-frozen inputs remain copied.
+    const owned = isImmutable(document)
+      ? options.migrateSchema ? { ...document } : document
+      : structuredClone(document);
+    validateDocument(owned);
     const retained =
       history === undefined
         ? { past: [], future: [] }
-        : parseRetainedHistory(history, document);
+        : parseRetainedHistory(history, owned);
+    if (options.migrateSchema) owned.schemaVersion = SCHEMA_VERSION;
+    const current = freeze(owned);
+    const intern = (entries: HistoryEntry[]) => {
+      let previous = current;
+      return [...entries].reverse().map(entry => {
+        const document = freeze(shareUnchanged(previous, entry.document));
+        previous = document;
+        return { ...entry, document };
+      }).reverse();
+    };
     this.state = {
-      document: freeze(structuredClone(document)),
+      document: current,
       selectedId: null,
       selectedIds: Object.freeze([]),
-      past: freeze(retained.past),
-      future: freeze(retained.future),
+      past: freeze(intern(retained.past)),
+      future: freeze(intern(retained.future)),
       revision: 0,
       canvasRevision: 0,
     };
@@ -84,7 +99,7 @@ export class EditorStore {
 
   dispatch(command: EditorCommand) {
     const document = execute(this.state.document, command);
-    if (JSON.stringify(document) === JSON.stringify(this.state.document))
+    if (document === this.state.document)
       return;
     this.publish({
       ...this.state,

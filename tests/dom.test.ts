@@ -462,3 +462,125 @@ describe("image resolution is not a product limit", () => {
     expect(duplicate.id).not.toBe(textLayer.id);
   });
 });
+
+it('transactions retain unchanged drawing data and leave earlier stages stable',()=>{
+ const document=new Document();
+ const first=document.layers.add(new PaintLayer()),second=document.layers.add(new PaintLayer());
+ first.strokes.add(new BrushStroke({points:[{x:0,y:0},{x:100,y:80}],size:20}));
+ const before=document.getSnapshot(),strokes=(before.document.children[0] as import('../src/core/model').PaintLayerData).strokes;
+ document.transaction('Move two layers',()=>{
+  first.x=10;
+  const earlier=document._read();
+  second.y=20;
+  const later=document._read();
+  expect((later.children[0] as import('../src/core/model').PaintLayerData).strokes).toBe(strokes);
+  expect(earlier.children[1].y).toBe(0);
+  expect(later.children[1].y).toBe(20);
+  expect(document.getSnapshot().document).toBe(before.document);
+ });
+ expect(document.getSnapshot().past.length).toBe(before.past.length+1);
+ document.undo();expect(document.toJSON()).toEqual(before.document);
+ document.redo();expect([first.x,second.y]).toEqual([10,20]);
+ const committed=document.toJSON();
+ expect(()=>document.transaction('Rollback',()=>{first.x=50;second.opacity=2;})).toThrow();
+ expect(document.toJSON()).toEqual(committed);
+});
+
+
+it("fromJSON owns nested data without freezing or modifying the source", () => {
+  const original = new Document();
+  const layer = original.layers.add(new PaintLayer());
+  layer.strokes.add(new BrushStroke({size:8,points:[{x:10,y:20,pressure:1}]}));
+  const data = original.toJSON();
+  const restored = Document.fromJSON(data);
+  const expected = restored.toJSON();
+  const sourceLayer = data.children[0];
+  if (sourceLayer.kind !== "paint" || sourceLayer.strokes[0].kind !== "brush") throw Error("fixture");
+  expect(Object.isFrozen(sourceLayer.strokes[0].points[0])).toBe(false);
+  sourceLayer.strokes[0].points[0].x = 999;
+  sourceLayer.strokes[0].size = 200;
+  sourceLayer.name = "External change";
+  expect(restored.toJSON()).toEqual(expected);
+  restored.layers.at(0)!.name = "Owned edit";
+  restored.undo();
+  expect(restored.toJSON()).toEqual(expected);
+  expect(sourceLayer.name).toBe("External change");
+  expect(() => Document.fromJSON({...data,children:[{...sourceLayer,
+    strokes:[{...sourceLayer.strokes[0],size:-1}],
+  }]})).toThrow();
+  expect(restored.selectedLayer).toBeNull();
+});
+
+it("fromJSON validates legacy metadata before migration and leaves its version intact", () => {
+  const data = new Document().toJSON();
+  data.schemaVersion = 1;
+  const restored = Document.fromJSON(data);
+  expect(data.schemaVersion).toBe(1);
+  expect(restored.toJSON().schemaVersion).toBe(new Document().toJSON().schemaVersion);
+  expect(restored.getSnapshot().past).toHaveLength(0);
+  expect(() => Document.fromJSON({...data,width:0})).toThrow();
+  expect(() => Document.fromJSON({...data,schemaVersion:999})).toThrow();
+  expect(() => Document.fromJSON({...data,guides:[]})).toThrow(/guides/);
+});
+
+it("restored layer handles retain live ownership through transactions, copies, removal and undo", () => {
+  const source = new Document();
+  const group = source.layers.add(new LayerGroup());
+  const paint = group.layers.add(new PaintLayer());
+  paint.strokes.add(new BrushStroke({points:[{x:1,y:2,pressure:1},{x:3,y:4,pressure:1}]}));
+  const restored = Document.fromJSON(source.toJSON());
+  const handle = restored.getLayer(paint.id) as PaintLayer;
+  const groupHandle = restored.getLayer(group.id) as LayerGroup;
+  expect(groupHandle.layers.at(0)).toBe(handle);
+  const snapshot = restored.getSnapshot().document;
+  restored.transaction("Edit restored handle", () => {
+    handle.name = "Edited";
+    expect(handle.name).toBe("Edited");
+    expect(restored.getLayer(paint.id)).toBe(handle);
+  });
+  expect(snapshot.children[0]).toEqual(source.getSnapshot().document.children[0]);
+  const copy = handle.toJSON();
+  if (copy.kind !== "paint") throw new Error("Expected paint");
+  copy.strokes.length = 0;
+  expect(handle.strokes.length).toBe(1);
+  const duplicate = handle.duplicate() as PaintLayer;
+  duplicate.name = "Independent";
+  expect(handle.name).toBe("Edited");
+  groupHandle.remove();
+  expect(() => handle.name).toThrow(/current document revision/);
+  restored.undo();
+  expect(restored.getLayer(paint.id)).toBe(handle);
+  expect(handle.name).toBe("Edited");
+  expect(handle.strokes.length).toBe(1);
+});
+
+it("restored path handles preserve live data, returned-copy ownership and undo", () => {
+  const source = new Document();
+  const vector = source.layers.add(new VectorLayer());
+  vector.paths.add(new VectorPath({points:[{x:1,y:2},{x:30,y:40}]}));
+  const restored = Document.fromJSON(source.toJSON());
+  const owner = restored.layers.at(0) as VectorLayer;
+  const path = owner.paths.at(0)!;
+  const original = restored.getSnapshot().document;
+  const points = path.points;
+  points[0].in.x = 999;
+  const json = path.toJSON();
+  json.points[0].x = 999;
+  expect(path.points[0]).toMatchObject({x:1,in:{x:1,y:2}});
+  restored.transaction("Edit restored path", () => {
+    path.update({points:[{...path.points[0],x:5},path.points[1]]});
+    expect(owner.paths.get(path.id)).toBe(path);
+    expect(path.points[0].x).toBe(5);
+  });
+  expect(original.children[0]).toEqual(source.getSnapshot().document.children[0]);
+  restored.undo();
+  expect(path.points[0].x).toBe(1);
+  path.remove();
+  expect(() => path.points).toThrow(/current document revision/);
+  restored.undo();
+  expect(owner.paths.get(path.id)).toBe(path);
+  expect(path.points[0].x).toBe(1);
+  const copiedLayer = owner.duplicate() as VectorLayer;
+  copiedLayer.paths.at(0)!.stroke = "#ff0000";
+  expect(path.stroke).not.toBe("#ff0000");
+});

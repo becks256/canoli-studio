@@ -1,3 +1,5 @@
+import { useSelectionOutlines } from "./hooks/useSelectionOutlines";
+import { memo, useSyncExternalStore } from "react";
 import type { DocumentData, LayerData } from "../core/model";
 import type { Point } from "../core/drawing";
 import { maskTransform } from "../core/masks";
@@ -10,15 +12,21 @@ export function CanvasOverlays({
   tool,
   zoom,
   controller,
-  cursor,
+  cursorStore,
+  showBrushCursor = true,
+  onError,
 }: {
   document: DocumentData;
   selected?: LayerData;
   tool: Tool;
   zoom: number;
   controller: ToolController;
-  cursor: Point | null;
+  showBrushCursor?: boolean;
+  onError?(message: string): void;
+  cursorStore: { getSnapshot(): Point | null; subscribe(listener: () => void): () => void };
 }) {
+  const selectionOutlines = useSelectionOutlines(document.selection, onError);
+  const cursor = useSyncExternalStore(cursorStore.subscribe, cursorStore.getSnapshot);
   const state = controller.getSnapshot();
   const world = selected ? layerTransform(document, selected.id) : null;
   const pending = controller.pendingStroke;
@@ -33,18 +41,6 @@ export function CanvasOverlays({
     : selected?.kind === "vector"
       ? selected.paths
       : [];
-  // Transform geometry, not the SVG control group: handles retain screen size.
-  const paths = pathTransform
-    ? localPaths.map((path) => ({
-        ...path,
-        points: path.points.map((point) => ({
-          ...point,
-          ...pathTransform.point(point),
-          in: pathTransform.point(point.in),
-          out: pathTransform.point(point.out),
-        })),
-      }))
-    : [];
   const selectedAnchor = controller.selectedMaskAnchor;
   return (
     <svg
@@ -66,8 +62,14 @@ export function CanvasOverlays({
           <rect width={4 / zoom} height={8 / zoom} fill="#152019" />
         </pattern>
       </defs>
+      {state.lassoPoints && <path data-testid="lasso-preview" d={state.lassoPoints.map((p,i)=>`${i ? "L" : "M"}${p.x} ${p.y}`).join(" ")+" Z"} fill="none" stroke="url(#selection-hatch)" strokeWidth={1.5/zoom} strokeDasharray={`${5/zoom} ${3/zoom}`} />}
       {document.selection?.regions.map((r, index) =>
-        r.shape === "rectangle" ? (
+        r.shape === "pixels" ? (
+          <g key={index} transform={r.transform ? `matrix(${r.transform.a} ${r.transform.b} ${r.transform.c} ${r.transform.d} ${r.transform.e} ${r.transform.f})` : undefined}>
+            <path data-testid="pixel-selection-outline" d={selectionOutlines[index] ?? ""} transform={`translate(${r.x} ${r.y}) scale(${r.width/r.coverage!.width} ${r.height/r.coverage!.height})`}
+              fill="none" stroke={r.operation === "subtract" ? "#f5aea0" : "url(#selection-hatch)"} strokeWidth={1.5 / zoom} strokeDasharray={`${5/zoom} ${3/zoom}`} />
+          </g>
+        ) : r.shape === "rectangle" ? (
           <rect
             key={index}
             transform={
@@ -150,7 +152,10 @@ export function CanvasOverlays({
                   : undefined
               }
             >
-              {r.shape === "rectangle" ? (
+              {r.shape === "pixels" ? (
+                <path d={selectionOutlines[index] ?? ""} transform={`translate(${r.x} ${r.y}) scale(${r.width/r.coverage!.width} ${r.height/r.coverage!.height})`}
+                  fill="none" stroke="var(--color-accent)" strokeWidth={2/zoom} />
+              ) : r.shape === "rectangle" ? (
                 <rect
                   x={r.x}
                   y={r.y}
@@ -177,81 +182,18 @@ export function CanvasOverlays({
           ))}
         </g>
       )}
-      {tool === "pen" && pathTransform && paths.length > 0 && (
+      {tool === "pen" && pathTransform && localPaths.length > 0 && (
         <g data-testid="pen-controls">
-          {editingMask &&
-            paths.map((path, pathIndex) => (
-              <path
-                key={`outline-${path.id}`}
-                fill="none"
-                stroke="#d5e79b"
-                strokeWidth={1 / zoom}
-                strokeDasharray={
-                  pathIndex === controller.maskContourIndex
-                    ? `${4 / zoom} ${3 / zoom}`
-                    : undefined
-                }
-                d={
-                  `M ${path.points[0].x} ${path.points[0].y} ` +
-                  path.points
-                    .map((p, i) => {
-                      const next = path.points[(i + 1) % path.points.length];
-                      return `C ${p.out.x} ${p.out.y} ${next.in.x} ${next.in.y} ${next.x} ${next.y}`;
-                    })
-                    .join(" ") +
-                  " Z"
-                }
-              />
-            ))}
-          {paths.flatMap((path, pathIndex) =>
-            path.points.map((p, index) => (
-              <g key={`${path.id}:${index}`}>
-                <line
-                  x1={p.in.x}
-                  y1={p.in.y}
-                  x2={p.out.x}
-                  y2={p.out.y}
-                  stroke="#d5e79b"
-                  strokeWidth={1 / zoom}
-                />
-                <circle
-                  cx={p.in.x}
-                  cy={p.in.y}
-                  r={3 / zoom}
-                  fill="#202523"
-                  stroke="#d5e79b"
-                  strokeWidth={1 / zoom}
-                />
-                <circle
-                  cx={p.out.x}
-                  cy={p.out.y}
-                  r={3 / zoom}
-                  fill="#202523"
-                  stroke="#d5e79b"
-                  strokeWidth={1 / zoom}
-                />
-                <rect
-                  x={p.x - 4 / zoom}
-                  y={p.y - 4 / zoom}
-                  width={8 / zoom}
-                  height={8 / zoom}
-                  fill={
-                    (
-                      editingMask
-                        ? selectedAnchor?.layerId === selected?.id &&
-                          selectedAnchor?.pathIndex === pathIndex &&
-                          selectedAnchor?.index === index
-                        : index === 0
-                    )
-                      ? "#d5e79b"
-                      : "#202523"
-                  }
-                  stroke="#d5e79b"
-                  strokeWidth={1 / zoom}
-                />
-              </g>
-            )),
-          )}
+          {localPaths.map((path, pathIndex) => (
+            <PenPathControls key={path.id} points={path.points}
+              a={pathTransform.a} b={pathTransform.b} c={pathTransform.c}
+              d={pathTransform.d} e={pathTransform.e} f={pathTransform.f}
+              zoom={zoom} outline={editingMask}
+              contour={pathIndex === controller.maskContourIndex}
+              active={editingMask ? (selectedAnchor?.layerId === selected?.id &&
+                selectedAnchor?.pathIndex === pathIndex ? selectedAnchor.index : -1) : 0}
+            />
+          ))}
         </g>
       )}
       {tool === "clone" && state.cloneSource && (
@@ -278,8 +220,8 @@ export function CanvasOverlays({
           strokeLinejoin="round"
         />
       )}
-      {cursor &&
-        ["brush", "pencil", "clone", "heal", "dodge", "burn"].includes(
+      {showBrushCursor && cursor &&
+        ["brush", "pencil", "eraser", "clone", "heal", "dodge", "burn"].includes(
           tool,
         ) && (
           <g>
@@ -304,3 +246,62 @@ export function CanvasOverlays({
     </svg>
   );
 }
+
+
+// Numeric props let unchanged controls skip SVG reconciliation even when a
+// preview reconstructs the path DTOs or the cursor publishes a new position.
+// Compare fields directly to avoid two Object.keys arrays per anchor update.
+const PenAnchor = memo(function PenAnchor({
+  x, y, inX, inY, outX, outY, zoom, active,
+}: {
+  x: number; y: number; inX: number; inY: number;
+  outX: number; outY: number; zoom: number; active: boolean;
+}) {
+  return <g>
+    <line x1={inX} y1={inY} x2={outX} y2={outY} stroke="#d5e79b" strokeWidth={1 / zoom} />
+    <circle cx={inX} cy={inY} r={3 / zoom} fill="#202523" stroke="#d5e79b" strokeWidth={1 / zoom} />
+    <circle cx={outX} cy={outY} r={3 / zoom} fill="#202523" stroke="#d5e79b" strokeWidth={1 / zoom} />
+    <rect x={x - 4 / zoom} y={y - 4 / zoom} width={8 / zoom} height={8 / zoom}
+      fill={active ? "#d5e79b" : "#202523"} stroke="#d5e79b" strokeWidth={1 / zoom} />
+  </g>;
+}, (previous, next) =>
+  previous.x === next.x && previous.y === next.y &&
+  previous.inX === next.inX && previous.inY === next.inY &&
+  previous.outX === next.outX && previous.outY === next.outY &&
+  previous.zoom === next.zoom && previous.active === next.active,
+);
+
+
+type PenPathProps = {
+  points: readonly { x: number; y: number; in: Point; out: Point }[];
+  a: number; b: number; c: number; d: number; e: number; f: number;
+  zoom: number; outline: boolean; contour: boolean; active: number;
+};
+const PenPathControls = memo(function PenPathControls(props: PenPathProps) {
+  const { a, b, c, d, e, f, zoom, outline, contour, active } = props;
+  const coordinate = (p: Point) => `${a*p.x+c*p.y+e} ${b*p.x+d*p.y+f}`;
+  const points = props.points;
+  return <g>
+    {outline && points.length > 0 && <path fill="none" stroke="#d5e79b"
+      strokeWidth={1/zoom} strokeDasharray={contour ? `${4/zoom} ${3/zoom}` : undefined}
+      d={`M ${coordinate(points[0])} ` + points.map((p,i) => {
+        const next = points[(i+1)%points.length];
+        return `C ${coordinate(p.out)} ${coordinate(next.in)} ${coordinate(next)}`;
+      }).join(" ") + " Z"} />}
+    {points.map((point,index) => <PenAnchor key={index} x={a*point.x+c*point.y+e} y={b*point.x+d*point.y+f}
+      inX={a*point.in.x+c*point.in.y+e} inY={b*point.in.x+d*point.in.y+f}
+      outX={a*point.out.x+c*point.out.y+e} outY={b*point.out.x+d*point.out.y+f}
+      zoom={zoom} active={index===active} />)}
+  </g>;
+}, (previous, next) => {
+  if (previous.a!==next.a || previous.b!==next.b || previous.c!==next.c ||
+      previous.d!==next.d || previous.e!==next.e || previous.f!==next.f ||
+      previous.zoom!==next.zoom || previous.outline!==next.outline ||
+      previous.contour!==next.contour || previous.active!==next.active) return false;
+  if (previous.points===next.points) return true;
+  return previous.points.length===next.points.length && previous.points.every((p,i) => {
+    const q=next.points[i];
+    return p.x===q.x && p.y===q.y && p.in.x===q.in.x && p.in.y===q.in.y &&
+      p.out.x===q.out.x && p.out.y===q.out.y;
+  });
+});

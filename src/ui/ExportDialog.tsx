@@ -1,5 +1,6 @@
+import type { ExportControl, ExportProgress } from "../engine/export-control";
 import { exportFontFamilies, fontAvailability } from "./font-availability";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Dialog } from "./Dialog";
 import { Button, IconButton, Select, Slider, ColorField } from "./controls";
 import { AlertTriangle, CheckCircle, Info, X } from "lucide-react";
@@ -9,7 +10,7 @@ import { getExportCapabilityReport } from "../engine/export";
 
 export interface ExportDialogProps {
   document: DocumentData;
-  onExport(options: ExportOptions): Promise<void>;
+  onExport(options: ExportOptions, control?: ExportControl): Promise<void>;
   onClose(): void;
   busy?: boolean;
 }
@@ -24,6 +25,10 @@ export function ExportDialog({
   const [quality, setQuality] = useState(90);
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const [exporting, setExporting] = useState(false);
+  const [progress, setProgress] = useState<ExportProgress | null>(null);
+  const controller = useRef<AbortController | null>(null);
+  useEffect(() => () => controller.current?.abort(), []);
+  const dismiss = () => { controller.current?.abort(); onClose(); };
   const fontKey = JSON.stringify(exportFontFamilies(document));
   const [fontReport, setFontReport] = useState<{
     key: string;
@@ -76,15 +81,19 @@ export function ExportDialog({
   }, [document, format, quality, backgroundColor]);
 
   const handleExport = async () => {
+    const run = new AbortController();
+    controller.current = run;
+    setProgress(null);
     setExporting(true);
     try {
       await onExport({
         format,
         quality: quality / 100,
         backgroundColor,
-      });
-      onClose();
+      }, {signal:run.signal,onProgress:setProgress});
+      if (!run.signal.aborted) onClose();
     } finally {
+      controller.current = null;
       setExporting(false);
     }
   };
@@ -94,15 +103,15 @@ export function ExportDialog({
   return (
     <Dialog
       titleId="export-dialog-title"
-      onClose={onClose}
+      onClose={dismiss}
       className="export-dialog"
     >
       <div className="dialog-header">
         <h2 id="export-dialog-title">Export Document</h2>
         <IconButton
           label="Close"
-          onClick={onClose}
-          disabled={busy || exporting}
+          onClick={dismiss}
+          disabled={busy && !exporting}
         >
           <X size={18} />
         </IconButton>
@@ -223,11 +232,15 @@ export function ExportDialog({
         </div>
       </div>
 
+      {exporting && <div className="export-progress" role="status" aria-live="polite">
+        <span>{progress?.phase === 'encoding' ? 'Encoding file…' : 'Rendering image…'}</span>
+        <progress aria-label="Export progress" max={1} value={progress?.fraction ?? undefined} />
+      </div>}
       <div className="dialog-footer export-dialog-footer">
         <Button
           variant="secondary"
-          onClick={onClose}
-          disabled={busy || exporting}
+          onClick={() => exporting ? controller.current?.abort() : onClose()}
+          disabled={busy && !exporting}
         >
           Cancel
         </Button>

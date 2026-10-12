@@ -1,6 +1,7 @@
+import { freezeOwnedData } from "./immutable";
 import { AssetStore } from "./assets";
 import type { SerializedAsset, ImageAsset } from "./assets";
-import { allLayers, referencedAssets, validateDocument } from "./model";
+import { allLayers, referencedAssets, validateDocument, validateDocumentCooperatively } from "./model";
 import type { DocumentData } from "./model";
 import { parseRetainedHistory, type RetainedHistory } from "./history";
 
@@ -127,7 +128,8 @@ export async function serializeProject(
   return new Blob([header, json, ...blobs], { type: "application/x-luma" });
 }
 
-export async function readProject(file: Blob): Promise<{
+/** Internal editing preparation is opt-in; ordinary readers retain mutable owned data. */
+export async function readProject(file: Blob, options: { prepareImmutable?: boolean } = {}): Promise<{
   document: DocumentData;
   history?: RetainedHistory;
   entries: {
@@ -154,6 +156,10 @@ export async function readProject(file: Blob): Promise<{
         blob: await (await fetch(entry.dataUrl)).blob(),
       })),
     );
+    if (options.prepareImmutable) {
+      await freezeOwnedData(legacy.document);
+      await validateDocumentCooperatively(legacy.document);
+    }
     return { document: legacy.document, entries };
   }
   if (header.byteLength !== 16)
@@ -184,7 +190,10 @@ export async function readProject(file: Blob): Promise<{
     !Array.isArray(manifest.assets)
   )
     throw new Error("Unsupported project manifest.");
-  validateDocument(manifest.document);
+  if (options.prepareImmutable) {
+    await freezeOwnedData(manifest.document);
+    await validateDocumentCooperatively(manifest.document);
+  } else validateDocument(manifest.document);
   if (manifest.history !== undefined && !version3)
     throw new Error(
       "Retained history requires a checksummed project container.",
@@ -300,6 +309,7 @@ export function parseProject(text: string): ProjectFile {
 
 export async function loadProject(
   input: string | Blob,
+  options: { prepareImmutable?: boolean } = {},
 ): Promise<{
   document: DocumentData;
   assets: AssetStore;
@@ -307,6 +317,7 @@ export async function loadProject(
 }> {
   const project = await readProject(
     typeof input === "string" ? new Blob([input]) : input,
+    options,
   );
   const assets = new AssetStore();
   const rasterAssets = new Set(

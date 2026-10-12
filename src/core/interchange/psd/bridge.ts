@@ -146,6 +146,8 @@ export async function documentToPsd(
   for (const child of document.children) {
     if (child.kind === "raster") {
       const raster = child as RasterLayerData;
+      if (raster.erasures?.length)
+        throw new Error("PSD export cannot preserve raster erasures yet. Save a Luma project or export PNG to retain the edited pixels.");
       const img = await assetResolver(raster.assetId);
       if (img) {
         layersWithPixels.push({

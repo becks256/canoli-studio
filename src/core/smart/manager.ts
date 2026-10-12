@@ -1,3 +1,4 @@
+import { isImmutable } from "../immutable";
 import { rebindLayerComps } from "../layer-comps";
 import { layerMaskSchema } from "../masks";
 import { smartFiltersSchema } from "./filters";
@@ -50,7 +51,7 @@ export const componentDefinitionSchema = z
   .strict();
 
 /** Validate ordinary layer properties through the existing model, without persisting placeholders. */
-function inspectDocument(input: unknown): {
+function inspectDocument(input: unknown, retainImmutable = false): {
   document: SmartDocumentData;
   references: string[];
   assets: Set<string>;
@@ -151,7 +152,7 @@ function inspectDocument(input: unknown): {
     children: document.children.map((layer) => convert(layer, 0, true)),
   } as DocumentData);
   for (const asset of filterAssets) assets.add(asset);
-  return { document: structuredClone(document), references, assets };
+  return { document: retainImmutable && isImmutable(document) ? document : structuredClone(document), references, assets };
 }
 
 /** Immutable graph snapshots: validation must finish before callers publish a replacement. */
@@ -227,7 +228,16 @@ export class ComponentRegistry {
   }
 
   validatePlacements(document: SmartDocumentData): SmartDocumentData {
-    const inspected = inspectDocument(document);
+    return this.placements(document, false);
+  }
+
+  /** @internal Read-only render view; only proven immutable input may be shared. */
+  validatedView(document: SmartDocumentData): SmartDocumentData {
+    return this.placements(document, true);
+  }
+
+  private placements(document: SmartDocumentData, retainImmutable: boolean): SmartDocumentData {
+    const inspected = inspectDocument(document, retainImmutable);
     for (const reference of inspected.references)
       if (!this.definitions.has(reference)) {
         throw new Error(

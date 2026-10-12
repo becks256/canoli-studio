@@ -21,6 +21,7 @@ export function ToolOptions({
   hasSelection,
   disabled,
   onAction,
+  onOpenImageSize,
   onOpenArtboard,
   onOpenCrop,
   documentBusy,
@@ -41,6 +42,7 @@ export function ToolOptions({
   hasSelection: boolean;
   disabled: boolean;
   onAction(action: () => void): void;
+  onOpenImageSize?(): void;
   onOpenArtboard?(): void;
   onOpenCrop?(): void;
   documentBusy: boolean;
@@ -58,6 +60,7 @@ export function ToolOptions({
       <strong>
         {
           {
+            wand: "Magic wand",
             move: "Move",
             hand: "Hand",
             artboard: "Artboard",
@@ -69,6 +72,7 @@ export function ToolOptions({
             eraser: "Eraser",
             pen: "Pen",
             marquee: "Marquee",
+            lasso: "Freeform lasso",
             clone: "Clone",
             patch: "Patch",
             heal: "Spot Healing",
@@ -511,9 +515,15 @@ export function ToolOptions({
           </button>
         </>
       )}
-      {tool === "marquee" && (
+      {tool === "wand" && <>
+        <Slider label="Wand tolerance" value={settings.wandTolerance} min={0} max={255} step={1}
+          onPreview={value => controller.configure({ wandTolerance: value })} onCommit={value => controller.configure({ wandTolerance: value })} />
+        <label><input type="checkbox" checked={settings.wandContiguous} onChange={event => controller.configure({ wandContiguous: event.target.checked })} /> Contiguous</label>
+      <span className="tool-hint">Sample selected image · Shift adds · Alt subtracts</span>
+      </>}
+      {(tool === "marquee" || tool === "wand" || tool === "lasso") && (
         <>
-          <select
+          {tool === "marquee" && <select
             aria-label="Marquee shape"
             value={settings.selectionShape}
             onChange={(e) =>
@@ -525,7 +535,7 @@ export function ToolOptions({
           >
             <option value="rectangle">Rectangle</option>
             <option value="ellipse">Ellipse</option>
-          </select>
+          </select>}
           <select
             aria-label="Selection operation"
             value={settings.selectionMode}
@@ -593,11 +603,12 @@ export function ToolOptions({
           Resize artboard...
         </button>
       )}
+        {onOpenImageSize && <button type="button" className="button subtle compact" disabled={documentBusy} onClick={onOpenImageSize}>Image size…</button>}
       <span className="tool-hint">
-        {tool === "crop"
+        {tool === "lasso" ? "Drag to select · Shift adds · Alt subtracts · Shift+Alt intersects · Esc cancels" : tool === "crop"
           ? "Drag a frame or its handles · Enter applies · Esc cancels · Shift constrains corners"
           : tool === "artboard"
-            ? "Set canvas dimensions and scale proportionally"
+            ? "Change canvas bounds without scaling artwork"
             : tool === "text"
               ? "Click on the canvas to place a text layer"
               : tool === "move"
@@ -624,6 +635,7 @@ export function ToolOptions({
 export function PathProperties({
   layer,
   path,
+  anchorCount,
   disabled,
   onAction,
   onPreview,
@@ -631,6 +643,7 @@ export function PathProperties({
 }: {
   layer: VectorLayer;
   path: VectorPath | null;
+  anchorCount: number;
   disabled: boolean;
   onAction(action: () => void): void;
   onPreview(command: EditorCommand): void;
@@ -744,7 +757,7 @@ export function PathProperties({
         }
       />
       <p className="section-description">
-        {path.points.length} anchors · Pen tool moves anchors and handles.
+        {anchorCount} anchors · Pen tool moves anchors and handles.
         Alt/Option moves one handle independently.
       </p>
       <button

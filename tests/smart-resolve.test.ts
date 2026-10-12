@@ -97,3 +97,25 @@ it("rejects missing placements and expansion budget overflow before rendering", 
   input.children = [instance("missing")];
   expect(() => resolveSmartDocument(input, registry)).toThrow("missing");
 });
+
+it("render views share only validated immutable input while public placement results remain owned", async () => {
+  const { freeze } = await import("../src/core/immutable");
+  const { LayerMask, BrushStroke } = await import("../src/dom");
+  const registry = new ComponentRegistry([{ id: "source", name: "Source", source: { kind: "asset", assetId: "pixels", width: 16, height: 16 } }]);
+  const input: SmartDocumentData = { ...createDocument("Root", 32, 32), children: [{ ...instance("source"), filterMask: new LayerMask({ base: 1, strokes: [{ mode: "hide", stroke: new BrushStroke({ points: [{ x: 1, y: 2 }] }) }] }).toJSON() }] };
+  const frozen = freeze(structuredClone(input));
+  expect(registry.validatedView(frozen)).toBe(frozen);
+  const expanded = resolveSmartDocument(frozen, registry, { preserveFiltered: true, retainImmutable: true });
+  expect((expanded.children[0] as SmartObjectInstanceData).filterMask).toBe((frozen.children[0] as SmartObjectInstanceData).filterMask);
+  const publicCopy = registry.validatePlacements(frozen);
+  publicCopy.name = "Mutable copy";
+  (publicCopy.children[0] as SmartObjectInstanceData).filterMask!.strokes![0].stroke.points[0].x = 99;
+  expect((frozen.children[0] as SmartObjectInstanceData).filterMask!.strokes![0].stroke.points[0].x).toBe(1);
+  const shallow = Object.freeze(input);
+  const detached = registry.validatedView(shallow);
+  input.children[0].name = "Later mutation";
+  expect(detached.children[0].name).toBe("Instance");
+  const invalid = freeze({ ...frozen, width: 0 });
+  expect(() => registry.validatedView(invalid)).toThrow();
+  expect(() => registry.validatedView(freeze({ ...frozen, children: [instance("missing")] }))).toThrow("missing");
+});

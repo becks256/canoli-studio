@@ -21,6 +21,13 @@ const pages = [
   ["API", "REST API"],
   ["PLUGINS", "Plugins"],
 ];
+const pageDescriptions = {
+  SCRIPTING_API:
+    "Comprehensive guide and reference for Luma's JavaScript scripting API, document object model, and automation commands.",
+  API: "Local REST API reference for Luma image editor sessions, commands, and history.",
+  PLUGINS:
+    "Package format, permissions, and extension guide for Luma image editor command plugins.",
+};
 const slug = (name) => name.toLowerCase().replaceAll("_", "-");
 const escape = (text) =>
   text
@@ -29,6 +36,8 @@ const escape = (text) =>
     .replaceAll('"', "&quot;");
 await mkdir("public/developer", { recursive: true });
 for (const [name, title] of pages) {
+  const description =
+    pageDescriptions[name] ?? "Documentation for the Luma image editor.";
   const markdown = await readFile(`docs/${name}.md`, "utf8");
   let html = marked.parse(markdown);
   const ids = new Map();
@@ -60,7 +69,7 @@ for (const [name, title] of pages) {
     .join("");
   await writeFile(
     `public/developer/${slug(name)}.html`,
-    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><script src="../appearance.js"></script><title>${escape(title)} · Luma developer docs</title><link rel="stylesheet" href="docs.css"></head><body><a class="skip" href="#content">Skip to content</a><aside><a class="brand" href="../">luma<span>DEVELOPER DOCS</span></a><nav aria-label="Documentation">${nav}</nav>${renderToStaticMarkup(createElement(AppearanceSelect, { staticPage: true }))}<a class="return" href="../">← Return to editor</a></aside><main id="content">${html}</main></body></html>`,
+    `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} · Luma developer docs</title><meta name="description" content="${escape(description)}"><meta name="robots" content="index, follow, max-image-preview:large"><link rel="canonical" href="${slug(name)}.html"><meta property="og:type" content="article"><meta property="og:site_name" content="Luma"><meta property="og:title" content="${escape(title)} · Luma developer docs"><meta property="og:description" content="${escape(description)}"><meta property="og:image" content="../og-image.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${escape(title)} · Luma developer docs"><meta name="twitter:description" content="${escape(description)}"><meta name="twitter:image" content="../og-image.png"><meta name="color-scheme" content="light dark"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><script src="../appearance.js"></script><link rel="stylesheet" href="docs.css"></head><body><a class="skip" href="#content">Skip to content</a><aside><a class="brand" href="../">luma<span>DEVELOPER DOCS</span></a><nav aria-label="Documentation">${nav}</nav>${renderToStaticMarkup(createElement(AppearanceSelect, { staticPage: true }))}<a class="return" href="../">← Return to editor</a></aside><main id="content">${html}</main></body></html>`,
   );
 }
 await writeFile(

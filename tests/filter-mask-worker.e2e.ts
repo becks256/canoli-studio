@@ -47,3 +47,20 @@ test("filter-mask worker snapshots all inputs, mixes alpha and recovers from val
   });
   expect(result.error).toContain("density");
 });
+
+test("owned filter mixing transfers private inputs and matches caller-safe mixing exactly", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const { PixelProcessor } = await import(/* @vite-ignore */ String("/src/engine/processor.ts"));
+    const processor = new PixelProcessor();
+    try {
+      const original = Uint8ClampedArray.from({ length: 4096 }, (_, i) => (i * 17) % 256);
+      const filtered = Uint8ClampedArray.from({ length: 4096 }, (_, i) => (i * 43) % 256);
+      const mask = Uint8ClampedArray.from({ length: 4096 }, (_, i) => (i * 13) % 256);
+      const expected = await processor.mixFiltered(original, filtered, mask, 0.63, true);
+      const actual = await processor.mixFilteredOwned(original, filtered, mask, 0.63, true);
+      return { exact: expected.every((value: number, index: number) => actual[index] === value), lengths: [original.byteLength, filtered.byteLength, mask.byteLength] };
+    } finally { processor.dispose(); }
+  });
+  expect(result).toEqual({ exact: true, lengths: [0, 0, 0] });
+});

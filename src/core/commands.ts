@@ -1,3 +1,4 @@
+import { isImmutable, shareUnchanged } from "./immutable";
 import {
   flipCommands,
   distributionCommands,
@@ -15,6 +16,7 @@ import { ComponentRegistry } from "./smart/manager";
 import type { SmartComponentDefinition } from "./smart/types";
 import type { GuideData } from "./guides";
 import { AffineTransform } from "./affine";
+import { resizeImage } from "./image-resize";
 import { cropDocument } from "./crop";
 import type { CropBounds } from "./crop";
 import type {
@@ -63,7 +65,7 @@ export type LayerPatch = Partial<
     | "y"
   >
 > &
-  Partial<Pick<RasterLayerData, "width" | "height">> &
+  Partial<Pick<RasterLayerData, "width" | "height" | "erasures">> &
   Partial<
     Pick<
       TextLayerData,
@@ -87,6 +89,7 @@ export type EditorCommand =
   | { type: "document.guides"; guides: GuideData[] }
   | { type: "document.rename"; name: string }
   | { type: "document.resize"; width: number; height: number }
+  | { type: "document.resizeImage"; width: number; height: number }
   | { type: "document.crop"; bounds: CropBounds }
   | { type: "selection.set"; selection: SelectionData | null }
   | {
@@ -291,6 +294,10 @@ function apply(document: DocumentData, command: EditorCommand): void {
     cropDocument(document, command.bounds);
     return;
   }
+  if (command.type === "document.resizeImage") {
+    resizeImage(document, command.width, command.height);
+    return;
+  }
   if (command.type === "document.resize") {
     document.width = command.width;
     document.height = command.height;
@@ -386,19 +393,20 @@ function apply(document: DocumentData, command: EditorCommand): void {
         )
       )
         throw new Error("Instance ID already exists.");
-      const { assetId, effects, kind: _kind, ...placement } = layer;
+      const { assetId, effects, erasures, kind: _kind, ...placement } = layer;
       const width = Math.ceil(layer.width),
         height = Math.ceil(layer.height);
       const source = createRaster(layer.name, assetId, width, height);
       source.id = `${command.componentId}:source`;
       source.effects = structuredClone(effects);
+      if (erasures) source.erasures = structuredClone(erasures);
       const master = createDocument(layer.name, width, height);
       master.id = command.componentId;
       master.children = [source];
       const definition: SmartComponentDefinition = {
         id: command.componentId,
         name: layer.name,
-        source: effects.length
+        source: effects.length || erasures?.length
           ? { kind: "document", document: master }
           : { kind: "asset", assetId, width, height },
       };
@@ -414,6 +422,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
       return;
     }
     case "layer.update":
+      if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
       if (
         Object.keys(command.patch).some(
           (key) =>
@@ -443,6 +452,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "fontStyle",
               "direction",
               "adjustment",
+              "erasures",
             ].includes(key),
         )
       ) {
@@ -619,7 +629,10 @@ function apply(document: DocumentData, command: EditorCommand): void {
         )
       )
         throw new Error("Unsupported path property.");
-      Object.assign(path, structuredClone(command.patch));
+      const { points, ...properties } = command.patch;
+      Object.assign(path, structuredClone(properties));
+      if ("points" in command.patch)
+        path.points = points?.map(point => isImmutable(point) ? point : structuredClone(point)) as typeof path.points;
       break;
     }
     case "path.remove":
@@ -665,10 +678,39 @@ export function execute(
   command: EditorCommand,
   checkComponents = true,
 ): DocumentData {
-  const next = structuredClone(document);
-  apply(next, command);
+  // Store-owned snapshots are recursively frozen. Common editing commands only
+  // need a new root and the path to their target, never copies of pixel coverage.
+  while (command.type === "transaction" && command.commands.length === 1) command = command.commands[0];
+  let next: DocumentData;
+  const rootOnly = ["document.rename", "document.resize", "document.guides", "selection.set"].includes(command.type);
+  const targeted = command.type === "layer.update" || command.type === "paint.add" || command.type === "paint.remove" || command.type === "path.update" || command.type === "path.add" || command.type === "path.remove";
+  if (isImmutable(document) && rootOnly) next = { ...document };
+  else if (isImmutable(document) && targeted) {
+    const targetId = "id" in command ? command.id : "";
+    const copyPath = (nodes: LayerData[]): LayerData[] => nodes.map(node => {
+      if (node.id === targetId) {
+        if (command.type === "path.add" && node.kind === "vector") return { ...node, paths: [...node.paths] };
+        if (command.type === "path.update" && node.kind === "vector")
+          return { ...node, paths: node.paths.map(path => path.id === command.pathId ? { ...path } : path) };
+        if (command.type === "paint.add" && node.kind === "paint") return { ...node, strokes: [...node.strokes] };
+        return { ...node };
+      }
+      if (node.kind === "group" && findLayer({ ...document, children: node.children }, targetId)) return { ...node, children: copyPath(node.children) };
+      return node;
+    });
+    next = { ...document, children: copyPath(document.children) };
+  } else next = structuredClone(document);
+  // Erasure updates append to immutable prior records. Copy only new records;
+  // cloning every previous selection clip here makes each stroke more expensive.
+  if (command.type === "layer.update") {
+    const { erasures, ...rest } = command.patch;
+    const patch = structuredClone(rest) as LayerPatch;
+    if ("erasures" in command.patch)
+      patch.erasures = erasures?.map(entry => isImmutable(entry) ? entry : structuredClone(entry));
+    apply(next, { ...command, patch });
+  } else apply(next, command);
   validateDocument(next, checkComponents);
-  return next;
+  return shareUnchanged(document, next);
 }
 
 export function describe(command: EditorCommand): string {
@@ -725,6 +767,8 @@ export function describe(command: EditorCommand): string {
       return "Edit guides";
     case "document.rename":
       return "Rename document";
+    case "document.resizeImage":
+      return "Resize image";
     case "document.resize":
       return "Resize artboard";
     case "document.crop":
@@ -769,6 +813,7 @@ export function describe(command: EditorCommand): string {
 /** Session tool coordinates must be discarded after these operations, including undo/redo. */
 export function changesCanvasSpace(command: EditorCommand): boolean {
   return (
+    command.type === "document.resizeImage" ||
     command.type === "document.crop" ||
     command.type === "document.resize" ||
     (command.type === "transaction" &&

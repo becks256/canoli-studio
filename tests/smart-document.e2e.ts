@@ -1,3 +1,4 @@
+import { SCHEMA_VERSION } from "../src/core/model";
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 
@@ -105,7 +106,7 @@ test("isolated scripts create shared masters, edit all instances atomically, and
   expect(result.reopened).toEqual(result.after);
   expect(result).toMatchObject({
     oneUndo: true,
-    schema: 14,
+    schema: SCHEMA_VERSION,
     componentCount: 1,
     handles: true,
     assets: 1,

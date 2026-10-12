@@ -723,6 +723,7 @@ export function compileEditPlan(
             break;
           }
 
+          case "document.resizeImage":
           case "document.resize": {
             const w = Math.round(Number(actionValue(step.action.width)));
             const h = Math.round(Number(actionValue(step.action.height)));
@@ -737,7 +738,7 @@ export function compileEditPlan(
               );
             }
             const cmd: EditorCommand = {
-              type: "document.resize",
+              type: step.action.type,
               width: w,
               height: h,
             };

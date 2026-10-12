@@ -1,3 +1,6 @@
+import { checkRenderCurrent } from "../render-control";
+import { contentSignature } from "../content-signature";
+import { findLayer } from "../../core/model";
 import { AffineTransform } from "../../core/affine";
 import { localTransform } from "../../core/spatial";
 import { maskTransform, maskGeometry } from "../../core/masks";
@@ -342,7 +345,7 @@ export class WebGpuRenderer {
   private signature(layer: LayerData) {
     const existing = this.signatures.get(layer);
     if (existing) return existing;
-    const value = JSON.stringify({ ...layer, mask: null });
+    const value = contentSignature(layer);
     if (Object.isFrozen(layer)) this.signatures.set(layer, value);
     return value;
   }
@@ -359,6 +362,7 @@ export class WebGpuRenderer {
     if (
       translationOnly &&
       mask.kind === "selection" &&
+      !mask.selection.regions.some(r => r.shape === "pixels") &&
       !mask.feather &&
       !mask.strokes?.length
     )
@@ -647,9 +651,11 @@ export class WebGpuRenderer {
     x: number,
     y: number,
     world = AffineTransform.translation(x, y),
+    isCancelled?: () => boolean,
   ) {
     let content = this.make(space.width, space.height);
     for (const stroke of layer.strokes) {
+      checkRenderCurrent(isCancelled);
       const previousOwned = new Set(this.owned);
       let source: Surface;
       if (
@@ -675,6 +681,7 @@ export class WebGpuRenderer {
           x,
           y,
           world,
+          isCancelled,
         );
       }
       const result = this.pass(source, content, [
@@ -702,6 +709,7 @@ export class WebGpuRenderer {
     x: number,
     y: number,
     world = AffineTransform.translation(x, y),
+    isCancelled?: () => boolean,
   ) {
     const neutral = {
       ...layer,
@@ -724,6 +732,7 @@ export class WebGpuRenderer {
       assets,
       {
         cache: false,
+        isCancelled,
         rootTransform: world,
         region: {
           x: space.x,
@@ -766,6 +775,7 @@ export class WebGpuRenderer {
         !node.visible ||
         node.opacity === 0 ||
         (node.kind !== "smart-object" &&
+          !(node.kind === "raster" && node.erasures?.length) &&
           !node.styles?.dropShadow.enabled &&
           (node.kind !== "adjustment" ||
             node.adjustment.kind === "hsl" ||
@@ -778,7 +788,7 @@ export class WebGpuRenderer {
           (node.kind !== "paint" ||
             node.strokes.every(
               (stroke) =>
-                stroke.kind === "fill" || this.preciseStroke(stroke, scale),
+                !stroke.clip?.regions.some(r => r.shape === "pixels") && (stroke.kind === "fill" || this.preciseStroke(stroke, scale)),
             ))),
     );
   }
@@ -798,7 +808,9 @@ export class WebGpuRenderer {
     assets: AssetStore,
     options: RenderOptions,
   ): Promise<ViewportFrame | null> {
+    checkRenderCurrent(options.isCancelled);
     if (!(await this.ready) || !this.device || this.disposed) return null;
+    checkRenderCurrent(options.isCancelled);
     if (this.namespace !== document.id || this.assets !== assets) {
       this.clearCache();
       this.namespace = document.id;
@@ -833,7 +845,10 @@ export class WebGpuRenderer {
     };
     const scale = Math.min(space.sx, space.sy);
     if (
+      !!options.paintPreview?.filterMask ||
+      !!options.paintPreview?.cloneSource ||
       !this.supported(document.children, scale) ||
+      (!!options.paintPreview && !options.paintPreview.maskMode && (options.paintPreview.stroke.clip?.regions.some(r => r.shape === "pixels") || (options.paintPreview.stroke.kind === "eraser" && findLayer(document, options.paintPreview.layerId)?.kind === "raster"))) ||
       (options.paintPreview &&
         !options.paintPreview.maskMode &&
         !this.preciseStroke(options.paintPreview.stroke, scale))
@@ -847,6 +862,7 @@ export class WebGpuRenderer {
     device.pushErrorScope("out-of-memory");
     device.pushErrorScope("validation");
     const check = () => {
+      checkRenderCurrent(options.isCancelled);
       if (epoch !== this.epoch || this.device !== device || this.disposed)
         throw new Error("Obsolete GPU frame.");
     };
@@ -916,6 +932,7 @@ export class WebGpuRenderer {
                 x,
                 y,
                 world,
+                options.isCancelled,
               );
             else if (layer.kind === "paint")
               source = await this.paintLayer(
@@ -926,6 +943,7 @@ export class WebGpuRenderer {
                 x,
                 y,
                 world,
+                options.isCancelled,
               );
             else
               source = await this.reference(
@@ -936,6 +954,7 @@ export class WebGpuRenderer {
                 x,
                 y,
                 world,
+                options.isCancelled,
               );
             check();
             this.retain(layer.id, signature, source);
@@ -1052,7 +1071,7 @@ export class WebGpuRenderer {
       check();
     } catch (error) {
       failed = true;
-      this.reason = error instanceof Error ? error.message : String(error);
+      if (!options.isCancelled?.()) this.reason = error instanceof Error ? error.message : String(error);
     }
     let validation: GPUError | null = null;
     try {

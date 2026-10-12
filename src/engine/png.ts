@@ -1,3 +1,4 @@
+import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
 import type { DocumentRenderer } from "./renderer";
@@ -28,7 +29,10 @@ export async function exportPng(
   document: DocumentData,
   assets: AssetStore,
   renderer: DocumentRenderer,
+  control?: ExportControl,
 ): Promise<Blob> {
+  checkExport(control);
+  control?.onProgress?.({phase:"rendering",fraction:0});
   const { width, height } = document;
   // This is the PNG format's dimension boundary, not an image import restriction.
   if (width > 0x7fffffff || height > 0x7fffffff)
@@ -63,6 +67,7 @@ export async function exportPng(
       Math.min(64, Math.floor(4_000_000 / rowBytes)),
     );
     for (let y = 0; y < height; y += rowsPerStrip) {
+      checkExport(control);
       const rows = Math.min(rowsPerStrip, height - y);
       const strip = new Uint8Array(rowBytes * rows); // filter byte 0 for each row
       for (let x = 0; x < width; x += 2048) {
@@ -73,6 +78,7 @@ export async function exportPng(
           readback: true,
         });
         try {
+          checkExport(control);
           const pixels = tile
             .getContext("2d")!
             .getImageData(0, 0, tileWidth, rows).data;
@@ -86,11 +92,15 @@ export async function exportPng(
         }
       }
       await writer.write(strip);
+      control?.onProgress?.({phase:"rendering",fraction:(y+rows)/height});
       // Let input, status messages, and cancellation by navigation proceed.
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
     }
+    checkExport(control);
+    control?.onProgress?.({phase:"encoding",fraction:null});
     await writer.close();
     await collect;
+    checkExport(control);
   } catch (error) {
     await writer.abort(error).catch(() => {});
     await reader.cancel().catch(() => {});
@@ -157,4 +167,22 @@ export async function encodeRgbaPng(
 
   parts.push(chunk("IEND", new Uint8Array()));
   return new Blob(parts, { type: "image/png" });
+}
+
+
+/** Worker-side native encoding of canvas-captured RGBA; direct PNG fallback. */
+export async function encodeCapturedPng(pixels: Uint8ClampedArray, width: number, height: number): Promise<Blob> {
+  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0 || pixels.length !== width * height * 4)
+    throw new Error("PNG encoding requires matching RGBA dimensions.");
+  let png: Blob | undefined;
+  if (typeof OffscreenCanvas !== "undefined") {
+    const canvas = new OffscreenCanvas(width, height);
+    try {
+      canvas.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(pixels), width, height), 0, 0);
+      png = await canvas.convertToBlob({ type: "image/png" });
+    } catch { /* Native encoding is optional; retain the direct encoder. */ }
+    finally { canvas.width = canvas.height = 1; }
+  }
+  png ??= await encodeRgbaPng(new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength), width, height);
+  return png;
 }

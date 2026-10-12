@@ -1,3 +1,5 @@
+import { LayerThumbnail } from "./LayerThumbnail";
+import type { RasterEditing } from "../raster-editing";
 import { LayerFilterBar } from "./LayerFilterBar";
 import { emptyLayerFilter, filterLayers } from "./layer-filter";
 import { useEffect, useRef, useState } from "react";
@@ -44,10 +46,13 @@ export interface LayersPanelProps {
   historyPast: Array<{ label: string }>;
   historyFuture: Array<{ label: string }>;
   getThumbnail(assetId: string): string;
+  pixels?: RasterEditing;
+  deferThumbnails?: boolean;
   onCancelTools(): void;
   onClearPreview(): void;
   onAttempt(action: () => void): void;
   onSelectLayer(layer: Layer, additive?: boolean): void;
+  onLoadTransparency?(id: string): void;
   onAddLayer(): void;
   onAddGroup(): void;
   onAddAdjustmentLayer?(): void;
@@ -72,10 +77,13 @@ export function LayersPanel({
   historyPast,
   historyFuture,
   getThumbnail,
+  pixels,
+  deferThumbnails = false,
   onCancelTools,
   onClearPreview,
   onAttempt,
   onSelectLayer,
+  onLoadTransparency,
   onAddLayer,
   onAddGroup,
   onAddAdjustmentLayer,
@@ -224,16 +232,24 @@ export function LayersPanel({
                   <span className="layer-thumb group-thumb">
                     <Folder size={17} />
                   </span>
-                ) : node.kind === "raster" ? (
-                  <img
-                    className="layer-thumb"
-                    src={getThumbnail(node.assetId)}
-                    alt=""
+                ) : (node.kind === "raster" || node.kind === "paint") && pixels ? (
+                  <LayerThumbnail
+                    document={dom.getSnapshot().document}
+                    layerId={node.id}
+                    name={node.name}
+                    pixels={pixels}
+                    paused={deferThumbnails}
+                    fallback={node.kind === "raster" ? getThumbnail(node.assetId) : undefined}
+                    onClick={event => {
+                      if (!(event.ctrlKey || event.metaKey) || busy || !onLoadTransparency) return;
+                      event.preventDefault(); event.stopPropagation();
+                      onLoadTransparency(node.id);
+                    }}
                   />
+                ) : node.kind === "raster" ? (
+                  <img className="layer-thumb" src={getThumbnail(node.assetId)} alt="" />
                 ) : node.kind === "paint" ? (
-                  <span className="layer-thumb group-thumb">
-                    <Paintbrush size={15} />
-                  </span>
+                  <span className="layer-thumb group-thumb"><Paintbrush size={15} /></span>
                 ) : node.kind === "vector" ? (
                   <span className="layer-thumb group-thumb">
                     <PenTool size={15} />

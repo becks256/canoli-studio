@@ -1,3 +1,4 @@
+import { SCHEMA_VERSION } from "../src/core/model";
 import { expect, test } from "@playwright/test";
 
 test("retouch worker preserves caller buffers and snapshots inputs before asynchronous execution", async ({
@@ -257,7 +258,7 @@ test("scripted tonal layers render a live backdrop, undo and survive project rou
   expect(result.live.center[3]).toBe(128);
   expect(result.live.outside[3]).toBe(128);
   expect(result.unchangedSource).toBe(true);
-  expect(result.schema).toBe(12);
+  expect(result.schema).toBe(SCHEMA_VERSION);
 });
 
 test("dodge and burn gestures preview, share a tonal layer, and undo without changing the source", async ({
@@ -403,4 +404,58 @@ test("dodge and burn gestures preview, share a tonal layer, and undo without cha
     return [...ctx.getImageData(0, 0, 1, 1).data];
   });
   expect(original).toEqual([100, 100, 100, 255]);
+});
+
+test('sparse tonal processing matches full-tile correction for every mode and range',async({page})=>{
+  await page.goto('/');
+  const result=await page.evaluate(async()=>{
+    const {renderTonalStroke,renderRetouchCoverage}=await import(/* @vite-ignore */ String('/src/engine/retouch.ts'));
+    const {AffineTransform}=await import(/* @vite-ignore */ String('/src/core/affine.ts'));
+    const processor=window.luma.editor.renderer.processor;
+    const source=new Uint8ClampedArray(160*128*4);
+    for(let i=0;i<source.length;i++)source[i]=(i*73+19)%256;
+    const before=source.slice();
+    const brush=new window.luma.BrushStroke({points:[{x:5,y:8,pressure:.3},{x:30,y:20,pressure:1}],size:18,hardness:.4,opacity:.7,flow:.6}).toJSON();
+    const space={x:13.25,y:7.5,width:160,height:128,sx:1.25,sy:.8};
+    const world=new AffineTransform(1,.4,-.3,1,50,40);
+    const coverage=await renderRetouchCoverage(brush,space,processor,world);
+    const checks=[];
+    for(const mode of ['dodge','burn'] as const)for(const range of ['shadows','midtones','highlights'] as const)for(const protectTones of [false,true]){
+      const options={mode,range,exposure:.75,protectTones};
+      const expected=await processor.dodgeBurn(source,160,128,{...options,flow:1},coverage);
+      const actual=await renderTonalStroke(source,brush,options,space,processor,world);
+      checks.push(actual.every((v:number,i:number)=>v===expected[i]));
+    }
+    return {checks,unchanged:source.every((v,i)=>v===before[i]),covered:coverage.filter((v:number)=>v>0).length};
+  });
+  expect(result.checks).toEqual(Array(12).fill(true));
+  expect(result.unchanged).toBe(true);expect(result.covered).toBeGreaterThan(0);expect(result.covered).toBeLessThan(160*128/4);
+});
+
+test('retouch cell culling matches an uncropped fixed-grid coverage oracle',async({page})=>{
+  await page.goto('/');
+  const results=await page.evaluate(async()=>{
+    const {renderRetouchCoverage}=await import(/* @vite-ignore */ String('/src/engine/retouch.ts'));
+    const {drawMaskStroke}=await import(/* @vite-ignore */ String('/src/engine/drawing.ts'));
+    const {AffineTransform}=await import(/* @vite-ignore */ String('/src/core/affine.ts'));
+    const e=window.luma.editor,results=[];
+    const brush=new window.luma.BrushStroke({points:[{x:0,y:0,pressure:.2},{x:35,y:18,pressure:1}],size:27,hardness:.3,opacity:.6,flow:.7}).toJSON();
+    for(const [x,y,sx,sy,tx,ty] of [[0,0,1,1,255,255],[12.3,-8.7,.7,1.4,250,170],[-270,-30,1.2,.8,-10,5],[0,0,1,1,3000,3000]]){
+      const space={x,y,sx,sy,width:700,height:540},world=new AffineTransform(1,.3,-.4,1,tx,ty);
+      const expected=new Uint8Array(space.width*space.height),px=Math.floor(x*sx),py=Math.floor(y*sy),phaseX=x*sx-px,phaseY=y*sy-py;
+      for(let cy=Math.floor(py/256)*256;cy<py+space.height;cy+=256)for(let cx=Math.floor(px/256)*256;cx<px+space.width;cx+=256){
+        const cell=document.createElement('canvas');cell.width=cell.height=260;
+        try{
+          await drawMaskStroke({mode:'reveal',stroke:brush},cell,{...space,x:(cx+phaseX-2)/sx,y:(cy+phaseY-2)/sy,width:260,height:260},0,0,e.renderer.processor,undefined,world);
+          const left=Math.max(cx,px),top=Math.max(cy,py),w=Math.min(cx+256,px+space.width)-left,h=Math.min(cy+256,py+space.height)-top;
+          const rgba=cell.getContext('2d')!.getImageData(left-cx+2,top-cy+2,w,h).data;
+          for(let row=0;row<h;row++)for(let col=0;col<w;col++)expected[(top-py+row)*space.width+left-px+col]=rgba[(row*w+col)*4+3];
+        }finally{cell.width=cell.height=0;}
+      }
+      const actual=await renderRetouchCoverage(brush,space,e.renderer.processor,world);
+      results.push(actual.every((v:number,i:number)=>v===expected[i]));
+    }
+    return results;
+  });
+  expect(results).toEqual([true,true,true,true]);
 });

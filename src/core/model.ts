@@ -1,3 +1,6 @@
+import { yieldTask } from "./task-yield";
+import { z } from "zod";
+import { isImmutable } from "./immutable";
 import { layerCompSchema, type LayerCompData } from "./layer-comps";
 import { smartFiltersSchema } from "./smart/filters";
 import { ComponentRegistry } from "./smart/manager";
@@ -16,10 +19,12 @@ import type { LayerMaskData } from "./masks";
 import { authoredMetadataSchema } from "./metadata";
 import type { AuthoredMetadataData } from "./metadata";
 import {
+  rasterErasureSchema,
   styleSchema,
   selectionSchema,
   paintOperationSchema,
   pathSchema,
+  PATH_POINT_LIMIT,
 } from "./drawing";
 import type {
   LayerStyleData,
@@ -27,7 +32,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 15;
+export const SCHEMA_VERSION = 16;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -82,6 +87,7 @@ export interface RasterLayerData extends LayerBaseData {
   width: number;
   height: number;
   effects: ToneEffectData[];
+  erasures?: import("./drawing").RasterErasureData[];
 }
 
 export interface GroupLayerData extends LayerBaseData {
@@ -143,6 +149,7 @@ export interface DocumentData {
     | 12
     | 13
     | 14
+    | 15
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -411,10 +418,48 @@ export function toneOf(layer: RasterLayerData): ToneEffectData {
 
 // Import and command validation share the same invariants. Unknown node/effect
 // types fail explicitly instead of silently disappearing on load or export.
-export function validateDocument(
-  value: unknown,
-  checkComponents = true,
-): asserts value is DocumentData {
+const validatedSelections = new WeakSet<object>();
+const validatedDrawing = new WeakMap<object, Set<object>>();
+/** Validation may be reused only for recursively frozen store-owned values. */
+function validateDrawing<T>(schema: { parse(value: unknown): T }, value: unknown): T {
+  if (isImmutable(value)) {
+    let schemas = validatedDrawing.get(value);
+    if (!schemas?.has(schema)) {
+      schema.parse(value);
+      if (!schemas) { schemas = new Set(); validatedDrawing.set(value, schemas); }
+      schemas.add(schema);
+    }
+    return value as T;
+  }
+  return schema.parse(value);
+}
+
+// Validation-only schema: reuse proofs for immutable anchors in changing paths.
+// Mutable points still pass the exact public point schema on every invocation.
+const validationPathSchema = pathSchema.extend({
+  points: z.array(z.custom<z.infer<typeof pathSchema.shape.points.element>>((value) => {
+    validateDrawing(pathSchema.shape.points.element, value);
+    return true;
+  })).min(1).max(PATH_POINT_LIMIT),
+});
+
+export function validateDocument(value: unknown, checkComponents = true): asserts value is DocumentData {
+  for (const _ of documentValidationSteps(value, checkComponents)) { /* synchronous contract */ }
+}
+
+/** @internal Same validator, task boundaries only between complete checks of stable data. */
+export async function validateDocumentCooperatively(value: unknown): Promise<void> {
+  if (!isImmutable(value)) throw new Error("Cooperative validation requires immutable model data.");
+  let deadline = performance.now() + 2;
+  for (const _ of documentValidationSteps(value, true)) {
+    if (performance.now() >= deadline) {
+      await yieldTask();
+      deadline = performance.now() + 2;
+    }
+  }
+}
+
+function* documentValidationSteps(value: unknown, checkComponents: boolean): Generator<void> {
   const record = (v: unknown): v is Record<string, unknown> =>
     typeof v === "object" && v !== null && !Array.isArray(v);
   const number = (v: unknown, min: number, max: number) =>
@@ -439,7 +484,8 @@ export function validateDocument(
       value.schemaVersion !== 12 &&
       value.schemaVersion !== 13 &&
       value.schemaVersion !== 14 &&
-      value.schemaVersion !== 15) ||
+      value.schemaVersion !== 15 &&
+      value.schemaVersion !== 16) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -447,12 +493,15 @@ export function validateDocument(
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–15), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–16), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
     if (selection == null) return;
-    const parsed = selectionSchema.parse(selection);
+    const cached = isImmutable(selection) && validatedSelections.has(selection);
+    const parsed = cached ? selection as import("./drawing").SelectionData : selectionSchema.parse(selection);
+    if (isImmutable(selection)) validatedSelections.add(selection);
+    if (Number(value.schemaVersion) < 16 && parsed.regions.some(r => r.shape === "pixels")) throw new Error("Pixel selections require schema version 16.");
     if (
       Number(value.schemaVersion) < 5 &&
       parsed.regions.some((region) => region.transform !== undefined)
@@ -482,7 +531,7 @@ export function validateDocument(
   checkSelection(value.selection);
   const ids = new Set<string>();
   let count = 0;
-  const walk = (nodes: unknown, depth: number) => {
+  const walk = function* (nodes: unknown, depth: number): Generator<void> {
     if (!Array.isArray(nodes) || depth > 8)
       throw new Error("Invalid layer tree (maximum nesting: 8).");
     for (const node of nodes) {
@@ -533,14 +582,16 @@ export function validateDocument(
       if (node.fillOpacity !== undefined && !number(node.fillOpacity, 0, 1))
         throw new Error("Fill opacity must be between 0 and 1.");
       if (node.styles !== undefined) styleSchema.parse(node.styles);
-      if (node.kind === "group") walk(node.children, depth + 1);
+      if (node.kind === "group") yield* walk(node.children, depth + 1);
       else if (node.kind === "smart-object") {
         if (Number(value.schemaVersion) < 10)
           throw new Error("Smart objects require schema version 10.");
         if (node.filterMask != null) {
           if (Number(value.schemaVersion) < 12)
             throw new Error("Smart-filter masks require schema version 12.");
-          layerMaskSchema.parse(node.filterMask);
+          const mask = layerMaskSchema.parse(node.filterMask);
+          if (mask.kind === "selection") checkSelection(mask.selection);
+          for (const paint of mask.strokes ?? []) checkSelection(paint.stroke.clip);
         }
         if (node.smartFilters !== undefined) {
           if (Number(value.schemaVersion) < 11)
@@ -562,6 +613,14 @@ export function validateDocument(
           node.effects.length > 8
         )
           throw new Error("Invalid image layer.");
+        if (node.erasures !== undefined) {
+          if (Number(value.schemaVersion) < 16 || !Array.isArray(node.erasures) || node.erasures.length > 2048) throw new Error("Invalid raster erasures; schema version 16 is required.");
+          for (const entry of node.erasures) {
+            const { stroke } = validateDrawing(rasterErasureSchema, entry);
+            checkSelection(stroke.clip);
+            yield;
+          }
+        }
         const effectIds = new Set<string>();
         for (const effect of node.effects) {
           if (
@@ -600,12 +659,13 @@ export function validateDocument(
         for (const entry of entries) {
           const parsed =
             node.kind === "paint"
-              ? paintOperationSchema.parse(entry)
-              : pathSchema.parse(entry);
+              ? validateDrawing(paintOperationSchema, entry)
+              : validateDrawing(validationPathSchema, entry);
           if ("clip" in parsed) checkSelection(parsed.clip);
           if (entryIds.has(parsed.id))
             throw new Error("Duplicate drawing object ID.");
           entryIds.add(parsed.id);
+          yield;
         }
       } else if (node.kind === "text") {
         if (
@@ -641,11 +701,14 @@ export function validateDocument(
           throw new Error("Patch adjustments require schema version 9.");
         if (node.adjustment.kind === "hsl" && Number(value.schemaVersion) < 15)
           throw new Error("HSL adjustments require schema version 15.");
-        adjustmentSchema.parse(node.adjustment);
+        const adjustment = adjustmentSchema.parse(node.adjustment);
+        if (adjustment.kind === "tonal")
+          for (const stroke of adjustment.strokes) checkSelection(stroke.brush.clip);
       } else throw new Error("Unsupported layer type.");
+      yield;
     }
   };
-  walk(value.children, 0);
+  yield* walk(value.children, 0);
   if (value.components !== undefined && Number(value.schemaVersion) < 10)
     throw new Error("Component definitions require schema version 10.");
   if (checkComponents) {

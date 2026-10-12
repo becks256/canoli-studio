@@ -1,3 +1,4 @@
+import { featherRegion } from "../src/engine/feather-region";
 import { readFile } from "node:fs/promises";
 import { beforeAll, expect, it } from "vitest";
 import {
@@ -455,4 +456,44 @@ it("rasterizes independently transformed Boolean regions with exact sample and t
       y: -1e12,
     }),
   ).toEqual(full);
+});
+
+it('geometric mask rejection matches the generic sampler under affine and large-coordinate sampling',()=>{
+  for(const shape of ['rectangle','ellipse'] as const)for(const offset of [0,1e9,-1e9])for(const scale of [.01,1,17])for(const angle of [0,.2,1.57,2.8]){
+    const selection=new MarqueeSelection({shape,x:offset+7.25,y:offset-3.5,width:19.5,height:12.25}).toJSON();
+    selection.regions[0].transform={a:1,b:.2,c:-.3,d:.9,e:0,f:0};
+    const options={selection,width:48,height:32,x:offset*.7-13.25,y:offset*1.1-17.5,stepX:Math.cos(angle)*scale,stepY:Math.cos(angle)*scale,stepXY:-Math.sin(angle)*scale,stepYX:Math.sin(angle)*scale};
+    // Duplicate additive geometry is identical but forces the general sampler.
+    const reference=renderSelection(kernel,{...options,selection:{regions:[...selection.regions,...selection.regions]}});
+    expect(renderSelection(kernel,options)).toEqual(reference);
+  }
+});
+
+
+it('bounded feathering matches full-surface filtering including edges and fractional radii',()=>{
+  for(const [radiusX,radiusY] of [[0,0],[.25,1.7],[2,3],[12.5,.5]])for(const [x,y,w,h] of [[20,15,4,7],[0,0,9,8],[58,36,6,12],[0,0,64,48],[0,0,0,0]]){
+    const width=64,height=48,pixels=new Uint8ClampedArray(width*height*4);
+    for(let row=y;row<y+h;row++)for(let col=x;col<x+w;col++)pixels.set([255,255,255,1+(row*73+col*19)%255],(row*width+col)*4);
+    const tile={width,height,radiusX,radiusY};
+    const expected=featherAlpha(kernel,pixels.slice(),tile);
+    const region=featherRegion(pixels,tile),actual=new Uint8ClampedArray(pixels.length);
+    for(let p=0;p<width*height;p++)actual.set([255,255,255,0],p*4);
+    if(region){
+      const softened=featherAlpha(kernel,region.pixels,{...tile,width:region.width,height:region.height});
+      for(let row=0;row<region.height;row++)actual.set(softened.subarray(row*region.width*4,(row+1)*region.width*4),((region.y+row)*width+region.x)*4);
+    }
+    expect(actual).toEqual(expected);
+  }
+});
+
+it('geometric interior shortcut preserves edge coverage under reflection, shear and thin shapes',()=>{
+  for(const shape of ['rectangle','ellipse'] as const)for(const [width,height] of [[.001,17],[19,.002],[19.5,12.25],[1000,1000]])for(const transform of [{a:-1,b:.2,c:.7,d:.9,e:20,f:0},{a:1,b:0,c:8,d:1,e:0,f:0},{a:.001,b:0,c:0,d:.001,e:3,f:2}]){
+    const selection=new MarqueeSelection({shape,x:0,y:0,width,height}).toJSON();
+    selection.regions[0].transform=transform;
+    for(const step of [.001,.125,1,8]){
+      const options={selection,width:32,height:24,x:-.125,y:-.125,stepX:step,stepY:step,stepXY:step*.15,stepYX:-step*.3};
+      const reference=renderSelection(kernel,{...options,selection:{regions:[...selection.regions,...selection.regions]}});
+      expect(renderSelection(kernel,options)).toEqual(reference);
+    }
+  }
 });

@@ -116,21 +116,30 @@ export class RecipeService {
       this.unhookRecorder();
       this.unhookRecorder = null;
     }
-    const unhookCommands = doc.onCommand((command, before, after) => {
-      if (
-        (this.recorder.isRecording() || this.recorder.isPaused()) &&
-        JSON.stringify(before) === JSON.stringify(after)
-      )
-        return;
-      this.recorder.setSelectedId(doc.selectedLayer?.id ?? null);
-      if (this.recorder.isRecording()) this.captureRecordingSources(doc);
-      this.recorder.recordCommand(command, before, after);
-    });
+    let unhookCommands: (() => void) | null = null;
+    const syncRecordingSubscription = () => {
+      const observing = this.recorder.isRecording() || this.recorder.isPaused();
+      if (!observing) { unhookCommands?.(); unhookCommands = null; return; }
+      if (unhookCommands) return;
+      unhookCommands = doc.onCommand((command, before, after) => {
+        if (
+          (this.recorder.isRecording() || this.recorder.isPaused()) &&
+          JSON.stringify(before) === JSON.stringify(after)
+        )
+          return;
+        this.recorder.setSelectedId(doc.selectedLayer?.id ?? null);
+        if (this.recorder.isRecording()) this.captureRecordingSources(doc);
+        this.recorder.recordCommand(command, before, after);
+      });
+    };
+    const unhookState = this.recorder.subscribe(syncRecordingSubscription);
+    syncRecordingSubscription();
     const unhookHistory = doc.onHistoryNavigation((direction) =>
       this.recorder.navigateHistory(direction),
     );
     this.unhookRecorder = () => {
-      unhookCommands();
+      unhookState();
+      unhookCommands?.();
       unhookHistory();
     };
   }

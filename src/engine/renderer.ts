@@ -1,3 +1,9 @@
+import { maskSignature } from "./mask-signature";
+import { checkRenderCurrent } from "./render-control";
+import type { ClonePreviewSource } from "./clone-preview";
+import type { TonalStrokeData } from "../core/adjustments";
+import { isImmutable } from "../core/immutable";
+import { contentSignature } from "./content-signature";
 import {
   uniformFilterMaskCoverage,
   regionalFilterMask,
@@ -20,11 +26,12 @@ import type { AssetStore } from "../core/assets";
 import type {
   DocumentData,
   LayerData,
+  PaintLayerData,
   RasterLayerData,
   ToneEffectData,
 } from "../core/model";
 import { computeAdjustmentLuts } from "../core/adjustments";
-import { defaultStyle } from "../core/drawing";
+import { defaultStyle, strokeBounds } from "../core/drawing";
 import { PixelProcessor } from "./processor";
 import { createCanvas, release, renderTransform } from "./canvas";
 import { AffineTransform } from "../core/affine";
@@ -47,8 +54,11 @@ export interface RenderRegion {
 export interface PaintPreview {
   layerId: string;
   stroke: BrushStrokeData;
+  cloneSource?: ClonePreviewSource;
   /** Mask coverage target; absent for normal paint-layer previews. */
   maskMode?: "hide" | "reveal";
+  /** Apply coverage to smart filters rather than the ordinary layer mask. */
+  filterMask?: boolean;
   tonal?: Omit<DodgeBurnOptions, "flow">;
 }
 /** Trusted renderer-only preview; the final stroke still commits through the DOM. */
@@ -57,7 +67,7 @@ export function previewMask(
   preview?: PaintPreview | null,
 ): LayerMaskData | null | undefined {
   const mask = layer.mask;
-  return mask && preview?.maskMode && preview.layerId === layer.id
+  return mask && preview?.maskMode && !preview.filterMask && preview.layerId === layer.id
     ? {
         ...mask,
         strokes: [
@@ -68,6 +78,8 @@ export function previewMask(
     : mask;
 }
 export interface RenderOptions {
+  /** Internal transient cancellation predicate; never serialized. */
+  isCancelled?: () => boolean;
   /** Trusted transient tool data; never committed to document history. */
   paintPreview?: PaintPreview | null;
   /** Export/reference renders bypass retained viewport pixels. */
@@ -133,6 +145,13 @@ export class CanvasRenderer implements DocumentRenderer {
   }
   private activeStroke = new ActiveStrokeRaster();
   private signatures = new WeakMap<LayerData, string>();
+  private styledIds = new WeakMap<LayerData, number>();
+  private nextStyledId = 0;
+  private rasterPrefixes = new Map<string, { layer: RasterLayerData; signature: string; basis: string }>();
+  private patchPrefixes = new Map<string, { layer: LayerData; backdrop: LayerData[] }>();
+  private tonalPrefixes = new Map<string, { backdrop: LayerData[]; strokes: TonalStrokeData[]; signature: string }>();
+  private tonalVersion = 0;
+  private paintPrefixes = new Map<string, { layer: PaintLayerData; signature: string; basis: string }>();
   private assetIds = new WeakMap<AssetStore, number>();
   private nextAssetId = 0;
   private epoch = 0;
@@ -149,9 +168,18 @@ export class CanvasRenderer implements DocumentRenderer {
   private signature(layer: LayerData): string {
     const cached = this.signatures.get(layer);
     if (cached) return cached;
-    const signature = JSON.stringify({ ...layer, mask: null });
+    const signature = contentSignature(layer);
     if (Object.isFrozen(layer)) this.signatures.set(layer, signature);
     return signature;
+  }
+
+  private finishedStyleSignature(layer: LayerData, documentTransform?: AffineTransform): string {
+    let identity = this.styledIds.get(layer);
+    if (identity === undefined) {
+      identity = ++this.nextStyledId;
+      this.styledIds.set(layer, identity);
+    }
+    return `styled:${identity}:${JSON.stringify(documentTransform)}`;
   }
 
   async renderMaskCoverage(
@@ -290,7 +318,10 @@ export class CanvasRenderer implements DocumentRenderer {
       ),
     );
     const placement = renderTransform(space, nativeWorld);
-    const filterMask = layer.filterMask;
+    const preview = options.paintPreview;
+    const filterMask = layer.filterMask && preview?.filterMask && preview.maskMode && preview.layerId === layer.id
+      ? { ...layer.filterMask, strokes: [...(layer.filterMask.strokes ?? []), { mode: preview.maskMode, stroke: preview.stroke }] }
+      : layer.filterMask;
     const epoch = this.epoch;
     const maskBasis = filterMask
       ? (() => {
@@ -320,7 +351,14 @@ export class CanvasRenderer implements DocumentRenderer {
                 0,
                 0,
                 this.processor,
-                undefined,
+                options.cache === false ? undefined : {
+                  paint: this.maskPaint,
+                  key: `filter-mask:${this.assetIds.get(assets)}:${layer.componentId}:${layer.id}`,
+                  retainFull: !(preview?.filterMask && preview.layerId === layer.id),
+                  // Coverage is read back for worker blending on each affected tile.
+                  readback: true,
+                  canCache: () => this.epoch === epoch && !options.isCancelled?.(),
+                },
                 maskBasis,
                 filterMask.kind === "bitmap"
                   ? assets.get(filterMask.assetId).bitmap
@@ -353,11 +391,11 @@ export class CanvasRenderer implements DocumentRenderer {
                       JSON.stringify([
                         filterSignature,
                         maskBasis,
-                        regionalFilterMask(filterMask, region, maskBasis),
+                        maskSignature(regionalFilterMask(filterMask, region, maskBasis)),
                       ]),
                   }
                 : undefined,
-            canCache: () => this.epoch === epoch,
+            canCache: () => this.epoch === epoch && !options.isCancelled?.(),
           };
     const halo = smartFilterHalo(filters);
     // Partition in output coordinates so affine clipping never overlaps or leaves antialiased seams.
@@ -370,6 +408,7 @@ export class CanvasRenderer implements DocumentRenderer {
     const context = target.getContext("2d")!;
     for (let ty = 0; ty < target.height; ty += step)
       for (let tx = 0; tx < target.width; tx += step) {
+        checkRenderCurrent(options.isCancelled);
         const width = Math.min(step, target.width - tx),
           height = Math.min(step, target.height - ty);
         const bounds = inverse.bounds({ x: tx, y: ty, width, height });
@@ -422,6 +461,7 @@ export class CanvasRenderer implements DocumentRenderer {
                 cache: options.cache,
                 readback: true,
                 componentDepth: (options.componentDepth ?? 0) + 1,
+                isCancelled: options.isCancelled,
               }),
             this.processor,
             tileRegion,
@@ -447,6 +487,7 @@ export class CanvasRenderer implements DocumentRenderer {
     assets: AssetStore,
     options: CanvasRenderOptions = {},
   ): Promise<HTMLCanvasElement> {
+    checkRenderCurrent(options.isCancelled);
     const registry = document.components?.length
       ? new ComponentRegistry(document.components)
       : undefined;
@@ -456,6 +497,7 @@ export class CanvasRenderer implements DocumentRenderer {
     if (registry)
       document = resolveSmartDocument(document, registry, {
         preserveFiltered: true,
+        retainImmutable: true,
       });
     if ((options.componentDepth ?? 0) > 64)
       throw new Error(
@@ -495,7 +537,7 @@ export class CanvasRenderer implements DocumentRenderer {
     );
     const epoch = this.epoch;
     const cache = options.cache === false ? undefined : this.cache;
-    const canCache = () => this.epoch === epoch;
+    const canCache = () => this.epoch === epoch && !options.isCancelled?.();
     if (!this.assetIds.has(assets))
       this.assetIds.set(assets, ++this.nextAssetId);
     const scope = `${document.id}:${this.assetIds.get(assets)}:${registrySignature}`;
@@ -517,9 +559,11 @@ export class CanvasRenderer implements DocumentRenderer {
       target: HTMLCanvasElement,
       current: RenderSpace,
       parent: AffineTransform,
+      isolated?: LayerData,
     ) => {
       const targetContext = target.getContext("2d")!;
       for (const layer of nodes) {
+        checkRenderCurrent(options.isCancelled);
         if (!layer.visible || layer.opacity === 0) continue;
         const world = parent.multiply(localTransform(layer));
         const style = layer.styles ?? defaultStyle(),
@@ -532,6 +576,64 @@ export class CanvasRenderer implements DocumentRenderer {
         const haloY = shadow.enabled
           ? Math.ceil((shadow.blur * 3 + Math.abs(shadow.y)) * current.sy) + 2
           : 0;
+        if (cache && isolated !== layer && !affected.has(layer.id) &&
+            (layer.kind === "raster" || (layer.kind === "paint" && layer.strokes.every(stroke => stroke.kind === "fill" && !stroke.clip))) &&
+            layer.blendMode === "normal" && (layer.fillOpacity ?? 1) === 1 &&
+            !style.blendIf.enabled) {
+          const placement = renderTransform(current, world);
+          const bounds = layer.kind === "raster"
+            ? [{ x: 0, y: 0, width: layer.width, height: layer.height }]
+            : layer.strokes.map(strokeBounds);
+          const blurSupport = shadow.enabled ? shadow.blur * 3 * Math.max(current.sx,current.sy) : 0;
+          const marginX = shadow.enabled ? Math.ceil(blurSupport+Math.abs(shadow.x*current.sx))+2 : 0;
+          const marginY = shadow.enabled ? Math.ceil(blurSupport+Math.abs(shadow.y*current.sy))+2 : 0;
+          let left = current.width, top = current.height, right = 0, bottom = 0;
+          for (const bound of bounds) {
+            const box = placement.bounds(bound);
+            left = Math.min(left, Math.floor(box.x)-2-marginX); top = Math.min(top, Math.floor(box.y)-2-marginY);
+            right = Math.max(right, Math.ceil(box.x+box.width)+2+marginX); bottom = Math.max(bottom, Math.ceil(box.y+box.height)+2+marginY);
+          }
+          left = Math.max(0,left); top = Math.max(0,top);
+          right = Math.min(current.width,right); bottom = Math.min(current.height,bottom);
+          if (right <= left || bottom <= top) continue;
+          // Keep the viewport's exact output-pixel grid. Isolated composition
+          // leaves opacity for the parent, preserving backdrop alpha behavior.
+          if ((right-left)*(bottom-top) < current.width*current.height*.75) {
+            const bounded = {...current,x:current.x+left/current.sx,y:current.y+top/current.sy,width:right-left,height:bottom-top};
+            // Finished appearances can draw directly without an intermediate
+            // surface. Their key includes the same halo as the inner compositor.
+            const maskActive = !!(layer.mask?.enabled && layer.mask.density > 0);
+            const directSignature = isImmutable(layer) && (shadow.enabled || maskActive)
+              ? this.finishedStyleSignature(layer, options.documentTransform)
+              : !shadow.enabled && !maskActive
+                ? style.colorOverlay.enabled
+                  ? JSON.stringify(["color-overlay", this.signature(layer), style.colorOverlay])
+                  : this.signature(layer)
+                : undefined;
+            if (directSignature !== undefined) {
+              const keySpace = {...bounded,x:bounded.x-haloX/current.sx,y:bounded.y-haloY/current.sy,
+                width:bounded.width+haloX*2,height:bounded.height+haloY*2};
+              const boundedKey = `${scope}:${layer.id}:${JSON.stringify([keySpace, world])}`;
+              targetContext.save();
+              try {
+                targetContext.globalAlpha = layer.opacity;
+                targetContext.globalCompositeOperation = "source-over";
+                if (cache.draw(boundedKey, directSignature, targetContext, left, top)) continue;
+              } finally { targetContext.restore(); }
+            }
+            const surface = createCanvas(right-left,bottom-top);
+            try {
+              await paint([layer],surface,bounded,parent,layer);
+              targetContext.save();
+              try {
+                targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
+                targetContext.globalCompositeOperation = "source-over";
+                targetContext.drawImage(surface,left,top);
+              } finally { targetContext.restore(); }
+            } finally { release(surface); }
+            continue;
+          }
+        }
         const padded: RenderSpace = {
           ...current,
           x: current.x - haloX / current.sx,
@@ -539,28 +641,89 @@ export class CanvasRenderer implements DocumentRenderer {
           width: current.width + haloX * 2,
           height: current.height + haloY * 2,
         };
+        // Cache unstyled content; opacity/blending and backdrop-dependent
+        // Blend If are evaluated on every composition. Ancestors of a live
+        // stroke are recomposed from their cached, unchanged children.
+        const cacheable =
+          !(preview?.filterMask && preview.layerId === layer.id) &&
+          (!affected.has(layer.id) ||
+            layer.kind === "paint" || layer.kind === "raster" ||
+            (!!preview?.maskMode && layer.id === preview.layerId)) &&
+          layer.kind !== "adjustment" &&
+          // Mutable vector previews cannot populate the raw cache. Serializing
+          // thousands of points to probe it adds work without a possible hit.
+          (layer.kind !== "vector" || isImmutable(layer.paths));
+        const key = `${scope}:${layer.id}:${JSON.stringify([padded, world])}`;
+        const signature = cacheable && cache ? this.signature(layer) : "";
+        const patchBackdrop = layer.kind === "adjustment" && layer.adjustment.kind === "patch"
+          ? nodes.slice(0, nodes.indexOf(layer)) : [];
+        const retainPatch = !!cache && layer.kind === "adjustment" && layer.adjustment.kind === "patch" &&
+          isImmutable(layer) && !affected.has(layer.id) && !layer.mask && layer.opacity === 1 &&
+          (layer.fillOpacity ?? 1) === 1 && layer.blendMode === "normal" &&
+          !style.blendIf.enabled && !style.colorOverlay.enabled && !shadow.enabled &&
+          patchBackdrop.every(node => isImmutable(node) && !affected.has(node.id));
+        const patchKey = `${key}:patch:${JSON.stringify(options.documentTransform)}`;
+        if (retainPatch) {
+          const previous = this.patchPrefixes.get(patchKey);
+          if (previous?.layer === layer && previous.backdrop.length === patchBackdrop.length &&
+              previous.backdrop.every((node, i) => node === patchBackdrop[i])) {
+            targetContext.save();
+            try {
+              targetContext.globalAlpha = 1;
+              targetContext.globalCompositeOperation = "copy";
+              if (cache!.draw(patchKey, "completed", targetContext)) continue;
+            } finally { targetContext.restore(); }
+          }
+        }
+
+        const finishedStyle = !!cache && cacheable && isImmutable(layer) &&
+          !affected.has(layer.id) && !style.blendIf.enabled &&
+          (shadow.enabled || !!(layer.mask?.enabled && layer.mask.density > 0));
+        let finishedSignature = "";
+        if (finishedStyle) {
+          finishedSignature = this.finishedStyleSignature(layer, options.documentTransform);
+          targetContext.save();
+          try {
+            targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
+            targetContext.globalCompositeOperation = layer.blendMode === "normal" ? "source-over" : layer.blendMode;
+            if (cache!.draw(key, finishedSignature, targetContext)) continue;
+          } finally { targetContext.restore(); }
+        }
+        // Composite a retained, unchanged surface synchronously. No cache-owned
+        // canvas escapes across an await, and no postprocessing mutates it.
+        const rawComposite = cacheable && !affected.has(layer.id) &&
+          !shadow.enabled && !style.blendIf.enabled &&
+          (layer.fillOpacity ?? 1) === 1 &&
+          !(layer.mask?.enabled && layer.mask.density > 0);
+        const compositeSignature = style.colorOverlay.enabled
+          ? JSON.stringify(["color-overlay", signature, style.colorOverlay]) : signature;
+        if (rawComposite && cache) {
+          targetContext.save();
+          try {
+            targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
+            targetContext.globalCompositeOperation =
+              layer.blendMode === "normal" ? "source-over" : layer.blendMode;
+            if (cache.draw(key, compositeSignature, targetContext)) continue;
+          } finally { targetContext.restore(); }
+        }
         const content = createCanvas(
           padded.width,
           padded.height,
           layer.kind === "group" && needsReadback(layer.children),
         );
-        const result = createCanvas(
+        // Ordinary content already has the exact output geometry. Keep a separate
+        // surface only when shadow/fill/Blend If needs another processing stage.
+        const directContent = layer.kind !== "adjustment" && !shadow.enabled &&
+          !style.blendIf.enabled && (layer.fillOpacity ?? 1) === 1;
+        const result = directContent ? content : createCanvas(
           current.width,
           current.height,
           style.blendIf.enabled,
         );
+        let occupied = layer.kind === "text" ? cache?.bounds(key, signature) : undefined;
         try {
-          // Cache unstyled content; opacity/blending and backdrop-dependent
-          // Blend If are evaluated on every composition. Ancestors of a live
-          // stroke are recomposed from their cached, unchanged children.
-          const cacheable =
-            (!affected.has(layer.id) ||
-              layer.kind === "paint" ||
-              (!!preview?.maskMode && layer.id === preview.layerId)) &&
-            layer.kind !== "adjustment";
-          const key = `${scope}:${layer.id}:${JSON.stringify([padded, world])}`;
-          const signature = cacheable && cache ? this.signature(layer) : "";
           if (!cacheable || !cache?.read(key, signature, content)) {
+            let textInk: ReturnType<typeof drawText>;
             if (layer.kind === "smart-object") {
               if (!registry) throw new Error("Missing smart-object registry.");
               await this.smart(
@@ -572,31 +735,87 @@ export class CanvasRenderer implements DocumentRenderer {
                 world,
                 options,
               );
-            } else if (layer.kind === "raster")
-              await this.raster(layer, assets, content, padded, world);
-            else if (layer.kind === "paint")
+            } else if (layer.kind === "raster") {
+              const basis = contentSignature({ ...layer, erasures: [] });
+              const previous = cache ? this.rasterPrefixes.get(key) : undefined;
+              const erasures = layer.erasures ?? [];
+              let start = 0;
+              const reusable = previous && isImmutable(layer) && isImmutable(previous.layer) &&
+                previous.basis === basis && (previous.layer.erasures?.length ?? 0) <= erasures.length &&
+                (previous.layer.erasures ?? []).every((entry, i) => entry === erasures[i]) &&
+                cache!.read(key, previous.signature, content);
+              if (reusable) start = previous.layer.erasures?.length ?? 0;
+              else await this.raster(layer, assets, content, padded, world);
+              for (const entry of erasures.slice(start)) await drawPaint({ ...layer, kind: "paint", strokes: [entry.stroke] }, assets, content, padded, world.multiply(AffineTransform.scale(layer.width / entry.width, layer.height / entry.height)), this.processor, undefined, cache, canCache, undefined, options.isCancelled);
+              if (cache && canCache() && isImmutable(layer)) {
+                this.rasterPrefixes.delete(key);
+                this.rasterPrefixes.set(key, { layer, signature, basis });
+                while (this.rasterPrefixes.size > 64)
+                  this.rasterPrefixes.delete(this.rasterPrefixes.keys().next().value!);
+              }
+            }
+            else if (layer.kind === "paint") {
+              // A committed append can start from the retained, unstyled prefix.
+              // Identity checks are safe only for immutable store-owned strokes.
+              const basis = contentSignature({ ...layer, strokes: [] });
+              const previous = cache ? this.paintPrefixes.get(key) : undefined;
+              let start = 0;
+              if (previous && isImmutable(layer) && isImmutable(previous.layer) &&
+                  previous.basis === basis && previous.layer.strokes.length <= layer.strokes.length &&
+                  previous.layer.strokes.every((stroke, i) => stroke === layer.strokes[i]) &&
+                  cache!.read(key, previous.signature, content)) {
+                start = previous.layer.strokes.length;
+              }
               await drawPaint(
-                layer,
+                start ? { ...layer, strokes: layer.strokes.slice(start) } : layer,
                 assets,
                 content,
                 padded,
                 world,
                 this.processor,
+                undefined,
+                cache,
+                canCache,
+                undefined,
+                options.isCancelled,
               );
+              if (cache && canCache() && isImmutable(layer)) {
+                this.paintPrefixes.delete(key);
+                this.paintPrefixes.set(key, { layer, signature, basis });
+                while (this.paintPrefixes.size > 64)
+                  this.paintPrefixes.delete(this.paintPrefixes.keys().next().value!);
+              }
+            }
             else if (layer.kind === "vector")
               drawVectors(layer, content, padded, world);
             else if (layer.kind === "text")
-              drawText(layer, content, padded, world);
+              textInk = drawText(layer, content, padded, world,
+                !!cache && cacheable && isImmutable(layer));
             else if (layer.kind === "adjustment") {
               const c = content.getContext("2d")!;
               c.drawImage(target, haloX, haloY);
               if (layer.adjustment.kind === "patch") {
                 const patch = layer.adjustment;
                 const bitmap = assets.get(patch.assetId).bitmap;
+                const patchTransform = renderTransform(padded, world);
+                const corners = [
+                  { x: 0, y: 0 }, { x: patch.width, y: 0 },
+                  { x: 0, y: patch.height }, { x: patch.width, y: patch.height },
+                ].map(point => patchTransform.point(point));
+                // Keep the existing tile rasterization grid, but transfer only
+                // affected pixels. Two output pixels cover interpolation edges.
+                const left = Math.max(0, Math.floor(Math.min(...corners.map(p => p.x))) - 2);
+                const top = Math.max(0, Math.floor(Math.min(...corners.map(p => p.y))) - 2);
+                const right = Math.min(padded.width, Math.ceil(Math.max(...corners.map(p => p.x))) + 2);
+                const bottom = Math.min(padded.height, Math.ceil(Math.max(...corners.map(p => p.y))) + 2);
                 for (let ty = 0; ty < padded.height; ty += 1024)
                   for (let tx = 0; tx < padded.width; tx += 1024) {
                     const width = Math.min(1024, padded.width - tx),
                       height = Math.min(1024, padded.height - ty);
+                    const x = Math.max(tx, left), y = Math.max(ty, top);
+                    const affectedWidth = Math.min(tx + width, right) - x;
+                    const affectedHeight = Math.min(ty + height, bottom) - y;
+                    if (affectedWidth <= 0 || affectedHeight <= 0) continue;
                     const tileSpace = {
                       ...padded,
                       x: padded.x + tx / padded.sx,
@@ -617,26 +836,30 @@ export class CanvasRenderer implements DocumentRenderer {
                         patch.height,
                       );
                       const corrected = context.getImageData(
-                        0,
-                        0,
-                        width,
-                        height,
+                        x - tx,
+                        y - ty,
+                        affectedWidth,
+                        affectedHeight,
                       ).data;
-                      const backdrop = c.getImageData(tx, ty, width, height);
+                      const backdrop = c.getImageData(x, y, affectedWidth, affectedHeight);
                       const pixels = await this.processor.blendAdjustment(
                         backdrop.data,
                         corrected,
                         corrected,
                         1,
                       );
-                      const output = c.createImageData(width, height);
+                      const output = c.createImageData(affectedWidth, affectedHeight);
                       output.data.set(pixels);
-                      c.putImageData(output, tx, ty);
+                      c.putImageData(output, x, y);
                     } finally {
                       release(surface);
                     }
                   }
               } else if (layer.adjustment.kind === "tonal") {
+                const backdrop = nodes.slice(0, nodes.indexOf(layer));
+                const committed = layer.adjustment.strokes;
+                const reusable = !!cache && isImmutable(committed) &&
+                  backdrop.every(node => isImmutable(node) && !affected.has(node.id));
                 for (let ty = 0; ty < padded.height; ty += 1024)
                   for (let tx = 0; tx < padded.width; tx += 1024) {
                     const width = Math.min(1024, padded.width - tx),
@@ -649,23 +872,32 @@ export class CanvasRenderer implements DocumentRenderer {
                       height,
                     };
                     const image = c.getImageData(tx, ty, width, height);
+                    const prefixKey = `${key}:tonal:${tx}:${ty}:${JSON.stringify(options.documentTransform)}`;
+                    const previous = reusable ? this.tonalPrefixes.get(prefixKey) : undefined;
                     let pixels: Uint8ClampedArray = image.data;
-                    const strokes =
-                      preview?.layerId === layer.id && preview.tonal
-                        ? [
-                            ...layer.adjustment.strokes,
-                            { ...preview.tonal, brush: preview.stroke },
-                          ]
-                        : layer.adjustment.strokes;
-                    for (const stroke of strokes)
-                      pixels = await renderTonalStroke(
-                        pixels,
-                        stroke.brush,
-                        stroke,
-                        tileSpace,
-                        this.processor,
-                        world,
-                      );
+                    let start = 0;
+                    if (previous && previous.backdrop.length === backdrop.length &&
+                        previous.backdrop.every((node, i) => node === backdrop[i]) &&
+                        previous.strokes.length <= committed.length &&
+                        previous.strokes.every((stroke, i) => stroke === committed[i])) {
+                      const retained = cache!.readPixels(prefixKey, previous.signature);
+                      if (retained) { pixels = retained; start = previous.strokes.length; }
+                    }
+                    for (const stroke of committed.slice(start))
+                      pixels = await renderTonalStroke(pixels, stroke.brush, stroke,
+                        tileSpace, this.processor, world);
+                    if (reusable && canCache() && (!previous || start !== committed.length)) {
+                      const signature = String(++this.tonalVersion);
+                      cache!.writePixels(prefixKey, signature, pixels);
+                      this.tonalPrefixes.delete(prefixKey);
+                      this.tonalPrefixes.set(prefixKey, { backdrop, strokes: committed, signature });
+                      while (this.tonalPrefixes.size > 64)
+                        this.tonalPrefixes.delete(this.tonalPrefixes.keys().next().value!);
+                    }
+                    // A live preview must never become the retained committed prefix.
+                    if (preview?.layerId === layer.id && preview.tonal)
+                      pixels = await renderTonalStroke(pixels, preview.stroke, preview.tonal,
+                        tileSpace, this.processor, world);
                     image.data.set(pixels);
                     c.putImageData(image, tx, ty);
                   }
@@ -733,15 +965,34 @@ export class CanvasRenderer implements DocumentRenderer {
               throw new Error(
                 "Smart-object references must be resolved before compositing.",
               );
-            if (cacheable && canCache()) cache?.write(key, signature, content);
+            // Mutable command previews are short-lived. Retaining their transformed
+            // raw surface copies pixels and evicts reusable committed layers.
+            if (cacheable && isImmutable(layer) && canCache()) {
+              const bounds = layer.kind === "raster"
+                ? [{ x: 0, y: 0, width: layer.width, height: layer.height }]
+                : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
+                : layer.kind === "text" && textInk ? [textInk] : null;
+              if (bounds) {
+                const placement = renderTransform(padded, world);
+                const boxes = bounds.map(bound => placement.bounds(bound));
+                if (boxes.length) {
+                  const x = Math.floor(Math.min(...boxes.map(box => box.x))) - 2;
+                  const y = Math.floor(Math.min(...boxes.map(box => box.y))) - 2;
+                  const right = Math.ceil(Math.max(...boxes.map(box => box.x + box.width))) + 2;
+                  const bottom = Math.ceil(Math.max(...boxes.map(box => box.y + box.height))) + 2;
+                  occupied = { x, y, width: right-x, height: bottom-y };
+                } else occupied = { x: 0, y: 0, width: 0, height: 0 };
+              }
+              cache?.write(key, signature, content, layer.kind === "paint" ? 64 : 1, occupied);
+            }
           }
           if (
-            layer.kind === "paint" &&
+            (layer.kind === "paint" || (layer.kind === "raster" && preview?.stroke.kind === "eraser")) &&
             !preview?.maskMode &&
             layer.id === preview?.layerId
           ) {
             await drawPaint(
-              { ...layer, strokes: [preview.stroke] },
+              { ...layer, kind: "paint", strokes: [preview.stroke] },
               assets,
               content,
               padded,
@@ -750,6 +1001,8 @@ export class CanvasRenderer implements DocumentRenderer {
               cache && canCache() ? this.activeStroke : undefined,
               canCache() ? cache : undefined,
               canCache,
+              preview.cloneSource,
+              options.isCancelled,
             );
           }
           const c = content.getContext("2d")!,
@@ -839,9 +1092,45 @@ export class CanvasRenderer implements DocumentRenderer {
             c.fillRect(0, 0, padded.width, padded.height);
             c.restore();
           }
+          // During gestures, promote unchanged overlay layers to finished
+          // pixels in the SAME cache slot. Retaining both forms would thrash the
+          // shared byte budget on modest multi-layer documents. The active layer
+          // keeps its raw prefix; a later style change can rebuild cold content.
+          // Text can also promote on ordinary edits: it has no stroke prefix to
+          // preserve, and otherwise rebuilds every overlay on each keystroke.
+          if ((preview || (layer.kind === "text" && isImmutable(layer))) &&
+              rawComposite && style.colorOverlay.enabled && canCache())
+            cache?.write(key, compositeSignature, content, 1,
+              layer.kind === "text" ? occupied : undefined);
           if (layer.kind === "adjustment") {
             try {
-              for (let ty = 0; ty < current.height; ty += 1024)
+              const directPatch = layer.adjustment.kind === "patch" &&
+                layer.opacity === 1 && (layer.fillOpacity ?? 1) === 1 &&
+                layer.blendMode === "normal" && !maskCanvas &&
+                !style.blendIf.enabled && !style.colorOverlay.enabled &&
+                !shadow.enabled;
+              if (directPatch) {
+                // Patch correction already preserves the backdrop alpha. At
+                // full strength this is the completed composite, so avoid a
+                // second full-canvas readback and worker interpolation pass.
+                targetContext.save();
+                try {
+                  targetContext.globalAlpha = 1;
+                  targetContext.globalCompositeOperation = "copy";
+                  targetContext.drawImage(content, haloX, haloY,
+                    current.width, current.height, 0, 0,
+                    current.width, current.height);
+                } finally {
+                  targetContext.restore();
+                }
+                if (retainPatch && canCache()) {
+                  cache!.write(patchKey, "completed", target);
+                  this.patchPrefixes.delete(patchKey);
+                  this.patchPrefixes.set(patchKey, { layer, backdrop: patchBackdrop });
+                  while (this.patchPrefixes.size > 64)
+                    this.patchPrefixes.delete(this.patchPrefixes.keys().next().value!);
+                }
+              } else for (let ty = 0; ty < current.height; ty += 1024)
                 for (let tx = 0; tx < current.width; tx += 1024) {
                   const width = Math.min(1024, current.width - tx),
                     height = Math.min(1024, current.height - ty);
@@ -880,9 +1169,11 @@ export class CanvasRenderer implements DocumentRenderer {
               if (maskCanvas) release(maskCanvas);
             }
           } else {
-            r.globalAlpha = layer.fillOpacity ?? 1;
-            r.drawImage(content, -haloX, -haloY);
-            r.globalAlpha = 1;
+            if (!directContent) {
+              r.globalAlpha = layer.fillOpacity ?? 1;
+              r.drawImage(content, -haloX, -haloY);
+              r.globalAlpha = 1;
+            }
             if (style.blendIf.enabled) {
               for (let ty = 0; ty < current.height; ty += 1024)
                 for (let tx = 0; tx < current.width; tx += 1024) {
@@ -898,8 +1189,26 @@ export class CanvasRenderer implements DocumentRenderer {
                   r.putImageData(adjusted, tx, ty);
                 }
             }
+            // Retain the completed appearance in the raw slot, sharing the
+            // same bounded budget rather than keeping duplicate full surfaces.
+            if (finishedStyle && canCache()) {
+              let finishedBounds: typeof occupied;
+              if (layer.kind === "text" && occupied) {
+                // Raw coverage uses padded coordinates; the completed appearance
+                // is on the current output grid. Masks/overlays cannot expand ink.
+                const blur = shadow.enabled ? shadow.blur * 3 * Math.max(current.sx, current.sy) : 0;
+                const dx = shadow.enabled ? shadow.x * current.sx : 0;
+                const dy = shadow.enabled ? shadow.y * current.sy : 0;
+                const x = Math.floor(occupied.x - haloX + Math.min(0, dx - blur)) - 2;
+                const y = Math.floor(occupied.y - haloY + Math.min(0, dy - blur)) - 2;
+                const right = Math.ceil(occupied.x + occupied.width - haloX + Math.max(0, dx + blur)) + 2;
+                const bottom = Math.ceil(occupied.y + occupied.height - haloY + Math.max(0, dy + blur)) + 2;
+                finishedBounds = { x, y, width: right - x, height: bottom - y };
+              }
+              cache!.write(key, finishedSignature, result, 1, finishedBounds);
+            }
             targetContext.save();
-            targetContext.globalAlpha = layer.opacity;
+            targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
             targetContext.globalCompositeOperation =
               layer.blendMode === "normal" ? "source-over" : layer.blendMode;
             targetContext.drawImage(result, 0, 0);
@@ -907,7 +1216,7 @@ export class CanvasRenderer implements DocumentRenderer {
           }
         } finally {
           release(content);
-          release(result);
+          if (result !== content) release(result);
         }
       }
     };
@@ -918,19 +1227,29 @@ export class CanvasRenderer implements DocumentRenderer {
         space,
         options.rootTransform ?? new AffineTransform(),
       );
+      checkRenderCurrent(options.isCancelled);
       return output;
     } catch (error) {
       release(output);
       throw error;
     }
   }
-  clearCache() {
+  /** End in-flight view work while retaining document/asset-scoped pixels. */
+  resetView() {
     this.epoch++;
-    this.cache.clear();
     this.filterTiles.clear();
     this.maskPaint.clear();
     this.activeStroke.clear();
+  }
+  clearCache() {
+    this.resetView();
+    this.cache.clear();
     this.signatures = new WeakMap();
+    this.styledIds = new WeakMap();
+    this.paintPrefixes.clear();
+    this.rasterPrefixes.clear();
+    this.tonalPrefixes.clear();
+    this.patchPrefixes.clear();
   }
   dispose() {
     this.fonts?.removeEventListener("loadingdone", this.fontsChanged);

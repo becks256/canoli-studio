@@ -1,8 +1,13 @@
+import { strokeCaptureRegion, strokeIntersectsRegion } from "./engine/stroke-region";
+import { freeze } from "./core/immutable";
+import { ClonePreviewSource } from "./engine/clone-preview";
+import { lassoSelection } from "./core/lasso";
 import { CanvasRenderer } from "./engine/renderer";
 import { CropController } from "./crop-controller";
 import type { CropHandle } from "./crop-controller";
 import type { EditorApplication } from "./editor";
 import {
+  RasterLayer,
   BrushStroke,
   SmartObjectLayer,
   AdjustmentLayer,
@@ -44,6 +49,7 @@ import { release } from "./engine/canvas";
 import type { PaintPreview } from "./engine/renderer";
 
 export type Tool =
+  | "wand"
   | "move"
   | "hand"
   | "heal"
@@ -54,6 +60,7 @@ export type Tool =
   | "pencil"
   | "eraser"
   | "pen"
+  | "lasso"
   | "marquee"
   | "clone"
   | "artboard"
@@ -87,10 +94,13 @@ export interface ToolSettings {
   penWidth: number;
   penFill: boolean;
   selectionShape: "rectangle" | "ellipse";
+  wandTolerance: number;
+  wandContiguous: boolean;
   selectionMode: "replace" | SelectionOperation;
   cloneAligned: boolean;
 }
 interface ToolState {
+  lassoPoints: Point[] | null;
   healingStroke: BrushStrokeData | null;
   patchOffset: Point | null;
   settings: ToolSettings;
@@ -112,7 +122,7 @@ interface PaintGesture extends BaseGesture {
   kind: "paint";
   tool: "brush" | "pencil" | "clone" | "eraser" | "dodge" | "burn";
   points: StrokePoint[];
-  layer: PaintLayer | AdjustmentLayer;
+  layer: PaintLayer | AdjustmentLayer | RasterLayer;
   fresh: boolean;
   after: Layer | null;
   origin: Point;
@@ -120,6 +130,13 @@ interface PaintGesture extends BaseGesture {
   settings: ToolSettings;
   offset: Point | null;
   stroke: BrushStrokeData;
+  cloneSource?: ClonePreviewSource;
+}
+interface LassoGesture extends BaseGesture {
+  kind: "lasso";
+  points: Point[];
+  previous: SelectionData | null;
+  operation: "replace" | SelectionOperation;
 }
 interface MarqueeGesture extends BaseGesture {
   kind: "marquee";
@@ -210,6 +227,7 @@ type Gesture =
   | MaskPenGesture
   | MaskPaintGesture
   | PaintGesture
+  | LassoGesture
   | MarqueeGesture
   | PenGesture
   | FillGesture;
@@ -242,10 +260,13 @@ export class ToolController {
       penWidth: 3,
       penFill: false,
       selectionShape: "rectangle",
+      wandTolerance: 32,
+      wandContiguous: true,
       selectionMode: "replace",
       cloneAligned: true,
     },
     preview: null,
+    lassoPoints: null,
     paintPreview: null,
     cloneSource: null,
     cloneOffset: null,
@@ -276,6 +297,15 @@ export class ToolController {
     );
   }
   getSnapshot = () => this.state;
+  private uiSnapshot: ToolState | null = null;
+  /** High-frequency paint pixels are consumed directly by the viewport. */
+  getUiSnapshot = () => {
+    const previous = this.uiSnapshot;
+    if (!previous || (Object.keys(this.state) as (keyof ToolState)[]).some(
+      key => key !== "paintPreview" && previous[key] !== this.state[key],
+    )) this.uiSnapshot = this.state;
+    return this.uiSnapshot!;
+  };
   get maskContourIndex() {
     return this.maskContour?.pathIndex ?? -1;
   }
@@ -332,9 +362,11 @@ export class ToolController {
     this.maskContour = null;
     this.cancelFrame();
     this.generation++;
+    if(this.gesture?.kind === "paint")this.gesture.cloneSource?.dispose();
     this.gesture = null;
     this.publish({
       preview: null,
+      lassoPoints: null,
       paintPreview: null,
       drawing: false,
       patchOffset: null,
@@ -350,9 +382,11 @@ export class ToolController {
     this.maskPoint = null;
     this.cancelFrame();
     this.generation++;
+    if(this.gesture?.kind === "paint")this.gesture.cloneSource?.dispose();
     this.gesture = null;
     this.publish({
       preview: null,
+      lassoPoints: null,
       paintPreview: null,
       drawing: false,
       penTarget: null,
@@ -462,7 +496,7 @@ export class ToolController {
   private unlocked() {
     const doc = this.editor.document,
       selected = doc.selectedLayer;
-    if (selected && isLocked(doc.toJSON(), selected.id))
+    if (selected && isLocked(doc._read(), selected.id))
       throw new Error(
         "Unlock the selected layer and its parent groups before drawing.",
       );
@@ -542,6 +576,12 @@ export class ToolController {
       this.publish({ drawing: true, patchOffset: { x: 0, y: 0 } });
       return;
     }
+    if (tool === "lasso") {
+      const operation = modifiers.shift && modifiers.alt ? "intersect" : modifiers.shift ? "add" : modifiers.alt ? "subtract" : this.state.settings.selectionMode;
+      this.gesture = { ...base, kind: "lasso", points: [point], previous: doc.selection?.toJSON() ?? null, operation };
+      this.publish({drawing: true, lassoPoints: [point]});
+      return;
+    }
     if (tool === "marquee") {
       const operation =
         modifiers.shift && modifiers.alt
@@ -607,7 +647,7 @@ export class ToolController {
       let maskWorld = this.maskWorld(doc, selected, data);
       if (filterMask && selected instanceof SmartObjectLayer) {
         const master = doc.getComponent(selected.componentId);
-        const nativeWorld = layerTransform(doc.toJSON(), selected.id)!.multiply(
+        const nativeWorld = layerTransform(doc._read(), selected.id)!.multiply(
           AffineTransform.scale(
             selected.width / master.width,
             selected.height / master.height,
@@ -667,7 +707,7 @@ export class ToolController {
             : new PaintLayer({ name: "Fill layer" });
       const origin = fresh
         ? { x: 0, y: 0 }
-        : layerOrigin(doc.toJSON(), layer.id)!;
+        : layerOrigin(doc._read(), layer.id)!;
       const fill = new PaintFill({
         color: this.state.settings.color,
         opacity: this.state.settings.opacity,
@@ -721,10 +761,10 @@ export class ToolController {
     const reusable = tonal
       ? selected instanceof AdjustmentLayer &&
         selected.adjustmentKind === "tonal"
-      : selected instanceof PaintLayer;
+      : selected instanceof PaintLayer || (tool === "eraser" && selected instanceof RasterLayer);
     const fresh = !reusable,
       layer = reusable
-        ? (selected as PaintLayer | AdjustmentLayer)
+        ? (selected as PaintLayer | AdjustmentLayer | RasterLayer)
         : tonal
           ? new AdjustmentLayer({
               name: "Tonal retouch",
@@ -742,10 +782,10 @@ export class ToolController {
             });
     const origin = fresh
       ? { x: 0, y: 0 }
-      : layerOrigin(doc.toJSON(), layer.id)!;
+      : layerOrigin(doc._read(), layer.id)!;
     const inputTransform = fresh
       ? AffineTransform.translation(-origin.x, -origin.y)
-      : layerTransform(doc.toJSON(), layer.id)!.inverse();
+      : layerTransform(doc._read(), layer.id)!.inverse();
     const offset =
       tool === "clone"
         ? this.state.settings.cloneAligned && this.state.cloneOffset
@@ -787,7 +827,7 @@ export class ToolController {
     };
     // Place an empty transient layer once. Pointer movement never clones or
     // validates the document; only the final DOM commit enters history.
-    if (fresh && tool !== "clone")
+    if (fresh)
       this.publish({ preview: this.newLayerPreview(layer.toJSON(), selected) });
     this.updatePaintPreview(this.gesture);
     this.publish({ drawing: true });
@@ -807,7 +847,11 @@ export class ToolController {
           type: "path.update",
           id: gesture.layer.id,
           pathId: gesture.path.id,
-          patch: { points: gesture.data.points, closed: gesture.data.closed },
+          patch: {
+            points: gesture.data.points.map((point, index) =>
+              index === gesture.index ? structuredClone(point) : point),
+            closed: gesture.data.closed,
+          },
         };
   }
   private maskWorld(
@@ -815,7 +859,7 @@ export class ToolController {
     layer: Layer,
     mask: LayerMaskData,
   ): AffineTransform {
-    return maskTransform(mask, layerTransform(document.toJSON(), layer.id)!);
+    return maskTransform(mask, layerTransform(document._read(), layer.id)!);
   }
   startMaskContour() {
     const { doc, selected } = this.unlocked();
@@ -1022,35 +1066,40 @@ export class ToolController {
       layer = selected instanceof VectorLayer ? selected : new VectorLayer();
     const origin = fresh
       ? { x: 0, y: 0 }
-      : layerOrigin(base.document.toJSON(), layer.id)!;
+      : layerOrigin(base.document._read(), layer.id)!;
     const world = fresh
       ? new AffineTransform()
-      : layerTransform(base.document.toJSON(), layer.id)!;
+      : layerTransform(base.document._read(), layer.id)!;
     const inputTransform = world.inverse();
     const local = inputTransform.point(point);
     const target = this.state.penTarget;
-    let path =
-      target?.layerId === layer.id ? layer.paths.get(target.pathId) : null;
+    const layerData = layer._read();
+    const paths = layerData.kind === "vector" ? layerData.paths : [];
+    let sourcePath = target?.layerId === layer.id
+      ? paths.find(candidate => candidate.id === target.pathId) ?? null : null;
+    let path = sourcePath ? layer.paths.get(sourcePath.id) : null;
     let mode: PenGesture["mode"] = "new",
-      index = path?.points.length ?? 0,
+      index = sourcePath?.points.length ?? 0,
       newPath = !path;
     const near = (p: Point) => {
       const canvas = world.point(p);
       return Math.hypot(canvas.x - point.x, canvas.y - point.y) <= 7 / zoom;
     };
-    if (path && path.points.length >= 3 && near(path.points[0])) {
+    if (sourcePath && sourcePath.points.length >= 3 && near(sourcePath.points[0])) {
       mode = "close";
       index = 0;
     } else {
-      outer: for (const candidate of layer.paths)
-        for (let i = 0; i < candidate.points.length; i++) {
-          const anchor = candidate.points[i];
+      outer: for (const candidate of paths) {
+        const points = candidate.points;
+        for (let i = 0; i < points.length; i++) {
+          const anchor = points[i];
           for (const part of ["in", "out", "anchor"] as const) {
             const p = part === "anchor" ? anchor : anchor[part];
             if (part !== "anchor" && p.x === anchor.x && p.y === anchor.y)
               continue;
             if (near(p)) {
-              path = candidate;
+              sourcePath = candidate;
+              path = layer.paths.get(candidate.id);
               index = i;
               mode = part;
               newPath = false;
@@ -1058,6 +1107,7 @@ export class ToolController {
             }
           }
         }
+      }
     }
     if (!path)
       path = new VectorPath({
@@ -1066,8 +1116,12 @@ export class ToolController {
         fill: this.state.settings.penFill ? this.state.settings.color : null,
         strokeWidth: this.state.settings.penWidth,
       });
-    const original = path.toJSON(),
-      data = path.toJSON();
+    // Existing path records are immutable document data. Clone only the active
+    // anchor; public path getters remain defensive for external callers.
+    const original = sourcePath ?? freeze(path.toJSON()),
+      data = { ...original, points: [...original.points] };
+    // Only the active anchor is mutable during a Pen gesture.
+    if (data.points[index]) data.points[index] = structuredClone(data.points[index]);
     if (mode === "new" && !newPath)
       data.points.push({ ...local, in: { ...local }, out: { ...local } });
     if (mode === "close") data.closed = true;
@@ -1254,6 +1308,17 @@ export class ToolController {
       }
       return;
     }
+    if (gesture.kind === "lasso") {
+      const last=gesture.points.at(-1)!;
+      if(Math.hypot(point.x-last.x,point.y-last.y)<0.25)return;
+      if(gesture.points.length>=20000)throw new Error("Finish this lasso before adding more points.");
+      gesture.points.push(point);
+      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{
+        this.paintFrame=null;
+        if(this.gesture===gesture)this.publish({lassoPoints:[...gesture.points]});
+      });
+      return;
+    }
     if (gesture.kind === "marquee") {
       const width = Math.abs(point.x - gesture.start.x),
         height = Math.abs(point.y - gesture.start.y);
@@ -1328,26 +1393,10 @@ export class ToolController {
           : new BrushStroke(options);
   }
   private updateMaskPreview(gesture: MaskPaintGesture) {
-    if (gesture.filterMask) {
-      this.publish({
-        paintPreview: null,
-        preview: {
-          type: "smartObject.filterMask",
-          id: gesture.layer.id,
-          mask: gesture.mask
-            .paint(
-              PaintOperation.fromJSON(gesture.stroke) as
-                BrushStroke | PencilStroke,
-              gesture.mode,
-            )
-            .toJSON(),
-        },
-      });
-      return;
-    }
     this.publish({
       paintPreview: {
         layerId: gesture.layer.id,
+        filterMask: gesture.filterMask,
         maskMode: gesture.mode,
         stroke: { ...gesture.stroke, points: gesture.stroke.points.slice() },
       },
@@ -1355,14 +1404,33 @@ export class ToolController {
   }
 
   private updatePaintPreview(gesture: PaintGesture) {
-    if (gesture.tool === "clone") {
-      this.publish({ preview: null });
-      return;
+    if (gesture.tool === "clone" && !gesture.cloneSource) {
+      const snapshot=gesture.document.getSnapshot().document,assets=this.editor.assetStore;
+      const inverse=gesture.inputTransform;
+      const affine=inverse.a!==1||inverse.b!==0||inverse.c!==0||inverse.d!==1;
+      const sampler=affine?new CanvasRenderer():null;
+      const root=inverse.multiply(AffineTransform.translation(-gesture.offset!.x,-gesture.offset!.y));
+      gesture.cloneSource=new ClonePreviewSource(async region=>{
+        this.assertCurrent(gesture);
+        const sx=region.x+gesture.origin.x+gesture.offset!.x,sy=region.y+gesture.origin.y+gesture.offset!.y;
+        const image=sampler?await sampler.render(snapshot,assets,{region,cache:false,rootTransform:root,documentTransform:root})
+          :await this.editor.renderer.render(snapshot,assets,{region:{...region,x:sx,y:sy},cache:false});
+        try { this.assertCurrent(gesture); } catch(error) { release(image); throw error; }
+        const c=image.getContext("2d")!;
+        c.save();c.globalCompositeOperation="destination-in";c.fillStyle="#fff";
+        if(sampler){
+          const corners=[{x:0,y:0},{x:snapshot.width,y:0},{x:snapshot.width,y:snapshot.height},{x:0,y:snapshot.height}].map(p=>root.point(p));
+          c.beginPath();c.moveTo(corners[0].x-region.x,corners[0].y-region.y);
+          for(const p of corners.slice(1))c.lineTo(p.x-region.x,p.y-region.y);c.closePath();c.fill();
+        }else c.fillRect(-sx,-sy,snapshot.width,snapshot.height);
+        c.restore();return image;
+      },()=>sampler?.dispose());
     }
     this.publish({
       paintPreview: {
         layerId: gesture.layer.id,
-        stroke: { ...gesture.stroke, points: gesture.points.slice() },
+        cloneSource: gesture.cloneSource,
+        stroke: { ...gesture.stroke, color: gesture.tool === "clone" ? "#ffffff" : gesture.stroke.color, points: gesture.points.slice() },
         tonal:
           gesture.tool === "dodge" || gesture.tool === "burn"
             ? {
@@ -1414,6 +1482,9 @@ export class ToolController {
     const gesture = this.gesture;
     if (!gesture) return;
     this.gesture = null;
+    // Keep the displayed frame, but stop source work for previews that can no
+    // longer be updated. Durable capture owns its own sampling resources.
+    if (gesture.kind === "paint") gesture.cloneSource?.dispose();
     const assets = this.editor.assetStore;
     let stagedTiles: CloneTile[] = [];
     let committed = false;
@@ -1498,6 +1569,13 @@ export class ToolController {
         else gesture.layer.mask = mask;
         return;
       }
+      if (gesture.kind === "lasso") {
+        const selection=lassoSelection(gesture.points,doc.width,doc.height);
+        if(!selection.regions.length)return;
+        const region=selection.regions[0];
+        doc.selection=new MarqueeSelection(gesture.operation==='replace' ? selection : {regions:[...(gesture.previous?.regions??[]),{...region,operation:gesture.operation}]});
+        return;
+      }
       if (gesture.kind === "marquee") {
         doc.selection = new MarqueeSelection(gesture.selection);
         return;
@@ -1567,7 +1645,8 @@ export class ToolController {
                 protectTones: gesture.settings.protectTones,
               }),
             );
-          } else gesture.layer.strokes.add(this.stroke(gesture, tiles));
+          } else if (gesture.layer instanceof RasterLayer) gesture.layer.erase(this.stroke(gesture) as EraserStroke);
+          else gesture.layer.strokes.add(this.stroke(gesture, tiles));
         },
       );
       committed = true;
@@ -1575,10 +1654,12 @@ export class ToolController {
       if (gesture.offset && gesture.settings.cloneAligned)
         this.publish({ cloneOffset: gesture.offset });
     } finally {
+      if(gesture.kind === "paint")gesture.cloneSource?.dispose();
       if (!committed)
         stagedTiles.forEach((tile) => assets.remove(tile.assetId));
       this.publish({
         preview: null,
+        lassoPoints: null,
         paintPreview: null,
         drawing: false,
         patchOffset: null,
@@ -1598,12 +1679,8 @@ export class ToolController {
   private async sampleClone(gesture: PaintGesture): Promise<CloneTile[]> {
     const snapshot = gesture.document.toJSON(),
       assets = this.editor.assetStore;
-    const bounds = strokeBounds(
-      new BrushStroke({
-        points: gesture.points,
-        size: gesture.settings.size,
-      }).toJSON(),
-    );
+    const stroke = { ...gesture.stroke, points: gesture.points };
+    const bounds = strokeBounds(stroke);
     const inverse = gesture.inputTransform;
     const affine =
       inverse.a !== 1 || inverse.b !== 0 || inverse.c !== 0 || inverse.d !== 1;
@@ -1619,22 +1696,27 @@ export class ToolController {
       right = Math.ceil(bounds.x + bounds.width),
       bottom = Math.ceil(bounds.y + bounds.height);
     try {
-      for (let y = top; y < bottom; y += 1024)
-        for (let x = left; x < right; x += 1024) {
-          const width = Math.min(1024, right - x),
-            height = Math.min(1024, bottom - y);
+      for (let ty = top; ty < bottom; ty += 1024)
+        for (let tx = left; tx < right; tx += 1024) {
+          const tile = { x: tx, y: ty, width: Math.min(1024, right-tx), height: Math.min(1024, bottom-ty) };
+          if (!strokeIntersectsRegion(stroke, tile)) continue;
+          const capture = strokeCaptureRegion(stroke, tile);
+          if (!capture) continue;
+          const { x, y, width, height } = capture;
           const sx = x + gesture.origin.x + offset.x,
             sy = y + gesture.origin.y + offset.y;
           const image = sampler
             ? await sampler.render(snapshot, assets, {
                 region: { x, y, width, height },
                 cache: false,
+                readback: true,
                 rootTransform: root,
                 documentTransform: root,
               })
             : await this.editor.renderer.render(snapshot, assets, {
                 region: { x: sx, y: sy, width, height },
                 cache: false,
+                readback: true,
               });
           try {
             const c = image.getContext("2d")!;
@@ -1663,21 +1745,11 @@ export class ToolController {
               if (sy + height > snapshot.height)
                 c.clearRect(0, snapshot.height - sy, width, height);
             }
-            const blob = await new Promise<Blob>((resolve, reject) =>
-              image.toBlob(
-                (blob) =>
-                  blob
-                    ? resolve(blob)
-                    : reject(new Error("Could not sample clone source.")),
-                "image/png",
-              ),
-            );
-            const asset = await assets.add(
-              blob,
-              "Clone source tile",
-              undefined,
-              false,
-            );
+            // Browser idle encoding can defer every tile for about a second.
+            // Transfer the private readback to the worker for native encoding with direct fallback.
+            const pixels = c.getImageData(0, 0, width, height).data;
+            const blob = await this.editor.renderer.processor.encodePng(pixels, width, height);
+            const asset = await assets.add(blob, "Clone source tile", undefined, false);
             created.push(asset.id);
             tiles.push({ assetId: asset.id, x, y, width, height });
           } finally {
@@ -1695,7 +1767,7 @@ export class ToolController {
   }
   private fillGeometry(doc: Document, layer: PaintLayer | null) {
     const inverse = layer
-      ? layerTransform(doc.toJSON(), layer.id)!.inverse()
+      ? layerTransform(doc._read(), layer.id)!.inverse()
       : new AffineTransform();
     const bounds = { x: 0, y: 0, width: doc.width, height: doc.height };
     const selection = doc.selection?.toJSON();
@@ -1715,6 +1787,11 @@ export class ToolController {
 
   fillSelection(erase = false) {
     const { doc, selected } = this.unlocked();
+    if (erase && selected instanceof RasterLayer) {
+      const local = transformSelection(doc.selection?.toJSON(), layerTransform(doc._read(), selected.id)!.inverse());
+      doc.transaction("Clear selected pixels", () => selected.clear(local ? new MarqueeSelection(local) : null));
+      return;
+    }
     if (erase && !(selected instanceof PaintLayer))
       throw new Error("Select a paint layer to clear its selected pixels.");
     const layer =
@@ -1737,7 +1814,7 @@ export class ToolController {
   get pendingStroke(): BrushStrokeData | null {
     const gesture = this.gesture;
     if (gesture?.kind !== "paint" || gesture.tool !== "clone") return null;
-    // Cursor overlay only; clone pixels are sampled atomically on release.
+    // Source-position cursor; live pixels use the gesture-owned source cache.
     return new BrushStroke({
       points: gesture.points.map((p) => ({
         ...p,

@@ -3,9 +3,146 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luma — Free In-Browser Image Editor &amp; Layer Studio</title>
+
+    <!-- SEO & Metadata -->
+    <meta
+      name="description"
+      content="Free, private in-browser image editor with layers, blend modes, non-destructive adjustments, and WebGPU acceleration. Edit photos locally with no account or uploads."
+    />
+    <meta
+      name="keywords"
+      content="image editor, photo editor, in-browser image editor, layer editor, WebGPU image editor, non-destructive photo editing, online image editor, graphic design, local photo editor"
+    />
+    <meta name="author" content="Luma" />
+    <meta name="creator" content="Luma" />
+    <meta name="publisher" content="Luma" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="googlebot"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+    <meta
+      name="bingbot"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+    <link rel="canonical" href="https://luma-editor.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Luma" />
+    <meta
+      property="og:title"
+      content="Luma — Free In-Browser Image Editor &amp; Layer Studio"
+    />
+    <meta
+      property="og:description"
+      content="Free, private in-browser image editor with layers, blend modes, non-destructive adjustments, and WebGPU acceleration. Edit photos locally with no account or uploads."
+    />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Luma — Free In-Browser Image Editor &amp; Layer Studio"
+    />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Luma — Free In-Browser Image Editor &amp; Layer Studio"
+    />
+    <meta
+      name="twitter:description"
+      content="Free, private in-browser image editor with layers, blend modes, non-destructive adjustments, and WebGPU acceleration. Edit photos locally with no account or uploads."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta
+      name="twitter:image:alt"
+      content="Luma — Free In-Browser Image Editor &amp; Layer Studio"
+    />
+
+    <!-- Mobile & Application -->
+    <meta name="application-name" content="Luma" />
+    <meta name="apple-mobile-web-app-title" content="Luma" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#f4f3ed"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#181c1b"
+    />
+
+    <!-- Icons & Manifest -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Schema.org JSON-LD Structured Data for Search Engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "@id": "https://luma-editor.app/#webapp",
+            "name": "Luma",
+            "url": "https://luma-editor.app/",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "All",
+            "browserRequirements": "Requires a modern browser with WebGPU or HTML5 Canvas support",
+            "description": "Free, private in-browser image editor with layers, blend modes, non-destructive adjustments, and WebGPU acceleration. Edit photos locally with no account or uploads.",
+            "image": "/og-image.png",
+            "screenshot": "/og-image.png",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "featureList": [
+              "Object-oriented layer groups and 16 blend modes",
+              "Non-destructive exposure, contrast, and saturation adjustments",
+              "Hardware WebGPU viewport acceleration with Canvas/WASM fallback",
+              "Paint brush, pixel pencil, Bézier pen, and marquee tools",
+              "Private local image processing without accounts or cloud uploads",
+              "Local recovery checkpoints and project file storage"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://luma-editor.app/#website",
+            "name": "Luma",
+            "url": "https://luma-editor.app/",
+            "description": "Free, private in-browser image editor and layer studio.",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Luma"
+            }
+          }
+        ]
+      }
+    </script>
+
     <script src="/appearance.js"></script>
-    <title>Luma — Image editor</title>
   </head>
   <body>
     <div id="root"></div>

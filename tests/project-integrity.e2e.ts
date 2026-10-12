@@ -65,3 +65,33 @@ test("save project button awaits hashing and downloads a v3 file", async ({
   const loaded = await readProject(new Blob([bytes]));
   expect(loaded.document.width).toBeGreaterThan(0);
 });
+
+test("edits and document switches during project opening keep current work intact", async ({ page }) => {
+  await page.goto("/");
+  const results = await page.evaluate(async () => {
+    const {editor:e, PaintLayer, BrushStroke} = window.luma;
+    e.newDocument({width:698,height:396});
+    const layer = new PaintLayer({visible:false});
+    layer.strokes.add(new BrushStroke({points:Array.from({length:20000}, (_,i) => ({x:i%698,y:i%396,pressure:1}))}));
+    e.document.layers.add(layer);
+    const blob = await e.saveProject();
+    await e.recovery.flush(); await e.workspaceAutosave.flush();
+    const results = [];
+    for (const switchDocument of [false,true]) {
+      e.newDocument({name:"Current work",width:200,height:100});
+      const opening = e.openProject(new File([blob],"incoming.luma")).then(() => "opened", error => String(error));
+      if (switchDocument) e.newDocument({name:"New active document",width:300,height:200});
+      else e.document.name = "Edited during open";
+      const current = e.document;
+      const expected = current.toJSON();
+      const outcome = await opening;
+      results.push({outcome, sameDocument:e.document===current, unchanged:JSON.stringify(e.document.toJSON())===JSON.stringify(expected)});
+    }
+    return results;
+  });
+  for (const result of results) {
+    expect(result.outcome).toContain("document changed while the project was opening");
+    expect(result.sameDocument).toBe(true);
+    expect(result.unchanged).toBe(true);
+  }
+});

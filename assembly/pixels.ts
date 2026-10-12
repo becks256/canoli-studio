@@ -121,18 +121,104 @@ export function selectionMask(
   stepXY: f64,
   stepYX: f64,
 ): void {
+  // One native-resolution pixel region has constant coverage across all sixteen
+  // subpixel samples. Decode it once, walking ordered RLE spans monotonically.
+  if (count == 1 && load<f64>(regions) == 0 && load<f64>(regions + 8) == 2 &&
+      stepX == 1 && stepY == 1 && stepXY == 0 && stepYX == 0 &&
+      load<f64>(regions + 48) == 1 && load<f64>(regions + 72) == 1 &&
+      load<f64>(regions + 56) == 0 && load<f64>(regions + 64) == 0) {
+    const rw = load<f64>(regions + 32), rh = load<f64>(regions + 40);
+    const ox = x + load<f64>(regions + 80) - load<f64>(regions + 16);
+    const oy = y + load<f64>(regions + 88) - load<f64>(regions + 24);
+    if (rw == load<f64>(regions + 96) && rh == load<f64>(regions + 104) &&
+        ox == Math.floor(ox) && oy == Math.floor(oy)) {
+      const data = <usize>load<f64>(regions + 112);
+      const runs = <i32>load<f64>(regions + 120);
+      let run: i32 = 0;
+      for (let py: i32 = 0; py < height; py++) {
+        const ly = oy + py;
+        for (let px: i32 = 0; px < width; px++) {
+          const lx = ox + px;
+          let alpha: u8 = 0;
+          if (lx >= 0 && lx < rw && ly >= 0 && ly < rh) {
+            const index = ly * rw + lx;
+            while (run + 1 < runs && index >= load<f64>(data + <usize>(run * 16))) run++;
+            alpha = <u8>load<f64>(data + <usize>(run * 16 + 8));
+          }
+          const p = ptr + <usize>((py * width + px) * 4);
+          store<u8>(p, 255); store<u8>(p + 1, 255); store<u8>(p + 2, 255);
+          store<u8>(p + 3, alpha);
+        }
+      }
+      return;
+    }
+  }
+  // A single additive geometric region cannot cover pixels outside its local
+  // rectangle. Bound the complete transformed pixel footprint conservatively;
+  // edge pixels still use the original sixteen exact sample evaluations.
+  const geometric = count == 1 && load<f64>(regions) == 0 && load<f64>(regions + 8) < 2;
+  let a: f64 = 0, b: f64 = 0, c: f64 = 0, d: f64 = 0, e: f64 = 0, f: f64 = 0;
+  let rx: f64 = 0, ry: f64 = 0, right: f64 = 0, bottom: f64 = 0;
+  let extentX: f64 = 0, extentY: f64 = 0, slack: f64 = 0;
+  if (geometric) {
+    a = load<f64>(regions + 48); b = load<f64>(regions + 56);
+    c = load<f64>(regions + 64); d = load<f64>(regions + 72);
+    e = load<f64>(regions + 80); f = load<f64>(regions + 88);
+    rx = load<f64>(regions + 16); ry = load<f64>(regions + 24);
+    right = rx + load<f64>(regions + 32); bottom = ry + load<f64>(regions + 40);
+    extentX = (Math.abs(a * stepX + c * stepYX) + Math.abs(a * stepXY + c * stepY)) / 2;
+    extentY = (Math.abs(b * stepX + d * stepYX) + Math.abs(b * stepXY + d * stepY)) / 2;
+    // Cover rounding/cancellation at large coordinates. Nonfinite bounds simply
+    // disable rejection and leave the general sampler authoritative.
+    const maxX = Math.abs(x) + <f64>width * Math.abs(stepX) + <f64>height * Math.abs(stepXY);
+    const maxY = Math.abs(y) + <f64>width * Math.abs(stepYX) + <f64>height * Math.abs(stepY);
+    slack = 1e-10 * (1 + (Math.abs(a) + Math.abs(b)) * maxX +
+      (Math.abs(c) + Math.abs(d)) * maxY + Math.abs(e) + Math.abs(f) +
+      Math.abs(rx) + Math.abs(ry) + Math.abs(right) + Math.abs(bottom));
+  }
   for (let py: i32 = 0; py < height; py++) {
     for (let px: i32 = 0; px < width; px++) {
-      let covered: i32 = 0;
+      if (geometric) {
+        const sampleX = x + (<f64>px + 0.5) * stepX + (<f64>py + 0.5) * stepXY;
+        const sampleY = y + (<f64>py + 0.5) * stepY + (<f64>px + 0.5) * stepYX;
+        const localX = a * sampleX + c * sampleY + e;
+        const localY = b * sampleX + d * sampleY + f;
+        if (localX + extentX < rx - slack || localX - extentX > right + slack ||
+            localY + extentY < ry - slack || localY - extentY > bottom + slack) {
+          const p = ptr + <usize>((py * width + px) * 4);
+          store<u8>(p, 255); store<u8>(p + 1, 255); store<u8>(p + 2, 255); store<u8>(p + 3, 0);
+          continue;
+        }
+        // The whole affine pixel footprint lies within this conservative local
+        // box. Interior pixels need no supersampling; retain the generic path
+        // near boundaries and whenever floating-point bounds are uncertain.
+        if (localX - extentX > rx + slack && localX + extentX < right - slack &&
+            localY - extentY > ry + slack && localY + extentY < bottom - slack) {
+          let interior = load<f64>(regions + 8) == 0;
+          if (!interior) {
+            const halfWidth = load<f64>(regions + 32) / 2;
+            const halfHeight = load<f64>(regions + 40) / 2;
+            const dx = (Math.abs(localX - rx - halfWidth) + extentX + slack) / halfWidth;
+            const dy = (Math.abs(localY - ry - halfHeight) + extentY + slack) / halfHeight;
+            interior = dx * dx + dy * dy < 1 - 1e-10;
+          }
+          if (interior) {
+            const p = ptr + <usize>((py * width + px) * 4);
+            store<u8>(p, 255); store<u8>(p + 1, 255); store<u8>(p + 2, 255); store<u8>(p + 3, 255);
+            continue;
+          }
+        }
+      }
+      let covered: f64 = 0;
       for (let sy: i32 = 0; sy < 4; sy++) {
         for (let sx: i32 = 0; sx < 4; sx++) {
           const column = <f64>px + (<f64>sx + 0.5) / 4.0;
           const row = <f64>py + (<f64>sy + 0.5) / 4.0;
           const sampleX = x + column * stepX + row * stepXY;
           const sampleY = y + row * stepY + column * stepYX;
-          let inside = false;
+          let inside: f64 = 0;
           for (let n: i32 = 0; n < count; n++) {
-            const r = regions + <usize>(n * 96);
+            const r = regions + <usize>(n * 128);
             const operation = <i32>load<f64>(r),
               shape = <i32>load<f64>(r + 8);
             const rx = load<f64>(r + 16),
@@ -157,14 +243,23 @@ export function selectionMask(
                 dy = (localY - ry - rh / 2) / (rh / 2);
               hit = dx * dx + dy * dy <= 1;
             }
-            inside =
-              operation == 0
-                ? inside || hit
-                : operation == 1
-                  ? inside && !hit
-                  : inside && hit;
+            let coverage: f64 = hit ? 1 : 0;
+            if (hit && shape == 2) {
+              const pw = load<f64>(r + 96), ph = load<f64>(r + 104);
+              const index = Math.floor((localY - ry) * ph / rh) * pw + Math.floor((localX - rx) * pw / rw);
+              const data = <usize>load<f64>(r + 112);
+              let low: i32 = 0, high = <i32>load<f64>(r + 120);
+              while (low < high) {
+                const mid = (low + high) >> 1;
+                if (index < load<f64>(data + <usize>(mid * 16))) high = mid;
+                else low = mid + 1;
+              }
+              coverage = load<f64>(data + <usize>(low * 16 + 8)) / 255;
+            }
+            inside = operation == 0 ? Math.max(inside, coverage)
+              : operation == 1 ? inside * (1 - coverage) : Math.min(inside, coverage);
           }
-          if (inside) covered++;
+          covered += inside;
         }
       }
       const p = ptr + <usize>((py * width + px) * 4);

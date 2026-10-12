@@ -194,7 +194,7 @@ export const recipeActionSchema = z.discriminatedUnion("type", [
   }),
   z.object({ type: z.literal("effect.reset") }),
   z.object({
-    type: z.literal("document.resize"),
+    type: z.enum(["document.resize", "document.resizeImage"]),
     width: z.union([z.number(), z.string()]),
     height: z.union([z.number(), z.string()]),
   }),

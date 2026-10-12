@@ -92,7 +92,9 @@ export async function filteredMasterTile(
     ? `${completed.key}:${JSON.stringify(padded)}`
     : "";
   const completedSignature = completed?.signature(padded);
-  if (completed) {
+  // A changed mask commonly misses this cache. Do not allocate/readback-probe
+  // a surface merely to discover that the retained tile does not exist.
+  if (completed?.cache.hasCanvas(completedKey, completedSignature!)) {
     const hit = createCanvas(padded.width, padded.height, true);
     if (completed.cache.read(completedKey, completedSignature!, hit))
       return { canvas: hit, x: padded.x, y: padded.y };
@@ -178,7 +180,8 @@ export async function filteredMasterTile(
         const alpha = coverage
           .getContext("2d")!
           .getImageData(0, 0, padded.width, padded.height).data;
-        pixels = await processor.mixFiltered(
+        // Cache reads and native readback own fresh buffers; cache writes above copy.
+        pixels = await processor.mixFilteredOwned(
           original,
           pixels,
           alpha,
@@ -189,8 +192,9 @@ export async function filteredMasterTile(
         release(coverage);
       }
     }
-    const image = context.createImageData(padded.width, padded.height);
-    image.data.set(pixels);
+    // These are private ArrayBuffer-backed cache/readback/worker results.
+    // ImageData can wrap them directly; putImageData copies into the canvas.
+    const image = new ImageData(pixels as Uint8ClampedArray<ArrayBuffer>, padded.width, padded.height);
     context.putImageData(image, 0, 0);
     if (completed && retention?.canCache())
       completed.cache.write(completedKey, completedSignature!, canvas);

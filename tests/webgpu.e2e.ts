@@ -1634,3 +1634,39 @@ test("GPU text textures refresh after a late font load without changing the docu
   });
   expect(result.max).toBeLessThanOrEqual(1);
 });
+
+test('cancelled GPU reference work recovers without presenting obsolete pixels', async ({ page }) => {
+  await page.goto('/');
+  const result = await page.evaluate(async () => {
+    const { AdaptiveRenderer } = await import(/* @vite-ignore */ String('/src/engine/adaptive.ts'));
+    const { Document, PaintLayer, PaintFill, editor } = window.luma;
+    const renderer = new AdaptiveRenderer({ allowSoftwareAdapter: true });
+    const ready = await renderer.gpu.ready;
+    if (!ready) { renderer.dispose(); return { ready }; }
+    const doc = new Document({ width: 64, height: 64 });
+    const layer = doc.layers.add(new PaintLayer());
+    layer.strokes.add(new PaintFill({ bounds: { x: 0, y: 0, width: 64, height: 64 }, color: '#207040' }));
+    let cancelled = false, aborted = false;
+    const render = renderer.render.bind(renderer);
+    // Cancel when an actual Canvas reference upload has finished preparation.
+    renderer.render = async (...args: Parameters<typeof render>) => {
+      const canvas = await render(...args);
+      cancelled = true;
+      return canvas;
+    };
+    try {
+      try { const frame = await renderer.prepareViewport(doc.getSnapshot().document, editor.assetStore, { isCancelled: () => cancelled }); frame.dispose(); }
+      catch (error) { aborted = error instanceof DOMException && error.name === 'AbortError'; }
+      renderer.render = render;
+      const frame = await renderer.prepareViewport(doc.getSnapshot().document, editor.assetStore);
+      const backend = frame.backend;
+      if (!frame.readPixels) throw new Error('GPU readback unavailable');
+      const pixels = await frame.readPixels();
+      const offset = (20 * 64 + 20) * 4;
+      const pixel = [...pixels.slice(offset, offset + 4)];
+      frame.dispose();
+      return { ready, aborted, backend, pixel, state: renderer.gpu.diagnostics.state };
+    } finally { renderer.dispose(); }
+  });
+  expect(result).toEqual({ ready: true, aborted: true, backend: 'webgpu', pixel: [32,112,64,255], state: 'ready' });
+});

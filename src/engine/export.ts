@@ -1,3 +1,4 @@
+import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData, VectorLayerData } from "../core/model";
 import { allLayers } from "../core/model";
@@ -126,6 +127,8 @@ export function getExportCapabilityReport(
       break;
 
     case "psd":
+      if (layers.some((layer) => layer.kind === "raster" && layer.erasures?.length))
+        warnings.push("PSD export cannot preserve raster erasures yet; use a Luma project or PNG.");
       featuresPreserved.push(
         "Individual raster layers preserved with coordinates and names",
         "Layer opacity and blend modes",
@@ -174,7 +177,10 @@ export async function exportDocument(
   assets: AssetStore,
   renderer: DocumentRenderer,
   options: ExportOptions,
+  control?: ExportControl,
 ): Promise<ExportResult> {
+  checkExport(control);
+  control?.onProgress?.({phase:"rendering",fraction:null});
   const report = getExportCapabilityReport(document, options);
 
   if (options.format === "svg") {
@@ -244,7 +250,7 @@ ${layerElements.join("\n")}
   }
 
   if (options.format === "png") {
-    const blob = await exportPng(document, assets, renderer);
+    const blob = await exportPng(document, assets, renderer, control);
     return {
       blob,
       mimeType: "image/png",
@@ -271,6 +277,7 @@ ${layerElements.join("\n")}
       Math.min(1024, Math.floor(4_000_000 / Math.max(1, rowBytes))),
     );
     for (let y = 0; y < height; y += rowsPerStrip) {
+      checkExport(control);
       const rows = Math.min(rowsPerStrip, height - y);
       for (let x = 0; x < width; x += 2048) {
         const tileWidth = Math.min(2048, width - x);
@@ -280,13 +287,18 @@ ${layerElements.join("\n")}
           readback: true,
         });
         try {
+          checkExport(control);
           ctx.drawImage(tile, x, y);
         } finally {
           release(tile);
         }
       }
+      control?.onProgress?.({phase:"rendering",fraction:(y+rows)/height});
+      await new Promise<void>(resolve=>setTimeout(resolve,0));
     }
 
+    checkExport(control);
+    control?.onProgress?.({phase:"encoding",fraction:null});
     const mimeType = options.format === "jpeg" ? "image/jpeg" : "image/webp";
     const quality = options.quality ?? (options.format === "jpeg" ? 0.92 : 0.9);
     const extension = options.format === "jpeg" ? "jpg" : "webp";
@@ -316,6 +328,7 @@ ${layerElements.join("\n")}
       blob = await encodeRgbaPng(bytes, width, height);
     }
 
+    checkExport(control);
     return {
       blob,
       mimeType,

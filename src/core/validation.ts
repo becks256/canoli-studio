@@ -10,6 +10,7 @@ import { authoredMetadataSchema } from "./metadata";
 import { adjustmentSchema } from "./adjustments";
 import { BLEND_MODES } from "./model";
 import {
+  rasterErasureSchema,
   selectionSchema,
   styleSchema,
   paintOperationSchema,
@@ -74,6 +75,7 @@ const patch = z
     fontStyle: z.enum(["normal", "italic"]).optional(),
     direction: z.enum(["ltr", "rtl"]).optional(),
     adjustment: adjustmentSchema.optional(),
+    erasures: z.array(rasterErasureSchema).max(2048).optional(),
   })
   .strict();
 const layer = z.unknown().transform((value, context) => {
@@ -229,9 +231,9 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
       .strict(),
     z
       .object({
-        type: z.literal("document.resize"),
-        width: dimension,
-        height: dimension,
+        type: z.enum(["document.resize", "document.resizeImage"]),
+        width: dimension.int(),
+        height: dimension.int(),
       })
       .strict(),
     z

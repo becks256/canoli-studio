@@ -1,3 +1,7 @@
+import { encodeRgbaPng } from "./engine/png";
+import { checkExport, type ExportControl } from "./engine/export-control";
+import { ProjectEncoder } from "./workspace/project-encoder";
+import { RasterEditing } from "./raster-editing";
 import { rebindLayerComps } from "./core/layer-comps";
 import { prepareSmartRaster } from "./engine/smart-raster";
 import { computeSha256 } from "./ai/batch/manifest";
@@ -74,6 +78,7 @@ import { createCanvas, release } from "./engine/canvas";
 
 /** Application services own assets and I/O; the DOM itself is browser-independent. */
 export class EditorApplication {
+  readonly pixels = new RasterEditing(this);
   get recovery() {
     return this.activeSession.recovery;
   }
@@ -100,6 +105,9 @@ export class EditorApplication {
     }
   >();
   private ioGeneration = 0;
+  private idleRetouchProcessor: PixelProcessor | null = null;
+  private retouchProcessors = new Set<PixelProcessor>();
+  private retouchDisposed = false;
   readonly renderer = new AdaptiveRenderer();
   readonly scripts = new ScriptRunner();
   readonly tools = new ToolController(this);
@@ -150,6 +158,7 @@ export class EditorApplication {
   get openDocuments(): readonly Document[] {
     return this.sessions.map((session) => session.document);
   }
+  private readonly projectEncoder = new ProjectEncoder();
   private async captureWorkspace(): Promise<SavedWorkspace> {
     const sessions = [...this.sessions];
     const activeIndex = sessions.indexOf(this.activeSession);
@@ -195,7 +204,7 @@ export class EditorApplication {
       return cached.project;
     const entry = {
       state,
-      project: serializeProject(state.document, session.assets, {
+      project: this.projectEncoder.encode(state.document, session.assets, {
         version: 1,
         past: state.past,
         future: state.future,
@@ -415,8 +424,13 @@ export class EditorApplication {
         );
     };
     check();
-    const processor = new PixelProcessor();
-    const cancelWorker = () => processor.dispose();
+    if (this.retouchDisposed) throw new Error("The editor has been disposed.");
+    const processor = this.idleRetouchProcessor ?? new PixelProcessor();
+    this.idleRetouchProcessor = null;
+    this.retouchProcessors.add(processor);
+    let reusable = false;
+    let cancelled = false;
+    const cancelWorker = () => { cancelled = true; processor.dispose(); };
     signal?.addEventListener("abort", cancelWorker, { once: true });
     const staging = new AssetStore();
     let installed: string | undefined;
@@ -451,31 +465,16 @@ export class EditorApplication {
             signal,
           );
       check();
-      const surface = createCanvas(
+      // Encode the detached correction directly. HTMLCanvasElement.toBlob can
+      // defer its idle task for a full second while editor renders are pending.
+      const rgba = new Uint8Array(patch.correctedPixels);
+      for (let p = 0; p < patch.coverage.length; p++)
+        rgba[p * 4 + 3] = patch.coverage[p];
+      const blob = await encodeRgbaPng(
+        rgba,
         patch.bounds.width,
         patch.bounds.height,
-        true,
       );
-      let blob: Blob;
-      try {
-        const context = surface.getContext("2d")!,
-          image = context.createImageData(surface.width, surface.height);
-        image.data.set(patch.correctedPixels);
-        for (let p = 0; p < patch.coverage.length; p++)
-          image.data[p * 4 + 3] = patch.coverage[p];
-        context.putImageData(image, 0, 0);
-        blob = await new Promise<Blob>((resolve, reject) =>
-          surface.toBlob(
-            (value) =>
-              value
-                ? resolve(value)
-                : reject(new Error("Could not encode the patch.")),
-            "image/png",
-          ),
-        );
-      } finally {
-        release(surface);
-      }
       check();
       const asset = await staging.add(blob, "Retouch patch", id(), false);
       check();
@@ -496,6 +495,7 @@ export class EditorApplication {
         document.layers.add(layer),
       );
       installed = undefined;
+      reusable = true;
       return layer;
     } finally {
       if (installed) assets.remove(installed);
@@ -503,7 +503,10 @@ export class EditorApplication {
         for (const asset of staging.values()) asset.bitmap.close();
       signal?.removeEventListener("abort", cancelWorker);
       staging.metadata.dispose();
-      processor.dispose();
+      this.retouchProcessors.delete(processor);
+      if (reusable && !cancelled && !this.retouchDisposed && !this.idleRetouchProcessor)
+        this.idleRetouchProcessor = processor;
+      else processor.dispose();
     }
   }
 
@@ -1116,7 +1119,7 @@ export class EditorApplication {
     this.assets = session.assets;
     this.currentProfileId = session.colorProfile;
     this.currentSoftProof = session.softProof;
-    this.renderer.clearCache();
+    this.renderer.resetView();
     this.recipes?.pauseRecording();
     this.recipes?.hookDocument(document);
     this.observe();
@@ -1136,7 +1139,7 @@ export class EditorApplication {
       old.dispose();
     }
     if (document.layers.length)
-      this.recovery.schedule(this.recoverySessionId, document.toJSON(), assets);
+      this.recovery.schedule(this.recoverySessionId, document.getSnapshot().document, assets);
     this.publish();
   }
 
@@ -1317,7 +1320,7 @@ export class EditorApplication {
   async openProject(file: File) {
     const generation = ++this.ioGeneration;
     const revision = this.document.getSnapshot().revision;
-    const loaded = await loadProject(file);
+    const loaded = await loadProject(file, { prepareImmutable: true });
     if (
       generation !== this.ioGeneration ||
       revision !== this.document.getSnapshot().revision
@@ -1330,17 +1333,22 @@ export class EditorApplication {
     this.replace(Document.fromJSON(loaded.document), loaded.assets);
   }
 
-  async exportPng(): Promise<Blob> {
-    return (await this.export({ format: "png" })).blob;
+  async exportPng(control?: ExportControl): Promise<Blob> {
+    return (await this.export({ format: "png" }, control)).blob;
   }
 
-  async export(options: ExportOptions): Promise<ExportResult> {
-    return exportDocument(
+  async export(options: ExportOptions, control?: ExportControl): Promise<ExportResult> {
+    checkExport(control);
+    const result = await exportDocument(
       this.document.toJSON(),
       this.assets,
       this.renderer,
       options,
+      control,
     );
+    if (control?.signal) await new Promise<void>(resolve=>setTimeout(resolve,0));
+    checkExport(control);
+    return result;
   }
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {
@@ -1489,7 +1497,13 @@ export class EditorApplication {
   }
 
   dispose() {
+    this.retouchDisposed = true;
+    this.idleRetouchProcessor?.dispose();
+    this.idleRetouchProcessor = null;
+    for (const processor of this.retouchProcessors) processor.dispose();
+    this.retouchProcessors.clear();
     this.workspaceAutosave.dispose();
+    this.projectEncoder.dispose();
     this.tools.cancel();
     this.scripts.cancel();
     this.unsubscribe();

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { SCHEMA_VERSION } from "../src/core/model";
 import { exifSegment } from "./fixtures/exif";
 
 test("local metadata worker extracts declarations and exports an explicit privacy sidecar", async ({
@@ -111,7 +112,7 @@ test("authored metadata edits share undo, survive reopen, and work in isolated s
     await page.evaluate(
       () => window.luma.editor.document.toJSON().schemaVersion,
     ),
-  ).toBe(5);
+  ).toBe(SCHEMA_VERSION);
 });
 
 test("malformed metadata jobs leave editing available and do not block the next extraction", async ({
@@ -205,4 +206,24 @@ test("malformed metadata jobs leave editing available and do not block the next 
   await expect(page.getByLabel("Document name", { exact: true })).toHaveValue(
     "Editing while metadata runs",
   );
+});
+
+test("authored metadata presence distinguishes an empty stored record from no record and follows undo", async ({page}) => {
+  await page.goto('/');
+  await page.evaluate(async () => {
+    const canvas=new OffscreenCanvas(8,8);canvas.getContext('2d')!.fillRect(0,0,8,8);
+    await window.luma.editor.importImage(new File([await canvas.convertToBlob()],'metadata.png',{type:'image/png'}));
+  });
+  await page.getByText('Asset info',{exact:true}).click();
+  const clear=page.getByRole('button',{name:'Clear authored metadata',exact:true});
+  await expect(clear).toBeDisabled();
+  await page.evaluate(()=>{window.luma.editor.document.selectedLayer!.metadata=new window.luma.LayerMetadata();});
+  await expect(clear).toBeEnabled();
+  await clear.click();await expect(clear).toBeDisabled();
+  await page.keyboard.press('Control+z');await expect(clear).toBeEnabled();
+  const title=page.getByRole('textbox',{name:'Metadata title',exact:true});
+  await title.fill('Artwork');await title.press('Enter');
+  await expect(title).toHaveValue('Artwork');
+  await clear.click();await expect(clear).toBeDisabled();await expect(title).toHaveValue('');
+  await page.keyboard.press('Control+z');await expect(clear).toBeEnabled();await expect(title).toHaveValue('Artwork');
 });

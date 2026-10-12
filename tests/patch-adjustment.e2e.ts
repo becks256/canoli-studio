@@ -368,3 +368,59 @@ test("fractional patch coverage is applied once when prepared colors are committ
   expect(result.softChanged).toBeGreaterThan(0);
   expect(result.maxDelta).toBeLessThanOrEqual(2);
 });
+
+test('bounded patch processing matches full-surface blending for transformed edge coverage',async({page})=>{
+  await page.goto('/');
+  const results=await page.evaluate(async()=>{
+    const e=window.luma.editor;
+    const {AdjustmentLayer,PatchAdjustment}=window.luma;
+    const {AffineTransform}=await import(/* @vite-ignore */ String('/src/core/affine.ts'));
+    e.newDocument({width:220,height:140});
+    const base=new OffscreenCanvas(220,140),bc=base.getContext('2d')!;
+    bc.fillStyle='#345678';bc.fillRect(0,0,220,140);
+    await e.importImage(new File([await base.convertToBlob()],'base.png',{type:'image/png'}));
+    const patch=new OffscreenCanvas(12,9),pc=patch.getContext('2d')!;
+    pc.fillStyle='rgba(220,50,130,0.6)';pc.fillRect(0,0,12,9);
+    const asset=await e.assetStore.add(await patch.convertToBlob(),'patch');
+    const results=[];
+    for(const matrix of [
+      [1,0,0,1,70.3,30.7], [1.3,.6,-.7,1.8,80,40],
+      [-2,.2,.4,1.1,12,5], [.3,0,0,.4,219,139], [1,0,0,1,400,400],
+    ]){
+      const [a,b,c,d,tx,ty]=matrix;
+      const layer=e.document.layers.add(new AdjustmentLayer({adjustment:new PatchAdjustment({assetId:asset.id,width:12,height:9})}));
+      layer.transform=new AffineTransform(a,b,c,d,tx,ty);
+      const actual=await e.renderer.render(e.document.toJSON(),e.assetStore,{cache:false,readback:true});
+      const full=new OffscreenCanvas(220,140),fc=full.getContext('2d')!;
+      fc.setTransform(a,b,c,d,tx,ty);fc.drawImage(asset.bitmap,0,0,12,9);
+      const corrected=fc.getImageData(0,0,220,140).data;
+      const expected=await e.renderer.processor.blendAdjustment(bc.getImageData(0,0,220,140).data,corrected,corrected,1);
+      const observed=actual.getContext('2d')!.getImageData(0,0,220,140).data;
+      results.push(observed.every((value,i)=>value===expected[i]));
+      actual.width=actual.height=0;layer.remove();
+    }
+    return results;
+  });
+  expect(results).toEqual([true,true,true,true,true]);
+});
+
+test('direct patch composition matches masked reference across every backdrop alpha',async({page})=>{
+  await page.goto('/');
+  const result=await page.evaluate(async()=>{
+    const e=window.luma.editor,{AdjustmentLayer,PatchAdjustment,LayerMask,MarqueeSelection}=window.luma;
+    e.newDocument({width:256,height:4});
+    const canvas=new OffscreenCanvas(256,4),c=canvas.getContext('2d')!,data=c.createImageData(256,4);
+    for(let y=0;y<4;y++)for(let x=0;x<256;x++)data.data.set([37+y*41,91,173,x],(y*256+x)*4);
+    c.putImageData(data,0,0);await e.importImage(new File([await canvas.convertToBlob()],'alpha.png',{type:'image/png'}));
+    for(let y=0;y<4;y++)for(let x=0;x<256;x++)data.data.set([211,59+y*21,83,255-x],(y*256+x)*4);
+    c.putImageData(data,0,0);const asset=await e.assetStore.add(await canvas.convertToBlob(),'patch');
+    const layer=e.document.layers.add(new AdjustmentLayer({adjustment:new PatchAdjustment({assetId:asset.id,width:256,height:4})}));
+    const read=async()=>{const surface=await e.renderer.render(e.document.toJSON(),e.assetStore,{cache:false,readback:true});const bytes=[...surface.getContext('2d')!.getImageData(0,0,256,4).data];surface.width=surface.height=0;return bytes;};
+    const direct=await read();
+    layer.mask=new LayerMask({selection:new MarqueeSelection({shape:'rectangle',x:0,y:0,width:256,height:4})});
+    const reference=await read();
+    return {equal:direct.every((v,i)=>v===reference[i]),alpha:direct.filter((_,i)=>i%4===3)};
+  });
+  expect(result.equal).toBe(true);
+  expect(result.alpha).toEqual(Array.from({length:1024},(_,i)=>i%256));
+});

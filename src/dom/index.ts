@@ -1,3 +1,5 @@
+import { freeze, isImmutable } from "../core/immutable";
+import { EraserStroke, PaintFill } from "./values";
 import { LayerCompCollection } from "./layer-comps";
 export { LayerComp, LayerCompCollection } from "./layer-comps";
 import { parseRetainedHistory } from "../core/history";
@@ -346,12 +348,9 @@ export class Document {
   }
 
   static fromJSON(data: unknown): Document {
-    validateDocument(data);
+    const store = new EditorStore(data, undefined, { migrateSchema: true });
     const document = new Document();
-    document.store = new EditorStore({
-      ...structuredClone(data),
-      schemaVersion: SCHEMA_VERSION,
-    });
+    document.store = store;
     return document;
   }
   /** @internal Workspace restoration validates retained history before exposing the session. */
@@ -389,6 +388,9 @@ export class Document {
   }
   crop(bounds: CropBounds) {
     this._dispatch({ type: "document.crop", bounds });
+  }
+  resizeImage(width: number, height: number) {
+    this._dispatch({ type: "document.resizeImage", width, height });
   }
   resize(width: number, height: number) {
     this._dispatch({ type: "document.resize", width, height });
@@ -668,7 +670,9 @@ export class Document {
     if (!data) return null;
     let handle = this.handles.get(data.id);
     if (!handle) {
-      handle = Layer._fromData(data);
+      // Attached handles read through the document; do not copy retained artwork
+      // merely to identify a layer. Public toJSON() still returns an owned copy.
+      handle = Layer._fromData(data, false);
       handle._attach(this);
     }
     return handle;
@@ -701,7 +705,7 @@ export class Document {
   /** @internal Automation adapters must validate external requests before dispatch. */
   _dispatch(command: EditorCommand) {
     if (this.batch) {
-      this.staged = execute(this._read(), command);
+      this.staged = freeze(execute(this._read(), command));
       this.batch.push(command);
     } else {
       if (this.commandListeners.size > 0) {
@@ -1218,6 +1222,20 @@ export class SmartObjectLayer extends Layer {
 }
 
 export class RasterLayer extends Layer {
+  /** Non-destructive alpha erasure in layer-local coordinates. */
+  erase(stroke: EraserStroke): void {
+    if (!(stroke instanceof EraserStroke)) throw new Error("Use an EraserStroke value.");
+    this.appendErasure(stroke);
+  }
+  /** Clear a local-coordinate selection, or the complete image when omitted. */
+  clear(selection: MarqueeSelection | null = null): void {
+    if (selection !== null && !(selection instanceof MarqueeSelection)) throw new Error("Use a MarqueeSelection value.");
+    this.appendErasure(new PaintFill({ bounds: { x: 0, y: 0, width: this.width, height: this.height }, erase: true, clip: selection }));
+  }
+  private appendErasure(operation: PaintOperation): void {
+    this.update({ erasures: [...((this._read() as RasterLayerData).erasures ?? []), { width: this.width, height: this.height, stroke: operation.toJSON() }] });
+  }
+
   /** Convert without changing original source bytes or the layer's stack position. */
   convertToSmartObject(): SmartObjectLayer {
     const document = this.requireDocument();
@@ -1711,12 +1729,17 @@ export class VectorLayer extends Layer {
   }
   /** @internal */ _drawingCommand(command: EditorCommand) {
     if (this.document) this.document._dispatch(command);
-    else
-      Object.assign(
-        this.data,
-        execute({ ...createDocument(), children: [this.data] }, command)
-          .children[0],
-      );
+    else {
+      // The detached layer shell remains mutable (including inside a detached
+      // group). Copy caller-owned fields before freezing; retain only values
+      // already proven recursively immutable by our own registry.
+      const owned = Object.fromEntries(Object.entries(this.data).map(([key, value]) =>
+        [key, isImmutable(value) ? value : structuredClone(value)],
+      )) as unknown as LayerData;
+      const snapshot = freeze({ ...createDocument(), children: [owned] });
+      const next = execute(snapshot, command).children[0];
+      Object.assign(this.data, freeze(next));
+    }
   }
   toSvg(docWidth = 1920, docHeight = 1080): string {
     return exportVectorLayerSvg(
@@ -1877,9 +1900,16 @@ export class VectorPath {
       strokeWidth: options.strokeWidth,
     });
   }
-  /** @internal */ static _fromData(data: VectorPathData) {
-    const result = new VectorPath(data);
-    result.data = structuredClone(data);
+  /** @internal Owner-backed handles read validated data through their collection. */
+  static _fromData(data: VectorPathData, owner?: VectorLayer) {
+    // Initialize the normal instance without reparsing all owned anchors.
+    // Shape factories without an owner retain their defensive construction path.
+    const result = new VectorPath(owner ? { points: [{ x: 0, y: 0 }] } : data);
+    // Owner-backed getters resolve the current record by ID; retaining the old
+    // anchor graph here would unnecessarily pin it after history releases it.
+    if (owner) result.data.id = data.id;
+    else result.data = structuredClone(data);
+    result._owner = owner ?? null;
     return result;
   }
 }
@@ -1896,8 +1926,7 @@ export class PathCollection implements Iterable<VectorPath> {
     const data = this.data.find((entry) => entry.id === id);
     if (!data) return null;
     if (!this.handles.has(id)) {
-      const path = VectorPath._fromData(data);
-      path._owner = this.owner;
+      const path = VectorPath._fromData(data, this.owner);
       this.handles.set(id, path);
     }
     return this.handles.get(id)!;

@@ -205,12 +205,16 @@ export function renderSelection(
   const offset = kernel.bufferOffset(),
     length = tile.width * tile.height * 4;
   const regionsOffset = Math.ceil((offset + length) / 8) * 8;
+  let coverageOffset = regionsOffset + tile.selection.regions.length * 128;
+  const coverageArrays: { offset: number; values: Float64Array }[] = [];
   const values = new Float64Array(
     tile.selection.regions.flatMap((r) => {
+      const pointer = coverageOffset;
+      if (r.coverage) { const values = new Float64Array(r.coverage.runs); coverageArrays.push({ offset: pointer, values }); coverageOffset += values.byteLength; }
       const inverse = selectionRegionTransform(r).inverse();
       return [
         ["add", "subtract", "intersect"].indexOf(r.operation),
-        r.shape === "ellipse" ? 1 : 0,
+        r.shape === "pixels" ? 2 : r.shape === "ellipse" ? 1 : 0,
         r.x,
         r.y,
         r.width,
@@ -221,10 +225,11 @@ export function renderSelection(
         inverse.d,
         inverse.e,
         inverse.f,
+        r.coverage?.width ?? 0, r.coverage?.height ?? 0, pointer, (r.coverage?.runs.length ?? 0) / 2,
       ];
     }),
   );
-  const required = regionsOffset + values.byteLength;
+  const required = coverageOffset;
   if (required > kernel.memory.buffer.byteLength)
     kernel.memory.grow(
       Math.ceil((required - kernel.memory.buffer.byteLength) / 65536),
@@ -232,6 +237,7 @@ export function renderSelection(
   new Float64Array(kernel.memory.buffer, regionsOffset, values.length).set(
     values,
   );
+  for (const entry of coverageArrays) new Float64Array(kernel.memory.buffer, entry.offset, entry.values.length).set(entry.values);
   kernel.selectionMask(
     offset,
     regionsOffset,

@@ -306,3 +306,24 @@ describe("PSD / PSB Interchange Engine (F11)", () => {
     });
   });
 });
+
+it.each(['raw', 'rle'] as const)('honors %s compression for the composite and preserves planar RGBA', async(compression)=>{
+  const doc=createDocument('Compression',3,2);
+  const layer=createRaster('source','Pixels',3,2);
+  doc.children.push(layer);
+  const pixels=new ImageData(new Uint8ClampedArray([
+    255,0,0,255, 0,255,0,128, 0,0,255,255,
+    12,34,56,255, 78,90,123,64, 210,180,150,255,
+  ]),3,2);
+  const bytes=await documentToPsd(doc,()=>pixels,{compression});
+  // Walk the three length-prefixed sections after the fixed PSD header.
+  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+  let offset=26;
+  for(let section=0;section<3;section++)offset+=4+view.getUint32(offset);
+  expect(view.getUint16(offset)).toBe(compression==='raw'?PsdCompression.Raw:PsdCompression.Rle);
+  const parsed=parsePsd(bytes);
+  expect([...parsed.composite!.data]).toEqual([...pixels.data]);
+  expect([...parsed.layers[0].imageData!.data]).toEqual([...pixels.data]);
+  const flat=psdToDocument(bytes,{mode:'flatten'});
+  expect([...flat.assets.values()][0].data).toEqual(pixels.data);
+});

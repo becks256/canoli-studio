@@ -40,11 +40,11 @@ export function parseRetainedHistory(
     validateDocument(entry.document);
     if (entry.document.id !== current.id)
       throw new Error("History entry belongs to another document.");
-    return { ...entry, document: structuredClone(entry.document) };
+    return { ...entry, document: entry.document };
   };
-  return {
-    version: 1,
+  return structuredClone({
+    version: 1 as const,
     past: parsed.past.map(validate),
     future: parsed.future.map(validate),
-  };
+  });
 }

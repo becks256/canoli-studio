@@ -1,3 +1,5 @@
+import type { ClipboardRequest, ClipboardResult } from "./clipboard";
+import type { CoverageRequest, PixelCoverage } from "../core/pixel-selection";
 import {
   hslAdjustmentSchema,
   type HslAdjustmentData,
@@ -56,6 +58,9 @@ export class PixelProcessor {
         if (!request) return;
         this.pending.delete(event.data.id);
         if (event.data.error) request.reject(new Error(event.data.error));
+        else if (event.data.png) request.resolve(event.data.png);
+        else if (event.data.clipboard) request.resolve(event.data.clipboard);
+        else if (event.data.coverage) request.resolve(event.data.coverage);
         else if (event.data.histogram) request.resolve(event.data.histogram);
         else if (event.data.donorResult)
           request.resolve(event.data.donorResult);
@@ -160,14 +165,19 @@ export class PixelProcessor {
     density = 1,
     inverted = false,
   ): Promise<Uint8ClampedArray> {
-    // Snapshot all arrays before awaiting worker readiness; retain caller ownership.
-    return this.request(original.slice(), {
-      filteredMix: {
-        filtered: filtered.slice(),
-        mask: mask.slice(),
-        density,
-        inverted,
-      },
+    // Public helper retains caller ownership and captures values before readiness.
+    return this.mixFilteredOwned(original.slice(), filtered.slice(), mask.slice(), density, inverted);
+  }
+  /** Internal: consumes exclusively owned arrays; never pass retained cache/caller buffers. */
+  mixFilteredOwned(
+    original: Uint8ClampedArray,
+    filtered: Uint8ClampedArray,
+    mask: Uint8ClampedArray,
+    density = 1,
+    inverted = false,
+  ): Promise<Uint8ClampedArray> {
+    return this.request(original, {
+      filteredMix: { filtered, mask, density, inverted },
     });
   }
   blendAdjustment(
@@ -190,8 +200,23 @@ export class PixelProcessor {
   ): Promise<Uint8ClampedArray> {
     return this.request(pixels, { underlying, blend });
   }
+  featheredSelection(tile: SelectionTile, radiusX: number, radiusY: number): Promise<Uint8ClampedArray> {
+    return this.request(new Uint8ClampedArray(0), { featheredSelection: { tile, radiusX, radiusY } });
+  }
   selection(tile: SelectionTile): Promise<Uint8ClampedArray> {
     return this.request(new Uint8ClampedArray(0), { selection: tile });
+  }
+  /** Consumes a private captured pixel buffer; original image assets never transfer. */
+  selectionCoverage(pixels: Uint8ClampedArray, options: CoverageRequest): Promise<PixelCoverage> {
+    return this.request(pixels, { coverage: { ...options, wand: options.wand ? { ...options.wand } : undefined } });
+  }
+  /** Consumes captured pixels; masking, crop and PNG encoding stay in the worker. */
+  clipboardPixels(pixels: Uint8ClampedArray, options: ClipboardRequest): Promise<ClipboardResult> {
+    return this.request(pixels, { clipboard: { ...options } });
+  }
+  /** Consumes a private RGBA capture and encodes off the UI thread. */
+  encodePng(pixels: Uint8ClampedArray, width: number, height: number): Promise<Blob> {
+    return this.request(pixels, { png: { width, height } });
   }
   feather(pixels: Uint8ClampedArray, tile: FeatherTile) {
     return this.request(pixels, { feather: tile });
@@ -233,6 +258,7 @@ export class PixelProcessor {
       effects?: ToneEffectData[];
       underlying?: Uint8ClampedArray;
       blend?: BlendIfData;
+      featheredSelection?: { tile: SelectionTile; radiusX: number; radiusY: number };
       selection?: SelectionTile;
       feather?: FeatherTile;
       lut?: Uint8Array;
@@ -242,6 +268,9 @@ export class PixelProcessor {
         opacity: number;
       };
       histogram?: boolean;
+      coverage?: CoverageRequest;
+      png?: { width: number; height: number };
+      clipboard?: ClipboardRequest;
     },
   ): Promise<any> {
     await this.ready;
@@ -265,8 +294,7 @@ export class PixelProcessor {
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
     if (payload.filteredMix) {
-      // mixFiltered snapshots both inputs before awaiting readiness. Transfer those
-      // private copies rather than structured-cloning a second time on dispatch.
+      // Both mixing entry points supply exclusively owned buffers here.
       tryTransfer(payload.filteredMix.filtered.buffer);
       tryTransfer(payload.filteredMix.mask.buffer);
     }

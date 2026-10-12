@@ -380,3 +380,31 @@ test("healing reuses captured pixels and falls back for off-canvas solver halos"
   expect(results[1].preparationRenders).toBeGreaterThan(1);
   expect(results[1]).toMatchObject({ equal: true, equalCorrections: true });
 });
+
+test('successful healing reuses one idle worker; cancellation discards it and disposal releases its replacement',async({page})=>{
+ await page.goto('/');
+ const result=await page.evaluate(async()=>{
+  const {editor:e,BrushStroke}=window.luma;
+  e.newDocument({width:32,height:32});
+  const c=new OffscreenCanvas(32,32),ctx=c.getContext('2d')!;
+  ctx.fillStyle='#646464';ctx.fillRect(0,0,32,32);
+  await e.importImage(new File([await c.convertToBlob()],'source.png',{type:'image/png'}));
+  const brush=new BrushStroke({points:[{x:16,y:16}],size:8,hardness:1,pressureSize:false,pressureOpacity:false});
+  await e.healStroke(brush,undefined,undefined,12);
+  const worker=(e as any).idleRetouchProcessor;
+  await e.healStroke(brush,undefined,undefined,12);
+  const reused=worker===(e as any).idleRetouchProcessor;
+  const before=JSON.stringify(e.document.toJSON()),controller=new AbortController();
+  const find=worker.findDonor.bind(worker);
+  worker.findDonor=(...args:unknown[])=>{const pending=find(...args);controller.abort();return pending;};
+  let rejected=false;
+  try{await e.healStroke(brush,undefined,undefined,12,controller.signal);}catch{rejected=true;}
+  const unchanged=JSON.stringify(e.document.toJSON())===before;
+  const discarded=(e as any).idleRetouchProcessor===null&&worker.disposed;
+  await e.healStroke(brush,undefined,undefined,12);
+  const replacement=(e as any).idleRetouchProcessor;
+  e.dispose();
+  return {reused,rejected,unchanged,discarded,replaced:replacement!==worker,released:replacement.disposed};
+ });
+ expect(result).toEqual({reused:true,rejected:true,unchanged:true,discarded:true,replaced:true,released:true});
+});

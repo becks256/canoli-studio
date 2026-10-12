@@ -1,10 +1,10 @@
 import { AffineTransform } from "../core/affine";
 import { maskStrokeSchema } from "../core/masks";
-import type { BrushStrokeData } from "../core/drawing";
+import { strokeBounds, type BrushStrokeData } from "../core/drawing";
 import type { DodgeBurnOptions } from "../core/retouch/types";
 import { createCanvas, release } from "./canvas";
 import type { RenderSpace } from "./canvas";
-import { drawMaskStroke } from "./drawing";
+import { drawMaskStroke, overlaps } from "./drawing";
 import type { PixelProcessor } from "./processor";
 
 /** Render one editable brush path into a sampled RGBA tile without changing source pixels. */
@@ -16,18 +16,38 @@ export async function renderTonalStroke(
   processor: PixelProcessor,
   world = new AffineTransform(),
 ): Promise<Uint8ClampedArray> {
+  space = { ...space };
   if (source.length !== space.width * space.height * 4)
     throw new Error("Invalid retouch render tile geometry.");
   const captured = source.slice();
   const options = { ...adjustment, flow: 1 };
   const coverage = await renderRetouchCoverage(brush, space, processor, world);
-  return processor.dodgeBurn(
-    captured,
-    space.width,
-    space.height,
-    options,
-    coverage,
-  );
+  let left = space.width, top = space.height, right = -1, bottom = -1;
+  for (let p = 0; p < coverage.length; p++) {
+    if (!coverage[p]) continue;
+    const x = p % space.width, y = Math.floor(p / space.width);
+    left = Math.min(left, x); right = Math.max(right, x);
+    top = Math.min(top, y); bottom = Math.max(bottom, y);
+  }
+  const width = right - left + 1, height = bottom - top + 1;
+  // Tonal correction is pointwise. Keep coverage rasterization on its fixed
+  // grid, but transfer only covered bounds to the numerical worker.
+  if (width > 0 && height > 0 && width * height < coverage.length) {
+    const pixels = new Uint8ClampedArray(width * height * 4);
+    const mask = new Uint8Array(width * height);
+    for (let y = 0; y < height; y++) {
+      const start = (top + y) * space.width + left;
+      pixels.set(captured.subarray(start * 4, (start + width) * 4), y * width * 4);
+      mask.set(coverage.subarray(start, start + width), y * width);
+    }
+    const corrected = await processor.dodgeBurn(pixels, width, height, options, mask);
+    for (let y = 0; y < height; y++)
+      captured.set(corrected.subarray(y * width * 4, (y + 1) * width * 4),
+        ((top + y) * space.width + left) * 4);
+    return captured;
+  }
+  // Keep validation/error semantics even when no coverage intersects the tile.
+  return processor.dodgeBurn(captured, space.width, space.height, options, coverage);
 }
 
 /** Shared fixed-grid brush coverage for healing and tonal retouching. */
@@ -66,6 +86,7 @@ export async function renderRetouchCoverage(
   const phaseX = space.x * space.sx - pixelX,
     phaseY = space.y * space.sy - pixelY;
   const coverage = new Uint8Array(space.width * space.height);
+  const bounds = world.bounds(strokeBounds(entry.stroke));
   if (entry.stroke.flow !== 0) {
     for (
       let cy = Math.floor(pixelY / cellSize) * cellSize;
@@ -84,6 +105,9 @@ export async function renderRetouchCoverage(
           width: cellSize + 2 * gutter,
           height: cellSize + 2 * gutter,
         };
+        // drawMaskStroke applies the same rejection. Do it before allocating
+        // and reading back an empty cell, retaining the fixed raster grid.
+        if (!overlaps(bounds, padded, 0, 0)) continue;
         const mask = createCanvas(padded.width, padded.height, true);
         try {
           await drawMaskStroke(

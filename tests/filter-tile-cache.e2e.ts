@@ -362,8 +362,8 @@ test("finished mask tiles reuse distant coverage and invalidate both sides of a 
     );
     const renderer = new CanvasRenderer();
     let mixes = 0;
-    const mix = renderer.processor.mixFiltered.bind(renderer.processor);
-    renderer.processor.mixFiltered = (...args: Parameters<typeof mix>) => {
+    const mix = renderer.processor.mixFilteredOwned.bind(renderer.processor);
+    renderer.processor.mixFilteredOwned = (...args: Parameters<typeof mix>) => {
       mixes++;
       return mix(...args);
     };

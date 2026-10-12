@@ -26,7 +26,7 @@ export class LayerSelection {
     this.select([]);
   }
   get rootLayers() {
-    const doc = this.document.toJSON();
+    const doc = this.document._read();
     const layers = this.layers,
       ids = new Set(layers.map((layer) => layer.id));
     return layers.filter((layer) => {
@@ -39,7 +39,7 @@ export class LayerSelection {
     });
   }
   get bounds() {
-    const doc = this.document.toJSON();
+    const doc = this.document._read();
     return unionBounds(
       this.rootLayers.flatMap((layer) => {
         const bounds = layerBounds(doc, layer.id);
@@ -49,7 +49,7 @@ export class LayerSelection {
   }
   private editableRoots() {
     const layers = this.rootLayers,
-      doc = this.document.toJSON();
+      doc = this.document._read();
     if (layers.some((layer) => isLocked(doc, layer.id)))
       throw new Error("Selection contains a locked layer.");
     return layers;
@@ -58,7 +58,7 @@ export class LayerSelection {
     if (!Number.isFinite(x) || !Number.isFinite(y))
       throw new Error("Translation must be finite.");
     const layers = this.editableRoots(),
-      snapshot = this.document.toJSON();
+      snapshot = this.document._read();
     this.document.transaction("Move selected layers", () => {
       for (const layer of layers) {
         const delta = parentSpaceDelta(snapshot, layer.id, { x, y });
@@ -87,7 +87,7 @@ export class LayerSelection {
   }
   private transformAroundCenter(transform: AffineTransform, label: string) {
     const layers = this.editableRoots(),
-      snapshot = this.document.toJSON();
+      snapshot = this.document._read();
     if (!layers.length) return;
     const bounds = layers.map((layer) => layerBounds(snapshot, layer.id));
     if (bounds.some((value) => !value))
@@ -119,7 +119,7 @@ export class LayerSelection {
     )
       throw new Error("Unknown layer alignment.");
     const layers = this.editableRoots(),
-      doc = this.document.toJSON();
+      doc = this.document._read();
     const items = layers.map((layer) => ({
       layer,
       bounds: layerBounds(doc, layer.id),

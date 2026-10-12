@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { systemFonts, subscribeSystemFonts, getSystemFonts } from "./system-fonts";
 import { fontAvailability, type FontAvailability } from "./font-availability";
 import { AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import type { TextLayer } from "../dom";
@@ -44,6 +45,27 @@ export function TypographyPanel({
   onPreview,
 }: TypographyPanelProps) {
   const family = layer.fontFamily;
+  const localFonts = useSyncExternalStore(subscribeSystemFonts, getSystemFonts);
+  const [fontMessage, setFontMessage] = useState("");
+  const [loadingFonts, setLoadingFonts] = useState(false);
+  const families = useMemo(
+    () => [...new Set([...FONT_FAMILIES, ...localFonts, family])],
+    [localFonts, family],
+  );
+  const canListFonts = typeof window !== "undefined" && "queryLocalFonts" in window;
+  const loadFonts = async () => {
+    setLoadingFonts(true);
+    setFontMessage("");
+    try {
+      const fonts = await systemFonts();
+      setFontMessage(fonts.length ? `${fonts.length} installed font families available.` :
+        "No fonts were shared. Allow local font access in browser site settings, then retry, or enter a family name below.");
+    } catch {
+      setFontMessage("System fonts could not be accessed. Allow local font access in browser site settings, then retry, or enter a family name below.");
+    } finally {
+      setLoadingFonts(false);
+    }
+  };
   const [availability, setAvailability] = useState<FontAvailability>("unknown");
   useEffect(() => {
     let disposed = false,
@@ -84,17 +106,21 @@ export function TypographyPanel({
         layout="stacked"
         value={layer.fontFamily}
         disabled={disabled}
-        options={
-          FONT_FAMILIES.includes(layer.fontFamily)
-            ? FONT_FAMILIES
-            : [layer.fontFamily, ...FONT_FAMILIES]
-        }
+        options={families}
         onChange={(val) => {
           onAction(() => {
             layer.fontFamily = val;
           });
         }}
       />
+      {canListFonts ? (
+        <Button disabled={loadingFonts} onClick={() => void loadFonts()}>
+          {loadingFonts ? "Reading system fonts…" : localFonts.length ? "Refresh system fonts" : "Access system fonts"}
+        </Button>
+      ) : (
+        <p>This browser cannot list installed fonts. Enter a font family name below.</p>
+      )}
+      {fontMessage && <p role="status">{fontMessage}</p>}
       <TextInput
         label="Font family"
         layout="stacked"

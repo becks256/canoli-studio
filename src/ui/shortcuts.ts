@@ -4,6 +4,7 @@ export interface ShortcutAction {
   keys: string[];
   run(): void;
   enabled?(): boolean;
+  allowWhileBusy?: boolean;
 }
 
 export function isTextInput(target: EventTarget | null): boolean {
@@ -48,7 +49,7 @@ export function matchesShortcut(
 
 export class ShortcutRegistry {
   constructor(readonly actions: ShortcutAction[]) {}
-  handle(event: KeyboardEvent): boolean {
+  handle(event: KeyboardEvent, busy = false): boolean {
     if (
       event.defaultPrevented ||
       event.isComposing ||
@@ -58,7 +59,7 @@ export class ShortcutRegistry {
     const action = this.actions.find((entry) =>
       entry.keys.some((key) => matchesShortcut(event, key)),
     );
-    if (!action || action.enabled?.() === false) return false;
+    if (!action || (busy && !action.allowWhileBusy) || action.enabled?.() === false) return false;
     event.preventDefault();
     action.run();
     return true;
@@ -92,6 +93,7 @@ export function formatShortcut(shortcut: string): string {
 export const SHORTCUT_BINDINGS: Record<string, string[]> = {
   "command-palette": ["Mod+k"],
   plugins: ["Mod+Shift+l"],
+  "image-size": ["Mod+Alt+i"],
   artboard: ["a"],
   crop: ["c"],
   move: ["v"],
@@ -99,6 +101,8 @@ export const SHORTCUT_BINDINGS: Record<string, string[]> = {
   eraser: ["e"],
   text: ["t"],
   fill: ["g"],
+  "copy-pixels": ["Mod+c"],
+  "paste-pixels": ["Mod+v"],
   "select-all": ["Mod+a"],
   deselect: ["Mod+d"],
   "finish-path": ["Enter"],
@@ -140,6 +144,8 @@ export const TOOL_SHORTCUTS = [
   ["text", "Text tool", "t"],
   ["fill", "Paint bucket", "g"],
   ["marquee", "Marquee", "m"],
+  ["lasso", "Freeform lasso", "l"],
+  ["wand", "Magic wand", "w"],
   ["clone", "Clone brush", "s"],
   ["patch", "Patch", "j"],
   ["heal", "Spot Healing", "Shift+j"],

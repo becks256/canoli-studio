@@ -1,3 +1,7 @@
+import { checkRenderCurrent } from "./render-control";
+import { yieldTask } from "./task-yield";
+import { strokeIntersectsRegion } from "./stroke-region";
+import type { ClonePreviewSource } from "./clone-preview";
 import { AffineTransform } from "../core/affine";
 import type { PixelProcessor } from "./processor";
 import type { AssetStore } from "../core/assets";
@@ -19,7 +23,7 @@ import type { RenderSpace } from "./canvas";
 import type { CanvasCache } from "./cache";
 import type { LayerMaskData } from "../core/masks";
 
-function overlaps(bounds: Rect, space: RenderSpace, x: number, y: number) {
+export function overlaps(bounds: Rect, space: RenderSpace, x: number, y: number) {
   return (
     bounds.x + x < space.x + space.width / space.sx &&
     bounds.x + bounds.width + x > space.x &&
@@ -129,8 +133,7 @@ function stamp(
   context.fill();
   if (alpha !== prevAlpha) context.globalAlpha = prevAlpha;
 }
-export function visitStrokeStamps(
-  visit: (point: StrokePoint) => void,
+function* strokeStamps(
   stroke: BrushStrokeData,
   visible: Rect,
   from = 0,
@@ -141,7 +144,7 @@ export function visitStrokeStamps(
     p.x <= visible.x + visible.width + padding &&
     p.y >= visible.y - padding &&
     p.y <= visible.y + visible.height + padding;
-  if (from === 0 && inView(stroke.points[0])) visit(stroke.points[0]);
+  if (from === 0 && inView(stroke.points[0])) yield stroke.points[0];
   for (let i = Math.max(1, from); i < stroke.points.length; i++) {
     const a = stroke.points[i - 1],
       b = stroke.points[i];
@@ -188,13 +191,21 @@ export function visitStrokeStamps(
       step++
     ) {
       const t = step / count;
-      visit({
+      yield {
         x: a.x + dx * t,
         y: a.y + dy * t,
         pressure: a.pressure + (b.pressure - a.pressure) * t,
-      });
+      };
     }
   }
+}
+export function visitStrokeStamps(
+  visit: (point: StrokePoint) => void,
+  stroke: BrushStrokeData,
+  visible: Rect,
+  from = 0,
+) {
+  for (const point of strokeStamps(stroke, visible, from)) visit(point);
 }
 function drawStroke(
   context: CanvasRenderingContext2D,
@@ -226,6 +237,9 @@ export class ActiveStrokeRaster {
   private signature = "";
   private points: StrokePoint[] = [];
   appendedPoints = 0;
+  canRetain(space: RenderSpace) {
+    return space.width * space.height * 4 <= 16 * 1024 * 1024;
+  }
   clear() {
     if (this.canvas) release(this.canvas);
     this.canvas = null;
@@ -255,7 +269,7 @@ export class ActiveStrokeRaster {
     if (!reusable) this.clear();
     // Oversized effect halos use the normal ephemeral path rather than retain
     // an unbounded canvas. The source/document is never resized or rejected.
-    const retain = space.width * space.height * 4 <= 16 * 1024 * 1024;
+    const retain = this.canRetain(space);
     const canvas = retain
       ? (this.canvas ??= createCanvas(space.width, space.height))
       : target;
@@ -288,80 +302,134 @@ export async function drawPaint(
   active?: ActiveStrokeRaster,
   masks?: CanvasCache,
   canCache: () => boolean = () => true,
+  cloneSource?: ClonePreviewSource,
+  isCancelled?: () => boolean,
 ) {
   const targetContext = target.getContext("2d")!;
-  for (const stroke of layer.strokes) {
-    if (!overlaps(world.bounds(strokeBounds(stroke)), space, 0, 0)) continue;
-    let surface = createCanvas(space.width, space.height);
-    try {
-      const context = surface.getContext("2d")!;
-      applyTransform(context, space, world);
-      if (stroke.kind === "fill") {
-        context.fillStyle = stroke.color;
-        context.fillRect(
-          stroke.bounds.x,
-          stroke.bounds.y,
-          stroke.bounds.width,
-          stroke.bounds.height,
-        );
-      } else if (active && stroke.kind !== "clone") {
-        context.resetTransform();
-        active.draw(stroke, surface, space, 0, 0, world);
-      } else drawStroke(context, stroke, visibleLocalBounds(space, world));
-      context.resetTransform();
-      if (stroke.kind === "clone") {
-        const clone = createCanvas(space.width, space.height);
-        const c = clone.getContext("2d")!;
-        applyTransform(c, space, world);
-        for (const tile of stroke.tiles)
-          if (overlaps(world.bounds(tile), space, 0, 0))
-            c.drawImage(
-              assets.get(tile.assetId).bitmap,
-              tile.x,
-              tile.y,
-              tile.width,
-              tile.height,
-            );
-        c.resetTransform();
-        c.globalCompositeOperation = "destination-in";
-        c.drawImage(surface, 0, 0);
-        release(surface);
-        surface = clone;
+  // Replay-local scratch keeps the sampling grid and per-stroke isolation.
+  let scratch: HTMLCanvasElement | undefined;
+  const replaySliceMs = 2;
+  let deadline = performance.now() + replaySliceMs;
+  try {
+    for (const stroke of layer.strokes) {
+      checkRenderCurrent(isCancelled);
+      // Cold replays yield between strokes and stamp batches. Active previews
+      // keep their fast path and no partially drawn layer is presented.
+      if (performance.now() >= deadline) {
+        await yieldTask();
+        checkRenderCurrent(isCancelled);
+        deadline = performance.now() + replaySliceMs;
       }
-      if (stroke.clip) {
-        const signature = JSON.stringify([stroke.clip, space, world]);
-        let mask = createCanvas(space.width, space.height);
-        try {
-          if (!masks?.read("selection", signature, mask)) {
-            release(mask);
-            mask = await selectionMask(
-              stroke.clip,
-              space,
-              0,
-              0,
-              processor,
-              world,
-            );
-            if (canCache()) masks?.write("selection", signature, mask);
-          }
-          const c = surface.getContext("2d")!;
-          c.globalCompositeOperation = "destination-in";
-          c.drawImage(mask, 0, 0);
-        } finally {
-          release(mask);
+      if (!overlaps(world.bounds(strokeBounds(stroke)), space, 0, 0)) continue;
+      const reusable = stroke.kind !== "clone" && !cloneSource;
+      let surface = reusable && scratch ? scratch : createCanvas(space.width, space.height);
+      if (reusable) scratch = surface;
+      try {
+        const context = surface.getContext("2d")!;
+        if (reusable) {
+          context.resetTransform();
+          context.globalAlpha = 1;
+          context.globalCompositeOperation = "source-over";
+          context.clearRect(0,0,space.width,space.height);
         }
+        applyTransform(context, space, world);
+        if (stroke.kind === "fill") {
+          context.fillStyle = stroke.color;
+          context.fillRect(
+            stroke.bounds.x,
+            stroke.bounds.y,
+            stroke.bounds.width,
+            stroke.bounds.height,
+          );
+        } else if (active && stroke.kind !== "clone") {
+          context.resetTransform();
+          active.draw(stroke, surface, space, 0, 0, world);
+        } else {
+          let stamps = 0;
+          for (const point of strokeStamps(stroke, visibleLocalBounds(space, world))) {
+            stamp(context, stroke, point);
+            // Check in small batches without allocating a Promise per stamp.
+            if (++stamps % 32 === 0 && performance.now() >= deadline) {
+              await yieldTask();
+              checkRenderCurrent(isCancelled);
+              deadline = performance.now() + replaySliceMs;
+            }
+          }
+        }
+        checkRenderCurrent(isCancelled);
+        context.resetTransform();
+        if (stroke.kind === "clone" || cloneSource) {
+          const clone = createCanvas(space.width, space.height);
+          const c = clone.getContext("2d")!;
+          applyTransform(c, space, world);
+          if (cloneSource) {
+            const visible=visibleLocalBounds(space,world), bounds=strokeBounds(stroke);
+            const x=Math.max(visible.x,bounds.x),y=Math.max(visible.y,bounds.y);
+            const right=Math.min(visible.x+visible.width,bounds.x+bounds.width),bottom=Math.min(visible.y+visible.height,bounds.y+bounds.height);
+            // Include native interpolation and the local footprint of two output
+            // pixels, even under rotation, shear or a strongly reduced view.
+            const inverse = world.inverse();
+            const margin = 2 + 2 * Math.max(
+              Math.abs(inverse.a) / space.sx + Math.abs(inverse.c) / space.sy,
+              Math.abs(inverse.b) / space.sx + Math.abs(inverse.d) / space.sy,
+            );
+            try { if(right>x&&bottom>y)await cloneSource.draw(c,bounds,visible,
+              region => stroke.kind === "fill" || strokeIntersectsRegion(stroke, region, margin)); }
+            catch(error){release(clone);throw error;}
+          }
+          else if(stroke.kind === "clone") for (const tile of stroke.tiles)
+            if (overlaps(world.bounds(tile), space, 0, 0))
+              c.drawImage(
+                assets.get(tile.assetId).bitmap,
+                tile.x,
+                tile.y,
+                tile.width,
+                tile.height,
+              );
+          c.resetTransform();
+          c.globalCompositeOperation = "destination-in";
+          c.drawImage(surface, 0, 0);
+          release(surface);
+          surface = clone;
+        }
+        if (stroke.clip) {
+          const signature = JSON.stringify([stroke.clip, space, world]);
+          let mask = createCanvas(space.width, space.height);
+          try {
+            if (!masks?.read("selection", signature, mask)) {
+              release(mask);
+              mask = await selectionMask(
+                stroke.clip,
+                space,
+                0,
+                0,
+                processor,
+                world,
+              );
+              if (canCache()) masks?.write("selection", signature, mask);
+            }
+            const c = surface.getContext("2d")!;
+            c.globalCompositeOperation = "destination-in";
+            c.drawImage(mask, 0, 0);
+          } finally {
+            release(mask);
+          }
+        }
+        checkRenderCurrent(isCancelled);
+        targetContext.save();
+        targetContext.globalAlpha = stroke.opacity;
+        targetContext.globalCompositeOperation =
+          (stroke.kind === "fill" && stroke.erase) || stroke.kind === "eraser"
+            ? "destination-out"
+            : "source-over";
+        targetContext.drawImage(surface, 0, 0);
+        targetContext.restore();
+      } finally {
+        if (surface !== scratch) release(surface);
       }
-      targetContext.save();
-      targetContext.globalAlpha = stroke.opacity;
-      targetContext.globalCompositeOperation =
-        (stroke.kind === "fill" && stroke.erase) || stroke.kind === "eraser"
-          ? "destination-out"
-          : "source-over";
-      targetContext.drawImage(surface, 0, 0);
-      targetContext.restore();
-    } finally {
-      release(surface);
     }
+  } finally {
+    if (scratch) release(scratch);
   }
 }
 export function tracePath(
@@ -487,6 +555,7 @@ export function drawText(
   target: HTMLCanvasElement,
   space: RenderSpace,
   world: AffineTransform,
+  measureInk = false,
 ) {
   const context = target.getContext("2d")!;
   context.save();
@@ -505,6 +574,9 @@ export function drawText(
   context.textBaseline = "top";
   const lines = layer.text.split("\n");
   const lineHeightPx = layer.fontSize * layer.lineHeight;
+  let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+  let reliable = true;
+  const metrics = new Map<string, TextMetrics>();
   for (let i = 0; i < lines.length; i++) {
     let lineX = 0;
     if (layer.align === "center") {
@@ -513,8 +585,25 @@ export function drawText(
       lineX = layer.width;
     }
     context.fillText(lines[i], lineX, i * lineHeightPx);
+    if (measureInk) {
+      let ink = metrics.get(lines[i]);
+      if (!ink) { ink = context.measureText(lines[i]); metrics.set(lines[i], ink); }
+      const { actualBoundingBoxLeft: l, actualBoundingBoxRight: r,
+        actualBoundingBoxAscent: a, actualBoundingBoxDescent: d } = ink;
+      if (![l, r, a, d].every(Number.isFinite)) reliable = false;
+      else if (l + r > 0 && a + d > 0) {
+        left = Math.min(left, lineX - l); right = Math.max(right, lineX + r);
+        top = Math.min(top, i * lineHeightPx - a);
+        bottom = Math.max(bottom, i * lineHeightPx + d);
+      }
+    }
   }
   context.restore();
+  // Only crop retained pixels, never change the original drawing surface/grid.
+  // Unavailable ink metrics conservatively retain the entire rendered surface.
+  if (!measureInk || !reliable) return undefined;
+  return left === Infinity ? { x: 0, y: 0, width: 0, height: 0 }
+    : { x: left, y: top, width: right - left, height: bottom - top };
 }
 
 /** Composite one mask stroke from an unmodified coverage surface. */
@@ -531,6 +620,22 @@ export async function drawMaskStroke(
 ) {
   const { stroke, mode } = entry;
   if (!overlaps(world.bounds(strokeBounds(stroke)), space, 0, 0)) return;
+  // The retained coverage stays unmodified. Without clipping it can be blended
+  // directly, avoiding an intermediate full-tile surface and drawImage copy.
+  // Oversized/non-retained strokes still need isolation for stroke opacity.
+  if (active && !stroke.clip && active.canRetain(space)) {
+    const target = output.getContext("2d")!;
+    target.save();
+    try {
+      target.globalAlpha = stroke.opacity;
+      target.globalCompositeOperation =
+        mode === "hide" ? "destination-out" : "source-over";
+      active.draw({ ...stroke, color: "#ffffff" }, output, space, x, y, world);
+    } finally {
+      target.restore();
+    }
+    return;
+  }
   const surface = scratch ?? createCanvas(space.width, space.height);
   const context = surface.getContext("2d")!;
   context.save();

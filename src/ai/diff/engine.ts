@@ -1,3 +1,4 @@
+import { coverageAt } from "../../core/pixel-selection";
 import { selectionRegionTransform } from "../../core/drawing";
 import type { SelectionData } from "../../core/drawing";
 /**
@@ -173,9 +174,13 @@ export function rasterizeSelection(
           inside = dx * dx + dy * dy <= 1;
         }
         const i = y * width + x;
-        if (reg.operation === "intersect")
-          mask[i] = inside && mask[i] === 255 ? 255 : 0;
-        else if (inside) mask[i] = reg.operation === "add" ? 255 : 0;
+        let coverage = inside ? 255 : 0;
+        if (reg.shape === "pixels") {
+          const pixel = inverse.point({ x: x + 0.5, y: y + 0.5 });
+          coverage = coverageAt(reg.coverage!, (pixel.x-reg.x)*reg.coverage!.width/reg.width, (pixel.y-reg.y)*reg.coverage!.height/reg.height);
+        }
+        mask[i] = reg.operation === "intersect" ? Math.min(mask[i], coverage)
+          : reg.operation === "subtract" ? Math.round(mask[i] * (1-coverage/255)) : Math.max(mask[i],coverage);
       }
   }
 

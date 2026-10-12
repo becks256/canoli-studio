@@ -1,3 +1,4 @@
+import { pixelCoverageSchema, coverageAt, type PixelCoverage } from "./pixel-selection";
 import { AffineTransform } from "./affine";
 import type { AffineData } from "./affine";
 import { affineSchema } from "./transform-schema";
@@ -17,7 +18,8 @@ export interface Rect extends Point {
 export type SelectionOperation = "add" | "subtract" | "intersect";
 export interface SelectionRegion extends Rect {
   transform?: AffineData;
-  shape: "rectangle" | "ellipse";
+  shape: "rectangle" | "ellipse" | "pixels";
+  coverage?: PixelCoverage;
   operation: SelectionOperation;
 }
 export interface SelectionData {
@@ -102,10 +104,11 @@ export const selectionSchema: z.ZodType<SelectionData> = z
     regions: z
       .array(
         rect.extend({
-          shape: z.enum(["rectangle", "ellipse"]),
+          shape: z.enum(["rectangle", "ellipse", "pixels"]),
+          coverage: pixelCoverageSchema.optional(),
           operation: z.enum(["add", "subtract", "intersect"]),
           transform: affineSchema.optional(),
-        }),
+        }).refine(r => (r.shape === "pixels") === !!r.coverage, "Pixel regions require coverage; geometric regions must not contain it."),
       )
       .max(128),
   })
@@ -185,13 +188,14 @@ export const paintOperationSchema: z.ZodType<PaintOperationData> =
       })
       .strict(),
   ]);
+export const PATH_POINT_LIMIT = 20000;
 export const pathSchema = z
   .object({
     id: identifier,
     points: z
       .array(point.extend({ in: point, out: point }))
       .min(1)
-      .max(20000),
+      .max(PATH_POINT_LIMIT),
     closed: z.boolean(),
     fill: colorSchema.nullable(),
     stroke: colorSchema.nullable(),
@@ -276,7 +280,9 @@ export function containsSelection(
     const sx = point.x,
       sy = point.y;
     const hit =
-      region.shape === "rectangle"
+      region.shape === "pixels"
+        ? coverageAt(region.coverage!, (sx-region.x)*region.coverage!.width/region.width, (sy-region.y)*region.coverage!.height/region.height) > 0
+        : region.shape === "rectangle"
         ? sx >= region.x &&
           sx <= region.x + region.width &&
           sy >= region.y &&
@@ -314,16 +320,15 @@ export function strokeBounds(stroke: PaintOperationData): Rect {
 }
 export function pathBounds(path: VectorPathData): Rect {
   // The control-point hull contains the entire Bézier curve.
-  const points = path.points.flatMap((p) => [p, p.in, p.out]);
   let left = Infinity,
     top = Infinity,
     right = -Infinity,
     bottom = -Infinity;
-  for (const p of points) {
-    left = Math.min(left, p.x);
-    top = Math.min(top, p.y);
-    right = Math.max(right, p.x);
-    bottom = Math.max(bottom, p.y);
+  for (const p of path.points) {
+    left = Math.min(left, p.x, p.in.x, p.out.x);
+    top = Math.min(top, p.y, p.in.y, p.out.y);
+    right = Math.max(right, p.x, p.in.x, p.out.x);
+    bottom = Math.max(bottom, p.y, p.in.y, p.out.y);
   }
   const r = path.strokeWidth / 2;
   return {
@@ -333,3 +338,10 @@ export function pathBounds(path: VectorPathData): Rect {
     height: Math.max(1, bottom - top + r * 2),
   };
 }
+
+/** Capture the layer geometry so erasure follows later nonuniform raster resizing. */
+export interface RasterErasureData { width: number; height: number; stroke: PaintOperationData }
+export const rasterErasureSchema: z.ZodType<RasterErasureData> = z.object({
+  width: dimension, height: dimension,
+  stroke: paintOperationSchema.refine(stroke => stroke.kind === 'eraser' || (stroke.kind === 'fill' && stroke.erase), 'Raster erasure requires an eraser or clear operation.'),
+}).strict();

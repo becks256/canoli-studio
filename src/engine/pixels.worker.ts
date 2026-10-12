@@ -1,3 +1,7 @@
+import { featherRegion } from "./feather-region";
+import { encodeCapturedPng } from "./png";
+import { prepareClipboard, type ClipboardRequest } from "./clipboard";
+import { encodeCoverage, wandCoverage, type CoverageRequest } from "../core/pixel-selection";
 import { applyHsl } from "./wasm";
 import type { HslAdjustmentData } from "../core/adjustments";
 import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
@@ -81,6 +85,7 @@ self.onmessage = async (
     effects?: ToneEffectData[];
     underlying?: Uint8ClampedArray;
     blend?: BlendIfData;
+    featheredSelection?: { tile: SelectionTile; radiusX: number; radiusY: number };
     selection?: SelectionTile;
     feather?: FeatherTile;
     lut?: Uint8Array;
@@ -90,10 +95,37 @@ self.onmessage = async (
       opacity: number;
     };
     histogram?: boolean;
+    coverage?: CoverageRequest;
+    png?: { width: number; height: number };
+    clipboard?: ClipboardRequest;
   }>,
 ) => {
   try {
     const data = event.data;
+    if (data.png) {
+      const { width, height } = data.png;
+      const png = await encodeCapturedPng(data.pixels, width, height);
+      self.postMessage({ id: data.id, png });
+      return;
+    }
+    if (data.clipboard) {
+      const clipboard = await prepareClipboard(await kernel, data.pixels, data.clipboard);
+      self.postMessage({ id: data.id, clipboard });
+      return;
+    }
+    if (data.coverage) {
+      const { width, height, wand } = data.coverage;
+      if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0 || data.pixels.length !== width * height * 4)
+        throw new Error("Pixel coverage requires matching RGBA dimensions.");
+      let alpha: Uint8Array;
+      if (wand) alpha = wandCoverage(data.pixels, width, height, wand.x, wand.y, wand.tolerance, wand.contiguous);
+      else {
+        alpha = new Uint8Array(width * height);
+        for (let i = 0; i < alpha.length; i++) alpha[i] = data.pixels[i * 4 + 3];
+      }
+      self.postMessage({ id: data.id, coverage: encodeCoverage(alpha, width, height) });
+      return;
+    }
     if (data.hsl) {
       const pixels = applyHsl(await kernel, data.pixels, data.hsl);
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
@@ -171,6 +203,20 @@ self.onmessage = async (
     if (data.histogram) {
       const hist = computeWasmHistogram(await kernel, data.pixels);
       self.postMessage({ id: data.id, histogram: hist });
+      return;
+    }
+    if (data.featheredSelection) {
+      const { tile, radiusX, radiusY } = data.featheredSelection;
+      const pixels = renderSelection(await kernel, tile);
+      const region = featherRegion(pixels, { ...tile, radiusX, radiusY });
+      if (region) {
+        const softened = featherAlpha(await kernel, region.pixels,
+          { width: region.width, height: region.height, radiusX, radiusY });
+        for (let y = 0; y < region.height; y++) pixels.set(
+          softened.subarray(y * region.width * 4, (y + 1) * region.width * 4),
+          ((y + region.y) * tile.width + region.x) * 4);
+      }
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }
     const result = data.lut

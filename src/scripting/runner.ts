@@ -1,3 +1,4 @@
+import { isImmutable } from "../core/immutable";
 import runtimeSource from "../generated/script-runtime.js?raw";
 import type { Document } from "../dom";
 import type { EditorCommand } from "../core/commands";
@@ -36,22 +37,24 @@ export class ScriptRunner {
       return Promise.reject(
         new Error("Scripts must be smaller than 50,000 characters."),
       );
-    const snapshot = document.toJSON();
+    // postMessage creates the isolated copy. Retain a stable immutable revision
+    // until the worker is ready instead of cloning that same revision twice.
+    const current = document._read();
+    const snapshot = isImmutable(current) ? current : document.toJSON();
     const selectedId = document.selectedLayer?.id ?? null;
     const selectedIds = document.selectedLayers.map((layer) => layer.id);
     const iframe = window.document.createElement("iframe");
     iframe.setAttribute("sandbox", "allow-scripts");
     iframe.setAttribute("aria-hidden", "true");
     iframe.hidden = true;
-    const source = JSON.stringify(runtimeSource).replaceAll("<", "\\u003c");
     // Inherited by the blob worker: network access and external code imports are
     // denied, and no same-origin permission is granted to the frame.
     iframe.srcdoc = `<!doctype html><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob:; connect-src 'none';"><script>
       window.onmessage = (event) => {
-        if (!event.ports[0]) return;
+        if (event.source !== parent || !event.ports[0] || typeof event.data?.runtimeSource !== "string") return;
         const port = event.ports[0]; window.onmessage = null;
         try {
-          const url = URL.createObjectURL(new Blob([${source}], { type: 'application/javascript' }));
+          const url = URL.createObjectURL(new Blob([event.data.runtimeSource], { type: 'application/javascript' }));
           const worker = new Worker(url); URL.revokeObjectURL(url);
           worker.onmessage = (event) => port.postMessage(event.data);
           worker.onerror = () => port.postMessage({ type: 'error', error: 'Script worker failed.' });
@@ -175,7 +178,7 @@ export class ScriptRunner {
         }
       };
       iframe.onload = () => {
-        iframe.contentWindow?.postMessage("start", "*", [channel.port2]);
+        iframe.contentWindow?.postMessage({ runtimeSource }, "*", [channel.port2]);
       };
       window.document.body.append(iframe);
     });

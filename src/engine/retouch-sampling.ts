@@ -1,3 +1,4 @@
+import { yieldTask } from "./task-yield";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData, LayerData } from "../core/model";
 import type { RetouchSamplingOptions } from "../core/retouch/types";
@@ -5,11 +6,11 @@ import type { DocumentRenderer, RenderRegion } from "./renderer";
 import { release } from "./canvas";
 
 /** Capture once; retain ancestor transforms, masks and compositing for the selected branch. */
-export function retouchSampleDocument(
+export function retouchViewDocument(
   document: DocumentData,
   options: RetouchSamplingOptions,
 ): DocumentData {
-  const snapshot = structuredClone(document);
+  const snapshot = document;
   if (options.mode === "all-layers") return snapshot;
   if (options.mode !== "current-layer" && options.mode !== "current-and-below")
     throw new Error("Unknown retouch sampling mode.");
@@ -30,8 +31,12 @@ export function retouchSampleDocument(
   };
   const children = prune(snapshot.children);
   if (!children) throw new Error("Retouch sampling layer was not found.");
-  snapshot.children = children;
-  return snapshot;
+  return { ...snapshot, children };
+}
+
+/** Detach only the requested branch, rather than first cloning unrelated artwork. */
+export function retouchSampleDocument(document: DocumentData, options: RetouchSamplingOptions): DocumentData {
+  return structuredClone(retouchViewDocument(document, options));
 }
 
 /** Bounded readback surfaces, native document pixels and no live-document writes. */
@@ -53,7 +58,11 @@ export async function sampleRetouchRegion(
     throw new Error("Retouch sampling requires safe integer pixel geometry.");
   }
   signal?.throwIfAborted();
-  const pixels = new Uint8ClampedArray(width * height * 4);
+  // A single readback already owns a fresh native-resolution RGBA buffer.
+  // Allocate assembly storage only when several tiles must be combined.
+  const pixels = width <= 1024 && height <= 1024
+    ? null : new Uint8ClampedArray(width * height * 4);
+  let deadline = performance.now() + 4;
   for (let ty = 0; ty < height; ty += 1024)
     for (let tx = 0; tx < width; tx += 1024) {
       signal?.throwIfAborted();
@@ -75,7 +84,9 @@ export async function sampleRetouchRegion(
         if (!context)
           throw new Error("Retouch sampling could not read image pixels.");
         const tile = context.getImageData(0, 0, w, h).data;
-        for (let row = 0; row < h; row++)
+        if (!pixels) return tile;
+        if (w === width) pixels.set(tile, ty * width * 4);
+        else for (let row = 0; row < h; row++)
           pixels.set(
             tile.subarray(row * w * 4, (row + 1) * w * 4),
             ((ty + row) * width + tx) * 4,
@@ -83,8 +94,14 @@ export async function sampleRetouchRegion(
       } finally {
         release(canvas);
       }
+      // Keep the exact native tile grid, but do not join every tile into one
+      // long microtask chain that prevents pending input from being handled.
+      if ((tx + w < width || ty + h < height) && performance.now() >= deadline) {
+        await yieldTask();
+        deadline = performance.now() + 4;
+      }
     }
-  return pixels;
+  return pixels!;
 }
 
 export interface RetouchPixelWindow {

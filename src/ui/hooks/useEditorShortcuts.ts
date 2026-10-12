@@ -50,7 +50,11 @@ export function useEditorShortcuts({
         callbacksRef.current.onResetGestures();
         return;
       }
-      if (stateRef.current.busy || stateRef.current.modalOpen) {
+      if (stateRef.current.modalOpen) {
+        return;
+      }
+      if (stateRef.current.busy) {
+        shortcutsRef.current.handle(event, true);
         return;
       }
       if (event.code === "Space" && !isTextInput(event.target)) {

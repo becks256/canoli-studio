@@ -106,7 +106,7 @@ export type RecipeAction =
   | { type: "effect.remove"; effectId?: string; effectIndex?: number }
   | { type: "effect.reset" }
   | {
-      type: "document.resize";
+      type: "document.resize" | "document.resizeImage";
       width: number | string;
       height: number | string;
     }
