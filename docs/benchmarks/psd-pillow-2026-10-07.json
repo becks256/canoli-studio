@@ -1,0 +1,49 @@
+{
+  "reader": "Pillow",
+  "version": "10.3.0",
+  "results": [
+    {
+      "fixture": "alpha-raw",
+      "sha256": "ace4a0593d5cab684956b5de99ae86db2895fe7cfeed1f666fb2c35b7397b4a0",
+      "width": 3,
+      "height": 2,
+      "exactCompositeRGBA": true
+    },
+    {
+      "fixture": "layers-raw",
+      "sha256": "fc581e45b230fcee4d4cc8d2907d7e17d4a8176902e5d1e28073364452a74396",
+      "width": 2,
+      "height": 2,
+      "exactCompositeRGBA": true
+    },
+    {
+      "fixture": "multiply-raw",
+      "sha256": "7c8a93faddd4c430f488a3e63bdea7c7b207cee28d16ccf17654ef59745d420e",
+      "width": 2,
+      "height": 2,
+      "exactCompositeRGBA": true
+    },
+    {
+      "fixture": "alpha-rle",
+      "sha256": "e98298d76dad8fe19c066569f57ba07fe9bec2204e057ae84fb1b488dc3c0015",
+      "width": 3,
+      "height": 2,
+      "exactCompositeRGBA": true
+    },
+    {
+      "fixture": "layers-rle",
+      "sha256": "cca72d802f09745ede8b8583fb2e4fc64e56d4ce17cf40067dfbc0354f33ad76",
+      "width": 2,
+      "height": 2,
+      "exactCompositeRGBA": true
+    },
+    {
+      "fixture": "multiply-rle",
+      "sha256": "c5e78c69e76e31f7d1723f0475629c4d1d4fcf1a13a0e9a1b829362a9b92e6c2",
+      "width": 2,
+      "height": 2,
+      "exactCompositeRGBA": true
+    }
+  ],
+  "limitations": "Composite pixel decoding only; does not prove editable layer semantics, blend modes other than normal/multiply, effects, ICC conversion, or Photoshop compatibility."
+}

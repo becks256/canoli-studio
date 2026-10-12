@@ -1,0 +1,7542 @@
+{
+  "date": "2026-10-12",
+  "change": "Bound cached raster and unclipped fill-only paint working surfaces even when masked, shadowed or color-overlaid. Expand output bounds conservatively for shadow support and offsets; keep original pixel grid, normal blending, full fill opacity and no Blend If/active stroke. Finished cache hits draw directly into the parent without a temporary surface.",
+  "measurement": "Local production Chromium with CDP profiling; pre-change comparable profile is 20-layer styled rotation. Baseline broad audit also records all eight unprofiled transform fixtures.",
+  "results": "Profiled 20-layer rotation median 33.8\u219216.8 ms, median mask preparation 9.2\u21923.3 ms. Five/20-layer styled rotation p95 24.5/27.1 ms after the final direct-cache path.",
+  "intermediate_trial": "Cropping alone improved five-layer rotation but retained a temporary surface for each unchanged styled layer; twenty-layer p95 rose to 49 ms. Direct finished-cache composition removed that extra work.",
+  "limitations": "Measurements do not establish cross-device/GPU performance or editor-wide completion. Uncached/export reference rendering remains full-region. Brush/Clone/clipped-stroke surfaces retain previous geometry.",
+  "beforeProfile": [
+    {
+      "ms": 370.45799999999997,
+      "functionName": "(program)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 360.52099999999996,
+      "functionName": "(idle)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 301.6280000000001,
+      "functionName": "drawImage",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 95.85000000000002,
+      "functionName": "drawImage",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 35.609,
+      "functionName": "putImageData",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 23.304000000000006,
+      "functionName": "Sv",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 315,
+      "columnNumber": 174594
+    },
+    {
+      "ms": 23.166999999999998,
+      "functionName": "Fm",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 70,
+      "columnNumber": 110119
+    },
+    {
+      "ms": 21.456999999999997,
+      "functionName": "(garbage collector)",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 17.581999999999997,
+      "functionName": "save",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 17.419,
+      "functionName": "save",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 16.455,
+      "functionName": "save",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 13.016999999999998,
+      "functionName": "drawImage",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 12.974000000000002,
+      "functionName": "_",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 70,
+      "columnNumber": 116822
+    },
+    {
+      "ms": 9.803,
+      "functionName": "is",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 7,
+      "columnNumber": 49137
+    },
+    {
+      "ms": 9.097999999999999,
+      "functionName": "q",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 69,
+      "columnNumber": 14496
+    },
+    {
+      "ms": 8.868,
+      "functionName": "q",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 69,
+      "columnNumber": 14496
+    },
+    {
+      "ms": 7.586,
+      "functionName": "setTransform",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 6.797999999999999,
+      "functionName": "LC",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 329,
+      "columnNumber": 135805
+    },
+    {
+      "ms": 6.615,
+      "functionName": "save",
+      "scriptId": "0",
+      "url": "",
+      "lineNumber": -1,
+      "columnNumber": -1
+    },
+    {
+      "ms": 6.081,
+      "functionName": "tf",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 7,
+      "columnNumber": 128366
+    },
+    {
+      "ms": 5.497,
+      "functionName": "lv",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 315,
+      "columnNumber": 168164
+    },
+    {
+      "ms": 5.416,
+      "functionName": "",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 315,
+      "columnNumber": 176087
+    },
+    {
+      "ms": 5.377000000000001,
+      "functionName": "Ii",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 7,
+      "columnNumber": 28904
+    },
+    {
+      "ms": 4.406000000000001,
+      "functionName": "write",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 70,
+      "columnNumber": 106707
+    },
+    {
+      "ms": 4.402,
+      "functionName": "on",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 7,
+      "columnNumber": 7383
+    },
+    {
+      "ms": 4.397,
+      "functionName": "",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 315,
+      "columnNumber": 176087
+    },
+    {
+      "ms": 4.3919999999999995,
+      "functionName": "on",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 7,
+      "columnNumber": 7383
+    },
+    {
+      "ms": 3.665,
+      "functionName": "Mu",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 7,
+      "columnNumber": 109538
+    },
+    {
+      "ms": 3.3350000000000004,
+      "functionName": "Sv",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 315,
+      "columnNumber": 174594
+    },
+    {
+      "ms": 3.334,
+      "functionName": "",
+      "scriptId": "5",
+      "url": "http://127.0.0.1:4173/assets/index-DmJ_-B_D.js",
+      "lineNumber": 315,
+      "columnNumber": 176764
+    }
+  ],
+  "before": [
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 47.60000002384186,
+          "prepareMs": 20.599999994039536,
+          "waitBeforePrepareMs": 25.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 46.30000001192093,
+          "prepareMs": 30.599999994039536,
+          "waitBeforePrepareMs": 15.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 34.099999994039536,
+          "prepareMs": 20,
+          "waitBeforePrepareMs": 13.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 34.39999997615814,
+          "prepareMs": 22.700000017881393,
+          "waitBeforePrepareMs": 11.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 33.29999998211861,
+          "prepareMs": 21.700000017881393,
+          "waitBeforePrepareMs": 11.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 35,
+          "prepareMs": 24.700000017881393,
+          "waitBeforePrepareMs": 9.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 35.69999998807907,
+          "prepareMs": 23.299999982118607,
+          "waitBeforePrepareMs": 12
+        },
+        {
+          "phase": "move",
+          "ms": 29.19999998807907,
+          "prepareMs": 19.400000005960464,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 34.19999998807907,
+          "prepareMs": 22,
+          "waitBeforePrepareMs": 11.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 45.29999998211861,
+          "prepareMs": 35.400000005960464,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 49.60000002384186,
+          "prepareMs": 30.69999998807907,
+          "waitBeforePrepareMs": 18.30000001192093
+        },
+        {
+          "phase": "move",
+          "ms": 34.70000001788139,
+          "prepareMs": 21.5,
+          "waitBeforePrepareMs": 12.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 28.5,
+          "prepareMs": 19,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 34.400000005960464,
+          "prepareMs": 24.299999982118607,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 33.19999998807907,
+          "prepareMs": 21.100000023841858,
+          "waitBeforePrepareMs": 11.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 30.099999994039536,
+          "prepareMs": 20.30000001192093,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 29,
+          "prepareMs": 19.899999976158142,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 28.400000005960464,
+          "prepareMs": 19.200000017881393,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 28.400000005960464,
+          "prepareMs": 18.899999976158142,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 28.400000005960464,
+          "prepareMs": 19.5,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 33.80000001192093,
+          "prepareMs": 22.30000001192093,
+          "waitBeforePrepareMs": 11.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 30,
+          "prepareMs": 20.5,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 27.80000001192093,
+          "prepareMs": 19,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 29.19999998807907,
+          "prepareMs": 19.100000023841858,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 34.900000005960464,
+          "prepareMs": 25,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "commit",
+          "ms": 50.5,
+          "prepareMs": 24.900000005960464,
+          "waitBeforePrepareMs": 22.599999994039536
+        }
+      ],
+      "phases": [
+        {
+          "method": "renderMaskCoverage",
+          "ms": 16.30000001192093
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 24.400000005960464
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 22.599999994039536
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 20.900000005960464
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 24.900000005960464
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 18.900000005960464
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 17.599999994039536
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 20.700000017881393
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 18
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 18.900000005960464
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 15.399999976158142
+        },
+        {
+          "method": "raster",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.799999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 9.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.7000000178813934
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.900000005960464
+        },
+        {
+          "method": "raster",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 11.099999994039536
+        },
+        {
+          "method": "raster",
+          "ms": 1.100000023841858
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 10
+        },
+        {
+          "method": "raster",
+          "ms": 0.7000000178813934
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 9.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 10.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 16.400000005960464
+        },
+        {
+          "method": "raster",
+          "ms": 0.9000000059604645
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.7999999821186066
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.200000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 12.099999994039536
+        },
+        {
+          "method": "raster",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.7000000178813934
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.800000011920929
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.7999999821186066
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.800000011920929
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 1
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 9.099999994039536
+        },
+        {
+          "method": "raster",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.800000011920929
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.9000000059604645
+        }
+      ]
+    }
+  ],
+  "boundedOnly": [
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 19.19999998807907,
+          "prepareMs": 2.2000000178813934,
+          "waitBeforePrepareMs": 16.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 14.400000005960464,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 12.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 12.799999982118607,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 10.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.799999982118607,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 11.300000011920929,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 9.700000017881393,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.199999988079071,
+          "prepareMs": 2.100000023841858,
+          "waitBeforePrepareMs": 8.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 7
+        },
+        {
+          "phase": "move",
+          "ms": 9.799999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 10.699999988079071,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.700000017881393,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 9.699999988079071,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 10,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 9,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 10.199999988079071,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 8.699999988079071,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.800000011920929,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 6.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.199999988079071,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 8.400000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 6.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 9.700000017881393,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 8.599999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 8.300000011920929,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 6.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 8.200000017881393,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 6.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 10.799999982118607,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 9.300000011920929,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 9.299999982118607,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.5,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 6.899999976158142
+        },
+        {
+          "phase": "commit",
+          "ms": 8.600000023841858,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 18.600000023841858,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 16.80000001192093
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 14.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 11.199999988079071,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.699999988079071,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 8.699999988079071,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 10.599999994039536,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 9.900000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 10.200000017881393,
+          "prepareMs": 1.0999999940395355,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 9.599999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 10.199999988079071,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 8.400000005960464,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 9.799999982118607,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 8.800000011920929,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.899999976158142,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 9,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 9.199999988079071,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.299999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 10.200000017881393,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.2000000178813934,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 18.5,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 16.30000001192093
+        },
+        {
+          "phase": "move",
+          "ms": 11.400000005960464,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 10,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 9.700000017881393,
+          "prepareMs": 2.199999988079071,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 9,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 9.599999994039536,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "commit",
+          "ms": 9,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.300000011920929
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 21.400000005960464,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 18.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.900000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.299999982118607,
+          "prepareMs": 1.899999976158142,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 13.300000011920929,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 10.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 12.300000011920929,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 13.199999988079071,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 11
+        },
+        {
+          "phase": "move",
+          "ms": 11.5,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 2.199999988079071,
+          "waitBeforePrepareMs": 11.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 23.19999998807907,
+          "prepareMs": 3.4000000059604645,
+          "waitBeforePrepareMs": 18.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 10,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.299999982118607,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 11.5
+        },
+        {
+          "phase": "move",
+          "ms": 13.200000017881393,
+          "prepareMs": 2.2000000178813934,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 11.300000011920929,
+          "prepareMs": 1.600000023841858,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 10.299999982118607,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10.599999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 11.5,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 10.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 13.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.699999988079071,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.300000011920929,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 10.799999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.700000017881393,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.900000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 10.599999994039536,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.900000005960464,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.400000005960464,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10.700000017881393,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 9.799999982118607,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 10.299999982118607,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "commit",
+          "ms": 13.400000005960464,
+          "prepareMs": 2.300000011920929,
+          "waitBeforePrepareMs": 10.400000005960464
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 19.5,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 16.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 12.199999988079071,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 8.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 11.699999988079071,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 11.400000005960464,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 12.299999982118607,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 10.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.900000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.5,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 12.600000023841858,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 9.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11.199999988079071,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.800000011920929,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.5,
+          "prepareMs": 2.300000011920929,
+          "waitBeforePrepareMs": 11.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.900000005960464,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10.300000011920929,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 10.600000023841858,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 11.699999988079071,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 9.899999976158142,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.600000023841858,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 10.100000023841858,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 8.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 11.300000011920929,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 12.400000005960464,
+          "prepareMs": 2.300000011920929,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 12.400000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 16.200000017881393,
+          "prepareMs": 2.5,
+          "waitBeforePrepareMs": 12.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.900000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 12.5,
+          "prepareMs": 2.5999999940395355,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 12.599999994039536,
+          "prepareMs": 2.300000011920929,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 20.900000005960464,
+          "prepareMs": 3.199999988079071,
+          "waitBeforePrepareMs": 16.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 11.200000017881393,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "commit",
+          "ms": 12.099999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 9.300000011920929
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        }
+      ]
+    },
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 26.599999994039536,
+          "prepareMs": 9.5,
+          "waitBeforePrepareMs": 16.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 18.399999976158142,
+          "prepareMs": 8.900000005960464,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 18.599999994039536,
+          "prepareMs": 8.5,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 25.30000001192093,
+          "prepareMs": 14.600000023841858,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.400000005960464,
+          "prepareMs": 8.299999982118607,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 16.600000023841858,
+          "prepareMs": 8.5,
+          "waitBeforePrepareMs": 8.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 18.700000017881393,
+          "prepareMs": 8.5,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17.600000023841858,
+          "prepareMs": 8.099999994039536,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 20.799999982118607,
+          "prepareMs": 10.800000011920929,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 17.899999976158142,
+          "prepareMs": 9.199999988079071,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 19.400000005960464,
+          "prepareMs": 9.599999994039536,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 18,
+          "prepareMs": 9.5,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 18.399999976158142,
+          "prepareMs": 10.400000005960464,
+          "waitBeforePrepareMs": 7.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 19,
+          "prepareMs": 8.799999982118607,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 17.899999976158142,
+          "prepareMs": 8.599999994039536,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.900000005960464,
+          "prepareMs": 8.599999994039536,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 24,
+          "prepareMs": 13.300000011920929,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 16.599999994039536,
+          "prepareMs": 9,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 16.30000001192093,
+          "prepareMs": 8.099999994039536,
+          "waitBeforePrepareMs": 8.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 17.400000005960464,
+          "prepareMs": 8.300000011920929,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 7.4000000059604645,
+          "waitBeforePrepareMs": 7.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.400000005960464,
+          "prepareMs": 8,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.400000005960464,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 7
+        },
+        {
+          "phase": "move",
+          "ms": 14.199999988079071,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 15.200000017881393,
+          "prepareMs": 7.299999982118607,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.699999988079071,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 14.699999988079071,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.400000005960464,
+          "prepareMs": 5.9000000059604645,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "commit",
+          "ms": 11.699999988079071,
+          "prepareMs": 4.5999999940395355,
+          "waitBeforePrepareMs": 6.9000000059604645
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 4.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 9.400000005960464
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 4
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.2000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.899999976158142
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.399999976158142
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        }
+      ]
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 26.80000001192093,
+          "prepareMs": 9.799999982118607,
+          "waitBeforePrepareMs": 16.80000001192093
+        },
+        {
+          "phase": "move",
+          "ms": 23.200000017881393,
+          "prepareMs": 10.899999976158142,
+          "waitBeforePrepareMs": 12.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 18.099999994039536,
+          "prepareMs": 8.5,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 22.30000001192093,
+          "prepareMs": 11.400000005960464,
+          "waitBeforePrepareMs": 10.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 16.099999994039536,
+          "prepareMs": 7.399999976158142,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.400000005960464,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 23.5,
+          "prepareMs": 10.700000017881393,
+          "waitBeforePrepareMs": 12.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 17.099999994039536,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 16.900000005960464,
+          "prepareMs": 7.800000011920929,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 18.900000005960464,
+          "prepareMs": 8.700000017881393,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 26.200000017881393,
+          "prepareMs": 13.599999994039536,
+          "waitBeforePrepareMs": 12.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 26.600000023841858,
+          "prepareMs": 13.799999982118607,
+          "waitBeforePrepareMs": 12.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 24.400000005960464,
+          "prepareMs": 14.099999994039536,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 18.30000001192093,
+          "prepareMs": 10.700000017881393,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 8.099999994039536,
+          "waitBeforePrepareMs": 7.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 14.800000011920929,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 7.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 17.30000001192093,
+          "prepareMs": 7.800000011920929,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 13.900000005960464,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 7.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 7.699999988079071,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.700000017881393,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 16.19999998807907,
+          "prepareMs": 8.099999994039536,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 16.299999982118607,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 8.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.800000011920929,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 18.69999998807907,
+          "prepareMs": 9,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.199999988079071,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 16.700000017881393,
+          "prepareMs": 9,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 15.200000017881393,
+          "prepareMs": 7.899999976158142,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.799999982118607,
+          "prepareMs": 7.9000000059604645,
+          "waitBeforePrepareMs": 6.799999982118607
+        },
+        {
+          "phase": "commit",
+          "ms": 13.400000005960464,
+          "prepareMs": 4.800000011920929,
+          "waitBeforePrepareMs": 8.300000011920929
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.4000000059604645
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.2999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.100000023841858
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 49,
+          "prepareMs": 14.699999988079071,
+          "waitBeforePrepareMs": 33
+        },
+        {
+          "phase": "move",
+          "ms": 51.30000001192093,
+          "prepareMs": 31.599999994039536,
+          "waitBeforePrepareMs": 19.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 37.19999998807907,
+          "prepareMs": 20.30000001192093,
+          "waitBeforePrepareMs": 16.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 32.900000005960464,
+          "prepareMs": 21.900000005960464,
+          "waitBeforePrepareMs": 10.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 29.099999994039536,
+          "prepareMs": 17.30000001192093,
+          "waitBeforePrepareMs": 11.5
+        },
+        {
+          "phase": "move",
+          "ms": 28.400000005960464,
+          "prepareMs": 17.69999998807907,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 39.099999994039536,
+          "prepareMs": 23.900000005960464,
+          "waitBeforePrepareMs": 14.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 30.400000005960464,
+          "prepareMs": 18.30000001192093,
+          "waitBeforePrepareMs": 11.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 36.099999994039536,
+          "prepareMs": 22.30000001192093,
+          "waitBeforePrepareMs": 13.5
+        },
+        {
+          "phase": "move",
+          "ms": 34,
+          "prepareMs": 22.30000001192093,
+          "waitBeforePrepareMs": 11.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 30.599999994039536,
+          "prepareMs": 21.099999994039536,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 29.100000023841858,
+          "prepareMs": 19,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 27.399999976158142,
+          "prepareMs": 18.599999994039536,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 30.200000017881393,
+          "prepareMs": 19.799999982118607,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 28,
+          "prepareMs": 18.5,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 29.400000005960464,
+          "prepareMs": 20.5,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 28.399999976158142,
+          "prepareMs": 18.599999994039536,
+          "waitBeforePrepareMs": 9.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 28.100000023841858,
+          "prepareMs": 18.799999982118607,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 28.400000005960464,
+          "prepareMs": 19.30000001192093,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 31.100000023841858,
+          "prepareMs": 22.30000001192093,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 28.80000001192093,
+          "prepareMs": 18.5,
+          "waitBeforePrepareMs": 10.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 25.900000005960464,
+          "prepareMs": 16.80000001192093,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 27.19999998807907,
+          "prepareMs": 17,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 26.400000005960464,
+          "prepareMs": 17.600000023841858,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 27.19999998807907,
+          "prepareMs": 17.80000001192093,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 24.900000005960464,
+          "prepareMs": 16.400000005960464,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 26.5,
+          "prepareMs": 16.799999982118607,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 27.200000017881393,
+          "prepareMs": 16.799999982118607,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 31.30000001192093,
+          "prepareMs": 19.700000017881393,
+          "waitBeforePrepareMs": 11.5
+        },
+        {
+          "phase": "move",
+          "ms": 34.10000002384186,
+          "prepareMs": 22.400000005960464,
+          "waitBeforePrepareMs": 11.5
+        },
+        {
+          "phase": "commit",
+          "ms": 21.399999976158142,
+          "prepareMs": 10.5,
+          "waitBeforePrepareMs": 9.299999982118607
+        }
+      ],
+      "phases": [
+        {
+          "method": "renderMaskCoverage",
+          "ms": 10.200000017881393
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 13.5
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 13.899999976158142
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 14.900000005960464
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.400000005960464
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 27
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 16.700000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 20
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.600000023841858
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 9.400000005960464
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.299999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.099999994039536
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.4000000059604645
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.700000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.799999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.700000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 10.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 36.60000002384186,
+          "prepareMs": 19.299999982118607,
+          "waitBeforePrepareMs": 17.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 43.900000005960464,
+          "prepareMs": 25.700000017881393,
+          "waitBeforePrepareMs": 17.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 40.599999994039536,
+          "prepareMs": 27.69999998807907,
+          "waitBeforePrepareMs": 12.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 39.30000001192093,
+          "prepareMs": 25.400000005960464,
+          "waitBeforePrepareMs": 13.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 31.099999994039536,
+          "prepareMs": 19.599999994039536,
+          "waitBeforePrepareMs": 11.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 29.19999998807907,
+          "prepareMs": 18.400000005960464,
+          "waitBeforePrepareMs": 10.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 31.299999982118607,
+          "prepareMs": 21.599999994039536,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 31.299999982118607,
+          "prepareMs": 19.100000023841858,
+          "waitBeforePrepareMs": 11.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 33.29999998211861,
+          "prepareMs": 20,
+          "waitBeforePrepareMs": 13.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 30.5,
+          "prepareMs": 19.900000005960464,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 29.900000005960464,
+          "prepareMs": 21,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 30.30000001192093,
+          "prepareMs": 18.900000005960464,
+          "waitBeforePrepareMs": 11.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 27.30000001192093,
+          "prepareMs": 17.299999982118607,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 30.80000001192093,
+          "prepareMs": 21.799999982118607,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 28.69999998807907,
+          "prepareMs": 18.099999994039536,
+          "waitBeforePrepareMs": 10.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 29,
+          "prepareMs": 19.900000005960464,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 27.69999998807907,
+          "prepareMs": 18.599999994039536,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 27.900000005960464,
+          "prepareMs": 18.599999994039536,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 28.5,
+          "prepareMs": 18,
+          "waitBeforePrepareMs": 10.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 26.5,
+          "prepareMs": 18.099999994039536,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 25.400000005960464,
+          "prepareMs": 16.600000023841858,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 29.30000001192093,
+          "prepareMs": 19.5,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 27.599999994039536,
+          "prepareMs": 18.400000005960464,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 26.80000001192093,
+          "prepareMs": 18.5,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 25,
+          "prepareMs": 16.599999994039536,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 30.30000001192093,
+          "prepareMs": 19.599999994039536,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 32.400000005960464,
+          "prepareMs": 20.30000001192093,
+          "waitBeforePrepareMs": 11.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 33.19999998807907,
+          "prepareMs": 22.200000017881393,
+          "waitBeforePrepareMs": 10.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 32.29999998211861,
+          "prepareMs": 21.30000001192093,
+          "waitBeforePrepareMs": 10.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 26.299999982118607,
+          "prepareMs": 17.80000001192093,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "commit",
+          "ms": 23.799999982118607,
+          "prepareMs": 12.599999994039536,
+          "waitBeforePrepareMs": 9.199999988079071
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 9
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.700000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.299999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.099999994039536
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.099999994039536
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.299999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.299999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.200000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.299999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.399999976158142
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 9.400000005960464
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 18.799999982118607,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 16.69999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 12.800000011920929,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 10.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.899999976158142,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 7.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 9.800000011920929,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.800000011920929,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.599999994039536,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 9.299999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 10.699999988079071,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 8.599999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 6.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 9.599999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 8.800000011920929,
+          "prepareMs": 1.600000023841858,
+          "waitBeforePrepareMs": 7
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 7.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 8.800000011920929,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.199999988079071,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.199999988079071,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 6.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 8.300000011920929,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 6.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.099999994039536,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.200000017881393,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.700000017881393,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 11.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 10.900000005960464,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.800000011920929,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 12.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.899999976158142,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 9.899999976158142
+        },
+        {
+          "phase": "commit",
+          "ms": 10.600000023841858,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 8.100000023841858
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        }
+      ]
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 18.80000001192093,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 16.80000001192093
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 13.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.300000011920929,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 8.599999994039536,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 9.799999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.900000005960464,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 7.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 8.699999988079071,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 7.9000000059604645,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 6.5
+        },
+        {
+          "phase": "move",
+          "ms": 9,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 10,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 9.200000017881393,
+          "prepareMs": 1.2000000178813934,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 9.599999994039536,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 8.799999982118607,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 11.900000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 10.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 8.300000011920929,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 6.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 8.400000005960464,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 6.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.800000011920929,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 8.599999994039536,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7
+        },
+        {
+          "phase": "move",
+          "ms": 9,
+          "prepareMs": 1.0999999940395355,
+          "waitBeforePrepareMs": 7.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 7.9000000059604645,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 6.5
+        },
+        {
+          "phase": "move",
+          "ms": 8.199999988079071,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 6.5
+        },
+        {
+          "phase": "move",
+          "ms": 9.5,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 8.400000005960464,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 8.299999982118607,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "commit",
+          "ms": 8.5,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 6.699999988079071
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 21.599999994039536,
+          "prepareMs": 3.199999988079071,
+          "waitBeforePrepareMs": 17.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.800000011920929,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 12.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.200000017881393,
+          "prepareMs": 2.300000011920929,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 11.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 10.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.700000017881393,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 12.300000011920929,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.299999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 13.5,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.099999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.799999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 10.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 3.0999999940395355,
+          "waitBeforePrepareMs": 10.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.299999982118607,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 13,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 11.399999976158142,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.799999982118607,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10.900000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10.399999976158142,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.400000005960464,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 10.900000005960464,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 11.799999982118607,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 9.900000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.300000011920929,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "commit",
+          "ms": 12,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 9.100000023841858
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 19,
+          "prepareMs": 1.600000023841858,
+          "waitBeforePrepareMs": 16.69999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 11.699999988079071,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 11.5,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.700000017881393,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 10.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.5,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 12.199999988079071,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 13.800000011920929,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 11.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11.099999994039536,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10.700000017881393,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 12.599999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 12.300000011920929,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 11.099999994039536,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.699999988079071,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 11.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 10.199999988079071,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 9.800000011920929,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 10.700000017881393,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 12.800000011920929,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.699999988079071,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.100000023841858,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 12.900000005960464,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 10.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.300000011920929,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.800000011920929,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 2.5,
+          "waitBeforePrepareMs": 14
+        },
+        {
+          "phase": "move",
+          "ms": 9.699999988079071,
+          "prepareMs": 1.2000000178813934,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "commit",
+          "ms": 14.600000023841858,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 11.700000017881393
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 24.5,
+          "prepareMs": 7.799999982118607,
+          "waitBeforePrepareMs": 16.5
+        },
+        {
+          "phase": "move",
+          "ms": 19.599999994039536,
+          "prepareMs": 9.800000011920929,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.900000005960464,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 10.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 16.099999994039536,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 13.299999982118607,
+          "prepareMs": 5.299999982118607,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 27.599999994039536,
+          "prepareMs": 13.299999982118607,
+          "waitBeforePrepareMs": 14
+        },
+        {
+          "phase": "move",
+          "ms": 16.599999994039536,
+          "prepareMs": 6.600000023841858,
+          "waitBeforePrepareMs": 9.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 16.799999982118607,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 19.19999998807907,
+          "prepareMs": 8.599999994039536,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 16.19999998807907,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 7.800000011920929,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 13.299999982118607,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 16.30000001192093,
+          "prepareMs": 8.5,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 16.80000001192093,
+          "prepareMs": 8.399999976158142,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 7.4000000059604645,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 13.300000011920929,
+          "prepareMs": 5.399999976158142,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.299999982118607,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 7.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 7.4000000059604645,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.700000017881393,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.099999994039536,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 7.799999982118607,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.099999994039536,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 14.899999976158142,
+          "prepareMs": 5.799999982118607,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 13,
+          "prepareMs": 5,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 12.299999982118607,
+          "prepareMs": 5.0999999940395355,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 16.19999998807907,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.400000005960464,
+          "prepareMs": 5.0999999940395355,
+          "waitBeforePrepareMs": 8.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 5.800000011920929,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 14.099999994039536,
+          "prepareMs": 6.100000023841858,
+          "waitBeforePrepareMs": 7.799999982118607
+        },
+        {
+          "phase": "commit",
+          "ms": 13.699999988079071,
+          "prepareMs": 4.5,
+          "waitBeforePrepareMs": 8.799999982118607
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 4
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.2000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.4000000059604645
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        }
+      ]
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 25,
+          "prepareMs": 7.9000000059604645,
+          "waitBeforePrepareMs": 16.80000001192093
+        },
+        {
+          "phase": "move",
+          "ms": 16.299999982118607,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 18.799999982118607,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 12.5
+        },
+        {
+          "phase": "move",
+          "ms": 17.5,
+          "prepareMs": 7.799999982118607,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 9.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.900000005960464,
+          "prepareMs": 5.300000011920929,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.400000005960464,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 4.9000000059604645,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 12.900000005960464,
+          "prepareMs": 4.699999988079071,
+          "waitBeforePrepareMs": 8.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 18.5,
+          "prepareMs": 8.200000017881393,
+          "waitBeforePrepareMs": 10.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 17.700000017881393,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 14.199999988079071,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 14.899999976158142,
+          "prepareMs": 6.799999982118607,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15.900000005960464,
+          "prepareMs": 8.400000005960464,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 7.9000000059604645,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 15.700000017881393,
+          "prepareMs": 5.899999976158142,
+          "waitBeforePrepareMs": 9.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6.399999976158142,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 13.299999982118607,
+          "prepareMs": 5.699999988079071,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 12.900000005960464,
+          "prepareMs": 5.4000000059604645,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 15.199999988079071,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 6.799999982118607,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 5.9000000059604645,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 12.099999994039536,
+          "prepareMs": 5.199999988079071,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 15.699999988079071,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.5,
+          "prepareMs": 5.299999982118607,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 13.200000017881393,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 13.5,
+          "prepareMs": 5.9000000059604645,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "commit",
+          "ms": 11.600000023841858,
+          "prepareMs": 4.0999999940395355,
+          "waitBeforePrepareMs": 7.200000017881393
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.4000000059604645
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.399999976158142
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 4.299999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.2000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.2999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.600000023841858
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.600000023841858
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 27.099999994039536,
+          "prepareMs": 10.299999982118607,
+          "waitBeforePrepareMs": 16.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 25.5,
+          "prepareMs": 10.599999994039536,
+          "waitBeforePrepareMs": 14.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 18.80000001192093,
+          "prepareMs": 8,
+          "waitBeforePrepareMs": 10.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 17.400000005960464,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 10.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 22.900000005960464,
+          "prepareMs": 10.300000011920929,
+          "waitBeforePrepareMs": 12.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 16.200000017881393,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.299999982118607,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 19.099999994039536,
+          "prepareMs": 8.799999982118607,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 33.5,
+          "prepareMs": 16.299999982118607,
+          "waitBeforePrepareMs": 16.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.900000005960464,
+          "prepareMs": 6.700000017881393,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.099999994039536,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 20.400000005960464,
+          "prepareMs": 9.199999988079071,
+          "waitBeforePrepareMs": 11.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 18.80000001192093,
+          "prepareMs": 7.4000000059604645,
+          "waitBeforePrepareMs": 11.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 18.299999982118607,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 15.799999982118607,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 7.800000011920929,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 18.19999998807907,
+          "prepareMs": 8.300000011920929,
+          "waitBeforePrepareMs": 9.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.800000011920929,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 16.400000005960464,
+          "prepareMs": 6.800000011920929,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 7.299999982118607,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.5,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 17.899999976158142,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 10.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 16.599999994039536,
+          "prepareMs": 7.399999976158142,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 6.600000023841858,
+          "waitBeforePrepareMs": 8.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 5.799999982118607,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 17.30000001192093,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 10.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 6.4000000059604645,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 15.100000023841858,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.799999982118607,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "commit",
+          "ms": 13.900000005960464,
+          "prepareMs": 4.4000000059604645,
+          "waitBeforePrepareMs": 8.300000011920929
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.100000023841858
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 6.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.4000000059604645
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 10.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 4.700000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.2999999821186066
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.399999976158142
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 27.099999994039536,
+          "prepareMs": 10.099999994039536,
+          "waitBeforePrepareMs": 16.80000001192093
+        },
+        {
+          "phase": "move",
+          "ms": 23.099999994039536,
+          "prepareMs": 9.599999994039536,
+          "waitBeforePrepareMs": 13.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 29.099999994039536,
+          "prepareMs": 14.199999988079071,
+          "waitBeforePrepareMs": 14.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 16.30000001192093,
+          "prepareMs": 6.700000017881393,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 17.099999994039536,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 11
+        },
+        {
+          "phase": "move",
+          "ms": 14.5,
+          "prepareMs": 5.199999988079071,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 18.900000005960464,
+          "prepareMs": 7.399999976158142,
+          "waitBeforePrepareMs": 11.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 22.900000005960464,
+          "prepareMs": 12.200000017881393,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.200000017881393,
+          "prepareMs": 6.899999976158142,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 15.700000017881393,
+          "prepareMs": 5.899999976158142,
+          "waitBeforePrepareMs": 9.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 16.900000005960464,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 16.69999998807907,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 10.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.900000005960464,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 19,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 11.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 16.099999994039536,
+          "prepareMs": 7.200000017881393,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 14.5,
+          "prepareMs": 5.4000000059604645,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 15.699999988079071,
+          "prepareMs": 5.700000017881393,
+          "waitBeforePrepareMs": 9.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 15.899999976158142,
+          "prepareMs": 5.9000000059604645,
+          "waitBeforePrepareMs": 9.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 15.300000011920929,
+          "prepareMs": 5.4000000059604645,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 31,
+          "prepareMs": 15,
+          "waitBeforePrepareMs": 15.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 22.600000023841858,
+          "prepareMs": 11.799999982118607,
+          "waitBeforePrepareMs": 10.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.700000017881393,
+          "prepareMs": 5.600000023841858,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15.199999988079071,
+          "prepareMs": 6.4000000059604645,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.300000011920929,
+          "prepareMs": 6.100000023841858,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 17.69999998807907,
+          "prepareMs": 7.200000017881393,
+          "waitBeforePrepareMs": 10.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6.399999976158142,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 14.300000011920929,
+          "prepareMs": 5.4000000059604645,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "commit",
+          "ms": 15,
+          "prepareMs": 4.4000000059604645,
+          "waitBeforePrepareMs": 9.099999994039536
+        }
+      ],
+      "phases": [
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.399999976158142
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 5.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7.700000017881393
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 8
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.800000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.7000000178813934
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.29999998211860657
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.600000023841858
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.199999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.300000011920929
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 10.799999982118607
+        },
+        {
+          "method": "raster",
+          "ms": 0.30000001192092896
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 7
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.19999998807907104
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.699999988079071
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.0999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.09999999403953552
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 3.5
+        },
+        {
+          "method": "raster",
+          "ms": 0
+        },
+        {
+          "method": "renderMaskCoverage",
+          "ms": 2.5999999940395355
+        },
+        {
+          "method": "raster",
+          "ms": 0.20000001788139343
+        }
+      ]
+    }
+  ],
+  "repeat": [
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 26.69999998807907,
+          "prepareMs": 9.5,
+          "waitBeforePrepareMs": 17
+        },
+        {
+          "phase": "move",
+          "ms": 19.5,
+          "prepareMs": 8,
+          "waitBeforePrepareMs": 11.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 6.899999976158142,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 18.599999994039536,
+          "prepareMs": 8,
+          "waitBeforePrepareMs": 10.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 26.69999998807907,
+          "prepareMs": 13.200000017881393,
+          "waitBeforePrepareMs": 13.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 16.299999982118607,
+          "prepareMs": 7.200000017881393,
+          "waitBeforePrepareMs": 8.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 17.299999982118607,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 18.099999994039536,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 10.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 15.199999988079071,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 18.5,
+          "prepareMs": 7.799999982118607,
+          "waitBeforePrepareMs": 10.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 15.100000023841858,
+          "prepareMs": 7.199999988079071,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 19,
+          "prepareMs": 7.800000011920929,
+          "waitBeforePrepareMs": 11
+        },
+        {
+          "phase": "move",
+          "ms": 19.5,
+          "prepareMs": 9.099999994039536,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 19.099999994039536,
+          "prepareMs": 9.699999988079071,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 20.599999994039536,
+          "prepareMs": 10.800000011920929,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.19999998807907,
+          "prepareMs": 8.599999994039536,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 15.699999988079071,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.299999982118607,
+          "prepareMs": 8.5,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 6.200000017881393,
+          "waitBeforePrepareMs": 10.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.800000011920929,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 16.799999982118607,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 13.600000023841858,
+          "prepareMs": 5.299999982118607,
+          "waitBeforePrepareMs": 8.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 13.199999988079071,
+          "prepareMs": 5.199999988079071,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 18.19999998807907,
+          "prepareMs": 8.099999994039536,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 14.599999994039536,
+          "prepareMs": 5.9000000059604645,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.099999994039536,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 16.400000005960464,
+          "prepareMs": 6.200000017881393,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "commit",
+          "ms": 12.399999976158142,
+          "prepareMs": 3.199999988079071,
+          "waitBeforePrepareMs": 9
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 24.599999994039536,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 16.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 11.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.19999998807907,
+          "prepareMs": 5.699999988079071,
+          "waitBeforePrepareMs": 11.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17.900000005960464,
+          "prepareMs": 7.100000023841858,
+          "waitBeforePrepareMs": 10.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 4.699999988079071,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 13.700000017881393,
+          "prepareMs": 5.100000023841858,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 10.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.600000023841858,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 9.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 13.600000023841858,
+          "prepareMs": 6.399999976158142,
+          "waitBeforePrepareMs": 7.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 13.699999988079071,
+          "prepareMs": 6.200000017881393,
+          "waitBeforePrepareMs": 7.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 5.699999988079071,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 17.400000005960464,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 12.900000005960464,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 13.5,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 13,
+          "prepareMs": 5.800000011920929,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 13.699999988079071,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 15.700000017881393,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 12.799999982118607,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 14.599999994039536,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 13.400000005960464,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 16.399999976158142,
+          "prepareMs": 7.9000000059604645,
+          "waitBeforePrepareMs": 8.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 13.5,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 14.199999988079071,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 15.399999976158142,
+          "prepareMs": 6.799999982118607,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 13.300000011920929,
+          "prepareMs": 5.4000000059604645,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 7.699999988079071,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 32.60000002384186,
+          "prepareMs": 16.5,
+          "waitBeforePrepareMs": 15.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "commit",
+          "ms": 13.300000011920929,
+          "prepareMs": 4.699999988079071,
+          "waitBeforePrepareMs": 8.300000011920929
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 25.69999998807907,
+          "prepareMs": 8.700000017881393,
+          "waitBeforePrepareMs": 16.69999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 24.19999998807907,
+          "prepareMs": 9.800000011920929,
+          "waitBeforePrepareMs": 14.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 18.799999982118607,
+          "prepareMs": 7.699999988079071,
+          "waitBeforePrepareMs": 11
+        },
+        {
+          "phase": "move",
+          "ms": 15.300000011920929,
+          "prepareMs": 6.399999976158142,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 18.099999994039536,
+          "prepareMs": 7.100000023841858,
+          "waitBeforePrepareMs": 10.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 16.299999982118607,
+          "prepareMs": 6.800000011920929,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 17.69999998807907,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 10.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 19.599999994039536,
+          "prepareMs": 9,
+          "waitBeforePrepareMs": 10.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.699999988079071,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 5.800000011920929,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 7.799999982118607,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.69999998807907,
+          "prepareMs": 7.9000000059604645,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 18.299999982118607,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 10.5
+        },
+        {
+          "phase": "move",
+          "ms": 18.399999976158142,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 8.200000017881393,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 20.200000017881393,
+          "prepareMs": 8.600000023841858,
+          "waitBeforePrepareMs": 11.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.30000001192093,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.200000017881393,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6.200000017881393,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 7.199999988079071,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17.299999982118607,
+          "prepareMs": 7.199999988079071,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 6.800000011920929,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.5,
+          "prepareMs": 5.799999982118607,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 5.699999988079071,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "commit",
+          "ms": 13.800000011920929,
+          "prepareMs": 4.5999999940395355,
+          "waitBeforePrepareMs": 8.099999994039536
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 25.5,
+          "prepareMs": 8.599999994039536,
+          "waitBeforePrepareMs": 16.69999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 25.5,
+          "prepareMs": 12.199999988079071,
+          "waitBeforePrepareMs": 13.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 24.299999982118607,
+          "prepareMs": 10.5,
+          "waitBeforePrepareMs": 13.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 16.900000005960464,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 10.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.299999982118607,
+          "prepareMs": 5.299999982118607,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 15.700000017881393,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 18.799999982118607,
+          "prepareMs": 9.5,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 5.899999976158142,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.400000005960464,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 17.5,
+          "prepareMs": 7.5999999940395355,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 15.700000017881393,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 9.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 14.899999976158142,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.200000017881393,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 16.19999998807907,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 18.399999976158142,
+          "prepareMs": 7.4000000059604645,
+          "waitBeforePrepareMs": 10.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.599999994039536,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 16.900000005960464,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 9.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 18.100000023841858,
+          "prepareMs": 6.899999976158142,
+          "waitBeforePrepareMs": 11.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 17.19999998807907,
+          "prepareMs": 5.700000017881393,
+          "waitBeforePrepareMs": 11.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 17.600000023841858,
+          "prepareMs": 7.199999988079071,
+          "waitBeforePrepareMs": 10.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 15.400000005960464,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 5.699999988079071,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15.400000005960464,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 18.69999998807907,
+          "prepareMs": 8.099999994039536,
+          "waitBeforePrepareMs": 10.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 24.099999994039536,
+          "prepareMs": 10.399999976158142,
+          "waitBeforePrepareMs": 13.5
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 13.900000005960464,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "commit",
+          "ms": 14.400000005960464,
+          "prepareMs": 4.9000000059604645,
+          "waitBeforePrepareMs": 8.5
+        }
+      ],
+      "phases": []
+    }
+  ],
+  "validation": {
+    "unit": "702 tests in 94 files passed",
+    "browser": "43/44 selected cases initially passed. Remaining stamp-count case also failed identically on the pre-change renderer (20 observed vs stale 60 expected). Replaced exact algorithm counts with relative replay-work, zero repeat-work and cache-clear invariants; it passed. All 44 cases verified.",
+    "pixels": "Exact full-reference comparisons include transparent backgrounds, partial-alpha raster/fills, multiple rotations/zooms, feathered/inverted/unlinked/partial-density masks, overlays, shadows, clipping, undo and cache reuse.",
+    "performance": "Eight transform fixtures passed with profiling. Four styled fixtures repeated without profiling: rotation p95 26.7/24.2 ms for 5/20 layers, resize p95 24.6/25.5 ms.",
+    "build": "Production build and type check passed."
+  }
+}

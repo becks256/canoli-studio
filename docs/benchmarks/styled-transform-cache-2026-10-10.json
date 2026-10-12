@@ -1,0 +1,189 @@
+{
+  "status": "3 live-preview checks failed; 1 passed",
+  "scope": "Five/twenty-layer production rotation and resize with masks, feather, shadows and overlays. Empty live frames mean no measured presentation, not zero latency. Pixel correctness is checked separately. Single headless Chromium run, latest input to canvas submission.",
+  "measurements": [
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "commit",
+          "ms": 140,
+          "prepareMs": 85.6000000089407
+        }
+      ]
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 17.200000002980232,
+          "prepareMs": 14.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 31.600000008940697,
+          "prepareMs": 14
+        },
+        {
+          "phase": "move",
+          "ms": 32.30000001192093,
+          "prepareMs": 15.799999997019768
+        },
+        {
+          "phase": "move",
+          "ms": 31.900000005960464,
+          "prepareMs": 14.299999997019768
+        },
+        {
+          "phase": "move",
+          "ms": 31.799999997019768,
+          "prepareMs": 14.200000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 33.79999999701977,
+          "prepareMs": 16.100000008940697
+        },
+        {
+          "phase": "move",
+          "ms": 32.5,
+          "prepareMs": 14.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 32.20000000298023,
+          "prepareMs": 14.700000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 32.5,
+          "prepareMs": 14.700000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 32.6000000089407,
+          "prepareMs": 15.299999997019768
+        },
+        {
+          "phase": "move",
+          "ms": 32.5,
+          "prepareMs": 14.700000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 31.5,
+          "prepareMs": 14.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 32.30000001192093,
+          "prepareMs": 14.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 31.900000005960464,
+          "prepareMs": 14.5
+        },
+        {
+          "phase": "move",
+          "ms": 32.099999994039536,
+          "prepareMs": 14.700000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 31.5,
+          "prepareMs": 14.100000008940697
+        },
+        {
+          "phase": "move",
+          "ms": 32,
+          "prepareMs": 14.700000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 33.20000000298023,
+          "prepareMs": 15.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 31.799999997019768,
+          "prepareMs": 14.5
+        },
+        {
+          "phase": "move",
+          "ms": 32.29999999701977,
+          "prepareMs": 14.700000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 31.30000001192093,
+          "prepareMs": 14
+        },
+        {
+          "phase": "move",
+          "ms": 31.900000005960464,
+          "prepareMs": 14.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 31.799999997019768,
+          "prepareMs": 14.299999997019768
+        },
+        {
+          "phase": "move",
+          "ms": 33.400000005960464,
+          "prepareMs": 15.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 32.29999999701977,
+          "prepareMs": 14.899999991059303
+        },
+        {
+          "phase": "move",
+          "ms": 31.599999994039536,
+          "prepareMs": 14.200000002980232
+        },
+        {
+          "phase": "move",
+          "ms": 31.599999994039536,
+          "prepareMs": 14.300000011920929
+        },
+        {
+          "phase": "commit",
+          "ms": 23.299999997019768,
+          "prepareMs": 13.799999997019768
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "commit",
+          "ms": 203.79999999701977,
+          "prepareMs": 83.79999999701977
+        }
+      ]
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "commit",
+          "ms": 398.79999999701977,
+          "prepareMs": 87.09999999403954
+        }
+      ]
+    }
+  ]
+}

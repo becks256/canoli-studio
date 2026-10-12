@@ -1,0 +1,519 @@
+{
+  "measurements": [
+    {
+      "paths": 20,
+      "samples": [
+        20.399999991059303,
+        20.299999997019768,
+        20.400000005960464,
+        20.900000005960464,
+        21.599999994039536,
+        21.30000001192093,
+        20.399999991059303,
+        20.299999997019768,
+        20.30000001192093,
+        20.19999998807907,
+        21.299999997019768,
+        22.5,
+        20.5,
+        21.299999997019768,
+        20.899999991059303,
+        20.700000002980232,
+        20.200000002980232,
+        20.5,
+        20.30000001192093,
+        20.799999997019768,
+        20.399999991059303,
+        20.100000008940697,
+        20.299999997019768,
+        20.299999997019768,
+        20.799999997019768,
+        20.200000002980232,
+        19.900000005960464,
+        20,
+        20.400000005960464,
+        20.099999994039536,
+        7.800000011920929
+      ],
+      "frames": [
+        {
+          "phase": "move",
+          "oldestInputMs": 20.399999991059303,
+          "latestInputMs": 20.399999991059303,
+          "waitBeforePrepareMs": 16.599999994039536,
+          "prepareMs": 3.5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.299999997019768,
+          "latestInputMs": 20.299999997019768,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 3.2999999970197678
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.400000005960464,
+          "latestInputMs": 20.400000005960464,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 3.2999999970197678
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.900000005960464,
+          "latestInputMs": 20.900000005960464,
+          "waitBeforePrepareMs": 16.5,
+          "prepareMs": 4
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.599999994039536,
+          "latestInputMs": 21.599999994039536,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 4.4000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.30000001192093,
+          "latestInputMs": 21.30000001192093,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 4.0999999940395355
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.399999991059303,
+          "latestInputMs": 20.399999991059303,
+          "waitBeforePrepareMs": 16.69999998807907,
+          "prepareMs": 3.4000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.299999997019768,
+          "latestInputMs": 20.299999997019768,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 3.2999999970197678
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.30000001192093,
+          "latestInputMs": 20.30000001192093,
+          "waitBeforePrepareMs": 16.600000008940697,
+          "prepareMs": 3.3999999910593033
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.19999998807907,
+          "latestInputMs": 20.19999998807907,
+          "waitBeforePrepareMs": 16.69999998807907,
+          "prepareMs": 3.300000011920929
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.299999997019768,
+          "latestInputMs": 21.299999997019768,
+          "waitBeforePrepareMs": 16.899999991059303,
+          "prepareMs": 4
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22.5,
+          "latestInputMs": 22.5,
+          "waitBeforePrepareMs": 17.100000008940697,
+          "prepareMs": 4.899999991059303
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.5,
+          "latestInputMs": 20.5,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 3.5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.299999997019768,
+          "latestInputMs": 21.299999997019768,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 4
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.899999991059303,
+          "latestInputMs": 20.899999991059303,
+          "waitBeforePrepareMs": 16.5,
+          "prepareMs": 4.0999999940395355
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.700000002980232,
+          "latestInputMs": 20.700000002980232,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 3.5999999940395355
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.200000002980232,
+          "latestInputMs": 20.200000002980232,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 3.2000000029802322
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.5,
+          "latestInputMs": 20.5,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 3.2999999970197678
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.30000001192093,
+          "latestInputMs": 20.30000001192093,
+          "waitBeforePrepareMs": 16.80000001192093,
+          "prepareMs": 3.199999988079071
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.799999997019768,
+          "latestInputMs": 20.799999997019768,
+          "waitBeforePrepareMs": 17.099999994039536,
+          "prepareMs": 3.4000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.399999991059303,
+          "latestInputMs": 20.399999991059303,
+          "waitBeforePrepareMs": 16.69999998807907,
+          "prepareMs": 3.5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.100000008940697,
+          "latestInputMs": 20.100000008940697,
+          "waitBeforePrepareMs": 16.600000008940697,
+          "prepareMs": 3.199999988079071
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.299999997019768,
+          "latestInputMs": 20.299999997019768,
+          "waitBeforePrepareMs": 16.899999991059303,
+          "prepareMs": 3.2000000029802322
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.299999997019768,
+          "latestInputMs": 20.299999997019768,
+          "waitBeforePrepareMs": 16.599999994039536,
+          "prepareMs": 3.300000011920929
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.799999997019768,
+          "latestInputMs": 20.799999997019768,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 3.7000000029802322
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.200000002980232,
+          "latestInputMs": 20.200000002980232,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 3.2000000029802322
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 19.900000005960464,
+          "latestInputMs": 19.900000005960464,
+          "waitBeforePrepareMs": 16.299999997019768,
+          "prepareMs": 3.300000011920929
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20,
+          "latestInputMs": 20,
+          "waitBeforePrepareMs": 16.600000008940697,
+          "prepareMs": 3.199999988079071
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.400000005960464,
+          "latestInputMs": 20.400000005960464,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 3.4000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 20.099999994039536,
+          "latestInputMs": 20.099999994039536,
+          "waitBeforePrepareMs": 16.69999998807907,
+          "prepareMs": 3.2000000029802322
+        },
+        {
+          "phase": "commit",
+          "oldestInputMs": 7.800000011920929,
+          "latestInputMs": 7.800000011920929,
+          "waitBeforePrepareMs": 6.200000002980232,
+          "prepareMs": 1.2999999970197678
+        }
+      ],
+      "x": 60,
+      "y": 30
+    },
+    {
+      "paths": 200,
+      "samples": [
+        21.900000005960464,
+        22.200000002980232,
+        21.600000008940697,
+        21.600000008940697,
+        22.80000001192093,
+        21.700000002980232,
+        24,
+        21.600000008940697,
+        22,
+        21.5,
+        21.700000002980232,
+        22,
+        22.099999994039536,
+        22.19999998807907,
+        21.5,
+        21.900000005960464,
+        21.200000002980232,
+        22,
+        21.799999997019768,
+        22,
+        21.799999997019768,
+        21.299999997019768,
+        21.599999994039536,
+        21.899999991059303,
+        22.299999997019768,
+        21.5,
+        22,
+        21.200000002980232,
+        24.700000002980232,
+        22.30000001192093,
+        12.600000008940697
+      ],
+      "frames": [
+        {
+          "phase": "move",
+          "oldestInputMs": 21.900000005960464,
+          "latestInputMs": 21.900000005960464,
+          "waitBeforePrepareMs": 16.5,
+          "prepareMs": 5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22.200000002980232,
+          "latestInputMs": 22.200000002980232,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 5.200000002980232
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.600000008940697,
+          "latestInputMs": 21.600000008940697,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 4.700000002980232
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.600000008940697,
+          "latestInputMs": 21.600000008940697,
+          "waitBeforePrepareMs": 16.600000008940697,
+          "prepareMs": 4.899999991059303
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22.80000001192093,
+          "latestInputMs": 22.80000001192093,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 5.5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.700000002980232,
+          "latestInputMs": 21.700000002980232,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 4.699999988079071
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 24,
+          "latestInputMs": 24,
+          "waitBeforePrepareMs": 18.099999994039536,
+          "prepareMs": 5.5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.600000008940697,
+          "latestInputMs": 21.600000008940697,
+          "waitBeforePrepareMs": 16.600000008940697,
+          "prepareMs": 4.799999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22,
+          "latestInputMs": 22,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 4.9000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.5,
+          "latestInputMs": 21.5,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 4.299999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.700000002980232,
+          "latestInputMs": 21.700000002980232,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 4.5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22,
+          "latestInputMs": 22,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 4.9000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22.099999994039536,
+          "latestInputMs": 22.099999994039536,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 4.699999988079071
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22.19999998807907,
+          "latestInputMs": 22.19999998807907,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 4.899999991059303
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.5,
+          "latestInputMs": 21.5,
+          "waitBeforePrepareMs": 16.69999998807907,
+          "prepareMs": 4.600000008940697
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.900000005960464,
+          "latestInputMs": 21.900000005960464,
+          "waitBeforePrepareMs": 16.80000001192093,
+          "prepareMs": 4.699999988079071
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.200000002980232,
+          "latestInputMs": 21.200000002980232,
+          "waitBeforePrepareMs": 16.400000005960464,
+          "prepareMs": 4.5999999940395355
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22,
+          "latestInputMs": 22,
+          "waitBeforePrepareMs": 16.899999991059303,
+          "prepareMs": 4.9000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.799999997019768,
+          "latestInputMs": 21.799999997019768,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 4.799999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22,
+          "latestInputMs": 22,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 4.799999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.799999997019768,
+          "latestInputMs": 21.799999997019768,
+          "waitBeforePrepareMs": 16.69999998807907,
+          "prepareMs": 4.800000011920929
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.299999997019768,
+          "latestInputMs": 21.299999997019768,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 4.4000000059604645
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.599999994039536,
+          "latestInputMs": 21.599999994039536,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 4.600000008940697
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.899999991059303,
+          "latestInputMs": 21.899999991059303,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 4.799999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22.299999997019768,
+          "latestInputMs": 22.299999997019768,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 5.299999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.5,
+          "latestInputMs": 21.5,
+          "waitBeforePrepareMs": 16.900000005960464,
+          "prepareMs": 4.299999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22,
+          "latestInputMs": 22,
+          "waitBeforePrepareMs": 16.69999998807907,
+          "prepareMs": 5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 21.200000002980232,
+          "latestInputMs": 21.200000002980232,
+          "waitBeforePrepareMs": 16.700000002980232,
+          "prepareMs": 4.299999997019768
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 24.700000002980232,
+          "latestInputMs": 24.700000002980232,
+          "waitBeforePrepareMs": 16.799999997019768,
+          "prepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "oldestInputMs": 22.30000001192093,
+          "latestInputMs": 22.30000001192093,
+          "waitBeforePrepareMs": 16.80000001192093,
+          "prepareMs": 5.0999999940395355
+        },
+        {
+          "phase": "commit",
+          "oldestInputMs": 12.600000008940697,
+          "latestInputMs": 12.600000008940697,
+          "waitBeforePrepareMs": 10.5,
+          "prepareMs": 1.6000000089406967
+        }
+      ],
+      "x": 60,
+      "y": 30
+    }
+  ],
+  "scope": "Paced pointer input in headless production Chromium; one run, canvas submission endpoint. The pre-prepare interval includes React work and requestAnimationFrame waiting, not solely scheduler delay."
+}

@@ -1,0 +1,574 @@
+{
+  "date": "2026-10-12",
+  "change": "Compare all eight PenAnchor props directly and compute affine SVG coordinates without intermediate transformed point/handle objects. Preserve every anchor, line, circle, rectangle, draw order and mask outline.",
+  "scope": "Production Chromium, 20/200/2000 four-anchor paths and one 8000-anchor path. Existing benchmark verifies all control counts, preview anchor position, unchanged revision during drag and one committed edit.",
+  "unprofiledBefore": [
+    {
+      "paths": 20,
+      "anchors": 4,
+      "frames": 30,
+      "median": 7.800000011920929,
+      "p95": 9.300000011920929,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 16.30000001192093,
+          "prepareMs": 5.100000023841858
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 200,
+      "anchors": 4,
+      "frames": 30,
+      "median": 9.699999988079071,
+      "p95": 13.699999988079071,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 20.099999994039536,
+          "prepareMs": 7
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 2000,
+      "anchors": 4,
+      "frames": 30,
+      "median": 16.5,
+      "p95": 23.5,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 40.19999998807907,
+          "prepareMs": 9
+        }
+      ],
+      "longTasks": [
+        123
+      ]
+    },
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 27.400000005960464,
+      "p95": 33.599999994039536,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 33.69999998807907,
+          "prepareMs": 6.4000000059604645
+        }
+      ],
+      "longTasks": [
+        96,
+        82,
+        57,
+        53
+      ]
+    }
+  ],
+  "unprofiledAfter": [
+    {
+      "paths": 20,
+      "anchors": 4,
+      "frames": 30,
+      "median": 8,
+      "p95": 10.299999982118607,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 14.199999988079071,
+          "prepareMs": 4.5999999940395355
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 200,
+      "anchors": 4,
+      "frames": 30,
+      "median": 10.699999988079071,
+      "p95": 15,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 20.899999976158142,
+          "prepareMs": 5.5
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 2000,
+      "anchors": 4,
+      "frames": 30,
+      "median": 15.900000005960464,
+      "p95": 29,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 34.80000001192093,
+          "prepareMs": 8
+        }
+      ],
+      "longTasks": [
+        183,
+        59
+      ]
+    },
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 24.80000001192093,
+      "p95": 29.5,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 38.79999998211861,
+          "prepareMs": 7.5
+        }
+      ],
+      "longTasks": [
+        104,
+        98
+      ]
+    }
+  ],
+  "denseRepeat": [
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 24.400000005960464,
+      "p95": 29.599999994039536,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 49,
+          "prepareMs": 9
+        }
+      ],
+      "longTasks": [
+        126,
+        108,
+        61
+      ]
+    }
+  ],
+  "profiledBefore": [
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 26.19999998807907,
+      "p95": 32.900000005960464,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 39.79999998211861,
+          "prepareMs": 6.5
+        }
+      ],
+      "longTasks": [
+        136,
+        111
+      ]
+    }
+  ],
+  "profiledAfter": [
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 22.799999982118607,
+      "p95": 27,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 40,
+          "prepareMs": 7.5
+        }
+      ],
+      "longTasks": [
+        117,
+        88
+      ]
+    }
+  ],
+  "beforeCpu": [
+    [
+      {
+        "name": "(idle)",
+        "url": "",
+        "line": -1,
+        "ms": 680.161
+      },
+      {
+        "name": "(program)",
+        "url": "",
+        "line": -1,
+        "ms": 643.85
+      },
+      {
+        "name": "getBoundingClientRect",
+        "url": "",
+        "line": -1,
+        "ms": 66.333
+      },
+      {
+        "name": "query",
+        "url": "",
+        "line": 5718,
+        "ms": 65.95
+      },
+      {
+        "name": "drawImage",
+        "url": "",
+        "line": -1,
+        "ms": 48.452
+      },
+      {
+        "name": "query",
+        "url": "",
+        "line": 5718,
+        "ms": 47.301
+      },
+      {
+        "name": "Wr",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 7,
+        "ms": 42.588
+      },
+      {
+        "name": "(garbage collector)",
+        "url": "",
+        "line": -1,
+        "ms": 38.628
+      },
+      {
+        "name": "U",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 7,
+        "ms": 33.167
+      },
+      {
+        "name": "Qd",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 7,
+        "ms": 32.555
+      },
+      {
+        "name": "save",
+        "url": "",
+        "line": -1,
+        "ms": 31.732
+      },
+      {
+        "name": "save",
+        "url": "",
+        "line": -1,
+        "ms": 29.695
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 62,
+        "ms": 24.072
+      },
+      {
+        "name": "bezierCurveTo",
+        "url": "",
+        "line": -1,
+        "ms": 22.197
+      },
+      {
+        "name": "drawImage",
+        "url": "",
+        "line": -1,
+        "ms": 18.142
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 62,
+        "ms": 17.161
+      },
+      {
+        "name": "td",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 63,
+        "ms": 16.47
+      },
+      {
+        "name": "",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 329,
+        "ms": 16.408
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 62,
+        "ms": 16.025
+      },
+      {
+        "name": "Hc",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 62,
+        "ms": 15.405
+      },
+      {
+        "name": "Hc",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 62,
+        "ms": 15.384
+      },
+      {
+        "name": "Ta",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 7,
+        "ms": 14.789
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 62,
+        "ms": 14.188
+      },
+      {
+        "name": "h",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 7,
+        "ms": 14.079
+      },
+      {
+        "name": "get points",
+        "url": "http://127.0.0.1:4173/assets/index-BiMQC6jB.js",
+        "line": 70,
+        "ms": 13.264
+      }
+    ]
+  ],
+  "afterCpu": [
+    [
+      {
+        "name": "(idle)",
+        "url": "",
+        "line": -1,
+        "ms": 658.692
+      },
+      {
+        "name": "(program)",
+        "url": "",
+        "line": -1,
+        "ms": 625.584
+      },
+      {
+        "name": "query",
+        "url": "",
+        "line": 5718,
+        "ms": 74.124
+      },
+      {
+        "name": "getBoundingClientRect",
+        "url": "",
+        "line": -1,
+        "ms": 63.008
+      },
+      {
+        "name": "query",
+        "url": "",
+        "line": 5718,
+        "ms": 57.755
+      },
+      {
+        "name": "drawImage",
+        "url": "",
+        "line": -1,
+        "ms": 53.768
+      },
+      {
+        "name": "(garbage collector)",
+        "url": "",
+        "line": -1,
+        "ms": 35.56
+      },
+      {
+        "name": "save",
+        "url": "",
+        "line": -1,
+        "ms": 35.396
+      },
+      {
+        "name": "save",
+        "url": "",
+        "line": -1,
+        "ms": 34.198
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 62,
+        "ms": 26.051
+      },
+      {
+        "name": "Hc",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 62,
+        "ms": 20.851
+      },
+      {
+        "name": "td",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 63,
+        "ms": 18.633
+      },
+      {
+        "name": "bezierCurveTo",
+        "url": "",
+        "line": -1,
+        "ms": 16.782
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 62,
+        "ms": 16.264
+      },
+      {
+        "name": "querySelectorAll",
+        "url": "",
+        "line": -1,
+        "ms": 15.453
+      },
+      {
+        "name": "Tv",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 315,
+        "ms": 15.25
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 62,
+        "ms": 13.881
+      },
+      {
+        "name": "Ii",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 7,
+        "ms": 13.115
+      },
+      {
+        "name": "is",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 7,
+        "ms": 13.045
+      },
+      {
+        "name": "Qd",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 7,
+        "ms": 12.131
+      },
+      {
+        "name": "r",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 315,
+        "ms": 12.052
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 62,
+        "ms": 11.966
+      },
+      {
+        "name": "drawImage",
+        "url": "",
+        "line": -1,
+        "ms": 11.543
+      },
+      {
+        "name": "Ta",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 7,
+        "ms": 11.002
+      },
+      {
+        "name": "ml",
+        "url": "http://127.0.0.1:4173/assets/index-DJFU-V2m.js",
+        "line": 62,
+        "ms": 11.002
+      }
+    ]
+  ],
+  "rejectedExperiments": {
+    "omitCoincidentHandles": {
+      "reason": "Exact SVG comparison found antialiased edge differences; omitting apparently covered circles changes pixels. Reverted.",
+      "maximumChannelDifference": 7
+    },
+    "sharedSvgUse": {
+      "reason": "Preserved exact SVG pixels at tested fractional affine coordinates and zooms, but did not improve live latency and slowed release in the trial. Reverted.",
+      "result": [
+        {
+          "paths": 1,
+          "anchors": 8000,
+          "frames": 30,
+          "median": 26.19999998807907,
+          "p95": 32.80000001192093,
+          "commit": [
+            {
+              "phase": "commit",
+              "ms": 52.70000001788139,
+              "prepareMs": 7.300000011920929
+            }
+          ],
+          "longTasks": [
+            186,
+            134,
+            79,
+            75
+          ]
+        }
+      ]
+    },
+    "comparatorAlone": {
+      "reason": "Removed generic comparison from large CPU samples but did not show clear timing improvement alone. Retained only with direct-coordinate calculation, whose combined result was measured.",
+      "result": [
+        {
+          "paths": 1,
+          "anchors": 8000,
+          "frames": 30,
+          "median": 26.100000023841858,
+          "p95": 35.900000005960464,
+          "commit": [
+            {
+              "phase": "commit",
+              "ms": 37.10000002384186,
+              "prepareMs": 7.300000011920929
+            }
+          ],
+          "longTasks": [
+            124,
+            90,
+            57
+          ]
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Local timing observations do not prove a universal bound; dense p95 moved from 33.6 to 29.5/29.6 ms in unprofiled runs.",
+    "Release and other fixture timings vary; no claim of uniform speedup for every case.",
+    "Long tasks remain in recorded intervals, which include Playwright DOM assertions as well as gestures. They must not be attributed solely to user interaction.",
+    "The 2000-path test takes roughly 30 seconds overall, mostly outside its drag interval. Detached path construction repeatedly executes a full layer snapshot and is a follow-up investigation, not fixed here.",
+    "Global responsiveness is still incomplete for heavy scripts, large-image operations, long tasks and sustained cross-device use."
+  ],
+  "validation": "Final browser/unit/build results are recorded in the implementation roadmap."
+}

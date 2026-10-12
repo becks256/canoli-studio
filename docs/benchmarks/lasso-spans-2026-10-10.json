@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-10",
+  "environment": "Node.js 24, single-run synthetic CPU timings",
+  "fixture": "Closed axis-aligned contour covering the complete canvas, four vertices, 4x4 edge coverage",
+  "cases": [
+    {
+      "width": 698,
+      "height": 396,
+      "beforeMs": 22.41284900000005,
+      "afterMs": 5.335624999999993
+    },
+    {
+      "width": 10000,
+      "height": 5000,
+      "beforeMs": 1427.9418899999998,
+      "afterMs": 13.514399999999995
+    }
+  ],
+  "coverageRunNumbers": 2,
+  "limitations": "Not browser input latency or a bound for complex contours. Intersection work still scales with rows and contour edges; highly complex masks may produce many runs."
+}

@@ -1,0 +1,203 @@
+{
+  "cpuSelfTime": [
+    {
+      "name": "(program)",
+      "url": "",
+      "line": -1,
+      "ms": 749.831
+    },
+    {
+      "name": "(idle)",
+      "url": "",
+      "line": -1,
+      "ms": 664.753
+    },
+    {
+      "name": "eu",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 433.439
+    },
+    {
+      "name": "ym",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 70,
+      "ms": 115.673
+    },
+    {
+      "name": "drawImage",
+      "url": "",
+      "line": -1,
+      "ms": 99.435
+    },
+    {
+      "name": "e._zod.run",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 10,
+      "ms": 85.67
+    },
+    {
+      "name": "fl",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 83.64
+    },
+    {
+      "name": "(garbage collector)",
+      "url": "",
+      "line": -1,
+      "ms": 83.283
+    },
+    {
+      "name": "fl",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 79.981
+    },
+    {
+      "name": "fl",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 77.851
+    },
+    {
+      "name": "query",
+      "url": "",
+      "line": 5718,
+      "ms": 65.85
+    },
+    {
+      "name": "y",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 8,
+      "ms": 53.732
+    },
+    {
+      "name": "y",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 8,
+      "ms": 47.331
+    },
+    {
+      "name": "query",
+      "url": "",
+      "line": 5718,
+      "ms": 46.99
+    },
+    {
+      "name": "fl",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 42.923
+    },
+    {
+      "name": "save",
+      "url": "",
+      "line": -1,
+      "ms": 41.988
+    },
+    {
+      "name": "fl",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 41.762
+    },
+    {
+      "name": "fl",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 38.22
+    },
+    {
+      "name": "fl",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 62,
+      "ms": 38.211
+    },
+    {
+      "name": "querySelectorAll",
+      "url": "",
+      "line": -1,
+      "ms": 32.929
+    },
+    {
+      "name": "y",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 8,
+      "ms": 32.776
+    },
+    {
+      "name": "save",
+      "url": "",
+      "line": -1,
+      "ms": 31.937
+    },
+    {
+      "name": "getBoundingClientRect",
+      "url": "",
+      "line": -1,
+      "ms": 30.835
+    },
+    {
+      "name": "t",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 10,
+      "ms": 30.686
+    },
+    {
+      "name": "e._zod.parse",
+      "url": "http://127.0.0.1:4173/assets/index-DcIbkpY4.js",
+      "line": 60,
+      "ms": 30.551
+    }
+  ],
+  "latency": {
+    "paths": 2000,
+    "frames": 30,
+    "median": 61.20000001788139,
+    "p95": 68.19999998807907,
+    "commit": [
+      {
+        "phase": "commit",
+        "ms": 104.40000000596046,
+        "prepareMs": 8.099999994039536
+      }
+    ],
+    "longTasks": [
+      118,
+      86,
+      103,
+      78,
+      75,
+      74,
+      70,
+      71,
+      70,
+      73,
+      66,
+      77,
+      90,
+      68,
+      70,
+      69,
+      73,
+      69,
+      74,
+      69,
+      66,
+      69,
+      92,
+      65,
+      64,
+      68,
+      69,
+      63,
+      67,
+      71,
+      66,
+      64,
+      96
+    ]
+  },
+  "notes": "Production Chromium CPU profile, includes drag/release/test assertions. eu maps to recursive React subtree traversal; fl maps to React reconciliation in index-DcIbkpY4.js. Timings with profiling enabled are observational."
+}

@@ -1,0 +1,1382 @@
+{
+  "date": "2026-10-12",
+  "change": "ColorInput coalesces native input events within their task using a cancellable microtask token; the canvas continues to pace rendering by animation frame. Removes the double frame wait. Native change/blur/Enter commit and Escape cancellation remain.",
+  "measurement": "800x600 paint compositions, 5/20 layers, 30 native input events delivered programmatically with each next event after previous canvas presentation. This measures application handling, not OS color-dialog performance.",
+  "summary": "Five-layer preview median 33.2\u219216.7/17.65 ms; p95 34.3\u219217.9/28.1 ms. Twenty-layer median 33.3\u219224.2/20.35 ms; p95 35.5\u219230.6/30.8 ms. No recorded long tasks.",
+  "coverage": "Thirty previews leave revision unchanged; picker completion commits once; undo restores the initial color. Renderer presentation marks end-to-end completion.",
+  "runs": {
+    "before": [
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 5,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 16,
+              "prepareMs": 2.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 33.400000005960464,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 33.099999994039536,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 32.900000005960464,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 33.69999998807907,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 33.39999997615814,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 32.900000005960464,
+              "prepareMs": 2.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 33.5,
+              "prepareMs": 3.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 33.10000002384186,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 33.19999998807907,
+              "prepareMs": 2.899999976158142
+            },
+            {
+              "phase": "preview",
+              "ms": 32.29999998211861,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 33.70000001788139,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 33.099999994039536,
+              "prepareMs": 2.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 33.60000002384186,
+              "prepareMs": 2.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 32.80000001192093,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 33.79999998211861,
+              "prepareMs": 3.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 33.29999998211861,
+              "prepareMs": 3.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 34.30000001192093,
+              "prepareMs": 3.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 31.80000001192093,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 33.5,
+              "prepareMs": 3.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 32.69999998807907,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 33.900000005960464,
+              "prepareMs": 3.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 33.5,
+              "prepareMs": 3.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 35.5,
+              "prepareMs": 4.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 30.700000017881393,
+              "prepareMs": 3.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 33.20000001788139,
+              "prepareMs": 3.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 33.400000005960464,
+              "prepareMs": 3.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 29.700000017881393,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 32.900000005960464,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 33,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "commit",
+              "ms": 16.900000005960464,
+              "prepareMs": 2.4000000059604645
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      },
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 20,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 15.800000011920929,
+              "prepareMs": 6.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 30.80000001192093,
+              "prepareMs": 6.700000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 33.5,
+              "prepareMs": 6.700000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 35.099999994039536,
+              "prepareMs": 6.700000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 35.900000005960464,
+              "prepareMs": 10.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 30.400000005960464,
+              "prepareMs": 7.5
+            },
+            {
+              "phase": "preview",
+              "ms": 31.5,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 33.20000001788139,
+              "prepareMs": 6.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 32.70000001788139,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 33.900000005960464,
+              "prepareMs": 6.799999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 33.29999998211861,
+              "prepareMs": 6.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 34.60000002384186,
+              "prepareMs": 8.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 31.599999994039536,
+              "prepareMs": 6.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 33.599999994039536,
+              "prepareMs": 6.799999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 33.5,
+              "prepareMs": 7.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 33,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 35.5,
+              "prepareMs": 8.900000005960464
+            },
+            {
+              "phase": "preview",
+              "ms": 31,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 33.099999994039536,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 32.80000001192093,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 33.5,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 33.099999994039536,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 33.30000001192093,
+              "prepareMs": 6.399999976158142
+            },
+            {
+              "phase": "preview",
+              "ms": 34.599999994039536,
+              "prepareMs": 7.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 33.400000005960464,
+              "prepareMs": 8.099999994039536
+            },
+            {
+              "phase": "preview",
+              "ms": 31.599999994039536,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 33,
+              "prepareMs": 6.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 33.29999998211861,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 33.5,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 33.400000005960464,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "commit",
+              "ms": 17,
+              "prepareMs": 6.799999982118607
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      }
+    ],
+    "after": [
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 5,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 15.800000011920929,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 16.80000001192093,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 17.30000001192093,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 18.099999994039536,
+              "prepareMs": 2.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 16.900000005960464,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 15.300000011920929,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 15.400000005960464,
+              "prepareMs": 2.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 16.700000017881393,
+              "prepareMs": 2.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 16,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.900000005960464,
+              "prepareMs": 2.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 17.900000005960464,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 15.099999994039536,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 17.30000001192093,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 15.900000005960464,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.200000017881393,
+              "prepareMs": 2.399999976158142
+            },
+            {
+              "phase": "preview",
+              "ms": 16.900000005960464,
+              "prepareMs": 2.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 16.399999976158142,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.700000017881393,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.30000001192093,
+              "prepareMs": 2.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 17.100000023841858,
+              "prepareMs": 2.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 16.19999998807907,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 16.599999994039536,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.5,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 17.400000005960464,
+              "prepareMs": 3.2000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 15.5,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 17.30000001192093,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.400000005960464,
+              "prepareMs": 2.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 17.400000005960464,
+              "prepareMs": 2.899999976158142
+            },
+            {
+              "phase": "preview",
+              "ms": 14.800000011920929,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 17.19999998807907,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "commit",
+              "ms": 19.299999982118607,
+              "prepareMs": 2.699999988079071
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      },
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 20,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 18.200000017881393,
+              "prepareMs": 6.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 21.19999998807907,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 30.200000017881393,
+              "prepareMs": 7
+            },
+            {
+              "phase": "preview",
+              "ms": 23.900000005960464,
+              "prepareMs": 8.599999994039536
+            },
+            {
+              "phase": "preview",
+              "ms": 26.5,
+              "prepareMs": 7.100000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 25.400000005960464,
+              "prepareMs": 7.5
+            },
+            {
+              "phase": "preview",
+              "ms": 27.5,
+              "prepareMs": 7.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 39.60000002384186,
+              "prepareMs": 13.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 24.5,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 21,
+              "prepareMs": 7
+            },
+            {
+              "phase": "preview",
+              "ms": 27.400000005960464,
+              "prepareMs": 7.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 20.5,
+              "prepareMs": 6.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 28.899999976158142,
+              "prepareMs": 6.799999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 23.099999994039536,
+              "prepareMs": 7.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 27.5,
+              "prepareMs": 7.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 22.900000005960464,
+              "prepareMs": 7.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 25.5,
+              "prepareMs": 6.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 22.900000005960464,
+              "prepareMs": 7.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 27,
+              "prepareMs": 6.100000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 21.400000005960464,
+              "prepareMs": 7.200000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 28.599999994039536,
+              "prepareMs": 6.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 18.799999982118607,
+              "prepareMs": 6.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 18.700000017881393,
+              "prepareMs": 7.100000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 29,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 18.80000001192093,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 30.599999994039536,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 21.700000017881393,
+              "prepareMs": 6.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 28.19999998807907,
+              "prepareMs": 6.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 17.5,
+              "prepareMs": 5.799999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 20.30000001192093,
+              "prepareMs": 6.300000011920929
+            },
+            {
+              "phase": "commit",
+              "ms": 17,
+              "prepareMs": 7.700000017881393
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      }
+    ],
+    "repeat": [
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 5,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 16.900000005960464,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 17.700000017881393,
+              "prepareMs": 2.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 17.5,
+              "prepareMs": 2.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 20.5,
+              "prepareMs": 3.2000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 28.5,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 18.599999994039536,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 20.700000017881393,
+              "prepareMs": 3.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 27.69999998807907,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 18.19999998807907,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 19.200000017881393,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 15.699999988079071,
+              "prepareMs": 2.7999999821186066
+            },
+            {
+              "phase": "preview",
+              "ms": 28.100000023841858,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 18,
+              "prepareMs": 2.7999999821186066
+            },
+            {
+              "phase": "preview",
+              "ms": 15.099999994039536,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.700000017881393,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.400000005960464,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 18.400000005960464,
+              "prepareMs": 3.5
+            },
+            {
+              "phase": "preview",
+              "ms": 17.700000017881393,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 18.80000001192093,
+              "prepareMs": 2.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 27.599999994039536,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.80000001192093,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 17.599999994039536,
+              "prepareMs": 3.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 18.5,
+              "prepareMs": 3.2999999821186066
+            },
+            {
+              "phase": "preview",
+              "ms": 16,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 15.5,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.299999982118607,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 17,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 15,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 15.900000005960464,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 16.30000001192093,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "commit",
+              "ms": 18.400000005960464,
+              "prepareMs": 2.7000000178813934
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      },
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 20,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 21.900000005960464,
+              "prepareMs": 6.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 21.19999998807907,
+              "prepareMs": 5.700000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 29,
+              "prepareMs": 6.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 19.5,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 32.5,
+              "prepareMs": 7
+            },
+            {
+              "phase": "preview",
+              "ms": 30.80000001192093,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 19,
+              "prepareMs": 6.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 20,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 27.099999994039536,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 20.700000017881393,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 29.400000005960464,
+              "prepareMs": 6.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 18.900000005960464,
+              "prepareMs": 6.100000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 30.80000001192093,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 18.099999994039536,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 18.200000017881393,
+              "prepareMs": 6.200000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 29.900000005960464,
+              "prepareMs": 6.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 18.899999976158142,
+              "prepareMs": 6.399999976158142
+            },
+            {
+              "phase": "preview",
+              "ms": 18.19999998807907,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 29.5,
+              "prepareMs": 6.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 18.69999998807907,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 18.700000017881393,
+              "prepareMs": 6.200000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 29.299999982118607,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 18.5,
+              "prepareMs": 6.299999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 18.099999994039536,
+              "prepareMs": 6
+            },
+            {
+              "phase": "preview",
+              "ms": 29.5,
+              "prepareMs": 6.300000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 19.400000005960464,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 30.19999998807907,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 18.30000001192093,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 18.599999994039536,
+              "prepareMs": 6.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 30.30000001192093,
+              "prepareMs": 6.899999976158142
+            },
+            {
+              "phase": "commit",
+              "ms": 16.599999994039536,
+              "prepareMs": 7.5
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      }
+    ],
+    "final": [
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 5,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 16,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 17.200000017881393,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.599999994039536,
+              "prepareMs": 2.2999999821186066
+            },
+            {
+              "phase": "preview",
+              "ms": 19.30000001192093,
+              "prepareMs": 2.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 19.69999998807907,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 17.200000017881393,
+              "prepareMs": 3.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 26.5,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.700000017881393,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.19999998807907,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.399999976158142,
+              "prepareMs": 2.2999999821186066
+            },
+            {
+              "phase": "preview",
+              "ms": 17.599999994039536,
+              "prepareMs": 2.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 20.400000005960464,
+              "prepareMs": 3
+            },
+            {
+              "phase": "preview",
+              "ms": 28.700000017881393,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.19999998807907,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.599999994039536,
+              "prepareMs": 2.399999976158142
+            },
+            {
+              "phase": "preview",
+              "ms": 17.69999998807907,
+              "prepareMs": 3.2000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 15.900000005960464,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 17.400000005960464,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 15.299999982118607,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 16.899999976158142,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 17.599999994039536,
+              "prepareMs": 2.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 15.700000017881393,
+              "prepareMs": 2.7000000178813934
+            },
+            {
+              "phase": "preview",
+              "ms": 16.599999994039536,
+              "prepareMs": 2.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 15.800000011920929,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.69999998807907,
+              "prepareMs": 2.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 16.299999982118607,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.399999976158142,
+              "prepareMs": 2.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 16.599999994039536,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.30000001192093,
+              "prepareMs": 2.5
+            },
+            {
+              "phase": "preview",
+              "ms": 16.700000017881393,
+              "prepareMs": 2.5999999940395355
+            },
+            {
+              "phase": "commit",
+              "ms": 17,
+              "prepareMs": 2.399999976158142
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      },
+      {
+        "fixture": "color-latency",
+        "result": {
+          "layers": 20,
+          "samples": [
+            {
+              "phase": "preview",
+              "ms": 18.69999998807907,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 25,
+              "prepareMs": 7.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 25.799999982118607,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 19.099999994039536,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 35.10000002384186,
+              "prepareMs": 7.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 28.900000005960464,
+              "prepareMs": 6.699999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 21.099999994039536,
+              "prepareMs": 6.5999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 28.5,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 20.5,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 29.69999998807907,
+              "prepareMs": 6.800000011920929
+            },
+            {
+              "phase": "preview",
+              "ms": 19.700000017881393,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 29.69999998807907,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 20.30000001192093,
+              "prepareMs": 7.200000017881393
+            },
+            {
+              "phase": "preview",
+              "ms": 30,
+              "prepareMs": 6.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 19.599999994039536,
+              "prepareMs": 6.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 18.899999976158142,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 27.900000005960464,
+              "prepareMs": 6.9000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 19.19999998807907,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 29.900000005960464,
+              "prepareMs": 6.100000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 18,
+              "prepareMs": 6.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 19.599999994039536,
+              "prepareMs": 6.799999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 29.5,
+              "prepareMs": 6.799999982118607
+            },
+            {
+              "phase": "preview",
+              "ms": 20,
+              "prepareMs": 6.199999988079071
+            },
+            {
+              "phase": "preview",
+              "ms": 29.30000001192093,
+              "prepareMs": 6
+            },
+            {
+              "phase": "preview",
+              "ms": 19.5,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 17.700000017881393,
+              "prepareMs": 6.600000023841858
+            },
+            {
+              "phase": "preview",
+              "ms": 30.30000001192093,
+              "prepareMs": 7.0999999940395355
+            },
+            {
+              "phase": "preview",
+              "ms": 21,
+              "prepareMs": 6.5
+            },
+            {
+              "phase": "preview",
+              "ms": 28.299999982118607,
+              "prepareMs": 6.4000000059604645
+            },
+            {
+              "phase": "preview",
+              "ms": 19.799999982118607,
+              "prepareMs": 7.300000011920929
+            },
+            {
+              "phase": "commit",
+              "ms": 18.700000017881393,
+              "prepareMs": 7.5
+            }
+          ],
+          "longTasks": [],
+          "revision": 2,
+          "previewRevision": 2,
+          "commitRevision": 3,
+          "color": "#0000ff",
+          "original": "#d5e79b",
+          "undone": "#d5e79b"
+        }
+      }
+    ]
+  },
+  "validation": {
+    "unit": "702 tests passed",
+    "browser": "Eight adjustment cases and three color cases verified. New same-task cancellation case initially exposed a stale displayed native-input value; finish now restores it explicitly, and all three color tests passed on rerun.",
+    "production": "Final production build/type check and both color timing cases passed after the native-value cancellation fix; all preview/commit/undo assertions pass."
+  }
+}

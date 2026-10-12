@@ -1,0 +1,3446 @@
+{
+  "date": "2026-10-11",
+  "baseline": "mixed-stroke-response-2026-10-11.json",
+  "change": "Enable existing bounded renderer cache for thumbnails.",
+  "scope": "Production Chromium, 60 mixed rounds, 180 strokes and 420 switches.",
+  "result": {
+    "strokes": [
+      {
+        "tool": "Brush tool (B)",
+        "start": 976.9000000059605,
+        "commitMs": 6.299999982118607,
+        "presentMs": 17.19999998807907
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 1193.5999999940395,
+        "commitMs": 5.0999999940395355,
+        "presentMs": 17.69999998807907
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 1411.0999999940395,
+        "commitMs": 6.199999988079071,
+        "presentMs": 19.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 1943.7999999821186,
+        "commitMs": 5.5,
+        "presentMs": 15.600000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 2143.4000000059605,
+        "commitMs": 4.399999976158142,
+        "presentMs": 14.399999976158142
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 2343.0999999940395,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 15.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 2878.0999999940395,
+        "commitMs": 5,
+        "presentMs": 16.69999998807907
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 3078,
+        "commitMs": 4.799999982118607,
+        "presentMs": 14.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 3310,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 16
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 3827,
+        "commitMs": 5.799999982118607,
+        "presentMs": 16.900000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 4026.7999999821186,
+        "commitMs": 5.5,
+        "presentMs": 16.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 4229.9000000059605,
+        "commitMs": 6.699999988079071,
+        "presentMs": 20
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 4776.799999982119,
+        "commitMs": 4.700000017881393,
+        "presentMs": 14.700000017881393
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 4977.699999988079,
+        "commitMs": 16.80000001192093,
+        "presentMs": 40.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 5226.5999999940395,
+        "commitMs": 7.300000011920929,
+        "presentMs": 19.80000001192093
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 5727,
+        "commitMs": 5.299999982118607,
+        "presentMs": 18
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 5927.4000000059605,
+        "commitMs": 5.5999999940395355,
+        "presentMs": 14.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 6135.699999988079,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 14.900000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 6610.199999988079,
+        "commitMs": 5,
+        "presentMs": 16.80000001192093
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 6809.799999982119,
+        "commitMs": 4.200000017881393,
+        "presentMs": 13.100000023841858
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 7010.199999988079,
+        "commitMs": 5.5,
+        "presentMs": 16.80000001192093
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 7510.299999982119,
+        "commitMs": 4.700000017881393,
+        "presentMs": 15.400000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 7712.199999988079,
+        "commitMs": 4,
+        "presentMs": 13.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 7910,
+        "commitMs": 5,
+        "presentMs": 16.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 8509.59999999404,
+        "commitMs": 5.0999999940395355,
+        "presentMs": 15.300000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 8710.09999999404,
+        "commitMs": 5.5999999940395355,
+        "presentMs": 14.800000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 8929.199999988079,
+        "commitMs": 8.400000005960464,
+        "presentMs": 29.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 9410.90000000596,
+        "commitMs": 4.5,
+        "presentMs": 14.199999988079071
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 9610.799999982119,
+        "commitMs": 4.300000011920929,
+        "presentMs": 13.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 9810.799999982119,
+        "commitMs": 4.800000011920929,
+        "presentMs": 17.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 10295,
+        "commitMs": 7.5999999940395355,
+        "presentMs": 20.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 10492.799999982119,
+        "commitMs": 4.300000011920929,
+        "presentMs": 13.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 10693.299999982119,
+        "commitMs": 4.5,
+        "presentMs": 16.100000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 11194.40000000596,
+        "commitMs": 4.799999982118607,
+        "presentMs": 15.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 11393,
+        "commitMs": 5.799999982118607,
+        "presentMs": 18.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 11600.59999999404,
+        "commitMs": 4.699999988079071,
+        "presentMs": 15.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 12111.299999982119,
+        "commitMs": 5.300000011920929,
+        "presentMs": 16.400000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 12309.90000000596,
+        "commitMs": 5,
+        "presentMs": 15.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 12509.90000000596,
+        "commitMs": 5.199999988079071,
+        "presentMs": 14.799999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 13029.799999982119,
+        "commitMs": 6.300000011920929,
+        "presentMs": 18.400000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 13225.90000000596,
+        "commitMs": 3.7999999821186066,
+        "presentMs": 12.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 13426.5,
+        "commitMs": 6.199999988079071,
+        "presentMs": 18.299999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 13909.299999982119,
+        "commitMs": 4.5,
+        "presentMs": 15.200000017881393
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 14141.59999999404,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 13.300000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 14359.40000000596,
+        "commitMs": 3.899999976158142,
+        "presentMs": 13.299999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 14893.40000000596,
+        "commitMs": 5.899999976158142,
+        "presentMs": 16.799999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 15092,
+        "commitMs": 4.699999988079071,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 15293.199999988079,
+        "commitMs": 4.700000017881393,
+        "presentMs": 15.099999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 15793.90000000596,
+        "commitMs": 4.299999982118607,
+        "presentMs": 15.899999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 15993.299999982119,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 16194.5,
+        "commitMs": 5.299999982118607,
+        "presentMs": 18.69999998807907
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 16760.90000000596,
+        "commitMs": 4.0999999940395355,
+        "presentMs": 15.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 16960.09999999404,
+        "commitMs": 5.0999999940395355,
+        "presentMs": 16.80000001192093
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 17179.19999998808,
+        "commitMs": 5.5999999940395355,
+        "presentMs": 17.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 17727.19999998808,
+        "commitMs": 6.0999999940395355,
+        "presentMs": 16.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 17943.90000000596,
+        "commitMs": 4.699999988079071,
+        "presentMs": 16.399999976158142
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 18144.59999999404,
+        "commitMs": 8.099999994039536,
+        "presentMs": 22
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 18627,
+        "commitMs": 4.299999982118607,
+        "presentMs": 15.299999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 18826.19999998808,
+        "commitMs": 4.5,
+        "presentMs": 13.800000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 19026.69999998808,
+        "commitMs": 4.0999999940395355,
+        "presentMs": 15.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 19509.29999998212,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 16.200000017881393
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 19709.40000000596,
+        "commitMs": 4.5,
+        "presentMs": 14.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 19916.19999998808,
+        "commitMs": 4,
+        "presentMs": 17
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 20461.79999998212,
+        "commitMs": 6.200000017881393,
+        "presentMs": 17.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 20659.19999998808,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 15.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 20861,
+        "commitMs": 4.699999988079071,
+        "presentMs": 16.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 21375.90000000596,
+        "commitMs": 4.799999982118607,
+        "presentMs": 14.899999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 21575.29999998212,
+        "commitMs": 4.100000023841858,
+        "presentMs": 13.100000023841858
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 21775.79999998212,
+        "commitMs": 5,
+        "presentMs": 15.100000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 22259.69999998808,
+        "commitMs": 3.9000000059604645,
+        "presentMs": 14.700000017881393
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 22458.90000000596,
+        "commitMs": 4.799999982118607,
+        "presentMs": 14.399999976158142
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 22668.59999999404,
+        "commitMs": 3.9000000059604645,
+        "presentMs": 20.19999998807907
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 23242.79999998212,
+        "commitMs": 4.200000017881393,
+        "presentMs": 15.400000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 23442.19999998808,
+        "commitMs": 3.9000000059604645,
+        "presentMs": 15.300000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 23643.69999998808,
+        "commitMs": 3.9000000059604645,
+        "presentMs": 15.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 24159.79999998212,
+        "commitMs": 4.800000011920929,
+        "presentMs": 14.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 24359.79999998212,
+        "commitMs": 4.600000023841858,
+        "presentMs": 14.700000017881393
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 24560.59999999404,
+        "commitMs": 4.300000011920929,
+        "presentMs": 14.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 25076.5,
+        "commitMs": 4.9000000059604645,
+        "presentMs": 14.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 25276.59999999404,
+        "commitMs": 4.9000000059604645,
+        "presentMs": 14.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 25510.79999998212,
+        "commitMs": 6,
+        "presentMs": 17
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 26061.19999998808,
+        "commitMs": 4.300000011920929,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 26276.40000000596,
+        "commitMs": 4.799999982118607,
+        "presentMs": 14.199999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 26477.09999999404,
+        "commitMs": 5,
+        "presentMs": 17.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 27059.5,
+        "commitMs": 5.4000000059604645,
+        "presentMs": 16.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 27259.19999998808,
+        "commitMs": 5.5999999940395355,
+        "presentMs": 16.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 27460.59999999404,
+        "commitMs": 4.699999988079071,
+        "presentMs": 16
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 27992.09999999404,
+        "commitMs": 5,
+        "presentMs": 17.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 28212.19999998808,
+        "commitMs": 7.800000011920929,
+        "presentMs": 20.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 28460.29999998212,
+        "commitMs": 4.300000011920929,
+        "presentMs": 15.900000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 28942.40000000596,
+        "commitMs": 4.199999988079071,
+        "presentMs": 14.399999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 29175.09999999404,
+        "commitMs": 5.0999999940395355,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 29376.59999999404,
+        "commitMs": 4.5999999940395355,
+        "presentMs": 14.800000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 29862.19999998808,
+        "commitMs": 4.300000011920929,
+        "presentMs": 15.200000017881393
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 30058.90000000596,
+        "commitMs": 4.799999982118607,
+        "presentMs": 14.199999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 30260,
+        "commitMs": 4.5,
+        "presentMs": 16
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 30759.69999998808,
+        "commitMs": 4.800000011920929,
+        "presentMs": 15.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 30959.90000000596,
+        "commitMs": 4.299999982118607,
+        "presentMs": 14.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 31172,
+        "commitMs": 4.9000000059604645,
+        "presentMs": 16.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 31659.5,
+        "commitMs": 5.299999982118607,
+        "presentMs": 17
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 31859.40000000596,
+        "commitMs": 4.199999988079071,
+        "presentMs": 15
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 32062.09999999404,
+        "commitMs": 4.699999988079071,
+        "presentMs": 16.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 32594.5,
+        "commitMs": 6.299999982118607,
+        "presentMs": 18
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 32792.5,
+        "commitMs": 4.699999988079071,
+        "presentMs": 14.199999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 32993.79999998212,
+        "commitMs": 4.700000017881393,
+        "presentMs": 16
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 33510,
+        "commitMs": 4.5999999940395355,
+        "presentMs": 16.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 33710,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 15.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 33916.79999998212,
+        "commitMs": 4.5,
+        "presentMs": 16
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 34476.09999999404,
+        "commitMs": 4.9000000059604645,
+        "presentMs": 17.30000001192093
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 34675.5,
+        "commitMs": 4.199999988079071,
+        "presentMs": 14.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 34880.69999998808,
+        "commitMs": 4.300000011920929,
+        "presentMs": 15
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 35359.09999999404,
+        "commitMs": 5.4000000059604645,
+        "presentMs": 15.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 35559.09999999404,
+        "commitMs": 4.9000000059604645,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 35760,
+        "commitMs": 4.0999999940395355,
+        "presentMs": 16.900000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 36262.69999998808,
+        "commitMs": 4.700000017881393,
+        "presentMs": 17
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 36490.69999998808,
+        "commitMs": 5.9000000059604645,
+        "presentMs": 19.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 36710.19999998808,
+        "commitMs": 4.9000000059604645,
+        "presentMs": 16.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 37243.09999999404,
+        "commitMs": 4.9000000059604645,
+        "presentMs": 14.900000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 37442.19999998808,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 37642.79999998212,
+        "commitMs": 4.700000017881393,
+        "presentMs": 16.900000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 38144.09999999404,
+        "commitMs": 5.0999999940395355,
+        "presentMs": 15.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 38375.09999999404,
+        "commitMs": 5.699999988079071,
+        "presentMs": 17.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 38575.09999999404,
+        "commitMs": 3.9000000059604645,
+        "presentMs": 15.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 39075.90000000596,
+        "commitMs": 5.0999999940395355,
+        "presentMs": 14.899999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 39276,
+        "commitMs": 4,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 39489.40000000596,
+        "commitMs": 6,
+        "presentMs": 18.099999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 40011.59999999404,
+        "commitMs": 4.5999999940395355,
+        "presentMs": 15.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 40209.79999998212,
+        "commitMs": 4,
+        "presentMs": 14
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 40426.69999998808,
+        "commitMs": 5.9000000059604645,
+        "presentMs": 17.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 40942.90000000596,
+        "commitMs": 4.699999988079071,
+        "presentMs": 15.299999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 41142.19999998808,
+        "commitMs": 4.5,
+        "presentMs": 14.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 41342.69999998808,
+        "commitMs": 3.9000000059604645,
+        "presentMs": 14.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 41876,
+        "commitMs": 4.5999999940395355,
+        "presentMs": 14.199999988079071
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 42075.40000000596,
+        "commitMs": 3.899999976158142,
+        "presentMs": 14.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 42293.69999998808,
+        "commitMs": 4.5,
+        "presentMs": 16.099999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 42793.29999998212,
+        "commitMs": 4.5,
+        "presentMs": 15.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 42994,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 15.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 43193.19999998808,
+        "commitMs": 4.5,
+        "presentMs": 15.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 43758.40000000596,
+        "commitMs": 4.5,
+        "presentMs": 15.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 43958.19999998808,
+        "commitMs": 6.0999999940395355,
+        "presentMs": 17
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 44158.29999998212,
+        "commitMs": 4.200000017881393,
+        "presentMs": 14.900000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 44675.79999998212,
+        "commitMs": 4.800000011920929,
+        "presentMs": 15.100000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 44878.59999999404,
+        "commitMs": 4.699999988079071,
+        "presentMs": 15.199999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 45116.69999998808,
+        "commitMs": 7.5999999940395355,
+        "presentMs": 22.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 45609.59999999404,
+        "commitMs": 4.800000011920929,
+        "presentMs": 16.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 45809.19999998808,
+        "commitMs": 4,
+        "presentMs": 12.800000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 46010,
+        "commitMs": 4.5,
+        "presentMs": 16.299999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 46510.5,
+        "commitMs": 4.5999999940395355,
+        "presentMs": 15.199999988079071
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 46726,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 13.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 46941.79999998212,
+        "commitMs": 4.800000011920929,
+        "presentMs": 18.600000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 47509.79999998212,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 15.400000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 47709.59999999404,
+        "commitMs": 4.300000011920929,
+        "presentMs": 13.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 47937.59999999404,
+        "commitMs": 4.0999999940395355,
+        "presentMs": 14.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 48462.69999998808,
+        "commitMs": 6.5999999940395355,
+        "presentMs": 19.30000001192093
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 48675.09999999404,
+        "commitMs": 4.699999988079071,
+        "presentMs": 15.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 48875.79999998212,
+        "commitMs": 4.300000011920929,
+        "presentMs": 15
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 49375.79999998212,
+        "commitMs": 5.100000023841858,
+        "presentMs": 18
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 49592.19999998808,
+        "commitMs": 4.4000000059604645,
+        "presentMs": 13.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 49793.19999998808,
+        "commitMs": 4.800000011920929,
+        "presentMs": 16.30000001192093
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 50292,
+        "commitMs": 5.199999988079071,
+        "presentMs": 18.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 50492.29999998212,
+        "commitMs": 4.300000011920929,
+        "presentMs": 15.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 50727.5,
+        "commitMs": 5,
+        "presentMs": 16.099999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 51310.40000000596,
+        "commitMs": 6.0999999940395355,
+        "presentMs": 15.799999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 51525.40000000596,
+        "commitMs": 4.299999982118607,
+        "presentMs": 14.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 51727.90000000596,
+        "commitMs": 4.5999999940395355,
+        "presentMs": 14.799999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 52259.40000000596,
+        "commitMs": 5.399999976158142,
+        "presentMs": 16.899999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 52460.19999998808,
+        "commitMs": 5.5,
+        "presentMs": 15.700000017881393
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 52659.40000000596,
+        "commitMs": 4.5999999940395355,
+        "presentMs": 15.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 53210.29999998212,
+        "commitMs": 4.700000017881393,
+        "presentMs": 15.600000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 53408.79999998212,
+        "commitMs": 4,
+        "presentMs": 17.100000023841858
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 53625.90000000596,
+        "commitMs": 4.699999988079071,
+        "presentMs": 16.299999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 54126.29999998212,
+        "commitMs": 9.300000011920929,
+        "presentMs": 26.30000001192093
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 54342,
+        "commitMs": 4.199999988079071,
+        "presentMs": 13.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 54542.59999999404,
+        "commitMs": 5,
+        "presentMs": 16.30000001192093
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 55042.40000000596,
+        "commitMs": 4.0999999940395355,
+        "presentMs": 15.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 55246.59999999404,
+        "commitMs": 4.800000011920929,
+        "presentMs": 14.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 55443.69999998808,
+        "commitMs": 4.800000011920929,
+        "presentMs": 15.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "start": 55975.40000000596,
+        "commitMs": 4.799999982118607,
+        "presentMs": 15.299999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "start": 56175.40000000596,
+        "commitMs": 4.799999982118607,
+        "presentMs": 14.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "start": 56393.90000000596,
+        "commitMs": 5.199999988079071,
+        "presentMs": 23.19999998807907
+      }
+    ],
+    "samples": [
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 4,
+        "frameMs": 10.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 3.7000000178813934,
+        "frameMs": 8.700000017881393
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3,
+        "frameMs": 9.900000005960464
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 3.2000000178813934,
+        "frameMs": 8.700000017881393
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 13.300000011920929
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 13.400000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.2000000178813934,
+        "frameMs": 9
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 8.100000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 3.300000011920929,
+        "frameMs": 9.200000017881393
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.699999988079071,
+        "frameMs": 9.299999982118607
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 9.100000023841858
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 5.4000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 7.100000023841858
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.7000000178813934,
+        "frameMs": 14.100000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.800000011920929,
+        "frameMs": 8.600000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 3,
+        "frameMs": 9.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.4000000059604645,
+        "frameMs": 9.900000005960464
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 8.900000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 7.799999982118607
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.399999976158142,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.5999999940395355,
+        "frameMs": 13
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3,
+        "frameMs": 9.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5,
+        "frameMs": 12
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.800000011920929,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 7.299999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 3,
+        "frameMs": 6.300000011920929
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 10.199999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.899999976158142,
+        "frameMs": 9.199999988079071
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.200000017881393
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.9000000059604645,
+        "frameMs": 5.9000000059604645
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.699999988079071,
+        "frameMs": 12.5
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.099999994039536
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.300000011920929,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3,
+        "frameMs": 12.800000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 9.299999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.800000011920929,
+        "frameMs": 13.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.200000017881393
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 11.199999988079071
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5,
+        "frameMs": 11.600000023841858
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.300000011920929,
+        "frameMs": 13.600000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 10.700000017881393
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 7
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3,
+        "frameMs": 13.199999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 11
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 11.800000011920929
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 13.100000023841858
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 6.9000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 3.5999999940395355,
+        "frameMs": 5.5999999940395355
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.100000023841858,
+        "frameMs": 10
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.199999988079071,
+        "frameMs": 10.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 13.800000011920929
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.399999976158142
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 10
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.5
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.699999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.600000023841858,
+        "frameMs": 13.400000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.300000011920929,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.800000011920929,
+        "frameMs": 13
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.800000011920929,
+        "frameMs": 7.5999999940395355
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.700000017881393
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 13.900000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.800000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 11.300000011920929
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 10
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 13
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12.399999976158142
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.399999976158142,
+        "frameMs": 11.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 13.099999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.699999988079071
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.199999988079071,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 11.899999976158142
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 8.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.4000000059604645,
+        "frameMs": 5.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.399999976158142,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.100000023841858
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 10.899999976158142
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 9.199999988079071
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 11.199999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.800000011920929
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.800000011920929,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 8.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 13.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 8.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12.299999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 6.600000023841858
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 14.799999982118607
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 9.900000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 11.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.800000011920929,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.199999988079071,
+        "frameMs": 6.299999982118607
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5,
+        "frameMs": 12.700000017881393
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 8.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 3,
+        "frameMs": 10.300000011920929
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.399999976158142,
+        "frameMs": 5.699999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.399999976158142,
+        "frameMs": 9.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.899999976158142,
+        "frameMs": 8.299999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.800000011920929,
+        "frameMs": 9.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 8.400000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 11
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 13.300000011920929
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.300000011920929,
+        "frameMs": 10.099999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.9000000059604645,
+        "frameMs": 11.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 4.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5,
+        "frameMs": 12
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.199999988079071,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 10.799999982118607
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 13.100000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 10.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.899999976158142,
+        "frameMs": 7.5999999940395355
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.199999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5,
+        "frameMs": 12.100000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.399999976158142,
+        "frameMs": 12
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 11.199999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 13.100000023841858
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.7999999821186066,
+        "frameMs": 10.400000005960464
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 8.700000017881393
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 14.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5,
+        "frameMs": 4
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 13
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 4.5999999940395355,
+        "frameMs": 9.700000017881393
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 3,
+        "frameMs": 9.200000017881393
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.800000011920929,
+        "frameMs": 13.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 13.299999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 10.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.699999988079071,
+        "frameMs": 11.399999976158142
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.100000023841858,
+        "frameMs": 11
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.400000005960464
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 10.399999976158142
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.399999976158142,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 9.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.699999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 8.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 10.800000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.399999976158142,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 8
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.7999999821186066,
+        "frameMs": 6.4000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 12.800000011920929
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 9.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 5.5999999940395355
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.100000023841858,
+        "frameMs": 13.600000023841858
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 4.700000017881393
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 13.199999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.700000017881393
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12.399999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.699999988079071,
+        "frameMs": 12
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 15.699999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.799999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.7999999821186066,
+        "frameMs": 6.699999988079071
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 11
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 10.199999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.699999988079071,
+        "frameMs": 7.699999988079071
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.199999988079071,
+        "frameMs": 3.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.100000023841858
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5,
+        "frameMs": 10.099999994039536
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 6.5
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 12.200000017881393
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.699999988079071,
+        "frameMs": 9.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 4.5999999940395355,
+        "frameMs": 8.899999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 3.5,
+        "frameMs": 13.5
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 11.400000005960464
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 3.600000023841858,
+        "frameMs": 8.200000017881393
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.399999976158142,
+        "frameMs": 8.099999994039536
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 4.600000023841858
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 12.699999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5,
+        "frameMs": 12.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 10
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.799999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 10.699999988079071
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.700000017881393
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.300000011920929,
+        "frameMs": 9.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 13
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 11.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 11.699999988079071
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 12
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.800000011920929,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 9.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 3.5999999940395355,
+        "frameMs": 11.199999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 10.599999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 10.699999988079071
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 9.900000005960464
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 13.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.800000011920929,
+        "frameMs": 13
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.799999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 12
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2,
+        "frameMs": 13
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3,
+        "frameMs": 8.699999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.4000000059604645,
+        "frameMs": 8
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.300000011920929,
+        "frameMs": 10.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.199999988079071,
+        "frameMs": 9.299999982118607
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 3.199999988079071,
+        "frameMs": 13.299999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.5,
+        "frameMs": 5.5999999940395355
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 10.099999994039536
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.399999976158142,
+        "frameMs": 9.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 9
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5,
+        "frameMs": 11.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.899999976158142,
+        "frameMs": 9.699999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5,
+        "frameMs": 12
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 6.4000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.600000023841858,
+        "frameMs": 9.800000011920929
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 9.900000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3,
+        "frameMs": 10.300000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 10.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.5,
+        "frameMs": 5
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.300000011920929,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.4000000059604645,
+        "frameMs": 9.800000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.5,
+        "frameMs": 6.4000000059604645
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.300000011920929
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5,
+        "frameMs": 12.5
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 7.5999999940395355
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 11.699999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 9
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 12.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 12
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 12.200000017881393
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.800000011920929,
+        "frameMs": 9.400000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 8
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.399999976158142,
+        "frameMs": 11
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 8.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 12
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 13.900000005960464
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 12.299999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 7.0999999940395355
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.199999988079071,
+        "frameMs": 12.5
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.600000023841858,
+        "frameMs": 12.600000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 9
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 3.2000000178813934,
+        "frameMs": 9.700000017881393
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 7.800000011920929
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.699999988079071,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 8.099999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 3.199999988079071,
+        "frameMs": 9.799999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 13.099999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 6.9000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.199999988079071,
+        "frameMs": 7.9000000059604645
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 9.200000017881393
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.699999988079071,
+        "frameMs": 9.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 11.200000017881393
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 11.699999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.100000023841858,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 10.199999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 9.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 8.700000017881393
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 11
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.699999988079071,
+        "frameMs": 10.699999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 8.800000011920929
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 12.699999988079071
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 9.199999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 10.100000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 10
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 9.100000023841858
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.600000023841858,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 6.4000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.300000011920929,
+        "frameMs": 13.099999994039536
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12.799999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 9.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12.799999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 11.699999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.7999999821186066,
+        "frameMs": 7.799999982118607
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.699999988079071,
+        "frameMs": 9.899999976158142
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.800000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 9.700000017881393
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.300000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 13.099999994039536
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 7.0999999940395355
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 12.700000017881393
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5,
+        "frameMs": 9.799999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 3.2000000178813934,
+        "frameMs": 6.100000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 10.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.4000000059604645,
+        "frameMs": 13.700000017881393
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 9.099999994039536
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.100000023841858,
+        "frameMs": 5
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.900000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 8.799999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.899999976158142,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.199999988079071,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.199999988079071,
+        "frameMs": 12.699999988079071
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.300000011920929
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 9.900000005960464
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.799999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.300000011920929,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.400000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 6.9000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.699999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.299999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 12.599999994039536
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.399999976158142,
+        "frameMs": 8.899999976158142
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 3.199999988079071,
+        "frameMs": 10
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 4.300000011920929,
+        "frameMs": 7.800000011920929
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2,
+        "frameMs": 12.399999976158142
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.800000011920929,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5,
+        "frameMs": 9.799999982118607
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 9.899999976158142
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 10.400000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 10.199999988079071
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.9000000059604645,
+        "frameMs": 10.200000017881393
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 12.699999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.699999988079071,
+        "frameMs": 10.199999988079071
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 12.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.200000017881393
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 11.799999982118607
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 7.100000023841858
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.199999988079071,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.600000023841858,
+        "frameMs": 9.200000017881393
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 9.5
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.300000011920929,
+        "frameMs": 12
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 11.5
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.199999988079071,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 6.600000023841858
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5,
+        "frameMs": 13
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.800000011920929,
+        "frameMs": 14.300000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.299999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.800000011920929,
+        "frameMs": 14.699999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.5,
+        "frameMs": 12.5
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 5.9000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 3.4000000059604645,
+        "frameMs": 7.9000000059604645
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.5,
+        "frameMs": 11.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 4.700000017881393,
+        "frameMs": 7.5999999940395355
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 11.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.800000011920929,
+        "frameMs": 13.5
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.300000011920929,
+        "frameMs": 5.800000011920929
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 14.199999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 3.0999999940395355,
+        "frameMs": 9.699999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.7999999821186066,
+        "frameMs": 9.299999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 12.099999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.5,
+        "frameMs": 8.199999988079071
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 6.5
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.5,
+        "frameMs": 13
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12.400000005960464
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.699999988079071,
+        "frameMs": 13.799999982118607
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 11.599999994039536
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 12
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 11.900000005960464
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.300000011920929,
+        "frameMs": 6.700000017881393
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 10.599999994039536
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 9.100000023841858
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 11.799999982118607
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.399999976158142,
+        "frameMs": 12.799999982118607
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.300000011920929,
+        "frameMs": 13.100000023841858
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.300000011920929,
+        "frameMs": 7.9000000059604645
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.399999976158142,
+        "frameMs": 9.699999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.9000000059604645,
+        "frameMs": 13.300000011920929
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.7000000178813934,
+        "frameMs": 9.800000011920929
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2,
+        "frameMs": 10.699999988079071
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.800000011920929,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.4000000059604645,
+        "frameMs": 10
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 1.7000000178813934,
+        "frameMs": 10.100000023841858
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.0999999940395355,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.399999976158142,
+        "frameMs": 9.199999988079071
+      },
+      {
+        "tool": "Brush tool (B)",
+        "domMs": 2.5,
+        "frameMs": 9.100000023841858
+      },
+      {
+        "tool": "Pencil tool (N)",
+        "domMs": 2.300000011920929,
+        "frameMs": 12.300000011920929
+      },
+      {
+        "tool": "Eraser tool (E)",
+        "domMs": 2.800000011920929,
+        "frameMs": 13
+      },
+      {
+        "tool": "Marquee tool (M)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 13
+      },
+      {
+        "tool": "Lasso tool (L)",
+        "domMs": 2.2000000178813934,
+        "frameMs": 8.700000017881393
+      },
+      {
+        "tool": "Magic wand tool (W)",
+        "domMs": 2.2999999821186066,
+        "frameMs": 12.199999988079071
+      },
+      {
+        "tool": "Move tool (V)",
+        "domMs": 2.5999999940395355,
+        "frameMs": 9.799999982118607
+      }
+    ],
+    "longTasks": [],
+    "thumbnails": [
+      {
+        "start": 1535.699999988079,
+        "end": 1538.5
+      },
+      {
+        "start": 2466.199999988079,
+        "end": 2469.199999988079
+      },
+      {
+        "start": 3432.9000000059605,
+        "end": 3435.5
+      },
+      {
+        "start": 4354.4000000059605,
+        "end": 4358.5999999940395
+      },
+      {
+        "start": 5111.4000000059605,
+        "end": 5113.299999982119
+      },
+      {
+        "start": 5352.0999999940395,
+        "end": 5353.699999988079
+      },
+      {
+        "start": 6258.699999988079,
+        "end": 6261.199999988079
+      },
+      {
+        "start": 7135.799999982119,
+        "end": 7138.5999999940395
+      },
+      {
+        "start": 8035.5999999940395,
+        "end": 8038.5999999940395
+      },
+      {
+        "start": 9053.699999988079,
+        "end": 9055.699999988079
+      },
+      {
+        "start": 9935.5,
+        "end": 9938.199999988079
+      },
+      {
+        "start": 10816.199999988079,
+        "end": 10818.5
+      },
+      {
+        "start": 11739.199999988079,
+        "end": 11742.299999982119
+      },
+      {
+        "start": 12635.199999988079,
+        "end": 12637.59999999404
+      },
+      {
+        "start": 13552,
+        "end": 13554.799999982119
+      },
+      {
+        "start": 14482.09999999404,
+        "end": 14485.09999999404
+      },
+      {
+        "start": 15419,
+        "end": 15422.199999988079
+      },
+      {
+        "start": 16318.299999982119,
+        "end": 16322.09999999404
+      },
+      {
+        "start": 17302.69999998808,
+        "end": 17306.40000000596
+      },
+      {
+        "start": 18269.5,
+        "end": 18271.59999999404
+      },
+      {
+        "start": 19149.40000000596,
+        "end": 19152
+      },
+      {
+        "start": 20038.79999998212,
+        "end": 20041.59999999404
+      },
+      {
+        "start": 20985.79999998212,
+        "end": 20989.29999998212
+      },
+      {
+        "start": 21904.09999999404,
+        "end": 21907
+      },
+      {
+        "start": 22791.19999998808,
+        "end": 22793.90000000596
+      },
+      {
+        "start": 23768.5,
+        "end": 23771.59999999404
+      },
+      {
+        "start": 24685.19999998808,
+        "end": 24688.59999999404
+      },
+      {
+        "start": 25634.90000000596,
+        "end": 25638
+      },
+      {
+        "start": 26601.90000000596,
+        "end": 26605
+      },
+      {
+        "start": 27584.29999998212,
+        "end": 27586.90000000596
+      },
+      {
+        "start": 28584.69999998808,
+        "end": 28587.5
+      },
+      {
+        "start": 29065.40000000596,
+        "end": 29068.29999998212
+      },
+      {
+        "start": 29501.59999999404,
+        "end": 29503.69999998808
+      },
+      {
+        "start": 30384.69999998808,
+        "end": 30387.29999998212
+      },
+      {
+        "start": 31295.5,
+        "end": 31298.09999999404
+      },
+      {
+        "start": 32185.59999999404,
+        "end": 32189.09999999404
+      },
+      {
+        "start": 33118.29999998212,
+        "end": 33121.09999999404
+      },
+      {
+        "start": 34039.40000000596,
+        "end": 34043.19999998808
+      },
+      {
+        "start": 35003.79999998212,
+        "end": 35006.19999998808
+      },
+      {
+        "start": 35885,
+        "end": 35887.79999998212
+      },
+      {
+        "start": 36835.40000000596,
+        "end": 36838.19999998808
+      },
+      {
+        "start": 37768,
+        "end": 37770.59999999404
+      },
+      {
+        "start": 38698,
+        "end": 38700.59999999404
+      },
+      {
+        "start": 39613.40000000596,
+        "end": 39615.79999998212
+      },
+      {
+        "start": 40551.40000000596,
+        "end": 40554.79999998212
+      },
+      {
+        "start": 41468,
+        "end": 41471.69999998808
+      },
+      {
+        "start": 42418.19999998808,
+        "end": 42421.09999999404
+      },
+      {
+        "start": 43317.90000000596,
+        "end": 43321.19999998808
+      },
+      {
+        "start": 44281.29999998212,
+        "end": 44284.79999998212
+      },
+      {
+        "start": 45241.40000000596,
+        "end": 45243.79999998212
+      },
+      {
+        "start": 46134.29999998212,
+        "end": 46137.5
+      },
+      {
+        "start": 47068.90000000596,
+        "end": 47072.5
+      },
+      {
+        "start": 48060.5,
+        "end": 48063
+      },
+      {
+        "start": 49001,
+        "end": 49003.90000000596
+      },
+      {
+        "start": 49917.40000000596,
+        "end": 49920.19999998808
+      },
+      {
+        "start": 50851.19999998808,
+        "end": 50854.5
+      },
+      {
+        "start": 51851.09999999404,
+        "end": 51853.79999998212
+      },
+      {
+        "start": 52783.90000000596,
+        "end": 52787.19999998808
+      },
+      {
+        "start": 53750.40000000596,
+        "end": 53753.59999999404
+      },
+      {
+        "start": 54667.40000000596,
+        "end": 54670.19999998808
+      },
+      {
+        "start": 55567.5,
+        "end": 55570.5
+      },
+      {
+        "start": 56517.69999998808,
+        "end": 56521.40000000596
+      }
+    ],
+    "history": 60,
+    "strokeCount": 181,
+    "saved": "saved"
+  }
+}

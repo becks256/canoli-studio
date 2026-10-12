@@ -1,0 +1,123 @@
+{
+  "scope": "One production headless Chromium run, eight small paced Clone Stamp gestures on synthetic 698x396 raster. Completion after release; does not verify live clone preview, large sampling or transformed/grouped sources.",
+  "measurements": [
+    {
+      "tool": "clone",
+      "strokes": 8,
+      "start": 0,
+      "revision": 8,
+      "samples": [
+        40.400000005960464,
+        37,
+        38.79999999701977,
+        37.79999999701977,
+        38.1000000089407,
+        38.1000000089407,
+        38.400000005960464,
+        39.20000000298023
+      ],
+      "longTasks": [],
+      "phases": [
+        {
+          "method": "render",
+          "ms": 4.0999999940395355
+        },
+        {
+          "method": "toBlob",
+          "ms": 10.900000005960464
+        },
+        {
+          "method": "render",
+          "ms": 6.5999999940395355
+        },
+        {
+          "method": "render",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "toBlob",
+          "ms": 10.900000005960464
+        },
+        {
+          "method": "render",
+          "ms": 5.799999997019768
+        },
+        {
+          "method": "render",
+          "ms": 3.1000000089406967
+        },
+        {
+          "method": "toBlob",
+          "ms": 13.199999988079071
+        },
+        {
+          "method": "render",
+          "ms": 5.700000002980232
+        },
+        {
+          "method": "render",
+          "ms": 3.2999999970197678
+        },
+        {
+          "method": "toBlob",
+          "ms": 11.700000002980232
+        },
+        {
+          "method": "render",
+          "ms": 5.5999999940395355
+        },
+        {
+          "method": "render",
+          "ms": 3.300000011920929
+        },
+        {
+          "method": "toBlob",
+          "ms": 13.199999988079071
+        },
+        {
+          "method": "render",
+          "ms": 5.5999999940395355
+        },
+        {
+          "method": "render",
+          "ms": 4.100000008940697
+        },
+        {
+          "method": "toBlob",
+          "ms": 11.700000002980232
+        },
+        {
+          "method": "render",
+          "ms": 6
+        },
+        {
+          "method": "render",
+          "ms": 3.2000000029802322
+        },
+        {
+          "method": "toBlob",
+          "ms": 12.899999991059303
+        },
+        {
+          "method": "render",
+          "ms": 5.899999991059303
+        },
+        {
+          "method": "render",
+          "ms": 2.9000000059604645
+        },
+        {
+          "method": "toBlob",
+          "ms": 12.599999994039536
+        },
+        {
+          "method": "render",
+          "ms": 6.5999999940395355
+        }
+      ],
+      "liveStart": 2428,
+      "liveSamples": [],
+      "history": 9
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-12",
+  "change": "Transfer large encoded recovery checkpoints to a per-job IndexedDB worker",
+  "baseline": {
+    "source": "recovery-json-scheduling-2026-10-12.json",
+    "points": 256000,
+    "saveMs": 548.7,
+    "controlMs": 11.7,
+    "longTaskMs": 180
+  },
+  "runs": [
+    [
+      {
+        "saveMs": 184.19999998807907,
+        "input": {
+          "ms": 12.199999988079071,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 64000
+      },
+      {
+        "saveMs": 580.5,
+        "input": {
+          "ms": 13.700000017881393,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 256000
+      }
+    ],
+    [
+      {
+        "saveMs": 202.40000000596046,
+        "input": {
+          "ms": 11.799999982118607,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 64000
+      },
+      {
+        "saveMs": 580.9000000059605,
+        "input": {
+          "ms": 12.099999994039536,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 256000
+      }
+    ]
+  ],
+  "validation": {
+    "unitTests": 713,
+    "initialRecoveryBrowserTests": 12,
+    "nativeWorkerQuotaRepeat": "passed",
+    "productionBuild": "passed"
+  },
+  "limitations": [
+    "Total save time increased; improves main-thread availability, not save throughput.",
+    "Recovery list and restore still read document objects on the main thread.",
+    "Mutable external document inputs still require a synchronous owned clone.",
+    "Single-machine Chromium evidence does not establish all-tool responsiveness."
+  ],
+  "testInterference": "First worker quota run failed during overlapping build activity; isolated repeat passed."
+}

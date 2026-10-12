@@ -1,0 +1,122 @@
+{
+  "status": "Incomplete responsiveness: zero live clone preview frames across eight gestures. Existing completion/history assertions pass; they are not a live-feedback gate.",
+  "scope": "Headless production Chromium. Retouch instrumentation now records any paintPreview, not only tonal previews. Source confirms ToolController.updatePaintPreview returns early for clone.",
+  "measurement": {
+    "tool": "clone",
+    "strokes": 8,
+    "start": 0,
+    "revision": 8,
+    "samples": [
+      41.3999999910593,
+      36.599999994039536,
+      37,
+      37.900000005960464,
+      39,
+      37.6000000089407,
+      38.20000000298023,
+      37.400000005960464
+    ],
+    "longTasks": [],
+    "phases": [
+      {
+        "method": "render",
+        "ms": 4
+      },
+      {
+        "method": "toBlob",
+        "ms": 12.600000008940697
+      },
+      {
+        "method": "render",
+        "ms": 6.600000008940697
+      },
+      {
+        "method": "render",
+        "ms": 3.2000000029802322
+      },
+      {
+        "method": "toBlob",
+        "ms": 9.900000005960464
+      },
+      {
+        "method": "render",
+        "ms": 6.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 3.5999999940395355
+      },
+      {
+        "method": "toBlob",
+        "ms": 11.5
+      },
+      {
+        "method": "render",
+        "ms": 5.600000008940697
+      },
+      {
+        "method": "render",
+        "ms": 3.800000011920929
+      },
+      {
+        "method": "toBlob",
+        "ms": 11.5
+      },
+      {
+        "method": "render",
+        "ms": 6
+      },
+      {
+        "method": "render",
+        "ms": 3
+      },
+      {
+        "method": "toBlob",
+        "ms": 13.5
+      },
+      {
+        "method": "render",
+        "ms": 6.799999997019768
+      },
+      {
+        "method": "render",
+        "ms": 2.7000000029802322
+      },
+      {
+        "method": "toBlob",
+        "ms": 14.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 3
+      },
+      {
+        "method": "toBlob",
+        "ms": 13
+      },
+      {
+        "method": "render",
+        "ms": 6
+      },
+      {
+        "method": "render",
+        "ms": 3.0999999940395355
+      },
+      {
+        "method": "toBlob",
+        "ms": 15.600000008940697
+      },
+      {
+        "method": "render",
+        "ms": 5.899999991059303
+      }
+    ],
+    "liveStart": 2479.7999999970198,
+    "liveSamples": [],
+    "history": 9
+  }
+}

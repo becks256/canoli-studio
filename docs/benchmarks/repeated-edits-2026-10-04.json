@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-04",
+  "environment": "Node v24.0.1, same local development environment; single-run synthetic DOM command checks",
+  "scope": "Commit work only. Excludes pointer-to-display latency, image decoding and native pixel rendering. Not a general large-document performance guarantee.",
+  "repeated_document_rename": {
+    "document": [
+      500,
+      400
+    ],
+    "paint_layers": 8,
+    "selection_run_array_numbers": 200000,
+    "edits": 25,
+    "before_mean_ms": 81.1836366,
+    "after_mean_ms": 1.78495656,
+    "before_distinct_retained_selections": 26,
+    "after_distinct_retained_selections": 1
+  },
+  "repeated_clipped_raster_erasure": {
+    "document": [
+      500,
+      400
+    ],
+    "selection_run_array_numbers": 20000,
+    "strokes": 12,
+    "before_ms": [
+      32,
+      40,
+      60,
+      59,
+      74,
+      83,
+      102,
+      156,
+      183,
+      165,
+      175,
+      189
+    ],
+    "after_ms": [
+      37,
+      44,
+      41,
+      36,
+      30,
+      31,
+      36,
+      32,
+      40,
+      33,
+      32,
+      35
+    ],
+    "note": "Before this second fix already included the history-sharing fix; isolates repeated old-record copying/validation. Fixtures use deliberately verbose valid RLE to exercise large coverage payloads."
+  }
+}

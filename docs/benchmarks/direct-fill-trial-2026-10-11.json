@@ -1,0 +1,706 @@
+{
+  "date": "2026-10-11",
+  "decision": "Rejected direct-fill fast path; original renderer restored.",
+  "profile_after_compact_cache": {
+    "drawPaintSaveMs": 1680.6,
+    "applyTransformSetTransformMs": 1524.7,
+    "cacheWriteDrawImageMs": 846.9
+  },
+  "correctness": "General direct fill changed antialiased edges by 1\u20132 channel values. Pixel-aligned-only variant passed exact browser parity for filling/erasing; fractional and rotated cases kept original path.",
+  "performance": "No repeatable improvement: 64-layer crop ~159ms vs ~163ms, resize ~269ms vs ~262ms; long tasks remain.",
+  "next": "Investigate reducing layer working-surface dimensions, not only retained cache surfaces or one temporary fill surface.",
+  "baseline": [
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 5.799999982118607,
+          "presentMs": 20.799999982118607
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.300000011920929,
+          "presentMs": 13.900000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 37.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 5.5999999940395355,
+          "presentMs": 15.199999988079071
+        },
+        {
+          "action": "script",
+          "commitMs": 111.19999998807907,
+          "presentMs": 126.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 5.0999999940395355,
+          "presentMs": 13.900000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 5.4000000059604645,
+          "presentMs": 19.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 18.400000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.5,
+          "presentMs": 43.79999998211861
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.800000011920929,
+          "presentMs": 17.200000017881393
+        },
+        {
+          "action": "script",
+          "commitMs": 110,
+          "presentMs": 111.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.800000011920929,
+          "presentMs": 12.800000011920929
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.600000023841858,
+          "presentMs": 20.200000017881393
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.4000000059604645,
+          "presentMs": 19.30000001192093
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.200000017881393,
+          "presentMs": 40.099999994039536
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.100000023841858,
+          "presentMs": 13.600000023841858
+        },
+        {
+          "action": "script",
+          "commitMs": 98.5,
+          "presentMs": 99.90000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 17.299999982118607
+        },
+        {
+          "action": "crop",
+          "commitMs": 5.4000000059604645,
+          "presentMs": 19.400000005960464
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.5,
+          "presentMs": 23.299999982118607
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.5999999940395355,
+          "presentMs": 40.29999998211861
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 4.5,
+          "presentMs": 14.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 96.40000000596046,
+          "presentMs": 98.2999999821186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.800000011920929,
+          "presentMs": 10.599999994039536
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.200000017881393,
+          "presentMs": 19.80000001192093
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.5,
+          "presentMs": 19
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 6,
+          "presentMs": 39.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.7999999821186066,
+          "presentMs": 13.5
+        },
+        {
+          "action": "script",
+          "commitMs": 102.09999999403954,
+          "presentMs": 103.59999999403954
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.5,
+          "presentMs": 15.200000017881393
+        }
+      ],
+      "longTasks": [],
+      "restored": true,
+      "layers": 5
+    },
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 15.299999982118607,
+          "presentMs": 151.19999998807907
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 12,
+          "presentMs": 180.7000000178814
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 19.799999982118607,
+          "presentMs": 269.7999999821186
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 13.099999994039536,
+          "presentMs": 213.09999999403954
+        },
+        {
+          "action": "script",
+          "commitMs": 162.2000000178814,
+          "presentMs": 325.90000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.599999994039536,
+          "presentMs": 177.09999999403954
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.199999988079071,
+          "presentMs": 165.59999999403954
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.899999976158142,
+          "presentMs": 177.69999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.600000023841858,
+          "presentMs": 251.7000000178814
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 9,
+          "presentMs": 178.90000000596046
+        },
+        {
+          "action": "script",
+          "commitMs": 149.39999997615814,
+          "presentMs": 304
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.800000011920929,
+          "presentMs": 168
+        },
+        {
+          "action": "crop",
+          "commitMs": 9.099999994039536,
+          "presentMs": 158.59999999403954
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 8.599999994039536,
+          "presentMs": 172.59999999403954
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.400000005960464,
+          "presentMs": 272.59999999403954
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.099999994039536,
+          "presentMs": 173.2000000178814
+        },
+        {
+          "action": "script",
+          "commitMs": 150.69999998807907,
+          "presentMs": 314
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 11,
+          "presentMs": 171.59999999403954
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.900000005960464,
+          "presentMs": 163.40000000596046
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.300000011920929,
+          "presentMs": 182.59999999403954
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 13.599999994039536,
+          "presentMs": 262.40000000596046
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 10.5,
+          "presentMs": 182.60000002384186
+        },
+        {
+          "action": "script",
+          "commitMs": 156.5,
+          "presentMs": 332.60000002384186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 15.200000017881393,
+          "presentMs": 187.60000002384186
+        },
+        {
+          "action": "crop",
+          "commitMs": 12,
+          "presentMs": 162.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 8.099999994039536,
+          "presentMs": 219.59999999403954
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.200000017881393,
+          "presentMs": 261.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 7.5,
+          "presentMs": 185.5
+        },
+        {
+          "action": "script",
+          "commitMs": 169.2999999821186,
+          "presentMs": 335.89999997615814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 9.300000011920929,
+          "presentMs": 173.5
+        }
+      ],
+      "longTasks": [
+        146,
+        166,
+        239,
+        194,
+        168,
+        161,
+        149,
+        159,
+        234,
+        160,
+        159,
+        151,
+        149,
+        161,
+        254,
+        156,
+        167,
+        154,
+        147,
+        169,
+        243,
+        167,
+        181,
+        166,
+        149,
+        204,
+        248,
+        173,
+        171,
+        158
+      ],
+      "restored": true,
+      "layers": 64
+    }
+  ],
+  "trial": [
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 6.5,
+          "presentMs": 22.30000001192093
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 5.5999999940395355,
+          "presentMs": 13.400000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.799999982118607,
+          "presentMs": 37.099999994039536
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 5.699999988079071,
+          "presentMs": 15.400000005960464
+        },
+        {
+          "action": "script",
+          "commitMs": 103,
+          "presentMs": 117.80000001192093
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.4000000059604645,
+          "presentMs": 10.300000011920929
+        },
+        {
+          "action": "crop",
+          "commitMs": 5.899999976158142,
+          "presentMs": 19.599999994039536
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3,
+          "presentMs": 18.19999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.100000023841858,
+          "presentMs": 36.80000001192093
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.0999999940395355,
+          "presentMs": 15.900000005960464
+        },
+        {
+          "action": "script",
+          "commitMs": 100.40000000596046,
+          "presentMs": 103.2000000178814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.0999999940395355,
+          "presentMs": 17.400000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.5999999940395355,
+          "presentMs": 19
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.0999999940395355,
+          "presentMs": 18.900000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.299999982118607,
+          "presentMs": 38.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 2.699999988079071,
+          "presentMs": 11.699999988079071
+        },
+        {
+          "action": "script",
+          "commitMs": 97.09999999403954,
+          "presentMs": 98.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3,
+          "presentMs": 9.099999994039536
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.899999976158142,
+          "presentMs": 19.299999982118607
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4,
+          "presentMs": 18.599999994039536
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4,
+          "presentMs": 37.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.2999999821186066,
+          "presentMs": 12.399999976158142
+        },
+        {
+          "action": "script",
+          "commitMs": 100.7000000178814,
+          "presentMs": 102
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.399999976158142,
+          "presentMs": 17.19999998807907
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.300000011920929,
+          "presentMs": 19.599999994039536
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 2.7000000178813934,
+          "presentMs": 18.600000023841858
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 3.9000000059604645,
+          "presentMs": 38.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.5999999940395355,
+          "presentMs": 14.900000005960464
+        },
+        {
+          "action": "script",
+          "commitMs": 99.09999999403954,
+          "presentMs": 100.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 2.800000011920929,
+          "presentMs": 15.400000005960464
+        }
+      ],
+      "longTasks": [],
+      "restored": true,
+      "layers": 5
+    },
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 13.899999976158142,
+          "presentMs": 159.39999997615814
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 12.899999976158142,
+          "presentMs": 197.39999997615814
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 15.699999988079071,
+          "presentMs": 289.59999999403954
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 14.399999976158142,
+          "presentMs": 210.89999997615814
+        },
+        {
+          "action": "script",
+          "commitMs": 177.5,
+          "presentMs": 357.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 9.800000011920929,
+          "presentMs": 186.09999999403954
+        },
+        {
+          "action": "crop",
+          "commitMs": 11.199999988079071,
+          "presentMs": 170.69999998807907
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 10.900000005960464,
+          "presentMs": 206.09999999403954
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 11.199999988079071,
+          "presentMs": 254.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.299999982118607,
+          "presentMs": 220.2999999821186
+        },
+        {
+          "action": "script",
+          "commitMs": 153.90000000596046,
+          "presentMs": 352.7000000178814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 7.899999976158142,
+          "presentMs": 168.09999999403954
+        },
+        {
+          "action": "crop",
+          "commitMs": 8.900000005960464,
+          "presentMs": 153.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 7.0999999940395355,
+          "presentMs": 174.7999999821186
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10,
+          "presentMs": 268.59999999403954
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 9.800000011920929,
+          "presentMs": 181.5
+        },
+        {
+          "action": "script",
+          "commitMs": 147.69999998807907,
+          "presentMs": 301
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 12,
+          "presentMs": 179.5
+        },
+        {
+          "action": "crop",
+          "commitMs": 7.699999988079071,
+          "presentMs": 150.90000000596046
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 8.099999994039536,
+          "presentMs": 173.19999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 11.399999976158142,
+          "presentMs": 265
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8,
+          "presentMs": 177.09999999403954
+        },
+        {
+          "action": "script",
+          "commitMs": 158.40000000596046,
+          "presentMs": 314.40000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.299999982118607,
+          "presentMs": 187.7999999821186
+        },
+        {
+          "action": "crop",
+          "commitMs": 11.900000005960464,
+          "presentMs": 165.59999999403954
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.799999982118607,
+          "presentMs": 185.39999997615814
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 13.400000005960464,
+          "presentMs": 289.30000001192093
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 11.5,
+          "presentMs": 193.89999997615814
+        },
+        {
+          "action": "script",
+          "commitMs": 181.10000002384186,
+          "presentMs": 339.60000002384186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 11.900000005960464,
+          "presentMs": 179.40000000596046
+        }
+      ],
+      "longTasks": [
+        155,
+        171,
+        271,
+        190,
+        185,
+        170,
+        155,
+        183,
+        237,
+        208,
+        203,
+        152,
+        142,
+        159,
+        256,
+        161,
+        157,
+        160,
+        142,
+        162,
+        244,
+        164,
+        160,
+        174,
+        148,
+        170,
+        275,
+        179,
+        168,
+        161
+      ],
+      "restored": true,
+      "layers": 64
+    }
+  ]
+}

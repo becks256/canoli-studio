@@ -88,7 +88,7 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `CloneStroke`                                                | Constructor for clone brush strokes referencing sampled image tiles.                                                                                         |
 | `PaintFill`                                                  | Constructor for solid color canvas fills.                                                                                                                    |
 | `AffineTransform`                                            | Immutable affine matrix constructor and composition helpers for transformed selections.                                                                      |
-| `MarqueeSelection`                                           | Constructor for rectangular or elliptical selections.                                                                                                        |
+| `MarqueeSelection`                                           | Constructor for geometric or pixel-coverage selections.                                                                                                        |
 | `LayerMask`                                                  | Constructor for an immutable selection or Bézier layer mask.                                                                                                 |
 | `LayerMetadata`                                              | Constructor for user-authored layer descriptions, attribution and keywords.                                                                                  |
 | `LayerStyle`                                                 | Style object managing Blend If, color overlays, and drop shadows.                                                                                            |
@@ -123,6 +123,7 @@ There is no fixed megapixel cap. All current documents use sRGB. Browser decodin
 | `name`                           | Read/write string           | Rename through the shared command/history system.                                                                                                                        |
 | `width`, `height`                | Read/write numbers          | Canvas dimensions in pixels. Setting either dimension resizes the canvas through the shared command/history system.                                                      |
 | `crop({ x, y, width, height })`  | `void`                      | Rebase the canvas to a rectangle, preserving off-canvas artwork and original assets. One undoable command. See Canvas cropping below.                                    |
+| `resizeImage(width, height)` | `void` | Scales canvas and artwork together; positive safe-integer dimensions. See Resize the image and artwork below. |
 | `resize(width, height)`          | `void`                      | Resizes canvas dimensions atomically as one undoable command. Validates positive safe integers.                                                                          |
 | `layers`                         | Read-only `LayerCollection` | Root layers only, ordered back-to-front.                                                                                                                                 |
 | `selectedLayer`                  | Read/write layer or `null`  | Select a layer belonging to this document, or clear selection. Set after a transaction when selecting a newly added layer.                                               |
@@ -135,7 +136,7 @@ There is no fixed megapixel cap. All current documents use sRGB. Browser decodin
 | `canUndo`, `canRedo`             | Read-only booleans          | History availability in this instance. In Scripts these describe the worker's history, not the host's existing history.                                                  |
 | `undo()`, `redo()`               | `undefined`                 | Available on standalone instances and trusted application instances. **Disabled on the supplied script `document`**; use editor undo/redo after the run.                 |
 
-To inspect metadata as text, use `JSON.stringify(document.toJSON())`. Editing that returned object does not edit the document. `Document.fromJSON(document.toJSON())` creates an independent model with the same serialized IDs; it does not import source assets or establish shared ownership. Only operations against the supplied `document` are applied to the open composition.
+To inspect metadata as text, use `JSON.stringify(document.toJSON())`. Editing that returned object does not edit the document. `Document.fromJSON(document.toJSON())` creates an independent model with the same serialized IDs; it does not import source assets or establish shared ownership. Construction does not freeze or modify the supplied metadata, including its schema version. Validation checks the supplied schema before upgrading the owned copy; labeling newer fields with an older schema remains an error. Only operations against the supplied `document` are applied to the open composition.
 
 ## Layers and groups
 
@@ -426,7 +427,7 @@ These values currently transform selection regions. They do not yet add layer ro
 
 ### MarqueeSelection
 
-`new MarqueeSelection({ shape, x, y, width, height, operation = "add" })` creates one rectangle or ellipse. Dimensions must be positive. Alternatively pass `{ regions: [...] }`, with an explicit operation on each region; the default constructor creates an empty selection. At most 128 regions are accepted. Coordinates are in document space for `document.selection`, or layer space when used as a paint clip.
+`new MarqueeSelection({ shape, x, y, width, height, operation = "add" })` creates one rectangle, ellipse, or pixel-coverage region (see schema 16 below). Dimensions must be positive. Alternatively pass `{ regions: [...] }`, with an explicit operation on each region; the default constructor creates an empty selection. At most 128 regions are accepted. Coordinates are in document space for `document.selection`, or layer space when used as a paint clip.
 
 - `transformed(matrix)` returns a new selection, composing an `AffineTransform` with each region’s existing transform. Singular or nonfinite results throw. Each region retains its own coordinate basis when combined with other selections.
 - `regions` is a deep copy; `toJSON()` returns the full selection DTO.
@@ -848,6 +849,11 @@ This section is for trusted application code and development-console inspection,
 | `editor.runScript(code)`  | `Promise<string[]>`; runs the isolated scripting workflow and resolves to output lines after validated host application. Rejects on script/host failure. |
 | `editor.scripts.cancel()` | Cancel a pending run; its promise rejects and no script edits apply.                                                                                     |
 | `editor.document`         | Current live host `Document`. Direct trusted mutations use shared validation and history.                                                                |
+| `editor.export(options, control?)` | `Promise<ExportResult>` for trusted host code. `control` accepts an `AbortSignal` and non-throwing `onProgress({ phase, fraction })` callback. |
+| `editor.exportPng(control?)` | `Promise<Blob>`; PNG convenience method with the same optional execution controls. |
+
+
+Export controls default to absent. `phase` is `"rendering"` or `"encoding"`; `fraction` is a value from 0 to 1 for known rendering progress, or `null` for indeterminate work. An aborted signal rejects with its reason (normally `AbortError`). PNG/JPEG/WebP check cancellation between rendered tiles/strips and before returning encoded output. Browser encoding and synchronous SVG/PSD work cannot be preempted mid-call; the final host check suppresses a result after cancellation is received. These controls are host-only, are not serialized into REST options, and are unavailable inside isolated Scripts. They do not edit the document or create history entries.
 
 Directly accessing `editor.document` bypasses script isolation: ordinary setters create individual host history entries unless wrapped in a synchronous transaction. `editor.runScript` already handles snapshotting, validation, revision checking and a single host history entry; prefer it when executing user-authored script text. Never evaluate user scripts in the page context.
 
@@ -900,7 +906,7 @@ Script and plugin runs commit these edits together under their existing single-u
 
 ## LayerMask
 
-`new LayerMask({ selection, enabled = true, inverted = false, density = 1, feather = 0 })` creates an immutable selection-based mask. `selection` is a required `MarqueeSelection` in **layer-local document pixels**. It supports up to 128 ordered rectangle/ellipse add/subtract/intersect regions. `density` must be finite and between 0 and 1; booleans must be booleans. Invalid values throw. Empty selection hides all content; invert it to reveal all.
+`new LayerMask({ selection, enabled = true, inverted = false, density = 1, feather = 0 })` creates an immutable selection-based mask. `selection` is a required `MarqueeSelection` in **layer-local document pixels**. It supports up to 128 ordered rectangle/ellipse/pixel add/subtract/intersect regions. `density` must be finite and between 0 and 1; booleans must be booleans. Invalid values throw. Empty selection hides all content; invert it to reveal all.
 
 All layer kinds and groups expose `layer.mask: LayerMask | null`. Assign a mask or `null` to change/remove it through the normal locked-layer, validation, transaction and undo boundaries. Getter values and `toJSON()` snapshots are independent copies. `mask.with(partialOptions)` returns a new value; assign it back to commit. Read-only getters shared by all mask kinds: `kind`, `enabled`, `inverted`, `density`, `feather`, `x`, `y`, `linked`. `selection` is only valid for selection masks.
 
@@ -1625,3 +1631,30 @@ Trusted recipe-service reads (`getPresets`, `getAllRecipes`, `getRecipe`) return
 `TextLayer.reflow(): void` explicitly recalculates stored text bounds using fonts available in the current execution environment. It uses the ordinary text update command, preserving text, styles and placement; changed bounds create one undo entry, unchanged bounds create none, and locks reject the action. In the inspector, **Reflow text** performs this operation with browser-loaded fonts. Isolated workers and headless REST sessions may have different font availability; reflow there is not a guarantee of browser-identical metrics. REST callers can request the equivalent ordinary `layer.update` with the layer's unchanged `text` value.
 
 Automation recipe steps accept optional `literalValues: boolean` (default `false`). When true, action values retain strings verbatim, including `${parameter}` expressions; semantic targets and conditions still resolve normally. The recorder marks captured action values literal, except tone actions deliberately parameterized by `autoParameterizeTone`. This flag survives JSON and portable-package serialization and applies equally to batch replay. Existing recipes without the flag retain interpolation behavior; older saved recordings cannot have their original intent inferred automatically. Constructor scripting signatures are unchanged.
+
+### Raster erasure and pixel selections (schema 16)
+
+`RasterLayer.erase(stroke: EraserStroke): void` appends an undoable erasure. `RasterLayer.clear(selection: MarqueeSelection | null = null): void` clears the supplied selection, or the entire image when omitted. Coordinates and clips are layer-local. These methods do not implicitly read `document.selection`; UI tools translate the document selection for you. They preserve original asset bytes and respect layer locks. Invalid constructors throw. Each layer accepts at most 2,048 erasure records. Captured layer dimensions make erasures scale with subsequent image resizing.
+
+```js
+const image = document.selectedLayer;
+if (!(image instanceof RasterLayer)) throw new Error("Select an image layer.");
+image.clear(new MarqueeSelection({
+  shape: "rectangle", x: 10, y: 10, width: 40, height: 40,
+}));
+```
+
+`MarqueeSelection` also accepts `shape: "pixels"` with `coverage: { width, height, runs }`. Coverage dimensions are positive integer sample dimensions; region geometry controls placement and scaling. `runs` contains pairs of exclusive linear end offsets and alpha bytes (0–255), in row-major order. End offsets must strictly increase and the last must equal width × height. For example, `{ shape: "pixels", x: 0, y: 0, width: 2, height: 1, coverage: { width: 2, height: 1, runs: [1, 128, 2, 255] } }` selects two pixels at half and full coverage. Fractional coverage survives rendering, masks, clipping and project persistence. Existing add/subtract/intersect operations and the 128-region limit apply. Pixel coverage is required only for pixel regions and prohibited for geometric regions.
+
+The browser's pixel clipboard, magic-wand sampling and thumbnail action are host UI services, not additional isolated-script globals or REST clipboard endpoints. Scripts can construct pixel selections and erase/clear using the constructors above.
+
+### Resize the image and artwork
+
+`document.resizeImage(width: number, height: number): void` scales the canvas and all artwork together as one undoable operation. Dimensions must be positive safe integers; invalid dimensions or unrepresentable resulting geometry reject without partial changes. There are no optional arguments or implicit aspect-ratio constraints in the API. Pass proportional dimensions to preserve aspect ratio.
+
+```js
+// Double output dimensions while retaining editable layers and original assets.
+document.resizeImage(document.width * 2, document.height * 2);
+```
+
+This differs from `document.resize(width, height)`, which changes only canvas bounds. Image resizing transforms root placement once, including hidden and locked artwork, and preserves lock/visibility flags. Document-space masks, selections, guides and captured root layer-comp positions follow the scale. Nested local geometry remains editable. Pixel-based effect settings (shadow offsets/blur, mask feather, smart-filter radii) keep their existing values. Raster sources are not destructively resampled; rendering/export uses the existing interpolation at the new output dimensions. Direct calls, isolated scripts and REST `document.resizeImage` share validation and history.

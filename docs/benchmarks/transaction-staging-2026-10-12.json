@@ -1,0 +1,730 @@
+{
+  "date": "2026-10-12",
+  "change": "Freeze validated intermediate DOM transaction snapshots so later staged commands reuse immutable untouched subtrees instead of deep-cloning the full document.",
+  "measurement": "Test-only instrumented runtime reports module evaluation, Document.fromJSON and command execution; the ordinary production fixture separately measures end-to-end presentation. Fresh-worker isolation is unchanged.",
+  "results": [
+    {
+      "run": "before_worker",
+      "fixture": "script-runtime-phases",
+      "result": [
+        {
+          "layers": 5,
+          "mutate": false,
+          "repeat": 0,
+          "totalMs": 128,
+          "phase": "runtime",
+          "initializationMs": 21.099999994039536,
+          "documentMs": 3.800000011920929,
+          "executeMs": 0.09999999403953552,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 5,
+          "mutate": false,
+          "repeat": 1,
+          "totalMs": 117.5,
+          "phase": "runtime",
+          "initializationMs": 22.799999982118607,
+          "documentMs": 4.5999999940395355,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 5,
+          "mutate": false,
+          "repeat": 2,
+          "totalMs": 83.7999999821186,
+          "phase": "runtime",
+          "initializationMs": 16.900000005960464,
+          "documentMs": 3.699999988079071,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 5,
+          "mutate": true,
+          "repeat": 0,
+          "totalMs": 100,
+          "phase": "runtime",
+          "initializationMs": 19.80000001192093,
+          "documentMs": 4,
+          "executeMs": 2.7999999821186066,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 5,
+          "mutate": true,
+          "repeat": 1,
+          "totalMs": 108.5,
+          "phase": "runtime",
+          "initializationMs": 21.400000005960464,
+          "documentMs": 4.699999988079071,
+          "executeMs": 3.0999999940395355,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 5,
+          "mutate": true,
+          "repeat": 2,
+          "totalMs": 93,
+          "phase": "runtime",
+          "initializationMs": 17.599999994039536,
+          "documentMs": 4.0999999940395355,
+          "executeMs": 2.9000000059604645,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 64,
+          "mutate": false,
+          "repeat": 0,
+          "totalMs": 178.40000000596046,
+          "phase": "runtime",
+          "initializationMs": 21,
+          "documentMs": 7.5999999940395355,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 64,
+          "mutate": false,
+          "repeat": 1,
+          "totalMs": 102,
+          "phase": "runtime",
+          "initializationMs": 19.900000005960464,
+          "documentMs": 6.299999982118607,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 64,
+          "mutate": false,
+          "repeat": 2,
+          "totalMs": 100.2999999821186,
+          "phase": "runtime",
+          "initializationMs": 19.900000005960464,
+          "documentMs": 7,
+          "executeMs": 0.09999999403953552,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 64,
+          "mutate": true,
+          "repeat": 0,
+          "totalMs": 148.2000000178814,
+          "phase": "runtime",
+          "initializationMs": 19.700000017881393,
+          "documentMs": 6,
+          "executeMs": 38,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 64,
+          "mutate": true,
+          "repeat": 1,
+          "totalMs": 153.59999999403954,
+          "phase": "runtime",
+          "initializationMs": 22,
+          "documentMs": 6.100000023841858,
+          "executeMs": 37.69999998807907,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 64,
+          "mutate": true,
+          "repeat": 2,
+          "totalMs": 146.2000000178814,
+          "phase": "runtime",
+          "initializationMs": 16.600000023841858,
+          "documentMs": 6.300000011920929,
+          "executeMs": 37.900000005960464,
+          "revisionDelta": 1
+        }
+      ]
+    },
+    {
+      "run": "after",
+      "fixture": "document-operations-latency",
+      "result": {
+        "samples": [
+          {
+            "action": "crop",
+            "commitMs": 6,
+            "presentMs": 12.400000005960464,
+            "prepareMs": 3.399999976158142,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 4.899999976158142,
+            "presentMs": 12.899999976158142,
+            "prepareMs": 1.0999999940395355,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 6,
+            "presentMs": 20.5,
+            "prepareMs": 5.0999999940395355,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 4.699999988079071,
+            "presentMs": 18.599999994039536,
+            "prepareMs": 1.199999988079071,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 103.19999998807907,
+            "presentMs": 107.7999999821186,
+            "prepareMs": 4.299999982118607,
+            "scriptRuntimeMs": 96.7999999821186
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 5.9000000059604645,
+            "presentMs": 12.800000011920929,
+            "prepareMs": 1.300000011920929,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 4.199999988079071,
+            "presentMs": 19.400000005960464,
+            "prepareMs": 1.5,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 3.5,
+            "presentMs": 18,
+            "prepareMs": 1.0999999940395355,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 4.299999982118607,
+            "presentMs": 19.399999976158142,
+            "prepareMs": 1.7999999821186066,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 3.7000000178813934,
+            "presentMs": 18.600000023841858,
+            "prepareMs": 1.399999976158142,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 101.7999999821186,
+            "presentMs": 104.40000000596046,
+            "prepareMs": 1.2999999821186066,
+            "scriptRuntimeMs": 96.30000001192093
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 3.5999999940395355,
+            "presentMs": 17.599999994039536,
+            "prepareMs": 1.5,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 3.5,
+            "presentMs": 19.099999994039536,
+            "prepareMs": 1.0999999940395355,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 3.199999988079071,
+            "presentMs": 18.599999994039536,
+            "prepareMs": 1.300000011920929,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 3.5,
+            "presentMs": 19.5,
+            "prepareMs": 1.699999988079071,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 3.699999988079071,
+            "presentMs": 20.900000005960464,
+            "prepareMs": 1.199999988079071,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 104.5,
+            "presentMs": 106.10000002384186,
+            "prepareMs": 1.5,
+            "scriptRuntimeMs": 99.89999997615814
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 4.199999988079071,
+            "presentMs": 16.30000001192093,
+            "prepareMs": 1.0999999940395355,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 3.5999999940395355,
+            "presentMs": 19.30000001192093,
+            "prepareMs": 1.199999988079071,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 3.199999988079071,
+            "presentMs": 19.30000001192093,
+            "prepareMs": 1.2999999821186066,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 3.4000000059604645,
+            "presentMs": 20.400000005960464,
+            "prepareMs": 2,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 3.300000011920929,
+            "presentMs": 19.099999994039536,
+            "prepareMs": 1.0999999940395355,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 83.2000000178814,
+            "presentMs": 84.59999999403954,
+            "prepareMs": 1.0999999940395355,
+            "scriptRuntimeMs": 79.19999998807907
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 3.0999999940395355,
+            "presentMs": 10.199999988079071,
+            "prepareMs": 1.300000011920929,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 3.699999988079071,
+            "presentMs": 19.299999982118607,
+            "prepareMs": 0.9000000059604645,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 4.200000017881393,
+            "presentMs": 18.30000001192093,
+            "prepareMs": 1.2000000178813934,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 4.199999988079071,
+            "presentMs": 19.599999994039536,
+            "prepareMs": 1.9000000059604645,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 3.4000000059604645,
+            "presentMs": 18.900000005960464,
+            "prepareMs": 1.199999988079071,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 89.2000000178814,
+            "presentMs": 90.80000001192093,
+            "prepareMs": 1.5,
+            "scriptRuntimeMs": 84.5
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 2.899999976158142,
+            "presentMs": 17.599999994039536,
+            "prepareMs": 1.0999999940395355,
+            "scriptRuntimeMs": 0
+          }
+        ],
+        "longTasks": [],
+        "restored": true,
+        "layers": 5
+      }
+    },
+    {
+      "run": "after",
+      "fixture": "document-operations-latency",
+      "result": {
+        "samples": [
+          {
+            "action": "crop",
+            "commitMs": 14.099999994039536,
+            "presentMs": 50.900000005960464,
+            "prepareMs": 32,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 10.900000005960464,
+            "presentMs": 24.900000005960464,
+            "prepareMs": 2,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 20.5,
+            "presentMs": 68.7999999821186,
+            "prepareMs": 36.099999994039536,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 11.5,
+            "presentMs": 25.80000001192093,
+            "prepareMs": 2.2999999821186066,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 130.09999999403954,
+            "presentMs": 173.40000000596046,
+            "prepareMs": 41.89999997615814,
+            "scriptRuntimeMs": 113.59999999403954
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 10,
+            "presentMs": 28,
+            "prepareMs": 1.7999999821186066,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 11.599999994039536,
+            "presentMs": 22.19999998807907,
+            "prepareMs": 2.2000000178813934,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 10.699999988079071,
+            "presentMs": 26.400000005960464,
+            "prepareMs": 2,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 11.900000005960464,
+            "presentMs": 34.599999994039536,
+            "prepareMs": 3.4000000059604645,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 8.200000017881393,
+            "presentMs": 23.700000017881393,
+            "prepareMs": 1.800000011920929,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 115.5,
+            "presentMs": 120.2999999821186,
+            "prepareMs": 2.0999999940395355,
+            "scriptRuntimeMs": 102
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 7.699999988079071,
+            "presentMs": 16.099999994039536,
+            "prepareMs": 2,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 9.300000011920929,
+            "presentMs": 25.5,
+            "prepareMs": 4,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 12.400000005960464,
+            "presentMs": 26.900000005960464,
+            "prepareMs": 2,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 11.100000023841858,
+            "presentMs": 26.700000017881393,
+            "prepareMs": 3.800000011920929,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 9.299999982118607,
+            "presentMs": 22.099999994039536,
+            "prepareMs": 1.7999999821186066,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 114.69999998807907,
+            "presentMs": 117.39999997615814,
+            "prepareMs": 1.9000000059604645,
+            "scriptRuntimeMs": 102.40000000596046
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 9.699999988079071,
+            "presentMs": 28.099999994039536,
+            "prepareMs": 2.7000000178813934,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 13,
+            "presentMs": 24.80000001192093,
+            "prepareMs": 2.4000000059604645,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 14.199999988079071,
+            "presentMs": 27.799999982118607,
+            "prepareMs": 2.300000011920929,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 9.599999994039536,
+            "presentMs": 25.69999998807907,
+            "prepareMs": 2.9000000059604645,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 11.599999994039536,
+            "presentMs": 29.399999976158142,
+            "prepareMs": 1.699999988079071,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 123.89999997615814,
+            "presentMs": 128.19999998807907,
+            "prepareMs": 1.699999988079071,
+            "scriptRuntimeMs": 110.40000000596046
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 8.599999994039536,
+            "presentMs": 20.69999998807907,
+            "prepareMs": 2.2000000178813934,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "crop",
+            "commitMs": 9.899999976158142,
+            "presentMs": 20.099999994039536,
+            "prepareMs": 1.5,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-crop",
+            "commitMs": 8.700000017881393,
+            "presentMs": 20.400000005960464,
+            "prepareMs": 1.800000011920929,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "image-resize",
+            "commitMs": 9.300000011920929,
+            "presentMs": 22.900000005960464,
+            "prepareMs": 2.5,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "undo-resize",
+            "commitMs": 9,
+            "presentMs": 23.30000001192093,
+            "prepareMs": 2.0999999940395355,
+            "scriptRuntimeMs": 0
+          },
+          {
+            "action": "script",
+            "commitMs": 115.80000001192093,
+            "presentMs": 118.19999998807907,
+            "prepareMs": 1.699999988079071,
+            "scriptRuntimeMs": 103.40000000596046
+          },
+          {
+            "action": "undo-script",
+            "commitMs": 7.0999999940395355,
+            "presentMs": 18.899999976158142,
+            "prepareMs": 2,
+            "scriptRuntimeMs": 0
+          }
+        ],
+        "longTasks": [],
+        "restored": true,
+        "layers": 64
+      }
+    },
+    {
+      "run": "after",
+      "fixture": "script-runtime-phases",
+      "result": [
+        {
+          "layers": 5,
+          "mutate": false,
+          "repeat": 0,
+          "totalMs": 164.30000001192093,
+          "phase": "runtime",
+          "initializationMs": 29.599999994039536,
+          "documentMs": 4.5,
+          "executeMs": 0.09999999403953552,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 5,
+          "mutate": false,
+          "repeat": 1,
+          "totalMs": 119.59999999403954,
+          "phase": "runtime",
+          "initializationMs": 16.900000005960464,
+          "documentMs": 3.600000023841858,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 5,
+          "mutate": false,
+          "repeat": 2,
+          "totalMs": 93.40000000596046,
+          "phase": "runtime",
+          "initializationMs": 17.400000005960464,
+          "documentMs": 3.9000000059604645,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 5,
+          "mutate": true,
+          "repeat": 0,
+          "totalMs": 95.30000001192093,
+          "phase": "runtime",
+          "initializationMs": 19.5,
+          "documentMs": 4.5,
+          "executeMs": 2.5,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 5,
+          "mutate": true,
+          "repeat": 1,
+          "totalMs": 96.5,
+          "phase": "runtime",
+          "initializationMs": 19.299999982118607,
+          "documentMs": 3.7999999821186066,
+          "executeMs": 2.5999999940395355,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 5,
+          "mutate": true,
+          "repeat": 2,
+          "totalMs": 101,
+          "phase": "runtime",
+          "initializationMs": 21.400000005960464,
+          "documentMs": 3.7999999821186066,
+          "executeMs": 2.699999988079071,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 64,
+          "mutate": false,
+          "repeat": 0,
+          "totalMs": 194.59999999403954,
+          "phase": "runtime",
+          "initializationMs": 18.19999998807907,
+          "documentMs": 6.5999999940395355,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 64,
+          "mutate": false,
+          "repeat": 1,
+          "totalMs": 97.60000002384186,
+          "phase": "runtime",
+          "initializationMs": 18.799999982118607,
+          "documentMs": 6.0999999940395355,
+          "executeMs": 0,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 64,
+          "mutate": false,
+          "repeat": 2,
+          "totalMs": 102.69999998807907,
+          "phase": "runtime",
+          "initializationMs": 17.099999994039536,
+          "documentMs": 5.9000000059604645,
+          "executeMs": 0.09999999403953552,
+          "revisionDelta": 0
+        },
+        {
+          "layers": 64,
+          "mutate": true,
+          "repeat": 0,
+          "totalMs": 125.80000001192093,
+          "phase": "runtime",
+          "initializationMs": 21,
+          "documentMs": 6.300000011920929,
+          "executeMs": 15.800000011920929,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 64,
+          "mutate": true,
+          "repeat": 1,
+          "totalMs": 137.69999998807907,
+          "phase": "runtime",
+          "initializationMs": 18.299999982118607,
+          "documentMs": 6.100000023841858,
+          "executeMs": 15.200000017881393,
+          "revisionDelta": 1
+        },
+        {
+          "layers": 64,
+          "mutate": true,
+          "repeat": 2,
+          "totalMs": 130.90000000596046,
+          "phase": "runtime",
+          "initializationMs": 21.600000023841858,
+          "documentMs": 6.200000017881393,
+          "executeMs": 15.300000011920929,
+          "revisionDelta": 1
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Runtime evaluation remains about 17\u201323ms and other startup/transport/host work is not fully separated.",
+    "Cold bootstrap cost remains; scripting is not yet instantaneous.",
+    "Instrumented phase timings are diagnostic, not production telemetry or public API."
+  ]
+}

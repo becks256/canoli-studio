@@ -216,3 +216,25 @@ HSL appears in the adjustment-type selector as “Hue / Saturation / Lightness�
 Curves, Levels, Tone and HSL creation are searchable command-palette actions. They have no default shortcut chord, but can receive custom bindings through Keyboard shortcuts. The canvas context menu also exposes HSL directly. Creation uses the shared constructor, selects the new layer, generates an unused numbered name and adds one undo entry.
 
 Typography retains a Font preset selector and adds a Font family text field for locally installed/custom family names. Enter or blur commits one edit; Escape discards the draft. The field follows shared text-input validation and disabled states. A failed local-font probe remains visible beside the controls. This does not request font enumeration, download fonts or embed font files.
+
+### Raster selection controls
+
+Magic wand lives in the tool rail (W). Its tolerance uses the shared paired slider/numeric input (0–255), alongside a Contiguous checkbox and the existing selection operation control. Imported-image and paint layers show rendered thumbnails over a subtle checkerboard. Ctrl/Cmd-click on either thumbnail loads transparency without changing the active layer; Ctrl/Cmd-click on the layer name retains multi-selection. Thumbnails refresh after committed edits, not on each live brush movement. For transparency loading, hidden layers and ancestors are treated as visible; its tooltip explains the gesture, and the command palette provides keyboard access. Pixel selections draw their actual coverage boundaries with the existing selection treatment. Copy/paste shortcuts remain native inside text fields.
+
+Layer-style colors use the reusable `ColorInput`: native picker input previews at most once per animation frame, without creating undo entries. Native change (picker completion), blur or Enter commits once; Escape cancels the preview. Overlay and shadow colors use the same interaction. The control preserves a local draft while the canvas preview catches up.
+
+### App-drawn canvas cursors
+
+Canvas cursors use paired black and white outlines over artwork. Circular tools, including Eraser, show the current diameter multiplied by viewport zoom with a small center mark. Move, text, hand/grabbing, resize and rotation indicators communicate the active interaction; other precision tools use a crosshair. Cursor movement updates an independent overlay once per animation frame, without React state updates. Leaving the viewport, touch input, pointer cancellation, context menus and lost focus hide the custom cursor and restore the native pointer. Buttons and text fields retain native cursors.
+
+Users can restore system canvas cursors through the command palette (Use system canvas cursors); the reciprocal action restores custom cursors. This preference persists locally and does not affect document history. In system mode the size outline remains available, including for Eraser.
+
+### Image size versus canvas size
+
+Image size… is available in the options bar, command palette and Mod+Alt+I. It reuses the artboard dialog's paired pixel dimensions, aspect-ratio link, current-size summary, presets and Apply/Cancel controls, with a distinct Image size title and explanation that canvas and artwork scale together. The explanation also discloses unchanged pixel-based effect settings. Validation errors stay in the dialog without closing it. Canvas resizing retains its existing title and explicitly preserves artwork size and coordinates.
+
+### Freeform lasso
+
+The rail exposes Lasso (L) beside Marquee and Magic wand. The cursor is the precision crosshair. Dragging shows the traced contour plus its closing segment using the existing dashed selection treatment. Release commits an antialiased pixel selection. The shared selection-mode control and Shift/Alt modifiers match Marquee/Wand; the options hint explains all modifiers and Escape cancellation. Empty gestures preserve the current selection.
+
+Export progress appears inside the dialog above its footer, using the existing text/accent tokens and a labelled native progress element. Known rendering progress is determinate; encoding or unknown totals are indeterminate. Cancel remains enabled while exporting and leaves the dialog available after cancellation settles. Closing or dismissing the dialog also cancels its export. Intentional cancellation does not display an error toast or trigger a download.

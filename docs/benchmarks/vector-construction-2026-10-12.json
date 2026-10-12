@@ -1,0 +1,556 @@
+{
+  "date": "2026-10-12",
+  "change": "Detached vector commands use privately owned immutable snapshots and retain proven immutable prior fields; path.add/path.remove join the targeted-copy command path. Full validation, ownership, locks and limits remain unchanged.",
+  "before": [
+    {
+      "constructionMs": 25968.79999998212,
+      "attachmentMs": 56.5,
+      "paths": 2000,
+      "first": [
+        {
+          "x": 0,
+          "y": 0,
+          "in": {
+            "x": 0,
+            "y": 0
+          },
+          "out": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "in": {
+            "x": 10,
+            "y": 0
+          },
+          "out": {
+            "x": 10,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "in": {
+            "x": 10,
+            "y": 10
+          },
+          "out": {
+            "x": 10,
+            "y": 10
+          }
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "in": {
+            "x": 0,
+            "y": 10
+          },
+          "out": {
+            "x": 0,
+            "y": 10
+          }
+        }
+      ],
+      "last": [
+        {
+          "x": 1999,
+          "y": 0,
+          "in": {
+            "x": 1999,
+            "y": 0
+          },
+          "out": {
+            "x": 1999,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 0,
+          "in": {
+            "x": 2009,
+            "y": 0
+          },
+          "out": {
+            "x": 2009,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 10,
+          "in": {
+            "x": 2009,
+            "y": 10
+          },
+          "out": {
+            "x": 2009,
+            "y": 10
+          }
+        },
+        {
+          "x": 1999,
+          "y": 10,
+          "in": {
+            "x": 1999,
+            "y": 10
+          },
+          "out": {
+            "x": 1999,
+            "y": 10
+          }
+        }
+      ],
+      "undoEqual": true,
+      "redoEqual": true,
+      "history": 1
+    }
+  ],
+  "afterFirst": [
+    {
+      "constructionMs": 542.4000000059605,
+      "attachmentMs": 49.599999994039536,
+      "paths": 2000,
+      "first": [
+        {
+          "x": 0,
+          "y": 0,
+          "in": {
+            "x": 0,
+            "y": 0
+          },
+          "out": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "in": {
+            "x": 10,
+            "y": 0
+          },
+          "out": {
+            "x": 10,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "in": {
+            "x": 10,
+            "y": 10
+          },
+          "out": {
+            "x": 10,
+            "y": 10
+          }
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "in": {
+            "x": 0,
+            "y": 10
+          },
+          "out": {
+            "x": 0,
+            "y": 10
+          }
+        }
+      ],
+      "last": [
+        {
+          "x": 1999,
+          "y": 0,
+          "in": {
+            "x": 1999,
+            "y": 0
+          },
+          "out": {
+            "x": 1999,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 0,
+          "in": {
+            "x": 2009,
+            "y": 0
+          },
+          "out": {
+            "x": 2009,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 10,
+          "in": {
+            "x": 2009,
+            "y": 10
+          },
+          "out": {
+            "x": 2009,
+            "y": 10
+          }
+        },
+        {
+          "x": 1999,
+          "y": 10,
+          "in": {
+            "x": 1999,
+            "y": 10
+          },
+          "out": {
+            "x": 1999,
+            "y": 10
+          }
+        }
+      ],
+      "undoEqual": true,
+      "redoEqual": true,
+      "history": 1
+    }
+  ],
+  "afterRepeat": [
+    {
+      "constructionMs": 536.0999999940395,
+      "attachmentMs": 50.900000005960464,
+      "paths": 2000,
+      "first": [
+        {
+          "x": 0,
+          "y": 0,
+          "in": {
+            "x": 0,
+            "y": 0
+          },
+          "out": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "in": {
+            "x": 10,
+            "y": 0
+          },
+          "out": {
+            "x": 10,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "in": {
+            "x": 10,
+            "y": 10
+          },
+          "out": {
+            "x": 10,
+            "y": 10
+          }
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "in": {
+            "x": 0,
+            "y": 10
+          },
+          "out": {
+            "x": 0,
+            "y": 10
+          }
+        }
+      ],
+      "last": [
+        {
+          "x": 1999,
+          "y": 0,
+          "in": {
+            "x": 1999,
+            "y": 0
+          },
+          "out": {
+            "x": 1999,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 0,
+          "in": {
+            "x": 2009,
+            "y": 0
+          },
+          "out": {
+            "x": 2009,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 10,
+          "in": {
+            "x": 2009,
+            "y": 10
+          },
+          "out": {
+            "x": 2009,
+            "y": 10
+          }
+        },
+        {
+          "x": 1999,
+          "y": 10,
+          "in": {
+            "x": 1999,
+            "y": 10
+          },
+          "out": {
+            "x": 1999,
+            "y": 10
+          }
+        }
+      ],
+      "undoEqual": true,
+      "redoEqual": true,
+      "history": 1
+    }
+  ],
+  "final": [
+    {
+      "constructionMs": 522.6999999880791,
+      "attachmentMs": 50.900000005960464,
+      "paths": 2000,
+      "first": [
+        {
+          "x": 0,
+          "y": 0,
+          "in": {
+            "x": 0,
+            "y": 0
+          },
+          "out": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 0,
+          "in": {
+            "x": 10,
+            "y": 0
+          },
+          "out": {
+            "x": 10,
+            "y": 0
+          }
+        },
+        {
+          "x": 10,
+          "y": 10,
+          "in": {
+            "x": 10,
+            "y": 10
+          },
+          "out": {
+            "x": 10,
+            "y": 10
+          }
+        },
+        {
+          "x": 0,
+          "y": 10,
+          "in": {
+            "x": 0,
+            "y": 10
+          },
+          "out": {
+            "x": 0,
+            "y": 10
+          }
+        }
+      ],
+      "last": [
+        {
+          "x": 1999,
+          "y": 0,
+          "in": {
+            "x": 1999,
+            "y": 0
+          },
+          "out": {
+            "x": 1999,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 0,
+          "in": {
+            "x": 2009,
+            "y": 0
+          },
+          "out": {
+            "x": 2009,
+            "y": 0
+          }
+        },
+        {
+          "x": 2009,
+          "y": 10,
+          "in": {
+            "x": 2009,
+            "y": 10
+          },
+          "out": {
+            "x": 2009,
+            "y": 10
+          }
+        },
+        {
+          "x": 1999,
+          "y": 10,
+          "in": {
+            "x": 1999,
+            "y": 10
+          },
+          "out": {
+            "x": 1999,
+            "y": 10
+          }
+        }
+      ],
+      "undoEqual": true,
+      "redoEqual": true,
+      "history": 1
+    }
+  ],
+  "finalScript": [
+    {
+      "count": 750,
+      "ms": 356.7000000178814,
+      "error": "",
+      "logs": [
+        "750"
+      ],
+      "revisions": 1,
+      "paths": 750,
+      "undoEqual": true,
+      "redoEqual": true
+    },
+    {
+      "count": 2000,
+      "ms": 730,
+      "error": "The script returned invalid or unsupported document operations.",
+      "revisions": 0,
+      "unchanged": true
+    }
+  ],
+  "finalTransaction": [
+    {
+      "ms": 470,
+      "paths": 2000,
+      "history": 1,
+      "undoEqual": true,
+      "redoEqual": true
+    }
+  ],
+  "finalPen": [
+    {
+      "paths": 20,
+      "anchors": 4,
+      "frames": 30,
+      "median": 7.9000000059604645,
+      "p95": 12.400000005960464,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 15,
+          "prepareMs": 4.800000011920929
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 200,
+      "anchors": 4,
+      "frames": 30,
+      "median": 9.800000011920929,
+      "p95": 13.599999994039536,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 16.900000005960464,
+          "prepareMs": 5.299999982118607
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 2000,
+      "anchors": 4,
+      "frames": 30,
+      "median": 16.80000001192093,
+      "p95": 23.5,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 40.099999994039536,
+          "prepareMs": 8.700000017881393
+        }
+      ],
+      "longTasks": [
+        117
+      ]
+    },
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 23.69999998807907,
+      "p95": 30.5,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 34.900000005960464,
+          "prepareMs": 8
+        }
+      ],
+      "longTasks": [
+        102,
+        84
+      ]
+    }
+  ],
+  "validation": {
+    "unit": "706 tests across 95 files passed, including four new ownership/history/validation/limit cases.",
+    "production": "Eight construction and Pen cases passed; final build/typecheck passed.",
+    "browser": "Editor/affine/mask regression results recorded in roadmap.",
+    "initialScriptFinding": "A 2000-quad-path script exceeds the pre-existing 40000-value command budget. Keep this as atomic rejection coverage; 750 paths commit successfully. No payload limits were relaxed.",
+    "environment": "Initial browser launch permission review timed out; retry with workspace edits separated from browser command succeeded. Sandbox-only full suite could not bind two REST test servers; permitted rerun passed all tests."
+  },
+  "limitations": [
+    "Local Chromium measurements, not a universal speed guarantee.",
+    "Constructing 2000 paths still takes about 523\u2013542 ms synchronously on the host; individual DOM operations retain synchronous semantics. Large user scripts execute in the isolated worker.",
+    "Full validation/path-array traversal remains; this is not a claim of constant-time append or unbounded path counts.",
+    "Attachment is about 50\u201357 ms in this fixture and remains a separate cost.",
+    "The existing 2048-path layer limit and 40000-value sandbox/REST command complexity budget are unchanged.",
+    "The global responsiveness goal remains open, including script startup/host commit, large-image operations and sustained cross-device verification."
+  ]
+}

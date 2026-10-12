@@ -1,0 +1,250 @@
+{
+  "context": "Main-thread sampled CPU self-time during the production mixed-session fixture. Entire run including idle periods; caller names are minified and not an operation-by-operation long-task attribution.",
+  "selfTime": [
+    {
+      "ms": 5664.918000000001,
+      "function": "(idle)",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 3781.2930000000074,
+      "function": "(program)",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 404.55700000000047,
+      "function": "setTransform",
+      "url": "",
+      "line": 0,
+      "callers": "ff > bf > v > render"
+    },
+    {
+      "ms": 332.9990000000003,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "present > i > c > (root)"
+    },
+    {
+      "ms": 310.6760000000003,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "bf > v > render > prepareFallback"
+    },
+    {
+      "ms": 273.8020000000002,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "draw > read > v > render"
+    },
+    {
+      "ms": 269.96700000000027,
+      "function": "save",
+      "url": "",
+      "line": 0,
+      "callers": "v > render > prepareFallback > prepareViewport"
+    },
+    {
+      "ms": 243.0260000000002,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "v > (root)"
+    },
+    {
+      "ms": 145.72899999999993,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "write > v > (root)"
+    },
+    {
+      "ms": 137.03400000000002,
+      "function": "getTextAlternativeInternal",
+      "url": "",
+      "line": 3807,
+      "callers": "computeAccessibleNameComposite > getElementAccessibleNameText > match > query"
+    },
+    {
+      "ms": 126.62699999999998,
+      "function": "(garbage collector)",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 121.87899999999995,
+      "function": "up",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 9,
+      "callers": "Il > Pu > Mu > Pu"
+    },
+    {
+      "ms": 108.28599999999997,
+      "function": "Il",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 8,
+      "callers": "Pu > Mu > Pu > Mu"
+    },
+    {
+      "ms": 106.92599999999993,
+      "function": "",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 106.749,
+      "function": "sn",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 8,
+      "callers": "up > Il > Pu > Mu"
+    },
+    {
+      "ms": 88.579,
+      "function": "fill",
+      "url": "",
+      "line": 0,
+      "callers": "hf >  > gf > _f"
+    },
+    {
+      "ms": 87.97599999999996,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "bf > v > render > thumbnail"
+    },
+    {
+      "ms": 82.37899999999999,
+      "function": "as",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 8,
+      "callers": "qc > ml > nf > $d"
+    },
+    {
+      "ms": 73.993,
+      "function": "CC",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 330,
+      "callers": "as > qc > ml > nf"
+    },
+    {
+      "ms": 73.78099999999999,
+      "function": "hv",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 316,
+      "callers": "gv >  > as > Rc"
+    },
+    {
+      "ms": 61.79499999999999,
+      "function": "checkVisibility",
+      "url": "",
+      "line": 0,
+      "callers": "computeElementStyleVisibilityVisible > isElementStyleVisibilityVisible > isElementHiddenForAria > match"
+    },
+    {
+      "ms": 60.64600000000002,
+      "function": "query",
+      "url": "",
+      "line": 5413,
+      "callers": "queryRole > queryAll > _queryEngineAll > querySelectorAll"
+    },
+    {
+      "ms": 59.441,
+      "function": "getBoundingClientRect",
+      "url": "",
+      "line": 0,
+      "callers": "Kt > Jt > Kf > "
+    },
+    {
+      "ms": 58.13099999999999,
+      "function": "op",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 9,
+      "callers": "up > Il > Pu > Mu"
+    },
+    {
+      "ms": 57.45,
+      "function": "xl",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 8,
+      "callers": "of > nf > $d > Qd"
+    },
+    {
+      "ms": 52.46599999999999,
+      "function": "h",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 8,
+      "callers": "_ >  > Lc > ml"
+    },
+    {
+      "ms": 52.23799999999999,
+      "function": "restore",
+      "url": "",
+      "line": 0,
+      "callers": "bf > v > render > prepareFallback"
+    },
+    {
+      "ms": 47.68299999999998,
+      "function": "",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 316,
+      "callers": "as > Rc > ml > nf"
+    },
+    {
+      "ms": 46.89900000000001,
+      "function": "getBoundingClientRect",
+      "url": "",
+      "line": 0,
+      "callers": "check > raf > (root)"
+    },
+    {
+      "ms": 45.635999999999996,
+      "function": "hf",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 70,
+      "callers": " > gf > _f > bf"
+    },
+    {
+      "ms": 42.763,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "draw > bf > v > render"
+    },
+    {
+      "ms": 42.08900000000001,
+      "function": "getContext",
+      "url": "",
+      "line": 0,
+      "callers": "uf > bf > v > render"
+    },
+    {
+      "ms": 39.62,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "v > render > prepareFallback > prepareViewport"
+    },
+    {
+      "ms": 37.647,
+      "function": "getContext",
+      "url": "",
+      "line": 0,
+      "callers": "uf > render > prepareFallback > prepareViewport"
+    },
+    {
+      "ms": 37.055,
+      "function": "hv",
+      "url": "http://127.0.0.1:4173/assets/index-eaCGPp29.js",
+      "line": 316,
+      "callers": " > as > Rc > ml"
+    }
+  ]
+}

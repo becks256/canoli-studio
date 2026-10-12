@@ -1944,3 +1944,1015 @@ Verification: TypeScript check and the focused real-WebGPU browser regression pa
 Fixed the reviewed budget ownership defect. All public ledger methods returning budgets or reservations now return detached snapshots, preventing reference mutation from changing consent, approved limits, active reservation amounts, job identity or settlement ownership. Explicit ledger mutations and durable browser consent operations remain the supported write paths. API documentation describes this contract.
 
 Verification: production build, all 659 unit/API tests, and eleven generation/journal Chromium checks pass. New regression tests attempt consent restoration, ceiling inflation, reservation reduction and charge redirection through every relevant returned object. Existing accounting assertions now fetch fresh snapshots, and expiry tests use explicit restoration or invalid approval creation instead of mutating getters. Three browser fixtures required corrected 16×16 test-only provider capabilities to reach their dispatch/settlement checks. The literal recipe recording defect remains outstanding, along with live provider evaluation, asynchronous AI recipe/batch orchestration and other roadmap gates. The full implementation goal remains active.
+
+
+### Brush/pencil redundant frame wait — 2026-10-03
+
+Investigated reported brush and pencil lag. ToolController already batches stroke preview publication with requestAnimationFrame, but useCanvasRenderer waited for another frame before preparing the preview. Live paint previews now bypass that second wait. Non-paint updates retain frame coalescing; render serialization and stale revision/view/gesture protection remain intact. Smoothing defaults to zero and was not changed.
+
+Verification: production build, all sixteen hook tests and twenty-three tool/GPU Chromium checks pass. A new scheduling regression proves that a frame-batched preview starts preparing and presents without requesting another animation frame. Browser checks cover brush/pencil input, clipping, undo/reopen, GPU stroke preview/commit parity, fallback and device loss. These checks do not measure hardware input-to-photon latency or establish the broader performance gate. The interrupted recipe verification also completed: its prior browser log reports all twenty-one recipe/batch tests passed, including persisted literal expression replay. The broad implementation goal remains active.
+
+
+### Direct live-stroke rendering and isolated cursor updates — 2026-10-03
+
+Followed up continued reported drawing delay with a pointer/tool/render/presentation trace. Removing the redundant animation-frame wait alone left a React scheduling delay. Live stroke continuation now reaches the viewport through a direct subscription guarded by document identity, preview command, layer, mask mode and stroke ID. The editor shell ignores paint-preview-only state changes; cursor movement rerenders only the overlay. Renderer submission uses a layout effect for structural updates and avoids per-stroke status toggles.
+
+The single-run development Chromium comparison in `benchmarks/paint-input-chromium-2026-10-03.json` measures a simple 1600×1200 Canvas2D composition: sampled input-to-canvas-presentation median 21.8→5.6 ms and p95 26.8→6.8 ms. This is automated software presentation timing, not hardware input-to-photon latency or proof of complex-document performance. An intermediate layout-effect-only experiment worsened p95 and was not accepted as the solution.
+
+Verification: production build, all 666 unit/API tests, final TypeScript check, and all 43 distinct relevant Chromium tests pass. Existing browser coverage includes masks, stale gestures, clipping, GPU parity, fallback, undo and reopening. Two new live-paint checks verify ongoing frames, stable shell tool snapshots, and one-step undo for brush and pencil, attaching timing samples. Their initial run raced startup keyboard registration and left Move selected; explicit tool-button activation fixed the fixtures and both reruns passed. The full roadmap and hardware performance gates remain active.
+
+### Imported raster dogfooding workflows — 2026-10-04
+
+Implemented raster erasure, selection-based pixel copy/paste, Ctrl/Cmd-click thumbnail alpha selection, and Magic wand (W) with tolerance, contiguous matching and existing boolean selection modes. Delete with a raster selection clears pixels rather than deleting the layer. Source assets remain immutable; erasures follow later nonuniform resizing, and all document changes use shared commands/history. Clipboard reads preserve partial transparency and paste creates a separate raster at the copied canvas position. Asynchronous reads reject changed document state.
+
+Schema 16 adds RLE fractional pixel coverage and captured-geometry raster erasure records. The constructor API exposes RasterLayer.erase and RasterLayer.clear; REST uses the validated layer.update erasures field. WASM evaluates pixel coverage for rendering and clips, while unsupported GPU combinations use the reference path. Project reopen retains edits/selections. PSD export rejects raster erasures because its source-asset export path cannot preserve them; Luma and PNG are supported. Clipboard is internal to one editor instance; wand sampling currently targets one raster branch and performs native-resolution CPU flood fill. Browser memory and full-resolution sampling costs remain real limitations without an arbitrary megapixel cap.
+
+Verification: production build, all 669 unit/API tests and 47 distinct Chromium checks pass. Six new browser checks cover erasing imported PNGs, original-byte immutability, resizing, marquee copy/paste, half-alpha preservation, thumbnail alpha loading, wand islands, Delete, undo/reopen, isolated scripted fractional clears, PSD rejection and stale capture rejection. Existing mask, tool, gesture and GPU parity/fallback tests pass. Requirements, architecture, storage, API, scripting and interaction documentation updated. This completes the raster dogfooding slice, not the broader implementation roadmap.
+
+### Paint thumbnails and transparency selection — 2026-10-04
+
+Imported-image and paint layers now display rendered, checkerboard-backed thumbnails. Ctrl/Cmd-click loads the clicked layer's alpha without changing the active layer; hidden layers and hidden ancestry are sampled as visible, retaining masks and opacity. Empty paint layers load an empty selection. The command palette action also supports paint layers. Thumbnail output is bounded to 64×64, refreshed after committed edits with debounce and stale-result protection; live strokes do not generate thumbnails. Provisional paint layers show a placeholder until committed. Copy and wand scope is unchanged.
+
+Verification: production build, 669 unit/API tests and ten Chromium checks pass. New checks cover hidden transformed paint ancestry, fractional alpha, loading an unselected layer, Ctrl and Cmd clicks, thumbnail refresh, empty paint layers and hidden imported layers. Existing raster workflows and brush/pencil live-frame tests pass. The first browser run caught a provisional-layer lookup crash, fixed by deferring thumbnail rendering until the layer exists in the committed document. A test-only duplicate DOM constructor import was replaced with the application's exposed constructors. Requirements, architecture and interaction documentation updated.
+
+### Repeated-edit degradation and color-picker responsiveness — 2026-10-04
+
+Investigated rapid degradation during editing, then targeted the user's reported slow color-overlay picker and tool switching on an 800×600 document. Found repeated full-document/coverage copies in history and thumbnails, repeated copying/validation of old raster-erasure clips, main-thread workspace-history encoding, per-input color commits, and raw-content cache invalidation on style-only changes.
+
+Store-owned snapshots now share immutable unchanged subtrees; common edits copy only the target path, and restored histories also share equal data. Validation remains enforced, with memoization limited to recursively frozen owned selections/drawing records. External update payloads remain detached. Raster erasure appends retain old immutable records. Thumbnail branch extraction no longer clones unrelated artwork; keys avoid serializing large coverage arrays. Workspace project encoding runs in a disposable worker with ordinary error/retry handling and unchanged file formats/history limits.
+
+The reusable ColorInput previews at most once per animation frame, commits once on picker completion/blur/Enter and cancels on Escape. Overlay and shadow controls use it. Canvas/GPU raw-content signatures exclude properties applied during composition, enabling color changes to reuse source pixels while retaining geometry/child-content invalidation.
+
+Synthetic DOM measurements are recorded in `benchmarks/repeated-edits-2026-10-04.json`: repeated rename commits with a deliberately verbose coverage payload averaged 81.2→1.8 ms, with 26→1 retained selection objects. A second clipped-erasure fixture previously grew from 32 to 189 ms across twelve edits; after old-record reuse it stayed between 30 and 44 ms. These are single-run command timings, not end-to-end input latency or a universal document-size guarantee. Serialized history still repeats values on disk; native sampling/decoding and complex rendering retain their own costs.
+
+Verification: production build and all 672 unit/API tests pass. Across verification runs, 61 distinct browser checks pass, including repeated-edit stress, continued frames during worker autosave, zero thumbnail rerenders for unrelated edits, raster workflows, paint/pencil live frames, tool gestures, recovered undo/redo, storage-quota failures, masks and GPU parity/fallback. Two new 800×600 checks verify that 81 intermediate color inputs produce no history churn, completion produces one undo step, cancellation restores the color, tool switching still works, and overlay recoloring reuses raster source pixels with correct output. An initial stress fixture read autosave status after deliberately undoing/redoing (which correctly schedules another save); it now captures status before those edits. Documentation updated; broader roadmap remains active.
+
+### Custom canvas cursors and idle UI snapshot costs — 2026-10-05
+
+Followed up continued lag and the missing Eraser size indicator. Added independent app-drawn canvas cursors with black/white outlines, zoom-correct circular tool footprints, hand/move/text/transform indicators, pointer lifecycle cleanup and a locally persisted command-palette switch back to system cursors. Native pointers remain on surrounding controls. Custom-cursor movement no longer rerenders the selection overlay or editor shell; system mode also gains the missing Eraser ring.
+
+Found two additional main-thread costs missed by the previous bare-Document command benchmarks: LayerSelection getters serialized the whole document repeatedly during UI enabled-state checks, and RecipeService subscribed to before/after document snapshots while recording was idle. Internal selection geometry now reads the existing snapshot, selection-presence checks avoid detached MarqueeSelection construction, and the recorder subscribes only while active or paused. Public detached serialization, paused-history alignment and command-observer contracts are preserved.
+
+The single-run synthetic getter measurement in `benchmarks/idle-ui-reads-2026-10-05.json` uses an 800×600 document with 240,000 coverage run numbers: ten root-layer reads averaged 328.0 ms before and 0.046 ms after. This isolates redundant serialization; it is not end-to-end browser latency or proof that every source of the user's reported lag is resolved.
+
+Verification: all 672 unit/API tests and 35 distinct relevant Chromium checks pass across runs, including cursor size/zoom, system-pointer restoration, tool switching/hover without document serialization, idle/active/stopped recorder snapshots, color previews, live brush/pencil frames, gestures, recipe packages and undo/replay. The new performance browser fixture initially used an unsupported short hex color; corrected to six digits before passing. Requirements, architecture and design-system documentation updated. The broader roadmap and real-document responsiveness gate remain open.
+
+### Accumulated committed-stroke rendering — 2026-10-05
+
+Investigated the user's report of Rendering lasting 500 ms or more on a five-layer 698×396 document. A synthetic document at those dimensions with twenty clipped brush strokes reproduced a 1,094.5 ms cold Canvas render: every old stroke rebuilt the same selection mask. Committed paint and raster-erasure replay now use the bounded mask cache, reducing the fixture to one coverage rasterization. Paint layers also reuse retained unstyled prefixes for immutable append-only changes, drawing only new strokes when geometry and content basis match. Metadata is bounded to 64 entries; cache misses, undo and incompatible edits retain full replay.
+
+The initial mask-cache-only run measured 370.9 ms cold. With prefix reuse, an appended stroke measured 36.9 ms; final verification measured 413.2 ms cold and 44 ms appended. Cached append output and undo restoration match full-render pixels exactly. These are development Chromium timings for a synthetic clipped-stroke fixture, not the user's document, an input-to-photon measurement, or proof that all slow paths are resolved. See `benchmarks/committed-strokes-2026-10-05.json`.
+
+Relevant browser coverage passes across 20 distinct checks: the new render/undo regression, live brush/pencil frames, imported raster editing, tool gestures, styles, clipping, exports and sandbox scripts. The initial regression deliberately failed with twenty selection rasterizations before the fix. Production build and all 672 unit/API tests pass. The first unit run was blocked only by local-socket sandbox restrictions in two REST suites; rerunning with socket access passed all tests.
+
+### Image size separate from canvas size — 2026-10-06
+
+Added Image size… in the options bar and command palette, with Mod+Alt+I, linked pixel dimensions by default and one-step undo. The shared ArtboardDialog distinguishes canvas-only resizing from image resizing and retains validation failures in the dialog. `Document.resizeImage` and REST `document.resizeImage` share atomic execution; recipes record/replay the new operation and isolated scripts expose the same method.
+
+Image resizing scales root placement once, including hidden/locked layers, unlinked layer/filter masks, pixel selection, guides and captured root comp positions. Source assets and local editable artwork remain intact; renderer/export interpolation produces the new output resolution. Pixel-based effect settings remain unchanged, disclosed in the dialog and documentation. No interpolation selector, destructive asset resampling or arbitrary megapixel ceiling is introduced.
+
+Verification includes rendered Image Size output, linked controls, keyboard shortcut, cancellation, undo, isolated scripting, nested/locked artwork, unlinked masks, selections, saved comps, guides, REST command validation and recipe replay. Existing editor coverage includes canvas resize, project roundtrip, script isolation and 50 MP import/export. Initial checks caught an incorrectly scoped options-bar button and fractional command dimensions; both were corrected. Production build, all 675 unit/API tests and eight distinct Chromium editor checks pass.
+
+### Uncapped viewport magnification — 2026-10-06
+
+Removed the 400% clamp shared by zoom buttons, keyboard and wheel/pinch. Reject only numerical underflow/overflow (including projected document dimensions and percentage display). Fit/actual-size and bounded viewport rendering are unchanged.
+
+### Imported-image erasure prefix reuse — 2026-10-07
+
+The preceding goal turn made verified progress by removing the viewport zoom cap; the full roadmap remains incomplete. Current inspection found that committed raster erasures still rerendered source pixels and replayed every prior erasure despite the paint-layer prefix optimization. Added bounded immutable raster-prefix reuse with source/effect/geometry checks, earlier-erasure identity checks and cache invalidation fallback.
+
+A new real-browser regression applies eight soft, partial-opacity erasures and checks that the source raster is drawn only once. Cached output must match uncached full rendering exactly after appending, undoing, resizing and clearing the cache. Production build, all 675 unit/API tests and ten Chromium checks pass, including imported raster erasure, selection/clipboard, persistence and pixel parity. This advances editing performance and does not close the broader roadmap or establish hardware latency guarantees.
+
+### T17 PSD raw composite consistency — 2026-10-07
+
+The previous goal turn made verified implementation progress on raster-erasure prefix rendering. Inspection of the interchange gate found that PSD raw compression was honored for layer channels but ignored for the composite. The writer now emits planar raw composite data when requested, retaining existing RLE behavior otherwise. Two regression cases inspect the binary compression marker and verify exact RGBA bytes after layered and flattened import. The full interoperability gate remains open; same-implementation roundtrips do not prove independent-tool compatibility. Production build, all 677 unit/API tests and four color/interchange Chromium checks pass.
+
+### T17 independent PSD composite reader gate — 2026-10-07
+
+The preceding goal turn changed and verified raw composite serialization. Added a repeatable independent-reader check using installed Pillow 10.3.0. All four fixtures (raw/RLE × partial-alpha/multilayer normal composite) preserve exact RGBA and dimensions; the multilayer case includes a hidden layer. Evidence includes deterministic export hashes and reader version in `benchmarks/psd-pillow-2026-10-07.json`. The script uses temporary files, cleans up, has a bounded subprocess timeout and installs nothing. An initial stdin handoff hung; independent file-by-file decoding established that the PSDs were readable, and a file-based manifest fixed the harness. This advances T17's independent-tool gate without claiming editable layer, blend/effect, color-management or Photoshop parity.
+
+### T17 blended PSD merged images — 2026-10-07
+
+The preceding turn added independently decoded PSD composite evidence. Current inspection found that the writer retained layer blend-mode keys but merged every layer as normal. Added all 16 encoded-sRGB blend functions and alpha-aware source-over composition to merged-image construction. The independent Pillow harness now includes opaque multiply for both raw and RLE (six fixtures total).
+
+Verification checks every mode with opaque and partial-alpha inputs against Canvas. The first comparison revealed a one-byte alpha quantization difference (mathematical 192 versus Canvas 191 for half-alpha multiply); the contract now explicitly allows one alpha byte and three premultiplied RGB bytes, rather than claiming exact cross-backend rounding. Production build and all 677 unit/API tests pass. All five relevant Chromium checks pass, including 32 mode/alpha comparisons, and all six independent Pillow fixtures pass. Existing limitations for omitted layer types, effects and independent editable-layer semantics remain; the full plan stays active.
+
+### Freeform lasso selection — 2026-10-10
+
+Added Lasso (L) to the tool rail, command palette and selection-mode controls. Pointer gestures capture freehand contours, preview at animation-frame cadence, close on release and commit once through shared selection history. Shift/Alt/Shift+Alt support add/subtract/intersect. Escape, cancellation and revision guards discard drafts. Even-odd scan conversion uses 4×4 edge coverage and a row buffer, encoding into existing pixel-selection runs; degenerate/empty gestures preserve the old selection. Existing painting/erasing/copy/paste and persistence reuse the pixel-selection model. Gesture points are bounded at 20,000; document/import dimensions are not capped. Large contour conversion remains synchronous CPU work.
+
+Production build and all 678 unit/API tests pass. Nine relevant Chromium checks cover lasso selection/copy, modifier composition, undo/cancel and existing raster workflows; the extended lasso check also passes explicit add/subtract/intersect gestures. No new public scripting signature or storage schema is introduced.
+
+### Lasso scan-conversion performance — 2026-10-10
+
+The previous turn implemented and verified freeform selection. A follow-up synthetic 50 MP full-canvas contour took 1,427.9 ms because the initial converter visited every subpixel. Replaced interior iteration with per-row coverage-change events, preserving the same 4×4 edge sampling and even-odd fill. Solid spans emit directly into RLE without a full pixel mask or row-sized allocation. The same four-vertex contour measured 13.5 ms after the change; a 698×396 case measured 22.4→5.3 ms. These are single-run Node CPU timings, not hardware/browser latency guarantees; complex edge/intersection and run-count costs remain. Evidence is in `benchmarks/lasso-spans-2026-10-10.json`.
+
+New tests compare every output pixel against independent point sampling for fractional, concave, crossing and clipped contours, and verify the 50 MP rectangle produces a single coverage run. Production build, all 680 unit/API tests and the lasso Chromium workflow pass. The broad roadmap remains active.
+
+### Performance goal: dense lasso active edges — 2026-10-10
+
+The user replaced the full-feature implementation goal with an explicit editor-wide responsiveness goal. The previous interrupted turn produced a dense-lasso timing observation but no source edit; reinspection confirmed the all-edges scan remained. Added an active-edge scan conversion to avoid testing all 20,000 contour edges on every subpixel row. Three sequential Node measurements for a 2,000×2,000 circular selection improved from 445.7/421.2/422.3 ms to 37.1/17.4/15.4 ms. Full selection data hashes match exactly. See `benchmarks/dense-lasso-2026-10-10.json`; these are algorithm timings, not browser/hardware input latency.
+
+The responsiveness scope now explicitly includes all editing tools, controls, history/clipboard, document switching, import/export, scripts and background work, with end-to-end and sustained-use evidence needed before completion. Production build, all 680 unit/API tests and six Chromium checks pass, covering lasso, brush/pencil frames, color-overlay previews and repeated-edit/autosave behavior. These checks do not establish latency bounds for all tools; the editor-wide goal is not complete.
+
+### Responsiveness: tool-start geometry reads — 2026-10-10
+
+The prior turn made measured progress on dense-lasso conversion. Inspection of stroke startup found repeated full-document `toJSON()` calls for read-only lock, origin and transform queries. Replaced those queries with internal immutable snapshot reads across brush/eraser, masks, fill and vector input paths. Public detached serialization and clone sampling snapshot ownership are unchanged. Extended the detailed-selection browser regression to begin, move and commit a brush stroke while counting full-document serialization calls. Production build, all 680 unit/API tests and 13 distinct Chromium checks pass. The stroke fixture required explicit pressure/zoom arguments for TypeScript validation; its corrected rerun passes and confirms zero full-document serialization through begin/move/commit. No end-to-end speedup figure is claimed from the call-count assertion.
+
+### Responsiveness: fragmented selection outlines — 2026-10-10
+
+The previous turn removed repeated tool-start document copies. Current inspection found quadratic neighbor-span scans in pixel-selection outline construction. A 2,000×200 alternating-column fixture with 1,000 islands per row measured 858.1 ms and produced a 3,981,780-character SVG path. A monotonic neighbor cursor preserved the exact path hash and reduced construction to 147.5 ms. Coalescing consecutive vertical edges then reduced the path to 44,670 characters and construction to 113.8 ms. Evidence is recorded in `benchmarks/selection-outline-2026-10-10.json`. These single-run Node timings measure construction, not browser painting or end-to-end input latency. The extreme fixture remains above the routine 50 ms target, so responsiveness is not declared solved.
+
+A deterministic fragmented-mask regression checks every geometric boundary against an independent bitmap-edge oracle, including holes and row gaps, and checks compact output for a tall solid column. Production build, all 681 unit/API tests and nine Chromium selection/raster checks pass. The editor-wide responsiveness goal remains active.
+
+### Responsiveness: asynchronous selection outlines — 2026-10-10
+
+The preceding turn reduced fragmented outline construction and SVG size but left an extreme synchronous case above 50 ms. Moved outline construction out of React rendering into a dedicated module worker. Completed paths are weakly cached by coverage identity; pending workers terminate on selection replacement/clear/unmount, and cancellation guards reject late callbacks. The authoritative selection is immediately available to tools while its visual outline is prepared. Worker failures reach the existing editor error UI. Serialization, output SVG painting and selection command costs remain separate work.
+
+Added a controlled browser race check for replacement, late completion, clearing and cache reuse across tool switches; real-worker lasso and raster workflows are also included. Production build, all 681 unit/API tests and 10 Chromium selection/raster checks pass, including worker failure reporting without loss of the authoritative selection. The full responsiveness goal remains active.
+
+### Responsiveness: sustained brush baseline — 2026-10-10
+
+Added a real-pointer Chromium measurement for 60 sequential brush strokes on a 698×396 document with five paint layers. The fixture explicitly selects the fifth layer after its setup transaction; selecting during setup had left no committed selection and unintentionally created a sixth layer, so those initial measurements were discarded. The corrected browser test passes and TypeScript validation passes. Raw samples and context are in `benchmarks/sustained-paint-2026-10-10.json`.
+
+On this headless development-server Canvas2D run, stroke-end entry to canvas submission measured 71 ms median / 101 ms p95; the tool end call itself measured 43.6 ms median / 57.1 ms p95. First-20 versus last-20 submission p95 was 102.5 versus 100.3 ms, so this fixture does not demonstrate progressive degradation. It does demonstrate remaining completion latency above the routine interaction target. Canvas submission is not physical screen presentation, and the fixture does not cover live pointer lag, all tools, other backends or large documents. Next investigation should attribute stroke-end costs (command processing and synchronous subscribers) before optimizing further; production and broader sustained workflows remain unverified. The full responsiveness goal remains active.
+
+### Responsiveness: development versus production attribution — 2026-10-10
+
+Extended the sustained-paint fixture with optional `LUMA_PROFILE=1` Chromium CPU profiling and added `playwright.performance.config.ts` for the same gestures against optimized build output. Use `VITE_BENCHMARK=1 npm run build` before `npx playwright test --config playwright.performance.config.ts`; the ordinary production bundle intentionally omits `window.luma`. The first ordinary-production attempt failed for that expected missing test hook, then the benchmark-enabled build and both profiled browser runs passed.
+
+Evidence in `benchmarks/paint-dev-production-2026-10-10.json` materially changes the next investigation: development stroke-end median/p95 was 45/60.8 ms and submission 71.5/107.2 ms; optimized production was 5.3/7.3 ms and 28.5/31.7 ms respectively. CPU samples show substantial React development element construction overhead, so the earlier async-end timing must not be attributed solely to command processing. Production samples instead emphasize canvas `drawImage` across compositing, readback preparation, presentation and thumbnail rendering. Approximately 771 ms of sampled `drawImage` self-time across the whole 60-stroke production test had a thumbnail-render ancestry. Further investigation should measure live input and thumbnail/compositing contention, while avoiding treating this one headless Canvas2D release benchmark as proof of editor-wide responsiveness. Profiling adds overhead and canvas submission is not physical display latency. No application performance change is claimed in this measurement slice.
+
+### Responsiveness: defer thumbnail refreshes during drawing — 2026-10-10
+
+Following the production profile's thumbnail draw cost, inspection found that a pending refresh from a committed stroke could start during the next live gesture. The layers panel now pauses pending thumbnail timers during drawing. Refresh resumes for changed branches after the gesture; previews already current are skipped. Isolated source preparation also moved from each document render into the deferred callback. In-flight canvas work remains non-abortable, and no end-to-end timing improvement is claimed from this scheduling change alone.
+
+Production build and ten Chromium checks pass, including a five-layer regression that holds an active brush gesture beyond the debounce, verifies zero new thumbnail renders while drawing, exactly one changed-layer refresh afterward, and no refresh after a subsequent cancelled gesture. Existing raster editing, hidden/changed paint thumbnails, Ctrl/Cmd-click alpha selection and repeated-edit autosave checks also pass. The full responsiveness goal remains active; compositing and live-input latency still require further measurement.
+
+### Responsiveness: production live-input scaling — 2026-10-10
+
+Expanded the live brush/pencil browser fixture from an empty document to empty, five-layer and twenty-layer 800×600 documents, preserving the tool-snapshot stability and single-step undo checks. The production performance config now includes this fixture. Optimized benchmark-enabled build and all six browser cases pass. Raw samples are in `benchmarks/live-paint-production-2026-10-10.json`.
+
+Five-layer input-to-canvas submission measured brush 19.1 ms median / 21.8 ms p95 and pencil 19.3/21.3 ms. Empty-document p95 was 7/7.5 ms. Twenty layers increased brush to 67.2/70.2 ms and pencil to 56.5/63 ms, demonstrating a concrete compositing scalability problem beyond the 33 ms live interaction target. These single headless Canvas2D runs use paced pointer events; they do not prove hardware display latency or unthrottled input performance.
+
+Inspection of `CanvasRenderer.render` identifies an avoidable intermediate content-to-result draw for ordinary layers: result is allocated and copied even without shadow, Blend If or separate fill-opacity processing. Next work should remove that copy only where equivalent, with independent pixel comparisons for opacity/blends/masks and rerun the twenty-layer measurement. Existing caches retain raw layer content but still composite every layer per frame. The full responsiveness goal remains active; this turn adds evidence and coverage, not an application speedup.
+
+### Responsiveness: eliminate ordinary-layer intermediate copies — 2026-10-10
+
+Removed the content-to-result canvas allocation and draw for non-adjustment layers with no enabled shadow/Blend If and full fill opacity. Existing mask and overlay processing still precedes layer opacity and blending; effects requiring a separate result surface keep it. A browser pixel oracle compares the direct path against the original intermediate path forced by an invisible shadow, across every blend mode, fractional layer/paint opacity, elliptical mask density and color overlays. The fixture initially omitted optional style defaults; the corrected fixture passes exact byte equality.
+
+Benchmark-enabled production build, all 681 unit/API checks, 19 distinct compositor/stroke/mask browser checks (including the corrected oracle), six production live-input cases and TypeScript validation pass. Samples in `benchmarks/direct-composite-2026-10-10.json` show five-layer brush/pencil p95 falling from 21.8/21.3 ms to 13.5/14.3 ms. Twenty-layer p95 falls from 70.2/63 ms to 42.2/39.1 ms; median falls from 67.2/56.5 ms to 38.1/35.1 ms. These single headless Canvas2D runs measure paced input to canvas submission, not physical display latency. Twenty layers still exceed the 33 ms target; all layers still require per-frame composition and cache-to-working-surface copies. The editor-wide responsiveness goal remains active.
+
+### Responsiveness: direct cached-layer composition — 2026-10-10
+
+Extended the ordinary-layer optimization to composite unchanged raw content synchronously with the existing `CanvasCache.draw` ownership boundary. This avoids allocating and copying a working canvas on eligible cache hits. Active preview branches, effective masks, overlays, shadows, Blend If, partial fill opacity and adjustment layers retain processing paths. Cache misses use ordinary rendering. Context save/restore preserves parent blending state and no cache surface is borrowed across an await.
+
+Expanded the pixel oracle to warm and reuse the cache, covering every blend mode with and without masks and overlays, fractional opacity, and an independent intermediate-surface reference. Benchmark-enabled production build, all 681 unit/API tests, 21 compositor/color/mask/stroke browser checks and six production live-input cases pass. Raw samples in `benchmarks/cache-composite-2026-10-10.json` show twenty-layer brush/pencil p95 improving from 42.2/39.1 ms to 10/9.2 ms; five-layer p95 improves from 13.5/14.3 ms to 6.8/6.7 ms. Ordinary-layer painting now meets the live-input target in these paced headless Canvas2D fixtures. Single-run canvas-submission results do not establish physical display latency, hardware GPU behavior, effects-heavy compositions, other tools or sustained editor-wide responsiveness. The full goal remains active.
+
+### Responsiveness: eraser and overlay-heavy baseline — 2026-10-10
+
+Extended production live-input coverage to five-layer paint erasing, five-layer imported-raster erasing, and brush input with color overlays on all five or twenty layers. The twenty-styled-layer setup fills the existing 60-entry history limit; its assertion was corrected to account for that cap, and its rerun passes. All four new browser cases and TypeScript validation pass. Raw data is in `benchmarks/eraser-styled-latency-2026-10-10.json`.
+
+Paint and raster eraser p95 was 7.6/7.5 ms. Five-layer overlay brush p95 was 15.2 ms, but twenty-layer overlays reached 46.7 ms (44.7 ms median), above the 33 ms target. These single paced headless Canvas2D runs cover canvas submission, not physical display latency or other effects. The next concrete cost is repeated unchanged overlay processing: raw content caches deliberately exclude layer styles, and overlays bypass the new raw-cache composition route. Retaining processed output could avoid this cost, but must respect the existing cache budget, avoid raw/processed cache thrashing and invalidate correctly for style changes, masks, previews and undo. No application speedup is claimed this turn; the full responsiveness goal remains active.
+
+### Responsiveness: finished overlay cache reuse — 2026-10-10
+
+Retain finished color-overlay pixels for eligible unchanged layers during live drawing, replacing raw content in the same cache slot under a style-sensitive signature. This avoids dual raw/finished storage that could exceed the existing cache budget on twenty-layer documents. Active stroke targets retain raw prefix processing; later style changes can rebuild cold raw content. No cache budget increase or public API change was introduced.
+
+Benchmark-enabled production build, all 681 unit/API tests, six pixel/color/stroke browser checks and two production styled-input cases pass. The new regression checks exact uncached pixel parity after promotion, repeated reuse, color changes, undo, switching preview targets, disabling overlays and cache clear, and verifies stable retained byte count. Production five-layer overlay brush p95 improves from 15.2 to 7.9 ms; twenty-layer p95 improves from 46.7 to 9.5 ms (median 44.7 to 8.8 ms). Samples and limitations are in `benchmarks/overlay-cache-2026-10-10.json`. These single paced headless Canvas2D cases now meet the live-input target; masks/shadows/adjustments, other tools, large images and sustained editor-wide workloads still require investigation. The full responsiveness goal remains active.
+
+### Responsiveness: routine interaction baseline — 2026-10-10
+
+Added `tests/routine-latency.e2e.ts` to the production performance config. The fixture uses a 698×396 twenty-layer paint composition and actual keyboard/button input over fifteen rounds of move nudge, undo, redo, zoom in/out and hide/show selected layer. It records capture-phase input to canvas submission and verifies the final accumulated layer position. The browser test (105 measured actions) and TypeScript validation pass; no application performance change was made in this slice.
+
+Evidence in `benchmarks/routine-latency-2026-10-10.json` reports p95: move 21 ms, undo 16.7 ms, redo 19.4 ms, zoom in/out 21.8/16.8 ms, hide/show 15.9/15.7 ms. These cases meet routine response targets in this optimized headless Canvas2D fixture. Actions wait for the prior presentation; the run does not establish burst-input behavior, physical display latency, styled/large documents, continuous drag transforms or tool switching. Selection/clipboard, text/vector editing, switching/import/export, scripts, background saves and sustained mixed workloads still lack comprehensive end-to-end coverage. The full responsiveness goal remains active.
+
+### Responsiveness: selection and clipboard attribution — 2026-10-10
+
+Added production pixel-operation measurements for five rounds of wand, transparency selection, copy and paste on 698×396 and 2000×1500 two-color, partially transparent raster images. The fixture records service completion separately from frame gaps/Long Task entries and verifies paste/undo returns to one layer. Both cases and the instrumented follow-up rerun pass; TypeScript passes. Data is in `benchmarks/pixel-operations-2026-10-10.json` and `benchmarks/pixel-operation-phases-2026-10-10.json`.
+
+Small-document median completion was wand 19.9 ms, transparency 13.8 ms, copy 113.8 ms, paste 17.5 ms, with no Long Task entries. At 3 MP it was 109.4/65.5/1285.1/34.5 ms respectively, with whole-run main-thread tasks of 63–140 ms. The follow-up isolates copy's selection-mask generation: approximately 104.6 ms median for the small tile and 5,983 ms total over twenty large-image tiles across five copies (~1.2 seconds/copy), versus ~37 ms median large-image capture. Thus PNG encoding is not the primary measured copy delay. Inspection finds the selection WASM kernel repeats 4×4 supersampling and RLE binary searches even for native-resolution, axis-aligned pixel coverage. A pixel-grid-aligned exact path should avoid redundant samples while retaining the general transformed/Boolean antialiasing path. Main-thread wand/coverage construction and whole-run task attribution remain separate work. Measurements are service completion, not full outline/display completion; the full responsiveness goal remains active.
+
+### Responsiveness: exact native pixel-mask kernel — 2026-10-10
+
+Added a WASM fast path for a single additive native-resolution pixel selection aligned with the output pixel grid. It decodes coverage once per output pixel using a monotonic RLE cursor, avoiding sixteen redundant binary searches. All other sampling remains on the existing general kernel. Actual-WASM tests compare the path byte-for-byte against the general kernel forced by an extra out-of-bounds neutral region, and independently check all 256 alpha values, tile boundaries, outside pixels and integer/fractionally translated grid-aligned cases.
+
+Benchmark-enabled production build, all 682 unit/API tests, nine selection/raster browser workflows and both production pixel-operation cases pass. Data in `benchmarks/pixel-mask-fast-path-2026-10-10.json` shows 698×396 median copy completion improving from 113.8 to 19.3 ms, and 2000×1500 from 1285.1 to 197.4 ms. Small selection-mask median falls from 104.6 to 3 ms; summed mask time for five large copies falls from 5983 to 155.4 ms. Large-image wand/transparency completion and main-thread tasks remain roughly unchanged (whole-run tasks 62–128 ms); mask computation ran in a worker and was not the source of those blocks. Next work should attribute/offload main-thread pixel coverage/wand and clipboard postprocessing. The full responsiveness goal remains active.
+
+### Responsiveness: worker-based wand and transparency coverage — 2026-10-10
+
+Moved wand coverage computation and alpha/RLE encoding into the existing image worker, transferring private captured RGBA data and returning encoded runs. Retained post-worker stale-document checks before selection commits. The new browser regression delays a real worker result, changes the document, then verifies rejection without selection mutation. No new worker lifecycle or public API was introduced.
+
+Benchmark-enabled production build, 682 unit/API tests, ten selection/raster browser workflows, two production measurement cases and TypeScript pass. `benchmarks/coverage-worker-2026-10-10.json` records the same five-round workflow. At 3 MP, whole-run long tasks decreased from fifteen entries (62–128 ms) to six (53–132 ms), but the worst task remains and maximum frame gap is 116.6 ms. Median completion is wand 119.1 ms, transparency 64.8 ms, copy 198.2 ms, paste 33.9 ms. Small-image wand median increased from 14.6 to 25.8 ms while remaining below 50 ms; its run recorded no long tasks and maximum frame gap 16.8 ms. These single runs support reduced blocking frequency, not elimination of stalls or a completion-time speedup. Next profiling must attribute remaining capture/render/clipboard/main-thread tasks rather than treating offloading alone as success. The full responsiveness goal remains active.
+
+### Responsiveness: clipboard postprocessing off the main thread — 2026-10-10
+
+Added optional CPU profiling to the production pixel-operation fixture. The 3 MP profile identified ~250 ms of copy self-time across five rounds, plus capture/readback work. Moved selection alpha application, visible-bounds scan, crop and PNG encoding into the existing image worker. Captured pixels transfer once; finished PNG and crop offset return. The host still performs the final stale-document check before changing the clipboard. The new regression holds a real worker result, edits the source and verifies both rejection and preservation of the previous clipboard placement.
+
+Benchmark-enabled production build, 682 unit/API tests, eleven selection/raster browser checks, both production measurement cases and TypeScript pass. `benchmarks/clipboard-worker-2026-10-10.json` includes pre-change CPU attribution and post-change data. The 3 MP five-round workflow now records zero main-thread long tasks (previously six at 53–132 ms), and max frame gap falls from 116.6 to 50 ms. Median copy completion improves from 198.2 to 177.1 ms; small-image copy remains 19 ms with no long tasks. These single runs support reduced main-thread blocking, not universal responsiveness or instant large-image completion. Native capture/readback and wider tool/mixed-workload coverage remain open. The full responsiveness goal remains active.
+
+### Responsiveness: mixed-session tool switching and remaining repaint stalls — 2026-10-10
+
+Added a production mixed session with five overlaid paint layers, 45 brush/pencil/eraser strokes, 105 tool switches, fifteen undo/redo pairs and a verified autosave flush. The toolbar response is measured from capture-phase click through pressed-state DOM mutation and its next animation-frame callback. Initial-run tool DOM p95 was 4.4 ms and next-frame p95 14.3 ms. First/last thirds had comparable p95, but whole-run long tasks persisted (nine, up to 116 ms). See `benchmarks/mixed-session-2026-10-10.json`.
+
+A follow-up tracked thumbnail intervals: none of its nine long tasks overlapped thumbnail work; thumbnail duration peaked at 23.7 ms. Those stalls grew later in the session (51–81 ms). `benchmarks/mixed-session-thumbnail-2026-10-10.json` records this evidence. Optional CPU profiling then found substantial canvas work in renderTransform → drawPaint → compositor, consistent with replaying accumulated paint during history transitions; it does not yet isolate each long task. The relevant minified production functions were checked against bundle definitions (`ff` line 70 is renderTransform; `bf` line 70 loops paint strokes). `benchmarks/mixed-session-cpu-2026-10-10.json` preserves aggregate sampled self-time. Next investigation should isolate undo/redo repaint and retained stroke-prefix reuse, rather than assuming thumbnails or toolbar state are responsible.
+
+All three mixed-session runs and TypeScript checks pass; final stroke count, bounded history and autosave status are asserted. No application speedup is claimed this turn. The full responsiveness goal remains active.
+
+### Responsiveness: bounded prior paint-state cache — 2026-10-10
+
+Inspection confirmed raw paint content kept only the latest signature. Undoing an accumulated stroke could therefore miss the cache and replay the prior stroke list. Added optional two-version retention to CanvasCache, enabled only for paint-content writes. Variant lookup remains exact; per-key/global LRU and the existing byte/surface budget bound both states together. Ordinary replacement writes, including processed overlay promotion, keep their replacement semantics.
+
+A dedicated browser cache test verifies previous/current pixels, two-version eviction, access-order LRU, ordinary replacement, global budget eviction and clear. Existing uncached comparisons verify paint undo, erasure, overlay transitions and blends. Benchmark-enabled production build, 682 unit/API tests, seven cache/compositor/color browser checks, TypeScript and the production mixed session pass.
+
+The same 45-stroke, 105-tool-switch, fifteen undo/redo-pair workload now records zero long tasks, versus nine (51–81 ms) in the prior instrumented run. Tool-switch DOM/next-frame p95 remains 3.8/13.4 ms. Data is in `benchmarks/history-cache-2026-10-10.json`. This single run supports improved mixed-session repaint behavior, not universal history latency: deeper history, large surfaces under eviction, effects-heavy content and other tool workflows remain open. The full responsiveness goal remains active.
+
+### Responsiveness: deeper paint-history reuse — 2026-10-10
+
+Added a production fixture that renders forty brush strokes on five layers, then measures ten keyboard undo and ten redo actions through canvas submission. With two paint versions retained, the first undo took 8.4 ms but deeper steps took 62.1–129.9 ms; redo was already 9.8–18.8 ms. See `benchmarks/deep-history-before-2026-10-10.json`.
+
+Paint writes now allow additional rendered history variants while the existing global 64 MB/64-surface budget permits, rather than enforcing a two-version limit. Cache callers retain an explicit per-key version allowance; default writes still replace variants. No global allocation limit increased. Added pixel checks over seventy writes that prove the sixty-four retained versions and oldest-version eviction, alongside existing smaller-budget/LRU tests.
+
+Benchmark-enabled production build, 682 unit/API tests, five cache/compositor browser checks, TypeScript, deep-history and mixed-session production cases pass. Deep undo median/max is now 8.55/17.2 ms and redo 7.85/13.8 ms. The mixed session still records zero long tasks. Evidence is in `benchmarks/deep-history-cache-2026-10-10.json`. Large canvases may exhaust the shared budget much sooner; evicted history still needs replay, so these results do not prove all history workloads. The full responsiveness goal remains active.
+
+### Responsiveness: text input and vector dragging — 2026-10-10
+
+Added production browser measurements using actual text-input events and pointer drags. Text fixtures type twenty characters into one-line and hundred-line text layers. Vector fixtures drag a layer with twenty or two hundred closed paths and assert its final 60×30 translation. The initial vector instrumentation attached to the brush tool controller, which Move does not use; it was corrected to capture pointer events. All four corrected cases and TypeScript validation pass.
+
+`benchmarks/text-vector-2026-10-10.json` records text p95 15.9/17.2 ms and vector-drag p95 21.6/24.5 ms (twenty/two hundred paths). Individual vector maxima were 35.8/49.5 ms. These cases meet the live-input p95 target in the optimized headless Canvas2D fixture. Measurements stop at canvas submission; the long text extends beyond the viewport, and this does not cover font loading, Pen anchor editing, rotation/scale or complex typography. This slice adds verification, not an application speedup. The full responsiveness goal remains active, including large-image and remaining tool workflows.
+
+### Responsiveness: 50 MP production round trip and viewport zoom — 2026-10-10
+
+Extracted the existing deterministic PNG fixture generator for reuse and added a production 10000×5000 raster benchmark. It imports the original, applies exposure, saves/reopens a portable project, exports full resolution and checks pixel values at image edges and tile boundaries. A follow-up adds twenty alternating zoom inputs around 100% scale. Both production runs and TypeScript checks pass; this turn changes test coverage, not application behavior.
+
+`benchmarks/large-image-2026-10-10.json` records import/save/reopen/export completion at 299/40/303/3092 ms, with one 86 ms long task straddling setup and initial import. The follow-up `benchmarks/large-image-zoom-2026-10-10.json` measures 355/31/388/3082 ms and native-scale zoom median/p95/max 8.2/20.9/25.1 ms. Its single 92 ms long task also straddles setup/import; argument/materialization and UI setup are not separated from decoder work, so causation remains unresolved. Frame/task observation ends before the zoom samples; zoom has separate input-to-canvas timestamps.
+
+The source is a uniform-color PNG, not a large photographic decode stress case. This verifies original dimensions, full-resolution edited pixels and bounded visible-region interaction for that fixture, not multi-layer 50 MP history, arbitrary formats, complex photo import or export cancellation/progress. Those remain open under the full responsiveness goal.
+
+### Responsiveness: export progress and cooperative cancellation — 2026-10-10
+
+Inspection found the export dialog disabled Cancel while exporting and exposed no progress. Added host-only ExportControl separately from serialized format options. PNG/JPEG/WebP report strip progress and check cancellation between rendering chunks and encoding boundaries. The host checks again before returning output, and App checks before download. The dialog owns cancellation, supports Cancel/dismiss/unmount, displays rendering/encoding progress and suppresses intentional-abort error messages. Original callers without controls retain their behavior; application-integration documentation records the optional signatures without exposing these services to isolated Scripts or REST.
+
+Production build, all 682 unit/API tests, TypeScript, four cancellation/browser UI checks and the existing 50 MP round-trip/export test pass. Fixtures were corrected to contain an exportable layer and enough rows for multiple JPEG/WebP strips; pre-aborted exports reject across all formats, interrupted raster exports stop before final progress, later PNG export succeeds, and UI cancellation produces no download. Browser encoder calls and synchronous SVG/PSD work remain non-preemptible within a call; cooperative cancellation observes the signal at the next safe boundary. This improves control of long work, not raw export speed. The full responsiveness goal remains active.
+
+### Responsiveness: consolidated production audit — 2026-10-10
+
+The benchmark-enabled production build and all 21 performance browser cases pass. Raw measurements and summaries are retained in `benchmarks/performance-audit-2026-10-10.json`. Live paint input p95 ranges from 6.2 to 12.1 ms across the ten fixtures. The mixed session records zero long tasks and tool-switch DOM/next-frame p95 of 4.1/14 ms. Both pixel-operation fixtures record zero long tasks. Deep-history undo/redo maxima are 12.4/15.3 ms.
+
+Text input p95 is 16.4/14.8 ms for one/hundred lines. Vector dragging p95 is 22.5/27.2 ms for twenty/two hundred paths, with maxima of 38.2/57 ms. Investigate the vector outlier with commit-phase attribution next; existing latest-pointer timestamps may hide queued input and are not physical scanout. These tests enforce behavioral checks, not latency thresholds; a green suite alone is not proof that all tools are snappy.
+
+This audit changes recorded evidence, not application behavior. Remaining coverage includes retouch tools, Pen anchor and transform gestures, effects-heavy masks/shadows, scripting/document switching, complex photographic decoding and large multilayer history under cache eviction. The broad responsiveness goal remains active.
+
+### Responsiveness: vector timing attribution — 2026-10-10
+
+Corrected vector measurement to timestamp pointer release separately, clear consumed input timestamps, retain oldest/latest pending input, and record viewport preparation duration. The former probe reused the last pointermove timestamp on the commit frame, including the fixture's deliberate 16 ms pause and pointer-release delivery. Its mixed-phase maxima therefore did not isolate a rendering stall. The test now explicitly awaits a presented commit frame before collecting results and still verifies final translation.
+
+All four production text/vector cases pass. For twenty/two hundred paths, movement p95 is 21.1/23.6 ms, maxima 21.7/24.6 ms, and release-to-canvas submission 10.1/11.3 ms. Preparation maxima are 4.5/7.3 ms while moving and 1.8/1.2 ms on commit. Raw phase data is in `benchmarks/vector-phases-2026-10-10.json`. This is measurement correction, not an application speedup. Inspect gesture publication and renderer frame scheduling next to explain the remaining input-to-prepare interval; a single paced run cannot rule out real outliers or burst-input delays. The full goal remains active.
+
+### Responsiveness: move scheduling inspection — 2026-10-10
+
+Added pre-prepare timing to the production vector probe. App's Move pointer handler calls setPreview directly; unlike ToolController paint publication, it does not first schedule an animation frame. useCanvasRenderer then coalesces non-paint updates at one requestAnimationFrame boundary. Inspection therefore found no duplicate frame boundary to remove safely.
+
+All four production text/vector checks pass. Twenty/two hundred path movement has median pre-prepare intervals of 16.7/16.8 ms and preparation of 3.4/4.8 ms; median total input-to-submission is 20.4/21.9 ms. Commit response is 7.8/12.6 ms. Data is in `benchmarks/vector-scheduling-2026-10-10.json`. Pre-prepare includes React work as well as waiting; this is not pure scheduler attribution. Preserve single-frame batching and next profile retouch gestures, whose processing/completion path differs from cached paint. No application speedup is claimed for this diagnostic change. The full goal remains active.
+
+### Responsiveness: repeated retouch baseline — 2026-10-10
+
+Added production Dodge, Burn and Spot Healing fixtures on a 698×396 raster, each performing eight pointer gestures and awaiting presentation after the committed document revision. The test verifies eight history entries and records release-to-canvas completion plus main-thread long tasks; it does not replace existing pixel-correctness tests. All three cases pass behavior checks, but reveal unacceptable latency growth. Dodge progresses from 57.9 to 121.9 ms, Burn from 54.8 to 124 ms, and Spot Healing from 127.9 to 1306 ms. All record zero long tasks, demonstrating why worker-heavy completion needs independent timing.
+
+Raw results are in `benchmarks/retouch-baseline-2026-10-10.json`; the cases are included in the performance configuration. Inspection shows tonal rendering replays every accumulated stroke per tile. Healing routes through EditorApplication.commitRetouch and sampling/preparation; its much larger second-and-later-stroke delay requires phase attribution before choosing a fix. Prioritize healing capture/processing/composition, then tonal prefix reuse with correct backdrop invalidation. This turn adds actionable regression evidence, not a speedup. The overall goal remains active.
+
+### Responsiveness: remove healing patch encoding stall — 2026-10-10
+
+Phase instrumentation isolated HTMLCanvasElement.toBlob at 1000.9–1001.2 ms on every second-and-later healing stroke. Donor search and Poisson solving took tens/single-digit milliseconds; zero main-thread long tasks had hidden the asynchronous delay. The host patch/healing path now encodes detached corrected RGBA plus original fractional coverage with the existing PNG encoder, avoiding canvas idle encoding and premultiplied pixel round trips. Revision/lifetime/cancellation checks before asset installation remain intact. PNG row assembly still runs on the host; compression is asynchronous.
+
+The production build and repeated healing case pass. Later release-to-canvas results drop from 1133–1246 ms in the instrumented baseline to 143–249 ms; host healing work is 73–96 ms after the change. The first stroke remains about 140 ms. The ten healing/patch browser tests pass, including fractional coverage, backdrop alpha, tile/mask behavior, undo, persistence, target-change rejection and cancellation. Evidence is in `benchmarks/healing-encoding-2026-10-10.json`.
+
+This removes the dominant one-second stall but does not meet the full responsiveness goal. Patch-layer composition still grows with accumulated layers; investigate bounded affected-region processing and reuse next, alongside the independently observed tonal replay cost. Full unit/API validation is recorded below after completion.
+
+Validation follow-up: all 682 unit/API tests in 89 files pass.
+
+### Responsiveness: bound patch correction transfers — 2026-10-10
+
+Patch correction previously read and transferred each full 1024-limited render tile even for tiny healing patches. It now computes the transformed patch footprint, expands by two output pixels for interpolation, intersects each existing tile and sends only that rectangle through correction blending. Rasterization keeps its original tile dimensions/origin; empty intersections skip correction. This avoids changing clipping-dependent edge pixels. Outer adjustment composition remains unchanged.
+
+Added a browser pixel oracle comparing bounded output to full-surface worker blending for fractional translation, rotation/shear, reflection, scaling, edge clipping and an off-canvas patch. The fixture initially attempted an unsupported constructor transform option; it now uses the public transform setter. All nine healing/patch browser checks, production build, 682 unit/API tests and TypeScript pass.
+
+The eight-stroke production healing workload measures 125–213 ms (first 131 ms, eighth 213 ms), versus 143–249 ms after the prior encoding fix. Data is in `benchmarks/patch-bounds-2026-10-10.json`. This single run supports a modest improvement, not a universal latency bound. Accumulated patch layers still require full surrounding adjustment composition, and tonal strokes still replay; both remain optimization targets under the active broad goal.
+
+### Responsiveness: direct full-strength patch composition — 2026-10-10
+
+A plain full-strength patch's corrected content already contains the desired composite and retains backdrop alpha. Added a direct source-copy path for normal patch adjustments with full layer/fill opacity and no effective mask, Blend If, overlay or enabled shadow. It crops the current region from padded content, restores context state, and avoids the redundant full-frame readback/worker interpolation pass. Other adjustment/style cases retain their existing path.
+
+Added an exact pixel comparison against the general (fully revealing mask) path over every backdrop alpha value, with varying source RGB and patch coverage. All ten healing/patch browser tests pass, including transformed bounds, fractional coverage, persistence, cancellation and stale-target rejection. The benchmark-enabled production build passes.
+
+The eight-stroke production fixture now measures 106–132 ms release-to-submission (eighth 131.9 ms, previously 212.6 ms). Host preparation remains 72–88 ms; final presentation is no longer the dominant cost. Evidence is in `benchmarks/direct-patch-2026-10-10.json`. This is one synthetic paced run, not proof for complex styled patches or all retouch tools. Remaining work includes preparation latency, tonal replay, live retouch previews and the other unverified workflows under the full active goal.
+
+Validation follow-up: all 682 unit/API tests in 89 files pass; documentation build and diff whitespace checks pass.
+
+### Responsiveness: sparse tonal worker buffers — 2026-10-10
+
+renderTonalStroke now finds exact nonzero brush-coverage bounds, sends only that rectangle to the pointwise Dodge/Burn worker and copies corrected rows into the detached source tile. It preserves fixed-grid coverage rasterization and falls back to existing full/empty-coverage processing, including validation. Render-space geometry is copied before awaiting coverage. Added exact full-tile worker comparisons over both modes, all three ranges and both tone-protection settings, with transformed soft pressure coverage, varied alpha and immutable source checks.
+
+All five tonal browser cases pass. A preexisting assertion expected schema 12 despite the current schema being 16; it now uses SCHEMA_VERSION. Production build and all three repeated-retouch benchmarks pass. Eighth Dodge/Burn completion is 97.2/65.5 ms versus baseline 121.9/124 ms; individual ranges are 48–97/41–76 ms. Healing remains 108–133 ms. Data is in `benchmarks/sparse-tonal-2026-10-10.json`. These are single-run paced observations, not live-preview guarantees.
+
+Coverage generation and accumulated tonal-stroke replay still grow with stroke count. This reduces transfer/numerical work but does not eliminate that scaling or close the full responsiveness goal. Next investigate coverage-cell work and prefix reuse with correct backdrop invalidation; other tool and workload coverage also remains open.
+
+Validation follow-up: all 682 unit/API tests in 89 files pass; documentation build and whitespace checks pass.
+
+### Responsiveness: reject empty retouch cells before allocation — 2026-10-10
+
+Coverage rendering now reuses drawMaskStroke's overlap predicate before allocating or reading a cell. The underlying drawing routine already rejected those cells, but its caller still allocated and scanned their transparent canvases. Transformed bounds are computed once per coverage request; intersecting cells retain their exact fixed grid, phase and gutters.
+
+A full-grid coverage oracle checks all bytes across cell boundaries, transformed pressure/soft edges, fractional nonuniform scale, negative coordinates and offscreen strokes. All ten tonal/healing browser checks, TypeScript and the production build pass. Production repeated retouch cases pass: eighth Dodge/Burn is 88.9/53.5 ms compared with 97.2/65.5 ms previously; healing remains 107–133 ms. Raw data is in `benchmarks/retouch-cells-2026-10-10.json`. These are modest single-run improvements, not proof of a universal bound.
+
+Accumulated tonal replay still scales with history. Next work should measure a longer tonal session and implement prefix reuse with backdrop/transform/mask invalidation if confirmed, while retaining uncached pixel comparisons. Live retouch input latency and the broader unverified workflows also remain open. The full goal remains active.
+
+Validation follow-up: all 682 unit/API tests in 89 files pass; documentation build and whitespace checks pass.
+
+### Responsiveness: sustained tonal completion and preview baseline — 2026-10-10
+
+The retouch fixture now supports LUMA_RETOUCH_STRESS=1 for thirty-two Dodge/Burn gestures and records live tonal presentations separately from committed completion. Pointer-down resets preview timing so a new gesture cannot inherit an old move timestamp. The final isolated production run passes both behavioral cases and TypeScript; it reveals a performance failure despite green behavior assertions.
+
+Dodge completion median grows from 51.5 ms for strokes 1–8 to 168.2 ms for strokes 25–32; Burn grows from 49.0 to 163.9 ms. The first eight strokes have 26/27 measured live frames and p95 54.8/42.9 ms. The final eight have zero measured live frames in both cases: their short gestures finish before a tonal preview is presented. Null preview statistics in `benchmarks/tonal-stress-2026-10-10.json` mean no samples, not zero latency. Input timestamps capture the latest move at preparation, and only presented frames count; the workload does not prove physical scanout or burst-input behavior.
+
+This turn improves evidence, not application performance. Committed tonal-prefix reuse is the next priority. Reuse must include exact prior-sibling/backdrop state, asset scope, viewport/padded geometry, transforms and cache epoch; a live change below the adjustment must disable reuse. Store only committed correction before applying the current preview, retain shared bounded cache ownership, and compare cached output against full replay after backdrop edits, undo, masking, transform and cache eviction. The broad responsiveness goal remains active.
+
+### Responsiveness: committed tonal-prefix reuse — 2026-10-10
+
+Added exact RGBA prefix retention for tonal tiles under CanvasCache's existing shared 64 MB/64-entry budget. Numerical bytes are copied on read/write, avoiding canvas premultiplication loss at low alpha. Reuse requires immutable committed stroke prefixes and identical immutable preceding sibling layers; active previews in that backdrop disable it. Keys include document/asset/registry scope, padded geometry, world and document-plane transforms. Cache epoch guards writes, clearing removes metadata, and eviction/mutable snapshots fall back to replay. Only committed correction is stored before the current preview; masking and styling remain downstream.
+
+New browser checks compare cached output byte-for-byte with full replay after appends, live previews, backdrop opacity/mask changes, transforms, stroke undo/redo, live raster erasure below the adjustment and cache clearing. They also verify exact RGBA ownership and shared canvas/pixel eviction. Worker-call assertions use an isolated renderer so automatic UI rendering cannot contaminate counts. They prove unchanged committed content needs zero tonal calls, while an append or preview needs one. Existing tonal/history checks pass; production build and the sustained production cases pass.
+
+For the last eight of thirty-two strokes, Dodge/Burn completion medians fall from 168.2/163.9 ms to 35.6/35.9 ms. Both tools now present forty measured live frames in that block, versus zero previously; preview p95 is 25.8/20.9 ms. First-eight medians are 35.8/37.7 ms, so the observed accumulation slowdown is removed in this workload. Evidence: `benchmarks/tonal-prefix-cache-2026-10-10.json`. These are single-run headless Canvas2D observations, not physical scanout or proof for every large/styled document. The full responsiveness goal remains active, with remaining tool families and workloads still requiring verification.
+
+Validation follow-up: final nine tonal/cache browser checks and all 682 unit/API tests in 89 files pass; production build, TypeScript, documentation build and whitespace checks pass.
+
+### Responsiveness: post-tonal production audit and Clone Stamp baseline — 2026-10-10
+
+All 24 production performance cases pass after shared-budget tonal caching. Paint input p95 remains 5.3–10.3 ms across fixtures, mixed-session frame p95 is 13.2 ms with zero long tasks, and both pixel-operation fixtures record zero long tasks. History, text/vector and the 50 MP round trip also pass behavior checks. Raw data is in `benchmarks/post-tonal-audit-2026-10-10.json`; timings are observations, not enforced universal limits.
+
+Extended the repeated-retouch fixture with Clone Stamp source selection and eight strokes, retaining history and committed-presentation checks. Its separate production case passes with completion 37–40.4 ms and canvas encoding 10.9–13.2 ms; it does not exhibit healing's former one-second encoding stall in this workload. Data is in `benchmarks/clone-baseline-2026-10-10.json`. No speculative encoder change was made. The suite now includes this additional case for future runs.
+
+This turn expands verification without changing application behavior. Clone's larger/transformed sampling and live-feedback experience remain unmeasured. Remaining scope also includes longer mixed/effects-heavy sessions, large multi-layer cache eviction, Pen/transform/crop interactions, document switching and scripting, complex photographic decoding, and recovery/cancellation behavior for remaining long operations. The full responsiveness goal remains active.
+
+### Responsiveness: retain bounded pixels across document switches — 2026-10-10
+
+Added a production tab-switch fixture alternating twenty times between two 698×396 five-layer documents with forty brush strokes each. It checks presented document identity, distinctive pixels and unchanged histories. The baseline recorded 71.3 ms median/78.8 ms p95 and twenty main-thread long tasks because activation cleared all render caches.
+
+Document activation now resets view work: advance the epoch to prevent old pending cache writes, clear transient strokes/mask raster state, filtered tiles and GPU caches, but retain document/asset/geometry-scoped CPU pixels and prefix metadata under the existing shared budget. Explicit clearCache/disposal still release all retained data. GPU retention is deliberately unchanged; measured gains are Canvas2D.
+
+The production fixture now records 12.0 ms median/12.8 ms p95. One cold first return still takes 76.6 ms with a 67 ms long task; the remaining nineteen switches stay warm and have no long tasks. Evidence is in `benchmarks/document-switch-cache-2026-10-10.json`. Production build, TypeScript and seventeen workspace/cache browser tests pass, including source closure, copied assets, undo, recovery and proof settings. The fixture is now part of the performance suite. Larger documents under eviction and more complex switching remain unverified; the full responsiveness goal remains active.
+
+Validation follow-up: all 682 unit/API tests in 89 files pass; documentation build and whitespace checks pass.
+
+### Responsiveness: rotation and resize production coverage — 2026-10-10
+
+Added actual pointer-handle measurements for raster rotation and resize over five/twenty layers on a 698×396 document. Each fixture sends thirty paced moves, separates live and pointer-release timestamps, checks no document mutation during preview, verifies the final 90-degree rotation or 220×110 resize, and asserts one committed revision. All four production cases pass, each with thirty measured live frames.
+
+Live p95 is 20.1/22.2 ms for rotation and 20.2/22.6 ms for resize (five/twenty layers). Pointer-release submission is 8.8–15 ms; maximum live sample is 23.6 ms. Raw data is in `benchmarks/transform-latency-2026-10-10.json`; cases are part of the performance suite. These timings do not identify a required optimization in the measured ordinary raster/paint workload. This turn adds evidence, not application speedups.
+
+Measurements use latest pointer timestamps at preparation and stop at canvas submission. Multi-selection, effects-heavy/grouped layers, complex vectors, burst input, Pen anchor editing and crop previews remain separate coverage gaps. The full responsiveness goal remains active.
+
+### Responsiveness: styled-transform regression and finished appearances — 2026-10-10
+
+Expanded production transform fixtures to five/twenty layers with feathered masks, shadows and overlays. This exposed a real gap: three of four styled cases fail the existing requirement for more than ten live presentations. Five-layer rotation and both twenty-layer gestures present zero measured live frames, while five-layer resize initially measured 86.3 ms p95. Plain transform results must not be generalized to these workloads.
+
+Added bounded finished-appearance reuse for immutable masked/shadowed non-adjustment layers. It replaces the raw slot rather than allocating a parallel retained surface. Immutable identity includes style/mask changes; geometry, asset/document scope and document-plane transform remain in keys. Blend If and live-affected layers bypass this reuse, and layer opacity/blending stay at final composition. Overlay-only layers retain raw cache behavior to preserve color-picker reuse.
+
+Exact cached/uncached comparisons cover all blend modes, shadows, masks, overlays, opacity/fill opacity, mask inversion, transforms, undo, backdrop edits, previews and clear. The mask-edit fixture was corrected to replace the immutable LayerMask with with({inverted:true}); direct property assignment would not test an attached edit. Production build and TypeScript pass. The final styled benchmark still has three failures; five-layer resize improves to 33.4 ms p95 with 27 measured frames, but the other three still show zero. Data is in `benchmarks/styled-transform-cache-2026-10-10.json`.
+
+This is a partial performance improvement, not a completed transform fix. Investigate active transformed/feathered selection-mask generation next: unlike unchanged backdrops, its geometry changes every move and cannot use a retained completed appearance. Keep the failing performance checks visible until fixed. The full responsiveness goal remains active.
+
+Validation follow-up: five compositor/color browser checks and all 682 unit/API tests pass. Three styled-transform performance checks remain failing as described above.
+
+### Responsiveness: transformed mask rejection — 2026-10-10
+
+Optional transform phase instrumentation isolated selection generation at median 53.6 ms versus feathering at 10.4 ms in the failing five-layer rotation. The WASM sampler now bounds the affine footprint of each output pixel for a single additive rectangle/ellipse and rejects clearly outside pixels before supersampling. Conservative rounding allowance protects large-coordinate/cancellation cases; uncertain bounds and edge/compound/pixel regions retain the original path. An actual-WASM oracle compares against duplicate additive regions, which force generic evaluation, across shapes, affine transforms, scales and ±1e9 coordinates.
+
+Production build and all 683 unit/API tests pass. The production phase run reduces rotation selection medians to 5.4/7.0 ms (five/twenty layers). Both styled resize checks now pass, with thirty/twelve live frames and p95 33.9/62.2 ms. Both rotation checks still fail: only five/two live frames, p95 66.9/63.5 ms. Raw before/after phases are in `benchmarks/mask-rejection-2026-10-10.json`. These are instrumented single-run observations, and a passing resize frame count is not proof that 62 ms is snappy.
+
+The next issue is preview starvation: useCanvasRenderer permits an older same-stroke paint frame, but discards an older transform preview whenever a newer document preview is queued. Investigate gesture-scoped presentation that can display completed intermediate frames while rejecting frames after cancellation, commit, document switch, revision or viewport change. Continue reducing active mask/feather work as needed. The full responsiveness goal remains active; two performance failures remain visible.
+
+Validation follow-up: all 22 mask/patch browser checks pass, including transformed masks, feathering, exports, undo, persistence and coverage parity. Documentation build and whitespace checks pass. Two styled rotation performance checks remain failing.
+
+### Responsiveness: transform preview presentation during continuous input — 2026-10-10
+
+useCanvasRenderer now accepts completed intermediate frames from the same live App gesture while a newer transform preview is queued. It captures committed source snapshot and gesture identity, checks the live gesture ref, asset scope, region/zoom, font revision and backend state, and rejects old frames on cancellation, commit or document/revision changes. This addresses preview starvation without showing frames from a finished gesture.
+
+Six controlled browser tests hold a prepared frame, issue newer input and prove it presents during the same gesture but never after Escape, commit, document switch, zoom or committed revision change. Production build and TypeScript pass. All eight production transform cases now pass their live-presentation checks. Styled rotations present 29/15 live frames (five/twenty layers), versus 5/2 before; plain gestures retain thirty frames and p95 20–23 ms. Styled rotation p95 is still 72.6/72.5 ms, with median preparation 35.8/37.3 ms. More completed slow frames are now counted, so this improvement is restored feedback, not a claimed reduction in frame latency.
+
+Evidence is in `benchmarks/transform-gesture-presentation-2026-10-10.json`. The prior two failing checks are resolved, but the full responsiveness target is not: active styled rotation still needs lower preparation/scheduling latency, and broader coverage gaps remain. Continue phase attribution there while preserving stale-frame rejection. The full goal remains active.
+
+Validation follow-up: all 683 unit/API tests and five production paint/eraser/overlay latency checks pass, alongside the six delayed-frame browser checks and eight production transform checks. Documentation build and whitespace checks pass.
+
+### Responsiveness: bounded mask feathering — 2026-10-10
+
+The mask pipeline now crops numerical feathering to nonzero alpha bounds plus the full three-pass blur support, then restores the result into the original padded surface. This removes transparent-area worker/filter work without changing sampling geometry. Actual-WASM comparisons cover fractional radii, edges, full and empty coverage. All 684 unit/API tests and the production build pass.
+
+Four instrumented production styled-transform checks pass. Five/twenty-layer rotation feather calls have medians of 0.9/1.5 ms, versus 10.9 ms in the preceding five-layer profile. Rotation preparation medians are 25.9/27.2 ms; live frame p95 is 46.7/47.8 ms versus 72.6/72.5 ms in the prior presentation run. Thirty/twenty-one live rotation frames are measured. These single-run headless results measure input through canvas submission, not physical scanout. Raw evidence is in `benchmarks/feather-region-2026-10-10.json`.
+
+This is progress, not completion: styled rotation still exceeds a frame budget, and broad workflow coverage remains incomplete. Continue attributing remaining preparation and scheduling costs.
+
+Validation follow-up: all 22 mask/patch browser checks pass, including transformed and painted masks, feathering, export tiles, undo and persistence. Documentation build and whitespace checks pass.
+
+### Responsiveness: geometric mask interiors — 2026-10-10
+
+Additional optional transform instrumentation attributes five-layer rotation mask coverage to median 10.75 ms, including 5.4 ms selection generation, while raster drawing is 0.7 ms. The WASM sampler now accepts pixels whose complete conservative affine footprint is inside a single additive rectangle or ellipse. Boundary and uncertain pixels retain exact sixteen-sample evaluation. Actual-WASM parity coverage now includes thin geometry, reflected/sheared transforms and small sampling steps.
+
+All 685 unit/API tests, the production build and four styled transform checks pass. Five-layer rotation selection median drops to 4.2 ms and mask coverage to 9.8 ms. Five/twenty-layer rotation preparation medians are 24.75/26.6 ms, with 30/28 live frames. End-to-end p95 remains 48.9/48.8 ms; this run does not demonstrate a p95 improvement. Evidence and overlapping phase measurements are in `benchmarks/mask-interior-2026-10-10.json`. The full goal remains active: remaining surface/style composition and scheduling need attribution, alongside broader workflow verification.
+
+Validation follow-up: all 22 mask/patch browser regressions pass. Documentation build and whitespace checks pass. The render drain currently waits for requestAnimationFrame before each queued non-paint job; measure that scheduling delay separately before changing it.
+
+### Responsiveness: reuse transform frame boundaries — 2026-10-10
+
+The transform benchmark now records input-to-preparation wait separately from preparation. Baseline waits were approximately 16.7 ms across plain and styled gestures. The render drain now retains the next animation-frame promise at gesture preparation start and reuses it for subsequent jobs from that gesture. It avoids starting a fresh wait after the boundary already passed, while retaining single active preparation, latest-target coalescing and stale-frame rejection. Other document updates and ToolController paint scheduling retain their existing paths.
+
+All eight production transform cases pass. Median waits fall to 7.5–10.4 ms. Plain five-layer rotate/resize p95 changes from 20.9/20.3 to 14.2/16.3 ms; plain twenty-layer cases change from 22.4/22.0 to 18.0/21.4 ms. Styled five-layer resize improves from 33.4 to 26.4 ms and twenty-layer rotation from 60.6 to 52.8 ms. Styled five-layer rotation (43.6 to 45.2) and twenty-layer resize (44.2 to 45.0) show no p95 improvement. These single-run headless measurements do not establish physical display latency or a universal speedup. Evidence is in `benchmarks/transform-scheduling-2026-10-10.json`.
+
+Production build and six controlled stale-frame tests pass: same-gesture continuation presents, while cancel, commit, document switch, zoom and revision change reject held frames. Rendering work remains substantial in styled cases; the broad responsiveness goal remains active.
+
+Validation follow-up: all 685 unit/API tests and five production paint/eraser/overlay latency checks pass. Documentation build and whitespace checks pass.
+
+### Responsiveness: current production audit and clone feedback gap — 2026-10-10
+
+The full current production suite passes 34 behavioral checks in two minutes. Raw records are in `benchmarks/responsiveness-audit-2026-10-10.json`. Paint/pencil/eraser input-to-submission p95 spans 6.3–10.7 ms in the covered fixtures. Mixed editing p95 is 14.1 ms with no recorded long tasks. Text input medians are 11.4/12.3 ms for one/hundred lines. The 50 MP lifecycle preserves dimensions and sampled export pixels; import/reopen are about 312 ms, save 40 ms and export 3056 ms, with one 80 ms main-thread task.
+
+Passing these behavioral gates does not complete responsiveness. Spot healing median completion is 129.6 ms; 3 MP copy is 175.7 ms; styled transforms still exceed a frame budget. Dedicated latency evidence is also missing for Pen anchor editing, crop interaction and more complex documents.
+
+Inspection found a more fundamental clone gap: updatePaintPreview explicitly returns without showing sampled clone pixels. The old retouch fixture counted live frames only for tonal strokes, so fast clone commit timings hid this limitation. Instrumentation now counts every paintPreview; a fresh eight-stroke clone run records zero live frames. Evidence is in `benchmarks/clone-live-baseline-2026-10-10.json`. Commit/history checks still pass and must not be presented as proof of live clone responsiveness.
+
+Next priority is a real clone preview sourced from the pre-stroke document, with bounded sampling, preserved source alpha/selection/transforms, no provisional history mutation, and rejection/cleanup after cancellation or document changes. The final clone commit must match the preview and retain one undo entry. Add a live-feedback gate and pixel/cancellation comparisons when implementing this. This is pending work, not implemented behavior. The broad responsiveness goal remains active.
+
+### Responsiveness: live clone-stamp preview — 2026-10-10
+
+Clone now displays sampled source pixels during drawing. The source is the immutable pre-stroke document, with captured source offset and destination transform. Gesture-owned native tiles use a 15 MiB LRU and at most a 1024-square assembly surface. The preview bypasses PNG encoding and installs no document assets. Tile assembly follows final clone rectangles before transforming, fixing the antialiased seams found by exact rotated-layer parity tests. Existing brush coverage, pressure, opacity, selection and layer compositing are reused. GPU preparation explicitly delegates clone previews to the reference renderer.
+
+The new clone performance gate requires live frames, not only completed strokes. Eight production gestures now produce 57 live frames, with median 6.0 ms and p95 10.6 ms, versus zero before. Median release-to-commit presentation is 33.15 ms; no long tasks are recorded. This fixture is 698x396 with small strokes; large clone footprints and complex source documents still need latency evidence. Raw data is in `benchmarks/clone-preview-2026-10-10.json`.
+
+Eleven browser checks pass: exact preview/commit pixels on new and existing layers, rotated geometry, partially transparent source, opacity/flow and selection clipping; deferred-source cleanup on cancellation/document switch; and existing clone source composition, transformed/unlinked-mask, staged-asset cancellation, cross-document copy and persistence checks. Preview sampling leaves asset counts and history unchanged; commit creates one undo entry. Production build and five shared paint/eraser/overlay latency checks pass. The broad responsiveness goal remains active.
+
+Validation follow-up: all 685 unit/API tests pass. Documentation build and whitespace checks pass. The remaining large-footprint clone, healing, larger pixel-copy and styled-transform responsiveness work is not claimed complete.
+
+### Responsiveness: large clone encoding stall — 2026-10-10
+
+Added a production 50 MP clone fixture: a size-200 diagonal stroke across 6000 by 1500 document pixels, with live-frame timings, long tasks, PNG encoding phases, final sampled color, unchanged dimensions and one revision on release. An initial fixture sampled off the narrower preset stroke; it now configures clone after tool selection and checks the stroke center. The corrected baseline passes pixel assertions and shows 14 canvas.toBlob calls, each delayed roughly one second, yielding 14.30 seconds release-to-presentation.
+
+Clone capture now reads private RGBA from bounded readback surfaces and uses the existing direct PNG encoder. The corrected large fixture completes in 749.4 ms with no canvas.toBlob calls, while preserving sampled pixels and dimensions. The small-clone fixture retains 10.4 ms live p95; its 46.35 ms median completion is above the prior 33.15 ms single run, so no small-stroke commit speedup is claimed. Raw before/after records are in `benchmarks/clone-encoding-2026-10-10.json`.
+
+Production build, both clone performance cases and all 11 clone correctness/cancellation/persistence browser checks pass. Large-stroke live feedback remains slow: p95 186.9 ms, 16 long tasks with a maximum of 272 ms. The source cache currently samples and assembles the full growing stroke bounding rectangle, including areas outside the actual brush path. Next investigate conservative brush-footprint rejection for preview sampling and bounded work across frames; preserve exact transformed preview/commit parity. This is a partial fix, not completion of large clone responsiveness or the overall goal.
+
+Validation follow-up: all 685 unit/API tests pass. Documentation build and whitespace checks pass. Large-stroke live latency remains unresolved as recorded above.
+
+### Responsiveness: sparse clone source sampling — 2026-10-10
+
+Clone preview now rejects source-cache tiles and assembly rectangles outside a conservative brush-path footprint. The line-segment test includes full brush radius, interpolation/antialias margins transformed into local coordinates, and rounding allowance. It preserves full native sampling around every potentially covered pixel and leaves final brush/selection masking unchanged. Tile assembly retains the same grid as committed clone geometry.
+
+The 50 MP diagonal-stroke benchmark improves from 186.9 to 44.5 ms live p95, with median 19.25 ms and 32 measured live frames. Long tasks drop from 16 to one (122 ms); release-to-presentation is 593.4 ms. The small-clone fixture remains at 10.7 ms p95 with 56 live frames. Both performance cases preserve their pixel/history assertions. Single-run headless data is in `benchmarks/clone-region-2026-10-10.json`; it does not prove physical display latency or universal responsiveness.
+
+Two unit tests verify conservative rejection against independently sampled brush disks, crossings, endpoints and degenerate segments. Browser oracles compare full and sparse source sampling pixel-for-pixel with sheared geometry, variable pressure and reduced scale; existing rotated preview/commit and cleanup checks also pass. Production build passes. Large-clone commit remains above the desired response time, one long task remains, and other workflow coverage gaps are still open. The full goal remains active.
+
+Validation follow-up: all 687 unit/API tests and 13 clone browser checks pass on the final code, including exact sparse/full parity and existing transform, cancellation and persistence checks. Documentation build and whitespace checks pass.
+
+### Responsiveness: stop clone preview work on release — 2026-10-10
+
+Phase attribution measures 575.2 ms in native capture/encoding/asset creation out of 608.3 ms total release-to-presentation for the large-clone fixture. A bounded two-tile encoding experiment did not materially improve completion (600.2 ms) and increased the longest main-thread task to 171 ms; it was removed. Capture remains sequential. Its raw measurements are retained with the final evidence, not represented as implemented behavior.
+
+Released clone gestures now dispose preview source work immediately. The hook rejects queued or completed frames from disposed sources, including fallback frames, and suppresses expected preview cancellation errors. The last displayed preview remains visible until durable capture commits. The final native capture path is independent and retains its revision/asset cleanup checks.
+
+The instrumented large fixture completes in 535.5 ms versus 608.3 ms, with longest task 53 ms versus 110 ms. Small-clone median completion is 33.1 ms. Large/small live p95 is 28.8/7.0 ms, but late frames after release are now excluded, so this is not claimed as an equivalent-sample live-rendering speedup. Evidence and overlapping phase timings are in `benchmarks/clone-release-2026-10-10.json`.
+
+Twenty browser checks pass, including a new held-frame test that blocks durable asset completion, releases an old prepared preview, proves it never presents, verifies the prior displayed pixels remain visible, and confirms a single revision on commit. Existing clone pixel/parity/cancellation/persistence and transform stale-frame checks remain green. Both clone performance cases and production build pass. Native capture/encoding remains substantial, and broader responsiveness work remains active.
+
+Validation follow-up: all 687 unit/API tests, final production build and five clean production paint/eraser checks pass. The paint run was repeated after an overlapping build invalidated its timing conditions. Documentation build and whitespace checks pass. The broad responsiveness goal remains active.
+
+### 2026-10-11 — Installed system font discovery
+
+Added permission-triggered system font enumeration to Typography, deduplicated family choices, session reuse, refresh and recoverable permission/unsupported-browser states. Manual family entry remains available. This is local font discovery, not font embedding or cross-device font parity.
+
+2026-10-12 verification: five font browser cases pass (permission denial/retry, deduplication, refresh, unsupported enumeration, manual entry, persistence, undo and late font redraw). Native enumeration was attempted in both headless and headed Chromium with permission granted; this environment returns an empty catalog. The native discovery/rendering case explicitly skips for that condition; actual desktop font enumeration remains a manual verification gate. Font option merging is memoized so unrelated inspector updates do not rebuild the family catalog.
+
+### 2026-10-11 — Resumed responsiveness audit: Pen scaling
+
+Reviewed the pending Pen benchmark and expanded production coverage to 2,000 paths. Three cases pass gesture correctness (unchanged revision while dragging, exactly one commit, final anchor position and live presentation). Current input-to-canvas-submission medians are 10.1/22.4/120 ms for 20/200/2,000 paths; p95 13.9/29.5/136.1 ms. The 2,000-path release takes 207.2 ms, with 9.5 ms renderer preparation and repeated 100+ ms long tasks. These are observational timings, not acceptable performance gates. See `benchmarks/pen-response-2026-10-11.json`. The fixture includes off-artboard paths intentionally to expose total-layer scaling. CanvasOverlays currently transforms and constructs every anchor's SVG controls; isolate this cost next before choosing an optimization. The broad responsiveness goal remains incomplete, including prior large clone release and mixed-workload coverage gaps.
+
+### 2026-10-11 — Pen anchor reconciliation
+
+Memoized individual SVG anchor controls using numeric geometry/zoom/selection props. Production comparisons with all controls retained improve 200-path median drag from 22.4 to 17.2 ms and 2,000-path drag from 120 to 73.2 ms; large release drops from 207.2 to 117.4 ms. The 20-path median stays about 10 ms. Large-layer long tasks remain: this is partial progress, not completion. Evidence: `benchmarks/pen-anchor-memo-2026-10-11.json`. Production build and three production Pen cases pass; six mask browser regressions pass, including Pen anchor/handle editing, keyboard cancellation, undo and retained mask refinements. Added explicit live SVG anchor-position and full-control-count assertions to the Pen benchmark.
+
+### 2026-10-11 — Reuse unchanged Pen path controls
+
+Extended control reuse to entire paths, avoiding repeated transformed-point allocation and anchor element construction for unchanged geometry. Production 2,000-path median improves from 73.2 to 58.3 ms and release from 117.4 to 106 ms; 200-path median improves from 17.2 to 15.4 ms. Long tasks remain and further profiling is required. See `benchmarks/pen-path-memo-2026-10-11.json`. Build and all three production cases pass, including full anchor counts and live positions. Twelve mask/affine regressions pass initially; one additional affine-overlay fixture remained on Move after keyboard setup, so it now explicitly selects Pen and passes its unchanged transform/screen-size assertions on rerun. The early keyboard activation failure is not evidence of an overlay rendering failure, nor proof that shortcut timing is universally reliable.
+
+### 2026-10-11 — CPU profile of remaining Pen latency
+
+Added optional `LUMA_PROFILE=1` Chromium CPU sampling to the production Pen benchmark; raw samples are attached as `pen-cpu-profile`. The 2,000-path profile passes geometry/history/live-frame checks and records 61.2 ms median (profiling enabled, so not a replacement baseline). Mapping sampled function names back to the actual production bundle identifies the largest named JavaScript self-time entry (`eu`, 433 ms aggregate) as recursive React subtree traversal; repeated `fl` entries are React reconciliation. Schema parsing and canvas drawing are also present. These aggregates include the drag, release and test assertions, not solely frame preparation. The retained SVG representation contains 8,000 anchors with multiple elements each, even after memoization. Next investigate batching control geometry into fewer drawing primitives while preserving all anchors, handles, selected states, affine transforms and screen-size behavior; do not claim the remaining delay is solved by memoization. No runtime behavior changed in this profiling slice.
+
+### 2026-10-11 — Targeted Pen command copies
+
+Tested replacing per-anchor React controls with generated SVG markup. It retained controls but failed to improve production latency (2,000-path median 61.4 ms versus 58.3 ms); reverted the experiment. This weakens the earlier hypothesis that React control representation alone explains the delay.
+
+Instead extended immutable targeted copying to `path.update`, preserving full validation, defensive patch copying and unchanged sibling paths. Production median for 20/200/2,000 paths is now 8.8/12.6/29.2 ms; large release 48.1 ms (previous 106 ms), with three recorded long tasks instead of repeated long tasks across the drag. Three production cases pass live SVG positions, full control counts, one commit and final geometry. Added a nested-vector history regression covering sibling reuse, unchanged old snapshots, caller mutation isolation, rejected invalid geometry and undo/redo. Build passes. Evidence includes the rejected experiment in `benchmarks/pen-path-copy-2026-10-11.json`. Large-path and broader responsiveness work remain incomplete.
+
+Validation follow-up: all 688 unit/API tests and 13 Pen/mask/affine browser regressions pass for the targeted path-copy change.
+
+### 2026-10-11 — Dense single-path coverage
+
+Expanded the production Pen benchmark with one 8,000-anchor path, retaining the three existing multi-path fixtures. The dense case passes live control count/position and single-commit correctness but records 68 ms median, 82.2 ms p95 and 112.7 ms release, with repeated long tasks. Tested memoized 64-anchor control groups: 64.3 ms median, 70.5 ms p95, 121.3 ms release. Reverted this experiment because the limited improvement and slower release do not justify additional complexity. All four experiment cases passed correctness. Evidence: `benchmarks/pen-dense-path-2026-10-11.json`. The retained implementation is the prior path-level/anchor memoization and targeted path-copy change. Next inspect per-preview point-array copying/validation and compare targeted point updates with the same safety guarantees. Do not infer dense-path responsiveness from the many-short-path benchmark.
+
+### 2026-10-11 — Reuse immutable Pen point geometry
+
+Removed repeated cloning of unchanged anchor objects from existing-path previews while preserving an independent active-point snapshot per preview. The shared `path.update` command reuses only internally recursively frozen points and copies mutable caller points; full validation remains. Dense 8,000-anchor production median improves from 68 to 57.2 ms and release from 112.7 to 92.8 ms, with repeated long tasks still present. This is partial progress, not a dense-path responsiveness completion claim. Evidence: `benchmarks/pen-point-sharing-2026-10-11.json`. Production build and dense-path geometry/history checks pass; all 689 unit/API tests pass, including frozen-point reuse and mutable-caller isolation.
+
+Validation follow-up: 16 relevant browser regressions pass, including new vector paths, closing paths, anchors/handles, mask contours, affine coordinates, cancellation and undo; final type check passes.
+
+### 2026-10-11 — Cache immutable anchor validation
+
+Dense-path previews were reparsing every unchanged point even after geometry sharing. Document validation now reuses successful schema checks for internally frozen anchors, while retaining path-field checks and validating edited/mutable/new frozen points. Production dense-path median improves from 57.2 to 49 ms, p95 from 66.8 to 56.2 ms, and release from 92.8 to 80.5 ms. Repeated long tasks remain; responsiveness is not complete. Build, production dense-path correctness and all 691 unit/API tests pass. New parity cases compare document validation with the public path schema for malformed points, invalid handles, nonfinite coordinates, extra fields and excessive point counts, both mutable and frozen, including repeated attempts; mutable-point changes invalidate acceptance. Evidence: `benchmarks/pen-point-validation-2026-10-11.json`.
+
+Validation follow-up: all four focused browser checks pass (new/edited Bézier paths, transformed anchor hit testing, affine overlay screen sizes and mask contours); final type check passes.
+
+### 2026-10-11 — Remove accidental defensive point copies
+
+A new production CPU profile identified `VectorPath.points` getters as the dominant named self-time entries in dense-path interaction. The inspector was cloning all points just to count them, and hit-testing repeatedly read the getter in its loop. Inspector counts now use preview snapshot data; candidate hit-testing reads points once. Public defensive-copy behavior is unchanged. Dense-path median improves from 49 to 32.2 ms, p95 from 56.2 to 41.1 ms, release from 80.5 to 43.2 ms, with four long tasks recorded. Build and production geometry/history check pass. Five browser regressions pass, including a new 8,000-point path test editing anchor 199 and asserting fewer than ten defensive getter reads across the interaction; affine controls, contour creation, closing paths and undo also pass. Evidence: `benchmarks/pen-getter-copies-2026-10-11.json`. Broader performance scope and remaining dense-path frame delays are still open.
+
+### 2026-10-11 — Longer mixed editing and sustained painting audit
+
+Made mixed-session length configurable with `LUMA_MIXED_ROUNDS`, preserving the existing 15-round default. The 60-round production run exercises 180 brush/pencil/eraser strokes, 420 tool switches and repeated undo/redo on five styled 698×396 layers. Pointer positions wrap within the document for longer sessions. First/last 105 switches measure 11.7/11.6 ms median and 13.4/13.4 ms p95 (click to next animation frame after pressed-state update). History stays at 60, 181 paint records remain and autosave completes. The run records 32 long tasks, maximum 89 ms; stable switching does not prove all actions are responsive. Evidence: `benchmarks/long-mixed-session-2026-10-11.json`.
+
+A separate 60-stroke production painting run measures release-to-canvas submission: first/last 15 strokes median 14.9/14.4 ms, p95 19/17.1 ms. Evidence: `benchmarks/sustained-paint-2026-10-11.json`. Both browser checks pass and do not reproduce progressive latency growth in these fixtures. They do not measure physical display latency, mixed-session stroke latency, or explain the mixed-session long tasks; these remain follow-up scope alongside dense vectors and large clone/healing work. No runtime optimization was added in this audit slice.
+
+### 2026-10-11 — Mixed-session stroke completion and task overlap
+
+Extended the mixed-session harness to record tool-labelled release-to-committed-canvas timings and wait for each stroke presentation before proceeding. The 60-round production run records all 180 strokes. First/last 15 medians: brush 15.7/15.4 ms, pencil 14.7/14.8 ms, eraser 15.1/15.1 ms. Final-quarter p95 is at most 20.4 ms. The run passes its stroke-count, bounded-history, tool-switch and autosave checks. None of 26 long tasks overlap a measured stroke release interval; all overlap asynchronous thumbnail intervals, with maximum task 100 ms. This identifies thumbnail rendering as the next profiling target, not proven causation. Stroke pacing differs from the earlier mixed benchmark because presentation is now awaited. Evidence: `benchmarks/mixed-stroke-response-2026-10-11.json`.
+
+Current source inspection: `RasterEditing.thumbnail` requests a 64-pixel-bound render with `cache:false`; `LayerThumbnail` already debounces committed changes and pauses during gestures. Investigate replay/caching and main-thread work within thumbnail rendering instead of adding further debounce blindly. The broad responsiveness goal remains incomplete.
+
+### 2026-10-11 — Cache thumbnail rendering
+
+Enabled the existing bounded renderer cache in `RasterEditing.thumbnail` instead of forcing full replay. In the same 60-round production mixed-session fixture, thumbnail median falls from 46 to 2.8 ms and maximum from 100.1 to 4.2 ms. Recorded long tasks fall from 26 to zero. Stroke completion medians remain 14–16 ms across brush/pencil/eraser; all 180 strokes, 420 tool switches, bounded history and autosave checks pass. This supports thumbnail replay as the cause of the previously correlated stalls for this fixture, not a guarantee for every document. Evidence: `benchmarks/thumbnail-cache-2026-10-11.json`.
+
+Production build and 12 raster-editing/thumbnail browser checks pass. Added fresh-render PNG parity across 13 thumbnail states including paint, actual EraserStroke operations, color overlay, undo/redo and branching history. Corrected the initial test fixture's unsupported BrushStroke `erase` option before final parity rerun. The broad responsiveness goal remains incomplete, including dense vectors, large clone/healing and further workload coverage.
+
+### 2026-10-11 — Sparse committed Clone capture
+
+Rechecked current 50MP diagonal Clone release: 543.2 ms with 14 source tiles. Reusing the conservative stroke-region guard to skip untouched native capture rectangles reduces this to 391 ms and nine tiles, preserving the capture grid. One long task remains (51 ms); large-stroke release is still perceptibly slow. Evidence: `benchmarks/clone-sparse-capture-2026-10-11.json`.
+
+Build, final type check, all 691 unit/API tests and 14 Clone browser regressions pass. Added an independent full-source comparison for a committed diagonal clone at native resolution, 12.5%, 1% and 0.1% output scales; exact pixels match. Existing affine preview/commit, pressure, cancellation, stale-frame and asset cleanup checks pass. No completion claim for the broader responsiveness goal.
+
+### 2026-10-11 — Clone encoding experiment rejected
+
+Current phase profile: 388.3 ms release, 352.5 ms inside source capture; post-release render calls total 97.8 ms and asset registration 58.2 ms (nested phases, not additive to the total). Added a real-browser 1024² PNG microbenchmark for flat and patterned opaque tiles. Offscreen native encoding takes 7–9 ms versus direct RGBA encoding 23–45 ms and round-trips the fixture pixels. However, using main-thread OffscreenCanvas.convertToBlob in the real Clone workflow regresses release to 9,235 ms, consistent with roughly one-second scheduling delays per tile. Reverted the runtime experiment; retained the existing direct encoder and sparse capture. Do not choose the native encoder from the isolated benchmark alone. Further work should evaluate worker-side encoding/scheduling in the actual interaction context. Evidence: `benchmarks/clone-encoding-trial-2026-10-11.json`; microbenchmark in `tests/png-encoding.e2e.ts` uses the dev server and is not a production workflow result. Restored production build passes.
+
+Restored end-to-end Clone benchmark passes at 404.9 ms release, confirming the slow experiment is not retained.
+
+### 2026-10-11 — Worker-side Clone PNG encoding
+
+Moved private Clone tile readbacks to the existing pixel worker for native PNG encoding, with dimension validation and a direct-encoder fallback. Unlike the rejected main-thread native encoder, this avoids the per-tile scheduling stall. Initial production release was 324.2 ms; the final rebuilt production run records 278.9 ms, versus 404.9 ms for the restored direct-main-thread baseline. Both worker runs record no long main-thread tasks. Treat these as observed runs, not universal latency guarantees; roughly 0.3 seconds still leaves work toward the full responsiveness objective. Evidence: `benchmarks/clone-worker-encoding-2026-10-11.json`.
+
+Final build and production 50MP correctness pass. All 693 unit/API tests pass, including exact fallback bytes for missing/failing native encoders and invalid-dimension rejection. Fourteen Clone browser checks pass, including partial transparency, affine preview/commit parity, sparse native/overview pixels, cancellation and staged asset cleanup. Worker/helper refactoring was followed by the final production workflow run.
+
+### 2026-10-11 — Healing encoding trial rejected
+
+Rechecked eight production spot-healing strokes: 114 ms median, 148.5 ms maximum, no long main-thread tasks. Donor-search calls take roughly 39–63 ms in the measured phases; cumulative adjustment compositing also contributes. Tested the newly available worker PNG encoder for Healing output. Median became 121.9 ms (maximum 131.7 ms), again with no long tasks, so reverted it rather than generalizing the Clone improvement to smaller patches. Restored production build passes. No runtime change retained in this slice. Evidence: `benchmarks/healing-encoding-trial-2026-10-11.json`. Next investigate donor search and growing patch-layer compositing; the small sample does not establish a universal encoder comparison or complete responsiveness.
+
+### 2026-10-11 — Reuse successful host retouch workers
+
+Source inspection found a new worker/WASM startup on every host Healing/Patch operation. Retain one idle processor after successful operations while keeping exclusive ownership per active request, termination on cancellation/failure, and disposal of all retained/active workers with the editor. Production spot-healing median improves from 114 to 79.2 ms. Warm donor calls drop to roughly 5–6 ms versus 39–63 ms before; the first cold call remains 56.3 ms. No long main-thread tasks were observed. Evidence: `benchmarks/healing-worker-reuse-2026-10-11.json`.
+
+Build, all 693 unit/API tests and eight Healing/Poisson/scripting browser checks pass. A new lifecycle regression verifies warm reuse, cancellation without document changes, worker discard/replacement and editor-disposal release. This does not finish the full responsiveness goal or establish a retained-worker memory ceiling; rendering/commit delay and broader workloads remain open.
+
+### 2026-10-11 — Prevent accumulated Healing patch replay
+
+Extended stress mode to Healing and Clone (32 gestures) rather than only Dodge/Burn. The current Healing stress fixture reproduced growth: first/last eight median 76.9/181.25 ms, maximum 212.8 ms. Cached completed plain patch composites with exact immutable backdrop guards reduce these to 59.45/74.2 ms, maximum 112.8 ms. Existing shared renderer byte/entry limits apply; metadata is separately capped at 64. Evidence: `benchmarks/healing-patch-cache-2026-10-11.json`.
+
+Build, all 693 unit/API tests and nine Healing/Poisson/script browser checks pass. A new 15-state pixel parity test checks cached versus uncached output after backdrop drawing, alpha changes, patch opacity, affine transforms, undo/redo, visibility changes and cache reset. The goal remains active: residual Healing growth, dense vectors, large Clone release and unmeasured tool/workload combinations still prevent a broad completion claim.
+
+### 2026-10-11 — Full production responsiveness re-audit
+
+Ran all 39 production performance-suite checks sequentially against the current build: all correctness assertions pass in 2.8 minutes. Retained raw fixture observations in `benchmarks/responsiveness-audit-2026-10-11.json`. These are observational timings, not 39 passing latency gates; the run primarily exercises Canvas2D and does not establish hardware-GPU performance.
+
+Paint/pencil/eraser live-input p95 spans 5.5–11.5 ms across empty, 5-layer, 20-layer, raster-erasure and styled fixtures. Remaining explicit ≤33 ms live-input target failures include 2,000-path Pen p95 42.5 ms, one 8,000-anchor path 44.2 ms, styled rotation 45.4–49.3 ms and styled resize 43.4–51.1 ms. Larger clipboard work is also perceptible: 2000×1500 copy 166–201 ms, wand 101–120 ms, alpha selection 55–74 ms and paste 32–38 ms. Document switching has a 90.5 ms cold first sample despite subsequent roughly 9–12 ms samples. These measurements identify remaining work; no completion claim is justified.
+
+Next actionable target: evaluate the now-tested worker-side captured-PNG encoder within clipboard processing, measuring real workflow latency and preserving selection alpha/crop/paste pixels. Continue tracking remaining transforms, dense vectors, large-image completion/progress/cancellation and missing crop/scripting/real-hardware coverage. This audit added evidence, not runtime changes.
+
+### Clipboard native worker encoding — 2026-10-11
+
+Retained native worker PNG encoding for copy after exact browser-decoded pixel comparison across all 256 alpha values and 10 raster-editing browser checks. Production 2000×1500 copy median improved from about 168 ms to 129 ms; paste stayed around 32 ms. The 698×396 copy median was 17.7 ms. Recorded raw timings in `docs/benchmarks/clipboard-native-2026-10-11.json`. This remains incomplete against the broad responsiveness goal: the larger fixture still had a 54 ms main-thread task and frame gaps up to 66.7 ms; dense vector and styled transform p95 and large Clone commit remain outstanding.
+
+### Combined selection-mask feather worker — 2026-10-11
+
+Profiled styled transforms, then combined raw selection coverage and feathering in one worker operation. At 20 styled layers, rotation mask generation median decreased from 13.4 to 10.0 ms and input-to-presentation median from 37 to 33.3 ms. Rotation p95 remains about 43 ms; resize median is roughly unchanged (27–28 ms). Exact canvas-pixel comparisons cover rotated and multi-tile masks. Raw before/after data: `docs/benchmarks/selection-feather-worker-2026-10-11.json`. Further scheduling/compositing work remains necessary; this is not completion of the responsiveness target.
+
+### Transient transform cache writes — 2026-10-11
+
+CPU profiling found canvas copies dominated styled rotation, including raw cache writes for transient command-preview layers. Skip those writes while retaining unchanged immutable layers. In profiled production runs, 20-layer rotation median improved 34.3→29.8 ms and p95 39.9→34.6 ms; resize median was 25.6 ms and p95 28.4 ms. Raw evidence: `docs/benchmarks/transform-preview-cache-2026-10-11.json`. Timing is observational and rotation still exceeds the 33 ms p95 target. Added optional CPU-profile attachment to the existing transform benchmark for subsequent investigations.
+
+### Clone bounded-pipeline experiment — 2026-10-11
+
+Re-measured 50 MP diagonal Clone release at 270 ms (241 ms source capture), then tested at most two capture/encode/decode jobs in flight. Trials were 270 and 241 ms, with a 59 ms long task in the first; 12 experimental browser checks passed, including draining late assets after cancel and decode error. Rejected the runtime change because a repeatable responsiveness benefit was not established, and restored sequential capture. Evidence: `docs/benchmarks/clone-pipeline-trial-2026-10-11.json`. Next investigation should reduce captured pixels inside intersecting source tiles rather than add asynchronous state.
+
+### Crop unused Clone source pixels — 2026-10-11
+
+Reduced retained source-tile rectangles to conservative stroke support at native resolution. On the 50 MP diagonal fixture, captured pixels fell from 7,368,150 to 3,238,531 across the same nine tiles; source capture fell 241→139 ms and release-to-presentation 270→181 ms, with no long tasks in either measured run. Evidence: `docs/benchmarks/clone-capture-crop-2026-10-11.json`. Added sampled-stamp containment coverage and dense diagonal overview comparisons; broad responsiveness work remains open.
+
+The stronger patterned partial-alpha comparison exposed an existing difference between native tiled capture and one full-image reference (max unpremultiplied channel deltas 128/85 at native scale and 15 at 1/8 scale). Disabling the new crop reproduced it. The optimization is checked against the original tiled pipeline for this case; uniform full-source reference checks remain at four zoom levels. This discrepancy is unresolved and must not be represented as full-image reference parity.
+
+### Expanded responsiveness audit — 2026-10-11
+
+All 39 existing production performance cases passed after the Clone and transform changes. Added two production fixtures for crop, image resize, isolated scripts and undo at 800×600 with 5/64 layers (64 is the current model limit). Both pass state/undo checks; timing starts at DOM/script invocation, not a dialog click. Raw data: `docs/benchmarks/responsiveness-followup-2026-10-11.json`.
+
+Five-layer crop median was 20 ms, resize 48 ms, script 107 ms, without long tasks. At 64 simple layers, crop/undo/resize/script presentation medians were about 227/259/387/397 ms, with 200–400 ms main-thread tasks. This is a newly measured major gap, not successful responsiveness. Next priority is profiling large layer-count recomposition and shared-cache pressure. Dense Pen p95 remains 40–43 ms and styled rotation 37–38 ms. Clone release measured 157 ms in the broad run. No editor-wide completion claim is justified.
+
+### Compact raw layer cache — 2026-10-11
+
+Profiled the 64-layer stalls: canvas copies into the cache and paint-surface allocation dominate. Cache raw paint/raster surfaces only within conservative occupied bounds with integer placement offsets, keeping the existing 64 MiB/64-entry budget. Measured 64-layer crop median 227→163 ms, resize 387→262 ms, undo-crop 259→181 ms and script 397→326 ms. Exact cached/reference pixel checks, including affine transforms, partial alpha, masks, paint append, raster erase, history and Clone, passed (17 browser cases); 694 unit tests and build/type checks pass. Evidence: `docs/benchmarks/compact-layer-cache-2026-10-11.json`. Large layer-count operations still miss the responsiveness target; per-stroke temporary surface work remains a profiling lead.
+
+### Direct-fill experiment rejected — 2026-10-11
+
+Re-profiled after compact caching: native save/setTransform in paint rendering still dominate, with cache copies reduced. Tested bypassing the isolated fill surface. General affine direct fill changed antialiased edge channels by 1–2 values; restricting to output-pixel-aligned rectangles restored exact parity but did not materially improve performance (64-layer crop 159 ms, resize 269 ms versus compact-cache baseline 163/262 ms). Removed the fast path and its experiment-only test. Source evidence: `docs/benchmarks/direct-fill-trial-2026-10-11.json`. Next investigation is bounded layer working surfaces rather than retained-cache cropping alone.
+
+### Bounded raster/fill working surfaces — 2026-10-11
+
+Reduced working dimensions, not just retained cache dimensions, for eligible raster and unclipped fill-only layers. General brush cropping exposed pixel differences and was not retained. Exact cached/reference checks cover partial alpha, transformed/fractional fills, raster opacity, masks, history and raster erasure. At 64 layers, crop median improved 163→56 ms, resize 262→57 ms, undo-crop 181→64 ms and script 326→182 ms. Long tasks fell from repeated 146–254 ms events to two events at 52/53 ms. These remain incomplete responsiveness results; the next bottleneck needs profiling. Raw evidence: `docs/benchmarks/bounded-layer-surfaces-2026-10-11.json`.
+
+### Direct bounded-cache presentation — 2026-10-11
+
+Avoid a temporary isolated canvas when an eligible bounded raw layer is already cached. Production 20-layer plain brush/pencil p95 improved from 15.4/16.7 ms to 8.7/8.7 ms; all measured paint p95 values were 5.7–10.2 ms. Large document-operation timings did not improve (64-layer crop/resize/undo around 60 ms, scripts around 191 ms); these still require work. Raw timings: `docs/benchmarks/bounded-cache-hit-2026-10-11.json`.
+
+### Retain more small cache entries — 2026-10-11
+
+After reducing layer surfaces, profiling still showed cache eviction/copy costs. Permit 256 shared CanvasCache entries within the unchanged 64 MiB byte budget, keeping per-key versions at 64. Production 64-layer crop median improved 61→25 ms; undo-crop 62→24 ms, undo-resize 60→26 ms and undo-script 58→19 ms. Resize remained 61 ms and script 169 ms, with one 71 ms task. New browser tests exercise mixed canvas/RGBA entry eviction, byte limits and clearing. Raw evidence: `docs/benchmarks/small-cache-capacity-2026-10-11.json`. Browser/driver object overhead may increase with the larger entry count; specialized cache limits were not changed.
+
+### Equivalent transform cache keys — 2026-10-12
+
+Added document-operation phase timings. Five-layer scripts spent about 93 ms inside the isolated runner; 64-layer scripts about 144 ms. Image resize instead spent about 39 ms in render preparation. Equivalent resized matrices were recreated with new immutable identities, invalidating content signatures despite identical values. Encode these small transform records by value. Repeated 64-layer resize median presentation improved from 72 to 31 ms; preparation after the first call was 2.5–4.4 ms. First uncached resize remained 69 ms. Added cache identity/invalidation regression for equivalent and different resizes. Raw evidence: `docs/benchmarks/transform-signature-2026-10-12.json`. Script startup and cold rendering remain open.
+
+### Smaller scripting iframe bootstrap — 2026-10-12
+
+Deliver the trusted runtime string by structured message instead of embedding it inside each srcdoc script. Keep fresh frame/worker lifetimes, existing CSP and host validation; validate that initialization comes from the parent. Two production trials measured 64-layer script presentation at 145/157 ms versus 168 ms before. Five-layer results remained about 93–102 ms, so this is not a general script-startup solution. Evidence: `docs/benchmarks/script-bootstrap-2026-10-12.json`. Browser isolation/network denial/timeout/rollback/revision checks and 695 unit tests pass. Further runtime startup/execution profiling remains needed.
+
+### Immutable transaction staging — 2026-10-12
+
+Added a test-only instrumented scripting runtime to separate initialization, document reconstruction and command execution. The 64-layer transaction spent about 38 ms executing because intermediate DOM snapshots were mutable, forcing full-document cloning after the first command. Freeze validated staged snapshots so existing targeted-copy/share logic applies throughout the batch. Worker command execution fell to 15 ms; ordinary production script presentation measured 120 ms. Rollback, one-step undo, earlier-stage stability and untouched drawing identity are covered; 696 unit tests, five scripting/plugin browser checks, build and type check pass. Evidence: `docs/benchmarks/transaction-staging-2026-10-12.json`. Runtime startup and remaining rendering/input targets are still open.
+
+### Dense Pen preview overhead — 2026-10-12
+
+Profiles identified repeated temporary arrays in path bounds and full mutable-preview serialization. Removed both while preserving every SVG anchor/handle. Production 2000-path p95 measured 26.5 ms versus about 40 ms in the prior broad audit. The directly profiled 8000-anchor fixture improved median 28.5→25 ms and p95 39.1→36.1 ms, still above target. Four benchmark cases assert retained control counts, moved-anchor position and one commit. Added Bezier-handle and degenerate-bounds checks; 698 unit tests pass. Evidence: `docs/benchmarks/pen-preview-overhead-2026-10-12.json`.
+
+### Pen element reuse trial — 2026-10-12
+
+Tested a per-view WeakMap of immutable anchor geometry and active/inactive React elements, preserving every SVG control. The production 8000-anchor fixture did not improve: median 25→25.4 ms and p95 36.1→37.8 ms. Removed the candidate cache; retained the earlier numeric-prop/path memoization and preview bounds/cache fixes. All four benchmark correctness checks passed, but the candidate recorded long tasks, so it does not close the responsiveness gate. Raw timing/profile evidence: `docs/benchmarks/pen-element-reuse-trial-2026-10-12.json`. Dense SVG presentation, styled transform latency, cold large-layer operations and scripting startup still need work; do not repeat this element-identity cache without new evidence.
+
+After removal, build and 19 browser checks passed. The restored 8000-anchor fixture measured median 25.5 ms / p95 37 ms and also recorded long tasks, confirming no demonstrated candidate benefit rather than attributing those stalls specifically to the cache.
+
+### Script snapshot copy — 2026-10-12
+
+Profiled the remaining scripting boundary. A direct host/worker channel did not improve ordinary or stroke-heavy scripts and was removed. Retain the starting recursively immutable document revision until messaging copies it, avoiding the runner's redundant `toJSON()` clone; mutable inputs keep the defensive fallback. A production 64-stroke/64000-point read-only fixture improved median 381.9→349.6 ms, with a 352 ms repeat. Five/64-layer small-payload startup remained roughly unchanged. Added a browser check for stable starting data across concurrent host edits and staged rollback. Evidence: `docs/benchmarks/script-snapshot-copy-2026-10-12.json`. Heavy scripts and fresh-worker startup remain above responsiveness goals; this is a bounded copy reduction, not completion.
+
+Validation: production build, type check, 698 unit tests and 13 script/plugin browser checks pass, including snapshot retention across host edits and staged rollback.
+
+### Document reconstruction copy — 2026-10-12
+
+Added separate reconstruction timing to the 64000-point scripting diagnostic. `Document.fromJSON()` deep-copied metadata immediately before `EditorStore` deep-copied it again. Removed the first copy while retaining validation of the original schema, root-only version migration, and the store's owned copy/freeze. Reconstruction median improved 183.2→135.5 ms (132.2 ms repeat); full script median 360→328.2 ms (326.9 ms repeat). Added checks for nested input independence, mutable caller data, undo, legacy migration and validation before upgrading. Evidence: `docs/benchmarks/document-construction-copy-2026-10-12.json`. Heavy script responsiveness and other outstanding tool/startup targets remain open.
+
+Validation: 700 unit tests, production build and type check pass. All 17 selected browser cases are verified: 16 passed initially; a stale schema-14 expectation was changed to the current schema constant and the affected smart-object case passed on rerun. This includes the full-resolution 50 MP workflow.
+
+### Single document validation pass — 2026-10-12
+
+Consolidated `Document.fromJSON()` validation/migration into store construction. The store copies metadata once, validates that exact snapshot using its supplied schema, then upgrades and freezes the owned document. This removes duplicate full-tree validation while preserving legacy-field rejection, input independence and retained-history validation. New checks cover default version preservation, explicit migration, invalid retained histories and changing input accessors. Final production reconstruction median was 105.2 ms versus 132.2–135.5 ms before; script median was 290 ms versus 326.9–328.2 ms. Intermediate trials measured 262–265 ms scripts before moving validation onto the exact owned copy; keep the stronger ownership boundary and report final timings. Evidence: `docs/benchmarks/document-validation-pass-2026-10-12.json`. Small-script startup and broader rendering/input latency remain unresolved.
+
+Validation: 702 unit tests and 17 browser checks pass, including the 50 MP workflow and shared-master reopening. Production build/type check and performance fixtures pass; measured timings remain observational rather than a claim that responsiveness targets are globally met.
+
+### Broad responsiveness audit and color preview pacing — 2026-10-12
+
+All 43 existing production performance fixtures passed their correctness checks. Brush/pencil/eraser p95 measured roughly 6–10 ms; sustained five-layer paint median/p95 15/19.2 ms and mixed-session tool switching 10.8/13.3 ms. Styled rotations remain above target (38.7/41.2 ms p95), dense Pen is borderline (33.1 ms), and cold document switching/import work still records long tasks. The audit does not prove editor-wide completion. Raw evidence: `docs/benchmarks/responsiveness-audit-2026-10-12.json`.
+
+Added two color-preview performance cases because prior tests covered correctness without latency. They exposed a double animation-frame wait: ColorInput waited for a frame before the renderer scheduled another. Coalesce input bursts within the task, retain cancellable tokens, and leave rendering frame-paced. Five-layer median improved 33.2→16.7/17.65 ms and twenty-layer median 33.3→24.2/20.35 ms across two trials, with no recorded long tasks. Completion still commits once; previews do not add history; undo restores the color. Added an actual-canvas check that Escape in the same task cannot resurrect a queued preview. Evidence: `docs/benchmarks/color-preview-scheduling-2026-10-12.json`. The performance suite now includes 45 cases.
+
+The queued-cancel test caught a same-task native-input display issue: batched state returned to its initial value, allowing React to skip resetting the DOM value. Finishing an edit now restores that value explicitly. Eight adjustment browser cases and all three color cases pass (color cases rerun after the fix); 702 unit tests pass.
+
+### Bounded styled working surfaces — 2026-10-12
+
+Styled rotation profiling showed substantial full-viewport canvas copying plus about 9.2 ms median mask preparation. Extended bounded raster/unclipped fill-only surfaces to masks, overlays and shadows, including conservative shadow margins. Normal blending, full fill opacity, no Blend If and no active stroke remain eligibility conditions. Cropping alone still allocated temporary surfaces for unchanged styled layers; direct finished-cache hits now avoid them using the same halo key and appearance signature as the inner compositor.
+
+The profiled twenty-layer styled rotation improved median 33.8→16.8 ms and mask preparation 9.2→3.3 ms. Final five/twenty-layer styled rotation p95 measured 24.5/27.1 ms; all eight rotate/resize benchmark cases passed. Added exact full-reference pixel checks for transformed partial-alpha raster/fill layers, feathered masks, shadows, overlays, clipping, undo and cache reuse; expanded coverage includes transparent backgrounds and inverted/unlinked masks. Raw evidence: `docs/benchmarks/styled-working-surfaces-2026-10-12.json`. Broader cold-document, dense-Pen and startup responsiveness remains open.
+
+Validation: 702 unit tests and all 44 selected browser cases are verified. One old fixed brush-stamp count failed identically on the pre-change renderer; the test now verifies incremental work relative to replay, zero repeated work and correct cache-clear replay (20/0/1152/1152 observed). Exact styled-pixel parity includes transparent backgrounds and inverted, unlinked, partial-density masks. A non-profiled repeat measured rotation p95 26.7/24.2 ms and resize p95 24.6/25.5 ms for five/twenty layers.
+
+### Cold paint replay scratch reuse — 2026-10-12
+
+The updated document-switch fixture still showed an 83 ms first uncached switch and a 68 ms main-thread task. Reuse a cleared replay-local scratch canvas instead of allocating one full-region surface per ordinary stroke; preserve Clone's replacement surfaces and all per-stroke state boundaries. First-switch latency measured 68.3/68 ms in two trials while warm switching stayed about 12 ms. Long tasks remain 60 ms, so cold replay still misses the responsiveness target. Exact fresh-per-stroke comparisons cover mixed clipped/pressure/opacity brush strokes, erasing, Clone, pencil and fills at multiple scales/affine placement. All 29 selected browser cases and 702 unit tests pass. Evidence: `docs/benchmarks/paint-replay-scratch-2026-10-12.json`.
+
+Live regression measurements: all 11 paint/sustained-paint production cases pass. Live input p95 ranged 5.8–8.2 ms; sustained release-to-presentation p95 was 18.8 ms. No broader completion claim is made.
+
+### Cooperative cold paint replay — 2026-10-12
+
+Cold-switch profiling identified canvas copying as a major cost. Cropped source-rectangle copies changed low-alpha pixels and were rejected. Destination clipping and dirty-region clearing preserved pixels, but cold timings varied from 62.7 to 69.8 ms against a 68 ms baseline; removed both rather than retain complexity without a consistent benefit. The strengthened fresh-surface/full-composition oracle now includes tiny pressure-sensitive pencils at 800% zoom.
+
+Retained cooperative yielding between strokes after approximately 12 ms, using a MessageChannel task with prompt port cleanup. The recorded 60 ms main-thread task disappeared in two final switch trials; cold completion became 81.4/86.5 ms, with warm switching around 12 ms. This is an explicit responsiveness/throughput tradeoff, not a faster-completion claim. A browser test verifies the actual Pencil control updates before a 96-stroke replay finishes. All 30 selected browser cases and 702 unit tests pass. Single expensive strokes/native operations can still exceed the budget. Evidence: `docs/benchmarks/paint-replay-scheduling-2026-10-12.json`.
+
+Final 12 ms-budget live checks: all 11 paint/sustained-paint production cases passed, with input p95 5.3–7.9 ms and sustained release-to-presentation p95 18.4 ms. The interaction test and exact-pixel oracle pass on the retained implementation.
+
+
+### Yielding within cold paint strokes — 2026-10-12
+
+A 1200-point soft-brush stress fixture reproduced the remaining single-stroke input block: the actual Pencil control updated only after replay completed, about 1189 ms after render began. Extracted the unchanged stamp interpolation into a shared iterator so cold replay can yield every 32 stamps when its time slice expires. Active incremental previews remain synchronous. The private scratch surface, exact stamp order, pressure/spacing, clipping and final-frame presentation remain intact.
+
+A 12 ms slice allowed controls during replay but still delayed them about 120–130 ms and recorded multiple 50–66 ms tasks. A 4 ms trial reached about 65 ms. Retained a 2 ms slice: three local trials reached 33–36 ms, with completion around 1376–1435 ms. Two recorded no long tasks; one recorded 56 ms, so this is not a claim of universal long-task elimination. The initial baseline observer cannot capture its own already-running task; its 1189 ms elapsed control time, rather than the incomplete long-task list, establishes the original input block.
+
+Final production live input p95 ranges 5.4–10.7 ms across brush/pencil/eraser and styled/raster cases; sustained release-to-presentation p95 is 19.5 ms. Cold accumulated-paint document switching now completes around 95.3 ms, with no recorded long tasks and warm median 11.8 ms. The increased cold completion time versus the prior 81–87 ms slice is an explicit responsiveness/throughput tradeoff. Native canvas operations, each stamp batch, bounds scans and offscreen segment scans remain synchronous; obsolete replay cancellation and broader editor responsiveness remain open.
+
+Validation: 702 unit tests / 94 files, 9 paint/rendering browser tests, 12 production latency cases and final benchmark build/typecheck pass. The sandbox-only unit attempt could not bind localhost for two REST suites; rerunning with localhost permission passed all tests. New pixel coverage compares the long cooperative stroke exactly with synchronous preview under pressure, flow, opacity, elliptical clipping and affine placement. Existing mixed-stroke and incremental pixel oracles pass. Two existing test setup races became visible during validation: the brush test could send its shortcut before selection changed (failure snapshot showed Move still selected), and the warm-cache instrumentation shared a renderer with startup invalidation/viewport work. The pixel test now clicks Brush and verifies selection; the cache test awaits fonts and owns/disposes its renderer. No pixel or cache assertions were weakened.
+
+Raw evidence: `docs/benchmarks/paint-stamp-scheduling-2026-10-12.json`. This advances the full responsiveness objective without declaring it complete.
+
+### Cancel obsolete viewport preparation — 2026-10-12
+
+The previous cooperative replay still occupied the serialized viewport drain until an obsolete frame finished. Switching away from a cold 1200-point brush document reproduced 1448 ms of waiting in dev. Added an internal cancellation predicate to viewport RenderOptions, checked at replay yield/stroke boundaries, Canvas layer/final-output boundaries and GPU composition/reference boundaries. Nested smart-document references inherit it. Existing `finally` paths release incomplete temporary canvases; obsolete work cannot publish a frame or write new retained Canvas pixels. Expected cancellation does not trigger adaptive GPU fallback or a user-facing rendering error. Direct renders and export without a predicate retain their independent lifetime.
+
+The hook shares cancellation/presentation eligibility and preserves useful same-stroke or same-transform prefixes. Source revision and asset identity changes are detected directly, before React queues the next frame. Final dev trials presented replacement pixels in 79–93 ms. A controlled production comparison on the same build, with only the predicate disabled in the test wrapper, measured 1326 ms without cancellation versus 37.5/30.7 ms enabled. Both modes verified replacement pixels; enabled mode also verified that the obsolete preparation aborted rather than completed. The production benchmark supports `LUMA_CANCEL_BASELINE=1` for reproducible control measurements.
+
+Final production live drawing p95 is 6.3–8.1 ms across ten brush/pencil/eraser fixtures, and sustained release-to-presentation p95 is 20.4 ms. All eight transform latency cases also pass their behavior assertions; raw timings remain observational, not a global performance certification. Evidence: `docs/benchmarks/render-cancellation-2026-10-12.json`.
+
+Validation: 35 browser regression cases passed across paint, transform continuation/cancellation, export cancellation and real SwiftShader GPU rendering. After the direct source guard, all 13 affected hook/browser scenarios passed again. A new GPU cancellation/recovery test verifies AbortError and correct pixels from the next real GPU texture; the initial test incorrectly attempted headless swapchain readback, so it now uses the existing frame texture readback facility. The full production run passed 20 cases plus the disabled/enabled repeat. Final 702 unit tests / 94 files and benchmark build/typecheck pass. One initial unit failure came from a mock editor without assetStore; the fixture now supplies real identity semantics and additionally asserts same-stroke validity and source-revision cancellation.
+
+Cancellation remains cooperative: native canvas calls and in-progress workers/GPU submissions are not preempted. Physical-GPU performance, dense Pen, heavy scripts, large-image operations and the rest of the broad responsiveness objective remain open.
+
+### Pen control allocation — 2026-10-12
+
+Re-profiled dense 8000-anchor editing on the current production build. Generic React prop comparison and overlay point allocation remained visible alongside bounds, rendering and test-harness costs. Compare all eight PenAnchor geometry/zoom/selection props directly, avoiding per-anchor Object.keys arrays. Compute affine anchor/handle coordinates directly into SVG props and outline strings instead of allocating transformed point and handle objects. Every existing SVG line, circle and rectangle, including off-artboard controls, remains present in the same order. No geometry, hit testing, document mutation, shortcut or API contract changes.
+
+Controlled unprofiled dense-path p95 improved 33.6→29.5 ms, with a 29.6 ms repeat; median improved 27.4→24.8/24.4 ms. Profiled before/after p95 measured 32.9→27 ms. All four multi-path/dense correctness cases pass, including all 8000 controls, live anchor positions, unchanged preview revision and one commit. Release timing varies (33.7 ms before, 38.8/49 ms after), and other fixtures do not show a uniform speedup; do not extrapolate this result to all vector operations. Long tasks remain in intervals that include expensive Playwright DOM assertions, so their source is not isolated by this benchmark.
+
+Rejected two SVG representation experiments: simply omitting coincident handle shapes changed antialiased edge pixels (maximum tested channel difference 7). Shared SVG use references preserved the tested pixels but did not improve dense latency and slowed release in its trial. Both were removed. Direct prop comparison alone removed a named CPU cost but did not show a clear latency gain; retained only the combined allocation change measured above.
+
+Verification: 34 mask/affine browser cases, all four production Pen fixtures plus dense repeat, 702 unit/API tests across 94 files, and production build/typecheck pass. Strengthened the existing mask-Pen case to verify active/inactive anchor fills, live anchor x/y, and handle x/y before commit/cancellation. Raw timing/profile evidence: `docs/benchmarks/pen-control-allocation-2026-10-12.json`.
+
+The 2000-path fixture still takes roughly 30 seconds overall despite a short drag interval. Inspection shows detached PathCollection.add repeatedly calls VectorLayer._drawingCommand through execute on a full layer snapshot; profile/measure this construction path next. Large-image operations, heavy scripts, recorded long tasks and broad cross-device/sustained responsiveness remain open. This is not an editor-wide completion claim.
+
+### Vector construction and path command sharing — 2026-10-12
+
+A direct production benchmark isolated the long 2000-path Pen fixture setup: detached construction took 25,968.8 ms and attachment 56.5 ms. Every detached path add executed a mutable full-layer copy, repeatedly cloning/validating accumulated geometry. Added path.add/path.remove to immutable targeted command copying. Detached VectorLayer drawing commands now defensively copy mutable fields into a private immutable snapshot, retain only registry-proven immutable fields, execute with full validation, and freeze successful results before assigning fields back to the existing mutable layer shell. This preserves detached parent-group references and path handles while allowing unchanged geometry to share validation proofs. No API signature, script permission, payload budget, path-count limit or undo contract changed.
+
+Production detached construction measured 542.4/536.1/522.7 ms across three retained runs (about 50× faster than the measured baseline), with attachment about 49.6–50.9 ms. An attached 2000-path transaction completed in 470 ms and retained one-step undo/redo. A 750-path script completed through the real isolated worker and host commit in 356.7 ms with one revision and exact undo/redo. The attempted 2000-quad-path script exceeds the pre-existing 40,000-value command payload budget; retained this as explicit atomic-rejection coverage rather than relaxing the trust boundary or claiming that script workload is supported. Its failure leaves revision/document unchanged.
+
+Four new unit cases cover detached group/shell ownership, retained immutable sibling geometry, mutable caller isolation, path updates/removals, styles after construction, attachment undo/redo, rejected invalid/duplicate inputs, inherited locks, mutable execute inputs and unchanged 2048-path overflow behavior. All 706 unit/API tests across 95 files pass. Eight production construction/Pen cases and 42 editor/affine/mask browser regressions pass; final benchmark build/typecheck passes. Pen p95 spans 12.4–30.5 ms in the retained run. The sandbox-only test attempt could not bind the REST test servers; the localhost-permitted rerun passed. One browser launch hit an automatic approval-review timeout and succeeded when retried with file edits separated from the test command.
+
+Evidence: `docs/benchmarks/vector-construction-2026-10-12.json`. Large host-side construction remains synchronous at roughly half a second, and full path-array traversal/validation remains; this is not constant-time insertion or a global responsiveness completion claim. Heavy user scripts stay in the isolated worker. Large-image operations, host commit/startup overhead and sustained cross-device responsiveness remain open.
+
+### Ordered copy/paste input — 2026-10-12
+
+A controlled browser regression held clipboard worker completion and sent two paste shortcuts. Both were silently dropped by the UI busy gate (one original layer remained instead of three). The UI now queues these requests during its own copy task and executes them serially after successful copy, retaining individual undo steps and stale-document checks. A narrow registry opt-in permits this action during busy state without enabling unrelated commands or bypassing text-input/modal guards. Escape and blur discard requests that have not started. Copy processing time is unchanged; this addresses input reliability during asynchronous work, not overall completion latency.
+
+Validation: baseline regression failed with both paste requests lost. After the fix, all 12 raster browser cases passed; expanded complete/Escape/blur/concurrent-edit cases then passed (4/4). Production build/typecheck and 707 unit/API tests across 95 files pass, including busy opt-in and modal guards. The broader preceding production audit passed all 50 behavior cases; raw records are retained in `docs/benchmarks/responsiveness-followup-2026-10-12.json`. At 3 MP, copy p95 remained about 149 ms and wand 117 ms with no recorded long tasks; small-document pixel operations were approximately 17–27 ms. The 50 MP recorded 77 ms long task begins before import measurement, so attribution remains unresolved. These results do not establish editor-wide responsiveness or physical-device parity.
+
+### Clipboard bounds scan — 2026-10-12
+
+Production copy measurements isolated roughly 36 ms of 3 MP capture from a 128 ms total median. The worker scanned every visible pixel to update all four crop bounds, then copied the full RGBA image even when bounds were unchanged. Find only the first and last nonzero alpha in each row and reuse the private captured buffer for full-size crops. Keep selection masking and PNG encoding unchanged.
+
+Three-megapixel copy median improved 128→102 ms, with a 102.5 ms repeat; maximum of five samples improved 151.1→117.3/109.4 ms. Small-document median improved 15.3→12.4/13.1 ms. Capture stayed about 36 ms in the main comparison. Both final runs recorded no long tasks. Exact worker tests compare full-scan crop bounds and every cropped RGBA row for dense/sparse/edge/single/empty patterns, with and without fractional elliptical selection masking. Evidence: `docs/benchmarks/clipboard-crop-2026-10-12.json`. This benchmark uses dense image content; timings are local observations, and 3 MP completion still exceeds an instant interaction budget. Large pixel operations, scripting and broad sustained/cross-device responsiveness remain open.
+
+Validation: 708 unit/API tests across 96 files, all 16 selected raster/PNG browser cases, two production pixel-operation cases in each of baseline/final/repeat runs, and the final benchmark production build/typecheck pass. Native PNG, partial-alpha clipboard behavior, source retention, undo, stale-copy rejection and queued paste cancellation retain their existing browser checks.
+
+### Magic-wand scanline flood fill — 2026-10-12
+
+The retained clipboard benchmark measured 3 MP wand median 112.5 ms. Hoisting seed premultiplied color and short-circuiting channel comparisons alone measured 109 ms, too small to describe as a decisive gain. Replaced per-pixel four-neighbor queue traversal with cached horizontal-run discovery and typed-array range fills. The pending stack contains run seeds, avoiding a preallocated full-image 32-bit index queue; output and byte state buffers remain native-resolution. No tolerance, hidden-RGB, connectivity or API changes.
+
+Final 3 MP medians measured 93.9 ms and 91.8 ms on repeat, approximately 18% below the preceding 112.5 ms baseline; maximum-of-five samples was 108.6/102 ms versus 124.8 ms. Small-document medians varied 26.1/21 ms versus 23.6 ms, so no uniform small-image speedup claim. Both final runs recorded no long tasks. Added an independent full-image color-distance/four-neighbor reference check across 24 randomized, alpha-island and winding-corridor fixtures, nine tolerances and both contiguous modes. The production fixture now verifies every encoded wand coverage run, in addition to existing paste/layer checks. Evidence: `docs/benchmarks/wand-scanline-2026-10-12.json`. Three-megapixel completion remains above live-input targets; capture, coverage encoding, large operations and broader editor responsiveness remain open.
+
+Validation: 709 unit/API tests across 96 files, 14 raster-editing browser cases plus 2 outline/feathered-selection cases, both production pixel-operation cases on each final run, and final benchmark production build/typecheck pass. The first browser invocation included a nonexistent `selection.e2e.ts` filter and therefore ran only raster cases; the actual outline/feathered files were then run separately and passed. No threshold was weakened and no broad performance completion claim is made.
+
+### Native capture buffer ownership — 2026-10-12
+
+Profiled shared pixel capture used by wand, transparency, clipboard, healing and patch/donor sampling. Native readback and tile assembly remain substantial costs. Tried wider strips within the existing one-megapixel area budget; exact patterned-raster comparison failed (maximum channel difference 28 unstyled / 42 transformed and masked). Reverted that experiment, preserving the original 1024×1024 grid.
+
+Retained direct ownership of the fresh readback buffer when a capture fits one tile, eliminating an extra full RGBA allocation and row copying (1,105,632 bytes for 698×396, up to 4 MiB for 1024×1024). Multi-tile captures whose tiles span the full requested width use a single contiguous copy per tile. Tile positions, resolution, release/cancellation guards and source ownership remain unchanged. Added exact browser comparisons against original square-tile assembly for 698×396, 698×1500 and 2000×1500, including partial alpha, fractional placement, affine transform and feathered masks.
+
+Observed small capture medians changed from 3.6/3.4/3.8 ms to 2.9/2.9/3.4 ms for wand/transparency/copy. Three-megapixel capture remains roughly 32–35 ms; timing differences are small and do not establish a broad speedup. Evidence: `docs/benchmarks/native-capture-copy-2026-10-12.json`. Larger readback, heavy scripts and sustained/cross-device responsiveness remain unresolved.
+
+Validation: 709 unit/API tests, 22 raster/healing/native-sampling browser cases, both production pixel-operation cases, and final benchmark build/typecheck pass. The new exact-pixel cases pass on the retained original-grid implementation. The rejected strip experiment remains documented rather than weakening pixel assertions.
+
+### Sustained-use follow-up and move snapshot reads — 2026-10-12
+
+Ran 60 mixed editing rounds on the reported five-layer 698×396 shape: 180 brush/pencil/eraser strokes, 420 tool switches, undo/redo and autosave. First/last 30 tool-switch nearest-rank p95 measured 13.5/13.7 ms (medians 10.1/10.6 ms); first/last stroke presentation medians were 16.05/16 ms. No long tasks were recorded. Deep-history undo/redo and sustained paint also passed. Raw evidence: `docs/benchmarks/sustained-followup-2026-10-12.json`. This covers a specific workload, not the whole editor.
+
+Inspection found a missed Move-tool bottleneck: `movePatch()` serialized the entire document for every coordinate calculation. Added production drag cases with zero and 64,000 retained paint points. Hidden source artwork isolates metadata copying from replay. Baseline heavy dragging made 32 full copies (1,341.5 ms total), with live median/nearest-rank p95 49.9/71.9 ms and release 89.2 ms. Use the existing immutable snapshot for pure parent/layer transform reads in pointer movement and keyboard nudging. Final heavy median/nearest-rank p95 measured 8.9/15.7 ms, with an 8.8/31.1 ms repeat and zero full copies. First final release measured 8.1 ms. The light control remains about 8 ms median.
+
+Both fixtures verify unchanged preview revision, exact final translation, one commit and undo. The performance suite now includes 52 cases. Initial fixture setup used an invalid exact Ready-text locator, then an ambiguous status-dot selector; corrected it to the actual footer's working indicator before collecting baseline timings. Evidence: `docs/benchmarks/move-snapshot-2026-10-12.json`. No public API, snapshot ownership, pixel geometry or history contract changed. Broader heavy operations and sustained cross-device responsiveness remain open.
+
+Validation: 709 unit/API tests across 96 files, all 48 affine/layer-selection/mask/transform-presentation browser cases, both production move cases in baseline/final/repeat, and final benchmark production build/typecheck pass. Three production sustained/history cases also pass. Nearest-rank p95 is recorded explicitly in the artifact; earlier interim commentary used a lower-index percentile estimate. The final heavy repeat p95 is 31.1 ms, showing variability despite the consistent ~8.8–8.9 ms median and elimination of document copies.
+
+### Inspector rotation snapshot reads — 2026-10-12
+
+Audited remaining UI serialization calls after the Move-tool fix. The rotation slider still called `dom.toJSON()` for every preview. Added native-pointer production slider cases with zero and 64,000 retained hidden paint points. Baseline heavy rotation made 31 full copies (1,278 ms total), with median/nearest-rank p95 49.05/55.1 ms. Replace that pure spatial-read copy with `getSnapshot().document`; no rotation math or command boundary changes. Final initial median/p95 was 7.2/11 ms with zero copies. Both light/heavy cases verify preview revision stability, final angle from the actual slider value, one commit and undo. The initial fixture correctly exposed that Ctrl+Z is ignored while an input is focused; the test now blurs the slider before invoking the application shortcut.
+
+The performance suite now contains 54 cases. Evidence: `docs/benchmarks/inspector-snapshot-2026-10-12.json`. Remaining UI copy sites include new-layer naming/parent lookup, export-dialog props and selected-raster metadata presence checks; inspect their actual cost and ownership semantics next. Large readback, heavy operations and sustained cross-device responsiveness remain open.
+
+The repeat measured heavy median/p95 7.1/11.3 ms, with zero document copies. Further inspection identifies a stronger follow-up: `LayerMetadata.toJSON()` currently calls `layer.toJSON()` before extracting metadata, and the always-rendered raster AssetInfoPanel calls it plus another whole-layer copy for the reset-button state. Raster layers with many eraser points can therefore copy geometry on every inspector render, even when only metadata presence is needed. Preserve metadata getter ownership while measuring/removing those copies next.
+
+Validation: 709 unit/API tests across 96 files, all 24 layer-transform/transform-presentation browser cases, both production rotation cases in baseline/final/repeat, and final benchmark production build/typecheck pass. This includes affine-parent rotation, keyboard adjustment, single-step undo and stale transform presentation/cancellation. Broad responsiveness remains active.
+
+### Raster metadata copies during tool switching — 2026-10-12
+
+Added production tool-switch cases with a visible raster containing zero or 64,000 eraser points. Baseline heavy switching triggered 242 whole-layer copies (10,084.4 ms total across 30 tool switches), median/nearest-rank p95 85.9/96.3 ms, and 91 recorded long tasks up to 212 ms. `LayerMetadata.toJSON()` serialized the entire owner before extracting metadata; AssetInfoPanel also serialized the whole layer for its reset-button state even while collapsed.
+
+Read metadata through the owner's internal live data and clone only that subtree. Pass metadata presence from the inspector's existing snapshot. Preserve absent-versus-explicit-empty metadata semantics, live handles, staged transactions, validation, lock behavior and defensive keyword/JSON copies. Final heavy median/p95 measured 9.25/13.9 ms, with an 11.55/14.1 ms repeat and zero whole-layer copies. Light controls remain roughly 10–12 ms median. Each final heavy run still records one 87–89 ms long task; do not claim their elimination.
+
+Added ownership coverage across detached/attached handles, returned keywords, transactions, reset, undo and removed handles, plus browser reset-button checks for an explicitly empty metadata record and undo. The production suite now contains 56 cases. Evidence: `docs/benchmarks/metadata-copy-2026-10-12.json`.
+
+A separate CPU-profile run identifies remaining recovery work: about 41.7 ms self time in recovery save preparation, 36.5 ms in checkpoint JSON encoding, and 37.4 ms in its IndexedDB success callback. `RecoveryRepository.save` still clones the full document, and `checkpointDigest` stringifies/encodes it on the main thread. The profile is saved locally at `/tmp/luma-raster-inspector.cpuprofile`; the summary artifact retains the finding. Optimize those save paths next while preserving checkpoint checksums, asset lifetime capture and atomic recovery semantics. Large operations and broader sustained/cross-device responsiveness remain open.
+
+Validation: 710 unit/API tests across 96 files, all 18 metadata/raster browser cases, both production tool-switch cases in baseline/final/repeat, the separate diagnostic profile, and final benchmark production build/typecheck pass. The initial browser run had one obsolete schema-5 expectation; it now compares against SCHEMA_VERSION, and all four metadata cases passed on rerun. Initial typechecking also caught an overly broad prop insertion and an unused benchmark binding; both were corrected before final builds and measurements. Public metadata signatures and serialization values are unchanged.
+
+### Recovery snapshot copy — 2026-10-12
+
+The preceding CPU profile found roughly 42 ms in recovery-save preparation on a 64,000-point raster document. RecoveryRepository.save validated and then cloned even store-owned immutable snapshots. Retain those registry-proven immutable snapshots directly; mutable or merely shallow-frozen caller objects still receive defensive deep copies before any await. Asset capture, checksum bytes and transaction durability are unchanged.
+
+In the same production tool-switch fixture, the previously recorded 87–89 ms task became 50 ms in one final run and absent in a repeat. Tool-switch median/p95 remained 9.55/13.3 ms and 9.45/13.5 ms. These observations do not establish universal long-task elimination: JSON checksum encoding and IndexedDB cloning remain synchronous. Added browser coverage that mutates caller names/nested text and advances the live document while saves are pending; saved checkpoints must retain the original values for mutable, shallow-frozen and immutable inputs. Evidence: `docs/benchmarks/recovery-snapshot-2026-10-12.json`. Larger save payloads and the rest of the broad responsiveness objective remain open.
+
+Validation: 710 unit/API tests across 96 files, all 11 recovery/quota browser cases (including new ownership coverage), two production heavy-raster measurement runs, and final benchmark build/typecheck pass. Corrupt-checkpoint fallback, original source checksums, independent tabs, atomic write failure and browser-enforced quota recovery remain verified.
+
+### Cooperative checkpoint JSON encoding — 2026-10-12
+
+Expanded raster-inspector diagnostics to accept LUMA_ERASER_POINTS. A 256,000-point trial exposed a measurement gap: initial recovery work can finish before that fixture begins observing. Added dedicated production recovery cases that await startup recovery/workspace saves, then save while scheduling a real Pencil control update. Native encoding measured control response 48.9/118.3 ms and save completion 122.5/374.2 ms for 64,000/256,000 points. The large case also recorded a 222 ms storage task. The final observer includes every task overlapping the save window; earlier start-only filtering could omit the initial call's blocking task, so do not compare summed long-task time across these runs.
+
+Added stable-data cooperative JSON encoding and use it for checkpoint checksums. Preserve native ordering, formatting, escaping, sparse/undefined array entries, object omissions and shared subobjects. Reject cycles/non-data serialization. A first token-by-token version improved control response to 12.6/16.4 ms but slowed saves to 390/1594 ms. Retained bounded native batching of up to 64 shallow records instead: final response 11.8/12.2 ms and completion 152.4/556.6 ms; repeat 11.3/11.7 ms and 153.8/548.7 ms. This is an explicit responsiveness/throughput tradeoff. Exact native checksum comparisons pass in both production cases, including the large document.
+
+The 256,000-point case still records 178–180 ms IndexedDB work. The next storage step must address large-object cloning without reintroducing it through an unbounded worker postMessage. Cooperative UTF-8 bytes provide a potential transferable transport, but worker-backed persistence is not implemented. Keep original recovery schema, digest compatibility, source ownership, atomic failures, quota handling and corruption fallback intact. Evidence: `docs/benchmarks/recovery-json-scheduling-2026-10-12.json`. The performance suite now includes 58 cases; the broad responsiveness goal remains open.
+
+Validation: 713 unit/API tests across 97 files, all 15 recovery/quota/paint browser cases, both dedicated production recovery cases in final/repeat, and final benchmark build/typecheck pass. JSON tests cover exact UTF-8 equality (including surrogate handling, large strings, nested arrays, numeric key order, omitted values and shared records), actual yielding, and rejection of cycles/custom serialization. Recovery corruption fallback and native hash compatibility remain verified.
+
+### 2026-10-12 — Large recovery persistence worker
+
+Transferred cooperatively encoded checkpoint bytes into a per-job worker for large saves, preserving atomic storage, three-revision retention, checksums, and quota error names. A production 256k-point checkpoint previously caused a 180 ms main-thread task; the first worker measurement had no observed long tasks, 13.7 ms tool response, and 580.5 ms total save (previous 548.7 ms). The 64k-point case completed in 184.2 ms with 12.2 ms tool response and no observed long tasks. This improves interactivity, not total save speed. Added large-checkpoint retention/corruption fallback coverage and routed the native Chromium quota scenario through the worker. Full responsiveness remains an open objective, including recovery reads, large exports and other synchronous work.
+
+Worker follow-up validation: 713 unit/API tests passed, 12 initial recovery browser cases passed, and the native quota test passed with large worker-bound metadata on an isolated repeat. The first quota run overlapped a build and lost the expected recovery session; it is recorded as an invalidated run, not hidden as a pass. Production repeat: 64k/256k saves 202.4/580.9 ms, controls 11.8/12.1 ms, no observed main-thread long tasks, exact native checksum oracle preserved. Build/typecheck passed. Evidence: `docs/benchmarks/recovery-worker-2026-10-12.json`.
+
+### 2026-10-12 — Recovery dialog listing responsiveness
+
+A production fixture containing three retained 256k-point revisions exposed a 280 ms main-thread task and a 289.5 ms animation-frame gap when listing recovery entries. The dialog now requests minimal display summaries from a worker cursor over the existing store. The first measurement had no observed long tasks and a 17.1 ms maximum frame gap; list completion increased from 303.8 to 405.4 ms. Full checkpoint inspection, restoration and document schema remain unchanged. The benchmark isolates the per-document list rather than claiming to measure every other Recovery panel request. Added summary equivalence checks against full entries, including ordering and exclusion of artwork/history fields. Cross-tool responsiveness and other large-operation stalls remain open.
+
+Listing repeat: 375 ms completion, 16.8 ms maximum frame gap, no observed long tasks. Validation: 713 unit/API tests, 12 recovery/quota browser tests, three production save/list cases and one repeated production list case passed; final build/typecheck passed. Measurements are recorded in `docs/benchmarks/recovery-list-worker-2026-10-12.json`. The performance suite now includes 59 cases; this turn reran only the affected cases.
+
+### 2026-10-12 — Recovery preparation responsiveness
+
+A three-revision, 256k-point fixture exposed 289, 160 and 350 ms main-thread tasks during checkpoint reading, integrity checking and project preparation; its maximum frame gap was 356.4 ms. Recovery now sends the checkpoint ID into the worker and receives the fully prepared project Blob and restore metadata. The first production result had no observed long tasks and a 17.7 ms maximum frame gap. Completion changed from 876.9 to 951.6 ms, reflecting worker overhead rather than a throughput improvement. Added byte-identical output comparison with the direct preparation path and missing-checkpoint error coverage. Full project opening and rendering remain separate responsiveness work; the benchmark measures preparation only.
+
+Preparation repeat: 964.3 ms completion, 17.8 ms maximum frame gap, no observed long tasks. Validation: 713 unit/API tests, 12 recovery/quota browser tests, and two post-change production preparation runs passed; final build/typecheck passed. Worker and direct prepared project SHA-256 hashes match. Evidence: `docs/benchmarks/recovery-restore-worker-2026-10-12.json`. The performance suite now includes 60 cases; only the affected preparation benchmark was timed in this turn. The broad all-tools responsiveness objective remains incomplete.
+
+### 2026-10-12 — Project opening copy profile
+
+Added a production project-open fixture using a prepared 698×396 project with 256k retained paint points. Baseline opening took 940.2 ms with a 923 ms main-thread task. CPU sampling identified approximately 177 ms in layer-handle construction and 155 ms in public document serialization used for recovery scheduling. Attached handle creation now shares the document-owned record, and replacement schedules recovery from the immutable snapshot. The first follow-up took 701.6 ms with a 678 ms task. Both measurements used CPU sampling; this is a partial improvement, not a passed responsiveness gate. The follow-up profile still showed about 177 ms in EditorStore construction and 80 ms in recursive freezing, with substantial schema validation work. Public serialization and external fromJSON ownership remain defensive. Added restored-handle checks covering transactions, copies, duplication, removal and undo.
+
+Opening repeat with CPU sampling: 626.9 ms completion, 621 ms maximum frame gap, 612 ms long task. Validation: 714 unit/API tests, 26 project/recovery/workspace browser cases, final build/typecheck and two post-change production opening runs passed. Evidence and top sampled frames: `docs/benchmarks/project-open-copies-2026-10-12.json`. The performance suite now includes 61 cases; this turn timed the new project-open fixture only. Large-project opening remains visibly blocking and is not complete.
+
+### 2026-10-12 — Cooperative project preparation and immutable store reuse
+
+The project-open profile's remaining store copy and recursive freeze were addressed by incrementally freezing the private parsed document, then reusing only registry-proven immutable data during store construction. Migration owns a new root; untrusted mutable/shallow-frozen inputs are still copied, and validation remains mandatory. First production result with CPU sampling: 497.2 ms opening, 207.7 ms maximum frame gap, and 195/137 ms long tasks, versus the preceding 626.9–701.6 ms opening and 612–678 ms long task. Added immutable-proof, ownership/migration, invalid-input, and asynchronous document-change protection coverage. Large project opening remains blocking in other phases; this is not a completed responsiveness gate.
+
+Cooperative preparation repeat: 501.6 ms opening, 204.8 ms maximum frame gap, 191/147 ms long tasks. Validation: 717 unit/API tests across 98 files, 27 project/recovery/workspace browser cases, final build/typecheck and two post-change production opening runs passed. Evidence: `docs/benchmarks/project-open-freeze-2026-10-12.json`. These measurements still contradict a claim that large-project opening is fully responsive; parsing and validation need further work.
+
+### 2026-10-12 — Shared validation scheduling during project opening
+
+Converted document validation to one traversal consumed synchronously by existing callers and cooperatively by the internal project-opening path. Immutable preparation now precedes initial binary-manifest validation, allowing drawing checks to run between task boundaries and their existing proofs to be reused during store construction. No validation rules or external ownership semantics were removed. The first production opening measurement was 458.1 ms with a 51.2 ms maximum frame gap and no observed long tasks, versus the preceding ~205 ms frame gaps and 137–195 ms tasks. Added equivalence/rejection fixtures, an event-loop yielding check, and mutable-input rejection for the cooperative helper. This fixture does not cover worst-case single strokes, large component definitions, retained history, or legacy JSON parsing.
+
+Validation scheduling repeat: 516.9 ms opening, 58.9 ms maximum frame gap, no observed long tasks. A 15-round mixed editing session completed 45 strokes and 105 tool switches with no long tasks; stroke presentation median/p95 16/20.5 ms and switching median/p95 11.6/13.8 ms. Routine keyboard/layer interactions passed. Validation: 720 unit/API tests across 99 files, 27 project/recovery/workspace browser cases, final build/typecheck, two post-change opening runs and two additional production editing cases passed. Evidence: `docs/benchmarks/project-open-validation-2026-10-12.json`. Absence of ≥50 ms tasks does not imply 60fps, and unmeasured worst-case documents remain outside this evidence. The all-tools responsiveness goal remains active.
+
+### 2026-10-12 — Full responsiveness audit and dense-pen cursor scope
+
+Ran all 61 production performance cases after project validation scheduling: all correctness assertions passed in four minutes. The evidence still includes latency gaps; passing cases are not universal performance gates. Small-image pixel operations measured medians of 11.6–19 ms, while 3 MP copy/transparency/wand measured 110.2/65.4/94.6 ms. The 50 MP export took about three seconds. Recovery worker cases had no observed long tasks. Raw records: `docs/benchmarks/responsiveness-audit-2026-10-12.json`.
+
+Dense-pen long tasks prompted CPU and event-phase profiling. Moving the test's geometry query outside the measured interval did not remove the stalls, disproving the initial harness-only hypothesis. First hover still incurred roughly 110–135 ms native work. Narrowing custom-cursor CSS and keeping the inert SVG cursor stable removed that first-hover long task in both the 2000-path and 8000-anchor fixtures. One ~85 ms pointer-down task remained in the 8000-anchor case; this is not a complete dense-pen fix. The pen benchmark now records hover/down/move/commit timestamps and long-task start times, with optional raw CPU profile output for attribution. Canvas/handle cursor behavior is tested separately.
+
+Cursor follow-up validation: all three cursor browser cases and all four pen production fixtures passed after the final build/typecheck. The added cursor fixture was corrected to use valid six-digit colors, the registered Pen shortcut with explicit keyboard focus, and actual raster resize controls. The repeat retained 50–81 ms tasks in dense fixtures, but no recurrence of the preceding 110–135 ms first-hover task. Movement p95 was 24.8 ms for 2000 four-anchor paths and 32.9 ms for one 8000-anchor path. Evidence: `docs/benchmarks/cursor-style-scope-2026-10-12.json`. The full 61-case audit predates this small cursor change; post-change verification was scoped to affected cursor and pen behavior. Large pixel operations, dense pointer-down work, scripts and worst-case documents remain performance follow-ups.
+
+### 2026-10-12 — Dense pen pointer-down copies
+
+Browser timeline tracing narrowed the remaining 8000-anchor pointer-down task: event dispatch took 71.6 ms, with roughly 38 ms in the event callback and 33 ms in the subsequent React callback; nested layout was only about 1.6 ms. CPU sampling alone had previously left much of this work unattributed. Pen begin/hit testing was still copying public point arrays and the full path despite already holding immutable document data. Those internal reads now reuse document path records and copy only the active anchor for the gesture. First follow-up dispatch was 15.7 ms. Movement p95 remained about 31.8 ms and another 58 ms task was still observed, so dense-pen responsiveness is not complete.
+
+The dense-pen browser check now verifies unchanged document geometry during preview, no public point-array copies, commit, undo and Escape cancellation. All 13 tools/cursor browser checks passed. The first full unit run had one validation-fixture setup timeout; its 64×1000-point workload was preserved while constructing serialized fixture data directly instead of repeatedly adding through the DOM. The suite is rerun rather than treating the timeout as a pass.
+
+Pen-begin repeat: pointer-down dispatch 17.7 ms for the 8000-anchor fixture (baseline 71.6 ms, first follow-up 15.7 ms). Its movement p95 was 28.1 ms with no observed long tasks. The 2000-path repeat still recorded one 56 ms task and 23.8 ms movement p95. Validation: all 720 unit/API tests passed on rerun, 13 tools/cursor browser cases passed, final build/typecheck passed, and all four production pen fixtures passed. Evidence: `docs/benchmarks/pen-begin-snapshot-2026-10-12.json`. First access to restored path handles remains a separate unmeasured case; the broad responsiveness goal remains active.
+
+### 2026-10-12 — First access to restored vector path handles
+
+Added production measurements for first path access after `Document.fromJSON()`, outside document construction or rendering. The old owned-handle factory parsed public constructor options and cloned the full path again: one 20000-anchor path cost 63 ms, while 64×1000-anchor paths cost 151.2 ms and caused corresponding long tasks. Owner-backed handles now retain only a small identity record and resolve live path data through their owner. Shape factories and public returned-copy ownership remain unchanged. Initial follow-up measured 0.4/1.3 ms and ~17 ms frame gaps with no long tasks. Added restored-path tests for nested returned-copy mutation, transaction reads, immutable source snapshots, removal, undo and independent duplicates. These are first-access measurements, not a full reopened-document interaction benchmark.
+
+Final first-access repeat: 0.5 ms for one 20000-anchor path and 1.5 ms for 64×1000-anchor paths; maximum frame gaps 16.8/16.7 ms, no observed long tasks. All four unprofiled production pen editing fixtures also passed, with no observed long tasks in this run. Validation: 721 unit/API tests, 12 tools/workspace-history browser cases, final build/typecheck and six final production cases passed. Evidence: `docs/benchmarks/path-handle-access-2026-10-12.json`. The performance suite now contains 63 cases; this turn reran the six affected fixtures. Other large operations and worst-case interaction latency remain open.
+
+### 2026-10-12 — Task breaks between native capture tiles
+
+Profiled copy, transparency selection and wand captures at 3 MP took about 39–41 ms each and could join several native canvas tiles into one UI task. Added budgeted task breaks between released tiles, retaining the exact tile grid and byte assembly. In the first production profiled follow-up, maximum frame gap fell from 50.1 to 33.4 ms and observed long tasks fell from two (50/53 ms) to zero. Copy median stayed 110.3→110.2 ms; wand 107.4→100.6 ms; transparency selection 82.6→74.9 ms. The small-document control remained approximately unchanged. These are single-run observations, not universal responsiveness guarantees. Native per-tile canvas readback, full-buffer allocation and overall operation latency remain optimization targets. Added cancellation coverage proving that an input-time abort prevents the next tile render and that the previous surface was released before yielding. Evidence: `benchmarks/capture-task-scheduling-2026-10-12.json`.
+
+Validation: 722 unit/API tests across 100 files, 17 raster/capture browser tests, final production build/typecheck and both repeated production cases pass. Repeat 3 MP maximum frame gap was 33.4 ms with no observed long tasks; operation medians were copy 119.2 ms, wand 121.2 ms, load-transparency 76.5 ms, paste 34.7 ms. Variation in completion time remains; this change improves task scheduling without claiming all pixel operations are snappy.
+
+### 2026-10-12 — Autosave worker transport baseline
+
+Added two production autosave cases with 64k/256k hidden stroke points and five retained undo entries. They time actual worker postMessage calls, control response before save completion, and main-thread long tasks, and verify automatic workspace storage contains the expected named project. These checks do not claim full reopened-history correctness; existing workspace-history regressions cover that contract. At 256k points, baseline/repeat transport took 67.8/68.3 ms synchronously, tool response 85.6/85.9 ms, and total save 1068.6/1103.1 ms. Each run recorded one 71–73 ms UI task. The 64k control had 13.6/13.9 ms transport and 22/22.4 ms tool response, with no long tasks. This confirms worker offloading alone leaves main-thread structured-clone work. No production optimization is claimed for this slice. Next: bound transport per UI task while preserving sharing across document/history snapshots; naive independent JSON encoding would duplicate retained artwork. Evidence: `benchmarks/workspace-transport-2026-10-12.json`. The performance suite now contains 65 cases.
+
+### 2026-10-12 — Bounded autosave graph transfer
+
+Replaced whole-document/history worker postMessage with cooperative plain-data graph batches. Reference identities preserve shared artwork across history snapshots instead of serializing every retained snapshot independently on the UI thread. Capture owns history containers before yielding, retains only proven immutable document data, and copies mutable caller data defensively. Worker reconstruction still passes through existing validation and project encoding; no storage format or history budget changes.
+
+First production 256k-point result: tool response 18.1 ms (baseline 85.6–90 ms), no observed long tasks (baseline 71–75 ms tasks), total save 1654.2 ms (baseline 1068.6–1154.1 ms). The increased background completion cost is explicit. New unit coverage checks shared identities, chunk scheduling, sparse arrays, safe own-property handling and cancellation. A browser test compares full project SHA-256 output against the existing serializer while mutable callers/live documents change, runs concurrent encodes and checks disposal. Existing workspace reload/undo/redo, history-only assets and failed-write retry tests remain required. Broad performance completion is still unproven.
+
+Final repeat: 256k-point tool response 12.9 ms, largest individual postMessage 3.9 ms, no observed long tasks, total save 1846.6 ms. The 64k control responded in 15.1 ms with no long tasks and saved in 467.8 ms. Validation: 725 unit/API tests, seven affected browser cases, final build/typecheck and two production cases in each of two runs pass. Evidence: `benchmarks/workspace-graph-transfer-2026-10-12.json`. Background throughput and peak-memory work remain open alongside other interaction gaps.
+
+### 2026-10-12 — Full post-transport responsiveness audit
+
+All 65 production performance cases passed their correctness assertions in 4.5 minutes. Brush/pencil/eraser live input p95 was 5.6–8.7 ms across the existing 0/5/20-layer styled/raster fixtures. Pixel operations, recovery saves, repeated retouching and sustained painting recorded no long tasks in this run. Dense Pen cases still recorded 65 ms (2000 paths) and 52 ms (8000 anchors) main-thread tasks during movement; their movement p95 was 24.7/30 ms. Project opening took 489.8 ms with a 51.9 ms maximum frame gap, despite no recorded long task. One 53 ms task remains in document operations. The 50 MP test's 82 ms task started before the import measurement and overlaps its beginning; this trace does not attribute it solely to import.
+
+A focused 8000-anchor run with timeline/CPU tracing passed but did not reproduce the main-thread long task. Traced movement p95 was 34.6 ms. Main-thread totals included 189.5 ms layout and 227.1 ms paint across the gesture; CPU samples attributed 74 ms self-time to getBoundingClientRect. The trace's largest complete event, 57.25 ms HandlePostMessage, belongs to a dedicated worker and is not evidence of UI blocking. These findings motivate further overlay/layout analysis without claiming the intermittent task is diagnosed.
+
+Evidence: `benchmarks/responsiveness-post-transport-2026-10-12.json` contains all 66 timing records, completed case names and the focused trace summary. No production-code changes were made in this audit slice. Passing these tests does not prove the broad goal: filter-mask painting and larger filter stacks lack equivalent latency coverage; worst-case text, cross-device hardware behavior, isolated-script startup and expensive operation completion remain open, as do the measured dense-vector stalls.
+
+### 2026-10-12 — Filter-mask live response coverage
+
+Added production brush cases over blur/unsharp/tone smart-filter stacks at 800×600 and 2000×1500. The initial harness incorrectly watched the ordinary paintPreview flag; filter-mask painting follows the command-preview path. It now records actual presentation while drawing, verifies no live revision change, and checks one committed mask stroke/revision. Baseline median/nearest-rank p95: 27.3/32.9 ms at 800×600 and 44.2/62 ms at 3 MP. (The initial progress estimate of roughly 57 ms was below the nearest-rank p95 for the 18-sample large case.)
+
+Removed unused readback canvas allocation on completed-filter cache misses. This alone had little latency effect (3 MP median/p95 42.4/61.5 ms). Phase measurement found filters already cached, with repeated mixFiltered work and median frame preparation about 27.2 ms at 3 MP. Added cancellation checks between smart output tiles and cancellation-aware cache retention so obsolete mask previews stop scheduling more work. Final median/p95: 27.9/32.1 ms small and 42.2/55.3 ms large, no observed long tasks. These single-run comparisons are partial evidence, not an achieved live-response gate. Native mask coverage/readback and per-tile worker mixing remain expensive.
+
+Eight affected browser tests pass, including a new controlled cancellation case that completes one mask mix, supersedes the render, and requires AbortError before a second tile is processed. Existing selection/pixel, undo, persistence, affine export parity and nested-cache invalidation checks pass. Evidence: `benchmarks/filter-mask-response-2026-10-12.json`. The performance suite now includes 67 cases; this slice ran the two new cases. Larger filter-mask workloads remain outstanding.
+
+Final verification: all 725 unit/API tests across 101 files and the final production build/typecheck pass. No claim of full filter-mask or editor-wide responsiveness is made.
+
+### 2026-10-12 — Remove duplicate filter-mask input copies
+
+Smart-filter tile preparation already owns copies of retained original/filtered pixels and fresh mask readback, but the caller-safe mixing helper copied all three again. Added an internal consuming mixing entry point and used it for these owned tile buffers. The existing helper still snapshots caller arrays before worker readiness. Cache retention, WASM math, density/inversion, source pixels and document history are unchanged.
+
+First production follow-up: 800×600 median/p95 26.5/29.7 ms (previous 27.9/32.1 ms), 3 MP 37.1/50.6 ms (previous 42.2/55.3 ms). This remains above the 33 ms large-case live target. Fourteen browser tests pass, including new exact parity between caller-safe and consuming mixing with fractional alpha/density/inversion, transferred-buffer detachment, unchanged caller-snapshot semantics, and existing tile-cache, mask cancellation/history and affine export correctness. Cache/cancellation instrumentation now wraps the internal method actually used by tile rendering, preserving its assertions.
+
+Final repeat 3 MP median/p95: 35.9/53.1 ms, with no observed long tasks. All 725 unit/API tests, 14 affected browser cases, final production build/typecheck and both production cases pass. Evidence: `benchmarks/filter-mix-ownership-2026-10-12.json`. Large filter-mask live latency still exceeds the target; no overall completion claim.
+
+### 2026-10-12 — Accumulated filter-mask feedback and transient previews
+
+Expanded filter-mask latency coverage with 16 retained 200-point strokes at 3 MP. Baseline failed the unchanged minimum-live-feedback assertion: only two presentations during 25 movements, about 79–83 ms each, with twelve 50–58 ms tasks. Wiring filter masks into existing bounded PaintedMaskRaster reduced replay stalls but still failed with three presentations and one 50 ms task. This trial showed raster reuse alone was insufficient.
+
+Filter-mask tool updates also reconstructed/validated the entire mask through command previews. They now use a renderer-only active stroke, with a dedicated filter-mask target flag; final DOM validation/history remains unchanged. Smart-layer preview pixels bypass raw content caching, ordinary masks remain separate, GPU previews explicitly fall back, and completed mask prefixes/active stamps use existing cache budgets. First result: all three production cases pass. Small case median/p95 13/17.8 ms; empty 3 MP 30.2/50.9 ms; accumulated 3 MP 41/70.2 ms with 25 presentations and no long tasks. The sparse baseline cannot support a like-for-like p95 comparison; the clear gains are live presentation count and removal of observed long tasks. Large-case p95 still misses the 33 ms target.
+
+Added an exact pixel oracle comparing transient filter-mask rendering against the validated mask command, with an ordinary mask present, followed by a clean cached re-render. Initial oracle setup reset the tool target to ordinary painting after a layer edit; explicitly restoring the filter-mask target fixed the fixture, without relaxing pixel assertions. The performance suite now has 68 cases. Larger masks, worst-case cache pressure and overall live latency remain open.
+
+Final repeat: small median/p95 13.8/17.8 ms; empty 3 MP 34.4/45.3 ms; accumulated 3 MP 43.5/65.7 ms with 24 presentations and no observed long tasks. All 725 unit/API tests, 29 affected browser cases, final build/typecheck and three production cases pass. Evidence: `benchmarks/filter-mask-transient-2026-10-12.json`. Live latency at 3 MP still needs work.
+
+### 2026-10-12 — Preserve smart render identities and compact mask signatures
+
+Removed the final duplicate filtered-pixel copy by wrapping owned output in ImageData. Its first accumulated-mask median/p95 was 40.3/63 ms, versus preceding 43.5/65.7 ms. A subsequent identity-key trial alone did not help (47/75.7 ms): smart-document expansion first deep-copied placement input, losing the immutable records needed by compact keys. That negative result is retained rather than attributed to a successful optimization.
+
+Added renderer-only validated immutable views during smart expansion. Public defaults and mutable/shallow-frozen ownership stay defensive; validation still executes. This allows retained stroke entries to use compact tagged cache identities while active/mutable strokes remain serialized by value. First combined production result: accumulated 3 MP median/p95 34.9/55.3 ms, empty 3 MP 30.1/44 ms, small 12.9/20.9 ms; no observed long tasks. These remain above the large-case live target, and single-run changes should not be treated as universal gains.
+
+Four new unit cases cover identity reuse, nested mutation of shallow-frozen entries, live-stroke changes, immutable expansion ownership, public returned-copy independence, mutable input isolation and rejection of invalid/missing references. All 729 unit/API tests pass. Exact browser pixel/history regressions and final production repeat remain part of this slice's verification.
+
+Final repeat: small median/p95 12.5/16.9 ms; empty 3 MP 32/41.3 ms; accumulated 3 MP 39.1/63.1 ms, 24 presentations and no long tasks. Variation is material; do not present the first 34.9/55.3 ms result as guaranteed. All 729 unit/API tests, 29 affected browser cases, final build/typecheck and three production cases pass. Evidence: `benchmarks/smart-render-view-2026-10-12.json`. Further filter-mask and editor-wide performance work remains.
+
+### 2026-10-12 — Skip transient finished-mask surface copies
+
+Added optional CPU profiling to the filter-mask benchmark. The accumulated-mask profile attributes substantial self-time to native canvas draw/readback and FilterTileCache read copies. PaintedMaskRaster also copied each active coverage result into its finished-mask cache on every preview. Filter-mask gestures now skip that write while retaining completed prefixes and incremental active stamps; final committed masks retain the previous default behavior. The completed filtered-tile cache is unchanged.
+
+With CPU profiling enabled in both runs, accumulated-mask median/p95 moved from 42.2/64.1 to 33.4/62.2 ms, with 24 presentations and no long tasks in either run. This reduces median work but does not resolve slow-tail latency. The strengthened exact pixel/cache test initially expected a committed raw-mask write even when a completed filtered-tile hit bypassed rasterization. It now verifies preview pixel/restoration parity first, clears completed caches, then verifies actual committed-mask retention. That corrected case passes; the other 28 browser regressions passed unchanged. No pixel assertions were weakened.
+
+Final unprofiled repeat median/p95: small 12/15.3 ms, empty 3 MP 30.5/44 ms, accumulated 3 MP 32.9/65.4 ms; no long tasks, 24 presentations in the accumulated case. All 729 unit/API tests, 29 affected browser cases (including the corrected oracle rerun), final build/typecheck and three production cases pass. Evidence: `benchmarks/filter-mask-finished-cache-2026-10-12.json`. Tail latency and the broad editor-wide goal remain unresolved.
+
+
+### 2026-10-12 — Readback-oriented retained filter-mask coverage
+
+Retained smart filter-mask prefix hits now allocate their output with the existing readback canvas hint. These outputs immediately feed pixel reads for worker blending. Prefix misses, cache bypass and ordinary masks retain existing allocation behavior. No native tile geometry, downsampling, blend math or cache budget changes.
+
+Two production trials support retaining this narrow change: empty 3 MP median/p95 27.4/41.4 and 26.7/36.6 ms, versus preceding 30.5/44 ms; accumulated 3 MP 36.4/57.5 and 32.9/50.1 ms, versus 32.9/65.4 ms. The median is mixed; both measured tails improve, but neither proves cross-device gains or meets the 33 ms large-case target. Small-document repeat measured 12.75/15.2 ms. No observed long tasks in either trial. The harness now records mask cache diagnostics: accumulated repeat ended with 59 prefix hits, 8 replays, 877 appended points and 8,924,388 active bytes. These counters include final commit, not only pointer movement.
+
+All 729 unit/API tests and final production build/typecheck pass. The initial sandboxed unit run could not bind localhost for API suites; the authorized rerun passed all tests. Exact filter-mask/cache browser regressions passed 10 cases. Evidence and raw samples: `benchmarks/filter-mask-readback-2026-10-12.json`. The remaining 19 mask/smart-filter browser regressions also pass (29 affected cases total). Editor-wide responsiveness and large-case tail latency remain open.
+
+
+### 2026-10-12 — Remove intermediate active mask-stroke canvases
+
+A production CPU profile after the readback change still showed 89.5 ms self-time in getImageData, 76.5 ms in the two largest retained-filter read-copy nodes, and substantial drawImage work. Inspection found an extra full-tile surface between retained active stroke coverage and mask output. Unclipped retained strokes now composite directly; clipped and oversized strokes retain the isolated path. Opacity still applies once, retained coverage is not modified, and memory budgets stay unchanged.
+
+Expanded the existing cached-versus-uncached pixel oracle to eight combinations: clipped/unclipped, hide/reveal, and zero/fractional feather, using a soft partially opaque stroke. It verifies exact pixels after append and after editing an earlier point, as well as incremental reuse and cache release. The standalone expanded oracle passes.
+
+Production first/repeat median/p95: small 13/19.4 and 12.1/16.7 ms; empty 3 MP 27.8/37.2 and 22.6/33.2 ms; accumulated 3 MP 29.8/51.8 and 32.7/56.4 ms. No observed long tasks. Against preceding accumulated 32.9/50.1 ms, median benefit is not consistent and tail latency has not improved. Retain the reduced surface/copy work without claiming a universal timing win. Raw evidence: `benchmarks/mask-direct-composite-2026-10-12.json`. All 729 unit/API tests, 29 affected browser cases, and final production build/typecheck pass. Large-case latency and broad responsiveness remain unresolved.
+
+
+### 2026-10-12 — Dense text coverage exposes cache thrashing
+
+Expanded production text measurements from 1/100 lines to include 600 lines, a 9,900-character line, and the current supported maximum of 64 text layers. Initial 1,000-line/100-layer fixtures exceeded existing validation limits and were corrected, without changing those limits. Strengthened timing to count only a prepared document containing the typed value; prior in-flight frames cannot satisfy the sample. The first harness revision mistakenly used DOM `layers` instead of serialized `children`; it failed without changing app behavior and was corrected. Added long-task observation and optional CPU profiles. The performance suite now has 71 cases.
+
+The strengthened baseline found single-layer p95 14.5–16.4 ms, but 64-layer p95 180.3 ms, median 167.3 ms and 20 long tasks (151–173 ms) across 20 keystrokes. The CPU profile was dominated by native canvas drawImage/save/release. Small text layers retained full 800×600 surfaces, thrashing the existing 64 MiB cache.
+
+Immutable text retention now crops cached pixels to actual glyph ink bounds, measured in the same canvas state as drawing and transformed with an outward-rounded two-pixel margin. Drawing still uses the original full surface/grid, so cropping cannot alter rasterization phase. Nonfinite/unavailable bounds retain the full surface. First result: 64-layer median/p95 17.15/22.6 ms, with no long tasks. Single-layer cases remained responsive. No cache budget increase, text-size cap change, or font substitution was introduced.
+
+Added exact cached-versus-uncached browser pixels for six alignment/direction combinations with italic/bold text, negative spacing, combining marks, mixed scripts/emoji, fractional affine placement and opacity. All six combinations preserve pixels and retain less than half a full surface. Existing font-load cache invalidation, undo, permission handling and manual-entry checks pass; real local font enumeration remains skipped because this browser returns no font list. Final repeat: 64-layer median/p95 15.15/20.2 ms, no long tasks; single-layer p95 14.1–15.4 ms. All 729 unit/API tests, 27 browser cases, seven production text/vector cases and final build/typecheck pass. One native font enumeration test remains explicitly skipped. Evidence: `benchmarks/text-ink-cache-2026-10-12.json`. Styled/dense text variants, cross-device measurements and the broad responsiveness goal remain open.
+
+
+### 2026-10-12 — Compact finished text effects and retain overlays
+
+Added 64-layer text fixtures for overlays and shadows (73 production performance cases total). Before this change, overlay typing median/p95 was 122.15/133 ms, and shadow typing 1016.25/1062.5 ms. Each case produced 20 long tasks. Finished shadow surfaces still occupied the full document rectangle, while overlays were only promoted during gestures and otherwise rebuilt for every keystroke.
+
+Finished text retention now reuses copied raw-cache geometry, rebases it from padded to output coordinates, and expands conservatively for shadow offset/blur. Text overlays also promote during ordinary immutable edits. Ordinary paint/raster behavior remains gesture-only so raw stroke prefixes are preserved. Cache-owned canvases never escape; the shared memory budget and original drawing/effect grids are unchanged.
+
+First production result: overlay median/p95 15.6/23.4 ms; shadow 28.75/33.7 ms; no observed long tasks. Expanded the exact text oracle to 24 combinations covering alignment, direction, overlays, shadows, masks and fill opacity, including changes from warmed raw text. Pixel comparisons passed immediately. Its original single-surface memory assertion was unsuitable for the new fixtures, which also retain an earlier unpadded entry and independent mask coverage; it now accounts for those surfaces while still requiring compact retention. The corrected full oracle passes. All 729 unit/API tests and 12 affected browser cases pass; one existing native font enumeration case remains skipped. Final production build/typecheck, all nine text/vector production cases and 16 mask regressions pass (28 browser cases total; one native font case skipped). Repeat median/p95: plain 64-layer 14.85/19.7 ms, overlay 17/21.2 ms, shadow 30.75/47.2 ms. No observed long tasks. Shadow tail latency varies and remains above 33 ms despite eliminating the previous one-second stalls. Evidence: `benchmarks/styled-text-cache-2026-10-12.json`. Broader workloads and device coverage remain open.
+
+
+### 2026-10-12 — Production audit after compact text/effect retention
+
+All 73 production performance cases pass in 4.7 minutes. Raw evidence: `benchmarks/responsiveness-post-text-2026-10-12.json`. Brush/pencil/eraser sampled p95 is 5.2–8.6 ms; 64-layer plain/overlay text 21.7/23.8 ms. Shadow text remains 42.6 ms. Empty/accumulated 3 MP filter masks remain 34.7/46.2 ms. Dense Pen cases report 50/56 ms long tasks, and 64-layer document operations 58/52/53 ms. Recovery, workspace saving, mixed editing, retouch and pixel-operation fixtures report no observed long tasks. A 76 ms task in the 50 MP fixture starts before import and overlaps its beginning; attribution to import alone is not justified. Green fixture assertions are not a claim that all numeric targets or hardware/cross-device gates pass.
+
+The user's GPU-status question prompted a source audit. Hardware selection remains enabled, but the current WebGPU support predicate falls back for the entire frame when visible content contains raster erasures, pixel-clipped paint, shadows, smart objects or unsupported adjustments/precision requirements. Raster erasures are operation entries on the existing raster layer, not a distinct layer type. Preserving the immutable import asset does not require replay-based editable storage: editable tiles with changed-tile undo are a possible architectural replacement. No such migration has been implemented or claimed. The exact cause in the user's current document remains unverified; they were asked whether a blank document also falls back. The broader responsiveness objective remains active.

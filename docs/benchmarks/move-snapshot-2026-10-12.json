@@ -1,0 +1,884 @@
+{
+  "date": "2026-10-12",
+  "change": "Read immutable document snapshots for pointer move and nudge spatial transforms instead of full toJSON copies.",
+  "runs": {
+    "before": [
+      {
+        "strokes": 0,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 32,
+        "copyMs": 1.8999999463558197,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 17.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 9.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 9
+          },
+          {
+            "phase": "move",
+            "ms": 8.700000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 8
+          },
+          {
+            "phase": "move",
+            "ms": 8
+          },
+          {
+            "phase": "move",
+            "ms": 8
+          },
+          {
+            "phase": "move",
+            "ms": 9
+          },
+          {
+            "phase": "move",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 8.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 8.799999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 8.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 8.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 9.5
+          },
+          {
+            "phase": "move",
+            "ms": 8.5
+          },
+          {
+            "phase": "move",
+            "ms": 9.5
+          },
+          {
+            "phase": "move",
+            "ms": 8.600000023841858
+          },
+          {
+            "phase": "move",
+            "ms": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 7.799999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 7.799999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 8.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 7.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 8.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 6.800000011920929
+          },
+          {
+            "phase": "commit",
+            "ms": 7
+          }
+        ],
+        "revision": 4,
+        "x": 280,
+        "y": 170
+      },
+      {
+        "strokes": 64,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 32,
+        "copyMs": 1341.4999999403954,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 67.5
+          },
+          {
+            "phase": "move",
+            "ms": 71.90000000596046
+          },
+          {
+            "phase": "move",
+            "ms": 78.2999999821186
+          },
+          {
+            "phase": "move",
+            "ms": 53.79999998211861
+          },
+          {
+            "phase": "move",
+            "ms": 50.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 55.29999998211861
+          },
+          {
+            "phase": "move",
+            "ms": 49.20000001788139
+          },
+          {
+            "phase": "move",
+            "ms": 55.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 60
+          },
+          {
+            "phase": "move",
+            "ms": 62.29999998211861
+          },
+          {
+            "phase": "move",
+            "ms": 51.30000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 47.89999997615814
+          },
+          {
+            "phase": "move",
+            "ms": 48.89999997615814
+          },
+          {
+            "phase": "move",
+            "ms": 47.29999998211861
+          },
+          {
+            "phase": "move",
+            "ms": 48.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 49.60000002384186
+          },
+          {
+            "phase": "move",
+            "ms": 48
+          },
+          {
+            "phase": "move",
+            "ms": 50.20000001788139
+          },
+          {
+            "phase": "move",
+            "ms": 46.29999998211861
+          },
+          {
+            "phase": "move",
+            "ms": 52
+          },
+          {
+            "phase": "move",
+            "ms": 48.5
+          },
+          {
+            "phase": "move",
+            "ms": 50.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 46.39999997615814
+          },
+          {
+            "phase": "move",
+            "ms": 46.70000001788139
+          },
+          {
+            "phase": "move",
+            "ms": 46.20000001788139
+          },
+          {
+            "phase": "move",
+            "ms": 49.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 69.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 59.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 47.79999998211861
+          },
+          {
+            "phase": "move",
+            "ms": 48.099999994039536
+          },
+          {
+            "phase": "commit",
+            "ms": 89.19999998807907
+          }
+        ],
+        "revision": 4,
+        "x": 280,
+        "y": 170
+      }
+    ],
+    "after": [
+      {
+        "strokes": 0,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 18
+          },
+          {
+            "phase": "move",
+            "ms": 11.299999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 9.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.5
+          },
+          {
+            "phase": "move",
+            "ms": 9.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 8.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 7.899999976158142
+          },
+          {
+            "phase": "move",
+            "ms": 9.5
+          },
+          {
+            "phase": "move",
+            "ms": 7.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 8.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 8.5
+          },
+          {
+            "phase": "move",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 7.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 8.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.200000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 7.899999976158142
+          },
+          {
+            "phase": "move",
+            "ms": 8.700000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 7.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 8
+          },
+          {
+            "phase": "move",
+            "ms": 8.5
+          },
+          {
+            "phase": "move",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.5
+          },
+          {
+            "phase": "commit",
+            "ms": 8.599999994039536
+          }
+        ],
+        "revision": 4,
+        "x": 280,
+        "y": 170
+      },
+      {
+        "strokes": 64,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 17.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 15.700000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 12.5
+          },
+          {
+            "phase": "move",
+            "ms": 13.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 14.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 12.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 12.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 11.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 9.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 12.5
+          },
+          {
+            "phase": "move",
+            "ms": 8.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.200000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 8.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 7.899999976158142
+          },
+          {
+            "phase": "move",
+            "ms": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 9.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 9.299999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 9.399999976158142
+          },
+          {
+            "phase": "move",
+            "ms": 7.600000023841858
+          },
+          {
+            "phase": "move",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 11.299999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 8.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 8.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 9.100000023841858
+          },
+          {
+            "phase": "commit",
+            "ms": 8.099999994039536
+          }
+        ],
+        "revision": 4,
+        "x": 280,
+        "y": 170
+      }
+    ],
+    "repeat": [
+      {
+        "strokes": 0,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 18
+          },
+          {
+            "phase": "move",
+            "ms": 11
+          },
+          {
+            "phase": "move",
+            "ms": 9
+          },
+          {
+            "phase": "move",
+            "ms": 8
+          },
+          {
+            "phase": "move",
+            "ms": 7.799999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 7.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 12
+          },
+          {
+            "phase": "move",
+            "ms": 11.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 9.5
+          },
+          {
+            "phase": "move",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 9.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.5
+          },
+          {
+            "phase": "move",
+            "ms": 9
+          },
+          {
+            "phase": "move",
+            "ms": 7.799999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 8.299999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 8.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 7.600000023841858
+          },
+          {
+            "phase": "move",
+            "ms": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 9.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 10.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 8.700000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 7.600000023841858
+          },
+          {
+            "phase": "move",
+            "ms": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 10.199999988079071
+          },
+          {
+            "phase": "commit",
+            "ms": 7.5999999940395355
+          }
+        ],
+        "revision": 4,
+        "x": 280,
+        "y": 170
+      },
+      {
+        "strokes": 64,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 19.700000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 16.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 31.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 15.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 61.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 11.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 11.5
+          },
+          {
+            "phase": "move",
+            "ms": 11.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 11.5
+          },
+          {
+            "phase": "move",
+            "ms": 11.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 13.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 9.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 8
+          },
+          {
+            "phase": "move",
+            "ms": 8.799999982118607
+          },
+          {
+            "phase": "move",
+            "ms": 8.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 9.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 8.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 7
+          },
+          {
+            "phase": "move",
+            "ms": 7.200000017881393
+          },
+          {
+            "phase": "move",
+            "ms": 8.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 7
+          },
+          {
+            "phase": "move",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "commit",
+            "ms": 7.5999999940395355
+          }
+        ],
+        "revision": 4,
+        "x": 280,
+        "y": 170
+      }
+    ]
+  },
+  "limitations": [
+    "Heavy paint artwork is hidden to isolate metadata copying from paint replay.",
+    "Local Chromium timing, 30 drag updates per fixture per run.",
+    "Other live rendering and large operation targets remain unproven."
+  ],
+  "percentileMethod": "Nearest rank: sorted[ceil(p*n)-1]",
+  "summary": {
+    "before": [
+      {
+        "strokes": 0,
+        "medianMs": 8.549999997019768,
+        "p95Ms": 9.599999994039536,
+        "copies": 32
+      },
+      {
+        "strokes": 64,
+        "medianMs": 49.900000020861626,
+        "p95Ms": 71.90000000596046,
+        "copies": 32
+      }
+    ],
+    "after": [
+      {
+        "strokes": 0,
+        "medianMs": 7.9000000059604645,
+        "p95Ms": 11.299999982118607,
+        "copies": 0
+      },
+      {
+        "strokes": 64,
+        "medianMs": 8.900000005960464,
+        "p95Ms": 15.700000017881393,
+        "copies": 0
+      }
+    ],
+    "repeat": [
+      {
+        "strokes": 0,
+        "medianMs": 8.450000002980232,
+        "p95Ms": 12,
+        "copies": 0
+      },
+      {
+        "strokes": 64,
+        "medianMs": 8.800000011920929,
+        "p95Ms": 31.099999994039536,
+        "copies": 0
+      }
+    ]
+  }
+}

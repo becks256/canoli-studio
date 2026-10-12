@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-12",
+  "fixture": "698x396 document, three retained revisions, 256000 paint points; production Chromium",
+  "measurements": {
+    "before": {
+      "restoreMs": 876.9000000059605,
+      "maxFrameGapMs": 356.40000000596046,
+      "longTasks": [
+        289,
+        160,
+        350
+      ],
+      "skipped": 0,
+      "bytes": 7817311,
+      "savedAt": 1791792227737
+    },
+    "after": {
+      "restoreMs": 951.5999999940395,
+      "maxFrameGapMs": 17.700000017881393,
+      "longTasks": [],
+      "skipped": 0,
+      "bytes": 7817311,
+      "savedAt": 1791792323914
+    },
+    "repeat": {
+      "restoreMs": 964.3000000119209,
+      "maxFrameGapMs": 17.80000001192093,
+      "longTasks": [],
+      "skipped": 0,
+      "bytes": 7817311,
+      "savedAt": 1791792502066
+    }
+  },
+  "validation": {
+    "unitAndApiTests": 713,
+    "browserRecoveryTests": 12,
+    "productionPreparationCases": 2,
+    "buildAndTypecheck": "passed",
+    "workerVsDirectPreparedFile": "SHA-256 identical"
+  },
+  "limitations": [
+    "Measures recovery preparation only, not opening or rendering the resulting project.",
+    "Single-machine timing, not a hardware-independent gate.",
+    "Worker overhead increased completion time.",
+    "Explicit full listing and checkpoint deletion still read full records on the main thread."
+  ]
+}

@@ -1,0 +1,6855 @@
+{
+  "status": "Scheduling wait reduced; styled rendering remains above the responsiveness target.",
+  "scope": "One instrumented headless Chromium run before and after. Latest input at prepare start through canvas submission; no physical scanout. Phase timers overlap.",
+  "before": [
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "rotate",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.800000011920929,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 20.399999991059303,
+            "prepareMs": 2.800000011920929,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 20.299999997019768,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 20.899999991059303,
+            "prepareMs": 3,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 21,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 20.399999991059303,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 20.299999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 20.30000001192093,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 20.100000008940697,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 20.5,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.599999994039536,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 20.200000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.900000005960464,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.799999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 19.5,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 19.599999994039536,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 19.900000005960464,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.900000005960464,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 20.200000002980232,
+            "prepareMs": 2.699999988079071,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 19.899999991059303,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 19.900000005960464,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "commit",
+            "ms": 10.099999994039536,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 6.799999997019768
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 20.899999991059303,
+        "medianWaitBeforePrepareMs": 16.75,
+        "medianPrepareMs": 2.5
+      }
+    },
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "resize",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 20.599999994039536,
+            "prepareMs": 3.0999999940395355,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 20.19999998807907,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 20.299999997019768,
+            "prepareMs": 3,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.8999999910593033,
+            "waitBeforePrepareMs": 16.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 19.80000001192093,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 19.799999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 19.899999991059303,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.699999988079071,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 19.899999991059303,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 19.900000005960464,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.900000005960464,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.799999997019768,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 19.799999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 19.700000002980232,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.69999998807907,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 20.099999994039536,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 20,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 19.799999997019768,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 20.100000008940697,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "commit",
+            "ms": 9.299999997019768,
+            "prepareMs": 0.8999999910593033,
+            "waitBeforePrepareMs": 7.799999997019768
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 20.299999997019768,
+        "medianWaitBeforePrepareMs": 16.700000002980232,
+        "medianPrepareMs": 2.5499999970197678
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "rotate",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 22.400000005960464,
+            "prepareMs": 3.2999999970197678,
+            "waitBeforePrepareMs": 16.30000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 22.200000002980232,
+            "prepareMs": 3,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 22.299999997019768,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 22.400000005960464,
+            "prepareMs": 3,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 22,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.5,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 22,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 22.5,
+            "prepareMs": 2.8999999910593033,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 22,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 21.799999997019768,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 22.099999994039536,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 21.799999997019768,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.599999994039536,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.80000001192093,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 21.799999997019768,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.899999991059303,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 21.599999994039536,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.900000005960464,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 22.099999994039536,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 22,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 21.799999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.900000005960464,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.299999997019768,
+            "prepareMs": 2.300000011920929,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 22.099999994039536,
+            "prepareMs": 2.800000011920929,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 21.600000008940697,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "commit",
+            "ms": 14.5,
+            "prepareMs": 3.4000000059604645,
+            "waitBeforePrepareMs": 8.599999994039536
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 22.400000005960464,
+        "medianWaitBeforePrepareMs": 16.799999997019768,
+        "medianPrepareMs": 2.6500000059604645
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "resize",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 22,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 21.600000008940697,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 22.100000008940697,
+            "prepareMs": 3.1000000089406967,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.600000008940697,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 21.899999991059303,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 21.900000005960464,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 21.400000005960464,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 21.599999994039536,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 21.599999994039536,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 21.599999994039536,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.600000008940697,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.69999998807907,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.69999998807907,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.5,
+            "prepareMs": 2.699999988079071,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 21.299999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.599999994039536,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 21.299999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.600000008940697,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.5,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 21.399999991059303,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.700000002980232,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 21.600000008940697,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 22,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 21.799999997019768,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.899999991059303,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.5,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 21.799999997019768,
+            "prepareMs": 2.699999988079071,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "commit",
+            "ms": 11.799999997019768,
+            "prepareMs": 1,
+            "waitBeforePrepareMs": 8.299999997019768
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 22,
+        "medianWaitBeforePrepareMs": 16.799999997019768,
+        "medianPrepareMs": 2.649999998509884
+      }
+    },
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "rotate",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 43.20000000298023,
+            "prepareMs": 26.099999994039536,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 43.6000000089407,
+            "prepareMs": 26.400000005960464,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 43,
+            "prepareMs": 29.299999997019768,
+            "waitBeforePrepareMs": 12.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 40,
+            "prepareMs": 25.19999998807907,
+            "waitBeforePrepareMs": 14.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 41.20000000298023,
+            "prepareMs": 23.900000005960464,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.20000000298023,
+            "prepareMs": 24,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 41,
+            "prepareMs": 23.799999997019768,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 41.69999998807907,
+            "prepareMs": 24.799999997019768,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 40.900000005960464,
+            "prepareMs": 23.900000005960464,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 41.79999999701977,
+            "prepareMs": 24.599999994039536,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 42,
+            "prepareMs": 24.799999997019768,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 45.70000000298023,
+            "prepareMs": 28.799999997019768,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 39.6000000089407,
+            "prepareMs": 29.200000002980232,
+            "waitBeforePrepareMs": 10
+          },
+          {
+            "phase": "move",
+            "ms": 39.400000005960464,
+            "prepareMs": 22.399999991059303,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 41.20000000298023,
+            "prepareMs": 24,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 33.80000001192093,
+            "prepareMs": 25.099999994039536,
+            "waitBeforePrepareMs": 8.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 40.3999999910593,
+            "prepareMs": 23.099999994039536,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 40.599999994039536,
+            "prepareMs": 23.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 31.799999997019768,
+            "prepareMs": 23.400000005960464,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 40.099999994039536,
+            "prepareMs": 22.900000005960464,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.29999999701977,
+            "prepareMs": 23,
+            "waitBeforePrepareMs": 8.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 40.70000000298023,
+            "prepareMs": 23.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 33.400000005960464,
+            "prepareMs": 24.600000008940697,
+            "waitBeforePrepareMs": 8.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 41.099999994039536,
+            "prepareMs": 23.799999997019768,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 42.20000000298023,
+            "prepareMs": 25,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 42.30000001192093,
+            "prepareMs": 24.600000008940697,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 38,
+            "prepareMs": 23.200000002980232,
+            "waitBeforePrepareMs": 14.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 39.599999994039536,
+            "prepareMs": 22.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.900000005960464,
+            "prepareMs": 23.200000002980232,
+            "waitBeforePrepareMs": 9.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 41.900000005960464,
+            "prepareMs": 24.600000008940697,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "commit",
+            "ms": 23.200000002980232,
+            "prepareMs": 15.899999991059303,
+            "waitBeforePrepareMs": 6.600000008940697
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 4.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.899999991059303
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4
+          },
+          {
+            "method": "feather",
+            "ms": 1.2999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.199999988079071
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.900000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 1.2000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 4
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.0999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.100000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 3.8999999910593033
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.100000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 3.7000000029802322
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 8.600000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.0999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.100000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 5.200000002980232
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.399999991059303
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 4.600000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 5.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7000000029802322
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 8.599999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 4.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 1.199999988079071
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.5
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.300000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 3.8999999910593033
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 8.900000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4
+          },
+          {
+            "method": "feather",
+            "ms": 1.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.300000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7000000029802322
+          },
+          {
+            "method": "feather",
+            "ms": 1.1000000089406967
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 8.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 3.7000000029802322
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 8.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.0999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 3.8999999910593033
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1.5
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 4
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 8.900000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.8999999910593033
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 9
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 43.6000000089407,
+        "medianWaitBeforePrepareMs": 16.700000002980232,
+        "medianPrepareMs": 24.0
+      }
+    },
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "resize",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 31.600000008940697,
+            "prepareMs": 13.800000011920929,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 33.29999999701977,
+            "prepareMs": 15.700000002980232,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 29.299999997019768,
+            "prepareMs": 14.399999991059303,
+            "waitBeforePrepareMs": 14
+          },
+          {
+            "phase": "move",
+            "ms": 33.400000005960464,
+            "prepareMs": 15.700000002980232,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 33.599999994039536,
+            "prepareMs": 15.900000005960464,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.29999999701977,
+            "prepareMs": 14.599999994039536,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 31.5,
+            "prepareMs": 14,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 31.400000005960464,
+            "prepareMs": 14,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 31.600000008940697,
+            "prepareMs": 14.100000008940697,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.19999998807907,
+            "prepareMs": 14.799999997019768,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 31.900000005960464,
+            "prepareMs": 14.400000005960464,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.400000005960464,
+            "prepareMs": 15,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.400000005960464,
+            "prepareMs": 14.900000005960464,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.5,
+            "prepareMs": 14.800000011920929,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 31.700000002980232,
+            "prepareMs": 14.099999994039536,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.70000000298023,
+            "prepareMs": 15.199999988079071,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 32.1000000089407,
+            "prepareMs": 14.700000002980232,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 31.399999991059303,
+            "prepareMs": 14.100000008940697,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 32,
+            "prepareMs": 14.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.099999994039536,
+            "prepareMs": 14.400000005960464,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 31.799999997019768,
+            "prepareMs": 14.399999991059303,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32,
+            "prepareMs": 14.200000002980232,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 31.5,
+            "prepareMs": 14.299999997019768,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 32.20000000298023,
+            "prepareMs": 14.700000002980232,
+            "waitBeforePrepareMs": 16.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 31.700000002980232,
+            "prepareMs": 14.200000002980232,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32,
+            "prepareMs": 14.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32,
+            "prepareMs": 14.399999991059303,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 31.5,
+            "prepareMs": 14.099999994039536,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.29999999701977,
+            "prepareMs": 14.699999988079071,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.1000000089407,
+            "prepareMs": 14.699999988079071,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "commit",
+            "ms": 24.599999994039536,
+            "prepareMs": 13.400000005960464,
+            "waitBeforePrepareMs": 10.599999994039536
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 33.400000005960464,
+        "medianWaitBeforePrepareMs": 16.700000002980232,
+        "medianPrepareMs": 14.450000002980232
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "rotate",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 65.1000000089407,
+            "prepareMs": 25.799999997019768,
+            "waitBeforePrepareMs": 37.5
+          },
+          {
+            "phase": "move",
+            "ms": 60.6000000089407,
+            "prepareMs": 27.700000002980232,
+            "waitBeforePrepareMs": 32.5
+          },
+          {
+            "phase": "move",
+            "ms": 43.29999999701977,
+            "prepareMs": 26.5,
+            "waitBeforePrepareMs": 16.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 44,
+            "prepareMs": 27.400000005960464,
+            "waitBeforePrepareMs": 16
+          },
+          {
+            "phase": "move",
+            "ms": 46.099999994039536,
+            "prepareMs": 30.599999994039536,
+            "waitBeforePrepareMs": 15.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 43.5,
+            "prepareMs": 26.599999994039536,
+            "waitBeforePrepareMs": 16.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 36.8999999910593,
+            "prepareMs": 26.200000002980232,
+            "waitBeforePrepareMs": 10.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 41.80000001192093,
+            "prepareMs": 25,
+            "waitBeforePrepareMs": 16.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 36.599999994039536,
+            "prepareMs": 25.799999997019768,
+            "waitBeforePrepareMs": 10.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 41.900000005960464,
+            "prepareMs": 25,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 36.8999999910593,
+            "prepareMs": 26.399999991059303,
+            "waitBeforePrepareMs": 10
+          },
+          {
+            "phase": "move",
+            "ms": 43,
+            "prepareMs": 26.099999994039536,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 37.099999994039536,
+            "prepareMs": 26.900000005960464,
+            "waitBeforePrepareMs": 9.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 42.5,
+            "prepareMs": 25.799999997019768,
+            "waitBeforePrepareMs": 16.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 36.29999999701977,
+            "prepareMs": 26,
+            "waitBeforePrepareMs": 9.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 43.5,
+            "prepareMs": 26.299999997019768,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 37.8999999910593,
+            "prepareMs": 27.5,
+            "waitBeforePrepareMs": 10
+          },
+          {
+            "phase": "move",
+            "ms": 45.29999999701977,
+            "prepareMs": 28.099999994039536,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 38.599999994039536,
+            "prepareMs": 28.400000005960464,
+            "waitBeforePrepareMs": 9.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 43.5,
+            "prepareMs": 26.799999997019768,
+            "waitBeforePrepareMs": 16.30000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 39.400000005960464,
+            "prepareMs": 28.900000005960464,
+            "waitBeforePrepareMs": 10
+          },
+          {
+            "phase": "move",
+            "ms": 45.69999998807907,
+            "prepareMs": 28.700000002980232,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 60.20000000298023,
+            "prepareMs": 40.599999994039536,
+            "waitBeforePrepareMs": 19.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 45.099999994039536,
+            "prepareMs": 33.20000000298023,
+            "waitBeforePrepareMs": 11.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 45.8999999910593,
+            "prepareMs": 28.799999997019768,
+            "waitBeforePrepareMs": 16.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 47.19999998807907,
+            "prepareMs": 27.200000002980232,
+            "waitBeforePrepareMs": 19.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 38.599999994039536,
+            "prepareMs": 28.100000008940697,
+            "waitBeforePrepareMs": 10.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 43.099999994039536,
+            "prepareMs": 26,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 36.29999999701977,
+            "prepareMs": 26.599999994039536,
+            "waitBeforePrepareMs": 9.400000005960464
+          },
+          {
+            "phase": "commit",
+            "ms": 28.299999997019768,
+            "prepareMs": 16.5,
+            "waitBeforePrepareMs": 9.599999994039536
+          }
+        ],
+        "phases": [
+          {
+            "method": "selection",
+            "ms": 8.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 4.799999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 18.600000008940697
+          },
+          {
+            "method": "selection",
+            "ms": 8.900000005960464
+          },
+          {
+            "method": "feather",
+            "ms": 7.4000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 21.600000008940697
+          },
+          {
+            "method": "selection",
+            "ms": 16.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 26.900000005960464
+          },
+          {
+            "method": "selection",
+            "ms": 10.900000005960464
+          },
+          {
+            "method": "feather",
+            "ms": 6.700000002980232
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 24.5
+          },
+          {
+            "method": "selection",
+            "ms": 18
+          },
+          {
+            "method": "feather",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 27.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 1.2000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 8.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 5.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 6.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 7.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 5.199999988079071
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 16.600000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 6.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 1.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.600000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.900000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 5.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 6.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 5.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.5
+          },
+          {
+            "method": "feather",
+            "ms": 1.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 5.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 7.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 5.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.199999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.600000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 6.0999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 7.0999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 7
+          },
+          {
+            "method": "feather",
+            "ms": 1.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 8.400000005960464
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 6.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.600000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 7.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1.5
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.899999991059303
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 1.7000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 7.600000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 7.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 19.600000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 7.199999988079071
+          },
+          {
+            "method": "feather",
+            "ms": 5.600000008940697
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 17.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 6.600000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 7.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 1.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 6.600000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 29,
+        "p95Ms": 60.6000000089407,
+        "medianWaitBeforePrepareMs": 16.399999991059303,
+        "medianPrepareMs": 26.799999997019768
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "resize",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 58.099999994039536,
+            "prepareMs": 24.599999994039536,
+            "waitBeforePrepareMs": 31.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 31.399999991059303,
+            "prepareMs": 15.099999994039536,
+            "waitBeforePrepareMs": 13.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 34.900000005960464,
+            "prepareMs": 16.799999997019768,
+            "waitBeforePrepareMs": 15.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 34,
+            "prepareMs": 14.900000005960464,
+            "waitBeforePrepareMs": 16.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 34.099999994039536,
+            "prepareMs": 14.400000005960464,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 36,
+            "prepareMs": 16.5,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 35.79999999701977,
+            "prepareMs": 16.099999994039536,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 38.5,
+            "prepareMs": 18.599999994039536,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 35.69999998807907,
+            "prepareMs": 16.200000002980232,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 34.099999994039536,
+            "prepareMs": 14.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 34.900000005960464,
+            "prepareMs": 15.299999997019768,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 35.5,
+            "prepareMs": 16.299999997019768,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 35.099999994039536,
+            "prepareMs": 15.400000005960464,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 35.599999994039536,
+            "prepareMs": 16,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 33.599999994039536,
+            "prepareMs": 14.100000008940697,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 35.6000000089407,
+            "prepareMs": 16,
+            "waitBeforePrepareMs": 16.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 35,
+            "prepareMs": 15.299999997019768,
+            "waitBeforePrepareMs": 16.5
+          },
+          {
+            "phase": "move",
+            "ms": 39.599999994039536,
+            "prepareMs": 19.600000008940697,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 39.70000000298023,
+            "prepareMs": 19.799999997019768,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 37.900000005960464,
+            "prepareMs": 18.399999991059303,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 38.8999999910593,
+            "prepareMs": 19,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 38.8999999910593,
+            "prepareMs": 18.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 38.900000005960464,
+            "prepareMs": 19,
+            "waitBeforePrepareMs": 16.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 42.69999998807907,
+            "prepareMs": 22.799999997019768,
+            "waitBeforePrepareMs": 16.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 34,
+            "prepareMs": 14.700000002980232,
+            "waitBeforePrepareMs": 16.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 37.19999998807907,
+            "prepareMs": 18.400000005960464,
+            "waitBeforePrepareMs": 15.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 44.20000000298023,
+            "prepareMs": 24.599999994039536,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 37,
+            "prepareMs": 16.100000008940697,
+            "waitBeforePrepareMs": 18.399999991059303
+          },
+          {
+            "phase": "commit",
+            "ms": 27.5,
+            "prepareMs": 14.900000005960464,
+            "waitBeforePrepareMs": 9.900000005960464
+          }
+        ],
+        "phases": [
+          {
+            "method": "feather",
+            "ms": 3.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 12.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 4.5
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 22.200000002980232
+          },
+          {
+            "method": "selection",
+            "ms": 9.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 6.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 20.700000002980232
+          },
+          {
+            "method": "selection",
+            "ms": 8.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 23.900000005960464
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 37.8999999910593
+          },
+          {
+            "method": "selection",
+            "ms": 11.599999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 4.100000008940697
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 21.19999998807907
+          },
+          {
+            "method": "selection",
+            "ms": 8.5
+          },
+          {
+            "method": "feather",
+            "ms": 8.299999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 22.100000008940697
+          },
+          {
+            "method": "selection",
+            "ms": 15.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 3.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 24.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 1.2999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 1.199999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 28,
+        "p95Ms": 44.20000000298023,
+        "medianWaitBeforePrepareMs": 16.799999997019768,
+        "medianPrepareMs": 16.25
+      }
+    }
+  ],
+  "after": [
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "rotate",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 20.200000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 12,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 11.5,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 8.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 11.399999991059303,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 8.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 10.5,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 11.799999997019768,
+            "prepareMs": 3,
+            "waitBeforePrepareMs": 8.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 14.200000002980232,
+            "prepareMs": 2.8999999910593033,
+            "waitBeforePrepareMs": 10.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 10.599999994039536,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 10.200000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.0999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 9.800000011920929,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 6.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 10.299999997019768,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 10.399999991059303,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 7.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 11.199999988079071,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 7.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 11,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 11,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 9.599999994039536,
+            "prepareMs": 2.300000011920929,
+            "waitBeforePrepareMs": 6.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 10.200000002980232,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 10.800000011920929,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 10.5,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 10.299999997019768,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 10.599999994039536,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 7.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 10.699999988079071,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 10.699999988079071,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 7.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 9.799999997019768,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 6.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 10.5,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 10.400000005960464,
+            "prepareMs": 2.8999999910593033,
+            "waitBeforePrepareMs": 6.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 11.399999991059303,
+            "prepareMs": 2.699999988079071,
+            "waitBeforePrepareMs": 8.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 11.099999994039536,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 11.5,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 8.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 10.299999997019768,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "commit",
+            "ms": 14.700000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 11.600000008940697
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 1.2000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.4000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 14.200000002980232,
+        "medianWaitBeforePrepareMs": 7.649999998509884,
+        "medianPrepareMs": 2.5
+      }
+    },
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "resize",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 20.69999998807907,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 17.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 14.700000002980232,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 11.5
+          },
+          {
+            "phase": "move",
+            "ms": 10.799999997019768,
+            "prepareMs": 2.800000011920929,
+            "waitBeforePrepareMs": 7.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 11.600000008940697,
+            "prepareMs": 3.2999999970197678,
+            "waitBeforePrepareMs": 7.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 10.5,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 6.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 10.900000005960464,
+            "prepareMs": 2.800000011920929,
+            "waitBeforePrepareMs": 7.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 10.200000002980232,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 7.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 9.899999991059303,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 7
+          },
+          {
+            "phase": "move",
+            "ms": 10.5,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 7.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 10.600000008940697,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 9.5,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 6.5
+          },
+          {
+            "phase": "move",
+            "ms": 9.700000002980232,
+            "prepareMs": 2.2000000029802322,
+            "waitBeforePrepareMs": 6.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 10.600000008940697,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 10.900000005960464,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 10.599999994039536,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 7.0999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 10.200000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 7
+          },
+          {
+            "phase": "move",
+            "ms": 16.299999997019768,
+            "prepareMs": 6.600000008940697,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 12.299999997019768,
+            "prepareMs": 3.2000000029802322,
+            "waitBeforePrepareMs": 8.5
+          },
+          {
+            "phase": "move",
+            "ms": 10.400000005960464,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 11.5,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 11.100000008940697,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 12.299999997019768,
+            "prepareMs": 3.199999988079071,
+            "waitBeforePrepareMs": 8.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 11.200000002980232,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 8.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 10.700000002980232,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 12.5,
+            "prepareMs": 2.699999988079071,
+            "waitBeforePrepareMs": 9.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 11.099999994039536,
+            "prepareMs": 2.8999999910593033,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 12.100000008940697,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 13.199999988079071,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 9.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 9.5,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 6.5
+          },
+          {
+            "phase": "move",
+            "ms": 9.200000002980232,
+            "prepareMs": 2.2999999970197678,
+            "waitBeforePrepareMs": 6.4000000059604645
+          },
+          {
+            "phase": "commit",
+            "ms": 8.200000002980232,
+            "prepareMs": 0.800000011920929,
+            "waitBeforePrepareMs": 6.799999997019768
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 1.2000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 16.299999997019768,
+        "medianWaitBeforePrepareMs": 7.5,
+        "medianPrepareMs": 2.5
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "rotate",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 22.400000005960464,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 16.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 14.200000002980232,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 9.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 15.700000002980232,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 10.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 15.599999994039536,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 10
+          },
+          {
+            "phase": "move",
+            "ms": 15.900000005960464,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 11.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 14.099999994039536,
+            "prepareMs": 2.300000011920929,
+            "waitBeforePrepareMs": 9.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 13.699999988079071,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 14.099999994039536,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 9.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 15.100000008940697,
+            "prepareMs": 3.5999999940395355,
+            "waitBeforePrepareMs": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 13.700000002980232,
+            "prepareMs": 3.0999999940395355,
+            "waitBeforePrepareMs": 8.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 14,
+            "prepareMs": 2.8999999910593033,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 18,
+            "prepareMs": 3,
+            "waitBeforePrepareMs": 12.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 13.400000005960464,
+            "prepareMs": 2.8999999910593033,
+            "waitBeforePrepareMs": 8.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 15,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 12.900000005960464,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 14.899999991059303,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 9.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 14.5,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 9.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 13.700000002980232,
+            "prepareMs": 3.4000000059604645,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 13.299999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 13.900000005960464,
+            "prepareMs": 3.0999999940395355,
+            "waitBeforePrepareMs": 8.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 12.599999994039536,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 7.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 13.700000002980232,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 12.799999997019768,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 13.299999997019768,
+            "prepareMs": 2.800000011920929,
+            "waitBeforePrepareMs": 7.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 11.900000005960464,
+            "prepareMs": 2.4000000059604645,
+            "waitBeforePrepareMs": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 13.200000002980232,
+            "prepareMs": 2.9000000059604645,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 13.100000008940697,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 8.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 12.900000005960464,
+            "prepareMs": 2.6000000089406967,
+            "waitBeforePrepareMs": 7.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 12.099999994039536,
+            "prepareMs": 2.199999988079071,
+            "waitBeforePrepareMs": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 13.100000008940697,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8.400000005960464
+          },
+          {
+            "phase": "commit",
+            "ms": 13,
+            "prepareMs": 3.3999999910593033,
+            "waitBeforePrepareMs": 7.5
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 18,
+        "medianWaitBeforePrepareMs": 8.700000002980232,
+        "medianPrepareMs": 2.6000000089406967
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "resize",
+        "styled": false,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 23.399999991059303,
+            "prepareMs": 3.699999988079071,
+            "waitBeforePrepareMs": 17
+          },
+          {
+            "phase": "move",
+            "ms": 18.69999998807907,
+            "prepareMs": 3.5,
+            "waitBeforePrepareMs": 12.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 18.799999997019768,
+            "prepareMs": 3.8999999910593033,
+            "waitBeforePrepareMs": 12.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 16.799999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 11.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 15.399999991059303,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 10.5
+          },
+          {
+            "phase": "move",
+            "ms": 18.900000005960464,
+            "prepareMs": 3.5999999940395355,
+            "waitBeforePrepareMs": 12
+          },
+          {
+            "phase": "move",
+            "ms": 16.299999997019768,
+            "prepareMs": 3.2000000029802322,
+            "waitBeforePrepareMs": 10.5
+          },
+          {
+            "phase": "move",
+            "ms": 21.400000005960464,
+            "prepareMs": 3.4000000059604645,
+            "waitBeforePrepareMs": 15.5
+          },
+          {
+            "phase": "move",
+            "ms": 18.5,
+            "prepareMs": 4.0999999940395355,
+            "waitBeforePrepareMs": 11.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 15,
+            "prepareMs": 3,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 13.700000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 8.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 17.400000005960464,
+            "prepareMs": 4,
+            "waitBeforePrepareMs": 10.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 12.5,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 13.799999997019768,
+            "prepareMs": 3.199999988079071,
+            "waitBeforePrepareMs": 8
+          },
+          {
+            "phase": "move",
+            "ms": 13.300000011920929,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 8.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 13.299999997019768,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 13.299999997019768,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 13.800000011920929,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 13.599999994039536,
+            "prepareMs": 2.7000000029802322,
+            "waitBeforePrepareMs": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 15.799999997019768,
+            "prepareMs": 3.1000000089406967,
+            "waitBeforePrepareMs": 9.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 13.599999994039536,
+            "prepareMs": 2.699999988079071,
+            "waitBeforePrepareMs": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 13.5,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 12.399999991059303,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 12.299999997019768,
+            "prepareMs": 2.3999999910593033,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 12.400000005960464,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 12.700000002980232,
+            "prepareMs": 2.5999999940395355,
+            "waitBeforePrepareMs": 7.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 12.599999994039536,
+            "prepareMs": 2.7999999970197678,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 12.900000005960464,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 13.400000005960464,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 8.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 12.299999997019768,
+            "prepareMs": 2.5,
+            "waitBeforePrepareMs": 7.699999988079071
+          },
+          {
+            "phase": "commit",
+            "ms": 10.899999991059303,
+            "prepareMs": 1.0999999940395355,
+            "waitBeforePrepareMs": 7.5
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 21.400000005960464,
+        "medianWaitBeforePrepareMs": 8.600000001490116,
+        "medianPrepareMs": 2.7000000029802322
+      }
+    },
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "rotate",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 45.20000000298023,
+            "prepareMs": 27.900000005960464,
+            "waitBeforePrepareMs": 16.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 54.400000005960464,
+            "prepareMs": 44.900000005960464,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 39.29999999701977,
+            "prepareMs": 28,
+            "waitBeforePrepareMs": 10.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 37.5,
+            "prepareMs": 26.100000008940697,
+            "waitBeforePrepareMs": 11
+          },
+          {
+            "phase": "move",
+            "ms": 36.29999999701977,
+            "prepareMs": 26.69999998807907,
+            "waitBeforePrepareMs": 9.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 34.099999994039536,
+            "prepareMs": 25.900000005960464,
+            "waitBeforePrepareMs": 7.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 35,
+            "prepareMs": 25.700000002980232,
+            "waitBeforePrepareMs": 8.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 36.5,
+            "prepareMs": 25.600000008940697,
+            "waitBeforePrepareMs": 10.5
+          },
+          {
+            "phase": "move",
+            "ms": 39.5,
+            "prepareMs": 29.200000002980232,
+            "waitBeforePrepareMs": 10
+          },
+          {
+            "phase": "move",
+            "ms": 36.5,
+            "prepareMs": 27.80000001192093,
+            "waitBeforePrepareMs": 8.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 35.70000000298023,
+            "prepareMs": 27.099999994039536,
+            "waitBeforePrepareMs": 8.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 43.70000000298023,
+            "prepareMs": 32.599999994039536,
+            "waitBeforePrepareMs": 10.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 41.400000005960464,
+            "prepareMs": 31.099999994039536,
+            "waitBeforePrepareMs": 9.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 34.80000001192093,
+            "prepareMs": 26.899999991059303,
+            "waitBeforePrepareMs": 7.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 34.1000000089407,
+            "prepareMs": 25.399999991059303,
+            "waitBeforePrepareMs": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 34.20000000298023,
+            "prepareMs": 26.099999994039536,
+            "waitBeforePrepareMs": 7.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 35.30000001192093,
+            "prepareMs": 27.5,
+            "waitBeforePrepareMs": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 35.1000000089407,
+            "prepareMs": 26.799999997019768,
+            "waitBeforePrepareMs": 7.9000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 33.70000000298023,
+            "prepareMs": 25.599999994039536,
+            "waitBeforePrepareMs": 7.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 35.6000000089407,
+            "prepareMs": 27.400000005960464,
+            "waitBeforePrepareMs": 7.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.900000005960464,
+            "prepareMs": 24.899999991059303,
+            "waitBeforePrepareMs": 7.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 37.099999994039536,
+            "prepareMs": 28.200000002980232,
+            "waitBeforePrepareMs": 8.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 36,
+            "prepareMs": 27.299999997019768,
+            "waitBeforePrepareMs": 8.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 37.3999999910593,
+            "prepareMs": 28.200000002980232,
+            "waitBeforePrepareMs": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 42.79999999701977,
+            "prepareMs": 33.599999994039536,
+            "waitBeforePrepareMs": 8.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 41.30000001192093,
+            "prepareMs": 29,
+            "waitBeforePrepareMs": 11.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 39.70000000298023,
+            "prepareMs": 29.100000008940697,
+            "waitBeforePrepareMs": 10.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 36.70000000298023,
+            "prepareMs": 27.5,
+            "waitBeforePrepareMs": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 37.400000005960464,
+            "prepareMs": 28.299999997019768,
+            "waitBeforePrepareMs": 8.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 39.8999999910593,
+            "prepareMs": 31.100000008940697,
+            "waitBeforePrepareMs": 8.399999991059303
+          },
+          {
+            "phase": "commit",
+            "ms": 24.80000001192093,
+            "prepareMs": 15.700000002980232,
+            "waitBeforePrepareMs": 8.600000008940697
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.199999988079071
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.899999991059303
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 14.099999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 1.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 24.5
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 4.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 6.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 3
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.600000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 3.1000000089406967
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 3.1000000089406967
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 6.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 8
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.300000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 4.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 3.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 4.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 3.199999988079071
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 5.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 18.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 10.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 2.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 17.299999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 3.1000000089406967
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 4
+          },
+          {
+            "method": "feather",
+            "ms": 3.1000000089406967
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 4
+          },
+          {
+            "method": "feather",
+            "ms": 2.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 4
+          },
+          {
+            "method": "feather",
+            "ms": 3.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7000000029802322
+          },
+          {
+            "method": "feather",
+            "ms": 3.2000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 3.2000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 3.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 3.4000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.100000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 4.5999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 3.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 3.5999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 3.699999988079071
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.5
+          },
+          {
+            "method": "feather",
+            "ms": 3.6000000089406967
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 3.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 4.299999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.900000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 5
+          },
+          {
+            "method": "feather",
+            "ms": 5.200000002980232
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.5
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 4.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 4.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 3.7000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.100000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.800000011920929
+          },
+          {
+            "method": "feather",
+            "ms": 3.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 9.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 15.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 45.20000000298023,
+        "medianWaitBeforePrepareMs": 8.5,
+        "medianPrepareMs": 27.5
+      }
+    },
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "resize",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 32.69999998807907,
+            "prepareMs": 14.900000005960464,
+            "waitBeforePrepareMs": 16.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 26.399999991059303,
+            "prepareMs": 16.100000008940697,
+            "waitBeforePrepareMs": 9.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 24.399999991059303,
+            "prepareMs": 14.899999991059303,
+            "waitBeforePrepareMs": 8.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 25.899999991059303,
+            "prepareMs": 16.200000002980232,
+            "waitBeforePrepareMs": 8.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 24.400000005960464,
+            "prepareMs": 14.599999994039536,
+            "waitBeforePrepareMs": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 24.30000001192093,
+            "prepareMs": 13.700000002980232,
+            "waitBeforePrepareMs": 9.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 25.200000002980232,
+            "prepareMs": 15.5,
+            "waitBeforePrepareMs": 8.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 24,
+            "prepareMs": 13.900000005960464,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 24.69999998807907,
+            "prepareMs": 15.100000008940697,
+            "waitBeforePrepareMs": 8.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 24.69999998807907,
+            "prepareMs": 15.799999997019768,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 24.299999997019768,
+            "prepareMs": 15.300000011920929,
+            "waitBeforePrepareMs": 8.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 24.599999994039536,
+            "prepareMs": 15.299999997019768,
+            "waitBeforePrepareMs": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 22.399999991059303,
+            "prepareMs": 14.099999994039536,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "move",
+            "ms": 23.299999997019768,
+            "prepareMs": 15.299999997019768,
+            "waitBeforePrepareMs": 7.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 26,
+            "prepareMs": 16.200000002980232,
+            "waitBeforePrepareMs": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 22.700000002980232,
+            "prepareMs": 14.600000008940697,
+            "waitBeforePrepareMs": 7.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 25.5,
+            "prepareMs": 16.5,
+            "waitBeforePrepareMs": 8.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 22.200000002980232,
+            "prepareMs": 14.299999997019768,
+            "waitBeforePrepareMs": 7
+          },
+          {
+            "phase": "move",
+            "ms": 23.5,
+            "prepareMs": 14.799999997019768,
+            "waitBeforePrepareMs": 8.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 23.30000001192093,
+            "prepareMs": 15.100000008940697,
+            "waitBeforePrepareMs": 7.5
+          },
+          {
+            "phase": "move",
+            "ms": 22.099999994039536,
+            "prepareMs": 14.399999991059303,
+            "waitBeforePrepareMs": 7
+          },
+          {
+            "phase": "move",
+            "ms": 23.799999997019768,
+            "prepareMs": 14.700000002980232,
+            "waitBeforePrepareMs": 8.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 25.299999997019768,
+            "prepareMs": 16.099999994039536,
+            "waitBeforePrepareMs": 8.5
+          },
+          {
+            "phase": "move",
+            "ms": 23.200000002980232,
+            "prepareMs": 15.100000008940697,
+            "waitBeforePrepareMs": 7.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 23.100000008940697,
+            "prepareMs": 14.799999997019768,
+            "waitBeforePrepareMs": 7.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 22.400000005960464,
+            "prepareMs": 14.299999997019768,
+            "waitBeforePrepareMs": 7.4000000059604645
+          },
+          {
+            "phase": "move",
+            "ms": 23.69999998807907,
+            "prepareMs": 15.5,
+            "waitBeforePrepareMs": 7.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 22.299999997019768,
+            "prepareMs": 13.800000011920929,
+            "waitBeforePrepareMs": 7.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 23.299999997019768,
+            "prepareMs": 15.100000008940697,
+            "waitBeforePrepareMs": 7.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 25.200000002980232,
+            "prepareMs": 16.5,
+            "waitBeforePrepareMs": 7.5999999940395355
+          },
+          {
+            "phase": "commit",
+            "ms": 27.5,
+            "prepareMs": 15.600000008940697,
+            "waitBeforePrepareMs": 11.099999994039536
+          }
+        ],
+        "phases": [
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 1
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 1.300000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.8999999910593033
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 26.399999991059303,
+        "medianWaitBeforePrepareMs": 8.100000001490116,
+        "medianPrepareMs": 15.100000008940697
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "rotate",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 60,
+            "prepareMs": 26.200000002980232,
+            "waitBeforePrepareMs": 32.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 52,
+            "prepareMs": 35.79999999701977,
+            "waitBeforePrepareMs": 15.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 43.79999999701977,
+            "prepareMs": 31.399999991059303,
+            "waitBeforePrepareMs": 12.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 40.1000000089407,
+            "prepareMs": 28.19999998807907,
+            "waitBeforePrepareMs": 11.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 38,
+            "prepareMs": 28.5,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 38.5,
+            "prepareMs": 26,
+            "waitBeforePrepareMs": 12.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 40.5,
+            "prepareMs": 29.5,
+            "waitBeforePrepareMs": 10.5
+          },
+          {
+            "phase": "move",
+            "ms": 36.79999999701977,
+            "prepareMs": 26.700000002980232,
+            "waitBeforePrepareMs": 9.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 36,
+            "prepareMs": 26.099999994039536,
+            "waitBeforePrepareMs": 9.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 39.69999998807907,
+            "prepareMs": 29,
+            "waitBeforePrepareMs": 10.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 35.29999999701977,
+            "prepareMs": 26,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 41.1000000089407,
+            "prepareMs": 29.299999997019768,
+            "waitBeforePrepareMs": 11.300000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 39,
+            "prepareMs": 29.5,
+            "waitBeforePrepareMs": 9.199999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 40.29999999701977,
+            "prepareMs": 27.200000002980232,
+            "waitBeforePrepareMs": 12.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 36.099999994039536,
+            "prepareMs": 27.100000008940697,
+            "waitBeforePrepareMs": 8.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 45.20000000298023,
+            "prepareMs": 32.20000000298023,
+            "waitBeforePrepareMs": 12.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 52.79999999701977,
+            "prepareMs": 38,
+            "waitBeforePrepareMs": 14.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 44.099999994039536,
+            "prepareMs": 31.700000002980232,
+            "waitBeforePrepareMs": 12
+          },
+          {
+            "phase": "move",
+            "ms": 35.69999998807907,
+            "prepareMs": 25.400000005960464,
+            "waitBeforePrepareMs": 9.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 40.900000005960464,
+            "prepareMs": 31,
+            "waitBeforePrepareMs": 9.5
+          },
+          {
+            "phase": "move",
+            "ms": 40,
+            "prepareMs": 30.19999998807907,
+            "waitBeforePrepareMs": 9.5
+          },
+          {
+            "phase": "move",
+            "ms": 39.70000000298023,
+            "prepareMs": 29.700000002980232,
+            "waitBeforePrepareMs": 9.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 44,
+            "prepareMs": 32.5,
+            "waitBeforePrepareMs": 11.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 38.70000000298023,
+            "prepareMs": 28.399999991059303,
+            "waitBeforePrepareMs": 9.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 40,
+            "prepareMs": 29.5,
+            "waitBeforePrepareMs": 10.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 38.79999999701977,
+            "prepareMs": 27.799999997019768,
+            "waitBeforePrepareMs": 10.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 38.79999999701977,
+            "prepareMs": 28,
+            "waitBeforePrepareMs": 10.5
+          },
+          {
+            "phase": "move",
+            "ms": 39.30000001192093,
+            "prepareMs": 29.599999994039536,
+            "waitBeforePrepareMs": 9.400000005960464
+          },
+          {
+            "phase": "commit",
+            "ms": 27.5,
+            "prepareMs": 16.099999994039536,
+            "waitBeforePrepareMs": 9.100000008940697
+          }
+        ],
+        "phases": [
+          {
+            "method": "feather",
+            "ms": 5.200000002980232
+          },
+          {
+            "method": "selection",
+            "ms": 22.5
+          },
+          {
+            "method": "feather",
+            "ms": 8.799999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 36.79999999701977
+          },
+          {
+            "method": "selection",
+            "ms": 23.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 4.799999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 33.5
+          },
+          {
+            "method": "selection",
+            "ms": 16.099999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 5.899999991059303
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 27.599999994039536
+          },
+          {
+            "method": "selection",
+            "ms": 19.30000001192093
+          },
+          {
+            "method": "feather",
+            "ms": 4.600000008940697
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 29.600000008940697
+          },
+          {
+            "method": "selection",
+            "ms": 8.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 3.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 17.200000002980232
+          },
+          {
+            "method": "selection",
+            "ms": 9.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 4.700000002980232
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 19.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6
+          },
+          {
+            "method": "feather",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 10.600000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 9.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 20.899999991059303
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 6
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 16.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 6.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 2.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.8999999910593033
+          },
+          {
+            "method": "feather",
+            "ms": 4.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 6.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.900000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 8.400000005960464
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 3.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 3.800000011920929
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 7.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 1.300000011920929
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 3.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 3.4000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.900000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 7.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 1.1000000089406967
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 8.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.200000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 6.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 3.7999999970197678
+          },
+          {
+            "method": "feather",
+            "ms": 3.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 6.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 1.4000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.299999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 7
+          },
+          {
+            "method": "feather",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 17.899999991059303
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 7.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 5.4000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 17
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 6.5
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 11.600000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 8.5
+          },
+          {
+            "method": "feather",
+            "ms": 1.2999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 7.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 7.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 7.5999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 2.0999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 6.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 12.100000008940697
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 9.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 14.099999994039536
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 7.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 1.5
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 8.400000005960464
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.5
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 8.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 13.799999997019768
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 28,
+        "p95Ms": 52.79999999701977,
+        "medianWaitBeforePrepareMs": 10.399999998509884,
+        "medianPrepareMs": 29.149999998509884
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "resize",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 80.29999999701977,
+            "prepareMs": 37.400000005960464,
+            "waitBeforePrepareMs": 40.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 45,
+            "prepareMs": 15.099999994039536,
+            "waitBeforePrepareMs": 26.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 26.600000008940697,
+            "prepareMs": 13.900000005960464,
+            "waitBeforePrepareMs": 10.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 30.599999994039536,
+            "prepareMs": 15.100000008940697,
+            "waitBeforePrepareMs": 12.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 29.200000002980232,
+            "prepareMs": 14.600000008940697,
+            "waitBeforePrepareMs": 12.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 31.599999994039536,
+            "prepareMs": 17.599999994039536,
+            "waitBeforePrepareMs": 11.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 29.400000005960464,
+            "prepareMs": 15.099999994039536,
+            "waitBeforePrepareMs": 11.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 28,
+            "prepareMs": 15.599999994039536,
+            "waitBeforePrepareMs": 9.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 28.700000002980232,
+            "prepareMs": 15.599999994039536,
+            "waitBeforePrepareMs": 10.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 30,
+            "prepareMs": 16.5,
+            "waitBeforePrepareMs": 10.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 27.299999997019768,
+            "prepareMs": 14.800000011920929,
+            "waitBeforePrepareMs": 9.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 27.099999994039536,
+            "prepareMs": 15.400000005960464,
+            "waitBeforePrepareMs": 9.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 27.900000005960464,
+            "prepareMs": 16.099999994039536,
+            "waitBeforePrepareMs": 9.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 31.299999997019768,
+            "prepareMs": 15.599999994039536,
+            "waitBeforePrepareMs": 12.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 26.600000008940697,
+            "prepareMs": 14.600000008940697,
+            "waitBeforePrepareMs": 9.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.20000000298023,
+            "prepareMs": 17.5,
+            "waitBeforePrepareMs": 11.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 27,
+            "prepareMs": 15.5,
+            "waitBeforePrepareMs": 9
+          },
+          {
+            "phase": "move",
+            "ms": 24.799999997019768,
+            "prepareMs": 13.799999997019768,
+            "waitBeforePrepareMs": 8.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 25.299999997019768,
+            "prepareMs": 14.200000002980232,
+            "waitBeforePrepareMs": 8.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 27.69999998807907,
+            "prepareMs": 14.599999994039536,
+            "waitBeforePrepareMs": 10.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 24.80000001192093,
+            "prepareMs": 13.700000002980232,
+            "waitBeforePrepareMs": 8.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 29.19999998807907,
+            "prepareMs": 15,
+            "waitBeforePrepareMs": 11.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 29.30000001192093,
+            "prepareMs": 15,
+            "waitBeforePrepareMs": 11.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 26,
+            "prepareMs": 14.5,
+            "waitBeforePrepareMs": 8.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 26,
+            "prepareMs": 14,
+            "waitBeforePrepareMs": 9.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 30.299999997019768,
+            "prepareMs": 17.900000005960464,
+            "waitBeforePrepareMs": 9.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 27.100000008940697,
+            "prepareMs": 15.099999994039536,
+            "waitBeforePrepareMs": 8.800000011920929
+          },
+          {
+            "phase": "move",
+            "ms": 26.899999991059303,
+            "prepareMs": 15.799999997019768,
+            "waitBeforePrepareMs": 8.599999994039536
+          },
+          {
+            "phase": "commit",
+            "ms": 24,
+            "prepareMs": 13.299999997019768,
+            "waitBeforePrepareMs": 8.599999994039536
+          }
+        ],
+        "phases": [
+          {
+            "method": "feather",
+            "ms": 3.800000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 21.30000001192093
+          },
+          {
+            "method": "feather",
+            "ms": 4.800000011920929
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 31.30000001192093
+          },
+          {
+            "method": "selection",
+            "ms": 9.599999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 23.600000008940697
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 38.70000000298023
+          },
+          {
+            "method": "selection",
+            "ms": 17.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 4
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 28.400000005960464
+          },
+          {
+            "method": "selection",
+            "ms": 8.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 6.799999997019768
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 20.399999991059303
+          },
+          {
+            "method": "selection",
+            "ms": 15.599999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 4.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 25.599999994039536
+          },
+          {
+            "method": "selection",
+            "ms": 18.5
+          },
+          {
+            "method": "feather",
+            "ms": 4.5999999940395355
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 29.400000005960464
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 12.400000005960464
+          },
+          {
+            "method": "renderMaskCoverage",
+            "ms": 23.700000002980232
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "raster",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.6000000089406967
+          },
+          {
+            "method": "raster",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "raster",
+            "ms": 0.5999999940395355
+          },
+          {
+            "method": "raster",
+            "ms": 0.7000000029802322
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 28,
+        "p95Ms": 45,
+        "medianWaitBeforePrepareMs": 10.0,
+        "medianPrepareMs": 15.099999994039536
+      }
+    }
+  ],
+  "validation": "685 unit/API tests, eight production transform checks, six stale-frame checks, five production paint/eraser checks, production build, documentation build and whitespace checks pass."
+}

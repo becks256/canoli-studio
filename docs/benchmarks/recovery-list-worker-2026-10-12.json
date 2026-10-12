@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-12",
+  "fixture": "698x396 document, three retained revisions of 256000 paint points; production Chromium",
+  "measurements": {
+    "before": {
+      "listMs": 303.7999999821186,
+      "maxFrameGapMs": 289.5,
+      "longTasks": [
+        280
+      ],
+      "entries": [
+        {
+          "id": "0e5c75e2-f2fb-4df2-86ac-87b8d5154e4a",
+          "name": "Listing revision 2",
+          "width": 698,
+          "height": 396
+        }
+      ],
+      "currentId": "0e5c75e2-f2fb-4df2-86ac-87b8d5154e4a"
+    },
+    "after": {
+      "listMs": 405.39999997615814,
+      "maxFrameGapMs": 17.099999994039536,
+      "longTasks": [],
+      "entries": [
+        {
+          "id": "9e540425-958d-41bc-bf73-a12dfb9533ae",
+          "name": "Listing revision 2",
+          "width": 698,
+          "height": 396
+        }
+      ],
+      "currentId": "9e540425-958d-41bc-bf73-a12dfb9533ae"
+    },
+    "repeat": {
+      "listMs": 375,
+      "maxFrameGapMs": 16.80000001192093,
+      "longTasks": [],
+      "entries": [
+        {
+          "id": "050f7a15-22cc-4a8f-9e8f-d92392079d73",
+          "name": "Listing revision 2",
+          "width": 698,
+          "height": 396
+        }
+      ],
+      "currentId": "050f7a15-22cc-4a8f-9e8f-d92392079d73"
+    }
+  },
+  "validation": {
+    "unitAndApiTests": 713,
+    "browserRecoveryTests": 12,
+    "productionSaveAndListCases": 3,
+    "productionListRepeatCases": 1,
+    "buildAndTypecheck": "passed"
+  },
+  "limitations": [
+    "Measures the per-document list path, not the entire Recovery dialog.",
+    "No hardware-independent timing gate.",
+    "Worker still deserializes complete checkpoint records; total list time increased.",
+    "Explicit full list and restore still deserialize on the main thread."
+  ]
+}

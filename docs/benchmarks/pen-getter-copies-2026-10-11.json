@@ -1,0 +1,182 @@
+{
+  "date": "2026-10-11",
+  "baseline": "pen-point-validation-2026-10-11.json",
+  "change": "Read anchor count from preview snapshot; read points once per candidate path during hit testing. Public defensive getter unchanged.",
+  "scope": "Production Chromium, dense 8,000-anchor path, 30 paced drag moves, input-to-canvas submission. Profile includes test assertions.",
+  "profile": [
+    [
+      {
+        "name": "(idle)",
+        "url": "",
+        "line": -1,
+        "ms": 820.124
+      },
+      {
+        "name": "get points",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 70,
+        "ms": 688.462
+      },
+      {
+        "name": "(program)",
+        "url": "",
+        "line": -1,
+        "ms": 619.962
+      },
+      {
+        "name": "get points",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 70,
+        "ms": 350.949
+      },
+      {
+        "name": "drawImage",
+        "url": "",
+        "line": -1,
+        "ms": 87.208
+      },
+      {
+        "name": "getBoundingClientRect",
+        "url": "",
+        "line": -1,
+        "ms": 59.3
+      },
+      {
+        "name": "xm",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 70,
+        "ms": 58.245
+      },
+      {
+        "name": "query",
+        "url": "",
+        "line": 5718,
+        "ms": 55.928
+      },
+      {
+        "name": "(garbage collector)",
+        "url": "",
+        "line": -1,
+        "ms": 46.519
+      },
+      {
+        "name": "hl",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 62,
+        "ms": 43.616
+      },
+      {
+        "name": "query",
+        "url": "",
+        "line": 5718,
+        "ms": 41.749
+      },
+      {
+        "name": "hl",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 62,
+        "ms": 36.653
+      },
+      {
+        "name": "Gr",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 7,
+        "ms": 36.539
+      },
+      {
+        "name": "$d",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 7,
+        "ms": 36.205
+      },
+      {
+        "name": "hl",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 62,
+        "ms": 33.261
+      },
+      {
+        "name": "save",
+        "url": "",
+        "line": -1,
+        "ms": 33.21
+      },
+      {
+        "name": "save",
+        "url": "",
+        "line": -1,
+        "ms": 27.399
+      },
+      {
+        "name": "hl",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 62,
+        "ms": 25.752
+      },
+      {
+        "name": "hl",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 62,
+        "ms": 23.909
+      },
+      {
+        "name": "get points",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 70,
+        "ms": 21.92
+      },
+      {
+        "name": "bezierCurveTo",
+        "url": "",
+        "line": -1,
+        "ms": 19.748
+      },
+      {
+        "name": "nd",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 63,
+        "ms": 19.612
+      },
+      {
+        "name": "hl",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 62,
+        "ms": 18.69
+      },
+      {
+        "name": "H",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 7,
+        "ms": 18.632
+      },
+      {
+        "name": "Uc",
+        "url": "http://127.0.0.1:4173/assets/index-hXyyH6vM.js",
+        "line": 62,
+        "ms": 18.486
+      }
+    ]
+  ],
+  "result": [
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 32.19999998807907,
+      "p95": 41.099999994039536,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 43.19999998807907,
+          "prepareMs": 7.5
+        }
+      ],
+      "longTasks": [
+        101,
+        95,
+        58,
+        55
+      ]
+    }
+  ]
+}

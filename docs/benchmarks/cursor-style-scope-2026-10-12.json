@@ -1,0 +1,1456 @@
+{
+  "date": "2026-10-12",
+  "change": "Scope custom cursor styles to viewport/interactive targets and avoid redundant activation attribute writes; inert SVG retains stable cursor inheritance",
+  "runs": {
+    "before": [
+      {
+        "paths": 2000,
+        "anchors": 4,
+        "frames": 30,
+        "median": 17.400000005960464,
+        "p95": 23,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 39.69999998807907,
+            "prepareMs": 9
+          }
+        ],
+        "longTasks": [
+          111,
+          52,
+          51
+        ],
+        "longTaskDetails": [
+          {
+            "start": 2075.199999988079,
+            "duration": 111
+          },
+          {
+            "start": 2186.4000000059605,
+            "duration": 52
+          },
+          {
+            "start": 2632.0999999940395,
+            "duration": 51
+          }
+        ],
+        "events": [
+          {
+            "phase": "down",
+            "start": 2202.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2282.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2365.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 2432.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2492.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 2552.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 2632.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2711.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2767
+          },
+          {
+            "phase": "move",
+            "start": 2824.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2882.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 2937.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2990.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3048.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3106.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 3168.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 3227.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3282.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3335.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3385.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3440
+          },
+          {
+            "phase": "move",
+            "start": 3492.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3549
+          },
+          {
+            "phase": "move",
+            "start": 3606
+          },
+          {
+            "phase": "move",
+            "start": 3661.5
+          },
+          {
+            "phase": "move",
+            "start": 3749.5
+          },
+          {
+            "phase": "move",
+            "start": 3807.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3865.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3919.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3972.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 4032.300000011921
+          },
+          {
+            "phase": "commit",
+            "start": 4240.4000000059605
+          }
+        ]
+      },
+      {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 22.19999998807907,
+        "p95": 31,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 37.29999998211861,
+            "prepareMs": 6.800000011920929
+          }
+        ],
+        "longTasks": [
+          121,
+          86
+        ],
+        "longTaskDetails": [
+          {
+            "start": 1306.2999999821186,
+            "duration": 121
+          },
+          {
+            "start": 1427.5999999940395,
+            "duration": 86
+          }
+        ],
+        "events": [
+          {
+            "phase": "down",
+            "start": 1438
+          },
+          {
+            "phase": "move",
+            "start": 1544.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1627.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 1692.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1759.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1825.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1881.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1942.5
+          },
+          {
+            "phase": "move",
+            "start": 1992.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2044.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2100.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2159.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2215.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2271.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2325.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 2379.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2436
+          },
+          {
+            "phase": "move",
+            "start": 2508.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 2567.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2626.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2685.5
+          },
+          {
+            "phase": "move",
+            "start": 2742.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2802.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2859.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2915.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2975.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 3025.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 3078
+          },
+          {
+            "phase": "move",
+            "start": 3130.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 3187.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3242.4000000059605
+          },
+          {
+            "phase": "commit",
+            "start": 3415.5
+          }
+        ]
+      }
+    ],
+    "hoverAttributed": [
+      {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 22.099999994039536,
+        "p95": 34.19999998807907,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 35.099999994039536,
+            "prepareMs": 7.800000011920929
+          }
+        ],
+        "longTasks": [
+          120,
+          88,
+          53
+        ],
+        "longTaskDetails": [
+          {
+            "start": 1323.0999999940395,
+            "duration": 120
+          },
+          {
+            "start": 1443.2999999821186,
+            "duration": 88
+          },
+          {
+            "start": 2451.0999999940395,
+            "duration": 53
+          }
+        ],
+        "events": [
+          {
+            "phase": "hover",
+            "start": 1329.7999999821186
+          },
+          {
+            "phase": "down",
+            "start": 1457.5
+          },
+          {
+            "phase": "move",
+            "start": 1552.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 1652.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 1720.5
+          },
+          {
+            "phase": "move",
+            "start": 1794.3999999761581
+          },
+          {
+            "phase": "move",
+            "start": 1867.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 1928.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1984.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2037.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 2094.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2151.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2210
+          },
+          {
+            "phase": "move",
+            "start": 2269.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2327.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2385.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2451.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2532.399999976158
+          },
+          {
+            "phase": "move",
+            "start": 2589.5
+          },
+          {
+            "phase": "move",
+            "start": 2651.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2707.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2767.899999976158
+          },
+          {
+            "phase": "move",
+            "start": 2823.399999976158
+          },
+          {
+            "phase": "move",
+            "start": 2884.5
+          },
+          {
+            "phase": "move",
+            "start": 2940.899999976158
+          },
+          {
+            "phase": "move",
+            "start": 3001.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 3057.399999976158
+          },
+          {
+            "phase": "move",
+            "start": 3117.899999976158
+          },
+          {
+            "phase": "move",
+            "start": 3170.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 3220.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3270.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 3325.399999976158
+          },
+          {
+            "phase": "commit",
+            "start": 3508.199999988079
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "paths": 2000,
+        "anchors": 4,
+        "frames": 30,
+        "median": 18.5,
+        "p95": 21.600000023841858,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 37.099999994039536,
+            "prepareMs": 8.400000005960464
+          }
+        ],
+        "longTasks": [
+          51
+        ],
+        "longTaskDetails": [
+          {
+            "start": 3744.7999999821186,
+            "duration": 51
+          }
+        ],
+        "events": [
+          {
+            "phase": "hover",
+            "start": 2171.199999988079
+          },
+          {
+            "phase": "down",
+            "start": 2208
+          },
+          {
+            "phase": "move",
+            "start": 2264.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2337.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2399.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2459.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 2521.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2579.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2641.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2703.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2787.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2848
+          },
+          {
+            "phase": "move",
+            "start": 2904.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 2959.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 3015
+          },
+          {
+            "phase": "move",
+            "start": 3071
+          },
+          {
+            "phase": "move",
+            "start": 3127.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 3187.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3246
+          },
+          {
+            "phase": "move",
+            "start": 3304.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 3354.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 3414.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3471.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3523.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3576
+          },
+          {
+            "phase": "move",
+            "start": 3632.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3687.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 3744.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3837.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 3891.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3947.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 4004.2999999821186
+          },
+          {
+            "phase": "commit",
+            "start": 4225
+          }
+        ]
+      },
+      {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 23.099999994039536,
+        "p95": 31.200000017881393,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 33.599999994039536,
+            "prepareMs": 6.700000017881393
+          }
+        ],
+        "longTasks": [
+          85
+        ],
+        "longTaskDetails": [
+          {
+            "start": 1381.699999988079,
+            "duration": 85
+          }
+        ],
+        "events": [
+          {
+            "phase": "hover",
+            "start": 1363.699999988079
+          },
+          {
+            "phase": "down",
+            "start": 1394
+          },
+          {
+            "phase": "move",
+            "start": 1502.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1586.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 1652.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1718.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 1785.5
+          },
+          {
+            "phase": "move",
+            "start": 1844.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1906.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1969
+          },
+          {
+            "phase": "move",
+            "start": 2027.5
+          },
+          {
+            "phase": "move",
+            "start": 2087
+          },
+          {
+            "phase": "move",
+            "start": 2152.2999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2223.899999976158
+          },
+          {
+            "phase": "move",
+            "start": 2285.399999976158
+          },
+          {
+            "phase": "move",
+            "start": 2342.899999976158
+          },
+          {
+            "phase": "move",
+            "start": 2402.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2461.899999976158
+          },
+          {
+            "phase": "move",
+            "start": 2552.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2613
+          },
+          {
+            "phase": "move",
+            "start": 2668.7999999821186
+          },
+          {
+            "phase": "move",
+            "start": 2730.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2785.5
+          },
+          {
+            "phase": "move",
+            "start": 2839.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2895.5
+          },
+          {
+            "phase": "move",
+            "start": 2952.399999976158
+          },
+          {
+            "phase": "move",
+            "start": 3005.5
+          },
+          {
+            "phase": "move",
+            "start": 3059.399999976158
+          },
+          {
+            "phase": "move",
+            "start": 3118.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 3177.5
+          },
+          {
+            "phase": "move",
+            "start": 3235.399999976158
+          },
+          {
+            "phase": "move",
+            "start": 3287
+          },
+          {
+            "phase": "commit",
+            "start": 3458.699999988079
+          }
+        ]
+      }
+    ],
+    "repeat": [
+      {
+        "paths": 20,
+        "anchors": 4,
+        "frames": 30,
+        "median": 8.400000005960464,
+        "p95": 10.299999982118607,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 16.5,
+            "prepareMs": 6.199999988079071
+          }
+        ],
+        "longTasks": [],
+        "longTaskDetails": [],
+        "events": [
+          {
+            "phase": "hover",
+            "start": 893.1999999880791
+          },
+          {
+            "phase": "down",
+            "start": 897.3000000119209
+          },
+          {
+            "phase": "move",
+            "start": 936.8000000119209
+          },
+          {
+            "phase": "move",
+            "start": 986.8000000119209
+          },
+          {
+            "phase": "move",
+            "start": 1036.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1088
+          },
+          {
+            "phase": "move",
+            "start": 1136.699999988079
+          },
+          {
+            "phase": "move",
+            "start": 1173.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 1213.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 1253.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1290
+          },
+          {
+            "phase": "move",
+            "start": 1325.5
+          },
+          {
+            "phase": "move",
+            "start": 1370.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1406.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 1443.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1486.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1522.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1558.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 1603.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 1641.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 1686.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1722.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1756.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1791.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1836.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1876
+          },
+          {
+            "phase": "move",
+            "start": 1920.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 1955.5
+          },
+          {
+            "phase": "move",
+            "start": 1992.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2036.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2076.199999988079
+          },
+          {
+            "phase": "move",
+            "start": 2120.0999999940395
+          },
+          {
+            "phase": "commit",
+            "start": 2179.5
+          }
+        ]
+      },
+      {
+        "paths": 200,
+        "anchors": 4,
+        "frames": 30,
+        "median": 10,
+        "p95": 13.5,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 20,
+            "prepareMs": 6.4000000059604645
+          }
+        ],
+        "longTasks": [],
+        "longTaskDetails": [],
+        "events": [
+          {
+            "phase": "hover",
+            "start": 965.5999999940395
+          },
+          {
+            "phase": "down",
+            "start": 971.2000000178814
+          },
+          {
+            "phase": "move",
+            "start": 1014.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1064.5
+          },
+          {
+            "phase": "move",
+            "start": 1116.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1167.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1214.5
+          },
+          {
+            "phase": "move",
+            "start": 1253.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1297.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1335.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1381.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 1419.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1464.5
+          },
+          {
+            "phase": "move",
+            "start": 1507.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1549.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1597.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1641.2000000178814
+          },
+          {
+            "phase": "move",
+            "start": 1683.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1731.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 1770.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1817.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1864.5
+          },
+          {
+            "phase": "move",
+            "start": 1907.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1948.2000000178814
+          },
+          {
+            "phase": "move",
+            "start": 1986.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2031.2000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2069.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2114.5
+          },
+          {
+            "phase": "move",
+            "start": 2157
+          },
+          {
+            "phase": "move",
+            "start": 2197.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 2235.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2281.2000000178814
+          },
+          {
+            "phase": "commit",
+            "start": 2351.4000000059605
+          }
+        ]
+      },
+      {
+        "paths": 2000,
+        "anchors": 4,
+        "frames": 30,
+        "median": 17.69999998807907,
+        "p95": 24.799999982118607,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 38,
+            "prepareMs": 7.700000017881393
+          }
+        ],
+        "longTasks": [
+          54,
+          50,
+          56
+        ],
+        "longTaskDetails": [
+          {
+            "start": 2106.7000000178814,
+            "duration": 54
+          },
+          {
+            "start": 2194.5,
+            "duration": 50
+          },
+          {
+            "start": 2661.100000023842,
+            "duration": 56
+          }
+        ],
+        "events": [
+          {
+            "phase": "hover",
+            "start": 2097.100000023842
+          },
+          {
+            "phase": "down",
+            "start": 2128.100000023842
+          },
+          {
+            "phase": "move",
+            "start": 2194.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 2277.600000023842
+          },
+          {
+            "phase": "move",
+            "start": 2340.100000023842
+          },
+          {
+            "phase": "move",
+            "start": 2411
+          },
+          {
+            "phase": "move",
+            "start": 2463.100000023842
+          },
+          {
+            "phase": "move",
+            "start": 2527.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2596.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2661.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2750.2000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2811
+          },
+          {
+            "phase": "move",
+            "start": 2867.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 2927.600000023842
+          },
+          {
+            "phase": "move",
+            "start": 2983.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3038.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 3094.2000000178814
+          },
+          {
+            "phase": "move",
+            "start": 3148.5
+          },
+          {
+            "phase": "move",
+            "start": 3203.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 3260.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 3315.100000023842
+          },
+          {
+            "phase": "move",
+            "start": 3369.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3427.600000023842
+          },
+          {
+            "phase": "move",
+            "start": 3483.600000023842
+          },
+          {
+            "phase": "move",
+            "start": 3537.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3594.2000000178814
+          },
+          {
+            "phase": "move",
+            "start": 3644.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3696.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 3777.600000023842
+          },
+          {
+            "phase": "move",
+            "start": 3830.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 3886.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 3944.2000000178814
+          },
+          {
+            "phase": "commit",
+            "start": 4159.300000011921
+          }
+        ]
+      },
+      {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 22.5,
+        "p95": 32.900000005960464,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 32.79999998211861,
+            "prepareMs": 6.0999999940395355
+          }
+        ],
+        "longTasks": [
+          81
+        ],
+        "longTaskDetails": [
+          {
+            "start": 1347.0999999940395,
+            "duration": 81
+          }
+        ],
+        "events": [
+          {
+            "phase": "hover",
+            "start": 1331.9000000059605
+          },
+          {
+            "phase": "down",
+            "start": 1357.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1475.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1558.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 1621.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1692.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 1751.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 1809.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 1865.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 1925.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 1976.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2028.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2086.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2141.9000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2197.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2258.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2315.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 2375.4000000059605
+          },
+          {
+            "phase": "move",
+            "start": 2434.5
+          },
+          {
+            "phase": "move",
+            "start": 2501.5
+          },
+          {
+            "phase": "move",
+            "start": 2558.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2625.5999999940395
+          },
+          {
+            "phase": "move",
+            "start": 2681
+          },
+          {
+            "phase": "move",
+            "start": 2742
+          },
+          {
+            "phase": "move",
+            "start": 2797
+          },
+          {
+            "phase": "move",
+            "start": 2858.7000000178814
+          },
+          {
+            "phase": "move",
+            "start": 2915
+          },
+          {
+            "phase": "move",
+            "start": 2975.300000011921
+          },
+          {
+            "phase": "move",
+            "start": 3027.0999999940395
+          },
+          {
+            "phase": "move",
+            "start": 3081.800000011921
+          },
+          {
+            "phase": "move",
+            "start": 3150.5
+          },
+          {
+            "phase": "move",
+            "start": 3208.7000000178814
+          },
+          {
+            "phase": "commit",
+            "start": 3397.300000011921
+          }
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "preChangeFullProductionAudit": 61,
+    "postChangeCursorBrowserTests": 3,
+    "postChangePenCases": 6,
+    "finalBuildAndTypecheck": "passed"
+  },
+  "findings": [
+    "Geometry-query relocation alone did not remove the native hover/down stalls.",
+    "The ~110\u2013135 ms initial hover task disappeared after cursor style scoping.",
+    "The repeat retained 50\u201381 ms tasks during down/move in dense fixtures; this is not a complete pen performance fix."
+  ],
+  "limitations": [
+    "Profiles and measurements are local Chromium only.",
+    "Native work dominated initial samples; exact layout/paint subphase was not traced.",
+    "The full 61-case audit predates the small cursor change; post-change verification was scoped."
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-11",
+  "change": "Reuse unchanged Pen path controls before transforming points or constructing anchor elements; compare complete control geometry, affine matrix, zoom and selection state.",
+  "baseline": "pen-anchor-memo-2026-10-11.json",
+  "scope": "Production Chromium, 30 paced drag moves, input-to-canvas submission, all controls retained. Observational timings.",
+  "results": [
+    {
+      "paths": 20,
+      "frames": 30,
+      "median": 10.100000023841858,
+      "p95": 12.699999988079071,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 15.599999994039536,
+          "prepareMs": 4.699999988079071
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 200,
+      "frames": 30,
+      "median": 15.400000005960464,
+      "p95": 19.19999998807907,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 28.099999994039536,
+          "prepareMs": 7.0999999940395355
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 2000,
+      "frames": 30,
+      "median": 58.29999998211861,
+      "p95": 69.09999999403954,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 106,
+          "prepareMs": 8.099999994039536
+        }
+      ],
+      "longTasks": [
+        117,
+        77,
+        77,
+        91,
+        77,
+        84,
+        65,
+        74,
+        75,
+        68,
+        70,
+        67,
+        67,
+        78,
+        68,
+        66,
+        65,
+        62,
+        66,
+        69,
+        64,
+        65,
+        67,
+        64,
+        85,
+        65,
+        68,
+        65,
+        65,
+        66,
+        63,
+        65,
+        97
+      ]
+    }
+  ]
+}

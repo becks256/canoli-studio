@@ -1,0 +1,253 @@
+{
+  "date": "2026-10-12",
+  "change": "Document.fromJSON validates the supplied version, shallow-copies the root for schema migration, and lets EditorStore make the single owned deep copy. Removed the preceding redundant deep copy.",
+  "environment": "Production Chromium; 64 hidden brush strokes, 1000 points each, five fresh reconstructions and five fresh script workers per trial. Hidden artwork excludes viewport drawing work.",
+  "results": "Reconstruction median 183.2\u2192135.5 ms, repeat 132.2 ms. Script median 360\u2192328.2 ms, repeat 326.9 ms.",
+  "invariants": "External nested metadata remains unfrozen and independent; legacy input must validate before upgrading. Store validation, history, worker isolation and command contracts are unchanged.",
+  "limitations": "Local observational timings. Heavy scripts remain above responsiveness targets and this does not prove broad application readiness.",
+  "runs": {
+    "before": [
+      {
+        "fixture": "document-reconstruction-latency",
+        "medianMs": 183.2000000178814,
+        "samples": [
+          {
+            "ms": 165.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 184.39999997615814,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 183.2000000178814,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 173.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 192.09999999403954,
+            "layers": 1,
+            "history": 0
+          }
+        ]
+      },
+      {
+        "fixture": "script-transport-latency",
+        "medianMs": 360,
+        "samples": [
+          {
+            "ms": 440.90000000596046,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 400.80000001192093,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 360,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 344.5,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 352.59999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "fixture": "document-reconstruction-latency",
+        "medianMs": 135.5,
+        "samples": [
+          {
+            "ms": 123.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 141.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 131.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 135.5,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 168.59999999403954,
+            "layers": 1,
+            "history": 0
+          }
+        ]
+      },
+      {
+        "fixture": "script-transport-latency",
+        "medianMs": 328.19999998807907,
+        "samples": [
+          {
+            "ms": 385.90000000596046,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 372.80000001192093,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 328.19999998807907,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 302.2000000178814,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 297.09999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ]
+      }
+    ],
+    "repeat": [
+      {
+        "fixture": "document-reconstruction-latency",
+        "medianMs": 132.19999998807907,
+        "samples": [
+          {
+            "ms": 124.30000001192093,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 136.59999999403954,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 127.30000001192093,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 132.19999998807907,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 177.7000000178814,
+            "layers": 1,
+            "history": 0
+          }
+        ]
+      },
+      {
+        "fixture": "script-transport-latency",
+        "medianMs": 326.90000000596046,
+        "samples": [
+          {
+            "ms": 389.80000001192093,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 313.7999999821186,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 326.90000000596046,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 300.59999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 331,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "unit": "700 tests in 94 files passed",
+    "build": "Production build and TypeScript check passed",
+    "browser": "16 of 17 cases initially passed; remaining smart-object case asserted stale schema 14 instead of current 16. Updated expectation to SCHEMA_VERSION; affected case passed on rerun. All 17 cases now verified.",
+    "coverage": "Ownership/legacy-validation unit cases; script isolation/rollback/timeout; 50 MP import/WASM/save/reopen/export; layer comps and shared smart masters."
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "date": "2026-10-12",
+  "scope": "Production autosave with 64 hidden strokes and five retained undo entries; real IndexedDB save and tool input. No engine optimization in this measurement slice.",
+  "runs": {
+    "baseline": [
+      {
+        "points": 64000,
+        "saveMs": 273.90000000596046,
+        "control": {
+          "ms": 22,
+          "beforeSave": true,
+          "selected": true
+        },
+        "posts": [
+          13.599999994039536
+        ],
+        "longTasks": [],
+        "savedName": "Autosave revision 3",
+        "bytes": 9797441,
+        "history": 5
+      },
+      {
+        "points": 256000,
+        "saveMs": 1068.5999999940395,
+        "control": {
+          "ms": 85.59999999403954,
+          "beforeSave": true,
+          "selected": true
+        },
+        "posts": [
+          67.80000001192093
+        ],
+        "longTasks": [
+          {
+            "start": 12523.40000000596,
+            "duration": 73
+          }
+        ],
+        "savedName": "Autosave revision 3",
+        "bytes": 39086641,
+        "history": 5
+      }
+    ],
+    "repeat": [
+      {
+        "points": 64000,
+        "saveMs": 276.80000001192093,
+        "control": {
+          "ms": 22.400000005960464,
+          "beforeSave": true,
+          "selected": true
+        },
+        "posts": [
+          13.900000005960464
+        ],
+        "longTasks": [],
+        "savedName": "Autosave revision 3",
+        "bytes": 9797441,
+        "history": 5
+      },
+      {
+        "points": 256000,
+        "saveMs": 1103.0999999940395,
+        "control": {
+          "ms": 85.90000000596046,
+          "beforeSave": true,
+          "selected": true
+        },
+        "posts": [
+          68.2999999821186
+        ],
+        "longTasks": [
+          {
+            "start": 12926.200000017881,
+            "duration": 71
+          }
+        ],
+        "savedName": "Autosave revision 3",
+        "bytes": 39086641,
+        "history": 5
+      }
+    ],
+    "final": [
+      {
+        "points": 64000,
+        "saveMs": 284.19999998807907,
+        "control": {
+          "ms": 23.399999976158142,
+          "beforeSave": true,
+          "selected": true
+        },
+        "posts": [
+          16.599999994039536
+        ],
+        "longTasks": [],
+        "savedName": "Autosave revision 3",
+        "bytes": 9797441,
+        "history": 5
+      },
+      {
+        "points": 256000,
+        "saveMs": 1154.0999999940395,
+        "control": {
+          "ms": 90,
+          "beforeSave": true,
+          "selected": true
+        },
+        "posts": [
+          71.09999999403954
+        ],
+        "longTasks": [
+          {
+            "start": 12573.09999999404,
+            "duration": 75
+          }
+        ],
+        "savedName": "Autosave revision 3",
+        "bytes": 39086641,
+        "history": 5
+      }
+    ]
+  },
+  "nextStep": "Bound the structured-clone work per UI task while preserving shared object references across retained history; avoid naive repeated JSON encoding of each snapshot.",
+  "validation": {
+    "productionCases": 2,
+    "typecheck": "passed",
+    "note": "Baseline/repeat used equivalent rest-argument instrumentation; final uses type-correct overload forwarding. Typecheck overlapped repeat setup; final run was isolated."
+  }
+}

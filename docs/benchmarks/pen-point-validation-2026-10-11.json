@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-11",
+  "baseline": "pen-point-sharing-2026-10-11.json",
+  "change": "Reuse successful anchor schema validation only for internally recursively frozen points. Mutable and previously unseen frozen points still parse through the public anchor schema.",
+  "scope": "Production Chromium, dense 8,000-anchor path, 30 paced moves, input-to-canvas submission; observational timing.",
+  "results": [
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 49,
+      "p95": 56.19999998807907,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 80.5,
+          "prepareMs": 7.0999999940395355
+        }
+      ],
+      "longTasks": [
+        113,
+        130,
+        80,
+        60,
+        61,
+        57,
+        57,
+        55,
+        64,
+        55,
+        56,
+        57,
+        57,
+        57,
+        55,
+        54,
+        55,
+        53,
+        55,
+        65,
+        53,
+        55,
+        53,
+        56,
+        52,
+        55,
+        53,
+        53,
+        53,
+        54,
+        61,
+        54,
+        73
+      ]
+    }
+  ]
+}

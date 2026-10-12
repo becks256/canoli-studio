@@ -1,0 +1,804 @@
+{
+  "development": {
+    "document": {
+      "width": 698,
+      "height": 396,
+      "layers": 5
+    },
+    "samples": [
+      {
+        "commitMs": 71.5,
+        "presentMs": 125.70000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 60.79999999701977,
+        "presentMs": 103.59999999403954,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 19.099999994039536,
+        "presentMs": 44.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 52,
+        "presentMs": 93.40000000596046,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 48.29999999701977,
+        "presentMs": 78.29999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18.700000002980232,
+        "presentMs": 43.20000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 63.80000001192093,
+        "presentMs": 109.6000000089407,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 30.200000002980232,
+        "presentMs": 55.20000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 19.299999997019768,
+        "presentMs": 43.20000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 57.70000000298023,
+        "presentMs": 108,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 48.599999994039536,
+        "presentMs": 76.59999999403954,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 22.5,
+        "presentMs": 53.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 59.20000000298023,
+        "presentMs": 106.40000000596046,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 25.299999997019768,
+        "presentMs": 50.79999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18.19999998807907,
+        "presentMs": 43.099999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 52.5,
+        "presentMs": 96.6000000089407,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 42.70000000298023,
+        "presentMs": 68.30000001192093,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 19.30000001192093,
+        "presentMs": 44.400000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 51.29999999701977,
+        "presentMs": 97.09999999403954,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 45,
+        "presentMs": 68.70000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 19.200000002980232,
+        "presentMs": 43.599999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 51.19999998807907,
+        "presentMs": 92.8999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 41.900000005960464,
+        "presentMs": 66.70000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 19.299999997019768,
+        "presentMs": 44.3999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 52.3999999910593,
+        "presentMs": 94,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 41.5,
+        "presentMs": 65.8999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18.599999994039536,
+        "presentMs": 43.599999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 51,
+        "presentMs": 96.80000001192093,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 41.8999999910593,
+        "presentMs": 65.8999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18.600000008940697,
+        "presentMs": 42,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 33.29999999701977,
+        "presentMs": 73.79999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 55.70000000298023,
+        "presentMs": 89.40000000596046,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18,
+        "presentMs": 44.3999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 49.3999999910593,
+        "presentMs": 89.70000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 24.80000001192093,
+        "presentMs": 49.900000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18.700000002980232,
+        "presentMs": 43.6000000089407,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 52.599999994039536,
+        "presentMs": 99.79999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 41.900000005960464,
+        "presentMs": 65.70000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 17.69999998807907,
+        "presentMs": 42.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 48.900000005960464,
+        "presentMs": 89,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 46.900000005960464,
+        "presentMs": 76.90000000596046,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 21.69999998807907,
+        "presentMs": 49.099999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 59.6000000089407,
+        "presentMs": 107.20000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 47.599999994039536,
+        "presentMs": 78,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18.299999997019768,
+        "presentMs": 42.400000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 61.599999994039536,
+        "presentMs": 105.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 28.299999997019768,
+        "presentMs": 56.29999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 57.79999999701977,
+        "presentMs": 97.79999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 51.29999999701977,
+        "presentMs": 91.3999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 19.799999997019768,
+        "presentMs": 46,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 55.400000005960464,
+        "presentMs": 101,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 45.70000000298023,
+        "presentMs": 71.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 17,
+        "presentMs": 39.79999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 52.400000005960464,
+        "presentMs": 94.30000001192093,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 24.100000008940697,
+        "presentMs": 48.900000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 50.1000000089407,
+        "presentMs": 98.20000000298023,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 50.1000000089407,
+        "presentMs": 92.6000000089407,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 18.099999994039536,
+        "presentMs": 42.3999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 48.19999998807907,
+        "presentMs": 88.79999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 39.1000000089407,
+        "presentMs": 63.20000000298023,
+        "backend": "canvas2d"
+      }
+    ],
+    "summary": {
+      "commitMs": {
+        "median": 45,
+        "p95": 60.79999999701977
+      },
+      "presentMs": {
+        "median": 71.5,
+        "p95": 107.20000000298023
+      }
+    }
+  },
+  "production": {
+    "document": {
+      "width": 698,
+      "height": 396,
+      "layers": 5
+    },
+    "samples": [
+      {
+        "commitMs": 7.399999991059303,
+        "presentMs": 29.299999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.0999999940395355,
+        "presentMs": 28.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 7.299999997019768,
+        "presentMs": 29.299999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.100000008940697,
+        "presentMs": 26.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 7,
+        "presentMs": 29.100000008940697,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.199999988079071,
+        "presentMs": 31.69999998807907,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 7.699999988079071,
+        "presentMs": 28.099999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.799999997019768,
+        "presentMs": 30.299999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.299999997019768,
+        "presentMs": 27.299999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.299999997019768,
+        "presentMs": 28.399999991059303,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.5999999940395355,
+        "presentMs": 27.900000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6,
+        "presentMs": 30.899999991059303,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.700000002980232,
+        "presentMs": 22.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.5999999940395355,
+        "presentMs": 29.19999998807907,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.799999997019768,
+        "presentMs": 21.899999991059303,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.5,
+        "presentMs": 28.299999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.699999988079071,
+        "presentMs": 29.099999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.5999999940395355,
+        "presentMs": 29.19999998807907,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.100000008940697,
+        "presentMs": 23.700000002980232,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.299999997019768,
+        "presentMs": 21.400000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.700000002980232,
+        "presentMs": 23.600000008940697,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.5999999940395355,
+        "presentMs": 30.099999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.100000008940697,
+        "presentMs": 28.900000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.5,
+        "presentMs": 28.799999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.200000002980232,
+        "presentMs": 26.900000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.5999999940395355,
+        "presentMs": 28.899999991059303,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.800000011920929,
+        "presentMs": 29.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.299999997019768,
+        "presentMs": 26,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5,
+        "presentMs": 25.200000002980232,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.5,
+        "presentMs": 29.899999991059303,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.9000000059604645,
+        "presentMs": 24.30000001192093,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.600000008940697,
+        "presentMs": 28.700000002980232,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.100000008940697,
+        "presentMs": 27.900000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.700000002980232,
+        "presentMs": 28,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 7.200000002980232,
+        "presentMs": 29.80000001192093,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.0999999940395355,
+        "presentMs": 30.599999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.0999999940395355,
+        "presentMs": 29.599999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.799999997019768,
+        "presentMs": 30.200000002980232,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.700000002980232,
+        "presentMs": 24.400000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.0999999940395355,
+        "presentMs": 23.599999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.200000002980232,
+        "presentMs": 29,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 7.700000002980232,
+        "presentMs": 32.8999999910593,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6,
+        "presentMs": 25.700000002980232,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.200000002980232,
+        "presentMs": 29.099999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.799999997019768,
+        "presentMs": 26.599999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.800000011920929,
+        "presentMs": 26.700000002980232,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.799999997019768,
+        "presentMs": 27.899999991059303,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.700000002980232,
+        "presentMs": 27.600000008940697,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.399999991059303,
+        "presentMs": 28.200000002980232,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.0999999940395355,
+        "presentMs": 31.799999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.5,
+        "presentMs": 32.29999999701977,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.299999997019768,
+        "presentMs": 29,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.9000000059604645,
+        "presentMs": 30.900000005960464,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 4.799999997019768,
+        "presentMs": 31,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 7,
+        "presentMs": 27.799999997019768,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.799999997019768,
+        "presentMs": 31.5,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 6.4000000059604645,
+        "presentMs": 24.600000008940697,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5,
+        "presentMs": 22.599999994039536,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.299999997019768,
+        "presentMs": 23.100000008940697,
+        "backend": "canvas2d"
+      },
+      {
+        "commitMs": 5.4000000059604645,
+        "presentMs": 22.80000001192093,
+        "backend": "canvas2d"
+      }
+    ],
+    "summary": {
+      "commitMs": {
+        "median": 5.299999997019768,
+        "p95": 7.299999997019768
+      },
+      "presentMs": {
+        "median": 28.5,
+        "p95": 31.69999998807907
+      }
+    }
+  },
+  "productionCpuSelfTime": [
+    {
+      "function": "(idle)",
+      "url": "",
+      "line": 0,
+      "ms": 7689.209999999973
+    },
+    {
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "ms": 5283.172999999998
+    },
+    {
+      "function": "(program)",
+      "url": "",
+      "line": 0,
+      "ms": 2534.7170000000024
+    },
+    {
+      "function": "q",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 70,
+      "ms": 579.3210000000003
+    },
+    {
+      "function": "fill",
+      "url": "",
+      "line": 0,
+      "ms": 449.90900000000045
+    },
+    {
+      "function": "setTransform",
+      "url": "",
+      "line": 0,
+      "ms": 370.534
+    },
+    {
+      "function": "getContext",
+      "url": "",
+      "line": 0,
+      "ms": 324.58000000000027
+    },
+    {
+      "function": "save",
+      "url": "",
+      "line": 0,
+      "ms": 276.66499999999996
+    },
+    {
+      "function": "gf",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 70,
+      "ms": 147.764
+    },
+    {
+      "function": "(garbage collector)",
+      "url": "",
+      "line": 0,
+      "ms": 105.68999999999997
+    },
+    {
+      "function": "createRadialGradient",
+      "url": "",
+      "line": 0,
+      "ms": 83.67099999999995
+    },
+    {
+      "function": "Pl",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 8,
+      "ms": 63.313
+    },
+    {
+      "function": "_v",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 316,
+      "ms": 55.746
+    },
+    {
+      "function": "",
+      "url": "",
+      "line": 0,
+      "ms": 49.78899999999999
+    },
+    {
+      "function": "",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 316,
+      "ms": 49.54899999999999
+    },
+    {
+      "function": "v",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 71,
+      "ms": 49.51500000000001
+    },
+    {
+      "function": "is",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 8,
+      "ms": 47.90200000000001
+    },
+    {
+      "function": "on",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 8,
+      "ms": 43.68
+    },
+    {
+      "function": "up",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 9,
+      "ms": 42.81899999999998
+    },
+    {
+      "function": "setAttribute",
+      "url": "",
+      "line": 0,
+      "ms": 39.893999999999984
+    },
+    {
+      "function": "Qd",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 8,
+      "ms": 39.662000000000006
+    },
+    {
+      "function": "df",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 70,
+      "ms": 37.56299999999999
+    },
+    {
+      "function": "TC",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 330,
+      "ms": 37.25300000000001
+    },
+    {
+      "function": "op",
+      "url": "http://127.0.0.1:4173/assets/index-BW8NiJPi.js",
+      "line": 9,
+      "ms": 31.575
+    },
+    {
+      "function": "createElement",
+      "url": "",
+      "line": 0,
+      "ms": 29.517999999999997
+    }
+  ],
+  "context": "Single runs in headless Chromium with CPU profiling enabled. Production uses VITE_BENCHMARK=1. Canvas2D backend. Timings include profiler overhead and measure canvas submission rather than screen scanout. Self-time is sampled across the complete gesture test, including idle time, not only release.",
+  "productionDrawImageCallerMs": {
+    "draw > read > v > render": 1337.9750000000024,
+    "v > render > prepareFallback > prepareViewport": 1575.5770000000018,
+    "xf > v > render > prepareFallback": 141.73299999999995,
+    "v > (root)": 551.781,
+    "present > i > c > (root)": 620.6589999999999,
+    "draw > xf > v > render": 119.08699999999999,
+    "write > v > (root)": 74.65599999999998,
+    "present > frame.present > i > c": 90.72499999999995,
+    "xf > v > render > thumbnail": 770.9799999999997
+  }
+}

@@ -1,0 +1,1233 @@
+{
+  "date": "2026-10-12",
+  "scope": "Production filter-mask brush over blur, unsharp and tone filters at 800x600 and 2000x1500, fit viewport.",
+  "changes": [
+    "Avoid readback surface allocation for a known completed-filter cache miss",
+    "Check render cancellation between smart-object tiles and suppress stale cache writes"
+  ],
+  "limits": "Latency remains above the 33ms live-input p95 target at 3MP; phase instrumentation adds overhead and runs are observational.",
+  "baseline": [
+    {
+      "size": 800,
+      "samples": [
+        23.69999998807907,
+        26.899999976158142,
+        25.899999976158142,
+        26.200000017881393,
+        24.299999982118607,
+        27.5,
+        34.5,
+        26.69999998807907,
+        26.799999982118607,
+        28,
+        26.900000005960464,
+        28.100000023841858,
+        26.19999998807907,
+        28,
+        28.5,
+        28.400000005960464,
+        29.19999998807907,
+        29,
+        26.899999976158142,
+        27.099999994039536,
+        27.900000005960464,
+        32.900000005960464,
+        24.099999994039536,
+        31.5
+      ],
+      "longTasks": [],
+      "input": 1700.2000000178814,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    },
+    {
+      "size": 2000,
+      "samples": [
+        36.5,
+        39.20000001788139,
+        56.60000002384186,
+        42.900000005960464,
+        41.80000001192093,
+        43.400000005960464,
+        37.400000005960464,
+        37.70000001788139,
+        44.900000005960464,
+        34.900000005960464,
+        42.19999998807907,
+        48.099999994039536,
+        51.70000001788139,
+        62,
+        47.900000005960464,
+        48.80000001192093,
+        46.10000002384186,
+        46.599999994039536
+      ],
+      "longTasks": [],
+      "input": 2844,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    }
+  ],
+  "after": [
+    {
+      "size": 800,
+      "samples": [
+        22.400000005960464,
+        25.69999998807907,
+        26.19999998807907,
+        25.099999994039536,
+        25.5,
+        26.900000005960464,
+        27.900000005960464,
+        29.69999998807907,
+        26.700000017881393,
+        27.80000001192093,
+        27.900000005960464,
+        27.30000001192093,
+        27.700000017881393,
+        29.100000023841858,
+        27.100000023841858,
+        27.200000017881393,
+        28.599999994039536,
+        27,
+        27,
+        27.899999976158142,
+        27.5,
+        33.30000001192093,
+        36,
+        26.599999994039536,
+        30.799999982118607
+      ],
+      "longTasks": [],
+      "input": 1689.199999988079,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    },
+    {
+      "size": 2000,
+      "samples": [
+        28.69999998807907,
+        31.599999994039536,
+        43.79999998211861,
+        37.20000001788139,
+        43.30000001192093,
+        46.5,
+        38.79999998211861,
+        42.30000001192093,
+        34.5,
+        42.400000005960464,
+        36.79999998211861,
+        42.5,
+        37.60000002384186,
+        61.5,
+        57.80000001192093,
+        58.900000005960464
+      ],
+      "longTasks": [],
+      "input": 2775.600000023842,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    }
+  ],
+  "phases": [
+    {
+      "size": 800,
+      "samples": [
+        21.80000001192093,
+        24,
+        24.19999998807907,
+        24.30000001192093,
+        24.69999998807907,
+        26.599999994039536,
+        28.900000005960464,
+        34.69999998807907,
+        24.799999982118607,
+        27.799999982118607,
+        29.100000023841858,
+        29.900000005960464,
+        24.899999976158142,
+        28.5,
+        29.900000005960464,
+        28.700000017881393,
+        27.599999994039536,
+        27.799999982118607,
+        27.80000001192093,
+        27.899999976158142,
+        27.5,
+        31,
+        19.5,
+        31.399999976158142
+      ],
+      "preparation": [
+        7.5999999940395355,
+        7.199999988079071,
+        7.5,
+        7.300000011920929,
+        7.699999988079071,
+        9.800000011920929,
+        12,
+        17.5,
+        8.899999976158142,
+        10.800000011920929,
+        11.799999982118607,
+        12.699999988079071,
+        9.099999994039536,
+        11.399999976158142,
+        12.700000017881393,
+        11.800000011920929,
+        10.700000017881393,
+        10.799999982118607,
+        10.700000017881393,
+        10.599999994039536,
+        10.200000017881393,
+        13.900000005960464,
+        10.099999994039536,
+        14.299999982118607
+      ],
+      "phases": [
+        {
+          "method": "mixFiltered",
+          "ms": 4.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.7000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 2.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.7000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 6
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 9.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.7000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        }
+      ],
+      "longTasks": [],
+      "input": 1660.699999988079,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    },
+    {
+      "size": 2000,
+      "samples": [
+        28.69999998807907,
+        36.10000002384186,
+        42.89999997615814,
+        36.69999998807907,
+        44.099999994039536,
+        44.19999998807907,
+        41.099999994039536,
+        34.900000005960464,
+        37.900000005960464,
+        38,
+        42.20000001788139,
+        34,
+        44,
+        43.5,
+        60.30000001192093,
+        52.400000005960464,
+        56
+      ],
+      "preparation": [
+        15.300000011920929,
+        19.400000005960464,
+        28.69999998807907,
+        27.099999994039536,
+        27.200000017881393,
+        32.60000002384186,
+        26.19999998807907,
+        25.400000005960464,
+        25.400000005960464,
+        28.099999994039536,
+        25.400000005960464,
+        25.599999994039536,
+        27.400000005960464,
+        35.5,
+        43.70000001788139,
+        38.5,
+        39.5
+      ],
+      "phases": [
+        {
+          "method": "mixFiltered",
+          "ms": 7
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.799999982118607
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 7.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 5.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.299999982118607
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.099999994039536
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.299999982118607
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 5.799999982118607
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.399999976158142
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 12.400000005960464
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.7999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 9
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.2999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.700000017881393
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.399999976158142
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.399999976158142
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 5.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 10.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 21.099999994039536
+        }
+      ],
+      "longTasks": [],
+      "input": 2806.2999999821186,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    }
+  ],
+  "final": [
+    {
+      "size": 800,
+      "samples": [
+        25.19999998807907,
+        25.599999994039536,
+        27.599999994039536,
+        25.100000023841858,
+        25.099999994039536,
+        27.900000005960464,
+        32.30000001192093,
+        29.69999998807907,
+        27.200000017881393,
+        30.5,
+        28.19999998807907,
+        27.400000005960464,
+        24.599999994039536,
+        27.700000017881393,
+        29.099999994039536,
+        27.099999994039536,
+        28.69999998807907,
+        28.400000005960464,
+        28.900000005960464,
+        26.5,
+        28.5,
+        32.099999994039536,
+        25.19999998807907,
+        29.099999994039536,
+        28.599999994039536
+      ],
+      "preparation": [
+        9.599999994039536,
+        8.5,
+        10.5,
+        8.200000017881393,
+        8.300000011920929,
+        10.900000005960464,
+        15.599999994039536,
+        12.800000011920929,
+        10,
+        13.400000005960464,
+        11,
+        10.700000017881393,
+        8.099999994039536,
+        10.900000005960464,
+        12.300000011920929,
+        11.099999994039536,
+        12,
+        11.599999994039536,
+        12,
+        9.599999994039536,
+        11.400000005960464,
+        15.200000017881393,
+        11.900000005960464,
+        12.200000017881393,
+        11.900000005960464
+      ],
+      "phases": [
+        {
+          "method": "mixFiltered",
+          "ms": 4.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.600000023841858
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.7999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.6000000238418579
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.399999976158142
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 2.399999976158142
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.2000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 2.7999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.7999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 0.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 1.0999999940395355
+        }
+      ],
+      "longTasks": [],
+      "input": 1820.4000000059605,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    },
+    {
+      "size": 2000,
+      "samples": [
+        29.69999998807907,
+        34,
+        45.19999998807907,
+        36.900000005960464,
+        47.80000001192093,
+        39.89999997615814,
+        42.79999998211861,
+        36,
+        42.20000001788139,
+        36.5,
+        40.400000005960464,
+        34.099999994039536,
+        50.80000001192093,
+        53,
+        52.900000005960464,
+        46.70000001788139,
+        55.30000001192093
+      ],
+      "preparation": [
+        16.400000005960464,
+        17.099999994039536,
+        28.299999982118607,
+        26,
+        30.799999982118607,
+        29.799999982118607,
+        25.69999998807907,
+        25.5,
+        24.700000017881393,
+        26.80000001192093,
+        29,
+        25.400000005960464,
+        34.70000001788139,
+        43.69999998807907,
+        42,
+        38.10000002384186,
+        42.70000001788139
+      ],
+      "phases": [
+        {
+          "method": "mixFiltered",
+          "ms": 6.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 9.400000005960464
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.7000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.2999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 12.599999994039536
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 5.799999982118607
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 9.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.7000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.300000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 9.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 10.299999982118607
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.200000017881393
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.7999999821186066
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.899999976158142
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 6.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.299999982118607
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.100000023841858
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.9000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 7.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 11.400000005960464
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 10.100000023841858
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 6.800000011920929
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.4000000059604645
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.7000000178813934
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 8.599999994039536
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 3.5
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.0999999940395355
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 17.900000005960464
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 12.699999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.199999988079071
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 9.100000023841858
+        },
+        {
+          "method": "mixFiltered",
+          "ms": 4.199999988079071
+        }
+      ],
+      "longTasks": [],
+      "input": 2786.100000023842,
+      "revision": 4,
+      "after": 5,
+      "strokes": 1
+    }
+  ],
+  "validation": {
+    "unitTests": 725,
+    "unitFiles": 101,
+    "browserTests": 8,
+    "productionCases": 2,
+    "finalBuildAndTypecheck": "passed"
+  }
+}

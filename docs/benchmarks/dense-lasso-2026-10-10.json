@@ -1,0 +1,16 @@
+{
+  "fixture": "20000-point circle radius 900 centered at (1000,1000), 2000x2000 document",
+  "environment": "Node.js 24; three sequential CPU measurements per implementation",
+  "beforeMs": [
+    445.744541,
+    421.2236419999999,
+    422.27555000000007
+  ],
+  "afterMs": [
+    37.12610000000001,
+    17.374498999999986,
+    15.352994000000024
+  ],
+  "identicalSelectionSHA256": "fe2cdb1cc79d0b7034d596f1d8d73adc8d84307233a40c7deb2d8abe982882b3",
+  "limitations": "Synthetic CPU timings, not browser input-to-display latency or a bound for heavily crossing contours."
+}

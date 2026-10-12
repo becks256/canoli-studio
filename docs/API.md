@@ -382,3 +382,15 @@ Schema-14 documents optionally contain `layerComps`. REST command arrays accept 
 Schema 15 adds adjustment DTO `{ kind: "hsl", hue: number, saturation: number, lightness: number }`: hue -180…180 degrees, saturation/lightness -100…100; all fields required and finite. Create through `layer.add` with an adjustment layer or replace its adjustment through `layer.update`. Existing revision, lock, validation and undo rules apply. Documents declaring schema 14 or earlier reject HSL nodes; supported older documents migrate to schema 15 when opened.
 
 Host `BudgetLedger` methods return detached accounting snapshots, including `createBudget`, `getBudget`, `requireConsent`, `listBudgets`, `reserve`, and `listReservations`. Mutating a returned value does not change approval, reserved balances, or settlement ownership. Use explicit ledger operations for mutations; browser approval changes must use the durable service method described above.
+
+### Schema 16 raster edits
+
+Shared `layer.update` validation accepts `erasures` only on raster layers: an array (maximum 2,048) of `{ width, height, stroke }`, where positive dimensions capture the layer geometry at edit time and stroke is an eraser operation or an erasing fill. REST command clients use this validated DTO field; constructor-based scripts use `RasterLayer.erase(EraserStroke)` or `RasterLayer.clear(MarqueeSelection | null)`. Both follow shared locking, history and revision rules. Pixel selections use `shape: "pixels"` with validated RLE coverage; see SCRIPTING_API.md. Existing schema 1–15 inputs migrate to 16 after validation. Browser clipboard/wand sampling is not exposed as a headless REST service.
+
+### Image size
+
+`{ type: "document.resizeImage", width, height }` scales canvas dimensions and layer placement together. Both dimensions must be positive safe integers. This is distinct from `document.resize`, which changes canvas bounds only. REST commands use the same atomic validation and undo behavior as `Document.resizeImage(width, height)`; sources remain immutable and layers editable. Masks, selections, guides and saved root comp positions follow the document scale. Pixel-based effect settings retain their values. Recipes accept and record the same action (including numeric parameter expressions).
+
+### Trusted browser export execution controls
+
+`editor.export(options, control?)` and `editor.exportPng(control?)` accept optional `{ signal?: AbortSignal, onProgress?: (progress: { phase: "rendering" | "encoding", fraction: number | null }) => void }`. Controls are host-only execution state, separate from serialized format options; isolated Scripts and REST do not receive these browser services. Progress callbacks must not throw. Cancellation rejects with the signal reason (normally AbortError), releases current raster resources and prevents a completed result from being returned by the host. Raster work checks between tiles/strips; browser encoding and synchronous SVG/PSD work are not preemptible. See the application-integration section of SCRIPTING_API.md for the complete current boundary.

@@ -1,0 +1,851 @@
+{
+  "context": "Production headless Chromium Canvas2D, same five-round workflow as coverage-worker-2026-10-10.json. Completion is pixel-service resolution; whole-run frame gaps/tasks include capture/render/undo/background work. Selection masks now run internally in the worker, so host phase instrumentation does not report their separate time.",
+  "profileBefore": [
+    {
+      "ms": 477.48200000000054,
+      "function": "(idle)",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 371.68499999999983,
+      "function": "(program)",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 283.80899999999997,
+      "function": "",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 250.32700000000008,
+      "function": "copy",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 71,
+      "callers": "(root)"
+    },
+    {
+      "ms": 170.25399999999996,
+      "function": "getImageData",
+      "url": "",
+      "line": 0,
+      "callers": "lp > (root)"
+    },
+    {
+      "ms": 99.67699999999999,
+      "function": "lp",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 71,
+      "callers": "(root)"
+    },
+    {
+      "ms": 87.21899999999994,
+      "function": "save",
+      "url": "",
+      "line": 0,
+      "callers": "_ > raster > v"
+    },
+    {
+      "ms": 82.36599999999999,
+      "function": "fillRect",
+      "url": "",
+      "line": 0,
+      "callers": "uf > render > lp"
+    },
+    {
+      "ms": 77.32100000000001,
+      "function": "(garbage collector)",
+      "url": "",
+      "line": 0,
+      "callers": "(root)"
+    },
+    {
+      "ms": 38.683,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "v > (root)"
+    },
+    {
+      "ms": 37.321999999999996,
+      "function": "get regions",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 64,
+      "callers": "IS > as > qc"
+    },
+    {
+      "ms": 34.217,
+      "function": "K",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 70,
+      "callers": "lp > (root)"
+    },
+    {
+      "ms": 29.908,
+      "function": "lf",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 70,
+      "callers": "copy > (root)"
+    },
+    {
+      "ms": 26.444999999999997,
+      "function": "e._zod.run",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 11,
+      "callers": "e._zod.parse >  > e._zod.parse"
+    },
+    {
+      "ms": 18.775999999999996,
+      "function": "hv",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 316,
+      "callers": " > as > Rc"
+    },
+    {
+      "ms": 17.069000000000003,
+      "function": "t",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 11,
+      "callers": "e._zod.run > e._zod.parse > "
+    },
+    {
+      "ms": 16.489,
+      "function": "save",
+      "url": "",
+      "line": 0,
+      "callers": "v > render > prepareFallback"
+    },
+    {
+      "ms": 15.436999999999998,
+      "function": "e._zod.parse",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 11,
+      "callers": " > e._zod.parse > e._zod.run"
+    },
+    {
+      "ms": 15.415,
+      "function": "Il",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 8,
+      "callers": "Pu > Mu > Pu"
+    },
+    {
+      "ms": 12.169,
+      "function": "as",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 8,
+      "callers": "qc > ml > $d"
+    },
+    {
+      "ms": 12.144,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "write > v > (root)"
+    },
+    {
+      "ms": 11.072,
+      "function": "up",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 9,
+      "callers": "Il > Pu > Mu"
+    },
+    {
+      "ms": 8.893,
+      "function": "Xl",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 63,
+      "callers": "Zl > dispatch > _dispatch"
+    },
+    {
+      "ms": 8.862,
+      "function": "",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 71,
+      "callers": "encode > captureWorkspaceProject > "
+    },
+    {
+      "ms": 8.684000000000001,
+      "function": "m",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 9,
+      "callers": "m > m > m"
+    },
+    {
+      "ms": 8.108,
+      "function": "",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 71,
+      "callers": "request > (root)"
+    },
+    {
+      "ms": 7.69,
+      "function": "sn",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 8,
+      "callers": "up > Il > Pu"
+    },
+    {
+      "ms": 6.662999999999999,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "present > i > c"
+    },
+    {
+      "ms": 6.024,
+      "function": "h",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 8,
+      "callers": "_ >  > Lc"
+    },
+    {
+      "ms": 5.584,
+      "function": "cp",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 71,
+      "callers": "capture > e.pixels.capture > copy"
+    },
+    {
+      "ms": 5.542999999999999,
+      "function": "$d",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 8,
+      "callers": "Qd > Bd > Lf"
+    },
+    {
+      "ms": 5.481,
+      "function": "drawImage",
+      "url": "",
+      "line": 0,
+      "callers": "_ > raster > v"
+    },
+    {
+      "ms": 5.4799999999999995,
+      "function": "",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 330,
+      "callers": "wl > Uu > U"
+    },
+    {
+      "ms": 5.466,
+      "function": "Zl",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 63,
+      "callers": "_dispatch > add > "
+    },
+    {
+      "ms": 5.189000000000001,
+      "function": "xl",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 8,
+      "callers": "$d > Qd > Bd"
+    },
+    {
+      "ms": 4.804,
+      "function": "toJSON",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 64,
+      "callers": "set selection > loadTransparency > (root)"
+    },
+    {
+      "ms": 4.443,
+      "function": "CC",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 330,
+      "callers": "as > qc > ml"
+    },
+    {
+      "ms": 4.439,
+      "function": "",
+      "url": "",
+      "line": 3,
+      "callers": "e._zod.parse > e._zod.run > e._zod.parse"
+    },
+    {
+      "ms": 4.425,
+      "function": "ml",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 8,
+      "callers": "$d > Qd > Bd"
+    },
+    {
+      "ms": 4.415,
+      "function": "op",
+      "url": "http://127.0.0.1:4173/assets/index-BhC-Jk98.js",
+      "line": 9,
+      "callers": "up > Il > Pu"
+    }
+  ],
+  "runs": [
+    {
+      "width": 698,
+      "height": 396,
+      "samples": [
+        {
+          "action": "wand",
+          "ms": 28.600000008940697
+        },
+        {
+          "action": "load-transparency",
+          "ms": 21
+        },
+        {
+          "action": "copy",
+          "ms": 27.400000005960464
+        },
+        {
+          "action": "paste",
+          "ms": 18.700000002980232
+        },
+        {
+          "action": "wand",
+          "ms": 21.600000008940697
+        },
+        {
+          "action": "load-transparency",
+          "ms": 16.299999997019768
+        },
+        {
+          "action": "copy",
+          "ms": 18
+        },
+        {
+          "action": "paste",
+          "ms": 13.5
+        },
+        {
+          "action": "wand",
+          "ms": 20.80000001192093
+        },
+        {
+          "action": "load-transparency",
+          "ms": 15.100000008940697
+        },
+        {
+          "action": "copy",
+          "ms": 19.399999991059303
+        },
+        {
+          "action": "paste",
+          "ms": 12.400000005960464
+        },
+        {
+          "action": "wand",
+          "ms": 17.200000002980232
+        },
+        {
+          "action": "load-transparency",
+          "ms": 13.900000005960464
+        },
+        {
+          "action": "copy",
+          "ms": 18.5
+        },
+        {
+          "action": "paste",
+          "ms": 13.5
+        },
+        {
+          "action": "wand",
+          "ms": 20.400000005960464
+        },
+        {
+          "action": "load-transparency",
+          "ms": 16.700000002980232
+        },
+        {
+          "action": "copy",
+          "ms": 19
+        },
+        {
+          "action": "paste",
+          "ms": 13.600000008940697
+        }
+      ],
+      "phases": [
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 4.0999999940395355
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 3.7999999970197678
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 3.8999999910593033
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 3.6000000089406967
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 3.7000000029802322
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 3.9000000059604645
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 3.800000011920929
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 4
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 3.7000000029802322
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 3.5
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 3.9000000059604645
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 3.9000000059604645
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 3.800000011920929
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 3.5999999940395355
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 3.7000000029802322
+        }
+      ],
+      "gaps": [
+        -1.4000000029802777,
+        16.600000000000023,
+        16.700000000000045,
+        16.699999999999932,
+        16.700000000000045,
+        16.5,
+        16.700000000000045,
+        16.699999999999932,
+        16.700000000000045,
+        16.699999999999932,
+        16.600000000000023,
+        16.700000000000045,
+        16.699999999999932,
+        16.600000000000023,
+        16.700000000000045,
+        16.600000000000023,
+        16.699999999999932,
+        16.700000000000045,
+        16.699999999999932,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.699999999999818,
+        16.700000000000045
+      ],
+      "longTasks": [],
+      "layers": 1,
+      "canPaste": true,
+      "summary": {
+        "wand": {
+          "median": 20.80000001192093,
+          "max": 28.600000008940697
+        },
+        "load-transparency": {
+          "median": 16.299999997019768,
+          "max": 21
+        },
+        "copy": {
+          "median": 19,
+          "max": 27.400000005960464
+        },
+        "paste": {
+          "median": 13.5,
+          "max": 18.700000002980232
+        }
+      },
+      "maxFrameGap": 16.799999999999955
+    },
+    {
+      "width": 2000,
+      "height": 1500,
+      "samples": [
+        {
+          "action": "wand",
+          "ms": 133.20000000298023
+        },
+        {
+          "action": "load-transparency",
+          "ms": 68.5
+        },
+        {
+          "action": "copy",
+          "ms": 197.3999999910593
+        },
+        {
+          "action": "paste",
+          "ms": 36.599999994039536
+        },
+        {
+          "action": "wand",
+          "ms": 101.40000000596046
+        },
+        {
+          "action": "load-transparency",
+          "ms": 63.80000001192093
+        },
+        {
+          "action": "copy",
+          "ms": 177.09999999403954
+        },
+        {
+          "action": "paste",
+          "ms": 34.20000000298023
+        },
+        {
+          "action": "wand",
+          "ms": 115.5
+        },
+        {
+          "action": "load-transparency",
+          "ms": 70.5
+        },
+        {
+          "action": "copy",
+          "ms": 167.5
+        },
+        {
+          "action": "paste",
+          "ms": 32.20000000298023
+        },
+        {
+          "action": "wand",
+          "ms": 106.20000000298023
+        },
+        {
+          "action": "load-transparency",
+          "ms": 65.59999999403954
+        },
+        {
+          "action": "copy",
+          "ms": 185.70000000298023
+        },
+        {
+          "action": "paste",
+          "ms": 37.70000000298023
+        },
+        {
+          "action": "wand",
+          "ms": 115.29999999701977
+        },
+        {
+          "action": "load-transparency",
+          "ms": 67.59999999403954
+        },
+        {
+          "action": "copy",
+          "ms": 152.09999999403954
+        },
+        {
+          "action": "paste",
+          "ms": 32.099999994039536
+        }
+      ],
+      "phases": [
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 42.1000000089407
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 35.79999999701977
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 38.69999998807907
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 34.8999999910593
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 39
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 42.19999998807907
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 35.19999998807907
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 40.29999999701977
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 39.900000005960464
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 37
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 38.099999994039536
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 38.599999994039536
+        },
+        {
+          "action": "wand",
+          "phase": "pixel-capture",
+          "ms": 37.20000000298023
+        },
+        {
+          "action": "load-transparency",
+          "phase": "pixel-capture",
+          "ms": 37.29999999701977
+        },
+        {
+          "action": "copy",
+          "phase": "pixel-capture",
+          "ms": 35.099999994039536
+        }
+      ],
+      "gaps": [
+        40.328000002980275,
+        0,
+        16.671999999999912,
+        16.600000000000023,
+        16.700000000000045,
+        16.699999999999932,
+        16.600000000000023,
+        16.700000000000045,
+        33.39999999999998,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        33.299999999999955,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.600000000000136,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        33.299999999999955,
+        33.399999999999864,
+        50,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.600000000000136,
+        16.700000000000045,
+        33.299999999999955,
+        16.799999999999955,
+        16.59999999999991,
+        50,
+        16.700000000000045,
+        16.600000000000136,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.799999999999955,
+        16.59999999999991,
+        16.700000000000045,
+        50,
+        16.700000000000045,
+        16.59999999999991,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.700000000000045,
+        33.299999999999955,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        33.30000000000018,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        33.40000000000009,
+        33.29999999999973,
+        16.59999999999991,
+        16.700000000000273,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        33.40000000000009,
+        16.59999999999991,
+        16.59999999999991,
+        16.800000000000182,
+        33.29999999999973,
+        16.59999999999991,
+        16.700000000000273,
+        16.59999999999991,
+        16.800000000000182,
+        16.59999999999991,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        33.40000000000009,
+        16.699999999999818,
+        33.30000000000018,
+        16.59999999999991,
+        16.800000000000182,
+        16.59999999999991,
+        16.699999999999818,
+        16.59999999999991,
+        16.600000000000364,
+        33.5,
+        16.59999999999991,
+        16.59999999999991,
+        16.699999999999818,
+        33.40000000000009,
+        16.59999999999991,
+        16.700000000000273,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818
+      ],
+      "longTasks": [],
+      "layers": 1,
+      "canPaste": true,
+      "summary": {
+        "wand": {
+          "median": 115.29999999701977,
+          "max": 133.20000000298023
+        },
+        "load-transparency": {
+          "median": 67.59999999403954,
+          "max": 70.5
+        },
+        "copy": {
+          "median": 177.09999999403954,
+          "max": 197.3999999910593
+        },
+        "paste": {
+          "median": 34.20000000298023,
+          "max": 37.70000000298023
+        }
+      },
+      "maxFrameGap": 50
+    }
+  ]
+}

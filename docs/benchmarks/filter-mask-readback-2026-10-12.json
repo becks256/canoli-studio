@@ -1,0 +1,2797 @@
+{
+  "date": "2026-10-12",
+  "change": "Use readback-oriented output canvases for retained smart filter-mask coverage on prefix cache hits.",
+  "percentile": "Nearest rank ceil(0.95*n)-1",
+  "limitations": [
+    "Single local Chromium environment; hardware/browser coverage remains open.",
+    "Prefix misses still use existing paintedMask allocation.",
+    "Accumulated-mask median varies; p95 improves in both trials but remains above 33 ms."
+  ],
+  "runs": {
+    "baseline": [
+      {
+        "width": 800,
+        "retainedStrokes": 0,
+        "presentations": 26,
+        "medianMs": 12.049999997019768,
+        "p95Ms": 15.300000011920929,
+        "measurement": {
+          "size": 800,
+          "retained": 0,
+          "samples": [
+            9.600000023841858,
+            10.100000023841858,
+            9.099999994039536,
+            9.199999988079071,
+            9.399999976158142,
+            13.300000011920929,
+            12.799999982118607,
+            13.800000011920929,
+            35.20000001788139,
+            15.300000011920929,
+            12.699999988079071,
+            11.400000005960464,
+            13.900000005960464,
+            12.099999994039536,
+            12,
+            11.5,
+            12.299999982118607,
+            11.400000005960464,
+            11.099999994039536,
+            11.399999976158142,
+            11.599999994039536,
+            11.600000023841858,
+            13,
+            14.900000005960464,
+            14.099999994039536,
+            14
+          ],
+          "preparation": [
+            8.900000005960464,
+            9.300000011920929,
+            8.299999982118607,
+            8.599999994039536,
+            8.800000011920929,
+            12.699999988079071,
+            12.199999988079071,
+            12.900000005960464,
+            4.4000000059604645,
+            14.700000017881393,
+            11.800000011920929,
+            10.699999988079071,
+            13.300000011920929,
+            11.400000005960464,
+            11.5,
+            10.899999976158142,
+            11.699999988079071,
+            11,
+            10.5,
+            10.800000011920929,
+            11.099999994039536,
+            11,
+            12.400000005960464,
+            14.299999982118607,
+            13.5,
+            13.300000011920929
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.100000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            }
+          ],
+          "longTasks": [],
+          "input": 1577,
+          "revision": 4,
+          "after": 5,
+          "strokes": 1
+        }
+      },
+      {
+        "width": 2000,
+        "retainedStrokes": 0,
+        "presentations": 25,
+        "medianMs": 30.5,
+        "p95Ms": 44,
+        "measurement": {
+          "size": 2000,
+          "retained": 0,
+          "samples": [
+            16.400000005960464,
+            20.5,
+            31.200000017881393,
+            28.599999994039536,
+            29.099999994039536,
+            22.80000001192093,
+            26,
+            27.400000005960464,
+            30.5,
+            28.30000001192093,
+            27.700000017881393,
+            26.600000023841858,
+            28.599999994039536,
+            26.700000017881393,
+            37.599999994039536,
+            41,
+            44,
+            43.29999998211861,
+            48.19999998807907,
+            37.5,
+            33,
+            34.099999994039536,
+            31.30000001192093,
+            34.5,
+            32.599999994039536
+          ],
+          "preparation": [
+            15.800000011920929,
+            19.599999994039536,
+            30.19999998807907,
+            27.80000001192093,
+            28.099999994039536,
+            22.099999994039536,
+            25.299999982118607,
+            26.799999982118607,
+            29.69999998807907,
+            27.5,
+            27,
+            25.799999982118607,
+            27.899999976158142,
+            25.799999982118607,
+            36.69999998807907,
+            40.19999998807907,
+            43.20000001788139,
+            41,
+            47.400000005960464,
+            36.80000001192093,
+            32.19999998807907,
+            33.400000005960464,
+            30.600000023841858,
+            33.900000005960464,
+            31.69999998807907
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.100000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.799999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.100000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.799999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.100000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            }
+          ],
+          "longTasks": [],
+          "input": 2679.5999999940395,
+          "revision": 4,
+          "after": 5,
+          "strokes": 1
+        }
+      },
+      {
+        "width": 2000,
+        "retainedStrokes": 16,
+        "presentations": 24,
+        "medianMs": 32.900000005960464,
+        "p95Ms": 65.40000000596046,
+        "measurement": {
+          "size": 2000,
+          "retained": 16,
+          "samples": [
+            24.400000005960464,
+            24.80000001192093,
+            32.80000001192093,
+            29.299999982118607,
+            28.30000001192093,
+            33,
+            33.60000002384186,
+            31.69999998807907,
+            31.19999998807907,
+            28.700000017881393,
+            30,
+            31.599999994039536,
+            30.5,
+            29.5,
+            47.70000001788139,
+            65.40000000596046,
+            71.40000000596046,
+            54.099999994039536,
+            53.20000001788139,
+            55.89999997615814,
+            54.599999994039536,
+            48,
+            59.20000001788139,
+            57.79999998211861
+          ],
+          "preparation": [
+            23.599999994039536,
+            24,
+            32,
+            28.599999994039536,
+            27.599999994039536,
+            32.19999998807907,
+            32.599999994039536,
+            30.80000001192093,
+            30.5,
+            28.099999994039536,
+            29.19999998807907,
+            30.799999982118607,
+            29.69999998807907,
+            28.900000005960464,
+            46.89999997615814,
+            56,
+            65.69999998807907,
+            53.30000001192093,
+            45.30000001192093,
+            38.5,
+            36.69999998807907,
+            40,
+            41.79999998211861,
+            39.39999997615814
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.799999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 13.099999994039536
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 10
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.399999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.399999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.600000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 42
+            }
+          ],
+          "longTasks": [],
+          "input": 2793.199999988079,
+          "revision": 4,
+          "after": 5,
+          "strokes": 17
+        }
+      }
+    ],
+    "first": [
+      {
+        "width": 800,
+        "retainedStrokes": 0,
+        "presentations": 26,
+        "medianMs": 12.150000005960464,
+        "p95Ms": 15.600000023841858,
+        "measurement": {
+          "size": 800,
+          "retained": 0,
+          "samples": [
+            9.799999982118607,
+            9.799999982118607,
+            10,
+            8.699999988079071,
+            9.400000005960464,
+            14.200000017881393,
+            13.900000005960464,
+            11.799999982118607,
+            12.599999994039536,
+            33.70000001788139,
+            13.5,
+            12.100000023841858,
+            12.900000005960464,
+            11.299999982118607,
+            12.199999988079071,
+            12.5,
+            11.199999988079071,
+            12.900000005960464,
+            12.099999994039536,
+            11.099999994039536,
+            11.5,
+            11.599999994039536,
+            12.300000011920929,
+            15,
+            15.600000023841858,
+            15.5
+          ],
+          "preparation": [
+            9.100000023841858,
+            9.099999994039536,
+            9.400000005960464,
+            8.100000023841858,
+            8.800000011920929,
+            13.5,
+            13,
+            11.300000011920929,
+            12.099999994039536,
+            3.5999999940395355,
+            12.699999988079071,
+            11.5,
+            12.099999994039536,
+            10.800000011920929,
+            11.400000005960464,
+            12,
+            10.800000011920929,
+            12.100000023841858,
+            11.399999976158142,
+            10.5,
+            10.900000005960464,
+            11.099999994039536,
+            11.800000011920929,
+            14.599999994039536,
+            15.099999994039536,
+            14.800000011920929
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.600000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.8999999761581421
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.6000000238418579
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.8999999761581421
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.6000000238418579
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.9000000059604645
+            }
+          ],
+          "longTasks": [],
+          "input": 1549.4000000059605,
+          "revision": 4,
+          "after": 5,
+          "strokes": 1
+        }
+      },
+      {
+        "width": 2000,
+        "retainedStrokes": 0,
+        "presentations": 25,
+        "medianMs": 27.400000005960464,
+        "p95Ms": 41.400000005960464,
+        "measurement": {
+          "size": 2000,
+          "retained": 0,
+          "samples": [
+            21.19999998807907,
+            21.69999998807907,
+            27.400000005960464,
+            22.400000005960464,
+            23.099999994039536,
+            22,
+            23.099999994039536,
+            23.80000001192093,
+            24.69999998807907,
+            25.5,
+            28.400000005960464,
+            24.099999994039536,
+            23.69999998807907,
+            25.80000001192093,
+            36.69999998807907,
+            42.30000001192093,
+            41.400000005960464,
+            31.599999994039536,
+            33.29999998211861,
+            29.900000005960464,
+            31.5,
+            33.5,
+            32.70000001788139,
+            31.299999982118607,
+            34.5
+          ],
+          "preparation": [
+            20.200000017881393,
+            20.80000001192093,
+            26.69999998807907,
+            21.599999994039536,
+            22.299999982118607,
+            21.099999994039536,
+            22.400000005960464,
+            22.5,
+            23.900000005960464,
+            24.69999998807907,
+            27.69999998807907,
+            23.299999982118607,
+            23.099999994039536,
+            25.099999994039536,
+            35.80000001192093,
+            41.599999994039536,
+            40.400000005960464,
+            31,
+            32.599999994039536,
+            29.100000023841858,
+            30.799999982118607,
+            32.79999998211861,
+            32,
+            30.69999998807907,
+            33.900000005960464
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 8.099999994039536
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.700000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.399999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.100000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            }
+          ],
+          "longTasks": [],
+          "input": 2532.7999999821186,
+          "revision": 4,
+          "after": 5,
+          "strokes": 1
+        }
+      },
+      {
+        "width": 2000,
+        "retainedStrokes": 16,
+        "presentations": 24,
+        "medianMs": 36.3999999910593,
+        "p95Ms": 57.5,
+        "measurement": {
+          "size": 2000,
+          "retained": 16,
+          "samples": [
+            27.099999994039536,
+            23,
+            34.39999997615814,
+            30.80000001192093,
+            31.30000001192093,
+            38.400000005960464,
+            45,
+            31.5,
+            28.299999982118607,
+            30.799999982118607,
+            28.80000001192093,
+            27.200000017881393,
+            27.599999994039536,
+            30.299999982118607,
+            42.39999997615814,
+            52.5,
+            46,
+            42.099999994039536,
+            52.599999994039536,
+            57.29999998211861,
+            46.70000001788139,
+            47.30000001192093,
+            57.5,
+            57.599999994039536
+          ],
+          "preparation": [
+            26.299999982118607,
+            22.19999998807907,
+            33.70000001788139,
+            30.099999994039536,
+            30.299999982118607,
+            37.10000002384186,
+            44.20000001788139,
+            30.80000001192093,
+            27.599999994039536,
+            30.099999994039536,
+            28.099999994039536,
+            26.599999994039536,
+            27,
+            29.599999994039536,
+            41.900000005960464,
+            44.69999998807907,
+            45.29999998211861,
+            41.5,
+            44.599999994039536,
+            37.60000002384186,
+            37.70000001788139,
+            38.79999998211861,
+            40.80000001192093,
+            38.80000001192093
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.799999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.600000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.700000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.399999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.700000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.700000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 34.400000005960464
+            }
+          ],
+          "longTasks": [],
+          "input": 2747.199999988079,
+          "revision": 4,
+          "after": 5,
+          "strokes": 17
+        }
+      }
+    ],
+    "repeat": [
+      {
+        "width": 800,
+        "retainedStrokes": 0,
+        "presentations": 26,
+        "medianMs": 12.75,
+        "p95Ms": 15.199999988079071,
+        "measurement": {
+          "size": 800,
+          "retained": 0,
+          "beforeMask": {
+            "prefixHits": 0,
+            "prefixReplays": 0,
+            "appendedPoints": 0,
+            "activeBytes": 0
+          },
+          "samples": [
+            9.400000005960464,
+            10,
+            10,
+            10,
+            9.599999994039536,
+            13.300000011920929,
+            11.900000005960464,
+            11.900000005960464,
+            37,
+            13.799999982118607,
+            13.099999994039536,
+            12,
+            13,
+            11.900000005960464,
+            12.199999988079071,
+            13.5,
+            12.800000011920929,
+            11.5,
+            12.900000005960464,
+            12.900000005960464,
+            11.699999988079071,
+            12.699999988079071,
+            13.300000011920929,
+            15.199999988079071,
+            13.5,
+            13.5
+          ],
+          "preparation": [
+            8.700000017881393,
+            9.200000017881393,
+            9.300000011920929,
+            9.299999982118607,
+            8.800000011920929,
+            12.599999994039536,
+            11.199999988079071,
+            11.200000017881393,
+            4.199999988079071,
+            13.100000023841858,
+            12.5,
+            11.200000017881393,
+            12.199999988079071,
+            11.300000011920929,
+            11.599999994039536,
+            12.900000005960464,
+            12.200000017881393,
+            10.800000011920929,
+            12.299999982118607,
+            12.300000011920929,
+            11.099999994039536,
+            12,
+            12.700000017881393,
+            14.599999994039536,
+            13.099999994039536,
+            12.900000005960464
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.600000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.8999999761581421
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.100000023841858
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.8999999761581421
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.6000000238418579
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 0.5
+            }
+          ],
+          "longTasks": [],
+          "input": 1588.6000000238419,
+          "revision": 4,
+          "afterMask": {
+            "prefixHits": 49,
+            "prefixReplays": 3,
+            "appendedPoints": 78,
+            "activeBytes": 1018468
+          },
+          "after": 5,
+          "strokes": 1
+        }
+      },
+      {
+        "width": 2000,
+        "retainedStrokes": 0,
+        "presentations": 25,
+        "medianMs": 26.69999998807907,
+        "p95Ms": 36.599999994039536,
+        "measurement": {
+          "size": 2000,
+          "retained": 0,
+          "beforeMask": {
+            "prefixHits": 0,
+            "prefixReplays": 0,
+            "appendedPoints": 0,
+            "activeBytes": 0
+          },
+          "samples": [
+            19.099999994039536,
+            20.19999998807907,
+            29.900000005960464,
+            24.099999994039536,
+            26.69999998807907,
+            25.5,
+            24.599999994039536,
+            23.400000005960464,
+            22.599999994039536,
+            22.400000005960464,
+            25.69999998807907,
+            23.80000001192093,
+            25.400000005960464,
+            23.100000023841858,
+            36.599999994039536,
+            30,
+            30.30000001192093,
+            32.599999994039536,
+            35.599999994039536,
+            32.099999994039536,
+            30.900000005960464,
+            33.5,
+            32.5,
+            43.79999998211861,
+            34.400000005960464
+          ],
+          "preparation": [
+            18.100000023841858,
+            19.400000005960464,
+            29.099999994039536,
+            23.200000017881393,
+            25.799999982118607,
+            24.599999994039536,
+            24,
+            22.69999998807907,
+            22,
+            21.69999998807907,
+            24.700000017881393,
+            23,
+            24.599999994039536,
+            22.299999982118607,
+            35.900000005960464,
+            29.200000017881393,
+            29.599999994039536,
+            32.10000002384186,
+            34.89999997615814,
+            31.30000001192093,
+            30.100000023841858,
+            32.900000005960464,
+            32,
+            43.19999998807907,
+            33.80000001192093
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.700000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 8
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.399999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 8.900000005960464
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 1.9000000059604645
+            }
+          ],
+          "longTasks": [],
+          "input": 2547.4000000059605,
+          "revision": 4,
+          "afterMask": {
+            "prefixHits": 60,
+            "prefixReplays": 3,
+            "appendedPoints": 78,
+            "activeBytes": 3417600
+          },
+          "after": 5,
+          "strokes": 1
+        }
+      },
+      {
+        "width": 2000,
+        "retainedStrokes": 16,
+        "presentations": 24,
+        "medianMs": 32.900000005960464,
+        "p95Ms": 50.10000002384186,
+        "measurement": {
+          "size": 2000,
+          "retained": 16,
+          "beforeMask": {
+            "prefixHits": 0,
+            "prefixReplays": 8,
+            "appendedPoints": 800,
+            "activeBytes": 8924388
+          },
+          "samples": [
+            24.799999982118607,
+            22.599999994039536,
+            33,
+            28.599999994039536,
+            30.69999998807907,
+            31.80000001192093,
+            36.400000005960464,
+            31.80000001192093,
+            32.19999998807907,
+            31,
+            32.80000001192093,
+            29.299999982118607,
+            28.700000017881393,
+            28.200000017881393,
+            42.900000005960464,
+            59.69999998807907,
+            50.10000002384186,
+            49.80000001192093,
+            43.70000001788139,
+            39,
+            38.89999997615814,
+            39.400000005960464,
+            46.5,
+            49.900000005960464
+          ],
+          "preparation": [
+            24,
+            21.80000001192093,
+            32.5,
+            27.80000001192093,
+            29.900000005960464,
+            31.099999994039536,
+            35.80000001192093,
+            31,
+            31.5,
+            30.299999982118607,
+            31.900000005960464,
+            28.599999994039536,
+            28.19999998807907,
+            27.5,
+            42.29999998211861,
+            52.099999994039536,
+            49.400000005960464,
+            40.599999994039536,
+            43,
+            38.10000002384186,
+            38.30000001192093,
+            38.60000002384186,
+            45.599999994039536,
+            41.80000001192093
+          ],
+          "phases": [
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.399999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2000000178813934
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 8.799999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 8.599999994039536
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.199999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 7.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.899999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.200000017881393
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.0999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5999999940395355
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.299999982118607
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.2999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.9000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.800000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 4.300000011920929
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 5.699999988079071
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 6.4000000059604645
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 3.399999976158142
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 2.7999999821186066
+            },
+            {
+              "method": "mixFilteredOwned",
+              "ms": 41
+            }
+          ],
+          "longTasks": [],
+          "input": 2787.5999999940395,
+          "revision": 4,
+          "afterMask": {
+            "prefixHits": 59,
+            "prefixReplays": 8,
+            "appendedPoints": 877,
+            "activeBytes": 8924388
+          },
+          "after": 5,
+          "strokes": 17
+        }
+      }
+    ]
+  },
+  "validation": {
+    "unitAndApiTests": 729,
+    "affectedBrowserTests": 29,
+    "productionCasesPerTrial": 3,
+    "productionTrials": 2,
+    "buildAndTypecheck": "passed"
+  }
+}

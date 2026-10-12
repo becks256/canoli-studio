@@ -1,0 +1,1012 @@
+{
+  "date": "2026-10-03",
+  "environment": {
+    "browser": "local headless Chromium",
+    "viewportCssPixels": [
+      1440,
+      1000
+    ],
+    "documentPixels": [
+      1600,
+      1200
+    ],
+    "backend": "canvas2d",
+    "build": "Vite development"
+  },
+  "method": "60 mouse moves with a 16 ms requested pause. Instrument ToolController.move and prepared frame present. Exclude initial pointer-down frame from aggregates. One before/after run.",
+  "limitations": [
+    "Software presentation timing, not hardware input-to-photon latency.",
+    "Simple single paint layer, default brush settings; not a complex-document or real-device performance gate.",
+    "Browser automation pacing and instrumentation affect measurements."
+  ],
+  "runs": {
+    "before": {
+      "samples": [
+        {
+          "input": 17.5,
+          "publish": 17.299999952316284,
+          "render": 5.800000011920929,
+          "total": 23.600000023841858,
+          "backend": "canvas2d",
+          "points": 2
+        },
+        {
+          "input": 18.30000001192093,
+          "publish": 18,
+          "render": 4.800000011920929,
+          "total": 23.400000035762787,
+          "backend": "canvas2d",
+          "points": 3
+        },
+        {
+          "input": 18,
+          "publish": 17.900000035762787,
+          "render": 4.800000011920929,
+          "total": 23.099999964237213,
+          "backend": "canvas2d",
+          "points": 4
+        },
+        {
+          "input": 18.69999998807907,
+          "publish": 18.5,
+          "render": 6.200000047683716,
+          "total": 25.19999998807907,
+          "backend": "canvas2d",
+          "points": 5
+        },
+        {
+          "input": 20.100000023841858,
+          "publish": 20,
+          "render": 6.299999952316284,
+          "total": 26.600000023841858,
+          "backend": "canvas2d",
+          "points": 6
+        },
+        {
+          "input": 22,
+          "publish": 21.899999976158142,
+          "render": 7,
+          "total": 29.19999998807907,
+          "backend": "canvas2d",
+          "points": 7
+        },
+        {
+          "input": 17.5,
+          "publish": 17.299999952316284,
+          "render": 4.600000023841858,
+          "total": 22.30000001192093,
+          "backend": "canvas2d",
+          "points": 8
+        },
+        {
+          "input": 18.5,
+          "publish": 18.400000035762787,
+          "render": 5,
+          "total": 23.69999998807907,
+          "backend": "canvas2d",
+          "points": 9
+        },
+        {
+          "input": 21.200000047683716,
+          "publish": 21,
+          "render": 5.199999988079071,
+          "total": 26.80000001192093,
+          "backend": "canvas2d",
+          "points": 10
+        },
+        {
+          "input": 21.5,
+          "publish": 21.30000001192093,
+          "render": 5.899999976158142,
+          "total": 27.69999998807907,
+          "backend": "canvas2d",
+          "points": 11
+        },
+        {
+          "input": 19.399999976158142,
+          "publish": 19.19999998807907,
+          "render": 4.600000023841858,
+          "total": 24.299999952316284,
+          "backend": "canvas2d",
+          "points": 12
+        },
+        {
+          "input": 7,
+          "publish": 6.900000035762787,
+          "render": 5.699999988079071,
+          "total": 13,
+          "backend": "canvas2d",
+          "points": 13
+        },
+        {
+          "input": 7.199999988079071,
+          "publish": 7,
+          "render": 6.100000023841858,
+          "total": 13.5,
+          "backend": "canvas2d",
+          "points": 14
+        },
+        {
+          "input": 5.599999964237213,
+          "publish": 5.5,
+          "render": 4.400000035762787,
+          "total": 10.299999952316284,
+          "backend": "canvas2d",
+          "points": 15
+        },
+        {
+          "input": 6,
+          "publish": 5.799999952316284,
+          "render": 5.400000035762787,
+          "total": 11.800000011920929,
+          "backend": "canvas2d",
+          "points": 16
+        },
+        {
+          "input": 6.800000011920929,
+          "publish": 6.699999988079071,
+          "render": 5.099999964237213,
+          "total": 12.199999988079071,
+          "backend": "canvas2d",
+          "points": 17
+        },
+        {
+          "input": 6.5,
+          "publish": 6.300000011920929,
+          "render": 4.699999988079071,
+          "total": 11.400000035762787,
+          "backend": "canvas2d",
+          "points": 18
+        },
+        {
+          "input": 5.900000035762787,
+          "publish": 5.800000011920929,
+          "render": 4.399999976158142,
+          "total": 10.600000023841858,
+          "backend": "canvas2d",
+          "points": 19
+        },
+        {
+          "input": 6.299999952316284,
+          "publish": 6.199999988079071,
+          "render": 5.400000035762787,
+          "total": 12,
+          "backend": "canvas2d",
+          "points": 20
+        },
+        {
+          "input": 5.900000035762787,
+          "publish": 5.800000011920929,
+          "render": 5,
+          "total": 11.100000023841858,
+          "backend": "canvas2d",
+          "points": 21
+        },
+        {
+          "input": 18.899999976158142,
+          "publish": 18.599999964237213,
+          "render": 5.200000047683716,
+          "total": 24.399999976158142,
+          "backend": "canvas2d",
+          "points": 22
+        },
+        {
+          "input": 18.80000001192093,
+          "publish": 18.399999976158142,
+          "render": 5.100000023841858,
+          "total": 24.100000023841858,
+          "backend": "canvas2d",
+          "points": 23
+        },
+        {
+          "input": 18.599999964237213,
+          "publish": 18.5,
+          "render": 5.700000047683716,
+          "total": 24.69999998807907,
+          "backend": "canvas2d",
+          "points": 24
+        },
+        {
+          "input": 17,
+          "publish": 16.900000035762787,
+          "render": 4.899999976158142,
+          "total": 22.19999998807907,
+          "backend": "canvas2d",
+          "points": 25
+        },
+        {
+          "input": 17.799999952316284,
+          "publish": 17.69999998807907,
+          "render": 5.200000047683716,
+          "total": 23.399999976158142,
+          "backend": "canvas2d",
+          "points": 26
+        },
+        {
+          "input": 17.100000023841858,
+          "publish": 17,
+          "render": 5.199999988079071,
+          "total": 22.700000047683716,
+          "backend": "canvas2d",
+          "points": 27
+        },
+        {
+          "input": 16.900000035762787,
+          "publish": 16.80000001192093,
+          "render": 5.699999988079071,
+          "total": 22.900000035762787,
+          "backend": "canvas2d",
+          "points": 28
+        },
+        {
+          "input": 16.80000001192093,
+          "publish": 16.80000001192093,
+          "render": 4.5,
+          "total": 21.5,
+          "backend": "canvas2d",
+          "points": 29
+        },
+        {
+          "input": 16.5,
+          "publish": 16.400000035762787,
+          "render": 4.399999976158142,
+          "total": 21.299999952316284,
+          "backend": "canvas2d",
+          "points": 30
+        },
+        {
+          "input": 17.30000001192093,
+          "publish": 17.100000023841858,
+          "render": 4.800000011920929,
+          "total": 22.30000001192093,
+          "backend": "canvas2d",
+          "points": 31
+        },
+        {
+          "input": 17.900000035762787,
+          "publish": 17.80000001192093,
+          "render": 4.399999976158142,
+          "total": 22.5,
+          "backend": "canvas2d",
+          "points": 32
+        },
+        {
+          "input": 18.69999998807907,
+          "publish": 18.5,
+          "render": 5.600000023841858,
+          "total": 24.69999998807907,
+          "backend": "canvas2d",
+          "points": 33
+        },
+        {
+          "input": 5.699999988079071,
+          "publish": 5.599999964237213,
+          "render": 4.5,
+          "total": 10.600000023841858,
+          "backend": "canvas2d",
+          "points": 34
+        },
+        {
+          "input": 5.600000023841858,
+          "publish": 5.400000035762787,
+          "render": 4.599999964237213,
+          "total": 10.600000023841858,
+          "backend": "canvas2d",
+          "points": 35
+        },
+        {
+          "input": 5.700000047683716,
+          "publish": 5.400000035762787,
+          "render": 4.599999964237213,
+          "total": 10.600000023841858,
+          "backend": "canvas2d",
+          "points": 36
+        },
+        {
+          "input": 5.399999976158142,
+          "publish": 5.399999976158142,
+          "render": 4.5,
+          "total": 10.199999988079071,
+          "backend": "canvas2d",
+          "points": 37
+        },
+        {
+          "input": 6,
+          "publish": 5.800000011920929,
+          "render": 4.399999976158142,
+          "total": 10.699999988079071,
+          "backend": "canvas2d",
+          "points": 38
+        },
+        {
+          "input": 6.100000023841858,
+          "publish": 5.900000035762787,
+          "render": 4.299999952316284,
+          "total": 10.699999988079071,
+          "backend": "canvas2d",
+          "points": 39
+        },
+        {
+          "input": 5.400000035762787,
+          "publish": 5.300000011920929,
+          "render": 4.399999976158142,
+          "total": 10.200000047683716,
+          "backend": "canvas2d",
+          "points": 40
+        },
+        {
+          "input": 5.199999988079071,
+          "publish": 5.099999964237213,
+          "render": 5.199999988079071,
+          "total": 10.899999976158142,
+          "backend": "canvas2d",
+          "points": 41
+        },
+        {
+          "input": 5.199999988079071,
+          "publish": 5,
+          "render": 5.300000011920929,
+          "total": 10.800000011920929,
+          "backend": "canvas2d",
+          "points": 42
+        },
+        {
+          "input": 5.5,
+          "publish": 5.199999988079071,
+          "render": 4.300000011920929,
+          "total": 10.100000023841858,
+          "backend": "canvas2d",
+          "points": 43
+        },
+        {
+          "input": 5.399999976158142,
+          "publish": 5.199999988079071,
+          "render": 4.199999988079071,
+          "total": 10,
+          "backend": "canvas2d",
+          "points": 44
+        },
+        {
+          "input": 5.599999964237213,
+          "publish": 5.399999976158142,
+          "render": 4.699999988079071,
+          "total": 10.699999988079071,
+          "backend": "canvas2d",
+          "points": 45
+        },
+        {
+          "input": 5.600000023841858,
+          "publish": 5.400000035762787,
+          "render": 4.399999976158142,
+          "total": 10.199999988079071,
+          "backend": "canvas2d",
+          "points": 46
+        },
+        {
+          "input": 16.80000001192093,
+          "publish": 16.700000047683716,
+          "render": 4.699999988079071,
+          "total": 21.80000001192093,
+          "backend": "canvas2d",
+          "points": 47
+        },
+        {
+          "input": 17.19999998807907,
+          "publish": 17.100000023841858,
+          "render": 4.399999976158142,
+          "total": 21.899999976158142,
+          "backend": "canvas2d",
+          "points": 48
+        },
+        {
+          "input": 17.69999998807907,
+          "publish": 17.600000023841858,
+          "render": 4.5,
+          "total": 22.599999964237213,
+          "backend": "canvas2d",
+          "points": 49
+        },
+        {
+          "input": 16.899999976158142,
+          "publish": 16.69999998807907,
+          "render": 4.899999976158142,
+          "total": 22.19999998807907,
+          "backend": "canvas2d",
+          "points": 50
+        },
+        {
+          "input": 18.5,
+          "publish": 18.399999976158142,
+          "render": 6.700000047683716,
+          "total": 25.600000023841858,
+          "backend": "canvas2d",
+          "points": 51
+        },
+        {
+          "input": 16.600000023841858,
+          "publish": 16.5,
+          "render": 5.099999964237213,
+          "total": 22,
+          "backend": "canvas2d",
+          "points": 52
+        },
+        {
+          "input": 17.19999998807907,
+          "publish": 17,
+          "render": 5,
+          "total": 22.5,
+          "backend": "canvas2d",
+          "points": 53
+        },
+        {
+          "input": 16.600000023841858,
+          "publish": 16.5,
+          "render": 4.699999988079071,
+          "total": 21.5,
+          "backend": "canvas2d",
+          "points": 54
+        },
+        {
+          "input": 16.299999952316284,
+          "publish": 16.099999964237213,
+          "render": 4.100000023841858,
+          "total": 20.799999952316284,
+          "backend": "canvas2d",
+          "points": 55
+        },
+        {
+          "input": 17.100000023841858,
+          "publish": 16.900000035762787,
+          "render": 4.799999952316284,
+          "total": 22.19999998807907,
+          "backend": "canvas2d",
+          "points": 56
+        },
+        {
+          "input": 16.600000023841858,
+          "publish": 16.400000035762787,
+          "render": 4.5,
+          "total": 21.30000001192093,
+          "backend": "canvas2d",
+          "points": 57
+        },
+        {
+          "input": 17.5,
+          "publish": 17.299999952316284,
+          "render": 4.600000023841858,
+          "total": 22.5,
+          "backend": "canvas2d",
+          "points": 58
+        },
+        {
+          "input": 5.5,
+          "publish": 5.399999976158142,
+          "render": 4.600000023841858,
+          "total": 10.399999976158142,
+          "backend": "canvas2d",
+          "points": 59
+        },
+        {
+          "input": 5.800000011920929,
+          "publish": 5.599999964237213,
+          "render": 4.5,
+          "total": 10.600000023841858,
+          "backend": "canvas2d",
+          "points": 60
+        }
+      ],
+      "summaryMs": {
+        "input": {
+          "median": 16.80000001192093,
+          "p95": 21.200000047683716
+        },
+        "publish": {
+          "median": 16.69999998807907,
+          "p95": 21
+        },
+        "render": {
+          "median": 4.800000011920929,
+          "p95": 6.299999952316284
+        },
+        "total": {
+          "median": 21.80000001192093,
+          "p95": 26.80000001192093
+        }
+      }
+    },
+    "directSubscription": {
+      "samples": [
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 2
+        },
+        {
+          "input": 0.3999999761581421,
+          "publish": 0,
+          "render": 4.700000047683716,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 3
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.400000035762787,
+          "total": 5.400000035762787,
+          "backend": "canvas2d",
+          "points": 4
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0.09999996423721313,
+          "render": 5,
+          "total": 5.899999976158142,
+          "backend": "canvas2d",
+          "points": 5
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.5,
+          "total": 5.199999988079071,
+          "backend": "canvas2d",
+          "points": 6
+        },
+        {
+          "input": 0.699999988079071,
+          "publish": 0,
+          "render": 5.199999988079071,
+          "total": 6.199999988079071,
+          "backend": "canvas2d",
+          "points": 7
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.800000011920929,
+          "backend": "canvas2d",
+          "points": 8
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 5.399999976158142,
+          "total": 6.300000011920929,
+          "backend": "canvas2d",
+          "points": 9
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 5.100000023841858,
+          "total": 5.899999976158142,
+          "backend": "canvas2d",
+          "points": 10
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 4.5,
+          "total": 5.399999976158142,
+          "backend": "canvas2d",
+          "points": 11
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0.09999996423721313,
+          "render": 4.400000035762787,
+          "total": 5.199999988079071,
+          "backend": "canvas2d",
+          "points": 12
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.099999964237213,
+          "total": 4.800000011920929,
+          "backend": "canvas2d",
+          "points": 13
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 5.400000035762787,
+          "total": 6.199999988079071,
+          "backend": "canvas2d",
+          "points": 14
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 5.100000023841858,
+          "total": 6,
+          "backend": "canvas2d",
+          "points": 15
+        },
+        {
+          "input": 1,
+          "publish": 0,
+          "render": 5,
+          "total": 6.300000011920929,
+          "backend": "canvas2d",
+          "points": 16
+        },
+        {
+          "input": 0.699999988079071,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.699999988079071,
+          "backend": "canvas2d",
+          "points": 17
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.399999976158142,
+          "total": 5.199999988079071,
+          "backend": "canvas2d",
+          "points": 18
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.300000011920929,
+          "total": 5.199999988079071,
+          "backend": "canvas2d",
+          "points": 19
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.5,
+          "total": 5.299999952316284,
+          "backend": "canvas2d",
+          "points": 20
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.600000023841858,
+          "total": 5.300000011920929,
+          "backend": "canvas2d",
+          "points": 21
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.300000011920929,
+          "total": 5.100000023841858,
+          "backend": "canvas2d",
+          "points": 22
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.400000035762787,
+          "total": 5.100000023841858,
+          "backend": "canvas2d",
+          "points": 23
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.699999988079071,
+          "total": 5.600000023841858,
+          "backend": "canvas2d",
+          "points": 24
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.199999988079071,
+          "total": 5,
+          "backend": "canvas2d",
+          "points": 25
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.599999964237213,
+          "backend": "canvas2d",
+          "points": 26
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.599999964237213,
+          "total": 5.399999976158142,
+          "backend": "canvas2d",
+          "points": 27
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 5.800000011920929,
+          "total": 6.699999988079071,
+          "backend": "canvas2d",
+          "points": 28
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.399999976158142,
+          "total": 5.099999964237213,
+          "backend": "canvas2d",
+          "points": 29
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 4.300000011920929,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 30
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.5,
+          "total": 5.400000035762787,
+          "backend": "canvas2d",
+          "points": 31
+        },
+        {
+          "input": 0.7000000476837158,
+          "publish": 0,
+          "render": 4.5,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 32
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 6,
+          "total": 7.099999964237213,
+          "backend": "canvas2d",
+          "points": 33
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.599999964237213,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 34
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 6,
+          "total": 6.900000035762787,
+          "backend": "canvas2d",
+          "points": 35
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 4.900000035762787,
+          "total": 5.800000011920929,
+          "backend": "canvas2d",
+          "points": 36
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.200000047683716,
+          "total": 4.900000035762787,
+          "backend": "canvas2d",
+          "points": 37
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 5.299999952316284,
+          "total": 6.199999988079071,
+          "backend": "canvas2d",
+          "points": 38
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 5.399999976158142,
+          "total": 6.199999988079071,
+          "backend": "canvas2d",
+          "points": 39
+        },
+        {
+          "input": 0.7999999523162842,
+          "publish": 0,
+          "render": 4.400000035762787,
+          "total": 5.599999964237213,
+          "backend": "canvas2d",
+          "points": 40
+        },
+        {
+          "input": 0.699999988079071,
+          "publish": 0,
+          "render": 4.599999964237213,
+          "total": 5.599999964237213,
+          "backend": "canvas2d",
+          "points": 41
+        },
+        {
+          "input": 0.7000000476837158,
+          "publish": 0,
+          "render": 5.599999964237213,
+          "total": 6.800000011920929,
+          "backend": "canvas2d",
+          "points": 42
+        },
+        {
+          "input": 0.800000011920929,
+          "publish": 0.10000002384185791,
+          "render": 4.899999976158142,
+          "total": 6,
+          "backend": "canvas2d",
+          "points": 43
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.599999964237213,
+          "backend": "canvas2d",
+          "points": 44
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.5,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 45
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 5.800000011920929,
+          "total": 6.800000011920929,
+          "backend": "canvas2d",
+          "points": 46
+        },
+        {
+          "input": 0.699999988079071,
+          "publish": 0,
+          "render": 4.600000023841858,
+          "total": 5.699999988079071,
+          "backend": "canvas2d",
+          "points": 47
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.600000023841858,
+          "backend": "canvas2d",
+          "points": 48
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.699999988079071,
+          "total": 5.699999988079071,
+          "backend": "canvas2d",
+          "points": 49
+        },
+        {
+          "input": 0.699999988079071,
+          "publish": 0,
+          "render": 5,
+          "total": 6,
+          "backend": "canvas2d",
+          "points": 50
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 5.600000023841858,
+          "total": 6.300000011920929,
+          "backend": "canvas2d",
+          "points": 51
+        },
+        {
+          "input": 0.699999988079071,
+          "publish": 0,
+          "render": 5.200000047683716,
+          "total": 6.199999988079071,
+          "backend": "canvas2d",
+          "points": 52
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 5.599999964237213,
+          "total": 6.5,
+          "backend": "canvas2d",
+          "points": 53
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.699999988079071,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 54
+        },
+        {
+          "input": 0.5,
+          "publish": 0,
+          "render": 4.699999988079071,
+          "total": 5.5,
+          "backend": "canvas2d",
+          "points": 55
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.800000011920929,
+          "backend": "canvas2d",
+          "points": 56
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0.09999996423721313,
+          "render": 4.700000047683716,
+          "total": 5.599999964237213,
+          "backend": "canvas2d",
+          "points": 57
+        },
+        {
+          "input": 0.6000000238418579,
+          "publish": 0,
+          "render": 4.800000011920929,
+          "total": 5.699999988079071,
+          "backend": "canvas2d",
+          "points": 58
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 4.900000035762787,
+          "total": 5.799999952316284,
+          "backend": "canvas2d",
+          "points": 59
+        },
+        {
+          "input": 0.5999999642372131,
+          "publish": 0,
+          "render": 4.400000035762787,
+          "total": 5.300000011920929,
+          "backend": "canvas2d",
+          "points": 60
+        }
+      ],
+      "summaryMs": {
+        "input": {
+          "median": 0.5999999642372131,
+          "p95": 0.7999999523162842
+        },
+        "publish": {
+          "median": 0,
+          "p95": 0.09999996423721313
+        },
+        "render": {
+          "median": 4.700000047683716,
+          "p95": 5.800000011920929
+        },
+        "total": {
+          "median": 5.599999964237213,
+          "p95": 6.800000011920929
+        }
+      }
+    }
+  }
+}

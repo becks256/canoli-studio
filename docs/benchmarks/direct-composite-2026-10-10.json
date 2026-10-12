@@ -1,0 +1,1559 @@
+{
+  "context": "Headless Chromium, production benchmark-enabled build, Canvas2D. Same paced 40-move fixtures as live-paint-production-2026-10-10.json. Single run per case, canvas submission rather than physical display latency.",
+  "runs": [
+    {
+      "tool": "brush",
+      "layers": 0,
+      "samples": [
+        {
+          "inputMs": 5.299999997019768,
+          "prepareMs": 4.5,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 4,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999997019768,
+          "prepareMs": 4.5,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000002980232,
+          "prepareMs": 4.4000000059604645,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.299999997019768,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.5,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.100000008940697,
+          "prepareMs": 4.4000000059604645,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.600000008940697,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000002980232,
+          "prepareMs": 4.799999997019768,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.299999997019768,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.200000002980232,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.600000008940697,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.0999999940395355,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.299999997019768,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.299999997019768,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.4000000059604645,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.5,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.299999997019768,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.4000000059604645,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999991059303,
+          "prepareMs": 4.800000011920929,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.299999997019768,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999997019768,
+          "prepareMs": 4.100000008940697,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.799999997019768,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999997019768,
+          "prepareMs": 4.700000002980232,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999997019768,
+          "prepareMs": 4.700000002980232,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999997019768,
+          "prepareMs": 4.200000002980232,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.399999991059303,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999997019768,
+          "prepareMs": 4.100000008940697,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.399999991059303,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999997019768,
+          "prepareMs": 4.300000011920929,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.700000002980232,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.299999997019768,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999991059303,
+          "prepareMs": 4.600000008940697,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.399999991059303,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000002980232,
+          "prepareMs": 4.5999999940395355,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999997019768,
+          "prepareMs": 4.299999997019768,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.299999997019768,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.299999997019768,
+          "prepareMs": 3.7000000029802322,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.9000000059604645,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ],
+      "summary": {
+        "inputMs": {
+          "median": 5.0999999940395355,
+          "p95": 5.4000000059604645
+        },
+        "prepareMs": {
+          "median": 4.4000000059604645,
+          "p95": 4.799999997019768
+        }
+      }
+    },
+    {
+      "tool": "pencil",
+      "layers": 0,
+      "samples": [
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 5,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000002980232,
+          "prepareMs": 4.299999997019768,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.200000002980232,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.899999991059303,
+          "prepareMs": 4.0999999940395355,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.899999991059303,
+          "prepareMs": 4.399999991059303,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.399999991059303,
+          "prepareMs": 3.9000000059604645,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.0999999940395355,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.100000008940697,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.100000008940697,
+          "prepareMs": 4.4000000059604645,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.799999997019768,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.399999991059303,
+          "prepareMs": 8.099999994039536,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8,
+          "prepareMs": 6.299999997019768,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.700000002980232,
+          "prepareMs": 4.200000002980232,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.299999997019768,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5999999940395355,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.899999991059303,
+          "prepareMs": 4.200000002980232,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.799999997019768,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000002980232,
+          "prepareMs": 5.299999997019768,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.100000008940697,
+          "prepareMs": 4.4000000059604645,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.399999991059303,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5.200000002980232,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.600000008940697,
+          "prepareMs": 4,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9,
+          "prepareMs": 7.299999997019768,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.200000002980232,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 4,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.299999997019768,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.700000002980232,
+          "prepareMs": 6.800000011920929,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999997019768,
+          "prepareMs": 4.200000002980232,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4.299999997019768,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.100000008940697,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.100000008940697,
+          "prepareMs": 4.299999997019768,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.799999997019768,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.5,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999997019768,
+          "prepareMs": 4.200000002980232,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 4,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.300000011920929,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.899999991059303,
+          "prepareMs": 4.0999999940395355,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.700000002980232,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ],
+      "summary": {
+        "inputMs": {
+          "median": 5.0999999940395355,
+          "p95": 8
+        },
+        "prepareMs": {
+          "median": 4.300000011920929,
+          "p95": 6.800000011920929
+        }
+      }
+    },
+    {
+      "tool": "brush",
+      "layers": 5,
+      "samples": [
+        {
+          "inputMs": 12.399999991059303,
+          "prepareMs": 9.5,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.099999994039536,
+          "prepareMs": 9.400000005960464,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.799999997019768,
+          "prepareMs": 9.900000005960464,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.200000002980232,
+          "prepareMs": 10.199999988079071,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.399999991059303,
+          "prepareMs": 9.5,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.400000005960464,
+          "prepareMs": 9.799999997019768,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 48.900000005960464,
+          "prepareMs": 9.900000005960464,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.299999997019768,
+          "prepareMs": 9.399999991059303,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.700000002980232,
+          "prepareMs": 9.099999994039536,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.800000011920929,
+          "prepareMs": 9.699999988079071,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.099999994039536,
+          "prepareMs": 9.700000002980232,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.799999997019768,
+          "prepareMs": 9.899999991059303,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13,
+          "prepareMs": 10,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.899999991059303,
+          "prepareMs": 9.5,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.099999994039536,
+          "prepareMs": 8.899999991059303,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12,
+          "prepareMs": 9.700000002980232,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.099999994039536,
+          "prepareMs": 9.599999994039536,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.5,
+          "prepareMs": 10.599999994039536,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.099999994039536,
+          "prepareMs": 9.800000011920929,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.800000011920929,
+          "prepareMs": 9.299999997019768,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.899999991059303,
+          "prepareMs": 10.599999994039536,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.299999997019768,
+          "prepareMs": 10.299999997019768,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12,
+          "prepareMs": 9.699999988079071,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.100000008940697,
+          "prepareMs": 10.700000002980232,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.900000005960464,
+          "prepareMs": 10.200000002980232,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.700000002980232,
+          "prepareMs": 10,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.100000008940697,
+          "prepareMs": 9.600000008940697,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.799999997019768,
+          "prepareMs": 10.800000011920929,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12,
+          "prepareMs": 9.400000005960464,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12,
+          "prepareMs": 9.599999994039536,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10.399999991059303,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.700000002980232,
+          "prepareMs": 9.400000005960464,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.700000002980232,
+          "prepareMs": 9.399999991059303,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.800000011920929,
+          "prepareMs": 9.100000008940697,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.799999997019768,
+          "prepareMs": 9.099999994039536,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.700000002980232,
+          "prepareMs": 9.599999994039536,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10.399999991059303,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.199999988079071,
+          "prepareMs": 9.599999994039536,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.599999994039536,
+          "prepareMs": 9,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.299999997019768,
+          "prepareMs": 9.799999997019768,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.200000002980232,
+          "prepareMs": 8.900000005960464,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ],
+      "summary": {
+        "inputMs": {
+          "median": 12.199999988079071,
+          "p95": 13.5
+        },
+        "prepareMs": {
+          "median": 9.699999988079071,
+          "p95": 10.599999994039536
+        }
+      }
+    },
+    {
+      "tool": "pencil",
+      "layers": 5,
+      "samples": [
+        {
+          "inputMs": 12.599999994039536,
+          "prepareMs": 9.600000008940697,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.900000005960464,
+          "prepareMs": 9.899999991059303,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10.099999994039536,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.400000005960464,
+          "prepareMs": 9.799999997019768,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.799999997019768,
+          "prepareMs": 9.399999991059303,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.399999991059303,
+          "prepareMs": 9.5,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.5,
+          "prepareMs": 10.400000005960464,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.099999994039536,
+          "prepareMs": 9.300000011920929,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.899999991059303,
+          "prepareMs": 10.200000002980232,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.099999994039536,
+          "prepareMs": 9.600000008940697,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.299999997019768,
+          "prepareMs": 9.600000008940697,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.900000005960464,
+          "prepareMs": 9.400000005960464,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.399999991059303,
+          "prepareMs": 8.899999991059303,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.400000005960464,
+          "prepareMs": 9.700000002980232,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.400000005960464,
+          "prepareMs": 10.5,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.700000002980232,
+          "prepareMs": 10.099999994039536,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13,
+          "prepareMs": 10.300000011920929,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12,
+          "prepareMs": 9.600000008940697,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12,
+          "prepareMs": 9.599999994039536,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.099999994039536,
+          "prepareMs": 9,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.899999991059303,
+          "prepareMs": 9.899999991059303,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.299999997019768,
+          "prepareMs": 11.5,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.400000005960464,
+          "prepareMs": 10.800000011920929,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.100000008940697,
+          "prepareMs": 11.399999991059303,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.100000008940697,
+          "prepareMs": 10.299999997019768,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.900000005960464,
+          "prepareMs": 11.400000005960464,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.5,
+          "prepareMs": 11.399999991059303,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.799999997019768,
+          "prepareMs": 10.099999994039536,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.200000002980232,
+          "prepareMs": 11.200000002980232,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13,
+          "prepareMs": 9.900000005960464,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.900000005960464,
+          "prepareMs": 10.299999997019768,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.200000002980232,
+          "prepareMs": 10.400000005960464,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.600000008940697,
+          "prepareMs": 10.100000008940697,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.299999997019768,
+          "prepareMs": 10.200000002980232,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.899999991059303,
+          "prepareMs": 9.400000005960464,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.299999997019768,
+          "prepareMs": 9.799999997019768,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.299999997019768,
+          "prepareMs": 11,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.200000002980232,
+          "prepareMs": 9.600000008940697,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.900000005960464,
+          "prepareMs": 10,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.299999997019768,
+          "prepareMs": 11.400000005960464,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ],
+      "summary": {
+        "inputMs": {
+          "median": 12.899999991059303,
+          "p95": 14.299999997019768
+        },
+        "prepareMs": {
+          "median": 10,
+          "p95": 11.400000005960464
+        }
+      }
+    },
+    {
+      "tool": "brush",
+      "layers": 20,
+      "samples": [
+        {
+          "inputMs": 50.29999999701977,
+          "prepareMs": 48.400000005960464,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.400000005960464,
+          "prepareMs": 35.19999998807907,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38.099999994039536,
+          "prepareMs": 37,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38,
+          "prepareMs": 36.70000000298023,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.8999999910593,
+          "prepareMs": 36.70000000298023,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38.400000005960464,
+          "prepareMs": 37.099999994039536,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38.900000005960464,
+          "prepareMs": 37.6000000089407,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.70000000298023,
+          "prepareMs": 36.400000005960464,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 35.900000005960464,
+          "prepareMs": 34.70000000298023,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.1000000089407,
+          "prepareMs": 36,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.1000000089407,
+          "prepareMs": 35.900000005960464,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.5,
+          "prepareMs": 36.30000001192093,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.5,
+          "prepareMs": 35.19999998807907,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.5,
+          "prepareMs": 38.29999999701977,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.400000005960464,
+          "prepareMs": 36.3999999910593,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.30000001192093,
+          "prepareMs": 38.29999999701977,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.70000000298023,
+          "prepareMs": 35.5,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.5,
+          "prepareMs": 35.29999999701977,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.29999999701977,
+          "prepareMs": 35.099999994039536,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.599999994039536,
+          "prepareMs": 36.599999994039536,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.79999999701977,
+          "prepareMs": 36.30000001192093,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38.80000001192093,
+          "prepareMs": 37.599999994039536,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 40.5,
+          "prepareMs": 39.20000000298023,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38.19999998807907,
+          "prepareMs": 37,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 40,
+          "prepareMs": 38.8999999910593,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 40.79999999701977,
+          "prepareMs": 39.099999994039536,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.70000000298023,
+          "prepareMs": 38.599999994039536,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.099999994039536,
+          "prepareMs": 34.8999999910593,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 35.69999998807907,
+          "prepareMs": 34.70000000298023,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.900000005960464,
+          "prepareMs": 35.79999999701977,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 41.099999994039536,
+          "prepareMs": 39.900000005960464,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.3999999910593,
+          "prepareMs": 35.30000001192093,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.6000000089407,
+          "prepareMs": 38.29999999701977,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.099999994039536,
+          "prepareMs": 38,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.1000000089407,
+          "prepareMs": 36.1000000089407,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 42.900000005960464,
+          "prepareMs": 41.70000000298023,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 40.70000000298023,
+          "prepareMs": 39.70000000298023,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 40.599999994039536,
+          "prepareMs": 39.5,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 42.20000000298023,
+          "prepareMs": 40.900000005960464,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 41,
+          "prepareMs": 39.900000005960464,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ],
+      "summary": {
+        "inputMs": {
+          "median": 38.099999994039536,
+          "p95": 42.20000000298023
+        },
+        "prepareMs": {
+          "median": 37,
+          "p95": 40.900000005960464
+        }
+      }
+    },
+    {
+      "tool": "pencil",
+      "layers": 20,
+      "samples": [
+        {
+          "inputMs": 33.70000000298023,
+          "prepareMs": 33.099999994039536,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.900000005960464,
+          "prepareMs": 33.29999999701977,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.099999994039536,
+          "prepareMs": 32.79999999701977,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 75.09999999403954,
+          "prepareMs": 33.79999999701977,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.900000005960464,
+          "prepareMs": 33.3999999910593,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.79999999701977,
+          "prepareMs": 33.29999999701977,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 34.29999999701977,
+          "prepareMs": 34.099999994039536,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 34.1000000089407,
+          "prepareMs": 33.70000000298023,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.5,
+          "prepareMs": 33.099999994039536,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.099999994039536,
+          "prepareMs": 38.69999998807907,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.20000000298023,
+          "prepareMs": 36.8999999910593,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.29999999701977,
+          "prepareMs": 37,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 34.29999999701977,
+          "prepareMs": 33.79999999701977,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38,
+          "prepareMs": 37.70000000298023,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 40.69999998807907,
+          "prepareMs": 40.30000001192093,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 35.1000000089407,
+          "prepareMs": 34.80000001192093,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.8999999910593,
+          "prepareMs": 36.599999994039536,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.19999998807907,
+          "prepareMs": 32.70000000298023,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.29999999701977,
+          "prepareMs": 32.900000005960464,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36,
+          "prepareMs": 35.79999999701977,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 32.70000000298023,
+          "prepareMs": 32.29999999701977,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.70000000298023,
+          "prepareMs": 33.29999999701977,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.599999994039536,
+          "prepareMs": 33.20000000298023,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.900000005960464,
+          "prepareMs": 36.79999999701977,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.79999999701977,
+          "prepareMs": 36.5,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.80000001192093,
+          "prepareMs": 33.5,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 35.400000005960464,
+          "prepareMs": 35.099999994039536,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.20000000298023,
+          "prepareMs": 36.900000005960464,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.19999998807907,
+          "prepareMs": 33,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.599999994039536,
+          "prepareMs": 33.099999994039536,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 34.099999994039536,
+          "prepareMs": 33.8999999910593,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 38.70000000298023,
+          "prepareMs": 38.5,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.6000000089407,
+          "prepareMs": 36.29999999701977,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 33.400000005960464,
+          "prepareMs": 33,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 32.900000005960464,
+          "prepareMs": 32.5,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37,
+          "prepareMs": 36.70000000298023,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 35.8999999910593,
+          "prepareMs": 35.599999994039536,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.19999998807907,
+          "prepareMs": 37,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.79999999701977,
+          "prepareMs": 36.5,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 35.6000000089407,
+          "prepareMs": 35.29999999701977,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.79999999701977,
+          "prepareMs": 37.599999994039536,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ],
+      "summary": {
+        "inputMs": {
+          "median": 35.1000000089407,
+          "p95": 39.099999994039536
+        },
+        "prepareMs": {
+          "median": 34.099999994039536,
+          "p95": 38.5
+        }
+      }
+    }
+  ]
+}

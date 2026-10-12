@@ -1,0 +1,920 @@
+{
+  "date": "2026-10-12",
+  "change": "Use the immutable document snapshot for read-only inspector rotation calculations.",
+  "percentileMethod": "Nearest rank: sorted[ceil(p*n)-1]",
+  "runs": {
+    "before": [
+      {
+        "strokes": 0,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 31,
+        "copyMs": 1.8000000417232513,
+        "frames": [
+          {
+            "phase": "preview",
+            "ms": 10.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 9.299999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "preview",
+            "ms": 7.299999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 6.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 6.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.600000023841858
+          },
+          {
+            "phase": "preview",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 7
+          },
+          {
+            "phase": "preview",
+            "ms": 8
+          },
+          {
+            "phase": "preview",
+            "ms": 7.100000023841858
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.4000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6
+          },
+          {
+            "phase": "preview",
+            "ms": 6.200000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7
+          },
+          {
+            "phase": "preview",
+            "ms": 6.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 8.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 8.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 5.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5
+          },
+          {
+            "phase": "commit",
+            "ms": 15.699999988079071
+          }
+        ],
+        "revision": 4,
+        "transform": {
+          "a": 0.23004973718810445,
+          "b": 0.9731788727770883,
+          "c": -0.9731788727770883,
+          "d": 0.23004973718810445,
+          "e": 320.5231759360352,
+          "f": 92.94370069030876
+        }
+      },
+      {
+        "strokes": 64,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 31,
+        "copyMs": 1278.000000089407,
+        "frames": [
+          {
+            "phase": "preview",
+            "ms": 54
+          },
+          {
+            "phase": "preview",
+            "ms": 56.400000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 51
+          },
+          {
+            "phase": "preview",
+            "ms": 54
+          },
+          {
+            "phase": "preview",
+            "ms": 48.19999998807907
+          },
+          {
+            "phase": "preview",
+            "ms": 55.099999994039536
+          },
+          {
+            "phase": "preview",
+            "ms": 44.39999997615814
+          },
+          {
+            "phase": "preview",
+            "ms": 44.69999998807907
+          },
+          {
+            "phase": "preview",
+            "ms": 49.29999998211861
+          },
+          {
+            "phase": "preview",
+            "ms": 48.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 46.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 47.19999998807907
+          },
+          {
+            "phase": "preview",
+            "ms": 49.19999998807907
+          },
+          {
+            "phase": "preview",
+            "ms": 44
+          },
+          {
+            "phase": "preview",
+            "ms": 46
+          },
+          {
+            "phase": "preview",
+            "ms": 50.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 46.19999998807907
+          },
+          {
+            "phase": "preview",
+            "ms": 44.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 47.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 49.80000001192093
+          },
+          {
+            "phase": "preview",
+            "ms": 46
+          },
+          {
+            "phase": "preview",
+            "ms": 49.70000001788139
+          },
+          {
+            "phase": "preview",
+            "ms": 51.19999998807907
+          },
+          {
+            "phase": "preview",
+            "ms": 51.20000001788139
+          },
+          {
+            "phase": "preview",
+            "ms": 48.5
+          },
+          {
+            "phase": "preview",
+            "ms": 50.69999998807907
+          },
+          {
+            "phase": "preview",
+            "ms": 49.29999998211861
+          },
+          {
+            "phase": "preview",
+            "ms": 48.30000001192093
+          },
+          {
+            "phase": "preview",
+            "ms": 52.5
+          },
+          {
+            "phase": "preview",
+            "ms": 47.69999998807907
+          },
+          {
+            "phase": "commit",
+            "ms": 52.099999994039536
+          }
+        ],
+        "revision": 4,
+        "transform": {
+          "a": 0.23004973718810445,
+          "b": 0.9731788727770883,
+          "c": -0.9731788727770883,
+          "d": 0.23004973718810445,
+          "e": 320.5231759360352,
+          "f": 92.94370069030876
+        }
+      }
+    ],
+    "after": [
+      {
+        "strokes": 0,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "preview",
+            "ms": 10.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 8.700000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 8.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 8.400000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 8.600000023841858
+          },
+          {
+            "phase": "preview",
+            "ms": 6.700000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5
+          },
+          {
+            "phase": "preview",
+            "ms": 7.800000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 6.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 9.400000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 8.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 5.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.200000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 6
+          },
+          {
+            "phase": "preview",
+            "ms": 5.800000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 6.700000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 6.4000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 6.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.299999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 9.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 7.800000011920929
+          },
+          {
+            "phase": "commit",
+            "ms": 7.5999999940395355
+          }
+        ],
+        "revision": 4,
+        "transform": {
+          "a": 0.23004973718810445,
+          "b": 0.9731788727770883,
+          "c": -0.9731788727770883,
+          "d": 0.23004973718810445,
+          "e": 320.5231759360352,
+          "f": 92.94370069030876
+        }
+      },
+      {
+        "strokes": 64,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "preview",
+            "ms": 11
+          },
+          {
+            "phase": "preview",
+            "ms": 8.899999976158142
+          },
+          {
+            "phase": "preview",
+            "ms": 9.5
+          },
+          {
+            "phase": "preview",
+            "ms": 13.5
+          },
+          {
+            "phase": "preview",
+            "ms": 7
+          },
+          {
+            "phase": "preview",
+            "ms": 10.899999976158142
+          },
+          {
+            "phase": "preview",
+            "ms": 7.200000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 7.200000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 6.800000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 8.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 6.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 6
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 6.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 7
+          },
+          {
+            "phase": "preview",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 9.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 6.800000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 6.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 5.899999976158142
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 8.900000005960464
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 7.200000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 6.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 8.599999994039536
+          },
+          {
+            "phase": "commit",
+            "ms": 9.099999994039536
+          }
+        ],
+        "revision": 4,
+        "transform": {
+          "a": 0.23004973718810445,
+          "b": 0.9731788727770883,
+          "c": -0.9731788727770883,
+          "d": 0.23004973718810445,
+          "e": 320.5231759360352,
+          "f": 92.94370069030876
+        }
+      }
+    ],
+    "repeat": [
+      {
+        "strokes": 0,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "preview",
+            "ms": 10.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 8.399999976158142
+          },
+          {
+            "phase": "preview",
+            "ms": 9
+          },
+          {
+            "phase": "preview",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 7
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.4000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.700000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 8.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 7.700000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 7.5999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 7.200000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 8.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 8.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 6.299999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 6.4000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 6.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 6.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.200000017881393
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.4000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 6.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 5.899999976158142
+          },
+          {
+            "phase": "preview",
+            "ms": 6
+          },
+          {
+            "phase": "preview",
+            "ms": 6.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.399999976158142
+          },
+          {
+            "phase": "commit",
+            "ms": 20.599999994039536
+          }
+        ],
+        "revision": 4,
+        "transform": {
+          "a": 0.23004973718810445,
+          "b": 0.9731788727770883,
+          "c": -0.9731788727770883,
+          "d": 0.23004973718810445,
+          "e": 320.5231759360352,
+          "f": 92.94370069030876
+        }
+      },
+      {
+        "strokes": 64,
+        "start": 0,
+        "phase": "commit",
+        "sequence": 31,
+        "copies": 0,
+        "copyMs": 0,
+        "frames": [
+          {
+            "phase": "preview",
+            "ms": 11.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 11.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 8
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 6.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 7.800000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 8.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.100000023841858
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 7.399999976158142
+          },
+          {
+            "phase": "preview",
+            "ms": 6.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 8.099999994039536
+          },
+          {
+            "phase": "preview",
+            "ms": 7.800000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 6.299999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 7.799999982118607
+          },
+          {
+            "phase": "preview",
+            "ms": 7.699999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 6
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 5.9000000059604645
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.5
+          },
+          {
+            "phase": "preview",
+            "ms": 6.199999988079071
+          },
+          {
+            "phase": "preview",
+            "ms": 6.0999999940395355
+          },
+          {
+            "phase": "preview",
+            "ms": 8.300000011920929
+          },
+          {
+            "phase": "preview",
+            "ms": 6.4000000059604645
+          },
+          {
+            "phase": "commit",
+            "ms": 8.599999994039536
+          }
+        ],
+        "revision": 4,
+        "transform": {
+          "a": 0.23004973718810445,
+          "b": 0.9731788727770883,
+          "c": -0.9731788727770883,
+          "d": 0.23004973718810445,
+          "e": 320.5231759360352,
+          "f": 92.94370069030876
+        }
+      }
+    ]
+  },
+  "summary": {
+    "before": [
+      {
+        "strokes": 0,
+        "medianMs": 7.049999997019768,
+        "p95Ms": 9.299999982118607,
+        "copies": 31
+      },
+      {
+        "strokes": 64,
+        "medianMs": 49.04999999701977,
+        "p95Ms": 55.099999994039536,
+        "copies": 31
+      }
+    ],
+    "after": [
+      {
+        "strokes": 0,
+        "medianMs": 7.149999991059303,
+        "p95Ms": 9.900000005960464,
+        "copies": 0
+      },
+      {
+        "strokes": 64,
+        "medianMs": 7.199999988079071,
+        "p95Ms": 11,
+        "copies": 0
+      }
+    ],
+    "repeat": [
+      {
+        "strokes": 0,
+        "medianMs": 6.799999997019768,
+        "p95Ms": 9,
+        "copies": 0
+      },
+      {
+        "strokes": 64,
+        "medianMs": 7.0999999940395355,
+        "p95Ms": 11.300000011920929,
+        "copies": 0
+      }
+    ]
+  },
+  "limitations": [
+    "Retained paint source is hidden to isolate metadata copying from drawing.",
+    "Local Chromium timing only; 30 previews per size per run.",
+    "No claim of broad editor completion."
+  ]
+}

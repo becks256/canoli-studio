@@ -1,0 +1,156 @@
+{
+  "date": "2026-10-11",
+  "scope": "Production Chromium, dense single path versus many short paths. All anchors retained, live geometry and one history commit asserted.",
+  "decision": "Revert chunked React controls: small drag difference and worse release do not justify added complexity. Dense path remains unresolved.",
+  "baseline": [
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 68,
+      "p95": 82.19999998807907,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 112.69999998807907,
+          "prepareMs": 7.4000000059604645
+        }
+      ],
+      "longTasks": [
+        110,
+        111,
+        96,
+        89,
+        82,
+        77,
+        80,
+        80,
+        71,
+        81,
+        77,
+        73,
+        83,
+        74,
+        71,
+        72,
+        76,
+        70,
+        104,
+        72,
+        69,
+        72,
+        82,
+        69,
+        77,
+        70,
+        80,
+        81,
+        70,
+        72,
+        70,
+        71,
+        104
+      ]
+    }
+  ],
+  "rejectedChunkExperiment": [
+    {
+      "paths": 20,
+      "anchors": 4,
+      "frames": 30,
+      "median": 8.799999982118607,
+      "p95": 12.099999994039536,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 16.5,
+          "prepareMs": 4.100000023841858
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 200,
+      "anchors": 4,
+      "frames": 30,
+      "median": 11.699999988079071,
+      "p95": 16.5,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 19.5,
+          "prepareMs": 5.5
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 2000,
+      "anchors": 4,
+      "frames": 30,
+      "median": 29.700000017881393,
+      "p95": 36,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 50.20000001788139,
+          "prepareMs": 8.799999982118607
+        }
+      ],
+      "longTasks": [
+        135,
+        72,
+        58
+      ]
+    },
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 64.2999999821186,
+      "p95": 70.5,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 121.30000001192093,
+          "prepareMs": 7.9000000059604645
+        }
+      ],
+      "longTasks": [
+        120,
+        117,
+        81,
+        70,
+        73,
+        75,
+        68,
+        69,
+        66,
+        78,
+        68,
+        72,
+        66,
+        67,
+        67,
+        74,
+        67,
+        71,
+        75,
+        70,
+        69,
+        69,
+        71,
+        68,
+        76,
+        67,
+        67,
+        84,
+        72,
+        69,
+        65,
+        64,
+        113
+      ]
+    }
+  ]
+}

@@ -1,0 +1,651 @@
+{
+  "status": "Live clone feedback implemented and measured; broad responsiveness goal remains active.",
+  "scope": "One production headless Chromium run, 698x396 document, eight short size-16 strokes. Canvas submission, not physical scanout. Does not cover large clone footprints or complex source documents.",
+  "measurement": {
+    "tool": "clone",
+    "strokes": 8,
+    "start": 0,
+    "revision": 8,
+    "samples": [
+      143.70000000298023,
+      32.599999994039536,
+      32.29999999701977,
+      30.099999994039536,
+      32.400000005960464,
+      48.1000000089407,
+      33.900000005960464,
+      33.70000000298023
+    ],
+    "longTasks": [],
+    "phases": [
+      {
+        "method": "render",
+        "ms": 0.5
+      },
+      {
+        "method": "render",
+        "ms": 9.399999991059303
+      },
+      {
+        "method": "render",
+        "ms": 5.5999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 5.700000002980232
+      },
+      {
+        "method": "render",
+        "ms": 6
+      },
+      {
+        "method": "render",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 4.399999991059303
+      },
+      {
+        "method": "render",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "toBlob",
+        "ms": 108.40000000596046
+      },
+      {
+        "method": "render",
+        "ms": 6.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 1.7999999970197678
+      },
+      {
+        "method": "render",
+        "ms": 7.799999997019768
+      },
+      {
+        "method": "render",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 5.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 5
+      },
+      {
+        "method": "render",
+        "ms": 5.100000008940697
+      },
+      {
+        "method": "render",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 4.9000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 3.2000000029802322
+      },
+      {
+        "method": "render",
+        "ms": 5
+      },
+      {
+        "method": "toBlob",
+        "ms": 12.599999994039536
+      },
+      {
+        "method": "render",
+        "ms": 6.5
+      },
+      {
+        "method": "render",
+        "ms": 2.6000000089406967
+      },
+      {
+        "method": "render",
+        "ms": 8.400000005960464
+      },
+      {
+        "method": "render",
+        "ms": 5.800000011920929
+      },
+      {
+        "method": "render",
+        "ms": 5.699999988079071
+      },
+      {
+        "method": "render",
+        "ms": 5
+      },
+      {
+        "method": "render",
+        "ms": 5.100000008940697
+      },
+      {
+        "method": "render",
+        "ms": 4.899999991059303
+      },
+      {
+        "method": "render",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 3.2000000029802322
+      },
+      {
+        "method": "render",
+        "ms": 4.799999997019768
+      },
+      {
+        "method": "toBlob",
+        "ms": 11.599999994039536
+      },
+      {
+        "method": "render",
+        "ms": 6.5
+      },
+      {
+        "method": "render",
+        "ms": 3.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 9.400000005960464
+      },
+      {
+        "method": "render",
+        "ms": 5
+      },
+      {
+        "method": "render",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 5.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 5.5
+      },
+      {
+        "method": "render",
+        "ms": 5.100000008940697
+      },
+      {
+        "method": "render",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 5
+      },
+      {
+        "method": "render",
+        "ms": 2.9000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 4.799999997019768
+      },
+      {
+        "method": "toBlob",
+        "ms": 12
+      },
+      {
+        "method": "render",
+        "ms": 5.5
+      },
+      {
+        "method": "render",
+        "ms": 3.8999999910593033
+      },
+      {
+        "method": "render",
+        "ms": 10
+      },
+      {
+        "method": "render",
+        "ms": 5.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 5.5
+      },
+      {
+        "method": "render",
+        "ms": 5.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 5.100000008940697
+      },
+      {
+        "method": "render",
+        "ms": 4.600000008940697
+      },
+      {
+        "method": "render",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 3.7999999970197678
+      },
+      {
+        "method": "render",
+        "ms": 4.700000002980232
+      },
+      {
+        "method": "toBlob",
+        "ms": 11.700000002980232
+      },
+      {
+        "method": "render",
+        "ms": 5.799999997019768
+      },
+      {
+        "method": "render",
+        "ms": 4.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 10.699999988079071
+      },
+      {
+        "method": "render",
+        "ms": 5.0999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 5
+      },
+      {
+        "method": "render",
+        "ms": 5.5
+      },
+      {
+        "method": "render",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 5.0999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 5.700000002980232
+      },
+      {
+        "method": "render",
+        "ms": 4.300000011920929
+      },
+      {
+        "method": "render",
+        "ms": 5.299999997019768
+      },
+      {
+        "method": "toBlob",
+        "ms": 14.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 6.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 1.699999988079071
+      },
+      {
+        "method": "render",
+        "ms": 7.100000008940697
+      },
+      {
+        "method": "render",
+        "ms": 5.5
+      },
+      {
+        "method": "render",
+        "ms": 6.300000011920929
+      },
+      {
+        "method": "render",
+        "ms": 6
+      },
+      {
+        "method": "render",
+        "ms": 5.5999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 5.5
+      },
+      {
+        "method": "render",
+        "ms": 6
+      },
+      {
+        "method": "render",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "render",
+        "ms": 5.0999999940395355
+      },
+      {
+        "method": "toBlob",
+        "ms": 12.600000008940697
+      },
+      {
+        "method": "render",
+        "ms": 6.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 2.4000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 8.100000008940697
+      },
+      {
+        "method": "render",
+        "ms": 5.0999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 4.9000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 5.600000008940697
+      },
+      {
+        "method": "render",
+        "ms": 6.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "render",
+        "ms": 5.100000008940697
+      },
+      {
+        "method": "render",
+        "ms": 4
+      },
+      {
+        "method": "render",
+        "ms": 6.100000008940697
+      },
+      {
+        "method": "toBlob",
+        "ms": 12.900000005960464
+      },
+      {
+        "method": "render",
+        "ms": 6.200000002980232
+      }
+    ],
+    "liveStart": 2768.5999999940395,
+    "liveSamples": [
+      {
+        "stroke": 0,
+        "ms": 6.300000011920929
+      },
+      {
+        "stroke": 0,
+        "ms": 6.4000000059604645
+      },
+      {
+        "stroke": 0,
+        "ms": 5.9000000059604645
+      },
+      {
+        "stroke": 0,
+        "ms": 6.5
+      },
+      {
+        "stroke": 0,
+        "ms": 7
+      },
+      {
+        "stroke": 0,
+        "ms": 6.200000002980232
+      },
+      {
+        "stroke": 0,
+        "ms": 11
+      },
+      {
+        "stroke": 1,
+        "ms": 5.799999997019768
+      },
+      {
+        "stroke": 1,
+        "ms": 5.800000011920929
+      },
+      {
+        "stroke": 1,
+        "ms": 5.700000002980232
+      },
+      {
+        "stroke": 1,
+        "ms": 5.5999999940395355
+      },
+      {
+        "stroke": 1,
+        "ms": 5.700000002980232
+      },
+      {
+        "stroke": 1,
+        "ms": 5.399999991059303
+      },
+      {
+        "stroke": 1,
+        "ms": 8.599999994039536
+      },
+      {
+        "stroke": 2,
+        "ms": 6.399999991059303
+      },
+      {
+        "stroke": 2,
+        "ms": 6.5
+      },
+      {
+        "stroke": 2,
+        "ms": 5.600000008940697
+      },
+      {
+        "stroke": 2,
+        "ms": 5.799999997019768
+      },
+      {
+        "stroke": 2,
+        "ms": 5.5
+      },
+      {
+        "stroke": 2,
+        "ms": 6
+      },
+      {
+        "stroke": 2,
+        "ms": 8.5
+      },
+      {
+        "stroke": 3,
+        "ms": 5.699999988079071
+      },
+      {
+        "stroke": 3,
+        "ms": 6
+      },
+      {
+        "stroke": 3,
+        "ms": 22.100000008940697
+      },
+      {
+        "stroke": 3,
+        "ms": 6
+      },
+      {
+        "stroke": 3,
+        "ms": 5.700000002980232
+      },
+      {
+        "stroke": 3,
+        "ms": 6
+      },
+      {
+        "stroke": 3,
+        "ms": 5.5
+      },
+      {
+        "stroke": 3,
+        "ms": 8.300000011920929
+      },
+      {
+        "stroke": 4,
+        "ms": 5.9000000059604645
+      },
+      {
+        "stroke": 4,
+        "ms": 6.299999997019768
+      },
+      {
+        "stroke": 4,
+        "ms": 5.9000000059604645
+      },
+      {
+        "stroke": 4,
+        "ms": 5.700000002980232
+      },
+      {
+        "stroke": 4,
+        "ms": 5.299999997019768
+      },
+      {
+        "stroke": 4,
+        "ms": 5.799999997019768
+      },
+      {
+        "stroke": 4,
+        "ms": 9.100000008940697
+      },
+      {
+        "stroke": 5,
+        "ms": 5.700000002980232
+      },
+      {
+        "stroke": 5,
+        "ms": 5.799999997019768
+      },
+      {
+        "stroke": 5,
+        "ms": 6.199999988079071
+      },
+      {
+        "stroke": 5,
+        "ms": 5.9000000059604645
+      },
+      {
+        "stroke": 5,
+        "ms": 5.799999997019768
+      },
+      {
+        "stroke": 5,
+        "ms": 6.299999997019768
+      },
+      {
+        "stroke": 5,
+        "ms": 10.099999994039536
+      },
+      {
+        "stroke": 6,
+        "ms": 6.200000002980232
+      },
+      {
+        "stroke": 6,
+        "ms": 6.899999991059303
+      },
+      {
+        "stroke": 6,
+        "ms": 6.5999999940395355
+      },
+      {
+        "stroke": 6,
+        "ms": 6.600000008940697
+      },
+      {
+        "stroke": 6,
+        "ms": 6.0999999940395355
+      },
+      {
+        "stroke": 6,
+        "ms": 6.5999999940395355
+      },
+      {
+        "stroke": 6,
+        "ms": 9.400000005960464
+      },
+      {
+        "stroke": 7,
+        "ms": 5.799999997019768
+      },
+      {
+        "stroke": 7,
+        "ms": 5.899999991059303
+      },
+      {
+        "stroke": 7,
+        "ms": 6.299999997019768
+      },
+      {
+        "stroke": 7,
+        "ms": 6.899999991059303
+      },
+      {
+        "stroke": 7,
+        "ms": 5.699999988079071
+      },
+      {
+        "stroke": 7,
+        "ms": 5.700000002980232
+      },
+      {
+        "stroke": 7,
+        "ms": 10.600000008940697
+      }
+    ],
+    "history": 9
+  },
+  "summary": {
+    "liveFrames": 57,
+    "medianLiveMs": 6,
+    "p95LiveMs": 10.600000008940697,
+    "medianCommitMs": 33.149999998509884,
+    "longTasks": 0
+  },
+  "validation": "685 unit/API tests, 11 clone browser checks, production clone live-feedback gate, five production paint/eraser checks, production build, documentation build and whitespace checks pass."
+}

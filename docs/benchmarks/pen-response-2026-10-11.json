@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-11",
+  "scope": "Production Chromium Pen anchor drag; input-to-canvas submission, not display scanout. 30 paced pointer moves; one history commit. Observational timings, not universal thresholds.",
+  "results": [
+    {
+      "paths": 20,
+      "frames": 30,
+      "median": 10.099999994039536,
+      "p95": 13.900000005960464,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 14,
+          "prepareMs": 3.699999988079071
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 200,
+      "frames": 30,
+      "median": 22.400000005960464,
+      "p95": 29.5,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 39.10000002384186,
+          "prepareMs": 7.299999982118607
+        }
+      ],
+      "longTasks": []
+    },
+    {
+      "paths": 2000,
+      "frames": 30,
+      "median": 120,
+      "p95": 136.09999999403954,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 207.2000000178814,
+          "prepareMs": 9.5
+        }
+      ],
+      "longTasks": [
+        109,
+        106,
+        152,
+        128,
+        130,
+        130,
+        127,
+        132,
+        141,
+        131,
+        128,
+        129,
+        141,
+        129,
+        139,
+        128,
+        129,
+        167,
+        145,
+        150,
+        129,
+        122,
+        136,
+        127,
+        128,
+        127,
+        136,
+        128,
+        135,
+        128,
+        137,
+        129,
+        197
+      ]
+    }
+  ]
+}

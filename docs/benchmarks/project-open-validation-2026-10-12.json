@@ -1,0 +1,822 @@
+{
+  "date": "2026-10-12",
+  "fixture": "Production Chromium, 698x396, 256000 paint points; CPU sampling enabled for opening",
+  "baselineSource": "project-open-freeze-2026-10-12.json",
+  "opening": {
+    "after": {
+      "openMs": 458.09999999403954,
+      "maxFrameGapMs": 51.19999998807907,
+      "longTasks": [],
+      "name": "Listing revision 2",
+      "layers": 1,
+      "topSelfSamples": [
+        {
+          "ms": 188.0,
+          "frame": {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 125.2,
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 117.1,
+          "frame": {
+            "functionName": "Gc",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 62,
+            "columnNumber": 31246
+          }
+        },
+        {
+          "ms": 63.7,
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 63.7,
+          "frame": {
+            "functionName": "r",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 62,
+            "columnNumber": 31275
+          }
+        },
+        {
+          "ms": 48.0,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 10,
+            "columnNumber": 1058
+          }
+        },
+        {
+          "ms": 31.9,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 18.6,
+          "frame": {
+            "functionName": "mp",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 70,
+            "columnNumber": 49694
+          }
+        },
+        {
+          "ms": 11.7,
+          "frame": {
+            "functionName": "e._zod.parse",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 10,
+            "columnNumber": 7631
+          }
+        },
+        {
+          "ms": 11.1,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 9.6,
+          "frame": {
+            "functionName": "digest",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 8.7,
+          "frame": {
+            "functionName": "e._zod.parse",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 60,
+            "columnNumber": 156
+          }
+        }
+      ]
+    },
+    "repeat": {
+      "openMs": 516.9000000059605,
+      "maxFrameGapMs": 58.900000005960464,
+      "longTasks": [],
+      "name": "Listing revision 2",
+      "layers": 1,
+      "topSelfSamples": [
+        {
+          "ms": 181.4,
+          "frame": {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 162.4,
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 148.2,
+          "frame": {
+            "functionName": "Gc",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 62,
+            "columnNumber": 31246
+          }
+        },
+        {
+          "ms": 66.5,
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 65.4,
+          "frame": {
+            "functionName": "r",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 62,
+            "columnNumber": 31275
+          }
+        },
+        {
+          "ms": 45.5,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 10,
+            "columnNumber": 1058
+          }
+        },
+        {
+          "ms": 31.2,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 25.7,
+          "frame": {
+            "functionName": "mp",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 70,
+            "columnNumber": 49694
+          }
+        },
+        {
+          "ms": 15.9,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 9.7,
+          "frame": {
+            "functionName": "e._zod.parse",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 10,
+            "columnNumber": 7631
+          }
+        },
+        {
+          "ms": 9.4,
+          "frame": {
+            "functionName": "digest",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 7.6,
+          "frame": {
+            "functionName": "jr",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-gT28-cqh.js",
+            "lineNumber": 10,
+            "columnNumber": 8838
+          }
+        }
+      ]
+    }
+  },
+  "mixed": {
+    "strokePresentation": {
+      "count": 45,
+      "medianMs": 16,
+      "p95Ms": 20.5,
+      "maxMs": 26.099999994039536
+    },
+    "toolSwitch": {
+      "count": 105,
+      "medianMs": 11.599999994039536,
+      "p95Ms": 13.800000011920929,
+      "maxMs": 15.400000005960464
+    },
+    "longTasks": [],
+    "history": 60,
+    "saved": "saved"
+  },
+  "routine": [
+    {
+      "action": "move-nudge",
+      "ms": 13.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 12.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 12.399999976158142,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 17,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 8.600000023841858,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 11.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 11.100000023841858,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 12.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 9.699999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 14.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 9.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 13.700000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.699999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 9.100000023841858,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 10.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 8.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 12.799999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 9.199999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.899999976158142,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.200000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 10.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 9.199999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 15.699999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 8.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 11.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 12.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 7.0999999940395355,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 12.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 8.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 15.200000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 8.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 10.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 7.899999976158142,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 11.200000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 8,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.700000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 9.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 8.199999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 14.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 8.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 16.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 12.799999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 18.100000023841858,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 10.699999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 10.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 9.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 8.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 8.100000023841858,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.399999976158142,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 9.399999976158142,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 9,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 12.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 8.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 8,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 7.4000000059604645,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 8.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 8.799999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 8,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 12.699999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 12,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.199999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 8.700000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 14.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 10.100000023841858,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 13.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 7.799999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 12.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 9.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 8.700000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 13.700000017881393,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 7.9000000059604645,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 8.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.299999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 8,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 10.600000023841858,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 7.299999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 14.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 7.4000000059604645,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 12.799999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 12.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 10.899999976158142,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 15.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 9.299999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 7.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 8.799999982118607,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 7.9000000059604645,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 10.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 8.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 8.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 12.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.5,
+      "backend": "canvas2d"
+    }
+  ],
+  "validation": {
+    "unitAndApiTests": 720,
+    "testFiles": 99,
+    "browserTests": 27,
+    "postChangeOpeningRuns": 2,
+    "additionalProductionEditingCases": 2,
+    "buildAndTypecheck": "passed"
+  },
+  "limitations": [
+    "No observed long tasks is not equivalent to 60fps; maximum frame gaps were 51\u201359 ms.",
+    "Single large schema calls, history parsing, component validation and legacy JSON parsing can still block.",
+    "Only affected opening and two editing fixtures were rerun; full responsiveness remains unproved."
+  ]
+}

@@ -1,0 +1,647 @@
+{
+  "date": "2026-10-11",
+  "change": "Raise shared CanvasCache entry ceiling from 64 to 256 while retaining the 64MiB byte budget and 64-version per-key cap.",
+  "scope": "Production Chromium, 800x600 5/64 layer document operations; observational timing.",
+  "limitations": [
+    "Actual retained memory and canvas-object count may increase for many small entries, but the existing pixel/signature byte budget still applies. Browser/driver object overhead is not included in that budget.",
+    "64-layer resize and scripts still miss responsiveness targets; one 71ms task observed.",
+    "GPU texture and other specialized caches are unchanged."
+  ],
+  "before": [
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 6,
+          "presentMs": 12.199999988079071
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.300000011920929,
+          "presentMs": 13.800000011920929
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.5,
+          "presentMs": 21.80000001192093
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 4.700000017881393,
+          "presentMs": 18.5
+        },
+        {
+          "action": "script",
+          "commitMs": 104.19999998807907,
+          "presentMs": 108.80000001192093
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 6,
+          "presentMs": 12.599999994039536
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.300000011920929,
+          "presentMs": 16.599999994039536
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.9000000059604645,
+          "presentMs": 18.400000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.200000017881393,
+          "presentMs": 22.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.100000023841858,
+          "presentMs": 19
+        },
+        {
+          "action": "script",
+          "commitMs": 103.7000000178814,
+          "presentMs": 106.2000000178814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3,
+          "presentMs": 18
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.5,
+          "presentMs": 19.30000001192093
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 2.9000000059604645,
+          "presentMs": 18.69999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 3.9000000059604645,
+          "presentMs": 24.799999982118607
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.600000023841858,
+          "presentMs": 24.200000017881393
+        },
+        {
+          "action": "script",
+          "commitMs": 123.80000001192093,
+          "presentMs": 125.30000001192093
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.700000017881393,
+          "presentMs": 14.300000011920929
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.5999999940395355,
+          "presentMs": 19.30000001192093
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.2000000178813934,
+          "presentMs": 18.30000001192093
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 3.7999999821186066,
+          "presentMs": 22.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.300000011920929,
+          "presentMs": 18.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 90.69999998807907,
+          "presentMs": 92.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3,
+          "presentMs": 17.900000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.5,
+          "presentMs": 18.700000017881393
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.7000000178813934,
+          "presentMs": 18.600000023841858
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.199999988079071,
+          "presentMs": 22.900000005960464
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.199999988079071,
+          "presentMs": 19.299999982118607
+        },
+        {
+          "action": "script",
+          "commitMs": 98.09999999403954,
+          "presentMs": 99.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3,
+          "presentMs": 9.900000005960464
+        }
+      ],
+      "longTasks": [],
+      "restored": true,
+      "layers": 5
+    },
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 18.19999998807907,
+          "presentMs": 60.89999997615814
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 11.900000005960464,
+          "presentMs": 60.70000001788139
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 15.400000005960464,
+          "presentMs": 65.40000000596046
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 13,
+          "presentMs": 60.400000005960464
+        },
+        {
+          "action": "script",
+          "commitMs": 159.09999999403954,
+          "presentMs": 199
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 9.200000017881393,
+          "presentMs": 57.900000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.299999982118607,
+          "presentMs": 55.89999997615814
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 12.800000011920929,
+          "presentMs": 61.900000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 11.099999994039536,
+          "presentMs": 60.39999997615814
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.299999982118607,
+          "presentMs": 55.5
+        },
+        {
+          "action": "script",
+          "commitMs": 141.90000000596046,
+          "presentMs": 181.30000001192093
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 10.300000011920929,
+          "presentMs": 86.19999998807907
+        },
+        {
+          "action": "crop",
+          "commitMs": 9.099999994039536,
+          "presentMs": 52.79999998211861
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.300000011920929,
+          "presentMs": 63.20000001788139
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 11.199999988079071,
+          "presentMs": 61.80000001192093
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 10.099999994039536,
+          "presentMs": 66
+        },
+        {
+          "action": "script",
+          "commitMs": 144.80000001192093,
+          "presentMs": 180.80000001192093
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 7.9000000059604645,
+          "presentMs": 47.19999998807907
+        },
+        {
+          "action": "crop",
+          "commitMs": 12.699999988079071,
+          "presentMs": 61.599999994039536
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 11.299999982118607,
+          "presentMs": 67.69999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.200000017881393,
+          "presentMs": 64.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 9.300000011920929,
+          "presentMs": 59.30000001192093
+        },
+        {
+          "action": "script",
+          "commitMs": 150.19999998807907,
+          "presentMs": 190.69999998807907
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 12.599999994039536,
+          "presentMs": 62.19999998807907
+        },
+        {
+          "action": "crop",
+          "commitMs": 12.700000017881393,
+          "presentMs": 63.20000001788139
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 10.699999988079071,
+          "presentMs": 59.400000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 12,
+          "presentMs": 67.7000000178814
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.5,
+          "presentMs": 60.70000001788139
+        },
+        {
+          "action": "script",
+          "commitMs": 189.09999999403954,
+          "presentMs": 225.90000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8,
+          "presentMs": 51.400000005960464
+        }
+      ],
+      "longTasks": [
+        50,
+        54
+      ],
+      "restored": true,
+      "layers": 64
+    }
+  ],
+  "after": [
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 5.800000011920929,
+          "presentMs": 12
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.799999982118607,
+          "presentMs": 15
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.4000000059604645,
+          "presentMs": 22.400000005960464
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 4.0999999940395355,
+          "presentMs": 18.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 103,
+          "presentMs": 107.09999999403954
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.600000023841858,
+          "presentMs": 11.700000017881393
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 18.80000001192093
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.300000011920929,
+          "presentMs": 18.30000001192093
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4,
+          "presentMs": 22.100000023841858
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.199999988079071,
+          "presentMs": 18.80000001192093
+        },
+        {
+          "action": "script",
+          "commitMs": 96,
+          "presentMs": 101.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 2.800000011920929,
+          "presentMs": 17.30000001192093
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.300000011920929,
+          "presentMs": 20.100000023841858
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 2.9000000059604645,
+          "presentMs": 18.5
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 3.5,
+          "presentMs": 21.900000005960464
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.100000023841858,
+          "presentMs": 20.30000001192093
+        },
+        {
+          "action": "script",
+          "commitMs": 94,
+          "presentMs": 95.40000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.300000011920929,
+          "presentMs": 14.099999994039536
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.199999988079071,
+          "presentMs": 19.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.300000011920929,
+          "presentMs": 19
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 3.4000000059604645,
+          "presentMs": 22.600000023841858
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.199999988079071,
+          "presentMs": 18.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 101.59999999403954,
+          "presentMs": 103
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 13.400000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 4,
+          "presentMs": 20.799999982118607
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 5.199999988079071,
+          "presentMs": 18.69999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4,
+          "presentMs": 22.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.2000000178813934,
+          "presentMs": 18.700000017881393
+        },
+        {
+          "action": "script",
+          "commitMs": 96.10000002384186,
+          "presentMs": 97.60000002384186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.800000011920929,
+          "presentMs": 11.400000005960464
+        }
+      ],
+      "longTasks": [],
+      "restored": true,
+      "layers": 5
+    },
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 15.399999976158142,
+          "presentMs": 54.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 12.400000005960464,
+          "presentMs": 27.099999994039536
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 18.899999976158142,
+          "presentMs": 70.09999999403954
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 11.599999994039536,
+          "presentMs": 25.69999998807907
+        },
+        {
+          "action": "script",
+          "commitMs": 171.90000000596046,
+          "presentMs": 215.2999999821186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.900000005960464,
+          "presentMs": 16.600000023841858
+        },
+        {
+          "action": "crop",
+          "commitMs": 11.399999976158142,
+          "presentMs": 24.899999976158142
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 11.099999994039536,
+          "presentMs": 25.599999994039536
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.599999994039536,
+          "presentMs": 81.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 13.600000023841858,
+          "presentMs": 29.80000001192093
+        },
+        {
+          "action": "script",
+          "commitMs": 142.19999998807907,
+          "presentMs": 145.19999998807907
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 9.099999994039536,
+          "presentMs": 23.099999994039536
+        },
+        {
+          "action": "crop",
+          "commitMs": 9.700000017881393,
+          "presentMs": 19.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 8,
+          "presentMs": 20.099999994039536
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 9.099999994039536,
+          "presentMs": 54.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.699999988079071,
+          "presentMs": 28.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 166.89999997615814,
+          "presentMs": 170.7999999821186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8,
+          "presentMs": 18.900000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 11.099999994039536,
+          "presentMs": 21.19999998807907
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 7.4000000059604645,
+          "presentMs": 19.80000001192093
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.299999982118607,
+          "presentMs": 61.400000005960464
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 9.900000005960464,
+          "presentMs": 23.400000005960464
+        },
+        {
+          "action": "script",
+          "commitMs": 138.09999999403954,
+          "presentMs": 140.90000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.800000011920929,
+          "presentMs": 20.599999994039536
+        },
+        {
+          "action": "crop",
+          "commitMs": 12.699999988079071,
+          "presentMs": 25
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 11.700000017881393,
+          "presentMs": 23.900000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 9.599999994039536,
+          "presentMs": 55.900000005960464
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.900000005960464,
+          "presentMs": 26
+        },
+        {
+          "action": "script",
+          "commitMs": 164.59999999403954,
+          "presentMs": 169.40000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 7.699999988079071,
+          "presentMs": 18.5
+        }
+      ],
+      "longTasks": [
+        71
+      ],
+      "restored": true,
+      "layers": 64
+    }
+  ]
+}

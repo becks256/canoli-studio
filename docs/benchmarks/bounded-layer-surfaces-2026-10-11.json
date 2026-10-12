@@ -1,0 +1,3201 @@
+{
+  "date": "2026-10-11",
+  "change": "Use bounded working surfaces for cached, unstyled normal-blend raster and unclipped fill-only paint layers when occupied area is under 75% of the working viewport. Opacity is applied once by the parent compositor.",
+  "scope": "Production Chromium, 800x600 5/64 layers; observational timing.",
+  "limitations": [
+    "Brush, Clone, clipped strokes, masks, styles and backdrop-dependent blends retain their existing working geometry.",
+    "A general brush implementation failed exact clipped-stroke pixel parity and was restricted before retention.",
+    "Uncached/export reference rendering is unchanged.",
+    "64-layer operations still exceed the target; two 52\u201353ms tasks remain in the measured run."
+  ],
+  "before": [
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 5.799999982118607,
+          "presentMs": 20.799999982118607
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.300000011920929,
+          "presentMs": 13.900000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 37.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 5.5999999940395355,
+          "presentMs": 15.199999988079071
+        },
+        {
+          "action": "script",
+          "commitMs": 111.19999998807907,
+          "presentMs": 126.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 5.0999999940395355,
+          "presentMs": 13.900000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 5.4000000059604645,
+          "presentMs": 19.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 18.400000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.5,
+          "presentMs": 43.79999998211861
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.800000011920929,
+          "presentMs": 17.200000017881393
+        },
+        {
+          "action": "script",
+          "commitMs": 110,
+          "presentMs": 111.5
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.800000011920929,
+          "presentMs": 12.800000011920929
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.600000023841858,
+          "presentMs": 20.200000017881393
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.4000000059604645,
+          "presentMs": 19.30000001192093
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.200000017881393,
+          "presentMs": 40.099999994039536
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.100000023841858,
+          "presentMs": 13.600000023841858
+        },
+        {
+          "action": "script",
+          "commitMs": 98.5,
+          "presentMs": 99.90000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 17.299999982118607
+        },
+        {
+          "action": "crop",
+          "commitMs": 5.4000000059604645,
+          "presentMs": 19.400000005960464
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.5,
+          "presentMs": 23.299999982118607
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.5999999940395355,
+          "presentMs": 40.29999998211861
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 4.5,
+          "presentMs": 14.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 96.40000000596046,
+          "presentMs": 98.2999999821186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.800000011920929,
+          "presentMs": 10.599999994039536
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.200000017881393,
+          "presentMs": 19.80000001192093
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.5,
+          "presentMs": 19
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 6,
+          "presentMs": 39.19999998807907
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.7999999821186066,
+          "presentMs": 13.5
+        },
+        {
+          "action": "script",
+          "commitMs": 102.09999999403954,
+          "presentMs": 103.59999999403954
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.5,
+          "presentMs": 15.200000017881393
+        }
+      ],
+      "longTasks": [],
+      "restored": true,
+      "layers": 5
+    },
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 15.299999982118607,
+          "presentMs": 151.19999998807907
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 12,
+          "presentMs": 180.7000000178814
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 19.799999982118607,
+          "presentMs": 269.7999999821186
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 13.099999994039536,
+          "presentMs": 213.09999999403954
+        },
+        {
+          "action": "script",
+          "commitMs": 162.2000000178814,
+          "presentMs": 325.90000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.599999994039536,
+          "presentMs": 177.09999999403954
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.199999988079071,
+          "presentMs": 165.59999999403954
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.899999976158142,
+          "presentMs": 177.69999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.600000023841858,
+          "presentMs": 251.7000000178814
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 9,
+          "presentMs": 178.90000000596046
+        },
+        {
+          "action": "script",
+          "commitMs": 149.39999997615814,
+          "presentMs": 304
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.800000011920929,
+          "presentMs": 168
+        },
+        {
+          "action": "crop",
+          "commitMs": 9.099999994039536,
+          "presentMs": 158.59999999403954
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 8.599999994039536,
+          "presentMs": 172.59999999403954
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.400000005960464,
+          "presentMs": 272.59999999403954
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.099999994039536,
+          "presentMs": 173.2000000178814
+        },
+        {
+          "action": "script",
+          "commitMs": 150.69999998807907,
+          "presentMs": 314
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 11,
+          "presentMs": 171.59999999403954
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.900000005960464,
+          "presentMs": 163.40000000596046
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.300000011920929,
+          "presentMs": 182.59999999403954
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 13.599999994039536,
+          "presentMs": 262.40000000596046
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 10.5,
+          "presentMs": 182.60000002384186
+        },
+        {
+          "action": "script",
+          "commitMs": 156.5,
+          "presentMs": 332.60000002384186
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 15.200000017881393,
+          "presentMs": 187.60000002384186
+        },
+        {
+          "action": "crop",
+          "commitMs": 12,
+          "presentMs": 162.5
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 8.099999994039536,
+          "presentMs": 219.59999999403954
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 10.200000017881393,
+          "presentMs": 261.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 7.5,
+          "presentMs": 185.5
+        },
+        {
+          "action": "script",
+          "commitMs": 169.2999999821186,
+          "presentMs": 335.89999997615814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 9.300000011920929,
+          "presentMs": 173.5
+        }
+      ],
+      "longTasks": [
+        146,
+        166,
+        239,
+        194,
+        168,
+        161,
+        149,
+        159,
+        234,
+        160,
+        159,
+        151,
+        149,
+        161,
+        254,
+        156,
+        167,
+        154,
+        147,
+        169,
+        243,
+        167,
+        181,
+        166,
+        149,
+        204,
+        248,
+        173,
+        171,
+        158
+      ],
+      "restored": true,
+      "layers": 64
+    }
+  ],
+  "after": [
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 4.5,
+          "presentMs": 11.599999994039536
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.5,
+          "presentMs": 14.099999994039536
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 6.200000017881393,
+          "presentMs": 21
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 6.600000023841858,
+          "presentMs": 19.30000001192093
+        },
+        {
+          "action": "script",
+          "commitMs": 109.59999999403954,
+          "presentMs": 114.19999998807907
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 5,
+          "presentMs": 13.799999982118607
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.4000000059604645,
+          "presentMs": 21.200000017881393
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4.0999999940395355,
+          "presentMs": 19.099999994039536
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.200000017881393,
+          "presentMs": 22.099999994039536
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.2999999821186066,
+          "presentMs": 19.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 99.5,
+          "presentMs": 101.7000000178814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 2.9000000059604645,
+          "presentMs": 10.400000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 4.299999982118607,
+          "presentMs": 19.900000005960464
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.0999999940395355,
+          "presentMs": 18.900000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4.100000023841858,
+          "presentMs": 21.700000017881393
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.899999976158142,
+          "presentMs": 19.299999982118607
+        },
+        {
+          "action": "script",
+          "commitMs": 92.90000000596046,
+          "presentMs": 94.90000000596046
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 4.9000000059604645,
+          "presentMs": 14.100000023841858
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.4000000059604645,
+          "presentMs": 20.19999998807907
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 4,
+          "presentMs": 19.19999998807907
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 4,
+          "presentMs": 22.900000005960464
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 3.300000011920929,
+          "presentMs": 19.5
+        },
+        {
+          "action": "script",
+          "commitMs": 96.2000000178814,
+          "presentMs": 98.30000001192093
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 3.300000011920929,
+          "presentMs": 12.900000005960464
+        },
+        {
+          "action": "crop",
+          "commitMs": 3.5,
+          "presentMs": 20
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 3.2999999821186066,
+          "presentMs": 19.399999976158142
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 5.699999988079071,
+          "presentMs": 29
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 4,
+          "presentMs": 16.600000023841858
+        },
+        {
+          "action": "script",
+          "commitMs": 108.5,
+          "presentMs": 110.69999998807907
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 2.7000000178813934,
+          "presentMs": 10.900000005960464
+        }
+      ],
+      "longTasks": [],
+      "restored": true,
+      "layers": 5
+    },
+    {
+      "samples": [
+        {
+          "action": "crop",
+          "commitMs": 14.799999982118607,
+          "presentMs": 55.89999997615814
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 11.900000005960464,
+          "presentMs": 63.5
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 18.299999982118607,
+          "presentMs": 67.59999999403954
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 12.200000017881393,
+          "presentMs": 58.70000001788139
+        },
+        {
+          "action": "script",
+          "commitMs": 165.30000001192093,
+          "presentMs": 203.2000000178814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 10.099999994039536,
+          "presentMs": 63.30000001192093
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.400000005960464,
+          "presentMs": 56.29999998211861
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 13.900000005960464,
+          "presentMs": 62.5
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 9.599999994039536,
+          "presentMs": 57
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 7.0999999940395355,
+          "presentMs": 53.400000005960464
+        },
+        {
+          "action": "script",
+          "commitMs": 139.80000001192093,
+          "presentMs": 174.80000001192093
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.400000005960464,
+          "presentMs": 57
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.600000023841858,
+          "presentMs": 56.10000002384186
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 8.699999988079071,
+          "presentMs": 65.5
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 11.5,
+          "presentMs": 57.39999997615814
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 9,
+          "presentMs": 51.599999994039536
+        },
+        {
+          "action": "script",
+          "commitMs": 149,
+          "presentMs": 183.2000000178814
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 7.100000023841858,
+          "presentMs": 46.60000002384186
+        },
+        {
+          "action": "crop",
+          "commitMs": 11.099999994039536,
+          "presentMs": 59.89999997615814
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.399999976158142,
+          "presentMs": 70.7999999821186
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 12.700000017881393,
+          "presentMs": 63.70000001788139
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.800000011920929,
+          "presentMs": 52.900000005960464
+        },
+        {
+          "action": "script",
+          "commitMs": 150.30000001192093,
+          "presentMs": 182.19999998807907
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 7.699999988079071,
+          "presentMs": 49.5
+        },
+        {
+          "action": "crop",
+          "commitMs": 10.699999988079071,
+          "presentMs": 53.19999998807907
+        },
+        {
+          "action": "undo-crop",
+          "commitMs": 9.099999994039536,
+          "presentMs": 53.900000005960464
+        },
+        {
+          "action": "image-resize",
+          "commitMs": 9.899999976158142,
+          "presentMs": 54.5
+        },
+        {
+          "action": "undo-resize",
+          "commitMs": 8.100000023841858,
+          "presentMs": 57.5
+        },
+        {
+          "action": "script",
+          "commitMs": 139.89999997615814,
+          "presentMs": 173.09999999403954
+        },
+        {
+          "action": "undo-script",
+          "commitMs": 8.700000017881393,
+          "presentMs": 50.80000001192093
+        }
+      ],
+      "longTasks": [
+        53,
+        52
+      ],
+      "restored": true,
+      "layers": 64
+    }
+  ],
+  "live_paint": [
+    {
+      "tool": "brush",
+      "layers": 0,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.699999988079071,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.399999976158142,
+          "prepareMs": 3.600000023841858,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.199999988079071,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.9000000059604645,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.800000011920929,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 4,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 4,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.399999976158142,
+          "prepareMs": 3.9000000059604645,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.200000017881393,
+          "prepareMs": 3.699999988079071,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.9000000059604645,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.299999982118607,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.4000000059604645,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.800000011920929,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.199999988079071,
+          "prepareMs": 3.5999999940395355,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.699999988079071,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.5999999940395355,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.7000000178813934,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.299999982118607,
+          "prepareMs": 3.600000023841858,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 4.0999999940395355,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.7999999821186066,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.200000017881393,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4.199999988079071,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.199999988079071,
+          "prepareMs": 3.600000023841858,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.399999976158142,
+          "prepareMs": 3.800000011920929,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 3.9000000059604645,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.299999982118607,
+          "prepareMs": 3.800000011920929,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.199999988079071,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.300000011920929,
+          "prepareMs": 3.699999988079071,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.399999976158142,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.199999988079071,
+          "prepareMs": 3.7000000178813934,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.9000000059604645,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.800000011920929,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.700000017881393,
+          "prepareMs": 4.199999988079071,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.299999982118607,
+          "prepareMs": 3.800000011920929,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.9000000059604645,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.100000023841858,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5999999940395355,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "pencil",
+      "layers": 0,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.4000000059604645,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.5,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.699999988079071,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.200000017881393,
+          "prepareMs": 3.5999999940395355,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.800000011920929,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.5999999940395355,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.899999976158142,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.800000011920929,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999976158142,
+          "prepareMs": 4.800000011920929,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.899999976158142,
+          "prepareMs": 4.299999982118607,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.699999988079071,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.600000023841858,
+          "prepareMs": 4,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.4000000059604645,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5999999940395355,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 5.100000023841858,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4,
+          "prepareMs": 3.5999999940395355,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.800000011920929,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999982118607,
+          "prepareMs": 4.200000017881393,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.7999999821186066,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.199999988079071,
+          "prepareMs": 3.5999999940395355,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.5,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.199999988079071,
+          "prepareMs": 3.699999988079071,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.700000017881393,
+          "prepareMs": 4.100000023841858,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.699999988079071,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.100000023841858,
+          "prepareMs": 3.5,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.4000000059604645,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.5,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.7999999821186066,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.700000017881393,
+          "prepareMs": 4,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5999999940395355,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.9000000059604645,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.7000000178813934,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.600000023841858,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.899999976158142,
+          "prepareMs": 5,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.800000011920929,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5999999940395355,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.199999988079071,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.5999999940395355,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 5,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5.9000000059604645,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.5,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.899999976158142,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.100000023841858,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.799999982118607,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 5.300000011920929,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.100000023841858,
+          "prepareMs": 5.0999999940395355,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.10000002384186,
+          "prepareMs": 6.0999999940395355,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.4000000059604645,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.300000011920929,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.4000000059604645,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999976158142,
+          "prepareMs": 4.5,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.4000000059604645,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.5,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.800000011920929,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.9000000059604645,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.300000011920929,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5.199999988079071,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 6.100000023841858,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 5,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5.9000000059604645,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 5,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 6,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.5,
+          "prepareMs": 6.5,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.799999982118607,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.9000000059604645,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.199999988079071,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 5.699999988079071,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8,
+          "prepareMs": 6.699999988079071,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.600000023841858,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.9000000059604645,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.899999976158142,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "pencil",
+      "layers": 5,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.200000017881393,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.700000017881393,
+          "prepareMs": 5.699999988079071,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 5,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.299999982118607,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 5.200000017881393,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.5999999940395355,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 5.799999982118607,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.399999976158142,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 21.900000005960464,
+          "prepareMs": 7.0999999940395355,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.399999976158142,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.699999988079071,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.600000023841858,
+          "prepareMs": 4.699999988079071,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.4000000059604645,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.300000011920929,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.800000011920929,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.899999976158142,
+          "prepareMs": 5,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.5,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5.0999999940395355,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.300000011920929,
+          "prepareMs": 6.5,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 6.200000017881393,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 5.5999999940395355,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.899999976158142,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 5.4000000059604645,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.399999976158142,
+          "prepareMs": 6.299999982118607,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.299999982118607,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5,
+          "prepareMs": 6.200000017881393,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.399999976158142,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.9000000059604645,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.899999976158142,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.699999988079071,
+          "prepareMs": 6.399999976158142,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.200000017881393,
+          "prepareMs": 6.699999988079071,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.800000011920929,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.699999988079071,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.700000017881393,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 20,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 14.099999994039536,
+          "prepareMs": 11.100000023841858,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.800000011920929,
+          "prepareMs": 10.299999982118607,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10.300000011920929,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.099999994039536,
+          "prepareMs": 10.200000017881393,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.199999988079071,
+          "prepareMs": 10.5,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.400000005960464,
+          "prepareMs": 12.599999994039536,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.300000011920929,
+          "prepareMs": 10.799999982118607,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.299999982118607,
+          "prepareMs": 10.599999994039536,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.699999988079071,
+          "prepareMs": 11.400000005960464,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.799999982118607,
+          "prepareMs": 10.099999994039536,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.400000005960464,
+          "prepareMs": 10.099999994039536,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.299999982118607,
+          "prepareMs": 10.599999994039536,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.599999994039536,
+          "prepareMs": 10.199999988079071,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.800000011920929,
+          "prepareMs": 10.099999994039536,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.700000017881393,
+          "prepareMs": 10.100000023841858,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 15.400000005960464,
+          "prepareMs": 12.599999994039536,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.199999988079071,
+          "prepareMs": 9.900000005960464,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.5,
+          "prepareMs": 11.099999994039536,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.699999988079071,
+          "prepareMs": 10.300000011920929,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.900000005960464,
+          "prepareMs": 10.5,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.299999982118607,
+          "prepareMs": 10.900000005960464,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 9.800000011920929,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10.200000017881393,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.200000017881393,
+          "prepareMs": 9.699999988079071,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.800000011920929,
+          "prepareMs": 12,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.5,
+          "prepareMs": 10.099999994039536,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.699999988079071,
+          "prepareMs": 10.099999994039536,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.399999976158142,
+          "prepareMs": 9.900000005960464,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.599999994039536,
+          "prepareMs": 10,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.899999976158142,
+          "prepareMs": 10.300000011920929,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 24.5,
+          "prepareMs": 21.799999982118607,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 15.299999982118607,
+          "prepareMs": 12.700000017881393,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14,
+          "prepareMs": 10.600000023841858,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.5,
+          "prepareMs": 11,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.800000011920929,
+          "prepareMs": 10.700000017881393,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.599999994039536,
+          "prepareMs": 10.300000011920929,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.800000011920929,
+          "prepareMs": 11.400000005960464,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.899999976158142,
+          "prepareMs": 10.099999994039536,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.400000005960464,
+          "prepareMs": 11.299999982118607,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.900000005960464,
+          "prepareMs": 9.700000017881393,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "pencil",
+      "layers": 20,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 14.099999994039536,
+          "prepareMs": 11.400000005960464,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.399999976158142,
+          "prepareMs": 10.800000011920929,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 15.400000005960464,
+          "prepareMs": 12.200000017881393,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 16,
+          "prepareMs": 13,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 63.19999998807907,
+          "prepareMs": 13.399999976158142,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.699999988079071,
+          "prepareMs": 10.300000011920929,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.800000011920929,
+          "prepareMs": 10.299999982118607,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.700000017881393,
+          "prepareMs": 11,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 16.200000017881393,
+          "prepareMs": 13.299999982118607,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.400000005960464,
+          "prepareMs": 10.800000011920929,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.099999994039536,
+          "prepareMs": 10.400000005960464,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.300000011920929,
+          "prepareMs": 10,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.300000011920929,
+          "prepareMs": 9.799999982118607,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.300000011920929,
+          "prepareMs": 10,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.799999982118607,
+          "prepareMs": 10.200000017881393,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.5,
+          "prepareMs": 11,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.400000005960464,
+          "prepareMs": 10.800000011920929,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.300000011920929,
+          "prepareMs": 9.700000017881393,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.700000017881393,
+          "prepareMs": 11.099999994039536,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.199999988079071,
+          "prepareMs": 10.700000017881393,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.699999988079071,
+          "prepareMs": 10.800000011920929,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.800000011920929,
+          "prepareMs": 11.900000005960464,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.799999982118607,
+          "prepareMs": 12,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 15.599999994039536,
+          "prepareMs": 12.300000011920929,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14,
+          "prepareMs": 11.599999994039536,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.599999994039536,
+          "prepareMs": 11.900000005960464,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 16.69999998807907,
+          "prepareMs": 13.599999994039536,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 15.100000023841858,
+          "prepareMs": 12,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.300000011920929,
+          "prepareMs": 10.799999982118607,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.900000005960464,
+          "prepareMs": 10.200000017881393,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.400000005960464,
+          "prepareMs": 11,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.099999994039536,
+          "prepareMs": 10.699999988079071,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.300000011920929,
+          "prepareMs": 10.300000011920929,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.800000011920929,
+          "prepareMs": 10.399999976158142,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.699999988079071,
+          "prepareMs": 10.199999988079071,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.699999988079071,
+          "prepareMs": 10.300000011920929,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 12.800000011920929,
+          "prepareMs": 10.399999976158142,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 15.099999994039536,
+          "prepareMs": 11.700000017881393,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 20.600000023841858,
+          "prepareMs": 17.400000005960464,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 14.099999994039536,
+          "prepareMs": 11.599999994039536,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 13.300000011920929,
+          "prepareMs": 10.5,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "eraser",
+      "layers": 5,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.5999999940395355,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 5.799999982118607,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.800000011920929,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.299999982118607,
+          "prepareMs": 6,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5999999940395355,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5.5999999940395355,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.099999994039536,
+          "prepareMs": 6.5999999940395355,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5.9000000059604645,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 37.79999998211861,
+          "prepareMs": 6.5999999940395355,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 5.0999999940395355,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 5,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.399999976158142,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5.699999988079071,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.0999999940395355,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.799999982118607,
+          "prepareMs": 5.5999999940395355,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.300000011920929,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.199999988079071,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.700000017881393,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 5.9000000059604645,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.800000011920929,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.9000000059604645,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.799999982118607,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 5.4000000059604645,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 5,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 5,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.800000011920929,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.799999982118607,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.600000023841858,
+          "prepareMs": 4.9000000059604645,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.800000011920929,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.9000000059604645,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.799999982118607,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.9000000059604645,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 5.299999982118607,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.099999994039536,
+          "prepareMs": 7,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.300000011920929,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.399999976158142,
+          "prepareMs": 5.200000017881393,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5,
+          "prepareMs": 6.199999988079071,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.9000000059604645,
+          "prepareMs": 6.799999982118607,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "eraser",
+      "layers": 5,
+      "styled": false,
+      "raster": true,
+      "samples": [
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.800000011920929,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.200000017881393,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.199999988079071,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.399999976158142,
+          "prepareMs": 5.5,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.4000000059604645,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.299999982118607,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 36.900000005960464,
+          "prepareMs": 5.4000000059604645,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 6,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.9000000059604645,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.199999988079071,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 5.700000017881393,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.200000017881393,
+          "prepareMs": 6,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5.9000000059604645,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 6.4000000059604645,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.299999982118607,
+          "prepareMs": 6.0999999940395355,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.899999976158142,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5,
+          "prepareMs": 6.100000023841858,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.4000000059604645,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.899999976158142,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 5.800000011920929,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 5.299999982118607,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.4000000059604645,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5.199999988079071,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.199999988079071,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.4000000059604645,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 5.5999999940395355,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 5,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.199999988079071,
+          "prepareMs": 6,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 5.9000000059604645,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 5.5,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5.0999999940395355,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5999999940395355,
+          "prepareMs": 6.5,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.0999999940395355,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.199999988079071,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.199999988079071,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 6.100000023841858,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 5,
+      "styled": true,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.600000023841858,
+          "prepareMs": 4.600000023841858,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.600000023841858,
+          "prepareMs": 4.799999982118607,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.600000023841858,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 5,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.199999988079071,
+          "prepareMs": 5.4000000059604645,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 4.399999976158142,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5.100000023841858,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 35,
+          "prepareMs": 5.899999976158142,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.199999988079071,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.100000023841858,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.700000017881393,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.5,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.299999982118607,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.4000000059604645,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 4.699999988079071,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.200000017881393,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.5,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.600000023841858,
+          "prepareMs": 4.299999982118607,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.199999988079071,
+          "prepareMs": 5.4000000059604645,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 4.5,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.899999976158142,
+          "prepareMs": 4.299999982118607,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 5.200000017881393,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 5.0999999940395355,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.0999999940395355,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.9000000059604645,
+          "prepareMs": 6.100000023841858,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 5.199999988079071,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 5.4000000059604645,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.799999982118607,
+          "prepareMs": 5.5,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5.199999988079071,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.300000011920929,
+          "prepareMs": 7.4000000059604645,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 5.299999982118607,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.899999976158142,
+          "prepareMs": 5,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.600000023841858,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.899999976158142,
+          "prepareMs": 6.0999999940395355,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.199999988079071,
+          "prepareMs": 5.4000000059604645,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.799999982118607,
+          "prepareMs": 6,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5,
+          "prepareMs": 5.799999982118607,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.5999999940395355,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 20,
+      "styled": true,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 9.799999982118607,
+          "prepareMs": 8.900000005960464,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.200000017881393,
+          "prepareMs": 8.199999988079071,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.900000005960464,
+          "prepareMs": 8.899999976158142,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.5,
+          "prepareMs": 8.699999988079071,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9,
+          "prepareMs": 8.200000017881393,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.699999988079071,
+          "prepareMs": 8.800000011920929,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.300000011920929,
+          "prepareMs": 8.300000011920929,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.5,
+          "prepareMs": 8.699999988079071,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.099999994039536,
+          "prepareMs": 8.300000011920929,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9,
+          "prepareMs": 8.200000017881393,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.099999994039536,
+          "prepareMs": 8.100000023841858,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.099999994039536,
+          "prepareMs": 8,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.700000017881393,
+          "prepareMs": 7.799999982118607,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9,
+          "prepareMs": 8.099999994039536,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.099999994039536,
+          "prepareMs": 9,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.900000005960464,
+          "prepareMs": 9,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 11.5,
+          "prepareMs": 10.200000017881393,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.800000011920929,
+          "prepareMs": 8.899999976158142,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10,
+          "prepareMs": 9.200000017881393,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.700000017881393,
+          "prepareMs": 8.799999982118607,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.299999982118607,
+          "prepareMs": 9.400000005960464,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.599999994039536,
+          "prepareMs": 9.599999994039536,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.400000005960464,
+          "prepareMs": 9.700000017881393,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.900000005960464,
+          "prepareMs": 9.699999988079071,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.900000005960464,
+          "prepareMs": 10.200000017881393,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.799999982118607,
+          "prepareMs": 9.099999994039536,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.400000005960464,
+          "prepareMs": 7.5999999940395355,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.700000017881393,
+          "prepareMs": 8,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.099999994039536,
+          "prepareMs": 8,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.800000011920929,
+          "prepareMs": 8,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.299999982118607,
+          "prepareMs": 8.699999988079071,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.800000011920929,
+          "prepareMs": 8,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.699999988079071,
+          "prepareMs": 8.199999988079071,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.699999988079071,
+          "prepareMs": 7.9000000059604645,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.5,
+          "prepareMs": 8.700000017881393,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.799999982118607,
+          "prepareMs": 8,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.199999988079071,
+          "prepareMs": 8.400000005960464,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9.100000023841858,
+          "prepareMs": 8.199999988079071,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 9,
+          "prepareMs": 8.299999982118607,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.099999994039536,
+          "prepareMs": 9.099999994039536,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    }
+  ]
+}

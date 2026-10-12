@@ -1,0 +1,1026 @@
+{
+  "scope": "One production headless Chromium run, eight paced strokes on 698x396 synthetic raster; timings end at canvas submission, nested phases overlap.",
+  "measurement": {
+    "tool": "spot-heal",
+    "start": 0,
+    "revision": 8,
+    "samples": [
+      130.6000000089407,
+      124.6000000089407,
+      140.90000000596046,
+      153.20000000298023,
+      159.20000000298023,
+      188.5,
+      188.59999999403954,
+      212.59999999403954
+    ],
+    "longTasks": [],
+    "phases": [
+      {
+        "method": "render",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "findDonor",
+        "ms": 57.400000005960464
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 4.899999991059303
+      },
+      {
+        "method": "healStroke",
+        "ms": 88
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 11.599999994039536
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 6.5
+      },
+      {
+        "method": "render",
+        "ms": 27.799999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 8
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2999999970197678
+      },
+      {
+        "method": "render",
+        "ms": 11.300000011920929
+      },
+      {
+        "method": "findDonor",
+        "ms": 44.8999999910593
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 3.7999999970197678
+      },
+      {
+        "method": "healStroke",
+        "ms": 77.09999999403954
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 12.700000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 6.799999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.700000002980232
+      },
+      {
+        "method": "render",
+        "ms": 37.3999999910593
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 51.30000001192093
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 9.200000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.29999999701976776
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 13.799999997019768
+      },
+      {
+        "method": "findDonor",
+        "ms": 49.79999999701977
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 3.5999999940395355
+      },
+      {
+        "method": "healStroke",
+        "ms": 83.6000000089407
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 12.299999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.600000008940697
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.1000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.30000001192092896
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.9000000059604645
+      },
+      {
+        "method": "render",
+        "ms": 48
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 59.20000000298023
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.20000000298023224
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 67.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.1000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 8
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.3999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "render",
+        "ms": 14
+      },
+      {
+        "method": "findDonor",
+        "ms": 37.69999998807907
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "healStroke",
+        "ms": 70.59999999403954
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 14.299999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.399999991059303
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 9.299999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.700000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 68.79999999701977
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.5999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 80.40000000596046
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 6.799999997019768
+      },
+      {
+        "method": "render",
+        "ms": 73
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 2.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 2.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 9.599999994039536
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 9.699999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.699999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 8.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.29999999701976776
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 15.799999997019768
+      },
+      {
+        "method": "findDonor",
+        "ms": 45.6000000089407
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 4.700000002980232
+      },
+      {
+        "method": "healStroke",
+        "ms": 81.09999999403954
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 10.600000008940697
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 7.200000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.699999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.3999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 59.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 54.8999999910593
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.699999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 6.299999997019768
+      },
+      {
+        "method": "render",
+        "ms": 68.70000000298023
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 8.900000005960464
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.30000001192092896
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.20000000298023224
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5999999940395355
+      },
+      {
+        "method": "render",
+        "ms": 17.5
+      },
+      {
+        "method": "findDonor",
+        "ms": 46.900000005960464
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 4.300000011920929
+      },
+      {
+        "method": "healStroke",
+        "ms": 82.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 12.399999991059303
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 6.200000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.3999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 74.8999999910593
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 7.199999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 72.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.199999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.300000011920929
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.299999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.5999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.700000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 6.5999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 10
+      },
+      {
+        "method": "render",
+        "ms": 95.59999999403954
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 2.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 7.800000011920929
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 11.200000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.699999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.29999999701976776
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.6000000089406967
+      },
+      {
+        "method": "render",
+        "ms": 20.599999994039536
+      },
+      {
+        "method": "findDonor",
+        "ms": 39
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 4.200000002980232
+      },
+      {
+        "method": "healStroke",
+        "ms": 81.20000000298023
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 11.900000005960464
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.700000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.29999999701976776
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.8999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 58.70000000298023
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 65.3999999910593
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.800000011920929
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.299999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.1000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.2000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.1000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 8.100000008940697
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.699999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.29999999701976776
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 2.2999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.29999999701976776
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "render",
+        "ms": 98.29999999701977
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 7.800000011920929
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 2
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.20000000298023224
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.800000011920929
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.20000000298023224
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5
+      },
+      {
+        "method": "render",
+        "ms": 19.799999997019768
+      },
+      {
+        "method": "findDonor",
+        "ms": 33.5
+      },
+      {
+        "method": "poissonBlend",
+        "ms": 4
+      },
+      {
+        "method": "healStroke",
+        "ms": 74.3999999910593
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 12.299999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 6.700000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 9.799999997019768
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 75
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 69.09999999403954
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.600000008940697
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.300000011920929
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 2
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.199999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.6000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.4000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.200000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 5.100000008940697
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.699999988079071
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.1000000089406967
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.5999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.0999999940395355
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.200000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.2999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.7000000029802322
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.600000008940697
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.800000011920929
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.7999999970197678
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.20000000298023224
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 4.200000002980232
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 1.9000000059604645
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.5
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 0.3999999910593033
+      },
+      {
+        "method": "blendAdjustment",
+        "ms": 3.7000000029802322
+      },
+      {
+        "method": "render",
+        "ms": 126.30000001192093
+      }
+    ],
+    "history": 9
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "document": {
+    "width": 698,
+    "height": 396
+  },
+  "result": "3 production browser cases passed",
+  "measurements": [
+    {
+      "tool": "dodge",
+      "start": 0,
+      "revision": 8,
+      "samples": [
+        57.8999999910593,
+        52.400000005960464,
+        59.79999999701977,
+        72.90000000596046,
+        80.1000000089407,
+        96.1000000089407,
+        106.20000000298023,
+        121.90000000596046
+      ],
+      "longTasks": [],
+      "history": 9
+    },
+    {
+      "tool": "burn",
+      "start": 0,
+      "revision": 8,
+      "samples": [
+        54.79999999701977,
+        47.099999994039536,
+        67.79999999701977,
+        59.599999994039536,
+        62.30000001192093,
+        95.29999999701977,
+        85.80000001192093,
+        124
+      ],
+      "longTasks": [],
+      "history": 9
+    },
+    {
+      "tool": "spot-heal",
+      "start": 0,
+      "revision": 8,
+      "samples": [
+        127.90000000596046,
+        1142.699999988079,
+        1174.7000000029802,
+        1226,
+        1232.4000000059605,
+        1212.9000000059605,
+        1301.2999999970198,
+        1306
+      ],
+      "longTasks": [],
+      "history": 9
+    }
+  ],
+  "limitations": [
+    "Single run with eight paced gestures per tool on a synthetic raster.",
+    "Measures pointer release to presentation after a document revision; does not measure live preview or physical display.",
+    "History count checked; existing retouch correctness suites remain the pixel oracle.",
+    "No long tasks does not imply short worker completion time."
+  ]
+}

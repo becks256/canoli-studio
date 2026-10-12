@@ -1,0 +1,348 @@
+{
+  "date": "2026-10-12",
+  "fixture": "Production Chromium, 698x396, 256000 retained paint points, prepared recovery Blob; CPU sampling enabled",
+  "baselineSource": "project-open-copies-2026-10-12.json",
+  "measurements": {
+    "after": {
+      "openMs": 497.2000000178814,
+      "maxFrameGapMs": 207.69999998807907,
+      "longTasks": [
+        195,
+        137
+      ],
+      "name": "Listing revision 2",
+      "layers": 1,
+      "topSelfSamples": [
+        {
+          "ms": 187.7,
+          "frame": {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 128.4,
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 74.8,
+          "frame": {
+            "functionName": "g",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 8,
+            "columnNumber": 51417
+          }
+        },
+        {
+          "ms": 60.9,
+          "frame": {
+            "functionName": "r",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 8,
+            "columnNumber": 51446
+          }
+        },
+        {
+          "ms": 51.1,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 1058
+          }
+        },
+        {
+          "ms": 31.4,
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 28.6,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 26.4,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 21.8,
+          "frame": {
+            "functionName": "fp",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 70,
+            "columnNumber": 49688
+          }
+        },
+        {
+          "ms": 20.4,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 15.4,
+          "frame": {
+            "functionName": "Ir",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 8838
+          }
+        },
+        {
+          "ms": 14.1,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 1058
+          }
+        },
+        {
+          "ms": 8.9,
+          "frame": {
+            "functionName": "e._zod.check",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 8,
+            "columnNumber": 73308
+          }
+        },
+        {
+          "ms": 8.7,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 8.5,
+          "frame": {
+            "functionName": "e._zod.parse",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 60,
+            "columnNumber": 157
+          }
+        }
+      ]
+    },
+    "repeat": {
+      "openMs": 501.59999999403954,
+      "maxFrameGapMs": 204.80000001192093,
+      "longTasks": [
+        191,
+        147
+      ],
+      "name": "Listing revision 2",
+      "layers": 1,
+      "topSelfSamples": [
+        {
+          "ms": 191.8,
+          "frame": {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 135.9,
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 78.6,
+          "frame": {
+            "functionName": "g",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 8,
+            "columnNumber": 51417
+          }
+        },
+        {
+          "ms": 50.0,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 1058
+          }
+        },
+        {
+          "ms": 43.7,
+          "frame": {
+            "functionName": "r",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 8,
+            "columnNumber": 51446
+          }
+        },
+        {
+          "ms": 35.2,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 32.8,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 29.9,
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 26.4,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 1058
+          }
+        },
+        {
+          "ms": 18.6,
+          "frame": {
+            "functionName": "fp",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 70,
+            "columnNumber": 49688
+          }
+        },
+        {
+          "ms": 17.6,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 14.0,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 12.1,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 10.5,
+          "frame": {
+            "functionName": "e._zod.parse",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-CSnMfuN3.js",
+            "lineNumber": 10,
+            "columnNumber": 7631
+          }
+        },
+        {
+          "ms": 8.8,
+          "frame": {
+            "functionName": "digest",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        }
+      ]
+    }
+  },
+  "changes": [
+    "Freeze the privately loaded document cooperatively before installation.",
+    "Reuse only registry-proven immutable document data in EditorStore; migrate an owned root.",
+    "Retain defensive copies for mutable and shallow-frozen callers and full validation for all inputs."
+  ],
+  "validation": {
+    "unitAndApiTests": 717,
+    "testFiles": 98,
+    "browserTests": 27,
+    "buildAndTypecheck": "passed"
+  },
+  "limitations": [
+    "Opening still produces 137\u2013195 ms main-thread tasks.",
+    "Timing includes CPU profiling overhead.",
+    "Native JSON parsing and schema validation remain synchronous.",
+    "Only affected opening benchmark repeated; all-tool responsiveness remains unproved."
+  ]
+}

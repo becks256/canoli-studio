@@ -1,0 +1,850 @@
+{
+  "date": "2026-10-12",
+  "change": "Move fromJSON schema migration into EditorStore. Clone the input once, validate the exact owned snapshot under its supplied schema version, parse any history, then optionally upgrade its schema version and freeze it. Removes the duplicate full-document validation pass.",
+  "environment": "Production Chromium; hidden 64-stroke/64000-point document, five constructions and five fresh isolated script workers per trial.",
+  "results": "Previous reconstruction medians 135.5/132.2 ms; final owned-validation implementation 105.2 ms. Previous script medians 328.2/326.9 ms; final 290 ms. Intermediate pre-copy-validation trial scripts measured 262.3/264.7 ms; retained stronger exact-copy validation despite timing variation.",
+  "invariants": "Always validate supplied-version rules; migration cannot authorize newer fields in legacy input. Store callers without migration preserve the original version. Retained history remains validated. Getter-backed inputs cannot change between validation and ownership.",
+  "limitations": "Observational local samples. Small-payload scripts remain around 94\u2013122 ms; heavy scripts and application-wide responsiveness still need work.",
+  "runs": {
+    "before": [
+      {
+        "fixture": "document-reconstruction-latency",
+        "result": [
+          {
+            "ms": 123.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 141.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 131.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 135.5,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 168.59999999403954,
+            "layers": 1,
+            "history": 0
+          }
+        ],
+        "medianMs": 135.5
+      },
+      {
+        "fixture": "script-transport-latency",
+        "result": [
+          {
+            "ms": 385.90000000596046,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 372.80000001192093,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 328.19999998807907,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 302.2000000178814,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 297.09999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ],
+        "medianMs": 328.19999998807907
+      }
+    ],
+    "before_repeat": [
+      {
+        "fixture": "document-reconstruction-latency",
+        "result": [
+          {
+            "ms": 124.30000001192093,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 136.59999999403954,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 127.30000001192093,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 132.19999998807907,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 177.7000000178814,
+            "layers": 1,
+            "history": 0
+          }
+        ],
+        "medianMs": 132.19999998807907
+      },
+      {
+        "fixture": "script-transport-latency",
+        "result": [
+          {
+            "ms": 389.80000001192093,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 313.7999999821186,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 326.90000000596046,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 300.59999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 331,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ],
+        "medianMs": 326.90000000596046
+      }
+    ],
+    "candidate": [
+      {
+        "fixture": "document-operations-latency",
+        "result": {
+          "samples": [
+            {
+              "action": "crop",
+              "commitMs": 5.5999999940395355,
+              "presentMs": 12.5,
+              "prepareMs": 3.7999999821186066,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 4.0999999940395355,
+              "presentMs": 12.699999988079071,
+              "prepareMs": 1.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 7.4000000059604645,
+              "presentMs": 22.400000005960464,
+              "prepareMs": 6.4000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 5.800000011920929,
+              "presentMs": 18.5,
+              "prepareMs": 1.699999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 100.40000000596046,
+              "presentMs": 105.7000000178814,
+              "prepareMs": 5.100000023841858,
+              "scriptRuntimeMs": 93.5
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 5.699999988079071,
+              "presentMs": 15.199999988079071,
+              "prepareMs": 1.4000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 11.399999976158142,
+              "presentMs": 24.19999998807907,
+              "prepareMs": 3.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 4.9000000059604645,
+              "presentMs": 13.599999994039536,
+              "prepareMs": 1.2000000178813934,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 4.5999999940395355,
+              "presentMs": 19.5,
+              "prepareMs": 1.800000011920929,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 3.9000000059604645,
+              "presentMs": 18.599999994039536,
+              "prepareMs": 1.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 88.10000002384186,
+              "presentMs": 101.40000000596046,
+              "prepareMs": 1.199999988079071,
+              "scriptRuntimeMs": 83.5
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 2.9000000059604645,
+              "presentMs": 17.600000023841858,
+              "prepareMs": 1.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 3.5999999940395355,
+              "presentMs": 19.30000001192093,
+              "prepareMs": 1.100000023841858,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 3.399999976158142,
+              "presentMs": 18.899999976158142,
+              "prepareMs": 1.2000000178813934,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 3.600000023841858,
+              "presentMs": 19.400000005960464,
+              "prepareMs": 1.5999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 3.0999999940395355,
+              "presentMs": 19.30000001192093,
+              "prepareMs": 1.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 87.59999999403954,
+              "presentMs": 89.09999999403954,
+              "prepareMs": 1.300000011920929,
+              "scriptRuntimeMs": 82.59999999403954
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 3,
+              "presentMs": 16.900000005960464,
+              "prepareMs": 1.0999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 3.5,
+              "presentMs": 19.400000005960464,
+              "prepareMs": 1,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 3.7000000178813934,
+              "presentMs": 19.30000001192093,
+              "prepareMs": 1.0999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 3.2999999821186066,
+              "presentMs": 21.5,
+              "prepareMs": 1.699999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 3.399999976158142,
+              "presentMs": 19.69999998807907,
+              "prepareMs": 1.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 90.69999998807907,
+              "presentMs": 92.19999998807907,
+              "prepareMs": 1.399999976158142,
+              "scriptRuntimeMs": 86.09999999403954
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 3.0999999940395355,
+              "presentMs": 16,
+              "prepareMs": 1.399999976158142,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 3.199999988079071,
+              "presentMs": 19.799999982118607,
+              "prepareMs": 1.300000011920929,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 2.800000011920929,
+              "presentMs": 18.80000001192093,
+              "prepareMs": 1.2999999821186066,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 3.800000011920929,
+              "presentMs": 20.099999994039536,
+              "prepareMs": 1.5999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 3.199999988079071,
+              "presentMs": 18.69999998807907,
+              "prepareMs": 1.0999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 92.2000000178814,
+              "presentMs": 93.5,
+              "prepareMs": 1.199999988079071,
+              "scriptRuntimeMs": 86.5
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 3.600000023841858,
+              "presentMs": 16.100000023841858,
+              "prepareMs": 1.5,
+              "scriptRuntimeMs": 0
+            }
+          ],
+          "longTasks": [],
+          "restored": true,
+          "layers": 5
+        }
+      },
+      {
+        "fixture": "document-operations-latency",
+        "result": {
+          "samples": [
+            {
+              "action": "crop",
+              "commitMs": 14,
+              "presentMs": 52.400000005960464,
+              "prepareMs": 32.900000005960464,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 10.400000005960464,
+              "presentMs": 25.099999994039536,
+              "prepareMs": 3.100000023841858,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 19.5,
+              "presentMs": 66.7000000178814,
+              "prepareMs": 35.099999994039536,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 11.599999994039536,
+              "presentMs": 26.19999998807907,
+              "prepareMs": 2.0999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 119.69999998807907,
+              "presentMs": 159.5,
+              "prepareMs": 38.39999997615814,
+              "scriptRuntimeMs": 104.40000000596046
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 11,
+              "presentMs": 29.69999998807907,
+              "prepareMs": 2,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 13.900000005960464,
+              "presentMs": 27.599999994039536,
+              "prepareMs": 1.9000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 8.699999988079071,
+              "presentMs": 22.799999982118607,
+              "prepareMs": 2.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 11.799999982118607,
+              "presentMs": 29.899999976158142,
+              "prepareMs": 3.699999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 7.700000017881393,
+              "presentMs": 22.700000017881393,
+              "prepareMs": 1.9000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 124.90000000596046,
+              "presentMs": 129.59999999403954,
+              "prepareMs": 2.300000011920929,
+              "scriptRuntimeMs": 111.40000000596046
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 9.5,
+              "presentMs": 21.299999982118607,
+              "prepareMs": 1.9000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 9.400000005960464,
+              "presentMs": 25.200000017881393,
+              "prepareMs": 5.9000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 12.599999994039536,
+              "presentMs": 25.900000005960464,
+              "prepareMs": 2.199999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 10.800000011920929,
+              "presentMs": 27.400000005960464,
+              "prepareMs": 3.2000000178813934,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 7.700000017881393,
+              "presentMs": 21.900000005960464,
+              "prepareMs": 2.300000011920929,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 119.40000000596046,
+              "presentMs": 122,
+              "prepareMs": 1.800000011920929,
+              "scriptRuntimeMs": 106.39999997615814
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 8.199999988079071,
+              "presentMs": 24.400000005960464,
+              "prepareMs": 1.600000023841858,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 12.199999988079071,
+              "presentMs": 28.5,
+              "prepareMs": 1.7000000178813934,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 7.299999982118607,
+              "presentMs": 21.399999976158142,
+              "prepareMs": 1.699999988079071,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 8.800000011920929,
+              "presentMs": 30.400000005960464,
+              "prepareMs": 2.9000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 9.799999982118607,
+              "presentMs": 25.19999998807907,
+              "prepareMs": 1.5999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 118.10000002384186,
+              "presentMs": 122.30000001192093,
+              "prepareMs": 1.800000011920929,
+              "scriptRuntimeMs": 106.30000001192093
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 9.099999994039536,
+              "presentMs": 19.400000005960464,
+              "prepareMs": 2.0999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "crop",
+              "commitMs": 15.699999988079071,
+              "presentMs": 29.5,
+              "prepareMs": 1.9000000059604645,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-crop",
+              "commitMs": 18.69999998807907,
+              "presentMs": 36.900000005960464,
+              "prepareMs": 2.0999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "image-resize",
+              "commitMs": 11,
+              "presentMs": 25,
+              "prepareMs": 2.899999976158142,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "undo-resize",
+              "commitMs": 8.200000017881393,
+              "presentMs": 22.200000017881393,
+              "prepareMs": 1.5999999940395355,
+              "scriptRuntimeMs": 0
+            },
+            {
+              "action": "script",
+              "commitMs": 110.7000000178814,
+              "presentMs": 113.30000001192093,
+              "prepareMs": 2,
+              "scriptRuntimeMs": 99.5
+            },
+            {
+              "action": "undo-script",
+              "commitMs": 11.099999994039536,
+              "presentMs": 26.599999994039536,
+              "prepareMs": 1.4000000059604645,
+              "scriptRuntimeMs": 0
+            }
+          ],
+          "longTasks": [],
+          "restored": true,
+          "layers": 64
+        }
+      },
+      {
+        "fixture": "document-reconstruction-latency",
+        "result": [
+          {
+            "ms": 94.90000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 119.69999998807907,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 109.80000001192093,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 102.69999998807907,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 139.80000001192093,
+            "layers": 1,
+            "history": 0
+          }
+        ],
+        "medianMs": 109.80000001192093
+      },
+      {
+        "fixture": "script-transport-latency",
+        "result": [
+          {
+            "ms": 322.59999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 310.90000000596046,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 252.59999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 262.30000001192093,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 246.5,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ],
+        "medianMs": 262.30000001192093
+      }
+    ],
+    "candidate_repeat": [
+      {
+        "fixture": "document-reconstruction-latency",
+        "result": [
+          {
+            "ms": 106.7000000178814,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 120.7999999821186,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 102.7000000178814,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 114.59999999403954,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 119.09999999403954,
+            "layers": 1,
+            "history": 0
+          }
+        ],
+        "medianMs": 114.59999999403954
+      },
+      {
+        "fixture": "script-transport-latency",
+        "result": [
+          {
+            "ms": 329,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 271.30000001192093,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 255.2999999821186,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 262.7000000178814,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 264.69999998807907,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ],
+        "medianMs": 264.69999998807907
+      }
+    ],
+    "final_owned_validation": [
+      {
+        "fixture": "document-reconstruction-latency",
+        "result": [
+          {
+            "ms": 99.40000000596046,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 109.59999999403954,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 102.7000000178814,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 105.2000000178814,
+            "layers": 1,
+            "history": 0
+          },
+          {
+            "ms": 125.7999999821186,
+            "layers": 1,
+            "history": 0
+          }
+        ],
+        "medianMs": 105.2000000178814
+      },
+      {
+        "fixture": "script-transport-latency",
+        "result": [
+          {
+            "ms": 371.7000000178814,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 296.90000000596046,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 263.09999999403954,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 290,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          },
+          {
+            "ms": 259.19999998807907,
+            "commands": 0,
+            "logs": [
+              "1"
+            ],
+            "revision": 0
+          }
+        ],
+        "medianMs": 290
+      }
+    ]
+  },
+  "validation": {
+    "unit": "702 tests in 94 files passed",
+    "browser": "17 tests passed, including script isolation/rollback/timeout, independent snapshots, 50 MP import/WASM/save/reopen/export, layer comps and shared smart-object projects",
+    "production": "Build/type check and four production timing checks passed across the final and intermediate trials"
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-11",
+  "baseline": "pen-path-memo-2026-10-11.json",
+  "scope": "Production Chromium, 30 paced drag moves, input-to-canvas submission; full control count and live positions asserted. Observational timing.",
+  "experiments": {
+    "rejectedSvgMarkup": [
+      {
+        "paths": 20,
+        "frames": 30,
+        "median": 10.300000011920929,
+        "p95": 14.5,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 17.69999998807907,
+            "prepareMs": 3.7999999821186066
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 200,
+        "frames": 30,
+        "median": 16.099999994039536,
+        "p95": 19.400000005960464,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 22.299999982118607,
+            "prepareMs": 5.200000017881393
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 2000,
+        "frames": 30,
+        "median": 61.400000005960464,
+        "p95": 68,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 117.59999999403954,
+            "prepareMs": 8.300000011920929
+          }
+        ],
+        "longTasks": [
+          124,
+          84,
+          77,
+          77,
+          74,
+          74,
+          73,
+          72,
+          81,
+          71,
+          70,
+          69,
+          69,
+          68,
+          70,
+          73,
+          70,
+          71,
+          71,
+          68,
+          70,
+          95,
+          74,
+          68,
+          72,
+          68,
+          69,
+          74,
+          72,
+          69,
+          70,
+          86,
+          108
+        ]
+      }
+    ],
+    "targetedPathCopy": [
+      {
+        "paths": 20,
+        "frames": 30,
+        "median": 8.799999982118607,
+        "p95": 10.199999988079071,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 14.5,
+            "prepareMs": 3.7000000178813934
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 200,
+        "frames": 30,
+        "median": 12.599999994039536,
+        "p95": 14.899999976158142,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 17.399999976158142,
+            "prepareMs": 5.5
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 2000,
+        "frames": 30,
+        "median": 29.19999998807907,
+        "p95": 37.60000002384186,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 48.099999994039536,
+            "prepareMs": 10.699999988079071
+          }
+        ],
+        "longTasks": [
+          121,
+          59,
+          50
+        ]
+      }
+    ]
+  }
+}

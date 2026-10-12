@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-05",
+  "environment": "Node.js 24; synthetic DOM getter benchmark, no concurrent browser tests",
+  "fixture": {
+    "width": 800,
+    "height": 600,
+    "selectedLayers": 1,
+    "layerType": "PaintLayer",
+    "pixelSelection": {
+      "width": 800,
+      "height": 600,
+      "runsLength": 240000,
+      "runsFormula": "Array.from({length:240000}, (_,i) => i % 2 ? 128 : (i / 2 + 1) * 4)"
+    }
+  },
+  "measurement": {
+    "iterations": 20,
+    "rootLayersReadsPerIteration": 10,
+    "metric": "mean milliseconds per iteration",
+    "before": 327.97205205,
+    "after": 0.04647369999999569
+  },
+  "change": "LayerSelection reads internal document snapshot instead of calling detached toJSON serialization.",
+  "limitations": [
+    "Single-run synthetic getter timing, not end-to-end browser latency.",
+    "Intentionally verbose pixel coverage; results depend on document contents.",
+    "Does not measure rendering, GPU presentation or hardware input-to-photon latency."
+  ]
+}

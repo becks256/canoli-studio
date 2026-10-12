@@ -1,0 +1,1402 @@
+{
+  "date": "2026-10-12",
+  "experiment": "Reuse immutable Pen anchor geometry and React element identities through a per-view WeakMap.",
+  "decision": "Rejected; removed runtime candidate.",
+  "reason": "8000-anchor median 25\u219225.4 ms and p95 36.1\u219237.8 ms show no improvement. Candidate also recorded long tasks; measurements are observational, not a causal attribution.",
+  "environment": "Production Vite benchmark build, Chromium, Canvas2D, CDP CPU profiling enabled. Four fixtures, 30 input frames each.",
+  "coverage": "Checks retain all anchor controls, moved-anchor SVG position, no document revision during drag, and one commit on release.",
+  "limitations": "Separate runs can vary; no claim of hardware GPU or cross-device performance. Broad responsiveness target remains open.",
+  "before": {
+    "timings": [
+      {
+        "paths": 20,
+        "anchors": 4,
+        "frames": 30,
+        "median": 7.899999976158142,
+        "p95": 15.300000011920929,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 13.699999988079071,
+            "prepareMs": 4.0999999940395355
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 200,
+        "anchors": 4,
+        "frames": 30,
+        "median": 11.700000017881393,
+        "p95": 16,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 17.200000017881393,
+            "prepareMs": 6.5
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 2000,
+        "anchors": 4,
+        "frames": 30,
+        "median": 16.80000001192093,
+        "p95": 26.5,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 33.19999998807907,
+            "prepareMs": 8.300000011920929
+          }
+        ],
+        "longTasks": [
+          120,
+          50,
+          54
+        ]
+      },
+      {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 25,
+        "p95": 36.099999994039536,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 38.10000002384186,
+            "prepareMs": 6.4000000059604645
+          }
+        ],
+        "longTasks": [
+          130,
+          93,
+          67
+        ]
+      }
+    ],
+    "profiles": [
+      [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 673.215
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 301.134
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 33.501
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 30.529
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 16.348
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 10.218
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 8.8
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 8.5
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 8.436
+        },
+        {
+          "name": "",
+          "url": "",
+          "line": -1,
+          "ms": 6.59
+        },
+        {
+          "name": "q",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 69,
+          "ms": 5.541
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 5.311
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.403
+        },
+        {
+          "name": "tf",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.201
+        },
+        {
+          "name": "render",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 70,
+          "ms": 3.924
+        },
+        {
+          "name": "pl",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.327
+        },
+        {
+          "name": "createElement",
+          "url": "",
+          "line": -1,
+          "ms": 3.323
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.306
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 3.301
+        },
+        {
+          "name": "on",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.297
+        },
+        {
+          "name": "up",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 8,
+          "ms": 3.29
+        },
+        {
+          "name": "op",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 8,
+          "ms": 3.278
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 3.271
+        },
+        {
+          "name": "Pl",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.262
+        },
+        {
+          "name": "evaluate",
+          "url": "",
+          "line": 304,
+          "ms": 3.224
+        }
+      ],
+      [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 646.848
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 389.238
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 47.327
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 36.287
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 29.83
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 20.045
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 14.131
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 13.204
+        },
+        {
+          "name": "hu",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 9.196
+        },
+        {
+          "name": "",
+          "url": "",
+          "line": -1,
+          "ms": 8.966
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 8.632
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 7.864
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 7.862
+        },
+        {
+          "name": "evaluate",
+          "url": "",
+          "line": 304,
+          "ms": 5.532
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 5.506
+        },
+        {
+          "name": "on",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.91
+        },
+        {
+          "name": "Df",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 69,
+          "ms": 4.798
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.474
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 4.434
+        },
+        {
+          "name": "LC",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 4.421
+        },
+        {
+          "name": "tf",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.418
+        },
+        {
+          "name": "qu",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 4.375
+        },
+        {
+          "name": "fill",
+          "url": "",
+          "line": -1,
+          "ms": 4.324
+        },
+        {
+          "name": "G",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 3.616
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 3.431
+        }
+      ],
+      [
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 708.443
+        },
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 624.685
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 73.565
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 60.127
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 51.404
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 40.487
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 32.554
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 30.549
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 28.754
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 24.081
+        },
+        {
+          "name": "querySelectorAll",
+          "url": "",
+          "line": -1,
+          "ms": 17.534
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 17.472
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 14.388
+        },
+        {
+          "name": "fill",
+          "url": "",
+          "line": -1,
+          "ms": 14.304
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 14.251
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 13.218
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 12.753
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 12.731
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 11.109
+        },
+        {
+          "name": "h",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 11.092
+        },
+        {
+          "name": "Ii",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 9.934
+        },
+        {
+          "name": "td",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 8.115
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 7.828
+        },
+        {
+          "name": "querySelectorAll",
+          "url": "",
+          "line": -1,
+          "ms": 7.669
+        },
+        {
+          "name": "bounds",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 7.367
+        }
+      ],
+      [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 670.746
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 598.006
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 69.325
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 63.397
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 50.551
+        },
+        {
+          "name": "Wr",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 49.214
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 42.849
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 42.277
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 35.105
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 32.925
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 29.491
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 28.563
+        },
+        {
+          "name": "td",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 23.425
+        },
+        {
+          "name": "Hc",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 20.796
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 20.093
+        },
+        {
+          "name": "U",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 18.77
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 17.928
+        },
+        {
+          "name": "bezierCurveTo",
+          "url": "",
+          "line": -1,
+          "ms": 17.287
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 15.77
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 15.321
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 15.321
+        },
+        {
+          "name": "Ii",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 14.247
+        },
+        {
+          "name": "Ta",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 14.191
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 13.649
+        },
+        {
+          "name": "e._zod.parse",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 10,
+          "ms": 13.498
+        }
+      ]
+    ]
+  },
+  "candidate": {
+    "timings": [
+      {
+        "paths": 20,
+        "anchors": 4,
+        "frames": 30,
+        "median": 8.799999982118607,
+        "p95": 11.599999994039536,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 15.200000017881393,
+            "prepareMs": 5.199999988079071
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 200,
+        "anchors": 4,
+        "frames": 30,
+        "median": 11.099999994039536,
+        "p95": 17.700000017881393,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 20.19999998807907,
+            "prepareMs": 5.9000000059604645
+          }
+        ],
+        "longTasks": []
+      },
+      {
+        "paths": 2000,
+        "anchors": 4,
+        "frames": 30,
+        "median": 16.69999998807907,
+        "p95": 24.900000005960464,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 55.5,
+            "prepareMs": 11.099999994039536
+          }
+        ],
+        "longTasks": [
+          123,
+          69,
+          68
+        ]
+      },
+      {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 25.400000005960464,
+        "p95": 37.79999998211861,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 37.900000005960464,
+            "prepareMs": 7.300000011920929
+          }
+        ],
+        "longTasks": [
+          116,
+          91,
+          65
+        ]
+      }
+    ],
+    "profiles": [
+      [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 708.012
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 328.218
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 33.101
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 32.07
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 12.895
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 12.064
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 11.437
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 8.808
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 7.732
+        },
+        {
+          "name": "h",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 5.495
+        },
+        {
+          "name": "getContext",
+          "url": "",
+          "line": -1,
+          "ms": 4.434
+        },
+        {
+          "name": "op",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 8,
+          "ms": 4.391
+        },
+        {
+          "name": "yv",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 4.382
+        },
+        {
+          "name": "",
+          "url": "",
+          "line": -1,
+          "ms": 4.322
+        },
+        {
+          "name": "tf",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 4.028
+        },
+        {
+          "name": "on",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 3.662
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 3.561
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 3.342
+        },
+        {
+          "name": "sf",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 3.318
+        },
+        {
+          "name": "h",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 3.313
+        },
+        {
+          "name": "tf",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 3.306
+        },
+        {
+          "name": "on",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 3.306
+        },
+        {
+          "name": "q",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 69,
+          "ms": 3.3
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 3.278
+        },
+        {
+          "name": "Pl",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 3.237
+        }
+      ],
+      [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 739.618
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 385.919
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 42.025
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 37.801
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 29.759
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 24.044
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 17.722
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 14.991
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 12.127
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 9.148
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 8.877
+        },
+        {
+          "name": "yl",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 7.95
+        },
+        {
+          "name": "",
+          "url": "",
+          "line": -1,
+          "ms": 6.755
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 6.608
+        },
+        {
+          "name": "fill",
+          "url": "",
+          "line": -1,
+          "ms": 6.581
+        },
+        {
+          "name": "q",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 69,
+          "ms": 5.603
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 5.561
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 5.534
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 5.471
+        },
+        {
+          "name": "h",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 5.436
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 5.413
+        },
+        {
+          "name": "Pl",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 5.377
+        },
+        {
+          "name": "Mu",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 4.457
+        },
+        {
+          "name": "up",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 8,
+          "ms": 4.413
+        },
+        {
+          "name": "bezierCurveTo",
+          "url": "",
+          "line": -1,
+          "ms": 4.409
+        }
+      ],
+      [
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 753.549
+        },
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 644.324
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 81.918
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 64.543
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 49.386
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 34.574
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 33.326
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 30.823
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 26.848
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 24.325
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 18.137
+        },
+        {
+          "name": "Rc",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 17.671
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 16.681
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 16.237
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 14.666
+        },
+        {
+          "name": "querySelectorAll",
+          "url": "",
+          "line": -1,
+          "ms": 13.232
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 12.826
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 12.322
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 12.15
+        },
+        {
+          "name": "Df",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 69,
+          "ms": 11.741
+        },
+        {
+          "name": "h",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 10.904
+        },
+        {
+          "name": "bounds",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 9.906
+        },
+        {
+          "name": "h",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 9.876
+        },
+        {
+          "name": "fill",
+          "url": "",
+          "line": -1,
+          "ms": 9.85
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 9.8
+        }
+      ],
+      [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 682.724
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 595.896
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 63.143
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 56.98
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 53.719
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 39.393
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 36.759
+        },
+        {
+          "name": "Wr",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 35.922
+        },
+        {
+          "name": "U",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 32.453
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 31.901
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 31.089
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 29.317
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 28.578
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 26.034
+        },
+        {
+          "name": "Hc",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 24.656
+        },
+        {
+          "name": "bezierCurveTo",
+          "url": "",
+          "line": -1,
+          "ms": 21.403
+        },
+        {
+          "name": "e.a.t.a.e.b.t.b.e.c.t.c.e.d.t.d.e.e.t.e.e.f.t.f.e.zoom.t.zoom.e.outline.t.outline.e.contour.t.contour.e.active.t.active.e.points.t.points.e.points.length.t.points.length.e.points.every.r",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 329,
+          "ms": 13.824
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 62,
+          "ms": 12.546
+        },
+        {
+          "name": "td",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 63,
+          "ms": 12.16
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 329,
+          "ms": 12.092
+        },
+        {
+          "name": "get points",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 70,
+          "ms": 12.073
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 11.09
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 315,
+          "ms": 11.085
+        },
+        {
+          "name": "_",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 7,
+          "ms": 10.994
+        },
+        {
+          "name": "toJSON",
+          "url": "http://127.0.0.1:4173/assets/index-C1peBWUa.js",
+          "line": 70,
+          "ms": 10.923
+        }
+      ]
+    ]
+  },
+  "restored": {
+    "timings": [
+      {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 25.5,
+        "p95": 37,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 39.39999997615814,
+            "prepareMs": 8.300000011920929
+          }
+        ],
+        "longTasks": [
+          121,
+          91,
+          55
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "build": "passed after removal",
+    "browser": "19 Pen/affine/mask/undo and related checks passed after removal",
+    "production": "Four candidate fixtures passed; restored 8000-anchor fixture passed with p95 37 ms.",
+    "interpretation": "Restored run also recorded long tasks; their presence is not unique to the candidate. No demonstrated element-reuse benefit."
+  }
+}

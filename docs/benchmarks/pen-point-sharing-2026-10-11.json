@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-11",
+  "baseline": "pen-dense-path-2026-10-11.json",
+  "change": "Freeze gesture baseline points; only active anchor mutable. Copy active anchor into each preview; reuse recursively frozen unchanged points during command patch application. Full document validation retained.",
+  "scope": "Production Chromium, one 8,000-anchor path, 30 paced moves, input-to-canvas submission. Observational timings, all anchors and live geometry asserted.",
+  "results": [
+    {
+      "paths": 1,
+      "anchors": 8000,
+      "frames": 30,
+      "median": 57.20000001788139,
+      "p95": 66.7999999821186,
+      "commit": [
+        {
+          "phase": "commit",
+          "ms": 92.80000001192093,
+          "prepareMs": 8.300000011920929
+        }
+      ],
+      "longTasks": [
+        114,
+        133,
+        77,
+        69,
+        74,
+        69,
+        66,
+        64,
+        66,
+        65,
+        72,
+        70,
+        64,
+        63,
+        62,
+        63,
+        63,
+        61,
+        62,
+        75,
+        62,
+        62,
+        62,
+        64,
+        60,
+        64,
+        61,
+        64,
+        61,
+        77,
+        62,
+        60,
+        84
+      ]
+    }
+  ]
+}

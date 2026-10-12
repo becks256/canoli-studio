@@ -1,0 +1,1593 @@
+{
+  "status": "Four styled transform checks pass; responsiveness work remains.",
+  "scope": "Single instrumented headless Chromium run. Latest input at prepare start through canvas submission, not physical scanout.",
+  "before": [
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 55.400000005960464,
+          "prepareMs": 38.69999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 59.8999999910593,
+          "prepareMs": 37
+        },
+        {
+          "phase": "move",
+          "ms": 61.29999999701977,
+          "prepareMs": 34.70000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 55.79999999701977,
+          "prepareMs": 37.5
+        },
+        {
+          "phase": "move",
+          "ms": 66.8999999910593,
+          "prepareMs": 44.20000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 69,
+          "prepareMs": 35.20000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 56.20000000298023,
+          "prepareMs": 34.70000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 61.79999999701977,
+          "prepareMs": 37.3999999910593
+        },
+        {
+          "phase": "move",
+          "ms": 64.59999999403954,
+          "prepareMs": 36.29999999701977
+        },
+        {
+          "phase": "move",
+          "ms": 72.59999999403954,
+          "prepareMs": 38.69999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 66.29999999701977,
+          "prepareMs": 43.20000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 63.20000000298023,
+          "prepareMs": 34.5
+        },
+        {
+          "phase": "move",
+          "ms": 56.20000000298023,
+          "prepareMs": 34.79999999701977
+        },
+        {
+          "phase": "move",
+          "ms": 60.3999999910593,
+          "prepareMs": 36.20000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 61.20000000298023,
+          "prepareMs": 34.19999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 47.099999994039536,
+          "prepareMs": 37.20000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 53.6000000089407,
+          "prepareMs": 36.3999999910593
+        },
+        {
+          "phase": "move",
+          "ms": 55.29999999701977,
+          "prepareMs": 33.70000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 57.400000005960464,
+          "prepareMs": 34
+        },
+        {
+          "phase": "move",
+          "ms": 59,
+          "prepareMs": 34.3999999910593
+        },
+        {
+          "phase": "move",
+          "ms": 65.5,
+          "prepareMs": 40.20000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 77.1000000089407,
+          "prepareMs": 41.5
+        },
+        {
+          "phase": "move",
+          "ms": 55.20000000298023,
+          "prepareMs": 33.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 45,
+          "prepareMs": 36.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 52.29999999701977,
+          "prepareMs": 35.20000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 55.29999999701977,
+          "prepareMs": 35
+        },
+        {
+          "phase": "move",
+          "ms": 57.30000001192093,
+          "prepareMs": 34
+        },
+        {
+          "phase": "move",
+          "ms": 59,
+          "prepareMs": 34.70000000298023
+        },
+        {
+          "phase": "move",
+          "ms": 59.79999999701977,
+          "prepareMs": 34.3999999910593
+        },
+        {
+          "phase": "move",
+          "ms": 45.900000005960464,
+          "prepareMs": 37.79999999701977
+        },
+        {
+          "phase": "commit",
+          "ms": 29.599999994039536,
+          "prepareMs": 15.799999997019768
+        }
+      ],
+      "phases": [
+        {
+          "method": "selection",
+          "ms": 6.200000002980232
+        },
+        {
+          "method": "feather",
+          "ms": 12.200000002980232
+        },
+        {
+          "method": "selection",
+          "ms": 6.600000008940697
+        },
+        {
+          "method": "feather",
+          "ms": 10.399999991059303
+        },
+        {
+          "method": "selection",
+          "ms": 5.399999991059303
+        },
+        {
+          "method": "feather",
+          "ms": 10.199999988079071
+        },
+        {
+          "method": "selection",
+          "ms": 5.5
+        },
+        {
+          "method": "feather",
+          "ms": 11.900000005960464
+        },
+        {
+          "method": "selection",
+          "ms": 12.200000002980232
+        },
+        {
+          "method": "feather",
+          "ms": 13.200000002980232
+        },
+        {
+          "method": "selection",
+          "ms": 6.200000002980232
+        },
+        {
+          "method": "feather",
+          "ms": 10.599999994039536
+        },
+        {
+          "method": "selection",
+          "ms": 5.199999988079071
+        },
+        {
+          "method": "feather",
+          "ms": 11
+        },
+        {
+          "method": "selection",
+          "ms": 5.5999999940395355
+        },
+        {
+          "method": "feather",
+          "ms": 10.700000002980232
+        },
+        {
+          "method": "selection",
+          "ms": 5.299999997019768
+        },
+        {
+          "method": "feather",
+          "ms": 12.600000008940697
+        },
+        {
+          "method": "selection",
+          "ms": 5.5
+        },
+        {
+          "method": "feather",
+          "ms": 13.399999991059303
+        },
+        {
+          "method": "selection",
+          "ms": 10.599999994039536
+        },
+        {
+          "method": "feather",
+          "ms": 13.299999997019768
+        },
+        {
+          "method": "selection",
+          "ms": 5.299999997019768
+        },
+        {
+          "method": "feather",
+          "ms": 10.600000008940697
+        },
+        {
+          "method": "selection",
+          "ms": 5.299999997019768
+        },
+        {
+          "method": "feather",
+          "ms": 10.599999994039536
+        },
+        {
+          "method": "selection",
+          "ms": 5.199999988079071
+        },
+        {
+          "method": "feather",
+          "ms": 13
+        },
+        {
+          "method": "selection",
+          "ms": 5.299999997019768
+        },
+        {
+          "method": "feather",
+          "ms": 10.100000008940697
+        },
+        {
+          "method": "selection",
+          "ms": 6.299999997019768
+        },
+        {
+          "method": "feather",
+          "ms": 12
+        },
+        {
+          "method": "selection",
+          "ms": 5.299999997019768
+        },
+        {
+          "method": "feather",
+          "ms": 12.399999991059303
+        },
+        {
+          "method": "selection",
+          "ms": 5.4000000059604645
+        },
+        {
+          "method": "feather",
+          "ms": 10.200000002980232
+        },
+        {
+          "method": "selection",
+          "ms": 5.399999991059303
+        },
+        {
+          "method": "feather",
+          "ms": 10.299999997019768
+        },
+        {
+          "method": "selection",
+          "ms": 5.5
+        },
+        {
+          "method": "feather",
+          "ms": 10.399999991059303
+        },
+        {
+          "method": "selection",
+          "ms": 5.5
+        },
+        {
+          "method": "feather",
+          "ms": 14.400000005960464
+        },
+        {
+          "method": "selection",
+          "ms": 10.300000011920929
+        },
+        {
+          "method": "feather",
+          "ms": 10.600000008940697
+        },
+        {
+          "method": "selection",
+          "ms": 5.5
+        },
+        {
+          "method": "feather",
+          "ms": 10.099999994039536
+        },
+        {
+          "method": "selection",
+          "ms": 5.300000011920929
+        },
+        {
+          "method": "feather",
+          "ms": 12
+        },
+        {
+          "method": "selection",
+          "ms": 5.4000000059604645
+        },
+        {
+          "method": "feather",
+          "ms": 11.300000011920929
+        },
+        {
+          "method": "selection",
+          "ms": 5.600000008940697
+        },
+        {
+          "method": "feather",
+          "ms": 10.699999988079071
+        },
+        {
+          "method": "selection",
+          "ms": 5.200000002980232
+        },
+        {
+          "method": "feather",
+          "ms": 10.199999988079071
+        },
+        {
+          "method": "selection",
+          "ms": 5.199999988079071
+        },
+        {
+          "method": "feather",
+          "ms": 10.900000005960464
+        },
+        {
+          "method": "selection",
+          "ms": 5.399999991059303
+        },
+        {
+          "method": "feather",
+          "ms": 10.799999997019768
+        },
+        {
+          "method": "selection",
+          "ms": 6
+        },
+        {
+          "method": "feather",
+          "ms": 11.099999994039536
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "rotate",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 44.29999999701977,
+            "prepareMs": 27.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 41.70000000298023,
+            "prepareMs": 25
+          },
+          {
+            "phase": "move",
+            "ms": 44,
+            "prepareMs": 26.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 40.69999998807907,
+            "prepareMs": 24.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 46.70000000298023,
+            "prepareMs": 29.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 45.79999999701977,
+            "prepareMs": 26.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 36.29999999701977,
+            "prepareMs": 26
+          },
+          {
+            "phase": "move",
+            "ms": 44.5,
+            "prepareMs": 27.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 40.79999999701977,
+            "prepareMs": 24.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 36,
+            "prepareMs": 26.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 41.80000001192093,
+            "prepareMs": 25.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 44.8999999910593,
+            "prepareMs": 27.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 44.29999999701977,
+            "prepareMs": 33.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 41.80000001192093,
+            "prepareMs": 27
+          },
+          {
+            "phase": "move",
+            "ms": 42.79999999701977,
+            "prepareMs": 26
+          },
+          {
+            "phase": "move",
+            "ms": 42.1000000089407,
+            "prepareMs": 24.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 33.099999994039536,
+            "prepareMs": 24.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 41.3999999910593,
+            "prepareMs": 24.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 41.20000000298023,
+            "prepareMs": 24.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 31.799999997019768,
+            "prepareMs": 23.5
+          },
+          {
+            "phase": "move",
+            "ms": 43,
+            "prepareMs": 25.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 34.8999999910593,
+            "prepareMs": 25.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 42.6000000089407,
+            "prepareMs": 25.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 33.8999999910593,
+            "prepareMs": 26.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 42.29999999701977,
+            "prepareMs": 25.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 35.70000000298023,
+            "prepareMs": 27.5
+          },
+          {
+            "phase": "move",
+            "ms": 52.900000005960464,
+            "prepareMs": 33.5
+          },
+          {
+            "phase": "move",
+            "ms": 35,
+            "prepareMs": 24.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 42,
+            "prepareMs": 24.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 34.599999994039536,
+            "prepareMs": 25.5
+          },
+          {
+            "phase": "commit",
+            "ms": 28.5,
+            "prepareMs": 15.900000005960464
+          }
+        ],
+        "phases": [
+          {
+            "method": "selection",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 5.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.5
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 3.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 5.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1.1000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 5.5
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 5.5
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 6.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 4.600000008940697
+          },
+          {
+            "method": "selection",
+            "ms": 5.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 5.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 5.5999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.5
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 5.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1.2999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 6.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1.0999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.699999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 5.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 10
+          },
+          {
+            "method": "feather",
+            "ms": 3.5
+          },
+          {
+            "method": "selection",
+            "ms": 5.699999988079071
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 5.300000011920929
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 46.70000000298023,
+        "medianPrepareMs": 25.850000001490116
+      }
+    },
+    {
+      "measurement": {
+        "layers": 5,
+        "gesture": "resize",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 32.599999994039536,
+            "prepareMs": 15
+          },
+          {
+            "phase": "move",
+            "ms": 32.30000001192093,
+            "prepareMs": 14.699999988079071
+          },
+          {
+            "phase": "move",
+            "ms": 31.799999997019768,
+            "prepareMs": 14.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 32.20000000298023,
+            "prepareMs": 14.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 30.599999994039536,
+            "prepareMs": 13.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 33,
+            "prepareMs": 15.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 32.70000000298023,
+            "prepareMs": 15.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 32.20000000298023,
+            "prepareMs": 14.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 32.599999994039536,
+            "prepareMs": 15
+          },
+          {
+            "phase": "move",
+            "ms": 31.799999997019768,
+            "prepareMs": 14.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 33.70000000298023,
+            "prepareMs": 16
+          },
+          {
+            "phase": "move",
+            "ms": 32.099999994039536,
+            "prepareMs": 14.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.79999999701977,
+            "prepareMs": 15.5
+          },
+          {
+            "phase": "move",
+            "ms": 32.29999999701977,
+            "prepareMs": 14.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.400000005960464,
+            "prepareMs": 14.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 31.900000005960464,
+            "prepareMs": 14.5
+          },
+          {
+            "phase": "move",
+            "ms": 32.5,
+            "prepareMs": 14.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 32.400000005960464,
+            "prepareMs": 15.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 33.099999994039536,
+            "prepareMs": 15.5
+          },
+          {
+            "phase": "move",
+            "ms": 32.80000001192093,
+            "prepareMs": 15.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 33.3999999910593,
+            "prepareMs": 15.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.1000000089407,
+            "prepareMs": 14.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 31.299999997019768,
+            "prepareMs": 13.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 31.899999991059303,
+            "prepareMs": 14.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.79999999701977,
+            "prepareMs": 15.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 32.29999999701977,
+            "prepareMs": 14.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 31.799999997019768,
+            "prepareMs": 14.5
+          },
+          {
+            "phase": "move",
+            "ms": 31.599999994039536,
+            "prepareMs": 14
+          },
+          {
+            "phase": "move",
+            "ms": 33.20000000298023,
+            "prepareMs": 15.5
+          },
+          {
+            "phase": "move",
+            "ms": 32.599999994039536,
+            "prepareMs": 15.099999994039536
+          },
+          {
+            "phase": "commit",
+            "ms": 24.600000008940697,
+            "prepareMs": 13.799999997019768
+          }
+        ],
+        "phases": []
+      },
+      "summary": {
+        "liveFrames": 30,
+        "p95Ms": 33.3999999910593,
+        "medianPrepareMs": 14.75
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "rotate",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 60.79999999701977,
+            "prepareMs": 25.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 43.8999999910593,
+            "prepareMs": 29.30000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 45.70000000298023,
+            "prepareMs": 28.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 41.29999999701977,
+            "prepareMs": 29.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 43.30000001192093,
+            "prepareMs": 26.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 41.6000000089407,
+            "prepareMs": 25.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 42.79999999701977,
+            "prepareMs": 25.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 38.20000000298023,
+            "prepareMs": 27.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 45.5,
+            "prepareMs": 28.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 45.79999999701977,
+            "prepareMs": 32.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 45.80000001192093,
+            "prepareMs": 27.5
+          },
+          {
+            "phase": "move",
+            "ms": 40.29999999701977,
+            "prepareMs": 25.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 42,
+            "prepareMs": 24.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 42.80000001192093,
+            "prepareMs": 25.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 34.8999999910593,
+            "prepareMs": 25.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 44.20000000298023,
+            "prepareMs": 27.200000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 34.6000000089407,
+            "prepareMs": 25.399999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 46.80000001192093,
+            "prepareMs": 28.69999998807907
+          },
+          {
+            "phase": "move",
+            "ms": 47.80000001192093,
+            "prepareMs": 28.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 40.1000000089407,
+            "prepareMs": 29.80000001192093
+          },
+          {
+            "phase": "move",
+            "ms": 43.6000000089407,
+            "prepareMs": 26.400000005960464
+          },
+          {
+            "phase": "commit",
+            "ms": 27.5,
+            "prepareMs": 15.699999988079071
+          }
+        ],
+        "phases": [
+          {
+            "method": "feather",
+            "ms": 4.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 28.899999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 10.900000005960464
+          },
+          {
+            "method": "selection",
+            "ms": 41.5
+          },
+          {
+            "method": "feather",
+            "ms": 13.799999997019768
+          },
+          {
+            "method": "selection",
+            "ms": 24.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 4
+          },
+          {
+            "method": "selection",
+            "ms": 24.099999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 5.299999997019768
+          },
+          {
+            "method": "selection",
+            "ms": 25.80000001192093
+          },
+          {
+            "method": "feather",
+            "ms": 4.700000002980232
+          },
+          {
+            "method": "selection",
+            "ms": 24.30000001192093
+          },
+          {
+            "method": "feather",
+            "ms": 4.5
+          },
+          {
+            "method": "selection",
+            "ms": 24.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 5.5
+          },
+          {
+            "method": "selection",
+            "ms": 24.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 3.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 23.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 3.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 23.600000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 4.4000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 25
+          },
+          {
+            "method": "feather",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 8.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1.5
+          },
+          {
+            "method": "selection",
+            "ms": 6.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 9
+          },
+          {
+            "method": "feather",
+            "ms": 1.199999988079071
+          },
+          {
+            "method": "selection",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1.300000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 1.0999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 7.100000008940697
+          },
+          {
+            "method": "feather",
+            "ms": 1.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1.7000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 7.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "selection",
+            "ms": 6.0999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 2.6000000089406967
+          },
+          {
+            "method": "selection",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.700000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 5.5999999940395355
+          },
+          {
+            "method": "feather",
+            "ms": 0.8999999910593033
+          },
+          {
+            "method": "selection",
+            "ms": 6.4000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 6
+          },
+          {
+            "method": "feather",
+            "ms": 0.9000000059604645
+          },
+          {
+            "method": "selection",
+            "ms": 6.199999988079071
+          },
+          {
+            "method": "feather",
+            "ms": 0.7999999970197678
+          },
+          {
+            "method": "selection",
+            "ms": 5.9000000059604645
+          },
+          {
+            "method": "feather",
+            "ms": 1.2000000029802322
+          },
+          {
+            "method": "selection",
+            "ms": 5.399999991059303
+          },
+          {
+            "method": "feather",
+            "ms": 1
+          },
+          {
+            "method": "selection",
+            "ms": 10.200000002980232
+          },
+          {
+            "method": "feather",
+            "ms": 0.800000011920929
+          },
+          {
+            "method": "selection",
+            "ms": 5.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 1.2000000029802322
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 21,
+        "p95Ms": 47.80000001192093,
+        "medianPrepareMs": 27.200000002980232
+      }
+    },
+    {
+      "measurement": {
+        "layers": 20,
+        "gesture": "resize",
+        "styled": true,
+        "frames": [
+          {
+            "phase": "move",
+            "ms": 73.3999999910593,
+            "prepareMs": 33.5
+          },
+          {
+            "phase": "move",
+            "ms": 42.1000000089407,
+            "prepareMs": 15.5
+          },
+          {
+            "phase": "move",
+            "ms": 33.900000005960464,
+            "prepareMs": 17.400000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 33.79999999701977,
+            "prepareMs": 14.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 34.20000000298023,
+            "prepareMs": 14.899999991059303
+          },
+          {
+            "phase": "move",
+            "ms": 34.099999994039536,
+            "prepareMs": 14.900000005960464
+          },
+          {
+            "phase": "move",
+            "ms": 35.80000001192093,
+            "prepareMs": 16.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 35.400000005960464,
+            "prepareMs": 16.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 34.099999994039536,
+            "prepareMs": 14.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 34.3999999910593,
+            "prepareMs": 15.5
+          },
+          {
+            "phase": "move",
+            "ms": 33.8999999910593,
+            "prepareMs": 14.600000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 34.099999994039536,
+            "prepareMs": 14.799999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 33.70000000298023,
+            "prepareMs": 14.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 34.400000005960464,
+            "prepareMs": 15.099999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 34.79999999701977,
+            "prepareMs": 15.599999994039536
+          },
+          {
+            "phase": "move",
+            "ms": 34.1000000089407,
+            "prepareMs": 15.100000008940697
+          },
+          {
+            "phase": "move",
+            "ms": 34.20000000298023,
+            "prepareMs": 14.5
+          },
+          {
+            "phase": "move",
+            "ms": 35.20000000298023,
+            "prepareMs": 15.299999997019768
+          },
+          {
+            "phase": "move",
+            "ms": 34.6000000089407,
+            "prepareMs": 15.700000002980232
+          },
+          {
+            "phase": "move",
+            "ms": 39.400000005960464,
+            "prepareMs": 20
+          },
+          {
+            "phase": "commit",
+            "ms": 30.299999997019768,
+            "prepareMs": 15.5
+          }
+        ],
+        "phases": [
+          {
+            "method": "feather",
+            "ms": 4
+          },
+          {
+            "method": "selection",
+            "ms": 26.099999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 21.5
+          },
+          {
+            "method": "selection",
+            "ms": 24
+          },
+          {
+            "method": "feather",
+            "ms": 11.100000008940697
+          },
+          {
+            "method": "selection",
+            "ms": 27
+          },
+          {
+            "method": "feather",
+            "ms": 5.200000002980232
+          },
+          {
+            "method": "selection",
+            "ms": 28.799999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 4.0999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 25.599999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 8
+          },
+          {
+            "method": "selection",
+            "ms": 25.599999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 6.799999997019768
+          },
+          {
+            "method": "selection",
+            "ms": 24.400000005960464
+          },
+          {
+            "method": "feather",
+            "ms": 7.5999999940395355
+          },
+          {
+            "method": "selection",
+            "ms": 24.599999994039536
+          },
+          {
+            "method": "feather",
+            "ms": 8.900000005960464
+          },
+          {
+            "method": "selection",
+            "ms": 29.299999997019768
+          },
+          {
+            "method": "feather",
+            "ms": 4.299999997019768
+          },
+          {
+            "method": "selection",
+            "ms": 25.900000005960464
+          },
+          {
+            "method": "feather",
+            "ms": 4
+          },
+          {
+            "method": "selection",
+            "ms": 5.5
+          },
+          {
+            "method": "feather",
+            "ms": 7.5999999940395355
+          }
+        ]
+      },
+      "summary": {
+        "liveFrames": 20,
+        "p95Ms": 42.1000000089407,
+        "medianPrepareMs": 15.200000002980232
+      }
+    }
+  ],
+  "validation": "684 unit/API tests, production build, 22 mask/patch browser checks, four styled production transform checks, documentation build and whitespace checks pass."
+}

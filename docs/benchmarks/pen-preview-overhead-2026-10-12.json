@@ -1,0 +1,897 @@
+{
+  "date": "2026-10-12",
+  "change": "Compute Bezier control hull without temporary point arrays; skip raw-cache signature/probes for mutable vector path arrays that cannot be retained.",
+  "scope": "Production Chromium Pen anchor drag; same 8000 SVG controls and editable anchors; four fixtures, observational timing.",
+  "results": [
+    {
+      "run": "before_dense",
+      "fixture": "pen-profile",
+      "result": [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 676.324
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 584.48
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 60.705
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 58.958
+        },
+        {
+          "name": "Sm",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 70,
+          "ms": 56.951
+        },
+        {
+          "name": "Wr",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 7,
+          "ms": 47.482
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 44.851
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 43.878
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 62,
+          "ms": 42.876
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 40.597
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 62,
+          "ms": 36.55
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 62,
+          "ms": 32.936
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 7,
+          "ms": 30.787
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 27.472
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 25.295
+        },
+        {
+          "name": "bezierCurveTo",
+          "url": "",
+          "line": -1,
+          "ms": 25.213
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 62,
+          "ms": 22.008
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 62,
+          "ms": 22.002
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 20.562
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 62,
+          "ms": 19.947
+        },
+        {
+          "name": "td",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 63,
+          "ms": 17.577
+        },
+        {
+          "name": "Ta",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 7,
+          "ms": 16.43
+        },
+        {
+          "name": "Hc",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 62,
+          "ms": 15.382
+        },
+        {
+          "name": "Ii",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 7,
+          "ms": 13.238
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-CMAzQw_D.js",
+          "line": 329,
+          "ms": 13.194
+        }
+      ]
+    },
+    {
+      "run": "before_dense",
+      "fixture": "pen-latency",
+      "result": {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 28.5,
+        "p95": 39.099999994039536,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 42,
+            "prepareMs": 9.300000011920929
+          }
+        ],
+        "longTasks": [
+          125,
+          102
+        ]
+      }
+    },
+    {
+      "run": "after",
+      "fixture": "pen-profile",
+      "result": [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 673.215
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 301.134
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 33.501
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 30.529
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 16.348
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 10.218
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 8.8
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 8.5
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 8.436
+        },
+        {
+          "name": "",
+          "url": "",
+          "line": -1,
+          "ms": 6.59
+        },
+        {
+          "name": "q",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 69,
+          "ms": 5.541
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 5.311
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.403
+        },
+        {
+          "name": "tf",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.201
+        },
+        {
+          "name": "render",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 70,
+          "ms": 3.924
+        },
+        {
+          "name": "pl",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.327
+        },
+        {
+          "name": "createElement",
+          "url": "",
+          "line": -1,
+          "ms": 3.323
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.306
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 3.301
+        },
+        {
+          "name": "on",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.297
+        },
+        {
+          "name": "up",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 8,
+          "ms": 3.29
+        },
+        {
+          "name": "op",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 8,
+          "ms": 3.278
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 3.271
+        },
+        {
+          "name": "Pl",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 3.262
+        },
+        {
+          "name": "evaluate",
+          "url": "",
+          "line": 304,
+          "ms": 3.224
+        }
+      ]
+    },
+    {
+      "run": "after",
+      "fixture": "pen-latency",
+      "result": {
+        "paths": 20,
+        "anchors": 4,
+        "frames": 30,
+        "median": 7.899999976158142,
+        "p95": 15.300000011920929,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 13.699999988079071,
+            "prepareMs": 4.0999999940395355
+          }
+        ],
+        "longTasks": []
+      }
+    },
+    {
+      "run": "after",
+      "fixture": "pen-profile",
+      "result": [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 646.848
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 389.238
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 47.327
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 36.287
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 29.83
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 20.045
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 14.131
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 13.204
+        },
+        {
+          "name": "hu",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 9.196
+        },
+        {
+          "name": "",
+          "url": "",
+          "line": -1,
+          "ms": 8.966
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 8.632
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 7.864
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 7.862
+        },
+        {
+          "name": "evaluate",
+          "url": "",
+          "line": 304,
+          "ms": 5.532
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 5.506
+        },
+        {
+          "name": "on",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.91
+        },
+        {
+          "name": "Df",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 69,
+          "ms": 4.798
+        },
+        {
+          "name": "is",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.474
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 4.434
+        },
+        {
+          "name": "LC",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 4.421
+        },
+        {
+          "name": "tf",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 4.418
+        },
+        {
+          "name": "qu",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 4.375
+        },
+        {
+          "name": "fill",
+          "url": "",
+          "line": -1,
+          "ms": 4.324
+        },
+        {
+          "name": "G",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 3.616
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 3.431
+        }
+      ]
+    },
+    {
+      "run": "after",
+      "fixture": "pen-latency",
+      "result": {
+        "paths": 200,
+        "anchors": 4,
+        "frames": 30,
+        "median": 11.700000017881393,
+        "p95": 16,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 17.200000017881393,
+            "prepareMs": 6.5
+          }
+        ],
+        "longTasks": []
+      }
+    },
+    {
+      "run": "after",
+      "fixture": "pen-profile",
+      "result": [
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 708.443
+        },
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 624.685
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 73.565
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 60.127
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 51.404
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 40.487
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 32.554
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 30.549
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 28.754
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 24.081
+        },
+        {
+          "name": "querySelectorAll",
+          "url": "",
+          "line": -1,
+          "ms": 17.534
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 17.472
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 14.388
+        },
+        {
+          "name": "fill",
+          "url": "",
+          "line": -1,
+          "ms": 14.304
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 14.251
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 13.218
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 12.753
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 12.731
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 11.109
+        },
+        {
+          "name": "h",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 11.092
+        },
+        {
+          "name": "Ii",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 9.934
+        },
+        {
+          "name": "td",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 8.115
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 7.828
+        },
+        {
+          "name": "querySelectorAll",
+          "url": "",
+          "line": -1,
+          "ms": 7.669
+        },
+        {
+          "name": "bounds",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 7.367
+        }
+      ]
+    },
+    {
+      "run": "after",
+      "fixture": "pen-latency",
+      "result": {
+        "paths": 2000,
+        "anchors": 4,
+        "frames": 30,
+        "median": 16.80000001192093,
+        "p95": 26.5,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 33.19999998807907,
+            "prepareMs": 8.300000011920929
+          }
+        ],
+        "longTasks": [
+          120,
+          50,
+          54
+        ]
+      }
+    },
+    {
+      "run": "after",
+      "fixture": "pen-profile",
+      "result": [
+        {
+          "name": "(idle)",
+          "url": "",
+          "line": -1,
+          "ms": 670.746
+        },
+        {
+          "name": "(program)",
+          "url": "",
+          "line": -1,
+          "ms": 598.006
+        },
+        {
+          "name": "getBoundingClientRect",
+          "url": "",
+          "line": -1,
+          "ms": 69.325
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 63.397
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 50.551
+        },
+        {
+          "name": "Wr",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 49.214
+        },
+        {
+          "name": "query",
+          "url": "",
+          "line": 5718,
+          "ms": 42.849
+        },
+        {
+          "name": "Qd",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 42.277
+        },
+        {
+          "name": "(garbage collector)",
+          "url": "",
+          "line": -1,
+          "ms": 35.105
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 32.925
+        },
+        {
+          "name": "save",
+          "url": "",
+          "line": -1,
+          "ms": 29.491
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 28.563
+        },
+        {
+          "name": "td",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 63,
+          "ms": 23.425
+        },
+        {
+          "name": "Hc",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 20.796
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 20.093
+        },
+        {
+          "name": "U",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 18.77
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 17.928
+        },
+        {
+          "name": "bezierCurveTo",
+          "url": "",
+          "line": -1,
+          "ms": 17.287
+        },
+        {
+          "name": "Sv",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 315,
+          "ms": 15.77
+        },
+        {
+          "name": "",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 329,
+          "ms": 15.321
+        },
+        {
+          "name": "ml",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 62,
+          "ms": 15.321
+        },
+        {
+          "name": "Ii",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 14.247
+        },
+        {
+          "name": "Ta",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 7,
+          "ms": 14.191
+        },
+        {
+          "name": "drawImage",
+          "url": "",
+          "line": -1,
+          "ms": 13.649
+        },
+        {
+          "name": "e._zod.parse",
+          "url": "http://127.0.0.1:4173/assets/index-xxfHyrp5.js",
+          "line": 10,
+          "ms": 13.498
+        }
+      ]
+    },
+    {
+      "run": "after",
+      "fixture": "pen-latency",
+      "result": {
+        "paths": 1,
+        "anchors": 8000,
+        "frames": 30,
+        "median": 25,
+        "p95": 36.099999994039536,
+        "commit": [
+          {
+            "phase": "commit",
+            "ms": 38.10000002384186,
+            "prepareMs": 6.4000000059604645
+          }
+        ],
+        "longTasks": [
+          130,
+          93,
+          67
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Single 8000-anchor path remains above 33ms p95 at 36.1ms.",
+    "Profile/long-task collection includes test-harness work; not a hardware-independent responsiveness guarantee."
+  ]
+}

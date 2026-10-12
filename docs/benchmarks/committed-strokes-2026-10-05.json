@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-05",
+  "environment": "Development Chromium, Canvas2D, single runs",
+  "fixture": {
+    "width": 698,
+    "height": 396,
+    "layers": 5,
+    "clippedBrushStrokes": 20
+  },
+  "before": {
+    "coldRenderMs": 1094.5,
+    "selectionRasterizations": 20
+  },
+  "maskCacheOnly": {
+    "coldRenderMs": 370.89999997615814,
+    "selectionRasterizations": 1
+  },
+  "withPrefixReuse": {
+    "coldRenderMs": 375,
+    "appendRenderMs": 36.89999997615814,
+    "selectionRasterizationsOnColdRender": 1,
+    "matchesUncachedPixels": true
+  },
+  "limitations": "Synthetic clipped-stroke fixture, not the user document or hardware input-to-photon latency. Cold and appended render timings measure different workloads.",
+  "finalVerification": {
+    "coldRenderMs": 413.19999998807907,
+    "appendRenderMs": 44,
+    "selectionRasterizationsOnColdRender": 1,
+    "matchesUncachedPixels": true,
+    "undoRestoresOriginalPixels": true
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-12",
+  "change": "Cooperatively encode checkpoint JSON UTF-8 using bounded native batches and ~2 ms task slices; preserve checksum bytes.",
+  "runs": {
+    "recovery-dedicated-before": [
+      {
+        "saveMs": 122.5,
+        "input": {
+          "ms": 48.900000005960464,
+          "beforeSave": true,
+          "selected": true
+        },
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 64000
+      },
+      {
+        "saveMs": 374.2000000178814,
+        "input": {
+          "ms": 118.30000001192093,
+          "beforeSave": true,
+          "selected": true
+        },
+        "longTasks": [
+          {
+            "start": 12431.59999999404,
+            "duration": 222
+          }
+        ],
+        "revisionUnchanged": true,
+        "points": 256000
+      }
+    ],
+    "recovery-json-after": [
+      {
+        "saveMs": 390.2000000178814,
+        "input": {
+          "ms": 12.599999994039536,
+          "beforeSave": true,
+          "selected": true
+        },
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 64000
+      },
+      {
+        "saveMs": 1593.699999988079,
+        "input": {
+          "ms": 16.400000005960464,
+          "beforeSave": true,
+          "selected": true
+        },
+        "longTasks": [
+          {
+            "start": 15975.800000011921,
+            "duration": 180
+          }
+        ],
+        "revisionUnchanged": true,
+        "points": 256000
+      }
+    ],
+    "recovery-json-batched": [
+      {
+        "saveMs": 152.39999997615814,
+        "input": {
+          "ms": 11.799999982118607,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 64000
+      },
+      {
+        "saveMs": 556.6000000238419,
+        "input": {
+          "ms": 12.200000017881393,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [
+          {
+            "start": 12203.40000000596,
+            "duration": 178
+          }
+        ],
+        "revisionUnchanged": true,
+        "points": 256000
+      }
+    ],
+    "recovery-json-repeat": [
+      {
+        "saveMs": 153.80000001192093,
+        "input": {
+          "ms": 11.300000011920929,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [],
+        "revisionUnchanged": true,
+        "points": 64000
+      },
+      {
+        "saveMs": 548.6999999880791,
+        "input": {
+          "ms": 11.699999988079071,
+          "beforeSave": true,
+          "selected": true
+        },
+        "checksumMatchesNative": true,
+        "longTasks": [
+          {
+            "start": 12417.09999999404,
+            "duration": 180
+          }
+        ],
+        "revisionUnchanged": true,
+        "points": 256000
+      }
+    ]
+  },
+  "limitations": [
+    "Final overlapping-task observer includes a task that starts before the measured call; earlier runs filtered by task start only, so their initial blocking task may be omitted. Control-response elapsed times still cover that initial block.",
+    "Background save throughput decreases: final 256000-point saves ~549\u2013557 ms versus native 374 ms.",
+    "IndexedDB still produces ~178\u2013180 ms main-thread tasks on the large fixture.",
+    "Data-only stable snapshots; native individual-string encoding, final allocation and crypto submission remain synchronous.",
+    "No editor-wide completion claim."
+  ]
+}

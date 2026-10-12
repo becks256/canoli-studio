@@ -1,0 +1,19 @@
+{
+  "fixture": "2000x200 alternating opaque/transparent vertical pixels; 1000 islands per row",
+  "environment": "Node.js 24, single CPU run per implementation",
+  "before": {
+    "ms": 858.080089,
+    "length": 3981780,
+    "hash": "c201071760bfda32582b16b43191eb743f1d9bda5ffa8e1e08d571fba4dc0568"
+  },
+  "after": {
+    "ms": 147.47535,
+    "length": 3981780,
+    "hash": "c201071760bfda32582b16b43191eb743f1d9bda5ffa8e1e08d571fba4dc0568"
+  },
+  "limitations": "Outline construction only; long SVG path painting and pathological contour size remain separate costs.",
+  "merged": {
+    "ms": 113.76397800000001,
+    "length": 44670
+  }
+}

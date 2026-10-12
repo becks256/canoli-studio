@@ -1,0 +1,4472 @@
+{
+  "date": "2026-10-12",
+  "change": "Cancel obsolete viewport preparation at cooperative replay/layer boundaries using the same eligibility rules as presentation. Preserve same-stroke and same-transform prefixes. Stop immediately on source-revision/asset changes. Propagate to smart-document and GPU Canvas-reference renders; exports without a predicate remain independent.",
+  "fixture": "Real UI switches from a 698x396 document containing one 1200-point soft brush stroke to a solid-color document during cold preparation. Observe abort, latest presented pixels and elapsed time from newDocument; do not replace renderer output.",
+  "productionBaseline": [
+    {
+      "cancelEnabled": false,
+      "started": 486.5,
+      "changed": 497.40000000596046,
+      "aborted": false,
+      "completed": true,
+      "presented": 1823.4000000059605,
+      "pixel": [
+        32,
+        112,
+        64,
+        255
+      ],
+      "error": "",
+      "latestMs": 1326
+    }
+  ],
+  "productionFinal": [
+    {
+      "started": 497.30000001192093,
+      "changed": 507.09999999403954,
+      "aborted": true,
+      "completed": false,
+      "presented": 544.5999999940395,
+      "pixel": [
+        32,
+        112,
+        64,
+        255
+      ],
+      "error": "Render superseded.",
+      "latestMs": 37.5
+    }
+  ],
+  "productionRepeat": [
+    {
+      "cancelEnabled": true,
+      "started": 478.19999998807907,
+      "changed": 488.7999999821186,
+      "aborted": true,
+      "completed": false,
+      "presented": 519.5,
+      "pixel": [
+        32,
+        112,
+        64,
+        255
+      ],
+      "error": "Render superseded.",
+      "latestMs": 30.700000017881393
+    }
+  ],
+  "devBaseline": [
+    {
+      "started": 1327.5999999940395,
+      "changed": 1350.699999988079,
+      "aborted": false,
+      "completed": true,
+      "presented": 2799.0999999940395,
+      "pixel": [
+        32,
+        112,
+        64,
+        255
+      ],
+      "error": "",
+      "latestMs": 1448.4000000059605
+    }
+  ],
+  "devFinal": [
+    {
+      "started": 1347.0999999940395,
+      "changed": 1374,
+      "aborted": true,
+      "completed": false,
+      "presented": 1464.5,
+      "pixel": [
+        32,
+        112,
+        64,
+        255
+      ],
+      "error": "Render superseded.",
+      "latestMs": 90.5
+    }
+  ],
+  "live": [
+    {
+      "tool": "brush",
+      "layers": 0,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 4.799999982118607,
+          "prepareMs": 4.0999999940395355,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.100000023841858,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.700000017881393,
+          "prepareMs": 4,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.4000000059604645,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.300000011920929,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.899999976158142,
+          "prepareMs": 4.100000023841858,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.100000023841858,
+          "prepareMs": 3.9000000059604645,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.4000000059604645,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 6,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 3.9000000059604645,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.0999999940395355,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.5,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.5,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.5,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.200000017881393,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5.899999976158142,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5999999940395355,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 4,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.300000011920929,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.5999999940395355,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.9000000059604645,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.0999999940395355,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.9000000059604645,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999982118607,
+          "prepareMs": 4.299999982118607,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.899999976158142,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.0999999940395355,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.899999976158142,
+          "prepareMs": 4.5,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.800000011920929,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 5,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5.799999982118607,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.0999999940395355,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.399999976158142,
+          "prepareMs": 3.800000011920929,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4.299999982118607,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.4000000059604645,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999982118607,
+          "prepareMs": 4.0999999940395355,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 4,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5,
+          "prepareMs": 3.800000011920929,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.9000000059604645,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.300000011920929,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "pencil",
+      "layers": 0,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.800000011920929,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 4,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.899999976158142,
+          "prepareMs": 5,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 3.9000000059604645,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 5.299999982118607,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.699999988079071,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.700000017881393,
+          "prepareMs": 3.7999999821186066,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.5,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.600000023841858,
+          "prepareMs": 3.9000000059604645,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 3.899999976158142,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.0999999940395355,
+          "prepareMs": 3.800000011920929,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.4000000059604645,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 3.899999976158142,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4.0999999940395355,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.699999988079071,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5999999940395355,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 4.0999999940395355,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.399999976158142,
+          "prepareMs": 3.9000000059604645,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.299999982118607,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.9000000059604645,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 5.0999999940395355,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.600000023841858,
+          "prepareMs": 4,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.700000017881393,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.700000017881393,
+          "prepareMs": 4.0999999940395355,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.4000000059604645,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.9000000059604645,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 5.100000023841858,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.800000011920929,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.399999976158142,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.300000011920929,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.5,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.399999976158142,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.5,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.100000023841858,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.5,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 5.0999999940395355,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 5,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.200000017881393,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.300000011920929,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.199999988079071,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.0999999940395355,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.399999976158142,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.100000023841858,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5999999940395355,
+          "prepareMs": 5.700000017881393,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.4000000059604645,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.199999988079071,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 26.30000001192093,
+          "prepareMs": 5,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.299999982118607,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 3.800000011920929,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.0999999940395355,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.199999988079071,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.4000000059604645,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.9000000059604645,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.199999988079071,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.200000017881393,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 3.7999999821186066,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 3.9000000059604645,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.9000000059604645,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.299999982118607,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.399999976158142,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 5.600000023841858,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.300000011920929,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.299999982118607,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.799999982118607,
+          "prepareMs": 3.800000011920929,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.300000011920929,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.0999999940395355,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.5999999940395355,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 5.0999999940395355,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.600000023841858,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.9000000059604645,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.799999982118607,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5999999940395355,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.100000023841858,
+          "prepareMs": 5.9000000059604645,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.199999988079071,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999976158142,
+          "prepareMs": 4.5,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.699999988079071,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "pencil",
+      "layers": 5,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.300000011920929,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.100000023841858,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.199999988079071,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.300000011920929,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 3.800000011920929,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 4,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 39.69999998807907,
+          "prepareMs": 4.300000011920929,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 3.9000000059604645,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 3.9000000059604645,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.4000000059604645,
+          "prepareMs": 3.7000000178813934,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.100000023841858,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 3.699999988079071,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.699999988079071,
+          "prepareMs": 3.9000000059604645,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 3.9000000059604645,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 4.0999999940395355,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.199999988079071,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.100000023841858,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.5999999940395355,
+          "prepareMs": 3.9000000059604645,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.0999999940395355,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.0999999940395355,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.600000023841858,
+          "prepareMs": 5,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.4000000059604645,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.600000023841858,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.799999982118607,
+          "prepareMs": 5.4000000059604645,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.9000000059604645,
+          "prepareMs": 4.0999999940395355,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.9000000059604645,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.4000000059604645,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.0999999940395355,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.299999982118607,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.5999999940395355,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.4000000059604645,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.600000023841858,
+          "prepareMs": 3.699999988079071,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 4.800000011920929,
+          "prepareMs": 3.800000011920929,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.300000011920929,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999976158142,
+          "prepareMs": 4.300000011920929,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 5,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 20,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 8.300000011920929,
+          "prepareMs": 5.699999988079071,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.4000000059604645,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.100000023841858,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.300000011920929,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.200000017881393,
+          "prepareMs": 5.199999988079071,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 24.700000017881393,
+          "prepareMs": 5.5999999940395355,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.5,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.600000023841858,
+          "prepareMs": 4.199999988079071,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.699999988079071,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.299999982118607,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.700000017881393,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 4.5,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 4.5,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.800000011920929,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.399999976158142,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 5.399999976158142,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 4.9000000059604645,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 4.9000000059604645,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.0999999940395355,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.899999976158142,
+          "prepareMs": 4.0999999940395355,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.0999999940395355,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.200000017881393,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.4000000059604645,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 4.699999988079071,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.0999999940395355,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 3.9000000059604645,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.0999999940395355,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 4.5999999940395355,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.199999988079071,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5.0999999940395355,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 4.399999976158142,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.399999976158142,
+          "prepareMs": 4.4000000059604645,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.5,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "pencil",
+      "layers": 20,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.699999988079071,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 4.5999999940395355,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.799999982118607,
+          "prepareMs": 4.800000011920929,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.299999982118607,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 27,
+          "prepareMs": 5.300000011920929,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 4.299999982118607,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.199999988079071,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.199999988079071,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 4.4000000059604645,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 4.199999988079071,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.4000000059604645,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.600000023841858,
+          "prepareMs": 3.9000000059604645,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 5.300000011920929,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 4.5,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 4.9000000059604645,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 4.800000011920929,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.700000017881393,
+          "prepareMs": 5.799999982118607,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 4.0999999940395355,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8,
+          "prepareMs": 5.5,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5,
+          "prepareMs": 5.100000023841858,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 3.899999976158142,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 4.200000017881393,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.300000011920929,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.199999988079071,
+          "prepareMs": 5,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.4000000059604645,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.0999999940395355,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.299999982118607,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.4000000059604645,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 4.700000017881393,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.399999976158142,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.699999988079071,
+          "prepareMs": 5.399999976158142,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.700000017881393,
+          "prepareMs": 4.699999988079071,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 3.9000000059604645,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.100000023841858,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.100000023841858,
+          "prepareMs": 4.199999988079071,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.100000023841858,
+          "prepareMs": 4.0999999940395355,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "eraser",
+      "layers": 5,
+      "styled": false,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 4.9000000059604645,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 10.199999988079071,
+          "prepareMs": 5.799999982118607,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 6.100000023841858,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.199999988079071,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.300000011920929,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.4000000059604645,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.5999999940395355,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 18.69999998807907,
+          "prepareMs": 6.0999999940395355,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.399999976158142,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.200000017881393,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.299999982118607,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.5,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.200000017881393,
+          "prepareMs": 4.199999988079071,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.800000011920929,
+          "prepareMs": 6.299999982118607,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.399999976158142,
+          "prepareMs": 6.0999999940395355,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.0999999940395355,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.4000000059604645,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.700000017881393,
+          "prepareMs": 5.299999982118607,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5.200000017881393,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.5999999940395355,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.700000017881393,
+          "prepareMs": 5.4000000059604645,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.800000011920929,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.699999988079071,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.299999982118607,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.600000023841858,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.5999999940395355,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.799999982118607,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.600000023841858,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 5.4000000059604645,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.4000000059604645,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.300000011920929,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 5.200000017881393,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.5,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "eraser",
+      "layers": 5,
+      "styled": false,
+      "raster": true,
+      "samples": [
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 5.700000017881393,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.700000017881393,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.4000000059604645,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.700000017881393,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.699999988079071,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.100000023841858,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.899999976158142,
+          "prepareMs": 5.800000011920929,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 22.69999998807907,
+          "prepareMs": 5.700000017881393,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5.300000011920929,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.399999976158142,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5999999940395355,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.5999999940395355,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.100000023841858,
+          "prepareMs": 5,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.899999976158142,
+          "prepareMs": 5.800000011920929,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.4000000059604645,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.300000011920929,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.799999982118607,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5999999940395355,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.700000017881393,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.5,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.800000011920929,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.800000011920929,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.0999999940395355,
+          "prepareMs": 5.800000011920929,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.4000000059604645,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.4000000059604645,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 5.199999988079071,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.9000000059604645,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.800000011920929,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.4000000059604645,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.799999982118607,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.800000011920929,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 5.9000000059604645,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 5.4000000059604645,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.699999988079071,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 5.200000017881393,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5.899999976158142,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6,
+          "prepareMs": 4.9000000059604645,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.399999976158142,
+          "prepareMs": 5.0999999940395355,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 5,
+      "styled": true,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 6.100000023841858,
+          "prepareMs": 5.0999999940395355,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.600000023841858,
+          "prepareMs": 5.5,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.200000017881393,
+          "prepareMs": 6,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.200000017881393,
+          "prepareMs": 6.699999988079071,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.899999976158142,
+          "prepareMs": 5.700000017881393,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.300000011920929,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 5.0999999940395355,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.600000023841858,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 19.099999994039536,
+          "prepareMs": 5.100000023841858,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.0999999940395355,
+          "prepareMs": 4.200000017881393,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.200000017881393,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.199999988079071,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5,
+          "prepareMs": 4.200000017881393,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.700000017881393,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.100000023841858,
+          "prepareMs": 5.0999999940395355,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999976158142,
+          "prepareMs": 4.4000000059604645,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.199999988079071,
+          "prepareMs": 4.4000000059604645,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.300000011920929,
+          "prepareMs": 4.299999982118607,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.399999976158142,
+          "prepareMs": 4.200000017881393,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.899999976158142,
+          "prepareMs": 5.199999988079071,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.800000011920929,
+          "prepareMs": 4.800000011920929,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.9000000059604645,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.4000000059604645,
+          "prepareMs": 4.5,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 5.5,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.9000000059604645,
+          "prepareMs": 4.9000000059604645,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.299999982118607,
+          "prepareMs": 4.5999999940395355,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.5999999940395355,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.300000011920929,
+          "prepareMs": 5.299999982118607,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 4.9000000059604645,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5,
+          "prepareMs": 4.4000000059604645,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.5999999940395355,
+          "prepareMs": 4.800000011920929,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.699999988079071,
+          "prepareMs": 4.800000011920929,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.199999988079071,
+          "prepareMs": 5.300000011920929,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.799999982118607,
+          "prepareMs": 4.800000011920929,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.299999982118607,
+          "prepareMs": 5.4000000059604645,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 5.700000017881393,
+          "prepareMs": 4.799999982118607,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    },
+    {
+      "tool": "brush",
+      "layers": 20,
+      "styled": true,
+      "raster": false,
+      "samples": [
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 5.0999999940395355,
+          "points": 2,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 5.4000000059604645,
+          "points": 3,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8,
+          "prepareMs": 6,
+          "points": 4,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.100000023841858,
+          "prepareMs": 5.5,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 32.400000005960464,
+          "prepareMs": 5.799999982118607,
+          "points": 5,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8.700000017881393,
+          "prepareMs": 6.0999999940395355,
+          "points": 6,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.199999988079071,
+          "prepareMs": 5.100000023841858,
+          "points": 7,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "points": 8,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 4.700000017881393,
+          "points": 9,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 5.100000023841858,
+          "points": 10,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5.0999999940395355,
+          "points": 11,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.199999988079071,
+          "prepareMs": 5.300000011920929,
+          "points": 12,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 4.9000000059604645,
+          "points": 13,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.4000000059604645,
+          "prepareMs": 5.300000011920929,
+          "points": 14,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7,
+          "prepareMs": 5.200000017881393,
+          "points": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.700000017881393,
+          "prepareMs": 5.5999999940395355,
+          "points": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.799999982118607,
+          "prepareMs": 4.800000011920929,
+          "points": 17,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.800000011920929,
+          "points": 18,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.5999999940395355,
+          "points": 19,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 8,
+          "prepareMs": 6,
+          "points": 20,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 4.5,
+          "points": 21,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.200000017881393,
+          "prepareMs": 4.5,
+          "points": 22,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5999999940395355,
+          "prepareMs": 4.700000017881393,
+          "points": 23,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.100000023841858,
+          "prepareMs": 5.0999999940395355,
+          "points": 24,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.399999976158142,
+          "prepareMs": 4.5,
+          "points": 25,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.600000023841858,
+          "points": 26,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.4000000059604645,
+          "prepareMs": 4.799999982118607,
+          "points": 27,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.0999999940395355,
+          "prepareMs": 4.299999982118607,
+          "points": 28,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.699999988079071,
+          "prepareMs": 4.600000023841858,
+          "points": 29,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.600000023841858,
+          "prepareMs": 4.699999988079071,
+          "points": 30,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5,
+          "points": 31,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.399999976158142,
+          "prepareMs": 4.600000023841858,
+          "points": 32,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.600000023841858,
+          "prepareMs": 5,
+          "points": 33,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.700000017881393,
+          "prepareMs": 4.899999976158142,
+          "points": 34,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.5,
+          "prepareMs": 4.800000011920929,
+          "points": 35,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.100000023841858,
+          "prepareMs": 4.4000000059604645,
+          "points": 36,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.800000011920929,
+          "prepareMs": 5.0999999940395355,
+          "points": 37,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.299999982118607,
+          "prepareMs": 5.199999988079071,
+          "points": 38,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.5,
+          "prepareMs": 5.5999999940395355,
+          "points": 39,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 6.9000000059604645,
+          "prepareMs": 5,
+          "points": 40,
+          "backend": "canvas2d"
+        },
+        {
+          "inputMs": 7.300000011920929,
+          "prepareMs": 5.5,
+          "points": 41,
+          "backend": "canvas2d"
+        }
+      ]
+    }
+  ],
+  "sustained": [
+    {
+      "document": {
+        "width": 698,
+        "height": 396,
+        "layers": 5
+      },
+      "samples": [
+        {
+          "commitMs": 7.5999999940395355,
+          "presentMs": 18.099999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 9.199999988079071,
+          "presentMs": 21.19999998807907,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.0999999940395355,
+          "presentMs": 14.299999982118607,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.800000011920929,
+          "presentMs": 16.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.5999999940395355,
+          "presentMs": 17.30000001192093,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.200000017881393,
+          "presentMs": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.5999999940395355,
+          "presentMs": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.4000000059604645,
+          "presentMs": 16.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6.5,
+          "presentMs": 17.69999998807907,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.200000017881393,
+          "presentMs": 14.700000017881393,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.9000000059604645,
+          "presentMs": 15.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.4000000059604645,
+          "presentMs": 14.599999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.5,
+          "presentMs": 15.600000023841858,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.699999988079071,
+          "presentMs": 13.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.399999976158142,
+          "presentMs": 13.699999988079071,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.600000023841858,
+          "presentMs": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5999999940395355,
+          "presentMs": 15.199999988079071,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5999999940395355,
+          "presentMs": 13.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.4000000059604645,
+          "presentMs": 14.099999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5,
+          "presentMs": 14.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.799999982118607,
+          "presentMs": 14.699999988079071,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4,
+          "presentMs": 15.299999982118607,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5,
+          "presentMs": 16.30000001192093,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.399999976158142,
+          "presentMs": 17.799999982118607,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.5999999940395355,
+          "presentMs": 16.30000001192093,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.800000011920929,
+          "presentMs": 17.200000017881393,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6.299999982118607,
+          "presentMs": 19.900000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4,
+          "presentMs": 14.300000011920929,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5999999940395355,
+          "presentMs": 14.599999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6,
+          "presentMs": 18.200000017881393,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.299999982118607,
+          "presentMs": 16,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5,
+          "presentMs": 14.300000011920929,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.5,
+          "presentMs": 16.099999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.5999999940395355,
+          "presentMs": 15.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.300000011920929,
+          "presentMs": 19.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6,
+          "presentMs": 17.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6.0999999940395355,
+          "presentMs": 17.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6.799999982118607,
+          "presentMs": 18.099999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6.600000023841858,
+          "presentMs": 20.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 8.900000005960464,
+          "presentMs": 22.100000023841858,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5,
+          "presentMs": 14.399999976158142,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.100000023841858,
+          "presentMs": 14.900000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.199999988079071,
+          "presentMs": 15.099999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.4000000059604645,
+          "presentMs": 14.699999988079071,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.4000000059604645,
+          "presentMs": 14.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5,
+          "presentMs": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 6.5,
+          "presentMs": 16.299999982118607,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.699999988079071,
+          "presentMs": 14.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.200000017881393,
+          "presentMs": 13.300000011920929,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5999999940395355,
+          "presentMs": 15.899999976158142,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.800000011920929,
+          "presentMs": 16.900000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5,
+          "presentMs": 14.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.200000017881393,
+          "presentMs": 14.300000011920929,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.0999999940395355,
+          "presentMs": 14.900000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.100000023841858,
+          "presentMs": 15,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.300000011920929,
+          "presentMs": 20.400000005960464,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.5,
+          "presentMs": 16.5,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5,
+          "presentMs": 15.099999994039536,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 4.700000017881393,
+          "presentMs": 14.600000023841858,
+          "backend": "canvas2d"
+        },
+        {
+          "commitMs": 5.0999999940395355,
+          "presentMs": 14.899999976158142,
+          "backend": "canvas2d"
+        }
+      ]
+    }
+  ],
+  "transforms": [
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 18.69999998807907,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 16.69999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 11.899999976158142,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 10.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 10.699999988079071,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 10,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 9.300000011920929,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 9,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.900000005960464,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 12.400000005960464,
+          "prepareMs": 2.600000023841858,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 9.600000023841858,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 8.700000017881393,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 7.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 15.900000005960464,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 13.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 12.099999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 9.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.100000023841858,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 9,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.699999988079071,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.300000011920929,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 6.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 8.700000017881393,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 6.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 8.400000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 6.5
+        },
+        {
+          "phase": "move",
+          "ms": 9.800000011920929,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 8.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11.300000011920929,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 8.899999976158142,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.899999976158142,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.599999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 6.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 8.800000011920929,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 6.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.899999976158142,
+          "waitBeforePrepareMs": 6.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 11.599999994039536
+        },
+        {
+          "phase": "commit",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.4000000059604645
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 19.099999994039536,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 17.19999998807907
+        },
+        {
+          "phase": "move",
+          "ms": 14.300000011920929,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 12.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 12.700000017881393,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 10.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.400000005960464,
+          "prepareMs": 4,
+          "waitBeforePrepareMs": 9.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.400000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 14.599999994039536,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 12.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.099999994039536,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 12
+        },
+        {
+          "phase": "move",
+          "ms": 17.099999994039536,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 14.5
+        },
+        {
+          "phase": "move",
+          "ms": 8.800000011920929,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 7.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 8.300000011920929,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 6.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.799999982118607,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 10.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 11.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 9.399999976158142,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 9.200000017881393,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 8,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 6.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 8.300000011920929,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 6.5
+        },
+        {
+          "phase": "move",
+          "ms": 8.599999994039536,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 8.5,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 10.099999994039536,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.700000017881393,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 12.199999988079071,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 10.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 10.699999988079071,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 8.900000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 7
+        },
+        {
+          "phase": "move",
+          "ms": 9.099999994039536,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 7
+        },
+        {
+          "phase": "move",
+          "ms": 11.400000005960464,
+          "prepareMs": 1.600000023841858,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.299999982118607,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 9.199999988079071,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.699999988079071,
+          "prepareMs": 1.600000023841858,
+          "waitBeforePrepareMs": 7.799999982118607
+        },
+        {
+          "phase": "commit",
+          "ms": 10.099999994039536,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 7.699999988079071
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 19.69999998807907,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 16.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 13.599999994039536,
+          "prepareMs": 2.300000011920929,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 12.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 13.700000017881393,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 10.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13.100000023841858,
+          "prepareMs": 2.199999988079071,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 10.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 12,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 12.599999994039536,
+          "prepareMs": 2.0999999940395355,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 12.600000023841858,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 12.800000011920929,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17.5,
+          "prepareMs": 2.4000000059604645,
+          "waitBeforePrepareMs": 14.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.399999976158142,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.199999988079071,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 12.5,
+          "prepareMs": 2.199999988079071,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 12.900000005960464,
+          "prepareMs": 2.7000000178813934,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 12.900000005960464,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 12.799999982118607,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 9.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 10.099999994039536,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11.100000023841858,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 10.599999994039536,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 9.599999994039536,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.399999976158142,
+          "prepareMs": 2.100000023841858,
+          "waitBeforePrepareMs": 8.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 10.700000017881393,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "commit",
+          "ms": 12.5,
+          "prepareMs": 2.2999999821186066,
+          "waitBeforePrepareMs": 9.5
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": false,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 19.69999998807907,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 17.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 12.299999982118607,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 13.400000005960464,
+          "prepareMs": 2.300000011920929,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 13.900000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 11.5
+        },
+        {
+          "phase": "move",
+          "ms": 12,
+          "prepareMs": 1.399999976158142,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 12.199999988079071,
+          "prepareMs": 1.2999999821186066,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 10.600000023841858,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 11.900000005960464,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 12,
+          "prepareMs": 1.5999999940395355,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 13.299999982118607,
+          "prepareMs": 2,
+          "waitBeforePrepareMs": 10.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 13.699999988079071,
+          "prepareMs": 1.9000000059604645,
+          "waitBeforePrepareMs": 10.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 14.599999994039536,
+          "prepareMs": 1.7000000178813934,
+          "waitBeforePrepareMs": 11.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 14.099999994039536,
+          "prepareMs": 2.100000023841858,
+          "waitBeforePrepareMs": 10.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.400000005960464,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 12.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.599999994039536,
+          "prepareMs": 1.7999999821186066,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 9.799999982118607,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 7.5999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 13.400000005960464,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 11.100000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 11.900000005960464,
+          "prepareMs": 1.600000023841858,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 10.5,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.300000011920929,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 11.699999988079071,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 12.5,
+          "prepareMs": 1.800000011920929,
+          "waitBeforePrepareMs": 9.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 11.5,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11,
+          "prepareMs": 1.199999988079071,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 11.400000005960464,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 10.400000005960464,
+          "prepareMs": 1.5,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 11.700000017881393,
+          "prepareMs": 1.699999988079071,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 10.300000011920929,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 9.700000017881393,
+          "prepareMs": 1.4000000059604645,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "commit",
+          "ms": 11.599999994039536,
+          "prepareMs": 2.2000000178813934,
+          "waitBeforePrepareMs": 8.599999994039536
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 5,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 25.69999998807907,
+          "prepareMs": 9,
+          "waitBeforePrepareMs": 16.5
+        },
+        {
+          "phase": "move",
+          "ms": 18.30000001192093,
+          "prepareMs": 7.600000023841858,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.19999998807907,
+          "prepareMs": 6.800000011920929,
+          "waitBeforePrepareMs": 10.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 16.5,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 17.100000023841858,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 6.399999976158142,
+          "waitBeforePrepareMs": 11
+        },
+        {
+          "phase": "move",
+          "ms": 39.900000005960464,
+          "prepareMs": 19.30000001192093,
+          "waitBeforePrepareMs": 20.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.199999988079071,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.900000005960464,
+          "prepareMs": 6.699999988079071,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 23.5,
+          "prepareMs": 11.300000011920929,
+          "waitBeforePrepareMs": 12
+        },
+        {
+          "phase": "move",
+          "ms": 14.800000011920929,
+          "prepareMs": 5.700000017881393,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17.099999994039536,
+          "prepareMs": 8.199999988079071,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 14.599999994039536,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 7.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 26.200000017881393,
+          "prepareMs": 13.399999976158142,
+          "waitBeforePrepareMs": 12.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 14.700000017881393,
+          "prepareMs": 6.700000017881393,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 15.199999988079071,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.299999982118607,
+          "prepareMs": 5.800000011920929,
+          "waitBeforePrepareMs": 8.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 14.300000011920929,
+          "prepareMs": 5.200000017881393,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 15.799999982118607,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.699999988079071,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 13.800000011920929,
+          "prepareMs": 6.399999976158142,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 7.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.5,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 8.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.300000011920929,
+          "prepareMs": 5.899999976158142,
+          "waitBeforePrepareMs": 8.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 15.099999994039536,
+          "prepareMs": 5.5,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 17.099999994039536,
+          "prepareMs": 7.200000017881393,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 13.700000017881393,
+          "prepareMs": 5.200000017881393,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 7.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 13,
+          "prepareMs": 5.4000000059604645,
+          "waitBeforePrepareMs": 7.5
+        },
+        {
+          "phase": "commit",
+          "ms": 11.799999982118607,
+          "prepareMs": 3.5,
+          "waitBeforePrepareMs": 7.899999976158142
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 5,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 25,
+          "prepareMs": 7.9000000059604645,
+          "waitBeforePrepareMs": 16.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 6.800000011920929,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.100000023841858,
+          "prepareMs": 5.799999982118607,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 16.400000005960464,
+          "prepareMs": 7,
+          "waitBeforePrepareMs": 9.300000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 15.300000011920929,
+          "prepareMs": 5.9000000059604645,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 15.599999994039536,
+          "prepareMs": 5.700000017881393,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 16.19999998807907,
+          "prepareMs": 6.800000011920929,
+          "waitBeforePrepareMs": 9.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 14.5,
+          "prepareMs": 6.200000017881393,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.900000005960464,
+          "prepareMs": 5.100000023841858,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 24.19999998807907,
+          "prepareMs": 10.099999994039536,
+          "waitBeforePrepareMs": 13.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 14.099999994039536,
+          "prepareMs": 5.9000000059604645,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 12.5,
+          "prepareMs": 4.700000017881393,
+          "waitBeforePrepareMs": 7.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 14.400000005960464,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 8
+        },
+        {
+          "phase": "move",
+          "ms": 14.700000017881393,
+          "prepareMs": 6.899999976158142,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 12.699999988079071,
+          "prepareMs": 5.300000011920929,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 13.199999988079071,
+          "prepareMs": 5.700000017881393,
+          "waitBeforePrepareMs": 7.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 14.800000011920929,
+          "prepareMs": 5.799999982118607,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 12.699999988079071,
+          "prepareMs": 5.4000000059604645,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 12.799999982118607,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 7.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 12.300000011920929,
+          "prepareMs": 5.199999988079071,
+          "waitBeforePrepareMs": 7
+        },
+        {
+          "phase": "move",
+          "ms": 12.699999988079071,
+          "prepareMs": 5.699999988079071,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 13.199999988079071,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 12.800000011920929,
+          "prepareMs": 5.800000011920929,
+          "waitBeforePrepareMs": 6.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 13.5,
+          "prepareMs": 5.5999999940395355,
+          "waitBeforePrepareMs": 7.9000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 13.699999988079071,
+          "prepareMs": 5.800000011920929,
+          "waitBeforePrepareMs": 7.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 7.4000000059604645
+        },
+        {
+          "phase": "move",
+          "ms": 12.400000005960464,
+          "prepareMs": 5.300000011920929,
+          "waitBeforePrepareMs": 7.0999999940395355
+        },
+        {
+          "phase": "move",
+          "ms": 15.900000005960464,
+          "prepareMs": 6.899999976158142,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 14.599999994039536,
+          "prepareMs": 5.800000011920929,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "commit",
+          "ms": 12,
+          "prepareMs": 4.0999999940395355,
+          "waitBeforePrepareMs": 7.5
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 20,
+      "gesture": "rotate",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 162,
+          "prepareMs": 141.69999998807907,
+          "waitBeforePrepareMs": 18.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 45.099999994039536,
+          "prepareMs": 18.899999976158142,
+          "waitBeforePrepareMs": 26.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 22.700000017881393,
+          "prepareMs": 10.900000005960464,
+          "waitBeforePrepareMs": 11.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 19.80000001192093,
+          "prepareMs": 8.700000017881393,
+          "waitBeforePrepareMs": 11
+        },
+        {
+          "phase": "move",
+          "ms": 16.400000005960464,
+          "prepareMs": 6.200000017881393,
+          "waitBeforePrepareMs": 10.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 16.400000005960464,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 18.299999982118607,
+          "prepareMs": 8.300000011920929,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 19.799999982118607,
+          "prepareMs": 9.699999988079071,
+          "waitBeforePrepareMs": 10
+        },
+        {
+          "phase": "move",
+          "ms": 17.799999982118607,
+          "prepareMs": 8,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 27.400000005960464,
+          "prepareMs": 13.299999982118607,
+          "waitBeforePrepareMs": 14
+        },
+        {
+          "phase": "move",
+          "ms": 18.5,
+          "prepareMs": 8.600000023841858,
+          "waitBeforePrepareMs": 9.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15.699999988079071,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 8.299999982118607,
+          "waitBeforePrepareMs": 9.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 19.099999994039536,
+          "prepareMs": 8.300000011920929,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 18.099999994039536,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 18.5,
+          "prepareMs": 7.699999988079071,
+          "waitBeforePrepareMs": 10.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 24.599999994039536,
+          "prepareMs": 12.600000023841858,
+          "waitBeforePrepareMs": 11.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 16.5,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 9.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 18,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 10.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 16.69999998807907,
+          "prepareMs": 7.0999999940395355,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 16.400000005960464,
+          "prepareMs": 7.399999976158142,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 16,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.400000005960464,
+          "prepareMs": 7.199999988079071,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 17.30000001192093,
+          "prepareMs": 7.199999988079071,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 17,
+          "prepareMs": 7.4000000059604645,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 14.099999994039536,
+          "prepareMs": 5.700000017881393,
+          "waitBeforePrepareMs": 8.299999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 8.600000023841858
+        },
+        {
+          "phase": "move",
+          "ms": 15.299999982118607,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "commit",
+          "ms": 14.699999988079071,
+          "prepareMs": 4,
+          "waitBeforePrepareMs": 9.699999988079071
+        }
+      ],
+      "phases": []
+    },
+    {
+      "layers": 20,
+      "gesture": "resize",
+      "styled": true,
+      "frames": [
+        {
+          "phase": "move",
+          "ms": 175,
+          "prepareMs": 155.90000000596046,
+          "waitBeforePrepareMs": 17.899999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 45.400000005960464,
+          "prepareMs": 18.69999998807907,
+          "waitBeforePrepareMs": 26.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 27.19999998807907,
+          "prepareMs": 13.599999994039536,
+          "waitBeforePrepareMs": 13.5
+        },
+        {
+          "phase": "move",
+          "ms": 22.899999976158142,
+          "prepareMs": 10.900000005960464,
+          "waitBeforePrepareMs": 11.799999982118607
+        },
+        {
+          "phase": "move",
+          "ms": 18.400000005960464,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 11
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 5.300000011920929,
+          "waitBeforePrepareMs": 8.699999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 19.69999998807907,
+          "prepareMs": 10,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 16.900000005960464,
+          "prepareMs": 6.9000000059604645,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 14,
+          "prepareMs": 5.200000017881393,
+          "waitBeforePrepareMs": 8.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 17.599999994039536,
+          "prepareMs": 7.300000011920929,
+          "waitBeforePrepareMs": 10.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.599999994039536,
+          "prepareMs": 7.699999988079071,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 16.30000001192093,
+          "prepareMs": 7.4000000059604645,
+          "waitBeforePrepareMs": 8.800000011920929
+        },
+        {
+          "phase": "move",
+          "ms": 16.900000005960464,
+          "prepareMs": 7.200000017881393,
+          "waitBeforePrepareMs": 9.599999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.299999982118607,
+          "prepareMs": 5,
+          "waitBeforePrepareMs": 9.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 16.200000017881393,
+          "prepareMs": 6.5999999940395355,
+          "waitBeforePrepareMs": 9.5
+        },
+        {
+          "phase": "move",
+          "ms": 17.80000001192093,
+          "prepareMs": 8.699999988079071,
+          "waitBeforePrepareMs": 9
+        },
+        {
+          "phase": "move",
+          "ms": 14.799999982118607,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 15,
+          "prepareMs": 6,
+          "waitBeforePrepareMs": 8.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 15.699999988079071,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 8.199999988079071
+        },
+        {
+          "phase": "move",
+          "ms": 14.600000023841858,
+          "prepareMs": 6.100000023841858,
+          "waitBeforePrepareMs": 8.5
+        },
+        {
+          "phase": "move",
+          "ms": 16.099999994039536,
+          "prepareMs": 6.0999999940395355,
+          "waitBeforePrepareMs": 9.900000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 16.599999994039536,
+          "prepareMs": 6.299999982118607,
+          "waitBeforePrepareMs": 10.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 14.600000023841858,
+          "prepareMs": 6.199999988079071,
+          "waitBeforePrepareMs": 8.200000017881393
+        },
+        {
+          "phase": "move",
+          "ms": 17.099999994039536,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 9.399999976158142
+        },
+        {
+          "phase": "move",
+          "ms": 18,
+          "prepareMs": 7.5,
+          "waitBeforePrepareMs": 10.400000005960464
+        },
+        {
+          "phase": "move",
+          "ms": 14.400000005960464,
+          "prepareMs": 6.300000011920929,
+          "waitBeforePrepareMs": 8.099999994039536
+        },
+        {
+          "phase": "move",
+          "ms": 14.300000011920929,
+          "prepareMs": 6.5,
+          "waitBeforePrepareMs": 7.700000017881393
+        },
+        {
+          "phase": "commit",
+          "ms": 15.400000005960464,
+          "prepareMs": 4.100000023841858,
+          "waitBeforePrepareMs": 10.099999994039536
+        }
+      ],
+      "phases": []
+    }
+  ],
+  "validation": {
+    "browser": "35 regression cases passed; after direct source guard 13 affected cases passed again. Added GPU cancellation/recovery case passes with real SwiftShader texture readback.",
+    "production": "20 latency cases passed, plus controlled baseline and enabled repeat on the same build.",
+    "unit": "Final full suite and typecheck/build results recorded in roadmap.",
+    "initialUnitFailure": "Hook mock lacked assetStore; now matches actual editor identity and asserts same-stroke validity and changed-revision cancellation.",
+    "gpuTestCorrection": "Headless SwiftShader cannot present a browser swapchain; test now reads the actual GPU output texture, consistent with existing GPU tests."
+  },
+  "reproduce": "VITE_BENCHMARK=1 npm run build; use playwright.performance.config.ts with tests/render-cancellation-latency.e2e.ts. LUMA_CANCEL_BASELINE=1 disables only the cancellation predicate in the test wrapper for the control measurement.",
+  "limitations": [
+    "Measurements are local Chromium observations, not universal hardware/browser guarantees.",
+    "Cancellation is cooperative; native canvas work and already-running workers/GPU commands are not preempted.",
+    "Already-completed correctly keyed caches may remain. Temporary canceled output is released and never presented.",
+    "GPU correctness uses SwiftShader; physical GPU timing remains unverified.",
+    "Dense Pen, heavy scripts, large-image import/export and other broad responsiveness gaps remain open."
+  ]
+}

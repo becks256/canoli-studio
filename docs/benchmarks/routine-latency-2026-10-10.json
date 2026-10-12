@@ -1,0 +1,560 @@
+{
+  "context": "Headless Chromium optimized benchmark-enabled build, Canvas2D, 698x396 twenty-layer composition. 15 sequential rounds. Capture-phase keydown/click to canvas submission, not physical display scanout. Each action waits for previous presentation.",
+  "summary": {
+    "move-nudge": {
+      "median": 13.300000011920929,
+      "p95": 21
+    },
+    "undo": {
+      "median": 12.5,
+      "p95": 16.700000002980232
+    },
+    "redo": {
+      "median": 15.600000008940697,
+      "p95": 19.400000005960464
+    },
+    "zoom-in": {
+      "median": 10.799999997019768,
+      "p95": 21.799999997019768
+    },
+    "zoom-out": {
+      "median": 11.600000008940697,
+      "p95": 16.799999997019768
+    },
+    "hide-layer": {
+      "median": 14.5,
+      "p95": 15.900000005960464
+    },
+    "show-layer": {
+      "median": 14.600000008940697,
+      "p95": 15.699999988079071
+    }
+  },
+  "samples": [
+    {
+      "action": "move-nudge",
+      "ms": 17.30000001192093,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 13.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 12.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 11.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 11.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 15.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 14.399999991059303,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 10.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 15.600000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 18,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 10.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.600000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 12.600000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 12.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 17.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 10.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 15,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 11.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 13.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 18.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 10.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 15.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 20.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 12.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 14.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 15.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 13.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.399999991059303,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 13.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 9.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 16.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 21.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 11.600000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 11.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 20.600000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 16.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 14.899999991059303,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 15.200000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 21,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 11.399999991059303,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 19.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 12.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 15,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 12.100000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 9.699999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 9.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 15.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 9.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.600000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 13.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 10.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 13.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 9.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 15.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.200000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 13.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 13.200000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 10.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 11.099999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 14.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 14.399999991059303,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 12.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 15.800000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 11.599999994039536,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 10.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 14.200000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 15.699999988079071,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 11.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 13.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 18,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 11.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 15.900000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.700000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 12.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 12.300000011920929,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 17.5,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 10.100000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 10.399999991059303,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 12.299999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 14.600000008940697,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "move-nudge",
+      "ms": 11.200000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "undo",
+      "ms": 14.399999991059303,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "redo",
+      "ms": 9.200000002980232,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-in",
+      "ms": 9.400000005960464,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "zoom-out",
+      "ms": 16.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "hide-layer",
+      "ms": 12.799999997019768,
+      "backend": "canvas2d"
+    },
+    {
+      "action": "show-layer",
+      "ms": 13.900000005960464,
+      "backend": "canvas2d"
+    }
+  ]
+}

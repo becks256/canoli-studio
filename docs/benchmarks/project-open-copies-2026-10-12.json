@@ -1,0 +1,504 @@
+{
+  "date": "2026-10-12",
+  "fixture": "Production Chromium, 698x396, 256000 retained paint points, prepared recovery Blob; CPU sampling enabled for each run",
+  "measurements": {
+    "before": {
+      "openMs": 940.2000000178814,
+      "maxFrameGapMs": 936.2999999821186,
+      "longTasks": [
+        923
+      ],
+      "name": "Listing revision 2",
+      "layers": 1,
+      "topSelfSamples": [
+        {
+          "ms": 177.4,
+          "frame": {
+            "functionName": "_fromData",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 70,
+            "columnNumber": 19000
+          }
+        },
+        {
+          "ms": 176.8,
+          "frame": {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 155.4,
+          "frame": {
+            "functionName": "If",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 70,
+            "columnNumber": 3064
+          }
+        },
+        {
+          "ms": 155.3,
+          "frame": {
+            "functionName": "toJSON",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 70,
+            "columnNumber": 13254
+          }
+        },
+        {
+          "ms": 99.7,
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 76.8,
+          "frame": {
+            "functionName": "Uc",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 62,
+            "columnNumber": 30804
+          }
+        },
+        {
+          "ms": 74.5,
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 37.5,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 37.1,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 24.2,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 23.2,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 23.0,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 10,
+            "columnNumber": 1056
+          }
+        },
+        {
+          "ms": 18.6,
+          "frame": {
+            "functionName": "dp",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 70,
+            "columnNumber": 49659
+          }
+        },
+        {
+          "ms": 18.4,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 10,
+            "columnNumber": 1056
+          }
+        },
+        {
+          "ms": 10.2,
+          "frame": {
+            "functionName": "jr",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-7j6zk99U.js",
+            "lineNumber": 10,
+            "columnNumber": 8836
+          }
+        }
+      ]
+    },
+    "after": {
+      "openMs": 701.5999999940395,
+      "maxFrameGapMs": 680.9000000059605,
+      "longTasks": [
+        678
+      ],
+      "name": "Listing revision 2",
+      "layers": 1,
+      "topSelfSamples": [
+        {
+          "ms": 193.1,
+          "frame": {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 177.0,
+          "frame": {
+            "functionName": "If",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 70,
+            "columnNumber": 3064
+          }
+        },
+        {
+          "ms": 125.2,
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 80.4,
+          "frame": {
+            "functionName": "Uc",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 62,
+            "columnNumber": 30804
+          }
+        },
+        {
+          "ms": 63.7,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 58.5,
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 37.4,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 28.6,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 1056
+          }
+        },
+        {
+          "ms": 24.2,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 23.5,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 1056
+          }
+        },
+        {
+          "ms": 23.3,
+          "frame": {
+            "functionName": "dp",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 70,
+            "columnNumber": 49662
+          }
+        },
+        {
+          "ms": 20.7,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 17.6,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 12.6,
+          "frame": {
+            "functionName": "e._zod.parse",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 7629
+          }
+        },
+        {
+          "ms": 11.0,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        }
+      ]
+    },
+    "repeat": {
+      "openMs": 626.9000000059605,
+      "maxFrameGapMs": 621,
+      "longTasks": [
+        612
+      ],
+      "name": "Listing revision 2",
+      "layers": 1,
+      "topSelfSamples": [
+        {
+          "ms": 192.3,
+          "frame": {
+            "functionName": "(idle)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 158.7,
+          "frame": {
+            "functionName": "If",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 70,
+            "columnNumber": 3064
+          }
+        },
+        {
+          "ms": 93.7,
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 73.5,
+          "frame": {
+            "functionName": "Uc",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 62,
+            "columnNumber": 30804
+          }
+        },
+        {
+          "ms": 49.1,
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          }
+        },
+        {
+          "ms": 41.6,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 30.4,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 1056
+          }
+        },
+        {
+          "ms": 29.6,
+          "frame": {
+            "functionName": "",
+            "scriptId": "15",
+            "url": "",
+            "lineNumber": 2,
+            "columnNumber": 16
+          }
+        },
+        {
+          "ms": 23.0,
+          "frame": {
+            "functionName": "dp",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 70,
+            "columnNumber": 49662
+          }
+        },
+        {
+          "ms": 21.0,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 21.0,
+          "frame": {
+            "functionName": "e._zod.run",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 1056
+          }
+        },
+        {
+          "ms": 20.4,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 14.6,
+          "frame": {
+            "functionName": "e._zod.parse",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 7629
+          }
+        },
+        {
+          "ms": 13.3,
+          "frame": {
+            "functionName": "t",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 422
+          }
+        },
+        {
+          "ms": 13.1,
+          "frame": {
+            "functionName": "jr",
+            "scriptId": "5",
+            "url": "http://127.0.0.1:4173/assets/index-BKH8HO-P.js",
+            "lineNumber": 10,
+            "columnNumber": 8836
+          }
+        }
+      ]
+    }
+  },
+  "changes": [
+    "Attached layer handles reuse document-owned data instead of cloning retained artwork.",
+    "Document replacement schedules recovery from immutable store snapshot."
+  ],
+  "validation": {
+    "unitAndApiTests": 714,
+    "browserTests": 26,
+    "buildAndTypecheck": "passed"
+  },
+  "limitations": [
+    "Project opening still has a 612\u2013678 ms main-thread task.",
+    "Timing includes profiling overhead.",
+    "Store copy, freeze and schema validation remain synchronous.",
+    "No claim of all-tool responsiveness."
+  ]
+}
