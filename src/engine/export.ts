@@ -128,7 +128,7 @@ export function getExportCapabilityReport(
 
     case "psd":
       if (layers.some((layer) => layer.kind === "raster" && layer.erasures?.length))
-        warnings.push("PSD export cannot preserve raster erasures yet; use a Luma project or PNG.");
+        warnings.push("PSD export cannot preserve raster erasures yet; use a Canoli Studio project or PNG.");
       featuresPreserved.push(
         "Individual raster layers preserved with coordinates and names",
         "Layer opacity and blend modes",

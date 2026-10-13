@@ -1,4 +1,8 @@
-# Luma Studio design system
+# Canoli Studio design system
+
+Use **Canoli Studio** as the product wordmark, retaining the existing abstract mark and semantic color tokens. The editor header uses a compact, single-line wordmark; developer documentation and sharing previews use the same spelling and capitalization.
+
+At widths up to 1500 CSS pixels, the header uses compact action icons with accessible names and hover titles. The document-name input stays visible; the action row scrolls horizontally when the controls exceed the remaining width.
 
 ## Direction
 

@@ -1,6 +1,6 @@
-# Luma
+# Canoli Studio
 
-An early browser image-editor foundation with a constructor-based document model, AssemblyScript/WASM adjustments, local JavaScript scripting, installable command plugins, and an optional REST document service. Luma is a working name.
+An early browser image-editor foundation with a constructor-based document model, AssemblyScript/WASM adjustments, local JavaScript scripting, installable command plugins, and an optional REST document service. The product is named Canoli Studio (formerly Luma).
 
 ## Run locally
 

@@ -372,7 +372,7 @@ export const examplePlugin: PluginManifest = {
   version: "1.0.0",
   description:
     "A small example extension: inspect a composition or add an editable guide frame.",
-  author: "Luma example",
+  author: "Canoli Studio example",
   permissions: ["document:read", "document:write"],
   commands: [
     {

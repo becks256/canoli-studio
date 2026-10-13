@@ -1,5 +1,5 @@
 /**
- * Bidirectional bridge connecting Luma Document model and binary PSD files.
+ * Bidirectional bridge connecting Canoli Studio Document model and binary PSD files.
  */
 
 import {
@@ -25,7 +25,7 @@ export interface PsdImportResult {
 }
 
 /**
- * Converts a PSD binary buffer into a Luma DocumentData, capability report, and assets map.
+ * Converts a PSD binary buffer into a Canoli Studio DocumentData, capability report, and assets map.
  */
 export function psdToDocument(
   buffer: ArrayBuffer | Uint8Array,
@@ -132,7 +132,7 @@ export function psdToDocument(
 }
 
 /**
- * Exports a Luma DocumentData into a binary PSD file.
+ * Exports a Canoli Studio DocumentData into a binary PSD file.
  */
 export async function documentToPsd(
   document: DocumentData,
@@ -147,7 +147,7 @@ export async function documentToPsd(
     if (child.kind === "raster") {
       const raster = child as RasterLayerData;
       if (raster.erasures?.length)
-        throw new Error("PSD export cannot preserve raster erasures yet. Save a Luma project or export PNG to retain the edited pixels.");
+        throw new Error("PSD export cannot preserve raster erasures yet. Save a Canoli Studio project or export PNG to retain the edited pixels.");
       const img = await assetResolver(raster.assetId);
       if (img) {
         layersWithPixels.push({

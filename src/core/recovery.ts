@@ -116,7 +116,7 @@ export class RecoveryRepository {
         this.database = undefined;
         reject(
           new Error(
-            "Recovery storage is blocked by another tab. Close older Luma tabs and retry.",
+            "Recovery storage is blocked by another tab. Close older Canoli Studio tabs and retry.",
           ),
         );
       };

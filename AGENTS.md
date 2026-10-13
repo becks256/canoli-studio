@@ -1,4 +1,4 @@
-# Working on Luma
+# Working on Canoli Studio
 
 Read these files before changing product behavior or architecture:
 

@@ -1,9 +1,11 @@
 import { chromium } from "@playwright/test";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
 async function main() {
   const browser = await chromium.launch();
   const page = await browser.newPage();
+  const manrope = (await readFile("node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2")).toString("base64");
+  const dmMono = (await readFile("node_modules/@fontsource/dm-mono/files/dm-mono-latin-500-normal.woff2")).toString("base64");
 
   const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <rect width="64" height="64" rx="14" fill="#181c1b"/>
@@ -51,8 +53,9 @@ async function main() {
 <html>
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap">
   <style>
+    @font-face { font-family: 'Manrope'; font-style: normal; font-weight: 200 800; src: url(data:font/woff2;base64,${manrope}) format('woff2'); }
+    @font-face { font-family: 'DM Mono'; font-style: normal; font-weight: 500; src: url(data:font/woff2;base64,${dmMono}) format('woff2'); }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       width: 1200px;
@@ -196,7 +199,7 @@ async function main() {
     <div class="brand-mark">
       <i></i><i></i><i></i><i></i>
     </div>
-    <div class="brand-title">luma</div>
+    <div class="brand-title">Canoli Studio</div>
     <div class="badge">IMAGE EDITOR</div>
   </div>
 
@@ -214,7 +217,7 @@ async function main() {
 </body>
 </html>`);
 
-  await page.waitForTimeout(300); // ensure fonts/layout ready
+  await page.evaluate(() => document.fonts.ready);
   const ogBuffer = await page.screenshot();
   await writeFile("public/og-image.png", ogBuffer);
 

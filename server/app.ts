@@ -201,7 +201,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
             response,
             401,
             { error: "Unauthorized: Invalid or missing authentication token." },
-            { "WWW-Authenticate": 'Bearer realm="Luma REST API"' },
+            { "WWW-Authenticate": 'Bearer realm="Canoli Studio REST API"' },
           );
           return;
         }

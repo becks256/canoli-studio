@@ -254,7 +254,7 @@ export function buildStandardIccProfile(
   descBuf.set(descBytes, 12);
 
   // 2. 'cprt' (textType)
-  const cprtStr = "Luma Color Engine";
+  const cprtStr = "Canoli Studio Color Engine";
   const cprtTagLen = 8 + cprtStr.length + 1;
   const cprtBuf = new Uint8Array(cprtTagLen);
   const cprtView = new DataView(cprtBuf.buffer);

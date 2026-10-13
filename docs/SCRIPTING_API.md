@@ -1,6 +1,6 @@
 # Scripting API
 
-Luma scripts use JavaScript and an object-oriented document model to control the open composition. This guide describes the current implementation in [src/dom/index.ts](../src/dom/index.ts) and [src/scripting](../src/scripting). It is a prototype API; Photoshop scripting compatibility and a published, stable SDK are not implemented.
+Canoli Studio scripts use JavaScript and an object-oriented document model to control the open composition. This guide describes the current implementation in [src/dom/index.ts](../src/dom/index.ts) and [src/scripting](../src/scripting). It is a prototype API; Photoshop scripting compatibility and a published, stable SDK are not implemented.
 
 For reusable installable commands, see [Plugins and extensions](PLUGINS.md). Plugin commands receive these same bindings and obey the same runtime limits, with additional host-enforced document permissions.
 
@@ -764,7 +764,7 @@ print("Clone source retained:", source.assetId);
 ```js
 const text = new TextLayer({
   name: "Title",
-  text: "Luma Editor",
+  text: "Canoli Studio Editor",
   fontSize: 48,
   fontFamily: "sans-serif",
   color: "#d5e79b",
@@ -976,7 +976,7 @@ The existing document schema v3 stores this additional mask kind; earlier reader
 
 All mask kinds accept `feather`, a finite number from 0 to 128 in document pixels; default 0 preserves the original hard coverage. Read `mask.feather` or assign `layer.mask = layer.mask.with({ feather: 12.5 })`. The Properties panel pairs a **Mask feather** slider with an exact pixel input. Changes share locks, preview/commit, undo, scripts, REST and project persistence. Older mask DTOs that omit the optional field read as zero; older builds with a strict mask schema reject new DTOs containing it.
 
-Feathering softens mask coverage before inversion, density, styles and blending. It uses three separable box-filter passes, with each pass's half-width equal to one third of the requested feather distance, scaled independently to the render grid. Fractional endpoint weights support fractional radii; floating-point intermediates are rounded to byte alpha after the final pass. This is Luma's defined smoothing kernel, not a claim of Photoshop/Gaussian-kernel equivalence.
+Feathering softens mask coverage before inversion, density, styles and blending. It uses three separable box-filter passes, with each pass's half-width equal to one third of the requested feather distance, scaled independently to the render grid. Fractional endpoint weights support fractional radii; floating-point intermediates are rounded to byte alpha after the final pass. This is Canoli Studio's defined smoothing kernel, not a claim of Photoshop/Gaussian-kernel equivalence.
 
 Coverage tiles include the entire finite filter support, so nearby geometry outside a viewport/export tile still contributes. Existing source pixels are not blurred. Empty/reveal-all masks retain their meaning, and density zero or disabled masks bypass feathering. At extreme zoom/radius combinations a four-million-pixel working-tile budget can prevent rendering; the error asks users to reduce zoom or feather radius. This is a rendering allocation constraint, not an image import limit. Export computes the requested radius at source resolution.
 

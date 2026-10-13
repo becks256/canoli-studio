@@ -177,7 +177,7 @@ async function placeCandidate({
         title: record.prompt.slice(0, 240),
         description: `Generated via ${record.providerName} (${record.modelVersion}) with prompt: "${record.prompt}"${diffStatus}`,
         altText: `AI-generated ${record.taskKind}: ${record.prompt.slice(0, 200)}`,
-        creator: `Luma AI / ${record.providerName}`,
+        creator: `Canoli Studio AI / ${record.providerName}`,
         copyright: "All rights reserved by creator",
         license: `Generated Asset (Record ID: ${record.id})`,
         keywords: [

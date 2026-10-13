@@ -1,6 +1,6 @@
 import { blendColors } from "./blend";
 /**
- * Binary PSD builder: serializes Luma document and layer pixels into a valid,
+ * Binary PSD builder: serializes Canoli Studio document and layer pixels into a valid,
  * specification-compliant Adobe Photoshop (8BPS) file.
  */
 

@@ -7,10 +7,10 @@ describe("SEO metadata and discoverability", () => {
     const html = await readFile("index.html", "utf8");
 
     // Title & description
-    expect(html).toContain("<title>Luma — Free In-Browser Image Editor &amp; Layer Studio</title>");
+    expect(html).toContain("<title>Canoli Studio — Free In-Browser Image Editor &amp; Layer Studio</title>");
     expect(html).toMatch(/<meta\s+name="description"\s+content="[^"]+"/);
     expect(html).toMatch(/<meta\s+name="keywords"\s+content="[^"]+"/);
-    expect(html).toMatch(/<meta\s+name="author"\s+content="Luma"/);
+    expect(html).toMatch(/<meta\s+name="author"\s+content="Canoli Studio"/);
     expect(html).toMatch(/<meta\s+name="robots"\s+content="index,\s*follow/);
 
     // Canonical link
@@ -44,13 +44,13 @@ describe("SEO metadata and discoverability", () => {
 
     const webApp = graph.find((item: any) => item["@type"] === "WebApplication");
     expect(webApp).toBeDefined();
-    expect(webApp.name).toBe("Luma");
+    expect(webApp.name).toBe("Canoli Studio");
     expect(webApp.applicationCategory).toBe("DesignApplication");
     expect(webApp.offers.price).toBe("0");
 
     const webSite = graph.find((item: any) => item["@type"] === "WebSite");
     expect(webSite).toBeDefined();
-    expect(webSite.name).toBe("Luma");
+    expect(webSite.name).toBe("Canoli Studio");
   });
 
   it("provides valid robots.txt and sitemap.xml", async () => {
@@ -73,7 +73,8 @@ describe("SEO metadata and discoverability", () => {
     expect(existsSync("public/manifest.webmanifest")).toBe(true);
     const manifestJson = await readFile("public/manifest.webmanifest", "utf8");
     const manifest = JSON.parse(manifestJson);
-    expect(manifest.name).toContain("Luma");
+    expect(manifest.name).toContain("Canoli Studio");
+    expect(manifest.short_name).toBe("Canoli Studio");
     expect(manifest.start_url).toBe("/");
     expect(manifest.display).toBe("standalone");
     expect(manifest.icons.length).toBeGreaterThanOrEqual(2);
@@ -95,6 +96,9 @@ describe("SEO metadata and discoverability", () => {
       const path = `public/developer/${doc}.html`;
       expect(existsSync(path)).toBe(true);
       const content = await readFile(path, "utf8");
+      expect(content).toContain(`· Canoli Studio developer docs</title>`);
+      expect(content).toContain('content="Canoli Studio"');
+      expect(content).toContain('>Canoli Studio<span>DEVELOPER DOCS</span>');
       expect(content).toContain("<meta name=\"description\"");
       expect(content).toContain("<meta name=\"robots\"");
       expect(content).toContain("<meta property=\"og:title\"");

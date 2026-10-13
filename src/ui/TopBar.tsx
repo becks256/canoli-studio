@@ -62,7 +62,7 @@ export function TopBar({
     <header className="topbar">
       <a
         className="brand"
-        href="https://github.com/google/luma"
+        href="https://canoli.studio"
         target="_blank"
         rel="noreferrer"
       >
@@ -72,7 +72,7 @@ export function TopBar({
           <i />
           <i />
         </span>
-        luma<span className="alpha-label">PROTOTYPE</span>
+        Canoli Studio
       </a>
       <div className="document-title">
         <input
@@ -112,40 +112,40 @@ export function TopBar({
           <Redo2 size={16} />
         </IconButton>
         <span className="separator" />
-        <Button variant="subtle" onClick={onOpen} disabled={busy}>
+        <Button variant="subtle" aria-label="Open" title="Open" onClick={onOpen} disabled={busy}>
           <FolderOpen size={15} />
           <span>Open</span>
         </Button>
-        <Button variant="subtle" onClick={onSave} disabled={busy}>
+        <Button variant="subtle" aria-label="Save project" title="Save project" onClick={onSave} disabled={busy}>
           <Save size={15} />
           <span>Save project</span>
         </Button>
         {onPsdImport && (
-          <Button variant="subtle" onClick={onPsdImport} disabled={busy}>
+          <Button variant="subtle" aria-label="PSD" title="PSD" onClick={onPsdImport} disabled={busy}>
             <FileCode size={15} />
             <span>PSD</span>
           </Button>
         )}
         {onColorProfile && (
-          <Button variant="subtle" onClick={onColorProfile} disabled={busy}>
+          <Button variant="subtle" aria-label="Color" title="Color" onClick={onColorProfile} disabled={busy}>
             <Palette size={15} />
             <span>Color</span>
           </Button>
         )}
         {onGenerate && (
-          <Button variant="subtle" onClick={onGenerate} disabled={busy}>
+          <Button variant="subtle" aria-label="Generate" title="Generate" onClick={onGenerate} disabled={busy}>
             <Sparkles size={15} />
             <span>Generate</span>
           </Button>
         )}
         {onRecipes && (
-          <Button variant="subtle" onClick={onRecipes} disabled={busy}>
+          <Button variant="subtle" aria-label="Recipes" title="Recipes" onClick={onRecipes} disabled={busy}>
             <Workflow size={15} />
             <span>Recipes</span>
           </Button>
         )}
         {onBatch && (
-          <Button variant="subtle" onClick={onBatch} disabled={busy}>
+          <Button variant="subtle" aria-label="Batch" title="Batch" onClick={onBatch} disabled={busy}>
             <Boxes size={15} />
             <span>Batch</span>
           </Button>
@@ -153,6 +153,8 @@ export function TopBar({
         {onSelectSubject && (
           <Button
             variant="subtle"
+            aria-label="Subject"
+            title="Subject"
             onClick={onSelectSubject}
             disabled={busy || !hasLayers}
           >
@@ -163,6 +165,8 @@ export function TopBar({
         {onRefineEdge && (
           <Button
             variant="subtle"
+            aria-label="Refine"
+            title="Refine"
             onClick={onRefineEdge}
             disabled={busy || !hasLayers}
           >
@@ -173,6 +177,8 @@ export function TopBar({
         {onExportDialog && (
           <Button
             variant="subtle"
+            aria-label="Export…"
+            title="Export…"
             onClick={onExportDialog}
             disabled={busy || !hasLayers}
           >

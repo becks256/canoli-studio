@@ -144,7 +144,7 @@ Delivery generation requires a recorded SHA-256 source digest for every item wit
 
 ### Browser storage estimates and persistence
 
-Recovery → Browser storage reports estimated origin-wide usage/quota and persistence status without changing stored formats. It includes all data stored under the site, not only Luma project blobs. Refresh re-reads browser estimates. Request persistent storage invokes the browser API only from that explicit action; grant, decline and API failure are distinct visible outcomes. Missing APIs display unavailable values and do not block workspace controls. Persistent storage reduces automatic eviction risk but does not prevent site-data clearing, device loss or storage failures. Actual completed transactions, not capacity estimates, determine checkpoint success.
+Recovery → Browser storage reports estimated origin-wide usage/quota and persistence status without changing stored formats. It includes all data stored under the site, not only Canoli Studio project blobs. Refresh re-reads browser estimates. Request persistent storage invokes the browser API only from that explicit action; grant, decline and API failure are distinct visible outcomes. Missing APIs display unavailable values and do not block workspace controls. Persistent storage reduces automatic eviction risk but does not prevent site-data clearing, device loss or storage failures. Actual completed transactions, not capacity estimates, determine checkpoint success.
 
 ### Quota failure and retry
 

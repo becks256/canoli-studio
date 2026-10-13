@@ -1,4 +1,4 @@
-# Luma feature strategy: a professional editor with inspectable AI
+# Canoli Studio feature strategy: a professional editor with inspectable AI
 
 Planning baseline: 2026-09-21. Status: proposed product plan, not shipped features or a release promise. Owner: founder/product owner. Implementation handoff: [roadmap](IMPLEMENTATION_ROADMAP.md), [AI specifications](AI_FEATURE_SPECS.md), [competitive evidence](COMPETITIVE_RESEARCH.md). Current behavior remains defined by [requirements](REQUIREMENTS.md), code, and tests.
 
@@ -107,7 +107,7 @@ All rows are planned scope, including later photography, painting, color, intero
 
 ## What will count as better
 
-Use a consented benchmark pack spanning product shots, wall art, portraits, multilingual posters, illustration and complex composites. Capture user time, manual corrections, output defects, editability, reload fidelity and cost. Run the same task in Luma and an appropriate incumbent using experienced users; alternate order to reduce learning bias. Report browser/hardware, editor version, model version and task-specific limitations.
+Use a consented benchmark pack spanning product shots, wall art, portraits, multilingual posters, illustration and complex composites. Capture user time, manual corrections, output defects, editability, reload fidelity and cost. Run the same task in Canoli Studio and an appropriate incumbent using experienced users; alternate order to reduce learning bias. Report browser/hardware, editor version, model version and task-specific limitations.
 
 Proposed pilot gates (targets, not results): at least five target users complete three repeated workflows; median total task time improves at least 30% over their normal process; at least 80% of outputs are accepted within two attempts; no source-preservation or project-loss failures in the gate corpus. Report sample size and distribution; a small pilot does not prove market-wide superiority. Do not trade output quality for time savings or count prompting time alone.
 

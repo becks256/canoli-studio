@@ -1,6 +1,8 @@
-# Luma — product brief
+# Canoli Studio — product brief
 
-Luma is a working name, not an approved brand. This brief is the source of truth for product intent. Read it before planning or implementing features. See [REQUIREMENTS.md](./REQUIREMENTS.md) for acceptance criteria and [ARCHITECTURE.md](./ARCHITECTURE.md) for implementation boundaries.
+Canoli Studio is the chosen product name (formerly Luma). This brief is the source of truth for product intent. Read it before planning or implementing features. See [REQUIREMENTS.md](./REQUIREMENTS.md) for acceptance criteria and [ARCHITECTURE.md](./ARCHITECTURE.md) for implementation boundaries.
+
+The rebrand changes product-facing names and credits. Existing `.luma` projects, plugin/recipe formats, browser storage keys, development `window.luma` access and `LUMA_API_*` configuration remain compatible. The repository directory and existing deployment URLs remain unchanged until a new destination is configured.
 
 ## Application objective
 
@@ -104,6 +106,6 @@ No stage authorizes implementing every listed capability at once. Prioritize a s
 - AI providers, processing location, data retention, and commercial usage terms.
 - Required PSD interoperability, color-management fidelity, and requirements for extremely large documents beyond browser decoding and memory capabilities. Fixed megapixel import cutoffs are explicitly excluded.
 - Cloud collaboration versus local-first operation beyond the initial milestone.
-- Brand/name, pricing, distribution, and budget for operating the hosted product.
+- Pricing, distribution, and budget for operating the hosted product.
 
 Do not silently turn open decisions into product requirements. Make reversible implementation choices when needed and record consequential assumptions.

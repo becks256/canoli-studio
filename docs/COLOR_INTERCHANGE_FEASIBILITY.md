@@ -2,7 +2,7 @@
 
 **Ticket:** T17  
 **Milestone:** Precedes F10 (Color Management & Precision) and F11 (Interchange & High-Fidelity Export) Claims  
-**Author:** Luma Architecture Team  
+**Author:** Canoli Studio Architecture Team
 **Status:** Approved & Implemented in Prototype  
 **Date:** 2026-09-28
 
@@ -23,7 +23,7 @@ This study directly resolves Roadmap Decision **D10** ("Color/interchange work i
 
 ### 2.1 Theoretical Foundations & CIE Standards
 
-Color in Luma is treated as a physical and perceptual continuum, not merely raw $[0, 255]$ device bytes. All color conversions transition through device-independent CIE 1931 standard color spaces.
+Color in Canoli Studio is treated as a physical and perceptual continuum, not merely raw $[0, 255]$ device bytes. All color conversions transition through device-independent CIE 1931 standard color spaces.
 
 ```
                       ┌──────────────────────┐
@@ -87,7 +87,7 @@ $$\begin{bmatrix} X_{\text{D50}} \\ Y_{\text{D50}} \\ Z_{\text{D50}} \end{bmatri
 
 #### Gamut Excursion Detection & Soft-Proofing
 
-- **Rendering Intent `"unclipped"`**: Standard relative-colorimetric mapping clamps out-of-gamut values to $[0, 1]$. To detect whether a color falls outside the target gamut, Luma's color engine provides an unclipped conversion mode. Coordinates falling outside $[0, 1]$ (with tolerance $\epsilon = 10^{-4}$) trigger out-of-gamut flags.
+- **Rendering Intent `"unclipped"`**: Standard relative-colorimetric mapping clamps out-of-gamut values to $[0, 1]$. To detect whether a color falls outside the target gamut, Canoli Studio's color engine provides an unclipped conversion mode. Coordinates falling outside $[0, 1]$ (with tolerance $\epsilon = 10^{-4}$) trigger out-of-gamut flags.
 - **Soft-Proof Gamut Warning Mask**: Generates an overlay highlighting out-of-gamut pixels in neon cyan (`rgba(0, 255, 255, 255)`), providing artists with immediate feedback on out-of-gamut excursions prior to printing or web publication.
 
 ### 2.4 Binary ICC.1:2010 Profile Parser & Generator
@@ -154,7 +154,7 @@ Photoshop standardizes on Apple PackBits run-length encoding for scanline compre
 - Byte $n$ in range $[-127, -1]$ (two's complement $129 \le n \le 255$): Repeat the next single byte $(-n + 1)$ times.
 - Byte $n = -128$ (`0x80`): No-op byte (skipped).
 
-Luma implements high-speed PackBits decoding and encoding (`src/core/interchange/psd/packbits.ts`) operating directly on typed byte buffers.
+Canoli Studio implements high-speed PackBits decoding and encoding (`src/core/interchange/psd/packbits.ts`) operating directly on typed byte buffers.
 
 ### 3.3 Layer Record & Channel Architecture
 
@@ -175,7 +175,7 @@ Each layer record specifies:
 ### 3.4 Bidirectional Model Mapping
 
 ```
-      Photoshop Binary (8BPS)                  Luma Document Model
+      Photoshop Binary (8BPS)                  Canoli Studio Document Model
    ┌───────────────────────────┐           ┌───────────────────────────┐
    │ PsdParsedDocument         │           │ Document                  │
    │  - Header (width, height) │ ────────> │  - width, height, name    │
@@ -193,7 +193,7 @@ Each layer record specifies:
 
 When importing:
 
-- If `mode: "layered"` and layers are present: Individual pixel layers are extracted into Luma `RasterLayer` entities, and pixel data is stored in the `AssetStore`.
+- If `mode: "layered"` and layers are present: Individual pixel layers are extracted into Canoli Studio `RasterLayer` entities, and pixel data is stored in the `AssetStore`.
 - If `mode: "flatten"` or unsupported layer constructs exist: The high-resolution composite merged image is imported as a single background `RasterLayer`.
 
 When exporting:
@@ -204,7 +204,7 @@ When exporting:
 
 ## 4. Capability Matrix & Preflight Audit
 
-The table below delineates Luma's current capability matrix for PSD interchange:
+The table below delineates Canoli Studio's current capability matrix for PSD interchange:
 
 | Feature Category    | PSD Feature                                           | Import Support               | Export Support        | Preflight Classification              |
 | :------------------ | :---------------------------------------------------- | :--------------------------- | :-------------------- | :------------------------------------ |
@@ -233,11 +233,11 @@ The table below delineates Luma's current capability matrix for PSD interchange:
 
 ### 5.1 Evaluation of Third-Party Alternatives
 
-Prior to building the in-tree prototype, candidate third-party libraries were evaluated against Luma's core architectural constraints:
+Prior to building the in-tree prototype, candidate third-party libraries were evaluated against Canoli Studio's core architectural constraints:
 
 | Library      | License | Size / Footprint    | Strengths                                     | Disqualifying Limitations                                                                                                            |
 | :----------- | :------ | :------------------ | :-------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
-| `ag-psd`     | MIT     | ~280 KB minified    | High feature coverage (effects, text, shapes) | Large bundle weight; couples canvas DOM to browser globals; complex internal data structures diverge from Luma's OOP model.          |
+| `ag-psd`     | MIT     | ~280 KB minified    | High feature coverage (effects, text, shapes) | Large bundle weight; couples canvas DOM to browser globals; complex internal data structures diverge from Canoli Studio's OOP model.          |
 | `psd.js`     | MIT     | ~180 KB             | Node / Browser support                        | Abandoned (no updates in 7+ years); lacks 16-bit support, PSB support, and modern ICC embedding.                                     |
 | `lcms2-wasm` | MIT     | ~1.8 MB WASM binary | Gold-standard LittleCMS color engine          | Heavy binary download; high initialization overhead; overkill for standard RGB/Display P3/Adobe RGB gamut mapping and soft-proofing. |
 | `colorjs.io` | MIT     | ~85 KB              | Comprehensive color math                      | General-purpose library; lacks binary ICC profile parsing, PackBits codecs, and high-performance typed array batch transforms.       |
@@ -245,11 +245,11 @@ Prior to building the in-tree prototype, candidate third-party libraries were ev
 ### 5.2 Resolution of Decision D10
 
 **Decision D10 Resolution:**  
-Luma will **retain its zero-dependency, specification-compliant in-tree engine** (`src/core/color/` and `src/core/interchange/psd/`) for the following strategic reasons:
+Canoli Studio will **retain its zero-dependency, specification-compliant in-tree engine** (`src/core/color/` and `src/core/interchange/psd/`) for the following strategic reasons:
 
 1. **Auditability & Zero External Licensing Risk:** No GPL, LGPL, or restrictive Adobe patents. All code is pure TypeScript utilizing standardized binary specifications (ICC.1:2010 and Adobe Photoshop File Format Specification).
 2. **Deterministic Web Worker & Sandboxed Scripting:** The engine operates entirely on `ArrayBuffer` and `Uint8Array` primitives, running seamlessly in web workers, headless Node/Vitest test suites, and browser UI threads.
-3. **Tight Architectural Integration:** Directly maps PSD data structures into Luma's OOP document model (`Document`, `RasterLayer`, `LayerMask`), routing mutations through single-transaction undoable commands.
+3. **Tight Architectural Integration:** Directly maps PSD data structures into Canoli Studio's OOP document model (`Document`, `RasterLayer`, `LayerMask`), routing mutations through single-transaction undoable commands.
 4. **Minimal Bundle Overhead:** The complete color and PSD engine adds less than 35 KB minified to the application bundle, compared to 1.8+ MB for external WASM/CMM alternatives.
 
 ---

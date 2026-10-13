@@ -88,7 +88,7 @@ export const PRESET_VIGNETTE_WARM: Recipe = {
     },
   ],
   tags: ["color", "retouch", "warmth", "preset"],
-  author: "Luma Studio",
+  author: "Canoli Studio",
 };
 
 export const PRESET_PRODUCT_DROP_SHADOW: Recipe = {
@@ -176,7 +176,7 @@ export const PRESET_PRODUCT_DROP_SHADOW: Recipe = {
     },
   ],
   tags: ["composition", "mockup", "depth", "preset"],
-  author: "Luma Studio",
+  author: "Canoli Studio",
 };
 
 export const PRESET_HIGH_CONTRAST_BW: Recipe = {
@@ -225,7 +225,7 @@ export const PRESET_HIGH_CONTRAST_BW: Recipe = {
     },
   ],
   tags: ["monochrome", "contrast", "preset"],
-  author: "Luma Studio",
+  author: "Canoli Studio",
 };
 
 export const PRESET_WATERMARK_STAMP: Recipe = {
@@ -240,7 +240,7 @@ export const PRESET_WATERMARK_STAMP: Recipe = {
       name: "watermarkText",
       label: "Watermark Copy",
       type: "string",
-      default: "© LUMA STUDIO",
+      default: "© CANOLI STUDIO",
       required: true,
       description: "Text line to render as the watermark.",
     },
@@ -284,7 +284,7 @@ export const PRESET_WATERMARK_STAMP: Recipe = {
     },
   ],
   tags: ["branding", "export", "text", "preset"],
-  author: "Luma Studio",
+  author: "Canoli Studio",
 };
 
 export const PRESET_HSL_RECOLOR: Recipe = {
@@ -294,7 +294,7 @@ export const PRESET_HSL_RECOLOR: Recipe = {
   description:
     "Adds an editable HSL adjustment above the root composition. Source pixels remain unchanged.",
   version: 1,
-  author: "Luma Studio",
+  author: "Canoli Studio",
   tags: ["color", "hue", "saturation", "batch"],
   parameters: [
     {

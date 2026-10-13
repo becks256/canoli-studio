@@ -121,7 +121,7 @@ export function formatDeliverableFileName(
  */
 export async function generateDeliveryManifest(
   run: BatchRun,
-  generatorName = "Luma Editor Batch Runner v0.1.0",
+  generatorName = "Canoli Studio Editor Batch Runner v0.1.0",
 ): Promise<DeliveryManifest> {
   const deliverables: DeliveryManifestDeliverable[] = [];
   const usedPaths = new Set<string>();

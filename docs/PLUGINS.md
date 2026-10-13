@@ -1,6 +1,6 @@
 # Plugins and extensions
 
-Luma supports local command plugins: install a JSON package, review its access and JavaScript, then run its named commands from the **Plugins** panel (tool rail, or **Mod+Shift+L**). Commands use the same constructor-based [scripting API](SCRIPTING_API.md) as the Scripts panel. This is the first extension surface; a marketplace, custom panels, background services, external network access and native/WASM plugin modules are not implemented.
+Canoli Studio supports local command plugins: install a JSON package, review its access and JavaScript, then run its named commands from the **Plugins** panel (tool rail, or **Mod+Shift+L**). Commands use the same constructor-based [scripting API](SCRIPTING_API.md) as the Scripts panel. This is the first extension surface; a marketplace, custom panels, background services, external network access and native/WASM plugin modules are not implemented.
 
 ## Try the example
 

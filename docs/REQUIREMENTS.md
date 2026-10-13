@@ -1,4 +1,4 @@
-# Luma editor requirements
+# Canoli Studio editor requirements
 
 Status: local editor foundation and rich tool milestone implemented; verification and limitations below. This document separates requested requirements from implementation decisions and future work.
 
@@ -372,7 +372,7 @@ Recorded automation must preserve literal action strings, including parameter-li
 - Ctrl/Cmd+C copies selected raster pixels (the entire visible raster when there is no selection); Ctrl/Cmd+V adds a new raster at the copied canvas coordinates. The clipboard is internal to this editor instance, preserves partial transparency, and crops to nontransparent copied pixels. Sampling uses the selected rendered raster branch within the canvas, including masks and opacity. Other layers are excluded.
 - Ctrl/Cmd-clicking an imported-image or paint-layer thumbnail loads its rendered alpha as a fractional pixel selection, without changing the active layer. Hidden layers and hidden ancestry are sampled as visible; masks and opacity still apply. Empty paint layers load an empty selection. The command palette exposes the same action.
 - Magic wand (W) samples the selected raster. Tolerance 0–255 (default 32), contiguous (default on), and replace/add/subtract/intersect modes are supported. Shift adds, Alt subtracts, and Shift+Alt intersects. Contiguous uses four-connected pixels; matching compares premultiplied RGB and alpha, ignoring hidden RGB in transparent pixels.
-- Editable text fields retain native copy/paste shortcuts. Clipboard sampling rejects stale document changes. Selection, erasure and paste changes use ordinary undo and project persistence. No arbitrary megapixel import limit is introduced; native-resolution sampling remains subject to browser memory. PSD export currently rejects edited raster erasures; Luma and PNG retain them.
+- Editable text fields retain native copy/paste shortcuts. Clipboard sampling rejects stale document changes. Selection, erasure and paste changes use ordinary undo and project persistence. No arbitrary megapixel import limit is introduced; native-resolution sampling remains subject to browser memory. PSD export currently rejects edited raster erasures; Canoli Studio and PNG retain them.
 
 Repeated-edit responsiveness: undo states must share unchanged immutable coverage/artwork; selection or document-name changes must not trigger thumbnail rendering. Workspace autosave must move expensive history validation/JSON encoding off the browser UI thread while retaining undo/redo and recovery fidelity. No import-resolution cap or reduction to the 60-entry history contract is introduced.
 

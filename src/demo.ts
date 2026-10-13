@@ -70,7 +70,7 @@ export async function createDemo() {
     ctx.font = "18px sans-serif";
     ctx.fillText("An exploration of shape, color, and quiet balance.", 0, 68);
     ctx.textAlign = "right";
-    ctx.fillText("LUMA STUDIO", 1450, 30);
+    ctx.fillText("CANOLI STUDIO", 1450, 30);
     ctx.fillText("1600 × 1200", 1450, 68);
   });
   title.x = 75;

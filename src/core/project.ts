@@ -163,7 +163,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     return { document: legacy.document, entries };
   }
   if (header.byteLength !== 16)
-    throw new Error("Truncated Luma project header.");
+    throw new Error("Truncated Canoli Studio project header.");
   const length = Number(new DataView(header.buffer).getBigUint64(8, true));
   if (
     !Number.isSafeInteger(length) ||

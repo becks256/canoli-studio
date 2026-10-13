@@ -24,7 +24,7 @@ Set the `LUMA_API_KEY` environment variable to require token-based authenticatio
 
 - Supply the key via standard HTTP Bearer token: `Authorization: Bearer <key>`
 - Or via custom header: `X-API-Key: <key>`
-- Requests missing or supplying an invalid key receive **401 Unauthorized** with the header `WWW-Authenticate: Bearer realm="Luma REST API"`.
+- Requests missing or supplying an invalid key receive **401 Unauthorized** with the header `WWW-Authenticate: Bearer realm="Canoli Studio REST API"`.
 - When `LUMA_API_KEY` is omitted, loopback Host and Origin checks protect the local development service against cross-site requests.
 
 | Method | Endpoint                         | Behavior                                                               |

@@ -1,12 +1,12 @@
-# Luma System Design & Architecture Specification
+# Canoli Studio System Design & Architecture Specification
 
-This document defines the system design, architectural boundaries, and non-negotiable invariants of Luma. All human contributors and AI coding agents working on this codebase must strictly adhere to these specifications.
+This document defines the system design, architectural boundaries, and non-negotiable invariants of Canoli Studio. All human contributors and AI coding agents working on this codebase must strictly adhere to these specifications.
 
 ---
 
 ## 1. High-Level Architecture
 
-Luma is a browser-first, local-first image editor combining precision manual editing with future AI-assisted workflows. It decouples document representation, state mutation, image rendering, and execution surfaces.
+Canoli Studio is a browser-first, local-first image editor combining precision manual editing with future AI-assisted workflows. It decouples document representation, state mutation, image rendering, and execution surfaces.
 
 ```mermaid
 flowchart TD

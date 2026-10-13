@@ -1,6 +1,6 @@
 {
-  "name": "Luma — In-Browser Image Editor",
-  "short_name": "Luma",
+  "name": "Canoli Studio — In-Browser Image Editor",
+  "short_name": "Canoli Studio",
   "description": "Free, private in-browser image editor with layers, blend modes, non-destructive adjustments, and WebGPU acceleration.",
   "start_url": "/",
   "scope": "/",

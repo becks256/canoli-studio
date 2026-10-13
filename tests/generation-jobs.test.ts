@@ -1205,7 +1205,7 @@ describe("T11: Revision Concurrency & Atomic Candidate Application", () => {
     // Layer metadata contains provenance without secrets
     expect(layer.metadata).toBeDefined();
     expect(layer.metadata!.title).toBe("Victorian street lamp");
-    expect(layer.metadata!.creator).toBe("Luma AI / FLUX.1 Pro Test");
+    expect(layer.metadata!.creator).toBe("Canoli Studio AI / FLUX.1 Pro Test");
     expect(layer.metadata!.keywords).toContain("ai-generated");
     expect(layer.metadata!.keywords).toContain("object");
 
