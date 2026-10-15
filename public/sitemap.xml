@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://luma-editor.app/</loc>
+    <loc>https://canoli.studio/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://luma-editor.app/developer/scripting-api.html</loc>
+    <loc>https://canoli.studio/developer/scripting-api.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://luma-editor.app/developer/api.html</loc>
+    <loc>https://canoli.studio/developer/api.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://luma-editor.app/developer/plugins.html</loc>
+    <loc>https://canoli.studio/developer/plugins.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

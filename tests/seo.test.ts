@@ -63,10 +63,10 @@ describe("SEO metadata and discoverability", () => {
     expect(existsSync("public/sitemap.xml")).toBe(true);
     const sitemap = await readFile("public/sitemap.xml", "utf8");
     expect(sitemap).toContain("<urlset");
-    expect(sitemap).toContain("https://luma-editor.app/</loc>");
-    expect(sitemap).toContain("https://luma-editor.app/developer/scripting-api.html</loc>");
-    expect(sitemap).toContain("https://luma-editor.app/developer/api.html</loc>");
-    expect(sitemap).toContain("https://luma-editor.app/developer/plugins.html</loc>");
+    expect(sitemap).toContain("https://canoli.studio/</loc>");
+    expect(sitemap).toContain("https://canoli.studio/developer/scripting-api.html</loc>");
+    expect(sitemap).toContain("https://canoli.studio/developer/api.html</loc>");
+    expect(sitemap).toContain("https://canoli.studio/developer/plugins.html</loc>");
   });
 
   it("provides valid web application manifest", async () => {
