@@ -192,7 +192,7 @@ describe("adjustment math and schemas", () => {
 
     const json = doc.toJSON();
     expect(json.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(json.schemaVersion).toBe(16);
+    expect(json.schemaVersion).toBe(27);
 
     // Validating under schema version 3 should throw
     const v3 = { ...json, schemaVersion: 3 };

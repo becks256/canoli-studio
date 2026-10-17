@@ -1,8 +1,21 @@
+import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSettings } from "../core/color-range";
+import { lutAdjustmentSchema, type LutAdjustmentData } from "../core/lut";
+import { whiteBalanceAdjustmentSchema, type WhiteBalanceAdjustmentData } from "../core/white-balance";
+import { gradientMapAdjustmentSchema, type GradientMapAdjustmentData } from "../core/gradient-map";
 import type { ClipboardRequest, ClipboardResult } from "./clipboard";
+import type { SelectionModificationRequest, SelectionModificationProgress } from "../core/selection-modification";
+import type { ChannelCoverageRequest } from '../core/alpha-channels';
+import type { QuickSelectionRequest } from '../core/quick-selection';
+import type { SubjectRequest } from '../core/subject-selection';
+import type {MattingTileRequest,MattingTileResult} from './matting-tile';
+import type {ClosedFormDiagnostics} from '../intelligence/matting/closed-form';
+import type { SelectionData } from "../core/drawing";
 import type { CoverageRequest, PixelCoverage } from "../core/pixel-selection";
 import {
   hslAdjustmentSchema,
   type HslAdjustmentData,
+  chromaticAdjustmentSchema,
+  type ChromaticAdjustmentData,
 } from "../core/adjustments";
 import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
 import type {
@@ -26,7 +39,7 @@ export class PixelProcessor {
   private sequence = 0;
   private pending = new Map<
     number,
-    { resolve(value: any): void; reject(error: Error): void }
+    { resolve(value: any): void; reject(error: Error): void; onProgress?(value: SelectionModificationProgress): void }
   >();
   readonly ready: Promise<void>;
   private failure: Error | null = null;
@@ -56,11 +69,20 @@ export class PixelProcessor {
         }
         const request = this.pending.get(event.data.id);
         if (!request) return;
+        if (event.data.type === "progress") {
+          try { request.onProgress?.(event.data.progress); }
+          catch (error) { this.pending.delete(event.data.id); request.reject(error instanceof Error ? error : new Error(String(error))); }
+          return;
+        }
         this.pending.delete(event.data.id);
         if (event.data.error) request.reject(new Error(event.data.error));
         else if (event.data.png) request.resolve(event.data.png);
         else if (event.data.clipboard) request.resolve(event.data.clipboard);
         else if (event.data.coverage) request.resolve(event.data.coverage);
+        else if (event.data.selectionResult) request.resolve(event.data.selectionResult);
+        else if (event.data.mattingTile) request.resolve(event.data.mattingTile);
+        else if (event.data.mattingDiagnostics) request.resolve(event.data.mattingDiagnostics);
+        else if (event.data.colorRangeCoverage) request.resolve(event.data.colorRangeCoverage);
         else if (event.data.histogram) request.resolve(event.data.histogram);
         else if (event.data.donorResult)
           request.resolve(event.data.donorResult);
@@ -116,6 +138,24 @@ export class PixelProcessor {
       return Promise.reject(new Error("HSL requires complete RGBA pixels."));
     const settings = hslAdjustmentSchema.parse(adjustment);
     return this.request(pixels.slice(), { hsl: settings });
+  }
+  chromatic(pixels: Uint8ClampedArray, adjustment: ChromaticAdjustmentData): Promise<Uint8ClampedArray> {
+    if (pixels.length%4) return Promise.reject(new Error("Chromatic adjustments require complete RGBA pixels."));
+    return this.request(pixels.slice(), { chromatic: chromaticAdjustmentSchema.parse(adjustment) });
+  }
+  gradientMap(pixels: Uint8ClampedArray, adjustment: GradientMapAdjustmentData): Promise<Uint8ClampedArray> {
+    if (pixels.length % 4) return Promise.reject(new Error("Gradient maps require complete RGBA pixels."));
+    return this.request(pixels.slice(), { gradientMap: gradientMapAdjustmentSchema.parse(adjustment) });
+  }
+  whiteBalance(pixels: Uint8ClampedArray, adjustment: WhiteBalanceAdjustmentData): Promise<Uint8ClampedArray> {
+    if (pixels.length % 4) return Promise.reject(new Error("White balance requires complete RGBA pixels."));
+    return this.request(pixels.slice(), { whiteBalance: whiteBalanceAdjustmentSchema.parse(adjustment) });
+  }
+  lookup(pixels: Uint8ClampedArray, adjustment: LutAdjustmentData): Promise<Uint8ClampedArray> {
+    return this.request(pixels.slice(), { lookup: lutAdjustmentSchema.parse(adjustment) });
+  }
+  colorRange(pixels:Uint8ClampedArray,options:ColorRangeOptions):Promise<Uint8Array> {
+    return this.request(pixels.slice(),{colorRange:colorRangeOptionsSchema.parse(options)});
   }
   applyLut(
     pixels: Uint8ClampedArray,
@@ -206,6 +246,27 @@ export class PixelProcessor {
   selection(tile: SelectionTile): Promise<Uint8ClampedArray> {
     return this.request(new Uint8ClampedArray(0), { selection: tile });
   }
+  modifySelection(input: SelectionModificationRequest, onProgress?: (value: SelectionModificationProgress) => void): Promise<SelectionData> {
+    return this.request(new Uint8ClampedArray(0), { selectionModification: structuredClone(input) }, onProgress);
+  }
+  channelSelection(input:ChannelCoverageRequest,onProgress?:(value:SelectionModificationProgress)=>void):Promise<SelectionData>{
+    return this.request(new Uint8ClampedArray(0),{channelSelection:structuredClone(input)},onProgress);
+  }
+  /** Consumes a private native capture; original image assets never transfer. */
+  quickSelection(pixels:Uint8ClampedArray,request:QuickSelectionRequest,onProgress?:(value:SelectionModificationProgress)=>void):Promise<SelectionData>{
+    return this.request(pixels,{quickSelection:structuredClone(request)},onProgress);
+  }
+  /** Consumes only a private source capture, never asset-owned bytes. */
+  selectSubject(pixels:Uint8ClampedArray,request:SubjectRequest,onProgress?:(value:SelectionModificationProgress)=>void):Promise<SelectionData>{
+    return this.request(pixels,{subject:structuredClone(request)},onProgress);
+  }
+  /** Consumes a private padded source tile; results remain outside script globals. */
+  mattingTile(pixels:Uint8ClampedArray,request:MattingTileRequest):Promise<MattingTileResult>{
+    return this.request(pixels,{matting:structuredClone(request)});
+  }
+  async beginMatting(width:number,height:number):Promise<void>{await this.request(new Uint8ClampedArray(0),{mattingBegin:{width,height}});}
+  async accumulateMatting(pixels:Uint8ClampedArray,request:MattingTileRequest):Promise<void>{await this.request(pixels,{mattingAccumulate:structuredClone(request)});}
+  solveMatting(onIteration?:(iteration:number,residual:number)=>void):Promise<ClosedFormDiagnostics>{return this.request(new Uint8ClampedArray(0),{mattingSolve:true},value=>{const residual=(value as typeof value&{relativeResidual:number}).relativeResidual;if(!Number.isFinite(residual)||residual<0)throw new Error('Invalid matting solver progress.');onIteration?.(value.completed,residual);});}
   /** Consumes a private captured pixel buffer; original image assets never transfer. */
   selectionCoverage(pixels: Uint8ClampedArray, options: CoverageRequest): Promise<PixelCoverage> {
     return this.request(pixels, { coverage: { ...options, wand: options.wand ? { ...options.wand } : undefined } });
@@ -255,6 +316,11 @@ export class PixelProcessor {
         coverage?: Uint8Array | Uint8ClampedArray;
       };
       hsl?: HslAdjustmentData;
+      chromatic?: ChromaticAdjustmentData;
+      gradientMap?: GradientMapAdjustmentData;
+      whiteBalance?: WhiteBalanceAdjustmentData;
+      lookup?: LutAdjustmentData;
+      colorRange?:ColorRangeSettings;
       effects?: ToneEffectData[];
       underlying?: Uint8ClampedArray;
       blend?: BlendIfData;
@@ -271,7 +337,16 @@ export class PixelProcessor {
       coverage?: CoverageRequest;
       png?: { width: number; height: number };
       clipboard?: ClipboardRequest;
+      selectionModification?: SelectionModificationRequest;
+      channelSelection?: ChannelCoverageRequest;
+      quickSelection?: QuickSelectionRequest;
+      subject?: SubjectRequest;
+      matting?: MattingTileRequest;
+      mattingBegin?:{width:number;height:number};
+      mattingAccumulate?:MattingTileRequest;
+      mattingSolve?:boolean;
     },
+    onProgress?: (value: SelectionModificationProgress) => void,
   ): Promise<any> {
     await this.ready;
     if (this.failure) throw this.failure;
@@ -318,7 +393,7 @@ export class PixelProcessor {
       }
     }
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      this.pending.set(id, { resolve, reject, onProgress });
       try {
         this.worker.postMessage({ id, pixels, ...payload }, transfer);
       } catch (error) {

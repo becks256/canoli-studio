@@ -2,6 +2,15 @@ import { maskStrokeSchema } from "./masks";
 import type { BrushStrokeData } from "./drawing";
 import type { DodgeBurnOptions } from "./retouch/types";
 import { z } from "zod";
+import { lutAdjustmentSchema, type LutAdjustmentData } from "./lut";
+export { lutAdjustmentSchema, defaultLutAdjustment } from "./lut";
+export type { LutAdjustmentData } from "./lut";
+import { whiteBalanceAdjustmentSchema, type WhiteBalanceAdjustmentData } from "./white-balance";
+export { whiteBalanceAdjustmentSchema, defaultWhiteBalanceAdjustment } from "./white-balance";
+export type { WhiteBalanceAdjustmentData } from "./white-balance";
+import { gradientMapAdjustmentSchema, type GradientMapAdjustmentData } from "./gradient-map";
+export { gradientMapAdjustmentSchema, defaultGradientMapAdjustment } from "./gradient-map";
+export type { GradientMapAdjustmentData, GradientStop } from "./gradient-map";
 
 export interface CurvePoint {
   x: number;
@@ -92,7 +101,42 @@ export function defaultHslAdjustment(): HslAdjustmentData {
   return { kind: "hsl", hue: 0, saturation: 0, lightness: 0 };
 }
 
+export interface BalanceChannels { red: number; green: number; blue: number }
+export interface ColorBalanceAdjustmentData {
+  kind: "color-balance";
+  shadows: BalanceChannels;
+  midtones: BalanceChannels;
+  highlights: BalanceChannels;
+  preserveLuminosity: boolean;
+}
+export interface VibranceAdjustmentData { kind: "vibrance"; vibrance: number; saturation: number }
+const balanceChannelsSchema = z.object({
+  red: z.number().finite().min(-100).max(100),
+  green: z.number().finite().min(-100).max(100),
+  blue: z.number().finite().min(-100).max(100),
+}).strict();
+export const colorBalanceAdjustmentSchema = z.object({
+  kind: z.literal("color-balance"), shadows: balanceChannelsSchema,
+  midtones: balanceChannelsSchema, highlights: balanceChannelsSchema,
+  preserveLuminosity: z.boolean(),
+}).strict();
+export const vibranceAdjustmentSchema = z.object({
+  kind: z.literal("vibrance"), vibrance: z.number().finite().min(-100).max(100),
+  saturation: z.number().finite().min(-100).max(100),
+}).strict();
+export const chromaticAdjustmentSchema = z.discriminatedUnion("kind", [colorBalanceAdjustmentSchema,vibranceAdjustmentSchema]);
+export type ChromaticAdjustmentData = ColorBalanceAdjustmentData | VibranceAdjustmentData;
+export function defaultColorBalanceAdjustment(): ColorBalanceAdjustmentData {
+  return {kind:"color-balance",shadows:{red:0,green:0,blue:0},midtones:{red:0,green:0,blue:0},highlights:{red:0,green:0,blue:0},preserveLuminosity:true};
+}
+export function defaultVibranceAdjustment(): VibranceAdjustmentData { return {kind:"vibrance",vibrance:0,saturation:0}; }
+
 export type AdjustmentData =
+  | LutAdjustmentData
+  | WhiteBalanceAdjustmentData
+  | GradientMapAdjustmentData
+  | ColorBalanceAdjustmentData
+  | VibranceAdjustmentData
   | HslAdjustmentData
   | CurvesAdjustmentData
   | LevelsAdjustmentData
@@ -166,6 +210,11 @@ export const toneAdjustmentSchema = z
   .strict();
 
 export const adjustmentSchema = z.discriminatedUnion("kind", [
+  lutAdjustmentSchema,
+  whiteBalanceAdjustmentSchema,
+  gradientMapAdjustmentSchema,
+  colorBalanceAdjustmentSchema,
+  vibranceAdjustmentSchema,
   hslAdjustmentSchema,
   curvesAdjustmentSchema,
   levelsAdjustmentSchema,
@@ -336,6 +385,14 @@ export interface AdjustmentLuts {
 export function computeAdjustmentLuts(
   adjustment: AdjustmentData,
 ): AdjustmentLuts {
+  if (adjustment.kind === "lut")
+    throw new Error("Imported LUTs require domain-aware table processing, not a channel lookup table.");
+  if (adjustment.kind === "white-balance")
+    throw new Error("White balance requires linear cross-channel pixel processing, not a channel lookup table.");
+  if (adjustment.kind === "gradient-map")
+    throw new Error("Gradient maps require cross-channel pixel processing, not a channel lookup table.");
+  if (adjustment.kind === "color-balance" || adjustment.kind === "vibrance")
+    throw new Error("Chromatic adjustments require cross-channel pixel processing, not a lookup table.");
   if (adjustment.kind === "hsl")
     throw new Error(
       "HSL requires cross-channel pixel processing, not a lookup table.",

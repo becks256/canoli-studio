@@ -1,3 +1,4 @@
+import {expectPenControl} from './pen-control-position';
 import { expect, test } from "@playwright/test";
 test("public layer rotation renders and survives portable save/reopen", async ({
   page,
@@ -415,16 +416,14 @@ test("pen overlays follow affine artwork while handles retain screen size", asyn
   await page.keyboard.press("Control+1");
   const controls = page.getByTestId("pen-controls");
   const anchor = controls.locator("rect").first();
-  await expect(anchor).toHaveAttribute("x", "156");
-  await expect(anchor).toHaveAttribute("y", "56");
-  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cy", "80");
+  await expectPenControl(anchor, 160, 60);
+  await expectPenControl(controls.locator("circle").nth(1), 160, 80);
   const before = (await anchor.boundingBox())!;
   await page.evaluate(() => {
     window.luma.editor.document.layers.at(0)!.transform =
       new window.luma.AffineTransform(3, 1, 0.5, 2, 10, 5);
   });
-  await expect(anchor).toHaveAttribute("x", "76");
-  await expect(anchor).toHaveAttribute("y", "61");
+  await expectPenControl(anchor, 80, 65);
   const after = (await anchor.boundingBox())!;
   expect(after.width).toBeCloseTo(before.width);
   expect(after.height).toBeCloseTo(before.height);

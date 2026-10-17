@@ -345,7 +345,7 @@ it("stores independent constructor filter stacks with atomic undo, strict valida
   legacy.schemaVersion = 10;
   expect(() => validateDocument(legacy)).toThrow(/schema version 11/);
   delete (legacy.children[0] as any).smartFilters;
-  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(16);
+  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(27);
   const restored = Document.fromJSON(stable).getLayer(
     first.id,
   ) as SmartObjectLayer;
@@ -425,7 +425,7 @@ it("smart-filter masks share constructor validation, locks, undo, asset tracking
   legacy.schemaVersion = 11;
   expect(() => validateDocument(legacy)).toThrow("schema version 12");
   delete (legacy.children[0] as any).filterMask;
-  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(16);
+  expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(27);
   const command = parseCommands([
     {
       type: "smartObject.filterMask",

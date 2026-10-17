@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-15",
+  "feature": "F04 White Balance adjustment layers",
+  "environment": {
+    "browser": "Chromium through Playwright",
+    "gpuAdapter": "SwiftShader",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "independentMathReference": {
+    "generator": "Colour Science",
+    "version": "0.4.6",
+    "fixture": "tests/fixtures/white-balance-reference.json",
+    "regenerator": "scripts/generate-white-balance-reference.py",
+    "cases": 24,
+    "temperatureKelvin": [2000, 2222, 2222.5, 4000, 4000.5, 6504, 10000, 25000],
+    "tint": [-100, 0, 100],
+    "assertedMaxXyzError": 1e-8,
+    "assertedMaxMatrixEntryError": 1e-7,
+    "independentNumericalTangent": true,
+    "cameraRawCalibrationClaimed": false
+  },
+  "wasmReference": {
+    "seededPixelCount": 65536,
+    "settingsCases": 18,
+    "exactRgbAndAlphaAgreement": true,
+    "neutralByteIdentity": true,
+    "callerOwnershipAndMemoryGrowthPassed": true
+  },
+  "gpuReference": {
+    "comparisons": 128,
+    "temperatureKelvin": [2000, 2856, 4000, 6504, 12000, 25000],
+    "tint": [-100, 0, 100],
+    "includesExactNeutralDefault": true,
+    "opacity": [1, 0.5],
+    "maskDensity": 0.7,
+    "blendModes": ["normal", "multiply"],
+    "sourceAlphaBytes": [0, 1, 64, 128, 255],
+    "assertedMaxPremultipliedRgbErrorBytes": 3,
+    "assertedMeanRgbErrorUpperBoundBytes": 1,
+    "observedMaxPremultipliedRgbErrorBytes": 1,
+    "observedMaxMeanRgbErrorBytes": 0.14013671875,
+    "alphaExact": true
+  },
+  "nativeExport": {
+    "width": 10000,
+    "height": 5000,
+    "source": "opaque #507896 PaintFill",
+    "temperatureKelvin": 9000,
+    "tint": 12,
+    "initialElapsedMs": 8651.5,
+    "repeatElapsedMs": 9484.2,
+    "sampleCoordinates": [[0, 0], [1023, 1023], [1024, 1024], [2048, 2048], [9999, 4999]],
+    "rgbaAtEachSample": [91, 119, 134, 255],
+    "dimensionsAndSamplesPassed": true,
+    "notes": "Individual container runs; repeat overlapped production browser checks. Not input-latency percentiles or a controlled performance comparison."
+  },
+  "existingRealImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "exportElapsedMs": 3514
+  },
+  "validation": {
+    "fullUnitApiTestsPassed": 769,
+    "unitTestFiles": 108,
+    "distinctDevelopmentBrowserTestsPassed": 33,
+    "productionBrowserTestsPassed": 16,
+    "buildPassed": true,
+    "maskedPngAndBothPsdModesPassed": true,
+    "workspaceCurrentAndRedoOnlyParametersPassed": true,
+    "documentedScriptAtomicityAndPluginRevocationPassed": true
+  },
+  "limits": "The D65-relative Planckian/tint control model corrects rendered 8-bit sRGB; it does not estimate scene illumination or camera RAW multipliers. Broader device, color-management, HDR, print, interchange and interactive-latency gates remain open. User LUT import and the rest of the implementation roadmap are unfinished."
+}

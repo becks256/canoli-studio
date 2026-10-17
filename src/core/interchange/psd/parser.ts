@@ -4,6 +4,7 @@
 
 import { ByteReader } from "./stream";
 import { decodePackBits } from "./packbits";
+import { unmattePreviewChannel } from "./composite";
 import {
   PSD_BLEND_MODE_MAP,
   PsdColorMode,
@@ -16,7 +17,7 @@ import {
   type PsdParsedLayer,
 } from "./types";
 
-export function parsePsd(buffer: ArrayBuffer | Uint8Array): PsdParsedDocument {
+export function parsePsd(buffer: ArrayBuffer | Uint8Array, options: { legacyStraightAlpha?: boolean } = {}): PsdParsedDocument {
   const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
   const reader = new ByteReader(bytes);
 
@@ -101,6 +102,8 @@ export function parsePsd(buffer: ArrayBuffer | Uint8Array): PsdParsedDocument {
 
   // 4. Layer and Mask Information Section
   const layers: PsdParsedLayer[] = [];
+  let mergedTransparency = false;
+  let legacyLayout = false;
   if (reader.remaining() >= 4) {
     const layerMaskSectionLen =
       version === 1 ? reader.readUint32() : reader.readUint64(); // In PSB, 64-bit
@@ -109,9 +112,11 @@ export function parsePsd(buffer: ArrayBuffer | Uint8Array): PsdParsedDocument {
     if (layerMaskSectionLen > 0 && reader.remaining() >= 4) {
       const layerInfoLen =
         version === 1 ? reader.readUint32() : reader.readUint64();
+      legacyLayout = version === 1 && layerMaskSectionLen === 4 + layerInfoLen;
 
       if (layerInfoLen > 0 && reader.remaining() >= 2) {
         const rawLayerCount = reader.readInt16();
+        mergedTransparency = rawLayerCount < 0;
         const layerCount = Math.abs(rawLayerCount);
 
         // Read Layer Records
@@ -396,15 +401,23 @@ export function parsePsd(buffer: ArrayBuffer | Uint8Array): PsdParsedDocument {
         const red = planes[0];
         const green = planes[1];
         const blue = planes[2];
-        const alpha = planes.length >= 4 ? planes[3] : null;
+        // Extra alpha channels are not merged transparency. The earlier Canoli
+        // writer used a positive count and straight RGBA; its ICC CMM identifies
+        // that legacy output together with its missing global-mask field. A
+        // resaved file can reuse the ICC profile without being a legacy file.
+        const legacyCmm = iccProfile && iccProfile.length >= 8 && String.fromCharCode(...iccProfile.subarray(4, 8)) === "LUMA";
+        const legacy = !mergedTransparency && (options.legacyStraightAlpha === true ||
+          (options.legacyStraightAlpha === undefined && legacyLayout && legacyCmm));
+        const alpha = planes.length >= 4 && (mergedTransparency || legacy) ? planes[3] : null;
 
         for (let p = 0; p < planeSize; p++) {
           const idx = p * 4;
           const sampleOffset = p * bytesPerSample;
-          cData[idx] = red[sampleOffset];
-          cData[idx + 1] = green[sampleOffset];
-          cData[idx + 2] = blue[sampleOffset];
-          cData[idx + 3] = alpha ? alpha[sampleOffset] : 255;
+          const a = alpha ? alpha[sampleOffset] : 255;
+          cData[idx] = mergedTransparency ? unmattePreviewChannel(red[sampleOffset], a) : red[sampleOffset];
+          cData[idx + 1] = mergedTransparency ? unmattePreviewChannel(green[sampleOffset], a) : green[sampleOffset];
+          cData[idx + 2] = mergedTransparency ? unmattePreviewChannel(blue[sampleOffset], a) : blue[sampleOffset];
+          cData[idx + 3] = a;
         }
       }
     }

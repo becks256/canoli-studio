@@ -1,0 +1,188 @@
+{
+  "date": "2026-10-15",
+  "feature": "F04 portable 1D/3D Cube LUT adjustments",
+  "environment": {
+    "browser": "Chromium through Playwright",
+    "gpuAdapter": "SwiftShader",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "independentReference": {
+    "generator": "Colour Science",
+    "version": "0.4.6",
+    "script": "scripts/generate-lut-reference.py",
+    "settingsCases": 12,
+    "pixelsPerCase": 74,
+    "dimensions": [
+      1,
+      3
+    ],
+    "interpolation": [
+      "tetrahedral",
+      "trilinear"
+    ],
+    "amount": [
+      0,
+      35,
+      100
+    ],
+    "customDomainsAndClippedOutputs": true,
+    "byteAgreement": true,
+    "fixturesReproducedExactly": true,
+    "sha256": {
+      "independent-1d.cube": "1f09fe5b464991a0eee67bea9ed104757bd1a6234e89b957ec7b0cfcc4af71d2",
+      "independent-3d.cube": "3f90dff1969a994dbdb30133d816f673d6350f011dbda493dee9a72aa13b52b0",
+      "reference.json": "58ea7d54854f9703cf5b43601c19d37f83ab50401fc8e47b971e17854ddc3359"
+    }
+  },
+  "wasmReference": {
+    "seededPixelCount": 65536,
+    "settingsCases": 18,
+    "exactRgbAndAlphaAgreement": true,
+    "callerOwnershipAndMemoryGrowthPassed": true,
+    "maximum1dSizeParsedAndProcessed": 65536,
+    "maximum3dSizeHeaderAcceptedButFull256CubedTableNotExercised": true,
+    "signedZeroTableExportRoundTripPassed": true,
+    "cooperativeValidationCancellationAndInputOwnershipPassed": true
+  },
+  "gpuReference": {
+    "comparisons": 96,
+    "dimensions": [
+      1,
+      3
+    ],
+    "interpolation": [
+      "tetrahedral",
+      "trilinear"
+    ],
+    "amount": [
+      0,
+      35,
+      100
+    ],
+    "opacity": [
+      1,
+      0.5
+    ],
+    "maskDensity": 0.7,
+    "blendModes": [
+      "normal",
+      "multiply"
+    ],
+    "sourceAlphaBytes": [
+      0,
+      1,
+      64,
+      128,
+      255
+    ],
+    "assertedMaxPremultipliedRgbErrorBytes": 3,
+    "assertedMeanRgbErrorUpperBoundBytes": 1,
+    "observedMaxPremultipliedRgbErrorBytes": 1,
+    "observedMaxMeanRgbErrorBytes": 0.14013671875,
+    "alphaExact": true,
+    "precisionFallbackAndCacheReleasePassed": true
+  },
+  "native50MpExport": {
+    "width": 10000,
+    "height": 5000,
+    "source": "opaque #507896 PaintFill",
+    "table": "2x2x2 red/blue swap, tetrahedral, amount 100",
+    "elapsedMsObservations": [
+      5881.9,
+      6294.3,
+      7152.6
+    ],
+    "sampleCoordinates": [
+      [
+        0,
+        0
+      ],
+      [
+        1023,
+        1023
+      ],
+      [
+        1024,
+        1024
+      ],
+      [
+        9999,
+        4999
+      ]
+    ],
+    "rgbaAtEachSample": [
+      150,
+      120,
+      80,
+      255
+    ],
+    "dimensionsAndSamplesPassed": true,
+    "notes": "Individual runs; later repeats overlapped other suites. These are completion times, not controlled speed comparisons or gesture latency percentiles."
+  },
+  "realImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "exportElapsedMs": 3555
+  },
+  "largeTableImport": {
+    "cubeSide": 65,
+    "tableRows": 274625,
+    "base64Length": 4394000,
+    "fullProjectRoundTripAndPixelPassed": true,
+    "productionFullCubeExportRowCountPassed": true,
+    "beforeCooperativeValidationProduction": {
+      "elapsedMs": 847.9,
+      "longTasksMs": [
+        72
+      ]
+    },
+    "afterCooperativeValidationProduction": {
+      "elapsedMs": 863.8,
+      "longTasksMs": []
+    },
+    "developmentObservations": [
+      {
+        "importMs": 831.6,
+        "longTasksMs": []
+      },
+      {
+        "importMs": 836.9,
+        "longTasksMs": [
+          84
+        ],
+        "otherSuitesRunning": true
+      },
+      {
+        "importMs": 840.8,
+        "longTasksMs": [
+          61
+        ],
+        "otherSuitesRunning": false
+      },
+      {
+        "importMs": 840.1,
+        "longTasksMs": [
+          78
+        ],
+        "fullProjectRoundTripPassed": true
+      }
+    ],
+    "notes": "Initial in-memory Playwright upload recorded 879/460 ms tasks and included automation buffer conversion; it is not comparable to file-path measurements. Removing redundant conversions and cooperative validation address actual editor work. Production recorded no long tasks in the final measured case; development repeats still show variation. No universal responsiveness or p95 gate is claimed.",
+    "productionFinalDocsExportRepeat": {
+      "elapsedMs": 851.6,
+      "longTasksMs": []
+    }
+  },
+  "validation": {
+    "fullUnitApiTestsPassed": 777,
+    "unitTestFiles": 109,
+    "distinctDevelopmentBrowserTestsPassed": 38,
+    "productionBrowserTestsPassed": 18,
+    "buildPassed": true,
+    "maskedPngAndPsdModesPassed": true,
+    "workspaceCurrentAndRedoOnlyTablesPassed": true,
+    "documentedScriptPluginRevocationAndAtomicInvalidImportPassed": true,
+    "whitespaceCheckPassed": true
+  },
+  "limits": "Rendered 8-bit encoded sRGB; no implicit camera-log/ACES/HDR conversion, other LUT formats, combined shapers, hardware GPU or universal interpolation-error claim. Large valid tables remain subject to device memory and existing automation request limits. Broader color/device/performance gates and the full implementation roadmap remain open."
+}

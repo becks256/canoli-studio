@@ -1,3 +1,4 @@
+import {RASTER_EXPORT_COLUMNS,rasterExportRows} from './raster-export-grid';
 import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
@@ -21,6 +22,8 @@ function chunk(type: string, bytes: Uint8Array): Uint8Array<ArrayBuffer> {
   view.setUint32(result.length - 4, (crc ^ 0xffffffff) >>> 0);
   return result;
 }
+
+export {PngRowEncoder} from '../core/png-stream';
 
 /** PNG is streamed through a deflater, without a document-sized canvas or RGBA
  * buffer. Retained output is compressed; source decoding remains browser-managed.
@@ -62,16 +65,13 @@ export async function exportPng(
   void collect.catch(() => {});
   try {
     const rowBytes = width * 4 + 1;
-    const rowsPerStrip = Math.max(
-      1,
-      Math.min(64, Math.floor(4_000_000 / rowBytes)),
-    );
+    const rowsPerStrip = rasterExportRows(width);
     for (let y = 0; y < height; y += rowsPerStrip) {
       checkExport(control);
       const rows = Math.min(rowsPerStrip, height - y);
       const strip = new Uint8Array(rowBytes * rows); // filter byte 0 for each row
-      for (let x = 0; x < width; x += 2048) {
-        const tileWidth = Math.min(2048, width - x);
+      for (let x = 0; x < width; x += RASTER_EXPORT_COLUMNS) {
+        const tileWidth = Math.min(RASTER_EXPORT_COLUMNS, width - x);
         const tile = await renderer.render(document, assets, {
           region: { x, y, width: tileWidth, height: rows },
           cache: false,

@@ -1,4 +1,7 @@
+import { replaceVectorPaths, type VectorBooleanSelection } from './vector-boolean';
+import {vectorStrokeKeys} from './vector-stroke';
 import { isImmutable, shareUnchanged } from "./immutable";
+import { lassoSelection, polygonSelectionSchema } from "./lasso";
 import {
   flipCommands,
   distributionCommands,
@@ -17,10 +20,13 @@ import type { SmartComponentDefinition } from "./smart/types";
 import type { GuideData } from "./guides";
 import { AffineTransform } from "./affine";
 import { resizeImage } from "./image-resize";
+import { alphaChannelSchema, type AlphaChannelData } from './alpha-channels';
 import { cropDocument } from "./crop";
 import type { CropBounds } from "./crop";
 import type {
   SelectionData,
+  SelectionOperation,
+  Point,
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
@@ -76,6 +82,12 @@ export type LayerPatch = Partial<
       | "align"
       | "lineHeight"
       | "letterSpacing"
+      | "wordSpacing"
+      | "fontKerning"
+      | "wrapWidth"
+      | "paragraphSpacing"
+      | "firstLineIndent"
+      | "paragraphJustify"
       | "fontWeight"
       | "fontStyle"
       | "direction"
@@ -92,6 +104,7 @@ export type EditorCommand =
   | { type: "document.resizeImage"; width: number; height: number }
   | { type: "document.crop"; bounds: CropBounds }
   | { type: "selection.set"; selection: SelectionData | null }
+  | { type: "selection.polygon"; points: Point[]; operation?: "replace" | SelectionOperation }
   | {
       type: "layer.place";
       id: string;
@@ -109,9 +122,13 @@ export type EditorCommand =
       patch: Partial<Omit<VectorPathData, "id">>;
     }
   | { type: "path.remove"; id: string; pathId: string }
+  | { type: "paths.replace"; operands: VectorBooleanSelection['operands']; result: VectorPathData | null }
   | { type: "smartObject.filterMask"; id: string; mask: LayerMaskData | null }
   | { type: "smartObject.filters"; id: string; filters: SmartFilterData[] }
   | { type: "layerComp.set"; comp: LayerCompData }
+  | { type: 'alphaChannel.set'; channel: AlphaChannelData }
+  | { type: 'alphaChannel.remove'; id: string }
+  | { type: 'alphaChannel.reorder'; id: string; direction: 'up'|'down' }
   | { type: "layerComp.remove"; id: string }
   | { type: "layerComp.apply"; id: string }
   | { type: "component.set"; definition: SmartComponentDefinition }
@@ -173,6 +190,7 @@ export type EditorCommand =
   | { type: "transaction"; label: string; commands: EditorCommand[] };
 
 function apply(document: DocumentData, command: EditorCommand): void {
+  if (command.type === 'paths.replace') { replaceVectorPaths(document, command.operands, command.result); return; }
   if (command.type === "transaction") {
     for (const child of command.commands) apply(document, child);
     return;
@@ -239,8 +257,35 @@ function apply(document: DocumentData, command: EditorCommand): void {
       .values();
     return;
   }
+  if(command.type==='alphaChannel.set'){
+    const channel=alphaChannelSchema.parse(command.channel),entries=document.alphaChannels??[];
+    const index=entries.findIndex(entry=>entry.id===channel.id);
+    if(index<0)entries.push(channel);else entries[index]=channel;
+    document.alphaChannels=entries;return;
+  }
+  if(command.type==='alphaChannel.remove'||command.type==='alphaChannel.reorder'){
+    const entries=document.alphaChannels??[],index=entries.findIndex(entry=>entry.id===command.id);
+    if(index<0)throw new Error('Alpha channel not found.');
+    if(command.type==='alphaChannel.remove')document.alphaChannels=entries.filter(entry=>entry.id!==command.id);
+    else{
+      if(command.direction!=='up'&&command.direction!=='down')throw new Error('Invalid alpha channel direction.');
+      const target=index+(command.direction==='up'?-1:1);
+      if(target>=0&&target<entries.length)[entries[index],entries[target]]=[entries[target],entries[index]];
+    }
+    return;
+  }
   if (command.type === "selection.set") {
     document.selection = structuredClone(command.selection);
+    return;
+  }
+  if (command.type === "selection.polygon") {
+    const { points, operation } = polygonSelectionSchema.parse({ points: command.points, operation: command.operation });
+    const selection = lassoSelection(points, document.width, document.height);
+    if (!selection.regions.length)
+      throw new Error("The polygon must cover at least one canvas pixel.");
+    document.selection = operation === "replace" ? selection : {
+      regions: [...(document.selection?.regions ?? []), { ...selection.regions[0], operation }],
+    };
     return;
   }
   if (command.type === "layerComp.set") {
@@ -423,6 +468,8 @@ function apply(document: DocumentData, command: EditorCommand): void {
     }
     case "layer.update":
       if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
+      if (layer.kind !== 'text' && ['text','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
+        throw new Error('Typography properties require a text layer.');
       if (
         Object.keys(command.patch).some(
           (key) =>
@@ -448,6 +495,12 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "align",
               "lineHeight",
               "letterSpacing",
+              "wordSpacing",
+              "fontKerning",
+              "wrapWidth",
+              "paragraphSpacing",
+              "firstLineIndent",
+              "paragraphJustify",
               "fontWeight",
               "fontStyle",
               "direction",
@@ -479,8 +532,15 @@ function apply(document: DocumentData, command: EditorCommand): void {
           layer.lineHeight,
           {
             letterSpacing: layer.letterSpacing,
+            wordSpacing: layer.wordSpacing,
+            fontKerning: layer.fontKerning,
+            direction: layer.direction,
             fontWeight: layer.fontWeight,
             fontStyle: layer.fontStyle,
+            wrapWidth: layer.wrapWidth,
+            paragraphSpacing: layer.paragraphSpacing,
+            firstLineIndent: layer.firstLineIndent,
+            paragraphJustify: layer.paragraphJustify,
           },
         );
         layer.width = bounds.width;
@@ -508,6 +568,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
         if (node.kind === "vector")
           node.paths.forEach((path) => {
             path.id = command.newIds?.[path.id] ?? id();
+            for (const contour of path.subpaths ?? []) contour.id = command.newIds?.[contour.id] ?? id();
           });
       }
       copy.name = `${copy.name.slice(0, 234)} copy`;
@@ -623,7 +684,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
       if (
         Object.keys(command.patch).some(
           (key) =>
-            !["points", "closed", "fill", "stroke", "strokeWidth"].includes(
+            !["points", "closed", "fill", "stroke", "strokeWidth","fillGradient","fillRule","subpaths",...vectorStrokeKeys].includes(
               key,
             ),
         )
@@ -682,9 +743,21 @@ export function execute(
   // need a new root and the path to their target, never copies of pixel coverage.
   while (command.type === "transaction" && command.commands.length === 1) command = command.commands[0];
   let next: DocumentData;
-  const rootOnly = ["document.rename", "document.resize", "document.guides", "selection.set"].includes(command.type);
+  const rootOnly = ["document.rename", "document.resize", "document.guides", "selection.set", "selection.polygon"].includes(command.type);
   const targeted = command.type === "layer.update" || command.type === "paint.add" || command.type === "paint.remove" || command.type === "path.update" || command.type === "path.add" || command.type === "path.remove";
   if (isImmutable(document) && rootOnly) next = { ...document };
+  else if (isImmutable(document) && command.type === 'paths.replace') {
+    const targets=new Set(command.operands.map(ref=>ref.layerId));
+    const copy=(nodes:LayerData[]):LayerData[]=>nodes.map(node=>{
+      if(node.kind==='vector'&&targets.has(node.id))return {...node};
+      if(node.kind==='group'){
+        const children=copy(node.children);
+        if(children.some((child,index)=>child!==node.children[index]))return {...node,children};
+      }
+      return node;
+    });
+    next={...document,children:copy(document.children)};
+  }
   else if (isImmutable(document) && targeted) {
     const targetId = "id" in command ? command.id : "";
     const copyPath = (nodes: LayerData[]): LayerData[] => nodes.map(node => {
@@ -715,6 +788,9 @@ export function execute(
 
 export function describe(command: EditorCommand): string {
   switch (command.type) {
+    case 'alphaChannel.set': return 'Save alpha channel';
+    case 'alphaChannel.remove': return 'Remove alpha channel';
+    case 'alphaChannel.reorder': return 'Reorder alpha channel';
     case "layer.flip":
       return "Flip selected layers";
     case "layer.distribute":
@@ -745,6 +821,8 @@ export function describe(command: EditorCommand): string {
       return "Remove component";
     case "selection.set":
       return command.selection ? "Set selection" : "Deselect";
+    case "selection.polygon":
+      return "Polygon selection";
     case "layer.place":
       return "Move layer";
     case "paint.add":
@@ -763,6 +841,8 @@ export function describe(command: EditorCommand): string {
       return "Edit path";
     case "path.remove":
       return "Remove path";
+    case "paths.replace":
+      return "Combine vector paths";
     case "document.guides":
       return "Edit guides";
     case "document.rename":

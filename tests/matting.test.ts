@@ -5,7 +5,7 @@
  * Verifies:
  * 1. Saliency detection and bounding box estimation (detectSalientSubject).
  * 2. 3-state Trimap generation and boundary radius expansion (generateTrimapFromMask).
- * 3. Local KNN alpha matting engine and regularization (solveAlphaMatte).
+ * 3. Local color-line reference and regularization (solveAlphaMatte).
  * 4. Color bleeding decontamination on semi-transparent transition edges (decontaminateColors).
  * 5. Bitmap LayerMask schema, persistence, and referencedAssets registration.
  * 6. Non-destructive layer mask attachment and byte-for-byte source image preservation.
@@ -25,6 +25,7 @@ import {
   erodeMask,
   dilateMask,
 } from "../src/intelligence/matting/segmentation";
+import {encodeRgbaPng} from '../src/engine/png';
 import {
   solveAlphaMatte,
   decontaminateColors,
@@ -128,6 +129,15 @@ describe("T19: Object selection and background removal with interactive matting"
   const height = 32;
   const numPixels = width * height;
 
+  // OO/history units use a genuine prepared PNG fixture. Browser/API suites own
+  // the worker/readback/staging integration checks; this Canvas shim cannot do that.
+  async function preparedHost(document:Document,assets:AssetStore,rgba:Uint8Array){
+    const candidate=detectSalientSubject(rgba,width,height),trimap=generateTrimapFromMask(candidate.mask,width,height,3),matte=solveAlphaMatte(rgba,trimap,{radius:3,decontaminate:false},candidate.mask),pixels=new Uint8Array(numPixels*4);
+    for(let i=0;i<numPixels;i++)pixels.set([255,255,255,matte.alpha[i]],i*4);
+    const asset=await assets.add(await encodeRgbaPng(pixels,width,height),'Prepared matte',undefined,false);
+    document._prepareMatting=async request=>({plan:{sourceId:request.layerId,mask:LayerMask.fromBitmap(asset.id).toJSON(),unresolvedPixels:matte.unresolvedPixels??0}});
+  }
+
   /**
    * Helper to create a synthetic image with a distinct bright foreground rectangle
    * centered on a dark blue background.
@@ -168,7 +178,7 @@ describe("T19: Object selection and background removal with interactive matting"
       expect(result.bounds.x).toBeLessThanOrEqual(12);
       expect(result.bounds.y).toBeGreaterThanOrEqual(8);
       expect(result.bounds.y).toBeLessThanOrEqual(12);
-      expect(result.confidence).toBeGreaterThan(0.2);
+      expect(result.confidence).toBe(0); // This heuristic has no calibrated quality score.
 
       // Verify foreground pixels inside mask
       const centerIdx = 16 * width + 16;
@@ -179,12 +189,12 @@ describe("T19: Object selection and background removal with interactive matting"
       expect(result.mask[cornerIdx]).toBe(0);
     });
 
-    it("falls back gracefully when contrast is minimal or uniform", () => {
+    it("returns no foreground for uniform pixels instead of fabricating a fallback", () => {
       const uniformRgba = new Uint8Array(numPixels * 4).fill(128);
       const result = detectSalientSubject(uniformRgba, width, height);
 
-      expect(result.bounds.width).toBeGreaterThan(0);
-      expect(result.bounds.height).toBeGreaterThan(0);
+      expect(result.bounds).toEqual({x:0,y:0,width:0,height:0});
+      expect(result.mask.some(value=>value>0)).toBe(false);
       expect(result.mask.length).toBe(numPixels);
     });
 
@@ -233,8 +243,9 @@ describe("T19: Object selection and background removal with interactive matting"
       }
     });
 
-    it("converts mask to SelectionData rectangle", () => {
+    it("converts actual mask coverage, preserving holes and fractional alpha", () => {
       const mask = new Uint8Array(numPixels);
+      mask[5*width+5]=255;mask[5*width+7]=128;mask[6*width+5]=64;
       const bounds = { x: 5, y: 5, width: 10, height: 12 };
       const sel = maskToSelectionData(mask, width, height, bounds);
 
@@ -244,8 +255,9 @@ describe("T19: Object selection and background removal with interactive matting"
         y: 5,
         width: 10,
         height: 12,
-        shape: "rectangle",
+        shape: "pixels",
         operation: "add",
+        coverage:{width:3,height:2,runs:[1,255,2,0,3,128,4,64,6,0]},
       });
     });
   });
@@ -307,8 +319,8 @@ describe("T19: Object selection and background removal with interactive matting"
       );
       expect(decontaminated.length).toBe(rgba.length);
 
-      // Alpha channel must be preserved
-      expect(decontaminated[edgeIdx * 4 + 3]).toBe(alpha[edgeIdx]);
+      // Corrected RGB and relative matte coverage are separate; intrinsic alpha stays intact.
+      expect(decontaminated[edgeIdx * 4 + 3]).toBe(rgba[edgeIdx*4+3]);
     });
   });
 
@@ -383,6 +395,7 @@ describe("T19: Object selection and background removal with interactive matting"
       expect(layer.mask).toBeNull();
 
       // Execute refineEdge on RasterLayer
+      await preparedHost(doc,assets,origBytes);
       const mask = await layer.refineEdge({ radius: 4, smooth: 10 });
 
       expect(mask).toBeDefined();
@@ -395,6 +408,7 @@ describe("T19: Object selection and background removal with interactive matting"
       expect(storedAsset.id).toBe(origAsset.id);
       expect(storedAsset.width).toBe(origAsset.width);
       expect(storedAsset.height).toBe(origAsset.height);
+      expect(new Uint8Array(await storedAsset.blob.arrayBuffer())).toEqual(origBytes);
     });
 
     it("rolls back refineEdge or removeBackground cleanly in exactly 1 undo step", async () => {
@@ -419,6 +433,7 @@ describe("T19: Object selection and background removal with interactive matting"
       expect(layer.mask).toBeNull();
 
       // Remove background
+      await preparedHost(doc,assets,origBytes);
       await doc.removeBackground();
       expect(layer.mask).not.toBeNull();
       expect(doc.canUndo).toBe(true);
@@ -452,7 +467,8 @@ describe("T19: Object selection and background removal with interactive matting"
       doc.selectedLayer = layer;
 
       expect(doc.selection).toBeNull();
-
+      // Unit host supplies genuine reference coverage; browser tests use native workers/readback.
+      doc._prepareSubject=async()=>{const candidate=detectSalientSubject(origBytes,width,height);return maskToSelectionData(candidate.mask,width,height);};
       const selection = await doc.selectSubject();
       expect(selection.regions.length).toBeGreaterThan(0);
       expect(doc.selection).not.toBeNull();
@@ -482,10 +498,12 @@ describe("T19: Object selection and background removal with interactive matting"
       app.document.selectedLayer = layer;
 
       // Test selectSubject via EditorApplication
+      app.document._prepareSubject=async()=>{const candidate=detectSalientSubject(origBytes,width,height);return maskToSelectionData(candidate.mask,width,height);};
       const sel = await app.selectSubject();
       expect(sel.regions.length).toBeGreaterThan(0);
 
       // Test refineEdge via EditorApplication
+      await preparedHost(app.document,app.assetStore,origBytes);
       const mask = await app.refineEdge({ radius: 3 });
       expect(mask).toBeDefined();
       expect(layer.mask).not.toBeNull();

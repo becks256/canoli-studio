@@ -1,0 +1,269 @@
+{
+  "date": "2026-10-16",
+  "feature": "T19/A04 global closed-form matting",
+  "fullT19Complete": false,
+  "fullRoadmapComplete": false,
+  "formulation": {
+    "primarySource": "https://www.cs.jhu.edu/~misha/ReadingSeminar/Papers/Levin06.pdf",
+    "equations": [
+      12,
+      13
+    ],
+    "implementation": "Original float64 sparse matting Laplacian and hard-constraint elimination, solved once globally through Jacobi-preconditioned conjugate gradients",
+    "windows": "Overlapping native 3x3 windows centered at every source pixel, clipped at image boundaries; zero-alpha RGB omitted",
+    "colorSpace": "Decoded encoded-sRGB RGB divided by 255",
+    "epsilon": 1e-07,
+    "maximumIterations": 2000,
+    "relativeResidualGate": 1e-07,
+    "residual": "Actual ||Ax-b|| / max(1,||b||), recomputed before success",
+    "postprocessing": "Clip/round coverage to bytes, then explicit smoothing/contrast/WASM fractional feather; RGB decontamination remains a separate corrected foreground",
+    "crossTileConnectionsRetained": true,
+    "independentTileSolutionsSubstituted": false,
+    "implicitLocalFallback": false,
+    "defaultSolver": "closed-form",
+    "explicitAlternative": "color-line",
+    "knnImplemented": false
+  },
+  "memory": {
+    "graphWorkingBudgetBytes": 201326592,
+    "chunkRows": 2048,
+    "stencilEntriesPerUnknownRow": 25,
+    "estimatedBytesPerReservedUnknownRow": 444,
+    "unknownRowsOnly": true,
+    "fullImageOutputPlaneOrCanvas": false,
+    "nativeCaptureCore": [
+      512,
+      64
+    ],
+    "capture": "Disjoint row-major cores plus label/postprocessing halo, followed by native recapture for encoding",
+    "limits": [
+      "Graph estimate includes typed work arrays and a Map overhead estimate; actual heap/peak process memory was not measured",
+      "Graph allocation and nonconvergence reject without changing imports, source bytes, public assets or history",
+      "Original and final browser bitmaps remain resident; automatic Subject still uses a full RGBA plane",
+      "Node supports the existing PNG/input-mask subset and retains full decoded source/optional mask/trimap planes",
+      "No arbitrary image MP/file-size import cap, source downsampling, browser scene rendering or REST/browser synchronization added"
+    ]
+  },
+  "versions": {
+    "documentSchema": 21,
+    "projectContainer": 3,
+    "workspaceSnapshot": 2,
+    "schemaChanged": false
+  },
+  "independentOracle": {
+    "generator": "scripts/generate-closed-form-reference.py",
+    "numpy": "1.26.4",
+    "scipy": "1.13.0",
+    "implementation": "Independent NumPy covariance/inverse and COO full-image Laplacian; SciPy direct sparse solve, separate from production chunked stencil/PCG",
+    "fixtures": {
+      "color-line": {
+        "width": 9,
+        "height": 5,
+        "directRelativeResidual": 2.3190266214470663e-15,
+        "independentReferenceSyntheticQuality": {
+          "unknownPixels": 25,
+          "meanAbsoluteError": 0.0007843137254901933,
+          "meanSquaredError": 1.1534025374855742e-06,
+          "maximumAbsoluteError": 0.0019607843137254832
+        }
+      },
+      "wide-unknown": {
+        "width": 65,
+        "height": 9,
+        "directRelativeResidual": 4.641323069153811e-15,
+        "independentReferenceSyntheticQuality": {
+          "unknownPixels": 549,
+          "meanAbsoluteError": 0.053746785599485696,
+          "meanSquaredError": 0.0034269112634406056,
+          "maximumAbsoluteError": 0.07787990196078431
+        }
+      },
+      "single-column": {
+        "width": 1,
+        "height": 9,
+        "directRelativeResidual": 8.844167811729666e-17,
+        "independentReferenceSyntheticQuality": {
+          "unknownPixels": 7,
+          "meanAbsoluteError": 0.0014005602240896309,
+          "meanSquaredError": 2.608886691931656e-06,
+          "maximumAbsoluteError": 0.002450980392156854
+        }
+      },
+      "full-rank-rgb": {
+        "width": 13,
+        "height": 11,
+        "directRelativeResidual": 8.756985589256329e-16,
+        "independentReferenceSyntheticQuality": null
+      },
+      "synthetic-fine-strands": {
+        "width": 49,
+        "height": 33,
+        "directRelativeResidual": 1.3726018309851418e-15,
+        "independentReferenceSyntheticQuality": {
+          "unknownPixels": 710,
+          "meanAbsoluteError": 0.006886953508786998,
+          "meanSquaredError": 7.392128828414795e-05,
+          "maximumAbsoluteError": 0.032467812823801845
+        }
+      },
+      "synthetic-translucent-sheet": {
+        "width": 39,
+        "height": 27,
+        "directRelativeResidual": 1.8896418241656543e-14,
+        "independentReferenceSyntheticQuality": {
+          "unknownPixels": 539,
+          "meanAbsoluteError": 0.001504283871034443,
+          "meanSquaredError": 3.4840064627658274e-06,
+          "maximumAbsoluteError": 0.004399479445077015
+        }
+      },
+      "distant-native-patch": {
+        "width": 603,
+        "height": 11,
+        "directRelativeResidual": 7.805072150710457e-15,
+        "independentReferenceSyntheticQuality": {
+          "unknownPixels": 5355,
+          "meanAbsoluteError": 0.002974789915966372,
+          "meanSquaredError": 1.3004855921607271e-05,
+          "maximumAbsoluteError": 0.008823529411764619
+        }
+      }
+    },
+    "comparisonGate": {
+      "maximumAlphaByteError": 1,
+      "meanAlphaByteErrorExclusiveUpperBound": 0.02,
+      "knownLabels": "Exact bytes",
+      "sourceTransparentHiddenRgb": "Invariant"
+    },
+    "sha256": {
+      "closed-form-single-column-trimap.png": "8b1a8345057450f96c8bb2d8d7a6ab71a1272369c08717f684a4a9635b452600",
+      "closed-form-color-line-trimap.png": "3dd67b67fe219f0a7597feeb41ec7272ea1e3de44cffa333db17fd26c184dd9f",
+      "closed-form-synthetic-translucent-sheet-trimap.png": "666aed19cfc45c658804a3ffa32d0cf9a7d9e2e054cfb1c3c670fd9624b2e962",
+      "closed-form-synthetic-translucent-sheet.png": "fc42a4989ed38096cd06a12d96e9475e5c42488b516a5ff5ee08deb49028d0e5",
+      "closed-form-native-50mp-trimap.png": "afb1dc3426e999cab70ecfe488946edfa9b98b1053c5db2f71b40e6ac809b336",
+      "closed-form-native-50mp.png": "16e2249411024b0a0423c3da76950216c81bfcd574f776a882be1e39f9c52ce8",
+      "closed-form-wide-unknown.png": "8f7c3fd217cabc0fafc8179b2728ba4f6a9d32060288a0acde7605e5f07a78f6",
+      "closed-form-synthetic-fine-strands-trimap.png": "325539622efb22670659441627212da17a0c4875c5124462f82947018986ae7e",
+      "closed-form-single-column.png": "aefd56a7c3707047695ef32a8e2528495208cedff64354673546a2e9b1b65aa4",
+      "closed-form-full-rank-rgb.png": "fce5884dbbc1b0c65081a830f3b5b3256c75c139a547f5203317067c3cd73743",
+      "closed-form-full-rank-rgb-trimap.png": "8bcc2c446ff6a36b9da8794b0fcb2e41f2590afbf7a89d53ee128a9f0fa64ca9",
+      "closed-form-synthetic-fine-strands.png": "2f498d5a687d1f471215d642d8ffdcbff74fadcf8fd3838a550e04a9fa4febfa",
+      "closed-form-reference.json": "c69343413cae5ce185b63f1092f6742c8073edd8356586c9c276c534879bf348",
+      "closed-form-wide-unknown-trimap.png": "1549bfcde83864a029436fb2d9e44236f7e509bc5cc6e79cbb08d23f5c3ee50d",
+      "closed-form-color-line.png": "c6e7f3864fcf1317238a3decdfff67c32f374f570cfbf1c62f221c822c49f35e"
+    }
+  },
+  "nativeBrowser50Mp": {
+    "elapsedMs": 14425.100000023842,
+    "width": 10000,
+    "height": 5000,
+    "revisionDelta": 1,
+    "inputResponseMs": 1.100000023841858,
+    "progressFirst": {
+      "completed": 0,
+      "total": 3161,
+      "phase": "capture"
+    },
+    "progressLast": {
+      "completed": 3161,
+      "total": 3161,
+      "phase": "encode"
+    },
+    "solveLast": {
+      "completed": 1580,
+      "total": 3161,
+      "phase": "solve",
+      "iteration": 1700,
+      "relativeResidual": 3.307373600630786e-08
+    },
+    "longTasks": [
+      {
+        "start": 8724.600000023842,
+        "duration": 114
+      },
+      {
+        "start": 17323.899999976158,
+        "duration": 85
+      }
+    ],
+    "sourceUnchanged": true,
+    "projectRestored": true,
+    "maximumByteError": 0,
+    "meanByteError": 0
+  },
+  "verification": {
+    "build": "Final actual WASM/runtime/docs/TypeScript/Vite build passes",
+    "fullUnitApiPriorExpandedFixture": {
+      "testsPassed": 847,
+      "filesPassed": 121,
+      "log": "/tmp/canoli-closed-form-final-unit-all.log"
+    },
+    "expandedIndependentNumericalSuite": {
+      "testsPassed": 11,
+      "log": "/tmp/canoli-closed-form-full-rank.log"
+    },
+    "globalAndLegacyMattingBrowser": {
+      "distinctTestsPassed": 19,
+      "log": "/tmp/canoli-closed-form-browser.log",
+      "finalGlobalAndLegacyUiRerun": {
+        "testsPassed": 8,
+        "log": "/tmp/canoli-closed-form-final-browser.log"
+      }
+    },
+    "selectionChannelRegressions": {
+      "testsPassed": 36,
+      "log": "/tmp/canoli-closed-form-selection-regressions.log"
+    },
+    "production": {
+      "distinctTestsPassed": 24,
+      "log": "/tmp/canoli-closed-form-production.log",
+      "finalSolverRgbAndDocsRerun": {
+        "testsPassed": 4,
+        "log": "/tmp/canoli-closed-form-final-production.log"
+      }
+    },
+    "realImage50MpImportEditProjectPng": {
+      "testsPassed": 1,
+      "exportMilliseconds": 3805,
+      "log": "/tmp/canoli-closed-form-editor50.log"
+    },
+    "distinctDevelopmentBrowserTestsPassed": 56,
+    "distinctBrowserTestsPassed": 80,
+    "coverage": [
+      "Global propagation through a wide unknown region without local foreground/background samples",
+      "Independent full-rank RGB covariance, single-column, mixture, fine-strand and translucent-sheet fixtures",
+      "Exact hard constraints, zero-alpha RGB invariance, genuine-prior preservation for unconstrained components and rejection without evidence",
+      "Incomplete assembly, genuine graph memory budget failure, nonconvergence and invalid worker diagnostics reject",
+      "Actual iterations/cancellation and no late source/asset/history commit",
+      "Default corrected RGB reaches a real foreground asset, retains intrinsic alpha, and exports exact matte alpha",
+      "Documented isolated script runs and later failure discards private assets",
+      "Existing plugin revocation, transformed/unlinked masks, native trimap brushes, undo/redo/projects/workspace/source bytes",
+      "Production default solver and genuine PNG output without developer globals"
+    ],
+    "fullUnitApi": {
+      "testsPassed": 848,
+      "filesPassed": 121,
+      "log": "/tmp/canoli-closed-form-final-unit-expanded.log"
+    },
+    "independentFixtureRegeneration": {
+      "files": 15,
+      "hashesUnchanged": true,
+      "log": "/tmp/canoli-closed-form-reference-final.log"
+    },
+    "visualInspection": [
+      "/tmp/canoli-closed-form-dialog.png",
+      "/tmp/canoli-closed-form-result.png"
+    ],
+    "whitespace": "git diff --check passes",
+    "finalBuildLog": "/tmp/canoli-closed-form-release-build.log"
+  },
+  "limits": [
+    "Synthetic mathematical fixtures are not held-out natural hair/glass/fur/foliage/translucent-fabric accuracy evidence",
+    "No semantic model, calibrated confidence or universal quality/precision guarantee",
+    "The 50 MP source is mostly transparent with a distant 601x9 opaque unknown patch; it exercises real global propagation across horizontal/vertical native tile seams, not a dense 50 MP graph",
+    "The graph contains 5355 unknown visible pixels in the large fixture; source dimensions remain 10000x5000",
+    "Native browser queued Hand response is one callback during actual solver iterations, not p95 or input-to-photon timing",
+    "Observed 85/114 ms final-run long tasks remain; no universal responsiveness claim",
+    "Individual overlapping-suite timings are not controlled speed comparisons; no hardware GPU/tablet or peak-memory result"
+  ]
+}

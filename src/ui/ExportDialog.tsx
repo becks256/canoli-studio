@@ -22,6 +22,8 @@ export function ExportDialog({
   busy = false,
 }: ExportDialogProps) {
   const [format, setFormat] = useState<ExportFormat>("png");
+  const [psdMode, setPsdMode] = useState<"layers" | "flatten">("layers");
+  const [tiffVariant,setTiffVariant]=useState<"auto"|"classic"|"big">("auto");
   const [quality, setQuality] = useState(90);
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const [exporting, setExporting] = useState(false);
@@ -77,8 +79,10 @@ export function ExportDialog({
       format,
       quality: quality / 100,
       backgroundColor,
+      psdMode,
+      tiffVariant,
     });
-  }, [document, format, quality, backgroundColor]);
+  }, [document, format, quality, backgroundColor, psdMode,tiffVariant]);
 
   const handleExport = async () => {
     const run = new AbortController();
@@ -90,6 +94,8 @@ export function ExportDialog({
         format,
         quality: quality / 100,
         backgroundColor,
+        psdMode,
+        tiffVariant,
       }, {signal:run.signal,onProgress:setProgress});
       if (!run.signal.aborted) onClose();
     } finally {
@@ -98,7 +104,7 @@ export function ExportDialog({
     }
   };
 
-  const extension = format === "jpeg" ? "jpg" : format;
+  const extension = format === "jpeg" ? "jpg" : format==='tiff'?'tif':format;
 
   return (
     <Dialog
@@ -130,6 +136,7 @@ export function ExportDialog({
               label: "JPEG — High compression photo (flattened background)",
             },
             { value: "webp", label: "WebP — Modern efficient web image" },
+            { value: "tiff", label: "TIFF — Lossless raster with transparency and ICC profile" },
             { value: "svg", label: "SVG — Scalable Bézier vector paths" },
             {
               value: "psd",
@@ -139,6 +146,14 @@ export function ExportDialog({
           ]}
           onChange={(val) => setFormat(val as ExportFormat)}
         />
+
+        {format === "psd" && <Select label="PSD layers" layout="stacked" value={psdMode} disabled={busy || exporting}
+          options={[{ value: "layers", label: "Keep independent layers; merge dependent effects" }, { value: "flatten", label: "Flatten visible composition into one layer" }]}
+          onChange={value => setPsdMode(value as "layers" | "flatten")} />}
+
+        {format==='tiff'&&<Select label="TIFF compatibility" layout="stacked" value={tiffVariant} disabled={busy||exporting}
+          options={[{value:'auto',label:'Automatic — TIFF or BigTIFF as needed'},{value:'classic',label:'Classic TIFF — widest compatibility'},{value:'big',label:'BigTIFF — requires a compatible viewer'}]}
+          onChange={value=>setTiffVariant(value as 'auto'|'classic'|'big')} />}
 
         <div className="export-dimension-info">
           <span>

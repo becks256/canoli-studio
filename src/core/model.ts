@@ -1,4 +1,8 @@
+import {vectorStrokeKeys} from './vector-stroke';
+import {applyTextStyle, measureStyledText, UnsupportedTextStyleError} from './text-style';
+import {layoutText, NativeJustificationError, assertParagraphStyle, type ParagraphStyle} from './text-layout';
 import { yieldTask } from "./task-yield";
+import { alphaChannelSchema, MAX_ALPHA_CHANNELS, type AlphaChannelData } from './alpha-channels';
 import { z } from "zod";
 import { isImmutable } from "./immutable";
 import { layerCompSchema, type LayerCompData } from "./layer-comps";
@@ -32,7 +36,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 16;
+export const SCHEMA_VERSION = 27;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -103,7 +107,7 @@ export interface VectorLayerData extends LayerBaseData {
   kind: "vector";
   paths: VectorPathData[];
 }
-export interface TextLayerData extends LayerBaseData {
+export interface TextLayerData extends LayerBaseData, ParagraphStyle {
   kind: "text";
   text: string;
   fontSize: number;
@@ -112,6 +116,8 @@ export interface TextLayerData extends LayerBaseData {
   align: "left" | "center" | "right";
   lineHeight: number;
   letterSpacing?: number;
+  wordSpacing?: number;
+  fontKerning?: 'auto' | 'normal' | 'none';
   fontWeight?: string;
   fontStyle?: "normal" | "italic";
   direction?: "ltr" | "rtl";
@@ -150,6 +156,17 @@ export interface DocumentData {
     | 13
     | 14
     | 15
+    | 16
+    | 17
+    | 18
+    | 19
+    | 20
+    | 21
+    | 22
+    | 23
+    | 24
+    | 25
+    | 26
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -160,6 +177,7 @@ export interface DocumentData {
   guides?: GuideData[];
   components?: SmartComponentDefinition[];
   layerComps?: LayerCompData[];
+  alphaChannels?: AlphaChannelData[];
   children: LayerData[];
 }
 
@@ -226,16 +244,16 @@ export function measureTextBounds(
   fontSize: number,
   fontFamily: string,
   lineHeight: number,
-  options: {
+  options: ParagraphStyle & {
     letterSpacing?: number;
+    wordSpacing?: number;
+    fontKerning?: 'auto' | 'normal' | 'none';
+    direction?: 'ltr' | 'rtl';
     fontWeight?: string;
     fontStyle?: "normal" | "italic";
   } = {},
 ): { width: number; height: number } {
-  const lines = text.split("\n");
-  const lineHeightPx = fontSize * lineHeight;
-  const height = Math.max(1, Math.round(lines.length * lineHeightPx));
-  let maxWidth = 0;
+  assertParagraphStyle(options);
 
   if (!measureCtx) {
     if (typeof OffscreenCanvas !== "undefined") {
@@ -251,53 +269,44 @@ export function measureTextBounds(
     }
   }
 
-  const weight = options.fontWeight ?? "normal";
-  const style = options.fontStyle ?? "normal";
   const letterSpacing = options.letterSpacing ?? 0;
 
   if (measureCtx) {
+    const context = measureCtx;
     try {
-      measureCtx.font = `${style} ${weight} ${fontSize}px ${fontFamily}`;
-      if ("letterSpacing" in measureCtx) {
-        (measureCtx as any).letterSpacing = `${letterSpacing}px`;
-      }
-      for (const line of lines) {
-        const metrics = measureCtx.measureText(line);
+      applyTextStyle(context, {...options, fontSize, fontFamily});
+      const layout = layoutText({...options, text, fontSize, lineHeight}, (line, spacing) => {
+        const width = measureStyledText(context,line,{...options,fontSize,fontFamily},spacing);
         const spacingAdjustment =
-          "letterSpacing" in measureCtx
+          "letterSpacing" in context
             ? 0
             : Math.max(0, line.length - 1) * letterSpacing;
-        maxWidth = Math.max(maxWidth, metrics.width + spacingAdjustment);
-      }
-    } catch {
-      maxWidth = 0;
+        return width + spacingAdjustment;
+      });
+      return {width: layout.width, height: layout.height};
+    } catch (error) {
+      if (error instanceof UnsupportedTextStyleError || error instanceof NativeJustificationError) throw error;
     }
   }
 
-  if (maxWidth === 0) {
-    for (const line of lines) {
-      maxWidth = Math.max(
-        maxWidth,
-        (line.length || 1) * fontSize * 0.6 +
-          Math.max(0, line.length - 1) * letterSpacing,
-      );
-    }
-  }
-
-  const width = Math.max(1, Math.round(maxWidth));
-  return { width, height };
+  const layout = layoutText({...options, text, fontSize, lineHeight}, (line, spacing) =>
+    (line.length || 1) * fontSize * 0.6 + Math.max(0, line.length - 1) * letterSpacing +
+    (line.match(/[ \u00a0\t\r\f]/g)?.length ?? 0) * (spacing ?? options.wordSpacing ?? 0));
+  return {width: layout.width, height: layout.height};
 }
 
 export function createText(
   name: string,
   text = "Text",
-  options: {
+  options: ParagraphStyle & {
     fontSize?: number;
     fontFamily?: string;
     color?: string;
     align?: "left" | "center" | "right";
     lineHeight?: number;
     letterSpacing?: number;
+    wordSpacing?: number;
+    fontKerning?: 'auto' | 'normal' | 'none';
     fontWeight?: string;
     fontStyle?: "normal" | "italic";
     direction?: "ltr" | "rtl";
@@ -309,13 +318,22 @@ export function createText(
   const align = options.align ?? "left";
   const lineHeight = options.lineHeight ?? 1.2;
   const letterSpacing = options.letterSpacing;
+  const wordSpacing = options.wordSpacing;
+  const fontKerning = options.fontKerning;
   const fontWeight = options.fontWeight;
   const fontStyle = options.fontStyle;
   const direction = options.direction;
   const bounds = measureTextBounds(text, fontSize, fontFamily, lineHeight, {
     letterSpacing,
+    wordSpacing,
+    fontKerning,
+    direction,
     fontWeight,
     fontStyle,
+    ...(options.wrapWidth === undefined ? {} : {wrapWidth: options.wrapWidth}),
+    ...(options.paragraphSpacing === undefined ? {} : {paragraphSpacing: options.paragraphSpacing}),
+    ...(options.firstLineIndent === undefined ? {} : {firstLineIndent: options.firstLineIndent}),
+    ...(options.paragraphJustify === undefined ? {} : {paragraphJustify: options.paragraphJustify}),
   });
   return {
     ...base(name),
@@ -327,6 +345,12 @@ export function createText(
     align,
     lineHeight,
     letterSpacing,
+    ...(wordSpacing === undefined ? {} : {wordSpacing}),
+    ...(fontKerning === undefined ? {} : {fontKerning}),
+    ...(options.wrapWidth === undefined ? {} : {wrapWidth: options.wrapWidth}),
+    ...(options.paragraphSpacing === undefined ? {} : {paragraphSpacing: options.paragraphSpacing}),
+    ...(options.firstLineIndent === undefined ? {} : {firstLineIndent: options.firstLineIndent}),
+    ...(options.paragraphJustify === undefined ? {} : {paragraphJustify: options.paragraphJustify}),
     fontWeight,
     fontStyle,
     direction,
@@ -419,6 +443,7 @@ export function toneOf(layer: RasterLayerData): ToneEffectData {
 // Import and command validation share the same invariants. Unknown node/effect
 // types fail explicitly instead of silently disappearing on load or export.
 const validatedSelections = new WeakSet<object>();
+const validatedAlphaChannels = new WeakSet<object>();
 const validatedDrawing = new WeakMap<object, Set<object>>();
 /** Validation may be reused only for recursively frozen store-owned values. */
 function validateDrawing<T>(schema: { parse(value: unknown): T }, value: unknown): T {
@@ -436,7 +461,7 @@ function validateDrawing<T>(schema: { parse(value: unknown): T }, value: unknown
 
 // Validation-only schema: reuse proofs for immutable anchors in changing paths.
 // Mutable points still pass the exact public point schema on every invocation.
-const validationPathSchema = pathSchema.extend({
+const validationPathSchema = pathSchema.safeExtend({
   points: z.array(z.custom<z.infer<typeof pathSchema.shape.points.element>>((value) => {
     validateDrawing(pathSchema.shape.points.element, value);
     return true;
@@ -485,7 +510,18 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 13 &&
       value.schemaVersion !== 14 &&
       value.schemaVersion !== 15 &&
-      value.schemaVersion !== 16) ||
+      value.schemaVersion !== 16 &&
+      value.schemaVersion !== 17 &&
+      value.schemaVersion !== 18 &&
+      value.schemaVersion !== 19 &&
+      value.schemaVersion !== 20 &&
+      value.schemaVersion !== 21 &&
+      value.schemaVersion !== 22 &&
+      value.schemaVersion !== 23 &&
+      value.schemaVersion !== 24 &&
+      value.schemaVersion !== 25 &&
+      value.schemaVersion !== 26 &&
+      value.schemaVersion !== 27) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -493,7 +529,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–16), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–27), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -528,6 +564,17 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       compIds.add(comp.id);
     }
   }
+  if(value.alphaChannels!==undefined){
+    if(Number(value.schemaVersion)<21)throw new Error('Alpha channels require schema version 21.');
+    if(!Array.isArray(value.alphaChannels)||value.alphaChannels.length>MAX_ALPHA_CHANNELS)throw new Error('A document supports at most 64 alpha channels.');
+    const channelIds=new Set<string>();
+    for(const entry of value.alphaChannels){
+      const channel=isImmutable(entry)&&validatedAlphaChannels.has(entry)?entry as AlphaChannelData:alphaChannelSchema.parse(entry);
+      if(isImmutable(entry))validatedAlphaChannels.add(entry);
+      if(channelIds.has(channel.id))throw new Error('Duplicate alpha channel identity.');
+      channelIds.add(channel.id);yield;
+    }
+  }
   checkSelection(value.selection);
   const ids = new Set<string>();
   let count = 0;
@@ -552,6 +599,10 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
+      if (node.kind !== 'text' && ('wordSpacing' in node || 'fontKerning' in node))
+        throw new Error('Word spacing and font kerning require a text layer.');
+      if (node.kind !== 'text' && ('paragraphJustify' in node || 'wrapWidth' in node || 'paragraphSpacing' in node || 'firstLineIndent' in node))
+        throw new Error('Paragraph layout requires a text layer.');
       if (node.transform !== undefined) {
         if (Number(value.schemaVersion) < 6)
           throw new Error("Layer transforms require schema version 6.");
@@ -661,6 +712,9 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
             node.kind === "paint"
               ? validateDrawing(paintOperationSchema, entry)
               : validateDrawing(validationPathSchema, entry);
+          if(node.kind==='vector'&&Number(value.schemaVersion)<23&&'fillGradient' in (entry as object))throw new Error('Vector gradients require schema version 23.');
+          if(node.kind==='vector'&&Number(value.schemaVersion)<24&&('subpaths' in (entry as object)||'fillRule' in (entry as object)))throw new Error('Compound paths and fill rules require schema version 24.');
+          if(node.kind==='vector'&&Number(value.schemaVersion)<22&&vectorStrokeKeys.some(key=>key in (entry as object)))throw new Error('Vector stroke styles require schema version 22.');
           if ("clip" in parsed) checkSelection(parsed.clip);
           if (entryIds.has(parsed.id))
             throw new Error("Duplicate drawing object ID.");
@@ -668,6 +722,14 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           yield;
         }
       } else if (node.kind === "text") {
+        if (Number(value.schemaVersion) < 27 && 'paragraphJustify' in node) throw new Error('Paragraph justification requires schema version 27.');
+        if (Number(value.schemaVersion) < 26 && ('wrapWidth' in node || 'paragraphSpacing' in node || 'firstLineIndent' in node))
+          throw new Error('Paragraph layout requires schema version 26.');
+        assertParagraphStyle(node);
+        if (node.wrapWidth != null && node.width !== node.wrapWidth)
+          throw new Error('Paragraph bounds must retain their authored wrap width.');
+        if (Number(value.schemaVersion) < 25 && ('wordSpacing' in node || 'fontKerning' in node))
+          throw new Error('Word spacing and font kerning require schema version 25.');
         if (
           typeof node.text !== "string" ||
           node.text.length > 10000 ||
@@ -680,6 +742,8 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           !number(node.height, 1, MAX_COORDINATE) ||
           (node.letterSpacing !== undefined &&
             !number(node.letterSpacing, -50, 500)) ||
+          (node.wordSpacing !== undefined && !number(node.wordSpacing, -50, 500)) ||
+          (node.fontKerning !== undefined && !['auto', 'normal', 'none'].includes(node.fontKerning as string)) ||
           (node.fontWeight !== undefined && !text(node.fontWeight)) ||
           (node.fontStyle !== undefined &&
             !["normal", "italic"].includes(node.fontStyle as string)) ||
@@ -701,6 +765,14 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           throw new Error("Patch adjustments require schema version 9.");
         if (node.adjustment.kind === "hsl" && Number(value.schemaVersion) < 15)
           throw new Error("HSL adjustments require schema version 15.");
+        if ((node.adjustment.kind === "color-balance" || node.adjustment.kind === "vibrance") && Number(value.schemaVersion) < 17)
+          throw new Error("Color Balance and Vibrance adjustments require schema version 17.");
+        if (node.adjustment.kind === "gradient-map" && Number(value.schemaVersion) < 18)
+          throw new Error("Gradient maps require schema version 18.");
+        if (node.adjustment.kind === "white-balance" && Number(value.schemaVersion) < 19)
+          throw new Error("White balance requires schema version 19.");
+        if (node.adjustment.kind === "lut" && Number(value.schemaVersion) < 20)
+          throw new Error("Imported LUTs require schema version 20.");
         const adjustment = adjustmentSchema.parse(node.adjustment);
         if (adjustment.kind === "tonal")
           for (const stroke of adjustment.strokes) checkSelection(stroke.brush.clip);

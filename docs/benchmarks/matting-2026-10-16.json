@@ -1,0 +1,217 @@
+{
+  "date": "2026-10-16",
+  "feature": "T19/A04 native Refine Edge and corrected foreground integration",
+  "fullT19Complete": false,
+  "fullRoadmapComplete": false,
+  "versions": {
+    "documentSchema": 21,
+    "projectContainer": 3,
+    "workspaceSnapshot": 2,
+    "schemaChanged": false
+  },
+  "environment": {
+    "browser": "Chromium through Playwright in local container",
+    "backend": "Actual JavaScript color-line solver in private workers, actual AssemblyScript/WASM selection/Subject/fractional feather",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "contract": {
+    "defaults": {
+      "radius": 10,
+      "smoothness": 10,
+      "edgeFeather": 0,
+      "contrast": 0,
+      "shiftEdge": 0,
+      "decontaminate": false,
+      "decontaminateAmount": 1,
+      "outputTo": "mask"
+    },
+    "radiusAndStrokeUnits": "Original source pixels, independent of placed geometry",
+    "initialCoverage": "Enabled nonzero-density target mask, else current selection, else source-native Select Subject; explicit trimap skips automatic Subject",
+    "correctedOutput": "Real new foreground RGB PNG plus separate relative matte; source hidden and unchanged",
+    "intrinsicAlphaPreserved": true,
+    "existingMaskLinkStatePreserved": true,
+    "undo": "One shared command transaction",
+    "scriptRepairOwnedAssetBudget": 32,
+    "correctedAssetSlots": 2,
+    "restSharedWorkerLimit": 4
+  },
+  "memory": {
+    "fullOutputRgbaPlaneOrCanvas": false,
+    "coreTileWidth": 512,
+    "maximumCoreRows": 64,
+    "rowStripTargetBytes": 4000000,
+    "maskTileSide": 512,
+    "retainedMaskAlphaTiles": 32,
+    "previewMaximumSide": 512,
+    "halo": "Finite support covers morphology, local estimation, smoothing, fractional feather and decontamination",
+    "limitations": [
+      "An extreme-width scanline can exceed the nominal strip target",
+      "Browser source decoding and final mask/foreground bitmaps remain resident",
+      "Automatic Subject preparation still uses a native RGBA plane with a 256 MiB WASM memory maximum",
+      "Node retains full source RGBA plus optional bitmap-mask/trimap decode planes",
+      "Compressed output, RLE, history, real decoder/process/address-range limits remain; no arbitrary import cap or native downsampling"
+    ]
+  },
+  "fixtures": {
+    "sha256": {
+      "tests/fixtures/matting/color-line.png": "bee9d5a4c3f6328354834cb335c37e4cabd423407b32bee5c59e3b4972f0227e",
+      "tests/fixtures/matting/color-line-trimap.png": "7c6a5274987f1980fc7dd532eab85fbe7f8c406e7d6bde2777c4bed32b3eaee2",
+      "tests/fixtures/matting/native-50mp.png": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f"
+    },
+    "generator": "scripts/generate-matting-fixtures.py uses independent Python struct/zlib PNG encoding",
+    "colorLine": {
+      "nativeSize": [
+        9,
+        5
+      ],
+      "expectedMatteRow": [
+        255,
+        255,
+        204,
+        166,
+        128,
+        89,
+        51,
+        0,
+        0
+      ],
+      "actualCorrectedCenter": [
+        199,
+        20,
+        11,
+        255
+      ],
+      "exportedPremultipliedRgbToleranceBytes": 1,
+      "alphaToleranceBytes": 0
+    },
+    "large": "10000x5000 mostly-transparent source-alpha prior, thin strip, hole and distant partial-alpha pixel; radius zero. This is not a dense unknown-zone or hair-quality speed benchmark."
+  },
+  "nativeBrowser50Mp": {
+    "milliseconds": 14295.900000035763,
+    "revisionDelta": 1,
+    "width": 10000,
+    "height": 5000,
+    "alpha": [
+      255,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      0
+    ],
+    "inputResponseMs": 4.699999988079071,
+    "longTasks": [
+      {
+        "start": 5140,
+        "duration": 75
+      },
+      {
+        "start": 5252.599999964237,
+        "duration": 54
+      },
+      {
+        "start": 5318.599999964237,
+        "duration": 113
+      },
+      {
+        "start": 17319.5,
+        "duration": 91
+      }
+    ],
+    "progressFirst": {
+      "completed": 0,
+      "total": 1580
+    },
+    "progressLast": {
+      "completed": 1580,
+      "total": 1580
+    },
+    "projectRestored": true,
+    "originalUnchanged": true
+  },
+  "nativeRest50Mp": {
+    "milliseconds": 11138.656734,
+    "width": 10000,
+    "height": 5000,
+    "samples": [
+      255,
+      255,
+      0,
+      0,
+      255,
+      255,
+      0,
+      0,
+      0
+    ]
+  },
+  "verification": {
+    "build": "Actual WASM, isolated runtime, generated developer docs, TypeScript and Vite pass",
+    "unitApi": {
+      "testsPassed": 836,
+      "filesPassed": 120
+    },
+    "mattingBrowser": {
+      "testsPassed": 14,
+      "log": "/tmp/canoli-matting-final-browser.log"
+    },
+    "production": {
+      "testsPassed": 23,
+      "log": "/tmp/canoli-matting-production.log"
+    },
+    "coverage": [
+      "Actual corrected source RGB and fractional exported alpha",
+      "Full nested/resized source placement, effective feather/inversion/density, unlinked world masks",
+      "Actual isolated documented example, later-error rollback, late assets-write revocation",
+      "Cancellation/revision changes held after genuine private PNG decode or native worker output",
+      "Native trimap brush preview/history isolation",
+      "One undo/redo, current/redo-only workspace restoration, project reopen and original compressed bytes",
+      "Exact padded-tile/whole-region equality with morphology, smoothing, feather and correction",
+      "Strict alias/label/output validation, genuine empty evidence, source-alpha normalization and zero-radius fractional priors"
+    ],
+    "selectionRegressions": {
+      "testsPassed": 36,
+      "log": "/tmp/canoli-matting-selection-regressions.log",
+      "suites": [
+        "alpha-channels",
+        "color-range",
+        "quick-selection",
+        "subject-selection"
+      ]
+    },
+    "existingRealImage50MpGate": {
+      "testsPassed": 1,
+      "fullResolutionPngExportMilliseconds": 3312,
+      "log": "/tmp/canoli-matting-editor50.log",
+      "coverage": "Real-image import, actual WASM edit, project save/reopen, full-resolution PNG export"
+    },
+    "distinctDevelopmentBrowserTestsPassed": 51,
+    "distinctBrowserTestsPassed": 74,
+    "independentFixturesRegeneratedWithIdenticalHashes": true,
+    "visualInspection": [
+      "/tmp/canoli-native-refine-600.png",
+      "/tmp/canoli-native-refine-result.png",
+      "/tmp/canoli-native-refine-edge.png"
+    ],
+    "whitespace": "git diff --check passes",
+    "finalProductionDocsRerun": {
+      "testsPassed": 2,
+      "log": "/tmp/canoli-matting-final-docs.log",
+      "includedInDistinctCount": true
+    },
+    "finalBuildLog": "/tmp/canoli-matting-final-build.log"
+  },
+  "limits": [
+    "Local Gaussian color-line estimation is not closed-form/KNN Laplacian matting; that T19 solver requirement remains open",
+    "No evaluated semantic/hair/glass/fur/foliage/translucent-fabric quality claim",
+    "Existing mask coverage is resampled at native source centers on the document pixel grid, flattening finer mask geometry",
+    "Headless supports documented PNGs and unstroked selection/bitmap input masks; no browser scene renderer or synchronization",
+    "Node bitmap bilinear alpha sampling is not universal Canvas antialias parity",
+    "Input-response observation is a queued Hand action after the first matte tile, not an interaction percentile or initial-Subject responsiveness gate",
+    "Observed long tasks remain explicit; individual runs and overlapping suites are not controlled comparative timings"
+  ]
+}

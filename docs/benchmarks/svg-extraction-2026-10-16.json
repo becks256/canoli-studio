@@ -1,0 +1,864 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T12:58:28.039211+00:00",
+  "scope": "T16/F07/F11 hierarchical SVG extraction and cooperative encoding; full roadmap incomplete",
+  "sourceSha256": {
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/core/svg-export.ts": "1b0ade303da30f2a0addfc65a9bf4c55a6111c097fe5edcb10df0de7c0bb83e4",
+    "src/core/shapes.ts": "4d4f41ccd2b2169f6927bba76002b391569d52b0395e04aaf1a15d363f685e83",
+    "src/engine/export.ts": "8ff3c6cb1b7957be1feca73ee9697245507ebdd398c1ed47674e781a5c63fe3a",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "tests/svg-export.test.ts": "fc9dad68c05374d9b219a6c8ed2365936891a5388f123b3dac85a95115cbf8d0",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/export.test.ts": "08a67996f3b0ddac00a43273a00d40e3e3a2ed2a103c764cee9bdb4990ae6c22",
+    "tests/production.e2e.ts": "8bb929e9080f2286a4ee444fd795eef6f1dbef44b18dde38a83cd85685b2d2ee",
+    "tests/export-cancellation.e2e.ts": "729a80aa8a8428538861d3b9b9476af2d5d101f5b2f8d9e9439814b2b01118dd",
+    "tests/foundation-increments.e2e.ts": "516a1ffd2201a478df0872718459bd6b3a4171de01c7ff7292c7b528ac320ca2",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "docs/SCRIPTING_API.md": "3cf478edb256cd1728d690d822dd90d03f896f31dfc84ed4d23dbc216b847d81",
+    "docs/ARCHITECTURE.md": "634138d88d17df76dbbef0a798c7af4d99cffa7c47413b34f53784300c6a78e0",
+    "docs/API.md": "4224540d4f65510ef7fe662f5f8ea2f9997dacd824258017361b56356ad5c0da",
+    "docs/REQUIREMENTS.md": "8a1e4e73cfbf4bd6bc9604222cb3da0316bba81d3a3b27e9763cee5a3b3c2e34",
+    "docs/SYSTEM_DESIGN.md": "91a6a73e619e4981424acfc05c7980d6ad65159b1477bcce20b7caa2238b981c",
+    "docs/FEATURE_STRATEGY.md": "c33cf067a13c1a124038e5ef129be44806cdf9e55a8b3df6d75c51d55e2a5519",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+    "dist/index.html": "04ee86be1b7c83449428ffa0600f0e6121456ce635bcb50c4d93ed377bbfda39"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "includes": [
+        "actual WASM compilation",
+        "isolated runtime generation",
+        "developer docs generation",
+        "TypeScript",
+        "production bundle"
+      ]
+    },
+    "unitApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": 892,
+      "files": 124,
+      "finalSnapshotImplementation": true
+    },
+    "developmentBroader": {
+      "command": "npx playwright test tests/svg-export.e2e.ts tests/export-cancellation.e2e.ts tests/foundation-increments.e2e.ts tests/editor.e2e.ts --grep 'SVG|export|Professional foundation' --reporter=line",
+      "passed": 17,
+      "stage": "hierarchical serializer, before SVG-only immutable snapshot optimization"
+    },
+    "productionBroader": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": 27,
+      "stage": "hierarchical serializer, before SVG-only immutable snapshot optimization"
+    },
+    "developmentFinal": {
+      "command": "npx playwright test tests/svg-export.e2e.ts --reporter=line",
+      "passed": 7,
+      "stage": "final SVG-only immutable snapshot optimization"
+    },
+    "productionFinal": {
+      "command": "npm run test:production -- --grep 'SVG download' --reporter=line",
+      "passed": 1,
+      "stage": "final SVG-only immutable snapshot optimization"
+    },
+    "distinctBrowserCases": 44,
+    "note": "Final SVG snapshot change is covered by the full unit suite, all seven SVG development cases and the production SVG case. Unchanged raster/50 MP/foundation and other production paths passed in the broader runs before that SVG-only optimization.",
+    "whitespace": "git diff --check passes"
+  },
+  "observations": {
+    "geometry": {
+      "matrix": [
+        0,
+        2,
+        -1,
+        1,
+        104,
+        15
+      ],
+      "bounds": [
+        92,
+        19,
+        101,
+        52
+      ],
+      "maxAlpha": 24,
+      "maxPremult": 24,
+      "interiorErrors": 0,
+      "edgeDifferences": 22,
+      "totalAlphaError": 206,
+      "oracleError": 0,
+      "pairs": [
+        [
+          101,
+          19,
+          128,
+          118
+        ],
+        [
+          99,
+          20,
+          0,
+          1
+        ],
+        [
+          100,
+          20,
+          128,
+          143
+        ],
+        [
+          99,
+          21,
+          128,
+          120
+        ],
+        [
+          98,
+          22,
+          128,
+          104
+        ],
+        [
+          97,
+          23,
+          128,
+          120
+        ],
+        [
+          96,
+          24,
+          128,
+          135
+        ],
+        [
+          94,
+          25,
+          0,
+          1
+        ]
+      ],
+      "pathCount": 1,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 8,
+      "afterRevision": 8
+    },
+    "opacity": {
+      "svg": [
+        [
+          255,
+          0,
+          0,
+          16
+        ],
+        [
+          0,
+          0,
+          255,
+          16
+        ],
+        [
+          0,
+          0,
+          255,
+          16
+        ]
+      ],
+      "png": [
+        [
+          255,
+          0,
+          0,
+          16
+        ],
+        [
+          0,
+          0,
+          255,
+          16
+        ],
+        [
+          0,
+          0,
+          255,
+          16
+        ]
+      ]
+    },
+    "blendModes": [
+      {
+        "mode": "normal",
+        "grouped": false,
+        "svg": [
+          189,
+          90,
+          193,
+          255
+        ],
+        "png": [
+          189,
+          90,
+          193,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "normal",
+        "grouped": true,
+        "svg": [
+          189,
+          90,
+          193,
+          255
+        ],
+        "png": [
+          189,
+          90,
+          193,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "multiply",
+        "grouped": false,
+        "svg": [
+          56,
+          50,
+          77,
+          255
+        ],
+        "png": [
+          56,
+          50,
+          77,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "multiply",
+        "grouped": true,
+        "svg": [
+          56,
+          50,
+          77,
+          255
+        ],
+        "png": [
+          56,
+          50,
+          77,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "screen",
+        "grouped": false,
+        "svg": [
+          208,
+          182,
+          218,
+          255
+        ],
+        "png": [
+          208,
+          182,
+          218,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "screen",
+        "grouped": true,
+        "svg": [
+          208,
+          182,
+          218,
+          255
+        ],
+        "png": [
+          208,
+          182,
+          218,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "overlay",
+        "grouped": false,
+        "svg": [
+          111,
+          109,
+          153,
+          255
+        ],
+        "png": [
+          111,
+          109,
+          153,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "overlay",
+        "grouped": true,
+        "svg": [
+          111,
+          109,
+          153,
+          255
+        ],
+        "png": [
+          111,
+          109,
+          153,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "darken",
+        "grouped": false,
+        "svg": [
+          75,
+          90,
+          101,
+          255
+        ],
+        "png": [
+          75,
+          90,
+          101,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "darken",
+        "grouped": true,
+        "svg": [
+          75,
+          90,
+          101,
+          255
+        ],
+        "png": [
+          75,
+          90,
+          101,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "lighten",
+        "grouped": false,
+        "svg": [
+          189,
+          142,
+          193,
+          255
+        ],
+        "png": [
+          189,
+          142,
+          193,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "lighten",
+        "grouped": true,
+        "svg": [
+          189,
+          142,
+          193,
+          255
+        ],
+        "png": [
+          189,
+          142,
+          193,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "color-dodge",
+        "grouped": false,
+        "svg": [
+          255,
+          219,
+          255,
+          255
+        ],
+        "png": [
+          255,
+          219,
+          255,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "color-dodge",
+        "grouped": true,
+        "svg": [
+          255,
+          219,
+          255,
+          255
+        ],
+        "png": [
+          255,
+          219,
+          255,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "color-burn",
+        "grouped": false,
+        "svg": [
+          12,
+          0,
+          52,
+          255
+        ],
+        "png": [
+          12,
+          0,
+          52,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "color-burn",
+        "grouped": true,
+        "svg": [
+          12,
+          0,
+          52,
+          255
+        ],
+        "png": [
+          12,
+          0,
+          52,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "hard-light",
+        "grouped": false,
+        "svg": [
+          162,
+          100,
+          180,
+          255
+        ],
+        "png": [
+          162,
+          100,
+          180,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "hard-light",
+        "grouped": true,
+        "svg": [
+          162,
+          100,
+          180,
+          255
+        ],
+        "png": [
+          162,
+          100,
+          180,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "soft-light",
+        "grouped": false,
+        "svg": [
+          106,
+          123,
+          132,
+          255
+        ],
+        "png": [
+          106,
+          123,
+          132,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "soft-light",
+        "grouped": true,
+        "svg": [
+          106,
+          123,
+          132,
+          255
+        ],
+        "png": [
+          106,
+          123,
+          132,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "difference",
+        "grouped": false,
+        "svg": [
+          114,
+          52,
+          92,
+          255
+        ],
+        "png": [
+          114,
+          52,
+          92,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "difference",
+        "grouped": true,
+        "svg": [
+          114,
+          52,
+          92,
+          255
+        ],
+        "png": [
+          114,
+          52,
+          92,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "exclusion",
+        "grouped": false,
+        "svg": [
+          152,
+          132,
+          140,
+          255
+        ],
+        "png": [
+          152,
+          132,
+          140,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "exclusion",
+        "grouped": true,
+        "svg": [
+          152,
+          132,
+          140,
+          255
+        ],
+        "png": [
+          152,
+          132,
+          140,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "hue",
+        "grouped": false,
+        "svg": [
+          155,
+          91,
+          158,
+          255
+        ],
+        "png": [
+          155,
+          91,
+          158,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "hue",
+        "grouped": true,
+        "svg": [
+          155,
+          91,
+          158,
+          255
+        ],
+        "png": [
+          155,
+          91,
+          158,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "saturation",
+        "grouped": false,
+        "svg": [
+          52,
+          155,
+          92,
+          255
+        ],
+        "png": [
+          52,
+          155,
+          92,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "saturation",
+        "grouped": true,
+        "svg": [
+          52,
+          155,
+          92,
+          255
+        ],
+        "png": [
+          52,
+          155,
+          92,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "color",
+        "grouped": false,
+        "svg": [
+          175,
+          76,
+          179,
+          255
+        ],
+        "png": [
+          175,
+          76,
+          179,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "color",
+        "grouped": true,
+        "svg": [
+          175,
+          76,
+          179,
+          255
+        ],
+        "png": [
+          175,
+          76,
+          179,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "luminosity",
+        "grouped": false,
+        "svg": [
+          89,
+          156,
+          115,
+          255
+        ],
+        "png": [
+          89,
+          156,
+          115,
+          255
+        ],
+        "max": 0
+      },
+      {
+        "mode": "luminosity",
+        "grouped": true,
+        "svg": [
+          89,
+          156,
+          115,
+          255
+        ],
+        "png": [
+          89,
+          156,
+          115,
+          255
+        ],
+        "max": 0
+      }
+    ],
+    "cancellation": {
+      "error": "AbortError",
+      "responded": true,
+      "encodingUpdates": 2,
+      "elapsed": 170.30000000074506,
+      "size": 169249,
+      "revision": 2,
+      "afterRevision": 2
+    },
+    "native50MpPngExportMs": 3478,
+    "native50MpGate": "Real 10000x5000 import, actual WASM edit, original compressed bytes retained, save/reopen and native-size PNG output; unaffected by final SVG-only snapshot optimization.",
+    "timingLimits": "Single container observations. Final SVG browser run overlapped unit validation. Cancellation elapsed time includes queued UI work and is not an isolated encoder benchmark, p95, input-to-photon or heap measurement. No speedup or universal responsiveness claim is made."
+  },
+  "independentOracles": [
+    "Explicit world matrix [0,2,-1,1,104,15] and occupied bounds [92,19,101,52] for composed quarter-turn plus shear/scale.",
+    "Analytic pixel area for quadrilateral (102,19),(102,43),(92,53),(92,29), including exact half-covered diagonal pixels. Decoded SVG alpha maximum error 0.",
+    "Opaque path overlap must be composited once before four nested half-opacity factors: alpha 16 in exclusive and overlapping areas.",
+    "32 actual SVG/PNG interior comparisons: all 16 blend modes, with and without isolated nested content. Maximum channel difference 0.",
+    "Magnified native fractional geometry remains visible at 10000x scale; two-decimal serialization would collapse the rectangle.",
+    "Actual DOMParser round-trip retains quoted, angle-bracket, ampersand, newline/tab and supplementary-Unicode identifiers with no injected nodes.",
+    "Real scheduled task cancellation after anchor 5000 is read and before the last of 20000 anchors; no simulated AbortSignal or dropped path samples.",
+    "Host changes during encoding replace immutable model nodes: export keeps original placement and the later change remains exactly one undo step.",
+    "Production UI SVG download is decoded through HTMLImageElement; exact opaque-color/quarter-alpha samples and hidden-subtree exclusion; one undo removes preceding script edits."
+  ],
+  "harnessCorrections": [
+    "This Chromium environment cannot decode SVG through createImageBitmap; SVG image checks use the actual HTMLImageElement decoder and Blob object URLs.",
+    "Initial direct SVG-versus-Canvas byte comparison revealed 22 edge pixel differences, maximum 24 alpha/premultiplied values. Added a strict independent analytic geometry/coverage oracle and retained bounded edge diagnostics rather than claiming byte parity. All native fully opaque/transparent pixels agree; total absolute coverage difference 206/255 of one pixel."
+  ],
+  "remaining": [
+    "SVG masks, Blend If, color overlays and drop shadows are omitted and reported.",
+    "Raster/paint/text/adjustment/smart-object contents, including embedded vector masters, are omitted and reported; omitted backdrops can change blends.",
+    "Viewer support for CSS blend modes/isolation and renderer edge differences remain interoperability limits.",
+    "Standalone layer toSvg is synchronous and in its own parent plane; no ancestor/sibling context or accompanying report.",
+    "General SVG document import/round-trip, deeper editable interchange and remaining F11 formats remain incomplete.",
+    "SVG parts/Blob construction and UI presentation still have memory/main-thread costs; no device/peak-memory/performance gate is closed.",
+    "A12 bleed/alignment/legibility/contrast/export integration and the broader editing, color/RAW, semantic/matting, AI/evaluation, workflow/collaboration/commercial/specialist roadmap remain incomplete."
+  ],
+  "localLogs": {
+    "/tmp/canoli-svg-build-final.log": {
+      "sha256": "7694f847308ca48a3d7e15ce26bfbd5672ca74558acd059cf1b9a1925d09355c",
+      "tail": [
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/Icon.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.08s"
+      ]
+    },
+    "/tmp/canoli-svg-unit-final.log": {
+      "sha256": "cb6646565552d308955b1a4ab888095b995208ddfc5bcd57f97b2358f05e13d1",
+      "tail": [
+        "",
+        "",
+        " Test Files  124 passed (124)",
+        "      Tests  892 passed (892)",
+        "   Start at  08:55:52",
+        "   Duration  60.37s (tests 75%, import 20%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  124 workers spawned \u00b7 ~118ms startup each (spawn + environment, per file)",
+        "             at least ~7.22s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-browser.log": {
+      "sha256": "5c87ffd3519bf77b532a0120acf9d57c33f87da9a094ae194ce204de102a8c32",
+      "tail": [
+        "[9/17] tests/foundation-increments.e2e.ts:163:3 \u203a Professional foundation increments (T16: F06, F07, F08, F11) \u203a F08: professional typography with font styling, weight, tracking, and direction",
+        "[10/17] tests/foundation-increments.e2e.ts:219:3 \u203a Professional foundation increments (T16: F06, F07, F08, F11) \u203a F11: multi-format export with honest capability reports",
+        "[11/17] tests/svg-export.e2e.ts:4:1 \u203a documented standalone SVG example runs in isolation without changing active work",
+        "[12/17] tests/svg-export.e2e.ts:12:1 \u203a SVG preserves nested affine geometry and matches actual native PNG pixels",
+        "[13/17] tests/svg-export.e2e.ts:54:1 \u203a SVG opacity composites overlapping paths and layers once per isolated boundary",
+        "[14/17] tests/svg-export.e2e.ts:68:1 \u203a reflected rounded paths retain fill and round stroke styling in SVG pixels",
+        "[15/17] tests/svg-export.e2e.ts:78:1 \u203a SVG CSS blend modes and group isolation match native interiors for every supported blend",
+        "[16/17] tests/svg-export.e2e.ts:102:1 \u203a SVG keeps subpixel paths visible under magnification, escapes IDs and rejects XML controls",
+        "[17/17] tests/svg-export.e2e.ts:117:1 \u203a large SVG export accepts queued cancellation during path serialization and preserves history",
+        "  17 passed (43.6s)"
+      ]
+    },
+    "/tmp/canoli-svg-browser-final.log": {
+      "sha256": "1c653712daa98822df6bf86e2a0ff5782092b290845cc64c497d7e6a8f3b2565",
+      "tail": [
+        "",
+        "",
+        "[1/7] tests/svg-export.e2e.ts:4:1 \u203a documented standalone SVG example runs in isolation without changing active work",
+        "[2/7] tests/svg-export.e2e.ts:12:1 \u203a SVG preserves nested affine geometry and matches actual native PNG pixels",
+        "[3/7] tests/svg-export.e2e.ts:54:1 \u203a SVG opacity composites overlapping paths and layers once per isolated boundary",
+        "[4/7] tests/svg-export.e2e.ts:68:1 \u203a reflected rounded paths retain fill and round stroke styling in SVG pixels",
+        "[5/7] tests/svg-export.e2e.ts:78:1 \u203a SVG CSS blend modes and group isolation match native interiors for every supported blend",
+        "[6/7] tests/svg-export.e2e.ts:102:1 \u203a SVG keeps subpixel paths visible under magnification, escapes IDs and rejects XML controls",
+        "[7/7] tests/svg-export.e2e.ts:117:1 \u203a large SVG export accepts queued cancellation during path serialization and preserves history",
+        "  7 passed (20.5s)"
+      ]
+    },
+    "/tmp/canoli-svg-production.log": {
+      "sha256": "82550879f89e3b7c1604b71b1260235ffdbba013508ecc4457d9049b64bcc68b",
+      "tail": [
+        "[19/27] tests/production.e2e.ts:793:1 \u203a production Color Range samples actual colors, applies native coverage and exports a selection mask without developer globals",
+        "[20/27] tests/production.e2e.ts:818:1 \u203a production alpha channel constructors and Inspector load native coverage and export independent masks",
+        "[21/27] tests/production.e2e.ts:835:1 \u203a production Quick Selection brush and isolated refinement export real nonrectangular masks",
+        "[22/27] tests/production.e2e.ts:874:1 \u203a production Select Subject preserves genuine source alpha through UI, isolated scripting and exported masks",
+        "[23/27] tests/production.e2e.ts:896:1 \u203a production Refine Edge exposes corrected-layer output and isolated native matting exports real corrected RGB",
+        "[24/27] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves wide-unknown with bundled workers and no developer globals",
+        "[25/27] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals",
+        "[26/27] tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers",
+        "[27/27] tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors",
+        "  27 passed (48.2s)"
+      ]
+    },
+    "/tmp/canoli-svg-production-final.log": {
+      "sha256": "7ede74288aef51bbf5ae22c3236ebd56bd3cd359897e445539aa6a90fa8bd237",
+      "tail": [
+        "",
+        "",
+        "Running 1 test using 1 worker",
+        "",
+        "(node:89998) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[1/1] tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors",
+        "  1 passed (2.7s)"
+      ]
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import {writeFile} from 'node:fs/promises';
 
 test("missing fonts warn without changing the document, and choosing a generic removes the warning", async ({
   page,
@@ -246,12 +247,16 @@ test("unsupported font enumeration retains manual family entry", async ({ page }
 
 test("real installed fonts populate the picker and change rendered text", async ({ page, context }) => {
   const cdp = await context.newCDPSession(page);
+  const {targetInfo}=await cdp.send('Target.getTargetInfo');
+  expect(targetInfo.browserContextId).toBeTruthy();
   await cdp.send("Browser.setPermission", {
     permission: { name: "local-fonts" },
     setting: "granted",
     origin: "http://127.0.0.1:5173",
+    browserContextId: targetInfo.browserContextId,
   });
   await page.goto("/");
+  expect(await page.evaluate(async()=>(await navigator.permissions.query({name:'local-fonts' as PermissionName})).state)).toBe('granted');
   await page.evaluate(() => {
     const { editor, TextLayer } = window.luma;
     editor.newDocument({ width: 400, height: 120 });
@@ -273,11 +278,15 @@ test("real installed fonts populate the picker and change rendered text", async 
   const empty = page.getByText("No fonts were shared.", { exact: false });
   await expect(page.getByRole("status").filter({ hasText: /installed font families available|No fonts were shared/ })).toBeVisible();
   test.skip(await empty.isVisible(), "This Chromium environment returns no local fonts, even with permission granted.");
+  const families=await page.evaluate(async()=>[...new Set((await (window as unknown as {queryLocalFonts():Promise<{family:string}[]>}).queryLocalFonts()).map(font=>font.family).filter(Boolean))]);
+  const options=await picker.locator('option').evaluateAll(nodes=>nodes.map(node=>(node as HTMLOptionElement).value));
+  for(const family of families)expect(options.filter(value=>value===family)).toHaveLength(1);
   // This family is installed in the Linux browser test environment.
   await expect(picker.locator('option[value="DejaVu Serif"]')).toHaveCount(1);
   await picker.selectOption("DejaVu Serif");
   expect(await pixels()).not.toEqual(before);
   await page.evaluate(() => window.luma.editor.document.undo());
   expect(await pixels()).toEqual(before);
+  await writeFile('/tmp/canoli-text-spacing-installed-fonts.json',JSON.stringify({permission:'granted',contextScoped:true,familyCount:families.length,allFamiliesPresentOnce:true,selected:'DejaVu Serif',glyphsChanged:true,undoPixelsExact:true},null,2)+'\n');
   await cdp.detach();
 });

@@ -10,7 +10,7 @@ const paths: Record<string, string> = {
   resize: "M3 3L21 21M3 9V3H9M15 21H21V15",
   rotate: "M5 9A8 8 0 1 1 5 17M2 4L5 9L10 7",
 };
-const roundTools = new Set(["brush", "pencil", "eraser", "clone", "heal", "dodge", "burn"]);
+const roundTools = new Set(["brush", "pencil", "eraser", "clone", "heal", "dodge", "burn", "quick-select"]);
 
 /** Screen-space cursor; pointer movement updates one DOM node, never the editor tree. */
 export function CanvasCursor({ viewport, enabled, tool, spacePan, size, zoom }: {

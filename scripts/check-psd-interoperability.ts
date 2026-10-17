@@ -49,9 +49,11 @@ for case in cases:
     with Image.open(case['path']) as image:
         assert image.size==(case['width'],case['height']), case['name']+' dimensions'
         pixels=list(image.convert('RGBA').tobytes())
-        assert pixels==case['expected'], case['name']+' composite pixels differ'
-        results.append({'fixture':case['name'],'sha256':case['sha256'],'width':image.width,'height':image.height,'exactCompositeRGBA':True})
-print(json.dumps({'reader':'Pillow','version':__version__,'results':results,'limitations':'Composite pixel decoding only; does not prove editable layer semantics, blend modes other than normal/multiply, effects, ICC conversion, or Photoshop compatibility.'},indent=2))
+        expected=case['expected']
+        matted=[(round(expected[i]*expected[i-i%4+3]/255+255-expected[i-i%4+3]) if i%4<3 else expected[i]) for i in range(len(expected))]
+        assert pixels==matted, case['name']+' white-matted preview channels differ'
+        results.append({'fixture':case['name'],'sha256':case['sha256'],'width':image.width,'height':image.height,'exactWhiteMattedMergedChannels':True})
+print(json.dumps({'reader':'Pillow','version':__version__,'results':results,'limitations':'Stored white-matted preview channel decoding only; does not prove editable layer semantics, blend modes other than normal/multiply, effects, ICC conversion, or Photoshop compatibility.'},indent=2))
 `,manifest],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']});
   if(result.error)throw result.error;
   if(result.status!==0)throw new Error(result.stderr||'Independent PSD check failed');

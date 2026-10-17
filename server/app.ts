@@ -1,12 +1,29 @@
+import { captureVectorBoolean, vectorBooleanSelectionSchema } from '../src/core/vector-boolean';
+import { prepareServerVectorBoolean } from './vector-boolean';
 import { z } from "zod";
+import {prepareServerMatting} from './matting';
+import {refineEdgeOptionsSchema} from '../src/core/matting';
+import {preflightOptionsSchema} from '../src/core/preflight';
+import {prepareServerPreflight} from './preflight';
+import { prepareServerSubject } from './subject-selection';
+import { selectSubjectOptionsSchema, subjectSource } from '../src/core/subject-selection';
+import { transformSelection } from '../src/core/drawing';
+import { AffineTransform } from '../src/core/affine';
+import { prepareServerSelection, prepareServerChannelSelection } from "./selection";
+import { channelLoadSchema } from '../src/core/alpha-channels';
+import { prepareServerColorRange } from "./color-range";
+import { prepareServerQuickSelection } from './quick-selection';
+import { quickSelectionOptionsSchema } from '../src/core/quick-selection';
+import { colorRangeOptionsSchema } from "../src/core/color-range";
+import { selectionModificationSchema } from "../src/core/selection-modification";
 import { tonalSculptSchema } from "../src/core/retouch/tonal-sculpt";
 import { encodeRgbaPng } from "../src/engine/png";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { timingSafeEqual } from "node:crypto";
-import { Document, LayerGroup, RasterLayer } from "../src/dom";
+import { Document, LayerGroup, RasterLayer, VectorLayer } from "../src/dom";
 import { AssetStore } from "../src/core/assets";
-import { BLEND_MODES, id } from "../src/core/model";
+import { BLEND_MODES, id, findLayer } from "../src/core/model";
 import {
   commandRequestSchema,
   createDocumentSchema,
@@ -77,6 +94,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
   const idempotencyJobs = new Map<string, ServerJob>();
   const jobSignatures = new Map<string, string>();
   const controllers = new Map<string, AbortController>();
+  const selectionControllers = new Map<AbortController, string>();
 
   const pruneJobs = () => {
     if (allJobs.size <= 100) return;
@@ -239,7 +257,78 @@ export function createApiServer(options: ApiServerOptions = {}) {
           const document = new Document(
             createDocumentSchema.parse(await body(request)),
           );
+          document._prepareSelectionModification = async (settings,control) => {
+            const selection = await prepareServerSelection({...settings,selection:document.getSnapshot().document.selection!,width:document.width,height:document.height},control.signal ?? new AbortController().signal);
+            if (!sessions.has(document.id)) throw new Error("Document was deleted.");
+            return selection;
+          };
+          document._prepareVectorBoolean=async(selection,control)=>{
+            const snapshot=document.getSnapshot(),request=captureVectorBoolean(snapshot.document,selection).request,abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==snapshot.revision)abort.abort(new Error('Document changed during the Boolean operation.'));});
+            try{const result=await prepareServerVectorBoolean(request,{signal:abort.signal,onProgress:control.onProgress});if(!sessions.has(document.id))throw new Error('Document was deleted.');return result;}
+            finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+          };
+          document._prepareChannelLoad=async(settings,control)=>{
+            const snapshot=document.getSnapshot(),channel=snapshot.document.alphaChannels?.find(entry=>entry.id===settings.id);
+            if(!channel)throw new Error('Alpha channel not found.');
+            const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==snapshot.revision)abort.abort(new Error('Document changed while loading its alpha channel.'));});
+            try{
+              const selection=await prepareServerChannelSelection({operation:settings.operation,invert:settings.invert,selection:channel.selection,base:snapshot.document.selection??null,width:document.width,height:document.height},abort.signal);
+              if(!sessions.has(document.id))throw new Error('Document was deleted.');return selection;
+            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+          };
           const assets = new AssetStore();
+          document._preflight=async(options,control)=>{
+            const snapshot=document.getSnapshot(),originals=assets.values(),alive=assets.captureLifetime();
+            const report=await prepareServerPreflight(snapshot.document,snapshot.revision,options,originals.map(asset=>[asset.id,{width:asset.width,height:asset.height}]),control.signal??new AbortController().signal);
+            alive();if(!sessions.has(document.id))throw new Error('Document was deleted during design checks.');for(const asset of originals)if(assets.get(asset.id)!==asset)throw new Error('Source assets changed during design checks.');return report;
+          };
+          document._prepareMatting=async(request,control)=>{
+            const snapshot=document.getSnapshot(),alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+            const source=findLayer(snapshot.document,request.layerId),keys=new Set<string>();if(source?.kind==='raster')keys.add(source.assetId);if(source?.mask?.kind==='bitmap')keys.add(source.mask.assetId);if(request.options.trimapAssetId)keys.add(request.options.trimapAssetId);
+            const originals=new Map([...keys].map(key=>[key,assets.get(key)]));
+            const check=()=>{abort.signal.throwIfAborted();alive();if(!sessions.has(document.id)||document.getSnapshot().revision!==snapshot.revision)throw new Error('Document changed during matting.');for(const [key,asset] of originals)if(assets.get(key)!==asset)throw new Error('Matting source changed.');};
+            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==snapshot.revision)abort.abort(new Error('Document changed during matting.'));});
+            try{return await prepareServerMatting(snapshot.document,assets,request,abort.signal,check,()=>document.getSnapshot().revision!==snapshot.revision);}
+            finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+          };
+          document._prepareSubject=async(settings,control)=>{
+            const source=subjectSource(document.getSnapshot().document,settings,id=>assets.get(id)),asset=assets.get(source.assetId),revision=document.getSnapshot().revision;
+            const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during Select Subject.'));});
+            try{
+              const selection=await prepareServerSubject(settings,asset,abort.signal);
+              if(!sessions.has(document.id)||assets.get(asset.id)!==asset)throw new Error('Select Subject source session changed.');
+              return transformSelection(selection,AffineTransform.fromJSON(source.transform))!;
+            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+          };
+          document._prepareQuickSelection=async(settings,control)=>{
+            if(settings.source.kind!=='asset')throw new Error('Headless Quick Selection requires an explicit PNG asset source.');
+            const asset=assets.get(settings.source.assetId),revision=document.getSnapshot().revision,abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during Quick Selection.'));});
+            try{
+              const selection=await prepareServerQuickSelection(settings,asset,document.width,document.height,abort.signal);
+              if(!sessions.has(document.id)||assets.get(asset.id)!==asset)throw new Error('Quick Selection source session changed.');return selection;
+            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+          };
+          document._prepareColorRange=async(settings,control)=>{
+            if(settings.source.kind!=='asset')throw new Error('Headless Color Range requires source.kind asset; browser composite/layer rendering is unavailable.');
+            const asset=assets.get(settings.source.assetId);
+            const revision=document.getSnapshot().revision,abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+            control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+            const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during Color Range sampling.'));});
+            try{
+              const selection=await prepareServerColorRange(settings,asset,document.width,document.height,abort.signal);
+              if(!sessions.has(document.id)||assets.get(asset.id)!==asset)throw new Error('Color Range source session changed.');
+              return selection;
+            }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
+          };
           sessions.set(document.id, { document, assets });
           send(response, 201, snapshot(document));
           return;
@@ -278,7 +367,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
 
       // Document scoped endpoints: /api/v1/documents/:id/...
       const docMatch = path.match(
-        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|assets|jobs|apply-candidate|tonal-sculpt))?(?:\/([^/]+))?$/,
+        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
         send(response, 404, { error: "Document or endpoint not found." });
@@ -289,6 +378,106 @@ export function createApiServer(options: ApiServerOptions = {}) {
       const document = session.document;
       const subresource = docMatch[2];
       const subresourceId = docMatch[3];
+      if(subresource==='preflight'&&!subresourceId&&method==='POST'){
+        const parsed=z.object({...revisionSchema.shape,options:preflightOptionsSchema.optional()}).strict().parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        if(selectionControllers.size>=4){send(response,409,{error:'Inspection workers are busy. Retry after an active operation finishes.'});return;}
+        const abort=new AbortController();selectionControllers.set(abort,document.id);const cancel=()=>{if(!response.writableEnded)abort.abort(new Error('Design-check request disconnected.'));};response.on('close',cancel);
+        const unsubscribe=document.subscribe(()=>{if(document.getSnapshot().revision!==revision)abort.abort(new Error('Document changed during design checks.'));});
+        try{send(response,200,{report:await document.preflight(parsed.options,{signal:abort.signal})});}
+        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during design checks.',revision:document.getSnapshot().revision});else throw error;}
+        finally{unsubscribe();selectionControllers.delete(abort);response.off('close',cancel);}return;
+      }
+      if(subresource==='refine-edge'&&!subresourceId&&method==='POST'){
+        const parsed=z.object({...revisionSchema.shape,layerId:z.string().min(1).max(240),options:z.unknown().optional()}).strict().parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        const options=refineEdgeOptionsSchema.parse(parsed.options??{}),layer=document.getLayer(parsed.layerId);if(!(layer instanceof RasterLayer))throw new Error('Refine Edge requires a raster layer.');
+        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
+        const abort=new AbortController();selectionControllers.set(abort,document.id);const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
+        try{await layer.refineEdge(options,{signal:abort.signal});send(response,200,snapshot(document));}
+        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
+        finally{selectionControllers.delete(abort);response.off('close',close);}return;
+      }
+      if(subresource==='select-subject'&&!subresourceId&&method==='POST'){
+        const parsed=selectSubjectOptionsSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
+        const {expectedRevision,...settings}=parsed,abort=new AbortController();selectionControllers.set(abort,document.id);
+        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
+        try{await document.selectSubject(settings,{signal:abort.signal});send(response,200,snapshot(document));}
+        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
+        finally{selectionControllers.delete(abort);response.off('close',close);}return;
+      }
+      if(subresource==='quick-selection'&&!subresourceId&&method==='POST'){
+        const parsed=quickSelectionOptionsSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
+        const {expectedRevision,...settings}=parsed,abort=new AbortController();selectionControllers.set(abort,document.id);
+        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
+        try{await document.selectQuickSelection(settings,{signal:abort.signal});send(response,200,snapshot(document));}
+        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
+        finally{selectionControllers.delete(abort);response.off('close',close);}return;
+      }
+      if(subresource==='alpha-channel-load'&&!subresourceId&&method==='POST'){
+        const parsed=channelLoadSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
+        const {expectedRevision,id,...settings}=parsed,channel=document.alphaChannels.getById(id);
+        if(!channel)throw new Error('Alpha channel not found.');
+        const abort=new AbortController();selectionControllers.set(abort,document.id);
+        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
+        try{await channel.load(settings,{signal:abort.signal});send(response,200,snapshot(document));}
+        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
+        finally{selectionControllers.delete(abort);response.off('close',close);}return;
+      }
+      if(subresource==='color-range'&&!subresourceId&&method==='POST'){
+        const parsed=colorRangeOptionsSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        if(selectionControllers.size>=4){send(response,409,{error:'Selection workers are busy. Retry after an active operation finishes.'});return;}
+        const {expectedRevision,...settings}=parsed,abort=new AbortController();selectionControllers.set(abort,document.id);
+        const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
+        try{await document.selectColorRange(settings,{signal:abort.signal});send(response,200,snapshot(document));}
+        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
+        finally{selectionControllers.delete(abort);response.off('close',close);}return;
+      }
+      if(subresource==='vector-boolean'&&!subresourceId&&method==='POST'){
+        const parsed=vectorBooleanSelectionSchema.extend(revisionSchema.shape).parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        if(selectionControllers.size>=4){send(response,409,{error:'Native workers are busy. Retry after an active operation finishes.'});return;}
+        const paths=parsed.operands.map(ref=>{const layer=document.getLayer(ref.layerId);if(!(layer instanceof VectorLayer))throw new Error('Select vector layers.');const path=layer.paths.get(ref.pathId);if(!path)throw new Error('Boolean operand path not found.');return path;});
+        const abort=new AbortController();selectionControllers.set(abort,document.id);const close=()=>{if(!response.writableEnded)abort.abort(new Error('Client disconnected.'));};response.on('close',close);
+        try{const path=await document.combinePaths(parsed.operation,paths,{signal:abort.signal});send(response,200,{...snapshot(document),result:path?{layerId:parsed.operands[0].layerId,pathId:path.id}:null});}
+        catch(error){if(document.getSnapshot().revision!==revision)send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});else throw error;}
+        finally{selectionControllers.delete(abort);response.off('close',close);}return;
+      }
+      if (subresource === "selection-modify" && !subresourceId && method === "POST") {
+        const parsed = selectionModificationSchema.extend(revisionSchema.shape).parse(await body(request));
+        const revision = document.getSnapshot().revision;
+        if (parsed.expectedRevision !== revision) {
+          send(response,409,{error:"Revision conflict. Read the document and retry.",revision});
+          return;
+        }
+        if (selectionControllers.size >= 4) {
+          send(response,409,{error:"Selection workers are busy. Retry after an active operation finishes."});
+          return;
+        }
+        const abort = new AbortController();
+        selectionControllers.set(abort,document.id);
+        const close = () => { if (!response.writableEnded) abort.abort(new Error("Client disconnected.")); };
+        response.on("close",close);
+        try {
+          await document.modifySelection({operation:parsed.operation,radius:parsed.radius},{signal:abort.signal});
+          if (!sessions.has(document.id)) throw new Error("Document was deleted.");
+          send(response,200,snapshot(document));
+        } catch (error) {
+          if (document.getSnapshot().revision !== revision) send(response,409,{error:"Revision conflict. Read the document and retry.",revision:document.getSnapshot().revision});
+          else throw error;
+        } finally {
+          selectionControllers.delete(abort);
+          response.off("close",close);
+        }
+        return;
+      }
 
       // GET /api/v1/documents/:id
       if (!subresource && method === "GET") {
@@ -318,6 +507,8 @@ export function createApiServer(options: ApiServerOptions = {}) {
           }
         }
         sessions.delete(document.id);
+        for (const [controller,documentId] of selectionControllers)
+          if (documentId === document.id) controller.abort(new Error("Document was deleted."));
         send(response, 200, { deleted: document.id });
         return;
       }
@@ -791,6 +982,8 @@ export function createApiServer(options: ApiServerOptions = {}) {
     }
   });
   server.on("close", () => {
+    for (const controller of selectionControllers.keys()) controller.abort(new Error("Server closed"));
+    selectionControllers.clear();
     for (const controller of controllers.values())
       controller.abort(new Error("Server closed"));
     controllers.clear();

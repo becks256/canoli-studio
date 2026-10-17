@@ -453,14 +453,16 @@ export class RecipeRecorder {
         break;
       }
 
+      case "selection.polygon":
       case "selection.set": {
+        const selection = command.type === "selection.polygon" ? afterDoc.selection : command.selection;
         this.steps.push({
           id: `step-${id()}`,
-          name: command.selection ? "Set Selection" : "Clear Selection",
+          name: selection ? "Set Selection" : "Clear Selection",
           action: {
             type: "selection.set",
-            selection: command.selection
-              ? structuredClone(command.selection)
+            selection: selection
+              ? structuredClone(selection)
               : null,
           },
         });

@@ -226,9 +226,9 @@ test("internal vector and text drawing applies full matrices and transformed cul
         drawVectors(vector, actual, space, world);
         context.beginPath();
         context.moveTo(300, 10);
-        context.bezierCurveTo(300, 10, 340, 10, 340, 10);
-        context.bezierCurveTo(340, 10, 300, 40, 300, 40);
-        context.bezierCurveTo(300, 40, 300, 10, 300, 10);
+        context.lineTo(340,10);
+        context.lineTo(300,40);
+        context.lineTo(300,10);
         context.closePath();
         context.fillStyle = "#c04080";
         context.fill();

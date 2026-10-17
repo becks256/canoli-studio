@@ -16,6 +16,17 @@ import {
 
 import { CanvasCache } from "./cache";
 
+/** Shared final coverage settings, after raw feathering and before masking artwork. */
+export function applyMaskSettings(canvas:HTMLCanvasElement,mask:LayerMaskData){
+  const context=canvas.getContext('2d')!;context.save();
+  try{
+    context.fillStyle='#ffffff';
+    if(mask.inverted){context.globalCompositeOperation='xor';context.fillRect(0,0,canvas.width,canvas.height);}
+    context.globalCompositeOperation='destination-over';context.globalAlpha=1-mask.density;
+    context.fillRect(0,0,canvas.width,canvas.height);
+  }finally{context.restore();}
+}
+
 /** Finished coverage shares the viewport LRU; raw active stamps have a separate bounded LRU. */
 export class PaintedMaskRaster {
   private active = new Map<

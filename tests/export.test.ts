@@ -122,8 +122,9 @@ describe("multi-format export engine with capability reports (F11)", () => {
     expect(svgReport.featuresPreserved).toContain(
       "Infinitely scalable Bézier vector paths",
     );
-    expect(svgReport.warnings.some((w) => w.includes("omitted"))).toBe(true);
-    expect(svgReport.featuresDegradedOrOmitted).toContain("Text layers");
+    expect(svgReport.warnings.some((w) => w.includes("without embedding font files"))).toBe(true);
+    expect(svgReport.featuresDegradedOrOmitted).not.toContain("Text layers");
+    expect(svgReport.featuresPreserved.join(' ')).toContain('Editable SVG text');
 
     // PSD Report
     const psdReport = getExportCapabilityReport(docData, { format: "psd" });
@@ -132,6 +133,16 @@ describe("multi-format export engine with capability reports (F11)", () => {
       "Layer opacity and blend modes",
     );
     expect(psdReport.warnings.some((w) => w.includes("rasterized"))).toBe(true);
+
+    for (const tiffVariant of ['auto', 'classic', 'big'] as const) {
+      const report = getExportCapabilityReport(docData, {format: 'tiff', tiffVariant});
+      expect(report.format).toBe('tiff');
+      expect(report.featuresPreserved).toContain('Unassociated RGBA transparency');
+      expect(report.featuresPreserved).toContain('Embedded output sRGB ICC profile');
+      expect(report.warnings.join(' ')).toMatch(/flattened.*72 DPI/);
+      expect(report.featuresDegradedOrOmitted.join(' ')).toContain('CMYK/HDR');
+    }
+    expect(() => getExportCapabilityReport(docData, {format: 'tiff', tiffVariant: 'invalid' as 'auto'})).toThrow(/container/);
   });
 
   it("exports document to standalone SVG with clean path representations", async () => {
@@ -156,6 +167,24 @@ describe("multi-format export engine with capability reports (F11)", () => {
     expect(text).toContain("<path ");
     expect(text).toContain('fill="#0000ff"');
     expect(text).toContain('stroke="#00ff00"');
+  });
+
+  it("pins the immutable SVG snapshot while later host edits remain undoable", async () => {
+    const editor = new EditorApplication();
+    const layer = editor.document.layers.add(new VectorLayer({x:10}));
+    layer.paths.add(VectorPath.rectangle({x:0,y:0,width:20,height:20}));
+    const revision = editor.document.getSnapshot().revision;
+    let changed = false;
+    const pending = editor.export({format:"svg"}, {onProgress: progress => {
+      if (progress.phase === "encoding" && !changed) {changed = true;layer.x = 90;}
+    }});
+    const text = await (await pending).blob.text();
+    expect(changed).toBe(true);
+    expect(text).toContain('matrix(1 0 0 1 10 0)');
+    expect(text).not.toContain('matrix(1 0 0 1 90 0)');
+    expect(layer.x).toBe(90);
+    expect(editor.document.getSnapshot().revision).toBe(revision + 1);
+    editor.document.undo();expect(layer.x).toBe(10);
   });
 
   it("exports document to PNG and JPEG through editor export API", async () => {

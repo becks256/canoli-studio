@@ -1,0 +1,3877 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T19:57:39.240139+00:00",
+  "scope": "T16/F07/F11 editable linear/radial vector fill paint and inert SVG gradient import/export; full professional-editor roadmap remains active and incomplete",
+  "versions": {
+    "document": 23,
+    "projectContainer": 3,
+    "workspaceSnapshot": 2
+  },
+  "implementation": {
+    "nativePaint": "Optional nullable path.fillGradient value overrides retained solid fill; linear endpoints or radial start/end circles, 2-32 nondecreasing hex/opacity stops with hard transitions, and optional independent invertible affine paint transform",
+    "validation": "Strict finite coordinate/radius/stop/opacity/transform validation and defensive input/output ownership; OO constructors/factories/attached setters and shared commands/history/locks/revision checks; separate headless REST conformance",
+    "migration": "Valid v1-v22 documents/history upgrade without injecting paint; earlier labels containing fillGradient reject outside the immutable validation cache; original sources/project/workspace formats unchanged",
+    "rendering": "Trace geometry under world placement, then fill with world*paint transform active; restore state before subsequent stroke/path. Existing GPU reference uploads/cache keys retain paint. Native tile origins cannot reset gradients",
+    "ui": "Native Solid/Linear/Radial selector, color/position/opacity stops, live opacity Slider and precise numeric value, preview Escape cancellation, insertion including coincident stops, removal/reversal, local geometry and disclosed affine matrix fields; shared undo/locks",
+    "svgExport": "Validated editable paint servers with user-space coordinates, ordered opacity stops, full matrix, encoded-sRGB interpolation and document-scoped generated IDs",
+    "svgImport": "Inert local template geometry, supported numeric/object-box/user-space/viewport lengths, actual cubic extrema excluding stroke, normalized SVG stop offsets, own interpolation property and explicit non-inherited stop-property computation in the chosen definition tree",
+    "cssStops": "Preserve unpremultiplied RGB at zero/low alpha using native relative sRGB conversion and canonical RGB/sRGB fallback; out-of-sRGB/unrepresentable colors require explicit flattening",
+    "sourceIsolation": "No source image mutation, MP/file-size import cutoff, new service/provider, install-time execution, plugin grant, isolated file/network/asset-byte privilege or REST/browser synchronization",
+    "recipes": "Existing layer-add templates retain paint values; standalone path-update recording remains explicitly unsupported"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "result": "actual WASM/runtime/developer-doc generation, TypeScript and production bundling passed"
+    },
+    "unit": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": 999,
+      "files": 134,
+      "newGradientInvariantCases": 9,
+      "newRestCases": 1
+    },
+    "development": {
+      "command": "npx playwright test tests/svg- tests/vector-strokes.e2e.ts tests/vector-gradients.e2e.ts tests/webgpu.e2e.ts tests/affine-render.e2e.ts tests/editor.e2e.ts tests/adjustments.e2e.ts tests/gradient-map.e2e.ts tests/chromatic-adjustments.e2e.ts tests/recipes.e2e.ts tests/foundation-increments.e2e.ts tests/tools.e2e.ts tests/vector-construction-latency.e2e.ts",
+      "passed": 353,
+      "casesByFile": {
+        "tests/adjustments.e2e.ts": 8,
+        "tests/affine-render.e2e.ts": 4,
+        "tests/chromatic-adjustments.e2e.ts": 6,
+        "tests/editor.e2e.ts": 8,
+        "tests/foundation-increments.e2e.ts": 4,
+        "tests/gradient-map.e2e.ts": 7,
+        "tests/recipes.e2e.ts": 13,
+        "tests/svg-composition.e2e.ts": 43,
+        "tests/svg-export.e2e.ts": 7,
+        "tests/svg-images.e2e.ts": 16,
+        "tests/svg-import.e2e.ts": 31,
+        "tests/svg-masks.e2e.ts": 20,
+        "tests/svg-paint.e2e.ts": 28,
+        "tests/svg-smart.e2e.ts": 26,
+        "tests/svg-styles.e2e.ts": 16,
+        "tests/svg-text.e2e.ts": 33,
+        "tests/tools.e2e.ts": 10,
+        "tests/vector-construction-latency.e2e.ts": 4,
+        "tests/vector-gradients.e2e.ts": 30,
+        "tests/vector-strokes.e2e.ts": 21,
+        "tests/webgpu.e2e.ts": 18
+      },
+      "newGradientFileCases": 30,
+      "softwareGpuFileCases": 18
+    },
+    "production": {
+      "command": "npm run test:production",
+      "passed": 37,
+      "newCase": "Verbatim documented constructor example through isolated Scripts, real inspector and SVG/PNG downloads, independent color samples, one edit undo plus whole-script undo, and editable SVG reimport; no developer globals"
+    },
+    "seo": {
+      "command": "npx vitest run tests/seo.test.ts",
+      "passed": 5
+    },
+    "typecheck": "npx tsc -b passed",
+    "gitDiffCheck": "passed",
+    "selectedDistinctBrowserCases": 390
+  },
+  "nativeComparisons": {
+    "fixtures": 11,
+    "svgByteExactModes": [
+      "linear",
+      "hard-stops",
+      "radial",
+      "focal",
+      "two-circle",
+      "outside-focal",
+      "radial-transform",
+      "paint-transform",
+      "reset"
+    ],
+    "maxCanvasAlpha": 2,
+    "maxCanvasPremult": 2,
+    "maxSvgAlpha": 2,
+    "maxSvgPremult": 2,
+    "allNativePngAfterSvgReimportExact": true,
+    "allProjectJsonReopensExact": true
+  },
+  "importComparisons": {
+    "fixtures": 15,
+    "maxAlpha": 62,
+    "maxPremult": 48.35294117647061,
+    "maxOpaqueInteriorPremult": 0,
+    "maxAreaError": 0.00028460202245796887,
+    "maxCentroidErrorPx": 0.0270194501494162,
+    "method": "Retain raw alpha/premultiplied residuals. Require direct interior color agreement; require whole-image premultiplied maxima <=2 for rectangular fixtures. Curved path antialiasing uses independent interior, silhouette, area and centroid checks; not universal pixel equality."
+  },
+  "observations50MP": {
+    "elapsed": 2589.6999999955297,
+    "bytes": 13402129,
+    "dimensions": [
+      10000,
+      5000
+    ],
+    "sourceUnchanged": true,
+    "samples": [
+      [
+        254,
+        0,
+        0,
+        255
+      ],
+      [
+        203,
+        0,
+        53,
+        255
+      ],
+      [
+        202,
+        0,
+        52,
+        255
+      ],
+      [
+        127,
+        0,
+        127,
+        255
+      ],
+      [
+        1,
+        0,
+        255,
+        255
+      ]
+    ],
+    "tiles": 395,
+    "released": true
+  },
+  "limitations": [
+    "Full F07/F11 and the overall roadmap remain incomplete. Boolean/richer vector/type/brush/color/RAW/AI/workflow/commercial/specialist requirements and broader interchange/device/performance gates remain.",
+    "Only encoded 8-bit sRGB stop colors and pad spread are native. Repeat/reflect, gradient strokes, linearRGB interpolation, out-of-sRGB/HDR/unavailable CSS conversion, degenerate rejected native geometry and unsupported CSS/paint graphs require explicit flattening.",
+    "Absolute-unit object-box lengths and viewport gradient percentages with an offset viewBox remain explicit flatten cases. XML/template identity and dynamic/shared definitions are not archived; converted object-box coordinates are native local values.",
+    "Template colors follow the tested Chromium definition tree; SVG2 shadow-style inheritance may differ in other viewers. Two-circle/outside-focal radial behavior depends on viewer SVG2 support. Actual old browsers and hardware GPU presentation remain unverified.",
+    "Curved/affine/mask edges retain raw raster differences. Direct interior color, silhouette and source geometry checks constrain errors without claiming universal viewer pixel identity or a browser-internal cause.",
+    "Relative-color absence is emulated by a real Canvas setter override with restoration; this is not actual legacy-browser acceptance. Software GPU reads premultiplied RGBA8; Canvas/PNG is straight RGBA8.",
+    "50 MP elapsed time is a single local observation, not p95/input-to-photon/long-task/peak-memory/device speed or controlled speedup evidence. Native output uses bounded tiles; resident source bitmaps and viewer PNG decode still consume substantial memory.",
+    "Standalone path-update recipe recording and wider mask/style graph reimport remain explicitly unsupported; native/project mask composition is verified separately."
+  ],
+  "validationStages": [
+    "Initial focused unit test used exact floating-point equality for a quadratic extremum (49.99999999999999 vs 50); corrected to a tight numeric bound without rounding geometry. Final analytical cubic two-root/ID-collision checks are included.",
+    "Initial browser run: 12/16 passed. Actual paint-transform restoration lost linear gradient coordinates; the fill now runs with paint transform active. Old geometry-only residual checks were too loose for radial color fields, so direct interior and whole-image premultiplied gates were added.",
+    "Corrected initial 16 browser cases passed; expanded radial/focal/CSS/preview/crop/mask/GPU coverage afterward. A Slider numeric-label test locator was updated to its actual accessible value name, and preview values now follow the live command without committing artwork.",
+    "A TypeScript mask fixture called an unimplemented ellipse factory; corrected to the actual MarqueeSelection constructor before runtime verification.",
+    "An earlier 345-case broad run was deliberately stopped for an actual CSS transparent-stop RGB bug; it had 86 passes, two stale schema-22 assertion failures, one interrupted and 256 unrun. Those two expected-version assertions now match current schema 23. This is not counted as final coverage.",
+    "Read-only browser proof showed source center [126,0,128,128] vs incorrect native [0,0,128,128] for transparent red CSS stop. Fixed unpremultiplied conversion and verified exact visible pixels, low/modern alpha and canonical fallback; unrepresentable gamut rejects before publication.",
+    "Initial stop/template inheritance fixtures: two passed/two failed. Corrected non-inherited stop defaults and separated own CSS interpolation from template geometry; all eight color/inheritance cases passed. Case-insensitive/whitespace CSS keywords are covered in final unit/browser cases.",
+    "Final 999 unit/API, full selected development, complete production, build/typecheck/SEO and whitespace checks pass. Source and runtime hashes are retained; no roadmap completion claim."
+  ],
+  "primaryReferences": [
+    "https://www.w3.org/TR/SVG2/pservers.html",
+    "https://www.w3.org/TR/SVG/latest/pservers.html",
+    "https://html.spec.whatwg.org/multipage/canvas.html#fill-and-stroke-styles"
+  ],
+  "environment": {
+    "node": "v24.0.1",
+    "platform": "linux",
+    "arch": "x64",
+    "chromiumExecutable": "/home/kestrel/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+    "chromium": "Google Chrome for Testing 153.0.8010.12"
+  },
+  "priorEvidenceUnchanged": {
+    "docs/benchmarks/vector-strokes-2026-10-16.json": {
+      "sha256": "475399a24695f5d9a4ba7657287ab9379c3d477ea44db382c0430cb48047ed5a",
+      "bytes": 143308
+    },
+    "docs/benchmarks/svg-import-2026-10-16.json": {
+      "sha256": "10f91299bd259bc5c6f8f73c320376fc1782ff8c4f0d0814797119afb83cbc21",
+      "bytes": 67054
+    }
+  },
+  "proseOnlyRefreshRuntimeProof": {
+    "allHashIdentical": true,
+    "artifacts": 13,
+    "hashes": {
+      "dist/appearance.js": "977e730925c6ab00dc344ab02aac27b3cfc2fed6084bd97be02326677fcdd76c",
+      "dist/developer/docs.css": "f8cb8902b3322ab4d12b252116ae4291630c72970138e48850f397eac0fdf933",
+      "dist/assets/preflight.worker-CZ6EZXnv.js": "c58e06b96115404aa108293a0f74751548164977d462871a1116c988fa5f4460",
+      "dist/assets/selection-outline.worker-Dj42pVuC.js": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+      "dist/assets/lut-import.worker-BtkofYSH.js": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+      "dist/assets/index-Ce5vHEBt.js": "c76be21adf4eea8ccead21ae48d8cb590ead5978ff1759adc4ed39cf16a18843",
+      "dist/assets/svg-import.worker-K4DYnHN8.js": "837c3a039c88bcf8cb1b784d973d71912835958dabc22a854744a88500f831de",
+      "dist/assets/project-encoder.worker-BEarW-XH.js": "1e9ee2d3a9e97edad4511aaa2766601b882e20c373faef710084cae783fe14e3",
+      "dist/assets/recovery-persistence.worker-DqDukTHn.js": "0da1cdad1bcc0b2a8b403d5c74209dfb02e39e0c3590d99ab2d9820e934961b8",
+      "dist/assets/pixels.worker-B3JX_AyS.js": "e13423de9bbc23d5346f660ee06ad1443945482071eb500404dcf87b0c3cff37",
+      "dist/assets/index-rxMNJI9e.css": "ae09e3d7d46b647a126df31d7ba5aeff865e6f2daf90eb67d3430680028503de",
+      "dist/assets/metadata.worker-o3DLPB-X.js": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+      "dist/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+    }
+  },
+  "sourceHashes": {
+    "package.json": {
+      "sha256": "ebbffd2baffc9067f316e9b9981236807e72923fd1688e80b533f90961ea6cde",
+      "bytes": 1706
+    },
+    "package-lock.json": {
+      "sha256": "0d2eb89a088c750ca3c9e6a09d88b6a11c34aff79be1b0446662f7937951625f",
+      "bytes": 72411
+    },
+    "src/core/vector-gradient.ts": {
+      "sha256": "c701d6c239ab94f9d33613ec2b0ab0c9546e33c62038442f270874928e083ac2",
+      "bytes": 2009
+    },
+    "src/core/vector-stroke.ts": {
+      "sha256": "843129ba4e9dfabbdfb667d6a92655a1b5f3e9948f1c8e8bda974962f45f739a",
+      "bytes": 2392
+    },
+    "src/core/bezier-bounds.ts": {
+      "sha256": "7f1d24243daaf7266ea45af1ea6faf1388a27d1a29743c97a04b01cccde06f66",
+      "bytes": 1455
+    },
+    "src/core/svg-gradient-import.ts": {
+      "sha256": "ed291c37fb2a819fd661b4abf174565976756e33f30f94de9d2c51f3a3037f69",
+      "bytes": 7530
+    },
+    "src/core/drawing.ts": {
+      "sha256": "560dd1a20e8943a43ab85042158993bcf3e7440e29a6d9f957883b7dbde9e54b",
+      "bytes": 10799
+    },
+    "src/core/model.ts": {
+      "sha256": "3ef7a725cca042a992e4788476fd683f2d628fd44097e0e6a2ba154a089ca85c",
+      "bytes": 27161
+    },
+    "src/core/commands.ts": {
+      "sha256": "dd6c793b5cd34cfa11564eac0a5c909be232c379ac3a22d29ee9ae84090cda55",
+      "bytes": 30973
+    },
+    "src/core/validation.ts": {
+      "sha256": "ff465a122933663e774eb7eeaa0ca61d56f8b96c1aa905ff34c0bfc9b65845ef",
+      "bytes": 10640
+    },
+    "src/core/store.ts": {
+      "sha256": "ffb875003fd52c8745b3b18c20e8384fb905c34d1e5ac1cdbea2ef7087883e64",
+      "bytes": 5245
+    },
+    "src/core/shapes.ts": {
+      "sha256": "50e47a6780fd224ca7ac4deddfb1bfba19432f762ae829f6d0005e703b8a2a90",
+      "bytes": 6116
+    },
+    "src/core/affine.ts": {
+      "sha256": "0a30403aeeb35b7fb6d7c3d4b9f7c62d9ef4827e6f7c792216b3e07b5e650f07",
+      "bytes": 4279
+    },
+    "src/core/transform-schema.ts": {
+      "sha256": "25ac9b7de49fec96d6236615892810a2181cd9dfe2c4b316c39a2b622cbb99de",
+      "bytes": 532
+    },
+    "src/core/svg-import.ts": {
+      "sha256": "bad0306167d2674d93d609daef6c90e4c7b8c69554bf21476d408e362abaa087",
+      "bytes": 25562
+    },
+    "src/core/svg-path-import.ts": {
+      "sha256": "b29f958ca96ffbead987d83494a05267d093ad56ea8e243902710b01395c4c77",
+      "bytes": 9305
+    },
+    "src/core/svg-path.ts": {
+      "sha256": "59cbea1f851641ec5ef921d35949c94fb10502a4c1bee81983d37bfd69919dca",
+      "bytes": 4542
+    },
+    "src/core/svg-export.ts": {
+      "sha256": "15ba55ce00d35262ebe2269d0a795d4a81f41f7ca2bedb31e03fdc17c26c3d30",
+      "bytes": 6604
+    },
+    "src/core/svg-masks.ts": {
+      "sha256": "0ddb90ffc6c96324d066711a979e34a28d9ba26e54e5145fa2ff3fc29fbef95e",
+      "bytes": 5829
+    },
+    "src/core/svg-smart.ts": {
+      "sha256": "743ff0575957b1d5de2133c3c2d7bd9f43cf424539e367611e37717e0c62fe3a",
+      "bytes": 2746
+    },
+    "src/core/svg-styles.ts": {
+      "sha256": "2ade629f6f1847ea6c0bb7b191ff2e0537b5019d6e627dac42d2a9f501e5c8cb",
+      "bytes": 4538
+    },
+    "src/core/svg-composition.ts": {
+      "sha256": "ff25e0e0fd92f7e6c5769b843f1b11e83e73e6ce83854d55bd7fbdd64139010e",
+      "bytes": 3124
+    },
+    "src/core/project.ts": {
+      "sha256": "ca39bebe4308146605b5442d355d3f0039128a369dc3751f120843390dca3988",
+      "bytes": 12144
+    },
+    "src/core/image-resize.ts": {
+      "sha256": "e06ffb8ed8dedaa665079ba1a5779ea1111967a03120dc982119b41f75e510af",
+      "bytes": 2022
+    },
+    "src/core/crop.ts": {
+      "sha256": "8fa66bda5d93d83b865d9548445e99ac31cb336c0b42e0f4ce1d1d906c6f0d59",
+      "bytes": 2989
+    },
+    "src/dom/index.ts": {
+      "sha256": "76b3ce0abb5a9374ce79b6ab7388d1b8e152c90f7ffe0e299c2fba1022cf1c1a",
+      "bytes": 78496
+    },
+    "src/editor.ts": {
+      "sha256": "b77f31758adb05a5c29b0cff9e67390d296eebc66780bc5400351517f0855c20",
+      "bytes": 65667
+    },
+    "src/tools.ts": {
+      "sha256": "fa3849935391eb371c923d22781e5d769f47b2c843095132a7c5449b65d94bf7",
+      "bytes": 71516
+    },
+    "src/engine/drawing.ts": {
+      "sha256": "65d30a5c068e40c8f0334a1a74f08cf598029e333c1870e2b4bd5feaadb97e62",
+      "bytes": 24079
+    },
+    "src/engine/renderer.ts": {
+      "sha256": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+      "bytes": 57100
+    },
+    "src/engine/cache.ts": {
+      "sha256": "76722f64df4b325ff6864974f1176545bcdad133400f3312f34e35560032a36d",
+      "bytes": 5133
+    },
+    "src/engine/gpu/renderer.ts": {
+      "sha256": "f3bdb34d1ce541dd1b45ddfd06a46869e2a00be37b28f7bfc5414c95e5bf4e46",
+      "bytes": 43757
+    },
+    "src/engine/export.ts": {
+      "sha256": "4fc5383ac9be7b2338ba2fe2882139a9b846ed57e145f32a1468045e44bf1427",
+      "bytes": 19879
+    },
+    "src/engine/png.ts": {
+      "sha256": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+      "bytes": 8586
+    },
+    "src/engine/svg-import.ts": {
+      "sha256": "f3ce4374cbd4d7ec687e58185bebed0a26980394a3cce3fd9ee8f64d6f630d2b",
+      "bytes": 8854
+    },
+    "src/engine/svg-import.worker.ts": {
+      "sha256": "c48a132e73ef8f8b499694dfe112a6a1664468a9fbf933ee8e75fedd7a0aaedb",
+      "bytes": 1103
+    },
+    "src/ui/VectorGradientControls.tsx": {
+      "sha256": "ef1108be1e668017bb4e8944ac90745888e954a3c32c487cb459bb044b608f55",
+      "bytes": 5224
+    },
+    "src/ui/VectorStrokeControls.tsx": {
+      "sha256": "d25714d2c248b075531c6bf79fb89a1647e4166fdd09655eec3dd37b6e642e2f",
+      "bytes": 3078
+    },
+    "src/ui/ToolOptions.tsx": {
+      "sha256": "584dc219c5e499c299554eb860052df357bd6b98137feab3fd544bb6a963eac2",
+      "bytes": 28955
+    },
+    "src/ui/InspectorPanel.tsx": {
+      "sha256": "1a4c2a4ea57758d54741c7844fa259b196073341115f7a438c72241dae2f4cae",
+      "bytes": 32497
+    },
+    "src/ui/controls.tsx": {
+      "sha256": "d43c79ad545d3bd6e2e3847a9e8dd720794d84ffb0ccc1e2d5496ba7ee145d29",
+      "bytes": 17936
+    },
+    "src/ui/styles.css": {
+      "sha256": "4939499b7368ff5582f79fadef9ac9f0ead6d8252e1da50a7ff719ac8d0eb019",
+      "bytes": 123529
+    },
+    "src/scripting/runtime.ts": {
+      "sha256": "b7b159a899a10b3b069b3041eeb9cb44b40db6a1651daf2a8bb3c9bea00b30a7",
+      "bytes": 8744
+    },
+    "src/generated/script-runtime.js": {
+      "sha256": "cff68aa71bb122ad0386906d6c58b61fa2ba91a26b1a1e84265d4ad644ab49aa",
+      "bytes": 612489
+    },
+    "src/ai/recipes/recorder.ts": {
+      "sha256": "41a4f57c5dc4cd1852068154b49ec9005776c9d5c45b3c8dbb8f5cf30dcc2e44",
+      "bytes": 17241
+    },
+    "server/app.ts": {
+      "sha256": "c365c35c0d3e2ea19d6def5f1e80fa9f4cafa86526017fb8591be56834119218",
+      "bytes": 43678
+    },
+    "assembly/pixels.ts": {
+      "sha256": "ba0d75e22076c5fd70fbae44c460c7efb18969eb27d9afc08b4b11810e8423d1",
+      "bytes": 17110
+    },
+    "public/wasm/pixels.wasm": {
+      "sha256": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+      "bytes": 24547
+    },
+    "README.md": {
+      "sha256": "77b127d8c353d7014650d9064c45186e451c164aaf4d9876b1dbdd4b443282ad",
+      "bytes": 6665
+    },
+    "docs/PRODUCT_BRIEF.md": {
+      "sha256": "fd48aaa1aa7305eeea419b2873b8186d314f66d8ea01a7125aa016ced368a7f3",
+      "bytes": 10770
+    },
+    "docs/REQUIREMENTS.md": {
+      "sha256": "502f0ab3a435691508702858f8991a8028786fc47ea148e45ffcc9fb717142ca",
+      "bytes": 108642
+    },
+    "docs/ARCHITECTURE.md": {
+      "sha256": "821a30698ee3f3768b0289a3f6e6b44ab97b3efcdea8e7920c418d84aabdbe64",
+      "bytes": 279603
+    },
+    "docs/API.md": {
+      "sha256": "1fc8bbfafb073fa1c46fea1693da6718b4ba7b8784e07d8ee17858fa08ac24c4",
+      "bytes": 80439
+    },
+    "docs/SCRIPTING_API.md": {
+      "sha256": "2fbd25f2d4263c6e75f5e6c8f4373ec88fad6937e07b2221529981a05b229420",
+      "bytes": 286607
+    },
+    "docs/DESIGN_SYSTEM.md": {
+      "sha256": "c8e821a30a9e25555f03806226caadf3e11d4a1c09206e02ee8c07c9bc1debfe",
+      "bytes": 53484
+    },
+    "docs/PLUGINS.md": {
+      "sha256": "9ea28a38d3759b0fb70a12ff6f596cb68cf4487b3467e93a02ba8938cc002db0",
+      "bytes": 28900
+    },
+    "docs/SYSTEM_DESIGN.md": {
+      "sha256": "f42f04f3767abc03ade4126694c4cf8ff2df4aeb26998212a6c85d1060e2fa5d",
+      "bytes": 31702
+    },
+    "docs/STORAGE_FORMAT.md": {
+      "sha256": "bc11c6ba168dc86aa350aad234fde1631b54e0348d4d3350564fa456bff097ad",
+      "bytes": 42876
+    },
+    "docs/FEATURE_STRATEGY.md": {
+      "sha256": "e178a48c26e1b56d6344e80a729bbe71dde6cbc79bb645949b3467e60006ffe6",
+      "bytes": 29594
+    },
+    "docs/IMPLEMENTATION_ROADMAP.md": {
+      "sha256": "4d0c34a54af1619e9bf22db427f1379c95b93b76e84bee0f5b12c62ec457a919",
+      "bytes": 781745
+    },
+    "tests/vector-gradients.test.ts": {
+      "sha256": "ec8112a0f41219a7e7721010c362908e402fb6374c5eaaf60e48b2453592aca2",
+      "bytes": 10476
+    },
+    "tests/vector-gradients.e2e.ts": {
+      "sha256": "7d5df0f6b28128911876934596625dd43075c545fcbf6561812655351c4b0dc6",
+      "bytes": 20757
+    },
+    "tests/vector-strokes.test.ts": {
+      "sha256": "7a6899c5e2f3ebed911a09241ff9d998771fbcecde1345729c0649ef5435abd7",
+      "bytes": 7360
+    },
+    "tests/vector-strokes.e2e.ts": {
+      "sha256": "820bf527c6d3e9b1cdd2dcfa54e1534e924d1ee03eb38f32a5022cc39bf3dd19",
+      "bytes": 17203
+    },
+    "tests/api.test.ts": {
+      "sha256": "9f53abf88e414f95963eca484f556eb317b442e76db00f01a761beac0596e555",
+      "bytes": 56054
+    },
+    "tests/webgpu.e2e.ts": {
+      "sha256": "a43e5cc1d82705d1d4799dcd0668071afdc5e70daf6898da51ccc762381f5dca",
+      "bytes": 64325
+    },
+    "tests/production.e2e.ts": {
+      "sha256": "c73c785047a75ad61a9a0a7995cd3b59923b3e84f98cf882f607d9d16cdd04ec",
+      "bytes": 96017
+    },
+    "tests/seo.test.ts": {
+      "sha256": "4438445889c0b5d85866e8de65ee937f2b0f1eeae974338e9244175d5b0818a5",
+      "bytes": 5568
+    },
+    "tests/chromatic-adjustments.e2e.ts": {
+      "sha256": "0de03e15f26981bd72d3d7a7caa97d15473a426e361bd902548d227a865c2fab",
+      "bytes": 9081
+    },
+    "tests/gradient-map.e2e.ts": {
+      "sha256": "630c0669e433ff65f0fd69db0edcf32c51bf1370adee1245cac18bd83eef5c76",
+      "bytes": 15872
+    },
+    "tests/affine-render.e2e.ts": {
+      "sha256": "c0f13e5e9ad08feb2bb320ff929f26462d0c49acee75d1fa3111b65155262dc5",
+      "bytes": 12265
+    },
+    "tests/svg-import-pixels.ts": {
+      "sha256": "a6544ef97614acda9c2c9065d0e1164e6d9b71aea3444eeadbb1624b006d19db",
+      "bytes": 1673
+    },
+    "playwright.config.ts": {
+      "sha256": "42711757cc7fe8dd1d514566627e38cda6fa238e8c047a5b8a73d126d038b926",
+      "bytes": 616
+    },
+    "playwright.production.config.ts": {
+      "sha256": "8701855d56a8fb434935682a19a06480c9c2b3de645024341a4f4ac90ac47c75",
+      "bytes": 386
+    },
+    "tests/svg-composition.e2e.ts": {
+      "sha256": "1c117e9c319affe99a9437f345c2fc666521729fa6966b02657583c715daf2a3",
+      "bytes": 27420
+    },
+    "tests/svg-export.e2e.ts": {
+      "sha256": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+      "bytes": 12922
+    },
+    "tests/svg-images.e2e.ts": {
+      "sha256": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+      "bytes": 12625
+    },
+    "tests/svg-import.e2e.ts": {
+      "sha256": "d34e30def1c226d0e64c12229399c8736c56501d31be491d2e1d3784c21d1d9a",
+      "bytes": 25726
+    },
+    "tests/svg-masks.e2e.ts": {
+      "sha256": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+      "bytes": 17365
+    },
+    "tests/svg-paint.e2e.ts": {
+      "sha256": "0784081188e3f58bbbf2e4709e373d65088670d224e84d19c0cbd4dffb81ebec",
+      "bytes": 19197
+    },
+    "tests/svg-smart.e2e.ts": {
+      "sha256": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+      "bytes": 15813
+    },
+    "tests/svg-styles.e2e.ts": {
+      "sha256": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+      "bytes": 8813
+    },
+    "tests/svg-text.e2e.ts": {
+      "sha256": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+      "bytes": 16511
+    },
+    "node_modules/@xmldom/xmldom/package.json": {
+      "sha256": "b61c2dd342e0e1abb800302ec62c0b06ae7a07cd9b907c88428ff80100f64c6a",
+      "bytes": 2253
+    },
+    "node_modules/@xmldom/xmldom/lib/dom-parser.js": {
+      "sha256": "4188e24b953e2c70b66150306c66547495ad968d040e31dd65f22a7b3485da28",
+      "bytes": 20276
+    },
+    "node_modules/@xmldom/xmldom/lib/sax.js": {
+      "sha256": "324e8a0c7b475c645efcd1736b634733e133150849bff741fa0e2215e7017d02",
+      "bytes": 32465
+    },
+    "node_modules/@xmldom/xmldom/lib/dom.js": {
+      "sha256": "bea9ba89adfec227e9e572ee934a48223a170c5cf96b7087d7e3d3023ac47be3",
+      "bytes": 133234
+    }
+  },
+  "sourceHashesDuringFinalBrowserRun": {
+    "src/main.tsx": "5f7500325c4fc2da47f89d3aa85e74f02b98072deb7d299126b69fe17ec87b8b",
+    "src/editor.ts": "b77f31758adb05a5c29b0cff9e67390d296eebc66780bc5400351517f0855c20",
+    "src/tools.ts": "fa3849935391eb371c923d22781e5d769f47b2c843095132a7c5449b65d94bf7",
+    "src/raster-editing.ts": "4723ecfa37d2077246260099a1e56b62299e5e744d2c264723dba5782b679577",
+    "src/demo.ts": "40bbb8e48b9aa1c4bb9db5c8b18a18719f128e538e86a509259d296193e4aac3",
+    "src/crop-controller.ts": "eebf8c6d23cfc67318978bc72aaad3abc2b6849a9e71fd7a20c77d7aea099e6f",
+    "src/generated/script-runtime.js": "cff68aa71bb122ad0386906d6c58b61fa2ba91a26b1a1e84265d4ad644ab49aa",
+    "src/ui/CanvasRulers.tsx": "d9fcf8b3434206960dade0e93872731d73d5f7d848fe73bd24c85dadaac516b4",
+    "src/ui/ResultDiffInspector.tsx": "89a00acec5f58593ed9fb258348fe5a1a8a7297261bcd3f46bad8240dc3e1aa4",
+    "src/ui/VectorStrokeControls.tsx": "d25714d2c248b075531c6bf79fb89a1647e4166fdd09655eec3dd37b6e642e2f",
+    "src/ui/system-fonts.ts": "636ade8e025a5670c8e4b42f2ff0e65cd1abb61bfb2859ad2dd7b329848910a7",
+    "src/ui/GuideOverlay.tsx": "13e5bec12064a720c4f92b171849742179e54949cf0e5cd4a310af2c3d142b35",
+    "src/ui/Dialog.tsx": "0aae2a9040dfc452ea1c742a05fd7ceb73f78755209d89da92fe28ad3686a6b2",
+    "src/ui/LayerFilterBar.tsx": "0e8efdcd3456ff2f626dfcfed00c4b4f2cc7ecaea3a3a73dcf367c5af0d4c65e",
+    "src/ui/AppearanceSelect.tsx": "20c6ad43c863d1e05f121f747d48ca8bafdbc448d87148ce5a2c8ceb9e0a5724",
+    "src/ui/GradientMapControls.tsx": "e3d5fd60ac33e122c4560db52ca8c13da5d5d815d8ad2fff5d8a72f41314540f",
+    "src/ui/ArtboardDialog.tsx": "0f718bf85cf1f6f61353eb9ee51a65e586a9e234db74a6df98bfc1e77ddc95f5",
+    "src/ui/AppearanceToggle.tsx": "db98d4a292d846b7c23f548d3bee7cb7464f6102c067126aaa954cba436e1cfc",
+    "src/ui/BatchRunnerDialog.tsx": "0e33558f13ed231dbd0a7b1c3805fee66af876b299fcc6e631525e178d52a494",
+    "src/ui/SvgImportDialog.tsx": "e4fb4bce157296e33d551590ecdbf383c1d1f6caa888a531491eda94b6c706fb",
+    "src/ui/shortcuts.ts": "0fbbb08adc11d169c17c599c10981396d7e043ef81e1dbf1eb512d89072cb467",
+    "src/ui/ColorInput.tsx": "1cdd09a06f3942ab6b37b33a3ead6a05ea6928b09014b8c23e515091096627b5",
+    "src/ui/ScriptPanel.tsx": "ea2812883ab94d8301a01f17f031db5809549fb1c7dba97e8c7b33b56a3482e0",
+    "src/ui/CanvasContextMenu.tsx": "5b4c14c8cd49b21d8da6a6216a2f0454060d118c82e705cfc50620275d000fbe",
+    "src/ui/ToolRail.tsx": "ca1d1484424fcca19a1ea1132c62c48ce0790af7b0d209b39e244cdc5275297e",
+    "src/ui/InspectorSection.tsx": "2f13160d005ef734c51c01cd56504b40a9c2019cf31c7cf37c7e5e783888a266",
+    "src/ui/WhiteBalanceControls.tsx": "fe1313463009757791b023578afa8ffe06e86ab9ece4964a7cc190689b8fee7e",
+    "src/ui/CanvasOverlays.tsx": "dab244abdab4cb6e0294bac9bccc83089fcf49191b68c41fbf85b4062a491856",
+    "src/ui/AppearanceSelect.css": "1c4036eae32661e9621375ee52219f023679142347d2531ef89586482d0b4179",
+    "src/ui/HistogramView.tsx": "45ccab6b41a54251136ac429eca5cb1c88940d499881f2f1b5830fefac592f55",
+    "src/ui/controls.tsx": "d43c79ad545d3bd6e2e3847a9e8dd720794d84ffb0ccc1e2d5496ba7ee145d29",
+    "src/ui/CanvasCursor.tsx": "31a5093104185b1bb2ffb60bdd57c2af36dc0ec6826109e286808ef959b5814e",
+    "src/ui/VectorGradientControls.tsx": "ef1108be1e668017bb4e8944ac90745888e954a3c32c487cb459bb044b608f55",
+    "src/ui/font-availability.ts": "3b6b63dbc391737fa603b2cad2044b4bda1253cc0e83a1353335e5610d11fcfe",
+    "src/ui/LayerStylesPanel.tsx": "e10f8e2a5ff6eee4435f894eb5285c18ee55e64fb77dd00ed4f00f3d7a8948a7",
+    "src/ui/LayerCompsPanel.tsx": "4ee4207be63d6424ac64f04166a944b0314e7ee99f263ce9b4c01ae48871e76d",
+    "src/ui/ShortcutDialog.tsx": "44ad1e164d3072d97dd5201fee7be1136a4bf47eb03bb445220b36256adef747",
+    "src/ui/RecipePackagesPanel.tsx": "94da5cc33f11ed7cbaa7cc0ba9d6f26ba891310ed6180e32116863c51cf53635",
+    "src/ui/LayerMaskPanel.tsx": "c3f4d3020a97fe527e99f363d0ab145de038af19a68e8381aa67ba205663b075",
+    "src/ui/CropDialog.tsx": "3f4f84878c75e46ac6a994b5b010d4eef06b6eb557afa936144e72244a675497",
+    "src/ui/LayerThumbnail.tsx": "297c6083321d4293f730ca7783720772dec25af318394b4b7e618741e030e4ea",
+    "src/ui/PsdImportDialog.tsx": "30fa810863523d28a320f0b0e153be0c3b9f01ababa75ef7eb0ff9f5567f1d38",
+    "src/ui/ColorRangeDialog.tsx": "6a34b21d4de99d21aed2d02258f6f9cca8d47141836694108115282f71c184c1",
+    "src/ui/command-search.ts": "de470041429f71d8581c89cc7677e87cbc6441fbdd8e30cd491e2a8525e15cbc",
+    "src/ui/StorageHealthPanel.tsx": "673a25a5fa65f98c0af54b17233edae1bf195d60755f66fd8a73dbc7bb19de6d",
+    "src/ui/ToolOptions.tsx": "584dc219c5e499c299554eb860052df357bd6b98137feab3fd544bb6a963eac2",
+    "src/ui/PanelResizeHandle.tsx": "61d7eab79c2efb61e77bc3c02adcb19cc28b15b239f3a3afe8aac68a116ff946",
+    "src/ui/TypographyPanel.tsx": "ebe90feaea8dac9bbbd04734e918f449533cffd1da036cddcdb83c01e63e23f5",
+    "src/ui/RefineEdgeDialog.tsx": "0a44916650d4a5c67054516e7a2a1cb57ac3a594ff16fc679c7c07a31a47fef3",
+    "src/ui/TopBar.tsx": "26846cd72383b71a2c323b4908fab768077ff85c49946acec64c2a3070dcff71",
+    "src/ui/SyntaxHighlighter.tsx": "44ff77e7fbcf9e818c1f18f7f447a5d5bb2efe91e9f275063fd49dfc67447ffd",
+    "src/ui/RecipeDialog.tsx": "1fee59d542b46d4465808fe8ca062399da66b025cda1eea7556e6e2137a8ca6b",
+    "src/ui/layer-filter.ts": "1fdbe4c4b7643de1393193b4dcbc2c6739b2d4cb2d1fb9fd1f7467bcd00709b3",
+    "src/ui/SmartFiltersPanel.tsx": "b90eea456b7bb35c965b775981d099bec7f4b6f6392e086fb2506162910bc559",
+    "src/ui/SubjectSelectionProgress.tsx": "c4edaad95b49238100e1aa7df3c298347989ef24db3eebd56fcb9763569ae424",
+    "src/ui/SmartFilterMaskPanel.tsx": "3087bba9548bce908d5d59bcfcfac3d34b86c3cae75912e462d3b4939d3d3bc7",
+    "src/ui/LayerFilterBar.css": "0afb8d840c09aaec98c4b7a12d68bcc31a8f8f8ff3f5f482c81901c6b818fb5f",
+    "src/ui/AlphaChannelsPanel.tsx": "d73319aa5afcd5881d05324207256216c1be717b2920b382e1e707b660d4c267",
+    "src/ui/ExportDialog.tsx": "e85201c2e6ba99a522f905fa0fcf0763f8225aeb8aa641e5a12363380eed8cbd",
+    "src/ui/DocumentTabBar.tsx": "7f4c31b436546775b7b681ca3a45aa2a3a883faa649d5f7d457223c63f0a429d",
+    "src/ui/PluginPanel.tsx": "1e40c38e1cfe1f5e15f18ca38b45bb622f9ed8fb0f8a42084693883e4d6433d0",
+    "src/ui/PreflightDialog.tsx": "ce14e6bfdd544f689d0f73c09def669f8387222f21a257f5b9e0d1b8f0576db9",
+    "src/ui/InspectorPanel.tsx": "1a4c2a4ea57758d54741c7844fa259b196073341115f7a438c72241dae2f4cae",
+    "src/ui/GenerationRecoveryPanel.tsx": "d96bfb403178f0ab89334ae2ef83d4b1089e9d6baa3cfd63db4271dfb3905733",
+    "src/ui/utils.ts": "0bd0a28f400c3581f7de3c055962c91e31d0d3a9d5284d7696b3d7cb6f614200",
+    "src/ui/ColorProfileDialog.tsx": "78506162fa9b39ce331f8c614c687a21dd56c065a76f5336a12a5d37644123cf",
+    "src/ui/CropOverlay.tsx": "75181d73172deeb361391b8418bc44c5353b55fe7bbd5abc42a66681933903ba",
+    "src/ui/CommandPalette.tsx": "84a5a7a2ce3dedb04ba6fe50742a61f3b7172669d8b9a2ee5237ac693adb46d9",
+    "src/ui/CurvesEditor.tsx": "d3df0aa26853a8a77d6b564869e8235ebb1588eb48249476e55795c0f4720dbb",
+    "src/ui/panel-layout.ts": "bbea3bfd1fc47e0576c5fa8967823c649699dda00b141fae2d8f8b557e511479",
+    "src/ui/SmartFiltersPanel.css": "2e5d79ce4382569725c1503fc69cfe02acf2e8c728bf2c9cc98840e12ccc9219",
+    "src/ui/styles.css": "4939499b7368ff5582f79fadef9ac9f0ead6d8252e1da50a7ff719ac8d0eb019",
+    "src/ui/DocumentTabBar.css": "a5eef8bc0e53f3b8a58a710907479ad5b06b26bbbeb6f6c3bf95af5c04e1d2ed",
+    "src/ui/App.tsx": "b2b194203479f023cd63b5ed455fb820224c2c4565dfdfdea2167d0ae601f1d4",
+    "src/ui/SelectionModifyDialog.tsx": "a9e6206e8fddaa67d2056d5ef0725ae7b42a40c2c9f59114c7220d98849e208a",
+    "src/ui/RecipeParameterFields.tsx": "f596d739b1a3c48186552c302727de1afd35eb1acf4d7d4dc91d26be7985f955",
+    "src/ui/tokens.css": "150cfa149b2c7a3d6f490608b868ef1d9d99dc9d67e6380f1160b6a7b4b1d932",
+    "src/ui/SyntaxHighlighter.css": "0ae3e6d053acb5f094629e7bd3239dc85ebde100a43a64110e99bb2a9bf30bd3",
+    "src/ui/RecoveryPanel.tsx": "3df8389b65249a0e36309c3355a09d8f779bda5d59779d349851d47ba1c143b4",
+    "src/ui/LayersPanel.tsx": "389f6d1a47ae277e462154f77a788911e71940b6e8bbeadde9a6cfcf093189de",
+    "src/ui/GenerateAssetDialog.tsx": "37e385717caf2816898a775a907ed27be7122b0db4eb04664e829b687a519fa4",
+    "src/ui/LevelsEditor.tsx": "5b279fc8888082a6c30224656fca6916c321beeb38b3bbbc96d19bf601173edf",
+    "src/ui/GuidesPanel.tsx": "9de104ebc77a70c72727e67e6d9853b59eb2223800354692b2cd172d8e4dca89",
+    "src/ui/selection-outline.worker.ts": "82e1aa269ebfb924675bdf907345189a0cc36032ec714d6db09e05efa3900da9",
+    "src/ui/AssetInfoPanel.tsx": "f5948f3c1468ae17a464119babf0ab979f5b0aa791f6776018bfc50faefc7c4f",
+    "src/ui/ChromaticAdjustmentControls.tsx": "21d09facfa61d9f2828171c307e0e6e06fb4782a36cbab1f8bd5fa32e0018443",
+    "src/ui/shortcut-bindings.ts": "f5306c6b3cb308cccf26fc8d77f7dce91dde738f1c836766aa34c24b62ae951e",
+    "src/ui/CommandPalette.css": "6fab8bfcb66f300f4dbcc938e5e98f52dd3dd2a4a24735ceea321ef3c1f09e36",
+    "src/ui/LutControls.tsx": "e50797428247d2514df49b016efb719f045571b5e5f0baea04ef3b68230b0a48",
+    "src/ui/ShortcutHints.tsx": "bb0524b30079ca3791d7eba4ba787ee022198189698961c77f71950a14055959",
+    "src/ui/hooks/useDocumentViewport.ts": "8b95378d762c930bc5cce214fb0af101a2aee70bb4e014dd4d0d579d3200c3ee",
+    "src/ui/hooks/usePanelLayout.ts": "fbe37b0e278aa33b116a8bccae8ba9c3c739bbfd5155e393e4c4aa6e7a56b429",
+    "src/ui/hooks/useUnsavedChangesWarning.ts": "4790168749789e8aeaf83385f85fd6b250a7555f4e3fcd699a0cc30cd2e084de",
+    "src/ui/hooks/useSelectionOutlines.ts": "a7a9ac894076db051e6d7ee8b935a500060e4630b3ce42d5c88f3197b1c6f9dd",
+    "src/ui/hooks/useEditorShortcuts.ts": "a90704b15828b5fe16840d14493437a6bed4d11a1d5cfa31f161e0b2bce84779",
+    "src/ui/hooks/useViewportObserver.ts": "206d2628b4d27cf63d660b208272f1e67b67c8aebc574bdaac4b05c55fba8155",
+    "src/ui/hooks/useWasmReady.ts": "4008475132e2b680f6dff06ae349544639dbc1a1f0da3862c05b189cb78ab83c",
+    "src/ui/hooks/useCanvasRenderer.ts": "01bef891d7d16c75cf9fc59f69462f82c24528d0cb3114dacd136256bd79aa06",
+    "src/ui/hooks/useWheelZoom.ts": "686204b74fb225333367965471106488fe96a0581c28302ab14e7ed964f37493",
+    "src/ui/hooks/index.ts": "a3bed70e459e6265db59c53773fb3c1de2bcdc64bf37739e70b9af143ae6e371",
+    "src/plugins/index.ts": "aba0837b48f568b26076b26c8989541d818c19339839daf98540a4b073b60947",
+    "src/scripting/runtime.ts": "b7b159a899a10b3b069b3041eeb9cb44b40db6a1651daf2a8bb3c9bea00b30a7",
+    "src/scripting/retouch.ts": "743b04c254590d4dd9c6af02ff5d659b9a29132a7f883aa6c547db8553d10cf5",
+    "src/scripting/bridge.ts": "954161c31e7ba0f6ba4acec6f16738b043e90e39add943a7f89e83889939c1f9",
+    "src/scripting/runner.ts": "4f4619122fe746ae8c781472d276d3f473440071cade975582009ba4a3fcff21",
+    "src/engine/export-control.ts": "feb42344c76ee80a5c6556700c4973762a9b2d0510bd32eb46ee805f2fb13542",
+    "src/engine/matting-source.ts": "5e709a2736f3fb45948374a1f1bbd7c863f103997683a6ee24266eef92f1fcdd",
+    "src/engine/patch.ts": "e9c75f0bc763a762f2db31a811eef5c521c1aac480dae7ef193be1b7b0d89c7f",
+    "src/engine/svg-images.ts": "fc1137c20b75db35ff086daa7b89b86c3fabd24a454fa5d7764d12a9eb41258e",
+    "src/engine/selection-modification.ts": "49c42bd62c8fd60cdbfbd501d3950d30676a196a52a68ff7f96da49e08de2e89",
+    "src/engine/png.ts": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+    "src/engine/filter-mask-coverage.ts": "43bc9a7c8678c1d5e968ef82408250fb01aa51cdb67448685d389fd42c882f17",
+    "src/engine/white-balance.ts": "23d8525223f1cdee5ca2936b4df2667c16fc9325e641eb99a50245940aa35f82",
+    "src/engine/matting-iterations.ts": "96273e455030f6a5dbe06bcfa5cc8514e5beb68c00ba881ba5be4e46f2a9de1b",
+    "src/engine/color-range.ts": "81472f6b2216d25bc5a43616f36c99f5269359f6792a4b5bdc5659db01e4b78f",
+    "src/engine/stroke-region.ts": "4074fa9df83135c21687c837ee4d1015f2552e97919efa40751ffc1fd6bb45d8",
+    "src/engine/retouch.ts": "df1db719c17072d0840768ccbffad2dc83ed301b5540948060476b4ee6fa00b3",
+    "src/engine/preflight.ts": "9d79f9df05cc3799faacf8346d05a7a6d248c75647337548bcf02746fa02f984",
+    "src/engine/retouch-sampling.ts": "107e24163cdb99bb601341959affd780056daa40fa3d235c3280197c4f890141",
+    "src/engine/canvas.ts": "f8aaa150a72696a8cb0a8c4dfb8d5956e567b3808ce6eea77ac48b612baad5df",
+    "src/engine/filter-tile-cache.ts": "26325a601b0f97a0f5084a7bbf9808991ebdcf53ff4d2bec188a78cf5d0de1e2",
+    "src/engine/psd.ts": "31d8166dbcc0f5dc01d3c173284c65f2e0e9d5b557dde5254ae9129912a8595f",
+    "src/engine/lut-import.worker.ts": "b79d7cd23ffdc296efe8cb72280493ac1b4434f747b605832268a4fd49322df9",
+    "src/engine/healing.ts": "e46f9a680b7e32cc3ab7920ef34c99fb3ecbe8a7793693311bdcd3ff24280f0b",
+    "src/engine/adjustment-blend.ts": "57a2afb0cb5aa163ca0713d473473f786843a5ed2f535e6d76163c1ad3ef0000",
+    "src/engine/font-availability.ts": "bbbb0740ef427fedeb14d9593e412124149b509843923dcad20a046c9353daf5",
+    "src/engine/svg-import.ts": "f3ce4374cbd4d7ec687e58185bebed0a26980394a3cce3fd9ee8f64d6f630d2b",
+    "src/engine/gradient-map.ts": "425259c169123e76eb70000a12274ec6cb4c4b07ebe86c2d9853f418603274e7",
+    "src/engine/prepare-channel.ts": "dbf28aea2f56b562ba54dc57dcc94ff51c38e541d734befe23e235ee75301d7a",
+    "src/engine/wasm.ts": "b51ef9934ffa1155a062c0e7ac0050b67e7af193211cf2fc2e5873cdc2ef9649",
+    "src/engine/matting-workflow.ts": "31064fda0731792c6d33ea05e1516e448a6f6c0cd00c81c8167b952a418c70de",
+    "src/engine/smart-raster.ts": "83681ff5bc20d6b21fce13f76858c431174bb5b4e6ad407796a5a356f5852c65",
+    "src/engine/prepare-quick-selection.ts": "65373f82b5c1ed55cbe74d6961cd81fc69f2fc3adbfbc6318796a97ebf4c0671",
+    "src/engine/prepare-matting.ts": "0aa33949033441dfd51a6f5d3c209f504ec6b1e3822cbd5178da5864d5e1956d",
+    "src/engine/channel-selection.ts": "7c33605b503cf3d1f7ad8dcb1cd071ef6fbe6d10cf41a688c4d5ff65d83c18ef",
+    "src/engine/adaptive.ts": "197044d5f9d720345d372e10be0d77dd2327127d90f8ab2875a0437549f83ba8",
+    "src/engine/mask-signature.ts": "36590b32d1454fa255fbfe9753fc6e4ef3f0909116298c3ddbe23ed7fbf9d7f7",
+    "src/engine/fitted-renderer.ts": "b70b4dfa680497b4fbf6bd4b428171f2db4e9e58daee2866e3412c8743d35fd7",
+    "src/engine/feather-region.ts": "235f484b821e6a4265268c63febfe8a9009426c6ad80db5eb2611b50864695f7",
+    "src/engine/quick-selection.ts": "b5184da3477a06e25f3d7ca17661d7d90c89711161dda85f757a61abe722af6d",
+    "src/engine/svg-import.worker.ts": "c48a132e73ef8f8b499694dfe112a6a1664468a9fbf933ee8e75fedd7a0aaedb",
+    "src/engine/chromatic.ts": "2eb549968af39fd8b9ad92b79925277bf6123067c46bd1084dc7585087dcf73f",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/engine/donor-search.ts": "382092955dddbaa13f54a2b1c0b6d0b012cffad7250ad796a8f75b96d77211fa",
+    "src/engine/export.ts": "4fc5383ac9be7b2338ba2fe2882139a9b846ed57e145f32a1468045e44bf1427",
+    "src/engine/matting-tile.ts": "accd278392ca87e65157eb308b03ff641a56ce83d079105e60afc0efe0561ec1",
+    "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+    "src/engine/smart-filters.ts": "305b7dc9915fef5596d34487d9354a033cef542b077c9c87723f6fdf0c9b8ed5",
+    "src/engine/subject-selection.ts": "2dca33dbf1c60e58071342e6442cad6a4ad0b211cb081956e2376be01064ab92",
+    "src/engine/prepare-selection.ts": "e3d67fb905f7e23f4b9cf170f0c6ddc423feef5fe3ab2c0aacc17c8ad6d47c0d",
+    "src/engine/processor.ts": "0fefd22024d6d381beecaf6e023c4ba438757c7b35f00227932dcc2860582885",
+    "src/engine/lut.ts": "140f8d7d0cf15094e1d7616748443f4bc5ff75406ed1829af9614e107c16d1a1",
+    "src/engine/render-control.ts": "1be96212cf9371a6c7ae123d809ee326bcf4aa09676794d0389399769991f17e",
+    "src/engine/svg-masks.ts": "518385ce19d2d7aa4ef5bc938a83a7ab6580afdf6513794886864d2965bbe46b",
+    "src/engine/clone-preview.ts": "d5c87759a8f128c13c2d7a37e86e7be5483358a7120aba025f7c077529e8be41",
+    "src/engine/cache.ts": "76722f64df4b325ff6864974f1176545bcdad133400f3312f34e35560032a36d",
+    "src/engine/hsl.ts": "5925bc11ff2d305a3a9ca3864b6e9c08f9004163040fc74a20930b0142d52b08",
+    "src/engine/preview-matting.ts": "43a262288bd35e73f4372111041c822b8532953144f3f6aef819f5a69a7cc962",
+    "src/engine/matting-output.ts": "94e61b397cded00ea32f67d8677176e1c7d38fe80ed3b49accc8c024745f4686",
+    "src/engine/clipboard.ts": "a62d9bd491637c61a65a2587d2f856f0d1e4f29d235e775b9b6ba705370dcd93",
+    "src/engine/task-yield.ts": "9f6693dc90eee1ff8fad13cee7a75c1303a906e91dcb47e6dc821cc94eeaace4",
+    "src/engine/pixels.worker.ts": "b456226b3ec64f8e8719f684f40e27e7d9cea3e21fa7fb943efef35e21e95152",
+    "src/engine/preflight.worker.ts": "b3b7121914f4cadda2514506738843a98d6e7b8715c1983495c0abca05ab4a94",
+    "src/engine/prepare-subject.ts": "7b23f402967fc6ad9ac9cbfc3a363c87d401fb925690aebc9e113b4369646bb1",
+    "src/engine/content-signature.ts": "d7ea24b738a47d6a3573a7e2e188a75c55cabd980386b43d8a9a36025d05b213",
+    "src/engine/drawing.ts": "65d30a5c068e40c8f0334a1a74f08cf598029e333c1870e2b4bd5feaadb97e62",
+    "src/engine/svg-text.ts": "8fc888a69fcaec44e5623e73a91536e9ce630930efd2c676fefe761438bf0fde",
+    "src/engine/gpu/shaders.ts": "e29a255a5f49776ed980e1c5ea59f2b5ede04382349ac95664304b6eddd0bf76",
+    "src/engine/gpu/renderer.ts": "f3bdb34d1ce541dd1b45ddfd06a46869e2a00be37b28f7bfc5414c95e5bf4e46",
+    "src/core/paint-stamps.ts": "2638f6500edf6c7e449dae832e9179ac58d3f0e4b91d8fc4bbfcec7e5c92d5be",
+    "src/core/svg-gradient-import.ts": "ed291c37fb2a819fd661b4abf174565976756e33f30f94de9d2c51f3a3037f69",
+    "src/core/svg-images.ts": "28ac58eab959ec6f52548afa4160ea11405853d528f8553d8aa15c0729b7eee5",
+    "src/core/selection-modification.ts": "359ea27fa8621bfe78231df03aa70c0d0b3150c5604d180549dbde70e3de1def",
+    "src/core/white-balance.ts": "476564b1af73dac1365fcb62352e876509e1ec83e2e00ca8dc88907c919852db",
+    "src/core/adjustments.ts": "2cd8ce5a4f5a3191045dc70a40f448c779bbf9e120e647eca246b95d7584dc7c",
+    "src/core/json-encoding.ts": "fffaf27a2cc41ee6dc7f97868471a81f25a788f4aa27f2f6188f092401d9b636",
+    "src/core/lasso.ts": "978b1f86ed89034a82f377a8aeaad59c175a11d6a633c93b93247bcf701fef71",
+    "src/core/bezier.ts": "3f7a5da68f8097f76f7e813bb8e9ebbdfd6a4ea086288ffea5a757a675291e3b",
+    "src/core/image-resize.ts": "e06ffb8ed8dedaa665079ba1a5779ea1111967a03120dc982119b41f75e510af",
+    "src/core/color-range.ts": "8a47ae10b369a42d27d73dd4754c10a7ef1418b282d6a6a1b48ce7b70d4e3bca",
+    "src/core/preflight.ts": "0ba746ae6572231b301442525c31fe7407c453fd94c760941524badb35bcf174",
+    "src/core/immutable.ts": "2490c2375b90a0d79cc2b64824798140184d053defdd7a04e95da3b901ef45ab",
+    "src/core/history.ts": "d457b51c5b02280c0af362a5cd7aeff6a5c31f57c23619414dc61e8b1ce87572",
+    "src/core/svg-paint.ts": "2610504a2111229b27a7d29a6ba661bdb1613e433801ee8cc39742261aab64f7",
+    "src/core/bezier-bounds.ts": "7f1d24243daaf7266ea45af1ea6faf1388a27d1a29743c97a04b01cccde06f66",
+    "src/core/affine.ts": "0a30403aeeb35b7fb6d7c3d4b9f7c62d9ef4827e6f7c792216b3e07b5e650f07",
+    "src/core/recovery-controller.ts": "35bdd2c432bd91c8aea224c912f98ac46624942ac233373d5870ded60e7c0cec",
+    "src/core/commands.ts": "dd6c793b5cd34cfa11564eac0a5c909be232c379ac3a22d29ee9ae84090cda55",
+    "src/core/snapping.ts": "e5f17e67e553e8d597ffff2ecf80eedd981b7cc6a0ae20ab1a150fa15193904c",
+    "src/core/storage-errors.ts": "cad878c1f2603c574754f77d4c6bcd426f62942e8a25c1297832f0216b0312aa",
+    "src/core/crop.ts": "8fa66bda5d93d83b865d9548445e99ac31cb336c0b42e0f4ce1d1d906c6f0d59",
+    "src/core/assets.ts": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+    "src/core/svg-import.ts": "bad0306167d2674d93d609daef6c90e4c7b8c69554bf21476d408e362abaa087",
+    "src/core/gradient-map.ts": "363c7644f913e4557f9a17b977dda1b49a083a368f4d01c7befb18771be0a5fd",
+    "src/core/preflight-view.ts": "41281c04f505f151abcd4e8cdb230abb6dd1601d308d0d252d9713f8d9cb8dbb",
+    "src/core/recovery-persistence.ts": "0a23d64bca3577bbae519898818d2cbdf03789f3b2ee776db3ab903fe77b3513",
+    "src/core/store.ts": "ffb875003fd52c8745b3b18c20e8384fb905c34d1e5ac1cdbea2ef7087883e64",
+    "src/core/metadata.ts": "be75ad4c03022d95b030e4f1b8260d6c42f6117c151dbf1489e978cb7b5e238a",
+    "src/core/svg-smart.ts": "743ff0575957b1d5de2133c3c2d7bd9f43cf424539e367611e37717e0c62fe3a",
+    "src/core/svg-path.ts": "59cbea1f851641ec5ef921d35949c94fb10502a4c1bee81983d37bfd69919dca",
+    "src/core/spatial.ts": "dc38d2228f71b59c77b393a08b37f0d3716280eb0f65a4a17188e79cf8aaaa8e",
+    "src/core/histogram.ts": "ce1444303de4f252a581e42f933cec654b4794c8935428e042713119ac147953",
+    "src/core/storage-health.ts": "cc29f62856dec74304bc619b657be0f7c3af3133e673999ae999ecb9dafb093b",
+    "src/core/svg-export.ts": "15ba55ce00d35262ebe2269d0a795d4a81f41f7ca2bedb31e03fdc17c26c3d30",
+    "src/core/selection-rows.ts": "528a67d95f1370e4910b02767f2f44bfcac5204c29055a664ea86cde262377a2",
+    "src/core/svg-styles.ts": "2ade629f6f1847ea6c0bb7b191ff2e0537b5019d6e627dac42d2a9f501e5c8cb",
+    "src/core/quick-selection.ts": "7edb832330b5890a98de4346edba1c9c7499101a845195b4cc3f7cfc8f9c10c0",
+    "src/core/svg-composition.ts": "ff25e0e0fd92f7e6c5769b843f1b11e83e73e6ce83854d55bd7fbdd64139010e",
+    "src/core/recovery.ts": "741aed2006c6373a81839d42b49ce3e766bf5e897cddcb007c873a34bc39a65e",
+    "src/core/svg-path-import.ts": "b29f958ca96ffbead987d83494a05267d093ad56ea8e243902710b01395c4c77",
+    "src/core/font-references.ts": "f1388502908bde164a883b961a5dd46e0822bfbc37d89142b6ba81580ea951f7",
+    "src/core/tone.ts": "0aecdcc9a9c85c329395f8ea831491ccfd6c187490fb568e39973d7ba61967df",
+    "src/core/masks.ts": "7a3c5f86a04afaca7ec0bbdf0f2d98a39d7b9ffebba060a5d4307430d2890a47",
+    "src/core/subject-selection.ts": "c5b3752d06afbbce9c835d58ec03a732f5b566e6310980721ad3835fadd9b4d7",
+    "src/core/shapes.ts": "50e47a6780fd224ca7ac4deddfb1bfba19432f762ae829f6d0005e703b8a2a90",
+    "src/core/lut.ts": "f70ab50b03ef5456dd8ab6fc02267cce8775ed338f8d02d87abdc3f4b17dbeb3",
+    "src/core/recovery-persistence.worker.ts": "7036dd1c023a1475f81a2817e0a1bd843f5fef41209599f269ecf5824be3adef",
+    "src/core/model.ts": "3ef7a725cca042a992e4788476fd683f2d628fd44097e0e6a2ba154a089ca85c",
+    "src/core/pixel-selection.ts": "ca30d9ac12a3977880e29808cd20329c4ac544e5a6d20c84b138112d6bcfc3d8",
+    "src/core/alpha-channels.ts": "29c329117d02fe45c705eff47f70d5bb2a15ec6c4c401722435defd0643b015a",
+    "src/core/svg-masks.ts": "0ddb90ffc6c96324d066711a979e34a28d9ba26e54e5145fa2ff3fc29fbef95e",
+    "src/core/vector-gradient.ts": "c701d6c239ab94f9d33613ec2b0ab0c9546e33c62038442f270874928e083ac2",
+    "src/core/layer-comps.ts": "493480f14c5f6f9ff6b68cf5b5eff76704e07585b88977bec52b04d8c42b342d",
+    "src/core/task-yield.ts": "86f4b20e3c9ba176e89ab045c0e5ed8f5720d6a2d77e0324758f338290b5a685",
+    "src/core/matting.ts": "1aa22bf5c31bd1d4a275986cdb7ab029a4ccb4cf785e9cc45474f56dcdbed4af",
+    "src/core/transform-schema.ts": "25ac9b7de49fec96d6236615892810a2181cd9dfe2c4b316c39a2b622cbb99de",
+    "src/core/validation.ts": "ff465a122933663e774eb7eeaa0ca61d56f8b96c1aa905ff34c0bfc9b65845ef",
+    "src/core/vector-stroke.ts": "843129ba4e9dfabbdfb667d6a92655a1b5f3e9948f1c8e8bda974962f45f739a",
+    "src/core/layer-layout.ts": "d29ebd991307ad28fb2453000b9caac382e726af5187c32c931e086295abb07b",
+    "src/core/guides.ts": "da6378b968b44d15fd9a7c19a2c034132819afbe29147a88720b8f4b928be602",
+    "src/core/project.ts": "ca39bebe4308146605b5442d355d3f0039128a369dc3751f120843390dca3988",
+    "src/core/drawing.ts": "560dd1a20e8943a43ab85042158993bcf3e7440e29a6d9f957883b7dbde9e54b",
+    "src/core/svg-text.ts": "a56618b60bb162ee854e17b3060ff270eec8bcda57f067c0695b8cd4a876649b",
+    "src/core/smart/manager.ts": "7bb1032a468754b11a04efdebe89094051c9edaa2f355da39af806e7e2c81824",
+    "src/core/smart/resolve.ts": "b090bb4067b8e554609aaa0d7230dd5a9a9e4553c7f3a5753040e94a3bb4deb5",
+    "src/core/smart/convert.ts": "0663b543f312fcd99359ad772d974a2f4fd6444a689b22d713313e3665eecb2d",
+    "src/core/smart/filters.ts": "bd83f8af134fc9b610dcb24e2ada68bf00d4bbed3cfba5169938743b4333f55c",
+    "src/core/smart/spatial-filter.ts": "ff75c8c0e203d867d227c7bd475f05ab1a85a9308f2b06b58950c73f087cf57b",
+    "src/core/smart/types.ts": "c2480e89ed81520cf548437799ca1dfbb6af8404269302f34db2b79c1196581b",
+    "src/core/retouch/dodgeBurn.ts": "4594ab30777cd6998620bf7a11ca5411ec6ac291af10f970b7c908e78208ed23",
+    "src/core/retouch/donor.ts": "6c4b8d531c8588e53d83f379087d318c503963b6fba00c2e048f6f9217416541",
+    "src/core/retouch/poisson-solver.ts": "eff11b7d9d41eacf02d6faa92563fb403c13304648a77b85dec12e9d4b69918e",
+    "src/core/retouch/patch-region.ts": "e19d5e6598d9e0a6faaea89a9d8c61fc55ca310c31b9a6524e7c5b37772371a6",
+    "src/core/retouch/tonal-sculpt.ts": "bd0e1cb9ee7629607bbe2bc0f7fd09c9ef7d2e09af9d9fa99c6cbab5d23c2087",
+    "src/core/retouch/heal-spot.ts": "2afd8c640f337b90be31c7527afdaddaef61e83192d27b7df66e746a06b8dec6",
+    "src/core/retouch/types.ts": "0f9f742879bc56655466168636f0237d50b82ee977a4cec193d6754a12eb25fb",
+    "src/core/retouch/poisson.ts": "34f0bc62c19275d23febd71870b6304655fac2352de485c0ad93e96c7111956c",
+    "src/core/interchange/psd/export-plan.ts": "79a6644849a6b50e38e1f8a4c4f6190409a0ad3fc604dfbb4789dfeddf7c285a",
+    "src/core/interchange/psd/parser.ts": "76b8fdc3a18c3388ee7c3d2ddb8f4c13fd5b88319495b80bb97b3e4e351371cd",
+    "src/core/interchange/psd/blend.ts": "2bf40fbe75b26600ff6afaccb2ab6749e607c3e186a772992a0d93a5406f25d0",
+    "src/core/interchange/psd/builder.ts": "777dc8342299fd82402d36cdb6f1b79e39d79cfdb65669dfe3cdca39a1a82acc",
+    "src/core/interchange/psd/composite.ts": "4441889086d602792d92a698e8b36cbfbe39d7bb35dc20eae00d7f6b4b4eaf4c",
+    "src/core/interchange/psd/bridge.ts": "39e98ce747735590ab60ffc631f14b38237a8fe14f443fbd166e1ce9b839c9a7",
+    "src/core/interchange/psd/types.ts": "fcad2e574d230d7ae4fade585d9639af39d5ff084f5f9d856cc53c45263c925a",
+    "src/core/interchange/psd/packbits.ts": "497cf6df4b54d3f0c83a717b3d5448c2d8c4ac6bef6ac0b6e636f5d91b200cc7",
+    "src/core/interchange/psd/index.ts": "3de8aa358ee9845bf5dfe11a85f9b35ed575b6981b9a5996a7ce54713c683844",
+    "src/core/interchange/psd/stream.ts": "da4ffc9a804b8327e135f74267f6e4930da1e85e737bb4fa4a4c0fdf64458f50",
+    "src/core/color/spaces.ts": "3765b8303d77136c7320208a6b06834a584ee6f73b93f8c7410ddf21b51252ba",
+    "src/core/color/engine.ts": "3dcac11418b55e435c15057f66052134aba47be20ba3c2151ad03af087560cba",
+    "src/core/color/icc.ts": "a2bcd01e032087877c4547d25b566eaf7b1251513458125d9584ffe935c03a69",
+    "src/core/color/types.ts": "d214a7178189e92e9b54e83bd7d73ea9f616c26796d125d3e0ea6e5ac8bf12d3",
+    "src/core/color/index.ts": "61eff7dabf74628103796c13e11a3543b3ab686815b5272ddf6179f97c45db72",
+    "src/workspace/autosave.ts": "afd63eed5ca78bc207fa73d8b8fc3e47fbbbce88f3c68dc3458b1927b1e64c87",
+    "src/workspace/project-encoder.ts": "4f6e8db659115d8c6936039c31c98035f1ad62ed9bed436f2d77d4f5388d14bb",
+    "src/workspace/project-encoder.worker.ts": "102fd6d9618fef9014c5d032f94e45b839fa913e362dc8b80911be8e75179ff5",
+    "src/workspace/document-session.ts": "6b9eb9ed0c6549b335950efea0d4fbf46d6fe7a08ff0afc01a03a6bfecab8e08",
+    "src/workspace/graph-transfer.ts": "fd654bcad37d1e4f76efbb2aa1192dd46eb18eda52c6e27f9a7a44f7baf3aa98",
+    "src/workspace/repository.ts": "a57b0e0a0d12d27f96471d2aa8b4f16d269a6204cfe1e30a25b51af302222c4d",
+    "src/intelligence/adapters/local-segmenter.ts": "5fa68f86f3db529ab99a68d1e7fdf294bbb83abe074cd7314f375bf223af41f9",
+    "src/intelligence/adapters/local-tagger.ts": "92c05b3377eabf39a6ddfcfcec75ade00d300bf484ea6695b788a194371c222e",
+    "src/intelligence/adapters/types.ts": "956d78f8abc5059498a7af47f42e56bf44fe4190bd4d84ce69899e095ad487e1",
+    "src/intelligence/adapters/registry.ts": "b9ff5c7c0fa3d6e1354a11b631ebaf3e79d4ce78717baec86a0f9e78a9b9a29c",
+    "src/intelligence/matting/engine.ts": "fc57a96b4d5603d90ede1d5502745c8e4a6d5f12405da97fff4073b6d53e4ada",
+    "src/intelligence/matting/segmentation.ts": "1835129f4bcf8bde38f4b406abd61151b289770bc6f359696e068936b3d03657",
+    "src/intelligence/matting/iterations.ts": "bf0c3594db04383174c149f0ba9502099d5aa3943e0c05d3b754128725214e97",
+    "src/intelligence/matting/coarse.ts": "10ef6c06c3c1dc9d8e29586e230a55ceea609ca8658102bd0771d4177ec30c3e",
+    "src/intelligence/matting/closed-form.ts": "0e930c74eaf41ec34611f189f8b77c0989e2fd1f16008f29a9cdd6346a38bc94",
+    "src/intelligence/matting/types.ts": "df00493aad52a34329abdfed3818e50280d30204cebf9596e659067a77d9ad06",
+    "src/intelligence/matting/index.ts": "eb138cd8ebb6a8394081f0bf1997edd731c813d281868dbf2b7baf0326472091",
+    "src/intelligence/evaluation/benchmark.ts": "03e3eded1a0575f40c5cb1cd6d1e612aca3a0c9b7a4dba0df00199cf42b3f586",
+    "src/intelligence/evaluation/metrics.ts": "6c6c6332cd51826394488caf2ee4b1a64b7ed15a4ff3a7fa77eeea0bf84e5934",
+    "src/intelligence/metadata/service.ts": "a08fb80aabd2bc89c26fbced70f72561b1df4a2af3984ee91179ec4014e713f8",
+    "src/intelligence/metadata/extract.ts": "5cbaf895d36e90628f702c612d844593a13ded701533dc0b5a5c262fe61c93e2",
+    "src/intelligence/metadata/metadata.worker.ts": "1d4829167929bf7b3a9d27c4d487db90d0c30c7e992c33e2c0d05082abcc1ec5",
+    "src/intelligence/metadata/model.ts": "80d5c81c39b792c48640e400d060960b4578fbfdf8fc0e22b3219768ba93fcfa",
+    "src/intelligence/candidates/image-input.ts": "e5418f0143851310f01ebc553b3110635966131b86de3cff8d7f8df72032482c",
+    "src/intelligence/candidates/service.ts": "d6ed07a2b3b2e09de5340565a25f3485af39e8bb295b2631e23562bbde959c1e",
+    "src/intelligence/candidates/types.ts": "e7530bad1fdfededcbbfa6d73e66f0774cca1e3dda4bcba2fd4a0f980308a68c",
+    "src/tools/mattingTool.ts": "b018643500d9edc480c667f41381deed32ba7c2d8d9e2258b13f6258aee369c4",
+    "src/dom/layer-selection.ts": "d4852512af598c7cf1876b78cb00aedd9327799129646da2660f23ff3ce0e036",
+    "src/dom/retouch.ts": "01875fca5be8c246e210cea3dbfbc16b2a389925892355e51138524d848cc31a",
+    "src/dom/metadata.ts": "f34219c38199fb072496044c200189f457b319c8d6620b4d156b80c1606b4ed5",
+    "src/dom/masks.ts": "f9a2e304da236131bdd3fb64258d4e5336318be0c47fc7bc62068498cf22a5db",
+    "src/dom/smart-filters.ts": "952db373456f3e9a485a139b26837f0b9dec5f7478fa701c736383bd22dd9e82",
+    "src/dom/alpha-channels.ts": "f0214baadb58bf2232ca22a62b42413cc75cb94e566ed7ea05a9970668113c2d",
+    "src/dom/values.ts": "319a7f047d6313841378445a0366d33ebfc797c29a0cd69e1660e7bbca6da99c",
+    "src/dom/layer-comps.ts": "8c1a4baceca158ec5e79c4eeddbf67a7993b2cc52e7c1f73637f734a1f4bae6b",
+    "src/dom/guides.ts": "3561ecafec2a495abe7c9783a6f073572ae3d176f3a275bde594faa8648e37ef",
+    "src/dom/index.ts": "76b3ce0abb5a9374ce79b6ab7388d1b8e152c90f7ffe0e299c2fba1022cf1c1a",
+    "src/ai/batch/source-names.ts": "5f737bc999c56983d08ae13a389e5e0c160f10c09896c53d24771c57ee87a51c",
+    "src/ai/batch/service.ts": "b488371b3a6e3c70702e75120f3ec937679b2cdf4edee614eefec3a5ad3308b5",
+    "src/ai/batch/storage.ts": "864bdfe6c4b32e8722cf43a848bb80bf7f09162b2dbc3243d7eaab668a362e88",
+    "src/ai/batch/zip.ts": "d4c9577c51e96bb1d818a86d14b284ad61c6c8a55647232c95d42c15d720fd1c",
+    "src/ai/batch/manifest.ts": "d2be0fcf1175df5797dfcf7290a8823c54f6255d97ee5a2b0c3343b02d6d0829",
+    "src/ai/batch/types.ts": "655d6beea8b1c3ca548ca5aeb067a64fc1207f8b83f415720aa20e3500c0b858",
+    "src/ai/batch/runner.ts": "bb3535f9e59df0c20ec5a7325ea1766143093a2911d6b7ad74fac7873f471cd2",
+    "src/ai/batch/schema.ts": "cf34e1498309abe7f53453464d749b48ea71e56ef1dd24fdd988db484a8b44bc",
+    "src/ai/batch/index.ts": "c6b041dbf4103312978a7446b654de0e3fac9d964d3fcc0e42b7f88c7de5ec09",
+    "src/ai/jobs/candidate-storage.ts": "e4fd90216bbb992cbcd3f15abb8e3cc54a6a9b0ed09440630afedd8686a6c23b",
+    "src/ai/jobs/service.ts": "ad7eedf58904a257e58e8c46943cbbb74a98f890ac763d1c589b78e448c034a8",
+    "src/ai/jobs/staging.ts": "e1791b5f2a4cad713779346f1338a28a5df601e72e837dc6aabf6e0d17f1f0e8",
+    "src/ai/jobs/fingerprint.ts": "7be68422258275c34cfc2b45510603e667efc537ceb92a41feb78f16c61b8cbf",
+    "src/ai/jobs/types.ts": "11caa3997560c056608f1a489323d47d3243f9a2b60bb0179dd585df2a11fb17",
+    "src/ai/jobs/journal.ts": "e74a912cf9f26f3f7a0a0ada17cff80ca6ba85a294afdf1d615a038e544dbb51",
+    "src/ai/jobs/apply.ts": "6dbbb839460e2b4f829a96cfc1c4d5eca74a14ea621de20fc1a6cb8225e4fa5f",
+    "src/ai/jobs/ledger.ts": "3f292e497124f30e24683bf5044fbaed5f8a98b733eed9c50bbf45bc49efe295",
+    "src/ai/jobs/index.ts": "79344959e351e8bf8894d15c86ec7ef0a90e884fe750d06460482a2e61923480",
+    "src/ai/jobs/thumbnail.ts": "cc0767dcd003b5b2a80f6ec96f78c52434910d978b9bf7707afe129b382c8f5a",
+    "src/ai/jobs/validate-request.ts": "2ad0e9d7eedfaba5b17954f4d4d38945c9ed628b73564e1f11ea9a6e6e487e03",
+    "src/ai/diff/engine.ts": "731ef704c21d85b066e4f0a241895360e879140c719da5491d31e87b72bbad4a",
+    "src/ai/diff/types.ts": "f3b410f36891a8397b2b20970778952d5edd99f36cb8b31330274743862068fb",
+    "src/ai/diff/index.ts": "ad3bd580b8fff2875ed6c32fabfc56011be9df3e3fb0e2183cb2176695dcb75d",
+    "src/ai/providers/types.ts": "ddbc0933cf6c1f966083117a0ba06e5f1a556ccacdbfd75a2012178b67c0e379",
+    "src/ai/providers/registry.ts": "bbf2f4be446dd6566698eb0965c1f58722bfdb9bb2aa261cdeafdb26429fa2d5",
+    "src/ai/providers/index.ts": "d2dbf90ebe2bf325476b29be41de1cac5191ed07c475e6d4f96b5a2cba95c87d",
+    "src/ai/recipes/package-executor.ts": "9e62982b3c9f4a727f8f29ea9f7a0a38866642412a5f028c7ba1754e53736df5",
+    "src/ai/recipes/presets.ts": "3854b5dd26f95c30511cfa15df322155f07c5bba7eae82d2dd928949d81ac59b",
+    "src/ai/recipes/executor.ts": "4d529c65e7ab1fee6c025f642ca3846f9a93cfe9b6a3c14317a7cfb753fbf5c6",
+    "src/ai/recipes/package-storage.ts": "482c20aefc14ee089ef3c8c5646bd96d00dbab2e8086b5a0182edd0105b13467",
+    "src/ai/recipes/package.ts": "787d91528bee9e12b23177dfa305ec3250493d92acfc5a4efc30a29136efce2b",
+    "src/ai/recipes/service.ts": "0b689826e3a22e351ae9dbe84c9de2388a1aebede75aaec3f68737b44cb4ff8b",
+    "src/ai/recipes/recorder.ts": "41a4f57c5dc4cd1852068154b49ec9005776c9d5c45b3c8dbb8f5cf30dcc2e44",
+    "src/ai/recipes/storage.ts": "7b5bac3a8ca8773710d14e89bce9e986c449b02aae8d2766abf1e790ccd84d90",
+    "src/ai/recipes/types.ts": "125a6e321cb9aaa7a632fa51dd4bc086e168efeea6848cd27b65e3bd7afd3107",
+    "src/ai/recipes/resolver.ts": "31676da9e438c033c48146eb04773609b58bdac2d00a0ec0c8269cf1579de512",
+    "src/ai/recipes/schema.ts": "082f1dd4ad02a753b222d67f522c06b58e4cd118eec8b58df10a3eb910d2569c",
+    "src/ai/recipes/index.ts": "a83e72750ecf672e1771d045a9ee48033f3a945871a6822b168715988aa32de3",
+    "src/ai/evaluation/bakeoff.ts": "e9c5f6774e3bb804f841c517012c3c1b6d969e1e94ed2be0af16dd8ab7a631ca",
+    "src/ai/evaluation/metrics.ts": "951617626bc60452e8ceb2a483c075c5d78c1f7b8d7adb1b4b0728da6ad0a4dc",
+    "server/color-range.ts": "dd79f304fe10868179d42c9110f1acb10ce78c6aea4cee120dca36722681f8d4",
+    "server/preflight.ts": "fa607a7f4f9c853585269ea252b5f868e9f4af5406668815e44bf80e22ae43d0",
+    "server/matting-runtime.ts": "17acd17d32f085825d6821301cd25333d7603b2c196ef9c9665a661fd438f694",
+    "server/subject-selection-worker.mjs": "5742254591032178d3522351f9a18962d63096698c5e22594461d6e4ce31303f",
+    "server/matting-worker.mjs": "d9a3f7b6defde59acca2a235dc8b33a60b7e0ee1b9c29d29fb98ca8f65919f20",
+    "server/quick-selection-worker.mjs": "720bd2435229fd0da782b0a2354e0e1bf300f9ea5e69347501a53be0c85d4e7a",
+    "server/png-rows.ts": "d7cb945f0483b4b7792e11071be3563cb08deedb59882f0ccdc2f425fdad2ead",
+    "server/selection.ts": "0cb771aaa768186e051b2be9c6a2a1e88375d65ea2e4cc76dad07c74e03ea02d",
+    "server/quick-selection.ts": "1ab4b1819ecca4765a8dfd138df36ffdbd681b483e21447b3a8ab9b6e9f27e13",
+    "server/app.ts": "c365c35c0d3e2ea19d6def5f1e80fa9f4cafa86526017fb8591be56834119218",
+    "server/selection-worker.mjs": "b59f9bc6463a0630474517d1c222bd520ea48a221c357dd15d5fc2250b6ba76e",
+    "server/subject-selection.ts": "9a6208a2caa97c38ac531f027a2e8229b9e061a893967bfe97554e9b7c60ff1c",
+    "server/color-range-worker.mjs": "68332ec79f9d6d245103ad4d8c198afb2099418c27688524175d10ecf42d7633",
+    "server/matting.ts": "38b8e7a095d7fee73e8a90966d127db5ee0728f7a89d4af4c44cdc01caaa0f90",
+    "server/index.ts": "7b736e97e745b666c09f30aae274579f1029c57edfebd502fc62a23fc9df5fb0",
+    "server/preflight-worker.mjs": "fc86be92b9e3238dc9c2292041a6af0f41ed58b1916e69146e57b1020ef27b2b",
+    "assembly/white-balance.ts": "e7f5785c97cb745b22b9a61f785e4b1fa5358adbc70df393afeb184a81738238",
+    "assembly/pixels.ts": "ba0d75e22076c5fd70fbae44c460c7efb18969eb27d9afc08b4b11810e8423d1",
+    "assembly/color-range.ts": "7f712fe3aef29940ea3b57050adbf22fe644101199bac18a1a20063983dbfa3e",
+    "assembly/donor.ts": "7d67cc3268544d5ca5200dcb3a0de016f6a876e662fed52fd5388d730326bb1c",
+    "assembly/gradient-map.ts": "1734178832c4616a490fea28231ce6cdc37e3a5115c723c8d39a378c13ab6d61",
+    "assembly/quick-selection.ts": "25e51c2fab7b526e7e6dfc261e5aef25f7f30ff242046426a7a7bd92807b9152",
+    "assembly/chromatic.ts": "2d7516148956a8d41f54021d73a65f41d6a68b414b4632d66db46df0314f2295",
+    "assembly/spatial-filter.ts": "6ad490cb47a6a4148ff478bda59b8275fc37162f78d6d7570c611be23aa4032e",
+    "assembly/subject-selection.ts": "dd67ff02d342c0f806f65629120399ea20e04894a2d40784badb5abd3e79dc36",
+    "assembly/poisson.ts": "e6128865a28b6e01ae7564c90bb41c056552a2867160c6311a5470fc80a04057",
+    "assembly/lookup.ts": "dd29389050bb4f5eeb6fa9f4b29a79700da2f2c171b37f42ba9fe3f66c0490ef",
+    "assembly/hsl.ts": "afee2e8be10ce272fcd6ed40d21a553b3439cd600e738490a67b6013c1dcf74c",
+    "assembly/matting.ts": "7679a69f360a541dfdbdaebfced6d2ab64211f1be3b460e74a5e6754d655dd45",
+    "scripts/check-psd-interoperability.ts": "ce440bf5a0b1d73904da887bbd4e47bcad2b4b8afb7ae8d93bfb74ba6af976f9",
+    "scripts/generate-lut-reference.py": "031b22bc112ce1bf6d07017d14dce8ab0d367b369593cb07d0abecfface2afd5",
+    "scripts/benchmark-retouch.ts": "428aed78d873b9ae3d13c34862dc0a80afc3a02663fe1ce03f9e6fd5e64ad063",
+    "scripts/generate-white-balance-reference.py": "d2b452caac81e6763426f20c7cce54caea03229d892fe169b7fb83bacee44229",
+    "scripts/check-rendered-psd.py": "fe644fd41710bcea6937c50ebb0bfbeb66a1864d3642993a8101ac3e5bc0e06f",
+    "scripts/generate-closed-form-reference.py": "c1ddab70025889c74110b0d9cde1902e6b46888c3d72d8340bc2f533fb6e27fd",
+    "scripts/score-matting-natural.py": "5cc9e58c78ca91f7cf011d2bcd75813978a75730b4dd30622e7448cc24903d2c",
+    "scripts/generate-matting-fixtures.py": "a0747a3d305413f4b5f198404436fde7a130cb6a7804dbd8f0b3994f18b17e09",
+    "scripts/report-matting-natural.py": "fff08d376f8bc22bc3d039eb0808c05f22b7a551903eea88bcf36d6ca7b2abbc",
+    "scripts/benchmark-matting-natural.ts": "8dfd557685385f7f3c1e8bd9fe80c58fac9a847aed9e73ffef0a220e56956419",
+    "scripts/generate-subject-fixtures.py": "d976c59cf8af945ed0f23a0f962d5c826dc321e44ff676db89b7616605511594",
+    "scripts/generate-independent-psd.py": "eb31f874be6c35621f5019bb7acd6e846cdf173313308e4a94b6a541db2df46d",
+    "scripts/generate-seo-assets.mjs": "b3fe7c416a865f299fee5568b6653a8a4c6edef8bfaab8b3cac4a333eda771a4",
+    "scripts/reference-matting-natural.py": "9245a708d2574c932989fa5be50702a9aafda30855b04a0d328c4b19d7c492cb",
+    "scripts/generate-color-range-fixtures.py": "66d8ae587507224afded56de449b09a81b06bb10471f41db9efd735b1cf99662",
+    "scripts/build-scripting.mjs": "633b05488ea0568794e31e7bc15817cea6545f7ac5d5bd6c3caaa7acb1b1cdd3",
+    "scripts/build-docs.mjs": "44f9f906344930385de05c3c9ef8279c837c14b5e5def9c957e2f5daef049947",
+    "scripts/prepare-matting-evaluation.py": "22fdadc10e868cf51bd587450bdf913947e6b9367df8310c41d1eff97ad0d626",
+    "tests/panel-layout.test.ts": "f64b57903a73317780103af3823343f64c86120e029a7f24f7f24a93d29ca6cf",
+    "tests/hsl.e2e.ts": "7bb0f141b30296b37e51b0d5fb9ac43b26ac5fb6547171db70157c375d67d6a1",
+    "tests/recovery-list-latency.e2e.ts": "63988dc5479f108946fad842ee8bd7369a4bf53b1ffc151c65438424b0ba2e2b",
+    "tests/edit-degradation.e2e.ts": "9b22e05101e8c847ba7a6a55818b7a7ece60180664411834fb32df9a96518944",
+    "tests/path-bounds.test.ts": "6bb91e5fd7a000112f1e7076ba7221a1d684bd109e67b802685378655b0052a7",
+    "tests/metadata.e2e.ts": "e4fe923fb271ffc662684d8647303a85117422859aac44c27e6fd5aeae250dbb",
+    "tests/gradient-map-gpu.e2e.ts": "0bb8252f091788d49ac8f9b1203a95eb4a6ea308da84f55c517fe462b77cbeb5",
+    "tests/batch.test.ts": "f953e6498a6018fa5004459d0955c88b9055d981c8a12d38a540a8c359ff49d2",
+    "tests/snapping.e2e.ts": "453d7708c5011916c8a901a2daff389829bc0270d54ce7575a18e7f3b75daa4a",
+    "tests/color-latency.e2e.ts": "370b7e45f0097813c5ebbaa45c7e7cbd2e13f6210da340e0593e9b748c146afa",
+    "tests/dodge-burn.test.ts": "a95bd9fd6416a38e2aaeb6e5b638afc8a76a9cd8decd5c7979a8de58f4df0cb9",
+    "tests/preflight-api.test.ts": "04d52943a61273b6c79b96bf33f17736ced21073725cf4ff506dccc468d38e48",
+    "tests/analysis-adapters.test.ts": "0e303a418b87e7be039321f8fb1611bfce29ecc2d86fbf36275978bf1e1346ec",
+    "tests/delivery-fit.e2e.ts": "6c7916b0dd72f4f28f466971e527eda901f9dc894ae55e6492baf95cd3147d4d",
+    "tests/crop-controller.test.ts": "33d4ae3bb016e0755dc7d80cbe5fd52c3c92ca96587a02ad76142ddcc234bfc0",
+    "tests/direct-composite.e2e.ts": "adbb2960947669da34a1d2ecb599ab2f135d0082c1317b3d661bf98a14244643",
+    "tests/workspace.e2e.ts": "07c5eea4a85a936fff7c98298d5d3e8b7a49ee08f9621a30a866f605f0978c01",
+    "tests/delivery-unicode.test.ts": "40e6894798bc6efa3426e0a8001a9c8e1a7a4d0dbcd67291c63248954fabd1de",
+    "tests/recovery-worker.e2e.ts": "46017c4102546006f1df5103b4f0a78091418acb6b88ac1d6b65315b8833781d",
+    "tests/tonal-sculpt.test.ts": "44d3e77347f364fef39e0461677073519f6f8d1b1d4cd10ec382e9ad71a03aa3",
+    "tests/recipe-package.test.ts": "2106778b7caccc2429ee0017a9b13769aaaffd9279633ddcd37d978f43b7600c",
+    "tests/white-balance.e2e.ts": "50e55d327fc2befa40ae0dff69b6af154e086f14a7ff5d2f8d1ff6d46fb76826",
+    "tests/bezier.test.ts": "ca8775dd00a5b8497c1c331397f102e41a99ad14760bf2aba66e2fc6f5a8272a",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/crop.test.ts": "13b2adf93d741edd52b28658a465eb9fc8f32cf920f4b25e74ed923ebed05970",
+    "tests/context-menu.e2e.ts": "cebcd45d54d975f3abadd06c3e89ba245690f335ce81e3e1cfcad95e55a287cf",
+    "tests/chromatic-gpu.e2e.ts": "8ea9805750c54b6eb3e7ac6d9ee3225a9e31c59bf936c6cd3e00fa2e3512332c",
+    "tests/alpha-channels.test.ts": "fc2ed598bbeea93af57959637b41efa7279b9e267b46de95d3ca08a1a0cada11",
+    "tests/gradient-map.test.ts": "b3b17dc9a7c0df0085862eb6ae69e9a1aa2c7f4996aa09e8b1d02ce095e48490",
+    "tests/affine.test.ts": "2d2a21539dcab8b9ef633754f69226ea0aee6cee910134fe0cccd739e51dbd72",
+    "tests/matting.e2e.ts": "a4c8db68bb781e82cfc4ead8f258e6ff5149fde8f6b14f9729d292b646486b1d",
+    "tests/filter-mask-latency.e2e.ts": "92a2821ad4cc49510a8f30e3706234b019e9811a944ae6ac26fa1b2db407988b",
+    "tests/zip64.test.ts": "0e8e0e8fda562ce5f6823368e46f7edb7f19be461370c5f089023842696d3e49",
+    "tests/vector-gradients.e2e.ts": "7d5df0f6b28128911876934596625dd43075c545fcbf6561812655351c4b0dc6",
+    "tests/candidate-lifetime.e2e.ts": "4ff82dc738bcde06c89b80f471ecedb0e8d1760308351fccbdd00803ea658337",
+    "tests/filter-tile-cache.e2e.ts": "dcb85006e3cf12784c24dc33a8783f65d7a599c85451e65c3cf0e55caaccb942",
+    "tests/smart-registry.test.ts": "2e4a0ceb1f9cbb803202081c8ff5477bbb713679bad5d575917e3907d7345037",
+    "tests/move-document-latency.e2e.ts": "9e71527e7265688de7dac21eda32c75dc04cfc5d992f4af3ff99ba6d705369fc",
+    "tests/project-open-latency.e2e.ts": "7f46caf2505680e8ae22b433346ad55a3c90bfd7ff7c0c383e219111033ad8db",
+    "tests/selection-transform.test.ts": "f226132c2bfde2386628feda9f60d136e8e492b58984933a65a9e61097ad1573",
+    "tests/white-balance-gpu.e2e.ts": "8f3262c4b0e4bcb3a17c68fafd6193a656aeb342aa11067f6521ff4cd55f0faf",
+    "tests/authored-metadata.test.ts": "605e3d143ffcedeed77fa4e95ab5fd7697853fec3b77ab7111732cc9a4e234e7",
+    "tests/routine-latency.e2e.ts": "257f87b6ee58306cce69b8e5c9ed9ab2c2860f500f822de4578da5b0e8d471a3",
+    "tests/recovery.e2e.ts": "9bbd362dd3052d2bd75bcb5e15ce26253d976f762ba270bf0466698cdd99f642",
+    "tests/script-runtime-phases.e2e.ts": "f7f6cf9a857e8237096f4de30751ec7cfb02ec71abc5462eea72d7a9fd8ddb8f",
+    "tests/script-healing.e2e.ts": "bbf1e69c1517bfeaf3f7cd8b1258e310c5dbb456ea7c50cf8327d6d09b7208ce",
+    "tests/psd-export.test.ts": "d62f49a1a00c9e4e18f0cf3f2ef516f8f38b041584b1735340453b23f66f89c7",
+    "tests/matting-native.e2e.ts": "028b356317c3e42b3c3396eb1b1004bb37c41b51336eb0c01f44a87e3e88598e",
+    "tests/filter-mask-paint.e2e.ts": "f8be90dd81ea2b4112781a552689de08245f01bf638292ea50a4ed83c4faa21b",
+    "tests/color-response.e2e.ts": "88255d949fb5aad86b914195fb661f79a4e1ade5e59825eaadbd75af56963f58",
+    "tests/project.test.ts": "ebb83e8aa3cb3317c48fd89eda1e6dd45a708d2647e9eb53891ac263515cb750",
+    "tests/svg-export.test.ts": "5fd6fe0fce483c2bc634a0e73361b61faca71a6efb5bb070e8826cc9cfc50116",
+    "tests/workspace-discovery.e2e.ts": "209437b6636613d03a26ff88d3d5cc76bebc925aac11492174f3f66f94255d00",
+    "tests/recipe-shadow.e2e.ts": "ad863ee93dfa1163aab4cc638783638dbaf289f71a9a2a09dd5e895c10958719",
+    "tests/protected-masked-edit.test.ts": "00225c98d8ca7cbf0c7b8202f516dc44e0050c1322733cd056d2e8fa82dd94b3",
+    "tests/candidate-discard.e2e.ts": "03d3c96f9fe67331bc19fe07d9a6ab89bbef4b640772f9f381be24773b6c28be",
+    "tests/patch-adjustment.test.ts": "34b5d8a0bd6cb820ed835c32d8366eb7caa0ad74f96d19bc49d6e8ef0d6ac5c5",
+    "tests/svg-images.e2e.ts": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+    "tests/smart-dom.test.ts": "15b63001877656b713936e0501918faf55bf56e37940ec8a37f5115b1a7b2ccc",
+    "tests/color-range.test.ts": "ff4ca04033336731fc13564318173873b036fed5b473d96d9d8d27ededa49a25",
+    "tests/document-switch-latency.e2e.ts": "ac046dc46b0e2e18ef3c5a83e01a931ce607f2a2360f69940321efaca9894c3a",
+    "tests/layer-comps.test.ts": "d999634d733cdfef80e258011b9e9c6a7882de947ee73ce570a13277090c9ee2",
+    "tests/raster-inspector-latency.e2e.ts": "4f8525788978d5127fd2b7dcaad851ae7cd54ba0b54e1f8363880ecafd155310",
+    "tests/quick-selection.e2e.ts": "738df01b5700c8b186c48f82995ebde5e7b0f195b782644fb0ee9dd44d9a5e99",
+    "tests/panel-layout.e2e.ts": "aede0d5bd779476c6a61f3a3ad2f316a203d0c7f00d1cb65b09ea0a0e0a90ab1",
+    "tests/layer-flip.e2e.ts": "d117ffb91e65cfc912ffbc7b21479804614de394987b2b43c05fda6f47bf20e7",
+    "tests/polygon-lasso.e2e.ts": "857f6834af4c050b861021493e5ffe5d1289d0cca9c7fdee1e2a98a62de8c807",
+    "tests/png-rows.test.ts": "21947eebf8975bc7937a3e92cb012765ad9a79b68b9f010bee93e12d28184cba",
+    "tests/donor-search.e2e.ts": "0d392416677281442831db2fc089d71b795dcc18f4330fee093516ea0d3eb3b9",
+    "tests/layer-selection.e2e.ts": "76e06867d037a3546d8a7225c73d6e1ea3e4344574bf2bfdbd8796f2923561ff",
+    "tests/recovery-restore-latency.e2e.ts": "cff096bf13b8e2a1f69b249343145939b4b4475a3eac8db5864667e99d9911f0",
+    "tests/feathered-selection.e2e.ts": "74a7b102627af7dc86ba022e763910e468e7cf391905afc330bb9215d0af5532",
+    "tests/render-cancellation-latency.e2e.ts": "176aff16019c722ff40c2c84ccba96c38f459bcd260313b621456ba54bdd96bc",
+    "tests/pixel-operation-latency.e2e.ts": "cae7d68bfe499ad03d052a32d43d421d19d9d70f32e5be22ad0b8c2fda69a4d1",
+    "tests/spatial-filter-wasm.test.ts": "565074937d01b66476296eab649f72a6bc90ab959303ac565c219f8abe0ce827",
+    "tests/ui-utils.test.ts": "26d8dafde4f342abe9fcbf630233bc5102bb9418c9d29d0f59cc60055a8f3532",
+    "tests/crop.e2e.ts": "86dffcc5083c26b6954b41212432713de9c53d2d1bec15a4e553d9df246dc980",
+    "tests/smart-raster.e2e.ts": "7cbd1ba3565913198427fee8dde99f6e29cf5448c19d9a88da95718f6fd1ec18",
+    "tests/json-encoding.test.ts": "c0dabc8c18304c22f8c490ed2a4f588cd107bb56a6265257ab1a3a4382a1e0c2",
+    "tests/spatial-filter.e2e.ts": "4753805adf0ed4a8fa159c34686b796dd7e267e826e97b97d04bf4f334baec2c",
+    "tests/closed-form-matting.e2e.ts": "5a452aed2f800e2257975af4ad11156a41d5068f9f10250524a258b75f9ade8a",
+    "tests/smart-filters.e2e.ts": "1ee5b65dfc2a5603042ab9b11a78def3ce9b223038c3d330e3e362d536dfb578",
+    "tests/mask-signature.test.ts": "ead8b0e40f8bd419ed2e31d57e0afa53561eb856abc5ef24de7962f01efb1870",
+    "tests/healing.e2e.ts": "b83229b8c4bf76c4857967e120aa56ceed97d09db1ad5d90d7535448560c5c4a",
+    "tests/smart-linked.e2e.ts": "8b4cd1362232f83316528ed34ed00de4ba8ad9b8237ad63f64bcf07f9a31bba7",
+    "tests/png-encoding.e2e.ts": "7a5bbf26d066bac9c872b97d67e9be60a0726fde1b7871fcc75d0dfe3b1ffdb0",
+    "tests/webgpu.e2e.ts": "a43e5cc1d82705d1d4799dcd0668071afdc5e70daf6898da51ccc762381f5dca",
+    "tests/filter-mask-wasm.test.ts": "09ebf80e6b3fb9ea578b94bf79cea7be2ccbebf683d0b40106f759cd906ec8af",
+    "tests/selection-outline-worker.e2e.ts": "c5cd416b6a3507f11eed7a18cff876f325f3bc2b23b7ef34a1969aa56591dbe4",
+    "tests/svg-paint.test.ts": "3c39f24053434feb260a3d5162bc18afea25ab8bf51c05f320e8d8cf8f54cf88",
+    "tests/rulers.test.ts": "72ecc422a73c400c4c9e4b36abad59089ff9f15be94e4be744cd1f69ccee1abb",
+    "tests/matting.test.ts": "9882581707bdb771635fc47db9eda52d31c05ad56993490d1fdbfc2ba427e7db",
+    "tests/paint-scratch.e2e.ts": "16b143e3c1d55f9e9ac27de7f518713f20973614751c2e3c824a7e4559d44d51",
+    "tests/subject-selection.e2e.ts": "e144d8a9e189790b67579b1b2c85812997114e8892c334b4397161b348335a1b",
+    "tests/brushes.test.ts": "def07baac90a2fffc7147c03b86db2b7276440aa50b03d0428d4c136aff93193",
+    "tests/text-cache-bounds.e2e.ts": "2a6dd3d66990adf68a1d1a8a204e94616e5fcc55562012d6388d35e58ca15e01",
+    "tests/mask-pen.test.ts": "8c693c7332514f90725982a7193cb42223b2198856afecd702a25c217444f418",
+    "tests/layer-filter.test.ts": "565b4f0adf8eebbaaa50d549f194e4886c058f566565e618f572bdd231c8cc22",
+    "tests/compact-cache.e2e.ts": "d564c6fd81e1789f31966e9fb5b87fa015378063eada149a0ee839b83540ebda",
+    "tests/recovery-controller.test.ts": "d867cbb2f8d2f3b4cfa7b440a552001a990aeab90d61551903b5f81e98f818a7",
+    "tests/immutable.test.ts": "5673b9f521e1ac6affddfcf0194177f9470501c06fb788a242a1c32d6606fa9f",
+    "tests/hsl.test.ts": "0570819fb0dcae3ffbe8b47b86a962612ea9e5bf21beb74289adab14d42b77d5",
+    "tests/path-validation.test.ts": "02de7b84c3f6f6a30c0745d754915fe6170b33b8984b4993591a23f13dee9da3",
+    "tests/recipe-storage.test.ts": "96b2a89dcc47b9ad5aff931e28f70e209c4afd6391da8b9b66feb84b13c29ca4",
+    "tests/content-signature.test.ts": "b965a0259769a64dc1572500f667f00dbba01aa0de047dc10035092853837932",
+    "tests/deep-history-latency.e2e.ts": "8781ebf3b9bad061220cd29003ce9c4a967f1f09b92192ea2f2fe4f1a02cae82",
+    "tests/batch-storage.e2e.ts": "18364695cb336173db9622dec08acf9231013bb954395eec3b82906883566a96",
+    "tests/gradient-map.e2e.ts": "630c0669e433ff65f0fd69db0edcf32c51bf1370adee1245cac18bd83eef5c76",
+    "tests/preflight.test.ts": "f8bc8bb426fca155b2173715cc601a0ada9003a8b0fa4c10f26fd3f15e88abdb",
+    "tests/subject-selection-api.test.ts": "0f60af033be7653bcaae13a1773276d349f4cd415b6ae97c639f4fe68ca83440",
+    "tests/generation-journal.e2e.ts": "753d386b9b948e462360ea531a7d7c3f59923751cb39883c88c1210b54a57183",
+    "tests/project-encoder.e2e.ts": "79713331dd32ac251b535f99eb4ce131403d6afa4467c29f10e370f97527e37c",
+    "tests/recipes.e2e.ts": "0f72101c3239b598146cd32b25900f67e02ce55623b47280429f4332777e8e04",
+    "tests/patch-adjustment.e2e.ts": "fdf7c5edc3ce2fa83d48682afda4a308966981f95b9c7a8b2a6dbaf0a3207131",
+    "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+    "tests/psd-interchange.test.ts": "35fe5b9e6bb57207f2baf06c3f99b291e71219c9d071c54626ec8ddcb53d3121",
+    "tests/large-image-latency.e2e.ts": "87af13f22ecfa99b867fd7b20704eb7f855462e70159f7363f8a11581fa9aa36",
+    "tests/command-search.test.ts": "c8dc254d4094a22492a119e36bd437cd09472b2a14bdcb1e166e4a9dd041794e",
+    "tests/render-transform.test.ts": "9953774b4c6ae7ceee00fe3a4c5cf469e0843a6cfb36d67cba87a12464d4d3fa",
+    "tests/layer-comps.e2e.ts": "5a842180d1ed709ba8b415d6ea6a7141c242c64710faf8ff66d52bc6afa23258",
+    "tests/styled-bounds.e2e.ts": "6bd95351acbb1cae84917a285bf4e76afa88dbacc030c7717b9af04c08d36d91",
+    "tests/production.e2e.ts": "c73c785047a75ad61a9a0a7995cd3b59923b3e84f98cf882f607d9d16cdd04ec",
+    "tests/transform-presentation.e2e.ts": "38002fdc8176f1cfd3cb0f836b73aa5e2f7ff49eb879735ab684902ea56f53d4",
+    "tests/masks.test.ts": "67342e70704653501af852c7d950902044e7ade20ce1850e54b44d391400d049",
+    "tests/workspace-smart-links.e2e.ts": "0f91227a1462a195a53ac154dacb65541ffc1dd8713f4aa1ec24a19e4651ce1c",
+    "tests/smart-resolve.test.ts": "81a520030c0699d65e1fed1f08f8cdfd1f2757a0d74c47fde191635f2adcd21b",
+    "tests/filter-tile-cache.test.ts": "dac7b2626e81e92c0769ad6a8e49ca4230b325997db1c613a2db1a5476aea49a",
+    "tests/generation-recovery.e2e.ts": "fc819468b17ae47f223d164ea9c40989dff51f12df971f4a7f13cedd09595bcb",
+    "tests/processor-lifecycle.test.ts": "7f94f471068e8d66df772d14d20e4ea12ca01565c9b02f0d78f3036471689651",
+    "tests/shortcut-bindings.e2e.ts": "96e475c0a39bf2d6b387b0de8c734976dbc9c56f4b0582c85869755840c6823d",
+    "tests/closed-form-matting.test.ts": "4c2af2ce91740446f92fbb2cb4eb7cb694b5aead1be6d43773a10a3fb0540651",
+    "tests/layer-transform.test.ts": "91ebd692f40d65d06f1cf9ff5be39f88def7ca795035e0e6bb1af246469ea8a1",
+    "tests/generation-jobs.test.ts": "7b1bd6818a66fda94360fcdb9663bd78c6b38080080fdf20eed15884230aac39",
+    "tests/smart-filters-ui.e2e.ts": "b2362dc87bef55b6828211490a3afc320b8ab2f471c35438a6884c651322c42d",
+    "tests/rendering.e2e.ts": "9ff4575e6427ab9060adc56b997d21f8fc249ae311262f14610a2f7196e94bc9",
+    "tests/masks.e2e.ts": "bcb440f5d57c1bc1379a5af720bb884895a1aa25463cf6d484339dab609796f9",
+    "tests/recipes.test.ts": "fd23d72a8b34794b00439db255dae22dc6c745ce1804dc22726764ac1abe6df8",
+    "tests/png-fixture.ts": "4249304038f03d048154f8a7628369aa4383ba387d27a22d8c75120f4517cfce",
+    "tests/dodge-burn.e2e.ts": "3c8365af4739474da50ef57829ac742859ab6a284092c1ed4406792c55b41184",
+    "tests/quick-selection.test.ts": "be3f3d129acb829874e725b405f0d1bd22ae5f7a0e5c2b219352fe86852c8671",
+    "tests/foundation-increments.e2e.ts": "fe4f0fbecd4952e9d3ff0b140cb10751f0452a1794a22d6d8670566e92b47718",
+    "tests/smart-transfer.e2e.ts": "370c1aeac9009f2e281d212cd7ac9aa60afa387b8c34a87bcefb5c3d6180864a",
+    "tests/recipe-concurrency.e2e.ts": "62e31c2099d5fc159e6b4cc58ede7d62c2cfdd9ea2b9ab7faabc89de21587b9d",
+    "tests/donor-search.test.ts": "66b9223506ef122bfae7a999800a8d7170b2b2c888f6f78d07cdfd7f0985ed96",
+    "tests/committed-paint.e2e.ts": "7d9dd83b241e5efe3bbbded6fc19dceba6ecaef48b0b15d90784ac3c07e451e4",
+    "tests/alpha-channels.e2e.ts": "04c695042420aa506e5ba4fe87508c9efea9d0f03ae0112d0c72759bfa994aa7",
+    "tests/vector-strokes.e2e.ts": "820bf527c6d3e9b1cdd2dcfa54e1534e924d1ee03eb38f32a5022cc39bf3dd19",
+    "tests/lut.test.ts": "575b996c76aed512dd8670a43d27f959f6da40b2ebdd3708fe6e487446f1eab6",
+    "tests/snapping.test.ts": "544a3fa738a3777e127cd05532c9359523a357ba470a59b0f15fbc26b29c3ba3",
+    "tests/generate-layer.e2e.ts": "34ea06c1d567e110837d8ec4768ebf2f9189d8ad621073bda7f91cad867361c9",
+    "tests/collapsible-inspector.e2e.ts": "902c4f05ba47eb66baa7cbec04d4b1d5254dde8ea1051affdd3cf09a6682e60c",
+    "tests/zip64.e2e.ts": "e799cb5a478b23a8796a3c4f999a8e19e8d15857ac1e488a81a32c84991dead1",
+    "tests/image-resize.test.ts": "275804af71667599e9410c24e64c94d28c8144dd0433ffab52d0a975d22c3860",
+    "tests/recovery-latency.e2e.ts": "ed325763b55cbad5de4ec8143715baa581d9807ae6e9af838e677244ea9b4df9",
+    "tests/canvas-cursors.e2e.ts": "0fde18d42a70284293465f8a710eb45189fc406fbf9c21c7ec65a9471484dbed",
+    "tests/image-resize.e2e.ts": "2ba26ef141a2e032c84cdb6bf50760dcec95d1174b7bf2eca69b5c67ebf42b27",
+    "tests/inspector-rotation-latency.e2e.ts": "782acedc32924fd12374ee2fd7f25fba3525ace3456c1825903c9134b85aaddb",
+    "tests/svg-composition.e2e.ts": "1c117e9c319affe99a9437f345c2fc666521729fa6966b02657583c715daf2a3",
+    "tests/shortcut-bindings.test.ts": "7043d7b9eaceb8e71f764ecc2b2e45f78e332637870454a15499867aa063d94b",
+    "tests/plugins.test.ts": "33c2571241b7aaff4e463b0b4f5baa1ac9b207b6c55a94e314e7b44c7ef4c139",
+    "tests/transform-latency.e2e.ts": "cc6cf96d09ab4137d254c4d17816ea4d1404843ddfe1cee35a57a57340e2484c",
+    "tests/guides.test.ts": "4ee53eea99a2b6cdc9f686211ea04b865504bed614383b19034517ccb7439c9f",
+    "tests/raster-editing.e2e.ts": "b5eecb41106af2c1589515c82b79d4234147ebb930774f06df495ba96af9f884",
+    "tests/svg-styles.test.ts": "f44dae9727fff6c98c766bad85e72095d8186eeeb540847da69804693456a519",
+    "tests/script-transport-latency.e2e.ts": "e71690501a3ca5e6eceb7e9fe9bd4fdb224671ead73fd3b7b2a20ac9cc42e31b",
+    "tests/chromatic-adjustments.test.ts": "b856ddf4103e437ff1b74c0073bde749b65e4e6a2c3f457c258f6d183df48503",
+    "tests/pen-latency.e2e.ts": "ab61883d925fe1a2a98e217d4a1760e593923c1965ca6d3de360ff8286228717",
+    "tests/smart-resolve.e2e.ts": "1cd05d6031f1f7c7386f18a4f85a1f7bdc8d289639ff5c80020d6c0236aa524e",
+    "tests/svg-text.test.ts": "93a14b19b1c5f5ea6080fe572e3f6fccbfc62127f15493a75d65230d30fda846",
+    "tests/recipe-monochrome.e2e.ts": "5d7e5aaa27c980240ac497fb4322b2749ee9edc193e3a8484abf644a76b5952c",
+    "tests/font-availability.e2e.ts": "cc3a68b3d170502cda5fee7bd154026357693f7158ed3476b030e3989317b8bc",
+    "tests/layer-selection.test.ts": "338f4615d2dbaa1987956ded0a1822c691d9880511d10c8445fb0386733fa270",
+    "tests/poisson.test.ts": "1321a2b5d997e866089ec6bf215d2c4fcd83f6054986cc62f2377696c851a728",
+    "tests/export.test.ts": "19fcd30cdbb8de6eafbcad8380f4e831ed466b2d05d8a83feb6fba1e54072240",
+    "tests/wasm.test.ts": "5c6591b3a2797486eeb73ec3538e9c020c8b012884ea7e7f25f0fbfdb6e49ee2",
+    "tests/canvas-history-cache.e2e.ts": "600e7261d43a15cdbba2f0819eebebe7c967475f55dca60cdc107863c9cebc94",
+    "tests/svg-import-pixels.ts": "a6544ef97614acda9c2c9065d0e1164e6d9b71aea3444eeadbb1624b006d19db",
+    "tests/hsl-wasm.test.ts": "2f3850f4e6796821e8f7c0077bf301c5614a52d253de86395c7be68cd21417f7",
+    "tests/svg-composition.test.ts": "e1776a297e6a2a82093ee406353b655faf5839d00a2a83fb1e9d62176f63778b",
+    "tests/plugins.e2e.ts": "1beac39e2df9767982308de45a0399755aab47fe35a4ffb7b310361dca9b3625",
+    "tests/vector-strokes.test.ts": "7a6899c5e2f3ebed911a09241ff9d998771fbcecde1345729c0649ef5435abd7",
+    "tests/analysis.e2e.ts": "deca372598c675e166ebd8f246d5f982efa34905dab8ed2bfc76805e6f7a2018",
+    "tests/polygon-selection.test.ts": "3544689149952ae9c496b92587f194cf3f7be4cf0ec2ef9fe64b87ce65e7984c",
+    "tests/workspace-save-latency.e2e.ts": "65d70785132642d376e02e4878ce0fd7880e4710d30de8732a27a2f5a9b62202",
+    "tests/zip-async.test.ts": "3bbeacd43df2b7e762805084d8964ed611723013c394ee2ec2d1abe04863fab3",
+    "tests/psd-blending.e2e.ts": "ed3b3da57037f83800b4158dd218b638fe04eb1ea22958ad75dbd604a32fc8e4",
+    "tests/lut.e2e.ts": "292704753c61ff395543e5c8d6e1bc9e9aaa2ddbf4cc78a813690d105ac862b0",
+    "tests/spatial.test.ts": "e842e7a75692777cc6e2d72deae3174c5f781ace475405a10f8f5a48c22ca377",
+    "tests/preflight.e2e.ts": "32e396efb3b28cea3ad62211ba6bea0b38d677c941bdfe01da1a3d6b0362b50f",
+    "tests/path-handle-latency.e2e.ts": "cddc0cf53028e3fadc739b56b3b02c8924b539c09b0c001eed22c0f863d55fe3",
+    "tests/command-palette.e2e.ts": "a90e50e74abca9bf32fae8540d74426277a5b485f533d79d236e8ac9ba4f6cbe",
+    "tests/layer-transform.e2e.ts": "94c752811756a28309a918fdd6322cff8f5ae7addbe20b273095a001616af06f",
+    "tests/layer-distribution.test.ts": "0793fe6b2d16d8c71fa63a8b411a0832e899e7533af32068289e79c995ef7e10",
+    "tests/recipe-review.test.ts": "8d94d440fdbca40bb706b9d3487bb28150b590d6e7a13d4faf282010e2ad3afa",
+    "tests/white-balance.test.ts": "75198a10eb7243fff98ad5ff092dad0dfb6e1b5b1a8142dcd3c36669bfe14626",
+    "tests/project-integrity.e2e.ts": "fa87ca403490e50b1d4097f91cd1bc2829368043caf5efc288d1b98a0d022ea4",
+    "tests/performance.bench.ts": "91e966c11fc902a1e944a86cb9e39f6ee206201a6586ff5527b3a2b4739363c5",
+    "tests/sustained-paint.e2e.ts": "a6455aa56ddbf1bf86cc8d9b8f2d4afe436752b7216581217211f6f171fd3a33",
+    "tests/shapes.test.ts": "6311f12b905282d6b5077349e918ffe51507443d7e44152d5bee5e879baeab5d",
+    "tests/alpha-channels-api.test.ts": "abd7ea0279f38555244cab81fe51519285bafb77534f3144d3a83fdbaf0363b9",
+    "tests/workspace-links.test.ts": "b0ceaec83a66616dc4708de067bd82c8ae7058aa5e016c20a0185c8ddbfc9845",
+    "tests/pixel-selection.test.ts": "7a5b931339e7630e1d607b08658d88e1f70e90d901fcf5f60111c43eaec64559",
+    "tests/export-cancellation.e2e.ts": "729a80aa8a8428538861d3b9b9476af2d5d101f5b2f8d9e9439814b2b01118dd",
+    "tests/lut-gpu.e2e.ts": "c6c83c590135ed4a864711fe4fa22a3b5c7600e6c96d0cf5ec33e8d8fd1f0c3b",
+    "tests/retouch.bench.ts": "4c6094db3d35a638dc29361b0a8499acaccdab700e336dc7ee099c82e564848b",
+    "tests/poisson-wasm.test.ts": "8fc474fd814e87d860e771baffa5f5015711ef56e31c779535b9afb0322163ee",
+    "tests/lasso.test.ts": "f7f02baf157beb6bed590a3096f394be7bcb60104aff4ce4326588b97914e2df",
+    "tests/svg-images.test.ts": "5ea617b24d18aa09a29b401c6d0a5293bdf9f1349c878b6112a7ea15b7fd648f",
+    "tests/export-fonts.test.ts": "7e8808bfcf374d7a42e842f4a91a50632dddfb376d7fbdca2e6ca5ec419ff884",
+    "tests/storage-health.test.ts": "9c60090f28a61148794bc2b6ba2cbd37433463a9ff2210d8cf60bc25d07989b8",
+    "tests/layer-distribution.e2e.ts": "ce3b9b57487fb5e6e7c0fb984968e3478240465f21a61e060311a379847004f0",
+    "tests/color-management.test.ts": "44d161a918153853d17c7bc03aa5b0609881549424cf7fefc5071ee48c3b3b4b",
+    "tests/layer-filter.e2e.ts": "63b8bd64451e51675ec5cda97320bfa58c400dd8cab5a4885c61bbcc4029c9a6",
+    "tests/svg-masks.test.ts": "f3da8176fc5d5896fdc94fa6870e1d27de0984583b59eb5bc8a9559b6e2dd420",
+    "tests/clipboard.test.ts": "0bec87e60c3a77f854dc27487bb1db57f3648ff4de6e642b64108d28e17e0677",
+    "tests/smart-filter-masks.e2e.ts": "a4eb4490276d366992a5f53173ca580147dcb20e6524449cb63d98e881f8d357",
+    "tests/batch.e2e.ts": "4c00564df55ff865596843b66c2b4e757b927796902759422b1956503e22e0aa",
+    "tests/recipe-warm.e2e.ts": "a571e12bc582f89e977dcc9af81301dbfabde5a79a9602346e81c1ef579e2bd1",
+    "tests/generation-fingerprint.test.ts": "ed56f6b9e9f6c78b9ae7c8897a2c2ef6b8b5c708818ab7ba12ecc225b711f271",
+    "tests/smart-edit.e2e.ts": "1ab4f5d923401f2d3c234a7141f469441018f9265810b69956c5589571c1bd37",
+    "tests/storage-health.e2e.ts": "0ebf446cfdf5d618d4fd0ce84f9695111764690998ea04c9a94c5364ef1420f0",
+    "tests/adjustments-dom.test.ts": "4a872bed0686cadc6b0a2bb77b6f6a383f0ac4d51a3a9605034018a0361c43d6",
+    "tests/psd-export.e2e.ts": "1c3b69b5c65e2063ff62ea5c071bb10b9f162d16db7640c308df4195a4ee16c8",
+    "tests/tonal-cache.e2e.ts": "3e0208d9d0d66f56d460573d33b8a61e3aac74c714799741119349428b65021b",
+    "tests/api-auth-jobs.test.ts": "6af3c9f05880fa1ee99e78a817b7371d839a5ee89e1b3e3e87915789a8313588",
+    "tests/vector-gradients.test.ts": "ec8112a0f41219a7e7721010c362908e402fb6374c5eaaf60e48b2453592aca2",
+    "tests/filter-mask-coverage.e2e.ts": "4b4cca263206223393b8d75ae3e195407327fa9a20990511121809ee7fd28c80",
+    "tests/color-range.e2e.ts": "26dc2b8f2ec0900bda4859b19bf0dc9fb745820eaf2e5847a8669efb81d3f009",
+    "tests/lasso.e2e.ts": "a1305c8925b694a58fa515da4df643561677f0557d33581a2fc00d02139894cb",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/matting-api.test.ts": "cc5c1b68e60d4b81ab466505379bdf21f0f22c4530eb17631c2d911150429074",
+    "tests/budget-recovery.test.ts": "05a576539852ea90d15ba2d217df023b6e3d2377434f8a17b43cfd9765ba39e4",
+    "tests/recipe-package.e2e.ts": "6007fdc80cf8b8dd9bed702c9000aa1670b87d7a9bb267ee69c9bec7f73bfb8c",
+    "tests/svg-import.e2e.ts": "d34e30def1c226d0e64c12229399c8736c56501d31be491d2e1d3784c21d1d9a",
+    "tests/tools.e2e.ts": "ecda64c77e7a444f8cd16dd45e622ba569942349f607f0f561bb9ae2c4b08e82",
+    "tests/seo.test.ts": "4438445889c0b5d85866e8de65ee937f2b0f1eeae974338e9244175d5b0818a5",
+    "tests/affine-render.e2e.ts": "c0f13e5e9ad08feb2bb320ff929f26462d0c49acee75d1fa3111b65155262dc5",
+    "tests/filter-mask-worker.e2e.ts": "dcd81258fd81d25a10d63de8466570f132c333ffae0e2ed9c5fc64f5ba59a980",
+    "tests/svg-text.e2e.ts": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+    "tests/donor-wasm.test.ts": "6ee8fa5dda097518b711ed48613b8f5ea40a0e198b1a1ae6510a7ad233bd9ee7",
+    "tests/host-bridge.test.ts": "4db9909a25038c2eb47dd3bc8c624a683b84296780ff6f4c056fd3364c4fd236",
+    "tests/large-clone-latency.e2e.ts": "ed8d3148b6349e4cb3b9e7155ed138d00682865040552ca49a32bf59bf6f98a1",
+    "tests/analysis-evaluation.test.ts": "fc71c162cd44d8428fddea0665faf5406286f5afeb4a6099ed05a14897503d51",
+    "tests/poisson.e2e.ts": "9bc038f9958abce755e0b750d440f4e4b33de96698fd781dd114a1cfb8b2ad83",
+    "tests/selection-modification.e2e.ts": "ce9c29eb4d88f130905ac9f290c600f3009d2158034688155fbbb03fb9a211d1",
+    "tests/filter-mask.bench.ts": "ba8814ed5ffd611da1ed3b4cf11d80e9cd0f472a6bad630d01b7dd4172de79e1",
+    "tests/retouch-sampling.e2e.ts": "a2e3b05387c2b95217f2d7452d8510147927dc88d81cf3d086b079f375139a49",
+    "tests/script-patch.e2e.ts": "e83f7c46126252c7e85942fbac83eba1aa919cc0fa146e9fe727bf025b785c00",
+    "tests/selection-modification.test.ts": "56a648f412aaed4c3bff644780b179c0c97f1f104d3ac23ad098ffafb3db1312",
+    "tests/chromatic-adjustments.e2e.ts": "0de03e15f26981bd72d3d7a7caa97d15473a426e361bd902548d227a865c2fab",
+    "tests/text-vector-latency.e2e.ts": "e1c850dcba43791b1fa17a154e47d64284ced7065c4bb5a98c5aaf07f23da8ec",
+    "tests/patch-cache.e2e.ts": "76a8c3e56c056e05833c49b90e8a192590429a68413b69ee8a4076277566772f",
+    "tests/dom.test.ts": "735eb3ce1bdcb155a02f4d4fdf7bd76e4ff28fada97897abe392f562de04fd6f",
+    "tests/history.test.ts": "4233b5a6c6549449ee46cab54da0cd93a2cc19d9c513bc7989a0882a05b876c5",
+    "tests/quick-selection-api.test.ts": "b403011bd4dcd5b70104cac19ef7bdabc33654a487f5b969441ba510d190838b",
+    "tests/smart-conversion.e2e.ts": "ef10588dd2b0a30bc991bce48af31bc935231967171e33d890c1063314e154a5",
+    "tests/filter-mask-coverage.test.ts": "f6e870e4e63fa4d3e9876d1beb13faaec6d2ebeb7a25c209d971678349331623",
+    "tests/quota-recovery.e2e.ts": "a1234e58bb76fdf72a8bf98c4802c80f8dc2fb29ae6f77e64660e3cd1558333f",
+    "tests/svg-smart.test.ts": "aa0e60a2cb2d35825c4f67dba17b4917b19a62968157cf11e1c1c9b63d872e1d",
+    "tests/workspace.test.ts": "7169b6235c1a0bba2407d382bb283839aeef4aa1383fd30f54091095dac64c68",
+    "tests/smart-document.e2e.ts": "732a7ffc34b9888bb254b20d1304097c605eecdd5b2db0bb67fb114d5d6759af",
+    "tests/color-interchange.e2e.ts": "827ea5052e96342f9450bec1dca05664cce87c854797c106b278462edd80cebe",
+    "tests/subject-selection.test.ts": "a78eccde64d303ddb37b59c5627cb779baa41f874edccc8ce3e975828f10a5ce",
+    "tests/retouch-latency.e2e.ts": "370e7670f8d1cfe5c71c9ccf28e6d29d40673c743de0ca7fe0b0c880b0db53d1",
+    "tests/layer-flip.test.ts": "fe0952590c435fee283f1eb376012dfdbd8914d17b328f4dbc20d3564dcca28f",
+    "tests/cooperative-validation.test.ts": "caf39092d37574201ea17274436a0b52ac5de0b195bf8413d9aa4fca13e1024e",
+    "tests/clone-preview.e2e.ts": "9eab46ebbacad76c9885613060f2c800b562891f5b3c048e791000727835a87b",
+    "tests/metadata.test.ts": "9d2a85df1d745d3ec652bf0866a0f55fb0746e9a29044fdc344773768413aeff",
+    "tests/vector-construction.test.ts": "66b6c2ee4a4754c958a538f171531576d910c3cdb7bcc0a301730b0f76256022",
+    "tests/smart-filter-mask-ui.e2e.ts": "c06b21b7c403f95d0a00042ee6d6f081958b31bd641b5f03907137a6e4416390",
+    "tests/paint-latency.e2e.ts": "754e0e1d05f78cc5846339082b7cbbdeff86258e9773bed3da64e2e6383748f0",
+    "tests/adjustments.test.ts": "be71a673d136520f76920b0f21232f64e4cbe294245ae3733206e7fd167f5f1b",
+    "tests/workspace-autosave.e2e.ts": "610db17442822ab6e908e74157fede564eae998ebb34256ed7addcb61752682e",
+    "tests/api.test.ts": "9f53abf88e414f95963eca484f556eb317b442e76db00f01a761beac0596e555",
+    "tests/document-operations-latency.e2e.ts": "7dc07d495888a9de04f71191fd2df3e5d6a4172f0cb11c7c8f5c6a3519ebdf72",
+    "tests/patch-tool.e2e.ts": "976548dc667fc34a78c899c2297c01fde2b4dd09a42854c98ee8b500dd795c2d",
+    "tests/stroke-region.test.ts": "cbbc86ee8a73974d394c23864898855126a88c4313e78c65e00ab209a115a017",
+    "tests/svg-import.test.ts": "2526c37f9e59d10599401c351bd6a5cce9bd8ad07e9085df31f406b33b4578f2",
+    "tests/svg-paint.e2e.ts": "0784081188e3f58bbbf2e4709e373d65088670d224e84d19c0cbd4dffb81ebec",
+    "tests/gesture-revision.e2e.ts": "fdafefb1387871e1bb75d2e1656e6eeb50b65a0762c0d084ad4df85bf921a45b",
+    "tests/svg-smart.e2e.ts": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+    "tests/protected-masked-edit.e2e.ts": "7a2fab6a45df96c189508b14baf5ce2938371d5f6406daa86107204c2d7453c9",
+    "tests/mixed-session-latency.e2e.ts": "85839dd744b22c91a07c5312085533fccf2dc2db2419566e8a100296991e1e43",
+    "tests/candidate-recovery.e2e.ts": "7739325da371703eb580f8ce8ed75259df29955f69b229f654bc1a0233b1360e",
+    "tests/analysis-candidates.test.ts": "03b55752d6543b0d6d14c4c68c09d1059b10626db7c53f780afa8c324f14edd3",
+    "tests/metadata-service.test.ts": "3ccb1a9577952df7c8863634d3675adb0fc57ec1005eeee6ace7276c823cf8d7",
+    "tests/workspace-history.e2e.ts": "9cbac784e74dc5cdee310bc1708c4286f24ab224e7ed3144416c62632628d366",
+    "tests/retouch-sampling-scheduling.test.ts": "cfa6e5202658e8c019a6d0462e0f55c58879beb4b271d12608dee22ddd00bb46",
+    "tests/color-range-api.test.ts": "27f3a4df50e22f420b2676466e1bfc0a59978b718e6d7ac79443788acb0340b3",
+    "tests/retouch-extraction.test.ts": "3328d573547ebfefb04543bd4a199227bfeed23edfe3e7d3ad3fd6a542187ba3",
+    "tests/review-regressions.e2e.ts": "0479fde0805a9ebd23a34cecab158d7a1aa1df9f21407073a3534b4438a1a096",
+    "tests/adjustments.e2e.ts": "24650e246229c504e6f508cf1906310441495a66e65729d9252166d2af0035b6",
+    "tests/histogram.test.ts": "f56172cf321c3d5967f8bcdace377d8931e602e805651a8ebc79d6469f981396",
+    "tests/png-capture.test.ts": "7b554e417fb55793bc7fe217c1280ceffc5c059f01e793f8bf9093441e941406",
+    "tests/review-input-fidelity.e2e.ts": "b94342e4ec63d6f746c58640ff968cd4400661f57f297e6d3a2698ce3144c8e0",
+    "tests/render-cancellation.e2e.ts": "a9a11abdc7505229595c91d057283ee1c18cc264cc3c62f29f949de7281ad70c",
+    "tests/generate-layer.test.ts": "7cd61b2782f0d6ad9e586daa0c1f1a849d98218accd21db75578b554d2d68acc",
+    "tests/matting-worker.test.ts": "9eb68791f14d8170518db2176bbfa7d3a43f395255e2aab2568a8caf02bca605",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "tests/provider-bakeoff.test.ts": "3ab74b644365189d183410a05cc5de1b467e22379172160af3b620a58dcd8925",
+    "tests/graph-transfer.test.ts": "be6f80bff55b2d914dfc3854fa3250bb3e3b0702c3b69abfeed39c1702bac9ce",
+    "tests/hooks.test.ts": "8583f61fb3cdb79674c647187d964655d2b050e148432f620166db6047b9a564",
+    "tests/cache-budget.e2e.ts": "c64975e6b2538aa7e660f553835e9dfe5a94f61bfd4da97e1d664a7fe5fdbbf8",
+    "tests/recipe-lifetime.e2e.ts": "4e26a0f5ddd7801977343db796e17232f0228153256a454a4b27588acef3c2e6",
+    "tests/patch-preparation.e2e.ts": "e7ac81ff3f17dccd39a2d2bbd70264ff34a6bbc436540a352e3f2784b772e7ac",
+    "tests/typography.test.ts": "18781048a5e7fa03fc232813e586811b0de5d730e1036ec02d1bd575bcd0b5b9",
+    "tests/thumbnail-scheduling.e2e.ts": "4680b5f2aa8a7017f904e54084c6b0b53d811c86b4f24b3f4dfe7b08114699b4",
+    "tests/heal-spot.test.ts": "20b3968e371d5315eabcbcc82127a7967b4f21845decc1d5ff88afc295ce4496",
+    "tests/guides.e2e.ts": "672562fbe30e7efa0b7b056e7d907c4b175ab1340f0acece15b97bf2c00509af",
+    "tests/vector-construction-latency.e2e.ts": "90a740ecc467eecf7ad510205ed0cd4d1e53dc28fa857a2ed6277a2d98c1bf4c",
+    "package.json": "ebbffd2baffc9067f316e9b9981236807e72923fd1688e80b533f90961ea6cde",
+    "package-lock.json": "0d2eb89a088c750ca3c9e6a09d88b6a11c34aff79be1b0446662f7937951625f",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+  },
+  "builtHashes": {
+    "dist/appearance.js": {
+      "sha256": "977e730925c6ab00dc344ab02aac27b3cfc2fed6084bd97be02326677fcdd76c",
+      "bytes": 2044
+    },
+    "dist/apple-touch-icon.png": {
+      "sha256": "8ee5d6b3c3e0907ca002991138e9cb06b14fdc59a81f686964613f99658be060",
+      "bytes": 5554
+    },
+    "dist/assets/dm-mono-latin-400-normal--0xN8mdc.woff": {
+      "sha256": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+      "bytes": 11212
+    },
+    "dist/assets/dm-mono-latin-400-normal-4GdczIuU.woff2": {
+      "sha256": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+      "bytes": 14820
+    },
+    "dist/assets/dm-mono-latin-ext-400-normal-1aZr6b2b.woff": {
+      "sha256": "5357dcba4e325c781acf79d15fd21f740f4abb7ca3f0fad88af774bd94a74e78",
+      "bytes": 7500
+    },
+    "dist/assets/dm-mono-latin-ext-400-normal-C2zvOubV.woff2": {
+      "sha256": "a52e19ebe0398c9c0f8fa28a0c5e9a6bc324f35d9f0881c9aa407d10af447175",
+      "bytes": 9552
+    },
+    "dist/assets/index-Ce5vHEBt.js": {
+      "sha256": "c76be21adf4eea8ccead21ae48d8cb590ead5978ff1759adc4ed39cf16a18843",
+      "bytes": 1943723
+    },
+    "dist/assets/index-rxMNJI9e.css": {
+      "sha256": "ae09e3d7d46b647a126df31d7ba5aeff865e6f2daf90eb67d3430680028503de",
+      "bytes": 113331
+    },
+    "dist/assets/lut-import.worker-BtkofYSH.js": {
+      "sha256": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+      "bytes": 97067
+    },
+    "dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2": {
+      "sha256": "c268b459a9329e59fecf39a17618efd44c71735532048d60b12aab76a8c14914",
+      "bytes": 14500
+    },
+    "dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2": {
+      "sha256": "2fb2e8cbfd52ae46179a8b6024eb162f1f9c6de3d22d6e3a30d8f395de7220be",
+      "bytes": 9444
+    },
+    "dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2": {
+      "sha256": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb",
+      "bytes": 15120
+    },
+    "dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2": {
+      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+      "bytes": 24836
+    },
+    "dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2": {
+      "sha256": "6bbb044ab420e07edb0a3042d2eb314b85e83a0182e945a15ab3b9092668dfd5",
+      "bytes": 8520
+    },
+    "dist/assets/metadata.worker-o3DLPB-X.js": {
+      "sha256": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+      "bytes": 77198
+    },
+    "dist/assets/pixels.worker-B3JX_AyS.js": {
+      "sha256": "e13423de9bbc23d5346f660ee06ad1443945482071eb500404dcf87b0c3cff37",
+      "bytes": 180908
+    },
+    "dist/assets/preflight.worker-CZ6EZXnv.js": {
+      "sha256": "c58e06b96115404aa108293a0f74751548164977d462871a1116c988fa5f4460",
+      "bytes": 108425
+    },
+    "dist/assets/project-encoder.worker-BEarW-XH.js": {
+      "sha256": "1e9ee2d3a9e97edad4511aaa2766601b882e20c373faef710084cae783fe14e3",
+      "bytes": 152351
+    },
+    "dist/assets/recovery-persistence.worker-DqDukTHn.js": {
+      "sha256": "0da1cdad1bcc0b2a8b403d5c74209dfb02e39e0c3590d99ab2d9820e934961b8",
+      "bytes": 159082
+    },
+    "dist/assets/selection-outline.worker-Dj42pVuC.js": {
+      "sha256": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+      "bytes": 70293
+    },
+    "dist/assets/svg-import.worker-K4DYnHN8.js": {
+      "sha256": "837c3a039c88bcf8cb1b784d973d71912835958dabc22a854744a88500f831de",
+      "bytes": 357834
+    },
+    "dist/developer/api.html": {
+      "sha256": "12553a62b628369f085dcac92e202dd6f33548aae48a3a7d66fd3d5eb75cc6de",
+      "bytes": 105091
+    },
+    "dist/developer/architecture.html": {
+      "sha256": "9eefd2c624d18c5d84938fca4cb4d084cf7652e2e145a8220d21635b1940a40f",
+      "bytes": 296805
+    },
+    "dist/developer/design-system.html": {
+      "sha256": "9d62318feadc8792b919d350bc76c77b980aeabe1d53abe372cfcde4172878cd",
+      "bytes": 58704
+    },
+    "dist/developer/docs.css": {
+      "sha256": "f8cb8902b3322ab4d12b252116ae4291630c72970138e48850f397eac0fdf933",
+      "bytes": 9171
+    },
+    "dist/developer/plugins.html": {
+      "sha256": "e1e3e70c4c75637d88b00ef08653cd6f67f273bc536725bb3d1af2c84a966dc8",
+      "bytes": 32672
+    },
+    "dist/developer/product-brief.html": {
+      "sha256": "892da4ee63fe8854f8f55ca738c141e350d28ef2a07224804a25655f9b35f970",
+      "bytes": 13972
+    },
+    "dist/developer/requirements.html": {
+      "sha256": "d465b322e49fcd0ffa237c1e2d88cff7515aa223712b311ebe4d49f86f9895a0",
+      "bytes": 109003
+    },
+    "dist/developer/scripting-api.html": {
+      "sha256": "742d49e0bd4e41b1acdac04982dfb15595b03523023a04be97c2a69fc1cee39f",
+      "bytes": 399056
+    },
+    "dist/developer/system-design.html": {
+      "sha256": "18b72576cb9f1cd1b4fcf30b99827996f24d6012650e85f5d12bb9779b631312",
+      "bytes": 36128
+    },
+    "dist/developer/tools-milestone.html": {
+      "sha256": "2cd7ebd3c64d864dbdaf192b8859514de0ceb0491222aee1bb7ea0878fb66a76",
+      "bytes": 8122
+    },
+    "dist/favicon-16x16.png": {
+      "sha256": "648f06b1a2f5c408ea54ad9344f2f03d591c131ef80a6c1f3a16dde744474033",
+      "bytes": 550
+    },
+    "dist/favicon-32x32.png": {
+      "sha256": "073460d86c64ff5d1692382780a3434ce7579a98159271a77e19baf991a7a0fd",
+      "bytes": 1099
+    },
+    "dist/favicon.ico": {
+      "sha256": "cb0a998e12738f56bad9ee6346f51d4dca155e0ab6462fa55ec1192228efedd0",
+      "bytes": 4314
+    },
+    "dist/favicon.svg": {
+      "sha256": "604b2e074d358a36fe6ccb3767a78ecfd4dbae73dea74b8f519e6b076318be81",
+      "bytes": 513
+    },
+    "dist/icon-192.png": {
+      "sha256": "6834323ab9d66d03ac980f9cecb8efd1d285ed2bcd3ed2f5c5cfe5b99bf1715a",
+      "bytes": 5946
+    },
+    "dist/icon-512.png": {
+      "sha256": "bb4d4071f7c020716c987a9aa50f8ed8a3a2ba4aee6e62526aedd07295cda599",
+      "bytes": 15714
+    },
+    "dist/index.html": {
+      "sha256": "328b1972737a6789cba1603c7237d826d7a66ab939d9e32387148ce0510e032c",
+      "bytes": 6494
+    },
+    "dist/manifest.webmanifest": {
+      "sha256": "312643f9c04a5cea7906e569d288733136f34e62ffcc3ec0754a9b5e29a5ef86",
+      "bytes": 856
+    },
+    "dist/og-image.png": {
+      "sha256": "3806fb6fd4996ca62e5707f0f579a59c6b37d262e88e7ca011b412df707bc2f9",
+      "bytes": 233979
+    },
+    "dist/robots.txt": {
+      "sha256": "5b02cfea2ffdcf23a8bbb2d4b6f335f2e7bc2cb4c98ac68ab394c4f9eaeca1da",
+      "bytes": 62
+    },
+    "dist/sitemap.xml": {
+      "sha256": "c0c8b43949e88df68a317070d2885c2585200d7c2b82702a7e3acef85b1395f2",
+      "bytes": 661
+    },
+    "dist/wasm/pixels.wasm": {
+      "sha256": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+      "bytes": 24547
+    }
+  },
+  "reports": {
+    "canoli-vector-gradient-linear.json": {
+      "mode": "linear",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "linear",
+        "start": {
+          "x": 16,
+          "y": 64
+        },
+        "end": {
+          "x": 144,
+          "y": 64
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ]
+      },
+      "samples": [
+        [
+          254,
+          0,
+          1,
+          255
+        ],
+        [
+          126,
+          0,
+          128,
+          255
+        ],
+        [
+          1,
+          0,
+          254,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-alpha.json": {
+      "mode": "alpha",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 1,
+        "premult": 1.552941176470597,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0.001796504981218357,
+        "centroidError": 0.01208579273240673
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "linear",
+        "start": {
+          "x": 16,
+          "y": 64
+        },
+        "end": {
+          "x": 144,
+          "y": 64
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 0
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 0.75
+          }
+        ]
+      },
+      "samples": [
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          125,
+          0,
+          128,
+          96
+        ],
+        [
+          1,
+          0,
+          255,
+          190
+        ]
+      ]
+    },
+    "canoli-vector-gradient-hard-stops.json": {
+      "mode": "hard-stops",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "linear",
+        "start": {
+          "x": 16,
+          "y": 64
+        },
+        "end": {
+          "x": 144,
+          "y": 64
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000"
+          },
+          {
+            "position": 0.5,
+            "color": "#ff0000"
+          },
+          {
+            "position": 0.5,
+            "color": "#0000ff"
+          },
+          {
+            "position": 1,
+            "color": "#0000ff"
+          }
+        ]
+      },
+      "samples": [
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-radial.json": {
+      "mode": "radial",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "radial",
+        "start": {
+          "x": 80,
+          "y": 64,
+          "radius": 0
+        },
+        "end": {
+          "x": 80,
+          "y": 64,
+          "radius": 56
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ]
+      },
+      "samples": [
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          251,
+          0,
+          3,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-focal.json": {
+      "mode": "focal",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "radial",
+        "start": {
+          "x": 50,
+          "y": 64,
+          "radius": 0
+        },
+        "end": {
+          "x": 80,
+          "y": 64,
+          "radius": 56
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ]
+      },
+      "samples": [
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          164,
+          0,
+          90,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-two-circle.json": {
+      "mode": "two-circle",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "radial",
+        "start": {
+          "x": 80,
+          "y": 64,
+          "radius": 16
+        },
+        "end": {
+          "x": 80,
+          "y": 64,
+          "radius": 56
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ]
+      },
+      "samples": [
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-outside-focal.json": {
+      "mode": "outside-focal",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "radial",
+        "start": {
+          "x": 144,
+          "y": 64,
+          "radius": 0
+        },
+        "end": {
+          "x": 80,
+          "y": 64,
+          "radius": 56
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ]
+      },
+      "samples": [
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          241,
+          0,
+          15,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-radial-transform.json": {
+      "mode": "radial-transform",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "radial",
+        "start": {
+          "x": 80,
+          "y": 64,
+          "radius": 0
+        },
+        "end": {
+          "x": 80,
+          "y": 64,
+          "radius": 56
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ],
+        "transform": {
+          "a": 0.8,
+          "b": 0.2,
+          "c": 0.3,
+          "d": 1.1,
+          "e": 0,
+          "f": -12
+        }
+      },
+      "samples": [
+        [
+          0,
+          0,
+          255,
+          255
+        ],
+        [
+          214,
+          0,
+          40,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-paint-transform.json": {
+      "mode": "paint-transform",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "linear",
+        "start": {
+          "x": 16,
+          "y": 64
+        },
+        "end": {
+          "x": 144,
+          "y": 64
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ],
+        "transform": {
+          "a": 1,
+          "b": 0.2,
+          "c": 0.25,
+          "d": 0.8,
+          "e": -16,
+          "f": 8
+        }
+      },
+      "samples": [
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          119,
+          0,
+          135,
+          255
+        ],
+        [
+          0,
+          0,
+          255,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-layer-affine.json": {
+      "mode": "layer-affine",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 2,
+        "premult": 2,
+        "interior": 1,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 8.68762556333822e-07,
+        "centroidError": 6.295312408570152e-05
+      },
+      "svg": {
+        "alpha": 2,
+        "premult": 2,
+        "interior": 1,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 8.68762556333822e-07,
+        "centroidError": 6.295312408570152e-05
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "linear",
+        "start": {
+          "x": 16,
+          "y": 64
+        },
+        "end": {
+          "x": 144,
+          "y": 64
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ]
+      },
+      "samples": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          123,
+          0,
+          131,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "canoli-vector-gradient-reset.json": {
+      "mode": "reset",
+      "reopened": true,
+      "editable": true,
+      "unsupported": [],
+      "roundtripExact": true,
+      "canvas": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "svg": {
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "gradients": 1,
+      "images": 0,
+      "style": {
+        "kind": "linear",
+        "start": {
+          "x": 16,
+          "y": 64
+        },
+        "end": {
+          "x": 144,
+          "y": 64
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000",
+            "opacity": 1
+          },
+          {
+            "position": 1,
+            "color": "#0000ff",
+            "opacity": 1
+          }
+        ]
+      },
+      "samples": [
+        [
+          254,
+          0,
+          1,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          1,
+          0,
+          254,
+          255
+        ]
+      ]
+    },
+    "canoli-vector-gradient-import-bbox-curve.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 41,
+      "premult": 24.556862745098044,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.00017821594860272948,
+      "centroidError": 0.0008428183674313618
+    },
+    "canoli-vector-gradient-import-bbox-cubic.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 62,
+      "premult": 48.35294117647061,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.00028460202245796887,
+      "centroidError": 0.0270194501494162
+    },
+    "canoli-vector-gradient-import-bbox-radial.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-user-percent.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-reference-alpha.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-template-color.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-stop-default.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-stop-inherit.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-template-interpolation.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-css-transparent.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-css-alpha-low.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-css-modern-alpha.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-current-color.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-clamped-stops.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-import-compound.json": {
+      "editable": true,
+      "unsupported": [],
+      "alpha": 0,
+      "premult": 0,
+      "interior": 0,
+      "reopened": true,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0
+    },
+    "canoli-vector-gradient-ui.json": {
+      "gradient": {
+        "kind": "radial",
+        "start": {
+          "x": 80,
+          "y": 64,
+          "radius": 0
+        },
+        "end": {
+          "x": 80,
+          "y": 64,
+          "radius": 48
+        },
+        "stops": [
+          {
+            "position": 0,
+            "color": "#ff0000"
+          },
+          {
+            "position": 0.4,
+            "color": "#202d17",
+            "opacity": 0.25
+          },
+          {
+            "position": 1,
+            "color": "#202d17"
+          }
+        ],
+        "transform": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "e": 8,
+          "f": 0
+        }
+      },
+      "rejected": true
+    },
+    "canoli-vector-gradient-50mp.json": {
+      "elapsed": 2589.6999999955297,
+      "bytes": 13402129,
+      "dimensions": [
+        10000,
+        5000
+      ],
+      "sourceUnchanged": true,
+      "samples": [
+        [
+          254,
+          0,
+          0,
+          255
+        ],
+        [
+          203,
+          0,
+          53,
+          255
+        ],
+        [
+          202,
+          0,
+          52,
+          255
+        ],
+        [
+          127,
+          0,
+          127,
+          255
+        ],
+        [
+          1,
+          0,
+          255,
+          255
+        ]
+      ],
+      "tiles": 395,
+      "released": true
+    },
+    "canoli-vector-gradient-composition.json": {
+      "alpha": 0,
+      "premult": 1.458823529411764,
+      "interior": 1.1921568627451222,
+      "unmodified": true,
+      "reopened": true,
+      "maskedSvgRequiresFlatten": true,
+      "center": [
+        128,
+        0,
+        128,
+        152
+      ],
+      "beforeSize": 160,
+      "dimensions": [
+        288,
+        224
+      ]
+    },
+    "canoli-vector-gradient-css-fallback.json": {
+      "relativeAbsent": {
+        "color": "#ff0000",
+        "alpha": 0
+      },
+      "lowAlpha": {
+        "color": "#783c1e",
+        "alpha": 0
+      },
+      "srgb": {
+        "color": "#ff0000",
+        "alpha": 0
+      },
+      "wideGamutEditable": false,
+      "wideGamutDocument": false,
+      "unsupported": [
+        "Invalid SVG gradient stop color/opacity."
+      ],
+      "fallbackWideGamut": null
+    },
+    "canoli-vector-gradient-gpu.json": {
+      "results": [
+        {
+          "stage": "initial",
+          "alpha": 0,
+          "premult": 0.47058823529411775,
+          "coverage": 2598153,
+          "uploads": 1,
+          "changed": true
+        },
+        {
+          "stage": "changed",
+          "alpha": 0,
+          "premult": 0.47058823529411775,
+          "coverage": 2598153,
+          "uploads": 2,
+          "changed": true
+        },
+        {
+          "stage": "repeat",
+          "alpha": 0,
+          "premult": 0.47058823529411775,
+          "coverage": 2598153,
+          "uploads": 2,
+          "changed": false
+        }
+      ],
+      "diagnostics": {
+        "state": "ready",
+        "reason": "",
+        "uploads": 2,
+        "stamps": 0,
+        "cacheHits": 1,
+        "frames": 3,
+        "readbacks": 3,
+        "retainedBytes": 81920,
+        "allocatedBytes": 81920
+      }
+    },
+    "canoli-vector-gradient-production.json": {
+      "max": 0,
+      "gradients": 1,
+      "images": 0,
+      "stops": [
+        "#ff0000",
+        "#0000ff"
+      ],
+      "samples": [
+        [
+          254,
+          0,
+          1,
+          255
+        ],
+        [
+          126,
+          0,
+          128,
+          255
+        ],
+        [
+          1,
+          0,
+          254,
+          255
+        ]
+      ]
+    }
+  },
+  "historicalDiagnostics": {
+    "canoli-vector-gradients-initial-reports.json": {
+      "canoli-vector-gradient-paint-transform.json": {
+        "mode": "paint-transform",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 0,
+          "premult": 45,
+          "interiorErrors": 9213,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "linear",
+          "start": {
+            "x": 16,
+            "y": 64
+          },
+          "end": {
+            "x": 144,
+            "y": 64
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 1
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 1
+            }
+          ],
+          "transform": {
+            "a": 1,
+            "b": 0.2,
+            "c": 0.25,
+            "d": 0.8,
+            "e": -16,
+            "f": 8
+          }
+        },
+        "samples": [
+          [
+            254,
+            0,
+            1,
+            255
+          ],
+          [
+            126,
+            0,
+            128,
+            255
+          ],
+          [
+            1,
+            0,
+            254,
+            255
+          ]
+        ]
+      },
+      "canoli-vector-gradient-focal.json": {
+        "mode": "focal",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "radial",
+          "start": {
+            "x": 50,
+            "y": 64,
+            "radius": 0
+          },
+          "end": {
+            "x": 80,
+            "y": 64,
+            "radius": 56
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 1
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 1
+            }
+          ]
+        },
+        "samples": [
+          [
+            0,
+            0,
+            255,
+            255
+          ],
+          [
+            164,
+            0,
+            90,
+            255
+          ],
+          [
+            0,
+            0,
+            255,
+            255
+          ]
+        ]
+      },
+      "canoli-vector-gradient-import-bbox-radial.json": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 0,
+        "premult": 252,
+        "reopened": true,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "canoli-vector-gradient-import-user-percent.json": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 0,
+        "premult": 0,
+        "reopened": true,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "canoli-vector-gradient-reset.json": {
+        "mode": "reset",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "linear",
+          "start": {
+            "x": 16,
+            "y": 64
+          },
+          "end": {
+            "x": 144,
+            "y": 64
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 1
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 1
+            }
+          ]
+        },
+        "samples": [
+          [
+            254,
+            0,
+            1,
+            255
+          ],
+          [
+            0,
+            255,
+            0,
+            255
+          ],
+          [
+            1,
+            0,
+            254,
+            255
+          ]
+        ]
+      },
+      "canoli-vector-gradient-alpha.json": {
+        "mode": "alpha",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 1,
+          "premult": 1.552941176470597,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0.001796504981218357,
+          "centroidError": 0.01208579273240673
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "linear",
+          "start": {
+            "x": 16,
+            "y": 64
+          },
+          "end": {
+            "x": 144,
+            "y": 64
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 0
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 0.75
+            }
+          ]
+        },
+        "samples": [
+          [
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            125,
+            0,
+            128,
+            96
+          ],
+          [
+            1,
+            0,
+            255,
+            190
+          ]
+        ]
+      },
+      "canoli-vector-gradient-hard-stops.json": {
+        "mode": "hard-stops",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "linear",
+          "start": {
+            "x": 16,
+            "y": 64
+          },
+          "end": {
+            "x": 144,
+            "y": 64
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000"
+            },
+            {
+              "position": 0.5,
+              "color": "#ff0000"
+            },
+            {
+              "position": 0.5,
+              "color": "#0000ff"
+            },
+            {
+              "position": 1,
+              "color": "#0000ff"
+            }
+          ]
+        },
+        "samples": [
+          [
+            255,
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            255,
+            255
+          ],
+          [
+            0,
+            0,
+            255,
+            255
+          ]
+        ]
+      },
+      "canoli-vector-gradient-50mp.json": {
+        "elapsed": 2672.5,
+        "bytes": 13402129,
+        "dimensions": [
+          10000,
+          5000
+        ],
+        "sourceUnchanged": true,
+        "samples": [
+          [
+            254,
+            0,
+            0,
+            255
+          ],
+          [
+            203,
+            0,
+            53,
+            255
+          ],
+          [
+            202,
+            0,
+            52,
+            255
+          ],
+          [
+            127,
+            0,
+            127,
+            255
+          ],
+          [
+            1,
+            0,
+            255,
+            255
+          ]
+        ],
+        "tiles": 395,
+        "released": true
+      },
+      "canoli-vector-gradient-radial.json": {
+        "mode": "radial",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "radial",
+          "start": {
+            "x": 80,
+            "y": 64,
+            "radius": 0
+          },
+          "end": {
+            "x": 80,
+            "y": 64,
+            "radius": 56
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 1
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 1
+            }
+          ]
+        },
+        "samples": [
+          [
+            0,
+            0,
+            255,
+            255
+          ],
+          [
+            251,
+            0,
+            3,
+            255
+          ],
+          [
+            0,
+            0,
+            255,
+            255
+          ]
+        ]
+      },
+      "canoli-vector-gradient-import-compound.json": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 0,
+        "premult": 254,
+        "reopened": true,
+        "interiorErrors": 9506,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "canoli-vector-gradient-import-reference-alpha.json": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 0,
+        "premult": 0,
+        "reopened": true,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "canoli-vector-gradient-layer-affine.json": {
+        "mode": "layer-affine",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 2,
+          "premult": 2,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 8.68762556333822e-07,
+          "centroidError": 6.295312408570152e-05
+        },
+        "svg": {
+          "alpha": 2,
+          "premult": 2,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 8.68762556333822e-07,
+          "centroidError": 6.295312408570152e-05
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "linear",
+          "start": {
+            "x": 16,
+            "y": 64
+          },
+          "end": {
+            "x": 144,
+            "y": 64
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 1
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 1
+            }
+          ]
+        },
+        "samples": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            123,
+            0,
+            131,
+            255
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "canoli-vector-gradient-linear.json": {
+        "mode": "linear",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "linear",
+          "start": {
+            "x": 16,
+            "y": 64
+          },
+          "end": {
+            "x": 144,
+            "y": 64
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 1
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 1
+            }
+          ]
+        },
+        "samples": [
+          [
+            254,
+            0,
+            1,
+            255
+          ],
+          [
+            126,
+            0,
+            128,
+            255
+          ],
+          [
+            1,
+            0,
+            254,
+            255
+          ]
+        ]
+      },
+      "canoli-vector-gradient-two-circle.json": {
+        "mode": "two-circle",
+        "reopened": true,
+        "editable": true,
+        "unsupported": [],
+        "roundtripExact": true,
+        "canvas": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "svg": {
+          "alpha": 0,
+          "premult": 0,
+          "interiorErrors": 0,
+          "contourErrors": 0,
+          "areaError": 0,
+          "centroidError": 0
+        },
+        "gradients": 1,
+        "images": 0,
+        "style": {
+          "kind": "radial",
+          "start": {
+            "x": 80,
+            "y": 64,
+            "radius": 16
+          },
+          "end": {
+            "x": 80,
+            "y": 64,
+            "radius": 56
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000",
+              "opacity": 1
+            },
+            {
+              "position": 1,
+              "color": "#0000ff",
+              "opacity": 1
+            }
+          ]
+        },
+        "samples": [
+          [
+            0,
+            0,
+            255,
+            255
+          ],
+          [
+            255,
+            0,
+            0,
+            255
+          ],
+          [
+            0,
+            0,
+            255,
+            255
+          ]
+        ]
+      },
+      "canoli-vector-gradient-ui.json": {
+        "gradient": {
+          "kind": "radial",
+          "start": {
+            "x": 80,
+            "y": 64,
+            "radius": 0
+          },
+          "end": {
+            "x": 80,
+            "y": 64,
+            "radius": 48
+          },
+          "stops": [
+            {
+              "position": 0,
+              "color": "#ff0000"
+            },
+            {
+              "position": 0.4,
+              "color": "#90170c",
+              "opacity": 0.25
+            },
+            {
+              "position": 1,
+              "color": "#202d17"
+            }
+          ],
+          "transform": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "e": 8,
+            "f": 0
+          }
+        },
+        "rejected": true
+      },
+      "canoli-vector-gradient-import-bbox-curve.json": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 41,
+        "premult": 252,
+        "reopened": true,
+        "interiorErrors": 6943,
+        "contourErrors": 0,
+        "areaError": 0.00017821594860272948,
+        "centroidError": 0.0008428183674313618
+      }
+    },
+    "canoli-vector-gradient-css-alpha-before.json": {
+      "colors": [
+        {
+          "value": "rgba(255,0,0,0)",
+          "canonical": "rgba(255, 0, 0, 0)",
+          "opaque": "color(srgb 1 0 0)",
+          "resolved": {
+            "color": "#000000",
+            "alpha": 0
+          }
+        },
+        {
+          "value": "rgba(120,60,30,.001)",
+          "canonical": "rgba(120, 60, 30, 0)",
+          "opaque": "color(srgb 0.470588 0.235294 0.117647)",
+          "resolved": {
+            "color": "#000000",
+            "alpha": 0
+          }
+        },
+        {
+          "value": "color(srgb 1 0 0 / 0)",
+          "canonical": "color(srgb 1 0 0 / 0)",
+          "opaque": "color(srgb 1 0 0)",
+          "resolved": {
+            "color": "#000000",
+            "alpha": 0
+          }
+        },
+        {
+          "value": "color(display-p3 1 0 0 / .25)",
+          "canonical": "color(display-p3 1 0 0 / 0.25)",
+          "opaque": "color(srgb 1.09302 -0.22669 -0.150073)",
+          "resolved": {
+            "color": "#ff0000",
+            "alpha": 0.25098039215686274
+          }
+        }
+      ],
+      "source": [
+        126,
+        0,
+        128,
+        128
+      ],
+      "native": [
+        0,
+        0,
+        128,
+        128
+      ]
+    },
+    "canoli-vector-gradients-inheritance-initial-reports.json": {
+      "template-color": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "reopened": true,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "stop-default": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 0,
+        "premult": 254,
+        "interior": 254,
+        "reopened": true,
+        "interiorErrors": 11750,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "stop-inherit": {
+        "editable": true,
+        "unsupported": [],
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "reopened": true,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      "template-interpolation": {
+        "editable": false,
+        "unsupported": [
+          "Only encoded-sRGB SVG gradients import as editable fills."
+        ]
+      }
+    }
+  },
+  "logs": {
+    "/tmp/canoli-vector-gradients-browser-before-css-alpha.log": {
+      "sha256": "dc85038ff195a34ed0f6b957c5b5ec0188f5273868e9fad0b6f2c20230e4683b",
+      "bytes": 21077,
+      "tail": [
+        "        at /home/kestrel/projects/luma-editor/tests/svg-composition.e2e.ts:81:47",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/svg-composition.e2e.ts-SVG-30a67-e-master-scope-for-original/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-composition.e2e.ts-SVG-30a67-e-master-scope-for-original/error-context.md",
+        "",
+        "  2 failed",
+        "    tests/chromatic-adjustments.e2e.ts:36:1 \u203a Color Balance and Vibrance render masks, export and project reopening without changing originals ",
+        "    tests/gradient-map.e2e.ts:59:1 \u203a gradient maps render masks, reverse, opacity and project round trips while preserving originals ",
+        "  1 interrupted",
+        "    tests/svg-composition.e2e.ts:80:75 \u203a SVG smart native adjustment prefixes preserve master scope for original ",
+        "  256 did not run",
+        "  86 passed (3.4m)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-browser-final.log": {
+      "sha256": "315c76d63c56c9f59482a6b5e0681f308907e9df030787a82d4ce1dc43ff7b9b",
+      "bytes": 50458,
+      "tail": [
+        "  \u2713  341 tests/webgpu.e2e.ts:545:1 \u203a unsupported effects and device loss fall back without losing the document (1.7s)",
+        "  \u2713  342 tests/webgpu.e2e.ts:631:1 \u203a subpixel brushes use the reference path without losing faint marks (1.6s)",
+        "  \u2713  343 tests/webgpu.e2e.ts:663:1 \u203a GPU presentation pipeline writes the canvas format without a CPU readback (2.0s)",
+        "  \u2713  344 tests/webgpu.e2e.ts:746:1 \u203a GPU layer masks match Canvas for nested groups, holes, inversion and density (7.5s)",
+        "  \u2713  345 tests/webgpu.e2e.ts:952:1 \u203a GPU transient mask previews preserve source textures and match committed coverage (2.3s)",
+        "  \u2713  346 tests/webgpu.e2e.ts:1051:1 \u203a GPU AdjustmentLayer HSL, master levels, tone, and fallback curves agree with the reference renderer and preserve backdrop alpha (2.2s)",
+        "  \u2713  347 tests/webgpu.e2e.ts:1239:1 \u203a GPU affine brush and pencil stamps preserve clips, pressure, cache invalidation and incremental replay (2.0s)",
+        "  \u2713  348 tests/webgpu.e2e.ts:1402:1 \u203a GPU eraser preview and commit remove existing paint with pressure, flow and one-step undo (2.0s)",
+        "  \u2713  349 tests/webgpu.e2e.ts:1540:1 \u203a GPU text textures refresh after a late font load without changing the document (2.1s)",
+        "  \u2713  350 tests/webgpu.e2e.ts:1639:1 \u203a cancelled GPU reference work recovers without presenting obsolete pixels (1.9s)",
+        "  \u2713  351 tests/webgpu.e2e.ts:1675:1 \u203a GPU numeric replay failure releases buffers and recovers a valid frame (2.0s)",
+        "  \u2713  352 tests/webgpu.e2e.ts:1690:1 \u203a GPU vector stroke reference uploads retain cap/join/dashes and invalidate only changed content (2.0s)",
+        "  \u2713  353 tests/webgpu.e2e.ts:1698:1 \u203a GPU vector gradient reference uploads retain transparent transformed paint and invalidate after stop edits (2.0s)",
+        "",
+        "  353 passed (13.2m)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-browser-initial.log": {
+      "sha256": "e7987d13dfe77c4ad81b1d881e58313889a09531fb4409eaa66b62cc91a1534a",
+      "bytes": 17400,
+      "tail": [
+        "      35 | test('gradient inspector edits stops, geometry and paint transforms with normal undo and locks',async({page})=>{",
+        "        at /home/kestrel/projects/luma-editor/tests/vector-gradients.e2e.ts:32:265",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/vector-gradients.e2e.ts-SV-1ce61--editable-paint-coordinates/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/vector-gradients.e2e.ts-SV-1ce61--editable-paint-coordinates/error-context.md",
+        "",
+        "  4 failed",
+        "    tests/vector-gradients.e2e.ts:5:131 \u203a native paint-transform gradient fill matches Canvas and stays editable through SVG/project round trips ",
+        "    tests/vector-gradients.e2e.ts:5:131 \u203a native layer-affine gradient fill matches Canvas and stays editable through SVG/project round trips ",
+        "    tests/vector-gradients.e2e.ts:24:101 \u203a SVG bbox-curve gradients import with native editable paint coordinates ",
+        "    tests/vector-gradients.e2e.ts:24:101 \u203a SVG compound gradients import with native editable paint coordinates ",
+        "  12 passed (50.9s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-browser-second.log": {
+      "sha256": "aaacc03f526a293a1a43ad7a367f83888129a3533f01d96bd82bba634d6befd4",
+      "bytes": 3309,
+      "tail": [
+        "  \u2713   4 tests/vector-gradients.e2e.ts:5:131 \u203a native radial gradient fill matches Canvas and stays editable through SVG/project round trips (2.2s)",
+        "  \u2713   5 tests/vector-gradients.e2e.ts:5:131 \u203a native focal gradient fill matches Canvas and stays editable through SVG/project round trips (2.3s)",
+        "  \u2713   6 tests/vector-gradients.e2e.ts:5:131 \u203a native two-circle gradient fill matches Canvas and stays editable through SVG/project round trips (2.3s)",
+        "  \u2713   7 tests/vector-gradients.e2e.ts:5:131 \u203a native paint-transform gradient fill matches Canvas and stays editable through SVG/project round trips (2.4s)",
+        "  \u2713   8 tests/vector-gradients.e2e.ts:5:131 \u203a native layer-affine gradient fill matches Canvas and stays editable through SVG/project round trips (2.4s)",
+        "  \u2713   9 tests/vector-gradients.e2e.ts:5:131 \u203a native reset gradient fill matches Canvas and stays editable through SVG/project round trips (2.4s)",
+        "  \u2713  10 tests/vector-gradients.e2e.ts:24:101 \u203a SVG bbox-curve gradients import with native editable paint coordinates (2.4s)",
+        "  \u2713  11 tests/vector-gradients.e2e.ts:24:101 \u203a SVG bbox-radial gradients import with native editable paint coordinates (2.3s)",
+        "  \u2713  12 tests/vector-gradients.e2e.ts:24:101 \u203a SVG user-percent gradients import with native editable paint coordinates (2.4s)",
+        "  \u2713  13 tests/vector-gradients.e2e.ts:24:101 \u203a SVG reference-alpha gradients import with native editable paint coordinates (2.3s)",
+        "  \u2713  14 tests/vector-gradients.e2e.ts:24:101 \u203a SVG compound gradients import with native editable paint coordinates (2.3s)",
+        "  \u2713  15 tests/vector-gradients.e2e.ts:35:1 \u203a gradient inspector edits stops, geometry and paint transforms with normal undo and locks (2.7s)",
+        "  \u2713  16 tests/vector-gradients.e2e.ts:42:1 \u203a 50 MP gradient fills preserve original source bytes and continuous paint across native PNG tile seams (6.3s)",
+        "",
+        "  16 passed (47.9s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-browser-third.log": {
+      "sha256": "5451a37eddc4c69a50485c0d69b28704ff2cfb6f494a49f6d5a8e239bb8fdf36",
+      "bytes": 9700,
+      "tail": [
+        "         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ^",
+        "      39 |  await page.getByLabel('Path fill type',{exact:true}).selectOption('radial');const radius=page.getByLabel('Gradient end radius',{exact:true});await radius.fill('48');await radius.press('Enter');await page.locator('.vector-gradient-controls summary').click();const tx=page.getByLabel('Gradient transform e',{exact:true});await tx.fill('8');await tx.press('Enter');await page.locator('.vector-gradient-controls').screenshot({path:'/tmp/canoli-vector-gradient-controls.png'});",
+        "      40 |  const result=await page.evaluate(()=>{const{editor,VectorLayer}=window.luma,layer=editor.document.selectedLayer as InstanceType<typeof VectorLayer>,p=layer.paths.at(0)!,gradient=p.fillGradient;layer.locked=true;let rejected=false;try{p.fillGradient=null;}catch{rejected=true;}return{gradient,rejected};});expect(result.gradient).toMatchObject({kind:'radial',end:{radius:48},transform:{e:8}});expect(result.rejected).toBe(true);await expect(radius).toBeDisabled();expect(errors).toEqual([]);await writeFile('/tmp/canoli-vector-gradient-ui.json',JSON.stringify(result,null,2)+'\\n');",
+        "      41 | });",
+        "        at /home/kestrel/projects/luma-editor/tests/vector-gradients.e2e.ts:38:1066",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/vector-gradients.e2e.ts-gr-a0f7d--with-normal-undo-and-locks/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/vector-gradients.e2e.ts-gr-a0f7d--with-normal-undo-and-locks/error-context.md",
+        "",
+        "  1 failed",
+        "    tests/vector-gradients.e2e.ts:36:1 \u203a gradient inspector edits stops, geometry and paint transforms with normal undo and locks ",
+        "  20 passed (1.2m)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-build-final.log": {
+      "sha256": "236afc2c11562a06983bbc1e99375fdef9d51b9ed7d5e67bdebf5c2a03862373",
+      "bytes": 3938,
+      "tail": [
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/Icon.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/Icon.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.04s"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-build.log": {
+      "sha256": "d2696bcc865addafffa33f669778098ac556655f48ff33ef57f656ba9f2450a3",
+      "bytes": 3938,
+      "tail": [
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/context.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/context.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.25s"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-css-final.log": {
+      "sha256": "38311341541f459954d144513dfcad7ceec5afae9b799a51a033c692a7c701cc",
+      "bytes": 1544,
+      "tail": [
+        "[WebServer] (node:348256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:348274) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 4 tests using 1 worker",
+        "",
+        "(node:348334) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/vector-gradients.e2e.ts:25:199 \u203a SVG css-transparent gradients import with native editable paint coordinates (2.4s)",
+        "  \u2713  2 tests/vector-gradients.e2e.ts:25:199 \u203a SVG css-alpha-low gradients import with native editable paint coordinates (2.5s)",
+        "  \u2713  3 tests/vector-gradients.e2e.ts:25:199 \u203a SVG css-modern-alpha gradients import with native editable paint coordinates (2.2s)",
+        "  \u2713  4 tests/vector-gradients.e2e.ts:60:1 \u203a gradient CSS color conversion preserves transparent RGB without relative-color API and rejects unrepresentable gamut (1.5s)",
+        "",
+        "  4 passed (13.7s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-cubic.log": {
+      "sha256": "348c1ed0f75610b53d7316e2cf6e6961b95f676443e565e9c706a70b2398c19a",
+      "bytes": 1100,
+      "tail": [
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:342701) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:342701) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:342719) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 1 test using 1 worker",
+        "",
+        "(node:342779) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/vector-gradients.e2e.ts:25:146 \u203a SVG bbox-cubic gradients import with native editable paint coordinates (2.2s)",
+        "",
+        "  1 passed (7.3s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-diff-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "/tmp/canoli-vector-gradients-focused-unit.log": {
+      "sha256": "de92c8e64c19e13d649819b4010b3bf5f883229963528d79ca2f62b01cbbeddc",
+      "bytes": 452,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  3 passed (3)",
+        "      Tests  55 passed (55)",
+        "   Start at  15:06:27",
+        "   Duration  1.53s (transform 63%, import 24%, tests 13%, worker 1%)",
+        "",
+        "  Transform  transforming modules took 2.17s \u00b7 63% of tracked time, re-done on every run",
+        "             persist transforms across runs with fsModuleCache: true",
+        "             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-gradients-inheritance-final.log": {
+      "sha256": "1623e418f52df80dac383fd2058e2d8e9b94dd0490e79c30cdf8b5f79babe742",
+      "bytes": 2076,
+      "tail": [
+        "",
+        "Running 8 tests using 1 worker",
+        "",
+        "(node:352405) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/vector-gradients.e2e.ts:25:271 \u203a SVG template-color gradients import with native editable paint coordinates (2.4s)",
+        "  \u2713  2 tests/vector-gradients.e2e.ts:25:271 \u203a SVG stop-default gradients import with native editable paint coordinates (2.2s)",
+        "  \u2713  3 tests/vector-gradients.e2e.ts:25:271 \u203a SVG stop-inherit gradients import with native editable paint coordinates (2.2s)",
+        "  \u2713  4 tests/vector-gradients.e2e.ts:25:271 \u203a SVG template-interpolation gradients import with native editable paint coordinates (2.4s)",
+        "  \u2713  5 tests/vector-gradients.e2e.ts:25:271 \u203a SVG css-transparent gradients import with native editable paint coordinates (2.3s)",
+        "  \u2713  6 tests/vector-gradients.e2e.ts:25:271 \u203a SVG css-alpha-low gradients import with native editable paint coordinates (2.2s)",
+        "  \u2713  7 tests/vector-gradients.e2e.ts:25:271 \u203a SVG css-modern-alpha gradients import with native editable paint coordinates (2.4s)",
+        "  \u2713  8 tests/vector-gradients.e2e.ts:60:1 \u203a gradient CSS color conversion preserves transparent RGB without relative-color API and rejects unrepresentable gamut (1.6s)",
+        "",
+        "  8 passed (22.8s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-inheritance-initial.log": {
+      "sha256": "0b3a0d778fc67542a3ac098f0beb535d31a56a0b5802b0a5fe90c39ddcf98a4b",
+      "bytes": 8395,
+      "tail": [
+        "      34 | });",
+        "      35 |",
+        "      36 | test('gradient inspector edits stops, geometry and paint transforms with normal undo and locks',async({page})=>{",
+        "        at /home/kestrel/projects/luma-editor/tests/vector-gradients.e2e.ts:33:166",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/vector-gradients.e2e.ts-SV-2725f--editable-paint-coordinates/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/vector-gradients.e2e.ts-SV-2725f--editable-paint-coordinates/error-context.md",
+        "",
+        "  2 failed",
+        "    tests/vector-gradients.e2e.ts:25:271 \u203a SVG stop-default gradients import with native editable paint coordinates ",
+        "    tests/vector-gradients.e2e.ts:25:271 \u203a SVG template-interpolation gradients import with native editable paint coordinates ",
+        "  2 passed (14.7s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-invariants-final.log": {
+      "sha256": "091bfe5829f77ffb4f6b240e96826750e1ea05cde7bf293bb6d538bb54f26c2a",
+      "bytes": 183,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  8 passed (8)",
+        "   Start at  15:21:41",
+        "   Duration  1.07s (transform 68%, import 22%, tests 9%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-gradients-production-final.log": {
+      "sha256": "bfa1f630ad411a55a2620db010adb5b3309bb4903d092c17bcb719a7e0c0e6fb",
+      "bytes": 6015,
+      "tail": [
+        "  \u2713  25 tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals (2.2s)",
+        "  \u2713  26 tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers (3.2s)",
+        "  \u2713  27 tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors (1.4s)",
+        "  \u2713  28 tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow (1.6s)",
+        "  \u2713  29 tests/production.e2e.ts:983:1 \u203a production SVG filters preserve document-space shadows with zero fill and rotated parents (1.4s)",
+        "  \u2713  30 tests/production.e2e.ts:998:1 \u203a production SVG download retains a native photo, raster erasures and independent vector paths (1.6s)",
+        "  \u2713  31 tests/production.e2e.ts:1010:1 \u203a production documented SVG text stays editable and matches native PNG through actual downloads (1.4s)",
+        "  \u2713  32 tests/production.e2e.ts:1025:1 \u203a production documented smart SVG keeps editable vectors and native filtered pixels through actual downloads (1.7s)",
+        "  \u2713  33 tests/production.e2e.ts:1037:1 \u203a production documented SVG paint retains editable dabs, erasers and native selection clips through actual downloads (1.6s)",
+        "  \u2713  34 tests/production.e2e.ts:1050:1 \u203a production documented native SVG backdrop preserves adjustments and Blend If with later editable artwork (1.6s)",
+        "  \u2713  35 tests/production.e2e.ts:1063:1 \u203a production SVG preflight imports editable geometry, preserves prior work and exports through bundled native code (2.2s)",
+        "  \u2713  36 tests/production.e2e.ts:1074:1 \u203a production documented vector strokes retain editable inspector settings and native/SVG pixels (2.1s)",
+        "  \u2713  37 tests/production.e2e.ts:1089:1 \u203a production documented gradient fills remain editable and survive actual SVG downloads and reimport (2.1s)",
+        "",
+        "  37 passed (1.1m)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-production-smoke.log": {
+      "sha256": "07c746e125431d8b306abe4bc04e218861347ccd5fdd86b5965d16e9b387058a",
+      "bytes": 687,
+      "tail": [
+        "",
+        "> canoli-studio@0.1.0 test:production",
+        "> playwright test --config playwright.production.config.ts --grep documented gradient fills",
+        "",
+        "[WebServer] (node:341918) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 1 test using 1 worker",
+        "",
+        "(node:341972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/production.e2e.ts:1089:1 \u203a production documented gradient fills remain editable and survive actual SVG downloads and reimport (2.3s)",
+        "",
+        "  1 passed (4.0s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-seo-final.log": {
+      "sha256": "ba92e6c940f645cd836440b238561ec1b554862b7b78a139661fdb41776fe0d8",
+      "bytes": 195,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  15:54:15",
+        "   Duration  176ms (transform 47%, tests 28%, import 19%, worker 6%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-gradients-types-before-mask-fixture.log": {
+      "sha256": "ef9fb94217ec6138ce438a3ec8fe8ee34a060d0ed2d36ed808cf8a68913e947d",
+      "bytes": 653,
+      "tail": [
+        "",
+        "",
+        "> canoli-studio@0.1.0 build:wasm",
+        "> asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
+        "",
+        "",
+        "> canoli-studio@0.1.0 build:runtime",
+        "> node scripts/build-scripting.mjs",
+        "",
+        "",
+        "> canoli-studio@0.1.0 build:docs",
+        "> node --import tsx scripts/build-docs.mjs",
+        "",
+        "Built 9 developer documentation pages.",
+        "tests/vector-gradients.e2e.ts(53,641): error TS2339: Property 'ellipse' does not exist on type 'typeof MarqueeSelection'."
+      ]
+    },
+    "/tmp/canoli-vector-gradients-types-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "/tmp/canoli-vector-gradients-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "/tmp/canoli-vector-gradients-ui-composition.log": {
+      "sha256": "b4c22a936de89a7c4fe4be03bb7cd527edd5f6acd6264b252f69def1ba5226d7",
+      "bytes": 1596,
+      "tail": [
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:340932) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 3 tests using 1 worker",
+        "",
+        "(node:340992) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/vector-gradients.e2e.ts:36:1 \u203a gradient inspector edits stops, geometry and paint transforms with normal undo and locks (2.9s)",
+        "  \u2713  2 tests/vector-gradients.e2e.ts:51:1 \u203a gradient paint follows image resize, crop, masks and layer appearance without changing its local values (2.0s)",
+        "(node:341141) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  3 tests/webgpu.e2e.ts:1698:1 \u203a GPU vector gradient reference uploads retain transparent transformed paint and invalidate after stop edits (2.1s)",
+        "",
+        "  3 passed (12.9s)"
+      ]
+    },
+    "/tmp/canoli-vector-gradients-unit-final.log": {
+      "sha256": "fad199ab582e7e5d285dbcaaa5d348eff122a799de94a2627ad11ff97cf5430d",
+      "bytes": 642,
+      "tail": [
+        "> canoli-studio@0.1.0 build:wasm",
+        "> asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
+        "",
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  134 passed (134)",
+        "      Tests  999 passed (999)",
+        "   Start at  15:36:37",
+        "   Duration  63.39s (tests 75%, import 21%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  134 workers spawned \u00b7 ~116ms startup each (spawn + environment, per file)",
+        "             at least ~7.68s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    }
+  }
+}

@@ -1,7 +1,10 @@
+import type {VectorGradientData} from '../core/vector-gradient';
+import {VectorGradientControls} from './VectorGradientControls';
+import {VectorStrokeControls} from './VectorStrokeControls';
 import type { Tool, ToolController, ToolSettings } from "../tools";
 import type { VectorLayer, VectorPath } from "../dom";
 import type { EditorCommand } from "../core/commands";
-import { Slider, Select } from "./controls";
+import { Button, Slider, Select } from "./controls";
 import { InspectorSection } from "./InspectorSection";
 
 export function ToolOptions({
@@ -25,6 +28,8 @@ export function ToolOptions({
   onOpenArtboard,
   onOpenCrop,
   documentBusy,
+  onModifySelection,
+  onColorRange,
 }: {
   tool: Tool;
   moveTarget: "layer" | "mask";
@@ -46,6 +51,8 @@ export function ToolOptions({
   onOpenArtboard?(): void;
   onOpenCrop?(): void;
   documentBusy: boolean;
+  onModifySelection?(): void;
+  onColorRange?(): void;
 }) {
   const tonal = tool === "dodge" || tool === "burn";
   const brush =
@@ -61,6 +68,7 @@ export function ToolOptions({
         {
           {
             wand: "Magic wand",
+            'quick-select':'Quick selection',
             move: "Move",
             hand: "Hand",
             artboard: "Artboard",
@@ -72,7 +80,7 @@ export function ToolOptions({
             eraser: "Eraser",
             pen: "Pen",
             marquee: "Marquee",
-            lasso: "Freeform lasso",
+            lasso: settings.lassoMode === "polygon" ? "Polygonal lasso" : "Freeform lasso",
             clone: "Clone",
             patch: "Patch",
             heal: "Spot Healing",
@@ -515,6 +523,17 @@ export function ToolOptions({
           </button>
         </>
       )}
+      {tool==='quick-select'&&<>
+        <Slider label="Quick selection diameter" value={settings.quickSize} min={.5} max={512} step={.5} suffix="px" disabled={documentBusy} onPreview={value=>controller.configure({quickSize:value})} onCommit={value=>controller.configure({quickSize:value})}/>
+        <Slider label="Color tolerance" value={settings.quickTolerance} min={0} max={255} step={1} disabled={documentBusy} onPreview={value=>controller.configure({quickTolerance:value})} onCommit={value=>controller.configure({quickTolerance:value})}/>
+        <Slider label="Edge threshold" value={settings.quickEdgeThreshold} min={0} max={255} step={1} disabled={documentBusy} onPreview={value=>controller.configure({quickEdgeThreshold:value})} onCommit={value=>controller.configure({quickEdgeThreshold:value})}/>
+        <Select label="Quick selection source" value={settings.quickSampling} disabled={documentBusy} options={[{value:'merged',label:'Visible composite'},{value:'layer',label:'Selected layer'}]} onChange={value=>controller.configure({quickSampling:value as ToolSettings['quickSampling']})}/>
+        <Select label="Quick selection operation" value={settings.quickSelectionMode} disabled={documentBusy} options={['replace','add','subtract','intersect']} onChange={value=>controller.configure({quickSelectionMode:value as ToolSettings['quickSelectionMode']})}/>
+        {controller.getSnapshot().quickSelectionProgress&&<>
+          <progress aria-label="Quick Selection progress" max={controller.getSnapshot().quickSelectionProgress!.total} value={controller.getSnapshot().quickSelectionProgress!.completed}/>
+          <button type="button" className="button subtle compact" onClick={()=>controller.cancel()}>Cancel Quick Selection</button>
+        </>}
+      </>}
       {tool === "wand" && <>
         <Slider label="Wand tolerance" value={settings.wandTolerance} min={0} max={255} step={1}
           onPreview={value => controller.configure({ wandTolerance: value })} onCommit={value => controller.configure({ wandTolerance: value })} />
@@ -523,6 +542,23 @@ export function ToolOptions({
       </>}
       {(tool === "marquee" || tool === "wand" || tool === "lasso") && (
         <>
+          {tool === "lasso" && <>
+            <select
+              aria-label="Lasso mode"
+              value={settings.lassoMode}
+              disabled={documentBusy}
+              onChange={event => controller.configure({ lassoMode: event.target.value as ToolSettings["lassoMode"] })}
+            >
+              <option value="freeform">Freeform</option>
+              <option value="polygon">Polygonal</option>
+            </select>
+            {settings.lassoMode === "polygon" && <button
+              type="button"
+              className="button subtle compact"
+              disabled={documentBusy || controller.polygonLassoPointCount < 3}
+              onClick={() => onAction(() => controller.finishPolygonLasso())}
+            >Finish selection</button>}
+          </>}
           {tool === "marquee" && <select
             aria-label="Marquee shape"
             value={settings.selectionShape}
@@ -551,6 +587,10 @@ export function ToolOptions({
             <option value="intersect">Intersect</option>
           </select>
         </>
+      )}
+      {onColorRange&&['move','marquee','lasso','wand'].includes(tool)&&<button type="button" className="button subtle compact" disabled={documentBusy} onClick={onColorRange}>Color Range…</button>}
+      {hasSelection && tool !== "crop" && (
+        <button type="button" className="button subtle compact" disabled={documentBusy} onClick={onModifySelection}>Modify selection…</button>
       )}
       {hasSelection && tool !== "crop" && (
         <button
@@ -605,7 +645,9 @@ export function ToolOptions({
       )}
         {onOpenImageSize && <button type="button" className="button subtle compact" disabled={documentBusy} onClick={onOpenImageSize}>Image size…</button>}
       <span className="tool-hint">
-        {tool === "lasso" ? "Drag to select · Shift adds · Alt subtracts · Shift+Alt intersects · Esc cancels" : tool === "crop"
+        {tool==='quick-select'?'Paint inside the region · Release to grow along colors/edges · Alt subtracts · Esc cancels':tool === "lasso" ? settings.lassoMode === "polygon"
+          ? "Click corners · Click the first corner or Enter to finish · Backspace removes a corner · Esc cancels"
+          : "Drag to select · Shift adds · Alt subtracts · Shift+Alt intersects · Esc cancels" : tool === "crop"
           ? "Drag a frame or its handles · Enter applies · Esc cancels · Shift constrains corners"
           : tool === "artboard"
             ? "Change canvas bounds without scaling artwork"
@@ -640,6 +682,7 @@ export function PathProperties({
   onAction,
   onPreview,
   previewStrokeWidth,
+  previewGradient,
 }: {
   layer: VectorLayer;
   path: VectorPath | null;
@@ -648,6 +691,7 @@ export function PathProperties({
   onAction(action: () => void): void;
   onPreview(command: EditorCommand): void;
   previewStrokeWidth?: number;
+  previewGradient?:VectorGradientData|null;
 }) {
   if (!path)
     return (
@@ -669,7 +713,7 @@ export function PathProperties({
           type="checkbox"
           aria-label="Closed path"
           checked={path.closed}
-          disabled={disabled}
+          disabled={disabled || path.subpaths.length > 0}
           onChange={(e) =>
             onAction(() => {
               path.closed = e.target.checked;
@@ -678,16 +722,21 @@ export function PathProperties({
         />
         Closed path
       </label>
+      <Select label="Path fill rule" value={path.fillRule} options={["nonzero", "evenodd"]} disabled={disabled} onChange={value => onAction(() => { path.fillRule = value as "nonzero" | "evenodd"; })} />
+      {path.subpaths.length > 0 && <details><summary>{path.subpaths.length + 1} editable contours</summary>
+        <p className="section-description">Use the Pen tool to move any contour's anchors and handles. All contours share this path's paint.</p>
+        {[...path.subpaths].map((contour, index) => <Button key={contour.id} variant="subtle" size="sm" disabled={disabled} onClick={() => onAction(() => contour.remove())}>Remove contour {index + 2}</Button>)}
+      </details>}
       <div className="style-color-row">
         <label className="check-field">
           <input
             type="checkbox"
             aria-label="Path fill enabled"
-            checked={!!path.fill}
+            checked={!!(path.fill||path.fillGradient)}
             disabled={disabled}
             onChange={(e) =>
               onAction(() => {
-                path.fill = e.target.checked ? "#d5e79b" : null;
+                path.update({fill:e.target.checked?"#d5e79b":null,fillGradient:null});
               })
             }
           />
@@ -697,7 +746,7 @@ export function PathProperties({
           type="color"
           aria-label="Path fill color"
           value={path.fill ?? "#d5e79b"}
-          disabled={disabled || !path.fill}
+          disabled={disabled || !path.fill || !!path.fillGradient}
           onChange={(e) =>
             onAction(() => {
               path.fill = e.target.value;
@@ -705,6 +754,7 @@ export function PathProperties({
           }
         />
       </div>
+      <VectorGradientControls key={`gradient:${path.id}`} path={path} disabled={disabled} onAction={onAction} previewGradient={previewGradient} onPreview={fillGradient=>onPreview({type:"path.update",id:layer.id,pathId:path.id,patch:{fillGradient}})}/>
       <div className="style-color-row">
         <label className="check-field">
           <input
@@ -756,6 +806,7 @@ export function PathProperties({
           })
         }
       />
+      <VectorStrokeControls key={`stroke:${path.id}`} path={path} disabled={disabled} onAction={onAction}/>
       <p className="section-description">
         {anchorCount} anchors · Pen tool moves anchors and handles.
         Alt/Option moves one handle independently.

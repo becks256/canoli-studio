@@ -1,0 +1,313 @@
+{
+  "date": "2026-10-15",
+  "feature": "T19/A04 source-native Select Subject correction",
+  "fullT19Complete": false,
+  "versions": {
+    "documentSchema": 21,
+    "projectContainer": 3,
+    "workspaceSnapshot": 2,
+    "schemaChanged": false
+  },
+  "environment": {
+    "browser": "Chromium through Playwright in local container",
+    "backend": "Actual AssemblyScript/WASM in private browser and Node workers",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "contract": {
+    "target": "Selected or explicit raster; original decoded pixels before layer effects/masks/opacity",
+    "hiddenAndLockedTargetsAllowed": true,
+    "placement": "Full ancestor/layer affine matrix multiplied by placed-to-native-source scale",
+    "threshold": {
+      "default": 0.35,
+      "minimum": 0,
+      "maximum": 1
+    },
+    "expandRadius": {
+      "default": 0,
+      "minimum": 0,
+      "maximum": 64,
+      "integer": true,
+      "units": "Original source pixels, grayscale disk dilation before placement, clipped to source"
+    },
+    "heuristic": "Visible-border RGB mean; majority-transparent border uses intrinsic alpha. Otherwise normalized encoded-RGB contrast plus Sobel edge and spatial weighting, without fabricated prior/fallback.",
+    "alpha": "Selected coverage copies native source byte alpha; hidden RGB under zero alpha is ignored",
+    "automaticHoleClosing": false,
+    "minimumComponentAreaRemoval": false,
+    "confidence": "Synchronous reference reports zero as unscored, not calibrated subject confidence",
+    "emptyUniformMissingOrNonRaster": "Reject without replacing selection/history or fabricating a source/shape",
+    "undo": "One shared selection transaction",
+    "sourceAssetsModified": false,
+    "scriptSharedPreparationLimit": 32,
+    "restSharedWorkerLimit": 4
+  },
+  "memory": {
+    "initialPages": 1,
+    "maximumPages": 4096,
+    "maximumBytes": 268435456,
+    "maximumSourceCanvasSide": 512,
+    "maximumScoreOrCoverageBandPixels": 262144,
+    "wasmRgbaBytesPerSourcePixel": 4,
+    "fullNativeRgbaPlaneAllocated": true,
+    "fullImageCanvasOrFloatLabelPlanesAllocated": false,
+    "note": "Browser capture/transferred input, original source decoding/bitmaps, RLE/history and bounded expansion tiles consume additional memory. The WASM maximum and actual process memory limit this operation; they do not cap imports or downsample originals."
+  },
+  "nativeBrowser50Mp": {
+    "milliseconds": 1953.699999988079,
+    "width": 10000,
+    "height": 5000,
+    "samples": [
+      255,
+      255,
+      0,
+      0,
+      255,
+      128,
+      0,
+      0,
+      0
+    ],
+    "revisionDelta": 1,
+    "inputResponseMs": 77.59999999403954,
+    "inputDuringCapture": true,
+    "handVisibleDuringCapture": true,
+    "progressFirst": {
+      "completed": 0,
+      "total": 150000200
+    },
+    "progressLast": {
+      "completed": 150000200,
+      "total": 150000200
+    },
+    "selectionRestored": true,
+    "originalUnchanged": true,
+    "longTasks": [
+      {
+        "start": 2698.9000000059605,
+        "duration": 106
+      },
+      {
+        "start": 2952.100000023842,
+        "duration": 61
+      },
+      {
+        "start": 4569.9000000059605,
+        "duration": 179
+      }
+    ]
+  },
+  "earlierBrowserObservations": [
+    {
+      "milliseconds": 2242.2000000178814,
+      "width": 10000,
+      "height": 5000,
+      "samples": [
+        255,
+        255,
+        0,
+        0,
+        255,
+        128,
+        0,
+        0,
+        0
+      ],
+      "revisionDelta": 1,
+      "inputResponseMs": 65.5,
+      "inputDuringCapture": true,
+      "handVisibleDuringCapture": true,
+      "progressFirst": {
+        "completed": 0,
+        "total": 150000200
+      },
+      "progressLast": {
+        "completed": 150000200,
+        "total": 150000200
+      },
+      "selectionRestored": true,
+      "originalUnchanged": true,
+      "longTasks": [
+        {
+          "start": 2757.9000000059605,
+          "duration": 98
+        },
+        {
+          "start": 2974.7999999821186,
+          "duration": 51
+        },
+        {
+          "start": 4855.4000000059605,
+          "duration": 239
+        }
+      ]
+    },
+    {
+      "milliseconds": 1988.4000000059605,
+      "width": 10000,
+      "height": 5000,
+      "samples": [
+        255,
+        255,
+        0,
+        0,
+        255,
+        128,
+        0,
+        0,
+        0
+      ],
+      "revisionDelta": 1,
+      "inputResponseMs": 74.19999998807907,
+      "inputDuringCapture": true,
+      "handVisibleDuringCapture": true,
+      "progressFirst": {
+        "completed": 0,
+        "total": 150000200
+      },
+      "progressLast": {
+        "completed": 150000200,
+        "total": 150000200
+      },
+      "selectionRestored": true,
+      "originalUnchanged": true,
+      "longTasks": [
+        {
+          "start": 2810.5999999940395,
+          "duration": 102
+        },
+        {
+          "start": 4720.699999988079,
+          "duration": 171
+        }
+      ]
+    }
+  ],
+  "performanceNotes": "The 50 MP fixture is a genuine mostly-transparent PNG that exercises intrinsic-alpha evidence, not a 50 MP Sobel/contrast benchmark. Smaller opaque/textured inputs verify the contrast branch against an independent JavaScript reference. Toolbar timing is a queued zero-delay callback clicking the real Hand control during trusted source capture and observing its pressed state before first capture completion, not OS input-to-photon or gesture p95. Overlapping long tasks remain and can include other browser work. These container observations do not establish cross-device performance or peak memory.",
+  "nativeRest50Mp": {
+    "milliseconds": 3984.9273259999995,
+    "width": 10000,
+    "height": 5000,
+    "samples": [
+      255,
+      255,
+      0,
+      0,
+      255,
+      128,
+      0,
+      0,
+      0
+    ]
+  },
+  "existingRealImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "exportElapsedMs": 3545
+  },
+  "fixtures": {
+    "generator": {
+      "path": "scripts/generate-subject-fixtures.py",
+      "sha256": "d976c59cf8af945ed0f23a0f962d5c826dc321e44ff676db89b7616605511594"
+    },
+    "large": {
+      "path": "tests/fixtures/matting/native-50mp.png",
+      "sha256": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f"
+    },
+    "largeReference": {
+      "width": 10000,
+      "height": 5000,
+      "points": [
+        [
+          20,
+          5
+        ],
+        [
+          219,
+          4994
+        ],
+        [
+          80,
+          400
+        ],
+        [
+          99,
+          419
+        ],
+        [
+          100,
+          419
+        ],
+        [
+          9000,
+          4000
+        ],
+        [
+          9001,
+          4000
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          9999,
+          4999
+        ]
+      ],
+      "alpha": [
+        255,
+        255,
+        0,
+        0,
+        255,
+        128,
+        0,
+        0,
+        0
+      ]
+    },
+    "smallProduction": {
+      "path": "tests/fixtures/matting/cutout.png",
+      "sha256": "97c8d977df0e75aacc51dbc7dd607da7f665a56dceed41cb2620b88e38f2ea03"
+    },
+    "generation": "Independent Python struct/zlib standard PNG scanlines; no full-image allocation in generator, no Canoli writer or image model used."
+  },
+  "validation": {
+    "build": "npm run build passed actual WASM, isolated runtime, developer docs, TypeScript and Vite",
+    "unitApiTestsPassed": 824,
+    "unitTestFiles": 118,
+    "unitCommand": "npm test -- --maxWorkers=2",
+    "subjectUnitCases": 8,
+    "subjectRestCases": 3,
+    "distinctDevelopmentBrowserTestsPassed": 40,
+    "subjectDevelopmentCases": 9,
+    "legacyMattingBrowserCases": 3,
+    "productionBrowserTestsPassed": 22,
+    "totalDistinctBrowserTestsPassed": 62,
+    "actualDocumentedScriptAndStagedTransformPassed": true,
+    "lateWorkerCancelButtonAndEscapePassed": true,
+    "latePluginAssetReadRevocationPassed": true,
+    "nestedAffinePlacementOriginalDimensionsAndLocksPassed": true,
+    "nonrectangularHoleDisconnectedPartialAlphaPngMasksPassed": true,
+    "projectAndCurrentRedoWorkspaceSourceIdentityPassed": true,
+    "unsupportedPngDepthProfileAndStrictAtomicRestPassed": true,
+    "independentReference": "Native byte coverage versus independent JavaScript scorer on textured nonrectangular input, four thresholds and two expansion radii",
+    "hiddenRgbInvariance": "Actual failing native regression at threshold 0.1 reproduced, then fixed for four threshold settings",
+    "productionNoDeveloperGlobals": true,
+    "whitespace": "git diff --check passed",
+    "limits": "Legacy mocked Canvas matting tests establish ownership/history only; they are not quality evidence. Actual native/PNG/browser tests provide the pixel coverage checks."
+  },
+  "correctedFailures": [
+    "Legacy subject method discarded its computed mask into bounds and fabricated a white image for missing raster input",
+    "Saliency added a positive spatial baseline, fabricated a central fallback and removed small details/holes",
+    "Initial new native alpha prior lost distant partial-alpha detail when a cutout touched a thin source-border band; majority-transparent border evidence corrected it",
+    "Hidden zero-alpha RGB changed visible Sobel evidence; native and reference scorers now ignore it",
+    "Old context-menu test read an earlier success notification before the asynchronous result; it now awaits actual coverage"
+  ],
+  "remaining": [
+    "Semantic/real-scene subject quality and held-out hair/transparency evaluation",
+    "Refine Edge/removeBackground still perform legacy full-image calling-thread preparation with incomplete transformed-selection/isolation handling",
+    "Legacy mask attachment ignores decontaminated foreground RGB computed by solver",
+    "General formats/profiles and headless scene rendering remain separate unfinished work",
+    "Dense retained coverage, real memory/device constraints, long tasks and broader roadmap gates remain open"
+  ]
+}

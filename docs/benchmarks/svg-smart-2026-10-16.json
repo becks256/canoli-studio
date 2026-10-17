@@ -1,0 +1,2874 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T15:19:08.344011+00:00",
+  "scope": "F09/F11 smart-master SVG expansion, native filtered-content preparation and shared native full-frame raster erasure correction. Full professional-editor roadmap remains active/incomplete.",
+  "sourceSha256": {
+    "src/core/svg-smart.ts": "743ff0575957b1d5de2133c3c2d7bd9f43cf424539e367611e37717e0c62fe3a",
+    "src/core/smart/resolve.ts": "b090bb4067b8e554609aaa0d7230dd5a9a9e4553c7f3a5753040e94a3bb4deb5",
+    "src/core/smart/manager.ts": "7bb1032a468754b11a04efdebe89094051c9edaa2f355da39af806e7e2c81824",
+    "src/core/smart/types.ts": "c2480e89ed81520cf548437799ca1dfbb6af8404269302f34db2b79c1196581b",
+    "src/core/smart/filters.ts": "bd83f8af134fc9b610dcb24e2ada68bf00d4bbed3cfba5169938743b4333f55c",
+    "src/core/svg-images.ts": "4fffa10eac38537b3ebdc6cf50e7db3687a95c9b278c9e109231e1fc2dc7c9d2",
+    "src/core/svg-styles.ts": "744300c0292ca06aef29922b2d4489807f39d5fc8f601849478e5e067f0f5527",
+    "src/core/svg-export.ts": "9d1f518135203102d355832f9aea819bac506240ea4fd61fb4519dcf85dfe11a",
+    "src/core/svg-masks.ts": "a2c0055d5a343dbf5cbadabb43bf1fa8056d5aad71a6704cbd998277de04e764",
+    "src/core/svg-text.ts": "a56618b60bb162ee854e17b3060ff270eec8bcda57f067c0695b8cd4a876649b",
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/engine/svg-images.ts": "292c6a47383e5d604500f074acce3850cf88b18b052e4b1d42d661acbf545dbf",
+    "src/engine/svg-text.ts": "8fc888a69fcaec44e5623e73a91536e9ce630930efd2c676fefe761438bf0fde",
+    "src/engine/export.ts": "984f29ffce30b15c376f938a974055dc3ea15d3f14bf3684fc6008e38dd71caa",
+    "src/engine/svg-masks.ts": "84ccb27f6095f5487bc9bdb3bec7ebcd035e5c74bb6f5fb34ee89c044ee33434",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/engine/smart-filters.ts": "305b7dc9915fef5596d34487d9354a033cef542b077c9c87723f6fdf0c9b8ed5",
+    "src/engine/filter-mask-coverage.ts": "43bc9a7c8678c1d5e968ef82408250fb01aa51cdb67448685d389fd42c882f17",
+    "src/engine/png.ts": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+    "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+    "src/engine/drawing.ts": "f9e713c63d0a48e9d3245d895f06a7d46d093063a26e866aa6e71293c8e10aac",
+    "src/core/model.ts": "4d5df5de545880b0f9b5e88a4579750c86d85b6bb45723f8d3c72b67ea3533a9",
+    "src/core/assets.ts": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+    "src/dom/index.ts": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "src/ui/ExportDialog.tsx": "e85201c2e6ba99a522f905fa0fcf0763f8225aeb8aa641e5a12363380eed8cbd",
+    "tests/svg-smart.test.ts": "fba50c2cc643d2fd34882a9f8e05aed8d9d1d719da3b68e890ecccc00032fac2",
+    "tests/svg-smart.e2e.ts": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+    "tests/smart-resolve.test.ts": "81a520030c0699d65e1fed1f08f8cdfd1f2757a0d74c47fde191635f2adcd21b",
+    "tests/export.test.ts": "19fcd30cdbb8de6eafbcad8380f4e831ed466b2d05d8a83feb6fba1e54072240",
+    "tests/svg-export.test.ts": "6c3d739b31d417ab8711396575dc03aaa58c438ea210df83b96105ccc2f5ed6b",
+    "tests/foundation-increments.e2e.ts": "53921c8f87b6162c09c2ed56a9ed521321d138f64b314f34c22b66e36382b0e4",
+    "tests/production.e2e.ts": "8eaed7dff5c96048dfafed3fc9d065be34018916e939332145e775c1b0028052",
+    "docs/REQUIREMENTS.md": "24c77ab738de5e9a46536e8d429b1b23390762e8c032a42fafd1570d351e7ff7",
+    "docs/API.md": "608460c9e8b26fe55d91a3ad48d38b77f0dd586795b4a54c3b294f44c2be6749",
+    "docs/SCRIPTING_API.md": "219af157b5b42c2b93c850a86946a371dbb4ca91992baa3ffe4dce62928be8de",
+    "docs/ARCHITECTURE.md": "41d5eeb9eb5f0d50a5c5b7b0d42fee49b7c3d30273b0d651ea7d7b66808485f3",
+    "docs/SYSTEM_DESIGN.md": "ab33777bf75d658c3240c73e70f3030d36992180b66a820598e9dbfd07fbf0ca",
+    "docs/DESIGN_SYSTEM.md": "ac3fc4f7bf9ca1132f82a3030c022411e34fa451a7c0f0fbd0959ad5688d160f",
+    "docs/PLUGINS.md": "082677ff3a307d20c5f2da0574c1ca64238afe987090a1fe87692ebacfefe904",
+    "docs/FEATURE_STRATEGY.md": "a992bcf447bf028f0122b24489dda2adf90c2d3fa1272ef2505bd7bd027db071",
+    "README.md": "ffaf2f27a0ad7d2a0cb373eef7edadde2855bfdfa513ecb1024e09d227ada071",
+    "src/generated/script-runtime.js": "1dea57f1e6ddf2f671fa3026f8f6caffa83b0712a78151260522301f9004bbdd",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+    "tests/fixtures/matting/native-50mp.png": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/svg-images.e2e.ts": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+    "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/svg-text.e2e.ts": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+    "tests/smart-raster.e2e.ts": "7cbd1ba3565913198427fee8dde99f6e29cf5448c19d9a88da95718f6fd1ec18",
+    "tests/smart-filters.e2e.ts": "1ee5b65dfc2a5603042ab9b11a78def3ce9b223038c3d330e3e362d536dfb578",
+    "tests/smart-linked.e2e.ts": "8b4cd1362232f83316528ed34ed00de4ba8ad9b8237ad63f64bcf07f9a31bba7",
+    "tests/smart-filters-ui.e2e.ts": "b2362dc87bef55b6828211490a3afc320b8ab2f471c35438a6884c651322c42d",
+    "tests/smart-transfer.e2e.ts": "370c1aeac9009f2e281d212cd7ac9aa60afa387b8c34a87bcefb5c3d6180864a",
+    "tests/smart-resolve.e2e.ts": "1cd05d6031f1f7c7386f18a4f85a1f7bdc8d289639ff5c80020d6c0236aa524e",
+    "tests/smart-filter-masks.e2e.ts": "a4eb4490276d366992a5f53173ca580147dcb20e6524449cb63d98e881f8d357",
+    "tests/smart-edit.e2e.ts": "1ab4f5d923401f2d3c234a7141f469441018f9265810b69956c5589571c1bd37",
+    "tests/smart-conversion.e2e.ts": "ef10588dd2b0a30bc991bce48af31bc935231967171e33d890c1063314e154a5",
+    "tests/smart-document.e2e.ts": "732a7ffc34b9888bb254b20d1304097c605eecdd5b2db0bb67fb114d5d6759af",
+    "tests/smart-filter-mask-ui.e2e.ts": "c06b21b7c403f95d0a00042ee6d6f081958b31bd641b5f03907137a6e4416390"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "includes": [
+        "actual WASM",
+        "isolated runtime",
+        "developer docs",
+        "TypeScript",
+        "production bundling"
+      ]
+    },
+    "unitAndApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": true,
+      "tests": 924,
+      "files": 129
+    },
+    "developmentBrowser": {
+      "command": "npx playwright test tests/svg-smart.e2e.ts tests/svg-text.e2e.ts tests/svg-images.e2e.ts tests/svg-styles.e2e.ts tests/svg-masks.e2e.ts tests/svg-export.e2e.ts tests/masks.e2e.ts tests/export-cancellation.e2e.ts tests/raster-editing.e2e.ts tests/foundation-increments.e2e.ts tests/metadata.e2e.ts tests/editor.e2e.ts:125 tests/smart-*.e2e.ts --reporter=line",
+      "passed": true,
+      "tests": 195,
+      "byFile": {
+        "editor.e2e.ts": 1,
+        "export-cancellation.e2e.ts": 5,
+        "foundation-increments.e2e.ts": 4,
+        "masks.e2e.ts": 16,
+        "metadata.e2e.ts": 4,
+        "raster-editing.e2e.ts": 14,
+        "smart-conversion.e2e.ts": 2,
+        "smart-document.e2e.ts": 4,
+        "smart-edit.e2e.ts": 3,
+        "smart-filter-mask-ui.e2e.ts": 3,
+        "smart-filter-masks.e2e.ts": 2,
+        "smart-filters-ui.e2e.ts": 3,
+        "smart-filters.e2e.ts": 3,
+        "smart-linked.e2e.ts": 6,
+        "smart-raster.e2e.ts": 6,
+        "smart-resolve.e2e.ts": 2,
+        "smart-transfer.e2e.ts": 2,
+        "svg-export.e2e.ts": 7,
+        "svg-images.e2e.ts": 16,
+        "svg-masks.e2e.ts": 20,
+        "svg-smart.e2e.ts": 23,
+        "svg-styles.e2e.ts": 16,
+        "svg-text.e2e.ts": 33
+      }
+    },
+    "additionalBrowser": {
+      "command": "npx playwright test tests/svg-smart.e2e.ts --grep 'filtered-affine|captured master' --reporter=line",
+      "passed": true,
+      "tests": 3,
+      "stage": "Test-only additions after full build/unit/broad/production. No product source changed; final TypeScript passes."
+    },
+    "productionBrowser": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": true,
+      "tests": 32,
+      "newCase": "Exact documented isolated constructor example, real capability report, native SVG/PNG downloads, independent vector clip plus filtered image pixels, one-step undo and no developer globals."
+    },
+    "seo": {
+      "command": "npx vitest run tests/seo.test.ts",
+      "passed": true,
+      "tests": 5
+    },
+    "distinctBrowserChecks": 230,
+    "diffCheck": "git diff --check passes."
+  },
+  "pixelAndGeometryComparisons": {
+    "vector": {
+      "mode": "vector",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 2,
+      "vectorMasks": 1,
+      "images": 0,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "shared": {
+      "mode": "shared",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 3,
+      "vectorMasks": 2,
+      "images": 0,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 7,
+      "afterRevision": 7,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "nested": {
+      "mode": "nested",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 2,
+      "vectorMasks": 2,
+      "images": 0,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 7,
+      "afterRevision": 7,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "clipped": {
+      "mode": "clipped",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 2,
+      "vectorMasks": 1,
+      "images": 0,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "affine": {
+      "mode": "affine",
+      "alpha": 30,
+      "premult": 14.599999999999994,
+      "geometry": {
+        "area": 1596.521568627451,
+        "cx": 66.39564813700373,
+        "cy": 48.497457708302115,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0.042291666666666665,
+      "holes": 0,
+      "paths": 2,
+      "vectorMasks": 1,
+      "images": 0,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 6,
+      "afterRevision": 6,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ]
+    },
+    "scoped-mask": {
+      "mode": "scoped-mask",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 2,
+      "vectorMasks": 1,
+      "images": 0,
+      "maskImages": 1,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "asset": {
+      "mode": "asset",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            32,
+            160,
+            64,
+            255
+          ],
+          "png": [
+            32,
+            160,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ]
+    },
+    "erased-master": {
+      "mode": "erased-master",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Raster tone effects and erasures are baked into document-resolution PNG images clipped to the expanded output support. Save a project to retain editable raster operations and original sources."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Rendered raster tone effects and erasures in document-resolution PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable raster tone effects/erasures and off-support pixels of processed rasters"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            32,
+            160,
+            64,
+            255
+          ],
+          "png": [
+            32,
+            160,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ]
+    },
+    "filters": {
+      "mode": "filters",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 5,
+      "afterRevision": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            160,
+            95,
+            65,
+            102
+          ],
+          "png": [
+            160,
+            95,
+            65,
+            102
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            159,
+            95,
+            64,
+            255
+          ],
+          "png": [
+            159,
+            95,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            159,
+            95,
+            63,
+            253
+          ],
+          "png": [
+            159,
+            95,
+            63,
+            253
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "filter-mask": {
+      "mode": "filter-mask",
+      "alpha": 2,
+      "premult": 2,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0.0175,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 1,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 10,
+      "afterRevision": 10,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            121,
+            134,
+            61,
+            42
+          ],
+          "png": [
+            121,
+            134,
+            61,
+            42
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            119,
+            126,
+            74,
+            152
+          ],
+          "png": [
+            119,
+            126,
+            74,
+            152
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            85,
+            92,
+            96,
+            185
+          ],
+          "png": [
+            85,
+            92,
+            95,
+            185
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            255,
+            18
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            18
+          ]
+        }
+      ]
+    },
+    "unlinked-filter-mask": {
+      "mode": "unlinked-filter-mask",
+      "alpha": 2,
+      "premult": 2,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0.0175,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 1,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "afterRevision": 11,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            121,
+            134,
+            61,
+            42
+          ],
+          "png": [
+            121,
+            134,
+            61,
+            42
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            119,
+            126,
+            74,
+            152
+          ],
+          "png": [
+            119,
+            126,
+            74,
+            152
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            85,
+            92,
+            96,
+            185
+          ],
+          "png": [
+            85,
+            92,
+            95,
+            185
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            255,
+            18
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            18
+          ]
+        }
+      ]
+    },
+    "filtered-nested": {
+      "mode": "filtered-nested",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 8,
+      "afterRevision": 8,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            160,
+            95,
+            65,
+            102
+          ],
+          "png": [
+            160,
+            95,
+            65,
+            102
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            159,
+            95,
+            64,
+            255
+          ],
+          "png": [
+            159,
+            95,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            160,
+            95,
+            65,
+            94
+          ],
+          "png": [
+            160,
+            95,
+            65,
+            94
+          ]
+        }
+      ]
+    },
+    "filtered-text": {
+      "mode": "filtered-text",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 5,
+      "afterRevision": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            158,
+            94,
+            64,
+            76
+          ],
+          "png": [
+            158,
+            94,
+            64,
+            76
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            161,
+            94,
+            67,
+            38
+          ],
+          "png": [
+            161,
+            94,
+            67,
+            38
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "filtered-paint": {
+      "mode": "filtered-paint",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 5,
+      "afterRevision": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            160,
+            95,
+            65,
+            102
+          ],
+          "png": [
+            160,
+            95,
+            65,
+            102
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            159,
+            95,
+            64,
+            255
+          ],
+          "png": [
+            159,
+            95,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            159,
+            96,
+            63,
+            93
+          ],
+          "png": [
+            159,
+            96,
+            63,
+            93
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "unused-master": {
+      "mode": "unused-master",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 2,
+      "vectorMasks": 1,
+      "images": 0,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 5,
+      "afterRevision": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "linked": {
+      "mode": "linked",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 5,
+      "afterRevision": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            32,
+            160,
+            64,
+            255
+          ],
+          "png": [
+            32,
+            160,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ]
+    },
+    "master-style": {
+      "mode": "master-style",
+      "alpha": 1,
+      "premult": 1,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0.0115625,
+      "holes": 0,
+      "paths": 2,
+      "vectorMasks": 1,
+      "images": 0,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            104,
+            112,
+            40,
+            255
+          ],
+          "png": [
+            104,
+            112,
+            40,
+            255
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            104,
+            112,
+            40,
+            255
+          ],
+          "png": [
+            104,
+            112,
+            40,
+            255
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            104,
+            112,
+            40,
+            255
+          ],
+          "png": [
+            104,
+            112,
+            40,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "filtered-affine": {
+      "mode": "filtered-affine",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 0,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 7,
+      "afterRevision": 7,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            160,
+            94,
+            64,
+            203
+          ],
+          "png": [
+            160,
+            94,
+            64,
+            203
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            159,
+            95,
+            64,
+            255
+          ],
+          "png": [
+            159,
+            95,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            159,
+            94,
+            63,
+            181
+          ],
+          "png": [
+            159,
+            94,
+            63,
+            181
+          ]
+        }
+      ]
+    },
+    "filtered-affine-mask": {
+      "mode": "filtered-affine-mask",
+      "alpha": 2,
+      "premult": 2.1960784313725554,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0
+      },
+      "meanAlpha": 0.017239583333333332,
+      "holes": 0,
+      "paths": 1,
+      "vectorMasks": 0,
+      "images": 1,
+      "maskImages": 1,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 13,
+      "afterRevision": 13,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate; save a project for editable filters and masters.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      },
+      "samples": [
+        {
+          "x": 20,
+          "y": 16,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 28,
+          "y": 24,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 36,
+          "y": 32,
+          "svg": [
+            126,
+            135,
+            63,
+            113
+          ],
+          "png": [
+            125,
+            134,
+            63,
+            114
+          ]
+        },
+        {
+          "x": 52,
+          "y": 48,
+          "svg": [
+            98,
+            104,
+            107,
+            184
+          ],
+          "png": [
+            98,
+            104,
+            105,
+            184
+          ]
+        },
+        {
+          "x": 64,
+          "y": 60,
+          "svg": [
+            75,
+            80,
+            140,
+            169
+          ],
+          "png": [
+            75,
+            80,
+            140,
+            169
+          ]
+        }
+      ]
+    }
+  },
+  "nativePreparationLifecycle": {
+    "cancel": {
+      "action": "cancel",
+      "invoked": true,
+      "returned": false,
+      "error": "AbortError: signal is aborted without reason",
+      "prepared": 2,
+      "released": true,
+      "retry": true,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "source-replace": {
+      "action": "source-replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "filter-mask-replace": {
+      "action": "filter-mask-replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "font-change": {
+      "action": "font-change",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: A referenced font family changed during SVG export. Retry after fonts are ready.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "encoding-source-replace": {
+      "action": "encoding-source-replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 4,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    }
+  },
+  "capturedMasterHostEdit": {
+    "changed": true,
+    "revision": 3,
+    "after": 4,
+    "captured": [
+      255,
+      128,
+      64,
+      255
+    ],
+    "undoRestored": true
+  },
+  "native50mpSharedSource": {
+    "elapsed": 1937.800000000745,
+    "bytes": 299683,
+    "decodedSize": [
+      10000,
+      5000
+    ],
+    "images": 1,
+    "uses": 2,
+    "samples": [
+      {
+        "x": 20,
+        "y": 5,
+        "rgba": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 219,
+        "y": 100,
+        "rgba": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 63,
+        "rgba": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 64,
+        "rgba": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 1023,
+        "rgba": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 1024,
+        "rgba": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 4994,
+        "rgba": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 9000,
+        "y": 4000,
+        "rgba": [
+          255,
+          0,
+          0,
+          128
+        ]
+      },
+      {
+        "x": 9999,
+        "y": 4999,
+        "rgba": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "sourceUnchanged": true,
+    "unchanged": true,
+    "revision": 0,
+    "after": 0
+  },
+  "production": {
+    "alpha": 0,
+    "premult": 0,
+    "paths": 1,
+    "vectorClips": 1,
+    "images": 1,
+    "original": [
+      128,
+      64,
+      32,
+      255
+    ],
+    "filtered": [
+      255,
+      128,
+      64,
+      255
+    ]
+  },
+  "existingNative50mpPng": {
+    "passed": true,
+    "observedExportMs": 3451.0,
+    "scope": "Actual import, WASM tone edit, save/reopen/full native PNG decode; existing native SVG mask and embedded-PNG regressions also pass."
+  },
+  "designAndLimits": [
+    "Unfiltered smart instances expand through the shared validated native resolver into supported editable vector/raster/text contents. Generated master-canvas clips use editable rectangular vector masks in this private SVG view; native callers retain existing selection clips.",
+    "Enabled smart filters keep a native-rendered leaf. Raw content/filter masks render through the existing master-plane pipeline into a document-plane PNG over expanded shadow support. Outer masks/styles/fill/layer opacity/blend remain separate. Unlinked filter masks are translated during document-plane rebasing.",
+    "Shared master/component identity is not preserved in SVG, and filtered inner contents/filters/filter-mask geometry/off-support pixels are explicitly baked/lost. Ordinary paint/adjustments and Blend If remain omitted outside native-rendered content. Projects retain original masters, operations and sources.",
+    "One dependency capture includes reachable visible native-filter raster, clone, patch, bitmap-mask and filter-mask sources; filtered text font readiness/lifetime shares the existing SVG guard. Unused masters are not prepared, but complete registry validation and logical expansion budgets still apply.",
+    "Source/filter-mask replacement, font changes, cancellation and replacement during final encoding reject without partial output; captured native surfaces release. A later independent master replacement cannot rewrite the captured export and retains exactly one undo entry.",
+    "Shared native full-frame raster-master optimization now preserves source erasures. An independently expected transparent sample verifies the erased master in real SVG output, alongside unit preservation/ownership invariants and broad native smart rendering regressions.",
+    "Fourteen of nineteen appearance fixtures are byte-exact for alpha/premultiplied RGB. Inner master styles reach one byte; three mask/style filtered cases reach two alpha levels and at most 2.1960784313725554 premultiplied values. The unfiltered affine shape has larger Canvas/SVG antialiasing differences, measured separately with independent geometry.",
+    "Affine analytic parallelogram oracle uses corners [33.6,27], [93.6,42], [99.2,70], [39.2,55], area1596 and centroid[66.4,48.5]. Decoded SVG area1596.521568627451 and centroid[66.39564813700373,48.497457708302115], zero interior/exterior errors beyond a1.5px edge band; native comparison max alpha30/premult14.6 and mean alpha0.042291666666666665. No universal pixel identity is claimed.",
+    "50 MP evidence proves one native10000x5000 embedded-PNG decode shared by two smart instances after actual save/reopen, nine source-coordinate samples including native strip boundaries/opaque content/distant half-alpha/transparent edge, and unchanged original compressed bytes/model/revision. It does not establish full50MP composite SVG raster decode or peak memory.",
+    "Linked-image masters use verified stored local snapshots without watching or refreshing files. Source-file metadata is not copied into embedded PNGs. Complete unmodified raster pixels and editable text can retain masked/off-canvas content; SVG is not redaction.",
+    "Existing4096-node/64-depth logical component work budgets apply, including retained filtered descendants. No arbitrary MP/import cap or full-document host RGBA/canvas allocation is introduced. Original decoding, compressed/base64 output, native tile/filter buffers and viewer allocations still consume memory.",
+    "No public constructor/mutation API, schema/project/workspace version, REST renderer/browser synchronization, script/plugin file/font-byte/download privilege, paid service, cloud upload or source-byte mutation.",
+    "Remaining SVG shared symbols/master identity, ordinary paint/adjustments/Blend If, import/round-trip, wider formats/viewers/precision/memory/performance gates and the full roadmap remain incomplete. No input-to-photon/p95/long-task/peak-memory/device-independent speed guarantee is inferred from these tests."
+  ],
+  "localLogs": {
+    "/tmp/canoli-svg-smart-build.log": {
+      "sha256": "eca376554635e64f76b894a3247f0061531893b9f4ec99bf2fcae59068cdd075",
+      "tail": [
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/Icon.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/Icon.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 953ms"
+      ]
+    },
+    "/tmp/canoli-svg-smart-unit.log": {
+      "sha256": "b1555f53bc46c5514655dc7124914253d41190c755310c0f56d1bdb166d938ab",
+      "tail": [
+        "> asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
+        "",
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  129 passed (129)",
+        "      Tests  924 passed (924)",
+        "   Start at  11:07:35",
+        "   Duration  62.56s (tests 74%, import 21%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  129 workers spawned \u00b7 ~124ms startup each (spawn + environment, per file)",
+        "             at least ~7.90s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-smart-focused.log": {
+      "sha256": "b7662db7950f07f2046c2f2389594d4e93c02aab233e634920ed492c2b36f2aa",
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  6 passed (6)",
+        "      Tests  36 passed (36)",
+        "   Start at  11:01:17",
+        "   Duration  2.39s (transform 66%, import 20%, tests 14%)",
+        "",
+        "  Transform  transforming modules took 4.79s \u00b7 66% of tracked time, re-done on every run",
+        "             persist transforms across runs with fsModuleCache: true",
+        "             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-smart-initial.log": {
+      "sha256": "8c2582ea3b0c86e0304c981c199c2ff91f3b84ee15a6fc23a9e6a32dd1824484",
+      "tail": [
+        "",
+        "",
+        "[7/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart asset retains native content, placement and original sources",
+        "[8/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart erased-master retains native content, placement and original sources",
+        "[9/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart filters retains native content, placement and original sources",
+        "[10/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart filter-mask retains native content, placement and original sources",
+        "[11/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart unlinked-filter-mask retains native content, placement and original sources",
+        "[12/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart filtered-nested retains native content, placement and original sources",
+        "[13/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart filtered-text retains native content, placement and original sources",
+        "[14/14] tests/svg-smart.e2e.ts:4:212 \u203a SVG smart filtered-paint retains native content, placement and original sources",
+        "  2 failed",
+        "    tests/svg-smart.e2e.ts:4:212 \u203a SVG smart affine retains native content, placement and original sources ",
+        "    tests/svg-smart.e2e.ts:4:212 \u203a SVG smart scoped-mask retains native content, placement and original sources ",
+        "  12 passed (30.4s)"
+      ]
+    },
+    "/tmp/canoli-svg-smart-geometry.log": {
+      "sha256": "80c966e5f4ed0cf4a2319e6c9835624d79e398a06dd5f11c5ca5e72d26fb8ab6",
+      "tail": [
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-smart.e2e.ts-SVG-smart-f3309-cement-and-original-sources/error-context.md",
+        "",
+        "",
+        "(node:162609) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[2/3] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart scoped-mask retains native content, placement and original sources",
+        "[3/3] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart unused-master retains native content, placement and original sources",
+        "  1 failed",
+        "    tests/svg-smart.e2e.ts:4:228 \u203a SVG smart affine retains native content, placement and original sources ",
+        "  2 passed (11.3s)"
+      ]
+    },
+    "/tmp/canoli-svg-smart-complete.log": {
+      "sha256": "cd2e940dcc96920bbed21218337d14669859e1cfada8b16c4881c1318d2db2a7",
+      "tail": [
+        "[9/21] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart filters retains native content, placement and original sources",
+        "[10/21] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart filter-mask retains native content, placement and original sources",
+        "[11/21] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart unlinked-filter-mask retains native content, placement and original sources",
+        "[12/21] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart filtered-nested retains native content, placement and original sources",
+        "[13/21] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart filtered-text retains native content, placement and original sources",
+        "[14/21] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart filtered-paint retains native content, placement and original sources",
+        "[15/21] tests/svg-smart.e2e.ts:4:228 \u203a SVG smart unused-master retains native content, placement and original sources",
+        "[16/21] tests/svg-smart.e2e.ts:36:120 \u203a SVG native smart preparation rejects cancel and releases real image surfaces",
+        "[17/21] tests/svg-smart.e2e.ts:36:120 \u203a SVG native smart preparation rejects source-replace and releases real image surfaces",
+        "[18/21] tests/svg-smart.e2e.ts:36:120 \u203a SVG native smart preparation rejects filter-mask-replace and releases real image surfaces",
+        "[19/21] tests/svg-smart.e2e.ts:36:120 \u203a SVG native smart preparation rejects font-change and releases real image surfaces",
+        "[20/21] tests/svg-smart.e2e.ts:36:120 \u203a SVG native smart preparation rejects encoding-source-replace and releases real image surfaces",
+        "[21/21] tests/svg-smart.e2e.ts:48:1 \u203a SVG smart instances share a genuine native 50 MP embedded source through save and reopen",
+        "  21 passed (43.6s)"
+      ]
+    },
+    "/tmp/canoli-svg-smart-browser.log": {
+      "sha256": "dc83305529dc5df96a5821fbb9dc88459009c30bfd36f3abedfcbafa8c6eaad9",
+      "tail": [
+        "[183/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-add respects font lifetime, history and cleanup",
+        "[184/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-remove respects font lifetime, history and cleanup",
+        "[185/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation unrelated-font respects font lifetime, history and cleanup",
+        "[186/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation encoding-change respects font lifetime, history and cleanup",
+        "[187/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation pending-font respects font lifetime, history and cleanup",
+        "[188/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-descriptor respects font lifetime, history and cleanup",
+        "[189/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation escaped-family respects font lifetime, history and cleanup",
+        "[190/195] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation host-edit respects font lifetime, history and cleanup",
+        "[191/195] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text font fails without a partial result or history changes",
+        "[192/195] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text color fails without a partial result or history changes",
+        "[193/195] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text xml fails without a partial result or history changes",
+        "[194/195] tests/svg-text.e2e.ts:71:1 \u203a downloaded SVG references a page-only font without copying font files or promising its appearance",
+        "[195/195] tests/svg-text.e2e.ts:79:1 \u203a SVG text keeps every layer untracked when native Canvas letter spacing is unavailable",
+        "  195 passed (6.6m)"
+      ]
+    },
+    "/tmp/canoli-svg-smart-production.log": {
+      "sha256": "2798655d4a7a26b6f43c407278146fc7706028e4bfdbfd2fc127c4d75f2a6eba",
+      "tail": [
+        "[20/32] tests/production.e2e.ts:818:1 \u203a production alpha channel constructors and Inspector load native coverage and export independent masks",
+        "[21/32] tests/production.e2e.ts:835:1 \u203a production Quick Selection brush and isolated refinement export real nonrectangular masks",
+        "[22/32] tests/production.e2e.ts:874:1 \u203a production Select Subject preserves genuine source alpha through UI, isolated scripting and exported masks",
+        "[23/32] tests/production.e2e.ts:896:1 \u203a production Refine Edge exposes corrected-layer output and isolated native matting exports real corrected RGB",
+        "[24/32] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves wide-unknown with bundled workers and no developer globals",
+        "[25/32] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals",
+        "[26/32] tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers",
+        "[27/32] tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors",
+        "[28/32] tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow",
+        "[29/32] tests/production.e2e.ts:983:1 \u203a production SVG filters preserve document-space shadows with zero fill and rotated parents",
+        "[30/32] tests/production.e2e.ts:998:1 \u203a production SVG download retains a native photo, raster erasures and independent vector paths",
+        "[31/32] tests/production.e2e.ts:1010:1 \u203a production documented SVG text stays editable and matches native PNG through actual downloads",
+        "[32/32] tests/production.e2e.ts:1025:1 \u203a production documented smart SVG keeps editable vectors and native filtered pixels through actual downloads",
+        "  32 passed (59.9s)"
+      ]
+    },
+    "/tmp/canoli-svg-smart-affine-snapshot.log": {
+      "sha256": "dc196a98fab0e791ad5ba86503955d4b90d05d1afe23f40abd579951dac52ee7",
+      "tail": [
+        "[WebServer] (node:177376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "Running 3 tests using 1 worker",
+        "",
+        "(node:177442) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[1/3] tests/svg-smart.e2e.ts:4:293 \u203a SVG smart filtered-affine retains native content, placement and original sources",
+        "[2/3] tests/svg-smart.e2e.ts:4:293 \u203a SVG smart filtered-affine-mask retains native content, placement and original sources",
+        "[3/3] tests/svg-smart.e2e.ts:55:1 \u203a SVG native smart output retains its captured master while a later host replacement keeps its own undo",
+        "  3 passed (10.2s)"
+      ]
+    },
+    "/tmp/canoli-svg-smart-seo.log": {
+      "sha256": "7500d07899a328b46af75bde9fe96532c6533d46b65a5a3d9e2749fb2129a09c",
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  11:09:09",
+        "   Duration  179ms (transform 53%, tests 20%, import 19%, worker 8%)",
+        ""
+      ]
+    }
+  }
+}

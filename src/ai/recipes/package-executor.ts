@@ -81,7 +81,7 @@ export async function executeRecipePackage(
     assertTargetAvailable();
     const ids = new Map<string, string>();
     for (const entry of contents.assets) {
-      const asset = await staging.add(entry.blob, entry.name, id(), false);
+      const asset = await staging.add(entry.blob, entry.name, id(), false,{tiff:entry.tiff});
       assertTargetAvailable();
       if (asset.width !== entry.width || asset.height !== entry.height)
         throw new Error(

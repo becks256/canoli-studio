@@ -1,0 +1,4605 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T18:58:26.179496+00:00",
+  "scope": "F07/F11 editable native vector stroke styles and SVG stroke import/export; full professional-editor roadmap remains active and incomplete",
+  "environment": {
+    "node": "v24.0.1",
+    "platform": "linux",
+    "arch": "x64",
+    "chromiumExecutable": "/home/kestrel/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+    "chromium": "Google Chrome for Testing 153.0.8010.12"
+  },
+  "versions": {
+    "document": 22,
+    "projectContainer": 3,
+    "workspaceSnapshot": 2,
+    "legacyNativeDefaults": [
+      "round",
+      "round",
+      4,
+      [],
+      0
+    ],
+    "svgDefaults": [
+      "butt",
+      "miter",
+      4,
+      [],
+      0
+    ]
+  },
+  "implementation": {
+    "styles": "Optional cap/join/miter/dash-array/dash-offset records; defensive dash ownership, strict shared path schemas, commands/locks/revisions/undo; OO constructors/setters and all shape factories",
+    "migration": "Valid v1-v21 documents/history upgrade without injecting fields; earlier schema labels containing new fields reject, including frozen validated entries",
+    "ui": "Native inspector controls, validated explicit dash draft Apply/Enter/Escape, Solid action and ancestor-lock/busy behavior",
+    "rendering": "Complete per-path Canvas state, native lines for exact straight segments, conservative square/miter bounds; mask tracing retains its prior cubic coverage",
+    "zeroLength": "Explicit zero segments/solid closed contours render round circles or centered squares; move-only/butt points are empty. Half-open dash phase retains zero-sized on-dashes. Closed zero contours with non-solid patterns remain empty, following measured browser behavior",
+    "svg": "Validated literal attributes; inert-worker inherited cap/join/miter/absolute-unit dashes and offsets become native editable records. Unsupported relative/pathLength/non-scaling/SVG2 extended joins use explicit flatten fallback",
+    "gpu": "Existing native vector reference uploads, style-aware cache invalidation and premultiplied diagnostic readback; no hardware presentation or speedup claim",
+    "isolation": "No new script/plugin privileges, install-time execution, external file/network access or REST/browser synchronization",
+    "recipes": "Existing layer-add templates retain styled paths; standalone path-update recording remains explicitly unsupported"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "result": "actual WASM/runtime/developer-doc generation, TypeScript and production bundling passed"
+    },
+    "unit": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": 989,
+      "files": 133,
+      "newStrokeInvariantTests": 8,
+      "newRestCases": 1
+    },
+    "development": {
+      "command": "npx playwright test tests/svg- tests/vector-strokes.e2e.ts tests/webgpu.e2e.ts tests/affine-render.e2e.ts tests/editor.e2e.ts tests/adjustments.e2e.ts tests/gradient-map.e2e.ts tests/chromatic-adjustments.e2e.ts tests/recipes.e2e.ts tests/foundation-increments.e2e.ts tests/tools.e2e.ts tests/vector-construction-latency.e2e.ts",
+      "passed": 322,
+      "casesByFile": {
+        "tests/adjustments.e2e.ts": 8,
+        "tests/affine-render.e2e.ts": 4,
+        "tests/chromatic-adjustments.e2e.ts": 6,
+        "tests/editor.e2e.ts": 8,
+        "tests/foundation-increments.e2e.ts": 4,
+        "tests/gradient-map.e2e.ts": 7,
+        "tests/recipes.e2e.ts": 13,
+        "tests/svg-composition.e2e.ts": 43,
+        "tests/svg-export.e2e.ts": 7,
+        "tests/svg-images.e2e.ts": 16,
+        "tests/svg-import.e2e.ts": 31,
+        "tests/svg-masks.e2e.ts": 20,
+        "tests/svg-paint.e2e.ts": 28,
+        "tests/svg-smart.e2e.ts": 26,
+        "tests/svg-styles.e2e.ts": 16,
+        "tests/svg-text.e2e.ts": 33,
+        "tests/tools.e2e.ts": 10,
+        "tests/vector-construction-latency.e2e.ts": 4,
+        "tests/vector-strokes.e2e.ts": 21,
+        "tests/webgpu.e2e.ts": 17
+      },
+      "newVectorStrokeCases": 21,
+      "softwareGpuFileCases": 17
+    },
+    "production": {
+      "command": "npm run test:production",
+      "passed": 36,
+      "newWorkflow": "Verbatim documented stroke example through real isolated Scripts, native inspector, downloaded SVG/PNG pixels, whole-script and individual edit undo, and editable SVG reimport without developer globals"
+    },
+    "seo": {
+      "command": "npx vitest run tests/seo.test.ts",
+      "passed": 5
+    },
+    "typecheck": "npx tsc -b passed",
+    "gitDiffCheck": "passed",
+    "selectedDistinctBrowserCases": 358
+  },
+  "ordinaryStrokeComparisons": {
+    "fixtures": 17,
+    "byteExactFixtures": [
+      "butt",
+      "round",
+      "square",
+      "dash-even",
+      "dash-odd",
+      "dash-zero",
+      "dash-zero-gap",
+      "dash-negative-offset",
+      "dash-positive-offset",
+      "closed-dash",
+      "reset"
+    ],
+    "maxRawRgbaDifference": 255,
+    "maxAlphaDifference": 86,
+    "maxPremultipliedRgbDifference": 86,
+    "maxAreaError": 0.0018552961694681524,
+    "maxCentroidErrorPx": 0.06892439454940245,
+    "allNativePngAfterSvgReimportByteExact": true,
+    "allProjectJsonReopensExact": true
+  },
+  "zeroLengthComparisons": {
+    "variants": 84,
+    "extremeMiterCases": 1,
+    "maxAlphaDifference": 12,
+    "maxPremultipliedRgbDifference": 12,
+    "explanation": "Browser SVG dashed butt points can have max alpha 5 despite ideal empty geometry; native butt stays empty. Round dash-on point edges differ by max alpha 12. Geometry/interior/contour checks and affine editable round trips retained independently. These viewer residuals are not erased by broad byte-parity claims."
+  },
+  "observations50MP": {
+    "elapsed": 1963.800000000745,
+    "bytes": 212952,
+    "sourceBytes": 209602,
+    "sourceUnchanged": true,
+    "sourceSize": [
+      10000,
+      5000
+    ],
+    "dimensions": [
+      10000,
+      5000
+    ],
+    "samples": [
+      [
+        40,
+        60,
+        80,
+        255
+      ],
+      [
+        0,
+        255,
+        0,
+        255
+      ],
+      [
+        40,
+        60,
+        80,
+        255
+      ],
+      [
+        0,
+        255,
+        0,
+        255
+      ],
+      [
+        40,
+        60,
+        80,
+        255
+      ]
+    ],
+    "tiles": 395,
+    "released": true
+  },
+  "limitations": [
+    "F07/F11 and the full roadmap remain incomplete: Boolean/gradient fills, richer vector/type/font editing, broader SVG CSS/type/effect/graph/identity support, PSB/TIFF/PDF/AVIF and remaining professional, AI, workflow and commercial work remain.",
+    "Ordinary curve/diagonal/affine fixtures retain antialiasing differences; exact decoded-pixel parity is established only for specifically listed fixtures and native export/reimport checks, not universal SVG viewer equivalence.",
+    "Degenerate dash boundaries follow measured Chromium behavior. Faint dashed butt coverage and round edges differ; closed non-solid zero contours remain empty. Not proof of universal SVG2 implementation identity.",
+    "Software-adapter diagnostic readback is premultiplied RGBA8; native PNG/Canvas pixels are straight RGBA8. Hardware GPU presentation and physical devices remain unverified.",
+    "Observed 50 MP time is one local run, not p95/input-to-photon/long-task/peak-memory/device-independent speed or a controlled performance comparison. Resident sources, browser precision, native decode and output allocations impose real limits; no arbitrary MP/file-size import cutoff.",
+    "Recipe standalone path-update recording remains unsupported. No provider evaluation or paid inference, credential/account/cloud transfer or new plugin privilege is introduced."
+  ],
+  "validationStages": [
+    "Initial strict straight dash comparisons exposed native cubic-vs-line rasterization differences. Geometrically straight vector segments now use native lines; mask curve tracing remains unchanged. Eleven ordinary axis/dash fixtures are byte-exact after the correction.",
+    "Inspector duplicate React key from its sibling slider was fixed with a distinct component key and console/page-error assertions.",
+    "Optional GPU readPixels required an explicit capability guard for TypeScript.",
+    "First new GPU comparison double-premultiplied diagnostic readback. Corrected the reference conversion; raw alpha and premultiplied residuals are retained. Added visible round/square point coverage to the final upload/invalidation case.",
+    "An earlier broad run was intentionally stopped after 281 passes with one interrupted and 38 unrun, to fix actual missing native round/square zero-length artwork. It is not counted as completed final validation.",
+    "Initial zero-cap tests assumed exact coverage at all SVG boundaries. Measured faint dashed butt epsilon pixels, round edge differences, half-open dash intervals and closed non-solid emptiness; implemented actual cap geometry/dash phase with explicit viewer residuals. Expanded final zero cases to 84 variants plus extreme miter metadata.",
+    "Final focused zero cap, affine editable point roundtrip, software GPU, full unit, full selected development and full production checks pass. The roadmap remains active and incomplete."
+  ],
+  "primaryReferences": [
+    "https://www.w3.org/TR/SVG2/painting.html#StrokeProperties",
+    "https://www.w3.org/TR/SVG2/painting.html#StrokeDashing",
+    "https://html.spec.whatwg.org/multipage/canvas.html#line-styles"
+  ],
+  "priorEvidence": {
+    "path": "docs/benchmarks/svg-import-2026-10-16.json",
+    "sha256": "10f91299bd259bc5c6f8f73c320376fc1782ff8c4f0d0814797119afb83cbc21",
+    "bytes": 67054
+  },
+  "proseOnlyRefreshRuntimeProof": {
+    "artifacts": 13,
+    "allHashIdentical": true,
+    "hashes": {
+      "dist/appearance.js": "977e730925c6ab00dc344ab02aac27b3cfc2fed6084bd97be02326677fcdd76c",
+      "dist/developer/docs.css": "f8cb8902b3322ab4d12b252116ae4291630c72970138e48850f397eac0fdf933",
+      "dist/assets/selection-outline.worker-Dj42pVuC.js": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+      "dist/assets/lut-import.worker-BtkofYSH.js": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+      "dist/assets/recovery-persistence.worker-Dza7H9pa.js": "9cad4af462c9c3e6eb26bcefdf455557b610907652bb8f9ccd4bf8dd94f9f458",
+      "dist/assets/svg-import.worker-B1PMn5bW.js": "a26d8458c2f0a319cf2ab2b98f458558f90aad3926bfa2e1b24476e094740144",
+      "dist/assets/index-BF41tN3z.js": "9d128c97cf829d35660ee4329e1a34cf6501872c8fa148c246313b36187471ae",
+      "dist/assets/pixels.worker-6oYuwoZC.js": "ee95795a4d2cc5ac8476734000f620e13712724d912b3eb102ebfac63f8dd3ec",
+      "dist/assets/project-encoder.worker-nayn7Dj2.js": "2e772486e8dbadbe045f18ce836ea0426b7dd1a4b9dd1c444596e88394e60908",
+      "dist/assets/preflight.worker-DbHQ2rfI.js": "deb5bfa4817c061316c269c84bc9d8a799ded3d499da1013f3d334d177f6a930",
+      "dist/assets/metadata.worker-o3DLPB-X.js": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+      "dist/assets/index-SvptFD39.css": "ee9c49c87f53479de40487e2ebffe5dde51f602eb6249e2911df2dde2074e730",
+      "dist/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+    }
+  },
+  "sourceHashes": {
+    "package.json": {
+      "sha256": "ebbffd2baffc9067f316e9b9981236807e72923fd1688e80b533f90961ea6cde",
+      "bytes": 1706
+    },
+    "package-lock.json": {
+      "sha256": "0d2eb89a088c750ca3c9e6a09d88b6a11c34aff79be1b0446662f7937951625f",
+      "bytes": 72411
+    },
+    "src/core/vector-stroke.ts": {
+      "sha256": "843129ba4e9dfabbdfb667d6a92655a1b5f3e9948f1c8e8bda974962f45f739a",
+      "bytes": 2392
+    },
+    "src/core/drawing.ts": {
+      "sha256": "e9ca5f304f945f4a0df6db5489de89b8fa848d7fec968b63d491daa992d1723c",
+      "bytes": 10640
+    },
+    "src/core/model.ts": {
+      "sha256": "31e96541dd2a3cb2e350b98643a8c26c2e50ecb4f2d2984953f54b78d646fb9c",
+      "bytes": 26949
+    },
+    "src/core/validation.ts": {
+      "sha256": "ff465a122933663e774eb7eeaa0ca61d56f8b96c1aa905ff34c0bfc9b65845ef",
+      "bytes": 10640
+    },
+    "src/core/commands.ts": {
+      "sha256": "bdb4d331da6b212ed3766f7a883edc156f417316e338b4240506e2f048f8c022",
+      "bytes": 30958
+    },
+    "src/core/store.ts": {
+      "sha256": "ffb875003fd52c8745b3b18c20e8384fb905c34d1e5ac1cdbea2ef7087883e64",
+      "bytes": 5245
+    },
+    "src/core/shapes.ts": {
+      "sha256": "2dd273b659f368e4cbe12a4cc3a86c2f0a64e1243b9f00e54e8098b9d445e48c",
+      "bytes": 5896
+    },
+    "src/core/affine.ts": {
+      "sha256": "0a30403aeeb35b7fb6d7c3d4b9f7c62d9ef4827e6f7c792216b3e07b5e650f07",
+      "bytes": 4279
+    },
+    "src/core/svg-path.ts": {
+      "sha256": "003a22137237c5386b551dab9bb39b5f84b30406cfa2efbc421b22df8db0c423",
+      "bytes": 3287
+    },
+    "src/core/svg-path-import.ts": {
+      "sha256": "b29f958ca96ffbead987d83494a05267d093ad56ea8e243902710b01395c4c77",
+      "bytes": 9305
+    },
+    "src/core/svg-import.ts": {
+      "sha256": "12c7de94c481aee966c2d77ee37acf255011d0cd1828ddd59913d9189a50ad57",
+      "bytes": 23556
+    },
+    "src/core/svg-export.ts": {
+      "sha256": "39fa07bd68797c83feeaca0026cc37147ebc7ae057cde9f201a6488b229e54b1",
+      "bytes": 6540
+    },
+    "src/core/assets.ts": {
+      "sha256": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+      "bytes": 4354
+    },
+    "src/core/project.ts": {
+      "sha256": "ca39bebe4308146605b5442d355d3f0039128a369dc3751f120843390dca3988",
+      "bytes": 12144
+    },
+    "src/dom/index.ts": {
+      "sha256": "8d19d9918fbcd840659eaf04675dcfff3f3ab20e7c265400a5ab6fcdae3b1b9d",
+      "bytes": 78050
+    },
+    "src/tools.ts": {
+      "sha256": "fa3849935391eb371c923d22781e5d769f47b2c843095132a7c5449b65d94bf7",
+      "bytes": 71516
+    },
+    "src/editor.ts": {
+      "sha256": "b77f31758adb05a5c29b0cff9e67390d296eebc66780bc5400351517f0855c20",
+      "bytes": 65667
+    },
+    "src/engine/drawing.ts": {
+      "sha256": "f42b819804e53730e33fe22e27ce35cb763d9626ee6baa25c1122022c805f8de",
+      "bytes": 23239
+    },
+    "src/engine/renderer.ts": {
+      "sha256": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+      "bytes": 57100
+    },
+    "src/engine/cache.ts": {
+      "sha256": "76722f64df4b325ff6864974f1176545bcdad133400f3312f34e35560032a36d",
+      "bytes": 5133
+    },
+    "src/engine/export.ts": {
+      "sha256": "b825e95af7e86b40eedfb4a1edaa1ae63fe17e7cf8412b5c7b3df39734595c88",
+      "bytes": 19773
+    },
+    "src/engine/gpu/renderer.ts": {
+      "sha256": "f3bdb34d1ce541dd1b45ddfd06a46869e2a00be37b28f7bfc5414c95e5bf4e46",
+      "bytes": 43757
+    },
+    "src/engine/png.ts": {
+      "sha256": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+      "bytes": 8586
+    },
+    "src/engine/svg-import.ts": {
+      "sha256": "f3ce4374cbd4d7ec687e58185bebed0a26980394a3cce3fd9ee8f64d6f630d2b",
+      "bytes": 8854
+    },
+    "src/engine/svg-import.worker.ts": {
+      "sha256": "c48a132e73ef8f8b499694dfe112a6a1664468a9fbf933ee8e75fedd7a0aaedb",
+      "bytes": 1103
+    },
+    "src/ui/ToolOptions.tsx": {
+      "sha256": "f5e049ff2c866d8c8f86f1a4187632d4ffb8aea3493bdd164fb36615394ba84f",
+      "bytes": 28444
+    },
+    "src/ui/VectorStrokeControls.tsx": {
+      "sha256": "d25714d2c248b075531c6bf79fb89a1647e4166fdd09655eec3dd37b6e642e2f",
+      "bytes": 3078
+    },
+    "src/ui/controls.tsx": {
+      "sha256": "d43c79ad545d3bd6e2e3847a9e8dd720794d84ffb0ccc1e2d5496ba7ee145d29",
+      "bytes": 17936
+    },
+    "src/ui/styles.css": {
+      "sha256": "936ca827f2bba62f31e88cb958650a0d42066a1dfa23359842cd1cc90b235c2c",
+      "bytes": 123033
+    },
+    "src/generated/script-runtime.js": {
+      "sha256": "f6af719075f114939e0d294093230e2e42677eadfb9f76830b56264c010e5b4e",
+      "bytes": 610110
+    },
+    "src/scripting/runtime.ts": {
+      "sha256": "b7b159a899a10b3b069b3041eeb9cb44b40db6a1651daf2a8bb3c9bea00b30a7",
+      "bytes": 8744
+    },
+    "src/ai/recipes/recorder.ts": {
+      "sha256": "41a4f57c5dc4cd1852068154b49ec9005776c9d5c45b3c8dbb8f5cf30dcc2e44",
+      "bytes": 17241
+    },
+    "server/app.ts": {
+      "sha256": "c365c35c0d3e2ea19d6def5f1e80fa9f4cafa86526017fb8591be56834119218",
+      "bytes": 43678
+    },
+    "public/wasm/pixels.wasm": {
+      "sha256": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+      "bytes": 24547
+    },
+    "assembly/pixels.ts": {
+      "sha256": "ba0d75e22076c5fd70fbae44c460c7efb18969eb27d9afc08b4b11810e8423d1",
+      "bytes": 17110
+    },
+    "README.md": {
+      "sha256": "d6bace08fca20fc3910f7be0ec31ad2d939745385b34c5cb3e2f13cd6999431b",
+      "bytes": 6650
+    },
+    "docs/PRODUCT_BRIEF.md": {
+      "sha256": "fd48aaa1aa7305eeea419b2873b8186d314f66d8ea01a7125aa016ced368a7f3",
+      "bytes": 10770
+    },
+    "docs/REQUIREMENTS.md": {
+      "sha256": "b3ebd901caa7fb6e10ad28087aab602067572cd288d3d355cba3ca310f7d0991",
+      "bytes": 107514
+    },
+    "docs/ARCHITECTURE.md": {
+      "sha256": "dc6a9e9dfe042ec1f6016f54faab7d3555e400bf244b5035b3a77a9ab6af2702",
+      "bytes": 277935
+    },
+    "docs/API.md": {
+      "sha256": "af9661511d30a513e14c084d591b85f557c32531cc9c187c1d02b397547d4d63",
+      "bytes": 79658
+    },
+    "docs/SCRIPTING_API.md": {
+      "sha256": "3e273b22f3bf341127b55270a465ce3d415dd09f53126d47c4869bcac18b4931",
+      "bytes": 280905
+    },
+    "docs/DESIGN_SYSTEM.md": {
+      "sha256": "f713afcc39c4c2184a6cbbffaa47aba1a99671163b95e636d882ad9b7caeb2fe",
+      "bytes": 52771
+    },
+    "docs/PLUGINS.md": {
+      "sha256": "482bbfff9e622d5eaa2d2431f1ace252bc9a4bdbbb145b5f58e95b62508e3ea5",
+      "bytes": 28442
+    },
+    "docs/SYSTEM_DESIGN.md": {
+      "sha256": "e617a76974862b86cbb4d433fa759a758ac955a3187f4e60fdea186e68dada70",
+      "bytes": 31085
+    },
+    "docs/STORAGE_FORMAT.md": {
+      "sha256": "97fe21a7df30ad2907fe08babc49605d25481a2b53afa98feb43d10a9704eef6",
+      "bytes": 42399
+    },
+    "docs/FEATURE_STRATEGY.md": {
+      "sha256": "5a011a954ffb0b6877ef6741e1946601ace89b855e10b7b1e2bb5998a554444a",
+      "bytes": 29540
+    },
+    "docs/IMPLEMENTATION_ROADMAP.md": {
+      "sha256": "a5a9b3fb422ad141fb494566f06db6e6ac834e2d85ed49e7a863476e02787a5f",
+      "bytes": 772341
+    },
+    "tests/vector-strokes.test.ts": {
+      "sha256": "7a6899c5e2f3ebed911a09241ff9d998771fbcecde1345729c0649ef5435abd7",
+      "bytes": 7360
+    },
+    "tests/vector-strokes.e2e.ts": {
+      "sha256": "820bf527c6d3e9b1cdd2dcfa54e1534e924d1ee03eb38f32a5022cc39bf3dd19",
+      "bytes": 17203
+    },
+    "tests/api.test.ts": {
+      "sha256": "6052da2e6ce4218e08001a7a2902bd45d680373cdcb1eb28fd2b3395dbe9d6b7",
+      "bytes": 53707
+    },
+    "tests/seo.test.ts": {
+      "sha256": "4438445889c0b5d85866e8de65ee937f2b0f1eeae974338e9244175d5b0818a5",
+      "bytes": 5568
+    },
+    "tests/svg-import.test.ts": {
+      "sha256": "2526c37f9e59d10599401c351bd6a5cce9bd8ad07e9085df31f406b33b4578f2",
+      "bytes": 8981
+    },
+    "tests/svg-import-pixels.ts": {
+      "sha256": "a6544ef97614acda9c2c9065d0e1164e6d9b71aea3444eeadbb1624b006d19db",
+      "bytes": 1673
+    },
+    "tests/affine-render.e2e.ts": {
+      "sha256": "c0f13e5e9ad08feb2bb320ff929f26462d0c49acee75d1fa3111b65155262dc5",
+      "bytes": 12265
+    },
+    "tests/webgpu.e2e.ts": {
+      "sha256": "903b3a821f49bdfa67497c44a44557e698461cebd689720c41547c36fc9cb6ca",
+      "bytes": 61776
+    },
+    "tests/production.e2e.ts": {
+      "sha256": "6a529b8964ebe9c62c6574287683af4957ac8c0f801e0e181119e7576a817f97",
+      "bytes": 91861
+    },
+    "tests/editor.e2e.ts": {
+      "sha256": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+      "bytes": 24414
+    },
+    "tests/vector-construction-latency.e2e.ts": {
+      "sha256": "90a740ecc467eecf7ad510205ed0cd4d1e53dc28fa857a2ed6277a2d98c1bf4c",
+      "bytes": 4310
+    },
+    "playwright.config.ts": {
+      "sha256": "42711757cc7fe8dd1d514566627e38cda6fa238e8c047a5b8a73d126d038b926",
+      "bytes": 616
+    },
+    "playwright.production.config.ts": {
+      "sha256": "8701855d56a8fb434935682a19a06480c9c2b3de645024341a4f4ac90ac47c75",
+      "bytes": 386
+    },
+    "tests/svg-composition.e2e.ts": {
+      "sha256": "1c117e9c319affe99a9437f345c2fc666521729fa6966b02657583c715daf2a3",
+      "bytes": 27420
+    },
+    "tests/svg-export.e2e.ts": {
+      "sha256": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+      "bytes": 12922
+    },
+    "tests/svg-images.e2e.ts": {
+      "sha256": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+      "bytes": 12625
+    },
+    "tests/svg-import.e2e.ts": {
+      "sha256": "6e5ca53d0964a826fb6db51c1874801fa575cab1d9d4e8f57448280f9191d8ca",
+      "bytes": 25703
+    },
+    "tests/svg-masks.e2e.ts": {
+      "sha256": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+      "bytes": 17365
+    },
+    "tests/svg-paint.e2e.ts": {
+      "sha256": "0784081188e3f58bbbf2e4709e373d65088670d224e84d19c0cbd4dffb81ebec",
+      "bytes": 19197
+    },
+    "tests/svg-smart.e2e.ts": {
+      "sha256": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+      "bytes": 15813
+    },
+    "tests/svg-styles.e2e.ts": {
+      "sha256": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+      "bytes": 8813
+    },
+    "tests/svg-text.e2e.ts": {
+      "sha256": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+      "bytes": 16511
+    },
+    "node_modules/@xmldom/xmldom/package.json": {
+      "sha256": "b61c2dd342e0e1abb800302ec62c0b06ae7a07cd9b907c88428ff80100f64c6a",
+      "bytes": 2253
+    },
+    "node_modules/@xmldom/xmldom/lib/dom-parser.js": {
+      "sha256": "4188e24b953e2c70b66150306c66547495ad968d040e31dd65f22a7b3485da28",
+      "bytes": 20276
+    },
+    "node_modules/@xmldom/xmldom/lib/sax.js": {
+      "sha256": "324e8a0c7b475c645efcd1736b634733e133150849bff741fa0e2215e7017d02",
+      "bytes": 32465
+    },
+    "node_modules/@xmldom/xmldom/lib/dom.js": {
+      "sha256": "bea9ba89adfec227e9e572ee934a48223a170c5cf96b7087d7e3d3023ac47be3",
+      "bytes": 133234
+    }
+  },
+  "builtHashes": {
+    "dist/appearance.js": {
+      "sha256": "977e730925c6ab00dc344ab02aac27b3cfc2fed6084bd97be02326677fcdd76c",
+      "bytes": 2044
+    },
+    "dist/apple-touch-icon.png": {
+      "sha256": "8ee5d6b3c3e0907ca002991138e9cb06b14fdc59a81f686964613f99658be060",
+      "bytes": 5554
+    },
+    "dist/assets/dm-mono-latin-400-normal--0xN8mdc.woff": {
+      "sha256": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+      "bytes": 11212
+    },
+    "dist/assets/dm-mono-latin-400-normal-4GdczIuU.woff2": {
+      "sha256": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+      "bytes": 14820
+    },
+    "dist/assets/dm-mono-latin-ext-400-normal-1aZr6b2b.woff": {
+      "sha256": "5357dcba4e325c781acf79d15fd21f740f4abb7ca3f0fad88af774bd94a74e78",
+      "bytes": 7500
+    },
+    "dist/assets/dm-mono-latin-ext-400-normal-C2zvOubV.woff2": {
+      "sha256": "a52e19ebe0398c9c0f8fa28a0c5e9a6bc324f35d9f0881c9aa407d10af447175",
+      "bytes": 9552
+    },
+    "dist/assets/index-BF41tN3z.js": {
+      "sha256": "9d128c97cf829d35660ee4329e1a34cf6501872c8fa148c246313b36187471ae",
+      "bytes": 1933752
+    },
+    "dist/assets/index-SvptFD39.css": {
+      "sha256": "ee9c49c87f53479de40487e2ebffe5dde51f602eb6249e2911df2dde2074e730",
+      "bytes": 112876
+    },
+    "dist/assets/lut-import.worker-BtkofYSH.js": {
+      "sha256": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+      "bytes": 97067
+    },
+    "dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2": {
+      "sha256": "c268b459a9329e59fecf39a17618efd44c71735532048d60b12aab76a8c14914",
+      "bytes": 14500
+    },
+    "dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2": {
+      "sha256": "2fb2e8cbfd52ae46179a8b6024eb162f1f9c6de3d22d6e3a30d8f395de7220be",
+      "bytes": 9444
+    },
+    "dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2": {
+      "sha256": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb",
+      "bytes": 15120
+    },
+    "dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2": {
+      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+      "bytes": 24836
+    },
+    "dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2": {
+      "sha256": "6bbb044ab420e07edb0a3042d2eb314b85e83a0182e945a15ab3b9092668dfd5",
+      "bytes": 8520
+    },
+    "dist/assets/metadata.worker-o3DLPB-X.js": {
+      "sha256": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+      "bytes": 77198
+    },
+    "dist/assets/pixels.worker-6oYuwoZC.js": {
+      "sha256": "ee95795a4d2cc5ac8476734000f620e13712724d912b3eb102ebfac63f8dd3ec",
+      "bytes": 180086
+    },
+    "dist/assets/preflight.worker-DbHQ2rfI.js": {
+      "sha256": "deb5bfa4817c061316c269c84bc9d8a799ded3d499da1013f3d334d177f6a930",
+      "bytes": 107601
+    },
+    "dist/assets/project-encoder.worker-nayn7Dj2.js": {
+      "sha256": "2e772486e8dbadbe045f18ce836ea0426b7dd1a4b9dd1c444596e88394e60908",
+      "bytes": 151095
+    },
+    "dist/assets/recovery-persistence.worker-Dza7H9pa.js": {
+      "sha256": "9cad4af462c9c3e6eb26bcefdf455557b610907652bb8f9ccd4bf8dd94f9f458",
+      "bytes": 157825
+    },
+    "dist/assets/selection-outline.worker-Dj42pVuC.js": {
+      "sha256": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+      "bytes": 70293
+    },
+    "dist/assets/svg-import.worker-B1PMn5bW.js": {
+      "sha256": "a26d8458c2f0a319cf2ab2b98f458558f90aad3926bfa2e1b24476e094740144",
+      "bytes": 348786
+    },
+    "dist/developer/api.html": {
+      "sha256": "5563a21f83ddfaeb9f1a030e805e9dae2678d2cfa06123d59447c45b336e6df0",
+      "bytes": 104220
+    },
+    "dist/developer/architecture.html": {
+      "sha256": "9ba115f25457bb852c125bb729ade438677e4d272cae87a5bd58898e630a236a",
+      "bytes": 294990
+    },
+    "dist/developer/design-system.html": {
+      "sha256": "5c31e43e4701a68efccc5cc62d8c1ce085acca28e07253fd751da4ddf9584cbe",
+      "bytes": 57947
+    },
+    "dist/developer/docs.css": {
+      "sha256": "f8cb8902b3322ab4d12b252116ae4291630c72970138e48850f397eac0fdf933",
+      "bytes": 9171
+    },
+    "dist/developer/plugins.html": {
+      "sha256": "7178b9b9c46e2a137aded83c74c983211e670c3496462522e779af5d7ca4e74c",
+      "bytes": 32194
+    },
+    "dist/developer/product-brief.html": {
+      "sha256": "892da4ee63fe8854f8f55ca738c141e350d28ef2a07224804a25655f9b35f970",
+      "bytes": 13972
+    },
+    "dist/developer/requirements.html": {
+      "sha256": "2bd4285a74da417b38277c8673aec3de4e38c21f6f04ac2ea8e15f00562fbe4e",
+      "bytes": 107804
+    },
+    "dist/developer/scripting-api.html": {
+      "sha256": "835fe53283494b4d1d8be03dd091f27d033ce2f911099661d4abe96714b133fc",
+      "bytes": 390290
+    },
+    "dist/developer/system-design.html": {
+      "sha256": "6a2af0cb1226d0fcafd34a54c4f7ea3342211a6bc65b30e26c15d4072c68c726",
+      "bytes": 35456
+    },
+    "dist/developer/tools-milestone.html": {
+      "sha256": "2cd7ebd3c64d864dbdaf192b8859514de0ceb0491222aee1bb7ea0878fb66a76",
+      "bytes": 8122
+    },
+    "dist/favicon-16x16.png": {
+      "sha256": "648f06b1a2f5c408ea54ad9344f2f03d591c131ef80a6c1f3a16dde744474033",
+      "bytes": 550
+    },
+    "dist/favicon-32x32.png": {
+      "sha256": "073460d86c64ff5d1692382780a3434ce7579a98159271a77e19baf991a7a0fd",
+      "bytes": 1099
+    },
+    "dist/favicon.ico": {
+      "sha256": "cb0a998e12738f56bad9ee6346f51d4dca155e0ab6462fa55ec1192228efedd0",
+      "bytes": 4314
+    },
+    "dist/favicon.svg": {
+      "sha256": "604b2e074d358a36fe6ccb3767a78ecfd4dbae73dea74b8f519e6b076318be81",
+      "bytes": 513
+    },
+    "dist/icon-192.png": {
+      "sha256": "6834323ab9d66d03ac980f9cecb8efd1d285ed2bcd3ed2f5c5cfe5b99bf1715a",
+      "bytes": 5946
+    },
+    "dist/icon-512.png": {
+      "sha256": "bb4d4071f7c020716c987a9aa50f8ed8a3a2ba4aee6e62526aedd07295cda599",
+      "bytes": 15714
+    },
+    "dist/index.html": {
+      "sha256": "62326e5839c347ca9ffa88c205fedf59893e4687ba181a8429382886486d310b",
+      "bytes": 6494
+    },
+    "dist/manifest.webmanifest": {
+      "sha256": "312643f9c04a5cea7906e569d288733136f34e62ffcc3ec0754a9b5e29a5ef86",
+      "bytes": 856
+    },
+    "dist/og-image.png": {
+      "sha256": "3806fb6fd4996ca62e5707f0f579a59c6b37d262e88e7ca011b412df707bc2f9",
+      "bytes": 233979
+    },
+    "dist/robots.txt": {
+      "sha256": "5b02cfea2ffdcf23a8bbb2d4b6f335f2e7bc2cb4c98ac68ab394c4f9eaeca1da",
+      "bytes": 62
+    },
+    "dist/sitemap.xml": {
+      "sha256": "c0c8b43949e88df68a317070d2885c2585200d7c2b82702a7e3acef85b1395f2",
+      "bytes": 661
+    },
+    "dist/wasm/pixels.wasm": {
+      "sha256": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+      "bytes": 24547
+    }
+  },
+  "reports": {
+    "canoli-vector-stroke-butt.json": {
+      "mode": "butt",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 424320,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "56bb14ab-b6dc-4e04-927c-fc8e2afea0d6",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "butt",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "butt",
+        "join": "round",
+        "limit": "12",
+        "dash": "none",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-round.json": {
+      "mode": "round",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 475158,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "a7edc876-c252-42b3-ba5f-e3384b47f55d",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "none",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-square.json": {
+      "mode": "square",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 489600,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "e4c8c3af-ee3c-4148-92bc-5bab0e939932",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "square",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "square",
+        "join": "round",
+        "limit": "12",
+        "dash": "none",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-square-diagonal.json": {
+      "mode": "square-diagonal",
+      "max": 11,
+      "maxAlpha": 11,
+      "maxPremult": 11,
+      "coverage": 388335,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.00014933327840615048,
+      "centroidError": 0.017716842592948485,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "1ab075fc-3899-4334-bdba-f409e7770d97",
+        "points": [
+          {
+            "x": 24,
+            "y": 32,
+            "in": {
+              "x": 24,
+              "y": 32
+            },
+            "out": {
+              "x": 24,
+              "y": 32
+            }
+          },
+          {
+            "x": 80,
+            "y": 88,
+            "in": {
+              "x": 80,
+              "y": 88
+            },
+            "out": {
+              "x": 80,
+              "y": 88
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "square",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "square",
+        "join": "round",
+        "limit": "12",
+        "dash": "none",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        197,
+        195
+      ]
+    },
+    "canoli-vector-stroke-bevel.json": {
+      "mode": "bevel",
+      "max": 36,
+      "maxAlpha": 36,
+      "maxPremult": 36,
+      "coverage": 864536,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0018552961694681524,
+      "centroidError": 0.007993883263503348,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "b65834bc-503c-446e-910d-167ae4264c5d",
+        "points": [
+          {
+            "x": 24,
+            "y": 112,
+            "in": {
+              "x": 24,
+              "y": 112
+            },
+            "out": {
+              "x": 24,
+              "y": 112
+            }
+          },
+          {
+            "x": 64,
+            "y": 16,
+            "in": {
+              "x": 64,
+              "y": 16
+            },
+            "out": {
+              "x": 64,
+              "y": 16
+            }
+          },
+          {
+            "x": 104,
+            "y": 112,
+            "in": {
+              "x": 104,
+              "y": 112
+            },
+            "out": {
+              "x": 104,
+              "y": 112
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "bevel",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "bevel",
+        "limit": "12",
+        "dash": "none",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-miter.json": {
+      "mode": "miter",
+      "max": 13,
+      "maxAlpha": 13,
+      "maxPremult": 13,
+      "coverage": 896162,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0013531467085907496,
+      "centroidError": 0.004644068507470725,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "cfa7277e-ea24-48e3-9530-9cc009082353",
+        "points": [
+          {
+            "x": 24,
+            "y": 112,
+            "in": {
+              "x": 24,
+              "y": 112
+            },
+            "out": {
+              "x": 24,
+              "y": 112
+            }
+          },
+          {
+            "x": 64,
+            "y": 16,
+            "in": {
+              "x": 64,
+              "y": 16
+            },
+            "out": {
+              "x": 64,
+              "y": 16
+            }
+          },
+          {
+            "x": 104,
+            "y": 112,
+            "in": {
+              "x": 104,
+              "y": 112
+            },
+            "out": {
+              "x": 104,
+              "y": 112
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "miter",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "miter",
+        "limit": "12",
+        "dash": "none",
+        "offset": "0"
+      },
+      "miterTip": [
+        255,
+        255
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-miter-low.json": {
+      "mode": "miter-low",
+      "max": 36,
+      "maxAlpha": 36,
+      "maxPremult": 36,
+      "coverage": 864536,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0018552961694681524,
+      "centroidError": 0.007993883263503348,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "1a56c9ac-c941-47cc-824b-7ec2e20d6178",
+        "points": [
+          {
+            "x": 24,
+            "y": 112,
+            "in": {
+              "x": 24,
+              "y": 112
+            },
+            "out": {
+              "x": 24,
+              "y": 112
+            }
+          },
+          {
+            "x": 64,
+            "y": 16,
+            "in": {
+              "x": 64,
+              "y": 16
+            },
+            "out": {
+              "x": 64,
+              "y": 16
+            }
+          },
+          {
+            "x": 104,
+            "y": 112,
+            "in": {
+              "x": 104,
+              "y": 112
+            },
+            "out": {
+              "x": 104,
+              "y": 112
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "miter",
+        "strokeMiterLimit": 1,
+        "strokeDashArray": [],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "miter",
+        "limit": "1",
+        "dash": "none",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-dash-even.json": {
+      "mode": "dash-even",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 468889,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "eb8aed0a-f49b-4c17-8bbe-f76fd82dd742",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          16,
+          8
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "16 8",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-dash-odd.json": {
+      "mode": "dash-odd",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 447210,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "1ce64ea5-8c33-4b14-9bb4-55a9764307f5",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          12,
+          6,
+          4
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "12 6 4",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-dash-zero.json": {
+      "mode": "dash-zero",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 475158,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "567653d1-7d49-47d6-8f36-76becbc937db",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          0,
+          0
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "0 0",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-dash-zero-gap.json": {
+      "mode": "dash-zero-gap",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 354729,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "30937ee8-0005-45c4-a566-ddf9c7c474d4",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          0,
+          16
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "0 16",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-dash-negative-offset.json": {
+      "mode": "dash-negative-offset",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 440329,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "7f59784b-7f5e-4041-8e37-5069378b2717",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          16,
+          8
+        ],
+        "strokeDashOffset": -7
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "16 8",
+        "offset": "-7"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-dash-positive-offset.json": {
+      "mode": "dash-positive-offset",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 448489,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "3fca4f5e-35a0-4a78-823d-c10b6043b35a",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          16,
+          8
+        ],
+        "strokeDashOffset": 13
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "16 8",
+        "offset": "13"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-curve-dash.json": {
+      "mode": "curve-dash",
+      "max": 255,
+      "maxAlpha": 86,
+      "maxPremult": 86,
+      "coverage": 786510,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0014336935817383597,
+      "centroidError": 0.06892439454940245,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "88791024-7c46-43a5-b687-b12485ce27d8",
+        "points": [
+          {
+            "x": 16,
+            "y": 64,
+            "in": {
+              "x": 16,
+              "y": 64
+            },
+            "out": {
+              "x": 37.33333333333333,
+              "y": 21.333333333333336
+            }
+          },
+          {
+            "x": 80,
+            "y": 64,
+            "in": {
+              "x": 58.66666666666667,
+              "y": 21.333333333333336
+            },
+            "out": {
+              "x": 101.33333333333333,
+              "y": 106.66666666666666
+            }
+          },
+          {
+            "x": 144,
+            "y": 64,
+            "in": {
+              "x": 122.66666666666667,
+              "y": 106.66666666666666
+            },
+            "out": {
+              "x": 144,
+              "y": 64
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          16,
+          8
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "16 8",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-closed-dash.json": {
+      "mode": "closed-dash",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 1464533,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "76b2bab8-cac1-4b5e-83a7-0cf3dc9d702b",
+        "points": [
+          {
+            "x": 24,
+            "y": 24,
+            "in": {
+              "x": 24,
+              "y": 24
+            },
+            "out": {
+              "x": 24,
+              "y": 24
+            }
+          },
+          {
+            "x": 128,
+            "y": 24,
+            "in": {
+              "x": 128,
+              "y": 24
+            },
+            "out": {
+              "x": 128,
+              "y": 24
+            }
+          },
+          {
+            "x": 128,
+            "y": 104,
+            "in": {
+              "x": 128,
+              "y": 104
+            },
+            "out": {
+              "x": 128,
+              "y": 104
+            }
+          },
+          {
+            "x": 24,
+            "y": 104,
+            "in": {
+              "x": 24,
+              "y": 104
+            },
+            "out": {
+              "x": 24,
+              "y": 104
+            }
+          }
+        ],
+        "closed": true,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          16,
+          8
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "16 8",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-affine.json": {
+      "mode": "affine",
+      "max": 255,
+      "maxAlpha": 35,
+      "maxPremult": 35,
+      "coverage": 433728,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.00030212386155808275,
+      "centroidError": 0.017021354719465594,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "67832005-0e80-497b-8fc0-681c678d53ac",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          16,
+          8
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "16 8",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-reset.json": {
+      "mode": "reset",
+      "max": 0,
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "coverage": 944047,
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "reopened": true,
+      "roundtrip": true,
+      "editable": true,
+      "styles": {
+        "id": "3da45ead-ce86-482b-b389-29077c12fb27",
+        "points": [
+          {
+            "x": 24,
+            "y": 40,
+            "in": {
+              "x": 24,
+              "y": 40
+            },
+            "out": {
+              "x": 24,
+              "y": 40
+            }
+          },
+          {
+            "x": 128,
+            "y": 40,
+            "in": {
+              "x": 128,
+              "y": 40
+            },
+            "out": {
+              "x": 128,
+              "y": 40
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "round",
+        "strokeJoin": "round",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          16,
+          8
+        ],
+        "strokeDashOffset": 0
+      },
+      "attributes": {
+        "cap": "round",
+        "join": "round",
+        "limit": "12",
+        "dash": "16 8",
+        "offset": "0"
+      },
+      "miterTip": [
+        0,
+        0
+      ],
+      "squareCorner": [
+        0,
+        0
+      ]
+    },
+    "canoli-vector-stroke-ui.json": {
+      "styles": {
+        "id": "1deb8678-941f-431d-aeaa-289d94cdd62b",
+        "points": [
+          {
+            "x": 24,
+            "y": 112,
+            "in": {
+              "x": 24,
+              "y": 112
+            },
+            "out": {
+              "x": 24,
+              "y": 112
+            }
+          },
+          {
+            "x": 64,
+            "y": 16,
+            "in": {
+              "x": 64,
+              "y": 16
+            },
+            "out": {
+              "x": 64,
+              "y": 16
+            }
+          },
+          {
+            "x": 104,
+            "y": 112,
+            "in": {
+              "x": 104,
+              "y": 112
+            },
+            "out": {
+              "x": 104,
+              "y": 112
+            }
+          }
+        ],
+        "closed": false,
+        "fill": null,
+        "stroke": "#ff0000",
+        "strokeWidth": 16,
+        "strokeCap": "square",
+        "strokeJoin": "miter",
+        "strokeMiterLimit": 12,
+        "strokeDashArray": [
+          12,
+          6,
+          4
+        ],
+        "strokeDashOffset": -7
+      },
+      "rejected": true
+    },
+    "canoli-vector-stroke-50mp.json": {
+      "elapsed": 1963.800000000745,
+      "bytes": 212952,
+      "sourceBytes": 209602,
+      "sourceUnchanged": true,
+      "sourceSize": [
+        10000,
+        5000
+      ],
+      "dimensions": [
+        10000,
+        5000
+      ],
+      "samples": [
+        [
+          40,
+          60,
+          80,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          40,
+          60,
+          80,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          40,
+          60,
+          80,
+          255
+        ]
+      ],
+      "tiles": 395,
+      "released": true
+    },
+    "canoli-vector-stroke-gpu.json": {
+      "results": [
+        {
+          "stage": "initial",
+          "alpha": 0,
+          "premult": 0.4980392156862763,
+          "point": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "uploads": 1,
+          "changed": true
+        },
+        {
+          "stage": "changed",
+          "alpha": 0,
+          "premult": 0.4980392156862763,
+          "point": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "uploads": 2,
+          "changed": true
+        },
+        {
+          "stage": "repeat",
+          "alpha": 0,
+          "premult": 0.4980392156862763,
+          "point": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "uploads": 2,
+          "changed": false
+        }
+      ],
+      "diagnostics": {
+        "state": "ready",
+        "reason": "",
+        "uploads": 2,
+        "stamps": 0,
+        "cacheHits": 1,
+        "frames": 3,
+        "readbacks": 3,
+        "retainedBytes": 81920,
+        "allocatedBytes": 81920
+      }
+    },
+    "canoli-vector-stroke-production.json": {
+      "attributes": {
+        "cap": "square",
+        "join": "miter",
+        "miter": "12",
+        "dash": "16 24",
+        "offset": "0"
+      },
+      "images": 0,
+      "exact": true,
+      "samples": [
+        [
+          128,
+          64,
+          32,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          128,
+          64,
+          32,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "canoli-vector-stroke-zero-caps.json": [
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "on",
+        "sourceCoverage": 80,
+        "nativeCoverage": 0,
+        "alpha": 5,
+        "premult": 5,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 1,
+        "centroidError": 93.03897032964198
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 80,
+        "nativeCoverage": 0,
+        "alpha": 5,
+        "premult": 5,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 1,
+        "centroidError": 93.03897032964198
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "solid",
+        "sourceCoverage": 50846,
+        "nativeCoverage": 50846,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "on",
+        "sourceCoverage": 50907,
+        "nativeCoverage": 50846,
+        "alpha": 12,
+        "premult": 12,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0.0011982635001080402,
+        "centroidError": 0.00844824202911499
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 50846,
+        "nativeCoverage": 50846,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 50907,
+        "nativeCoverage": 50846,
+        "alpha": 12,
+        "premult": 12,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0.0011982635001080402,
+        "centroidError": 0.00844824202911499
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 50846,
+        "nativeCoverage": 50846,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 50846,
+        "nativeCoverage": 50846,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "solid",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "on",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "extreme": true,
+        "stored": 9007199254740991,
+        "exact": true
+      }
+    ],
+    "canoli-vector-stroke-point-roundtrip.json": {
+      "editable": true,
+      "roundtripEditable": true,
+      "reopened": true,
+      "roundtripExact": true,
+      "paths": 6,
+      "images": 0,
+      "samples": [
+        [
+          255,
+          255
+        ],
+        [
+          255,
+          255
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          255,
+          255
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0006673729697262937,
+      "centroidError": 0.006962823190852271
+    }
+  },
+  "historicalDiagnostics": {
+    "canoli-vector-stroke-edge-diagnostic.json": [
+      {
+        "cap": "butt",
+        "d": "M80 64L80 64",
+        "native": 0,
+        "svg": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 64Z",
+        "native": 0,
+        "svg": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 64L80 64",
+        "native": 0,
+        "svg": 50846
+      },
+      {
+        "cap": "round",
+        "d": "M80 64Z",
+        "native": 0,
+        "svg": 50846
+      },
+      {
+        "cap": "square",
+        "d": "M80 64L80 64",
+        "native": 0,
+        "svg": 65280
+      },
+      {
+        "cap": "square",
+        "d": "M80 64Z",
+        "native": 0,
+        "svg": 65280
+      },
+      {
+        "extremeMiter": 896162,
+        "stored": 9007199254740991
+      }
+    ],
+    "canoli-vector-stroke-gpu-initial.json": {
+      "results": [
+        {
+          "stage": "initial",
+          "alpha": 0,
+          "premult": 32.372549019607845,
+          "uploads": 1,
+          "changed": true
+        },
+        {
+          "stage": "changed",
+          "alpha": 0,
+          "premult": 32.372549019607845,
+          "uploads": 2,
+          "changed": true
+        },
+        {
+          "stage": "repeat",
+          "alpha": 0,
+          "premult": 32.372549019607845,
+          "uploads": 2,
+          "changed": false
+        }
+      ],
+      "diagnostics": {
+        "state": "ready",
+        "reason": "",
+        "uploads": 2,
+        "stamps": 0,
+        "cacheHits": 1,
+        "frames": 3,
+        "readbacks": 3,
+        "retainedBytes": 81920,
+        "allocatedBytes": 81920
+      }
+    },
+    "canoli-vector-stroke-zero-caps-initial.json": [
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "on",
+        "sourceCoverage": 80,
+        "nativeCoverage": 0,
+        "alpha": 5,
+        "premult": 5,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 1,
+        "centroidError": 93.03897032964198
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48L80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 80,
+        "nativeCoverage": 0,
+        "alpha": 5,
+        "premult": 5,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 1,
+        "centroidError": 93.03897032964198
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "butt",
+        "d": "M80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "solid",
+        "sourceCoverage": 50846,
+        "nativeCoverage": 50846,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "on",
+        "sourceCoverage": 50907,
+        "nativeCoverage": 50846,
+        "alpha": 12,
+        "premult": 12,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0.0011982635001080402,
+        "centroidError": 0.00844824202911499
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 50846,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 118,
+        "contourErrors": 206,
+        "areaError": 50846,
+        "centroidError": 92.59343903148111
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 50846,
+        "nativeCoverage": 50846,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48L80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 50907,
+        "nativeCoverage": 0,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 118,
+        "contourErrors": 206,
+        "areaError": 1,
+        "centroidError": 92.59971550323465
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 50846,
+        "nativeCoverage": 50846,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 50846,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 118,
+        "contourErrors": 206,
+        "areaError": 50846,
+        "centroidError": 92.59343903148111
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 50846,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 118,
+        "contourErrors": 206,
+        "areaError": 50846,
+        "centroidError": 92.59343903148111
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 50846,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 118,
+        "contourErrors": 206,
+        "areaError": 50846,
+        "centroidError": 92.59343903148111
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "round",
+        "d": "M80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "solid",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "on",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 65280,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 196,
+        "contourErrors": 256,
+        "areaError": 65280,
+        "centroidError": 92.60939477180487
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48L80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 0,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 196,
+        "contourErrors": 256,
+        "areaError": 1,
+        "centroidError": 92.60939477180487
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "solid",
+        "sourceCoverage": 65280,
+        "nativeCoverage": 65280,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 65280,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 196,
+        "contourErrors": 256,
+        "areaError": 65280,
+        "centroidError": 92.60939477180487
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 65280,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 196,
+        "contourErrors": 256,
+        "areaError": 65280,
+        "centroidError": 92.60939477180487
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 65280,
+        "alpha": 255,
+        "premult": 255,
+        "interiorErrors": 196,
+        "contourErrors": 256,
+        "areaError": 65280,
+        "centroidError": 92.60939477180487
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48Z",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "solid",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "dot-on",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "dot-gap",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "cap": "square",
+        "d": "M80 48",
+        "pattern": "odd-boundary",
+        "sourceCoverage": 0,
+        "nativeCoverage": 0,
+        "alpha": 0,
+        "premult": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0
+      },
+      {
+        "extreme": true,
+        "stored": 9007199254740991,
+        "exact": true
+      }
+    ]
+  },
+  "logs": {
+    "/tmp/canoli-vector-strokes-browser-before-zero-caps.log": {
+      "sha256": "a6db52c03bbd82665793d0957d3f3443864ddbecff4b115f02b5042b84d2d13a",
+      "bytes": 40385,
+      "tail": [
+        "      25 |  await page.getByRole('button',{name:'Move tool (V)',exact:true}).click();",
+        "      26 |  const result=await page.evaluate(async(count)=>{",
+        "      27 |   const e=window.luma.editor;e.newDocument({width:800,height:600});",
+        "        at /home/kestrel/projects/luma-editor/tests/vector-construction-latency.e2e.ts:24:13",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/vector-construction-latenc-8f9dd-mmit-and-payload-boundaries/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/vector-construction-latenc-8f9dd-mmit-and-payload-boundaries/error-context.md",
+        "",
+        "  1 interrupted",
+        "    tests/vector-construction-latency.e2e.ts:23:31 \u203a isolated vector script with 750 paths preserves commit and payload boundaries ",
+        "  38 did not run",
+        "  281 passed (10.3m)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-browser-final.log": {
+      "sha256": "f5b512f856428bad88ed401948379ff78df1d0b5a440180a90759ade8d7f874c",
+      "bytes": 45988,
+      "tail": [
+        "  \u2713  310 tests/webgpu.e2e.ts:411:1 \u203a GPU soft strokes and Boolean clipping retain preview/commit parity across zoom and pan (2.2s)",
+        "  \u2713  311 tests/webgpu.e2e.ts:545:1 \u203a unsupported effects and device loss fall back without losing the document (1.7s)",
+        "  \u2713  312 tests/webgpu.e2e.ts:631:1 \u203a subpixel brushes use the reference path without losing faint marks (1.7s)",
+        "  \u2713  313 tests/webgpu.e2e.ts:663:1 \u203a GPU presentation pipeline writes the canvas format without a CPU readback (2.2s)",
+        "  \u2713  314 tests/webgpu.e2e.ts:746:1 \u203a GPU layer masks match Canvas for nested groups, holes, inversion and density (7.4s)",
+        "  \u2713  315 tests/webgpu.e2e.ts:952:1 \u203a GPU transient mask previews preserve source textures and match committed coverage (2.3s)",
+        "  \u2713  316 tests/webgpu.e2e.ts:1051:1 \u203a GPU AdjustmentLayer HSL, master levels, tone, and fallback curves agree with the reference renderer and preserve backdrop alpha (2.3s)",
+        "  \u2713  317 tests/webgpu.e2e.ts:1239:1 \u203a GPU affine brush and pencil stamps preserve clips, pressure, cache invalidation and incremental replay (2.0s)",
+        "  \u2713  318 tests/webgpu.e2e.ts:1402:1 \u203a GPU eraser preview and commit remove existing paint with pressure, flow and one-step undo (2.0s)",
+        "  \u2713  319 tests/webgpu.e2e.ts:1540:1 \u203a GPU text textures refresh after a late font load without changing the document (2.1s)",
+        "  \u2713  320 tests/webgpu.e2e.ts:1639:1 \u203a cancelled GPU reference work recovers without presenting obsolete pixels (2.0s)",
+        "  \u2713  321 tests/webgpu.e2e.ts:1675:1 \u203a GPU numeric replay failure releases buffers and recovers a valid frame (1.9s)",
+        "  \u2713  322 tests/webgpu.e2e.ts:1690:1 \u203a GPU vector stroke reference uploads retain cap/join/dashes and invalidate only changed content (2.0s)",
+        "",
+        "  322 passed (12.0m)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-browser-initial.log": {
+      "sha256": "070fb9e47841ff24ed5237733a08a9d7007c4ace3a87259023219a36c22e69e0",
+      "bytes": 38562,
+      "tail": [
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/vector-strokes.e2e.ts-nati-1d514-ain-SVG-project-editability/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/vector-strokes.e2e.ts-nati-1d514-ain-SVG-project-editability/error-context.md",
+        "",
+        "  6 failed",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-even strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-odd strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-zero-gap strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-negative-offset strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-positive-offset strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector reset strokes match independent Canvas and retain SVG/project editability ",
+        "  12 passed (53.5s)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-browser-second.log": {
+      "sha256": "3f9db303d846daa9797cdcda3b3cc4477ca924c24085e19610458996c79603a0",
+      "bytes": 14678,
+      "tail": [
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "[WebServer] 2:05:49 PM [vite] (client) [console.error] Encountered two children with the same key, `613003c8-0da5-4d89-8ea4-1f1601fbea93`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \u2014 the behavior is unsupported and could change in a future version.",
+        "  \u2713  18 tests/vector-strokes.e2e.ts:26:1 \u203a vector stroke inspector validates drafts, supports keyboard undo and preserves shared locks (2.6s)",
+        "",
+        "  18 passed (47.6s)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-browser.log": {
+      "sha256": "070fb9e47841ff24ed5237733a08a9d7007c4ace3a87259023219a36c22e69e0",
+      "bytes": 38562,
+      "tail": [
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/vector-strokes.e2e.ts-nati-1d514-ain-SVG-project-editability/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/vector-strokes.e2e.ts-nati-1d514-ain-SVG-project-editability/error-context.md",
+        "",
+        "  6 failed",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-even strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-odd strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-zero-gap strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-negative-offset strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector dash-positive-offset strokes match independent Canvas and retain SVG/project editability ",
+        "    tests/vector-strokes.e2e.ts:5:25 \u203a native vector reset strokes match independent Canvas and retain SVG/project editability ",
+        "  12 passed (53.5s)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-build-final.log": {
+      "sha256": "7ab9eecd846d107aad4b5e96682403bc2d363fb8efc418c9ca6caddded2b4c68",
+      "bytes": 3938,
+      "tail": [
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/Icon.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/Icon.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.15s"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-build.log": {
+      "sha256": "7104e90ef059f70c82b009c2db48ffb2310fd4b3780fda2711b99eba10677135",
+      "bytes": 3938,
+      "tail": [
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/Icon.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/Icon.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.05s"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-diff-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "/tmp/canoli-vector-strokes-focused-before-gpu-reference.log": {
+      "sha256": "8916c9d2ea213bf8fa95ddab9e33799906a2a7f58be81fe7f87af2b159931eed",
+      "bytes": 10873,
+      "tail": [
+        "    > 1695 |  });await writeFile('/tmp/canoli-vector-stroke-gpu.json',JSON.stringify(result,null,2)+'\\n');for(const r of result.results){expect(r.alpha).toBeLessThanOrEqual(2);expect(r.premult).toBeLessThanOrEqual(2);}expect(result.results[1].changed).toBe(true);expect(result.results[1].uploads).toBeGreaterThan(result.results[0].uploads);expect(result.results[2].changed).toBe(false);expect(result.results[2].uploads).toBe(result.results[1].uploads);",
+        "           |                                                                                                                                                                                      ^",
+        "      1696 | });",
+        "      1697 |",
+        "        at /home/kestrel/projects/luma-editor/tests/webgpu.e2e.ts:1695:182",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/webgpu.e2e.ts-GPU-vector-s-866ab-lidate-only-changed-content/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/webgpu.e2e.ts-GPU-vector-s-866ab-lidate-only-changed-content/error-context.md",
+        "",
+        "  1 failed",
+        "    tests/webgpu.e2e.ts:1690:1 \u203a GPU vector stroke reference uploads retain cap/join/dashes and invalidate only changed content ",
+        "  39 passed (1.7m)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-focused-final.log": {
+      "sha256": "8916c9d2ea213bf8fa95ddab9e33799906a2a7f58be81fe7f87af2b159931eed",
+      "bytes": 10873,
+      "tail": [
+        "    > 1695 |  });await writeFile('/tmp/canoli-vector-stroke-gpu.json',JSON.stringify(result,null,2)+'\\n');for(const r of result.results){expect(r.alpha).toBeLessThanOrEqual(2);expect(r.premult).toBeLessThanOrEqual(2);}expect(result.results[1].changed).toBe(true);expect(result.results[1].uploads).toBeGreaterThan(result.results[0].uploads);expect(result.results[2].changed).toBe(false);expect(result.results[2].uploads).toBe(result.results[1].uploads);",
+        "           |                                                                                                                                                                                      ^",
+        "      1696 | });",
+        "      1697 |",
+        "        at /home/kestrel/projects/luma-editor/tests/webgpu.e2e.ts:1695:182",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/webgpu.e2e.ts-GPU-vector-s-866ab-lidate-only-changed-content/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/webgpu.e2e.ts-GPU-vector-s-866ab-lidate-only-changed-content/error-context.md",
+        "",
+        "  1 failed",
+        "    tests/webgpu.e2e.ts:1690:1 \u203a GPU vector stroke reference uploads retain cap/join/dashes and invalidate only changed content ",
+        "  39 passed (1.7m)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-gpu-final.log": {
+      "sha256": "9125d3befc7fd1a6a769fbc990db967b798860b56fdf96af8f28a22c2415c2ab",
+      "bytes": 1114,
+      "tail": [
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:293267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:293267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:293279) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 1 test using 1 worker",
+        "",
+        "(node:293334) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/webgpu.e2e.ts:1690:1 \u203a GPU vector stroke reference uploads retain cap/join/dashes and invalidate only changed content (2.0s)",
+        "",
+        "  1 passed (7.2s)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-point-gpu-final.log": {
+      "sha256": "8e8c75ee683778a540a3d0d09afd78fd7cbff8362af81623d3124a8d621b3da3",
+      "bytes": 1416,
+      "tail": [
+        "[WebServer] (node:311735) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:311753) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 2 tests using 1 worker",
+        "",
+        "(node:311807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/vector-strokes.e2e.ts:61:1 \u203a imported point strokes remain editable through affine SVG and project round trips (3.2s)",
+        "(node:311946) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  2 tests/webgpu.e2e.ts:1690:1 \u203a GPU vector stroke reference uploads retain cap/join/dashes and invalidate only changed content (2.0s)",
+        "",
+        "  2 passed (11.3s)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-production-final.log": {
+      "sha256": "bf62a7a4b5de252c31b1d86705f8f216a7791e2aa37d0815dd47e6943881a126",
+      "bytes": 5850,
+      "tail": [
+        "  \u2713  24 tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves wide-unknown with bundled workers and no developer globals (1.8s)",
+        "  \u2713  25 tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals (2.1s)",
+        "  \u2713  26 tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers (2.4s)",
+        "  \u2713  27 tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors (1.4s)",
+        "  \u2713  28 tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow (1.4s)",
+        "  \u2713  29 tests/production.e2e.ts:983:1 \u203a production SVG filters preserve document-space shadows with zero fill and rotated parents (1.5s)",
+        "  \u2713  30 tests/production.e2e.ts:998:1 \u203a production SVG download retains a native photo, raster erasures and independent vector paths (1.7s)",
+        "  \u2713  31 tests/production.e2e.ts:1010:1 \u203a production documented SVG text stays editable and matches native PNG through actual downloads (1.6s)",
+        "  \u2713  32 tests/production.e2e.ts:1025:1 \u203a production documented smart SVG keeps editable vectors and native filtered pixels through actual downloads (1.6s)",
+        "  \u2713  33 tests/production.e2e.ts:1037:1 \u203a production documented SVG paint retains editable dabs, erasers and native selection clips through actual downloads (1.6s)",
+        "  \u2713  34 tests/production.e2e.ts:1050:1 \u203a production documented native SVG backdrop preserves adjustments and Blend If with later editable artwork (1.6s)",
+        "  \u2713  35 tests/production.e2e.ts:1063:1 \u203a production SVG preflight imports editable geometry, preserves prior work and exports through bundled native code (2.2s)",
+        "  \u2713  36 tests/production.e2e.ts:1074:1 \u203a production documented vector strokes retain editable inspector settings and native/SVG pixels (2.0s)",
+        "",
+        "  36 passed (1.1m)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-production-smoke.log": {
+      "sha256": "897c62e6d2bb124900333e10b6ec84bf08a27c33ac57eab194b837a599d8435e",
+      "bytes": 693,
+      "tail": [
+        "",
+        "> canoli-studio@0.1.0 test:production",
+        "> playwright test --config playwright.production.config.ts --grep production documented vector strokes",
+        "",
+        "[WebServer] (node:289954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 1 test using 1 worker",
+        "",
+        "(node:290009) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/production.e2e.ts:1074:1 \u203a production documented vector strokes retain editable inspector settings and native/SVG pixels (2.2s)",
+        "",
+        "  1 passed (3.9s)"
+      ]
+    },
+    "/tmp/canoli-vector-strokes-seo-final.log": {
+      "sha256": "bee526721eb3e5eaba5a39355b24a0f04a3314f565d156549e735749009a57e4",
+      "bytes": 195,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  14:56:48",
+        "   Duration  188ms (transform 48%, tests 26%, import 19%, worker 7%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-strokes-types-before-readback.log": {
+      "sha256": "3777a91cd69eeb3dced26d65dc2ab5834350986dc14312b597e4946da3c0220d",
+      "bytes": 190,
+      "tail": [
+        "tests/webgpu.e2e.ts(1694,334): error TS2722: Cannot invoke an object which is possibly 'undefined'.",
+        "tests/webgpu.e2e.ts(1694,334): error TS18048: 'frame.readPixels' is possibly 'undefined'."
+      ]
+    },
+    "/tmp/canoli-vector-strokes-types-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "/tmp/canoli-vector-strokes-types.log": {
+      "sha256": "3777a91cd69eeb3dced26d65dc2ab5834350986dc14312b597e4946da3c0220d",
+      "bytes": 190,
+      "tail": [
+        "tests/webgpu.e2e.ts(1694,334): error TS2722: Cannot invoke an object which is possibly 'undefined'.",
+        "tests/webgpu.e2e.ts(1694,334): error TS18048: 'frame.readPixels' is possibly 'undefined'."
+      ]
+    },
+    "/tmp/canoli-vector-strokes-unit-final.log": {
+      "sha256": "12d041eed22415cdcb4fc830d04863a61c9cf49fa777acf631c450b0e4a05dd3",
+      "bytes": 642,
+      "tail": [
+        "> canoli-studio@0.1.0 build:wasm",
+        "> asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
+        "",
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  133 passed (133)",
+        "      Tests  989 passed (989)",
+        "   Start at  14:42:15",
+        "   Duration  62.33s (tests 75%, import 21%, transform 3%, worker 1%)",
+        "",
+        "    Isolate  133 workers spawned \u00b7 ~113ms startup each (spawn + environment, per file)",
+        "             at least ~7.42s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-strokes-unit-schema.log": {
+      "sha256": "5a9fd73a4b57f09c2ed8de692f0b4eec481c43b08a73b9d27050140713590c6b",
+      "bytes": 194,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  7 passed (7)",
+        "   Start at  14:21:15",
+        "   Duration  1.07s (transform 68%, import 23%, tests 8%, worker 1%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-strokes-unit-zero.log": {
+      "sha256": "009001dcbfb8d234d117fb94d88ede4badef661fc5ae2f94564e9d7a104d9475",
+      "bytes": 194,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  8 passed (8)",
+        "   Start at  14:34:42",
+        "   Duration  1.01s (transform 68%, import 24%, tests 8%, worker 1%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-strokes-unit.log": {
+      "sha256": "2143147afc7e33d5cc9791fe40dd6604e8b68035ead4c14a0559962f7ccf575a",
+      "bytes": 441,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  4 passed (4)",
+        "      Tests  57 passed (57)",
+        "   Start at  14:00:04",
+        "   Duration  2.31s (transform 57%, tests 26%, import 16%)",
+        "",
+        "  Transform  transforming modules took 3.70s \u00b7 57% of tracked time, re-done on every run",
+        "             persist transforms across runs with fsModuleCache: true",
+        "             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns",
+        ""
+      ]
+    },
+    "/tmp/canoli-vector-strokes-zero-before-phase.log": {
+      "sha256": "681eed08e2eeb20acdcaa82209ec01f7f1651275ba1209c7974967eff4ff803d",
+      "bytes": 3941,
+      "tail": [
+        "      57 |   }finally{renderer.dispose();assets.dispose();}",
+        "    > 58 |  });await writeFile('/tmp/canoli-vector-stroke-zero-caps.json',JSON.stringify(results,null,2)+'\\n');for(const r of results){if('extreme' in r){expect(r.stored).toBe(Number.MAX_SAFE_INTEGER);expect(r.exact).toBe(true);continue;}expect(r.nativeCoverage,JSON.stringify(r)).toBe(r.sourceCoverage);expect(r.interiorErrors,JSON.stringify(r)).toBe(0);expect(r.contourErrors,JSON.stringify(r)).toBe(0);expect(r.alpha,JSON.stringify(r)).toBeLessThanOrEqual(2);expect(r.premult,JSON.stringify(r)).toBeLessThanOrEqual(2);}",
+        "         |                                                                                                                                                                                                                                                                               ^",
+        "      59 | });",
+        "      60 |",
+        "        at /home/kestrel/projects/luma-editor/tests/vector-strokes.e2e.ts:58:271",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/vector-strokes.e2e.ts-zero-f00ec--and-extreme-miter-metadata/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/vector-strokes.e2e.ts-zero-f00ec--and-extreme-miter-metadata/error-context.md",
+        "",
+        "  1 failed",
+        "    tests/vector-strokes.e2e.ts:46:1 \u203a zero-length stroke caps retain SVG artwork, dash phase, move-only emptiness and extreme miter metadata "
+      ]
+    },
+    "/tmp/canoli-vector-strokes-zero-final.log": {
+      "sha256": "e4cf50f48469b9759a0c2109251602a851f68416165cd7268ba719789b28bd0f",
+      "bytes": 1128,
+      "tail": [
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:309373) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:309373) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "[WebServer] (node:309400) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 1 test using 1 worker",
+        "",
+        "(node:309459) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/vector-strokes.e2e.ts:46:1 \u203a zero-length stroke caps retain SVG artwork, dash phase, move-only emptiness and extreme miter metadata (3.4s)",
+        "",
+        "  1 passed (8.6s)"
+      ]
+    }
+  }
+}

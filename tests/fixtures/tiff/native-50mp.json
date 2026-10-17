@@ -1,0 +1,11 @@
+{
+  "generator": "system libtiff",
+  "version": "4.6.0",
+  "source": "tests/fixtures/matting/native-50mp.png",
+  "sourceSha256": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f",
+  "sha256": "e928f1aba0426e91be6f01e722a5c8f76890025de181d7462f74e8bc8f883ed4",
+  "width": 10000,
+  "height": 5000,
+  "strips": 1,
+  "decodedStripBytes": 200000000
+}

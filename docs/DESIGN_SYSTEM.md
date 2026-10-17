@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+Pen control rendering retains all authored anchors and handles, their screen dimensions and original overlapping-marker order. Internal React blocks may skip unchanged controls during a drag; they must not hide, cluster or cap geometry. Edits across block boundaries and the final partial block must preserve live preview, Escape cancellation and one-step undo for artwork and masks.
+
+Typography uses the existing native Select for Kerning (Auto/Normal/None) and paired Slider/number input for Word spacing (-50…500 px). Keep these independent of Tracking; all previews support Escape and commits support undo. Disable mutations under busy/ancestor-lock state. Feature-detect native Canvas support, disable unavailable controls and explain the current limitation. Keep Reset spacing available to restore tracking/word spacing 0 and kerning Auto atomically, including for projects carrying unsupported settings. No new keyboard shortcut or component library is introduced.
+
 Use **Canoli Studio** as the product wordmark, retaining the existing abstract mark and semantic color tokens. The editor header uses a compact, single-line wordmark; developer documentation and sharing previews use the same spelling and capitalization.
 
 At widths up to 1500 CSS pixels, the header uses compact action icons with accessible names and hover titles. The document-name input stays visible; the action row scrolls horizontally when the controls exceed the remaining width.
@@ -242,3 +246,125 @@ Image size… is available in the options bar, command palette and Mod+Alt+I. It
 The rail exposes Lasso (L) beside Marquee and Magic wand. The cursor is the precision crosshair. Dragging shows the traced contour plus its closing segment using the existing dashed selection treatment. Release commits an antialiased pixel selection. The shared selection-mode control and Shift/Alt modifiers match Marquee/Wand; the options hint explains all modifiers and Escape cancellation. Empty gestures preserve the current selection.
 
 Export progress appears inside the dialog above its footer, using the existing text/accent tokens and a labelled native progress element. Known rendering progress is determinate; encoding or unknown totals are indeterminate. Cancel remains enabled while exporting and leaves the dialog available after cancellation settles. Closing or dismissing the dialog also cancels its export. Intentional cancellation does not display an error toast or trigger a download.
+
+### Polygonal lasso
+
+The Lasso options bar adds a native Freeform/Polygonal mode selector and a Finish selection button enabled after three corners. Polygon drafts reuse the dashed selection contour, with small accent-outlined corner markers and a larger first-corner marker identifying the closure target. The pointer segment is transient and frame-paced. The options hint explains click placement, first-corner/Enter completion, Backspace and Escape. Mode, Boolean-operation and finish controls remain available over locked artwork because they edit document selections. Use the existing command registry for Enter and Delete/Backspace; typing in fields keeps native behavior.
+
+### Selection modification
+
+Modify selection… appears beside other active-selection options; Expand selection…, Contract selection… and Feather selection… are searchable commands. The native modal uses the existing Dialog, NumberField, Select and button styles. It explains circular pixel radius, outside-canvas behavior and source preservation. Show a labelled native progress element and keep Cancel enabled while working; disable operation/radius/Apply until work settles. Errors stay in the modal. Escape or dismissal cancels the worker. Selection controls remain available over locked artwork; the resulting selection appears only after a successful atomic commit.
+
+### Color Balance and Vibrance
+
+Use the existing Adjustment section, type selector, Reset action and paired sliders. Color Balance has a local range selector (Midtones initially), three bipolar sliders labelled Cyan / Red, Magenta / Green and Yellow / Blue, and a Preserve luminosity checkbox. Range changes only choose which parameters are shown; they do not edit history. Vibrance presents Vibrance and Vibrance saturation separately, with a short explanation that less chromatic colors receive more change and that skin is not detected. New family actions are available in command search and the canvas adjustment menu, with no default keyboard chord. Disabled/locked states, pointer preview/commit and number-field typing follow existing controls.
+
+
+Gradient map Inspector controls use a labeled dark-to-light color ramp, native color pickers, exact percentage position fields, per-stop removal, Add gradient stop, and reversal. Positions remain ordered; invalid/duplicate values cannot commit. Two stops are required and the documented adjustment budget is 32. Color picker input previews without history; completion commits once and Escape restores the prior value. Shared Reset restores black/white endpoints and forward mapping. Locked layers disable mutations. The existing scrolling Inspector contains long stop lists; color is accompanied by labeled controls, not used as the sole meaning of an action.
+
+
+The PSD export section uses the shared Select for "Keep independent layers; merge dependent effects" versus "Flatten visible composition into one layer". Its capability report names the actual dependency merge and baked features before export. Cancel and progress use the existing dialog lifecycle; cancellation must produce no partial download. The PSD choice does not imply editable Photoshop text, masks, adjustments or group hierarchy.
+
+
+White Balance uses the shared paired Slider/number fields for Temperature (K) and Tint, with a short caption explaining correction direction and the neutral setting. Input previews without document history; commit adds one shared edit and Escape restores the prior value. Reset restores 6504 K and zero tint; locked layers disable controls. Creation/type switching follow the existing adjustment palette, context menu and Inspector patterns, without a new global shortcut.
+
+
+Color Lookup (LUT) follows the shared adjustment palette/context/Inspector patterns. Show the imported title and table dimensions as inert text, Import/Export .cube actions, actual processing status/cancel/errors, a paired amount slider/number input and a 3D interpolation select (disabled for 1D). Invalid or stale imports leave the effect unchanged. Reset returns the identity table and remains undoable. File actions wrap within the Inspector; locked targets disable edits. Explain source-encoding expectations and that exported .cube tables do not bake layer amount/masks.
+
+
+Color Range uses the custom Dialog, paired Fuzziness slider/input, source/Boolean/preview selectors, wrapped sample swatches and current status/errors. Keyboard coordinates and Sample pixel provide the same native sampling as clicking the preview. Label the display as a proxy; final application always samples native pixels. Included/excluded colors are editable locally; changes preview without history. Invert is explicitly limited to visible source pixels. Keep Cancel enabled during preparation and discard late results on close or stale revisions. Layout collapses to one column at narrow widths, and long sample lists scroll/wrap without hiding actions. There is no new global shortcut.
+
+
+### Alpha channels
+
+Use the collapsible Inspector section and existing TextInput/Select/Button controls. Show named saved channels, independent grayscale coverage preview, clear save/update/load actions, Boolean/invert options and wrapped management actions. White selects and black excludes; explain that the preview does not alter artwork. Preview stays bounded and hidden sections perform no preview work. Keep cancellation available during native loading, disable conflicting channel controls, surface actual errors/status and preserve keyboard editing. Document-level artwork locks do not disable channels. There is no new default key binding.
+
+
+### Quick Selection brush
+
+Use the rail's brush mark with the distinct Quick Selection label and Shift+W binding; W stays Magic wand. The canvas cursor shows native brush diameter. Frame-paced translucent seed marks are a draft, not a claimed grown mask. On release show real progress and an enabled Cancel Quick Selection action; Escape also cancels. Diameter/color/edge controls use paired sliders, with explicit source and Boolean mode controls. The hint tells users to paint inside the region and explains release/Alt/Escape. Preserve native editing keys, document-level operation over locked artwork, source appearance and one undo entry. Show real failures rather than a fabricated selection or success status.
+
+### Select Subject progress and honest results
+
+Toolbar, palette/shortcut and canvas-menu actions share Select Subject preparation. The custom progress dialog describes original-raster contrast sampling, shows actual progress and keeps Cancel Select Subject/Escape available. Cancellation suppresses late success. Empty, uniform, missing and non-raster sources show a useful failure while keeping prior selection/history. Successful marching ants represent real native coverage with source holes/transparency and full placement, rather than a bounding rectangle. Do not describe the local contrast heuristic as evaluated semantic detection or calibrated confidence.
+
+
+### Refine Edge workspace
+
+Keep the custom dialog's preview and native Apply distinct. Overlay/black/white/transparency/edge views use a separately scaled worker preview; they do not change history. Foreground/background/refine brushes store source-coordinate circular marks, with diameter, Undo mark and Clear marks. Empty previews keep source context and a useful foreground-painting hint. Apply stays disabled without actual foreground; processing errors stay visible. Native Apply reports real tile progress and keeps Cancel/Escape available. Suppress late results after dismissal/cancellation/document changes.
+
+Decontamination requires a new layer with corrected colors and a matte, hiding the retained original. Automatically choose new-layer output when enabled and explain it in the control; mask-only output must not imply RGB correction. Keep original slider identifiers/accessibility, keyboard editing, and the custom dialog/control system. Describe the local estimator honestly without claiming evaluated hair/glass quality. Direct Remove Background uses the same real cancellable preparation dialog.
+
+
+Refine Edge defaults to **Closed form (global)**; **Color line (local)** is an explicit solver choice. Report actual capture/solve/encoding progress and iteration counts, with Cancel/Escape available during global solving. Graph-memory or nonconvergence errors suggest adding known marks or explicitly choosing the local method; never silently switch algorithms or show success for an unconverged matte. Keep proxy/final distinction and unscored quality wording.
+
+
+Smooth 10 means a subtle 10% blend of the color-guided smoothing result; small values must not abruptly apply a full blur. Global preconditioning stays an engine detail. Keep actual iteration/progress/error feedback and cancellation available on photographed inputs, and retain the explicit proxy/final-preview distinction. Numerical convergence and sample scores must not be presented as a semantic confidence score.
+
+
+Design checks use a native modal with the custom heading, numeric fields, policy controls, severity labels and visible limitations. Findings show layer breadcrumbs and an explicit Select layer action; do not insert inferred fixes into the document. Keep a Cancel checks action enabled during work. Stale results are labeled and their download/navigation is disabled. A completed report with no findings says so only for enabled checks; never show a print-ready/AI-approved badge. The findings region is keyboard-scrollable and layout fits a narrow dialog without implying mobile editor support.
+
+SVG capability previews distinguish editable vector masks from native-resolution PNG coverage tiles before export. Keep artwork vector editability separate from raster-mask scaling/editability; do not label the complete output infinitely scalable when it includes raster masks. Native mask preparation uses the existing determinate rendering progress and Cancel controls, followed by indeterminate vector encoding. Missing/changed mask sources surface as export errors, with no partial download.
+
+For SVG raster images, distinguish source-resolution PNG pixels/editable placement from document-resolution images with baked tone/erasure operations. State metadata exclusion separately from pixel privacy: complete decoded source images can retain pixels hidden by masks or the canvas. Offer PNG for flattened delivery. Image and native-mask preparation share existing rendering progress/Cancel, followed by indeterminate SVG encoding; failed or stale preparation produces no download. Do not imply raster imagery or baked edits become infinitely scalable because the container is SVG.
+
+SVG previews identify live text as editable and explain that fonts are referenced without embedding. State viewer substitution/shaping/hinting separately from text editability; offer PNG for rendered appearance. Pending or changed referenced fonts surface a retry-after-fonts-ready error through the existing export error flow. Measurement uses indeterminate rendering progress with the existing Cancel control, followed by image/native-mask progress where needed and indeterminate encoding. No new font permission prompt, upload or paid service belongs in this workflow.
+
+SVG smart-object reports distinguish independently expanded editable master contents from native-rendered filtered pixels. Explain lost shared master links and baked filters/filter masks/off-support content before export. Keep outer mask/style editability separate from inner rendered content. Native preparation uses existing progress/Cancel/error controls; stale sources or fonts produce no download. Linked-image snapshots do not imply file watching or external refresh.
+
+SVG capability previews identify preserved editable overlay/shadow filters and native backdrop-prefix editability loss. Explain viewer filter/rounding/working-memory limits without implying that generated SVG effects match every renderer byte-for-byte. Keep native mask coverage/scaling warnings and the existing progress/cancel workflow.
+
+
+SVG paint previews distinguish editable dab/fill/eraser geometry from the original brush command settings, and native clone pixels from editable brush coverage. State the loss of off-support dabs, raster selection coverage, hidden clone pixels and dense/deep viewer limits before export. Use existing progress/Cancel/error controls; precision or source-lifetime failures produce no download. Do not imply that vector primitives preserve the original brush settings or guarantee native pixel identity. Projects retain the complete editing model.
+
+
+SVG adjustment/Blend If reports list affected sibling-stack endings and distinguish native rendered appearance from editable internal objects/settings. Later artwork and outer parent settings remain separate. Use existing rendering progress, Cancel and retryable errors; stale native sources/fonts return no download. Do not label prefix pixels as editable adjustment graphs or infinitely scalable artwork. Saving a project retains the full editing model.
+
+
+### SVG import preflight
+
+Import image and canvas drop accept SVG and open the custom Import SVG dialog. Show the file, resolved viewport, editable capabilities, unsupported findings and conversion limits before import. Use separate Import editable, Import flattened and Cancel buttons; never silently select a lossy fallback. Keep Cancel/close/Escape available during inspection/import. Editable import is disabled when unsupported. Status/error text uses existing semantic tokens; findings scroll within the dialog and wrap long names. Opening creates a document tab and retains prior edited work. Flattening and cubic/coverage/XML/master-identity losses must be readable before commitment.
+
+
+### Vector stroke controls
+
+The Vector path inspector uses existing Select and NumberField controls for Stroke cap, Stroke join, Stroke miter limit and Stroke dash offset. Miter limit is disabled for other joins while retaining its value. Dash/gap lengths use an editable draft with explicit Apply dashes/Enter; Escape restores the current pattern. Invalid drafts show an inline semantic error without changing history. Solid stroke clears the pattern in one command. Controls respect ancestor locks/busy state and keep editable-field shortcuts local. No new keyboard binding or design-system dependency is introduced.
+
+
+### Vector gradient fill controls
+
+The Vector path inspector retains fill enable/color controls and adds a native Solid/Linear/Radial selector. Gradient mode exposes color stops, exact ordered positions, opacity Slider/NumberField pairs, Add fill stop, Remove and Reverse fill. Start/end geometry stays in stacked NumberFields; radial circles include radii. A disclosure contains the affine paint matrix. Locked/busy state disables all mutations, native editable-field shortcuts remain local, and invalid geometry reports through the existing action error surface without changing history. Solid restores a literal fill; disabling fill clears both paints. No new shortcuts or external design-system dependency.
+
+
+### Compound path controls
+
+Vector Properties uses the existing Select for Path fill rule and a native details disclosure listing additional-contour removal buttons. Disable Closed path while extras exist, and disable all mutation controls under current/ancestor locks or busy state. Every contour shares paint; Pen anchor/handle affordances cover all boundaries using existing focus/cancel/undo behavior. No new keyboard binding or external component system is introduced.
+
+
+### Boolean vector dialog
+
+Use the existing custom Button, Select, TextInput, check fields, native progress and Dialog primitives. **Combine vector paths…** is available from Vector Properties and the command palette, with no new shortcut binding. Label area-only semantics and first-operand appearance so users can choose correctly. List searchable path candidates in pages of 32; disable open/locked paths and further selections at the 128-path budget. Let users change the first operand without losing other choices. Disable edits while working, show actual pair progress, and keep Cancel/Escape available to terminate work. Errors remain local to the dialog and preserve artwork/history; stale dialogs ask users to reopen against current geometry. Ordinary result selection and undo remain consistent with other document commands.
+
+
+## Pen control geometry
+
+Keep every authored anchor, handle and contour available. Precision-safe Pen overlay translations share one SVG group transform; the linear affine basis still maps control centers into document coordinates. Anchor squares, handle circles and strokes retain their screen dimensions through zoom and affine artwork changes. Transformed parents, compound paths and linked/unlinked vector masks follow the same rule. Treat local SVG x/y/cx/cy attributes as implementation details: acceptance checks use effective document/screen positions and actual pointer interactions. This adds no shortcut or new visual control.
+
+
+Pen translation shares the SVG group only when its conservative float-precision error bound stays below 1/1024 of a CSS pixel (`max(abs(e),abs(f)) * zoom * 2^-23`). Otherwise controls retain the earlier JavaScript-computed absolute coordinates and a zero group translation. This preserves cancellation between large local coordinates and opposing translation; it neither rejects geometry nor caps document coordinates/zoom. Crossing the precision boundary refreshes geometry and group placement atomically. The native browser test includes 1e10 local coordinates and a zoom-driven boundary transition.
+
+
+## Paragraph controls
+
+Typography adds the existing Select for Text layout (Point text/Paragraph text), NumberField for geometric Paragraph width, paired Slider/number inputs for Paragraph spacing (0…10000 px) and First-line indent (-10000…10000 px), plus Reset paragraph. Preserve live preview/Escape, one commit/undo, disabled ancestor locks and typing shortcuts. Paragraph corner handles change flow width and keep font size; text height grows from its lines. State that unbreakable content can extend outside the width. Missing native grapheme support disables new paragraph entry and width controls, explains the limitation and keeps Point text/Reset recovery available. No keyboard binding or component-library change is introduced.
+
+## Paragraph justification
+
+Text properties expose a Justification select with None and Inter-word, using existing stacked controls and semantic tokens. Explain that only Paragraph text soft wraps expand word spacing; final/forced/no-gap lines keep authored spacing. Disable unsupported native controls with a plain explanation and preserve Reset paragraph recovery. Ordinary attached setters give one undo entry, ancestor locks and busy-state behavior; editable-field shortcuts remain native. No new keyboard binding or visual component system is introduced.
+
+## SVG whitespace disclosure
+
+The Export dialog retains its existing font and glyph-placement warnings. Host whitespace calibration may improve local appearance while preserving editable whole lines; it must not imply that every font, combining-mark sequence or viewer matches the native canvas. Keep PNG and native-project guidance and preserve ordinary progress/cancel/error behavior. No new control, keyboard binding or component system is introduced.
+
+
+TIFF uses the existing Export dialog and native Select for TIFF compatibility: Automatic (default), Classic TIFF and BigTIFF. Show native pixel dimensions, flattening/metadata/72 DPI disclosures and the compatible-viewer warning before download. Keep compatibility/format controls disabled during work; progress and Cancel remain visible. Cancellation produces no partial download and allows retry. Use existing semantic controls/tokens; no new shortcut or UI library.

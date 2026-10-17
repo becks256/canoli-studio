@@ -8,12 +8,14 @@ import {
   BrushStroke,
   VectorLayer,
   VectorPath,
+  VectorContour,
   TextLayer,
   MarqueeSelection,
   AffineTransform,
   LayerStyle,
   BlendIf,
   AdjustmentLayer,
+  parseCubeLut,
 } from "../src/dom";
 const server = createApiServer();
 let base: string;
@@ -307,7 +309,7 @@ it("round-trips authored metadata through REST with revision validation and undo
     ],
   });
   expect(changed.status).toBe(200);
-  expect(changed.body.document.schemaVersion).toBe(16);
+  expect(changed.body.document.schemaVersion).toBe(27);
   expect(changed.body.document.children[0].metadata).toEqual(metadata);
   const invalid = await request(path + "/commands", {
     expectedRevision: 1,
@@ -1036,7 +1038,7 @@ it("persists a linked image declaration through REST component commands and undo
     ],
   });
   expect(result.status).toBe(200);
-  expect(result.body.document.schemaVersion).toBe(16);
+  expect(result.body.document.schemaVersion).toBe(27);
   expect(result.body.document.components[0].source).toEqual(source);
   const undo = await request(path + "/undo", { expectedRevision: 1 });
   expect(undo.body.document.components).toBeUndefined();
@@ -1186,4 +1188,211 @@ it("creates and updates an HSL adjustment via REST with validation and undo", as
   expect(invalid.status).toBeGreaterThanOrEqual(400);
   const undone = await request(path + "/undo", { expectedRevision: 2 });
   expect(undone.body.document.children).toEqual([layer]);
+});
+
+it('polygon selections use strict shared validation, revision checks and reversible history', async () => {
+  const created = await request('/documents', {width:100,height:100});
+  const path = `/documents/${created.body.document.id}`;
+  const points = [{x:10,y:10},{x:80,y:10},{x:10,y:80}];
+  for (const command of [
+    {type:'selection.polygon',points:points.slice(0,2)},
+    {type:'selection.polygon',points,operation:'union'},
+    {type:'selection.polygon',points,extra:true},
+    {type:'selection.polygon',points:[{x:1,y:1},{x:2,y:2},{x:3,y:3}]},
+  ]) {
+    expect((await request(path+'/commands',{expectedRevision:0,commands:[command]})).status).toBe(400);
+    expect((await request(path)).body.revision).toBe(0);
+  }
+  const applied = await request(path+'/commands', {expectedRevision:0,commands:[{type:'selection.polygon',points}]});
+  expect(applied.status).toBe(200);
+  expect(applied.body.document.selection.regions[0]).toMatchObject({shape:'pixels',x:10,y:10,width:70,height:70});
+  expect((await request(path+'/commands',{expectedRevision:0,commands:[{type:'selection.polygon',points,operation:'subtract'}]})).status).toBe(409);
+  const undo = await request(path+'/undo',{expectedRevision:applied.body.revision});
+  expect(undo.body.document).toEqual(created.body.document);
+  const redo = await request(path+'/redo',{expectedRevision:undo.body.revision});
+  expect(redo.body.document).toEqual(applied.body.document);
+});
+
+it('worker-backed selection modification validates options and commits once with revision protection',async()=>{
+  const created=await request('/documents',{width:32,height:32});
+  const path=`/documents/${created.body.document.id}`;
+  const missing=await request(path+'/selection-modify',{expectedRevision:0,operation:'expand',radius:1});
+  expect(missing.status).toBe(400);
+  const selected=await request(path+'/commands',{expectedRevision:0,commands:[{type:'selection.set',selection:new MarqueeSelection({shape:'rectangle',x:10,y:10,width:8,height:8}).toJSON()}]});
+  for(const options of [{operation:'expand',radius:0},{operation:'grow',radius:2},{operation:'feather',radius:129},{operation:'expand',radius:2,extra:true}]) {
+    expect((await request(path+'/selection-modify',{expectedRevision:selected.body.revision,...options})).status).toBe(400);
+    expect((await request(path)).body.revision).toBe(selected.body.revision);
+  }
+  expect((await request(path+'/selection-modify',{expectedRevision:0,operation:'expand',radius:1})).status).toBe(409);
+  const expanded=await request(path+'/selection-modify',{expectedRevision:selected.body.revision,operation:'expand',radius:2});
+  expect(expanded.status,JSON.stringify(expanded.body)).toBe(200);
+  expect(expanded.body.revision).toBe(selected.body.revision+1);
+  expect(expanded.body.document.selection.regions[0]).toMatchObject({shape:'pixels',x:8,y:8,width:12,height:12});
+  const undo=await request(path+'/undo',{expectedRevision:expanded.body.revision});
+  expect(undo.body.document).toEqual(selected.body.document);
+  const redo=await request(path+'/redo',{expectedRevision:undo.body.revision});
+  expect(redo.body.document).toEqual(expanded.body.document);
+});
+
+it('REST revision conflicts protect the document during asynchronous selection requests',async()=>{
+  const created=await request('/documents',{width:2000,height:1500});
+  const path=`/documents/${created.body.document.id}`;
+  const selected=await request(path+'/commands',{expectedRevision:0,commands:[{type:'selection.set',selection:new MarqueeSelection({shape:'rectangle',x:0,y:0,width:2000,height:1500}).toJSON()}]});
+  const pending=request(path+'/selection-modify',{expectedRevision:selected.body.revision,operation:'expand',radius:32});
+  // Exercise racing requests; browser progress tests separately prove stale results after work starts.
+  const renamed=await request(path+'/commands',{expectedRevision:selected.body.revision,commands:[{type:'document.rename',name:'Concurrent edit'}]});
+  expect(renamed.status).toBe(200);
+  const completed=await pending;
+  expect(completed.status).toBe(409);
+  const current=await request(path);
+  expect(current.body.document.name).toBe('Concurrent edit');
+  expect(current.body.document.selection).toEqual(selected.body.document.selection);
+});
+
+it('Color Balance and Vibrance REST commands share strict parameters, locks, revisions and undo',async()=>{
+  const created=await request('/documents',{width:20,height:20});const path=`/documents/${created.body.document.id}`;
+  const balance=new AdjustmentLayer({adjustment:{kind:'color-balance',shadows:{red:0,green:0,blue:0},midtones:{red:25,green:-8,blue:12},highlights:{red:0,green:0,blue:0},preserveLuminosity:true}});
+  const added=await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:balance.toJSON()}]});
+  expect(added.status).toBe(200);expect(added.body.document.schemaVersion).toBe(27);
+  const updated=await request(path+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:balance.id,patch:{adjustment:{kind:'vibrance',vibrance:60,saturation:-15}}}]});
+  expect(updated.status).toBe(200);expect(updated.body.document.children[0].adjustment).toEqual({kind:'vibrance',vibrance:60,saturation:-15});
+  for(const adjustment of [{kind:'vibrance',vibrance:101,saturation:0},{kind:'vibrance',vibrance:0,saturation:0,unknown:true},{...balance.adjustment,midtones:{red:0,green:0}}]){
+    expect((await request(path+'/commands',{expectedRevision:updated.body.revision,commands:[{type:'layer.update',id:balance.id,patch:{adjustment}}]})).status).toBe(400);
+    expect((await request(path)).body.document).toEqual(updated.body.document);
+  }
+  expect((await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.remove',id:balance.id}]})).status).toBe(409);
+  const undone=await request(path+'/undo',{expectedRevision:updated.body.revision});expect(undone.body.document).toEqual(added.body.document);
+  const redone=await request(path+'/redo',{expectedRevision:undone.body.revision});expect(redone.body.document).toEqual(updated.body.document);
+});
+
+
+it("gradient map REST commands preserve strict stops, revision conflicts and one-entry undo", async () => {
+  const created = await request("/documents", {width: 20, height: 20});
+  const path = `/documents/${created.body.document.id}`;
+  const adjustment = {kind: "gradient-map" as const, reverse: false, stops: [{position: 0, color: "#ff0000"}, {position: 1, color: "#0000ff"}]};
+  const layer = new AdjustmentLayer({adjustment});
+  const added = await request(path + "/commands", {expectedRevision: 0, commands: [{type: "layer.add", layer: layer.toJSON()}]});
+  expect(added.status, JSON.stringify(added.body)).toBe(200); expect(added.body.document.schemaVersion).toBe(27);
+  const changed = await request(path + "/commands", {expectedRevision: added.body.revision, commands: [{type: "layer.update", id: layer.id, patch: {adjustment: {...adjustment, reverse: true}}}]});
+  expect(changed.status).toBe(200);
+  for (const invalid of [{...adjustment, reverse: "yes"}, {...adjustment, stops: [adjustment.stops[0]]}, {...adjustment, stops: [{position: 0, color: "#fff"}, adjustment.stops[1]]}, {...adjustment, stops: adjustment.stops.map(stop => ({...stop, position: .5}))}]) {
+    expect((await request(path + "/commands", {expectedRevision: changed.body.revision, commands: [{type: "layer.update", id: layer.id, patch: {adjustment: invalid}}]})).status).toBe(400);
+    expect((await request(path)).body.document).toEqual(changed.body.document);
+  }
+  expect((await request(path + "/commands", {expectedRevision: 0, commands: [{type: "layer.remove", id: layer.id}]})).status).toBe(409);
+  const undone = await request(path + "/undo", {expectedRevision: changed.body.revision}); expect(undone.body.document).toEqual(added.body.document);
+  const redone = await request(path + "/redo", {expectedRevision: undone.body.revision}); expect(redone.body.document).toEqual(changed.body.document);
+});
+
+
+it("White Balance REST commands share strict parameters, revisions, locks and atomic undo", async () => {
+  const created=await request('/documents',{width:20,height:20}),path=`/documents/${created.body.document.id}`;
+  const adjustment={kind:'white-balance' as const,temperature:9000,tint:12},layer=new AdjustmentLayer({adjustment});
+  const added=await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:layer.toJSON()}]});
+  expect(added.status,JSON.stringify(added.body)).toBe(200);expect(added.body.document.schemaVersion).toBe(27);
+  for(const adjustment of [{kind:'white-balance',temperature:1999,tint:0},{kind:'white-balance',temperature:6504,tint:101},{kind:'white-balance',temperature:6504},{kind:'white-balance',temperature:6504,tint:0,extra:true}]) {
+    expect((await request(path+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{adjustment}}]})).status).toBe(400);
+    expect((await request(path)).body.document).toEqual(added.body.document);
+  }
+  const updated=await request(path+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{adjustment:{kind:'white-balance',temperature:2856,tint:-20}}}]});
+  expect(updated.status).toBe(200);
+  expect((await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.remove',id:layer.id}]})).status).toBe(409);
+  const undo=await request(path+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);
+  const redo=await request(path+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);
+  const locked=await request(path+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{locked:true}}]});
+  expect((await request(path+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{adjustment}}]})).status).toBe(400);
+});
+
+
+it("LUT REST commands retain portable tables with strict validation, locks, revisions and undo", async () => {
+  const created=await request('/documents',{width:20,height:20}),path=`/documents/${created.body.document.id}`;
+  const lut=parseCubeLut('LUT_1D_SIZE 2\n0 0 0\n1 1 1');
+  const adjustment={kind:'lut' as const,lut,amount:75,interpolation:'tetrahedral' as const},layer=new AdjustmentLayer({adjustment});
+  const added=await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:layer.toJSON()}]});
+  expect(added.status,JSON.stringify(added.body)).toBe(200);expect(added.body.document.schemaVersion).toBe(27);
+  for(const invalid of [{...adjustment,amount:101},{...adjustment,interpolation:'nearest'},{...adjustment,lut:{...lut,data:'AAAA'}},{...adjustment,lut:{...lut,domainMax:[0,1,1]}},{...adjustment,extra:true}]) {
+    expect((await request(path+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{adjustment:invalid}}]})).status).toBe(400);
+    expect((await request(path)).body.document).toEqual(added.body.document);
+  }
+  const updated=await request(path+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{adjustment:{...adjustment,amount:25,interpolation:'trilinear'}}}]});
+  expect(updated.status).toBe(200);expect(updated.body.document.children[0].adjustment.lut).toEqual(lut);
+  expect((await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.remove',id:layer.id}]})).status).toBe(409);
+  const undo=await request(path+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);
+  const redo=await request(path+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);
+  const locked=await request(path+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{locked:true}}]});
+  expect((await request(path+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{adjustment}}]})).status).toBe(400);
+});
+
+it('vector stroke REST commands validate styles, revisions, ancestor locks and one undo',async()=>{
+ const created=await request('/documents',{width:160,height:128}),endpoint=`/documents/${created.body.document.id}`,group=new LayerGroup(),layer=group.layers.add(new VectorLayer()),path=layer.paths.add(VectorPath.fromSvgPath('M24 112L64 16L104 112',{fill:null,stroke:'#ff0000',strokeWidth:16}));
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()}]});expect(added.status).toBe(200);
+ const styles={strokeCap:'square',strokeJoin:'miter',strokeMiterLimit:12,strokeDashArray:[16,8,4],strokeDashOffset:-7},updated=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'path.update',id:layer.id,pathId:path.id,patch:styles}]});expect(updated.status,JSON.stringify(updated.body)).toBe(200);expect(updated.body.document.schemaVersion).toBe(27);expect(updated.body.document.children[0].children[0].paths[0]).toMatchObject(styles);
+ for(const patch of [{strokeCap:'triangle'},{strokeJoin:'arcs'},{strokeMiterLimit:.5},{strokeDashArray:[-1,4]},{strokeDashArray:Array(257).fill(1)},{strokeDashOffset:'7'},{unknown:true}]){expect((await request(endpoint+'/commands',{expectedRevision:updated.body.revision,commands:[{type:'path.update',id:layer.id,pathId:path.id,patch}]})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(updated.body.document);}
+ expect((await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'path.update',id:layer.id,pathId:path.id,patch:{strokeCap:'butt'}}]})).status).toBe(409);
+ const undo=await request(endpoint+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);const locked=await request(endpoint+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:group.id,patch:{locked:true}}]});expect((await request(endpoint+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'path.update',id:layer.id,pathId:path.id,patch:{strokeDashArray:[]}}]})).status).toBe(400);
+});
+
+it('vector gradient REST commands retain editable nested paint, reject invalid stops and share undo/revision/locks',async()=>{
+ const created=await request('/documents',{width:160,height:128}),endpoint=`/documents/${created.body.document.id}`,group=new LayerGroup(),layer=group.layers.add(new VectorLayer()),p=layer.paths.add(VectorPath.rectangle({x:16,y:16,width:128,height:96},0,{fill:'#ff0000',stroke:null}));
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()}]});
+ const fillGradient={kind:'linear',start:{x:16,y:64},end:{x:144,y:64},stops:[{position:0,color:'#ff0000'},{position:1,color:'#0000ff',opacity:.5}]},updated=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch:{fillGradient}}]});expect(updated.status,JSON.stringify(updated.body)).toBe(200);expect(updated.body.document.schemaVersion).toBe(27);expect(updated.body.document.children[0].children[0].paths[0].fillGradient).toEqual(fillGradient);
+ for(const invalid of [{...fillGradient,stops:[]},{...fillGradient,stops:[{position:1,color:'#ff0000'},{position:0,color:'#0000ff'}]},{...fillGradient,start:{x:Infinity,y:0}},{...fillGradient,transform:{a:0,b:0,c:0,d:0,e:0,f:0}}]){expect((await request(endpoint+'/commands',{expectedRevision:updated.body.revision,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch:{fillGradient:invalid}}]})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(updated.body.document);}
+ expect((await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch:{fillGradient:null}}]})).status).toBe(409);const undo=await request(endpoint+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);const locked=await request(endpoint+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:group.id,patch:{locked:true}}]});expect((await request(endpoint+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch:{fillGradient:null}}]})).status).toBe(400);
+});
+
+it('compound path REST edits retain all contours atomically through revision checks, undo and ancestor locks',async()=>{
+ const created=await request('/documents',{width:160,height:128}),endpoint=`/documents/${created.body.document.id}`,group=new LayerGroup(),layer=group.layers.add(new VectorLayer()),p=layer.paths.add(VectorPath.rectangle({x:8,y:8,width:144,height:112},0,{fill:'#ff0000',stroke:null})),hole=new VectorContour({points:VectorPath.rectangle({x:40,y:40,width:80,height:48}).points});
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()}]}),patch={fillRule:'evenodd',subpaths:[hole.toJSON()]},updated=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch}]});expect(updated.status,JSON.stringify(updated.body)).toBe(200);expect(updated.body.document.schemaVersion).toBe(27);expect(updated.body.document.children[0].children[0].paths[0]).toMatchObject(patch);
+ for(const invalid of [{closed:false},{fillRule:'positive'},{subpaths:[{...hole.toJSON(),closed:false}]},{subpaths:[hole.toJSON(),hole.toJSON()]},{subpaths:[{...hole.toJSON(),points:[]}]}]){const rejected=await request(endpoint+'/commands',{expectedRevision:updated.body.revision,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch:invalid}]});expect(rejected.status).toBe(400);expect((await request(endpoint)).body.document).toEqual(updated.body.document);}
+ expect((await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch:{subpaths:[]}}]})).status).toBe(409);const undo=await request(endpoint+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);const locked=await request(endpoint+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:group.id,patch:{locked:true}}]});expect((await request(endpoint+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'path.update',id:layer.id,pathId:p.id,patch:{subpaths:[]}}]})).status).toBe(400);
+});
+
+it('Boolean REST uses real curve workers and one atomic cross-layer replacement with shared revisions/locks/undo',async()=>{
+ const created=await request('/documents',{width:160,height:128}),endpoint=`/documents/${created.body.document.id}`,group=new LayerGroup(),a=group.layers.add(new VectorLayer({name:'First'})),b=new VectorLayer({name:'Second'}),first=a.paths.add(VectorPath.rectangle({x:8,y:8,width:144,height:112},0,{fill:'#ed9966',stroke:null})),second=b.paths.add(VectorPath.ellipse({x:40,y:32,width:80,height:64},{stroke:null}));
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()},{type:'layer.add',layer:b.toJSON()}]}),operands=[{layerId:a.id,pathId:first.id},{layerId:b.id,pathId:second.id}],combined=await request(endpoint+'/vector-boolean',{expectedRevision:added.body.revision,operation:'subtract',operands});expect(combined.status,JSON.stringify(combined.body)).toBe(200);expect(combined.body.result).toEqual({layerId:a.id,pathId:first.id});expect(combined.body.document.children).toHaveLength(1);const result=combined.body.document.children[0].children[0].paths[0];expect(result.fill).toBe('#ed9966');expect(result.subpaths).toHaveLength(1);expect(result.subpaths[0].points.some((p:any)=>p.in.x!==p.x||p.in.y!==p.y)).toBe(true);
+ const undo=await request(endpoint+'/undo',{expectedRevision:combined.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(combined.body.document);
+ expect((await request(endpoint+'/vector-boolean',{expectedRevision:0,operation:'union',operands})).status).toBe(409);const restored=await request(endpoint+'/undo',{expectedRevision:redo.body.revision});
+ for(const patch of [{operation:'divide',operands},{operation:'union',operands:[operands[0],operands[0]]},{operation:'union',operands:[operands[0],{layerId:b.id,pathId:'missing'}]}])expect((await request(endpoint+'/vector-boolean',{expectedRevision:restored.body.revision,...patch})).status).toBe(400);
+ expect((await request(endpoint)).body.document).toEqual(added.body.document);const locked=await request(endpoint+'/commands',{expectedRevision:restored.body.revision,commands:[{type:'layer.update',id:group.id,patch:{locked:true}}]});expect((await request(endpoint+'/vector-boolean',{expectedRevision:locked.body.revision,operation:'union',operands})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(locked.body.document);
+});
+
+it('Boolean REST preserves concurrent edits and returns empty results without partial operands',async()=>{
+ const created=await request('/documents',{width:160,height:128}),endpoint=`/documents/${created.body.document.id}`,layer=new VectorLayer(),a=layer.paths.add(VectorPath.rectangle({x:0,y:0,width:100,height:100})),b=layer.paths.add(VectorPath.rectangle({x:0,y:0,width:100,height:100}));const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:layer.toJSON()}]}),operands=[{layerId:layer.id,pathId:a.id},{layerId:layer.id,pathId:b.id}];
+ const pending=request(endpoint+'/vector-boolean',{expectedRevision:added.body.revision,operation:'union',operands});await new Promise(r=>setTimeout(r,20));const renamed=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'document.rename',name:'Concurrent edit'}]}),stale=await pending;expect(renamed.status).toBe(200);expect(stale.status,JSON.stringify(stale.body)).toBe(409);expect((await request(endpoint)).body.document).toEqual(renamed.body.document);
+ const empty=await request(endpoint+'/vector-boolean',{expectedRevision:renamed.body.revision,operation:'exclude',operands});expect(empty.status,JSON.stringify(empty.body)).toBe(200);expect(empty.body.result).toBeNull();expect(empty.body.document.children).toEqual([]);const undo=await request(endpoint+'/undo',{expectedRevision:empty.body.revision});expect(undo.body.document).toEqual(renamed.body.document);
+});
+
+it('REST text spacing shares strict validation, atomic undo, conflicts and ancestor locks',async()=>{
+ const created=await request('/documents',{width:400,height:120}),endpoint=`/documents/${created.body.document.id}`,group=new LayerGroup(),text=group.layers.add(new TextLayer({text:'AV wide words',fontSize:32})),vector=new VectorLayer();
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()},{type:'layer.add',layer:vector.toJSON()}]});expect(added.status).toBe(200);
+ const updated=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:text.id,patch:{wordSpacing:18,fontKerning:'none'}}]});expect(updated.status).toBe(200);expect(updated.body.document.schemaVersion).toBe(27);expect(updated.body.document.children[0].children[0]).toMatchObject({wordSpacing:18,fontKerning:'none'});expect(updated.body.document.children[0].children[0].width).toBeGreaterThan(added.body.document.children[0].children[0].width);
+ expect((await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:text.id,patch:{wordSpacing:2}}]})).status).toBe(409);
+ for(const command of [{type:'layer.update',id:text.id,patch:{fontKerning:'optical'}},{type:'layer.update',id:text.id,patch:{wordSpacing:501}},{type:'layer.update',id:vector.id,patch:{wordSpacing:2}}])expect((await request(endpoint+'/commands',{expectedRevision:updated.body.revision,commands:[{type:'document.rename',name:'Must roll back'},command]})).status).toBe(400);
+ expect((await request(endpoint)).body.document).toEqual(updated.body.document);
+ const undo=await request(endpoint+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);
+ const locked=await request(endpoint+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:group.id,patch:{locked:true}}]});expect((await request(endpoint+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'layer.update',id:text.id,patch:{fontKerning:'normal'}}]})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(locked.body.document);
+});
+
+it('paragraph REST edits and nullable point reset share strict validation, revisions, locks and atomic undo',async()=>{
+ const created=await request('/documents',{width:480,height:320}),endpoint=`/documents/${created.body.document.id}`,group=new LayerGroup(),text=group.layers.add(new TextLayer({text:'One two three four\nFive six',fontSize:20,wrapWidth:120,paragraphSpacing:9,firstLineIndent:12})),vector=group.layers.add(new VectorLayer());
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()}]});expect(added.status).toBe(200);expect(added.body.document.schemaVersion).toBe(27);
+ const updated=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:text.id,patch:{wrapWidth:90.5,paragraphSpacing:18,firstLineIndent:-8}}]});expect(updated.status,JSON.stringify(updated.body)).toBe(200);expect(updated.body.document.children[0].children[0]).toMatchObject({text:text.text,width:90.5,wrapWidth:90.5,paragraphSpacing:18,firstLineIndent:-8});
+ for(const command of [{type:'layer.update',id:text.id,patch:{wrapWidth:0}},{type:'layer.update',id:text.id,patch:{paragraphSpacing:-1}},{type:'layer.update',id:text.id,patch:{firstLineIndent:10001}},{type:'layer.update',id:vector.id,patch:{wrapWidth:100}}]){
+  expect((await request(endpoint+'/commands',{expectedRevision:updated.body.revision,commands:[{type:'document.rename',name:'Must roll back'},command]})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(updated.body.document);
+ }
+ expect((await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.update',id:text.id,patch:{wrapWidth:null}}]})).status).toBe(409);
+ const undo=await request(endpoint+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);
+ const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);
+ const point=await request(endpoint+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:text.id,patch:{wrapWidth:null,paragraphSpacing:0,firstLineIndent:0}}]});expect(point.status).toBe(200);expect(point.body.document.children[0].children[0]).toMatchObject({wrapWidth:null,paragraphSpacing:0,firstLineIndent:0,text:text.text});expect(point.body.document.children[0].children[0].width).not.toBe(90.5);
+ const locked=await request(endpoint+'/commands',{expectedRevision:point.body.revision,commands:[{type:'layer.update',id:group.id,patch:{locked:true}}]});expect((await request(endpoint+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'layer.update',id:text.id,patch:{wrapWidth:100}}]})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(locked.body.document);
+});
+
+it('paragraph justification REST batches retain strict schema, atomic rollback, revisions and undo',async()=>{
+ const created=await request('/documents',{width:480,height:320}),endpoint=`/documents/${created.body.document.id}`,group=new LayerGroup(),text=group.layers.add(new TextLayer({text:'One two three four five',wrapWidth:120})),vector=group.layers.add(new VectorLayer());
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()}]});expect(added.status).toBe(200);
+ const updated=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:text.id,patch:{paragraphJustify:'inter-word'}}]});expect(updated.status,JSON.stringify(updated.body)).toBe(200);expect(updated.body.document.schemaVersion).toBe(27);expect(updated.body.document.children[0].children[0]).toMatchObject({paragraphJustify:'inter-word',wrapWidth:120,text:text.text});
+ for(const command of [{type:'layer.update',id:text.id,patch:{paragraphJustify:true}},{type:'layer.update',id:text.id,patch:{paragraphJustify:'all'}},{type:'layer.update',id:vector.id,patch:{paragraphJustify:'none'}}]){expect((await request(endpoint+'/commands',{expectedRevision:updated.body.revision,commands:[{type:'document.rename',name:'Must roll back'},command]})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(updated.body.document);}
+ expect((await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.update',id:text.id,patch:{paragraphJustify:'none'}}]})).status).toBe(409);
+ const undo=await request(endpoint+'/undo',{expectedRevision:updated.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(updated.body.document);
+ const locked=await request(endpoint+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:group.id,patch:{locked:true}}]});expect((await request(endpoint+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'layer.update',id:text.id,patch:{paragraphJustify:'none'}}]})).status).toBe(400);expect((await request(endpoint)).body.document).toEqual(locked.body.document);
 });

@@ -1,0 +1,116 @@
+{
+  "date": "2026-10-15",
+  "feature": "F02/T06 saved alpha channels",
+  "versions": {
+    "documentSchema": 21,
+    "projectContainer": 3,
+    "workspaceSnapshot": 2,
+    "legacyDocumentSchemasAccepted": "1-20, validated before migration",
+    "pre21AlphaChannelFieldRejected": true
+  },
+  "environment": {
+    "browser": "Chromium through Playwright",
+    "nativeCoverageBackend": "AssemblyScript/WASM selection rasterizer in dedicated browser/Node workers; byte composition in worker",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "contract": {
+    "maximumSavedChannelsPerDocument": 64,
+    "storage": "independent existing SelectionData values: Boolean/affine/geometric/native fractional RLE",
+    "loadOperations": [
+      "replace",
+      "add",
+      "subtract",
+      "intersect"
+    ],
+    "inverseScope": "current document canvas",
+    "byteUnion": "max(a,b)",
+    "byteSubtract": "round(a*(1-b/255))",
+    "byteIntersection": "min(a,b)",
+    "nullPriorSelection": "empty coverage",
+    "sourceArtworkModified": false,
+    "layerLocksBlockChannels": false,
+    "requiresImageAssetPermissions": false,
+    "scriptSharedPreparationLimit": 32,
+    "restSharedWorkerLimit": 4
+  },
+  "nativeWorkingBudgets": {
+    "maximumConfiguredTileSide": 512,
+    "maximumConfiguredCoverageBandPixels": 4000000,
+    "fullDocumentRgbaCanvasAllocatedForChannelLoad": false,
+    "note": "One extreme-width scanline may exceed the band budget. Source decoding, compressed blobs, RLE, validation and document/history storage consume additional memory; no heap peak was measured."
+  },
+  "nativeBrowser50Mp": {
+    "milliseconds": 1187.300000011921,
+    "width": 10000,
+    "height": 5000,
+    "alpha": [
+      255,
+      255,
+      255,
+      255,
+      0,
+      255,
+      0
+    ],
+    "progressFirst": {
+      "completed": 0,
+      "total": 260
+    },
+    "progressLast": {
+      "completed": 260,
+      "total": 260
+    },
+    "revisionDelta": 1,
+    "channelUnchanged": true,
+    "projectRestored": true,
+    "sourceBytesUnchanged": true
+  },
+  "native50MpEarlierObservationsMs": [
+    13450.100000023842,
+    1154.0999999940395
+  ],
+  "performanceNotes": "The initial geometry-only case took 13.45 seconds before provably disjoint region culling. Later fixtures also retain a real native PNG source and verify project restoration. These individual container observations are not a controlled same-fixture comparison, gesture percentiles or cross-device speed claims. Exact unsimplified-WASM comparisons cover affine holes and intersections followed by additions across native tile boundaries.",
+  "existingRealImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "exportElapsedMs": 3490
+  },
+  "rest": {
+    "endpoint": "POST /api/v1/documents/:id/alpha-channel-load",
+    "native50MpFullCoverageAndSeamsPassed": true,
+    "concurrentRevisionRejected": true,
+    "strictOptionsAndAtomicUndoPassed": true,
+    "browserSynchronizationOrSceneRendering": false
+  },
+  "validation": {
+    "unitApiTestsPassed": 802,
+    "unitTestFiles": 114,
+    "unitCommand": "npm test -- --maxWorkers=2",
+    "distinctDevelopmentBrowserTestsPassed": 53,
+    "productionBrowserTestsPassed": 20,
+    "buildAndTypecheckPassed": true,
+    "whitespacePassed": true,
+    "constructorOwnershipAndStableUndoHandlesPassed": true,
+    "schema20NonemptyLutMigrationPassed": true,
+    "projectAndRedoOnlyWorkspaceHistoryPassed": true,
+    "isolatedDocumentedScriptAndPluginRevocationPassed": true,
+    "cancelAfterRealWorkerOutputPassed": true,
+    "cropAndImageResizeCoveragePassed": true,
+    "psdOmissionDisclosed": true,
+    "commandPaletteSavePassed": true
+  },
+  "regressionFindings": [
+    "Whole Boolean expressions must be rasterized before channel composition. Alpha add/intersect use the existing max/min rules; subtract preserves fractional multiplication.",
+    "Corrected Color Range proxy add/intersect math to match its committed max/min masks; empty native matches now combine without throwing.",
+    "The 52-case development run passed 51 and exposed an idle crop Escape overlay bug. Crop bounds/active state lived outside the retained ToolState comparison; invalidating its UI snapshot before crop publication fixes it. All four crop cases plus all seven alpha cases pass after the fix.",
+    "Initial alpha UI locators omitted the count badge and Document command category from accessible names. Corrected the locators; the palette save and full UI management case passes.",
+    "An overlapping Playwright invocation removed a shared trace output directory. Reproduced the crop failure with a separate trace directory; final invocations use distinct output directories."
+  ],
+  "limits": [
+    "RGB/CMYK component editing, spot colors and PSD alpha-channel interchange remain unimplemented.",
+    "Current refinement loads into ordinary selection tools and updates the channel; direct grayscale channel painting is not implemented.",
+    "Loaded coverage records for offline recipes. Channel-management recipe steps report unsupported explicitly.",
+    "Very dense RLE, command/request complexity, extreme row widths and actual browser/process memory remain limits; no image megapixel cutoff was added.",
+    "Quick selection, broader F02 fidelity/device gates and the remainder of the full roadmap remain active and unfinished."
+  ]
+}

@@ -1,4 +1,24 @@
+import { captureVectorBoolean, vectorBooleanSelectionSchema } from './core/vector-boolean';
+import type { VectorBooleanRequest, VectorBooleanControl, VectorBooleanResult } from './core/vector-boolean';
+import { prepareVectorBoolean } from './engine/prepare-vector-boolean';
+import {inspectSvgFile,prepareSvgImport} from './engine/svg-import';
+import type {SvgImportControl,SvgImportOptions,SvgImportReport} from './core/svg-import';
 import { encodeRgbaPng } from "./engine/png";
+import {prepareMatting} from './engine/prepare-matting';
+import {preparePreflight} from './engine/preflight';
+import type {PreflightOptions,PreflightControl} from './core/preflight';
+import type {RefineEdgeControl} from './core/matting';
+import { prepareSubject } from './engine/prepare-subject';
+import { selectSubjectOptionsSchema, type SelectSubjectControl } from './core/subject-selection';
+import { prepareColorRange } from "./engine/color-range";
+import { prepareQuickSelection } from './engine/prepare-quick-selection';
+import { quickSelectionOptionsSchema } from './core/quick-selection';
+import { prepareChannelSelection } from './engine/prepare-channel';
+import { channelLoadSchema } from './core/alpha-channels';
+import { colorRangeOptionsSchema } from "./core/color-range";
+import { prepareSelectionModification } from "./engine/prepare-selection";
+import { selectionModificationSchema } from "./core/selection-modification";
+import { parseCommands } from "./core/validation";
 import { checkExport, type ExportControl } from "./engine/export-control";
 import { ProjectEncoder } from "./workspace/project-encoder";
 import { RasterEditing } from "./raster-editing";
@@ -43,6 +63,9 @@ import type { SelectionData } from "./core/drawing";
 import { AdaptiveRenderer } from "./engine/adaptive";
 import { ScriptRunner } from "./scripting/runner";
 import { exportDocument, getExportCapabilityReport } from "./engine/export";
+import {prepareTiffImport} from './engine/tiff-import';
+import {inspectTiffFile} from './core/interchange/tiff/client';
+import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
 import type {
   ExportOptions,
   ExportResult,
@@ -120,6 +143,7 @@ export class EditorApplication {
   private currentProfileId: StandardRgbSpaceId = "srgb";
   private currentSoftProof: SoftProofOptions | null = null;
   private listeners = new Set<() => void>();
+  private booleanControllers = new Set<AbortController>();
   private unsubscribe = () => {};
   private snapshot = this.makeSnapshot();
 
@@ -766,13 +790,14 @@ export class EditorApplication {
           if (
             previous.width !== asset.width ||
             previous.height !== asset.height ||
+            JSON.stringify(previous.tiff) !== JSON.stringify(asset.tiff) ||
             (await computeSha256(await previous.blob.arrayBuffer())) !==
               (await computeSha256(await asset.blob.arrayBuffer()))
           )
             throw new Error(
               "An image asset ID conflicts with the source document. Import it with a new identity before applying.",
             );
-        } else await staged.add(asset.blob, asset.name, asset.id, false);
+        } else await staged.add(asset.blob, asset.name, asset.id, false,{tiff:asset.tiff});
         assertCurrent();
       }
       assertCurrent();
@@ -879,7 +904,10 @@ export class EditorApplication {
                 tile.assetId = replacements.get(tile.assetId)!;
           }
         if (node.kind === "vector")
-          for (const path of node.paths) path.id = id();
+          for (const path of node.paths) {
+            path.id = id();
+            for (const contour of path.subpaths ?? []) contour.id = id();
+          }
       }
       return layerIds;
     };
@@ -987,6 +1015,9 @@ export class EditorApplication {
   get analysis() {
     return this.assets.analysis;
   }
+  preflight(options:PreflightOptions={},control:PreflightControl={}){
+    return this.document.preflight(options,control);
+  }
   get colorProfile(): StandardRgbSpaceId {
     return this.currentProfileId;
   }
@@ -1006,23 +1037,24 @@ export class EditorApplication {
     this.publish();
   }
 
-  async selectSubject(options?: SelectSubjectOptions): Promise<SelectionData> {
-    return this.activeDocument.selectSubject(options);
+  async selectSubject(options?: SelectSubjectOptions,control?:SelectSubjectControl): Promise<SelectionData> {
+    return this.activeDocument.selectSubject(options,control);
   }
 
   async removeBackground(
     targetLayer?: RasterLayer,
     options?: RefineEdgeOptions,
+    control?:RefineEdgeControl,
   ): Promise<RasterLayer> {
-    return this.activeDocument.removeBackground(targetLayer, options);
+    return this.activeDocument.removeBackground(targetLayer, options,control);
   }
 
-  async refineEdge(options: RefineEdgeOptions = {}): Promise<LayerMask> {
+  async refineEdge(options: RefineEdgeOptions = {},control?:RefineEdgeControl): Promise<LayerMask> {
     const layer = this.activeDocument.selectedLayer;
     if (!(layer instanceof RasterLayer)) {
       throw new Error("Select a raster layer to refine its edge.");
     }
-    return layer.refineEdge(options);
+    return layer.refineEdge(options,control);
   }
 
   getSnapshot = () => this.snapshot;
@@ -1086,6 +1118,15 @@ export class EditorApplication {
     this.publish();
   }
 
+  private async prepareBoolean(document:Document,request:VectorBooleanRequest,control:VectorBooleanControl,check:()=>void):Promise<VectorBooleanResult>{
+    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+    control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});
+    this.booleanControllers.add(abort);
+    const verify=()=>{try{check();}catch(error){abort.abort(error);}};
+    const stopDocument=document.subscribe(verify),stopSession=this.subscribe(verify),stopPermissions=this.plugins.subscribe(verify);
+    try{return await prepareVectorBoolean(request,{...control,signal:abort.signal},()=>{verify();abort.signal.throwIfAborted();});}
+    finally{stopDocument();stopSession();stopPermissions();this.booleanControllers.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+  }
   private createSession(document: Document, assets: AssetStore) {
     if (
       this.sessions.some(
@@ -1095,6 +1136,59 @@ export class EditorApplication {
       throw new Error(
         "Each document session must own an independent document and asset store.",
       );
+    document._preflight=(settings,control)=>{
+      const snapshot=document.getSnapshot(),generation=this.ioGeneration;
+      return preparePreflight(snapshot.document,snapshot.revision,assets,settings,control,()=>{
+        if(this.ioGeneration!==generation||this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during design checks.');
+      });
+    };
+    document._prepareChannelLoad=(settings,control)=>{
+      const snapshot=document.getSnapshot(),channel=snapshot.document.alphaChannels?.find(entry=>entry.id===settings.id),alive=assets.captureLifetime();
+      if(!channel)throw new Error('Alpha channel not found.');
+      return prepareChannelSelection({operation:settings.operation,invert:settings.invert,selection:channel.selection,base:snapshot.document.selection??null,width:document.width,height:document.height},control,()=>{
+        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed while loading its alpha channel.');
+      });
+    };
+    document._prepareSelectionModification = (options, control) => {
+      const snapshot = document.getSnapshot(), alive = assets.captureLifetime();
+      return prepareSelectionModification({ ...options, selection: snapshot.document.selection!, width:document.width, height:document.height }, control, () => {
+        alive();
+        if (this.document !== document || document.getSnapshot().revision !== snapshot.revision || !this.sessions.some(session => session.document === document))
+          throw new Error("The document changed while modifying its selection. Try again.");
+      });
+    };
+    document._prepareVectorBoolean=(selection,control)=>{
+      const snapshot=document.getSnapshot(),request=captureVectorBoolean(snapshot.document,selection).request;
+      return this.prepareBoolean(document,request,control,()=>{
+        if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during the Boolean operation.');
+      });
+    };
+    document._prepareQuickSelection=(options,control)=>{
+      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
+      return prepareQuickSelection(snapshot.document,assets,options,control,()=>{
+        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed during Quick Selection.');
+      });
+    };
+    document._prepareSubject=(options,control)=>{
+      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
+      return prepareSubject(snapshot.document,assets,options,control,()=>{
+        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed during Select Subject.');
+      });
+    };
+    document._prepareMatting=(request,control)=>{
+      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
+      return prepareMatting(snapshot.document,assets,request,control,()=>{
+        alive();if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))throw new Error('The document changed during matting.');
+      },()=>document.getSnapshot().revision!==snapshot.revision);
+    };
+    document._prepareColorRange=(options,control)=>{
+      const snapshot=document.getSnapshot(),alive=assets.captureLifetime();
+      return prepareColorRange(snapshot.document,assets,options,control,()=>{
+        alive();
+        if(this.document!==document||document.getSnapshot().revision!==snapshot.revision||!this.sessions.some(session=>session.document===document))
+          throw new Error('The document changed while selecting a color range. Try again.');
+      });
+    };
     document._rasterizeSmartObject = (layerId) => {
       const layer = document.getLayer(layerId);
       if (!(layer instanceof SmartObjectLayer))
@@ -1171,6 +1265,28 @@ export class EditorApplication {
     session.dispose();
     this.publish();
     return true;
+  }
+
+  /** Trusted local file preflight. Scripts/plugins do not receive file access. */
+  async inspectSvg(file:File,control:SvgImportControl={}):Promise<SvgImportReport>{
+    return (await inspectSvgFile(file,control)).report;
+  }
+
+  async inspectTiff(file:File,control:TiffImportControl={}):Promise<TiffImportReport>{return inspectTiffFile(file,control);}
+
+  async openTiff(file:File,options:TiffDecodeOptions={},control:TiffImportControl={}):Promise<TiffImportReport>{
+    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
+    const check=()=>{control.signal?.throwIfAborted();alive();if(generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during TIFF import. Try again.');};
+    const prepared=await prepareTiffImport(file,options,control,check);try{check();this.replace(prepared.document,prepared.assets);return prepared.report;}catch(error){prepared.assets.dispose();throw error;}
+  }
+
+  /** Open a complete imported document; preserve existing edited tabs. */
+  async openSvg(file:File,options:SvgImportOptions={},control:SvgImportControl={}):Promise<SvgImportReport>{
+    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
+    const check=()=>{control.signal?.throwIfAborted();alive();if(generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during SVG import. Try again.');};
+    const prepared=await prepareSvgImport(file,options,control,check);
+    try{check();this.replace(prepared.document,prepared.assets);return prepared.report;}
+    catch(error){prepared.assets.dispose();throw error;}
   }
 
   async openPsd(
@@ -1340,7 +1456,9 @@ export class EditorApplication {
   async export(options: ExportOptions, control?: ExportControl): Promise<ExportResult> {
     checkExport(control);
     const result = await exportDocument(
-      this.document.toJSON(),
+      // SVG/TIFF are pure readers. Pin the immutable model before yielding instead
+      // of cloning all paths and unrelated raster/effect data on the UI thread.
+      options.format === "svg" || options.format === "tiff" ? this.document._read() : this.document.toJSON(),
       this.assets,
       this.renderer,
       options,
@@ -1352,7 +1470,9 @@ export class EditorApplication {
   }
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {
-    return getExportCapabilityReport(this.document.toJSON(), options);
+    return getExportCapabilityReport(
+      options.format === "svg" || options.format === "tiff" ? this.document._read() : this.document.toJSON(), options,
+    );
   }
 
   async runScript(code: string) {
@@ -1396,6 +1516,17 @@ export class EditorApplication {
       generation = this.ioGeneration,
       snapshot = document.toJSON();
     let retouch: ScriptRetouch | undefined;
+    const selectionAbort = new AbortController();
+    let selectionBusy = false;
+    let selectionCount = 0;
+    let imageSelectionPrepared=false;
+    const checkSelection = () => {
+      selectionAbort.signal.throwIfAborted();
+      if (this.ioGeneration !== generation || this.document !== document || this.assets !== assets || document.getSnapshot().revision !== revision)
+        throw new Error("Document session changed during selection preparation.");
+      if (pluginContext && !this.plugins.getGrantedPermissions(pluginContext.pluginId).includes("document:write"))
+        throw new Error("Permission denied: document:write is required to modify the document.");
+    };
     const checkRetouch = () => {
       if (
         this.ioGeneration !== generation ||
@@ -1436,13 +1567,74 @@ export class EditorApplication {
       const result = await this.scripts.run(document, code, {
         hostBridge: {
           dispatch: (service, method, args) => {
+            if(service==='assets'&&pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required to inspect asset metadata.');
+            if(service==='selection'&&method==='subject'){
+              checkSelection();if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
+              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
+              const settings=selectSubjectOptionsSchema.parse(args[1]);
+              const checkSubject=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required for Select Subject.');};
+              checkSubject();imageSelectionPrepared=true;
+              const source=execute(snapshot,{type:'transaction',label:'Prepare Select Subject',commands:parseCommands(args[0])});
+              selectionBusy=true;return prepareSubject(source,assets,settings,{signal:selectionAbort.signal},checkSubject).finally(()=>{selectionBusy=false;});
+            }
+            if(service==='selection'&&method==='quick'){
+              checkSelection();if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
+              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
+              const settings=quickSelectionOptionsSchema.parse(args[1]);
+              const checkQuick=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required for Quick Selection.');};
+              checkQuick();imageSelectionPrepared=true;
+              const source=execute(snapshot,{type:'transaction',label:'Prepare Quick Selection',commands:parseCommands(args[0])});
+              selectionBusy=true;return prepareQuickSelection(source,assets,settings,{signal:selectionAbort.signal},checkQuick).finally(()=>{selectionBusy=false;});
+            }
+            if(service==='selection'&&method==='channel'){
+              checkSelection();
+              if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
+              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
+              const settings=channelLoadSchema.parse(args[1]);
+              const source=execute(snapshot,{type:'transaction',label:'Prepare alpha channel',commands:parseCommands(args[0])});
+              const channel=source.alphaChannels?.find(entry=>entry.id===settings.id);
+              if(!channel)throw new Error('Alpha channel not found.');
+              selectionBusy=true;
+              return prepareChannelSelection({operation:settings.operation,invert:settings.invert,selection:channel.selection,base:source.selection??null,width:source.width,height:source.height},{signal:selectionAbort.signal},checkSelection).finally(()=>{selectionBusy=false;});
+            }
+            if(service==='selection'&&method==='color-range'){
+              checkSelection();
+              if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
+              if(++selectionCount>32)throw new Error('A script can prepare at most 32 selections.');
+              const settings=colorRangeOptionsSchema.parse(args[1]);
+              const checkColor=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required for Color Range sampling.');};
+              checkColor();imageSelectionPrepared=true;
+              const source=execute(snapshot,{type:'transaction',label:'Prepare color range',commands:parseCommands(args[0])});
+              selectionBusy=true;
+              return prepareColorRange(source,assets,settings,{signal:selectionAbort.signal},checkColor).finally(()=>{selectionBusy=false;});
+            }
+            if (service === "selection" && method === "modify") {
+              checkSelection();
+              if (selectionBusy) throw new Error("Await each selection modification before starting another.");
+              if (++selectionCount > 32) throw new Error("A script can prepare at most 32 selections.");
+              const settings = selectionModificationSchema.parse(args[1]);
+              const source = execute(snapshot, {type:"transaction",label:"Prepare selection",commands:parseCommands(args[0])});
+              if (!source.selection) throw new Error("Create a pixel selection first.");
+              selectionBusy = true;
+              return prepareSelectionModification({...settings,selection:source.selection,width:source.width,height:source.height}, {signal:selectionAbort.signal}, checkSelection)
+                .finally(() => { selectionBusy = false; });
+            }
+            if(service==='vector'&&method==='boolean'){
+              checkSelection();
+              if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('document:read'))throw new Error('Permission denied: document:read is required for Boolean operations.');
+              if(selectionBusy)throw new Error('Await each native preparation before starting another.');
+              if(++selectionCount>32)throw new Error('A script can prepare at most 32 native operations.');
+              const selection=vectorBooleanSelectionSchema.parse(args[1]),source=execute(snapshot,{type:'transaction',label:'Prepare Boolean operation',commands:parseCommands(args[0])}),request=captureVectorBoolean(source,selection).request;
+              const check=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('document:read'))throw new Error('Permission denied: document:read is required for Boolean operations.');};
+              selectionBusy=true;return this.prepareBoolean(document,request,{signal:selectionAbort.signal},check).finally(()=>{selectionBusy=false;});
+            }
             if (service !== "retouch")
               return hostBridge.dispatch(service, method, args);
             checkRetouch();
             if (
               method !== "patch" &&
               method !== "heal" &&
-              method !== "rasterize"
+              method !== "rasterize" && method!=='matting'
             )
               return Promise.reject(new Error("Unknown retouch method."));
             retouch ??= new ScriptRetouch(
@@ -1473,6 +1665,18 @@ export class EditorApplication {
         throw new Error(
           "This plugin only has document:read permission. No edits were applied.",
         );
+      // Permissions can change while the isolated worker is running. Recheck
+      // before installing assets, dispatching staged commands or selecting layers.
+      if (pluginContext) {
+        const granted = this.plugins.getGrantedPermissions(pluginContext.pluginId);
+        if(imageSelectionPrepared&&!granted.includes('assets:read'))throw new Error('Plugin no longer has assets:read permission. No script edits were applied.');
+        if (!granted.includes("document:read"))
+          throw new Error("Plugin is no longer installed. No script edits were applied.");
+        if (!granted.includes("document:write") && (
+          result.commands.length > 0 || result.selectedId !== selectedId ||
+          JSON.stringify(result.selectedIds) !== JSON.stringify(selectedIds)
+        )) throw new Error("Plugin no longer has document:write permission. No script edits were applied.");
+      }
       const command = {
         type: "transaction" as const,
         label,
@@ -1492,11 +1696,14 @@ export class EditorApplication {
       );
       return result.logs;
     } finally {
+      selectionAbort.abort();
       retouch?.dispose();
     }
   }
 
   dispose() {
+    for(const controller of this.booleanControllers)controller.abort(new Error('Editor disposed during the Boolean operation.'));
+    this.booleanControllers.clear();
     this.retouchDisposed = true;
     this.idleRetouchProcessor?.dispose();
     this.idleRetouchProcessor = null;

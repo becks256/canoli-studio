@@ -1,0 +1,1005 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T14:16:21.638928+00:00",
+  "scope": "F07/F11 embedded raster imagery in hierarchical SVG. Full roadmap remains active and incomplete.",
+  "sourceSha256": {
+    "src/core/svg-images.ts": "b14fbf62aa655231e23e266eed0341a0392339f5b990c1f22cd8eab9b7a09fd3",
+    "src/core/svg-export.ts": "91f82338a4996494631a8cde0abc57423171b8b5158c01a25e3a843eae457862",
+    "src/core/svg-styles.ts": "ef8d35cf992a486835bfb238ef6a39baddf4fec691c82e70dfc51e25b5629621",
+    "src/core/svg-masks.ts": "a2c0055d5a343dbf5cbadabb43bf1fa8056d5aad71a6704cbd998277de04e764",
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/engine/svg-images.ts": "19c465ecd97b78586f04b7e9c233e59c683c55d0cb357c116187016fa2f73431",
+    "src/engine/svg-masks.ts": "84ccb27f6095f5487bc9bdb3bec7ebcd035e5c74bb6f5fb34ee89c044ee33434",
+    "src/engine/export.ts": "9bf1691ba4616d096e6b04fbc9fc732d553843d937169c748d5a7ca8d06af334",
+    "src/engine/png.ts": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+    "src/core/assets.ts": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "src/dom/index.ts": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+    "src/ui/ExportDialog.tsx": "e85201c2e6ba99a522f905fa0fcf0763f8225aeb8aa641e5a12363380eed8cbd",
+    "tests/svg-images.test.ts": "5ea617b24d18aa09a29b401c6d0a5293bdf9f1349c878b6112a7ea15b7fd648f",
+    "tests/svg-images.e2e.ts": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+    "tests/production.e2e.ts": "5d2cd6c32015c5b0d9281644913f727747b61d9c34078d9fcefc30797f211c2b",
+    "tests/svg-export.test.ts": "e19b4af8c09a387d547c4912a852ff7341a6e313dbfdc107d8c2f5004669830b",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/svg-masks.test.ts": "f3da8176fc5d5896fdc94fa6870e1d27de0984583b59eb5bc8a9559b6e2dd420",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/svg-styles.test.ts": "2a7fe9b5a506973cf8e5fef2068ec2950fe3dc0e30239672b5eb6e2c523e4c29",
+    "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+    "tests/export.test.ts": "08a67996f3b0ddac00a43273a00d40e3e3a2ed2a103c764cee9bdb4990ae6c22",
+    "tests/export-cancellation.e2e.ts": "729a80aa8a8428538861d3b9b9476af2d5d101f5b2f8d9e9439814b2b01118dd",
+    "tests/foundation-increments.e2e.ts": "f3b0b0737b30f5f113154ce2e25a293e43d852faebb0ac0ac1a1c2e5120eb1a7",
+    "tests/raster-editing.e2e.ts": "b5eecb41106af2c1589515c82b79d4234147ebb930774f06df495ba96af9f884",
+    "tests/metadata.e2e.ts": "e4fe923fb271ffc662684d8647303a85117422859aac44c27e6fd5aeae250dbb",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "tests/fixtures/matting/native-50mp.png": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f",
+    "docs/API.md": "6b7cd1dbfe0d54e089f08971905234118d02c99ce33b5a77f56443fb0a6112e2",
+    "docs/SCRIPTING_API.md": "6eca03a3d8043556f283360ba7562fb255cfd02c8b32d22618298fc0517a19c2",
+    "docs/ARCHITECTURE.md": "bae0ff57bb086327b52305a8dbc6cdf345577dd3eea3d6dba97e679fc7007d4c",
+    "docs/REQUIREMENTS.md": "b4c5580c4da747e309ae3816a7d5a49a86a338e4d202235975034ce43d4d214d",
+    "docs/DESIGN_SYSTEM.md": "6b7f109f4a0739936270fbdbe1d82c44c19a50d03cf598f3cca90546ba8a8e4c",
+    "docs/SYSTEM_DESIGN.md": "3d09f690e20ad877c57542c886e2755801e3ffa0849174909d3d46bec2156e61",
+    "docs/PLUGINS.md": "8868f24c29fd19a573a2e5999d4f304b8038aeb1ec858f891998246c9e4df499",
+    "docs/FEATURE_STRATEGY.md": "41350c1501e0410ab70804f3085e33f38c48a7f161e312a08ad93f5f5bcc92a6",
+    "README.md": "af328485e0ccf355afb4722db5679c2eaf38cc0dbb312b95617f43d908866d28",
+    "src/generated/script-runtime.js": "32e3032df06ef175bcbb470891182d7407906db6ed131e39a637b6fe56547cc3",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "includes": [
+        "actual WASM",
+        "isolated scripting runtime",
+        "developer docs",
+        "TypeScript",
+        "production bundling"
+      ]
+    },
+    "unitAndApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": true,
+      "tests": 910,
+      "files": 127
+    },
+    "developmentBrowser": {
+      "command": "npx playwright test tests/svg-images.e2e.ts tests/svg-styles.e2e.ts tests/svg-masks.e2e.ts tests/svg-export.e2e.ts tests/masks.e2e.ts tests/export-cancellation.e2e.ts tests/raster-editing.e2e.ts tests/foundation-increments.e2e.ts tests/metadata.e2e.ts tests/editor.e2e.ts --grep 'SVG|svg|mask|Mask|export|50 MP|eraser|clear|metadata|Metadata|F11' --reporter=line",
+      "passed": true,
+      "tests": 92,
+      "byFile": {
+        "editor.e2e.ts": 1,
+        "export-cancellation.e2e.ts": 5,
+        "foundation-increments.e2e.ts": 4,
+        "masks.e2e.ts": 16,
+        "metadata.e2e.ts": 4,
+        "raster-editing.e2e.ts": 3,
+        "svg-export.e2e.ts": 7,
+        "svg-images.e2e.ts": 16,
+        "svg-masks.e2e.ts": 20,
+        "svg-styles.e2e.ts": 16
+      }
+    },
+    "productionBrowser": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": true,
+      "tests": 30,
+      "newCase": "Actual SVG export dialog, pixel-privacy/metadata/baking report, downloaded SVG decode, native photo and erased copy plus independent vector, one undo reaches original imported raster; no developer globals."
+    },
+    "additionalChecks": [
+      "Final TypeScript passes after production test assertion addition.",
+      "git diff --check passes."
+    ],
+    "distinctBrowserChecks": 122,
+    "generatedDocAndSeoChecks": {
+      "command": "npx vitest run tests/seo.test.ts",
+      "passed": true,
+      "tests": 5
+    }
+  },
+  "pixelComparisons": {
+    "plain": {
+      "mode": "plain",
+      "alpha": 0,
+      "premult": 0,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          64,
+          32
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "progress": [
+        0,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "shared": {
+      "mode": "shared",
+      "alpha": 0,
+      "premult": 0,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          64,
+          32
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 2,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 6,
+      "afterRevision": 6,
+      "progress": [
+        0,
+        0.5,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "affine": {
+      "mode": "affine",
+      "alpha": 0,
+      "premult": 0,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          64,
+          32
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 6,
+      "afterRevision": 6,
+      "progress": [
+        0,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "masked-style": {
+      "mode": "masked-style",
+      "alpha": 2,
+      "premult": 2.211764705882352,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          64,
+          32
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 8,
+      "afterRevision": 8,
+      "progress": [
+        0,
+        0.5,
+        0.5,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "tone": {
+      "mode": "tone",
+      "alpha": 0,
+      "premult": 0,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          160,
+          120
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 6,
+      "afterRevision": 6,
+      "progress": [
+        0,
+        0.5333333333333333,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Raster tone effects and erasures are baked into document-resolution PNG images clipped to the expanded output support. Save a project to retain editable raster operations and original sources."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Rendered raster tone effects and erasures in document-resolution PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable raster tone effects/erasures and off-support pixels of processed rasters"
+        ]
+      }
+    },
+    "erased": {
+      "mode": "erased",
+      "alpha": 0,
+      "premult": 0,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          160,
+          120
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 5,
+      "afterRevision": 5,
+      "progress": [
+        0,
+        0.5333333333333333,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Raster tone effects and erasures are baked into document-resolution PNG images clipped to the expanded output support. Save a project to retain editable raster operations and original sources."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Rendered raster tone effects and erasures in document-resolution PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable raster tone effects/erasures and off-support pixels of processed rasters"
+        ]
+      }
+    },
+    "edited-style": {
+      "mode": "edited-style",
+      "alpha": 1,
+      "premult": 2.3137254901960773,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          214,
+          158
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "afterRevision": 11,
+      "progress": [
+        0,
+        0.20253164556962025,
+        0.4050632911392405,
+        0.5,
+        0.5,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Raster tone effects and erasures are baked into document-resolution PNG images clipped to the expanded output support. Save a project to retain editable raster operations and original sources.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Rendered raster tone effects and erasures in document-resolution PNG pixels, without original source-file metadata",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable raster tone effects/erasures and off-support pixels of processed rasters",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "jpeg-metadata": {
+      "mode": "jpeg-metadata",
+      "alpha": 0,
+      "premult": 0,
+      "sourceSize": [
+        32,
+        64
+      ],
+      "sizes": [
+        [
+          32,
+          64
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "progress": [
+        0,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "webp": {
+      "mode": "webp",
+      "alpha": 0,
+      "premult": 0,
+      "sourceSize": [
+        64,
+        32
+      ],
+      "sizes": [
+        [
+          64,
+          32
+        ]
+      ],
+      "pngChunks": [
+        [
+          "IHDR",
+          "sRGB",
+          "IDAT",
+          "IDAT",
+          "IEND"
+        ]
+      ],
+      "uses": 1,
+      "paths": 1,
+      "metadataExcluded": true,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "progress": [
+        0,
+        1
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    }
+  },
+  "lifecycle": {
+    "cancel": {
+      "action": "cancel",
+      "error": "AbortError: signal is aborted without reason",
+      "returned": false,
+      "invoked": true,
+      "prepared": 2,
+      "released": true,
+      "progress": [
+        0,
+        0.25
+      ],
+      "half": 0,
+      "retry": true,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "source-replace": {
+      "action": "source-replace",
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "returned": false,
+      "invoked": true,
+      "prepared": 2,
+      "released": true,
+      "progress": [
+        0,
+        0.25
+      ],
+      "half": 0,
+      "retry": false,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "bitmap-replace": {
+      "action": "bitmap-replace",
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "returned": false,
+      "invoked": true,
+      "prepared": 2,
+      "released": true,
+      "progress": [
+        0,
+        0.25
+      ],
+      "half": 0,
+      "retry": false,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "dispose": {
+      "action": "dispose",
+      "error": "Error: The target asset store was disposed during the operation.",
+      "returned": false,
+      "invoked": true,
+      "prepared": 2,
+      "released": true,
+      "progress": [
+        0,
+        0.25
+      ],
+      "half": 0,
+      "retry": false,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "between-phases": {
+      "action": "between-phases",
+      "error": "Error: A mask source changed during SVG export. Retry with the current assets.",
+      "returned": false,
+      "invoked": true,
+      "prepared": 4,
+      "released": true,
+      "progress": [
+        0,
+        0.25,
+        0.5,
+        0.5
+      ],
+      "half": 2,
+      "retry": false,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    }
+  },
+  "native50mpEmbeddedPng": {
+    "elapsed": 1893.9000000003725,
+    "bytes": 299769,
+    "size": [
+      10000,
+      5000
+    ],
+    "rootSize": [
+      "10000",
+      "5000"
+    ],
+    "imageCount": 1,
+    "paths": 1,
+    "samples": [
+      {
+        "x": 0,
+        "y": 0,
+        "output": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "original": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "x": 19,
+        "y": 5,
+        "output": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "original": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "x": 20,
+        "y": 5,
+        "output": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 219,
+        "y": 100,
+        "output": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 220,
+        "y": 100,
+        "output": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "original": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "x": 100,
+        "y": 63,
+        "output": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 64,
+        "output": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 1023,
+        "output": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 1024,
+        "output": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 4994,
+        "output": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          255
+        ]
+      },
+      {
+        "x": 100,
+        "y": 4995,
+        "output": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "original": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "x": 9000,
+        "y": 4000,
+        "output": [
+          255,
+          0,
+          0,
+          128
+        ],
+        "original": [
+          255,
+          0,
+          0,
+          128
+        ]
+      },
+      {
+        "x": 9999,
+        "y": 4999,
+        "output": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "original": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "sourceUnchanged": true,
+    "unchanged": true,
+    "revision": 3,
+    "after": 3
+  },
+  "existingNative50mpPng": {
+    "passed": true,
+    "scope": "Actual import, native WASM tone edit, save/reopen and full-resolution PNG decode, with source preservation and tile/strip boundary samples.",
+    "observedExportMs": 3784.0
+  },
+  "designAndLimits": [
+    "Unmodified decoded source images are re-encoded at source resolution with existing native streamed PNG export; shared instances reuse one image definition and retain authored size/affine placement.",
+    "Tone effects and erasures execute after native sampling. Modified rasters bake raw content at document resolution over expanded shadow support; masks/styles/fill/layer opacity/blends remain independent SVG hierarchy. Off-support processed pixels and operation editability are explicitly lost/reported.",
+    "Embedded PNGs contain only IHDR/sRGB/IDAT/IEND in real decoded PNG/JPEG/WebP fixtures. EXIF orientation is normalized to decoded geometry; original source-file metadata is excluded. Original source Blob bytes remain unchanged.",
+    "Complete unmodified decoded source pixels, including masked/off-canvas pixels, remain embedded and disclosed. SVG is not redaction; choose PNG for flattened delivery.",
+    "One initial dependency capture pins raster and bitmap-mask identities, bitmaps, Blobs, dimensions and asset repository lifetime across image/mask phases and final encoding. Destructive lifecycle tests use a separate actual application instance to avoid deliberately invalidating mounted UI assets.",
+    "No arbitrary import cap or full-document host RGBA/canvas allocation. Resident source decoding, compressed/base64 output, browser decoders and SVG filters/viewers still consume memory; PNG format geometry applies.",
+    "50 MP evidence proves a full native embedded-PNG decode, thirteen real source-coordinate samples (eight nontransparent), native SVG geometry and independent vector structure. It does not prove full 50 MP composite SVG raster decode, whole-process peak memory or viewer-wide conformance.",
+    "Seven of nine small image comparisons are byte-exact for alpha/premultiplied RGB; masked-style reaches two alpha levels and 2.211764705882352 premultiplied byte values; edited-style reaches one and 2.3137254901960773. These are fixture/viewer observations, not universal interchange tolerances.",
+    "Single container elapsed times are observational. The early development PNG regression overlaps unit validation; no speedup, p95/input-to-photon, long-task, heap or universal device responsiveness claim is made.",
+    "No new public constructor/mutation DTO, schema/project/workspace format, REST renderer/browser synchronization, script/plugin image-byte/file privilege, paid service or source mutation.",
+    "Remaining SVG Blend If, paint/text/adjustment/smart contents, import/round-trip, wider formats/viewers/precision and the full professional-editor roadmap remain incomplete."
+  ],
+  "localLogs": {
+    "/tmp/canoli-svg-images-build.log": {
+      "sha256": "15fa9cc10503ad183a4cf5b13b1e40410abe1a1d129a55a556e1e54b58d9da74",
+      "tail": [
+        "[plugin builtin:vite-reporter] ",
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/context.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/context.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.16s"
+      ]
+    },
+    "/tmp/canoli-svg-images-unit.log": {
+      "sha256": "ef19509ff1c4c6f526be20793d0ae6f8bae2dfcfd887505d626ba2aeae404f45",
+      "tail": [
+        "",
+        "> canoli-studio@0.1.0 build:wasm",
+        "> asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
+        "",
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  127 passed (127)",
+        "      Tests  910 passed (910)",
+        "   Start at  10:10:00",
+        "   Duration  63.93s (tests 75%, import 20%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  127 workers spawned \u00b7 ~123ms startup each (spawn + environment, per file)",
+        "             at least ~7.67s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-images-browser.log": {
+      "sha256": "b7c20e29ae8b12a7fb8d31ebedaa1fce014731d44609a9fd98bdeebe0116b7a2",
+      "tail": [
+        "[78/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG hard-shadow preserves native effect ordering and placement",
+        "[79/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG soft-shadow preserves native effect ordering and placement",
+        "[80/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG affine-shadow preserves native effect ordering and placement",
+        "[81/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG reflected-shadow preserves native effect ordering and placement",
+        "[82/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG scaled-shadow preserves native effect ordering and placement",
+        "[83/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG zero-fill preserves native effect ordering and placement",
+        "[84/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG vector-mask preserves native effect ordering and placement",
+        "[85/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG native-mask preserves native effect ordering and placement",
+        "[86/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG offcanvas-vector preserves native effect ordering and placement",
+        "[87/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG offcanvas-native preserves native effect ordering and placement",
+        "[88/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG nested preserves native effect ordering and placement",
+        "[89/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG nested-unmasked preserves native effect ordering and placement",
+        "[90/92] tests/svg-styles.e2e.ts:4:243 \u203a SVG nested-mask-only preserves native effect ordering and placement",
+        "[91/92] tests/svg-styles.e2e.ts:47:1 \u203a styled native SVG masks retain their padded coverage across tile seams",
+        "[92/92] tests/svg-styles.e2e.ts:61:1 \u203a documented standalone SVG effects run in the isolated constructor runtime",
+        "  92 passed (3.5m)"
+      ]
+    },
+    "/tmp/canoli-svg-images-production.log": {
+      "sha256": "295ee173e77b8d67682d2792f3eaf4082f7259b39647fff0c79f5076835a9183",
+      "tail": [
+        "tests/production.e2e.ts:775:1 \u203a production 65-point LUT import keeps the full table and records main-thread work",
+        "Production 65-point LUT import: {\"elapsedMs\":840.9000000003725,\"longTasks\":[]}",
+        "",
+        "[19/30] tests/production.e2e.ts:793:1 \u203a production Color Range samples actual colors, applies native coverage and exports a selection mask without developer globals",
+        "[20/30] tests/production.e2e.ts:818:1 \u203a production alpha channel constructors and Inspector load native coverage and export independent masks",
+        "[21/30] tests/production.e2e.ts:835:1 \u203a production Quick Selection brush and isolated refinement export real nonrectangular masks",
+        "[22/30] tests/production.e2e.ts:874:1 \u203a production Select Subject preserves genuine source alpha through UI, isolated scripting and exported masks",
+        "[23/30] tests/production.e2e.ts:896:1 \u203a production Refine Edge exposes corrected-layer output and isolated native matting exports real corrected RGB",
+        "[24/30] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves wide-unknown with bundled workers and no developer globals",
+        "[25/30] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals",
+        "[26/30] tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers",
+        "[27/30] tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors",
+        "[28/30] tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow",
+        "[29/30] tests/production.e2e.ts:983:1 \u203a production SVG filters preserve document-space shadows with zero fill and rotated parents",
+        "[30/30] tests/production.e2e.ts:998:1 \u203a production SVG download retains a native photo, raster erasures and independent vector paths",
+        "  30 passed (52.1s)"
+      ]
+    },
+    "/tmp/canoli-svg-images-seo.log": {
+      "sha256": "c8a3368041404df42177f12129687fd141dae74867cc2454237cb78d3441d772",
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  10:15:29",
+        "   Duration  180ms (transform 53%, tests 20%, import 19%, worker 8%)",
+        ""
+      ]
+    }
+  }
+}

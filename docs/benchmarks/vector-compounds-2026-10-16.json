@@ -1,0 +1,1592 @@
+{
+  "format": "canoli-vector-compounds-verification",
+  "version": 1,
+  "createdAt": "2026-10-16T20:45:50.436162+00:00",
+  "scope": "Native editable compound-path prerequisite for F07 Boolean operations. Boolean calculation and the full roadmap remain incomplete.",
+  "schemaVersions": {
+    "document": 24,
+    "projectContainer": 3,
+    "workspace": 2
+  },
+  "delivered": [
+    "Shared nonzero/even-odd fill, gradient and stroke across closed native boundaries.",
+    "Owner-backed VectorContour/SubpathCollection, defensive values and shared commands/locks/history.",
+    "Pen editing, previews, cancellation and undo for inner anchors/handles; fill-rule/removal controls.",
+    "Cross-field validation, cached old-label rejection, root/history migration and independent duplicate/clipboard contour IDs.",
+    "Native compound SVG import/export. Opaque closed fill/stroke paints share geometry; open/translucent paints remain separately editable with a capability warning.",
+    "Affine mask capture includes every contour and preserves explicit common rules and legacy implicit defaults.",
+    "Documented isolated constructors and separate REST validation/revision/lock/atomic-undo parity."
+  ],
+  "verification": {
+    "build": "passed",
+    "unitTests": 1008,
+    "unitFiles": 135,
+    "developmentBrowserTests": 134,
+    "completeProductionTests": 38,
+    "totalFinalSelectedBrowserTests": 172,
+    "seoTests": 5,
+    "productionDocsRecheck": 2,
+    "types": "passed",
+    "diffCheck": "passed",
+    "commands": [
+      "npm run build",
+      "npm test -- --maxWorkers=4",
+      "npx tsc -b",
+      "npx playwright test tests/vector-compounds.e2e.ts tests/svg-import.e2e.ts tests/vector-gradients.e2e.ts tests/vector-strokes.e2e.ts tests/tools.e2e.ts tests/editor.e2e.ts tests/affine-render.e2e.ts tests/webgpu.e2e.ts",
+      "npm run test:production",
+      "npx vitest run tests/seo.test.ts",
+      "npm run test:production -- --grep 'docs highlight|production docs, fragment'",
+      "git diff --check"
+    ],
+    "logs": {
+      "build": {
+        "path": "/tmp/canoli-compound-build.log",
+        "sha256": "9c67930378a3c2f7dd723aa1dd77c6d2dbf9d5934b22ef65b81008ecc50e0467"
+      },
+      "unit": {
+        "path": "/tmp/canoli-compound-unit.log",
+        "sha256": "dfc97566b09e0fd77165d241f329f9fe4038eaeb94398948f48864294c1abcc7"
+      },
+      "types": {
+        "path": "/tmp/canoli-compound-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "developmentBrowser": {
+        "path": "/tmp/canoli-compound-browser.log",
+        "sha256": "22f6fa7b1e78860c7b97a425107f17a359332af432a77fb541e79d3c16eed485"
+      },
+      "productionBrowser": {
+        "path": "/tmp/canoli-compound-production.log",
+        "sha256": "16295f4e75bd9cf18ab8a939b2150773e1c1f1d030858572f202d60885fb2f13"
+      },
+      "seo": {
+        "path": "/tmp/canoli-compound-seo.log",
+        "sha256": "7deac0f2b0eaec6b960a517a7d9e07270c1e7d9ac5de0c82139159eff6ba718d"
+      },
+      "productionDocs": {
+        "path": "/tmp/canoli-compound-docs-browser.log",
+        "sha256": "8e3cc2f0c5b7993ed5251d6384c6cdd0f4afe968a505b4fb8be251492cef7f8f"
+      },
+      "initialDevelopmentFailures": {
+        "path": "/tmp/canoli-compound-browser-initial.log",
+        "sha256": "00aa8284cd768ac70b5e73cff89cdc20e34ff82f8722ecbc130c3d79746bdcbb"
+      },
+      "initialProductionFailure": {
+        "path": "/tmp/canoli-compound-production-initial.log",
+        "sha256": "f48de0655872fc8940d695d502cdc4f9ef33acd6272ad19a54ed87d7bbc7616a"
+      }
+    }
+  },
+  "observations": {
+    "nativeCanvas": {
+      "fixtures": 7,
+      "byteExactFixtures": 6,
+      "allProjectJsonExact": true,
+      "allNativePngExactAfterEditableSvgReimport": true,
+      "maxAlphaResidual": 6,
+      "maxPremultipliedResidual": 5.015686274509804,
+      "maxInteriorResidual": 0,
+      "maxAreaRelativeError": 8.612346003051232e-05,
+      "maxCentroidErrorPixels": 0.002127755759522083
+    },
+    "largeImage": {
+      "elapsed": 1913.3000000044703,
+      "bytes": 259935,
+      "reopened": true,
+      "sourceUnchanged": true,
+      "dimensions": [
+        10000,
+        5000
+      ],
+      "samples": [
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          40,
+          60,
+          80,
+          255
+        ],
+        [
+          40,
+          60,
+          80,
+          255
+        ],
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          40,
+          60,
+          80,
+          255
+        ],
+        [
+          40,
+          60,
+          80,
+          255
+        ],
+        [
+          255,
+          0,
+          0,
+          255
+        ],
+        [
+          255,
+          0,
+          0,
+          255
+        ]
+      ],
+      "tiles": 395,
+      "released": true
+    },
+    "gpu": "Actual SwiftShader WebGPU readback/reference uploads and changed/repeat cache checks; software correctness only."
+  },
+  "rawReports": {
+    "canoli-vector-compound-50mp.json": {
+      "sha256": "8f2664fda419e1bbb9c7be79ab3858ab25c0b0e24fd484c8d27cc310fbab43bc",
+      "data": {
+        "elapsed": 1913.3000000044703,
+        "bytes": 259935,
+        "reopened": true,
+        "sourceUnchanged": true,
+        "dimensions": [
+          10000,
+          5000
+        ],
+        "samples": [
+          [
+            255,
+            0,
+            0,
+            255
+          ],
+          [
+            255,
+            0,
+            0,
+            255
+          ],
+          [
+            40,
+            60,
+            80,
+            255
+          ],
+          [
+            40,
+            60,
+            80,
+            255
+          ],
+          [
+            255,
+            0,
+            0,
+            255
+          ],
+          [
+            255,
+            0,
+            0,
+            255
+          ],
+          [
+            40,
+            60,
+            80,
+            255
+          ],
+          [
+            40,
+            60,
+            80,
+            255
+          ],
+          [
+            255,
+            0,
+            0,
+            255
+          ],
+          [
+            255,
+            0,
+            0,
+            255
+          ]
+        ],
+        "tiles": 395,
+        "released": true
+      }
+    },
+    "canoli-vector-compound-curves.json": {
+      "sha256": "d13f084237e2a67b3c76a015ce90b020c9d507ed82687b72ec6376967bc605d0",
+      "data": {
+        "mode": "curves",
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0,
+        "coverage": 1879610,
+        "reopened": true,
+        "editable": true,
+        "svgNoMask": true,
+        "roundtrip": true,
+        "center": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "island": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "canoli-vector-compound-dashes.json": {
+      "sha256": "8828a78660305fded8ea43da05e13270dd28b01919e0987da00430f177c090a0",
+      "data": {
+        "mode": "dashes",
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0,
+        "coverage": 2032134,
+        "reopened": true,
+        "editable": true,
+        "svgNoMask": true,
+        "roundtrip": true,
+        "center": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "island": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "canoli-vector-compound-evenodd.json": {
+      "sha256": "833c2ef2148850efcadd8558a11bd30f4f7e2e714721d037bf7c478e95ff4506",
+      "data": {
+        "mode": "evenodd",
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0,
+        "coverage": 1762560,
+        "reopened": true,
+        "editable": true,
+        "svgNoMask": true,
+        "roundtrip": true,
+        "center": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "island": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "canoli-vector-compound-gpu.json": {
+      "sha256": "e086f176ab3b306a96b1baa83a8a8ba00f2a6e9c5af42f3e2719aa7f3a3a6176",
+      "data": {
+        "results": [
+          {
+            "stage": "initial",
+            "alpha": 0,
+            "premult": 0,
+            "hole": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "island": [
+              128,
+              64,
+              32,
+              255
+            ],
+            "uploads": 1,
+            "changed": true
+          },
+          {
+            "stage": "changed",
+            "alpha": 0,
+            "premult": 0.4941176470588289,
+            "hole": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "island": [
+              128,
+              64,
+              32,
+              255
+            ],
+            "uploads": 2,
+            "changed": true
+          },
+          {
+            "stage": "repeat",
+            "alpha": 0,
+            "premult": 0.4941176470588289,
+            "hole": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "island": [
+              128,
+              64,
+              32,
+              255
+            ],
+            "uploads": 2,
+            "changed": false
+          }
+        ],
+        "diagnostics": {
+          "state": "ready",
+          "reason": "",
+          "uploads": 2,
+          "stamps": 0,
+          "cacheHits": 1,
+          "frames": 3,
+          "readbacks": 3,
+          "retainedBytes": 81920,
+          "allocatedBytes": 81920
+        }
+      }
+    },
+    "canoli-vector-compound-gradient-affine.json": {
+      "sha256": "8149be83ef0e3054aff1e8d7854b216851e0ee48fa60ed534add9b0263890368",
+      "data": {
+        "mode": "gradient-affine",
+        "alpha": 6,
+        "premult": 5.015686274509804,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 8.612346003051232e-05,
+        "centroidError": 0.002127755759522083,
+        "coverage": 731571,
+        "reopened": true,
+        "editable": true,
+        "svgNoMask": true,
+        "roundtrip": true,
+        "center": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "island": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "canoli-vector-compound-islands.json": {
+      "sha256": "fe690518b27d5c83c3862155bf69c01faca6989c7fbbd203bc1fd360b0c6f082",
+      "data": {
+        "mode": "islands",
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0,
+        "coverage": 2154240,
+        "reopened": true,
+        "editable": true,
+        "svgNoMask": true,
+        "roundtrip": true,
+        "center": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "island": [
+          255,
+          0,
+          0,
+          255
+        ]
+      }
+    },
+    "canoli-vector-compound-nonzero-filled.json": {
+      "sha256": "26f26b7365a28dd19e286b0f5ec64aa0fe6e857529b719ba712f47bf82faa0e6",
+      "data": {
+        "mode": "nonzero-filled",
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0,
+        "coverage": 2350080,
+        "reopened": true,
+        "editable": true,
+        "svgNoMask": true,
+        "roundtrip": true,
+        "center": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "island": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "canoli-vector-compound-nonzero-hole.json": {
+      "sha256": "a9d46e2752b2dba2b250f8882ad290cea87e302318784ab9d15413c6442cc888",
+      "data": {
+        "mode": "nonzero-hole",
+        "alpha": 0,
+        "premult": 0,
+        "interior": 0,
+        "interiorErrors": 0,
+        "contourErrors": 0,
+        "areaError": 0,
+        "centroidError": 0,
+        "coverage": 1762560,
+        "reopened": true,
+        "editable": true,
+        "svgNoMask": true,
+        "roundtrip": true,
+        "center": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "island": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "canoli-vector-compound-translucent.json": {
+      "sha256": "797e1502bc6676db705801ee6e5fff7571080d464c1e802fa0270ddc20e3abd7",
+      "data": {
+        "alpha": 1,
+        "premult": 0.7764705882352914,
+        "overlap": [
+          83,
+          0,
+          172,
+          114
+        ],
+        "hole": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "degraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Open fill/stroke geometry or translucent paints use independent editable fill/stroke layers; their later geometry edits are separate.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ]
+      }
+    },
+    "canoli-vector-compound-ui.json": {
+      "sha256": "57656ff04d04641e0cef024fdb1f18b0fc44c749ce08774ef2107307b6a47d81",
+      "data": {
+        "before": {
+          "data": {
+            "id": "92fb822f-27e8-4b3e-b2a6-dac4a9f35885",
+            "points": [
+              {
+                "x": 20,
+                "y": 20,
+                "in": {
+                  "x": 20,
+                  "y": 20
+                },
+                "out": {
+                  "x": 20,
+                  "y": 20
+                }
+              },
+              {
+                "x": 360,
+                "y": 20,
+                "in": {
+                  "x": 360,
+                  "y": 20
+                },
+                "out": {
+                  "x": 360,
+                  "y": 20
+                }
+              },
+              {
+                "x": 360,
+                "y": 270,
+                "in": {
+                  "x": 360,
+                  "y": 270
+                },
+                "out": {
+                  "x": 360,
+                  "y": 270
+                }
+              },
+              {
+                "x": 20,
+                "y": 270,
+                "in": {
+                  "x": 20,
+                  "y": 270
+                },
+                "out": {
+                  "x": 20,
+                  "y": 270
+                }
+              }
+            ],
+            "closed": true,
+            "fill": "#ff0000",
+            "stroke": null,
+            "strokeWidth": 2,
+            "fillRule": "evenodd",
+            "subpaths": [
+              {
+                "id": "8cb595e6-562d-4d6e-be08-f22ff4f9769d",
+                "points": [
+                  {
+                    "x": 100,
+                    "y": 90,
+                    "in": {
+                      "x": 100,
+                      "y": 90
+                    },
+                    "out": {
+                      "x": 140,
+                      "y": 70
+                    }
+                  },
+                  {
+                    "x": 200,
+                    "y": 90,
+                    "in": {
+                      "x": 200,
+                      "y": 90
+                    },
+                    "out": {
+                      "x": 200,
+                      "y": 90
+                    }
+                  },
+                  {
+                    "x": 200,
+                    "y": 190,
+                    "in": {
+                      "x": 200,
+                      "y": 190
+                    },
+                    "out": {
+                      "x": 200,
+                      "y": 190
+                    }
+                  },
+                  {
+                    "x": 100,
+                    "y": 190,
+                    "in": {
+                      "x": 100,
+                      "y": 190
+                    },
+                    "out": {
+                      "x": 100,
+                      "y": 190
+                    }
+                  }
+                ],
+                "closed": true
+              }
+            ]
+          },
+          "history": 4
+        },
+        "moved": {
+          "data": {
+            "id": "92fb822f-27e8-4b3e-b2a6-dac4a9f35885",
+            "points": [
+              {
+                "x": 20,
+                "y": 20,
+                "in": {
+                  "x": 20,
+                  "y": 20
+                },
+                "out": {
+                  "x": 20,
+                  "y": 20
+                }
+              },
+              {
+                "x": 360,
+                "y": 20,
+                "in": {
+                  "x": 360,
+                  "y": 20
+                },
+                "out": {
+                  "x": 360,
+                  "y": 20
+                }
+              },
+              {
+                "x": 360,
+                "y": 270,
+                "in": {
+                  "x": 360,
+                  "y": 270
+                },
+                "out": {
+                  "x": 360,
+                  "y": 270
+                }
+              },
+              {
+                "x": 20,
+                "y": 270,
+                "in": {
+                  "x": 20,
+                  "y": 270
+                },
+                "out": {
+                  "x": 20,
+                  "y": 270
+                }
+              }
+            ],
+            "closed": true,
+            "fill": "#ff0000",
+            "stroke": null,
+            "strokeWidth": 2,
+            "fillRule": "evenodd",
+            "subpaths": [
+              {
+                "id": "8cb595e6-562d-4d6e-be08-f22ff4f9769d",
+                "points": [
+                  {
+                    "x": 110,
+                    "y": 100,
+                    "in": {
+                      "x": 110,
+                      "y": 100
+                    },
+                    "out": {
+                      "x": 150,
+                      "y": 80
+                    }
+                  },
+                  {
+                    "x": 200,
+                    "y": 90,
+                    "in": {
+                      "x": 200,
+                      "y": 90
+                    },
+                    "out": {
+                      "x": 200,
+                      "y": 90
+                    }
+                  },
+                  {
+                    "x": 200,
+                    "y": 190,
+                    "in": {
+                      "x": 200,
+                      "y": 190
+                    },
+                    "out": {
+                      "x": 200,
+                      "y": 190
+                    }
+                  },
+                  {
+                    "x": 100,
+                    "y": 190,
+                    "in": {
+                      "x": 100,
+                      "y": 190
+                    },
+                    "out": {
+                      "x": 100,
+                      "y": 190
+                    }
+                  }
+                ],
+                "closed": true
+              }
+            ]
+          },
+          "history": 5
+        },
+        "errors": []
+      }
+    }
+  },
+  "artifactProof": {
+    "frozenSourceWasmFileCount": 698,
+    "sourceChangedDuringFinalRuns": false,
+    "sourceHashes": {
+      "assembly/chromatic.ts": "2d7516148956a8d41f54021d73a65f41d6a68b414b4632d66db46df0314f2295",
+      "assembly/color-range.ts": "7f712fe3aef29940ea3b57050adbf22fe644101199bac18a1a20063983dbfa3e",
+      "assembly/donor.ts": "7d67cc3268544d5ca5200dcb3a0de016f6a876e662fed52fd5388d730326bb1c",
+      "assembly/gradient-map.ts": "1734178832c4616a490fea28231ce6cdc37e3a5115c723c8d39a378c13ab6d61",
+      "assembly/hsl.ts": "afee2e8be10ce272fcd6ed40d21a553b3439cd600e738490a67b6013c1dcf74c",
+      "assembly/lookup.ts": "dd29389050bb4f5eeb6fa9f4b29a79700da2f2c171b37f42ba9fe3f66c0490ef",
+      "assembly/matting.ts": "7679a69f360a541dfdbdaebfced6d2ab64211f1be3b460e74a5e6754d655dd45",
+      "assembly/pixels.ts": "ba0d75e22076c5fd70fbae44c460c7efb18969eb27d9afc08b4b11810e8423d1",
+      "assembly/poisson.ts": "e6128865a28b6e01ae7564c90bb41c056552a2867160c6311a5470fc80a04057",
+      "assembly/quick-selection.ts": "25e51c2fab7b526e7e6dfc261e5aef25f7f30ff242046426a7a7bd92807b9152",
+      "assembly/spatial-filter.ts": "6ad490cb47a6a4148ff478bda59b8275fc37162f78d6d7570c611be23aa4032e",
+      "assembly/subject-selection.ts": "dd67ff02d342c0f806f65629120399ea20e04894a2d40784badb5abd3e79dc36",
+      "assembly/white-balance.ts": "e7f5785c97cb745b22b9a61f785e4b1fa5358adbc70df393afeb184a81738238",
+      "package-lock.json": "e062133f6c3ecd5d8cf31a15769970fad78be1d84a7157956c98f5f0409f4ac8",
+      "package.json": "567b668e3b9fe96714fb20672394e2018e58ac984bd6a45279a2980a1d3041af",
+      "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+      "scripts/benchmark-matting-natural.ts": "8dfd557685385f7f3c1e8bd9fe80c58fac9a847aed9e73ffef0a220e56956419",
+      "scripts/benchmark-retouch.ts": "428aed78d873b9ae3d13c34862dc0a80afc3a02663fe1ce03f9e6fd5e64ad063",
+      "scripts/build-docs.mjs": "44f9f906344930385de05c3c9ef8279c837c14b5e5def9c957e2f5daef049947",
+      "scripts/build-scripting.mjs": "633b05488ea0568794e31e7bc15817cea6545f7ac5d5bd6c3caaa7acb1b1cdd3",
+      "scripts/check-psd-interoperability.ts": "ce440bf5a0b1d73904da887bbd4e47bcad2b4b8afb7ae8d93bfb74ba6af976f9",
+      "scripts/generate-seo-assets.mjs": "b3fe7c416a865f299fee5568b6653a8a4c6edef8bfaab8b3cac4a333eda771a4",
+      "server/app.ts": "c365c35c0d3e2ea19d6def5f1e80fa9f4cafa86526017fb8591be56834119218",
+      "server/color-range-worker.mjs": "68332ec79f9d6d245103ad4d8c198afb2099418c27688524175d10ecf42d7633",
+      "server/color-range.ts": "dd79f304fe10868179d42c9110f1acb10ce78c6aea4cee120dca36722681f8d4",
+      "server/index.ts": "7b736e97e745b666c09f30aae274579f1029c57edfebd502fc62a23fc9df5fb0",
+      "server/matting-runtime.ts": "17acd17d32f085825d6821301cd25333d7603b2c196ef9c9665a661fd438f694",
+      "server/matting-worker.mjs": "d9a3f7b6defde59acca2a235dc8b33a60b7e0ee1b9c29d29fb98ca8f65919f20",
+      "server/matting.ts": "38b8e7a095d7fee73e8a90966d127db5ee0728f7a89d4af4c44cdc01caaa0f90",
+      "server/png-rows.ts": "d7cb945f0483b4b7792e11071be3563cb08deedb59882f0ccdc2f425fdad2ead",
+      "server/preflight-worker.mjs": "fc86be92b9e3238dc9c2292041a6af0f41ed58b1916e69146e57b1020ef27b2b",
+      "server/preflight.ts": "fa607a7f4f9c853585269ea252b5f868e9f4af5406668815e44bf80e22ae43d0",
+      "server/quick-selection-worker.mjs": "720bd2435229fd0da782b0a2354e0e1bf300f9ea5e69347501a53be0c85d4e7a",
+      "server/quick-selection.ts": "1ab4b1819ecca4765a8dfd138df36ffdbd681b483e21447b3a8ab9b6e9f27e13",
+      "server/selection-worker.mjs": "b59f9bc6463a0630474517d1c222bd520ea48a221c357dd15d5fc2250b6ba76e",
+      "server/selection.ts": "0cb771aaa768186e051b2be9c6a2a1e88375d65ea2e4cc76dad07c74e03ea02d",
+      "server/subject-selection-worker.mjs": "5742254591032178d3522351f9a18962d63096698c5e22594461d6e4ce31303f",
+      "server/subject-selection.ts": "9a6208a2caa97c38ac531f027a2e8229b9e061a893967bfe97554e9b7c60ff1c",
+      "src/ai/batch/index.ts": "c6b041dbf4103312978a7446b654de0e3fac9d964d3fcc0e42b7f88c7de5ec09",
+      "src/ai/batch/manifest.ts": "d2be0fcf1175df5797dfcf7290a8823c54f6255d97ee5a2b0c3343b02d6d0829",
+      "src/ai/batch/runner.ts": "bb3535f9e59df0c20ec5a7325ea1766143093a2911d6b7ad74fac7873f471cd2",
+      "src/ai/batch/schema.ts": "cf34e1498309abe7f53453464d749b48ea71e56ef1dd24fdd988db484a8b44bc",
+      "src/ai/batch/service.ts": "b488371b3a6e3c70702e75120f3ec937679b2cdf4edee614eefec3a5ad3308b5",
+      "src/ai/batch/source-names.ts": "5f737bc999c56983d08ae13a389e5e0c160f10c09896c53d24771c57ee87a51c",
+      "src/ai/batch/storage.ts": "864bdfe6c4b32e8722cf43a848bb80bf7f09162b2dbc3243d7eaab668a362e88",
+      "src/ai/batch/types.ts": "655d6beea8b1c3ca548ca5aeb067a64fc1207f8b83f415720aa20e3500c0b858",
+      "src/ai/batch/zip.ts": "d4c9577c51e96bb1d818a86d14b284ad61c6c8a55647232c95d42c15d720fd1c",
+      "src/ai/diff/engine.ts": "731ef704c21d85b066e4f0a241895360e879140c719da5491d31e87b72bbad4a",
+      "src/ai/diff/index.ts": "ad3bd580b8fff2875ed6c32fabfc56011be9df3e3fb0e2183cb2176695dcb75d",
+      "src/ai/diff/types.ts": "f3b410f36891a8397b2b20970778952d5edd99f36cb8b31330274743862068fb",
+      "src/ai/evaluation/bakeoff.ts": "e9c5f6774e3bb804f841c517012c3c1b6d969e1e94ed2be0af16dd8ab7a631ca",
+      "src/ai/evaluation/metrics.ts": "951617626bc60452e8ceb2a483c075c5d78c1f7b8d7adb1b4b0728da6ad0a4dc",
+      "src/ai/jobs/apply.ts": "6dbbb839460e2b4f829a96cfc1c4d5eca74a14ea621de20fc1a6cb8225e4fa5f",
+      "src/ai/jobs/candidate-storage.ts": "e4fd90216bbb992cbcd3f15abb8e3cc54a6a9b0ed09440630afedd8686a6c23b",
+      "src/ai/jobs/fingerprint.ts": "7be68422258275c34cfc2b45510603e667efc537ceb92a41feb78f16c61b8cbf",
+      "src/ai/jobs/index.ts": "79344959e351e8bf8894d15c86ec7ef0a90e884fe750d06460482a2e61923480",
+      "src/ai/jobs/journal.ts": "e74a912cf9f26f3f7a0a0ada17cff80ca6ba85a294afdf1d615a038e544dbb51",
+      "src/ai/jobs/ledger.ts": "3f292e497124f30e24683bf5044fbaed5f8a98b733eed9c50bbf45bc49efe295",
+      "src/ai/jobs/service.ts": "ad7eedf58904a257e58e8c46943cbbb74a98f890ac763d1c589b78e448c034a8",
+      "src/ai/jobs/staging.ts": "e1791b5f2a4cad713779346f1338a28a5df601e72e837dc6aabf6e0d17f1f0e8",
+      "src/ai/jobs/thumbnail.ts": "cc0767dcd003b5b2a80f6ec96f78c52434910d978b9bf7707afe129b382c8f5a",
+      "src/ai/jobs/types.ts": "11caa3997560c056608f1a489323d47d3243f9a2b60bb0179dd585df2a11fb17",
+      "src/ai/jobs/validate-request.ts": "2ad0e9d7eedfaba5b17954f4d4d38945c9ed628b73564e1f11ea9a6e6e487e03",
+      "src/ai/providers/index.ts": "d2dbf90ebe2bf325476b29be41de1cac5191ed07c475e6d4f96b5a2cba95c87d",
+      "src/ai/providers/registry.ts": "bbf2f4be446dd6566698eb0965c1f58722bfdb9bb2aa261cdeafdb26429fa2d5",
+      "src/ai/providers/types.ts": "ddbc0933cf6c1f966083117a0ba06e5f1a556ccacdbfd75a2012178b67c0e379",
+      "src/ai/recipes/executor.ts": "4d529c65e7ab1fee6c025f642ca3846f9a93cfe9b6a3c14317a7cfb753fbf5c6",
+      "src/ai/recipes/index.ts": "a83e72750ecf672e1771d045a9ee48033f3a945871a6822b168715988aa32de3",
+      "src/ai/recipes/package-executor.ts": "9e62982b3c9f4a727f8f29ea9f7a0a38866642412a5f028c7ba1754e53736df5",
+      "src/ai/recipes/package-storage.ts": "482c20aefc14ee089ef3c8c5646bd96d00dbab2e8086b5a0182edd0105b13467",
+      "src/ai/recipes/package.ts": "787d91528bee9e12b23177dfa305ec3250493d92acfc5a4efc30a29136efce2b",
+      "src/ai/recipes/presets.ts": "3854b5dd26f95c30511cfa15df322155f07c5bba7eae82d2dd928949d81ac59b",
+      "src/ai/recipes/recorder.ts": "41a4f57c5dc4cd1852068154b49ec9005776c9d5c45b3c8dbb8f5cf30dcc2e44",
+      "src/ai/recipes/resolver.ts": "31676da9e438c033c48146eb04773609b58bdac2d00a0ec0c8269cf1579de512",
+      "src/ai/recipes/schema.ts": "082f1dd4ad02a753b222d67f522c06b58e4cd118eec8b58df10a3eb910d2569c",
+      "src/ai/recipes/service.ts": "0b689826e3a22e351ae9dbe84c9de2388a1aebede75aaec3f68737b44cb4ff8b",
+      "src/ai/recipes/storage.ts": "7b5bac3a8ca8773710d14e89bce9e986c449b02aae8d2766abf1e790ccd84d90",
+      "src/ai/recipes/types.ts": "125a6e321cb9aaa7a632fa51dd4bc086e168efeea6848cd27b65e3bd7afd3107",
+      "src/core/adjustments.ts": "2cd8ce5a4f5a3191045dc70a40f448c779bbf9e120e647eca246b95d7584dc7c",
+      "src/core/affine.ts": "0a30403aeeb35b7fb6d7c3d4b9f7c62d9ef4827e6f7c792216b3e07b5e650f07",
+      "src/core/alpha-channels.ts": "29c329117d02fe45c705eff47f70d5bb2a15ec6c4c401722435defd0643b015a",
+      "src/core/assets.ts": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+      "src/core/bezier-bounds.ts": "7f1d24243daaf7266ea45af1ea6faf1388a27d1a29743c97a04b01cccde06f66",
+      "src/core/bezier.ts": "3f7a5da68f8097f76f7e813bb8e9ebbdfd6a4ea086288ffea5a757a675291e3b",
+      "src/core/color/engine.ts": "3dcac11418b55e435c15057f66052134aba47be20ba3c2151ad03af087560cba",
+      "src/core/color/icc.ts": "a2bcd01e032087877c4547d25b566eaf7b1251513458125d9584ffe935c03a69",
+      "src/core/color/index.ts": "61eff7dabf74628103796c13e11a3543b3ab686815b5272ddf6179f97c45db72",
+      "src/core/color/spaces.ts": "3765b8303d77136c7320208a6b06834a584ee6f73b93f8c7410ddf21b51252ba",
+      "src/core/color/types.ts": "d214a7178189e92e9b54e83bd7d73ea9f616c26796d125d3e0ea6e5ac8bf12d3",
+      "src/core/color-range.ts": "8a47ae10b369a42d27d73dd4754c10a7ef1418b282d6a6a1b48ce7b70d4e3bca",
+      "src/core/commands.ts": "4bb3b3b51351ba7d6108b74d6b480964ab5d68911fefceb726ff2f780e71487c",
+      "src/core/crop.ts": "8fa66bda5d93d83b865d9548445e99ac31cb336c0b42e0f4ce1d1d906c6f0d59",
+      "src/core/drawing.ts": "8bf80416826782610d77cfe808c86517b66964dac0eae5c658673866521d3dd3",
+      "src/core/font-references.ts": "f1388502908bde164a883b961a5dd46e0822bfbc37d89142b6ba81580ea951f7",
+      "src/core/gradient-map.ts": "363c7644f913e4557f9a17b977dda1b49a083a368f4d01c7befb18771be0a5fd",
+      "src/core/guides.ts": "da6378b968b44d15fd9a7c19a2c034132819afbe29147a88720b8f4b928be602",
+      "src/core/histogram.ts": "ce1444303de4f252a581e42f933cec654b4794c8935428e042713119ac147953",
+      "src/core/history.ts": "d457b51c5b02280c0af362a5cd7aeff6a5c31f57c23619414dc61e8b1ce87572",
+      "src/core/image-resize.ts": "e06ffb8ed8dedaa665079ba1a5779ea1111967a03120dc982119b41f75e510af",
+      "src/core/immutable.ts": "2490c2375b90a0d79cc2b64824798140184d053defdd7a04e95da3b901ef45ab",
+      "src/core/interchange/psd/blend.ts": "2bf40fbe75b26600ff6afaccb2ab6749e607c3e186a772992a0d93a5406f25d0",
+      "src/core/interchange/psd/bridge.ts": "39e98ce747735590ab60ffc631f14b38237a8fe14f443fbd166e1ce9b839c9a7",
+      "src/core/interchange/psd/builder.ts": "777dc8342299fd82402d36cdb6f1b79e39d79cfdb65669dfe3cdca39a1a82acc",
+      "src/core/interchange/psd/composite.ts": "4441889086d602792d92a698e8b36cbfbe39d7bb35dc20eae00d7f6b4b4eaf4c",
+      "src/core/interchange/psd/export-plan.ts": "79a6644849a6b50e38e1f8a4c4f6190409a0ad3fc604dfbb4789dfeddf7c285a",
+      "src/core/interchange/psd/index.ts": "3de8aa358ee9845bf5dfe11a85f9b35ed575b6981b9a5996a7ce54713c683844",
+      "src/core/interchange/psd/packbits.ts": "497cf6df4b54d3f0c83a717b3d5448c2d8c4ac6bef6ac0b6e636f5d91b200cc7",
+      "src/core/interchange/psd/parser.ts": "76b8fdc3a18c3388ee7c3d2ddb8f4c13fd5b88319495b80bb97b3e4e351371cd",
+      "src/core/interchange/psd/stream.ts": "da4ffc9a804b8327e135f74267f6e4930da1e85e737bb4fa4a4c0fdf64458f50",
+      "src/core/interchange/psd/types.ts": "fcad2e574d230d7ae4fade585d9639af39d5ff084f5f9d856cc53c45263c925a",
+      "src/core/json-encoding.ts": "fffaf27a2cc41ee6dc7f97868471a81f25a788f4aa27f2f6188f092401d9b636",
+      "src/core/lasso.ts": "978b1f86ed89034a82f377a8aeaad59c175a11d6a633c93b93247bcf701fef71",
+      "src/core/layer-comps.ts": "493480f14c5f6f9ff6b68cf5b5eff76704e07585b88977bec52b04d8c42b342d",
+      "src/core/layer-layout.ts": "d29ebd991307ad28fb2453000b9caac382e726af5187c32c931e086295abb07b",
+      "src/core/lut.ts": "f70ab50b03ef5456dd8ab6fc02267cce8775ed338f8d02d87abdc3f4b17dbeb3",
+      "src/core/masks.ts": "7a3c5f86a04afaca7ec0bbdf0f2d98a39d7b9ffebba060a5d4307430d2890a47",
+      "src/core/matting.ts": "1aa22bf5c31bd1d4a275986cdb7ab029a4ccb4cf785e9cc45474f56dcdbed4af",
+      "src/core/metadata.ts": "be75ad4c03022d95b030e4f1b8260d6c42f6117c151dbf1489e978cb7b5e238a",
+      "src/core/model.ts": "0c0c1caf15d57580aef7a6211a4fd8853435c85965c67bb18ffb102cd9abe229",
+      "src/core/paint-stamps.ts": "2638f6500edf6c7e449dae832e9179ac58d3f0e4b91d8fc4bbfcec7e5c92d5be",
+      "src/core/pixel-selection.ts": "ca30d9ac12a3977880e29808cd20329c4ac544e5a6d20c84b138112d6bcfc3d8",
+      "src/core/preflight-view.ts": "41281c04f505f151abcd4e8cdb230abb6dd1601d308d0d252d9713f8d9cb8dbb",
+      "src/core/preflight.ts": "0ba746ae6572231b301442525c31fe7407c453fd94c760941524badb35bcf174",
+      "src/core/project.ts": "ca39bebe4308146605b5442d355d3f0039128a369dc3751f120843390dca3988",
+      "src/core/quick-selection.ts": "7edb832330b5890a98de4346edba1c9c7499101a845195b4cc3f7cfc8f9c10c0",
+      "src/core/recovery-controller.ts": "35bdd2c432bd91c8aea224c912f98ac46624942ac233373d5870ded60e7c0cec",
+      "src/core/recovery-persistence.ts": "0a23d64bca3577bbae519898818d2cbdf03789f3b2ee776db3ab903fe77b3513",
+      "src/core/recovery-persistence.worker.ts": "7036dd1c023a1475f81a2817e0a1bd843f5fef41209599f269ecf5824be3adef",
+      "src/core/recovery.ts": "741aed2006c6373a81839d42b49ce3e766bf5e897cddcb007c873a34bc39a65e",
+      "src/core/retouch/dodgeBurn.ts": "4594ab30777cd6998620bf7a11ca5411ec6ac291af10f970b7c908e78208ed23",
+      "src/core/retouch/donor.ts": "6c4b8d531c8588e53d83f379087d318c503963b6fba00c2e048f6f9217416541",
+      "src/core/retouch/heal-spot.ts": "2afd8c640f337b90be31c7527afdaddaef61e83192d27b7df66e746a06b8dec6",
+      "src/core/retouch/patch-region.ts": "e19d5e6598d9e0a6faaea89a9d8c61fc55ca310c31b9a6524e7c5b37772371a6",
+      "src/core/retouch/poisson-solver.ts": "eff11b7d9d41eacf02d6faa92563fb403c13304648a77b85dec12e9d4b69918e",
+      "src/core/retouch/poisson.ts": "34f0bc62c19275d23febd71870b6304655fac2352de485c0ad93e96c7111956c",
+      "src/core/retouch/tonal-sculpt.ts": "bd0e1cb9ee7629607bbe2bc0f7fd09c9ef7d2e09af9d9fa99c6cbab5d23c2087",
+      "src/core/retouch/types.ts": "0f9f742879bc56655466168636f0237d50b82ee977a4cec193d6754a12eb25fb",
+      "src/core/selection-modification.ts": "359ea27fa8621bfe78231df03aa70c0d0b3150c5604d180549dbde70e3de1def",
+      "src/core/selection-rows.ts": "528a67d95f1370e4910b02767f2f44bfcac5204c29055a664ea86cde262377a2",
+      "src/core/shapes.ts": "50e47a6780fd224ca7ac4deddfb1bfba19432f762ae829f6d0005e703b8a2a90",
+      "src/core/smart/convert.ts": "0663b543f312fcd99359ad772d974a2f4fd6444a689b22d713313e3665eecb2d",
+      "src/core/smart/filters.ts": "bd83f8af134fc9b610dcb24e2ada68bf00d4bbed3cfba5169938743b4333f55c",
+      "src/core/smart/manager.ts": "7bb1032a468754b11a04efdebe89094051c9edaa2f355da39af806e7e2c81824",
+      "src/core/smart/resolve.ts": "b090bb4067b8e554609aaa0d7230dd5a9a9e4553c7f3a5753040e94a3bb4deb5",
+      "src/core/smart/spatial-filter.ts": "ff75c8c0e203d867d227c7bd475f05ab1a85a9308f2b06b58950c73f087cf57b",
+      "src/core/smart/types.ts": "c2480e89ed81520cf548437799ca1dfbb6af8404269302f34db2b79c1196581b",
+      "src/core/snapping.ts": "e5f17e67e553e8d597ffff2ecf80eedd981b7cc6a0ae20ab1a150fa15193904c",
+      "src/core/spatial.ts": "dc38d2228f71b59c77b393a08b37f0d3716280eb0f65a4a17188e79cf8aaaa8e",
+      "src/core/storage-errors.ts": "cad878c1f2603c574754f77d4c6bcd426f62942e8a25c1297832f0216b0312aa",
+      "src/core/storage-health.ts": "cc29f62856dec74304bc619b657be0f7c3af3133e673999ae999ecb9dafb093b",
+      "src/core/store.ts": "ffb875003fd52c8745b3b18c20e8384fb905c34d1e5ac1cdbea2ef7087883e64",
+      "src/core/subject-selection.ts": "c5b3752d06afbbce9c835d58ec03a732f5b566e6310980721ad3835fadd9b4d7",
+      "src/core/svg-composition.ts": "ff25e0e0fd92f7e6c5769b843f1b11e83e73e6ce83854d55bd7fbdd64139010e",
+      "src/core/svg-export.ts": "15ba55ce00d35262ebe2269d0a795d4a81f41f7ca2bedb31e03fdc17c26c3d30",
+      "src/core/svg-gradient-import.ts": "ed291c37fb2a819fd661b4abf174565976756e33f30f94de9d2c51f3a3037f69",
+      "src/core/svg-images.ts": "28ac58eab959ec6f52548afa4160ea11405853d528f8553d8aa15c0729b7eee5",
+      "src/core/svg-import.ts": "6a55cbe4f7f6b5b1da1cdae5ea0090d83b2fdcf515176d34b1999b06e9d3404b",
+      "src/core/svg-masks.ts": "0ddb90ffc6c96324d066711a979e34a28d9ba26e54e5145fa2ff3fc29fbef95e",
+      "src/core/svg-paint.ts": "2610504a2111229b27a7d29a6ba661bdb1613e433801ee8cc39742261aab64f7",
+      "src/core/svg-path-import.ts": "b29f958ca96ffbead987d83494a05267d093ad56ea8e243902710b01395c4c77",
+      "src/core/svg-path.ts": "71114769b25752fff4def9be08bf28558795df8ee79c2f9c30f817fe7fa04f6e",
+      "src/core/svg-smart.ts": "743ff0575957b1d5de2133c3c2d7bd9f43cf424539e367611e37717e0c62fe3a",
+      "src/core/svg-styles.ts": "2ade629f6f1847ea6c0bb7b191ff2e0537b5019d6e627dac42d2a9f501e5c8cb",
+      "src/core/svg-text.ts": "a56618b60bb162ee854e17b3060ff270eec8bcda57f067c0695b8cd4a876649b",
+      "src/core/task-yield.ts": "86f4b20e3c9ba176e89ab045c0e5ed8f5720d6a2d77e0324758f338290b5a685",
+      "src/core/tone.ts": "0aecdcc9a9c85c329395f8ea831491ccfd6c187490fb568e39973d7ba61967df",
+      "src/core/transform-schema.ts": "25ac9b7de49fec96d6236615892810a2181cd9dfe2c4b316c39a2b622cbb99de",
+      "src/core/validation.ts": "e5755b8d5f97d224677ae12d23b20bfdc05d11105385dfa392dde71ba4efcddb",
+      "src/core/vector-gradient.ts": "f1d25b4a7381f06134637d38a3f3d49387c4c91cede855f4f84ca2014b1a8889",
+      "src/core/vector-stroke.ts": "843129ba4e9dfabbdfb667d6a92655a1b5f3e9948f1c8e8bda974962f45f739a",
+      "src/core/white-balance.ts": "476564b1af73dac1365fcb62352e876509e1ec83e2e00ca8dc88907c919852db",
+      "src/crop-controller.ts": "eebf8c6d23cfc67318978bc72aaad3abc2b6849a9e71fd7a20c77d7aea099e6f",
+      "src/demo.ts": "40bbb8e48b9aa1c4bb9db5c8b18a18719f128e538e86a509259d296193e4aac3",
+      "src/dom/alpha-channels.ts": "f0214baadb58bf2232ca22a62b42413cc75cb94e566ed7ea05a9970668113c2d",
+      "src/dom/guides.ts": "3561ecafec2a495abe7c9783a6f073572ae3d176f3a275bde594faa8648e37ef",
+      "src/dom/index.ts": "cbcae5a0afbec8a815df49f515a0a5ef59d7aadeba3be37c0dfae1e7fef43617",
+      "src/dom/layer-comps.ts": "8c1a4baceca158ec5e79c4eeddbf67a7993b2cc52e7c1f73637f734a1f4bae6b",
+      "src/dom/layer-selection.ts": "d4852512af598c7cf1876b78cb00aedd9327799129646da2660f23ff3ce0e036",
+      "src/dom/masks.ts": "93144002a509704d8c0c3b2125425da087a46121b7a9674e4739b029078c0c89",
+      "src/dom/metadata.ts": "f34219c38199fb072496044c200189f457b319c8d6620b4d156b80c1606b4ed5",
+      "src/dom/retouch.ts": "01875fca5be8c246e210cea3dbfbc16b2a389925892355e51138524d848cc31a",
+      "src/dom/smart-filters.ts": "952db373456f3e9a485a139b26837f0b9dec5f7478fa701c736383bd22dd9e82",
+      "src/dom/values.ts": "319a7f047d6313841378445a0366d33ebfc797c29a0cd69e1660e7bbca6da99c",
+      "src/editor.ts": "18c3ef6edde14e6eec97e2d43bd9f1d927b03707bcc7c733a4c5e006fd7b0098",
+      "src/engine/adaptive.ts": "197044d5f9d720345d372e10be0d77dd2327127d90f8ab2875a0437549f83ba8",
+      "src/engine/adjustment-blend.ts": "57a2afb0cb5aa163ca0713d473473f786843a5ed2f535e6d76163c1ad3ef0000",
+      "src/engine/cache.ts": "76722f64df4b325ff6864974f1176545bcdad133400f3312f34e35560032a36d",
+      "src/engine/canvas.ts": "f8aaa150a72696a8cb0a8c4dfb8d5956e567b3808ce6eea77ac48b612baad5df",
+      "src/engine/channel-selection.ts": "7c33605b503cf3d1f7ad8dcb1cd071ef6fbe6d10cf41a688c4d5ff65d83c18ef",
+      "src/engine/chromatic.ts": "2eb549968af39fd8b9ad92b79925277bf6123067c46bd1084dc7585087dcf73f",
+      "src/engine/clipboard.ts": "a62d9bd491637c61a65a2587d2f856f0d1e4f29d235e775b9b6ba705370dcd93",
+      "src/engine/clone-preview.ts": "d5c87759a8f128c13c2d7a37e86e7be5483358a7120aba025f7c077529e8be41",
+      "src/engine/color-range.ts": "81472f6b2216d25bc5a43616f36c99f5269359f6792a4b5bdc5659db01e4b78f",
+      "src/engine/content-signature.ts": "d7ea24b738a47d6a3573a7e2e188a75c55cabd980386b43d8a9a36025d05b213",
+      "src/engine/donor-search.ts": "382092955dddbaa13f54a2b1c0b6d0b012cffad7250ad796a8f75b96d77211fa",
+      "src/engine/drawing.ts": "ced951df37039965df3bec19c944b58daec0493ab9c4969cde7d4ed9eaccb59e",
+      "src/engine/export-control.ts": "feb42344c76ee80a5c6556700c4973762a9b2d0510bd32eb46ee805f2fb13542",
+      "src/engine/export.ts": "4fc5383ac9be7b2338ba2fe2882139a9b846ed57e145f32a1468045e44bf1427",
+      "src/engine/feather-region.ts": "235f484b821e6a4265268c63febfe8a9009426c6ad80db5eb2611b50864695f7",
+      "src/engine/filter-mask-coverage.ts": "43bc9a7c8678c1d5e968ef82408250fb01aa51cdb67448685d389fd42c882f17",
+      "src/engine/filter-tile-cache.ts": "26325a601b0f97a0f5084a7bbf9808991ebdcf53ff4d2bec188a78cf5d0de1e2",
+      "src/engine/fitted-renderer.ts": "b70b4dfa680497b4fbf6bd4b428171f2db4e9e58daee2866e3412c8743d35fd7",
+      "src/engine/font-availability.ts": "bbbb0740ef427fedeb14d9593e412124149b509843923dcad20a046c9353daf5",
+      "src/engine/gpu/renderer.ts": "f3bdb34d1ce541dd1b45ddfd06a46869e2a00be37b28f7bfc5414c95e5bf4e46",
+      "src/engine/gpu/shaders.ts": "e29a255a5f49776ed980e1c5ea59f2b5ede04382349ac95664304b6eddd0bf76",
+      "src/engine/gradient-map.ts": "425259c169123e76eb70000a12274ec6cb4c4b07ebe86c2d9853f418603274e7",
+      "src/engine/healing.ts": "e46f9a680b7e32cc3ab7920ef34c99fb3ecbe8a7793693311bdcd3ff24280f0b",
+      "src/engine/hsl.ts": "5925bc11ff2d305a3a9ca3864b6e9c08f9004163040fc74a20930b0142d52b08",
+      "src/engine/lut-import.worker.ts": "b79d7cd23ffdc296efe8cb72280493ac1b4434f747b605832268a4fd49322df9",
+      "src/engine/lut.ts": "140f8d7d0cf15094e1d7616748443f4bc5ff75406ed1829af9614e107c16d1a1",
+      "src/engine/mask-signature.ts": "36590b32d1454fa255fbfe9753fc6e4ef3f0909116298c3ddbe23ed7fbf9d7f7",
+      "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+      "src/engine/matting-iterations.ts": "96273e455030f6a5dbe06bcfa5cc8514e5beb68c00ba881ba5be4e46f2a9de1b",
+      "src/engine/matting-output.ts": "94e61b397cded00ea32f67d8677176e1c7d38fe80ed3b49accc8c024745f4686",
+      "src/engine/matting-source.ts": "5e709a2736f3fb45948374a1f1bbd7c863f103997683a6ee24266eef92f1fcdd",
+      "src/engine/matting-tile.ts": "accd278392ca87e65157eb308b03ff641a56ce83d079105e60afc0efe0561ec1",
+      "src/engine/matting-workflow.ts": "31064fda0731792c6d33ea05e1516e448a6f6c0cd00c81c8167b952a418c70de",
+      "src/engine/patch.ts": "e9c75f0bc763a762f2db31a811eef5c521c1aac480dae7ef193be1b7b0d89c7f",
+      "src/engine/pixels.worker.ts": "b456226b3ec64f8e8719f684f40e27e7d9cea3e21fa7fb943efef35e21e95152",
+      "src/engine/png.ts": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+      "src/engine/preflight.ts": "9d79f9df05cc3799faacf8346d05a7a6d248c75647337548bcf02746fa02f984",
+      "src/engine/preflight.worker.ts": "b3b7121914f4cadda2514506738843a98d6e7b8715c1983495c0abca05ab4a94",
+      "src/engine/prepare-channel.ts": "dbf28aea2f56b562ba54dc57dcc94ff51c38e541d734befe23e235ee75301d7a",
+      "src/engine/prepare-matting.ts": "0aa33949033441dfd51a6f5d3c209f504ec6b1e3822cbd5178da5864d5e1956d",
+      "src/engine/prepare-quick-selection.ts": "65373f82b5c1ed55cbe74d6961cd81fc69f2fc3adbfbc6318796a97ebf4c0671",
+      "src/engine/prepare-selection.ts": "e3d67fb905f7e23f4b9cf170f0c6ddc423feef5fe3ab2c0aacc17c8ad6d47c0d",
+      "src/engine/prepare-subject.ts": "7b23f402967fc6ad9ac9cbfc3a363c87d401fb925690aebc9e113b4369646bb1",
+      "src/engine/preview-matting.ts": "43a262288bd35e73f4372111041c822b8532953144f3f6aef819f5a69a7cc962",
+      "src/engine/processor.ts": "0fefd22024d6d381beecaf6e023c4ba438757c7b35f00227932dcc2860582885",
+      "src/engine/psd.ts": "31d8166dbcc0f5dc01d3c173284c65f2e0e9d5b557dde5254ae9129912a8595f",
+      "src/engine/quick-selection.ts": "b5184da3477a06e25f3d7ca17661d7d90c89711161dda85f757a61abe722af6d",
+      "src/engine/render-control.ts": "1be96212cf9371a6c7ae123d809ee326bcf4aa09676794d0389399769991f17e",
+      "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+      "src/engine/retouch-sampling.ts": "107e24163cdb99bb601341959affd780056daa40fa3d235c3280197c4f890141",
+      "src/engine/retouch.ts": "df1db719c17072d0840768ccbffad2dc83ed301b5540948060476b4ee6fa00b3",
+      "src/engine/selection-modification.ts": "49c42bd62c8fd60cdbfbd501d3950d30676a196a52a68ff7f96da49e08de2e89",
+      "src/engine/smart-filters.ts": "305b7dc9915fef5596d34487d9354a033cef542b077c9c87723f6fdf0c9b8ed5",
+      "src/engine/smart-raster.ts": "83681ff5bc20d6b21fce13f76858c431174bb5b4e6ad407796a5a356f5852c65",
+      "src/engine/stroke-region.ts": "4074fa9df83135c21687c837ee4d1015f2552e97919efa40751ffc1fd6bb45d8",
+      "src/engine/subject-selection.ts": "2dca33dbf1c60e58071342e6442cad6a4ad0b211cb081956e2376be01064ab92",
+      "src/engine/svg-images.ts": "fc1137c20b75db35ff086daa7b89b86c3fabd24a454fa5d7764d12a9eb41258e",
+      "src/engine/svg-import.ts": "f3ce4374cbd4d7ec687e58185bebed0a26980394a3cce3fd9ee8f64d6f630d2b",
+      "src/engine/svg-import.worker.ts": "c48a132e73ef8f8b499694dfe112a6a1664468a9fbf933ee8e75fedd7a0aaedb",
+      "src/engine/svg-masks.ts": "518385ce19d2d7aa4ef5bc938a83a7ab6580afdf6513794886864d2965bbe46b",
+      "src/engine/svg-text.ts": "8fc888a69fcaec44e5623e73a91536e9ce630930efd2c676fefe761438bf0fde",
+      "src/engine/task-yield.ts": "9f6693dc90eee1ff8fad13cee7a75c1303a906e91dcb47e6dc821cc94eeaace4",
+      "src/engine/wasm.ts": "b51ef9934ffa1155a062c0e7ac0050b67e7af193211cf2fc2e5873cdc2ef9649",
+      "src/engine/white-balance.ts": "23d8525223f1cdee5ca2936b4df2667c16fc9325e641eb99a50245940aa35f82",
+      "src/generated/script-runtime.js": "8e4ba2ea9a6e6038cd27848853eaadb92977d6c41ba6b9cd421bc88ef7b99618",
+      "src/intelligence/adapters/local-segmenter.ts": "5fa68f86f3db529ab99a68d1e7fdf294bbb83abe074cd7314f375bf223af41f9",
+      "src/intelligence/adapters/local-tagger.ts": "92c05b3377eabf39a6ddfcfcec75ade00d300bf484ea6695b788a194371c222e",
+      "src/intelligence/adapters/registry.ts": "b9ff5c7c0fa3d6e1354a11b631ebaf3e79d4ce78717baec86a0f9e78a9b9a29c",
+      "src/intelligence/adapters/types.ts": "956d78f8abc5059498a7af47f42e56bf44fe4190bd4d84ce69899e095ad487e1",
+      "src/intelligence/candidates/image-input.ts": "e5418f0143851310f01ebc553b3110635966131b86de3cff8d7f8df72032482c",
+      "src/intelligence/candidates/service.ts": "03b7294c08b19221dcc01a7bf5797989185c4eaf02b0081e0890557af1fdd371",
+      "src/intelligence/candidates/types.ts": "e7530bad1fdfededcbbfa6d73e66f0774cca1e3dda4bcba2fd4a0f980308a68c",
+      "src/intelligence/evaluation/benchmark.ts": "03e3eded1a0575f40c5cb1cd6d1e612aca3a0c9b7a4dba0df00199cf42b3f586",
+      "src/intelligence/evaluation/metrics.ts": "6c6c6332cd51826394488caf2ee4b1a64b7ed15a4ff3a7fa77eeea0bf84e5934",
+      "src/intelligence/matting/closed-form.ts": "0e930c74eaf41ec34611f189f8b77c0989e2fd1f16008f29a9cdd6346a38bc94",
+      "src/intelligence/matting/coarse.ts": "10ef6c06c3c1dc9d8e29586e230a55ceea609ca8658102bd0771d4177ec30c3e",
+      "src/intelligence/matting/engine.ts": "fc57a96b4d5603d90ede1d5502745c8e4a6d5f12405da97fff4073b6d53e4ada",
+      "src/intelligence/matting/index.ts": "eb138cd8ebb6a8394081f0bf1997edd731c813d281868dbf2b7baf0326472091",
+      "src/intelligence/matting/iterations.ts": "bf0c3594db04383174c149f0ba9502099d5aa3943e0c05d3b754128725214e97",
+      "src/intelligence/matting/segmentation.ts": "1835129f4bcf8bde38f4b406abd61151b289770bc6f359696e068936b3d03657",
+      "src/intelligence/matting/types.ts": "df00493aad52a34329abdfed3818e50280d30204cebf9596e659067a77d9ad06",
+      "src/intelligence/metadata/extract.ts": "5cbaf895d36e90628f702c612d844593a13ded701533dc0b5a5c262fe61c93e2",
+      "src/intelligence/metadata/metadata.worker.ts": "1d4829167929bf7b3a9d27c4d487db90d0c30c7e992c33e2c0d05082abcc1ec5",
+      "src/intelligence/metadata/model.ts": "80d5c81c39b792c48640e400d060960b4578fbfdf8fc0e22b3219768ba93fcfa",
+      "src/intelligence/metadata/service.ts": "a08fb80aabd2bc89c26fbced70f72561b1df4a2af3984ee91179ec4014e713f8",
+      "src/main.tsx": "5f7500325c4fc2da47f89d3aa85e74f02b98072deb7d299126b69fe17ec87b8b",
+      "src/plugins/index.ts": "aba0837b48f568b26076b26c8989541d818c19339839daf98540a4b073b60947",
+      "src/raster-editing.ts": "4723ecfa37d2077246260099a1e56b62299e5e744d2c264723dba5782b679577",
+      "src/scripting/bridge.ts": "954161c31e7ba0f6ba4acec6f16738b043e90e39add943a7f89e83889939c1f9",
+      "src/scripting/retouch.ts": "743b04c254590d4dd9c6af02ff5d659b9a29132a7f883aa6c547db8553d10cf5",
+      "src/scripting/runner.ts": "4f4619122fe746ae8c781472d276d3f473440071cade975582009ba4a3fcff21",
+      "src/scripting/runtime.ts": "b40641cb40beff95e965eea2461dfa856e25d6b334bce52dbfe2aa14ad020429",
+      "src/tools/mattingTool.ts": "b018643500d9edc480c667f41381deed32ba7c2d8d9e2258b13f6258aee369c4",
+      "src/tools.ts": "7cac78ac63bb56542f529c873832f5abb4e9b1f2416efefe8e5d1a523992ad5c",
+      "src/ui/AlphaChannelsPanel.tsx": "d73319aa5afcd5881d05324207256216c1be717b2920b382e1e707b660d4c267",
+      "src/ui/App.tsx": "b2b194203479f023cd63b5ed455fb820224c2c4565dfdfdea2167d0ae601f1d4",
+      "src/ui/AppearanceSelect.css": "1c4036eae32661e9621375ee52219f023679142347d2531ef89586482d0b4179",
+      "src/ui/AppearanceSelect.tsx": "20c6ad43c863d1e05f121f747d48ca8bafdbc448d87148ce5a2c8ceb9e0a5724",
+      "src/ui/AppearanceToggle.tsx": "db98d4a292d846b7c23f548d3bee7cb7464f6102c067126aaa954cba436e1cfc",
+      "src/ui/ArtboardDialog.tsx": "0f718bf85cf1f6f61353eb9ee51a65e586a9e234db74a6df98bfc1e77ddc95f5",
+      "src/ui/AssetInfoPanel.tsx": "f5948f3c1468ae17a464119babf0ab979f5b0aa791f6776018bfc50faefc7c4f",
+      "src/ui/BatchRunnerDialog.tsx": "0e33558f13ed231dbd0a7b1c3805fee66af876b299fcc6e631525e178d52a494",
+      "src/ui/CanvasContextMenu.tsx": "5b4c14c8cd49b21d8da6a6216a2f0454060d118c82e705cfc50620275d000fbe",
+      "src/ui/CanvasCursor.tsx": "31a5093104185b1bb2ffb60bdd57c2af36dc0ec6826109e286808ef959b5814e",
+      "src/ui/CanvasOverlays.tsx": "8a920a50992f53f63a83234251f3ac48fd498eb6a2d57479e2f76d804a21131f",
+      "src/ui/CanvasRulers.tsx": "d9fcf8b3434206960dade0e93872731d73d5f7d848fe73bd24c85dadaac516b4",
+      "src/ui/ChromaticAdjustmentControls.tsx": "21d09facfa61d9f2828171c307e0e6e06fb4782a36cbab1f8bd5fa32e0018443",
+      "src/ui/ColorInput.tsx": "1cdd09a06f3942ab6b37b33a3ead6a05ea6928b09014b8c23e515091096627b5",
+      "src/ui/ColorProfileDialog.tsx": "78506162fa9b39ce331f8c614c687a21dd56c065a76f5336a12a5d37644123cf",
+      "src/ui/ColorRangeDialog.tsx": "6a34b21d4de99d21aed2d02258f6f9cca8d47141836694108115282f71c184c1",
+      "src/ui/CommandPalette.css": "6fab8bfcb66f300f4dbcc938e5e98f52dd3dd2a4a24735ceea321ef3c1f09e36",
+      "src/ui/CommandPalette.tsx": "84a5a7a2ce3dedb04ba6fe50742a61f3b7172669d8b9a2ee5237ac693adb46d9",
+      "src/ui/CropDialog.tsx": "3f4f84878c75e46ac6a994b5b010d4eef06b6eb557afa936144e72244a675497",
+      "src/ui/CropOverlay.tsx": "75181d73172deeb361391b8418bc44c5353b55fe7bbd5abc42a66681933903ba",
+      "src/ui/CurvesEditor.tsx": "d3df0aa26853a8a77d6b564869e8235ebb1588eb48249476e55795c0f4720dbb",
+      "src/ui/Dialog.tsx": "0aae2a9040dfc452ea1c742a05fd7ceb73f78755209d89da92fe28ad3686a6b2",
+      "src/ui/DocumentTabBar.css": "a5eef8bc0e53f3b8a58a710907479ad5b06b26bbbeb6f6c3bf95af5c04e1d2ed",
+      "src/ui/DocumentTabBar.tsx": "7f4c31b436546775b7b681ca3a45aa2a3a883faa649d5f7d457223c63f0a429d",
+      "src/ui/ExportDialog.tsx": "e85201c2e6ba99a522f905fa0fcf0763f8225aeb8aa641e5a12363380eed8cbd",
+      "src/ui/GenerateAssetDialog.tsx": "37e385717caf2816898a775a907ed27be7122b0db4eb04664e829b687a519fa4",
+      "src/ui/GenerationRecoveryPanel.tsx": "d96bfb403178f0ab89334ae2ef83d4b1089e9d6baa3cfd63db4271dfb3905733",
+      "src/ui/GradientMapControls.tsx": "e3d5fd60ac33e122c4560db52ca8c13da5d5d815d8ad2fff5d8a72f41314540f",
+      "src/ui/GuideOverlay.tsx": "13e5bec12064a720c4f92b171849742179e54949cf0e5cd4a310af2c3d142b35",
+      "src/ui/GuidesPanel.tsx": "9de104ebc77a70c72727e67e6d9853b59eb2223800354692b2cd172d8e4dca89",
+      "src/ui/HistogramView.tsx": "45ccab6b41a54251136ac429eca5cb1c88940d499881f2f1b5830fefac592f55",
+      "src/ui/InspectorPanel.tsx": "2c699b85331335476525c8a19980fcd429ed61d51c66166ef888e04e3dd941cf",
+      "src/ui/InspectorSection.tsx": "2f13160d005ef734c51c01cd56504b40a9c2019cf31c7cf37c7e5e783888a266",
+      "src/ui/LayerCompsPanel.tsx": "4ee4207be63d6424ac64f04166a944b0314e7ee99f263ce9b4c01ae48871e76d",
+      "src/ui/LayerFilterBar.css": "0afb8d840c09aaec98c4b7a12d68bcc31a8f8f8ff3f5f482c81901c6b818fb5f",
+      "src/ui/LayerFilterBar.tsx": "0e8efdcd3456ff2f626dfcfed00c4b4f2cc7ecaea3a3a73dcf367c5af0d4c65e",
+      "src/ui/LayerMaskPanel.tsx": "c3f4d3020a97fe527e99f363d0ab145de038af19a68e8381aa67ba205663b075",
+      "src/ui/LayerStylesPanel.tsx": "e10f8e2a5ff6eee4435f894eb5285c18ee55e64fb77dd00ed4f00f3d7a8948a7",
+      "src/ui/LayerThumbnail.tsx": "297c6083321d4293f730ca7783720772dec25af318394b4b7e618741e030e4ea",
+      "src/ui/LayersPanel.tsx": "389f6d1a47ae277e462154f77a788911e71940b6e8bbeadde9a6cfcf093189de",
+      "src/ui/LevelsEditor.tsx": "5b279fc8888082a6c30224656fca6916c321beeb38b3bbbc96d19bf601173edf",
+      "src/ui/LutControls.tsx": "e50797428247d2514df49b016efb719f045571b5e5f0baea04ef3b68230b0a48",
+      "src/ui/PanelResizeHandle.tsx": "61d7eab79c2efb61e77bc3c02adcb19cc28b15b239f3a3afe8aac68a116ff946",
+      "src/ui/PluginPanel.tsx": "1e40c38e1cfe1f5e15f18ca38b45bb622f9ed8fb0f8a42084693883e4d6433d0",
+      "src/ui/PreflightDialog.tsx": "ce14e6bfdd544f689d0f73c09def669f8387222f21a257f5b9e0d1b8f0576db9",
+      "src/ui/PsdImportDialog.tsx": "30fa810863523d28a320f0b0e153be0c3b9f01ababa75ef7eb0ff9f5567f1d38",
+      "src/ui/RecipeDialog.tsx": "1fee59d542b46d4465808fe8ca062399da66b025cda1eea7556e6e2137a8ca6b",
+      "src/ui/RecipePackagesPanel.tsx": "94da5cc33f11ed7cbaa7cc0ba9d6f26ba891310ed6180e32116863c51cf53635",
+      "src/ui/RecipeParameterFields.tsx": "f596d739b1a3c48186552c302727de1afd35eb1acf4d7d4dc91d26be7985f955",
+      "src/ui/RecoveryPanel.tsx": "3df8389b65249a0e36309c3355a09d8f779bda5d59779d349851d47ba1c143b4",
+      "src/ui/RefineEdgeDialog.tsx": "0a44916650d4a5c67054516e7a2a1cb57ac3a594ff16fc679c7c07a31a47fef3",
+      "src/ui/ResultDiffInspector.tsx": "89a00acec5f58593ed9fb258348fe5a1a8a7297261bcd3f46bad8240dc3e1aa4",
+      "src/ui/ScriptPanel.tsx": "ea2812883ab94d8301a01f17f031db5809549fb1c7dba97e8c7b33b56a3482e0",
+      "src/ui/SelectionModifyDialog.tsx": "a9e6206e8fddaa67d2056d5ef0725ae7b42a40c2c9f59114c7220d98849e208a",
+      "src/ui/ShortcutDialog.tsx": "44ad1e164d3072d97dd5201fee7be1136a4bf47eb03bb445220b36256adef747",
+      "src/ui/ShortcutHints.tsx": "bb0524b30079ca3791d7eba4ba787ee022198189698961c77f71950a14055959",
+      "src/ui/SmartFilterMaskPanel.tsx": "3087bba9548bce908d5d59bcfcfac3d34b86c3cae75912e462d3b4939d3d3bc7",
+      "src/ui/SmartFiltersPanel.css": "2e5d79ce4382569725c1503fc69cfe02acf2e8c728bf2c9cc98840e12ccc9219",
+      "src/ui/SmartFiltersPanel.tsx": "b90eea456b7bb35c965b775981d099bec7f4b6f6392e086fb2506162910bc559",
+      "src/ui/StorageHealthPanel.tsx": "673a25a5fa65f98c0af54b17233edae1bf195d60755f66fd8a73dbc7bb19de6d",
+      "src/ui/SubjectSelectionProgress.tsx": "c4edaad95b49238100e1aa7df3c298347989ef24db3eebd56fcb9763569ae424",
+      "src/ui/SvgImportDialog.tsx": "e4fb4bce157296e33d551590ecdbf383c1d1f6caa888a531491eda94b6c706fb",
+      "src/ui/SyntaxHighlighter.css": "0ae3e6d053acb5f094629e7bd3239dc85ebde100a43a64110e99bb2a9bf30bd3",
+      "src/ui/SyntaxHighlighter.tsx": "44ff77e7fbcf9e818c1f18f7f447a5d5bb2efe91e9f275063fd49dfc67447ffd",
+      "src/ui/ToolOptions.tsx": "8b25c4b1a137c1d51ace38f7f87cfac8ec23958be3bbdbe947c29129820c5780",
+      "src/ui/ToolRail.tsx": "ca1d1484424fcca19a1ea1132c62c48ce0790af7b0d209b39e244cdc5275297e",
+      "src/ui/TopBar.tsx": "26846cd72383b71a2c323b4908fab768077ff85c49946acec64c2a3070dcff71",
+      "src/ui/TypographyPanel.tsx": "ebe90feaea8dac9bbbd04734e918f449533cffd1da036cddcdb83c01e63e23f5",
+      "src/ui/VectorGradientControls.tsx": "18d8eeaccb425e7b164ecec35b0b108fea7a02315d55c48fba06c4f74a2dd268",
+      "src/ui/VectorStrokeControls.tsx": "d25714d2c248b075531c6bf79fb89a1647e4166fdd09655eec3dd37b6e642e2f",
+      "src/ui/WhiteBalanceControls.tsx": "fe1313463009757791b023578afa8ffe06e86ab9ece4964a7cc190689b8fee7e",
+      "src/ui/command-search.ts": "de470041429f71d8581c89cc7677e87cbc6441fbdd8e30cd491e2a8525e15cbc",
+      "src/ui/controls.tsx": "d43c79ad545d3bd6e2e3847a9e8dd720794d84ffb0ccc1e2d5496ba7ee145d29",
+      "src/ui/font-availability.ts": "3b6b63dbc391737fa603b2cad2044b4bda1253cc0e83a1353335e5610d11fcfe",
+      "src/ui/hooks/index.ts": "a3bed70e459e6265db59c53773fb3c1de2bcdc64bf37739e70b9af143ae6e371",
+      "src/ui/hooks/useCanvasRenderer.ts": "01bef891d7d16c75cf9fc59f69462f82c24528d0cb3114dacd136256bd79aa06",
+      "src/ui/hooks/useDocumentViewport.ts": "8b95378d762c930bc5cce214fb0af101a2aee70bb4e014dd4d0d579d3200c3ee",
+      "src/ui/hooks/useEditorShortcuts.ts": "a90704b15828b5fe16840d14493437a6bed4d11a1d5cfa31f161e0b2bce84779",
+      "src/ui/hooks/usePanelLayout.ts": "fbe37b0e278aa33b116a8bccae8ba9c3c739bbfd5155e393e4c4aa6e7a56b429",
+      "src/ui/hooks/useSelectionOutlines.ts": "a7a9ac894076db051e6d7ee8b935a500060e4630b3ce42d5c88f3197b1c6f9dd",
+      "src/ui/hooks/useUnsavedChangesWarning.ts": "4790168749789e8aeaf83385f85fd6b250a7555f4e3fcd699a0cc30cd2e084de",
+      "src/ui/hooks/useViewportObserver.ts": "206d2628b4d27cf63d660b208272f1e67b67c8aebc574bdaac4b05c55fba8155",
+      "src/ui/hooks/useWasmReady.ts": "4008475132e2b680f6dff06ae349544639dbc1a1f0da3862c05b189cb78ab83c",
+      "src/ui/hooks/useWheelZoom.ts": "686204b74fb225333367965471106488fe96a0581c28302ab14e7ed964f37493",
+      "src/ui/layer-filter.ts": "1fdbe4c4b7643de1393193b4dcbc2c6739b2d4cb2d1fb9fd1f7467bcd00709b3",
+      "src/ui/panel-layout.ts": "bbea3bfd1fc47e0576c5fa8967823c649699dda00b141fae2d8f8b557e511479",
+      "src/ui/selection-outline.worker.ts": "82e1aa269ebfb924675bdf907345189a0cc36032ec714d6db09e05efa3900da9",
+      "src/ui/shortcut-bindings.ts": "f5306c6b3cb308cccf26fc8d77f7dce91dde738f1c836766aa34c24b62ae951e",
+      "src/ui/shortcuts.ts": "0fbbb08adc11d169c17c599c10981396d7e043ef81e1dbf1eb512d89072cb467",
+      "src/ui/styles.css": "4939499b7368ff5582f79fadef9ac9f0ead6d8252e1da50a7ff719ac8d0eb019",
+      "src/ui/system-fonts.ts": "636ade8e025a5670c8e4b42f2ff0e65cd1abb61bfb2859ad2dd7b329848910a7",
+      "src/ui/tokens.css": "150cfa149b2c7a3d6f490608b868ef1d9d99dc9d67e6380f1160b6a7b4b1d932",
+      "src/ui/utils.ts": "0bd0a28f400c3581f7de3c055962c91e31d0d3a9d5284d7696b3d7cb6f614200",
+      "src/workspace/autosave.ts": "afd63eed5ca78bc207fa73d8b8fc3e47fbbbce88f3c68dc3458b1927b1e64c87",
+      "src/workspace/document-session.ts": "6b9eb9ed0c6549b335950efea0d4fbf46d6fe7a08ff0afc01a03a6bfecab8e08",
+      "src/workspace/graph-transfer.ts": "fd654bcad37d1e4f76efbb2aa1192dd46eb18eda52c6e27f9a7a44f7baf3aa98",
+      "src/workspace/project-encoder.ts": "4f6e8db659115d8c6936039c31c98035f1ad62ed9bed436f2d77d4f5388d14bb",
+      "src/workspace/project-encoder.worker.ts": "102fd6d9618fef9014c5d032f94e45b839fa913e362dc8b80911be8e75179ff5",
+      "src/workspace/repository.ts": "a57b0e0a0d12d27f96471d2aa8b4f16d269a6204cfe1e30a25b51af302222c4d",
+      "tests/adjustments-dom.test.ts": "4a872bed0686cadc6b0a2bb77b6f6a383f0ac4d51a3a9605034018a0361c43d6",
+      "tests/adjustments.e2e.ts": "4e39bed9cfabf074e9412f1ebd252d9ad17919f2d8f474b18fa3b5a2165937f7",
+      "tests/adjustments.test.ts": "8b10c20113198d0b6d9f6959047ac7158bb501c891a36daaadfc065bf17e5310",
+      "tests/affine-render.e2e.ts": "c0f13e5e9ad08feb2bb320ff929f26462d0c49acee75d1fa3111b65155262dc5",
+      "tests/affine.test.ts": "2d2a21539dcab8b9ef633754f69226ea0aee6cee910134fe0cccd739e51dbd72",
+      "tests/alpha-channels-api.test.ts": "abd7ea0279f38555244cab81fe51519285bafb77534f3144d3a83fdbaf0363b9",
+      "tests/alpha-channels.e2e.ts": "04c695042420aa506e5ba4fe87508c9efea9d0f03ae0112d0c72759bfa994aa7",
+      "tests/alpha-channels.test.ts": "fc2ed598bbeea93af57959637b41efa7279b9e267b46de95d3ca08a1a0cada11",
+      "tests/analysis-adapters.test.ts": "0e303a418b87e7be039321f8fb1611bfce29ecc2d86fbf36275978bf1e1346ec",
+      "tests/analysis-candidates.test.ts": "03b55752d6543b0d6d14c4c68c09d1059b10626db7c53f780afa8c324f14edd3",
+      "tests/analysis-evaluation.test.ts": "fc71c162cd44d8428fddea0665faf5406286f5afeb4a6099ed05a14897503d51",
+      "tests/analysis.e2e.ts": "deca372598c675e166ebd8f246d5f982efa34905dab8ed2bfc76805e6f7a2018",
+      "tests/api-auth-jobs.test.ts": "6af3c9f05880fa1ee99e78a817b7371d839a5ee89e1b3e3e87915789a8313588",
+      "tests/api.test.ts": "2e29778ca20a0b5848a26f5d37443ffc841673eb08c0f1717d84308ea125f08e",
+      "tests/authored-metadata.test.ts": "d6b45937138a56445af9dae97892b35420ed75e7faa82b8ec2c6e3466f30f7a2",
+      "tests/batch-storage.e2e.ts": "18364695cb336173db9622dec08acf9231013bb954395eec3b82906883566a96",
+      "tests/batch.e2e.ts": "4c00564df55ff865596843b66c2b4e757b927796902759422b1956503e22e0aa",
+      "tests/batch.test.ts": "f953e6498a6018fa5004459d0955c88b9055d981c8a12d38a540a8c359ff49d2",
+      "tests/bezier.test.ts": "ca8775dd00a5b8497c1c331397f102e41a99ad14760bf2aba66e2fc6f5a8272a",
+      "tests/brushes.test.ts": "def07baac90a2fffc7147c03b86db2b7276440aa50b03d0428d4c136aff93193",
+      "tests/budget-recovery.test.ts": "05a576539852ea90d15ba2d217df023b6e3d2377434f8a17b43cfd9765ba39e4",
+      "tests/cache-budget.e2e.ts": "c64975e6b2538aa7e660f553835e9dfe5a94f61bfd4da97e1d664a7fe5fdbbf8",
+      "tests/candidate-discard.e2e.ts": "03d3c96f9fe67331bc19fe07d9a6ab89bbef4b640772f9f381be24773b6c28be",
+      "tests/candidate-lifetime.e2e.ts": "4ff82dc738bcde06c89b80f471ecedb0e8d1760308351fccbdd00803ea658337",
+      "tests/candidate-recovery.e2e.ts": "7739325da371703eb580f8ce8ed75259df29955f69b229f654bc1a0233b1360e",
+      "tests/canvas-cursors.e2e.ts": "0fde18d42a70284293465f8a710eb45189fc406fbf9c21c7ec65a9471484dbed",
+      "tests/canvas-history-cache.e2e.ts": "600e7261d43a15cdbba2f0819eebebe7c967475f55dca60cdc107863c9cebc94",
+      "tests/chromatic-adjustments.e2e.ts": "f23cea64130b6d97c9e931994c30b2a23f1fe93f4ef48a53d3ecfd0e05c42a34",
+      "tests/chromatic-adjustments.test.ts": "62f899e68646dc5e817a0cbb1ef145c27d3a8baf0661a211e92c7d64a53e1840",
+      "tests/chromatic-gpu.e2e.ts": "8ea9805750c54b6eb3e7ac6d9ee3225a9e31c59bf936c6cd3e00fa2e3512332c",
+      "tests/clipboard.test.ts": "0bec87e60c3a77f854dc27487bb1db57f3648ff4de6e642b64108d28e17e0677",
+      "tests/clone-preview.e2e.ts": "9eab46ebbacad76c9885613060f2c800b562891f5b3c048e791000727835a87b",
+      "tests/closed-form-matting.e2e.ts": "5a452aed2f800e2257975af4ad11156a41d5068f9f10250524a258b75f9ade8a",
+      "tests/closed-form-matting.test.ts": "4c2af2ce91740446f92fbb2cb4eb7cb694b5aead1be6d43773a10a3fb0540651",
+      "tests/collapsible-inspector.e2e.ts": "902c4f05ba47eb66baa7cbec04d4b1d5254dde8ea1051affdd3cf09a6682e60c",
+      "tests/color-interchange.e2e.ts": "827ea5052e96342f9450bec1dca05664cce87c854797c106b278462edd80cebe",
+      "tests/color-latency.e2e.ts": "370b7e45f0097813c5ebbaa45c7e7cbd2e13f6210da340e0593e9b748c146afa",
+      "tests/color-management.test.ts": "44d161a918153853d17c7bc03aa5b0609881549424cf7fefc5071ee48c3b3b4b",
+      "tests/color-range-api.test.ts": "27f3a4df50e22f420b2676466e1bfc0a59978b718e6d7ac79443788acb0340b3",
+      "tests/color-range.e2e.ts": "26dc2b8f2ec0900bda4859b19bf0dc9fb745820eaf2e5847a8669efb81d3f009",
+      "tests/color-range.test.ts": "ff4ca04033336731fc13564318173873b036fed5b473d96d9d8d27ededa49a25",
+      "tests/color-response.e2e.ts": "88255d949fb5aad86b914195fb661f79a4e1ade5e59825eaadbd75af56963f58",
+      "tests/command-palette.e2e.ts": "a90e50e74abca9bf32fae8540d74426277a5b485f533d79d236e8ac9ba4f6cbe",
+      "tests/command-search.test.ts": "c8dc254d4094a22492a119e36bd437cd09472b2a14bdcb1e166e4a9dd041794e",
+      "tests/committed-paint.e2e.ts": "7d9dd83b241e5efe3bbbded6fc19dceba6ecaef48b0b15d90784ac3c07e451e4",
+      "tests/compact-cache.e2e.ts": "d564c6fd81e1789f31966e9fb5b87fa015378063eada149a0ee839b83540ebda",
+      "tests/content-signature.test.ts": "b965a0259769a64dc1572500f667f00dbba01aa0de047dc10035092853837932",
+      "tests/context-menu.e2e.ts": "cebcd45d54d975f3abadd06c3e89ba245690f335ce81e3e1cfcad95e55a287cf",
+      "tests/cooperative-validation.test.ts": "caf39092d37574201ea17274436a0b52ac5de0b195bf8413d9aa4fca13e1024e",
+      "tests/crop-controller.test.ts": "33d4ae3bb016e0755dc7d80cbe5fd52c3c92ca96587a02ad76142ddcc234bfc0",
+      "tests/crop.e2e.ts": "86dffcc5083c26b6954b41212432713de9c53d2d1bec15a4e553d9df246dc980",
+      "tests/crop.test.ts": "13b2adf93d741edd52b28658a465eb9fc8f32cf920f4b25e74ed923ebed05970",
+      "tests/deep-history-latency.e2e.ts": "8781ebf3b9bad061220cd29003ce9c4a967f1f09b92192ea2f2fe4f1a02cae82",
+      "tests/delivery-fit.e2e.ts": "6c7916b0dd72f4f28f466971e527eda901f9dc894ae55e6492baf95cd3147d4d",
+      "tests/delivery-unicode.test.ts": "40e6894798bc6efa3426e0a8001a9c8e1a7a4d0dbcd67291c63248954fabd1de",
+      "tests/direct-composite.e2e.ts": "adbb2960947669da34a1d2ecb599ab2f135d0082c1317b3d661bf98a14244643",
+      "tests/document-operations-latency.e2e.ts": "7dc07d495888a9de04f71191fd2df3e5d6a4172f0cb11c7c8f5c6a3519ebdf72",
+      "tests/document-switch-latency.e2e.ts": "ac046dc46b0e2e18ef3c5a83e01a931ce607f2a2360f69940321efaca9894c3a",
+      "tests/dodge-burn.e2e.ts": "3c8365af4739474da50ef57829ac742859ab6a284092c1ed4406792c55b41184",
+      "tests/dodge-burn.test.ts": "a95bd9fd6416a38e2aaeb6e5b638afc8a76a9cd8decd5c7979a8de58f4df0cb9",
+      "tests/dom.test.ts": "735eb3ce1bdcb155a02f4d4fdf7bd76e4ff28fada97897abe392f562de04fd6f",
+      "tests/donor-search.e2e.ts": "0d392416677281442831db2fc089d71b795dcc18f4330fee093516ea0d3eb3b9",
+      "tests/donor-search.test.ts": "66b9223506ef122bfae7a999800a8d7170b2b2c888f6f78d07cdfd7f0985ed96",
+      "tests/donor-wasm.test.ts": "6ee8fa5dda097518b711ed48613b8f5ea40a0e198b1a1ae6510a7ad233bd9ee7",
+      "tests/edit-degradation.e2e.ts": "9b22e05101e8c847ba7a6a55818b7a7ece60180664411834fb32df9a96518944",
+      "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+      "tests/export-cancellation.e2e.ts": "729a80aa8a8428538861d3b9b9476af2d5d101f5b2f8d9e9439814b2b01118dd",
+      "tests/export-fonts.test.ts": "7e8808bfcf374d7a42e842f4a91a50632dddfb376d7fbdca2e6ca5ec419ff884",
+      "tests/export.test.ts": "19fcd30cdbb8de6eafbcad8380f4e831ed466b2d05d8a83feb6fba1e54072240",
+      "tests/feathered-selection.e2e.ts": "74a7b102627af7dc86ba022e763910e468e7cf391905afc330bb9215d0af5532",
+      "tests/filter-mask-coverage.e2e.ts": "4b4cca263206223393b8d75ae3e195407327fa9a20990511121809ee7fd28c80",
+      "tests/filter-mask-coverage.test.ts": "f6e870e4e63fa4d3e9876d1beb13faaec6d2ebeb7a25c209d971678349331623",
+      "tests/filter-mask-latency.e2e.ts": "92a2821ad4cc49510a8f30e3706234b019e9811a944ae6ac26fa1b2db407988b",
+      "tests/filter-mask-paint.e2e.ts": "f8be90dd81ea2b4112781a552689de08245f01bf638292ea50a4ed83c4faa21b",
+      "tests/filter-mask-wasm.test.ts": "09ebf80e6b3fb9ea578b94bf79cea7be2ccbebf683d0b40106f759cd906ec8af",
+      "tests/filter-mask-worker.e2e.ts": "dcd81258fd81d25a10d63de8466570f132c333ffae0e2ed9c5fc64f5ba59a980",
+      "tests/filter-mask.bench.ts": "ba8814ed5ffd611da1ed3b4cf11d80e9cd0f472a6bad630d01b7dd4172de79e1",
+      "tests/filter-tile-cache.e2e.ts": "dcb85006e3cf12784c24dc33a8783f65d7a599c85451e65c3cf0e55caaccb942",
+      "tests/filter-tile-cache.test.ts": "dac7b2626e81e92c0769ad6a8e49ca4230b325997db1c613a2db1a5476aea49a",
+      "tests/fixtures/analysis/fixtures.ts": "d22e06cbc4af0eec2706cc7265d540d32aaa906e72620a548959526a1efaf0e2",
+      "tests/fixtures/analysis/local-ocr.ts": "7c774d2016518ce955f14ccb44be64753ba5bc86d666ca6fc790f981b9e4dcba",
+      "tests/fixtures/analysis/remote-adapter.ts": "9bcd51149446f391ec56773ec56229d5611d9cb1d68dd9fba0881b9db7423d2a",
+      "tests/fixtures/bakeoff/corpus.ts": "df2209ef2fe1db35417366b80753cf6ccb583d77056218b4f07f099fd1f83d16",
+      "tests/fixtures/exif.ts": "b4a4822b6c63139c284e22d5e0418fb3d3de273385bc2446dfa491a46caa3776",
+      "tests/fixtures/generation/adapters.ts": "83988d8d899a472f7a8c671f6861dc340a3e8e7a983dd5ca3a251c8f3d30bdc0",
+      "tests/fixtures/generation/profiles.ts": "bddcda3e1abe0376333191a7f80f63977c97a31b11e4d2b297c97e9d0469f9e3",
+      "tests/fixtures/generation/server-executor.ts": "24a177642b10c6892e74430f3d969e64030dc40032fa45c773c395c23aea3ccc",
+      "tests/fixtures/psd/generate-fixtures.ts": "22755257d0aa580ba570587f8175f496194774071eeb0844d1cf3aa6a63ae498",
+      "tests/font-availability.e2e.ts": "cc3a68b3d170502cda5fee7bd154026357693f7158ed3476b030e3989317b8bc",
+      "tests/foundation-increments.e2e.ts": "fe4f0fbecd4952e9d3ff0b140cb10751f0452a1794a22d6d8670566e92b47718",
+      "tests/generate-layer.e2e.ts": "34ea06c1d567e110837d8ec4768ebf2f9189d8ad621073bda7f91cad867361c9",
+      "tests/generate-layer.test.ts": "7cd61b2782f0d6ad9e586daa0c1f1a849d98218accd21db75578b554d2d68acc",
+      "tests/generation-fingerprint.test.ts": "ed56f6b9e9f6c78b9ae7c8897a2c2ef6b8b5c708818ab7ba12ecc225b711f271",
+      "tests/generation-jobs.test.ts": "7b1bd6818a66fda94360fcdb9663bd78c6b38080080fdf20eed15884230aac39",
+      "tests/generation-journal.e2e.ts": "753d386b9b948e462360ea531a7d7c3f59923751cb39883c88c1210b54a57183",
+      "tests/generation-recovery.e2e.ts": "fc819468b17ae47f223d164ea9c40989dff51f12df971f4a7f13cedd09595bcb",
+      "tests/gesture-revision.e2e.ts": "fdafefb1387871e1bb75d2e1656e6eeb50b65a0762c0d084ad4df85bf921a45b",
+      "tests/gradient-map-gpu.e2e.ts": "0bb8252f091788d49ac8f9b1203a95eb4a6ea308da84f55c517fe462b77cbeb5",
+      "tests/gradient-map.e2e.ts": "c71bc23b01d01b10211390bffae154689ee4521bdb6529a63c08cf79c44e91c1",
+      "tests/gradient-map.test.ts": "1955dfe96bfe5caf85947d3fbfbe98c6a62e8c213ae8ac4a88862a5eb3880f02",
+      "tests/graph-transfer.test.ts": "be6f80bff55b2d914dfc3854fa3250bb3e3b0702c3b69abfeed39c1702bac9ce",
+      "tests/guides.e2e.ts": "672562fbe30e7efa0b7b056e7d907c4b175ab1340f0acece15b97bf2c00509af",
+      "tests/guides.test.ts": "4ee53eea99a2b6cdc9f686211ea04b865504bed614383b19034517ccb7439c9f",
+      "tests/heal-spot.test.ts": "20b3968e371d5315eabcbcc82127a7967b4f21845decc1d5ff88afc295ce4496",
+      "tests/healing.e2e.ts": "b83229b8c4bf76c4857967e120aa56ceed97d09db1ad5d90d7535448560c5c4a",
+      "tests/histogram.test.ts": "f56172cf321c3d5967f8bcdace377d8931e602e805651a8ebc79d6469f981396",
+      "tests/history.test.ts": "c82bf0e4daf773acd1ad3d132189e53227d8504d6f4416079a938c7bc5447c8c",
+      "tests/hooks.test.ts": "8583f61fb3cdb79674c647187d964655d2b050e148432f620166db6047b9a564",
+      "tests/host-bridge.test.ts": "4db9909a25038c2eb47dd3bc8c624a683b84296780ff6f4c056fd3364c4fd236",
+      "tests/hsl-wasm.test.ts": "2f3850f4e6796821e8f7c0077bf301c5614a52d253de86395c7be68cd21417f7",
+      "tests/hsl.e2e.ts": "7bb0f141b30296b37e51b0d5fb9ac43b26ac5fb6547171db70157c375d67d6a1",
+      "tests/hsl.test.ts": "0570819fb0dcae3ffbe8b47b86a962612ea9e5bf21beb74289adab14d42b77d5",
+      "tests/image-resize.e2e.ts": "2ba26ef141a2e032c84cdb6bf50760dcec95d1174b7bf2eca69b5c67ebf42b27",
+      "tests/image-resize.test.ts": "275804af71667599e9410c24e64c94d28c8144dd0433ffab52d0a975d22c3860",
+      "tests/immutable.test.ts": "5673b9f521e1ac6affddfcf0194177f9470501c06fb788a242a1c32d6606fa9f",
+      "tests/inspector-rotation-latency.e2e.ts": "782acedc32924fd12374ee2fd7f25fba3525ace3456c1825903c9134b85aaddb",
+      "tests/json-encoding.test.ts": "c0dabc8c18304c22f8c490ed2a4f588cd107bb56a6265257ab1a3a4382a1e0c2",
+      "tests/large-clone-latency.e2e.ts": "ed8d3148b6349e4cb3b9e7155ed138d00682865040552ca49a32bf59bf6f98a1",
+      "tests/large-image-latency.e2e.ts": "87af13f22ecfa99b867fd7b20704eb7f855462e70159f7363f8a11581fa9aa36",
+      "tests/lasso.e2e.ts": "a1305c8925b694a58fa515da4df643561677f0557d33581a2fc00d02139894cb",
+      "tests/lasso.test.ts": "f7f02baf157beb6bed590a3096f394be7bcb60104aff4ce4326588b97914e2df",
+      "tests/layer-comps.e2e.ts": "5a842180d1ed709ba8b415d6ea6a7141c242c64710faf8ff66d52bc6afa23258",
+      "tests/layer-comps.test.ts": "28cd889c6363c025c968c45d56d7f6fe6b706bd2c51733d189ea05daea9a9f2b",
+      "tests/layer-distribution.e2e.ts": "ce3b9b57487fb5e6e7c0fb984968e3478240465f21a61e060311a379847004f0",
+      "tests/layer-distribution.test.ts": "0793fe6b2d16d8c71fa63a8b411a0832e899e7533af32068289e79c995ef7e10",
+      "tests/layer-filter.e2e.ts": "63b8bd64451e51675ec5cda97320bfa58c400dd8cab5a4885c61bbcc4029c9a6",
+      "tests/layer-filter.test.ts": "565b4f0adf8eebbaaa50d549f194e4886c058f566565e618f572bdd231c8cc22",
+      "tests/layer-flip.e2e.ts": "d117ffb91e65cfc912ffbc7b21479804614de394987b2b43c05fda6f47bf20e7",
+      "tests/layer-flip.test.ts": "fe0952590c435fee283f1eb376012dfdbd8914d17b328f4dbc20d3564dcca28f",
+      "tests/layer-selection.e2e.ts": "76e06867d037a3546d8a7225c73d6e1ea3e4344574bf2bfdbd8796f2923561ff",
+      "tests/layer-selection.test.ts": "338f4615d2dbaa1987956ded0a1822c691d9880511d10c8445fb0386733fa270",
+      "tests/layer-transform.e2e.ts": "94c752811756a28309a918fdd6322cff8f5ae7addbe20b273095a001616af06f",
+      "tests/layer-transform.test.ts": "91ebd692f40d65d06f1cf9ff5be39f88def7ca795035e0e6bb1af246469ea8a1",
+      "tests/lut-gpu.e2e.ts": "c6c83c590135ed4a864711fe4fa22a3b5c7600e6c96d0cf5ec33e8d8fd1f0c3b",
+      "tests/lut.e2e.ts": "292704753c61ff395543e5c8d6e1bc9e9aaa2ddbf4cc78a813690d105ac862b0",
+      "tests/lut.test.ts": "c159ee2dbe76b09694bba504ca61f73021371cd2f1f04cf716ece84f070600d7",
+      "tests/mask-pen.test.ts": "8c693c7332514f90725982a7193cb42223b2198856afecd702a25c217444f418",
+      "tests/mask-signature.test.ts": "ead8b0e40f8bd419ed2e31d57e0afa53561eb856abc5ef24de7962f01efb1870",
+      "tests/masks.e2e.ts": "bcb440f5d57c1bc1379a5af720bb884895a1aa25463cf6d484339dab609796f9",
+      "tests/masks.test.ts": "d27a5d20f7845cb7d6a05ab26ec6e247b30b51144a2bb122af962f02fcfe084f",
+      "tests/matting-api.test.ts": "cc5c1b68e60d4b81ab466505379bdf21f0f22c4530eb17631c2d911150429074",
+      "tests/matting-native.e2e.ts": "028b356317c3e42b3c3396eb1b1004bb37c41b51336eb0c01f44a87e3e88598e",
+      "tests/matting-worker.test.ts": "9eb68791f14d8170518db2176bbfa7d3a43f395255e2aab2568a8caf02bca605",
+      "tests/matting.e2e.ts": "a4c8db68bb781e82cfc4ead8f258e6ff5149fde8f6b14f9729d292b646486b1d",
+      "tests/matting.test.ts": "9882581707bdb771635fc47db9eda52d31c05ad56993490d1fdbfc2ba427e7db",
+      "tests/metadata-service.test.ts": "3ccb1a9577952df7c8863634d3675adb0fc57ec1005eeee6ace7276c823cf8d7",
+      "tests/metadata.e2e.ts": "e4fe923fb271ffc662684d8647303a85117422859aac44c27e6fd5aeae250dbb",
+      "tests/metadata.test.ts": "9d2a85df1d745d3ec652bf0866a0f55fb0746e9a29044fdc344773768413aeff",
+      "tests/mixed-session-latency.e2e.ts": "85839dd744b22c91a07c5312085533fccf2dc2db2419566e8a100296991e1e43",
+      "tests/move-document-latency.e2e.ts": "9e71527e7265688de7dac21eda32c75dc04cfc5d992f4af3ff99ba6d705369fc",
+      "tests/paint-latency.e2e.ts": "754e0e1d05f78cc5846339082b7cbbdeff86258e9773bed3da64e2e6383748f0",
+      "tests/paint-scratch.e2e.ts": "16b143e3c1d55f9e9ac27de7f518713f20973614751c2e3c824a7e4559d44d51",
+      "tests/panel-layout.e2e.ts": "aede0d5bd779476c6a61f3a3ad2f316a203d0c7f00d1cb65b09ea0a0e0a90ab1",
+      "tests/panel-layout.test.ts": "f64b57903a73317780103af3823343f64c86120e029a7f24f7f24a93d29ca6cf",
+      "tests/patch-adjustment.e2e.ts": "fdf7c5edc3ce2fa83d48682afda4a308966981f95b9c7a8b2a6dbaf0a3207131",
+      "tests/patch-adjustment.test.ts": "34b5d8a0bd6cb820ed835c32d8366eb7caa0ad74f96d19bc49d6e8ef0d6ac5c5",
+      "tests/patch-cache.e2e.ts": "76a8c3e56c056e05833c49b90e8a192590429a68413b69ee8a4076277566772f",
+      "tests/patch-preparation.e2e.ts": "e7ac81ff3f17dccd39a2d2bbd70264ff34a6bbc436540a352e3f2784b772e7ac",
+      "tests/patch-tool.e2e.ts": "976548dc667fc34a78c899c2297c01fde2b4dd09a42854c98ee8b500dd795c2d",
+      "tests/path-bounds.test.ts": "6bb91e5fd7a000112f1e7076ba7221a1d684bd109e67b802685378655b0052a7",
+      "tests/path-handle-latency.e2e.ts": "cddc0cf53028e3fadc739b56b3b02c8924b539c09b0c001eed22c0f863d55fe3",
+      "tests/path-validation.test.ts": "02de7b84c3f6f6a30c0745d754915fe6170b33b8984b4993591a23f13dee9da3",
+      "tests/pen-latency.e2e.ts": "ab61883d925fe1a2a98e217d4a1760e593923c1965ca6d3de360ff8286228717",
+      "tests/performance.bench.ts": "91e966c11fc902a1e944a86cb9e39f6ee206201a6586ff5527b3a2b4739363c5",
+      "tests/pixel-operation-latency.e2e.ts": "cae7d68bfe499ad03d052a32d43d421d19d9d70f32e5be22ad0b8c2fda69a4d1",
+      "tests/pixel-selection.test.ts": "7a5b931339e7630e1d607b08658d88e1f70e90d901fcf5f60111c43eaec64559",
+      "tests/plugins.e2e.ts": "1beac39e2df9767982308de45a0399755aab47fe35a4ffb7b310361dca9b3625",
+      "tests/plugins.test.ts": "33c2571241b7aaff4e463b0b4f5baa1ac9b207b6c55a94e314e7b44c7ef4c139",
+      "tests/png-capture.test.ts": "7b554e417fb55793bc7fe217c1280ceffc5c059f01e793f8bf9093441e941406",
+      "tests/png-encoding.e2e.ts": "7a5bbf26d066bac9c872b97d67e9be60a0726fde1b7871fcc75d0dfe3b1ffdb0",
+      "tests/png-fixture.ts": "4249304038f03d048154f8a7628369aa4383ba387d27a22d8c75120f4517cfce",
+      "tests/png-rows.test.ts": "21947eebf8975bc7937a3e92cb012765ad9a79b68b9f010bee93e12d28184cba",
+      "tests/poisson-wasm.test.ts": "8fc474fd814e87d860e771baffa5f5015711ef56e31c779535b9afb0322163ee",
+      "tests/poisson.e2e.ts": "9bc038f9958abce755e0b750d440f4e4b33de96698fd781dd114a1cfb8b2ad83",
+      "tests/poisson.test.ts": "1321a2b5d997e866089ec6bf215d2c4fcd83f6054986cc62f2377696c851a728",
+      "tests/polygon-lasso.e2e.ts": "857f6834af4c050b861021493e5ffe5d1289d0cca9c7fdee1e2a98a62de8c807",
+      "tests/polygon-selection.test.ts": "3544689149952ae9c496b92587f194cf3f7be4cf0ec2ef9fe64b87ce65e7984c",
+      "tests/preflight-api.test.ts": "04d52943a61273b6c79b96bf33f17736ced21073725cf4ff506dccc468d38e48",
+      "tests/preflight.e2e.ts": "32e396efb3b28cea3ad62211ba6bea0b38d677c941bdfe01da1a3d6b0362b50f",
+      "tests/preflight.test.ts": "f8bc8bb426fca155b2173715cc601a0ada9003a8b0fa4c10f26fd3f15e88abdb",
+      "tests/processor-lifecycle.test.ts": "7f94f471068e8d66df772d14d20e4ea12ca01565c9b02f0d78f3036471689651",
+      "tests/production.e2e.ts": "87172880984141b34e70ad720412f0a5e23b73f70c1d02bd06af8f0a8ff864c2",
+      "tests/project-encoder.e2e.ts": "79713331dd32ac251b535f99eb4ce131403d6afa4467c29f10e370f97527e37c",
+      "tests/project-integrity.e2e.ts": "fa87ca403490e50b1d4097f91cd1bc2829368043caf5efc288d1b98a0d022ea4",
+      "tests/project-open-latency.e2e.ts": "7f46caf2505680e8ae22b433346ad55a3c90bfd7ff7c0c383e219111033ad8db",
+      "tests/project.test.ts": "ebb83e8aa3cb3317c48fd89eda1e6dd45a708d2647e9eb53891ac263515cb750",
+      "tests/protected-masked-edit.e2e.ts": "7a2fab6a45df96c189508b14baf5ce2938371d5f6406daa86107204c2d7453c9",
+      "tests/protected-masked-edit.test.ts": "00225c98d8ca7cbf0c7b8202f516dc44e0050c1322733cd056d2e8fa82dd94b3",
+      "tests/provider-bakeoff.test.ts": "3ab74b644365189d183410a05cc5de1b467e22379172160af3b620a58dcd8925",
+      "tests/psd-blending.e2e.ts": "ed3b3da57037f83800b4158dd218b638fe04eb1ea22958ad75dbd604a32fc8e4",
+      "tests/psd-export.e2e.ts": "1c3b69b5c65e2063ff62ea5c071bb10b9f162d16db7640c308df4195a4ee16c8",
+      "tests/psd-export.test.ts": "d62f49a1a00c9e4e18f0cf3f2ef516f8f38b041584b1735340453b23f66f89c7",
+      "tests/psd-interchange.test.ts": "35fe5b9e6bb57207f2baf06c3f99b291e71219c9d071c54626ec8ddcb53d3121",
+      "tests/quick-selection-api.test.ts": "b403011bd4dcd5b70104cac19ef7bdabc33654a487f5b969441ba510d190838b",
+      "tests/quick-selection.e2e.ts": "738df01b5700c8b186c48f82995ebde5e7b0f195b782644fb0ee9dd44d9a5e99",
+      "tests/quick-selection.test.ts": "be3f3d129acb829874e725b405f0d1bd22ae5f7a0e5c2b219352fe86852c8671",
+      "tests/quota-recovery.e2e.ts": "a1234e58bb76fdf72a8bf98c4802c80f8dc2fb29ae6f77e64660e3cd1558333f",
+      "tests/raster-editing.e2e.ts": "b5eecb41106af2c1589515c82b79d4234147ebb930774f06df495ba96af9f884",
+      "tests/raster-inspector-latency.e2e.ts": "4f8525788978d5127fd2b7dcaad851ae7cd54ba0b54e1f8363880ecafd155310",
+      "tests/recipe-concurrency.e2e.ts": "62e31c2099d5fc159e6b4cc58ede7d62c2cfdd9ea2b9ab7faabc89de21587b9d",
+      "tests/recipe-lifetime.e2e.ts": "4e26a0f5ddd7801977343db796e17232f0228153256a454a4b27588acef3c2e6",
+      "tests/recipe-monochrome.e2e.ts": "5d7e5aaa27c980240ac497fb4322b2749ee9edc193e3a8484abf644a76b5952c",
+      "tests/recipe-package.e2e.ts": "6007fdc80cf8b8dd9bed702c9000aa1670b87d7a9bb267ee69c9bec7f73bfb8c",
+      "tests/recipe-package.test.ts": "2106778b7caccc2429ee0017a9b13769aaaffd9279633ddcd37d978f43b7600c",
+      "tests/recipe-review.test.ts": "8d94d440fdbca40bb706b9d3487bb28150b590d6e7a13d4faf282010e2ad3afa",
+      "tests/recipe-shadow.e2e.ts": "ad863ee93dfa1163aab4cc638783638dbaf289f71a9a2a09dd5e895c10958719",
+      "tests/recipe-storage.test.ts": "96b2a89dcc47b9ad5aff931e28f70e209c4afd6391da8b9b66feb84b13c29ca4",
+      "tests/recipe-warm.e2e.ts": "a571e12bc582f89e977dcc9af81301dbfabde5a79a9602346e81c1ef579e2bd1",
+      "tests/recipes.e2e.ts": "0f72101c3239b598146cd32b25900f67e02ce55623b47280429f4332777e8e04",
+      "tests/recipes.test.ts": "fd23d72a8b34794b00439db255dae22dc6c745ce1804dc22726764ac1abe6df8",
+      "tests/recovery-controller.test.ts": "d867cbb2f8d2f3b4cfa7b440a552001a990aeab90d61551903b5f81e98f818a7",
+      "tests/recovery-latency.e2e.ts": "ed325763b55cbad5de4ec8143715baa581d9807ae6e9af838e677244ea9b4df9",
+      "tests/recovery-list-latency.e2e.ts": "63988dc5479f108946fad842ee8bd7369a4bf53b1ffc151c65438424b0ba2e2b",
+      "tests/recovery-restore-latency.e2e.ts": "cff096bf13b8e2a1f69b249343145939b4b4475a3eac8db5864667e99d9911f0",
+      "tests/recovery-worker.e2e.ts": "46017c4102546006f1df5103b4f0a78091418acb6b88ac1d6b65315b8833781d",
+      "tests/recovery.e2e.ts": "9bbd362dd3052d2bd75bcb5e15ce26253d976f762ba270bf0466698cdd99f642",
+      "tests/render-cancellation-latency.e2e.ts": "176aff16019c722ff40c2c84ccba96c38f459bcd260313b621456ba54bdd96bc",
+      "tests/render-cancellation.e2e.ts": "a9a11abdc7505229595c91d057283ee1c18cc264cc3c62f29f949de7281ad70c",
+      "tests/render-transform.test.ts": "9953774b4c6ae7ceee00fe3a4c5cf469e0843a6cfb36d67cba87a12464d4d3fa",
+      "tests/rendering.e2e.ts": "9ff4575e6427ab9060adc56b997d21f8fc249ae311262f14610a2f7196e94bc9",
+      "tests/retouch-extraction.test.ts": "3328d573547ebfefb04543bd4a199227bfeed23edfe3e7d3ad3fd6a542187ba3",
+      "tests/retouch-latency.e2e.ts": "370e7670f8d1cfe5c71c9ccf28e6d29d40673c743de0ca7fe0b0c880b0db53d1",
+      "tests/retouch-sampling-scheduling.test.ts": "cfa6e5202658e8c019a6d0462e0f55c58879beb4b271d12608dee22ddd00bb46",
+      "tests/retouch-sampling.e2e.ts": "a2e3b05387c2b95217f2d7452d8510147927dc88d81cf3d086b079f375139a49",
+      "tests/retouch.bench.ts": "4c6094db3d35a638dc29361b0a8499acaccdab700e336dc7ee099c82e564848b",
+      "tests/review-input-fidelity.e2e.ts": "b94342e4ec63d6f746c58640ff968cd4400661f57f297e6d3a2698ce3144c8e0",
+      "tests/review-regressions.e2e.ts": "0479fde0805a9ebd23a34cecab158d7a1aa1df9f21407073a3534b4438a1a096",
+      "tests/routine-latency.e2e.ts": "257f87b6ee58306cce69b8e5c9ed9ab2c2860f500f822de4578da5b0e8d471a3",
+      "tests/rulers.test.ts": "72ecc422a73c400c4c9e4b36abad59089ff9f15be94e4be744cd1f69ccee1abb",
+      "tests/script-healing.e2e.ts": "bbf1e69c1517bfeaf3f7cd8b1258e310c5dbb456ea7c50cf8327d6d09b7208ce",
+      "tests/script-patch.e2e.ts": "e83f7c46126252c7e85942fbac83eba1aa919cc0fa146e9fe727bf025b785c00",
+      "tests/script-runtime-phases.e2e.ts": "f7f6cf9a857e8237096f4de30751ec7cfb02ec71abc5462eea72d7a9fd8ddb8f",
+      "tests/script-transport-latency.e2e.ts": "e71690501a3ca5e6eceb7e9fe9bd4fdb224671ead73fd3b7b2a20ac9cc42e31b",
+      "tests/selection-modification.e2e.ts": "ce9c29eb4d88f130905ac9f290c600f3009d2158034688155fbbb03fb9a211d1",
+      "tests/selection-modification.test.ts": "56a648f412aaed4c3bff644780b179c0c97f1f104d3ac23ad098ffafb3db1312",
+      "tests/selection-outline-worker.e2e.ts": "c5cd416b6a3507f11eed7a18cff876f325f3bc2b23b7ef34a1969aa56591dbe4",
+      "tests/selection-transform.test.ts": "ab2dd93d34a0f980f1dcecd93c025fb4711b4ba9e9d6b0add97b0b9377c3ef76",
+      "tests/seo.test.ts": "4438445889c0b5d85866e8de65ee937f2b0f1eeae974338e9244175d5b0818a5",
+      "tests/shapes.test.ts": "6311f12b905282d6b5077349e918ffe51507443d7e44152d5bee5e879baeab5d",
+      "tests/shortcut-bindings.e2e.ts": "96e475c0a39bf2d6b387b0de8c734976dbc9c56f4b0582c85869755840c6823d",
+      "tests/shortcut-bindings.test.ts": "7043d7b9eaceb8e71f764ecc2b2e45f78e332637870454a15499867aa063d94b",
+      "tests/smart-conversion.e2e.ts": "ef10588dd2b0a30bc991bce48af31bc935231967171e33d890c1063314e154a5",
+      "tests/smart-document.e2e.ts": "732a7ffc34b9888bb254b20d1304097c605eecdd5b2db0bb67fb114d5d6759af",
+      "tests/smart-dom.test.ts": "675721dd9968170bab2df33c70ff275af02b7cb9ecb7cdc967d2e3a681e0dbe1",
+      "tests/smart-edit.e2e.ts": "1ab4f5d923401f2d3c234a7141f469441018f9265810b69956c5589571c1bd37",
+      "tests/smart-filter-mask-ui.e2e.ts": "c06b21b7c403f95d0a00042ee6d6f081958b31bd641b5f03907137a6e4416390",
+      "tests/smart-filter-masks.e2e.ts": "a4eb4490276d366992a5f53173ca580147dcb20e6524449cb63d98e881f8d357",
+      "tests/smart-filters-ui.e2e.ts": "b2362dc87bef55b6828211490a3afc320b8ab2f471c35438a6884c651322c42d",
+      "tests/smart-filters.e2e.ts": "1ee5b65dfc2a5603042ab9b11a78def3ce9b223038c3d330e3e362d536dfb578",
+      "tests/smart-linked.e2e.ts": "8b4cd1362232f83316528ed34ed00de4ba8ad9b8237ad63f64bcf07f9a31bba7",
+      "tests/smart-raster.e2e.ts": "7cbd1ba3565913198427fee8dde99f6e29cf5448c19d9a88da95718f6fd1ec18",
+      "tests/smart-registry.test.ts": "2e4a0ceb1f9cbb803202081c8ff5477bbb713679bad5d575917e3907d7345037",
+      "tests/smart-resolve.e2e.ts": "1cd05d6031f1f7c7386f18a4f85a1f7bdc8d289639ff5c80020d6c0236aa524e",
+      "tests/smart-resolve.test.ts": "81a520030c0699d65e1fed1f08f8cdfd1f2757a0d74c47fde191635f2adcd21b",
+      "tests/smart-transfer.e2e.ts": "370c1aeac9009f2e281d212cd7ac9aa60afa387b8c34a87bcefb5c3d6180864a",
+      "tests/snapping.e2e.ts": "453d7708c5011916c8a901a2daff389829bc0270d54ce7575a18e7f3b75daa4a",
+      "tests/snapping.test.ts": "544a3fa738a3777e127cd05532c9359523a357ba470a59b0f15fbc26b29c3ba3",
+      "tests/spatial-filter-wasm.test.ts": "565074937d01b66476296eab649f72a6bc90ab959303ac565c219f8abe0ce827",
+      "tests/spatial-filter.e2e.ts": "4753805adf0ed4a8fa159c34686b796dd7e267e826e97b97d04bf4f334baec2c",
+      "tests/spatial.test.ts": "e842e7a75692777cc6e2d72deae3174c5f781ace475405a10f8f5a48c22ca377",
+      "tests/storage-health.e2e.ts": "0ebf446cfdf5d618d4fd0ce84f9695111764690998ea04c9a94c5364ef1420f0",
+      "tests/storage-health.test.ts": "9c60090f28a61148794bc2b6ba2cbd37433463a9ff2210d8cf60bc25d07989b8",
+      "tests/stroke-region.test.ts": "cbbc86ee8a73974d394c23864898855126a88c4313e78c65e00ab209a115a017",
+      "tests/styled-bounds.e2e.ts": "6bd95351acbb1cae84917a285bf4e76afa88dbacc030c7717b9af04c08d36d91",
+      "tests/subject-selection-api.test.ts": "0f60af033be7653bcaae13a1773276d349f4cd415b6ae97c639f4fe68ca83440",
+      "tests/subject-selection.e2e.ts": "e144d8a9e189790b67579b1b2c85812997114e8892c334b4397161b348335a1b",
+      "tests/subject-selection.test.ts": "a78eccde64d303ddb37b59c5627cb779baa41f874edccc8ce3e975828f10a5ce",
+      "tests/sustained-paint.e2e.ts": "a6455aa56ddbf1bf86cc8d9b8f2d4afe436752b7216581217211f6f171fd3a33",
+      "tests/svg-composition.e2e.ts": "1c117e9c319affe99a9437f345c2fc666521729fa6966b02657583c715daf2a3",
+      "tests/svg-composition.test.ts": "e1776a297e6a2a82093ee406353b655faf5839d00a2a83fb1e9d62176f63778b",
+      "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+      "tests/svg-export.test.ts": "5fd6fe0fce483c2bc634a0e73361b61faca71a6efb5bb070e8826cc9cfc50116",
+      "tests/svg-images.e2e.ts": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+      "tests/svg-images.test.ts": "5ea617b24d18aa09a29b401c6d0a5293bdf9f1349c878b6112a7ea15b7fd648f",
+      "tests/svg-import-pixels.ts": "a6544ef97614acda9c2c9065d0e1164e6d9b71aea3444eeadbb1624b006d19db",
+      "tests/svg-import.e2e.ts": "d34e30def1c226d0e64c12229399c8736c56501d31be491d2e1d3784c21d1d9a",
+      "tests/svg-import.test.ts": "e1744a17355ce13d825320936a8aa5c8e8b1f027cd041696401b8fa1359a6c2c",
+      "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+      "tests/svg-masks.test.ts": "f3da8176fc5d5896fdc94fa6870e1d27de0984583b59eb5bc8a9559b6e2dd420",
+      "tests/svg-paint.e2e.ts": "0784081188e3f58bbbf2e4709e373d65088670d224e84d19c0cbd4dffb81ebec",
+      "tests/svg-paint.test.ts": "3c39f24053434feb260a3d5162bc18afea25ab8bf51c05f320e8d8cf8f54cf88",
+      "tests/svg-smart.e2e.ts": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+      "tests/svg-smart.test.ts": "aa0e60a2cb2d35825c4f67dba17b4917b19a62968157cf11e1c1c9b63d872e1d",
+      "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+      "tests/svg-styles.test.ts": "f44dae9727fff6c98c766bad85e72095d8186eeeb540847da69804693456a519",
+      "tests/svg-text.e2e.ts": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+      "tests/svg-text.test.ts": "93a14b19b1c5f5ea6080fe572e3f6fccbfc62127f15493a75d65230d30fda846",
+      "tests/text-cache-bounds.e2e.ts": "2a6dd3d66990adf68a1d1a8a204e94616e5fcc55562012d6388d35e58ca15e01",
+      "tests/text-vector-latency.e2e.ts": "e1c850dcba43791b1fa17a154e47d64284ced7065c4bb5a98c5aaf07f23da8ec",
+      "tests/thumbnail-scheduling.e2e.ts": "4680b5f2aa8a7017f904e54084c6b0b53d811c86b4f24b3f4dfe7b08114699b4",
+      "tests/tonal-cache.e2e.ts": "3e0208d9d0d66f56d460573d33b8a61e3aac74c714799741119349428b65021b",
+      "tests/tonal-sculpt.test.ts": "44d3e77347f364fef39e0461677073519f6f8d1b1d4cd10ec382e9ad71a03aa3",
+      "tests/tools.e2e.ts": "ecda64c77e7a444f8cd16dd45e622ba569942349f607f0f561bb9ae2c4b08e82",
+      "tests/transform-latency.e2e.ts": "cc6cf96d09ab4137d254c4d17816ea4d1404843ddfe1cee35a57a57340e2484c",
+      "tests/transform-presentation.e2e.ts": "38002fdc8176f1cfd3cb0f836b73aa5e2f7ff49eb879735ab684902ea56f53d4",
+      "tests/typography.test.ts": "18781048a5e7fa03fc232813e586811b0de5d730e1036ec02d1bd575bcd0b5b9",
+      "tests/ui-utils.test.ts": "26d8dafde4f342abe9fcbf630233bc5102bb9418c9d29d0f59cc60055a8f3532",
+      "tests/vector-compounds.e2e.ts": "028aa8884a08ddfd5265c70c9472183d961b2c7edd63a422adbec578874ec0bd",
+      "tests/vector-compounds.test.ts": "a3abac152f624370a21fb66d0e0ac3a38dcee6c01d1cae200f067f1231c90ad0",
+      "tests/vector-construction-latency.e2e.ts": "90a740ecc467eecf7ad510205ed0cd4d1e53dc28fa857a2ed6277a2d98c1bf4c",
+      "tests/vector-construction.test.ts": "66b6c2ee4a4754c958a538f171531576d910c3cdb7bcc0a301730b0f76256022",
+      "tests/vector-gradients.e2e.ts": "7d5df0f6b28128911876934596625dd43075c545fcbf6561812655351c4b0dc6",
+      "tests/vector-gradients.test.ts": "4787dfd32de90aeed60f093d40341cc165efc327707456dee81df0f92e4b24b6",
+      "tests/vector-strokes.e2e.ts": "820bf527c6d3e9b1cdd2dcfa54e1534e924d1ee03eb38f32a5022cc39bf3dd19",
+      "tests/vector-strokes.test.ts": "7a6899c5e2f3ebed911a09241ff9d998771fbcecde1345729c0649ef5435abd7",
+      "tests/wasm.test.ts": "5c6591b3a2797486eeb73ec3538e9c020c8b012884ea7e7f25f0fbfdb6e49ee2",
+      "tests/webgpu.e2e.ts": "ae56a272bc31ec04ac185ebd868a0eedd93092bcecd65099f53debc68f573fd6",
+      "tests/white-balance-gpu.e2e.ts": "8f3262c4b0e4bcb3a17c68fafd6193a656aeb342aa11067f6521ff4cd55f0faf",
+      "tests/white-balance.e2e.ts": "50e55d327fc2befa40ae0dff69b6af154e086f14a7ff5d2f8d1ff6d46fb76826",
+      "tests/white-balance.test.ts": "464ee25592da3598ffea06e5786fc8747edde7543343cb9f14079bec9f378031",
+      "tests/workspace-autosave.e2e.ts": "610db17442822ab6e908e74157fede564eae998ebb34256ed7addcb61752682e",
+      "tests/workspace-discovery.e2e.ts": "209437b6636613d03a26ff88d3d5cc76bebc925aac11492174f3f66f94255d00",
+      "tests/workspace-history.e2e.ts": "9cbac784e74dc5cdee310bc1708c4286f24ab224e7ed3144416c62632628d366",
+      "tests/workspace-links.test.ts": "b0ceaec83a66616dc4708de067bd82c8ae7058aa5e016c20a0185c8ddbfc9845",
+      "tests/workspace-save-latency.e2e.ts": "65d70785132642d376e02e4878ce0fd7880e4710d30de8732a27a2f5a9b62202",
+      "tests/workspace-smart-links.e2e.ts": "0f91227a1462a195a53ac154dacb65541ffc1dd8713f4aa1ec24a19e4651ce1c",
+      "tests/workspace.e2e.ts": "07c5eea4a85a936fff7c98298d5d3e8b7a49ee08f9621a30a866f605f0978c01",
+      "tests/workspace.test.ts": "7169b6235c1a0bba2407d382bb283839aeef4aa1383fd30f54091095dac64c68",
+      "tests/zip-async.test.ts": "3bbeacd43df2b7e762805084d8964ed611723013c394ee2ec2d1abe04863fab3",
+      "tests/zip64.e2e.ts": "e799cb5a478b23a8796a3c4f999a8e19e8d15857ac1e488a81a32c84991dead1",
+      "tests/zip64.test.ts": "0e8e0e8fda562ce5f6823368e46f7edb7f19be461370c5f089023842696d3e49"
+    },
+    "builtFileCount": 43,
+    "builtHashes": {
+      "dist/appearance.js": "977e730925c6ab00dc344ab02aac27b3cfc2fed6084bd97be02326677fcdd76c",
+      "dist/apple-touch-icon.png": "8ee5d6b3c3e0907ca002991138e9cb06b14fdc59a81f686964613f99658be060",
+      "dist/assets/dm-mono-latin-400-normal--0xN8mdc.woff": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+      "dist/assets/dm-mono-latin-400-normal-4GdczIuU.woff2": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+      "dist/assets/dm-mono-latin-ext-400-normal-1aZr6b2b.woff": "5357dcba4e325c781acf79d15fd21f740f4abb7ca3f0fad88af774bd94a74e78",
+      "dist/assets/dm-mono-latin-ext-400-normal-C2zvOubV.woff2": "a52e19ebe0398c9c0f8fa28a0c5e9a6bc324f35d9f0881c9aa407d10af447175",
+      "dist/assets/index-BynKIGkz.js": "989e0da53eeaa6972089099386aaebd685a964de52533addb11c972512a0b0b9",
+      "dist/assets/index-rxMNJI9e.css": "ae09e3d7d46b647a126df31d7ba5aeff865e6f2daf90eb67d3430680028503de",
+      "dist/assets/lut-import.worker-BtkofYSH.js": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+      "dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2": "c268b459a9329e59fecf39a17618efd44c71735532048d60b12aab76a8c14914",
+      "dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2": "2fb2e8cbfd52ae46179a8b6024eb162f1f9c6de3d22d6e3a30d8f395de7220be",
+      "dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb",
+      "dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+      "dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2": "6bbb044ab420e07edb0a3042d2eb314b85e83a0182e945a15ab3b9092668dfd5",
+      "dist/assets/metadata.worker-o3DLPB-X.js": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+      "dist/assets/pixels.worker-B6Hh4yLY.js": "25d26d533ff1bde4eb52cc93b736348e94832e5a336654c6412e2322772886db",
+      "dist/assets/preflight.worker-3HTESSV6.js": "b83959371690e59f67caa153ad3190be6884099175184aad940243bac03d5885",
+      "dist/assets/project-encoder.worker-CstBZnDW.js": "3e52108b0e6be7d4e217c18038df3a562bca6751da46b1a6d4404ef75a1d3167",
+      "dist/assets/recovery-persistence.worker-GvnUZiYX.js": "7f0d806459bdb42401fbade0adc5395ffdfd6fff31135f3ef449a78ed475615c",
+      "dist/assets/selection-outline.worker-Dj42pVuC.js": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+      "dist/assets/svg-import.worker-BIO2Q-b0.js": "19cb72256b1d2a1f118ada110f64a9a5ae63bb9f99234b5767bae46250d6e17d",
+      "dist/developer/api.html": "a3a8f063dcd5d7246fa30bd4ece0f740be2baa2948f93250b9cf1fd9209d4bb1",
+      "dist/developer/architecture.html": "84776a84bf9b0e64bd123c2b5f4097f3ec0c70efdb45b0b007df17024852e599",
+      "dist/developer/design-system.html": "1a5e92d4ca3c4d4050195846783e24c3715ebd420a80272948dfec9d6171fa63",
+      "dist/developer/docs.css": "f8cb8902b3322ab4d12b252116ae4291630c72970138e48850f397eac0fdf933",
+      "dist/developer/plugins.html": "185c3dc6ce890fb3694e7944400310a9d3cf50a2abc91b3c8a4700c59e9c09ce",
+      "dist/developer/product-brief.html": "892da4ee63fe8854f8f55ca738c141e350d28ef2a07224804a25655f9b35f970",
+      "dist/developer/requirements.html": "416bf629794f80cff67130c5cd109ddb8d6826e5043ccc6ad50e5d2e0ad9c7fb",
+      "dist/developer/scripting-api.html": "0152d29e6dd94140042436db2c4f4fdbcf7cf869e8b66709d8d41636e13170c2",
+      "dist/developer/system-design.html": "08b10f6992c12e1953fc8faaee311948f6c6057a4b41259d577bd5269109a989",
+      "dist/developer/tools-milestone.html": "2cd7ebd3c64d864dbdaf192b8859514de0ceb0491222aee1bb7ea0878fb66a76",
+      "dist/favicon-16x16.png": "648f06b1a2f5c408ea54ad9344f2f03d591c131ef80a6c1f3a16dde744474033",
+      "dist/favicon-32x32.png": "073460d86c64ff5d1692382780a3434ce7579a98159271a77e19baf991a7a0fd",
+      "dist/favicon.ico": "cb0a998e12738f56bad9ee6346f51d4dca155e0ab6462fa55ec1192228efedd0",
+      "dist/favicon.svg": "604b2e074d358a36fe6ccb3767a78ecfd4dbae73dea74b8f519e6b076318be81",
+      "dist/icon-192.png": "6834323ab9d66d03ac980f9cecb8efd1d285ed2bcd3ed2f5c5cfe5b99bf1715a",
+      "dist/icon-512.png": "bb4d4071f7c020716c987a9aa50f8ed8a3a2ba4aee6e62526aedd07295cda599",
+      "dist/index.html": "23365917f8b242cc0c395b9da0392b50fd37d3b088763bef58fb238313427cc4",
+      "dist/manifest.webmanifest": "312643f9c04a5cea7906e569d288733136f34e62ffcc3ec0754a9b5e29a5ef86",
+      "dist/og-image.png": "3806fb6fd4996ca62e5707f0f579a59c6b37d262e88e7ca011b412df707bc2f9",
+      "dist/robots.txt": "5b02cfea2ffdcf23a8bbb2d4b6f335f2e7bc2cb4c98ac68ab394c4f9eaeca1da",
+      "dist/sitemap.xml": "c0c8b43949e88df68a317070d2885c2585200d7c2b82702a7e3acef85b1395f2",
+      "dist/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+    },
+    "builtProseOnlyChangeAfterFullProduction": [
+      "dist/developer/scripting-api.html"
+    ],
+    "jsCssWasmUnchangedAfterProseCorrection": true,
+    "postDevelopmentTestOnlyCorrection": {
+      "changed": [
+        "tests/production.e2e.ts"
+      ],
+      "reason": "Existing production SVG preflight assertion now expects native path contours."
+    },
+    "docsHashes": {
+      "README.md": "77b127d8c353d7014650d9064c45186e451c164aaf4d9876b1dbdd4b443282ad",
+      "docs/PRODUCT_BRIEF.md": "fd48aaa1aa7305eeea419b2873b8186d314f66d8ea01a7125aa016ced368a7f3",
+      "docs/REQUIREMENTS.md": "e2b9e5cf72260ae050c0eacec48c19e9a43c3580f41052b47826029f71fd272a",
+      "docs/ARCHITECTURE.md": "56f068034d5caa985f9cab9938e559fa8e570f084e573d586580bfb606cfe3c0",
+      "docs/API.md": "a4c67e77a34e135f2535c7f02abdc897ac89bc1538d0a6b528edd629a86060aa",
+      "docs/SCRIPTING_API.md": "90afe4ba015b019314a103943d61fdae3c22d5eaa2baa02754b91e516afcd556",
+      "docs/DESIGN_SYSTEM.md": "c9bfd87a480aedca7db550b41d3b26b3a146b2b26af7929c01eb9fe238cc9fd3",
+      "docs/PLUGINS.md": "c17ec4b4c2f8cc80601c800a22e4d7b7f1d69821d4202788a5838fb9ec7e4e75",
+      "docs/SYSTEM_DESIGN.md": "cefd1952fc73946c3a7ebcaa349b11d3aba05cd0c87bbc8d84044dfb9aebb127",
+      "docs/STORAGE_FORMAT.md": "d931c206cea72e6771c295c08736ecc8a190b2083b4f85bc7a6a6a5efa34d05e",
+      "docs/FEATURE_STRATEGY.md": "c6e2608d0f0b39c32b5d220b6318299fcb7f2f3c293356c504e828fcce0f3d9c",
+      "docs/IMPLEMENTATION_ROADMAP.md": "4e209658685a58ad48b37b6afeec2def80decbcfd5884fa41d74da04808fda2a"
+    },
+    "screenshot": {
+      "path": "/tmp/canoli-vector-compound-controls.png",
+      "sha256": "4ecec3ddcc155e47f7180dc9707d03876da6c11929f0c664914e049b4fe1bb5d"
+    }
+  },
+  "failureHistory": [
+    "Initial sandbox unit run could not bind loopback; this is separate from implementation failures.",
+    "Unbounded Vitest concurrency timed out JSON encoding and an alpha-channel REST test; complete four-worker reruns pass.",
+    "Initial broad browser run: 323 passed, three new-fixture failures; not counted as final coverage. Corrected paint-transform reference, accessible Pen label and a real opaque SVG paint split.",
+    "Focused checks corrected disclosure-state expectations after undo and characterized affine edge residuals with exact-interior, contour, area and centroid gates.",
+    "Initial production run: 37 passed and one stale vector-mask report-string assertion. Full rerun: 38 passed.",
+    "Final prose-only correction changes dist/developer/scripting-api.html; source/WASM and production JS/CSS/WASM hashes are identical. Five SEO and two affected production doc checks pass."
+  ],
+  "limits": [
+    "Fixture-specific native/SVG observations do not establish universal SVG viewer or device byte identity. Affine transparent paint retains measured antialiased edge residuals.",
+    "50 MP elapsed time excludes subsequent PNG decode. The full PNG was decoded and sampled. This is one local observation, not p95, input-to-photon, peak-memory or controlled speedup evidence.",
+    "Software WebGPU does not verify physical GPU presentation or performance.",
+    "Open/translucent SVG fill/stroke geometry remains separate; shared source-identity graphs are not retained.",
+    "Standalone path-update recipe recording remains unsupported; full layer-add templates retain compounds.",
+    "Boolean union/subtract/intersect/exclude calculation, worker scheduling/cancellation/staleness and shared atomic replacement across UI/OO/scripting/REST remain pending.",
+    "Broader vector/type/precision/color/RAW/retouch/AI/provider/evaluation/production/workflow/collaboration/device/performance/format and human-acceptance roadmap requirements remain incomplete."
+  ]
+}

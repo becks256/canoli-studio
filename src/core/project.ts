@@ -4,6 +4,7 @@ import type { SerializedAsset, ImageAsset } from "./assets";
 import { allLayers, referencedAssets, validateDocument, validateDocumentCooperatively } from "./model";
 import type { DocumentData } from "./model";
 import { parseRetainedHistory, type RetainedHistory } from "./history";
+import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from './interchange/tiff/types';
 
 interface ProjectFile {
   format: "luma";
@@ -24,6 +25,7 @@ interface BinaryAsset {
   size: number;
   offset: number;
   sha256?: string;
+  tiff?: TiffDecodeSettings;
 }
 interface BinaryManifest {
   format: "luma";
@@ -64,7 +66,7 @@ function verifyLinkedSnapshots(
 export interface ProjectAssetSource {
   get(
     id: string,
-  ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob">;
+  ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob" | "tiff">;
 }
 export async function serializeProject(
   document: DocumentData,
@@ -95,6 +97,7 @@ export async function serializeProject(
       type: asset.blob.type,
       size: asset.blob.size,
       offset,
+      ...(asset.tiff?{tiff:tiffDecodeOptionsSchema.parse(asset.tiff)}:{}),
     });
     blobs.push(asset.blob);
     offset += asset.blob.size;
@@ -138,6 +141,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     width: number;
     height: number;
     blob: Blob;
+    tiff?:TiffDecodeSettings;
   }[];
 }> {
   const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
@@ -216,7 +220,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       entry.width < 1 ||
       !Number.isSafeInteger(entry.height) ||
       entry.height < 1 ||
-      !["image/png", "image/jpeg", "image/webp"].includes(entry.type) ||
+      !["image/png", "image/jpeg", "image/webp", "image/tiff"].includes(entry.type) ||
       !Number.isSafeInteger(entry.size) ||
       entry.size <= 0 ||
       entry.offset !== offset ||
@@ -230,6 +234,8 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     )
       throw new Error("Missing or invalid project asset checksum.");
     ids.add(entry.id);
+    if(entry.tiff!==undefined&&entry.type!=='image/tiff')throw new Error('TIFF settings on a non-TIFF project asset.');
+    const tiff=entry.type==='image/tiff'?tiffDecodeOptionsSchema.parse(entry.tiff??{}):undefined;
     const blob = file.slice(
       headerSize + length + offset,
       headerSize + length + offset + entry.size,
@@ -242,6 +248,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       width: entry.width,
       height: entry.height,
       blob,
+      ...(tiff?{tiff}:{}),
     };
   });
   if (offset !== file.size - headerSize - length)
@@ -332,6 +339,7 @@ export async function loadProject(
         entry.name,
         entry.id,
         rasterAssets.has(entry.id),
+        {tiff:entry.tiff},
       );
       if (asset.width !== entry.width || asset.height !== entry.height)
         throw new Error("Embedded image dimensions do not match the project.");

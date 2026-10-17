@@ -1,0 +1,168 @@
+{
+  "date": "2026-10-15",
+  "feature": "F02/T06 native Color Range selections",
+  "environment": {
+    "browser": "Chromium through Playwright",
+    "browserSamplingBackend": "dedicated Canvas renderer and AssemblyScript/WASM image worker",
+    "restSamplingBackend": "Node worker, bounded PNG row decoder and same WASM kernel",
+    "nodeVersion": "24.0.1",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "contract": {
+    "includeColors": [
+      1,
+      32
+    ],
+    "excludeColors": [
+      0,
+      32
+    ],
+    "fuzziness": [
+      0,
+      200
+    ],
+    "distance": "CIE1976 in D50 CIELAB after sRGB decoding and Bradford D65 to D50 adaptation",
+    "operations": [
+      "replace",
+      "add",
+      "subtract",
+      "intersect"
+    ],
+    "transparentInverseCoverage": 0,
+    "sourceBytesPreserved": true,
+    "previewUsedForFinalSelection": false,
+    "documentSchema": 20,
+    "projectContainer": 3,
+    "workspace": 2
+  },
+  "independentReferences": {
+    "math": "Colour Science 0.4.6",
+    "pngPixels": "Pillow 10.3.0",
+    "generator": "scripts/generate-color-range-fixtures.py",
+    "mathPixelCount": 105,
+    "mathSettingsCases": 8,
+    "wasmBytesEqualIndependentReference": true,
+    "pngColorTypes": [
+      0,
+      2,
+      3,
+      4,
+      6
+    ],
+    "pngFilterTypes": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "fixtureHashesSha256": {
+      "filters-type-0.png": "2dc7e815cc7ba77c58a0448b8996ddde6d575c2e44daea1fe03301e26a3e0c32",
+      "filters-type-2.png": "278856b10f77dd73dec403d2bddc07f4eca886e2d4f79807ce5d5721a2af1768",
+      "filters-type-3.png": "fcd05a35ad418878a6899180e3b43fe14116e11eeb46279562de52f47556d274",
+      "filters-type-4.png": "a5f8d052b15907c0340777710b594d7a1604231e3e4d07fcedc8a60a8bae3eb5",
+      "filters-type-6.png": "d811eb75be905f43fdf2a21aa9adacbcc8fdebd9f211549b56599dace52680e7",
+      "native-50mp.png": "1e6acdb4bdf16b25b2231f76bf066283db1d8cdec732b416248563473f434a47",
+      "png-reference.json": "9d233a7dded44653860cf82d194895339bb55cc3d02e25e7e62ebc4671fe325a",
+      "reference.json": "e7ff8d6c97541333babca0067ee45c61538f6f81d83569baacfa25dd6808bc16",
+      "unsupported-16bit.png": "e831ecb93f501067c400999af58c2c30dfd5ef30092644f72f602a80d00acaec",
+      "unsupported-profile.png": "2af739456f34d6a3fc1ea1620aca651fbd1789481899a81ebd72e65a779d548b"
+    }
+  },
+  "wasmOracle": {
+    "seededPixels": 65536,
+    "settingsCases": 8,
+    "fuzziness": [
+      0,
+      0.5,
+      40,
+      200
+    ],
+    "invert": [
+      false,
+      true
+    ],
+    "exclusionsAlphaAndMemoryGrowthCovered": true,
+    "exactByteAgreement": true,
+    "callerOwnershipPassed": true
+  },
+  "nativeBrowser50Mp": {
+    "milliseconds": 1617.5999999940395,
+    "dimensions": [
+      10000,
+      5000
+    ],
+    "samples": [
+      255,
+      255,
+      255,
+      255,
+      0,
+      0,
+      255
+    ],
+    "selectionRestored": true,
+    "originalUnchanged": true,
+    "revisionDelta": 1,
+    "progressFirst": {
+      "completed": 0,
+      "total": 260
+    },
+    "progressLast": {
+      "completed": 260,
+      "total": 260
+    },
+    "coverageSize": [
+      10000,
+      5000
+    ],
+    "nativeTiles": 260,
+    "maxNativeTilePixels": 204800
+  },
+  "nativeRest50Mp": {
+    "width": 10000,
+    "height": 5000,
+    "elapsedMs": 3527.301285,
+    "nativeCorners": [
+      255,
+      0,
+      0,
+      255
+    ],
+    "boundedPngStrips": true
+  },
+  "nativeRestWorkingBuffers": {
+    "maximumTestedDecodedStripBytes": 1000000,
+    "fullDecodedImageAllocated": false,
+    "note": "A single extreme-width row may exceed the strip budget; compressed source bytes and returned RLE still consume memory."
+  },
+  "existingRealImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "exportElapsedMs": 3506
+  },
+  "validation": {
+    "fullUnitApiTestsPassed": 791,
+    "unitTestFiles": 112,
+    "fullUnitCommand": "npm test -- --maxWorkers=2",
+    "defaultConcurrencyInitialResult": "789 passed; cooperative JSON encoding hit its 5-second timeout. Full two-worker rerun passed 790 tests; after PNG validation regression addition, final full rerun passed 791.",
+    "distinctDevelopmentBrowserTestsPassed": 40,
+    "productionBrowserTestsPassed": 19,
+    "buildPassed": true,
+    "typecheckPassed": true,
+    "narrowDialogLongSourcesAnd32ColorsPassed": true,
+    "documentedIsolatedScriptAtomicityPassed": true,
+    "permissionRevocationAfterNativePreparationPassed": true,
+    "cancelAfterRealWorkerOutputPassed": true,
+    "projectAndWorkspaceRedoOnlyPersistencePassed": true,
+    "pngChunkOrderingAndHdrRejectionPassed": true
+  },
+  "limits": [
+    "These completion times are individual container observations, not p95 gesture measurements or controlled device comparisons.",
+    "Native matching is the defined CIE1976 editor model; Photoshop compatibility, CIEDE2000, skin detection and localized color clusters are not implemented.",
+    "Browser decoding and premultiplied surfaces can affect recovered RGB at low alpha. The REST endpoint reads raw PNG samples.",
+    "Headless REST supports only explicit noninterlaced 8-bit unmarked/explicit-sRGB PNG assets; ICC/cICP/mDCV/cLLI, animation, interlace, 16-bit and other source formats reject. No headless scene renderer or browser synchronization.",
+    "Dense RLE and command-complexity, extreme scanline widths, browser decoding and process memory remain practical limits; no arbitrary image megapixel cap was added.",
+    "Quick selection, channels, broader F02 fidelity/device gates and the remainder of the full implementation roadmap remain unfinished."
+  ]
+}

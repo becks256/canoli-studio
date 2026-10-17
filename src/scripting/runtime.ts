@@ -21,15 +21,18 @@ import {
   PaintFill,
   VectorLayer,
   VectorPath,
+  VectorContour,
   MarqueeSelection,
   AffineTransform,
   Guide,
   LayerComp,
+  AlphaChannel,
   LayerStyle,
   BlendIf,
 } from "../dom";
 import type { EditorCommand } from "../core/commands";
 import type { AdjustmentLayerData } from "../core/model";
+import {inspectDesign,preflightAssetMetadataSchema} from '../core/preflight';
 
 // Bundled into an isolated worker created by an opaque-origin sandbox iframe.
 // No UI references, credentials, source image bytes, or host globals enter here.
@@ -110,6 +113,39 @@ self.onmessage = async (event) => {
         [...commands],
         request,
       ) as Promise<AdjustmentLayerData>;
+    document._prepareSelectionModification = (request, control) => {
+      if (control.signal || control.onProgress) throw new Error("Use Scripts-panel cancellation; progress callbacks and AbortSignal are available to trusted host code only.");
+      return callHost("selection", "modify", [...commands], request) as Promise<import("../core/drawing").SelectionData>;
+    };
+    document._prepareVectorBoolean=(selection,control)=>{
+      if(control.signal||control.onProgress)throw new Error('Use Scripts-panel cancellation; callbacks and AbortSignal are available to trusted host code only.');
+      return callHost('vector','boolean',[...commands],selection) as Promise<import('../core/vector-boolean').VectorBooleanResult>;
+    };
+    document._prepareColorRange=(request,control)=>{
+      if(control.signal||control.onProgress)throw new Error('Use Scripts-panel cancellation; progress callbacks and AbortSignal are available to trusted host code only.');
+      return callHost('selection','color-range',[...commands],request) as Promise<import('../core/drawing').SelectionData>;
+    };
+    document._prepareQuickSelection=(request,control)=>{
+      if(control.signal||control.onProgress)throw new Error('Use Scripts-panel cancellation; callbacks and AbortSignal are available to trusted host code only.');
+      return callHost('selection','quick',[...commands],request) as Promise<import('../core/drawing').SelectionData>;
+    };
+    document._preflight=async(options,control)=>{
+      if(control.signal)throw new Error('Use Scripts-panel cancellation; AbortSignal is available to trusted host code only.');
+      const assets=preflightAssetMetadataSchema.parse(await callHost('assets','list'));
+      return inspectDesign(document._read(),document.getSnapshot().revision,options,{assets:new Map(assets.map(asset=>[asset.id,{width:asset.width,height:asset.height}]))});
+    };
+    document._prepareSubject=(request,control)=>{
+      if(control.signal||control.onProgress)throw new Error('Use Scripts-panel cancellation; callbacks and AbortSignal are available to trusted host code only.');
+      return callHost('selection','subject',[...commands],request) as Promise<import('../core/drawing').SelectionData>;
+    };
+    document._prepareMatting=async(request,control)=>{
+      if(control.signal||control.onProgress)throw new Error('Use Scripts-panel cancellation; callbacks and AbortSignal are available to trusted host code only.');
+      return{plan:await callHost('retouch','matting',[...commands],request) as import('../core/matting').MattingPlan};
+    };
+    document._prepareChannelLoad=(request,control)=>{
+      if(control.signal||control.onProgress)throw new Error('Use Scripts-panel cancellation; callbacks and AbortSignal are available to trusted host code only.');
+      return callHost('selection','channel',[...commands],request) as Promise<import('../core/drawing').SelectionData>;
+    };
     document._prepareHeal = (request) =>
       callHost(
         "retouch",
@@ -171,10 +207,12 @@ self.onmessage = async (event) => {
       "PaintFill",
       "VectorLayer",
       "VectorPath",
+      "VectorContour",
       "MarqueeSelection",
       "AffineTransform",
       "Guide",
       "LayerComp",
+      "AlphaChannel",
       "LayerStyle",
       "BlendIf",
       "print",
@@ -205,10 +243,12 @@ self.onmessage = async (event) => {
       PaintFill,
       VectorLayer,
       VectorPath,
+      VectorContour,
       MarqueeSelection,
       AffineTransform,
       Guide,
       LayerComp,
+      AlphaChannel,
       LayerStyle,
       BlendIf,
       print,

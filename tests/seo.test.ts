@@ -7,14 +7,14 @@ describe("SEO metadata and discoverability", () => {
     const html = await readFile("index.html", "utf8");
 
     // Title & description
-    expect(html).toContain("<title>Canoli Studio — Free In-Browser Image Editor &amp; Layer Studio</title>");
+    expect(html.match(/<title>([\s\S]*?)<\/title>/)?.[1].trim()).toBe("Canoli Studio — Free In-Browser Image Editor &amp; Layer Studio");
     expect(html).toMatch(/<meta\s+name="description"\s+content="[^"]+"/);
     expect(html).toMatch(/<meta\s+name="keywords"\s+content="[^"]+"/);
     expect(html).toMatch(/<meta\s+name="author"\s+content="Canoli Studio"/);
     expect(html).toMatch(/<meta\s+name="robots"\s+content="index,\s*follow/);
 
     // Canonical link
-    expect(html).toMatch(/<link\s+rel="canonical"\s+href="https:\/\/luma-editor\.app\/"/);
+    expect(html).toMatch(/<link\s+rel="canonical"\s+href="https:\/\/canoli\.studio\/"/);
 
     // Open Graph protocol
     expect(html).toMatch(/<meta\s+property="og:type"\s+content="website"/);
@@ -92,7 +92,7 @@ describe("SEO metadata and discoverability", () => {
   });
 
   it("includes SEO metadata in generated developer docs", async () => {
-    for (const doc of ["api", "scripting-api", "plugins"]) {
+    for (const doc of ["api", "scripting-api", "plugins", "requirements", "architecture", "product-brief", "design-system", "system-design", "tools-milestone"]) {
       const path = `public/developer/${doc}.html`;
       expect(existsSync(path)).toBe(true);
       const content = await readFile(path, "utf8");

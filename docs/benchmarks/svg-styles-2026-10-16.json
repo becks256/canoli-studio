@@ -1,0 +1,2375 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T13:43:45.173324+00:00",
+  "scope": "F07/F11 SVG overlay/shadow filters with affine document-space operations and shadow-aware mask support. Full roadmap remains active/incomplete.",
+  "sourceSha256": {
+    "src/core/svg-styles.ts": "65988adb34b1be657a4031cf6fc98f4e4f4ea55bf6ed6d1d0d4ee7c373515a1b",
+    "src/core/svg-export.ts": "719e40bacb19f88cc14b7c0c81c7d3385520039b74717ff4021eda62f2c6b346",
+    "src/core/svg-masks.ts": "a2c0055d5a343dbf5cbadabb43bf1fa8056d5aad71a6704cbd998277de04e764",
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/engine/svg-masks.ts": "84ccb27f6095f5487bc9bdb3bec7ebcd035e5c74bb6f5fb34ee89c044ee33434",
+    "src/engine/export.ts": "60edee933e1af3d55815e2266d59c9292c90b8669a8cce271a9f871aebb6622e",
+    "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/dom/index.ts": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "tests/svg-styles.test.ts": "2a7fe9b5a506973cf8e5fef2068ec2950fe3dc0e30239672b5eb6e2c523e4c29",
+    "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+    "tests/svg-export.test.ts": "e19b4af8c09a387d547c4912a852ff7341a6e313dbfdc107d8c2f5004669830b",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/svg-masks.test.ts": "f3da8176fc5d5896fdc94fa6870e1d27de0984583b59eb5bc8a9559b6e2dd420",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/masks.e2e.ts": "bcb440f5d57c1bc1379a5af720bb884895a1aa25463cf6d484339dab609796f9",
+    "tests/export-cancellation.e2e.ts": "729a80aa8a8428538861d3b9b9476af2d5d101f5b2f8d9e9439814b2b01118dd",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "tests/production.e2e.ts": "b32e5bac7b4a0a42087f7799af06344876e5e7236ff17f47c626c29dbc6e4d0b",
+    "docs/SCRIPTING_API.md": "ad330724730c9018e2eb41c3fd9bb6ab5b266243c81bbbce2bc61e1df0d2d8bf",
+    "docs/ARCHITECTURE.md": "fff0ff56290d96c40f5145aeb978f4d84448abe24dc587766a4859a3b2ad9c43",
+    "docs/API.md": "6284e8f8113b5cbcc8bf675e3861a537d098b944b2e82ec2d4781281d5212cf0",
+    "docs/REQUIREMENTS.md": "63fa88910f75589f9917ed654e6fbe79c171ed50bd8211a469e35235d8c4ac8e",
+    "docs/SYSTEM_DESIGN.md": "adb9e9c98e3b0767fc674c4539f3f0d7403d6c45e6b895eceedc125ff20bdcaa",
+    "docs/PLUGINS.md": "2c99bf69107cd717304e6bb3b27b4d2f777ef3ed011b938a3c0d82c846ca8019",
+    "docs/DESIGN_SYSTEM.md": "d91dfcaadf821dbfdc4a025ec79966e8713bfb1c1744db4bca08584d84113ce0",
+    "docs/FEATURE_STRATEGY.md": "82f23595eddfdd6883ffd6bbef147c35a6f5864dabff4d9b6bfaa81005956998",
+    "src/generated/script-runtime.js": "8988734f92a0f12ada31ea39f959c4855bf9c5a4bdd2a170c184b319b6b8b8a4",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "includes": [
+        "actual WASM",
+        "isolated runtime generation",
+        "developer docs",
+        "TypeScript",
+        "production bundle"
+      ]
+    },
+    "unitApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "tests": 904,
+      "files": 126,
+      "passed": true
+    },
+    "developmentBrowser": {
+      "command": "npx playwright test tests/svg-styles.e2e.ts tests/svg-masks.e2e.ts tests/svg-export.e2e.ts tests/masks.e2e.ts tests/export-cancellation.e2e.ts tests/editor.e2e.ts --grep 'SVG|mask|export|50 MP' --reporter=line",
+      "passed": 63,
+      "styleChecksInBroadRun": 14,
+      "unchangedSvgMaskNativeMaskCancellationAnd50MpChecks": 49
+    },
+    "additionalAffineBrowser": {
+      "command": "npx playwright test tests/svg-styles.e2e.ts --grep 'reflected-shadow|scaled-shadow' --reporter=line",
+      "passed": 2,
+      "note": "Test-only additions after the full build/unit/production runs; no product source changed. Final TypeScript check also passes."
+    },
+    "productionBrowser": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": 29,
+      "newActualSvgEffectDownload": true
+    },
+    "distinctBrowserCases": 94,
+    "whitespace": "git diff --check passes",
+    "finalSeoDocs": {
+      "command": "npx vitest run tests/seo.test.ts --maxWorkers=2",
+      "passed": 5
+    }
+  },
+  "effectComparisons": {
+    "overlay": {
+      "mode": "overlay",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 768,
+      "centroid": [
+        46,
+        32
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "hard-shadow": {
+      "mode": "hard-shadow",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 1392,
+      "centroid": [
+        56,
+        38
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "soft-shadow": {
+      "mode": "soft-shadow",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 1391.964705882353,
+      "centroid": [
+        56.0729523229967,
+        38.073338291764216
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            32,
+            255,
+            217
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            217
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "affine-shadow": {
+      "mode": "affine-shadow",
+      "maxAlpha": 1,
+      "maxPremult": 1.9058823529411733,
+      "alphaArea": 767.8980392156863,
+      "centroid": [
+        103,
+        54
+      ],
+      "meanAlpha": 0.012395833333333333,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 7,
+      "after": 7,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "reflected-shadow": {
+      "mode": "reflected-shadow",
+      "maxAlpha": 1,
+      "maxPremult": 1.345098039215685,
+      "alphaArea": 767.8745098039216,
+      "centroid": [
+        108,
+        49
+      ],
+      "meanAlpha": 0.009791666666666667,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 7,
+      "after": 7,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "scaled-shadow": {
+      "mode": "scaled-shadow",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 768.2509803921569,
+      "centroid": [
+        82,
+        40.5
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            0,
+            31,
+            255,
+            171
+          ],
+          "png": [
+            0,
+            31,
+            255,
+            171
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            34,
+            255,
+            45
+          ],
+          "png": [
+            0,
+            34,
+            255,
+            45
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "zero-fill": {
+      "mode": "zero-fill",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 768,
+      "centroid": [
+        66,
+        44
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "vector-mask": {
+      "mode": "vector-mask",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 768,
+      "centroid": [
+        48,
+        38
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 2,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "native-mask": {
+      "mode": "native-mask",
+      "maxAlpha": 1,
+      "maxPremult": 1.8352941176470576,
+      "alphaArea": 829.0078431372549,
+      "centroid": [
+        51.03977114150153,
+        38.01605273490163
+      ],
+      "meanAlpha": 0.010364583333333333,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            80,
+            64,
+            128,
+            255
+          ],
+          "png": [
+            80,
+            64,
+            128,
+            255
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            20,
+            40,
+            222,
+            204
+          ],
+          "png": [
+            21,
+            40,
+            224,
+            203
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            28,
+            255,
+            46
+          ],
+          "png": [
+            0,
+            28,
+            255,
+            46
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 1,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "offcanvas-vector": {
+      "mode": "offcanvas-vector",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 768,
+      "centroid": [
+        16,
+        52
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 0,
+      "paths": 2,
+      "unchanged": true,
+      "revision": 10,
+      "after": 10,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "offcanvas-native": {
+      "mode": "offcanvas-native",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "alphaArea": 768,
+      "centroid": [
+        16,
+        52
+      ],
+      "meanAlpha": 0,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            32,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            32,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 1,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 10,
+      "after": 10,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "nested": {
+      "mode": "nested",
+      "maxAlpha": 1,
+      "maxPremult": 2.247058823529411,
+      "alphaArea": 856.3725490196078,
+      "centroid": [
+        48.69400572409845,
+        44.58642930738409
+      ],
+      "meanAlpha": 0.05286458333333333,
+      "differences": [],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            112,
+            84,
+            96,
+            64
+          ],
+          "png": [
+            112,
+            84,
+            96,
+            64
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            86,
+            83,
+            125,
+            104
+          ],
+          "png": [
+            86,
+            83,
+            123,
+            104
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            50,
+            50,
+            202,
+            87
+          ],
+          "png": [
+            50,
+            47,
+            202,
+            87
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            35,
+            255,
+            0,
+            29
+          ],
+          "png": [
+            26,
+            255,
+            0,
+            29
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            33,
+            255,
+            0,
+            62
+          ],
+          "png": [
+            29,
+            255,
+            0,
+            62
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 2,
+      "images": 1,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 10,
+      "after": 10,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "nested-unmasked": {
+      "mode": "nested-unmasked",
+      "maxAlpha": 2,
+      "maxPremult": 2.4470588235294173,
+      "alphaArea": 1058.407843137255,
+      "centroid": [
+        48.65397896952137,
+        44.57190971270202
+      ],
+      "meanAlpha": 0.06854166666666667,
+      "differences": [
+        {
+          "x": 17,
+          "y": 33,
+          "svg": 65,
+          "png": 67
+        },
+        {
+          "x": 13,
+          "y": 36,
+          "svg": 64,
+          "png": 66
+        },
+        {
+          "x": 13,
+          "y": 47,
+          "svg": 64,
+          "png": 66
+        },
+        {
+          "x": 16,
+          "y": 50,
+          "svg": 64,
+          "png": 66
+        },
+        {
+          "x": 64,
+          "y": 63,
+          "svg": 32,
+          "png": 30
+        }
+      ],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            112,
+            83,
+            99,
+            80
+          ],
+          "png": [
+            110,
+            85,
+            94,
+            81
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            88,
+            80,
+            128,
+            128
+          ],
+          "png": [
+            88,
+            80,
+            128,
+            128
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            49,
+            49,
+            204,
+            109
+          ],
+          "png": [
+            49,
+            49,
+            204,
+            109
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            28,
+            255,
+            0,
+            36
+          ],
+          "png": [
+            28,
+            255,
+            0,
+            36
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            29,
+            255,
+            0,
+            78
+          ],
+          "png": [
+            30,
+            255,
+            0,
+            77
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 2,
+      "images": 0,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "nested-mask-only": {
+      "mode": "nested-mask-only",
+      "maxAlpha": 2,
+      "maxPremult": 2.023529411764706,
+      "alphaArea": 455.8627450980392,
+      "centroid": [
+        58.61875779603424,
+        39.591530818529826
+      ],
+      "meanAlpha": 0.04802083333333333,
+      "differences": [
+        {
+          "x": 58,
+          "y": 33,
+          "svg": 88,
+          "png": 86
+        },
+        {
+          "x": 51,
+          "y": 40,
+          "svg": 88,
+          "png": 86
+        }
+      ],
+      "samples": [
+        {
+          "x": 35,
+          "y": 25,
+          "svg": [
+            78,
+            58,
+            123,
+            62
+          ],
+          "png": [
+            75,
+            59,
+            125,
+            61
+          ]
+        },
+        {
+          "x": 55,
+          "y": 37,
+          "svg": [
+            51,
+            51,
+            172,
+            95
+          ],
+          "png": [
+            48,
+            48,
+            172,
+            95
+          ]
+        },
+        {
+          "x": 75,
+          "y": 50,
+          "svg": [
+            0,
+            29,
+            255,
+            88
+          ],
+          "png": [
+            0,
+            29,
+            255,
+            87
+          ]
+        },
+        {
+          "x": 10,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 25,
+          "y": 50,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 120,
+          "y": 80,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "filters": 1,
+      "images": 1,
+      "paths": 1,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    }
+  },
+  "paddedNativeMaskSeams": {
+    "alpha": 1,
+    "premult": 1.8980392156862536,
+    "tiles": [
+      {
+        "x": -34,
+        "y": -26,
+        "width": 1024,
+        "height": 152
+      },
+      {
+        "x": 990,
+        "y": -26,
+        "width": 1024,
+        "height": 152
+      },
+      {
+        "x": 2014,
+        "y": -26,
+        "width": 120,
+        "height": 152
+      }
+    ]
+  },
+  "independentChecks": {
+    "encodedSrgbOverlayGolden": {
+      "sourceRgb": [
+        128,
+        64,
+        32
+      ],
+      "overlayRgb": [
+        32,
+        64,
+        224
+      ],
+      "amount": 0.5,
+      "expectedRgba": [
+        80,
+        64,
+        128,
+        255
+      ],
+      "actualRgba": [
+        80,
+        64,
+        128,
+        255
+      ]
+    },
+    "zeroFillRetainsUntintedShadow": {
+      "rawSample": {
+        "x": 35,
+        "y": 25,
+        "svg": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "png": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "shadowSample": {
+        "x": 75,
+        "y": 50,
+        "svg": [
+          0,
+          32,
+          255,
+          255
+        ],
+        "png": [
+          0,
+          32,
+          255,
+          255
+        ]
+      }
+    },
+    "affineShadowCentroids": {
+      "affine-shadow": {
+        "expected": [
+          103,
+          54
+        ],
+        "actual": [
+          103,
+          54
+        ],
+        "alphaArea": 767.8980392156863,
+        "expectedContinuousArea": 768
+      },
+      "reflected-shadow": {
+        "expected": [
+          108,
+          49
+        ],
+        "actual": [
+          108,
+          49
+        ],
+        "alphaArea": 767.8745098039216,
+        "expectedContinuousArea": 768
+      },
+      "scaled-shadow": {
+        "expected": [
+          82,
+          40.5
+        ],
+        "actual": [
+          82,
+          40.5
+        ],
+        "alphaArea": 768.2509803921569,
+        "expectedContinuousArea": 768
+      }
+    },
+    "offCanvasMaskedCasterGoldens": {
+      "offcanvas-vector": {
+        "x": 10,
+        "y": 50,
+        "svg": [
+          0,
+          32,
+          255,
+          255
+        ],
+        "png": [
+          0,
+          32,
+          255,
+          255
+        ]
+      },
+      "offcanvas-native": {
+        "x": 10,
+        "y": 50,
+        "svg": [
+          0,
+          32,
+          255,
+          255
+        ],
+        "png": [
+          0,
+          32,
+          255,
+          255
+        ]
+      }
+    },
+    "productionRotatedParentShadowOnly": {
+      "expectedSamples": [
+        [
+          0,
+          32,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "filters": 1,
+      "images": 0,
+      "oneUndoRemovesPrecedingScriptTransaction": true
+    },
+    "exactFixtureNames": [
+      "overlay",
+      "hard-shadow",
+      "soft-shadow",
+      "scaled-shadow",
+      "zero-fill",
+      "vector-mask",
+      "offcanvas-vector",
+      "offcanvas-native"
+    ]
+  },
+  "native50MpMaskRegression": {
+    "dimensions": [
+      "10000",
+      "5000"
+    ],
+    "tileCount": 50,
+    "maxTile": 1024,
+    "samples": [
+      64,
+      255,
+      255,
+      64,
+      64,
+      64,
+      255,
+      64,
+      64,
+      64
+    ],
+    "elapsed": 19835.699999999255,
+    "bytes": 1581310,
+    "progressFirst": 0,
+    "progressLast": 1,
+    "sourceDimensions": [
+      10000,
+      5000
+    ],
+    "sourceUnchanged": true,
+    "unchanged": true,
+    "revision": 5,
+    "afterRevision": 5
+  },
+  "separateNative50MpPngGate": {
+    "passed": true,
+    "observedExportMs": 3461,
+    "scope": "Actual image import, original preservation, WASM edit, save/reopen and native PNG export."
+  },
+  "native50MpLimits": "SVG mask regression preserves real 10000x5000 source bytes/dimensions and fifty native coverage tiles. Ten decoded native-coordinate crops verify seam coverage; this is not a full 50 MP filtered SVG raster decode, peak-memory, p95 or device benchmark.",
+  "developmentFindings": [
+    "Parent SVG filters clipped nested child shadows despite explicit filter/primitive regions. Transparent input support geometry restores overflow; the failed nested masked/unmasked alpha maxima 121/145 become <=2 after correction.",
+    "The native renderer colors the masked silhouette before blur. Matching that graph order removes the observed ordinary colored soft-edge differences and gives exact fixture output, instead of coloring blurred alpha afterward.",
+    "Remaining native/SVG intermediate rounding is measured, with separate strict simple-case, affine/native-mask and nested-chain limits. Independent color/area/centroid/shadow-only and off-canvas goldens remain strict.",
+    "Initial unit planner fixtures mistakenly supplied a Document instead of its serialization; corrected to the private read-only DTO boundary. Extra affine fixtures initially placed Node assertions inside browser evaluation; fixed in the harness without changing product behavior."
+  ],
+  "limitations": [
+    "Transparent support rectangles can enlarge downstream SVG group selection bounds. Original paths and editor model geometry are unchanged.",
+    "Viewer SVG filter/antialiasing/intermediate rounding and working-memory/precision behavior can differ from native PNG. No universal bit-exact interoperability claim.",
+    "Native mask preparation remains tiled, but retained compressed/base64 output and viewer filter decoding consume memory. Individual mask/encoding calls are not preemptible.",
+    "Blend If and raster/paint/text/adjustment/smart contents remain omitted and reported; omitted content can change shadows, overlays and blend backdrops.",
+    "General SVG document import/round-trip, editable raster-mask geometry, broader format/precision/RAW/workflow/AI/commercial/specialist roadmap and human/device gates remain incomplete."
+  ],
+  "localLogs": {
+    "/tmp/canoli-svg-styles-build.log": {
+      "sha256": "8a96b8732d3c2b21cd07d8ec49c4770396a5f344e27b11583363890d095f4525",
+      "tail": [
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.07s"
+      ]
+    },
+    "/tmp/canoli-svg-styles-unit.log": {
+      "sha256": "acfacff0598a60a10ef79ec451d2b9d0af31caf872712feb8a592541d6701520",
+      "tail": [
+        "",
+        " Test Files  126 passed (126)",
+        "      Tests  904 passed (904)",
+        "   Start at  09:38:42",
+        "   Duration  61.10s (tests 75%, import 21%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  126 workers spawned \u00b7 ~120ms startup each (spawn + environment, per file)",
+        "             at least ~7.46s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-styles-browser.log": {
+      "sha256": "c300e6b44d57281a23aa40678f4e3ac81e3fdac456b9f63cabf9f537018eae83",
+      "tail": [
+        "[56/63] tests/svg-styles.e2e.ts:4:208 \u203a SVG native-mask preserves native effect ordering and placement",
+        "[57/63] tests/svg-styles.e2e.ts:4:208 \u203a SVG offcanvas-vector preserves native effect ordering and placement",
+        "[58/63] tests/svg-styles.e2e.ts:4:208 \u203a SVG offcanvas-native preserves native effect ordering and placement",
+        "[59/63] tests/svg-styles.e2e.ts:4:208 \u203a SVG nested preserves native effect ordering and placement",
+        "[60/63] tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-unmasked preserves native effect ordering and placement",
+        "[61/63] tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-mask-only preserves native effect ordering and placement",
+        "[62/63] tests/svg-styles.e2e.ts:42:1 \u203a styled native SVG masks retain their padded coverage across tile seams",
+        "[63/63] tests/svg-styles.e2e.ts:56:1 \u203a documented standalone SVG effects run in the isolated constructor runtime",
+        "  63 passed (2.5m)"
+      ]
+    },
+    "/tmp/canoli-svg-styles-production.log": {
+      "sha256": "15a05b882253a9a58506154436f174e9813602718e7c74aa7b20017365465d03",
+      "tail": [
+        "[22/29] tests/production.e2e.ts:874:1 \u203a production Select Subject preserves genuine source alpha through UI, isolated scripting and exported masks",
+        "[23/29] tests/production.e2e.ts:896:1 \u203a production Refine Edge exposes corrected-layer output and isolated native matting exports real corrected RGB",
+        "[24/29] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves wide-unknown with bundled workers and no developer globals",
+        "[25/29] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals",
+        "[26/29] tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers",
+        "[27/29] tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors",
+        "[28/29] tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow",
+        "[29/29] tests/production.e2e.ts:983:1 \u203a production SVG filters preserve document-space shadows with zero fill and rotated parents",
+        "  29 passed (53.0s)"
+      ]
+    },
+    "/tmp/canoli-svg-styles-affine-final.log": {
+      "sha256": "10c9713c81b073227ed4c7fc51c5d5a0aac8e42642868164b40ec42bdc320cbc",
+      "tail": [
+        "Running 2 tests using 1 worker",
+        "",
+        "(node:116992) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[1/2] tests/svg-styles.e2e.ts:4:243 \u203a SVG reflected-shadow preserves native effect ordering and placement",
+        "[2/2] tests/svg-styles.e2e.ts:4:243 \u203a SVG scaled-shadow preserves native effect ordering and placement",
+        "  2 passed (8.3s)"
+      ]
+    },
+    "/tmp/canoli-svg-styles-initial.log": {
+      "sha256": "812184c176cedc343cb90abb930e7742c607e8467f040eb232286bee4560dd89",
+      "tail": [
+        "    Error Context: test-results/svg-styles.e2e.ts-SVG-nest-e181e-fect-ordering-and-placement/error-context.md",
+        "",
+        "",
+        "  4 failed",
+        "    tests/svg-styles.e2e.ts:4:171 \u203a SVG soft-shadow preserves native effect ordering and placement \u2500",
+        "    tests/svg-styles.e2e.ts:4:171 \u203a SVG affine-shadow preserves native effect ordering and placement ",
+        "    tests/svg-styles.e2e.ts:4:171 \u203a SVG native-mask preserves native effect ordering and placement \u2500",
+        "    tests/svg-styles.e2e.ts:4:171 \u203a SVG nested preserves native effect ordering and placement \u2500\u2500\u2500\u2500\u2500\u2500",
+        "  6 passed (23.1s)"
+      ]
+    },
+    "/tmp/canoli-svg-styles-nested.log": {
+      "sha256": "c746c5a62364c899a680e545f763eace846c3fa462022ef8a466f1b1667d5e03",
+      "tail": [
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/svg-styles.e2e.ts-SVG-nest-e181e-fect-ordering-and-placement/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-styles.e2e.ts-SVG-nest-e181e-fect-ordering-and-placement/error-context.md",
+        "",
+        "",
+        "  1 failed",
+        "    tests/svg-styles.e2e.ts:4:171 \u203a SVG nested preserves native effect ordering and placement \u2500\u2500\u2500\u2500\u2500\u2500"
+      ]
+    },
+    "/tmp/canoli-svg-styles-diagnostic.log": {
+      "sha256": "a0680bbb4e270a7a5bdc95506868a2bef78ab050443c56c6345f51c4fffad95e",
+      "tail": [
+        "    Error Context: test-results/svg-styles.e2e.ts-SVG-nest-b61b3-fect-ordering-and-placement/error-context.md",
+        "",
+        "",
+        "  4 failed",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG native-mask preserves native effect ordering and placement \u2500",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG nested preserves native effect ordering and placement \u2500\u2500\u2500\u2500\u2500\u2500",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-unmasked preserves native effect ordering and placement ",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-mask-only preserves native effect ordering and placement ",
+        "  1 passed (15.3s)"
+      ]
+    },
+    "/tmp/canoli-svg-styles-support.log": {
+      "sha256": "8df73d7baaa1a9b5c14eb02d5d04a6ed325574f1ffd51b4fa8d3174e5cb00d8e",
+      "tail": [
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-styles.e2e.ts-SVG-nest-b61b3-fect-ordering-and-placement/error-context.md",
+        "",
+        "",
+        "  3 failed",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG nested preserves native effect ordering and placement \u2500\u2500\u2500\u2500\u2500\u2500",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-unmasked preserves native effect ordering and placement ",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-mask-only preserves native effect ordering and placement "
+      ]
+    },
+    "/tmp/canoli-svg-styles-corrected.log": {
+      "sha256": "8cce47e4fc50804aced7fe2e221186cb97c602474b099c1be730e3c0ff7f57eb",
+      "tail": [
+        "[7/12] tests/svg-styles.e2e.ts:4:208 \u203a SVG native-mask preserves native effect ordering and placement",
+        "[8/12] tests/svg-styles.e2e.ts:4:208 \u203a SVG offcanvas-vector preserves native effect ordering and placement",
+        "[9/12] tests/svg-styles.e2e.ts:4:208 \u203a SVG offcanvas-native preserves native effect ordering and placement",
+        "[10/12] tests/svg-styles.e2e.ts:4:208 \u203a SVG nested preserves native effect ordering and placement",
+        "[11/12] tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-unmasked preserves native effect ordering and placement",
+        "[12/12] tests/svg-styles.e2e.ts:4:208 \u203a SVG nested-mask-only preserves native effect ordering and placement",
+        "  1 failed",
+        "    tests/svg-styles.e2e.ts:4:208 \u203a SVG affine-shadow preserves native effect ordering and placement ",
+        "  11 passed (24.4s)"
+      ]
+    },
+    "/tmp/canoli-svg-styles-affine.log": {
+      "sha256": "145b81fb6b2d5cc1c39a520ccb68c49480d0c066a9bd7f71d32a111fe64286b3",
+      "tail": [
+        "    test-results/svg-styles.e2e.ts-SVG-scal-8a6c2-fect-ordering-and-placement/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-styles.e2e.ts-SVG-scal-8a6c2-fect-ordering-and-placement/error-context.md",
+        "",
+        "",
+        "  2 failed",
+        "    tests/svg-styles.e2e.ts:4:243 \u203a SVG reflected-shadow preserves native effect ordering and placement ",
+        "    tests/svg-styles.e2e.ts:4:243 \u203a SVG scaled-shadow preserves native effect ordering and placement "
+      ]
+    },
+    "/tmp/canoli-svg-styles-seo.log": {
+      "sha256": "06e7e4b8b625537d1d315940410c38d04489fe5b4106441f05f19d967ef1d009",
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  09:44:07",
+        "   Duration  180ms (transform 54%, import 20%, tests 19%, worker 7%)",
+        ""
+      ]
+    }
+  }
+}

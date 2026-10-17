@@ -1,4 +1,5 @@
 import { z } from "zod";
+import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from "../../core/interchange/tiff/types";
 import type { Recipe } from "./types";
 import { recipeSchema } from "./schema";
 
@@ -8,6 +9,7 @@ export interface RecipeAsset {
   width: number;
   height: number;
   blob: Blob;
+  tiff?:TiffDecodeSettings;
 }
 const magic = new Uint8Array([76, 85, 77, 65, 82, 49, 13, 10]); // LUMAR1\r\n
 const safeInteger = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
@@ -17,7 +19,8 @@ const assetSchema = z
     name: z.string(),
     width: safeInteger.positive(),
     height: safeInteger.positive(),
-    type: z.enum(["image/png", "image/jpeg", "image/webp"]),
+    type: z.enum(["image/png", "image/jpeg", "image/webp", "image/tiff"]),
+    tiff:tiffDecodeOptionsSchema.optional(),
     offset: safeInteger,
     size: safeInteger,
     sha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -106,6 +109,7 @@ export async function serializeRecipePackage(
         width: asset.width,
         height: asset.height,
         type: asset.blob.type,
+        ...(asset.tiff?{tiff:asset.tiff}:{}),
         offset,
         size: asset.blob.size,
         sha256: hex(await hash(asset.blob)),
@@ -161,6 +165,7 @@ export async function readRecipePackage(
       end > file.size
     )
       throw new Error("Invalid recipe asset ranges.");
+    if(entry.tiff!==undefined&&entry.type!=='image/tiff')throw new Error('TIFF settings on a non-TIFF recipe asset.');
     const blob = file.slice(start + offset, end, entry.type);
     if (hex(await hash(blob)) !== entry.sha256)
       throw new Error(`Recipe asset checksum mismatch: ${entry.id}`);
@@ -170,7 +175,7 @@ export async function readRecipePackage(
       width: entry.width,
       height: entry.height,
       blob,
-    });
+      ...(entry.tiff?{tiff:entry.tiff}:{}),    });
     offset += entry.size;
   }
   if (seen.size !== required.size) throw new Error("Missing recipe assets.");

@@ -1,6 +1,8 @@
 import { MetadataService } from "../intelligence/metadata/service";
 import { AnalysisService } from "../intelligence/candidates/service";
 import { id } from "./model";
+import {decodeTiffFile} from './interchange/tiff/client';
+import {tiffDecodeOptionsSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl} from './interchange/tiff/types';
 
 export interface SerializedAsset {
   id: string;
@@ -13,7 +15,9 @@ export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
   readonly blob: Blob;
   bitmap: ImageBitmap;
   thumbnail: string;
+  readonly tiff?: Readonly<TiffDecodeSettings>;
 }
+export interface AssetImportOptions extends TiffImportControl {tiff?:TiffDecodeOptions}
 
 export class AssetStore {
   readonly metadata = new MetadataService();
@@ -62,17 +66,24 @@ export class AssetStore {
     name: string,
     assetId: string = id(),
     analyzeMetadata = true,
+    options: AssetImportOptions = {},
   ): Promise<ImageAsset> {
-    if (!["image/png", "image/jpeg", "image/webp"].includes(blob.type))
-      throw new Error("Use a PNG, JPEG, or WebP image.");
+    options.signal?.throwIfAborted();
+    if (!["image/png", "image/jpeg", "image/webp", "image/tiff"].includes(blob.type))
+      throw new Error("Use a PNG, JPEG, WebP or supported TIFF image.");
+    if(options.tiff!==undefined&&blob.type!=='image/tiff')throw new Error('TIFF decoding settings require a TIFF source.');
+    const tiff=blob.type==='image/tiff'?Object.freeze(tiffDecodeOptionsSchema.parse(options.tiff??{})):undefined;
     if (this.assets.has(assetId) || this.pending.has(assetId))
       throw new Error("Duplicate asset ID.");
     const generation = this.generation;
     this.pending.add(assetId);
     let bitmap: ImageBitmap;
     try {
+      let decoded=blob;
+      if(tiff){if(typeof createImageBitmap==='undefined')throw new Error('TIFF source pixels require the browser image host.');decoded=(await decodeTiffFile(blob,tiff,{signal:options.signal,onProgress:p=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}})).png;}
+      options.signal?.throwIfAborted();
       if (typeof createImageBitmap !== "undefined") {
-        bitmap = await createImageBitmap(blob);
+        bitmap = await createImageBitmap(decoded);
       } else {
         bitmap = {
           width: 512,
@@ -80,13 +91,15 @@ export class AssetStore {
           close: () => {},
         } as unknown as ImageBitmap;
       }
-    } catch {
+    } catch (error) {
       this.pending.delete(assetId);
+      if(tiff||options.signal?.aborted)throw error;
       throw new Error(
         "The browser could not decode this image. Check the file format and available device memory.",
       );
     }
     try {
+      options.signal?.throwIfAborted();
       if (generation !== this.generation)
         throw new Error("The asset store changed during import.");
       let thumbnailDataUrl = "data:image/png;base64,";
@@ -112,6 +125,7 @@ export class AssetStore {
         blob,
         bitmap,
         thumbnail: thumbnailDataUrl,
+        ...(tiff?{tiff}:{}),
       };
       this.assets.set(assetId, asset);
       if (analyzeMetadata)

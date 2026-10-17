@@ -5,6 +5,8 @@ import { lassoSelection } from "./core/lasso";
 import { CanvasRenderer } from "./engine/renderer";
 import { CropController } from "./crop-controller";
 import type { CropHandle } from "./crop-controller";
+import type { QuickSelectionOptions } from './core/quick-selection';
+import type { SelectionModificationProgress } from './core/selection-modification';
 import type { EditorApplication } from "./editor";
 import {
   RasterLayer,
@@ -49,6 +51,7 @@ import { release } from "./engine/canvas";
 import type { PaintPreview } from "./engine/renderer";
 
 export type Tool =
+  | "quick-select"
   | "wand"
   | "move"
   | "hand"
@@ -68,6 +71,11 @@ export type Tool =
   | "text"
   | "fill";
 export interface ToolSettings {
+  quickSize:number;
+  quickTolerance:number;
+  quickEdgeThreshold:number;
+  quickSampling:'merged'|'layer';
+  quickSelectionMode:'replace'|SelectionOperation;
   healingRadius: number;
   patchSampling: "current-layer" | "current-and-below" | "all-layers";
   patchMode: "source" | "mixed";
@@ -94,12 +102,15 @@ export interface ToolSettings {
   penWidth: number;
   penFill: boolean;
   selectionShape: "rectangle" | "ellipse";
+  lassoMode: "freeform" | "polygon";
   wandTolerance: number;
   wandContiguous: boolean;
   selectionMode: "replace" | SelectionOperation;
   cloneAligned: boolean;
 }
 interface ToolState {
+  quickSelectionPoints:Point[]|null;
+  quickSelectionProgress:SelectionModificationProgress|null;
   lassoPoints: Point[] | null;
   healingStroke: BrushStrokeData | null;
   patchOffset: Point | null;
@@ -138,6 +149,16 @@ interface LassoGesture extends BaseGesture {
   previous: SelectionData | null;
   operation: "replace" | SelectionOperation;
 }
+interface QuickSelectionGesture extends BaseGesture {
+  kind:'quick-selection';
+  points:Point[];
+  options:Omit<QuickSelectionOptions,'points'>;
+}
+interface PolygonLassoDraft extends BaseGesture {
+  points: Point[];
+  pointer?: Point;
+  operation: "replace" | SelectionOperation;
+}
 interface MarqueeGesture extends BaseGesture {
   kind: "marquee";
   start: Point;
@@ -156,6 +177,8 @@ interface PenGesture extends BaseGesture {
   newPath: boolean;
   data: VectorPathData;
   original: VectorPathData;
+  rootOriginal?: VectorPathData;
+  contourId?: string;
   index: number;
   mode: "new" | "anchor" | "in" | "out" | "close";
   start: Point;
@@ -221,6 +244,7 @@ interface PatchGesture extends BaseGesture {
   settings: ToolSettings;
 }
 type Gesture =
+  | QuickSelectionGesture
   | HealGesture
   | PatchGesture
   | MaskContourGesture
@@ -234,11 +258,19 @@ type Gesture =
 
 /** Stateful tool orchestration; previews are commands, commits use the public DOM. */
 export class ToolController {
+  private quickAbort:AbortController|null=null;
   private patchAbort: AbortController | null = null;
   private state: ToolState = {
+    quickSelectionPoints:null,
+    quickSelectionProgress:null,
     healingStroke: null,
     patchOffset: null,
     settings: {
+      quickSize:32,
+      quickTolerance:32,
+      quickEdgeThreshold:64,
+      quickSampling:'merged',
+      quickSelectionMode:'add',
       healingRadius: 64,
       patchSampling: "all-layers",
       patchMode: "source",
@@ -260,6 +292,7 @@ export class ToolController {
       penWidth: 3,
       penFill: false,
       selectionShape: "rectangle",
+      lassoMode: "freeform",
       wandTolerance: 32,
       wandContiguous: true,
       selectionMode: "replace",
@@ -278,6 +311,7 @@ export class ToolController {
   private gesture: Gesture | null = null;
   private generation = 0;
   private maskContour: MaskContourDraft | null = null;
+  private polygonLasso: PolygonLassoDraft | null = null;
   private maskPoint: {
     layerId: string;
     pathIndex: number;
@@ -292,8 +326,12 @@ export class ToolController {
   constructor(private editor: EditorApplication) {
     this.crop = new CropController(
       () => this.editor.document,
-      () =>
-        this.publish({ drawing: this.crop.dragging || this.gesture !== null }),
+      () => {
+        // Crop bounds/active state live on the controller, outside ToolState.
+        // Publish those changes even when every cached ToolState field is equal.
+        this.uiSnapshot = null;
+        this.publish({ drawing: this.crop.dragging || this.gesture !== null });
+      },
     );
   }
   getSnapshot = () => this.state;
@@ -311,6 +349,13 @@ export class ToolController {
   }
   get drawingMaskContour() {
     return this.maskContour !== null;
+  }
+  get drawingPolygonLasso() {
+    return this.polygonLasso !== null;
+  }
+  get drawingQuickSelection(){return this.gesture?.kind==='quick-selection';}
+  get polygonLassoPointCount() {
+    return this.polygonLasso?.points.length ?? 0;
   }
   get maskContourPointCount() {
     return this.maskContour?.points.length ?? 0;
@@ -335,7 +380,23 @@ export class ToolController {
     this.state = { ...this.state, ...patch };
     this.listeners.forEach((listener) => listener());
   }
+  /** Trusted UI selection; path geometry and document history are unchanged. */
+  selectVectorPath(path:VectorPath|null){
+    const owner=path?._owner;
+    if(path&&(!owner||owner.document!==this.editor.document||!owner.paths.get(path.id)))throw new Error('Select a path attached to the active document.');
+    if(this.gesture||this.maskContour||this.polygonLasso||this.quickAbort||this.patchAbort||this.crop.active)this.cancel();
+    if(path&&(this.editor.document.selectedLayer?.id!==owner!.id||this.editor.document.selectedLayers.length!==1))this.editor.document.selectedLayer=owner!;
+    const hadMaskPoint=!!this.maskPoint;this.maskPoint=null;
+    const selectedPath=path?{layerId:owner!.id,pathId:path.id}:null,mode=path?'layer':this.state.settings.penEditTarget;
+    if(!hadMaskPoint&&!this.state.penTarget&&this.state.selectedPath?.layerId===selectedPath?.layerId&&this.state.selectedPath?.pathId===selectedPath?.pathId&&mode===this.state.settings.penEditTarget)return;
+    this.publish({selectedPath,penTarget:null,settings:mode===this.state.settings.penEditTarget?this.state.settings:{...this.state.settings,penEditTarget:mode}});
+  }
   configure(patch: Partial<ToolSettings>) {
+    if((this.drawingQuickSelection||this.quickAbort)&&(['quickSize','quickTolerance','quickEdgeThreshold','quickSampling','quickSelectionMode'] as const).some(key=>patch[key]!==undefined&&patch[key]!==this.state.settings[key]))this.cancel();
+    if (patch.lassoMode !== undefined && patch.lassoMode !== this.state.settings.lassoMode)
+      this.cancel();
+    if (this.polygonLasso && patch.selectionMode !== undefined && patch.selectionMode !== this.state.settings.selectionMode)
+      this.cancel();
     if (
       patch.paintTarget !== undefined &&
       patch.paintTarget !== this.state.settings.paintTarget
@@ -355,11 +416,14 @@ export class ToolController {
     this.publish({ settings: { ...this.state.settings, ...patch } });
   }
   cancel() {
+    this.quickAbort?.abort();this.quickAbort=null;
+    this.publish({quickSelectionPoints:null,quickSelectionProgress:null});
     this.patchAbort?.abort();
     this.patchAbort = null;
     this.publish({ patchOffset: null, healingStroke: null });
     this.crop.cancel();
     this.maskContour = null;
+    this.polygonLasso = null;
     this.cancelFrame();
     this.generation++;
     if(this.gesture?.kind === "paint")this.gesture.cloneSource?.dispose();
@@ -374,11 +438,14 @@ export class ToolController {
     });
   }
   reset() {
+    this.quickAbort?.abort();this.quickAbort=null;
+    this.publish({quickSelectionPoints:null,quickSelectionProgress:null});
     this.patchAbort?.abort();
     this.patchAbort = null;
     this.publish({ patchOffset: null, healingStroke: null });
     this.crop.cancel();
     this.maskContour = null;
+    this.polygonLasso = null;
     this.maskPoint = null;
     this.cancelFrame();
     this.generation++;
@@ -396,6 +463,10 @@ export class ToolController {
     });
   }
   finishPath() {
+    if (this.polygonLasso) {
+      this.finishPolygonLasso();
+      return;
+    }
     const draft = this.maskContour;
     if (draft) {
       this.assertMaskContour(draft);
@@ -413,6 +484,15 @@ export class ToolController {
     this.publish({ penTarget: null });
   }
   removeLastAnchor() {
+    if (this.polygonLasso) {
+      this.assertPolygonLasso(this.polygonLasso);
+      this.cancelFrame();
+      this.polygonLasso.pointer = undefined;
+      this.polygonLasso.points.pop();
+      if (!this.polygonLasso.points.length) this.cancel();
+      else this.publish({ lassoPoints: [...this.polygonLasso.points] });
+      return true;
+    }
     if (this.maskContour) {
       this.assertMaskContour(this.maskContour);
       this.maskContour.points.pop();
@@ -518,6 +598,53 @@ export class ToolController {
       pressure: p,
     };
   }
+  private assertPolygonLasso(draft: PolygonLassoDraft) {
+    try { this.assertCurrent(draft); }
+    catch (error) { this.cancel(); throw error; }
+  }
+  private beginPolygonLasso(
+    point: Point,
+    modifiers: { alt: boolean; shift: boolean },
+    zoom: number,
+  ) {
+    if (!this.polygonLasso) {
+      this.cancel();
+      const document = this.editor.document;
+      this.polygonLasso = {
+        document,
+        revision: document.getSnapshot().revision,
+        generation: this.generation,
+        points: [],
+        operation: modifiers.shift && modifiers.alt ? "intersect"
+          : modifiers.shift ? "add" : modifiers.alt ? "subtract"
+          : this.state.settings.selectionMode,
+      };
+    }
+    const draft = this.polygonLasso;
+    this.assertPolygonLasso(draft);
+    this.cancelFrame();
+    draft.pointer = undefined;
+    const first = draft.points[0];
+    if (draft.points.length >= 3 && Math.hypot(point.x-first.x, point.y-first.y) <= 6/zoom) {
+      this.finishPolygonLasso();
+      return;
+    }
+    const last = draft.points.at(-1);
+    if (last && last.x === point.x && last.y === point.y) return;
+    if (draft.points.length >= 20000)
+      throw new Error("Finish this lasso before adding more points.");
+    draft.points.push({ x: point.x, y: point.y });
+    this.publish({ lassoPoints: [...draft.points] });
+  }
+  finishPolygonLasso() {
+    const draft = this.polygonLasso;
+    if (!draft) return;
+    this.assertPolygonLasso(draft);
+    if (draft.points.length < 3)
+      throw new Error("Place at least three polygon corners before finishing.");
+    draft.document.selectPolygon(draft.points, draft.operation);
+    this.cancel();
+  }
   begin(
     tool: Tool,
     point: Point,
@@ -525,6 +652,10 @@ export class ToolController {
     zoom: number,
     cropHandle?: CropHandle,
   ) {
+    if (tool === "lasso" && this.state.settings.lassoMode === "polygon") {
+      this.beginPolygonLasso(point, modifiers, zoom);
+      return;
+    }
     if (tool === "crop") {
       if (!this.crop.active) this.cancel();
       this.crop.begin(point, zoom, cropHandle);
@@ -549,6 +680,13 @@ export class ToolController {
       revision: doc.getSnapshot().revision,
       generation: this.generation,
     };
+    if(tool==='quick-select'){
+      const settings=this.state.settings,layer=doc.selectedLayer;
+      if(settings.quickSampling==='layer'&&!layer)throw new Error('Choose a source layer for Quick Selection.');
+      const operation=modifiers.shift&&modifiers.alt?'intersect':modifiers.shift?'add':modifiers.alt?'subtract':settings.quickSelectionMode;
+      this.gesture={...base,kind:'quick-selection',points:[{...point}],options:{size:settings.quickSize,tolerance:settings.quickTolerance,edgeThreshold:settings.quickEdgeThreshold,operation,source:settings.quickSampling==='layer'?{kind:'layer',layerId:layer!.id}:{kind:'merged'}}};
+      this.publish({drawing:true,quickSelectionPoints:[{...point}]});return;
+    }
     if (tool === "heal") {
       const settings = { ...this.state.settings };
       const stroke = new BrushStroke({
@@ -847,12 +985,15 @@ export class ToolController {
           type: "path.update",
           id: gesture.layer.id,
           pathId: gesture.path.id,
-          patch: {
-            points: gesture.data.points.map((point, index) =>
-              index === gesture.index ? structuredClone(point) : point),
-            closed: gesture.data.closed,
-          },
+          patch: this.penPatch(gesture),
         };
+  }
+  private penPatch(gesture: PenGesture): Partial<Omit<VectorPathData, "id">> {
+    const points = gesture.data.points.map((point, index) =>
+      index === gesture.index ? structuredClone(point) : point);
+    return gesture.contourId
+      ? { subpaths: gesture.rootOriginal!.subpaths!.map(contour => contour.id === gesture.contourId ? { ...contour, points } : contour) }
+      : { points, closed: gesture.data.closed };
   }
   private maskWorld(
     document: Document,
@@ -1078,6 +1219,7 @@ export class ToolController {
     let sourcePath = target?.layerId === layer.id
       ? paths.find(candidate => candidate.id === target.pathId) ?? null : null;
     let path = sourcePath ? layer.paths.get(sourcePath.id) : null;
+    let contourId: string | undefined;
     let mode: PenGesture["mode"] = "new",
       index = sourcePath?.points.length ?? 0,
       newPath = !path;
@@ -1090,7 +1232,8 @@ export class ToolController {
       index = 0;
     } else {
       outer: for (const candidate of paths) {
-        const points = candidate.points;
+        for (const contour of [candidate, ...(candidate.subpaths ?? [])]) {
+        const points = contour.points;
         for (let i = 0; i < points.length; i++) {
           const anchor = points[i];
           for (const part of ["in", "out", "anchor"] as const) {
@@ -1099,6 +1242,7 @@ export class ToolController {
               continue;
             if (near(p)) {
               sourcePath = candidate;
+              contourId = contour === candidate ? undefined : contour.id;
               path = layer.paths.get(candidate.id);
               index = i;
               mode = part;
@@ -1106,6 +1250,7 @@ export class ToolController {
               break outer;
             }
           }
+        }
         }
       }
     }
@@ -1118,7 +1263,8 @@ export class ToolController {
       });
     // Existing path records are immutable document data. Clone only the active
     // anchor; public path getters remain defensive for external callers.
-    const original = sourcePath ?? freeze(path.toJSON()),
+    const rootOriginal = sourcePath ?? freeze(path.toJSON());
+    const original = contourId ? { ...rootOriginal, points: rootOriginal.subpaths!.find(c => c.id === contourId)!.points, closed: true, subpaths: undefined } : rootOriginal,
       data = { ...original, points: [...original.points] };
     // Only the active anchor is mutable during a Pen gesture.
     if (data.points[index]) data.points[index] = structuredClone(data.points[index]);
@@ -1135,6 +1281,8 @@ export class ToolController {
       newPath,
       data,
       original,
+      rootOriginal,
+      contourId,
       index,
       mode,
       start: local,
@@ -1151,12 +1299,35 @@ export class ToolController {
     point: Point,
     modifiers: { shift: boolean; alt: boolean; pressure: number },
   ) {
+    if (this.polygonLasso) {
+      const draft = this.polygonLasso;
+      this.assertPolygonLasso(draft);
+      draft.pointer = { x: point.x, y: point.y };
+      if (this.paintFrame === null) this.paintFrame = requestAnimationFrame(() => {
+        this.paintFrame = null;
+        if (this.polygonLasso !== draft) return;
+        if (this.editor.document !== draft.document || draft.document.getSnapshot().revision !== draft.revision) {
+          this.cancel();
+          return;
+        }
+        this.publish({ lassoPoints: [...draft.points, ...(draft.pointer ? [draft.pointer] : [])] });
+      });
+      return;
+    }
     if (this.crop.dragging) {
       this.crop.move(point, modifiers.shift);
       return;
     }
     const gesture = this.gesture;
     if (!gesture || gesture.kind === "fill") return;
+    if(gesture.kind==='quick-selection'){
+      try{this.assertCurrent(gesture);}catch(error){this.cancel();throw error;}
+      const last=gesture.points.at(-1)!;if(Math.hypot(point.x-last.x,point.y-last.y)<.25)return;
+      if(gesture.points.length>=20000)throw new Error('Finish this Quick Selection stroke before adding more points.');
+      gesture.points.push({...point});
+      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{this.paintFrame=null;if(this.gesture===gesture)this.publish({quickSelectionPoints:[...gesture.points]});});
+      return;
+    }
     if (gesture.kind === "heal") {
       let next = this.point(point, { x: 0, y: 0 }, modifiers.pressure);
       const last = gesture.stroke.points.at(-1)!;
@@ -1491,6 +1662,13 @@ export class ToolController {
     try {
       this.assertCurrent(gesture);
       const doc = gesture.document;
+      if(gesture.kind==='quick-selection'){
+        const abort=new AbortController();this.quickAbort=abort;this.publish({quickSelectionProgress:{completed:0,total:1}});
+        try{await doc.selectQuickSelection({...gesture.options,points:gesture.points},{signal:abort.signal,onProgress:progress=>this.publish({quickSelectionProgress:progress})});committed=true;}
+        catch(error){if(!abort.signal.aborted)throw error;}
+        finally{if(this.quickAbort===abort)this.quickAbort=null;}
+        return;
+      }
       if (gesture.kind === "heal") {
         const abort = new AbortController();
         this.patchAbort = abort;
@@ -1584,16 +1762,10 @@ export class ToolController {
         doc.transaction("Edit vector path", () => {
           if (gesture.fresh) this.placeNew(gesture.layer, gesture.after, doc);
           if (gesture.newPath) {
-            gesture.path.update({
-              points: gesture.data.points,
-              closed: gesture.data.closed,
-            });
+            gesture.path.update(this.penPatch(gesture));
             gesture.layer.paths.add(gesture.path);
           } else
-            gesture.path.update({
-              points: gesture.data.points,
-              closed: gesture.data.closed,
-            });
+            gesture.path.update(this.penPatch(gesture));
         });
         doc.selectedLayer = gesture.layer;
         this.publish({
@@ -1658,6 +1830,8 @@ export class ToolController {
       if (!committed)
         stagedTiles.forEach((tile) => assets.remove(tile.assetId));
       this.publish({
+        quickSelectionPoints:null,
+        quickSelectionProgress:null,
         preview: null,
         lassoPoints: null,
         paintPreview: null,
@@ -1902,6 +2076,7 @@ export class ToolController {
         : new VectorLayer({ name: "Imported vector" });
     const fresh = !(selected instanceof VectorLayer);
     const path = VectorPath.fromSvgPath(d, {
+      ...options,
       stroke:
         options.stroke === undefined
           ? this.state.settings.color

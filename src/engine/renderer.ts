@@ -21,7 +21,7 @@ import { blendAdjustedTile } from "./adjustment-blend";
 import { localTransform } from "../core/spatial";
 import { maskTransform, maskGeometry } from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
-import { maskCoverage, PaintedMaskRaster } from "./masks";
+import { maskCoverage, PaintedMaskRaster, applyMaskSettings } from "./masks";
 import type { AssetStore } from "../core/assets";
 import type {
   DocumentData,
@@ -40,6 +40,7 @@ import {
   ActiveStrokeRaster,
   drawPaint,
   drawText,
+  measureTextInk,
   drawVectors,
 } from "./drawing";
 import type { BrushStrokeData } from "../core/drawing";
@@ -105,6 +106,11 @@ export interface DocumentRenderer {
     assets: AssetStore,
     options?: RenderOptions,
   ): Promise<HTMLCanvasElement>;
+  /** Optional native coverage service for vector exports with rasterized masks. */
+  renderMaskCoverage?(
+    mask:LayerMaskData,space:RenderSpace,x:number,y:number,key:string,
+    retain?:boolean,world?:AffineTransform,assets?:AssetStore,
+  ):Promise<HTMLCanvasElement>;
   clearCache(): void;
   dispose(): void;
 }
@@ -577,61 +583,68 @@ export class CanvasRenderer implements DocumentRenderer {
           ? Math.ceil((shadow.blur * 3 + Math.abs(shadow.y)) * current.sy) + 2
           : 0;
         if (cache && isolated !== layer && !affected.has(layer.id) &&
-            (layer.kind === "raster" || (layer.kind === "paint" && layer.strokes.every(stroke => stroke.kind === "fill" && !stroke.clip))) &&
+            (layer.kind === "raster" || (layer.kind === "text" && shadow.enabled) ||
+              (layer.kind === "paint" && layer.strokes.every(stroke => stroke.kind === "fill" && !stroke.clip))) &&
             layer.blendMode === "normal" && (layer.fillOpacity ?? 1) === 1 &&
             !style.blendIf.enabled) {
           const placement = renderTransform(current, world);
+          const ink = layer.kind === "text" ? measureTextInk(layer) : undefined;
           const bounds = layer.kind === "raster"
             ? [{ x: 0, y: 0, width: layer.width, height: layer.height }]
-            : layer.strokes.map(strokeBounds);
-          const blurSupport = shadow.enabled ? shadow.blur * 3 * Math.max(current.sx,current.sy) : 0;
-          const marginX = shadow.enabled ? Math.ceil(blurSupport+Math.abs(shadow.x*current.sx))+2 : 0;
-          const marginY = shadow.enabled ? Math.ceil(blurSupport+Math.abs(shadow.y*current.sy))+2 : 0;
-          let left = current.width, top = current.height, right = 0, bottom = 0;
-          for (const bound of bounds) {
-            const box = placement.bounds(bound);
-            left = Math.min(left, Math.floor(box.x)-2-marginX); top = Math.min(top, Math.floor(box.y)-2-marginY);
-            right = Math.max(right, Math.ceil(box.x+box.width)+2+marginX); bottom = Math.max(bottom, Math.ceil(box.y+box.height)+2+marginY);
-          }
-          left = Math.max(0,left); top = Math.max(0,top);
-          right = Math.min(current.width,right); bottom = Math.min(current.height,bottom);
-          if (right <= left || bottom <= top) continue;
-          // Keep the viewport's exact output-pixel grid. Isolated composition
-          // leaves opacity for the parent, preserving backdrop alpha behavior.
-          if ((right-left)*(bottom-top) < current.width*current.height*.75) {
-            const bounded = {...current,x:current.x+left/current.sx,y:current.y+top/current.sy,width:right-left,height:bottom-top};
-            // Finished appearances can draw directly without an intermediate
-            // surface. Their key includes the same halo as the inner compositor.
-            const maskActive = !!(layer.mask?.enabled && layer.mask.density > 0);
-            const directSignature = isImmutable(layer) && (shadow.enabled || maskActive)
-              ? this.finishedStyleSignature(layer, options.documentTransform)
-              : !shadow.enabled && !maskActive
-                ? style.colorOverlay.enabled
-                  ? JSON.stringify(["color-overlay", this.signature(layer), style.colorOverlay])
-                  : this.signature(layer)
-                : undefined;
-            if (directSignature !== undefined) {
-              const keySpace = {...bounded,x:bounded.x-haloX/current.sx,y:bounded.y-haloY/current.sy,
-                width:bounded.width+haloX*2,height:bounded.height+haloY*2};
-              const boundedKey = `${scope}:${layer.id}:${JSON.stringify([keySpace, world])}`;
-              targetContext.save();
-              try {
-                targetContext.globalAlpha = layer.opacity;
-                targetContext.globalCompositeOperation = "source-over";
-                if (cache.draw(boundedKey, directSignature, targetContext, left, top)) continue;
-              } finally { targetContext.restore(); }
+            : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
+            : ink ? [ink] : undefined;
+          // Unsupported glyph metrics take the full reference path. Logical
+          // text width alone cannot bound italic, RTL or overlapping glyph ink.
+          if (bounds) {
+            const blurSupport = shadow.enabled ? shadow.blur * 3 * Math.max(current.sx,current.sy) : 0;
+            const marginX = shadow.enabled ? Math.ceil(blurSupport+Math.abs(shadow.x*current.sx))+2 : 0;
+            const marginY = shadow.enabled ? Math.ceil(blurSupport+Math.abs(shadow.y*current.sy))+2 : 0;
+            let left = current.width, top = current.height, right = 0, bottom = 0;
+            for (const bound of bounds) {
+              const box = placement.bounds(bound);
+              left = Math.min(left, Math.floor(box.x)-2-marginX); top = Math.min(top, Math.floor(box.y)-2-marginY);
+              right = Math.max(right, Math.ceil(box.x+box.width)+2+marginX); bottom = Math.max(bottom, Math.ceil(box.y+box.height)+2+marginY);
             }
-            const surface = createCanvas(right-left,bottom-top);
-            try {
-              await paint([layer],surface,bounded,parent,layer);
-              targetContext.save();
+            left = Math.max(0,left); top = Math.max(0,top);
+            right = Math.min(current.width,right); bottom = Math.min(current.height,bottom);
+            if (right <= left || bottom <= top) continue;
+            // Keep the viewport's exact output-pixel grid. Isolated composition
+            // leaves opacity for the parent, preserving backdrop alpha behavior.
+            if ((right-left)*(bottom-top) < current.width*current.height*.75) {
+              const bounded = {...current,x:current.x+left/current.sx,y:current.y+top/current.sy,width:right-left,height:bottom-top};
+              // Finished appearances can draw directly without an intermediate
+              // surface. Their key includes the same halo as the inner compositor.
+              const maskActive = !!(layer.mask?.enabled && layer.mask.density > 0);
+              const directSignature = isImmutable(layer) && (shadow.enabled || maskActive)
+                ? this.finishedStyleSignature(layer, options.documentTransform)
+                : !shadow.enabled && !maskActive
+                  ? style.colorOverlay.enabled
+                    ? JSON.stringify(["color-overlay", this.signature(layer), style.colorOverlay])
+                    : this.signature(layer)
+                  : undefined;
+              if (directSignature !== undefined) {
+                const keySpace = {...bounded,x:bounded.x-haloX/current.sx,y:bounded.y-haloY/current.sy,
+                  width:bounded.width+haloX*2,height:bounded.height+haloY*2};
+                const boundedKey = `${scope}:${layer.id}:${JSON.stringify([keySpace, world])}`;
+                targetContext.save();
+                try {
+                  targetContext.globalAlpha = layer.opacity;
+                  targetContext.globalCompositeOperation = "source-over";
+                  if (cache.draw(boundedKey, directSignature, targetContext, left, top)) continue;
+                } finally { targetContext.restore(); }
+              }
+              const surface = createCanvas(right-left,bottom-top);
               try {
-                targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
-                targetContext.globalCompositeOperation = "source-over";
-                targetContext.drawImage(surface,left,top);
-              } finally { targetContext.restore(); }
-            } finally { release(surface); }
-            continue;
+                await paint([layer],surface,bounded,parent,layer);
+                targetContext.save();
+                try {
+                  targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
+                  targetContext.globalCompositeOperation = "source-over";
+                  targetContext.drawImage(surface,left,top);
+                } finally { targetContext.restore(); }
+              } finally { release(surface); }
+              continue;
+            }
           }
         }
         const padded: RenderSpace = {
@@ -901,6 +914,38 @@ export class CanvasRenderer implements DocumentRenderer {
                     image.data.set(pixels);
                     c.putImageData(image, tx, ty);
                   }
+              } else if (layer.adjustment.kind === "lut") {
+                for (let ty = 0; ty < padded.height; ty += 1024)
+                  for (let tx = 0; tx < padded.width; tx += 1024) {
+                    const width = Math.min(1024, padded.width - tx), height = Math.min(1024, padded.height - ty);
+                    const image = c.getImageData(tx, ty, width, height);
+                    image.data.set(await this.processor.lookup(image.data, layer.adjustment));
+                    c.putImageData(image, tx, ty);
+                  }
+              } else if (layer.adjustment.kind === "white-balance") {
+                for (let ty = 0; ty < padded.height; ty += 1024)
+                  for (let tx = 0; tx < padded.width; tx += 1024) {
+                    const width = Math.min(1024, padded.width - tx), height = Math.min(1024, padded.height - ty);
+                    const image = c.getImageData(tx, ty, width, height);
+                    image.data.set(await this.processor.whiteBalance(image.data, layer.adjustment));
+                    c.putImageData(image, tx, ty);
+                  }
+              } else if (layer.adjustment.kind === "gradient-map") {
+                for (let ty = 0; ty < padded.height; ty += 1024)
+                  for (let tx = 0; tx < padded.width; tx += 1024) {
+                    const width = Math.min(1024, padded.width - tx), height = Math.min(1024, padded.height - ty);
+                    const image = c.getImageData(tx, ty, width, height);
+                    image.data.set(await this.processor.gradientMap(image.data, layer.adjustment));
+                    c.putImageData(image, tx, ty);
+                  }
+              } else if (layer.adjustment.kind === "color-balance" || layer.adjustment.kind === "vibrance") {
+                for (let ty = 0; ty < padded.height; ty += 1024)
+                  for (let tx = 0; tx < padded.width; tx += 1024) {
+                    const width = Math.min(1024,padded.width-tx), height = Math.min(1024,padded.height-ty);
+                    const image = c.getImageData(tx,ty,width,height);
+                    image.data.set(await this.processor.chromatic(image.data,layer.adjustment));
+                    c.putImageData(image,tx,ty);
+                  }
               } else if (layer.adjustment.kind === "hsl") {
                 for (let ty = 0; ty < padded.height; ty += 1024)
                   for (let tx = 0; tx < padded.width; tx += 1024) {
@@ -1041,15 +1086,7 @@ export class CanvasRenderer implements DocumentRenderer {
               if (canCache()) cache?.write(maskKey, maskSignature, mask);
             }
             try {
-              const m = mask.getContext("2d")!;
-              m.fillStyle = "#ffffff";
-              if (maskData.inverted) {
-                m.globalCompositeOperation = "xor";
-                m.fillRect(0, 0, mask.width, mask.height);
-              }
-              m.globalCompositeOperation = "destination-over";
-              m.globalAlpha = 1 - maskData.density;
-              m.fillRect(0, 0, mask.width, mask.height);
+              applyMaskSettings(mask,maskData);
               if (layer.kind === "adjustment") {
                 maskCanvas = createCanvas(mask.width, mask.height, true);
                 maskCanvas.getContext("2d")!.drawImage(mask, 0, 0);

@@ -118,11 +118,14 @@ test('isolated scripts clear fractional pixel selections and PSD cannot silently
   });
   expect(await alpha(page,16,16)).toBe(127);
   expect(await alpha(page,17,16)).toBe(255);
-  const error=await page.evaluate(async()=>{
-    try { await window.luma.editor.export({format:'psd'}); return ''; }
-    catch(error) { return String(error); }
+  const exported=await page.evaluate(async()=>{
+    const {parsePsd}=await import(/* @vite-ignore */String('/src/core/interchange/psd/parser.ts'));
+    const result=await window.luma.editor.export({format:'psd'});
+    const psd=parsePsd(await result.blob.arrayBuffer()),pixels=psd.composite!.data;
+    const at=(x:number,y:number)=>pixels[(y*psd.header.width+x)*4+3];
+    return {erased:at(16,16),untouched:at(17,16),layerAlpha:psd.layers[0].imageData!.data[(16*psd.layers[0].width+16)*4+3]};
   });
-  expect(error).toContain('cannot preserve raster erasures');
+  expect(exported).toEqual({erased:127,untouched:255,layerAlpha:127});
   await page.keyboard.press('Control+z');expect(await alpha(page,16,16)).toBe(255);
 });
 

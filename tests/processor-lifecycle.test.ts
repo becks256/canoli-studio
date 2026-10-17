@@ -69,3 +69,33 @@ it("a message cloning error rejects only its request and does not retain it", as
   expect([...(await next)]).toEqual([9, 8, 7, 6]);
   p.dispose();
 });
+
+it('selection progress retains the pending result and snapshots inputs before readiness',async()=>{
+  const p=processor(),worker=ControlledWorker.current;
+  const input={operation:'expand' as const,radius:2,width:20,height:20,selection:{regions:[{shape:'rectangle' as const,operation:'add' as const,x:2,y:2,width:4,height:4}]}};
+  const progress=vi.fn();let settled=false;
+  const pending=p.modifySelection(input,progress).then(value=>{settled=true;return value;});
+  input.radius=10;input.selection.regions[0].width=19;
+  worker.ready();await p.ready;await Promise.resolve();
+  const message=worker.postMessage.mock.calls.at(-1)![0];
+  expect(message.selectionModification.radius).toBe(2);
+  expect(message.selectionModification.selection.regions[0].width).toBe(4);
+  worker.onmessage?.({data:{id:message.id,type:'progress',progress:{completed:1,total:2}}});
+  await Promise.resolve();expect(settled).toBe(false);
+  expect(progress).toHaveBeenCalledWith({completed:1,total:2});
+  worker.onmessage?.({data:{id:message.id,selectionResult:{regions:[]}}});
+  expect(await pending).toEqual({regions:[]});p.dispose();
+});
+
+it('a failing progress callback rejects only its request and ignores late output',async()=>{
+  const p=processor(),worker=ControlledWorker.current;worker.ready();await p.ready;
+  const failed=p.modifySelection({operation:'feather',radius:1,width:1,height:1,selection:{regions:[]}},()=>{throw new Error('Progress callback failed');});
+  const next=p.process(new Uint8ClampedArray(4),[]);
+  await Promise.resolve();
+  const first=worker.postMessage.mock.calls[0][0],second=worker.postMessage.mock.calls[1][0];
+  worker.onmessage?.({data:{id:first.id,type:'progress',progress:{completed:0,total:1}}});
+  await expect(failed).rejects.toThrow('Progress callback failed');
+  worker.onmessage?.({data:{id:first.id,selectionResult:{regions:[]}}});
+  worker.onmessage?.({data:{id:second.id,pixels:new Uint8ClampedArray([1,2,3,4])}});
+  expect([...(await next)]).toEqual([1,2,3,4]);p.dispose();
+});

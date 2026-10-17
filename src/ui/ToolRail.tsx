@@ -1,5 +1,6 @@
 import {
   Search,
+  ClipboardCheck,
   Sun,
   Moon,
   BookOpen,
@@ -41,6 +42,7 @@ export interface ToolRailProps {
   onOpenPalette(): void;
   onOpenHelp(): void;
   onOpenRecovery(): void;
+  onOpenPreflight(): void;
   docsUrl?: string;
 }
 
@@ -56,6 +58,7 @@ export function ToolRail({
   onOpenPalette,
   onOpenHelp,
   onOpenRecovery,
+  onOpenPreflight,
   docsUrl = `${import.meta.env.BASE_URL}developer/scripting-api.html`,
 }: ToolRailProps) {
   return (
@@ -91,6 +94,7 @@ export function ToolRail({
           ["marquee", "Marquee tool (M)", Scan],
           ["lasso", "Lasso tool (L)", Lasso],
           ["wand", "Magic wand tool (W)", WandSparkles],
+          ["quick-select", "Quick selection (Shift+W)", Paintbrush],
           ["fill", "Paint bucket (G)", PaintBucket],
           ["brush", "Brush tool (B)", Paintbrush],
           ["dodge", "Dodge tool (O)", Sun],
@@ -155,6 +159,7 @@ export function ToolRail({
         <Puzzle size={19} />
       </IconButton>
       <div className="rail-bottom">
+        <IconButton label="Design checks" className="tool-button" onClick={onOpenPreflight} disabled={busy}><ClipboardCheck size={18}/></IconButton>
         <IconButton
           label="Recover work"
           className="tool-button"

@@ -11,6 +11,7 @@ import {
 } from "../../model";
 import { getPsdCapabilityReport, parsePsd } from "./parser";
 import { buildPsd, type LayerPixelSource } from "./builder";
+import { validatePsdDimensions } from "./export-plan";
 import {
   PSD_BLEND_MODE_MAP,
   type PsdCapabilityReport,
@@ -31,7 +32,7 @@ export function psdToDocument(
   buffer: ArrayBuffer | Uint8Array,
   options: PsdImportOptions = {},
 ): PsdImportResult {
-  const parsed = parsePsd(buffer);
+  const parsed = parsePsd(buffer, options);
   const report = getPsdCapabilityReport(parsed);
 
   const doc = createDocument(
@@ -141,14 +142,28 @@ export async function documentToPsd(
   ) => Promise<ImageData | null> | ImageData | null,
   options: PsdExportOptions = {},
 ): Promise<Uint8Array> {
+  validatePsdDimensions(document.width, document.height);
+  // This low-level helper has no document renderer. Reject unsupported content
+  // instead of silently dropping it; browser export uses engine/psd.ts.
+  for (const node of document.children) {
+    if (node.kind !== "raster" || node.transform || node.mask || (node.fillOpacity ?? 1) !== 1 ||
+      node.erasures?.length || node.styles?.blendIf.enabled || node.styles?.colorOverlay.enabled || node.styles?.dropShadow.enabled ||
+      node.effects.some(effect => effect.enabled && (effect.exposure !== 0 || effect.contrast !== 0 || effect.saturation !== 0)))
+      throw new Error("This document requires rendered PSD export. Use editor.export({format: 'psd'}) to preserve its appearance.");
+    if (!Number.isSafeInteger(node.x) || !Number.isSafeInteger(node.y) ||
+      Math.min(node.x, node.y) < -0x80000000 || Math.max(node.x + node.width, node.y + node.height) > 0x7fffffff)
+      throw new Error("Fractional or out-of-range raster placement requires rendered PSD export.");
+  }
   const layersWithPixels: LayerPixelSource[] = [];
 
   for (const child of document.children) {
     if (child.kind === "raster") {
       const raster = child as RasterLayerData;
-      if (raster.erasures?.length)
-        throw new Error("PSD export cannot preserve raster erasures yet. Save a Canoli Studio project or export PNG to retain the edited pixels.");
       const img = await assetResolver(raster.assetId);
+      if (!img) throw new Error(`Missing image asset for PSD export: ${raster.assetId}`);
+      validatePsdDimensions(img.width, img.height);
+      if (img.width !== raster.width || img.height !== raster.height)
+        throw new Error("Scaled raster placement requires rendered PSD export.");
       if (img) {
         layersWithPixels.push({
           layer: raster,

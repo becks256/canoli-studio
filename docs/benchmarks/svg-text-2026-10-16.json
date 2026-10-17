@@ -1,0 +1,1848 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T14:45:52.729419+00:00",
+  "scope": "F08/F11 editable SVG text with native baseline preparation. Full professional-editor roadmap remains active/incomplete.",
+  "sourceSha256": {
+    "src/core/svg-text.ts": "a56618b60bb162ee854e17b3060ff270eec8bcda57f067c0695b8cd4a876649b",
+    "src/engine/svg-text.ts": "b55086f34337942131f061ba7318fc06810e2995ef2a6419d611c5a1f098af14",
+    "src/core/svg-export.ts": "10c8a914708cb0a6c43486b987735c79e42df81d6c1a92b40a7a281ba67a24de",
+    "src/core/svg-styles.ts": "c153a4d81d76f554b16757b3d1b9080d11236842c9d59c9d021a7f65ac1c78ce",
+    "src/core/svg-masks.ts": "a2c0055d5a343dbf5cbadabb43bf1fa8056d5aad71a6704cbd998277de04e764",
+    "src/core/svg-images.ts": "b14fbf62aa655231e23e266eed0341a0392339f5b990c1f22cd8eab9b7a09fd3",
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/engine/export.ts": "0f890d2e322ac8b451c902797c817d77ed03a16d52aa375266a2097278515614",
+    "src/engine/svg-images.ts": "19c465ecd97b78586f04b7e9c233e59c683c55d0cb357c116187016fa2f73431",
+    "src/engine/svg-masks.ts": "84ccb27f6095f5487bc9bdb3bec7ebcd035e5c74bb6f5fb34ee89c044ee33434",
+    "src/engine/drawing.ts": "f9e713c63d0a48e9d3245d895f06a7d46d093063a26e866aa6e71293c8e10aac",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/engine/png.ts": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+    "src/core/model.ts": "4d5df5de545880b0f9b5e88a4579750c86d85b6bb45723f8d3c72b67ea3533a9",
+    "src/dom/index.ts": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "src/ui/ExportDialog.tsx": "e85201c2e6ba99a522f905fa0fcf0763f8225aeb8aa641e5a12363380eed8cbd",
+    "tests/svg-text.test.ts": "93a14b19b1c5f5ea6080fe572e3f6fccbfc62127f15493a75d65230d30fda846",
+    "tests/svg-text.e2e.ts": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+    "tests/production.e2e.ts": "0b56eb4b92c76cfa90851788612c940cda73d1b1f93d57c3a085a27a01b5e646",
+    "tests/export.test.ts": "19fcd30cdbb8de6eafbcad8380f4e831ed466b2d05d8a83feb6fba1e54072240",
+    "tests/foundation-increments.e2e.ts": "eb506249289334752ed644383c725a15ac974829a445fc502373329f97200b85",
+    "tests/svg-export.test.ts": "e19b4af8c09a387d547c4912a852ff7341a6e313dbfdc107d8c2f5004669830b",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/svg-images.test.ts": "5ea617b24d18aa09a29b401c6d0a5293bdf9f1349c878b6112a7ea15b7fd648f",
+    "tests/svg-images.e2e.ts": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+    "tests/svg-masks.test.ts": "f3da8176fc5d5896fdc94fa6870e1d27de0984583b59eb5bc8a9559b6e2dd420",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/svg-styles.test.ts": "2a7fe9b5a506973cf8e5fef2068ec2950fe3dc0e30239672b5eb6e2c523e4c29",
+    "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+    "tests/export-cancellation.e2e.ts": "729a80aa8a8428538861d3b9b9476af2d5d101f5b2f8d9e9439814b2b01118dd",
+    "tests/masks.e2e.ts": "bcb440f5d57c1bc1379a5af720bb884895a1aa25463cf6d484339dab609796f9",
+    "tests/raster-editing.e2e.ts": "b5eecb41106af2c1589515c82b79d4234147ebb930774f06df495ba96af9f884",
+    "tests/metadata.e2e.ts": "e4fe923fb271ffc662684d8647303a85117422859aac44c27e6fd5aeae250dbb",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "docs/REQUIREMENTS.md": "5f85edbff1b80e7651cee2d1f366ab37ba1fbd6f30efdbe41a8047393d1f189f",
+    "docs/API.md": "bd11de6fb98a058ba66bafe46be1cf64a4f6fca6e52af6059602d73e7c588677",
+    "docs/SCRIPTING_API.md": "df4a604329c12f91faaf543944d62f994118221ee6127eb3705c48ceb257c7ed",
+    "docs/ARCHITECTURE.md": "d5931d89ee80f82ed82839147a4033704a0a0c5dada3a42e48c75af20b09369e",
+    "docs/SYSTEM_DESIGN.md": "3a51bee652c02c43ada3a9b19ca2c6e86e7793442121a38e4de1eee3cb459c2c",
+    "docs/DESIGN_SYSTEM.md": "8310de7b63b425ad29904e2d27b9bf7763e9797fccae92e67369e293ddd5f706",
+    "docs/PLUGINS.md": "c7c332b590e73816f0e9571c76278a00107b7c96ce670b3f9f1b0666998176f2",
+    "docs/FEATURE_STRATEGY.md": "8e90c86e20a41e49ab8b3674c611619da036d2325de6ca8d8d33f5bbdda4ae69",
+    "README.md": "b0725723d06ff6cbc6e667c2402eac24610a256d91d865a2bbb81136e4638074",
+    "src/generated/script-runtime.js": "042c09493c8fb82812e0a91af9258a13957720e2356d41c19c561c229af0aa0f",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+    "node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+  },
+  "productionTestedAssetsSha256": {
+    "dist/assets/dm-mono-latin-400-normal--0xN8mdc.woff": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+    "dist/assets/dm-mono-latin-400-normal-4GdczIuU.woff2": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+    "dist/assets/dm-mono-latin-ext-400-normal-1aZr6b2b.woff": "5357dcba4e325c781acf79d15fd21f740f4abb7ca3f0fad88af774bd94a74e78",
+    "dist/assets/dm-mono-latin-ext-400-normal-C2zvOubV.woff2": "a52e19ebe0398c9c0f8fa28a0c5e9a6bc324f35d9f0881c9aa407d10af447175",
+    "dist/assets/index-3kGP_CDM.css": "bc02af1eeb196fb8fdb0f14ca630eaf22e459871d2d1ff15873ce3526b76da0a",
+    "dist/assets/index-iOs0sCpD.js": "67bcc0c3e9e7a49ea713682ec3420c5216237a4c7102bbf43e9772f9b422c982",
+    "dist/assets/lut-import.worker-BtkofYSH.js": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+    "dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2": "c268b459a9329e59fecf39a17618efd44c71735532048d60b12aab76a8c14914",
+    "dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2": "2fb2e8cbfd52ae46179a8b6024eb162f1f9c6de3d22d6e3a30d8f395de7220be",
+    "dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb",
+    "dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+    "dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2": "6bbb044ab420e07edb0a3042d2eb314b85e83a0182e945a15ab3b9092668dfd5",
+    "dist/assets/metadata.worker-o3DLPB-X.js": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+    "dist/assets/pixels.worker-DikD1MU2.js": "e35a2b52584305f73d191650f960269a18305d170b5296f894fee2959866e21e",
+    "dist/assets/preflight.worker-CqWUcc9C.js": "5ec39359e0f120c0bcbe2aae5a93f1855ffc5fa696f80bf9cf69d4b4b8887441",
+    "dist/assets/project-encoder.worker-BP1KpEQR.js": "cef92199e166115ff6c52b75374640d16d1d9991d0acbed5bfe95dce3133ca97",
+    "dist/assets/recovery-persistence.worker-WT-DLB5v.js": "5decfa87f37e09cbc46b51fe123da4f80a75e3adaabd811b8b25033bfa70788b",
+    "dist/assets/selection-outline.worker-Dj42pVuC.js": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+    "dist/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+  },
+  "broadRunSourceSha256": {
+    "src/core/svg-text.ts": "a56618b60bb162ee854e17b3060ff270eec8bcda57f067c0695b8cd4a876649b",
+    "src/core/svg-export.ts": "10c8a914708cb0a6c43486b987735c79e42df81d6c1a92b40a7a281ba67a24de",
+    "src/core/svg-styles.ts": "c153a4d81d76f554b16757b3d1b9080d11236842c9d59c9d021a7f65ac1c78ce",
+    "src/engine/svg-text.ts": "3127bd9f4fc9c8cbf68d724981198f7c17cf10cce3823303564e08d43a77258b",
+    "src/engine/export.ts": "0f890d2e322ac8b451c902797c817d77ed03a16d52aa375266a2097278515614",
+    "tests/svg-text.e2e.ts": "89bb7bb3802a5ae36002074a58b4f3528cdd9336229c435d5a800c148dc4308d",
+    "tests/production.e2e.ts": "0b56eb4b92c76cfa90851788612c940cda73d1b1f93d57c3a085a27a01b5e646"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "stage": "Final compatibility correction; actual WASM, runtime, developer docs, TypeScript, production bundling."
+    },
+    "unitAndApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": true,
+      "tests": 917,
+      "files": 128,
+      "stage": "Final implementation."
+    },
+    "broadDevelopmentBrowser": {
+      "command": "npx playwright test tests/svg-text.e2e.ts tests/svg-images.e2e.ts tests/svg-styles.e2e.ts tests/svg-masks.e2e.ts tests/svg-export.e2e.ts tests/masks.e2e.ts tests/export-cancellation.e2e.ts tests/raster-editing.e2e.ts tests/foundation-increments.e2e.ts tests/metadata.e2e.ts tests/editor.e2e.ts --grep 'SVG|svg|mask|Mask|export|50 MP|eraser|clear|metadata|Metadata|F11' --reporter=line",
+      "passed": true,
+      "tests": 124,
+      "stage": "Before final missing-letter-spacing compatibility correction; all other product paths unchanged by that correction.",
+      "byFile": {
+        "editor.e2e.ts": 1,
+        "export-cancellation.e2e.ts": 5,
+        "foundation-increments.e2e.ts": 4,
+        "masks.e2e.ts": 16,
+        "metadata.e2e.ts": 4,
+        "raster-editing.e2e.ts": 3,
+        "svg-export.e2e.ts": 7,
+        "svg-images.e2e.ts": 16,
+        "svg-masks.e2e.ts": 20,
+        "svg-styles.e2e.ts": 16,
+        "svg-text.e2e.ts": 32
+      }
+    },
+    "finalTextBrowser": {
+      "command": "npx playwright test tests/svg-text.e2e.ts --reporter=line",
+      "passed": true,
+      "tests": 33,
+      "stage": "Final implementation, including all prior text cases and one added missing-Canvas-letter-spacing regression."
+    },
+    "productionBrowser": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": true,
+      "tests": 31,
+      "stage": "Final built implementation; exact documented constructor example in real isolation, actual SVG/PNG downloads and one-step undo without developer globals."
+    },
+    "seo": {
+      "command": "npx vitest run tests/seo.test.ts",
+      "passed": true,
+      "tests": 5
+    },
+    "distinctBrowserChecks": 156,
+    "finalDocsSmoke": {
+      "command": "npm run test:production -- --grep 'docs highlight|production documented SVG text' --reporter=line",
+      "passed": true,
+      "tests": 2,
+      "stage": "Prose-only clarification regenerated docs and final build; 19 production-tested JS/CSS/worker/WASM assets independently hash-identical. These two cases already count within production31."
+    },
+    "diffCheck": "git diff --check passes."
+  },
+  "pixelAndGeometryComparisons": {
+    "plain": {
+      "mode": "plain",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 307681,
+      "pngArea": 307681,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "multiline": {
+      "mode": "multiline",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 72.25,
+          "nativeAdvance": 72.24609375,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 72.25,
+            "height": 28
+          }
+        },
+        {
+          "length": 0,
+          "nativeAdvance": 0,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0
+          }
+        },
+        {
+          "length": 72.25,
+          "nativeAdvance": 72.24609375,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": 61.03437805175781,
+            "width": 72.25,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 265617,
+      "pngArea": 265617,
+      "lines": [
+        {
+          "text": "First",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        },
+        {
+          "text": "",
+          "y": 50.634375000000006,
+          "anchor": "start",
+          "direction": "ltr"
+        },
+        {
+          "text": "Third",
+          "y": 83.03437500000001,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "whitespace": {
+      "mode": "whitespace",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 187.84375,
+          "nativeAdvance": 187.83984375,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 187.84375,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 196815,
+      "pngArea": 196815,
+      "lines": [
+        {
+          "text": "  A  B C  D  ",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "center": {
+      "mode": "center",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": -0.1484375,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 307642,
+      "pngArea": 307642,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "middle",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "right": {
+      "mode": "right",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": -0.296875,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 307665,
+      "pngArea": 307665,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "end",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "rtl-left": {
+      "mode": "rtl-left",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 187.84375,
+          "nativeAdvance": 187.83984375,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 187.84375,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 260997,
+      "pngArea": 260997,
+      "lines": [
+        {
+          "text": "\u0645\u0631\u062d\u0628\u0627 \u0628\u0627\u0644\u0639\u0627\u0644\u0645",
+          "y": 18.234375,
+          "anchor": "end",
+          "direction": "rtl"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "rtl-right": {
+      "mode": "rtl-right",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 187.84375,
+          "nativeAdvance": 187.83984375,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0.15625,
+            "y": -3.765625,
+            "width": 187.84375,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 260975,
+      "pngArea": 260975,
+      "lines": [
+        {
+          "text": "\u0645\u0631\u062d\u0628\u0627 \u0628\u0627\u0644\u0639\u0627\u0644\u0645",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "rtl"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 7,
+      "after": 7,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "bidi": {
+      "mode": "bidi",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 155.609375,
+          "nativeAdvance": 155.59375,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0.1953125,
+            "y": -3.765625,
+            "width": 155.609375,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 271099,
+      "pngArea": 271099,
+      "lines": [
+        {
+          "text": "\u05d0\u05d1\u05d2 ABC 123",
+          "y": 18.234375,
+          "anchor": "middle",
+          "direction": "rtl"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 7,
+      "after": 7,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "affine": {
+      "mode": "affine",
+      "alpha": 71,
+      "premult": 45.08627450980393,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 230.22372436523438,
+          "nativeAdvance": 230.2890625,
+          "matrix": [
+            1,
+            0.10000000149011612,
+            0.25,
+            1,
+            33,
+            31.00000001490116
+          ],
+          "box": {
+            "x": 0,
+            "y": -4.359751224517822,
+            "width": 230.2237091064453,
+            "height": 28.48824691772461
+          }
+        }
+      ],
+      "textAreaRatio": 0.9994134303500913,
+      "centroidDelta": [
+        -0.11318105752781094,
+        -0.00826396173644639
+      ],
+      "meanAlpha": 0.06913636363636363,
+      "svgArea": 388243,
+      "pngArea": 388411,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 8,
+      "after": 8,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "bold": {
+      "mode": "bold",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 407571,
+      "pngArea": 407571,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "italic": {
+      "mode": "italic",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 309252,
+      "pngArea": 309252,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "tracking": {
+      "mode": "tracking",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 230.296875,
+          "nativeAdvance": 230.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 230.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 307681,
+      "pngArea": 307681,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "escaped": {
+      "mode": "escaped",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 275.640625,
+          "nativeAdvance": 275.63671875,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -4.765625,
+            "width": 275.640625,
+            "height": 29
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 441022,
+      "pngArea": 441022,
+      "lines": [
+        {
+          "text": "A <script> & \"B\" \ud83d\ude42",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "reflection": {
+      "mode": "reflection",
+      "alpha": 110,
+      "premult": 69.1843137254902,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.22665405273438,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            -1,
+            0.10000000149011612,
+            0.25,
+            1,
+            283,
+            31.00000001490116
+          ],
+          "box": {
+            "x": 0,
+            "y": -4.359751224517822,
+            "width": 202.2266387939453,
+            "height": 28.48824691772461
+          }
+        }
+      ],
+      "textAreaRatio": 1.0019948026234378,
+      "centroidDelta": [
+        -0.0492844983176326,
+        -0.01620531990980112
+      ],
+      "meanAlpha": 0.061261363636363635,
+      "svgArea": 304428,
+      "pngArea": 304025,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "scale": {
+      "mode": "scale",
+      "alpha": 72,
+      "premult": 44.98823529411764,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.2408447265625,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1.5,
+            0,
+            0,
+            0.75,
+            35,
+            27
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.6907505989074707,
+            "width": 202.24082946777344,
+            "height": 27.82804298400879
+          }
+        }
+      ],
+      "textAreaRatio": 0.9987735767335196,
+      "centroidDelta": [
+        -0.08267202567026288,
+        0.00024453887576214584
+      ],
+      "meanAlpha": 0.051875,
+      "svgArea": 321068,
+      "pngArea": 321337,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "masked-style": {
+      "mode": "masked-style",
+      "alpha": 2,
+      "premult": 2.0392156862745097,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 0.9900892061463125,
+      "centroidDelta": [
+        -0.1699323173639442,
+        -0.03107690547267339
+      ],
+      "meanAlpha": 0.016329545454545454,
+      "svgArea": 211990,
+      "pngArea": 213091,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 8,
+      "after": 8,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "zero-fill": {
+      "mode": "zero-fill",
+      "alpha": 2,
+      "premult": 2,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 0.9773663652415859,
+      "centroidDelta": [
+        -0.2101611924468898,
+        0.034528317136704345
+      ],
+      "meanAlpha": 0.015125,
+      "svgArea": 156798,
+      "pngArea": 158067,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 8,
+      "after": 8,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "color": {
+      "mode": "color",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 224745,
+      "pngArea": 224745,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    },
+    "fallback": {
+      "mode": "fallback",
+      "alpha": 0,
+      "premult": 0,
+      "solidMisses": 0,
+      "displacedPixels": 0,
+      "geometry": [
+        {
+          "length": 202.296875,
+          "nativeAdvance": 202.2890625,
+          "matrix": [
+            1,
+            0,
+            0,
+            1,
+            30,
+            30
+          ],
+          "box": {
+            "x": 0,
+            "y": -3.765625,
+            "width": 202.296875,
+            "height": 28
+          }
+        }
+      ],
+      "textAreaRatio": 1,
+      "centroidDelta": [
+        0,
+        0
+      ],
+      "meanAlpha": 0,
+      "svgArea": 307681,
+      "pngArea": 307681,
+      "lines": [
+        {
+          "text": "Canoli ffi 123",
+          "y": 18.234375,
+          "anchor": "start",
+          "direction": "ltr"
+        }
+      ],
+      "paths": 1,
+      "images": 0,
+      "parserErrors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable SVG text with measured line baselines, typography, alignment and direction"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Embedded font files and guaranteed cross-viewer text appearance"
+        ]
+      }
+    }
+  },
+  "lifecycle": {
+    "cancel": {
+      "action": "cancel",
+      "initialFontStatus": "loaded",
+      "error": "AbortError: signal is aborted without reason",
+      "returned": false,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 0,
+      "undoRestored": false
+    },
+    "font-add": {
+      "action": "font-add",
+      "initialFontStatus": "loaded",
+      "error": "Error: A referenced font family changed during SVG export. Retry after fonts are ready.",
+      "returned": false,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 0,
+      "undoRestored": false
+    },
+    "font-remove": {
+      "action": "font-remove",
+      "initialFontStatus": "loaded",
+      "error": "Error: A referenced font family changed during SVG export. Retry after fonts are ready.",
+      "returned": false,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 0,
+      "undoRestored": false
+    },
+    "unrelated-font": {
+      "action": "unrelated-font",
+      "initialFontStatus": "loaded",
+      "error": "",
+      "returned": true,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 3000,
+      "undoRestored": false
+    },
+    "encoding-change": {
+      "action": "encoding-change",
+      "initialFontStatus": "loaded",
+      "error": "Error: A referenced font family changed during SVG export. Retry after fonts are ready.",
+      "returned": false,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 0,
+      "undoRestored": false
+    },
+    "pending-font": {
+      "action": "pending-font",
+      "initialFontStatus": "loading",
+      "error": "Error: A referenced text font is not loaded. Retry SVG export after fonts are ready.",
+      "returned": false,
+      "invoked": false,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 0,
+      "undoRestored": false
+    },
+    "font-descriptor": {
+      "action": "font-descriptor",
+      "initialFontStatus": "loaded",
+      "error": "Error: A referenced font family changed during SVG export. Retry after fonts are ready.",
+      "returned": false,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 0,
+      "undoRestored": false
+    },
+    "escaped-family": {
+      "action": "escaped-family",
+      "initialFontStatus": "loaded",
+      "error": "Error: A referenced font family changed during SVG export. Retry after fonts are ready.",
+      "returned": false,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": true,
+      "revision": 1,
+      "after": 1,
+      "lines": 0,
+      "undoRestored": false
+    },
+    "host-edit": {
+      "action": "host-edit",
+      "initialFontStatus": "loaded",
+      "error": "",
+      "returned": true,
+      "invoked": true,
+      "surfaces": 1,
+      "released": true,
+      "unchanged": false,
+      "revision": 1,
+      "after": 2,
+      "lines": 3000,
+      "undoRestored": true
+    }
+  },
+  "production": {
+    "alpha": 0,
+    "premult": 0,
+    "coverage": 213482,
+    "lines": [
+      "Canoli",
+      "Studio"
+    ],
+    "embedded": 0
+  },
+  "pageOnlyFontPortability": {
+    "differences": 3988,
+    "report": {
+      "format": "svg",
+      "warnings": [
+        "SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model."
+      ],
+      "featuresPreserved": [
+        "Editable SVG text with measured line baselines, typography, alignment and direction"
+      ],
+      "featuresDegradedOrOmitted": [
+        "Embedded font files and guaranteed cross-viewer text appearance"
+      ]
+    },
+    "family": "\"Canoli Page Only Font\", monospace",
+    "embeddedFonts": false
+  },
+  "missingCanvasLetterSpacing": {
+    "before": {
+      "nativePropertyAbsent": true,
+      "spacing": [
+        "0",
+        "8"
+      ]
+    },
+    "after": {
+      "spacing": [
+        "0",
+        "0"
+      ],
+      "alpha": 0,
+      "premult": 0,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    }
+  },
+  "largeImageRegression": {
+    "nativePngExportMs": 3792.0,
+    "scope": "Existing genuine native 50 MP import/WASM-edit/save/reopen/full PNG decode, SVG native embedded PNG decode and native SVG mask crop/seam regressions pass. No new full 50 MP composite SVG raster/heap gate is claimed."
+  },
+  "designAndLimits": [
+    "Live text exports as editable SVG text lines (including complete masked/off-canvas line content), with exact authored newline positions, typography/family references, direction and physical alignment under the shared affine/mask/style hierarchy. Tabs/CR/form feed normalize to spaces like native Canvas fillText.",
+    "Native per-line top/alphabetic ascent differences determine baselines. Preparation uses one released 1x1 canvas and bounded cooperative line batches; individual native measurements cannot be preempted.",
+    "Registered referenced-family identity/status/descriptors are pinned across preparation and final encoding, including family lists/CSS escapes. Pending fonts, related changes, invalid settings and cancellation reject without partial output. Unrelated faces remain valid; later independent host edits keep history and do not rewrite captured output.",
+    "Missing native Canvas letterSpacing support is captured once, before any property assignment. A real Chromium prototype-absence emulation previously produced 0/8 spacing across two layers; the final regression emits 0/0 and matches native decoded PNG pixels exactly. This is API-absence emulation, not an actual old-browser/device acceptance result.",
+    "Font files are referenced, not copied/embedded. A real page-only loaded font fixture produces different decoded SVG/PNG pixels because the SVG image decoder substitutes its fallback; the report explicitly explains portability limits. Missing names can fall back and are not proof of availability.",
+    "Transformed system-font glyphs show real Canvas/SVG rasterization/hinting differences. Independent CTMs, advances, integrated area/centroids, no solid holes and one-pixel silhouette support constrain geometry; maximum edge-byte differences are recorded rather than claimed as byte parity.",
+    "Initial affine byte-parity assertions failed, prompting independent geometry/coverage diagnostics. Initial binary-font pending fixture was already loaded; it was replaced with a genuinely stalled local browser font request whose status is verified as loading. Raw initial/corrected logs remain separately hashed.",
+    "No new constructor/mutation API, schema/project/workspace version, REST render/browser-sync route, plugin grant, script file/font-byte/enumeration privilege, source-byte mutation, paid operation or cloud upload.",
+    "No arbitrary image cap, full-document text rasterization, font packaging or glyph outlining. Individual timings do not establish input-to-photon/p95/long-task/heap/device-wide performance.",
+    "SVG paint/adjustment/smart contents, Blend If, general SVG import/round-trip, richer type/layout/font packaging and the complete broader roadmap remain open."
+  ],
+  "formatReferences": [
+    "https://www.w3.org/TR/SVG2/text.html",
+    "https://html.spec.whatwg.org/multipage/canvas.html#textmetrics"
+  ],
+  "localLogs": {
+    "/tmp/canoli-svg-text-initial.log": {
+      "sha256": "ca8381b66378ed3bd7c744e9b476954a440a4efb578383a26b47a58cc15b1828",
+      "tail": [
+        "",
+        "    Error Context: test-results/svg-text.e2e.ts-SVG-editab-516f4-ement-and-native-appearance/error-context.md",
+        "",
+        "",
+        "(node:138482) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[10/12] tests/svg-text.e2e.ts:4:154 \u203a SVG editable text masked-style retains measured placement and native appearance",
+        "[11/12] tests/svg-text.e2e.ts:4:154 \u203a SVG editable text zero-fill retains measured placement and native appearance",
+        "[12/12] tests/svg-text.e2e.ts:4:154 \u203a SVG editable text color retains measured placement and native appearance",
+        "  1 failed",
+        "    tests/svg-text.e2e.ts:4:154 \u203a SVG editable text affine retains measured placement and native appearance ",
+        "  11 passed (25.4s)"
+      ]
+    },
+    "/tmp/canoli-svg-text-geometry.log": {
+      "sha256": "d9d3df276ae13cdf21371c38852d584eb7d6fd75b28fade951d1b9d904a30097",
+      "tail": [
+        "        at /home/kestrel/projects/luma-editor/tests/svg-text.e2e.ts:27:374",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/svg-text.e2e.ts-SVG-editab-7ec0c-ement-and-native-appearance/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-text.e2e.ts-SVG-editab-7ec0c-ement-and-native-appearance/error-context.md",
+        "",
+        "",
+        "  3 failed",
+        "    tests/svg-text.e2e.ts:4:212 \u203a SVG editable text affine retains measured placement and native appearance ",
+        "    tests/svg-text.e2e.ts:4:212 \u203a SVG editable text reflection retains measured placement and native appearance ",
+        "    tests/svg-text.e2e.ts:4:212 \u203a SVG editable text scale retains measured placement and native appearance ",
+        "  4 passed (18.3s)"
+      ]
+    },
+    "/tmp/canoli-svg-text-complete.log": {
+      "sha256": "87379a957a53b2a214efb9046f7429c125add74312ac18def13b8e711e86e846",
+      "tail": [
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-text.e2e.ts-SVG-text-p-1a800-ifetime-history-and-cleanup/error-context.md",
+        "",
+        "",
+        "(node:141557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[25/25] tests/svg-text.e2e.ts:36:128 \u203a SVG text preparation host-edit respects font lifetime, history and cleanup",
+        "  2 failed",
+        "    tests/svg-text.e2e.ts:4:212 \u203a SVG editable text affine retains measured placement and native appearance ",
+        "    tests/svg-text.e2e.ts:36:128 \u203a SVG text preparation pending-font respects font lifetime, history and cleanup ",
+        "  23 passed (46.1s)"
+      ]
+    },
+    "/tmp/canoli-svg-text-diagnostics.log": {
+      "sha256": "f0ddb7cea8498160545c0474f9a67d29e10fb5762b8f510300bc682cb0366106",
+      "tail": [
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "Running 4 tests using 1 worker",
+        "",
+        "(node:142361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[1/4] tests/svg-text.e2e.ts:4:212 \u203a SVG editable text affine retains measured placement and native appearance",
+        "[2/4] tests/svg-text.e2e.ts:4:212 \u203a SVG editable text reflection retains measured placement and native appearance",
+        "[3/4] tests/svg-text.e2e.ts:4:212 \u203a SVG editable text scale retains measured placement and native appearance",
+        "[4/4] tests/svg-text.e2e.ts:40:128 \u203a SVG text preparation pending-font respects font lifetime, history and cleanup",
+        "  4 passed (11.7s)"
+      ]
+    },
+    "/tmp/canoli-svg-text-browser.log": {
+      "sha256": "6aa6a2fba8498307c0e96b9cdeb10ab3f7661ca0121e4b890caa467a8b0361dd",
+      "tail": [
+        "[112/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation cancel respects font lifetime, history and cleanup",
+        "[113/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-add respects font lifetime, history and cleanup",
+        "[114/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-remove respects font lifetime, history and cleanup",
+        "[115/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation unrelated-font respects font lifetime, history and cleanup",
+        "[116/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation encoding-change respects font lifetime, history and cleanup",
+        "[117/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation pending-font respects font lifetime, history and cleanup",
+        "[118/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-descriptor respects font lifetime, history and cleanup",
+        "[119/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation escaped-family respects font lifetime, history and cleanup",
+        "[120/124] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation host-edit respects font lifetime, history and cleanup",
+        "[121/124] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text font fails without a partial result or history changes",
+        "[122/124] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text color fails without a partial result or history changes",
+        "[123/124] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text xml fails without a partial result or history changes",
+        "[124/124] tests/svg-text.e2e.ts:71:1 \u203a downloaded SVG references a page-only font without copying font files or promising its appearance",
+        "  124 passed (4.4m)"
+      ]
+    },
+    "/tmp/canoli-svg-text-build-final.log": {
+      "sha256": "2da575b5f6f503364f170d693b54d34c9670d00ad6fd10afad8d2c73d12277d6",
+      "tail": [
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/context.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/context.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 984ms"
+      ]
+    },
+    "/tmp/canoli-svg-text-unit-final.log": {
+      "sha256": "fcaa6d07fd75f0b65c351a048233abe0c144661309f9472546c6fa2f92f4b902",
+      "tail": [
+        "> asc assembly/pixels.ts --outFile public/wasm/pixels.wasm --optimize --runtime stub --initialMemory 1 --maximumMemory 4096",
+        "",
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  128 passed (128)",
+        "      Tests  917 passed (917)",
+        "   Start at  10:40:26",
+        "   Duration  63.83s (tests 75%, import 21%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  128 workers spawned \u00b7 ~123ms startup each (spawn + environment, per file)",
+        "             at least ~7.76s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-text-final.log": {
+      "sha256": "22ad49256d483c4dd061cd26dc97e04e2e9cd0b596c1e318d93cc0ddd3773f1a",
+      "tail": [
+        "[21/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-add respects font lifetime, history and cleanup",
+        "[22/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-remove respects font lifetime, history and cleanup",
+        "[23/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation unrelated-font respects font lifetime, history and cleanup",
+        "[24/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation encoding-change respects font lifetime, history and cleanup",
+        "[25/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation pending-font respects font lifetime, history and cleanup",
+        "[26/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-descriptor respects font lifetime, history and cleanup",
+        "[27/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation escaped-family respects font lifetime, history and cleanup",
+        "[28/33] tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation host-edit respects font lifetime, history and cleanup",
+        "[29/33] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text font fails without a partial result or history changes",
+        "[30/33] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text color fails without a partial result or history changes",
+        "[31/33] tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text xml fails without a partial result or history changes",
+        "[32/33] tests/svg-text.e2e.ts:71:1 \u203a downloaded SVG references a page-only font without copying font files or promising its appearance",
+        "[33/33] tests/svg-text.e2e.ts:79:1 \u203a SVG text keeps every layer untracked when native Canvas letter spacing is unavailable",
+        "  33 passed (1.0m)"
+      ]
+    },
+    "/tmp/canoli-svg-text-production.log": {
+      "sha256": "01e26b3324d0654e9c5218a85ad6152a3ec768ccf18dee38aaa0d3b733eafd58",
+      "tail": [
+        "[19/31] tests/production.e2e.ts:793:1 \u203a production Color Range samples actual colors, applies native coverage and exports a selection mask without developer globals",
+        "[20/31] tests/production.e2e.ts:818:1 \u203a production alpha channel constructors and Inspector load native coverage and export independent masks",
+        "[21/31] tests/production.e2e.ts:835:1 \u203a production Quick Selection brush and isolated refinement export real nonrectangular masks",
+        "[22/31] tests/production.e2e.ts:874:1 \u203a production Select Subject preserves genuine source alpha through UI, isolated scripting and exported masks",
+        "[23/31] tests/production.e2e.ts:896:1 \u203a production Refine Edge exposes corrected-layer output and isolated native matting exports real corrected RGB",
+        "[24/31] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves wide-unknown with bundled workers and no developer globals",
+        "[25/31] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals",
+        "[26/31] tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers",
+        "[27/31] tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors",
+        "[28/31] tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow",
+        "[29/31] tests/production.e2e.ts:983:1 \u203a production SVG filters preserve document-space shadows with zero fill and rotated parents",
+        "[30/31] tests/production.e2e.ts:998:1 \u203a production SVG download retains a native photo, raster erasures and independent vector paths",
+        "[31/31] tests/production.e2e.ts:1010:1 \u203a production documented SVG text stays editable and matches native PNG through actual downloads",
+        "  31 passed (53.7s)"
+      ]
+    },
+    "/tmp/canoli-svg-text-seo.log": {
+      "sha256": "71864eac3a49847adf0dc1825d69b820249c5a9b2ce7e769a1c705df7cce9a49",
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  10:44:55",
+        "   Duration  203ms (transform 49%, tests 21%, import 20%, worker 10%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-text-docs-final.log": {
+      "sha256": "d4af8f61d085d0acf3d75cc40e6428d91c5ae22fd9b1889507d9aa488adc9aeb",
+      "tail": [
+        "",
+        "> canoli-studio@0.1.0 build:docs",
+        "> node --import tsx scripts/build-docs.mjs",
+        "",
+        "Built 3 developer documentation pages."
+      ]
+    },
+    "/tmp/canoli-svg-text-docs-production.log": {
+      "sha256": "48b789d0be1e5b7ca1bc1a4920537d7f480d15ed22df2ad9646eb43ae38d7826",
+      "tail": [
+        "",
+        "[WebServer] (node:156458) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "Running 2 tests using 1 worker",
+        "",
+        "(node:156525) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "",
+        "[1/2] tests/production.e2e.ts:5:1 \u203a docs highlight examples without JavaScript and keep long code keyboard-scrollable",
+        "[2/2] tests/production.e2e.ts:1010:1 \u203a production documented SVG text stays editable and matches native PNG through actual downloads",
+        "  2 passed (3.6s)"
+      ]
+    }
+  }
+}

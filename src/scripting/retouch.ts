@@ -1,4 +1,6 @@
 import { prepareSmartRaster } from "../engine/smart-raster";
+import {prepareMatting} from '../engine/prepare-matting';
+import {mattingRequestSchema} from '../core/matting';
 import { AssetStore } from "../core/assets";
 import { execute } from "../core/commands";
 import {
@@ -37,7 +39,7 @@ export class ScriptRetouch {
   async prepare(
     commands: unknown,
     request: unknown,
-    method: "patch" | "heal" | "rasterize" = "patch",
+    method: "patch" | "heal" | "rasterize" | 'matting' = "patch",
   ) {
     this.assertActive();
     if (this.busy)
@@ -60,6 +62,18 @@ export class ScriptRetouch {
     )
       throw new Error("Healing requires an attached unlocked layer.");
     this.busy = true;
+    if(method==='matting'){
+      const previous=new Set(this.view.values().map(asset=>asset.id));
+      let prepared:Awaited<ReturnType<typeof prepareMatting>>|undefined;
+      try{
+        const parsed=mattingRequestSchema.parse(request);
+        if(this.owned.size+(parsed.options.decontaminate?2:1)>32)throw new Error('A script can prepare at most 32 repair assets.');
+        prepared=await prepareMatting(document,this.view,parsed,{signal:this.abort.signal},()=>this.assertActive());
+        this.assertActive();prepared.commit!(()=>{});
+        for(const asset of this.view.values())if(!previous.has(asset.id))this.owned.add(asset.id);
+        return prepared.plan;
+      }finally{prepared?.dispose?.();this.busy=false;}
+    }
     if (method === "rasterize") {
       let installed: string | undefined;
       try {

@@ -74,7 +74,7 @@ The current implementation uses TypeScript DOM classes and UI code, AssemblyScri
 
 A local, single-document desktop-browser editor with image layers and groups, basic transforms, visibility/locking/opacity/blending, non-destructive tone adjustments, undo/redo, central keyboard shortcuts, editable project files, and PNG export. Its public constructors must already be usable from code, including a local scripting panel. An optional local REST service exercises the same document semantics.
 
-This milestone has no model API calls, billing, or cloud upload. The optional REST server is local, in-memory and separate from the browser session; it currently exposes document metadata/commands rather than image storage or rendering. It establishes the object and command boundaries required for future AI behavior. See the requirements document for exact limits and verification criteria.
+This milestone has no model API calls, billing, or cloud upload. The optional REST server is local, in-memory and separate from the browser session; it retains separate in-memory documents/assets and commands, with explicitly scoped jobs and PNG-source Color Range analysis. It does not render browser scenes or synchronize with the browser. It establishes the object and command boundaries required for future AI behavior. See the requirements document for exact limits and verification criteria.
 
 ## Current precision-tool milestone
 

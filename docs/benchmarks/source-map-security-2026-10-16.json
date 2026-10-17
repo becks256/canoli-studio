@@ -1,0 +1,345 @@
+{
+  "format": "canoli-source-map-security-verification",
+  "version": 1,
+  "createdAt": "2026-10-16T21:55:18.835431+00:00",
+  "scope": "Roadmap dependency security gate: source-map-js under Vite/PostCSS. Full professional-editor implementation and broader security/performance acceptance remain unfinished.",
+  "upstream": {
+    "advisory": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+    "patch": "https://github.com/7rulnik/source-map-js/commit/cf7658058ceeaa8619d5ae0ec90be6905209d016",
+    "release": "https://github.com/7rulnik/source-map-js/releases/tag/v1.2.2",
+    "verifiedDate": "2026-10-16"
+  },
+  "change": {
+    "dependencyChain": [
+      "vite@8.3.0",
+      "postcss@8.5.28",
+      "source-map-js@1.2.2"
+    ],
+    "changedLockEntries": [
+      "node_modules/source-map-js"
+    ],
+    "before": {
+      "version": "1.2.1",
+      "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz",
+      "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==",
+      "dev": true,
+      "license": "BSD-3-Clause",
+      "engines": {
+        "node": ">=0.10.0"
+      }
+    },
+    "after": {
+      "version": "1.2.2",
+      "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz",
+      "integrity": "sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==",
+      "dev": true,
+      "license": "BSD-3-Clause",
+      "engines": {
+        "node": ">=0.10.0"
+      }
+    },
+    "packageJsonUnchanged": true,
+    "newDirectDependencyOrOverride": false,
+    "lifecycleScriptsRun": false,
+    "installSource": "existing npm cache, offline"
+  },
+  "baseline": {
+    "version": "1.2.1",
+    "probe": "Construct indexed maps with one 1e12 offset and two nested 6000000 offsets. Do not generate or traverse huge baseline mappings. Compare rejection with the patched installed constructor.",
+    "archive": {
+      "path": "/tmp/canoli-source-map-before/source-map-js-1.2.1.tgz",
+      "bytes": 35340,
+      "sha256": "f126a6f9fca487a43219d8cb8c3a955279187a966119d548eb5cd47e999d4853"
+    },
+    "beforeAfter": [
+      {
+        "version": "1.2.1",
+        "values": [
+          {
+            "mode": "huge-offset",
+            "rejected": false,
+            "error": ""
+          },
+          {
+            "mode": "nested-offset",
+            "rejected": false,
+            "error": ""
+          }
+        ]
+      },
+      {
+        "version": "1.2.2",
+        "values": [
+          {
+            "mode": "huge-offset",
+            "rejected": true,
+            "error": "Section offset line must not exceed 10000000."
+          },
+          {
+            "mode": "nested-offset",
+            "rejected": true,
+            "error": "Section offset line must not exceed 10000000, including offsets of nested sections."
+          }
+        ]
+      }
+    ]
+  },
+  "regressionCases": [
+    "Oversized single section offset rejects before mapping work.",
+    "Cumulative nested section offsets reject.",
+    "A section at the allowed limit copies short generated content promptly; 40 nested zero-offset maps retain code/source contents.",
+    "Ordinary PostCSS CSS/source-map round trip preserves output and authored source provenance."
+  ],
+  "regressionIsolation": {
+    "process": "real child Node processes",
+    "maxOldSpaceMiB": 128,
+    "timeoutMs": 3000,
+    "maxOutputBytes": 131072,
+    "limits": "Old-space setting is not a total-RSS cap or peak-memory measurement. A dependency regression may fail via assertion, termination or timeout without blocking the parent test event loop."
+  },
+  "verification": {
+    "build": "passed real WASM/runtime/developer-doc/TypeScript/production bundling",
+    "unitTests": 1028,
+    "unitFiles": 137,
+    "newRegressionCases": 4,
+    "completeProductionBrowserCasesAfterPatch": 41,
+    "seoTests": 5,
+    "types": "passed",
+    "diffCheck": "passed",
+    "knownAdvisoriesAtAudit": 0,
+    "precedingDevelopmentBrowserCases": 177,
+    "totalDistinctSelectedBrowserCasesAcrossUnchangedRuntime": 218,
+    "browserScope": "The 177 development cases preceded the dependency patch; they were not rerun. All 45 release files remain byte-identical, and all 41 production cases were rerun after the patch. Repeated cases do not increase distinct coverage.",
+    "commands": [
+      "npm update source-map-js --offline --ignore-scripts --no-audit --no-fund",
+      "npx vitest run tests/source-map-security.test.ts",
+      "npm run build",
+      "npm test -- --maxWorkers=4",
+      "npm run test:production",
+      "npm audit --json",
+      "npx tsc -b",
+      "npx vitest run tests/seo.test.ts",
+      "git diff --check"
+    ],
+    "logs": {
+      "canoli-source-map-audit.log": {
+        "path": "/tmp/canoli-source-map-audit.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "canoli-source-map-baseline-pack.log": {
+        "path": "/tmp/canoli-source-map-baseline-pack.log",
+        "bytes": 1097,
+        "sha256": "efb0ebfcb78f41b7a6da22008d2162f91d34ddfaf52c7da8f970d57c1f65c8b0"
+      },
+      "canoli-source-map-build.log": {
+        "path": "/tmp/canoli-source-map-build.log",
+        "bytes": 4009,
+        "sha256": "e7e149bc692f4689bbbff8b5f880263058cb2ad4379d12b3f9f4d5c75c0e98da"
+      },
+      "canoli-source-map-diff.log": {
+        "path": "/tmp/canoli-source-map-diff.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "canoli-source-map-focus-authorized.log": {
+        "path": "/tmp/canoli-source-map-focus-authorized.log",
+        "bytes": 194,
+        "sha256": "18ada93e7f7784931d4ce70df9d561525693c268cb1153d92e4bbbc1c28dcbb4"
+      },
+      "canoli-source-map-focus.log": {
+        "path": "/tmp/canoli-source-map-focus.log",
+        "bytes": 13006,
+        "sha256": "8711d40ba48d8a66def1c1855412431aee89be808249e1410c8258ececaab02e"
+      },
+      "canoli-source-map-production.log": {
+        "path": "/tmp/canoli-source-map-production.log",
+        "bytes": 6590,
+        "sha256": "f009c6c5f644bb18298f0046b1aeb40050574307092d4ce168ab8eb934e66451"
+      },
+      "canoli-source-map-seo.log": {
+        "path": "/tmp/canoli-source-map-seo.log",
+        "bytes": 195,
+        "sha256": "95ab3f202d35d600cce3aa00de787163f3538d0a0d7ffea7f359b14f4daedaab"
+      },
+      "canoli-source-map-types.log": {
+        "path": "/tmp/canoli-source-map-types.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "canoli-source-map-unit.log": {
+        "path": "/tmp/canoli-source-map-unit.log",
+        "bytes": 644,
+        "sha256": "372f587c220402b6a6dd457065524fba4695155e9a2529422e82b01139c08b3d"
+      },
+      "canoli-source-map-update.log": {
+        "path": "/tmp/canoli-source-map-update.log",
+        "bytes": 28,
+        "sha256": "5648948eeea085a0780a5702641e8b2add215ef2afccf7b59ac5e44d5c9b8af9"
+      }
+    }
+  },
+  "audit": {
+    "before": {
+      "auditReportVersion": 2,
+      "vulnerabilities": {
+        "source-map-js": {
+          "name": "source-map-js",
+          "severity": "high",
+          "isDirect": false,
+          "via": [
+            {
+              "source": 1241209,
+              "name": "source-map-js",
+              "dependency": "source-map-js",
+              "title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+              "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+              "severity": "high",
+              "cwe": [
+                "CWE-1284"
+              ],
+              "cvss": {
+                "score": 7.5,
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+              },
+              "range": ">=1.0.0 <1.2.2"
+            }
+          ],
+          "effects": [],
+          "range": "1.0.0 - 1.2.1",
+          "nodes": [
+            "node_modules/source-map-js"
+          ],
+          "fixAvailable": true
+        }
+      },
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 1,
+          "critical": 0,
+          "total": 1
+        },
+        "dependencies": {
+          "prod": 12,
+          "dev": 124,
+          "optional": 73,
+          "peer": 0,
+          "peerOptional": 0,
+          "total": 135
+        }
+      }
+    },
+    "after": {
+      "auditReportVersion": 2,
+      "vulnerabilities": {},
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 12,
+          "dev": 124,
+          "optional": 73,
+          "peer": 0,
+          "peerOptional": 0,
+          "total": 135
+        }
+      }
+    },
+    "limit": "Point-in-time npm advisory database result for installed dependency versions, not proof of complete application security."
+  },
+  "artifactProof": {
+    "inheritedBooleanEvidence": {
+      "path": "docs/benchmarks/vector-booleans-2026-10-16.json",
+      "bytes": 139974,
+      "sha256": "528faa9a3572083d5aec9854513e55b0bf411a5beb66e7779a915b695e7ef45b"
+    },
+    "unchangedInheritedSourceFiles": 708,
+    "sourceManifestFileCount": 710,
+    "currentSourceHashDelta": {
+      "package-lock.json": "1d7a4557663bd60d1527ec21079ce477e5be6f38f0df3658a88c230b9e58f0b5",
+      "tests/source-map-security.test.ts": "a79cd881c6de6825408219c2875329fbc185dd128836b6c245c7740d13ffe081"
+    },
+    "sourceManifestSha256": "c0c19b633b1d09977f9c7ddb1516b9ced1c2d5d873ae2cd9c918ecbb56f91086",
+    "builtFilesUnchangedAfterPatch": 45,
+    "builtHashes": {
+      "dist/appearance.js": "977e730925c6ab00dc344ab02aac27b3cfc2fed6084bd97be02326677fcdd76c",
+      "dist/apple-touch-icon.png": "8ee5d6b3c3e0907ca002991138e9cb06b14fdc59a81f686964613f99658be060",
+      "dist/assets/dm-mono-latin-400-normal--0xN8mdc.woff": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+      "dist/assets/dm-mono-latin-400-normal-4GdczIuU.woff2": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+      "dist/assets/dm-mono-latin-ext-400-normal-1aZr6b2b.woff": "5357dcba4e325c781acf79d15fd21f740f4abb7ca3f0fad88af774bd94a74e78",
+      "dist/assets/dm-mono-latin-ext-400-normal-C2zvOubV.woff2": "a52e19ebe0398c9c0f8fa28a0c5e9a6bc324f35d9f0881c9aa407d10af447175",
+      "dist/assets/index-CXj4pHI3.js": "65ff30be4c7f101aa1d3e89492f35fad9d2cdb6c58660d7c0b65326e10845253",
+      "dist/assets/index-D0Q7V5v-.css": "1256b98b2079cd721d13d66685a5ab008814311f9443eac9e783792d7da9a3d9",
+      "dist/assets/lut-import.worker-BtkofYSH.js": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+      "dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2": "c268b459a9329e59fecf39a17618efd44c71735532048d60b12aab76a8c14914",
+      "dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2": "2fb2e8cbfd52ae46179a8b6024eb162f1f9c6de3d22d6e3a30d8f395de7220be",
+      "dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb",
+      "dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+      "dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2": "6bbb044ab420e07edb0a3042d2eb314b85e83a0182e945a15ab3b9092668dfd5",
+      "dist/assets/metadata.worker-o3DLPB-X.js": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+      "dist/assets/pixels.worker-DyiXshw2.js": "3902f1d22ff518e92b01de8a69081fbab587d90c855fd0484f3ecffc0367ac31",
+      "dist/assets/preflight.worker-3HTESSV6.js": "b83959371690e59f67caa153ad3190be6884099175184aad940243bac03d5885",
+      "dist/assets/project-encoder.worker-camY3F1G.js": "4d355d717017aa04248fcdc7bc5c9a99edbb2ff7ec38535bdc97698eff7129f8",
+      "dist/assets/recovery-persistence.worker-Bg562zcw.js": "dcd40213ad9b953a53a7747b364c947a04df755f8daadc8ede764ae2fc1cb170",
+      "dist/assets/selection-outline.worker-Dj42pVuC.js": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+      "dist/assets/svg-import.worker-B3-CdV_h.js": "7bb6325c48121938eb2c9864c2a92810f1ad253332c13a81bd2b858fce3ab4e6",
+      "dist/assets/vector-boolean.worker-jygndkc7.js": "e02cdf472ac5beae54338788f45a4902df9fb43740195f2ef8f5a5af52fd4d28",
+      "dist/developer/api.html": "945e976d32f200b5b0d5449d37627192506e8d40fadad3642736fd7cce07d5e9",
+      "dist/developer/architecture.html": "6635c9f8ccb59f984f167889a013824b02fee65b615158d34aca0829e6016746",
+      "dist/developer/design-system.html": "7184584f1e6d2f55c5ffa560f06f0f322330660a1af9248d0b53f5b63e7b179f",
+      "dist/developer/docs.css": "f8cb8902b3322ab4d12b252116ae4291630c72970138e48850f397eac0fdf933",
+      "dist/developer/plugins.html": "4228513b490e53b1662176fede7e6318c62724672b92876c865c665ac42cec5a",
+      "dist/developer/product-brief.html": "892da4ee63fe8854f8f55ca738c141e350d28ef2a07224804a25655f9b35f970",
+      "dist/developer/requirements.html": "9c2accbfb3e67183eefced76752f7740ec6edc7f9ae335733f5a6020739c29e9",
+      "dist/developer/scripting-api.html": "0cc95f090df0c0133107210a6aea3f1cb40e9cb2baf1debe7885986ba5df89d5",
+      "dist/developer/system-design.html": "99fa7b8ec7d774ac67ad2dac1cb575bc649712b442b976ba238f1b6f112b3936",
+      "dist/developer/tools-milestone.html": "2cd7ebd3c64d864dbdaf192b8859514de0ceb0491222aee1bb7ea0878fb66a76",
+      "dist/favicon-16x16.png": "648f06b1a2f5c408ea54ad9344f2f03d591c131ef80a6c1f3a16dde744474033",
+      "dist/favicon-32x32.png": "073460d86c64ff5d1692382780a3434ce7579a98159271a77e19baf991a7a0fd",
+      "dist/favicon.ico": "cb0a998e12738f56bad9ee6346f51d4dca155e0ab6462fa55ec1192228efedd0",
+      "dist/favicon.svg": "604b2e074d358a36fe6ccb3767a78ecfd4dbae73dea74b8f519e6b076318be81",
+      "dist/icon-192.png": "6834323ab9d66d03ac980f9cecb8efd1d285ed2bcd3ed2f5c5cfe5b99bf1715a",
+      "dist/icon-512.png": "bb4d4071f7c020716c987a9aa50f8ed8a3a2ba4aee6e62526aedd07295cda599",
+      "dist/index.html": "cdee01abfbf285c9f3433ee72386427f6d23b70970f2150c1dfdbde64e25d2df",
+      "dist/licenses/paperjs-LICENSE.txt": "f8833a38807922b4652421eb0cf29065400c55abd6f4832b9c3250dae87e1958",
+      "dist/manifest.webmanifest": "312643f9c04a5cea7906e569d288733136f34e62ffcc3ec0754a9b5e29a5ef86",
+      "dist/og-image.png": "3806fb6fd4996ca62e5707f0f579a59c6b37d262e88e7ca011b412df707bc2f9",
+      "dist/robots.txt": "5b02cfea2ffdcf23a8bbb2d4b6f335f2e7bc2cb4c98ac68ab394c4f9eaeca1da",
+      "dist/sitemap.xml": "c0c8b43949e88df68a317070d2885c2585200d7c2b82702a7e3acef85b1395f2",
+      "dist/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e"
+    },
+    "installedSourceMapFiles": {
+      "node_modules/source-map-js/lib/array-set.js": "163bb3055aaea7140167740036a83161fd912c344b14f992754b80f21477d754",
+      "node_modules/source-map-js/lib/base64-vlq.js": "f3407e528f54ec0787bd0a71eeac0c99fffd98445916fcbe116dc69ca3be928b",
+      "node_modules/source-map-js/lib/base64.js": "651bf433cf05e9ec8cee0b94639483236a605d48279e83d3d5c5de81c21d6599",
+      "node_modules/source-map-js/lib/binary-search.js": "c7f4a47a125af0bd860443dfd71d2f412d1a97dcb53ab7038189d63b91dc32bd",
+      "node_modules/source-map-js/lib/mapping-list.js": "35ddb82861f11a70ab84cb47d620fcb28d7f884bb444644e06bde815b836ef9e",
+      "node_modules/source-map-js/lib/quick-sort.js": "1e2857cc4f6c9c36b764ce529f39b9243bed27aed809e895d7cec04c8a869266",
+      "node_modules/source-map-js/lib/source-map-consumer.js": "9ad10db386da13c1f95e6a680d6298dbb306c77f57a9a3539e4595b723a7654b",
+      "node_modules/source-map-js/lib/source-map-generator.js": "07894c9ea1e674263e2e7694d43d4fb935e98549b93946205b9536c1420696c0",
+      "node_modules/source-map-js/lib/source-node.js": "d1a0ef136bf0e974ba956506c88e91fef5d8681bbf10c486ff9566a7d6d76f3c",
+      "node_modules/source-map-js/lib/util.js": "0629f3ae2f3049cda3a2e87ea651dcf0cc71108f4681795ab989a8ac1573fc03",
+      "node_modules/source-map-js/source-map.js": "dc098456c2d9ab90a4c0a17cca9be16665b9813df20906553a98b0088a157be7"
+    },
+    "roadmapHash": "4a76b081c34a438488c0944c3a794db33853c55b7886b7d646771659a1ea0500",
+    "typesConfigHash": "ec25f9d43443f70018fefa0f9c5345209e5d991a59d60ef10ec882a41f109c72"
+  },
+  "failureHistory": [
+    "Restricted first focused run was unable to spawn child processes (EPERM). The authorized focused run and full unit/API run execute all four cases successfully. No security or provenance assertion failed in those authorized runs."
+  ],
+  "limits": [
+    "No document/API/schema/plugin permission/image import behavior changed.",
+    "No claim that zero database advisories completes hosted, plugin, collaboration or application-security review.",
+    "Source-map line/complexity validation is unrelated to image source resolution and adds no megapixel or import-byte cap.",
+    "Boolean geometry/performance evidence remains immutable and historical; full roadmap and F14 responsiveness work remain active."
+  ]
+}

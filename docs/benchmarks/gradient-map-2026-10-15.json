@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-15",
+  "feature": "F04 gradient map adjustment layers",
+  "environment": {
+    "browser": "Chromium through Playwright",
+    "gpuAdapter": "SwiftShader",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "nativeGradientExport": {
+    "width": 10000,
+    "height": 5000,
+    "source": "opaque gray PaintFill",
+    "stops": [
+      {
+        "position": 0,
+        "color": "#ff0000"
+      },
+      {
+        "position": 1,
+        "color": "#0000ff"
+      }
+    ],
+    "elapsedMs": 5150.2,
+    "sampleCoordinates": [
+      [
+        0,
+        0
+      ],
+      [
+        1023,
+        1023
+      ],
+      [
+        1024,
+        1024
+      ],
+      [
+        9999,
+        4999
+      ]
+    ],
+    "rgbaAtEachSample": [
+      127,
+      0,
+      128,
+      255
+    ],
+    "dimensionsAndSamplesPassed": true
+  },
+  "existingRealImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "exportElapsedMs": 3622
+  },
+  "wasmReference": {
+    "seededPixelCount": 65536,
+    "settingsCases": 8,
+    "maximumStopsTested": 32,
+    "exactRgbAndAlphaAgreement": true,
+    "callerOwnershipAndMemoryGrowthPassed": true
+  },
+  "gpuReference": {
+    "comparisons": 16,
+    "stopCounts": [
+      2,
+      3,
+      32
+    ],
+    "reverse": [
+      false,
+      true
+    ],
+    "opacity": [
+      1,
+      0.5
+    ],
+    "maskDensity": 0.7,
+    "blendModes": [
+      "normal",
+      "multiply"
+    ],
+    "sourceAlphaBytes": [
+      0,
+      64,
+      128,
+      255
+    ],
+    "assertedMaxPremultipliedRgbErrorBytes": 3,
+    "assertedMeanRgbErrorUpperBoundBytes": 1,
+    "alphaExact": true,
+    "float32CollapsedStopFallbackPassed": true
+  },
+  "validation": {
+    "fullUnitApiTestsPassed": 758,
+    "unitTestFiles": 106,
+    "distinctDevelopmentBrowserTestsPassed": 38,
+    "productionBrowserTestsPassed": 14,
+    "buildPassed": true,
+    "whitespaceCheckPassed": true
+  },
+  "limits": "Timings are individual container runs, not latency percentiles or hardware-GPU performance claims. Broader color/device/interchange gates remain open."
+}

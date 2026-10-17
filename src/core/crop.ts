@@ -61,6 +61,8 @@ export function cropDocument(document: DocumentData, input: CropBounds): void {
   }
   if (document.selection)
     document.selection = translateSelection(document.selection, -x, -y);
+  for(const channel of document.alphaChannels??[])
+    channel.selection=translateSelection(channel.selection,-x,-y)!;
   document.width = width;
   document.height = height;
 }

@@ -1,0 +1,4431 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T16:51:25.136298+00:00",
+  "scope": "T16 F04/F09/F11 native SVG adjustment and Blend If backdrop-prefix preservation, guarded source/font lifetime and explicit internal editability loss. Full roadmap remains active/incomplete.",
+  "previousGoalTurn": "Progress: verified editable SVG paint, native stroke clips and numeric/GPU cleanup. Current turn revalidated that state and implemented the next remaining SVG appearance omissions.",
+  "sourceSha256": {
+    "src/core/svg-smart.ts": "743ff0575957b1d5de2133c3c2d7bd9f43cf424539e367611e37717e0c62fe3a",
+    "src/core/smart/resolve.ts": "b090bb4067b8e554609aaa0d7230dd5a9a9e4553c7f3a5753040e94a3bb4deb5",
+    "src/core/smart/manager.ts": "7bb1032a468754b11a04efdebe89094051c9edaa2f355da39af806e7e2c81824",
+    "src/core/smart/types.ts": "c2480e89ed81520cf548437799ca1dfbb6af8404269302f34db2b79c1196581b",
+    "src/core/smart/filters.ts": "bd83f8af134fc9b610dcb24e2ada68bf00d4bbed3cfba5169938743b4333f55c",
+    "src/core/svg-images.ts": "28ac58eab959ec6f52548afa4160ea11405853d528f8553d8aa15c0729b7eee5",
+    "src/core/svg-styles.ts": "2ade629f6f1847ea6c0bb7b191ff2e0537b5019d6e627dac42d2a9f501e5c8cb",
+    "src/core/svg-export.ts": "39fa07bd68797c83feeaca0026cc37147ebc7ae057cde9f201a6488b229e54b1",
+    "src/core/svg-masks.ts": "0ddb90ffc6c96324d066711a979e34a28d9ba26e54e5145fa2ff3fc29fbef95e",
+    "src/core/svg-text.ts": "a56618b60bb162ee854e17b3060ff270eec8bcda57f067c0695b8cd4a876649b",
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/engine/svg-images.ts": "fc1137c20b75db35ff086daa7b89b86c3fabd24a454fa5d7764d12a9eb41258e",
+    "src/engine/svg-text.ts": "8fc888a69fcaec44e5623e73a91536e9ce630930efd2c676fefe761438bf0fde",
+    "src/engine/export.ts": "fcced72033938cbb2c5d371015717043d1cb9e1d08eed87973123a30840ac50c",
+    "src/engine/svg-masks.ts": "518385ce19d2d7aa4ef5bc938a83a7ab6580afdf6513794886864d2965bbe46b",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/engine/smart-filters.ts": "305b7dc9915fef5596d34487d9354a033cef542b077c9c87723f6fdf0c9b8ed5",
+    "src/engine/filter-mask-coverage.ts": "43bc9a7c8678c1d5e968ef82408250fb01aa51cdb67448685d389fd42c882f17",
+    "src/engine/png.ts": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+    "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+    "src/engine/drawing.ts": "d4067b62abdacadb9649013a4942ebf982e061f782a1b8dd5b1ec1652aaf54ff",
+    "src/core/model.ts": "4d5df5de545880b0f9b5e88a4579750c86d85b6bb45723f8d3c72b67ea3533a9",
+    "src/core/assets.ts": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+    "src/dom/index.ts": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "src/ui/ExportDialog.tsx": "e85201c2e6ba99a522f905fa0fcf0763f8225aeb8aa641e5a12363380eed8cbd",
+    "tests/svg-smart.test.ts": "aa0e60a2cb2d35825c4f67dba17b4917b19a62968157cf11e1c1c9b63d872e1d",
+    "tests/svg-smart.e2e.ts": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+    "tests/smart-resolve.test.ts": "81a520030c0699d65e1fed1f08f8cdfd1f2757a0d74c47fde191635f2adcd21b",
+    "tests/export.test.ts": "19fcd30cdbb8de6eafbcad8380f4e831ed466b2d05d8a83feb6fba1e54072240",
+    "tests/svg-export.test.ts": "5fd6fe0fce483c2bc634a0e73361b61faca71a6efb5bb070e8826cc9cfc50116",
+    "tests/foundation-increments.e2e.ts": "fe4f0fbecd4952e9d3ff0b140cb10751f0452a1794a22d6d8670566e92b47718",
+    "tests/production.e2e.ts": "1cda02cadc75689a7ff22015103067a80bb9576332805417159f710a53f986e2",
+    "docs/REQUIREMENTS.md": "d7d09aeb447decc88639ef8b8bb2f08c2cc71a786ed1960c83a46a14bcec6bda",
+    "docs/API.md": "0f8a97d091089fd06e41a0bbae0a0e56baf8041799272242730691a63073620d",
+    "docs/SCRIPTING_API.md": "98b1d296e44dd49927b0e9c5872514570db6f1c67471460423413fc689ea09d0",
+    "docs/ARCHITECTURE.md": "7eeedb555af9588388571aa3890923ff29340ae67536a3eaa1d01c78497f9726",
+    "docs/SYSTEM_DESIGN.md": "3ad634d3ef122a7f9e51e4f254545d3382e6bebcc7f067d55e9f19f398d401cf",
+    "docs/DESIGN_SYSTEM.md": "411c11f2589b67caaf0dc64576d7999d01f7efc24cfb58a06bd749b927869a04",
+    "docs/PLUGINS.md": "3fdab8ae27f61c5e8d116e49104778a2f51393c72ef245e9d7985be0743ba483",
+    "docs/FEATURE_STRATEGY.md": "3639b0e706b875b3a18e111b7740870a3f39f1e8f869f3015007846478eaa658",
+    "README.md": "c5cd536e486c46e2f9a1ed6f533baee96739191d459b4cf44b13760f42103421",
+    "src/generated/script-runtime.js": "57db003cd31031701a1496350e2fdd6435abeac510ac72011af73bf8e2d49533",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+    "tests/fixtures/matting/native-50mp.png": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/svg-images.e2e.ts": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+    "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/svg-text.e2e.ts": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+    "tests/smart-raster.e2e.ts": "7cbd1ba3565913198427fee8dde99f6e29cf5448c19d9a88da95718f6fd1ec18",
+    "tests/smart-filters.e2e.ts": "1ee5b65dfc2a5603042ab9b11a78def3ce9b223038c3d330e3e362d536dfb578",
+    "tests/smart-linked.e2e.ts": "8b4cd1362232f83316528ed34ed00de4ba8ad9b8237ad63f64bcf07f9a31bba7",
+    "tests/smart-filters-ui.e2e.ts": "b2362dc87bef55b6828211490a3afc320b8ab2f471c35438a6884c651322c42d",
+    "tests/smart-transfer.e2e.ts": "370c1aeac9009f2e281d212cd7ac9aa60afa387b8c34a87bcefb5c3d6180864a",
+    "tests/smart-resolve.e2e.ts": "1cd05d6031f1f7c7386f18a4f85a1f7bdc8d289639ff5c80020d6c0236aa524e",
+    "tests/smart-filter-masks.e2e.ts": "a4eb4490276d366992a5f53173ca580147dcb20e6524449cb63d98e881f8d357",
+    "tests/smart-edit.e2e.ts": "1ab4f5d923401f2d3c234a7141f469441018f9265810b69956c5589571c1bd37",
+    "tests/smart-conversion.e2e.ts": "ef10588dd2b0a30bc991bce48af31bc935231967171e33d890c1063314e154a5",
+    "tests/smart-document.e2e.ts": "732a7ffc34b9888bb254b20d1304097c605eecdd5b2db0bb67fb114d5d6759af",
+    "tests/smart-filter-mask-ui.e2e.ts": "c06b21b7c403f95d0a00042ee6d6f081958b31bd641b5f03907137a6e4416390",
+    "src/core/paint-stamps.ts": "2638f6500edf6c7e449dae832e9179ac58d3f0e4b91d8fc4bbfcec7e5c92d5be",
+    "src/core/svg-paint.ts": "2610504a2111229b27a7d29a6ba661bdb1613e433801ee8cc39742261aab64f7",
+    "src/core/drawing.ts": "7b68c114f5e97ca5bb31368222df9300fdff0fd9c9dc02635c584a1295999d8c",
+    "src/engine/gpu/renderer.ts": "c0581c2bcb6c0cde50efbbf88176a34fa3dc45b2f1e6504f0e1c86b572c17191",
+    "src/engine/gpu/shaders.ts": "e29a255a5f49776ed980e1c5ea59f2b5ede04382349ac95664304b6eddd0bf76",
+    "tests/svg-paint.test.ts": "3c39f24053434feb260a3d5162bc18afea25ab8bf51c05f320e8d8cf8f54cf88",
+    "tests/svg-paint.e2e.ts": "0784081188e3f58bbbf2e4709e373d65088670d224e84d19c0cbd4dffb81ebec",
+    "tests/webgpu.e2e.ts": "8afdf8c2980d40be97bc71b2e871b190c59d7afefb9bf00457bd8b02c80e760e",
+    "tests/paint-scratch.e2e.ts": "16b143e3c1d55f9e9ac27de7f518713f20973614751c2e3c824a7e4559d44d51",
+    "tests/committed-paint.e2e.ts": "7d9dd83b241e5efe3bbbded6fc19dceba6ecaef48b0b15d90784ac3c07e451e4",
+    "tests/clone-preview.e2e.ts": "9eab46ebbacad76c9885613060f2c800b562891f5b3c048e791000727835a87b",
+    "tests/filter-mask-paint.e2e.ts": "f8be90dd81ea2b4112781a552689de08245f01bf638292ea50a4ed83c4faa21b",
+    "tests/tools.e2e.ts": "ecda64c77e7a444f8cd16dd45e622ba569942349f607f0f561bb9ae2c4b08e82",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "tests/seo.test.ts": "4438445889c0b5d85866e8de65ee937f2b0f1eeae974338e9244175d5b0818a5",
+    "scripts/build-docs.mjs": "44f9f906344930385de05c3c9ef8279c837c14b5e5def9c957e2f5daef049947",
+    "src/core/svg-composition.ts": "ff25e0e0fd92f7e6c5769b843f1b11e83e73e6ce83854d55bd7fbdd64139010e",
+    "tests/svg-composition.test.ts": "e1776a297e6a2a82093ee406353b655faf5839d00a2a83fb1e9d62176f63778b",
+    "tests/svg-composition.e2e.ts": "1c117e9c319affe99a9437f345c2fc666521729fa6966b02657583c715daf2a3",
+    "src/core/adjustments.ts": "2cd8ce5a4f5a3191045dc70a40f448c779bbf9e120e647eca246b95d7584dc7c",
+    "package.json": "14d26bc75eaf8ba8f16b1388bc7af4f11d13d0a5beac48ddf4bbd27b5e373eb0",
+    "package-lock.json": "7833130e34c95d8e2809c3b051f94f07d42b9d215c96d82329870ad4c3f8b110",
+    "playwright.config.ts": "42711757cc7fe8dd1d514566627e38cda6fa238e8c047a5b8a73d126d038b926",
+    "playwright.production.config.ts": "8701855d56a8fb434935682a19a06480c9c2b3de645024341a4f4ac90ac47c75",
+    "tsconfig.json": "ec25f9d43443f70018fefa0f9c5345209e5d991a59d60ef10ec882a41f109c72",
+    "node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+    "assembly/white-balance.ts": "e7f5785c97cb745b22b9a61f785e4b1fa5358adbc70df393afeb184a81738238",
+    "assembly/pixels.ts": "ba0d75e22076c5fd70fbae44c460c7efb18969eb27d9afc08b4b11810e8423d1",
+    "assembly/color-range.ts": "7f712fe3aef29940ea3b57050adbf22fe644101199bac18a1a20063983dbfa3e",
+    "assembly/donor.ts": "7d67cc3268544d5ca5200dcb3a0de016f6a876e662fed52fd5388d730326bb1c",
+    "assembly/gradient-map.ts": "1734178832c4616a490fea28231ce6cdc37e3a5115c723c8d39a378c13ab6d61",
+    "assembly/quick-selection.ts": "25e51c2fab7b526e7e6dfc261e5aef25f7f30ff242046426a7a7bd92807b9152",
+    "assembly/chromatic.ts": "2d7516148956a8d41f54021d73a65f41d6a68b414b4632d66db46df0314f2295",
+    "assembly/spatial-filter.ts": "6ad490cb47a6a4148ff478bda59b8275fc37162f78d6d7570c611be23aa4032e",
+    "assembly/subject-selection.ts": "dd67ff02d342c0f806f65629120399ea20e04894a2d40784badb5abd3e79dc36",
+    "assembly/poisson.ts": "e6128865a28b6e01ae7564c90bb41c056552a2867160c6311a5470fc80a04057",
+    "assembly/lookup.ts": "dd29389050bb4f5eeb6fa9f4b29a79700da2f2c171b37f42ba9fe3f66c0490ef",
+    "assembly/hsl.ts": "afee2e8be10ce272fcd6ed40d21a553b3439cd600e738490a67b6013c1dcf74c",
+    "assembly/matting.ts": "7679a69f360a541dfdbdaebfced6d2ab64211f1be3b460e74a5e6754d655dd45"
+  },
+  "priorHistoricalEvidence": {
+    "path": "docs/benchmarks/svg-paint-2026-10-16.json",
+    "sha256": "7d764997f2eb09dc927af2b5713a10b3acce42f78732f3ea41e70bf1e5792c6f",
+    "note": "Prior paint evidence is a historical source snapshot and was not overwritten."
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "includes": [
+        "actual WASM compilation",
+        "isolated scripting runtime",
+        "all nine developer documentation pages",
+        "TypeScript",
+        "production bundling"
+      ]
+    },
+    "unitAndApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": true,
+      "tests": 941,
+      "files": 131,
+      "newCases": 7
+    },
+    "focusedBrowser": {
+      "command": "npx playwright test tests/svg-composition.e2e.ts --reporter=line",
+      "passed": true,
+      "tests": 43,
+      "note": "Final direct sibling-root rebasing and encoding lifetime guards; repeats within broad run."
+    },
+    "broadBrowser": {
+      "command": "npx playwright test tests/svg-*.e2e.ts tests/export-cancellation.e2e.ts tests/foundation-increments.e2e.ts tests/metadata.e2e.ts tests/editor.e2e.ts:125 --reporter=line",
+      "passed": true,
+      "tests": 203,
+      "byFile": {
+        "tests/editor.e2e.ts": 1,
+        "tests/export-cancellation.e2e.ts": 5,
+        "tests/foundation-increments.e2e.ts": 4,
+        "tests/metadata.e2e.ts": 4,
+        "tests/svg-composition.e2e.ts": 43,
+        "tests/svg-export.e2e.ts": 7,
+        "tests/svg-images.e2e.ts": 16,
+        "tests/svg-masks.e2e.ts": 20,
+        "tests/svg-paint.e2e.ts": 28,
+        "tests/svg-smart.e2e.ts": 26,
+        "tests/svg-styles.e2e.ts": 16,
+        "tests/svg-text.e2e.ts": 33
+      }
+    },
+    "productionBrowser": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": true,
+      "tests": 34
+    },
+    "finalChecks": {
+      "command": "npx tsc -b && npx vitest run tests/seo.test.ts --maxWorkers=2 && git diff --check",
+      "passed": true,
+      "seoTests": 5
+    },
+    "distinctBrowserChecks": 237,
+    "method": "203 broad development and 34 production cases pass on final product source. Earlier focused cases repeat within broad and are not counted twice. Actual native WASM and real Chromium decode/render/download paths are used; no provider or mock decoder substitutes for output pixels."
+  },
+  "contract": {
+    "scope": "Within each isolated visible sibling list, render only the prefix through the last visible nonzero-opacity adjustment or enabled Blend If; preserve later siblings and outer parent settings. A parent Blend If itself needs its actual preceding sibling backdrop.",
+    "editability": "Native prefixes preserve rendered appearance, not editable internal paths/text/paint/adjustment/mask/style/Blend If graphs. Capability reports list stack endings and clipped off-support data. Projects retain all original data.",
+    "workingFrame": "Compose parent/output-origin matrices into original sibling roots directly. Preserve logical layer/depth counts, root-scope unlinked mask/filter-mask rebasing and retained smart-master coordinates. Clear private maps/support and layer comps from native frames; retain original component definitions.",
+    "lifetime": "Pin visible raster, clone, patch and bitmap-mask dependencies before the first callback; referenced fonts pin at font-preparation start before measurement/native rendering. Check sources/fonts around native work and cooperative encoding callbacks, release surfaces, and publish no partial result on stale/cancelled/failed work.",
+    "standalone": "Synchronous VectorLayer.toSvg rejects enabled Blend If with a host native-backdrop-preparation error. Hidden/zero-opacity output remains empty. No new public mutation/schema/REST renderer/script/plugin capability."
+  },
+  "fixtures": {
+    "50mp": {
+      "elapsed": 4489.39999999851,
+      "bytes": 299865,
+      "dimensions": [
+        10000,
+        5000
+      ],
+      "images": 1,
+      "livePaths": 1,
+      "tiles": 395,
+      "released": true,
+      "nativeSamples": [
+        {
+          "x": 2046,
+          "y": 63,
+          "pixel": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 2047,
+          "y": 63,
+          "pixel": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 63,
+          "pixel": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2049,
+          "y": 64,
+          "pixel": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2050,
+          "y": 64,
+          "pixel": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 66,
+          "pixel": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "samples": [
+        {
+          "x": 2047,
+          "y": 63,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 64,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 9002,
+          "y": 4002,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 9999,
+          "y": 4999,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 0,
+      "after": 0
+    },
+    "affine": {
+      "mode": "affine",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 172.40000000223517,
+      "bytes": 4309,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "after": 11,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Isolated / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "blend-adjustment": {
+      "mode": "blend-adjustment",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 167.10000000149012,
+      "bytes": 1996,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 10,
+      "after": 10,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            208,
+            104,
+            52,
+            255
+          ],
+          "png": [
+            208,
+            104,
+            52,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "blend-blue": {
+      "mode": "blend-blue",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 184.29999999701977,
+      "bytes": 1924,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "after": 11,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            96,
+            95,
+            94,
+            255
+          ],
+          "png": [
+            96,
+            95,
+            94,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Dependent\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "blend-green": {
+      "mode": "blend-green",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 186,
+      "bytes": 1924,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "after": 11,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            32,
+            160,
+            224,
+            255
+          ],
+          "png": [
+            32,
+            160,
+            224,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Dependent\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "blend-group": {
+      "mode": "blend-group",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 151.20000000298023,
+      "bytes": 1924,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 12,
+      "after": 12,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            32,
+            160,
+            224,
+            255
+          ],
+          "png": [
+            32,
+            160,
+            224,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Dependent group\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "blend-red": {
+      "mode": "blend-red",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 181.60000000149012,
+      "bytes": 1924,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "after": 11,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            96,
+            95,
+            96,
+            255
+          ],
+          "png": [
+            96,
+            95,
+            96,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Dependent\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "blend-source": {
+      "mode": "blend-source",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 161.89999999850988,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "after": 11,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Dependent\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "blend-underlying": {
+      "mode": "blend-underlying",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 174,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "after": 11,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Dependent\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "clone-cancel": {
+      "dependency": "clone",
+      "action": "cancel",
+      "invoked": true,
+      "returned": false,
+      "error": "AbortError: signal is aborted without reason",
+      "prepared": 2,
+      "released": true,
+      "retry": true,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "clone-replace": {
+      "dependency": "clone",
+      "action": "replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "color-balance": {
+      "mode": "color-balance",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 172,
+      "bytes": 1992,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            158,
+            53,
+            9,
+            255
+          ],
+          "png": [
+            158,
+            53,
+            9,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "curves": {
+      "mode": "curves",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 168.30000000074506,
+      "bytes": 1992,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            186,
+            97,
+            47,
+            255
+          ],
+          "png": [
+            186,
+            97,
+            47,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "dispose": {
+      "action": "dispose",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: The target asset store was disposed during the operation.",
+      "prepared": 2,
+      "released": true,
+      "unchanged": true,
+      "revision": 3,
+      "after": 3
+    },
+    "encoding-source-replace": {
+      "action": "encoding-source-replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 4,
+      "released": true,
+      "unchanged": true,
+      "revision": 3,
+      "after": 3
+    },
+    "font-change": {
+      "action": "font-change",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: A referenced font family changed during SVG export. Retry after fonts are ready.",
+      "prepared": 2,
+      "released": true,
+      "unchanged": true,
+      "revision": 3,
+      "after": 3
+    },
+    "gradient-map": {
+      "mode": "gradient-map",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 178.80000000074506,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            180,
+            0,
+            75,
+            255
+          ],
+          "png": [
+            180,
+            0,
+            75,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "hidden": {
+      "mode": "hidden",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 209.69999999925494,
+      "bytes": 1419,
+      "parseErrors": 0,
+      "images": 0,
+      "livePaths": 3,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 10,
+      "after": 10,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "host-edit": {
+      "changed": true,
+      "revision": 3,
+      "after": 4,
+      "captured": [
+        255,
+        128,
+        64,
+        255
+      ],
+      "undoRestored": true
+    },
+    "hsl": {
+      "mode": "hsl",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 171.30000000074506,
+      "bytes": 1992,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            83,
+            158,
+            30,
+            255
+          ],
+          "png": [
+            83,
+            158,
+            30,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "image-cancel": {
+      "dependency": "image",
+      "action": "cancel",
+      "invoked": true,
+      "returned": false,
+      "error": "AbortError: signal is aborted without reason",
+      "prepared": 2,
+      "released": true,
+      "retry": true,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "image-replace": {
+      "dependency": "image",
+      "action": "replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "inner-style": {
+      "mode": "inner-style",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 172,
+      "bytes": 3116,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 10,
+      "after": 10,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            208,
+            224,
+            80,
+            255
+          ],
+          "png": [
+            208,
+            224,
+            80,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "levels": {
+      "mode": "levels",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 166.20000000298023,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            151,
+            84,
+            43,
+            255
+          ],
+          "png": [
+            151,
+            84,
+            43,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "lut": {
+      "mode": "lut",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 165,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "mask-cancel": {
+      "dependency": "mask",
+      "action": "cancel",
+      "invoked": true,
+      "returned": false,
+      "error": "AbortError: signal is aborted without reason",
+      "prepared": 2,
+      "released": true,
+      "retry": true,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "mask-replace": {
+      "dependency": "mask",
+      "action": "replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "outer-style": {
+      "mode": "outer-style",
+      "maxAlpha": 1,
+      "maxPremult": 2.090196078431376,
+      "meanAlpha": 0.04151785714285714,
+      "holes": 0,
+      "elapsed": 190,
+      "bytes": 10781,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 13,
+      "after": 13,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            199,
+            160,
+            64,
+            204
+          ],
+          "png": [
+            199,
+            160,
+            64,
+            204
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Isolated / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "patch-cancel": {
+      "dependency": "patch",
+      "action": "cancel",
+      "invoked": true,
+      "returned": false,
+      "error": "AbortError: signal is aborted without reason",
+      "prepared": 2,
+      "released": true,
+      "retry": true,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "patch-replace": {
+      "dependency": "patch",
+      "action": "replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 4,
+      "after": 4
+    },
+    "patch": {
+      "mode": "patch",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 68.19999999925494,
+      "bytes": 1956,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 11,
+      "after": 11,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            32,
+            160,
+            224,
+            255
+          ],
+          "png": [
+            32,
+            160,
+            224,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "production": {
+      "alpha": 0,
+      "premult": 0,
+      "images": 1,
+      "livePaths": 1,
+      "samples": [
+        [
+          255,
+          128,
+          64,
+          255
+        ],
+        [
+          255,
+          128,
+          64,
+          255
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "scoped": {
+      "mode": "scoped",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 187.30000000074506,
+      "bytes": 2486,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 3,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 12,
+      "after": 12,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            32,
+            48,
+            64,
+            255
+          ],
+          "png": [
+            32,
+            48,
+            64,
+            255
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Isolated / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "shadow-support": {
+      "mode": "shadow-support",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 192.79999999701977,
+      "bytes": 3106,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 17,
+      "after": 17,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Isolated / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "smart-filtered": {
+      "filtered": true,
+      "variant": "filtered",
+      "alpha": 0,
+      "premult": 0,
+      "meanAlpha": 0,
+      "meanPremult": 0,
+      "holes": 0,
+      "outsideClipBand": 0,
+      "outsideSourceBand": 0,
+      "outsideArtworkBand": 0,
+      "differences": [],
+      "coverage": [
+        {
+          "area": 2056.113725490196,
+          "cx": 50.83784085338989,
+          "cy": 31.191851560816236
+        },
+        {
+          "area": 2056.113725490196,
+          "cx": 50.83784085338989,
+          "cy": 31.191851560816236
+        }
+      ],
+      "centerPixel": [
+        255,
+        228,
+        55,
+        255
+      ],
+      "images": 1,
+      "livePaths": 1,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate outside native backdrop prefixes; save a project for editable filters and masters."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Native-rendered smart filters and filter masks in document-resolution PNG pixels"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+          "Smart-object master links and shared component identity",
+          "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels"
+        ]
+      }
+    },
+    "smart-inset": {
+      "filtered": false,
+      "variant": "inset",
+      "alpha": 16,
+      "premult": 30.28235294117647,
+      "meanAlpha": 0.055078125,
+      "meanPremult": 0.041641573295985064,
+      "holes": 0,
+      "outsideClipBand": 51,
+      "outsideSourceBand": 2,
+      "outsideArtworkBand": 0,
+      "differences": [
+        {
+          "x": 90,
+          "y": 45,
+          "a": 181,
+          "b": 185,
+          "distance": 15.70068027210884
+        },
+        {
+          "x": 43,
+          "y": 55,
+          "a": 29,
+          "b": 25,
+          "distance": 11.795918367346943
+        },
+        {
+          "x": 44,
+          "y": 55,
+          "a": 63,
+          "b": 52,
+          "distance": 11.877551020408163
+        },
+        {
+          "x": 45,
+          "y": 55,
+          "a": 103,
+          "b": 89,
+          "distance": 11.95918367346939
+        },
+        {
+          "x": 46,
+          "y": 55,
+          "a": 147,
+          "b": 131,
+          "distance": 12.040816326530617
+        },
+        {
+          "x": 47,
+          "y": 55,
+          "a": 181,
+          "b": 170,
+          "distance": 12.122448979591837
+        },
+        {
+          "x": 49,
+          "y": 55,
+          "a": 225,
+          "b": 238,
+          "distance": 12.285714285714292
+        },
+        {
+          "x": 50,
+          "y": 55,
+          "a": 243,
+          "b": 253,
+          "distance": 12.367346938775512
+        },
+        {
+          "x": 51,
+          "y": 56,
+          "a": 152,
+          "b": 161,
+          "distance": 11.632653061224495
+        },
+        {
+          "x": 52,
+          "y": 56,
+          "a": 173,
+          "b": 178,
+          "distance": 11.714285714285715
+        },
+        {
+          "x": 55,
+          "y": 56,
+          "a": 212,
+          "b": 207,
+          "distance": 11.95918367346939
+        },
+        {
+          "x": 56,
+          "y": 56,
+          "a": 221,
+          "b": 214,
+          "distance": 12.040816326530617
+        },
+        {
+          "x": 57,
+          "y": 56,
+          "a": 231,
+          "b": 222,
+          "distance": 12.122448979591837
+        },
+        {
+          "x": 58,
+          "y": 56,
+          "a": 239,
+          "b": 234,
+          "distance": 12.204081632653065
+        },
+        {
+          "x": 61,
+          "y": 57,
+          "a": 189,
+          "b": 185,
+          "distance": 11.632653061224495
+        },
+        {
+          "x": 62,
+          "y": 57,
+          "a": 197,
+          "b": 191,
+          "distance": 11.714285714285722
+        }
+      ],
+      "coverage": [
+        {
+          "area": 2070.635294117647,
+          "cx": 64.75388816920828,
+          "cy": 42.29928107694522
+        },
+        {
+          "area": 2070.8039215686276,
+          "cx": 64.76611053772808,
+          "cy": 42.297604416206646
+        }
+      ],
+      "centerPixel": [
+        255,
+        128,
+        64,
+        255
+      ],
+      "images": 1,
+      "livePaths": 1,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Smart object / Component contents / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master contents and canvas clipping, editable outside native backdrop prefixes",
+          "Editable unfeathered vector layer/group masks, density and inversion",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+          "Smart-object master links and shared component identity"
+        ]
+      }
+    },
+    "smart-no-shadow": {
+      "filtered": false,
+      "variant": "no-shadow",
+      "alpha": 12,
+      "premult": 12,
+      "meanAlpha": 0.0077008928571428575,
+      "meanPremult": 0.0043996556956115785,
+      "holes": 0,
+      "outsideClipBand": 0,
+      "outsideSourceBand": 0,
+      "outsideArtworkBand": 0,
+      "differences": [
+        {
+          "x": 38,
+          "y": 10,
+          "a": 23,
+          "b": 19,
+          "distance": 0.1224489795918382
+        },
+        {
+          "x": 41,
+          "y": 10,
+          "a": 5,
+          "b": 0,
+          "distance": 0.36734693877551106
+        },
+        {
+          "x": 43,
+          "y": 11,
+          "a": 131,
+          "b": 121,
+          "distance": 0.2857142857142856
+        },
+        {
+          "x": 44,
+          "y": 11,
+          "a": 112,
+          "b": 107,
+          "distance": 0.204081632653061
+        },
+        {
+          "x": 46,
+          "y": 11,
+          "a": 75,
+          "b": 64,
+          "distance": 0.040816326530611846
+        },
+        {
+          "x": 48,
+          "y": 11,
+          "a": 44,
+          "b": 35,
+          "distance": 0.12244897959183643
+        },
+        {
+          "x": 51,
+          "y": 11,
+          "a": 7,
+          "b": 0,
+          "distance": 0.36734693877551017
+        },
+        {
+          "x": 53,
+          "y": 12,
+          "a": 123,
+          "b": 111,
+          "distance": 0.2857142857142847
+        },
+        {
+          "x": 54,
+          "y": 12,
+          "a": 96,
+          "b": 91,
+          "distance": 0.20408163265306012
+        },
+        {
+          "x": 56,
+          "y": 12,
+          "a": 50,
+          "b": 42,
+          "distance": 0.04081632653061096
+        },
+        {
+          "x": 58,
+          "y": 12,
+          "a": 20,
+          "b": 16,
+          "distance": 0.1224489795918382
+        },
+        {
+          "x": 16,
+          "y": 28,
+          "a": 143,
+          "b": 137,
+          "distance": 0.27210884353741527
+        },
+        {
+          "x": 16,
+          "y": 29,
+          "a": 96,
+          "b": 100,
+          "distance": 0.13605442176870763
+        }
+      ],
+      "coverage": [
+        {
+          "area": 1796.0039215686274,
+          "cx": 47.87009832285619,
+          "cy": 29.735924634428066
+        },
+        {
+          "area": 1795.6274509803923,
+          "cx": 47.87033753016587,
+          "cy": 29.739363595662667
+        }
+      ],
+      "centerPixel": [
+        255,
+        128,
+        64,
+        255
+      ],
+      "images": 1,
+      "livePaths": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Smart object / Component contents / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master contents and canvas clipping, editable outside native backdrop prefixes",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+          "Smart-object master links and shared component identity"
+        ]
+      }
+    },
+    "smart-original": {
+      "filtered": false,
+      "variant": "original",
+      "alpha": 12,
+      "premult": 12,
+      "meanAlpha": 0.03465401785714286,
+      "meanPremult": 0.014195626167133511,
+      "holes": 0,
+      "outsideClipBand": 0,
+      "outsideSourceBand": 0,
+      "outsideArtworkBand": 0,
+      "differences": [
+        {
+          "x": 38,
+          "y": 10,
+          "a": 23,
+          "b": 19,
+          "distance": 0.1224489795918382
+        },
+        {
+          "x": 41,
+          "y": 10,
+          "a": 5,
+          "b": 0,
+          "distance": 0.36734693877551106
+        },
+        {
+          "x": 43,
+          "y": 11,
+          "a": 131,
+          "b": 121,
+          "distance": 0.2857142857142856
+        },
+        {
+          "x": 44,
+          "y": 11,
+          "a": 112,
+          "b": 107,
+          "distance": 0.204081632653061
+        },
+        {
+          "x": 46,
+          "y": 11,
+          "a": 75,
+          "b": 64,
+          "distance": 0.040816326530611846
+        },
+        {
+          "x": 48,
+          "y": 11,
+          "a": 44,
+          "b": 35,
+          "distance": 0.12244897959183643
+        },
+        {
+          "x": 51,
+          "y": 11,
+          "a": 7,
+          "b": 0,
+          "distance": 0.36734693877551017
+        },
+        {
+          "x": 53,
+          "y": 12,
+          "a": 123,
+          "b": 111,
+          "distance": 0.2857142857142847
+        },
+        {
+          "x": 54,
+          "y": 12,
+          "a": 96,
+          "b": 91,
+          "distance": 0.20408163265306012
+        },
+        {
+          "x": 56,
+          "y": 12,
+          "a": 50,
+          "b": 42,
+          "distance": 0.04081632653061096
+        },
+        {
+          "x": 58,
+          "y": 12,
+          "a": 20,
+          "b": 16,
+          "distance": 0.1224489795918382
+        },
+        {
+          "x": 16,
+          "y": 28,
+          "a": 143,
+          "b": 147,
+          "distance": 0.27210884353741527
+        },
+        {
+          "x": 16,
+          "y": 29,
+          "a": 96,
+          "b": 100,
+          "distance": 0.13605442176870763
+        }
+      ],
+      "coverage": [
+        {
+          "area": 2054.0666666666666,
+          "cx": 50.81051171564014,
+          "cy": 31.156505411550878
+        },
+        {
+          "area": 2055.247058823529,
+          "cx": 50.82598533070782,
+          "cy": 31.169370411076002
+        }
+      ],
+      "centerPixel": [
+        255,
+        128,
+        64,
+        255
+      ],
+      "images": 1,
+      "livePaths": 1,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Smart object / Component contents / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master contents and canvas clipping, editable outside native backdrop prefixes",
+          "Editable unfeathered vector layer/group masks, density and inversion",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+          "Smart-object master links and shared component identity"
+        ]
+      }
+    },
+    "tonal": {
+      "mode": "tonal",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 184.29999999701977,
+      "bytes": 2400,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            140,
+            71,
+            36,
+            255
+          ],
+          "png": [
+            140,
+            71,
+            36,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "tone": {
+      "mode": "tone",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 168.19999999925494,
+      "bytes": 1984,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "two-adjustments": {
+      "mode": "two-adjustments",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 169.69999999925494,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 10,
+      "after": 10,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            191,
+            255,
+            64,
+            255
+          ],
+          "png": [
+            191,
+            255,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "unlinked": {
+      "mode": "unlinked",
+      "maxAlpha": 2,
+      "maxPremult": 2.192156862745108,
+      "meanAlpha": 0.10407366071428571,
+      "holes": 0,
+      "elapsed": 193.19999999925494,
+      "bytes": 5712,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 12,
+      "after": 12,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Isolated / Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "vibrance": {
+      "mode": "vibrance",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 170.60000000149012,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            135,
+            62,
+            25,
+            255
+          ],
+          "png": [
+            135,
+            62,
+            25,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    },
+    "white-balance": {
+      "mode": "white-balance",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "elapsed": 167.30000000074506,
+      "bytes": 1988,
+      "parseErrors": 0,
+      "images": 1,
+      "livePaths": 2,
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "samples": [
+        {
+          "x": 32,
+          "y": 32,
+          "svg": [
+            133,
+            63,
+            24,
+            255
+          ],
+          "png": [
+            133,
+            63,
+            24,
+            255
+          ]
+        },
+        {
+          "x": 120,
+          "y": 24,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 144,
+          "y": 92,
+          "svg": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "png": [
+            255,
+            0,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+          "Native backdrop stacks end at: \"Adjustment\".",
+          "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes"
+        ]
+      }
+    }
+  },
+  "appearanceSummary": {
+    "ordinaryFixtures": 26,
+    "allElevenAdjustmentKinds": [
+      "tone",
+      "hsl",
+      "curves",
+      "levels",
+      "color-balance",
+      "vibrance",
+      "gradient-map",
+      "white-balance",
+      "lut",
+      "tonal",
+      "patch"
+    ],
+    "ordinaryByteExactAlphaAndPremultiplied": 24,
+    "ordinaryMaxAlpha": 2,
+    "ordinaryMaxPremultiplied": 2.192156862745108,
+    "smartFixtures": {
+      "original": {
+        "filtered": false,
+        "variant": "original",
+        "alpha": 12,
+        "premult": 12,
+        "meanAlpha": 0.03465401785714286,
+        "meanPremult": 0.014195626167133511,
+        "holes": 0,
+        "outsideClipBand": 0,
+        "outsideSourceBand": 0,
+        "outsideArtworkBand": 0,
+        "differences": [
+          {
+            "x": 38,
+            "y": 10,
+            "a": 23,
+            "b": 19,
+            "distance": 0.1224489795918382
+          },
+          {
+            "x": 41,
+            "y": 10,
+            "a": 5,
+            "b": 0,
+            "distance": 0.36734693877551106
+          },
+          {
+            "x": 43,
+            "y": 11,
+            "a": 131,
+            "b": 121,
+            "distance": 0.2857142857142856
+          },
+          {
+            "x": 44,
+            "y": 11,
+            "a": 112,
+            "b": 107,
+            "distance": 0.204081632653061
+          },
+          {
+            "x": 46,
+            "y": 11,
+            "a": 75,
+            "b": 64,
+            "distance": 0.040816326530611846
+          },
+          {
+            "x": 48,
+            "y": 11,
+            "a": 44,
+            "b": 35,
+            "distance": 0.12244897959183643
+          },
+          {
+            "x": 51,
+            "y": 11,
+            "a": 7,
+            "b": 0,
+            "distance": 0.36734693877551017
+          },
+          {
+            "x": 53,
+            "y": 12,
+            "a": 123,
+            "b": 111,
+            "distance": 0.2857142857142847
+          },
+          {
+            "x": 54,
+            "y": 12,
+            "a": 96,
+            "b": 91,
+            "distance": 0.20408163265306012
+          },
+          {
+            "x": 56,
+            "y": 12,
+            "a": 50,
+            "b": 42,
+            "distance": 0.04081632653061096
+          },
+          {
+            "x": 58,
+            "y": 12,
+            "a": 20,
+            "b": 16,
+            "distance": 0.1224489795918382
+          },
+          {
+            "x": 16,
+            "y": 28,
+            "a": 143,
+            "b": 147,
+            "distance": 0.27210884353741527
+          },
+          {
+            "x": 16,
+            "y": 29,
+            "a": 96,
+            "b": 100,
+            "distance": 0.13605442176870763
+          }
+        ],
+        "coverage": [
+          {
+            "area": 2054.0666666666666,
+            "cx": 50.81051171564014,
+            "cy": 31.156505411550878
+          },
+          {
+            "area": 2055.247058823529,
+            "cx": 50.82598533070782,
+            "cy": 31.169370411076002
+          }
+        ],
+        "centerPixel": [
+          255,
+          128,
+          64,
+          255
+        ],
+        "images": 1,
+        "livePaths": 1,
+        "unchanged": true,
+        "revision": 6,
+        "after": 6,
+        "report": {
+          "format": "svg",
+          "warnings": [
+            "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+            "Native backdrop stacks end at: \"Smart object / Component contents / Adjustment\".",
+            "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+            "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+            "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+          ],
+          "featuresPreserved": [
+            "Infinitely scalable B\u00e9zier vector paths",
+            "Fill, stroke, and stroke-width styling",
+            "Nested group order, visibility and full affine transforms",
+            "Isolated layer/group opacity, fill opacity and CSS blend modes",
+            "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+            "Smart-object instance placement, masks, styles and supported contents",
+            "Unfiltered master contents and canvas clipping, editable outside native backdrop prefixes",
+            "Editable unfeathered vector layer/group masks, density and inversion",
+            "Color overlays and document-space drop shadows as editable SVG filters"
+          ],
+          "featuresDegradedOrOmitted": [
+            "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+            "Smart-object master links and shared component identity"
+          ]
+        }
+      },
+      "no-shadow": {
+        "filtered": false,
+        "variant": "no-shadow",
+        "alpha": 12,
+        "premult": 12,
+        "meanAlpha": 0.0077008928571428575,
+        "meanPremult": 0.0043996556956115785,
+        "holes": 0,
+        "outsideClipBand": 0,
+        "outsideSourceBand": 0,
+        "outsideArtworkBand": 0,
+        "differences": [
+          {
+            "x": 38,
+            "y": 10,
+            "a": 23,
+            "b": 19,
+            "distance": 0.1224489795918382
+          },
+          {
+            "x": 41,
+            "y": 10,
+            "a": 5,
+            "b": 0,
+            "distance": 0.36734693877551106
+          },
+          {
+            "x": 43,
+            "y": 11,
+            "a": 131,
+            "b": 121,
+            "distance": 0.2857142857142856
+          },
+          {
+            "x": 44,
+            "y": 11,
+            "a": 112,
+            "b": 107,
+            "distance": 0.204081632653061
+          },
+          {
+            "x": 46,
+            "y": 11,
+            "a": 75,
+            "b": 64,
+            "distance": 0.040816326530611846
+          },
+          {
+            "x": 48,
+            "y": 11,
+            "a": 44,
+            "b": 35,
+            "distance": 0.12244897959183643
+          },
+          {
+            "x": 51,
+            "y": 11,
+            "a": 7,
+            "b": 0,
+            "distance": 0.36734693877551017
+          },
+          {
+            "x": 53,
+            "y": 12,
+            "a": 123,
+            "b": 111,
+            "distance": 0.2857142857142847
+          },
+          {
+            "x": 54,
+            "y": 12,
+            "a": 96,
+            "b": 91,
+            "distance": 0.20408163265306012
+          },
+          {
+            "x": 56,
+            "y": 12,
+            "a": 50,
+            "b": 42,
+            "distance": 0.04081632653061096
+          },
+          {
+            "x": 58,
+            "y": 12,
+            "a": 20,
+            "b": 16,
+            "distance": 0.1224489795918382
+          },
+          {
+            "x": 16,
+            "y": 28,
+            "a": 143,
+            "b": 137,
+            "distance": 0.27210884353741527
+          },
+          {
+            "x": 16,
+            "y": 29,
+            "a": 96,
+            "b": 100,
+            "distance": 0.13605442176870763
+          }
+        ],
+        "coverage": [
+          {
+            "area": 1796.0039215686274,
+            "cx": 47.87009832285619,
+            "cy": 29.735924634428066
+          },
+          {
+            "area": 1795.6274509803923,
+            "cx": 47.87033753016587,
+            "cy": 29.739363595662667
+          }
+        ],
+        "centerPixel": [
+          255,
+          128,
+          64,
+          255
+        ],
+        "images": 1,
+        "livePaths": 1,
+        "unchanged": true,
+        "revision": 5,
+        "after": 5,
+        "report": {
+          "format": "svg",
+          "warnings": [
+            "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+            "Native backdrop stacks end at: \"Smart object / Component contents / Adjustment\".",
+            "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+            "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+          ],
+          "featuresPreserved": [
+            "Infinitely scalable B\u00e9zier vector paths",
+            "Fill, stroke, and stroke-width styling",
+            "Nested group order, visibility and full affine transforms",
+            "Isolated layer/group opacity, fill opacity and CSS blend modes",
+            "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+            "Smart-object instance placement, masks, styles and supported contents",
+            "Unfiltered master contents and canvas clipping, editable outside native backdrop prefixes",
+            "Editable unfeathered vector layer/group masks, density and inversion"
+          ],
+          "featuresDegradedOrOmitted": [
+            "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+            "Smart-object master links and shared component identity"
+          ]
+        }
+      },
+      "inset": {
+        "filtered": false,
+        "variant": "inset",
+        "alpha": 16,
+        "premult": 30.28235294117647,
+        "meanAlpha": 0.055078125,
+        "meanPremult": 0.041641573295985064,
+        "holes": 0,
+        "outsideClipBand": 51,
+        "outsideSourceBand": 2,
+        "outsideArtworkBand": 0,
+        "differences": [
+          {
+            "x": 90,
+            "y": 45,
+            "a": 181,
+            "b": 185,
+            "distance": 15.70068027210884
+          },
+          {
+            "x": 43,
+            "y": 55,
+            "a": 29,
+            "b": 25,
+            "distance": 11.795918367346943
+          },
+          {
+            "x": 44,
+            "y": 55,
+            "a": 63,
+            "b": 52,
+            "distance": 11.877551020408163
+          },
+          {
+            "x": 45,
+            "y": 55,
+            "a": 103,
+            "b": 89,
+            "distance": 11.95918367346939
+          },
+          {
+            "x": 46,
+            "y": 55,
+            "a": 147,
+            "b": 131,
+            "distance": 12.040816326530617
+          },
+          {
+            "x": 47,
+            "y": 55,
+            "a": 181,
+            "b": 170,
+            "distance": 12.122448979591837
+          },
+          {
+            "x": 49,
+            "y": 55,
+            "a": 225,
+            "b": 238,
+            "distance": 12.285714285714292
+          },
+          {
+            "x": 50,
+            "y": 55,
+            "a": 243,
+            "b": 253,
+            "distance": 12.367346938775512
+          },
+          {
+            "x": 51,
+            "y": 56,
+            "a": 152,
+            "b": 161,
+            "distance": 11.632653061224495
+          },
+          {
+            "x": 52,
+            "y": 56,
+            "a": 173,
+            "b": 178,
+            "distance": 11.714285714285715
+          },
+          {
+            "x": 55,
+            "y": 56,
+            "a": 212,
+            "b": 207,
+            "distance": 11.95918367346939
+          },
+          {
+            "x": 56,
+            "y": 56,
+            "a": 221,
+            "b": 214,
+            "distance": 12.040816326530617
+          },
+          {
+            "x": 57,
+            "y": 56,
+            "a": 231,
+            "b": 222,
+            "distance": 12.122448979591837
+          },
+          {
+            "x": 58,
+            "y": 56,
+            "a": 239,
+            "b": 234,
+            "distance": 12.204081632653065
+          },
+          {
+            "x": 61,
+            "y": 57,
+            "a": 189,
+            "b": 185,
+            "distance": 11.632653061224495
+          },
+          {
+            "x": 62,
+            "y": 57,
+            "a": 197,
+            "b": 191,
+            "distance": 11.714285714285722
+          }
+        ],
+        "coverage": [
+          {
+            "area": 2070.635294117647,
+            "cx": 64.75388816920828,
+            "cy": 42.29928107694522
+          },
+          {
+            "area": 2070.8039215686276,
+            "cx": 64.76611053772808,
+            "cy": 42.297604416206646
+          }
+        ],
+        "centerPixel": [
+          255,
+          128,
+          64,
+          255
+        ],
+        "images": 1,
+        "livePaths": 1,
+        "unchanged": true,
+        "revision": 6,
+        "after": 6,
+        "report": {
+          "format": "svg",
+          "warnings": [
+            "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+            "Native backdrop stacks end at: \"Smart object / Component contents / Adjustment\".",
+            "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+            "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+            "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+          ],
+          "featuresPreserved": [
+            "Infinitely scalable B\u00e9zier vector paths",
+            "Fill, stroke, and stroke-width styling",
+            "Nested group order, visibility and full affine transforms",
+            "Isolated layer/group opacity, fill opacity and CSS blend modes",
+            "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+            "Smart-object instance placement, masks, styles and supported contents",
+            "Unfiltered master contents and canvas clipping, editable outside native backdrop prefixes",
+            "Editable unfeathered vector layer/group masks, density and inversion",
+            "Color overlays and document-space drop shadows as editable SVG filters"
+          ],
+          "featuresDegradedOrOmitted": [
+            "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+            "Smart-object master links and shared component identity"
+          ]
+        }
+      },
+      "filtered": {
+        "filtered": true,
+        "variant": "filtered",
+        "alpha": 0,
+        "premult": 0,
+        "meanAlpha": 0,
+        "meanPremult": 0,
+        "holes": 0,
+        "outsideClipBand": 0,
+        "outsideSourceBand": 0,
+        "outsideArtworkBand": 0,
+        "differences": [],
+        "coverage": [
+          {
+            "area": 2056.113725490196,
+            "cx": 50.83784085338989,
+            "cy": 31.191851560816236
+          },
+          {
+            "area": 2056.113725490196,
+            "cx": 50.83784085338989,
+            "cy": 31.191851560816236
+          }
+        ],
+        "centerPixel": [
+          255,
+          228,
+          55,
+          255
+        ],
+        "images": 1,
+        "livePaths": 1,
+        "unchanged": true,
+        "revision": 9,
+        "after": 9,
+        "report": {
+          "format": "svg",
+          "warnings": [
+            "SVG renders 1 affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.",
+            "Native backdrop stacks end at: \"Adjustment\".",
+            "Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.",
+            "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.",
+            "Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate outside native backdrop prefixes; save a project for editable filters and masters."
+          ],
+          "featuresPreserved": [
+            "Infinitely scalable B\u00e9zier vector paths",
+            "Fill, stroke, and stroke-width styling",
+            "Nested group order, visibility and full affine transforms",
+            "Isolated layer/group opacity, fill opacity and CSS blend modes",
+            "Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes",
+            "Smart-object instance placement, masks, styles and supported contents",
+            "Native-rendered smart filters and filter masks in document-resolution PNG pixels"
+          ],
+          "featuresDegradedOrOmitted": [
+            "Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes",
+            "Smart-object master links and shared component identity",
+            "Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels"
+          ]
+        }
+      }
+    },
+    "independentChecks": "Known exposed RGB after +1 exposure, conditional overlays fully rejected by source/underlying gates, unchanged isolated backdrop outside its group, exact later green/red paths, opaque transformed master interiors, source/clip contours plus shifted three-blur-radius shadow support, zero fully opaque/transparent holes, coverage area within 0.1% and centroid within 0.05 pixels of native reference."
+  },
+  "diagnostics": [
+    "Initial 41-case run passes 40 and fails the unfiltered transformed master at maximum alpha/premultiplied error 12. Master-clip/shadow/inset variants isolate larger errors to transformed source/clip edges and propagated shadows; a pure blanket three-byte limit was insufficient.",
+    "Original and no-shadow variants differ by up to 12 alpha/premultiplied units; inset shape/shadow reaches 16 alpha / 30.28235294117647 premultiplied. All independent interior/geometry/coverage checks pass; filtered native prefix is byte-exact. Detailed maxima/means/area/centroid/contour diagnostics are retained. Product keeps editable parent geometry; no blanket fidelity or per-stage causal rounding proof is claimed.",
+    "Native frame construction was changed from an extra wrapper to direct sibling-root rebasing before final focused/build/unit/broad/production checks, preserving the original logical layer/depth budget."
+  ],
+  "genuine50MP": {
+    "nativePrefix": {
+      "elapsed": 4489.39999999851,
+      "bytes": 299865,
+      "dimensions": [
+        10000,
+        5000
+      ],
+      "images": 1,
+      "livePaths": 1,
+      "tiles": 395,
+      "released": true,
+      "nativeSamples": [
+        {
+          "x": 2046,
+          "y": 63,
+          "pixel": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 2047,
+          "y": 63,
+          "pixel": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 63,
+          "pixel": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2049,
+          "y": 64,
+          "pixel": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2050,
+          "y": 64,
+          "pixel": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 66,
+          "pixel": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "samples": [
+        {
+          "x": 2047,
+          "y": 63,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 64,
+          "svg": [
+            255,
+            128,
+            64,
+            255
+          ],
+          "png": [
+            255,
+            128,
+            64,
+            255
+          ]
+        },
+        {
+          "x": 9002,
+          "y": 4002,
+          "svg": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "png": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "x": 9999,
+          "y": 4999,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 0,
+      "after": 0
+    },
+    "scope": "Actual 10000x5000 import/save/reopen; all original source bytes preserved. Native prefix uses 395 bounded released render tiles; full 50 MP embedded PNG is actually decoded and six native-coordinate expected samples inspected. Four 8x8 decoded SVG crops agree with native readback, including later editable green geometry. This does not prove a full 50 MP composite SVG raster decode or whole-process peak memory.",
+    "separateFullPngWorkflow": {
+      "passed": true,
+      "observedExportMs": 3688.0,
+      "note": "Existing genuine 50 MP import/WASM edit/save/reopen/full-resolution PNG test; single observation during broad run, not a controlled speed benchmark."
+    }
+  },
+  "limitations": [
+    "Internal prefix artwork/settings and off-support pixels lose SVG editability; editable SVG adjustment graphs, shared symbols/master identity and general SVG import/round-trip remain open.",
+    "Prepared native/SVG hierarchy output has measured transformed-edge differences. Exact geometry and native kernels do not guarantee universal byte parity across working origins/viewers.",
+    "PNG/base64 output, resident decoded sources and viewer/filter allocations consume memory; native prefixes currently cover conservative full document/shadow support. No arbitrary import-resolution cap or destructive original-source resampling.",
+    "No p95/input-to-photon, long-task, peak-memory, hardware GPU or universal performance/fidelity claim.",
+    "Other F11 formats and all remaining editing/type/vector/color/RAW/matting/AI/workflow/collaboration/commercial/specialist roadmap requirements remain active/incomplete."
+  ],
+  "localLogs": {
+    "focused": {
+      "path": "/tmp/canoli-svg-composition-focused.log",
+      "sha256": "ed4c7c3e90ed2730116c69fb4e38e4fed827e6e4a13b535516f8655fc0ff9c45"
+    },
+    "initial": {
+      "path": "/tmp/canoli-svg-composition-initial.log",
+      "sha256": "a403f55c2bb1ae410fd6168924f382006c5f57c4966819425eceb572518730bd"
+    },
+    "complete": {
+      "path": "/tmp/canoli-svg-composition-complete.log",
+      "sha256": "1f8e306d7e62a4dd75fb893ca7ace636fa5879e3b1f4dd6c1969e20961813716"
+    },
+    "smart-diagnostic": {
+      "path": "/tmp/canoli-svg-composition-smart-diagnostic.log",
+      "sha256": "09b39edd19c2f6e9cfdbbddafa6419f8e91e02c4f0eb66edb504849b3aeb35df"
+    },
+    "smart-geometry": {
+      "path": "/tmp/canoli-svg-composition-smart-geometry.log",
+      "sha256": "f1bbbf7103a0b19c8be2d0f5b0197e138532b2ea92d7ae3751e8cdcc3b6ba3ee"
+    },
+    "smart-final": {
+      "path": "/tmp/canoli-svg-composition-smart-final.log",
+      "sha256": "95f5d058301e6dfc902fae8324fb5aa3836ca7252378ee3acebdf2e3a470cb9a"
+    },
+    "final-focused": {
+      "path": "/tmp/canoli-svg-composition-final-focused.log",
+      "sha256": "3931f9d7f0f09c4b302bdccb2a56469f60565153bc371f2568bd5c54655c8c14"
+    },
+    "build": {
+      "path": "/tmp/canoli-svg-composition-build.log",
+      "sha256": "22f790b789ef2a32c2181d36b46bfc6e8156e51b76cf1efb2111d63656898960"
+    },
+    "build-final": {
+      "path": "/tmp/canoli-svg-composition-build-final.log",
+      "sha256": "7c0fb265a970590196fd23eae7b7a9e414396ffc9517745ffc7aa6c7c9d376a6"
+    },
+    "unit": {
+      "path": "/tmp/canoli-svg-composition-unit.log",
+      "sha256": "764fbe7a69013fe632ace8a1c7c9d695837989629d8a7072b294c7a18e731e36"
+    },
+    "unit-final": {
+      "path": "/tmp/canoli-svg-composition-unit-final.log",
+      "sha256": "f9cfac15c41ee135c0bd5dbb7fe69292cc3a6831f6914f63f9d5c1159969ab2b"
+    },
+    "browser": {
+      "path": "/tmp/canoli-svg-composition-browser.log",
+      "sha256": "92ef1a9dd467b5fb1972267ecc2615c93786cf16133fad06b8215aa77df9f323"
+    },
+    "production": {
+      "path": "/tmp/canoli-svg-composition-production.log",
+      "sha256": "39a9f49aa89ddf717767e486a8abe404592913de24d8ce13f60090d9379c3438"
+    },
+    "final-checks": {
+      "path": "/tmp/canoli-svg-composition-final-checks.log",
+      "sha256": "92311a4722c25c2bd08520f4260b2747d1ff553b7b4586b605df8cf7f1ca5afa"
+    }
+  }
+}

@@ -143,6 +143,8 @@ export interface PsdCapabilityReport {
 }
 
 export interface PsdImportOptions {
+  /** Earlier unmarked Canoli files used straight RGBA without the merged-alpha flag. */
+  legacyStraightAlpha?: boolean;
   mode?: "layered" | "flatten";
   convertCmyk?: boolean;
   preserveMasks?: boolean;

@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open http://127.0.0.1:5173. Import a PNG/JPEG/WebP or open the sample composition. Save editable work as `.luma`; export PNG. The browser editor runs locally without an account, paid service or image upload. Committed edits are checkpointed locally for recovery; use the rail’s Recover work action to reopen them. Download project files as backups.
+Open http://127.0.0.1:5173. Import a PNG/JPEG/WebP, inspect an SVG for editable geometry/gradient fills/strokes or explicitly flattened import, or open the sample composition. Combine closed vector areas with Union/Subtract/Intersect/Exclude from Properties or the command palette, retaining editable holes/curves and one undo step. Save editable work as `.luma`; export PNG/JPEG/WebP, flattened lossless RGBA8 sRGB TIFF (Automatic/classic/BigTIFF), SVG or the supported PSD subset. SVG keeps vector paths, editable paint dabs/fills and text (with measured whitespace correction and explicit font/glyph portability limits), embedded raster imagery and supported smart-object contents, with native adjustment/Blend If backdrop prefixes and baked editability disclosed in the export report. The browser editor runs locally without an account, paid service or image upload. Committed edits are checkpointed locally for recovery; use the rail’s Recover work action to reopen them. Download project files as backups.
 
 For the separate local REST service, run `npm run dev:api` in another terminal. Default: http://127.0.0.1:8787/api/v1/health.
 
@@ -62,6 +62,8 @@ npm run test:e2e
 npm run test:production
 ```
 
+TIFF browser/production checks require Python 3 with Pillow (built with libtiff and ImageCms) and NumPy. They decode actual downloaded classic/BigTIFF files through `scripts/check-tiff-interoperability.py` and compare every RGBA pixel with native PNG. They fail explicitly if that independent reader is unavailable; they do not substitute the editor's own decoder.
+
 The browser suite exercises actual drawing/dragging gestures, selection and style export pixels, plugin installation/permissions/persistence, documented scripting recipes, scripting isolation/history, keyboard focus, project round trips, and a 10000 × 5000 (50 MP) image through import, WASM adjustment, save/reopen and full-resolution PNG export. It checks source preservation and pixels across tile boundaries. Tests are evidence for the tested environment, not a universal browser/device support guarantee.
 
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` can point to an existing Chromium binary. Builds generate the WASM module, isolated scripting bundle and in-app developer docs; generated files are ignored by Git. The local REST service binds loopback only and is not ready for public deployment.
@@ -73,3 +75,11 @@ The Plugins panel (**Mod+Shift+L**) includes **Load example** → **Install plug
 WebGPU requires a compatible hardware adapter and a secure context (localhost is supported). It is selected automatically; unsupported features/devices use the reference renderer. Drop shadows and subpixel brushes currently use that fallback. Source-resolution export remains Canvas/WASM. See [backend scope and budgets](docs/ARCHITECTURE.md#gpu-viewport-backend).
 
 `npx playwright test tests/webgpu.e2e.ts` validates actual WGSL through a software adapter using diagnostic GPU readback. This container has no hardware GPU, and its headless software swapchain cannot be used to verify direct canvas presentation reliably. Test hardware presentation and performance on a supported desktop browser; do not treat software-adapter timings as GPU speedups. Development-console diagnostics are available at `luma.editor.renderer.gpu.diagnostics`.
+
+Open **Design checks** from the rail or command palette to inspect font families, authored bounds and native raster sampling under an explicit DPI/PPI policy. Reports are read-only, downloadable JSON with visible limitations; this does not certify print readiness. The same [preflight API](docs/SCRIPTING_API.md#design-checks) is available through OO scripts and separate REST sessions.
+
+Boolean curve calculation uses Paper.js core under the [bundled MIT license](public/licenses/paperjs-LICENSE.txt). The library runs in the calculation worker; saved native geometry has no live library dependency.
+
+Paragraph text is available in Text properties: choose Paragraph text, set its width, then adjust paragraph spacing and first-line indent. Width drags keep font size and grow height automatically. Native projects preserve complete source text; SVG exports positioned editable lines with explicit font/whitespace portability warnings.
+
+Text properties also offer Inter-word justification for soft-wrapped paragraph lines. It preserves native whole-line shaping and authored source/spacing; final/forced lines and text without expandable spaces retain their spacing. Reset paragraph restores point text and clears justification.

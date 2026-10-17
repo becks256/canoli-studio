@@ -1,6 +1,6 @@
 /**
  * Core alpha matting engine and color decontamination kernel (T19 / A04).
- * Implements color-line Laplacian / KNN alpha estimation across trimap unknown zones,
+ * Implements local Gaussian color-line estimation across trimap unknown zones,
  * guided spatial regularization, edge contrast shaping, and color decontamination.
  */
 
@@ -20,6 +20,8 @@ export function solveAlphaMatte(
   rgbaOrImage: Uint8Array | ImageData,
   trimap: TrimapBuffer,
   options: MattingOptions = {},
+  prior?: Uint8Array,
+  estimate?:Uint8Array,
 ): MattingResult {
   const width = trimap.width;
   const height = trimap.height;
@@ -33,12 +35,15 @@ export function solveAlphaMatte(
         )
       : rgbaOrImage;
 
-  if (rgba.length < numPixels * 4 || trimap.data.length < numPixels) {
+  if (!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<=0||height<=0||!Number.isSafeInteger(numPixels)||rgba.length !== numPixels * 4 || trimap.data.length !== numPixels || (prior&&prior.length!==numPixels)||(estimate&&estimate.length!==numPixels)) {
     throw new Error("Buffer length does not match specified dimensions.");
   }
 
   const alpha = new Uint8Array(numPixels);
   const trimapData = options.trimap ?? trimap.data;
+  if(trimapData.length!==numPixels||trimapData.some(value=>value!==0&&value!==128&&value!==255))throw new Error('Trimap labels must be 0, 128 or 255 and match the source.');
+  let unresolvedPixels=0;
+  const unresolved=new Uint8Array(numPixels);
 
   // Search window for local color-line estimation
   const searchRadius = Math.max(
@@ -48,8 +53,6 @@ export function solveAlphaMatte(
   const spatialSigmaSq = 2 * Math.pow(searchRadius * 0.75, 2);
 
   let totalUnknown = 0;
-  let solvedUnknown = 0;
-  let colorSeparationSum = 0;
 
   // 1. Initial pass: set known pixels and identify unknown pixels
   for (let i = 0; i < numPixels; i++) {
@@ -70,7 +73,9 @@ export function solveAlphaMatte(
       width,
       height,
       trimap: trimapData,
-      confidence: 1.0,
+      confidence: 0,
+      unresolvedPixels,
+      unresolved,
       foregroundRgba:
         options.decontaminate !== false
           ? decontaminateColors(
@@ -85,14 +90,16 @@ export function solveAlphaMatte(
     };
   }
 
-  // 2. Solve unknown pixels using local KNN color line model
+  // 2. Solve unknown pixels using Gaussian-weighted local color lines.
   for (let y = 0; y < height; y++) {
     const row = y * width;
     for (let x = 0; x < width; x++) {
       const idx = row + x;
       if (trimapData[idx] !== TRIMAP_UNKNOWN) continue;
+      if(estimate&&!estimate[idx]&&prior){alpha[idx]=prior[idx];continue;}
 
       const px = idx * 4;
+      if(!rgba[px+3]){alpha[idx]=prior?.[idx]??0;continue;}
       const r = rgba[px];
       const g = rgba[px + 1];
       const b = rgba[px + 2];
@@ -126,6 +133,7 @@ export function solveAlphaMatte(
           const w = Math.exp(-distSq / spatialSigmaSq);
 
           const nPix = nIdx * 4;
+          if(!rgba[nPix+3])continue;
           if (tVal === TRIMAP_FOREGROUND) {
             fgR += rgba[nPix] * w;
             fgG += rgba[nPix + 1] * w;
@@ -141,11 +149,12 @@ export function solveAlphaMatte(
       }
 
       // If either foreground or background is missing in local window, expand or fallback
-      if (fgWeight === 0 && bgWeight === 0) {
-        // Fallback: estimate from distance to nearest border
-        alpha[idx] = 128;
+      if ((!fgWeight||!bgWeight)&&prior) {
+        alpha[idx]=prior[idx];unresolvedPixels++;unresolved[idx]=1;
         continue;
       }
+
+      if (!fgWeight && !bgWeight) throw new Error('Unknown trimap pixels need foreground/background evidence or an initial mask.');
 
       if (fgWeight === 0) {
         alpha[idx] = 0;
@@ -181,7 +190,6 @@ export function solveAlphaMatte(
         // Dot product projection: (U . V) / |V|^2
         const dot = uR * vR + uG * vG + uB * vB;
         estAlpha = dot / vLenSq;
-        colorSeparationSum += Math.sqrt(vLenSq);
       } else {
         // If foreground and background colors are nearly identical in this window,
         // weight by relative spatial proximity between fgWeight and bgWeight
@@ -191,12 +199,11 @@ export function solveAlphaMatte(
       // Clamp to [0, 1] and scale to [0, 255]
       const clamped = Math.max(0, Math.min(1, estAlpha));
       alpha[idx] = Math.round(clamped * 255);
-      solvedUnknown++;
     }
   }
 
   // 3. Guided spatial regularization (bilateral smoothing) to regularize noisy estimates
-  const smoothness = options.smoothness ?? 10;
+  const smoothness = options.smoothness ?? options.smooth ?? 10;
   if (smoothness > 0) {
     applyJointBilateralSmooth(
       alpha,
@@ -214,10 +221,13 @@ export function solveAlphaMatte(
   }
 
   // 5. Sub-pixel edge feathering (if configured)
-  if (options.edgeFeather && options.edgeFeather > 0) {
-    applyMatteFeather(alpha, trimapData, width, height, options.edgeFeather);
+  const feather=options.edgeFeather??options.feather??0;
+  if (feather > 0) {
+    applyMatteFeather(alpha, trimapData, width, height, feather);
   }
 
+  // Invisible RGB cannot supply new matte evidence, including during regularization.
+  for(let i=0;i<numPixels;i++)if(trimapData[i]===TRIMAP_UNKNOWN&&!rgba[i*4+3])alpha[i]=prior?.[i]??0;
   // 6. Color Bleeding Decontamination
   let foregroundRgba: Uint8Array | undefined;
   if (options.decontaminate !== false) {
@@ -231,16 +241,14 @@ export function solveAlphaMatte(
     );
   }
 
-  const avgColorSep =
-    solvedUnknown > 0 ? colorSeparationSum / solvedUnknown / 441.67 : 0.5;
-  const confidence = Math.max(0.2, Math.min(1.0, avgColorSep * 0.7 + 0.3));
-
   return {
     alpha,
     width,
     height,
     trimap: trimapData,
-    confidence,
+    confidence:0,
+    unresolvedPixels,
+    unresolved,
     foregroundRgba,
   };
 }
@@ -303,6 +311,7 @@ export function decontaminateColors(
       if (a <= 0.05 || a >= 0.98) continue;
 
       const px = idx * 4;
+      if(!rgba[px+3])continue;
       const r = rgba[px];
       const g = rgba[px + 1];
       const b = rgba[px + 2];
@@ -328,6 +337,7 @@ export function decontaminateColors(
           const spatialW = Math.exp(-(dx * dx + dy * dy) / spatialSigmaSq);
 
           const nPix = nIdx * 4;
+          if(!rgba[nPix+3])continue;
           bgR += rgba[nPix] * spatialW;
           bgG += rgba[nPix + 1] * spatialW;
           bgB += rgba[nPix + 2] * spatialW;
@@ -353,7 +363,8 @@ export function decontaminateColors(
       output[px] = Math.round(r * (1 - amt) + unmixedR * amt);
       output[px + 1] = Math.round(g * (1 - amt) + unmixedG * amt);
       output[px + 2] = Math.round(b * (1 - amt) + unmixedB * amt);
-      output[px + 3] = alpha[idx];
+      // RGB correction is separate from relative matte coverage; preserve intrinsic alpha.
+      output[px + 3] = rgba[px+3];
     }
   }
 
@@ -372,6 +383,7 @@ function applyJointBilateralSmooth(
   strength: number,
 ): void {
   const radius = Math.max(1, Math.min(5, Math.round(strength / 20)));
+  const amount=Math.max(0,Math.min(1,strength/100));
   const colorSigmaSq = 2 * 30 * 30;
   const spatialSigmaSq = 2 * radius * radius;
   const temp = new Uint8Array(alpha);
@@ -383,6 +395,7 @@ function applyJointBilateralSmooth(
       if (trimap[idx] !== TRIMAP_UNKNOWN) continue;
 
       const px = idx * 4;
+      if(!rgba[px+3])continue;
       const r = rgba[px];
       const g = rgba[px + 1];
       const b = rgba[px + 2];
@@ -400,6 +413,7 @@ function applyJointBilateralSmooth(
         for (let nx = minX; nx <= maxX; nx++) {
           const nIdx = nRow + nx;
           const nPix = nIdx * 4;
+          if(!rgba[nPix+3])continue;
 
           const dx = nx - x;
           const dy = ny - y;
@@ -419,38 +433,25 @@ function applyJointBilateralSmooth(
       }
 
       if (sumW > 0) {
-        alpha[idx] = Math.round(sumA / sumW);
+        alpha[idx] = Math.round(temp[idx]*(1-amount)+(sumA/sumW)*amount);
       }
     }
   }
 }
 
 /**
- * Adjusts alpha transition contrast via an S-curve.
+ * Adjusts alpha transition contrast linearly around the midpoint, then clips.
  */
 function applyMatteContrast(
   alpha: Uint8Array,
   trimap: Uint8Array,
   contrast: number,
 ): void {
-  const factor = Math.max(-0.95, Math.min(3.0, contrast / 50.0));
+  const factor = Math.pow(2,contrast/50);
   for (let i = 0; i < alpha.length; i++) {
     if (trimap[i] !== TRIMAP_UNKNOWN) continue;
     const aNorm = alpha[i] / 255.0;
-    // S-curve centered around 0.5
-    let adjusted: number;
-    if (factor >= 0) {
-      adjusted =
-        aNorm >= 0.5
-          ? 0.5 + 0.5 * Math.pow((aNorm - 0.5) * 2, 1 + factor)
-          : 0.5 - 0.5 * Math.pow((0.5 - aNorm) * 2, 1 + factor);
-    } else {
-      const soften = 1.0 / (1.0 - factor);
-      adjusted =
-        aNorm >= 0.5
-          ? 0.5 + 0.5 * Math.pow((aNorm - 0.5) * 2, soften)
-          : 0.5 - 0.5 * Math.pow((0.5 - aNorm) * 2, soften);
-    }
+    const adjusted=.5+(aNorm-.5)*factor;
     alpha[i] = Math.round(Math.max(0, Math.min(1, adjusted)) * 255);
   }
 }

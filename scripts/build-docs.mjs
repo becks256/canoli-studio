@@ -21,6 +21,16 @@ const pages = [
   ["API", "REST API"],
   ["PLUGINS", "Plugins"],
 ];
+// Refresh existing direct-link pages too; keep the primary API navigation focused.
+const generatedPages = [
+  ...pages,
+  ["REQUIREMENTS", "Requirements"],
+  ["ARCHITECTURE", "Architecture"],
+  ["PRODUCT_BRIEF", "Product brief"],
+  ["DESIGN_SYSTEM", "Design system"],
+  ["SYSTEM_DESIGN", "System design"],
+  ["TOOLS_MILESTONE", "Tools milestone"],
+];
 const pageDescriptions = {
   SCRIPTING_API:
     "Comprehensive guide and reference for Canoli Studio's JavaScript scripting API, document object model, and automation commands.",
@@ -35,7 +45,7 @@ const escape = (text) =>
     .replaceAll("<", "&lt;")
     .replaceAll('"', "&quot;");
 await mkdir("public/developer", { recursive: true });
-for (const [name, title] of pages) {
+for (const [name, title] of generatedPages) {
   const description =
     pageDescriptions[name] ?? "Documentation for the Canoli Studio image editor.";
   const markdown = await readFile(`docs/${name}.md`, "utf8");
@@ -87,4 +97,4 @@ await writeFile(
     await readFile("src/ui/AppearanceSelect.css", "utf8"),
   ].join("\n"),
 );
-console.log(`Built ${pages.length} developer documentation pages.`);
+console.log(`Built ${generatedPages.length} developer documentation pages.`);

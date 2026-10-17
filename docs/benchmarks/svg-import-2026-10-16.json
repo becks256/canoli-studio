@@ -1,0 +1,1619 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T17:52:59.240856+00:00",
+  "scope": "F07/F11 local SVG import and strict shared single-path construction; professional-editor roadmap remains incomplete",
+  "implementation": {
+    "editable": "OO path/shape/group/solid-paint/compound-mask/local-use/embedded-raster import; native commands and normal subsequent history",
+    "flatten": "Explicit browser SVG image decode followed by bounded native PNG tiles, with original XML/editability losses disclosed",
+    "admission": "Dedicated terminable xmldom worker; no live markup insertion, script/event/foreignObject/SMIL/CSS animation/DTD/entity/external resource execution",
+    "publication": "Validate worker data and complete staged assets before guarded tab publication; starting revision/session/asset lifetime and signal/progress failures reject atomically",
+    "singlePath": "Strict M/L/H/V/C/S/Q/T/A/Z conversion; quadratic exact conversion, reported cubic arc approximation; malformed or compound single-path input rejects",
+    "sourcePreservation": "Original embedded static PNG/JPEG/WebP bytes/dimensions survive native project save/reopen; source SVG XML/IDs/CSS/master identity are not archived",
+    "additionalCorrections": [
+      "Inline important declaration priority",
+      "Unpainted and zero-alpha geometry remains editable",
+      "CSS geometry/transforms require explicit flatten",
+      "Negative widths, invalid opacity, cyclic uses and unrepresentable native content cannot silently publish partial artwork"
+    ]
+  },
+  "dependency": {
+    "version": "0.9.12",
+    "resolved": "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.9.12.tgz",
+    "integrity": "sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==",
+    "license": "MIT",
+    "engines": {
+      "node": ">=14.6"
+    }
+  },
+  "verification": {
+    "build": "npm run build: actual WASM/runtime/docs/TypeScript/production bundling passed",
+    "unit": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": 980,
+      "files": 132,
+      "execution": "local loopback authorized; initial restricted attempt failed REST server bind"
+    },
+    "development": {
+      "command": "npx playwright test tests/svg- tests/editor.e2e.ts",
+      "passed": 228,
+      "files": "all nine SVG browser files plus editor.e2e.ts",
+      "newImportCases": 31,
+      "coverage": "new import fixture count is checked below; includes source geometry, PNG/JPEG/WebP bytes, native save/reopen/history, UI preflight/picker/drop/UTF-16, stale/cancel/dispose/callback failures, resource release, XML external/executable rejection, supported export/reimport, genuine 50 MP and existing SVG/editor regressions"
+    },
+    "production": {
+      "command": "npm run test:production",
+      "passed": 35,
+      "newWorkflow": "No developer globals; actual XML worker, preflight editable import, expected decoded PNG samples, prior document retained and exact documented isolated path example with one undo"
+    },
+    "gitDiffCheck": "passed",
+    "distinctBrowserCases": 263
+  },
+  "geometryComparison": {
+    "method": "Source browser SVG contour lengths and 101 normalized-length points per contour vs independently browser-measured imported cubic paths",
+    "maxPointDistancePx": 0.011295436644653972,
+    "maxRelativeLengthError": 7.277394470432502e-05,
+    "acceptance": {
+      "pointDistancePx": 0.04,
+      "relativeLengthError": 0.0001
+    },
+    "pixelMethod": "Keep raw max alpha/premultiplied residuals. Require stable interiors within 3 bytes, threshold contours within one pixel neighborhood, area/centroid checks, zero opaque/transparent holes and independent viewBox-circle radius sampling. These are not pixel identity or proof of a particular raster rounding cause."
+  },
+  "observations50MP": {
+    "editableMs": 855.6000000014901,
+    "flattenMs": 3441.300000000745,
+    "bytes": 944636,
+    "dimensions": [
+      10000,
+      5000
+    ],
+    "sourceUnchanged": true,
+    "reopened": true,
+    "flatDimensions": [
+      10000,
+      5000
+    ],
+    "flatType": "image/png",
+    "tiles": 395,
+    "released": true,
+    "pixels": [
+      [
+        128,
+        64,
+        32,
+        255
+      ],
+      [
+        128,
+        64,
+        32,
+        255
+      ],
+      [
+        128,
+        64,
+        32,
+        255
+      ],
+      [
+        128,
+        64,
+        32,
+        255
+      ],
+      [
+        0,
+        160,
+        255,
+        255
+      ],
+      [
+        0,
+        160,
+        255,
+        255
+      ]
+    ]
+  },
+  "limitations": [
+    "Not complete F07/F11 or complete roadmap delivery. Gradient/text/CSS/effect/clip/mask/non-round-stroke graphs require explicit flatten; broad identity/graph round-trip remains open.",
+    "Native Canvas and SVG curve/clip/image coverage differ; arc conversion is approximate without a universal error bound.",
+    "Native image decode/individual render/encoding calls are cooperative and cannot be preempted mid-call. XML worker termination and final guards suppress cancelled/stale publication.",
+    "Original SVG XML/IDs/CSS/editor metadata and shared use identity are not archived. Flattening discards original geometry/type/effects and off-viewport content.",
+    "Browser/source decode, native validation, resident source bitmaps, XML/base64/compressed output and viewer memory impose real limits; no arbitrary file-size/MP import cap.",
+    "Single observed 50 MP completion times are not p95, input-to-photon, long-task, peak-memory, controlled speedup, hardware GPU or universal device/fidelity acceptance."
+  ],
+  "validationStages": [
+    "Initial focused 52 checks passed.",
+    "Initial browser pass: 9/20 passed; ten strict pixel-maximum checks and one unawaited sample-open assertion failed. Raw logs retained.",
+    "Second browser pass: 21/22 passed; a coverage-centroid check failed on the viewBox/circle fixture. Browser curve and analytic-circle checks distinguish actual geometry from retained coverage residuals.",
+    "A broad pass was intentionally interrupted after review identified invisible-geometry loss and inline important priority; both were fixed with unit/browser regressions before final testing.",
+    "Initial production case reached correct output/undo but failed an exact accessible tab-name assertion because existing dirty-state UI appends Unsaved changes; the corrected check asserts restored document name and empty undo stack.",
+    "Final full build, 980 unit/API, 228 development browser and 35 production cases pass."
+  ],
+  "primaryReferences": [
+    "https://github.com/xmldom/xmldom",
+    "https://www.w3.org/TR/SVG2/conform.html",
+    "https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes",
+    "https://developers.google.com/speed/webp/docs/riff_container",
+    "https://www.w3.org/TR/png-3/#11acTL"
+  ],
+  "sourceHashes": {
+    "package.json": {
+      "sha256": "ebbffd2baffc9067f316e9b9981236807e72923fd1688e80b533f90961ea6cde",
+      "bytes": 1706
+    },
+    "package-lock.json": {
+      "sha256": "0d2eb89a088c750ca3c9e6a09d88b6a11c34aff79be1b0446662f7937951625f",
+      "bytes": 72411
+    },
+    "src/core/svg-import.ts": {
+      "sha256": "42b6af6a7236ef2fadb0be5665f7ef65dc44d94a0b80631232722f0836961a81",
+      "bytes": 22985
+    },
+    "src/core/svg-path-import.ts": {
+      "sha256": "b29f958ca96ffbead987d83494a05267d093ad56ea8e243902710b01395c4c77",
+      "bytes": 9305
+    },
+    "src/core/shapes.ts": {
+      "sha256": "9788a8309de313b01bf7664a5ba826b7469cbfe3d3ecfb33a48cc6929dca3254",
+      "bytes": 5655
+    },
+    "src/core/affine.ts": {
+      "sha256": "0a30403aeeb35b7fb6d7c3d4b9f7c62d9ef4827e6f7c792216b3e07b5e650f07",
+      "bytes": 4279
+    },
+    "src/core/model.ts": {
+      "sha256": "4d5df5de545880b0f9b5e88a4579750c86d85b6bb45723f8d3c72b67ea3533a9",
+      "bytes": 26666
+    },
+    "src/core/assets.ts": {
+      "sha256": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+      "bytes": 4354
+    },
+    "src/core/masks.ts": {
+      "sha256": "7a3c5f86a04afaca7ec0bbdf0f2d98a39d7b9ffebba060a5d4307430d2890a47",
+      "bytes": 3633
+    },
+    "src/core/drawing.ts": {
+      "sha256": "7b68c114f5e97ca5bb31368222df9300fdff0fd9c9dc02635c584a1295999d8c",
+      "bytes": 10153
+    },
+    "src/core/validation.ts": {
+      "sha256": "ff465a122933663e774eb7eeaa0ca61d56f8b96c1aa905ff34c0bfc9b65845ef",
+      "bytes": 10640
+    },
+    "src/core/commands.ts": {
+      "sha256": "9f991b2e3f27023f46867355ce7486db52844acaa2a4fd5945700e341da5d2e7",
+      "bytes": 30888
+    },
+    "src/core/store.ts": {
+      "sha256": "ffb875003fd52c8745b3b18c20e8384fb905c34d1e5ac1cdbea2ef7087883e64",
+      "bytes": 5245
+    },
+    "src/core/project.ts": {
+      "sha256": "ca39bebe4308146605b5442d355d3f0039128a369dc3751f120843390dca3988",
+      "bytes": 12144
+    },
+    "src/dom/index.ts": {
+      "sha256": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+      "bytes": 76965
+    },
+    "src/editor.ts": {
+      "sha256": "b77f31758adb05a5c29b0cff9e67390d296eebc66780bc5400351517f0855c20",
+      "bytes": 65667
+    },
+    "src/ui/SvgImportDialog.tsx": {
+      "sha256": "e4fb4bce157296e33d551590ecdbf383c1d1f6caa888a531491eda94b6c706fb",
+      "bytes": 3631
+    },
+    "src/ui/App.tsx": {
+      "sha256": "b2b194203479f023cd63b5ed455fb820224c2c4565dfdfdea2167d0ae601f1d4",
+      "bytes": 92283
+    },
+    "src/ui/styles.css": {
+      "sha256": "fa120ef7b54d20c879c73c99600559b46c9310d6bca152daa12557a81375418a",
+      "bytes": 122576
+    },
+    "src/ui/Dialog.tsx": {
+      "sha256": "0aae2a9040dfc452ea1c742a05fd7ceb73f78755209d89da92fe28ad3686a6b2",
+      "bytes": 1227
+    },
+    "src/engine/svg-import.ts": {
+      "sha256": "f3ce4374cbd4d7ec687e58185bebed0a26980394a3cce3fd9ee8f64d6f630d2b",
+      "bytes": 8854
+    },
+    "src/engine/svg-import.worker.ts": {
+      "sha256": "c48a132e73ef8f8b499694dfe112a6a1664468a9fbf933ee8e75fedd7a0aaedb",
+      "bytes": 1103
+    },
+    "src/engine/png.ts": {
+      "sha256": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+      "bytes": 8586
+    },
+    "src/engine/renderer.ts": {
+      "sha256": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+      "bytes": 57100
+    },
+    "src/engine/drawing.ts": {
+      "sha256": "d4067b62abdacadb9649013a4942ebf982e061f782a1b8dd5b1ec1652aaf54ff",
+      "bytes": 21940
+    },
+    "src/engine/canvas.ts": {
+      "sha256": "f8aaa150a72696a8cb0a8c4dfb8d5956e567b3808ce6eea77ac48b612baad5df",
+      "bytes": 2084
+    },
+    "src/engine/export-control.ts": {
+      "sha256": "feb42344c76ee80a5c6556700c4973762a9b2d0510bd32eb46ee805f2fb13542",
+      "bytes": 362
+    },
+    "src/generated/script-runtime.js": {
+      "sha256": "1496f295a90ddb882509112a75d2db5ba5e6363dcec037628c4f484eadcedf26",
+      "bytes": 608222
+    },
+    "src/scripting/runtime.ts": {
+      "sha256": "b7b159a899a10b3b069b3041eeb9cb44b40db6a1651daf2a8bb3c9bea00b30a7",
+      "bytes": 8744
+    },
+    "public/wasm/pixels.wasm": {
+      "sha256": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+      "bytes": 24547
+    },
+    "assembly/pixels.ts": {
+      "sha256": "ba0d75e22076c5fd70fbae44c460c7efb18969eb27d9afc08b4b11810e8423d1",
+      "bytes": 17110
+    },
+    "README.md": {
+      "sha256": "a0e234bc8677b5854b6e922b0e6b57e2b971834edc4fc89d2f795b710d97a01b",
+      "bytes": 6633
+    },
+    "docs/PRODUCT_BRIEF.md": {
+      "sha256": "fd48aaa1aa7305eeea419b2873b8186d314f66d8ea01a7125aa016ced368a7f3",
+      "bytes": 10770
+    },
+    "docs/REQUIREMENTS.md": {
+      "sha256": "68a53bc53f49ce6642cfcb512532d3fd3757016415f60021139af7eaf4349344",
+      "bytes": 106020
+    },
+    "docs/ARCHITECTURE.md": {
+      "sha256": "da9d8536644b176abc51c304ab364559ce2cb2f86d1eaffef68da533d3a89503",
+      "bytes": 275298
+    },
+    "docs/API.md": {
+      "sha256": "c95de965651f93c458585bbf10ff12d08aeb08d9e64d726293076adf580a991c",
+      "bytes": 78748
+    },
+    "docs/SCRIPTING_API.md": {
+      "sha256": "c0e45e5ab96fc85ad6b6589b9392f0184ef063fc6895106046ff4474a5562fb4",
+      "bytes": 276875
+    },
+    "docs/DESIGN_SYSTEM.md": {
+      "sha256": "53507d6fa8983f7460cc68267c0a0cb272f5ab2acb8c3e400fa5230e82352964",
+      "bytes": 52150
+    },
+    "docs/PLUGINS.md": {
+      "sha256": "05ea84e5ec7db127122664397ec0cc25a1f10e3cf75dabe7876fdafad366a643",
+      "bytes": 28053
+    },
+    "docs/SYSTEM_DESIGN.md": {
+      "sha256": "0b16e81f1e8d39281c6e4445c5ebdcd982df85e5c373aa0c9c40bfdc7e5abc90",
+      "bytes": 30195
+    },
+    "docs/FEATURE_STRATEGY.md": {
+      "sha256": "0cc76f0cdea4e1bc8ceb710557a5126a12b6f8030e23410cdafcc237772716e5",
+      "bytes": 29500
+    },
+    "docs/IMPLEMENTATION_ROADMAP.md": {
+      "sha256": "ddc0bc71352a4e1b8b54d0ce1c4ce09a88f57802c245a99be6850e6edd055c42",
+      "bytes": 765317
+    },
+    "tests/svg-import.test.ts": {
+      "sha256": "672837de26d36c0632103ffbcddbafe00c6e7f55fe015c57cc12ab01faf669c7",
+      "bytes": 8958
+    },
+    "tests/svg-import.e2e.ts": {
+      "sha256": "6e5ca53d0964a826fb6db51c1874801fa575cab1d9d4e8f57448280f9191d8ca",
+      "bytes": 25703
+    },
+    "tests/svg-import-pixels.ts": {
+      "sha256": "a6544ef97614acda9c2c9065d0e1164e6d9b71aea3444eeadbb1624b006d19db",
+      "bytes": 1673
+    },
+    "tests/production.e2e.ts": {
+      "sha256": "578a69d81641fa196d98433e98713da908c02b7691a1e5c27ed0c002a7e6da89",
+      "bytes": 87406
+    },
+    "tests/editor.e2e.ts": {
+      "sha256": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+      "bytes": 24414
+    },
+    "playwright.config.ts": {
+      "sha256": "42711757cc7fe8dd1d514566627e38cda6fa238e8c047a5b8a73d126d038b926",
+      "bytes": 616
+    },
+    "playwright.production.config.ts": {
+      "sha256": "8701855d56a8fb434935682a19a06480c9c2b3de645024341a4f4ac90ac47c75",
+      "bytes": 386
+    },
+    "tests/svg-composition.e2e.ts": {
+      "sha256": "1c117e9c319affe99a9437f345c2fc666521729fa6966b02657583c715daf2a3",
+      "bytes": 27420
+    },
+    "tests/svg-export.e2e.ts": {
+      "sha256": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+      "bytes": 12922
+    },
+    "tests/svg-images.e2e.ts": {
+      "sha256": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+      "bytes": 12625
+    },
+    "tests/svg-masks.e2e.ts": {
+      "sha256": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+      "bytes": 17365
+    },
+    "tests/svg-paint.e2e.ts": {
+      "sha256": "0784081188e3f58bbbf2e4709e373d65088670d224e84d19c0cbd4dffb81ebec",
+      "bytes": 19197
+    },
+    "tests/svg-smart.e2e.ts": {
+      "sha256": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+      "bytes": 15813
+    },
+    "tests/svg-styles.e2e.ts": {
+      "sha256": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+      "bytes": 8813
+    },
+    "tests/svg-text.e2e.ts": {
+      "sha256": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+      "bytes": 16511
+    },
+    "node_modules/@xmldom/xmldom/package.json": {
+      "sha256": "b61c2dd342e0e1abb800302ec62c0b06ae7a07cd9b907c88428ff80100f64c6a",
+      "bytes": 2253
+    },
+    "node_modules/@xmldom/xmldom/lib/dom-parser.js": {
+      "sha256": "4188e24b953e2c70b66150306c66547495ad968d040e31dd65f22a7b3485da28",
+      "bytes": 20276
+    },
+    "node_modules/@xmldom/xmldom/lib/sax.js": {
+      "sha256": "324e8a0c7b475c645efcd1736b634733e133150849bff741fa0e2215e7017d02",
+      "bytes": 32465
+    },
+    "node_modules/@xmldom/xmldom/lib/dom.js": {
+      "sha256": "bea9ba89adfec227e9e572ee934a48223a170c5cf96b7087d7e3d3023ac47be3",
+      "bytes": 133234
+    }
+  },
+  "builtHashes": {
+    "dist/appearance.js": {
+      "sha256": "977e730925c6ab00dc344ab02aac27b3cfc2fed6084bd97be02326677fcdd76c",
+      "bytes": 2044
+    },
+    "dist/apple-touch-icon.png": {
+      "sha256": "8ee5d6b3c3e0907ca002991138e9cb06b14fdc59a81f686964613f99658be060",
+      "bytes": 5554
+    },
+    "dist/assets/dm-mono-latin-400-normal--0xN8mdc.woff": {
+      "sha256": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+      "bytes": 11212
+    },
+    "dist/assets/dm-mono-latin-400-normal-4GdczIuU.woff2": {
+      "sha256": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+      "bytes": 14820
+    },
+    "dist/assets/dm-mono-latin-ext-400-normal-1aZr6b2b.woff": {
+      "sha256": "5357dcba4e325c781acf79d15fd21f740f4abb7ca3f0fad88af774bd94a74e78",
+      "bytes": 7500
+    },
+    "dist/assets/dm-mono-latin-ext-400-normal-C2zvOubV.woff2": {
+      "sha256": "a52e19ebe0398c9c0f8fa28a0c5e9a6bc324f35d9f0881c9aa407d10af447175",
+      "bytes": 9552
+    },
+    "dist/assets/index-B1BSRnny.css": {
+      "sha256": "004c915390b1516ce93ac36b5c4aab1bf0f8d9132103bd393eab37244f93ff7e",
+      "bytes": 112478
+    },
+    "dist/assets/index-CLJjhlWw.js": {
+      "sha256": "6926d9e58d7b67ab3ede5377fbf5c826a6d537c07f45ba588cf0dc7c76b40762",
+      "bytes": 1926831
+    },
+    "dist/assets/lut-import.worker-BtkofYSH.js": {
+      "sha256": "3e621fb8613bedeab646029c113b21410accc6582b0b2742be3b48c53294c750",
+      "bytes": 97067
+    },
+    "dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2": {
+      "sha256": "c268b459a9329e59fecf39a17618efd44c71735532048d60b12aab76a8c14914",
+      "bytes": 14500
+    },
+    "dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2": {
+      "sha256": "2fb2e8cbfd52ae46179a8b6024eb162f1f9c6de3d22d6e3a30d8f395de7220be",
+      "bytes": 9444
+    },
+    "dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2": {
+      "sha256": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb",
+      "bytes": 15120
+    },
+    "dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2": {
+      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+      "bytes": 24836
+    },
+    "dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2": {
+      "sha256": "6bbb044ab420e07edb0a3042d2eb314b85e83a0182e945a15ab3b9092668dfd5",
+      "bytes": 8520
+    },
+    "dist/assets/metadata.worker-o3DLPB-X.js": {
+      "sha256": "b2858cf04fa9fd59feb7548854dc3905de88f65124a46a3d792063a5dfa97cdb",
+      "bytes": 77198
+    },
+    "dist/assets/pixels.worker-DikD1MU2.js": {
+      "sha256": "e35a2b52584305f73d191650f960269a18305d170b5296f894fee2959866e21e",
+      "bytes": 179721
+    },
+    "dist/assets/preflight.worker-CqWUcc9C.js": {
+      "sha256": "5ec39359e0f120c0bcbe2aae5a93f1855ffc5fa696f80bf9cf69d4b4b8887441",
+      "bytes": 106924
+    },
+    "dist/assets/project-encoder.worker-CZgnFktF.js": {
+      "sha256": "f0d0175d6d9ff093d7427de5c699c644dbb93a2193443dc2555548052012bafd",
+      "bytes": 149654
+    },
+    "dist/assets/recovery-persistence.worker-CsaNKNay.js": {
+      "sha256": "6737537470b641a93538653cb5f2024c3a3473ae8ba1fd5be397438ce994f8cb",
+      "bytes": 156385
+    },
+    "dist/assets/selection-outline.worker-Dj42pVuC.js": {
+      "sha256": "1b3daae3320634f2f5e36f3dd37204e36e737a10bcf2e43b79cd79a51898a958",
+      "bytes": 70293
+    },
+    "dist/assets/svg-import.worker-4ipDfIt9.js": {
+      "sha256": "f408664439d54d58690b60a9fdf754523a130371b01fe9050ad64bd7a862838f",
+      "bytes": 346622
+    },
+    "dist/developer/api.html": {
+      "sha256": "2cc41db242b908befb45ce9412584c1448a5ab9307076f96885c8f763ecf72f1",
+      "bytes": 103159
+    },
+    "dist/developer/architecture.html": {
+      "sha256": "621f11fd558513b26e86f6dd252f30fb0094fa1d523fbbb46889e0cf5085eb47",
+      "bytes": 292234
+    },
+    "dist/developer/design-system.html": {
+      "sha256": "fb46b715189d84245d4d284ead7bbd8fb662f1325d3dafd1ccf7ea35afc47e67",
+      "bytes": 57289
+    },
+    "dist/developer/docs.css": {
+      "sha256": "f8cb8902b3322ab4d12b252116ae4291630c72970138e48850f397eac0fdf933",
+      "bytes": 9171
+    },
+    "dist/developer/plugins.html": {
+      "sha256": "6d804c1b36945ed0fedcb525addf302754b7705c7d8ef5d9fa4d4ef54edfc5c7",
+      "bytes": 31800
+    },
+    "dist/developer/product-brief.html": {
+      "sha256": "892da4ee63fe8854f8f55ca738c141e350d28ef2a07224804a25655f9b35f970",
+      "bytes": 13972
+    },
+    "dist/developer/requirements.html": {
+      "sha256": "c8186888122b8251c28c1ae33dba895b817ed36b403618a4b54f45a7ae5a13cc",
+      "bytes": 106230
+    },
+    "dist/developer/scripting-api.html": {
+      "sha256": "c548b781e2acf83e0be374f6b22ee25194b3cf9032d69eda660c0ab1527dcf97",
+      "bytes": 383394
+    },
+    "dist/developer/system-design.html": {
+      "sha256": "d78fa031fed392283375b560ede3ddfadd43b8dc6939f06f44290bf0ba85876d",
+      "bytes": 34510
+    },
+    "dist/developer/tools-milestone.html": {
+      "sha256": "2cd7ebd3c64d864dbdaf192b8859514de0ceb0491222aee1bb7ea0878fb66a76",
+      "bytes": 8122
+    },
+    "dist/favicon-16x16.png": {
+      "sha256": "648f06b1a2f5c408ea54ad9344f2f03d591c131ef80a6c1f3a16dde744474033",
+      "bytes": 550
+    },
+    "dist/favicon-32x32.png": {
+      "sha256": "073460d86c64ff5d1692382780a3434ce7579a98159271a77e19baf991a7a0fd",
+      "bytes": 1099
+    },
+    "dist/favicon.ico": {
+      "sha256": "cb0a998e12738f56bad9ee6346f51d4dca155e0ab6462fa55ec1192228efedd0",
+      "bytes": 4314
+    },
+    "dist/favicon.svg": {
+      "sha256": "604b2e074d358a36fe6ccb3767a78ecfd4dbae73dea74b8f519e6b076318be81",
+      "bytes": 513
+    },
+    "dist/icon-192.png": {
+      "sha256": "6834323ab9d66d03ac980f9cecb8efd1d285ed2bcd3ed2f5c5cfe5b99bf1715a",
+      "bytes": 5946
+    },
+    "dist/icon-512.png": {
+      "sha256": "bb4d4071f7c020716c987a9aa50f8ed8a3a2ba4aee6e62526aedd07295cda599",
+      "bytes": 15714
+    },
+    "dist/index.html": {
+      "sha256": "1cd50e1818cc9364ffea08cb8929f8da11ce20e266ea0d11a5b87e2977dc7763",
+      "bytes": 6494
+    },
+    "dist/manifest.webmanifest": {
+      "sha256": "312643f9c04a5cea7906e569d288733136f34e62ffcc3ec0754a9b5e29a5ef86",
+      "bytes": 856
+    },
+    "dist/og-image.png": {
+      "sha256": "3806fb6fd4996ca62e5707f0f579a59c6b37d262e88e7ca011b412df707bc2f9",
+      "bytes": 233979
+    },
+    "dist/robots.txt": {
+      "sha256": "5b02cfea2ffdcf23a8bbb2d4b6f335f2e7bc2cb4c98ac68ab394c4f9eaeca1da",
+      "bytes": 62
+    },
+    "dist/sitemap.xml": {
+      "sha256": "c0c8b43949e88df68a317070d2885c2585200d7c2b82702a7e3acef85b1395f2",
+      "bytes": 661
+    },
+    "dist/wasm/pixels.wasm": {
+      "sha256": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+      "bytes": 24547
+    }
+  },
+  "reports": {
+    "canoli-svg-import-50mp.json": {
+      "editableMs": 855.6000000014901,
+      "flattenMs": 3441.300000000745,
+      "bytes": 944636,
+      "dimensions": [
+        10000,
+        5000
+      ],
+      "sourceUnchanged": true,
+      "reopened": true,
+      "flatDimensions": [
+        10000,
+        5000
+      ],
+      "flatType": "image/png",
+      "tiles": 395,
+      "released": true,
+      "pixels": [
+        [
+          128,
+          64,
+          32,
+          255
+        ],
+        [
+          128,
+          64,
+          32,
+          255
+        ],
+        [
+          128,
+          64,
+          32,
+          255
+        ],
+        [
+          128,
+          64,
+          32,
+          255
+        ],
+        [
+          0,
+          160,
+          255,
+          255
+        ],
+        [
+          0,
+          160,
+          255,
+          255
+        ]
+      ]
+    },
+    "canoli-svg-import-abort.json": {
+      "action": "abort",
+      "invoked": true,
+      "error": "AbortError: signal is aborted without reason",
+      "noPublish": true,
+      "empty": true,
+      "retry": true
+    },
+    "canoli-svg-import-affine.json": {
+      "mode": "affine",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Elliptical arcs/circles/rounded corners are converted to editable cubic B\u00e9zier approximations.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 4,
+        "layers": 4,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0008182075365537898,
+      "centroidError": 0.02960420457564479,
+      "alpha": 51,
+      "premult": 29,
+      "meanAlpha": 0.18302083333333333,
+      "holes": 0,
+      "covered": 3885,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-arcs.json": {
+      "mode": "arcs",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Elliptical arcs/circles/rounded corners are converted to editable cubic B\u00e9zier approximations.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 3,
+        "layers": 3,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0012002534040822072,
+      "centroidError": 0.07719778299248951,
+      "alpha": 112,
+      "premult": 97.98431372549018,
+      "meanAlpha": 0.37786458333333334,
+      "holes": 0,
+      "covered": 7782,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-browser-geometry.json": [
+      {
+        "d": "M10 10 20 10H40V40h-20v-10l-10-10Z",
+        "lengthError": 0,
+        "distance": 0
+      },
+      {
+        "d": "m10 10c10-20 30-20 40 0s30 20 40 0",
+        "lengthError": 0,
+        "distance": 0
+      },
+      {
+        "d": "M0 0Q20 40 40 0T80 0q20-40 40 0t40 0",
+        "lengthError": 1.2896692591598115e-07,
+        "distance": 4.1580637658294e-05
+      },
+      {
+        "d": "M0 0A20 30 35 0 1 80 40a30 20 -20 1 0 -60 40Z",
+        "lengthError": 5.2595933787866936e-05,
+        "distance": 0.011295436644653972
+      },
+      {
+        "d": "M0 0C10 20 30 20 40 0Q50-20 60 0S80 20 90 0T120 0",
+        "lengthError": 0,
+        "distance": 1.5377536293599222e-05
+      },
+      {
+        "d": "M0 0A10 10 0 0110 10L20 20",
+        "lengthError": 7.277394470432502e-05,
+        "distance": 0.002824454937237191
+      },
+      {
+        "d": "M1e1 .5L20.25-.5L10.001.5Z",
+        "lengthError": 0,
+        "distance": 0
+      }
+    ],
+    "canoli-svg-import-callback-error.json": {
+      "action": "callback-error",
+      "invoked": true,
+      "error": "Error: Callback failed",
+      "noPublish": true,
+      "empty": true,
+      "retry": true
+    },
+    "canoli-svg-import-colors.json": {
+      "mode": "colors",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 5,
+        "layers": 5,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "alpha": 0,
+      "premult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "covered": 10240,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-compound.json": {
+      "mode": "compound",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Compound/even-odd/open fills retain editable vector-mask contours.",
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 3,
+        "layers": 3,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 3.36234982241484e-05,
+      "centroidError": 0.0013807892804569813,
+      "alpha": 29,
+      "premult": 29,
+      "meanAlpha": 0.0067708333333333336,
+      "holes": 0,
+      "covered": 8868,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-curves.json": {
+      "mode": "curves",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 2,
+        "layers": 2,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 4.475733053375507e-05,
+      "centroidError": 0.005004715232027872,
+      "alpha": 50,
+      "premult": 43.92156862745097,
+      "meanAlpha": 0.08953125,
+      "holes": 0,
+      "covered": 9165,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-dispose.json": {
+      "action": "dispose",
+      "invoked": true,
+      "error": "Error: The target asset store was disposed during the operation.",
+      "noPublish": true,
+      "empty": true,
+      "retry": false
+    },
+    "canoli-svg-import-edit.json": {
+      "action": "edit",
+      "invoked": true,
+      "error": "Error: Document session changed during SVG import. Try again.",
+      "noPublish": true,
+      "empty": true,
+      "retry": true
+    },
+    "canoli-svg-import-flat-cancel.json": {
+      "invoked": true,
+      "error": "AbortError: signal is aborted without reason",
+      "spawned": 1,
+      "terminated": 1,
+      "tiles": 2,
+      "releasedTiles": true,
+      "bitmaps": 1,
+      "releasedBitmaps": true,
+      "unchanged": true
+    },
+    "canoli-svg-import-flat-ui.json": {
+      "type": "image/png",
+      "dimensions": [
+        160,
+        120
+      ],
+      "left": [
+        254,
+        0,
+        0,
+        255
+      ],
+      "right": [
+        1,
+        0,
+        255,
+        255
+      ]
+    },
+    "canoli-svg-import-image-auto.json": {
+      "aspect": "auto",
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "alpha": 0,
+      "premult": 0,
+      "dimensions": [
+        64,
+        32
+      ],
+      "original": true,
+      "reopened": true
+    },
+    "canoli-svg-import-image-jpeg.json": {
+      "aspect": "jpeg",
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0.003921398027415535,
+      "alpha": 8,
+      "premult": 8,
+      "dimensions": [
+        64,
+        32
+      ],
+      "original": true,
+      "reopened": true
+    },
+    "canoli-svg-import-image-none.json": {
+      "aspect": "none",
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0.003921398027415535,
+      "alpha": 8,
+      "premult": 8,
+      "dimensions": [
+        64,
+        32
+      ],
+      "original": true,
+      "reopened": true
+    },
+    "canoli-svg-import-image-webp.json": {
+      "aspect": "webp",
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0.003921398027415535,
+      "alpha": 8,
+      "premult": 8,
+      "dimensions": [
+        64,
+        32
+      ],
+      "original": true,
+      "reopened": true
+    },
+    "canoli-svg-import-image-xMaxYMin-slice.json": {
+      "aspect": "xMaxYMin slice",
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.002151867167543569,
+      "centroidError": 0.08105746682163531,
+      "alpha": 66,
+      "premult": 80.21960784313725,
+      "dimensions": [
+        64,
+        32
+      ],
+      "original": true,
+      "reopened": true
+    },
+    "canoli-svg-import-image-xMidYMid-meet.json": {
+      "aspect": "xMidYMid meet",
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0.004705680516153166,
+      "alpha": 8,
+      "premult": 8,
+      "dimensions": [
+        64,
+        32
+      ],
+      "original": true,
+      "reopened": true
+    },
+    "canoli-svg-import-priority.json": {
+      "mode": "priority",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 4,
+        "layers": 4,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "alpha": 0,
+      "premult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "covered": 6144,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-production.json": {
+      "width": 160,
+      "height": 120,
+      "pixels": [
+        [
+          128,
+          64,
+          32,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          255,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "canoli-svg-import-roundtrip.json": {
+      "editable": true,
+      "images": 0,
+      "unchangedPixels": true,
+      "layers": true
+    },
+    "canoli-svg-import-solid.json": {
+      "mode": "solid",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 5,
+        "layers": 5,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "alpha": 0,
+      "premult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "covered": 6144,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-staged-abort.json": {
+      "action": "abort",
+      "error": "AbortError: signal is aborted without reason",
+      "invoked": true,
+      "staged": 1,
+      "released": true,
+      "empty": true,
+      "unchanged": true
+    },
+    "canoli-svg-import-staged-bad-image.json": {
+      "action": "bad-image",
+      "error": "Error: The browser could not decode this image. Check the file format and available device memory.",
+      "invoked": false,
+      "staged": 1,
+      "released": true,
+      "empty": true,
+      "unchanged": true
+    },
+    "canoli-svg-import-strokes.json": {
+      "mode": "strokes",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 3,
+        "layers": 5,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.00012398255879088625,
+      "centroidError": 0.006122835658186856,
+      "alpha": 23,
+      "premult": 23,
+      "meanAlpha": 0.01484375,
+      "holes": 0,
+      "covered": 5648,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-switch.json": {
+      "action": "switch",
+      "invoked": true,
+      "error": "Error: The target asset store was disposed during the operation.",
+      "noPublish": true,
+      "empty": true,
+      "retry": true
+    },
+    "canoli-svg-import-use.json": {
+      "mode": "use",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Elliptical arcs/circles/rounded corners are converted to editable cubic B\u00e9zier approximations.",
+          "SVG use references expand independently; shared symbol/DOM identity is not retained.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 7,
+        "layers": 9,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0001224689745264533,
+      "centroidError": 0.014856872100992858,
+      "alpha": 13,
+      "premult": 28,
+      "meanAlpha": 0.01875,
+      "holes": 0,
+      "covered": 1598,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-viewbox.json": {
+      "mode": "viewbox",
+      "circleRadiusError": 4.2256936700013625e-05,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Elliptical arcs/circles/rounded corners are converted to editable cubic B\u00e9zier approximations.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 3,
+        "layers": 3,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0.0031253062459255976,
+      "centroidError": 0.15062390087699662,
+      "alpha": 57,
+      "premult": 57,
+      "meanAlpha": 0.08098958333333334,
+      "holes": 0,
+      "covered": 1874,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    },
+    "canoli-svg-import-visibility.json": {
+      "mode": "visibility",
+      "circleRadiusError": 0,
+      "report": {
+        "version": 1,
+        "width": 160,
+        "height": 120,
+        "canImportEditable": true,
+        "featuresPreserved": [
+          "Editable paths, shapes, inherited solid paints and full affine placement."
+        ],
+        "featuresDegraded": [
+          "Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.",
+          "Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.",
+          "Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML."
+        ],
+        "unsupportedFeatures": [],
+        "additionalIssues": 0,
+        "elements": 6,
+        "layers": 6,
+        "images": 0
+      },
+      "interiorErrors": 0,
+      "contourErrors": 0,
+      "areaError": 0,
+      "centroidError": 0,
+      "alpha": 0,
+      "premult": 0,
+      "meanAlpha": 0,
+      "holes": 0,
+      "covered": 2304,
+      "changed": true,
+      "undone": true,
+      "reopened": true,
+      "revision": 0,
+      "nativeLayers": 1,
+      "hasVectors": true,
+      "constructor": "VectorLayer"
+    }
+  },
+  "logs": {
+    "/tmp/canoli-svg-import-all-unit-final.log": {
+      "sha256": "dbdb0797342c6186adcc35a3fef73b7a9c274f9acacea124b694e320b5450b3f",
+      "bytes": 642,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  132 passed (132)",
+        "      Tests  980 passed (980)",
+        "   Start at  13:39:21",
+        "   Duration  60.77s (tests 75%, import 21%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  132 workers spawned \u00b7 ~112ms startup each (spawn + environment, per file)",
+        "             at least ~7.29s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-import-all-unit.log": {
+      "sha256": "23195d91ff7c344f25eb1c781bdb5d315b1f41840a522f805cf7a674d0121d2d",
+      "bytes": 2457,
+      "tail": [
+        "Error: Server is not running.",
+        "\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[2/14]\u23af",
+        "",
+        "",
+        " Test Files  8 failed | 124 passed (132)",
+        "      Tests  920 passed | 59 skipped (979)",
+        "   Start at  13:34:44",
+        "   Duration  39.98s (tests 59%, import 34%, transform 6%, worker 1%)",
+        "",
+        "    Isolate  132 workers spawned \u00b7 ~111ms startup each (spawn + environment, per file)",
+        "             at least ~7.23s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-import-browser-final.log": {
+      "sha256": "474a119570295cb355c99b5cc48c3c085c5c6dcb98f516dacd6d20326604a09d",
+      "bytes": 30362,
+      "tail": [
+        "  \u2713  219 tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation encoding-change respects font lifetime, history and cleanup (1.6s)",
+        "  \u2713  220 tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation pending-font respects font lifetime, history and cleanup (1.8s)",
+        "  \u2713  221 tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation font-descriptor respects font lifetime, history and cleanup (1.6s)",
+        "  \u2713  222 tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation escaped-family respects font lifetime, history and cleanup (1.5s)",
+        "  \u2713  223 tests/svg-text.e2e.ts:40:163 \u203a SVG text preparation host-edit respects font lifetime, history and cleanup (1.8s)",
+        "  \u2713  224 tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text font fails without a partial result or history changes (1.5s)",
+        "  \u2713  225 tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text color fails without a partial result or history changes (1.5s)",
+        "  \u2713  226 tests/svg-text.e2e.ts:63:54 \u203a invalid SVG text xml fails without a partial result or history changes (1.5s)",
+        "  \u2713  227 tests/svg-text.e2e.ts:71:1 \u203a downloaded SVG references a page-only font without copying font files or promising its appearance (1.6s)",
+        "  \u2713  228 tests/svg-text.e2e.ts:79:1 \u203a SVG text keeps every layer untracked when native Canvas letter spacing is unavailable (1.5s)",
+        "",
+        "  228 passed (7.6m)"
+      ]
+    },
+    "/tmp/canoli-svg-import-browser-initial.log": {
+      "sha256": "2f86ead794882ede7f545f039775b41aad7c83f0206a08bae79d4c8969cba460",
+      "bytes": 44996,
+      "tail": [
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable compound matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable curves matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable arcs matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable strokes matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable affine matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable use matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable viewbox matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:29:70 \u203a SVG embedded raster xMidYMid meet keeps original bytes and editable placement ",
+        "    tests/svg-import.e2e.ts:29:70 \u203a SVG embedded raster xMaxYMin slice keeps original bytes and editable placement ",
+        "    tests/svg-import.e2e.ts:29:70 \u203a SVG embedded raster none keeps original bytes and editable placement ",
+        "    tests/svg-import.e2e.ts:39:1 \u203a SVG preflight offers editable, explicit flatten and cancel without changing existing work ",
+        "  9 passed (59.5s)"
+      ]
+    },
+    "/tmp/canoli-svg-import-browser-interrupted.log": {
+      "sha256": "0dee21c912787ba2a0c5bca7b50cbceb6fd4be25381d1fbd42a06109ff1bd0f9",
+      "bytes": 10857,
+      "tail": [
+        "        at /home/kestrel/projects/luma-editor/tests/svg-composition.e2e.ts:67:127",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/svg-composition.e2e.ts-SVG-726c1-ange-through-final-encoding/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-composition.e2e.ts-SVG-726c1-ange-through-final-encoding/error-context.md",
+        "",
+        "  1 interrupted",
+        "    tests/svg-composition.e2e.ts:66:82 \u203a SVG native prefix captures text/fonts and rejects font-change through final encoding ",
+        "  183 did not run",
+        "  42 passed (1.5m)"
+      ]
+    },
+    "/tmp/canoli-svg-import-browser-second.log": {
+      "sha256": "12a1e74d1bb37d806146a94fbf07769d7fd159575fd64b0582ff55b4af91496e",
+      "bytes": 7192,
+      "tail": [
+        "      29 | for(const aspect of ['xMidYMid meet','xMaxYMin slice','none','auto'])test(`SVG embedded raster ${aspect} keeps original bytes and editable placement`,async({page})=>{",
+        "        at /home/kestrel/projects/luma-editor/tests/svg-import.e2e.ts:26:558",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/svg-import.e2e.ts-SVG-edit-adb67-and-survives-project-reopen/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/svg-import.e2e.ts-SVG-edit-adb67-and-survives-project-reopen/error-context.md",
+        "",
+        "  1 failed",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable viewbox matches independently decoded source and survives project reopen ",
+        "  21 passed (1.0m)"
+      ]
+    },
+    "/tmp/canoli-svg-import-browser.log": {
+      "sha256": "2f86ead794882ede7f545f039775b41aad7c83f0206a08bae79d4c8969cba460",
+      "bytes": 44996,
+      "tail": [
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable compound matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable curves matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable arcs matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable strokes matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable affine matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable use matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:15:40 \u203a SVG editable viewbox matches independently decoded source and survives project reopen ",
+        "    tests/svg-import.e2e.ts:29:70 \u203a SVG embedded raster xMidYMid meet keeps original bytes and editable placement ",
+        "    tests/svg-import.e2e.ts:29:70 \u203a SVG embedded raster xMaxYMin slice keeps original bytes and editable placement ",
+        "    tests/svg-import.e2e.ts:29:70 \u203a SVG embedded raster none keeps original bytes and editable placement ",
+        "    tests/svg-import.e2e.ts:39:1 \u203a SVG preflight offers editable, explicit flatten and cancel without changing existing work ",
+        "  9 passed (59.5s)"
+      ]
+    },
+    "/tmp/canoli-svg-import-build-before-roundtrip.log": {
+      "sha256": "bf974f17114601cd9228109e519c0b1319ee4c750a76e18875de05b6e3eb199d",
+      "bytes": 3938,
+      "tail": [
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/context.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/context.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.10s"
+      ]
+    },
+    "/tmp/canoli-svg-import-build-final.log": {
+      "sha256": "c1305e613bfe35e52e43b4aba1bda94b3590cf7156465d5e22f85cd771f5e72a",
+      "bytes": 3938,
+      "tail": [
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/Icon.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/Icon.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.22s"
+      ]
+    },
+    "/tmp/canoli-svg-import-build.log": {
+      "sha256": "787a263ea4820063222dc3d18bf153206d51a5d5dac621170272cc443f17585c",
+      "bytes": 3938,
+      "tail": [
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "\u001b[33m[MODULE_LEVEL_DIRECTIVE] \u001b[0mThe semantics of the module level directive \"use client\" in \"node_modules/lucide-react/dist/esm/Icon.mjs\" may not be preserved when bundling.",
+        "   \u001b[38;5;246m\u256d\u001b[0m\u001b[38;5;246m\u2500\u001b[0m\u001b[38;5;246m[\u001b[0m node_modules/lucide-react/dist/esm/Icon.mjs:2:1 \u001b[38;5;246m]\u001b[0m",
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.34s"
+      ]
+    },
+    "/tmp/canoli-svg-import-production-final.log": {
+      "sha256": "036523bbb1404978b8e97f2e6022df00c2d58fe1845d2ade7355d98f68c52cd0",
+      "bytes": 5718,
+      "tail": [
+        "  \u2713  26 tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers (2.4s)",
+        "  \u2713  27 tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors (1.5s)",
+        "  \u2713  28 tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow (1.5s)",
+        "  \u2713  29 tests/production.e2e.ts:983:1 \u203a production SVG filters preserve document-space shadows with zero fill and rotated parents (1.5s)",
+        "  \u2713  30 tests/production.e2e.ts:998:1 \u203a production SVG download retains a native photo, raster erasures and independent vector paths (1.6s)",
+        "  \u2713  31 tests/production.e2e.ts:1010:1 \u203a production documented SVG text stays editable and matches native PNG through actual downloads (1.5s)",
+        "  \u2713  32 tests/production.e2e.ts:1025:1 \u203a production documented smart SVG keeps editable vectors and native filtered pixels through actual downloads (1.6s)",
+        "  \u2713  33 tests/production.e2e.ts:1037:1 \u203a production documented SVG paint retains editable dabs, erasers and native selection clips through actual downloads (1.6s)",
+        "  \u2713  34 tests/production.e2e.ts:1050:1 \u203a production documented native SVG backdrop preserves adjustments and Blend If with later editable artwork (1.6s)",
+        "  \u2713  35 tests/production.e2e.ts:1063:1 \u203a production SVG preflight imports editable geometry, preserves prior work and exports through bundled native code (2.3s)",
+        "",
+        "  35 passed (1.0m)"
+      ]
+    },
+    "/tmp/canoli-svg-import-production-first.log": {
+      "sha256": "a3e30033ab0b48f91fdddb63166ff37bfd701b7e01ee0dd620e7658e275693cd",
+      "bytes": 4721,
+      "tail": [
+        "      1072 | });",
+        "      1073 |",
+        "        at /home/kestrel/projects/luma-editor/tests/production.e2e.ts:1070:649",
+        "",
+        "    attachment #1: screenshot (image/png) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "    test-results/production.e2e.ts-producti-e0ed2-through-bundled-native-code/test-failed-1.png",
+        "    \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        "",
+        "    Error Context: test-results/production.e2e.ts-producti-e0ed2-through-bundled-native-code/error-context.md",
+        "",
+        "  1 failed",
+        "    tests/production.e2e.ts:1063:1 \u203a production SVG preflight imports editable geometry, preserves prior work and exports through bundled native code "
+      ]
+    },
+    "/tmp/canoli-svg-import-production-smoke.log": {
+      "sha256": "b563fb284f877a05d9726f86d8b600ccfe4d17b1b9ca732b85f0c2e608543d10",
+      "bytes": 700,
+      "tail": [
+        "> playwright test --config playwright.production.config.ts --grep production SVG preflight",
+        "",
+        "[WebServer] (node:267112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)",
+        "",
+        "Running 1 test using 1 worker",
+        "",
+        "(node:267166) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.",
+        "(Use `node --trace-warnings ...` to show where the warning was created)",
+        "  \u2713  1 tests/production.e2e.ts:1063:1 \u203a production SVG preflight imports editable geometry, preserves prior work and exports through bundled native code (2.4s)",
+        "",
+        "  1 passed (4.0s)"
+      ]
+    },
+    "/tmp/canoli-svg-import-seo-final.log": {
+      "sha256": "b81836d37689e65eb0870ad7c12a531ece0a277e86fe1e06ef0d08e68b834874",
+      "bytes": 195,
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  13:50:52",
+        "   Duration  233ms (transform 44%, tests 27%, import 19%, worker 9%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-import-types-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "/tmp/canoli-svg-import-types.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "/tmp/canoli-svg-import-unit-final.log": {
+      "sha256": "2a59c3703735c317b9ca349feefd6569a9b3fe454d18d275c2dc822b91c2aec5",
+      "bytes": 440,
+      "tail": [
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  3 passed (3)",
+        "      Tests  54 passed (54)",
+        "   Start at  13:34:15",
+        "   Duration  1.99s (transform 72%, import 19%, tests 8%)",
+        "",
+        "  Transform  transforming modules took 3.08s \u00b7 72% of tracked time, re-done on every run",
+        "             persist transforms across runs with fsModuleCache: true",
+        "             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-import-unit-second.log": {
+      "sha256": "2867b7dd417bff642c0ec12644aba6dc475f9c8e5ce962bf14a8ac8c3d0cd88e",
+      "bytes": 440,
+      "tail": [
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  3 passed (3)",
+        "      Tests  52 passed (52)",
+        "   Start at  13:28:33",
+        "   Duration  2.00s (transform 72%, import 20%, tests 8%)",
+        "",
+        "  Transform  transforming modules took 3.06s \u00b7 72% of tracked time, re-done on every run",
+        "             persist transforms across runs with fsModuleCache: true",
+        "             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-import-unit.log": {
+      "sha256": "cc5307f1935d5197401dbe43b416643f1606bb0d2b4e4a0f35617029bc3caa2a",
+      "bytes": 440,
+      "tail": [
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  3 passed (3)",
+        "      Tests  52 passed (52)",
+        "   Start at  13:22:46",
+        "   Duration  1.99s (transform 72%, import 20%, tests 8%)",
+        "",
+        "  Transform  transforming modules took 3.04s \u00b7 72% of tracked time, re-done on every run",
+        "             persist transforms across runs with fsModuleCache: true",
+        "             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns",
+        ""
+      ]
+    }
+  }
+}

@@ -10,6 +10,7 @@ import {
   TextLayer,
   RasterLayer,
   VectorPath,
+  VectorContour,
 } from "../../dom";
 import { MarqueeSelection } from "../../dom/values";
 import { defaultAnalysisRegistry } from "../adapters/registry";
@@ -294,6 +295,8 @@ export class AnalysisService {
               (path) =>
                 new VectorPath({
                   closed: path.closed,
+                  fillRule: path.fillRule,
+                  subpaths: [...path.subpaths].map(contour => new VectorContour({ points: contour.points.map(p => ({ ...point(p), in: point(p.in), out: point(p.out) })) })),
                   points: path.points.map((p) => ({
                     ...point(p),
                     in: point(p.in),

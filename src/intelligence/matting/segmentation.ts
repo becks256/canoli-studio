@@ -5,6 +5,7 @@
  */
 
 import type { SelectionData } from "../../core/drawing";
+import { selectSubjectOptionsSchema } from "../../core/subject-selection";
 import {
   TRIMAP_BACKGROUND,
   TRIMAP_FOREGROUND,
@@ -18,238 +19,53 @@ import {
  * Detects the salient foreground subject in an RGBA image buffer.
  */
 export function detectSalientSubject(
-  input: Uint8Array | ImageData,
-  widthOrOptions?: number | SelectSubjectOptions,
-  heightParam?: number,
-  optionsParam?: SelectSubjectOptions,
+  input: Uint8Array | ImageData, widthOrOptions?: number | SelectSubjectOptions,
+  heightParam?: number, optionsParam?: SelectSubjectOptions,
 ): SegmentationCandidate {
-  let rgba: Uint8Array;
-  let width: number;
-  let height: number;
-  let options: SelectSubjectOptions;
-
-  if ("data" in input && typeof input.width === "number") {
-    rgba = new Uint8Array(
-      input.data.buffer,
-      input.data.byteOffset,
-      input.data.byteLength,
-    );
-    width = input.width;
-    height = input.height;
-    options = (typeof widthOrOptions === "object" ? widthOrOptions : {}) ?? {};
-  } else {
-    rgba = input as Uint8Array;
-    width = widthOrOptions as number;
-    height = heightParam!;
-    options = optionsParam ?? {};
+  const image = "data" in input;
+  const rgba = image ? input.data : input;
+  const width = image ? input.width : widthOrOptions as number;
+  const height = image ? input.height : heightParam!;
+  const options = selectSubjectOptionsSchema.parse(image ? widthOrOptions ?? {} : optionsParam ?? {});
+  if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<=0||height<=0||!Number.isSafeInteger(width*height)||rgba.length!==width*height*4)
+    throw new Error('Invalid image dimensions or buffer length for segmentation.');
+  const border=Math.max(1,Math.min(16,Math.floor(Math.min(width,height)/20)));
+  let red=0,green=0,blue=0,visible=0;
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(x<border||x>=width-border||y<border||y>=height-border){
+    const i=(y*width+x)*4;if(rgba[i+3]){red+=rgba[i];green+=rgba[i+1];blue+=rgba[i+2];visible++;}
   }
-
-  if (width <= 0 || height <= 0 || rgba.length < width * height * 4) {
-    throw new Error(
-      "Invalid image dimensions or buffer length for segmentation.",
-    );
-  }
-
-  const threshold = options.threshold ?? 0.35;
-  const numPixels = width * height;
-
-  // 1. Calculate border background color model
-  // The outer perimeter (top, bottom, left, right edges) provides the background prior
-  const borderWidth = Math.max(
-    1,
-    Math.min(16, Math.floor(Math.min(width, height) / 20)),
-  );
-  let bgR = 0,
-    bgG = 0,
-    bgB = 0,
-    bgCount = 0;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      if (
-        x < borderWidth ||
-        x >= width - borderWidth ||
-        y < borderWidth ||
-        y >= height - borderWidth
-      ) {
-        const idx = (y * width + x) * 4;
-        const a = rgba[idx + 3];
-        if (a > 10) {
-          bgR += rgba[idx];
-          bgG += rgba[idx + 1];
-          bgB += rgba[idx + 2];
-          bgCount++;
-        }
-      }
+  if(visible){red/=visible;green/=visible;blue/=visible;}
+  const perimeter=width*height-Math.max(0,width-2*border)*Math.max(0,height-2*border);
+  if(visible*2<perimeter)visible=0;
+  const lum=(i:number)=>rgba[i*4+3] ? .299*rgba[i*4]+.587*rgba[i*4+1]+.114*rgba[i*4+2] : 0;
+  const score=(i:number)=>{
+    if(!rgba[i*4+3])return 0;if(!visible)return 1;
+    const x=i%width,y=Math.floor(i/width),p=i*4;
+    const distance=Math.hypot(rgba[p]-red,rgba[p+1]-green,rgba[p+2]-blue)/Math.sqrt(3*255*255);
+    let edge=0;
+    if(x>0&&x<width-1&&y>0&&y<height-1){
+      const gx=-lum(i-width-1)+lum(i-width+1)-2*lum(i-1)+2*lum(i+1)-lum(i+width-1)+lum(i+width+1);
+      const gy=-lum(i-width-1)-2*lum(i-width)-lum(i-width+1)+lum(i+width-1)+2*lum(i+width)+lum(i+width+1);
+      edge=Math.hypot(gx,gy)/1020;
     }
-  }
-
-  const meanBgR = bgCount > 0 ? bgR / bgCount : 255;
-  const meanBgG = bgCount > 0 ? bgG / bgCount : 255;
-  const meanBgB = bgCount > 0 ? bgB / bgCount : 255;
-
-  // 2. Spatial center Gaussian prior
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const spatialSigmaSq = 2 * Math.pow(Math.max(width, height) * 0.45, 2);
-
-  // 3. Compute luminance and Sobel edge gradient magnitude
-  const luminance = new Float32Array(numPixels);
-  for (let i = 0; i < numPixels; i++) {
-    const idx = i * 4;
-    luminance[i] =
-      0.299 * rgba[idx] + 0.587 * rgba[idx + 1] + 0.114 * rgba[idx + 2];
-  }
-
-  const gradients = new Float32Array(numPixels);
-  for (let y = 1; y < height - 1; y++) {
-    const row = y * width;
-    for (let x = 1; x < width - 1; x++) {
-      const idx = row + x;
-      // Sobel kernel
-      const gx =
-        -luminance[idx - width - 1] +
-        luminance[idx - width + 1] +
-        -2 * luminance[idx - 1] +
-        2 * luminance[idx + 1] +
-        -luminance[idx + width - 1] +
-        luminance[idx + width + 1];
-
-      const gy =
-        -luminance[idx - width - 1] -
-        2 * luminance[idx - width] -
-        luminance[idx - width + 1] +
-        luminance[idx + width - 1] +
-        2 * luminance[idx + width] +
-        luminance[idx + width + 1];
-
-      gradients[idx] = Math.sqrt(gx * gx + gy * gy) / 1020.0;
-    }
-  }
-
-  // 4. Compute composite saliency score per pixel
-  const saliency = new Float32Array(numPixels);
-  let maxSaliency = 0;
-
-  for (let y = 0; y < height; y++) {
-    const row = y * width;
-    for (let x = 0; x < width; x++) {
-      const idx = row + x;
-      const pix = idx * 4;
-      const a = rgba[pix + 3] / 255.0;
-
-      if (a < 0.05) {
-        saliency[idx] = 0;
-        continue;
-      }
-
-      // Color distance from border background prior
-      const dr = rgba[pix] - meanBgR;
-      const dg = rgba[pix + 1] - meanBgG;
-      const db = rgba[pix + 2] - meanBgB;
-      const colorDist = Math.sqrt(dr * dr + dg * dg + db * db) / 441.67;
-
-      // Spatial distance from canvas center
-      const dxCenter = x - centerX;
-      const dyCenter = y - centerY;
-      const centerWeight = Math.exp(
-        -(dxCenter * dxCenter + dyCenter * dyCenter) / spatialSigmaSq,
-      );
-
-      // Edge score
-      const edge = gradients[idx];
-
-      // Saliency combination
-      const score =
-        (colorDist * 0.55 + edge * 0.25 + 0.2) * (0.3 + 0.7 * centerWeight) * a;
-      saliency[idx] = score;
-      if (score > maxSaliency) maxSaliency = score;
-    }
-  }
-
-  // Normalize saliency map
-  const normFactor = maxSaliency > 0 ? 1.0 / maxSaliency : 1.0;
-  const initialMask = new Uint8Array(numPixels);
-  for (let i = 0; i < numPixels; i++) {
-    initialMask[i] = saliency[i] * normFactor >= threshold ? 255 : 0;
-  }
-
-  // 5. Morphological hole filling (closing: dilation followed by erosion)
-  const morphRadius = Math.max(
-    1,
-    Math.min(8, Math.round(Math.min(width, height) / 100)),
-  );
-  const dilated = dilateMask(initialMask, width, height, morphRadius);
-  const closed = erodeMask(dilated, width, height, morphRadius);
-
-  // 6. Connected Component Analysis: keep components near the center with significant area
-  const cleanedMask = filterConnectedComponents(
-    closed,
-    width,
-    height,
-    centerX,
-    centerY,
-  );
-
-  // 7. Calculate bounding box of the segmented subject
-  let minX = width;
-  let minY = height;
-  let maxX = 0;
-  let maxY = 0;
-  let fgPixels = 0;
-
-  for (let y = 0; y < height; y++) {
-    const row = y * width;
-    for (let x = 0; x < width; x++) {
-      if (cleanedMask[row + x] > 0) {
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-        fgPixels++;
-      }
-    }
-  }
-
-  // Fallback if no subject passed the threshold (e.g. extremely low contrast image)
-  if (fgPixels === 0 || minX > maxX) {
-    minX = Math.round(width * 0.15);
-    minY = Math.round(height * 0.15);
-    maxX = Math.round(width * 0.85);
-    maxY = Math.round(height * 0.85);
-    for (let y = minY; y <= maxY; y++) {
-      const row = y * width;
-      for (let x = minX; x <= maxX; x++) {
-        cleanedMask[row + x] = 255;
-      }
-    }
-    fgPixels = (maxX - minX + 1) * (maxY - minY + 1);
-  }
-
-  // Apply optional expand radius
-  let finalMask = cleanedMask;
-  if ((options.expandRadius ?? 0) > 0) {
-    finalMask = dilateMask(cleanedMask, width, height, options.expandRadius!);
-  }
-
-  const confidence = Math.min(
-    1.0,
-    Math.max(0.2, (fgPixels / numPixels) * 2.5 * maxSaliency),
-  );
-
-  return {
-    bounds: {
-      x: minX,
-      y: minY,
-      width: Math.max(1, maxX - minX + 1),
-      height: Math.max(1, maxY - minY + 1),
-    },
-    mask: finalMask,
-    width,
-    height,
-    confidence,
-    label: "Salient Subject",
+    const spatial=.3+.7*Math.exp(-((x-width/2)**2+(y-height/2)**2)/(2*(Math.max(width,height)*.45)**2));
+    return(.7*distance+.3*edge)*spatial;
   };
+  let maximum=0;for(let i=0;i<width*height;i++)maximum=Math.max(maximum,score(i));
+  let mask=new Uint8Array(width*height);
+  for(let i=0;i<mask.length;i++){const value=score(i);if(maximum>1e-12&&value>0&&value/maximum>=options.threshold)mask[i]=rgba[i*4+3];}
+  if(options.expandRadius){
+    const result=new Uint8Array(mask.length),r=options.expandRadius;
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+      let alpha=0;for(let dy=-r;dy<=r;dy++){const yy=y+dy;if(yy<0||yy>=height)continue;const half=Math.floor(Math.sqrt(r*r-dy*dy));
+        for(let xx=Math.max(0,x-half);xx<=Math.min(width-1,x+half);xx++)alpha=Math.max(alpha,mask[yy*width+xx]);}
+      result[y*width+x]=alpha;
+    }mask=result;
+  }
+  let left=width,top=height,right=-1,bottom=-1;
+  for(let i=0;i<mask.length;i++)if(mask[i]){const x=i%width,y=Math.floor(i/width);left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}
+  const bounds=right<left?{x:0,y:0,width:0,height:0}:{x:left,y:top,width:right-left+1,height:bottom-top+1};
+  return{mask,width,height,bounds,confidence:0,label:'Local border-contrast heuristic'};
 }
 
 /**
@@ -289,23 +105,20 @@ export function generateTrimapFromMask(
  * Converts a subject mask and bounding box into SelectionData.
  */
 export function maskToSelectionData(
-  _mask: Uint8Array,
-  _width: number,
-  _height: number,
-  bounds: { x: number; y: number; width: number; height: number },
+  mask: Uint8Array, width: number, height: number,
+  bounds?: {x:number;y:number;width:number;height:number},
 ): SelectionData {
-  return {
-    regions: [
-      {
-        x: bounds.x,
-        y: bounds.y,
-        width: bounds.width,
-        height: bounds.height,
-        shape: "rectangle",
-        operation: "add",
-      },
-    ],
-  };
+  if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<=0||height<=0||!Number.isSafeInteger(width*height)||mask.length!==width*height)
+    throw new Error('Invalid subject mask geometry.');
+  let left=width,top=height,right=-1,bottom=-1;
+  for(let i=0;i<mask.length;i++)if(mask[i]){const x=i%width,y=Math.floor(i/width);left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);}
+  if(right<left)return{regions:[]};
+  const w=right-left+1,h=bottom-top+1,runs:number[]=[];let offset=0;
+  for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++){
+    const value=mask[y*width+x];offset++;
+    if(runs.length&&runs[runs.length-1]===value)runs[runs.length-2]=offset;else runs.push(offset,value);
+  }
+  return{regions:[{...(bounds??{x:left,y:top,width:w,height:h}),shape:'pixels',operation:'add',coverage:{width:w,height:h,runs}}]};
 }
 
 /**
@@ -408,110 +221,4 @@ export function erodeMask(
   }
 
   return dst;
-}
-
-/**
- * Connected Component Labeling to eliminate small noise blobs and keep the primary subject.
- */
-function filterConnectedComponents(
-  mask: Uint8Array,
-  width: number,
-  height: number,
-  centerX: number,
-  centerY: number,
-): Uint8Array {
-  const labels = new Int32Array(mask.length);
-  let currentLabel = 0;
-  const componentAreas = new Map<number, number>();
-  const componentCenterDist = new Map<number, number>();
-
-  // 4-connected flood fill
-  const stack: number[] = [];
-
-  for (let y = 0; y < height; y++) {
-    const row = y * width;
-    for (let x = 0; x < width; x++) {
-      const idx = row + x;
-      if (mask[idx] > 0 && labels[idx] === 0) {
-        currentLabel++;
-        let area = 0;
-        let sumX = 0;
-        let sumY = 0;
-
-        stack.push(idx);
-        labels[idx] = currentLabel;
-
-        while (stack.length > 0) {
-          const curr = stack.pop()!;
-          area++;
-          const cx = curr % width;
-          const cy = Math.floor(curr / width);
-          sumX += cx;
-          sumY += cy;
-
-          // 4 neighbors
-          if (cx > 0) {
-            const left = curr - 1;
-            if (mask[left] > 0 && labels[left] === 0) {
-              labels[left] = currentLabel;
-              stack.push(left);
-            }
-          }
-          if (cx < width - 1) {
-            const right = curr + 1;
-            if (mask[right] > 0 && labels[right] === 0) {
-              labels[right] = currentLabel;
-              stack.push(right);
-            }
-          }
-          if (cy > 0) {
-            const up = curr - width;
-            if (mask[up] > 0 && labels[up] === 0) {
-              labels[up] = currentLabel;
-              stack.push(up);
-            }
-          }
-          if (cy < height - 1) {
-            const down = curr + width;
-            if (mask[down] > 0 && labels[down] === 0) {
-              labels[down] = currentLabel;
-              stack.push(down);
-            }
-          }
-        }
-
-        const avgX = sumX / area;
-        const avgY = sumY / area;
-        const dist = Math.hypot(avgX - centerX, avgY - centerY);
-        componentAreas.set(currentLabel, area);
-        componentCenterDist.set(currentLabel, dist);
-      }
-    }
-  }
-
-  if (currentLabel === 0) return mask;
-
-  // Find max area and prioritize central components
-  let maxArea = 0;
-  for (const area of componentAreas.values()) {
-    if (area > maxArea) maxArea = area;
-  }
-
-  const minAcceptableArea = Math.max(16, maxArea * 0.05);
-  const validLabels = new Set<number>();
-
-  for (const [lbl, area] of componentAreas.entries()) {
-    if (area >= minAcceptableArea) {
-      validLabels.add(lbl);
-    }
-  }
-
-  const result = new Uint8Array(mask.length);
-  for (let i = 0; i < mask.length; i++) {
-    if (validLabels.has(labels[i])) {
-      result[i] = 255;
-    }
-  }
-
-  return result;
 }

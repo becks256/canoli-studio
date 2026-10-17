@@ -2,6 +2,8 @@
 
 Canoli Studio scripts use JavaScript and an object-oriented document model to control the open composition. This guide describes the current implementation in [src/dom/index.ts](../src/dom/index.ts) and [src/scripting](../src/scripting). It is a prototype API; Photoshop scripting compatibility and a published, stable SDK are not implemented.
 
+The current document schema is **27**. Earlier schema numbers in adjustment-family sections identify the version that introduced those records; current constructors and restoration upgrade valid older documents to schema 27. Portable project container v3 and workspace v2 are separate versions.
+
 For reusable installable commands, see [Plugins and extensions](PLUGINS.md). Plugin commands receive these same bindings and obey the same runtime limits, with additional host-enforced document permissions.
 
 For HTTP automation, see the separate [REST API](API.md#rest-api). REST sessions currently contain their own document metadata and do not control the active browser tab.
@@ -13,6 +15,10 @@ The **Developer docs** link in the tool rail and Scripts panel opens this guide 
 - [Quick start](#quick-start)
 - [Execution and available bindings](#execution-and-available-bindings)
 - [Document](#document)
+- [Design checks](#design-checks)
+- [Alpha channels](#alpha-channels)
+- [Quick Selection brush](#quick-selection-brush)
+- [Select Subject](#select-subject)
 - [Layers and groups](#layers-and-groups)
 - [SmartObjectLayer and shared masters](#smartobjectlayer-and-shared-masters)
 - [LayerMask](#layermask)
@@ -79,7 +85,7 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `VectorLayer`                                                | Constructor for a vector layer containing Bézier vector paths.                                                                                               |
 | `VectorPath`                                                 | Constructor for editable vector paths with anchors, control handles, fill, and stroke.                                                                       |
 | `TextLayer`                                                  | Constructor for text layers with font, size, color, alignment, and line height.                                                                              |
-| `AdjustmentLayer`                                            | Constructor for non-destructive adjustment layers (Curves, Levels, Tone, Tonal strokes) modifying preceding backdrop pixels.                                 |
+| `AdjustmentLayer`                                            | Constructor for non-destructive adjustment layers modifying preceding backdrop pixels; see AdjustmentLayer for current families.                                 |
 | `PatchAdjustment`                                            | Immutable corrected-RGB asset descriptor for an alpha-preserving patch adjustment.                                                                           |
 | `TonalStroke`                                                | Constructor capturing a brush/pencil path and dodge/burn settings for a tonal adjustment layer.                                                              |
 | `BrushStroke`                                                | Constructor for soft brush strokes with color, size, hardness, opacity, and pressure points.                                                                 |
@@ -88,6 +94,7 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `CloneStroke`                                                | Constructor for clone brush strokes referencing sampled image tiles.                                                                                         |
 | `PaintFill`                                                  | Constructor for solid color canvas fills.                                                                                                                    |
 | `AffineTransform`                                            | Immutable affine matrix constructor and composition helpers for transformed selections.                                                                      |
+| `AlphaChannel` | Constructor for a saved independent selection channel. |
 | `MarqueeSelection`                                           | Constructor for geometric or pixel-coverage selections.                                                                                                        |
 | `LayerMask`                                                  | Constructor for an immutable selection or Bézier layer mask.                                                                                                 |
 | `LayerMetadata`                                              | Constructor for user-authored layer descriptions, attribution and keywords.                                                                                  |
@@ -126,10 +133,11 @@ There is no fixed megapixel cap. All current documents use sRGB. Browser decodin
 | `resizeImage(width, height)` | `void` | Scales canvas and artwork together; positive safe-integer dimensions. See Resize the image and artwork below. |
 | `resize(width, height)`          | `void`                      | Resizes canvas dimensions atomically as one undoable command. Validates positive safe integers.                                                                          |
 | `layers`                         | Read-only `LayerCollection` | Root layers only, ordered back-to-front.                                                                                                                                 |
+| `alphaChannels` | Read-only `AlphaChannelCollection` | Saved fractional selection channels, independent of layers. See Alpha channels below. |
 | `selectedLayer`                  | Read/write layer or `null`  | Select a layer belonging to this document, or clear selection. Set after a transaction when selecting a newly added layer.                                               |
 | `getLayer(id)`                   | Layer or `null`             | Search the entire tree by ID; accepts `null`, which returns `null`.                                                                                                      |
-| `selectSubject(options?)`        | `Promise<SelectionData>`    | Detects salient foreground subject across active layer or canvas and sets document marquee selection. One undoable step.                                                 |
-| `removeBackground(targetLayer?)` | `Promise<RasterLayer>`      | Detects subject, solves alpha matte, creates a non-destructive bitmap mask, and attaches it. One undoable step.                                                          |
+| `selectSubject(options?, control?)` | `Promise<SelectionData>` | Native source-derived pixel coverage from a raster, with complete placement transforms and one undo step; see Select Subject for heuristic limits. |
+| `removeBackground(targetLayer?, options?, control?)` | `Promise<RasterLayer>`      | Prepares a native matte on an unlocked raster. Returns the output raster (a new layer when requested); one undo entry. See the matting contract below.                                                          |
 | `transaction(label, callback)`   | `undefined`                 | Synchronous atomic batch. See transaction rules below.                                                                                                                   |
 | `toJSON()`                       | `DocumentData` object       | Deep copy of document metadata, including nested layers and adjustments. Includes pixel selection; excludes asset bytes, active layer, history and script code.          |
 | `Document.fromJSON(data)`        | New `Document`              | Validate a metadata object and create a separate document with empty history and no active layer; retains serialized pixel selection. Pass an object, not a JSON string. |
@@ -184,7 +192,7 @@ Shared read-only properties and methods:
 | `moveUp()`, `moveDown()`       | `undefined`                                    | Move one sibling position toward the front/back. No-op at the boundary. Requires attachment.                                                                                                                                                  |
 | `moveTo(parent, options = {})` | `undefined`                                    | Move to the front of the destination document/group's collection. Destination must belong to the same document. Local coordinates remain unchanged by default; `{ preservePosition: true }` preserves document position. Requires attachment. |
 | `maskFromBitmap(assetId)`      | `undefined`                                    | Attaches a bitmap mask referencing an asset in `AssetStore`. Supported on all attached layers. One undoable command.                                                                                                                          |
-| `refineEdge(options?)`         | `Promise<LayerMask>`                           | On `RasterLayer`: interactive local KNN alpha matting, edge feathering/contrast, and color decontamination. Returns and attaches bitmap `LayerMask`.                                                                                          |
+| `refineEdge(options?, control?)`         | `Promise<LayerMask>`                           | On attached unlocked `RasterLayer`: prepares a native matte and returns its attached `LayerMask`; corrected RGB requires new-layer output. See below.                                                                                          |
 | `toJSON()`                     | `LayerData` object                             | Deep metadata copy. A group includes its subtree; a raster includes effects and its asset reference.                                                                                                                                          |
 
 `moveTo` defaults to preserving local coordinates; opt into `preservePosition` when reparenting between offset groups. `moveBefore(target)` and `moveAfter(target)` place below/above a sibling target, adopting its parent and preserving document position. Targets must belong to the same document. Layer-row dragging uses these placement methods. Groups cannot contain themselves or an ancestor. The API has no public `parent` property or multi-selection yet; traverse collections when you need ancestry.
@@ -283,11 +291,66 @@ All colors use six-digit hex (`#rrggbb`), without an alpha suffix. All coordinat
 
 ## VectorLayer and paths
 
-Signature: `new VectorLayer(options = {})`; name defaults to `"Vector"`. Inherits common layer options. `vectorLayer.paths` is a `PathCollection` with `length`, `at(index)`, `get(id)`, `add(path)`, `remove(id)` and iteration. `at(-1)` returns the last path. `add` returns the same `VectorPath` instance and requires an unowned path. Each layer stores at most 2048 paths. Call `vectorLayer.toSvg()` to export all visible vector paths as an SVG `<path>` markup string.
+Signature: `new VectorLayer(options = {})`; name defaults to `"Vector"`. Inherits common layer options. `vectorLayer.paths` is a `PathCollection` with `length`, `at(index)`, `get(id)`, `add(path)`, `remove(id)` and iteration. `at(-1)` returns the last path. `add` returns the same `VectorPath` instance and requires an unowned path. Each layer stores at most 2048 paths. `vectorLayer.toSvg(docWidth = 1920, docHeight = 1080): string` returns a complete UTF-8-compatible SVG document string, not a `<path>` fragment. Dimensions must be positive safe integers; invalid values throw. It extracts this layer in its own parent coordinate plane, including its local translation/full affine basis, visibility, opacity, fill opacity and CSS blend mode. It does not include ancestors or siblings, even when attached; a blend mode therefore has no external backdrop in this standalone output. Hidden or zero-opacity layers produce an empty SVG canvas. Use host `editor.export({format: "svg"})` for document-wide placement and a capability report.
+
+Path anchors/handles retain JavaScript round-trip numeric precision, including scientific notation; `toSvgPath()` uses the same formatter. Path fills/strokes remain literal six-digit hex colors, with round stroke joins/caps. Generated SVG group IDs are XML-safe; `data-layer-id` retains the exact authored identifier with XML escaping, including whitespace character references. XML 1.0-unrepresentable identifiers (such as control characters or unpaired surrogates) throw at export without modifying the model.
+
+SVG extraction preserves unfeathered vector masks without painted corrections as editable compound paths, including even-odd/nonzero holes, density, inversion and linked/unlinked full affine placement. Attached `VectorLayer.toSvg` rebases an unlinked mask from document coordinates into the immediate parent plane when excluding ancestors; detached layers interpret unlinked coordinates in the standalone export canvas plane. Disabled/zero-density masks have no effect. Masks on hidden/zero-opacity subtrees or groups without extracted artwork are not prepared.
+
+Painted, sampled-selection, bitmap and feathered masks require host `editor.export({format: "svg"})`. Outside native backdrop prefixes, host output keeps artwork paths as vectors and embeds native document-resolution mask coverage in PNG tiles of at most 1024×1024, using the same raw coverage/finite-support feather/inversion/density rules as native PNG rendering. Native mask tiles contain white RGB plus coverage alpha, not original bitmap RGB or source files. Raster mask geometry/scalability is lost and the capability report states this before export. Missing/changed bitmap sources or disposed asset repositories reject rather than expose unmasked artwork. Host execution yields/checks cancellation between coverage tiles and path fragments; mask work or browser encoding already in progress cannot be preempted mid-call. Output retains compressed tile data and browser decoding has real memory costs; no image-resolution import cap is introduced.
+
+Synchronous standalone `toSvg` cannot prepare these native masks and throws an error directing the caller to host export. It never silently removes an active mask. Pure vector masks remain available inside isolated scripts without a host asset or download service. `toSvg` still returns only a string, without a capability report. Color overlays and drop shadows are retained as editable SVG filter graphs, in both host export and synchronous standalone output. Masks apply before effects. Shadow color is applied to the masked silhouette before document-pixel blur/offset, while overlay and fill opacity affect content only; layer opacity and blend mode apply to the combined result. Thus fill opacity zero can still leave a shadow. Full affine coordinate compensation keeps offsets/blur in document pixels under rotated, reflected or sheared ancestors. Synchronous standalone output rejects enabled Blend If with a native-backdrop-preparation error directing callers to host export. Trusted host export retains adjustment/Blend If appearance through reported native sibling-prefix rendering and also supports paint, raster, text and smart-object contents as described under Application integration. CSS blending and SVG filters require a supporting viewer; native prefixes retain their internal backdrop in pixels. SVG/native intermediate rounding and edge sampling can differ. Native mask preparation extends into the conservative shadow support region so off-canvas masked content can cast visible shadows. Transparent support rectangles prevent parent filters from clipping child effects; they can enlarge SVG group selection bounds. Viewers may allocate effect surfaces internally, so large SVG decoding still has device/working-memory limits. SVG and native Canvas edge antialiasing can differ; no pixel-exact interchange or general SVG import round-trip is claimed. Save a project for complete editability or export PNG for rendered appearance.
+
+<!-- example: standalone-svg -->
+```js
+const icon = new VectorLayer({ x: 10, y: 20 });
+icon.paths.add(VectorPath.rectangle(
+  { x: 0, y: 0, width: 40, height: 30 }, 0,
+  { fill: "#d5e79b", stroke: null }
+));
+const svg = icon.toSvg(200, 120);
+if (!svg.includes('matrix(1 0 0 1 10 20)')) throw new Error('Placement missing');
+print('Standalone SVG ready', svg.includes('<svg '));
+```
+
+<!-- example: standalone-svg-mask -->
+```js
+const masked = new VectorLayer();
+masked.paths.add(VectorPath.rectangle(
+  { x: 0, y: 0, width: 80, height: 60 }, 0,
+  { fill: "#d5e79b", stroke: null }
+));
+masked.mask = new LayerMask({
+  paths: [VectorPath.rectangle({ x: 10, y: 10, width: 40, height: 30 })],
+  density: 0.7,
+  inverted: true
+});
+const maskedSvg = masked.toSvg(100, 80);
+if (!maskedSvg.includes('<mask')) throw new Error('Vector mask missing');
+print('Standalone masked SVG ready');
+```
+
+<!-- example: standalone-svg-style -->
+```js
+const styled = new VectorLayer({ fillOpacity: 0 });
+styled.paths.add(VectorPath.rectangle(
+  { x: 10, y: 10, width: 40, height: 30 }, 0,
+  { fill: "#804020", stroke: null }
+));
+styled.styles = new LayerStyle({
+  colorOverlay: { enabled: true, color: "#2040e0", opacity: 0.5 },
+  dropShadow: { enabled: true, color: "#0020ff", opacity: 1, x: 20, y: 12, blur: 4 }
+});
+const styledSvg = styled.toSvg(100, 80);
+if (!styledSvg.includes('<filter')) throw new Error('Effect graph missing');
+print('Styled SVG ready');
+```
+
+The example constructs a detached layer and returns text in the isolated worker; it does not download files or change the active document. `toSvg` is synchronous and subject to the existing script deadline/output limits. Host SVG export yields between bounded path fragments and can receive cancellation within a large path; it does not expose a download API to scripts.
 
 ### VectorPath
 
-Signature: `new VectorPath({ points, closed = false, fill = null, stroke = "#d5e79b", strokeWidth = 2 })`.
+Signature: `new VectorPath({ points, closed = false, fill = null, stroke = "#d5e79b", strokeWidth = 2, strokeCap = "round", strokeJoin = "round", strokeMiterLimit = 4, strokeDashArray = [], strokeDashOffset = 0, fillGradient = null, fillRule = "nonzero", subpaths = [] })`.
 
 `points` contains 1–20,000 `{ x, y, in?, out? }` anchors in layer-local coordinates. `in` and `out` are absolute local control-point coordinates, not offsets. Omitted handles coincide with the anchor. Curves connect the previous `out` to the next `in`. A closed path also connects the last anchor to the first. Only closed paths receive a fill. Fill/stroke use six-digit hex or `null`; stroke width accepts 0…1024.
 
@@ -305,12 +368,142 @@ Signature: `new VectorPath({ points, closed = false, fill = null, stroke = "#d5e
 | `toSvgPath()`                             | Formats path anchors and cubic curves into an SVG `d` path attribute string.                                                        |
 | `toJSON()`                                | Deep metadata copy.                                                                                                                 |
 
+Stroke members are also read/write and accepted by `update(patch)`, every shape factory's `options`, and trusted `editor.tools.importSvgPath(d, options)`. The exported `VectorStrokeOptions` TypeScript type describes the five optional stored fields.
+
+| Member | Default | Accepted values |
+| --- | --- | --- |
+| `strokeCap` | `"round"` | `"butt"`, `"round"`, `"square"` |
+| `strokeJoin` | `"round"` | `"miter"`, `"round"`, `"bevel"` |
+| `strokeMiterLimit` | `4` | Finite ratio from 1 through `Number.MAX_SAFE_INTEGER` |
+| `strokeDashArray` | `[]` | At most 256 finite, nonnegative lengths through `Number.MAX_SAFE_INTEGER`, in local user units |
+| `strokeDashOffset` | `0` | Finite signed local-user-unit offset, within ±`Number.MAX_SAFE_INTEGER` |
+
+Dash arrays are defensive copies on input/output. Empty/all-zero arrays paint a solid stroke; odd-length patterns repeat, and signed offsets shift the repeating pattern according to [SVG stroke semantics](https://www.w3.org/TR/SVG2/painting.html#StrokeDashing). Explicit zero-length segments and solid closed contours keep round/square cap artwork; move-only contours and butt caps do not paint a point. Point dash phases use half-open intervals, with zero-size on-dashes retained. Closed zero-length contours with non-solid patterns stay empty, matching the verified browser behavior. Degenerate dash boundaries and faint edge coverage can differ in other viewers. Width, dashes and caps follow the complete layer affine transform; non-scaling strokes, markers and path-length calibration are not part of this model. Miter support and diagonal square/dash caps contribute conservative bounds for caching/culling/effects. Very large geometry/style values still encounter actual browser precision/allocation limits; this is not a source-image resolution cap. Vector drawing uses native line commands for geometrically straight segments to retain Canvas/SVG dash measurement; mask curve coverage retains its existing rasterization. Pixel antialiasing can differ between line/curve forms and SVG viewers; mathematical geometry remains unchanged.
+
+Invalid enums, nonfinite/out-of-range values, negative dash lengths and too many entries reject before mutation. Unknown update/command fields also reject. Ancestor locks, ownership, command validation, transactions and undo apply as usual. New fields require document schema 22. Valid v1–v21 documents migrate without injecting these fields; absent values keep legacy round caps/joins, solid strokes, limit 4 and offset 0. Project container 3, workspace 2 and source bytes are unchanged. Isolated Scripts and permissioned plugin commands receive the same setters without new file/network privileges. REST `path.add`/`path.update` use the same fields and validation in their separate sessions. Existing recipe recording still reports standalone path-update steps as unsupported; creating a layer that already contains styled paths retains those fields.
+
+<!-- example: vector-stroke-styles -->
+```js
+document.resize(160, 128);
+const layer = document.layers.add(new VectorLayer({ name: "Styled stroke" }));
+const path = layer.paths.add(VectorPath.fromSvgPath("M24 40H128", {
+  fill: null, stroke: "#804020", strokeWidth: 16,
+  strokeCap: "square", strokeJoin: "miter", strokeMiterLimit: 12,
+  strokeDashArray: [16, 24], strokeDashOffset: 0
+}));
+path.strokeCap = "square";
+path.strokeDashOffset = -2;
+path.strokeDashOffset = 0;
+const detachedDashes = path.strokeDashArray;
+detachedDashes[0] = 999;
+if (path.strokeDashArray[0] !== 16) throw new Error("Dash ownership failed");
+document.selectedLayer = layer;
+print("Stroke settings ready");
+```
+
+#### Boolean path operations
+
+`await document.combinePaths(operation, paths, control = {}): Promise<VectorPath | null>` combines an ordered array of attached `VectorPath` handles from this document. `await vectorLayer.combinePaths(operation, paths = [...vectorLayer.paths], control = {}): Promise<VectorPath | null>` is the same-layer convenience form; passing paths from other layers to it rejects. Operations are `"union"`, `"subtract"` (first minus every later area), `"intersect"` and `"exclude"` (sequential symmetric difference). Every primary contour must be closed. Fill visibility, stroke outlines, masks, effects and later operands' appearances do not define the operand areas; the path's fill rule and all native boundaries do.
+
+Operands are mapped through their complete ancestor/world affine transforms into the first operand's local layer plane. Results retain cubic handles without polygon/raster flattening, preserve the first path ID, paint/gradient/stroke settings, first layer placement and appearance, and occupy the first path's list position. Contour orientation and starting anchors are regenerated; dash placement follows the resulting contour while its stored stroke settings are retained. Other operand paths are removed. Empty operand vector layers are removed; parent groups and other content remain. An empty result removes all operand paths and returns `null`. Otherwise the returned owner-backed path shares the first handle's identity, with canonical nonzero winding and newly identified additional contours. Retained handles for removed operands fail until undo restores them. Shared `paths.replace` performs the validated atomic replacement in one named history entry; cancellation or failure adds no Boolean edits.
+
+Inputs require 2–128 distinct paths, at most 128 total input contours and 20,000 total input anchors. Each intermediate pair result and the final result support at most 128 contours/20,000 anchors; an oversized intermediate result rejects even if later operands would simplify it. These are operation-geometry budgets independent of image resolution. Invalid operations, open/foreign/missing/duplicate operands, locked operands/ancestors, invalid or over-budget geometry/results and malformed worker data reject before commit. Earlier edits in an isolated script are staged and are also discarded if the script fails. Source image bytes do not enter the geometry worker. Existing schema 25/project 3/workspace 2 store the final geometry; no new schema or live library dependency is needed to render/reopen/undo a completed result.
+
+A dedicated terminable browser or Node worker uses pinned Paper.js 0.12.18 cubic Boolean algorithms. Geometry is centered and uniformly normalized to a 1024-unit control-hull extent before calculation and restored afterwards, avoiding common large-offset/scale problems. Floating point tolerances, near-coincident/tiny geometry and existing browser precision limits still apply; exact symbolic algebra and universal SVG pixel identity are not promised. Calculation has a 30-second wall-clock deadline. Trusted `control` accepts `signal?: AbortSignal` and `onProgress?({completed,total})`, reporting completed pair operations rather than estimated time. Callback errors, aborts, stale revisions/session changes, worker failures and deadline expiry reject and terminate preparation without a replacement. Use the method outside synchronous transactions and on a configured application host; those unsupported contexts reject.
+
+Scripts/plugins await the same method through their isolated host boundary. They use panel cancellation rather than AbortSignal/progress callbacks. Plugin document-read/write permissions are rechecked during preparation and final commit; no new manifest/asset/file/network permission or installation behavior is added. Native asynchronous preparations share the existing sequential 32-operation script budget. The existing five-second script wall-clock limit includes host preparation, so a longer trusted native Boolean call can exceed the script budget before the 30-second worker deadline. A script timeout cancels its pending geometry worker and discards all staged edits. Existing full layer-add recipe templates can retain final compound geometry; standalone Boolean/path replacement recording remains unsupported.
+
+<!-- example: vector-boolean -->
+```js
+document.resize(160, 128);
+const layer = document.layers.add(new VectorLayer({ name: "Boolean cutout" }));
+const frame = layer.paths.add(VectorPath.rectangle(
+  { x: 8, y: 8, width: 144, height: 112 }, 0,
+  { fill: "#ed9966", stroke: null }
+));
+const hole = layer.paths.add(VectorPath.ellipse(
+  { x: 40, y: 32, width: 80, height: 64 }, { stroke: null }
+));
+const result = await layer.combinePaths("subtract", [frame, hole]);
+if (!result || result.subpaths.length !== 1) throw new Error("Expected a cutout");
+document.selectedLayer = layer;
+print("Boolean cutout ready");
+```
+
+The **Combine vector paths…** Properties action or command palette opens the local operation dialog. Choose paths, operation and first operand. Candidate checkboxes are searchable and paginated in groups of 32; open/locked paths cannot be chosen. Cancel/Escape terminates in-flight calculation. Reopen a stale dialog after other document edits. This adds no keyboard binding. The trusted `editor.tools.selectVectorPath(path: VectorPath | null): void` helper selects a validated active-document path and its owner layer (or clears only path selection), cancels pending gestures and selects the Pen layer target for a nonempty result. It changes UI state without document edits/history. The Boolean dialog uses it so a removed Pen target cannot make Properties select an unchecked later path.
+
+#### Compound paths and VectorContour
+
+A closed `VectorPath` can contain holes, nested boundaries and disconnected islands sharing one fill/gradient, stroke and fill rule. `path.points` edits the primary contour. `path.subpaths` is a read-only `SubpathCollection` of additional closed `VectorContour` objects. The complete path supports at most 128 contours and 20,000 total anchors; every contour must have at least one anchor. These are geometry budgets, not image-resolution limits. An open primary path cannot have additional contours.
+
+`fillRule` defaults to `"nonzero"` and is read/write; `"evenodd"` is also accepted. Nonzero uses contour winding; even-odd alternates coverage at crossings. Changing paint or fill rule affects every contour. The fill rule is also accepted by shape factory options and `VectorFillOptions`. Omitted fields preserve legacy records without adding defaults. Schema 24 introduces optional `fillRule` and `subpaths`; valid older roots/history upgrade without changing geometry/assets, and older schema labels containing either field reject. Project/workspace versions remain 3/2.
+
+`new VectorContour({points})` accepts the same anchor/absolute-handle constructor values as `VectorPath`. Additional contours are always closed and do not have independent paint. Its read-only `id`, `closed`, defensive `points`/`toJSON()`, `addPoint`, `setPoint`, `splitSegment(index, t = 0.5)`, `removePoint`, and `remove()` follow the parent path's ownership, locks and undo. Removing the final anchor rejects. `remove()` requires an owner. A retained handle throws when its contour or parent is absent from the current revision and becomes readable again after undo.
+
+`path.subpaths` provides `length`, `at(index)` (including negative indices), `get(id)`, `add(contour)`, `remove(id)` and iteration. `add` returns the same unowned contour instance. A contour cannot belong to two paths, even after removal. Constructor `subpaths` accepts unowned `VectorContour` instances; duplicate IDs/objects, an open primary with extra contours, invalid coordinates and over-budget geometry reject before mutation. Unknown serialized contour/update fields also reject. Getter arrays and constructor input arrays are independent copies. `path.update({subpaths, fillRule, ...})` and REST patches accept complete serialized contour values `{id, points, closed:true}` as replacement metadata; attached edits still enter shared commands/history. Full merged-path validation applies even when a partial patch is syntactically valid.
+
+The Pen tool edits anchors/handles on every boundary using one preview/commit and normal Escape cancellation. Properties shows a fill-rule selector and additional-contour removal; the Closed path toggle is disabled while additional contours exist. SVG export writes one compound `d` and explicit authored fill rule; editable SVG import retains native contour geometry, including implicitly closed fills. Opaque closed fill/stroke artwork retains one shared editable contour graph. Open geometry or translucent paints use separate fill/stroke layers to preserve paint composition before element opacity; the import report discloses that later geometry edits are independent. `VectorPath.fromSvgPath` continues to require a single contour; use trusted whole-file SVG import for compound source documents. Existing layer-add recipe templates retain compounds; standalone path-update recording remains unsupported. Boolean operations use the asynchronous methods documented above.
+
+<!-- example: vector-compound-paths -->
+```js
+document.resize(160, 128);
+const layer = document.layers.add(new VectorLayer({ name: "Editable compound" }));
+const path = layer.paths.add(VectorPath.rectangle(
+  { x: 8, y: 8, width: 144, height: 112 }, 0,
+  { fill: "#ed9966", stroke: null, fillRule: "evenodd" }
+));
+const hole = path.subpaths.add(new VectorContour({
+  points: VectorPath.rectangle({ x: 40, y: 40, width: 80, height: 48 }).points
+}));
+hole.setPoint(0, { x: 44, in: { x: 44, y: 40 }, out: { x: 44, y: 40 } });
+const detached = hole.points;
+detached[0].x = 999;
+if (hole.points[0].x !== 44) throw new Error("Contour ownership failed");
+document.selectedLayer = layer;
+print(`Compound ready: ${path.subpaths.length + 1} contours`);
+```
+
+#### Gradient fills
+
+`new VectorPath({points, closed, fillGradient, ...})`, all shape factories' `options`, trusted `editor.tools.importSvgPath(d, options)` and attached `path.fillGradient = value` accept a `VectorGradientData` value. The getter returns a complete defensive copy or `null`. Omitting the constructor option stores no gradient field. `path.update({fillGradient})` uses the same shared validation/locks/history as other path edits. Plain gradient descriptors are value parameters on the OO path; modifying a returned descriptor never mutates the document. `VectorGradientData`, `VectorGradientStop` and `VectorFillOptions` are exported TypeScript types.
+
+- Linear: `{kind:"linear", start:{x,y}, end:{x,y}, stops, transform?}`. Endpoints must differ.
+- Radial: `{kind:"radial", start:{x,y,radius}, end:{x,y,radius}, stops, transform?}`. Radii are nonnegative, the end radius is positive, and the two circles must differ. The start circle may be focal/off-center or have a nonzero radius. Regions not reached by the expanding radial circles remain transparent.
+- Stops: 2–32 `{position, color, opacity?}` values. Positions are finite 0–1 in nondecreasing order; duplicate positions retain hard transitions in their authored order. Colors are six-digit hex; optional opacity defaults to 1 and accepts finite 0–1. Stops need not include 0/1: colors pad before/after the first/last stop.
+- Geometry uses path-local coordinates, finite within ±`Number.MAX_SAFE_INTEGER`; radii use 0…`Number.MAX_SAFE_INTEGER`. Optional `transform:{a,b,c,d,e,f}` is a finite invertible affine paint transform, applied before complete layer/parent placement. Gradients remain continuous across native export tiles and source-preserving image resize/crop.
+
+A non-null gradient overrides the retained solid `fill`; setting `fillGradient=null` restores that solid color. Clearing both values removes the fill. Like solid paint, gradients only fill closed native paths. Missing/undefined gradient fields remain absent on legacy records. Colors and alpha interpolate in encoded sRGB without premultiplying stop colors, using native Canvas; alpha is composed normally afterward. Gradients do not embed source images or sample asset pixels. Coincident linear endpoints, identical radial circles, nonpositive end radii, unordered/invalid stops, singular transforms, unknown fields or invalid values reject before mutation. Actual browser precision/allocation limits remain; these metadata bounds are not image-resolution limits.
+
+Document schema **23** stores optional nullable `fillGradient`. Valid v1–v22 roots and retained workspace history migrate without injecting gradients; an older label containing this field rejects, including frozen validation-cache reuse. Project container 3/workspace 2 and source bytes are unchanged. Isolated scripts/plugins share the existing constructor/setter/commit boundary with no new permission or file/network privilege. Separate REST sessions accept the same records via `path.add`/`path.update`; they do not render/synchronize the browser. Existing layer-add recipe templates retain gradients; standalone path-update recording remains unsupported.
+
+SVG exports editable `linearGradient`/`radialGradient` paint servers with local user-space coordinates, full paint transforms, ordered opacity stops, encoded-sRGB interpolation and document-scoped IDs. Editable import supports local gradient templates, numeric/object-bounding-box coordinates, absolute user-space lengths and supported viewport percentages, solid stop colors, definition-tree currentColor and explicit stop-color/opacity inheritance. Object-bounding-box conversion uses actual cubic extrema, excluding stroke. Empty gradients remain unpainted geometry; one-stop gradients become equivalent repeated-color stops. Stop color/opacity are non-inherited by default; geometry templating and the referencing gradient's own interpolation property are separate. Definition-tree template colors match the tested browser; SVG2 shadow-style inheritance may differ in other viewers. SVG offset clamping/nondecreasing order follows rendered source semantics; original XML/template identity is not archived. Repeated/reflected spread, linearRGB interpolation, gradient strokes, degenerate geometry the native model rejects, unsupported CSS/paint-server graphs, absolute-unit object-box lengths and viewport percentages with an offset viewBox require explicit flattening. Gradient CSS colors convert to native 8-bit encoded-sRGB while retaining unpremultiplied RGB even at zero stop alpha. Native relative-color conversion is used when available, with a canonical RGB/sRGB fallback; colors that cannot be represented (including out-of-sRGB stops or unavailable required CSS conversion) require explicit flattening. This is not wide-gamut gradient support. Two-circle and outside-focal radial gradients require appropriate SVG2 viewer support. SVG viewers may differ at curve/mask/transformed edges; use PNG for the native rendered output.
+
+<!-- example: vector-gradient-fills -->
+```js
+document.resize(160, 128);
+const layer = document.layers.add(new VectorLayer({name: "Gradient fill"}));
+const path = layer.paths.add(VectorPath.rectangle(
+  {x:16, y:16, width:128, height:96}, 0,
+  {stroke:null, fillGradient:{
+    kind:"linear", start:{x:16,y:64}, end:{x:144,y:64},
+    stops:[{position:0,color:"#ff0000"},{position:1,color:"#0000ff"}]
+  }}
+));
+const copy = path.fillGradient;
+copy.stops[0].color = "#ffffff";
+if (path.fillGradient.stops[0].color !== "#ff0000") throw new Error("Paint ownership failed");
+document.selectedLayer = layer;
+print("Gradient fill ready");
+```
+
+#### Shape factories
+
 Static Factory Methods:
 
 - `VectorPath.rectangle({ x, y, width, height }, cornerRadius = 0, options = {})`: Creates a closed rectangular path with 4 Bézier anchors. Supports corner radius with smooth cubic Béziers ($\kappa \approx 0.55228$).
 - `VectorPath.ellipse({ x, y, width, height }, options = {})`: Creates a closed elliptical path with 4 cubic Bézier segments inscribed within the specified bounding rectangle.
 - `VectorPath.polygon({ x, y }, radius, sides = 5, options = {})`: Creates a regular $N$-sided polygon path centered at `{x, y}` with given radius (sides $\ge 3$).
-- `VectorPath.fromSvgPath(d, options = {})`: Parses an SVG path data string (`d` attribute) into a `VectorPath`, converting lines, cubic Béziers, and closing segments into smooth anchor points.
+- `VectorPath.fromSvgPath(d, options = {})`: Converts one SVG contour into an editable `VectorPath`. Supports absolute/relative M/L/H/V/C/S/Q/T/A/Z, implicit repeated arguments and scientific notation. Quadratic curves convert exactly to cubics; elliptical arcs become cubic approximations. `options` keeps the ordinary shape paint and stroke-style defaults. Disjoint moveto contours reject explicitly; use trusted SVG document import for compound artwork. Malformed/unknown commands, missing numbers, invalid arc flags, nonfinite/unrepresentable coordinates and the 20,000-anchor native budget reject rather than skipping or substituting data. Empty data cannot construct a native path. `parseSvgPath(d)` uses this same strict single-contour grammar and returns an empty anchor array for empty data. Closepath only merges an exactly repeated endpoint, preserving near-but-distinct geometry.
 - `VectorPath.toSvgPath(path)`: Formats a `VectorPath` into an SVG `d` path attribute string.
 
 Path handles remain attached to their owner and read the current revision across undo/redo. Access while absent throws. A path cannot be added to a second owner. Duplicating its layer gives each path a new ID.
@@ -325,11 +518,13 @@ Inherits common layer options (`name`, `opacity`, `fillOpacity`, `visible`, `loc
 | `name`          | string                          | `"Text"`       | Nonempty, at most 240 characters.                 |
 | `text`          | string                          | `"Text"`       | String up to 10,000 characters.                   |
 | `fontSize`      | number                          | `32`           | Finite positive number in pixels (>= 1).          |
-| `fontFamily`    | string                          | `"sans-serif"` | Nonempty string up to 100 characters.             |
+| `fontFamily`    | string                          | `"sans-serif"` | Nonempty string up to 240 characters.             |
 | `color`         | string                          | `"#ffffff"`    | CSS color string (e.g. hex).                      |
 | `align`         | `"left" \| "center" \| "right"` | `"left"`       | Text alignment.                                   |
 | `lineHeight`    | number                          | `1.2`          | Line height multiplier between 0.5 and 10.        |
 | `letterSpacing` | number                          | `0`            | Letter tracking in pixels between -50 and 500.    |
+| `wordSpacing`   | number                          | absent, effective `0` | Extra native separator spacing, finite pixels between -50 and 500. |
+| `fontKerning`   | `"auto" \| "normal" \| "none"` | absent, effective `"auto"` | Native font pair kerning: browser choice, enabled, or disabled. |
 | `fontWeight`    | string                          | `"normal"`     | Font weight (e.g. `"normal"`, `"bold"`, `"700"`). |
 | `fontStyle`     | `"normal" \| "italic"`          | `"normal"`     | Font style posture.                               |
 | `direction`     | `"ltr" \| "rtl"`                | `"ltr"`        | Directionality for text laying out.               |
@@ -345,12 +540,107 @@ Members:
 | `align`         | `"left" \| "center" \| "right"` | Read/write; horizontal text alignment relative to layer origin.                          |
 | `lineHeight`    | number                          | Read/write; line height scaling factor.                                                  |
 | `letterSpacing` | number                          | Read/write; letter tracking in pixels.                                                   |
+| `wordSpacing`   | `number \| undefined`            | Read/write; extra native word spacing. Undefined restores the effective zero default. |
+| `fontKerning`   | `"auto" \| "normal" \| "none" \| undefined` | Read/write; native pair kerning. Undefined restores Auto. |
 | `fontWeight`    | string                          | Read/write; font weight descriptor.                                                      |
 | `fontStyle`     | `"normal" \| "italic"`          | Read/write; font posture.                                                                |
 | `direction`     | `"ltr" \| "rtl"`                | Read/write; text flow direction.                                                         |
 | `width`         | number                          | Read-only measured intrinsic text width. Recalculated automatically on property updates. |
 | `height`        | number                          | Read-only measured intrinsic text height.                                                |
 | `update()`      | method                          | Update multiple text and layer properties in a single command.                           |
+| `reflow(): void` | method                         | Explicitly refresh stored bounds with fonts available in this execution environment. |
+| `resetSpacing(): void` | method                   | Reset tracking and word spacing to `0`, kerning to `"auto"`, in one validated command. |
+
+Kerning and word spacing retain whole-line browser shaping, including direction, ligatures and script joining; the editor does not split glyphs or words to fake these controls. They are independent of tracking. Measurement, reference rendering, native GPU textures and SVG baseline preparation use the same complete text state, resetting absent defaults on reused contexts. Valid zero/negative advances retain native measurements instead of invoking estimates; stored intrinsic advance width has a minimum of one pixel and is not the glyph ink rectangle. Corner resizing measures the resized font with its current weight/style/tracking/word spacing/kerning/direction; stored spacing stays in document pixels rather than scaling with font size. Point text keeps authored newline-separated lines; optional paragraph wrapping, gaps and first-line indent are described below. Full paragraph styles, pair-specific manual kerning, variable-font axes and font embedding remain unsupported.
+
+Attached changes obey ancestor locks, validate finite values and enum members, recalculate bounds and share UI/REST/script history. Typography patches on other layer kinds reject atomically. Invalid constructors, unsupported native settings or malformed commands leave no partial edit. If the current native Canvas lacks word-spacing or kerning control, requesting a nonzero/non-Auto value rejects measurement/rendering rather than silently substituting segmented text. The inspector disables unavailable controls and retains **Reset spacing**, which can reset both unsupported settings together in one command. Existing projects with unsupported authored values require reset or a supporting browser. This is feature detection, not a cross-browser acceptance claim.
+
+When Canvas/font measurement is unavailable (including the headless REST service), bounds remain explicitly approximate: the existing fallback estimates character advances and adds separator spacing, but cannot reproduce real font kerning or shaping. Isolated-worker/page fonts can differ; use **Reflow text** in the browser for its current metrics. Fonts and their availability are not embedded or synchronized by these properties. New fields require document schema **25**; valid v1–v24 roots/history migrate without inserting spacing fields, while new fields under old labels reject. Project container 3/workspace 2 and source assets are unchanged.
+
+Run this in **Scripts**; the complete example applies as one undo step. Export PNG through the UI to preserve the local glyph appearance, or SVG for editable line text with font references and literal spacing settings.
+
+<!-- example: text-spacing -->
+```js
+document.resize(480, 160);
+const caption = document.layers.add(new TextLayer({
+  name: "Spaced headline",
+  text: "AVATAR WA\nWide words",
+  fontFamily: "serif",
+  fontSize: 40,
+  lineHeight: 1.3,
+  letterSpacing: 1,
+  wordSpacing: 12,
+  fontKerning: "normal",
+  color: "#2050a0",
+  x: 16,
+  y: 16,
+}));
+document.selectedLayer = caption;
+print("Typography spacing ready");
+```
+
+### Paragraph layout
+
+`new TextLayer(options)` also accepts the following optional paragraph settings. Attached setters, `layer.update(...)`, isolated scripts/plugins and REST `layer.update` share validation and undo:
+
+| Option/member | Type and default | Bounds/behavior |
+| --- | --- | --- |
+| `wrapWidth` | number, null or undefined; effective point text | Finite 1…Number.MAX_SAFE_INTEGER document pixels when enabled. Null/undefined selects point text; the getter returns undefined for either. REST uses null to clear it. |
+| `paragraphSpacing` | number or undefined; effective 0 | 0…10000 document pixels between hard paragraphs. |
+| `firstLineIndent` | number or undefined; effective 0 | -10000…10000 document pixels at the logical start of each paragraph's first visual line. Negative values create a hanging first line. |
+| `resetParagraph()` | no arguments, returns void | Sets wrapWidth to null, spacing/indent to 0 and paragraphJustify to none together in one undo entry, retaining text/font/paint. |
+
+Paragraph mode keeps its exact authored width, including fractions, and calculates height from visual lines. Point mode retains intrinsic width and existing LF line behavior; paragraph spacing/indent also apply to its hard lines. In paragraph mode LF and U+2029 start paragraphs; U+2028 makes a mandatory line break inside a paragraph. Empty/trailing paragraphs and trailing U+2028 retain a blank line. Paragraph spacing applies only between paragraphs. Physical left/center/right alignment and logical LTR/RTL indentation are independent.
+
+Wrapping uses the pinned MIT [linebreak 1.1.0 engine](https://github.com/foliojs/linebreak), whose break classes target Unicode 13, filtered through the execution environment's native Intl.Segmenter grapheme boundaries. This prevents cutting combining/emoji clusters supported by that environment; it is not a claim of current-Unicode conformance, dictionary segmentation for every language, or locale-specific paragraph composition. Nonempty paragraph wrapping rejects without Intl.Segmenter. Whole visual lines stay in native shaping; no individual-glyph drawing or maxWidth condensation is used. Unbreakable runs overflow the frame and remain rendered. Soft-wrap separator spaces at the line end are consumed visually; authored leading spaces and explicit hard-line trailing spaces remain. A soft hyphen is shown as a hyphen only at its chosen soft break. Original text is never rewritten by layout.
+
+The inspector's Text layout selector enables a Paragraph width control and shows spacing/indent pairs. Paragraph corner drags change width while preserving font size, grow height automatically and hold the opposite corner; point-text corners retain font-size scaling. Preview/Escape, locks, editable-field shortcuts and a single final undo entry use the ordinary shared controls. Reset paragraph remains available to recover unsupported wrapping settings.
+
+Canvas measurement uses current local fonts. Headless REST/unsupported native measurement keeps explicitly approximate advances; isolated-worker/page fonts can differ. Authored width remains exact but line count/height can change between font environments. Use Reflow text after local fonts are ready. These settings do not embed or enumerate fonts. Layout/native pixel caches invalidate normally, and export checks font lifetime. SVG retains editable positioned visual lines with literal typography, but paragraph reflow/source separators are not portable SVG layout. Canvas/SVG whitespace-boundary glyph spacing and affine antialiasing can differ even with local fonts; export reports this limitation. Choose PNG for the editor's rendered glyph appearance and native projects for complete text/style editability.
+
+New fields require document schema **26**, even when null/zero. Valid v1–v25 roots and retained history upgrade without injecting paragraph fields; fields mislabeled under older roots reject. Paragraph bounds must agree with their authored wrapWidth. Invalid widths/spacing/indent, non-text targets or locked owners reject atomically. Project container 3/workspace 2 and original image bytes remain unchanged.
+
+#### Inter-word justification
+
+`TextLayerOptions.paragraphJustify` and the attached `TextLayer.paragraphJustify` getter/setter accept `"none" | "inter-word" | undefined`; absent/none keeps existing spacing. In Paragraph text mode, inter-word expands native word spacing on soft-wrapped lines to their available width after logical first-line indentation. It keeps physical alignment and whole-line native shaping, including RTL/script joining. Final paragraph lines, forced breaks, unbreakable overflow and lines without native expandable separators retain their authored spacing. Point text has no soft lines and is visually unchanged.
+
+The engine measures each complete line's response to native word spacing, verifies its derived advance, and applies that derived spacing only for drawing/ink/SVG. Authored wordSpacing/tracking/text stay unchanged. Native expandable Unicode space separators participate; fixed-width Unicode spaces without a native spacing response remain fixed. Lines with only one word and boundary spaces stay unexpanded. On multiword lines, explicit leading spaces and NBSP participate in the native response; this is inter-word justification, not inter-character CJK distribution, kashida insertion or dictionary composition. Canvas metrics impose finite precision (base fit tolerance max(1/64 px, available width × 2^-20), with cumulative spacing tolerance of 1/64 px per measured native word-spacing response unit). The engine prefers a fitting native advance; very wide lines can retain a small rounding remainder while their authored frame width stays exact. Derived spacing may exceed the authored wordSpacing input range; it is private layout data, never an alternative public mutation API.
+
+Native word-spacing response also depends on the current font/shaping state. In the tested Chromium, combining-mark text with Kerning Auto or None can ignore native word spacing even in fresh Canvas/OffscreenCanvas contexts; changing font state or rendering hints does not repair the None case. Native measured constructors/setters reject such justification atomically with guidance to choose Kerning Normal or Reset paragraph; it never silently changes authored kerning or substitutes disconnected glyphs. Normal kerning preserves whole-line shaping and supplies native spacing in that fixture. Imported snapshots preserve their declared typography without silently reflowing it; an unsupported host can require Normal/reset before rendering. Supporting that browser/font-state combination remains an open F08 requirement. Reset spacing retains paragraph formatting; if its Auto-kerning reset would make active justification unsupported, it rejects atomically. Clear paragraph justification with Reset paragraph first in that case. Native Canvas word-spacing support is required for nondefault justification; unsupported rendering rejects explicitly. The inspector disables Justification there and Reset paragraph clears it. `resetParagraph()` now sets paragraphJustify to `"none"` along with width null and zero paragraph spacing/indent, in one shared undo entry. Invalid enum/type, non-text targets and locked owners reject atomically. Explicit paragraphJustify (including none) requires schema **27**. Earlier valid roots/history migrate without injecting it. Project/workspace versions and plugin permissions remain unchanged. SVG exports editable visual lines with their individual derived word-spacing. Native/SVG fractional origins, tracking, boundary spaces and NBSP can change glyph placement even with the same local font; export reports these appearance limits. Preserve the native project for complete text/layout settings and PNG for rendered appearance.
+
+<!-- example: justified-paragraph -->
+```js
+document.resize(640, 360);
+const paragraph = document.layers.add(new TextLayer({
+  name: "Justified paragraph",
+  text: "Whole shaped lines expand their word spacing to this width. Final lines keep their spacing.",
+  fontFamily: "monospace", fontSize: 24, wrapWidth: 280, fontKerning: "normal",
+  paragraphJustify: "inter-word", firstLineIndent: 12,
+  color: "#2050a0", x: 24, y: 24,
+}));
+document.selectedLayer = paragraph;
+print("Justification ready", paragraph.paragraphJustify);
+```
+
+<!-- example: paragraph-text -->
+```js
+document.resize(640, 360);
+const caption = document.layers.add(new TextLayer({
+  name: "Paragraph caption",
+  text: "Editable paragraphs wrap to this width.\nThis is a second paragraph.",
+  fontFamily: "monospace",
+  fontSize: 24,
+  lineHeight: 1.4,
+  wrapWidth: 280,
+  paragraphSpacing: 18,
+  firstLineIndent: 20,
+  color: "#2050a0",
+  x: 24,
+  y: 24,
+}));
+document.selectedLayer = caption;
+print("Paragraph ready", caption.wrapWidth, caption.paragraphSpacing, caption.firstLineIndent);
+```
 
 ## AdjustmentLayer
 
@@ -361,17 +651,20 @@ Adjustment layers modify the preceding backdrop layers non-destructively in enco
 | Option       | Type             | Default                                      | Validation                                       |
 | ------------ | ---------------- | -------------------------------------------- | ------------------------------------------------ |
 | `name`       | string           | `"Adjustment"`                               | Nonempty, at most 240 characters.                |
-| `adjustment` | `AdjustmentData` | Default curves (`[{x:0,y:0},{x:255,y:255}]`) | Valid Curves, Levels, or Tone adjustment object. |
+| `adjustment` | `AdjustmentData` | Default curves (`[{x:0,y:0},{x:255,y:255}]`) | Valid adjustment DTO from the families below. |
+
+Current adjustment kinds are `"curves"`, `"levels"`, `"tone"`, `"hsl"`, `"color-balance"`, `"vibrance"`, `"gradient-map"`, `"white-balance"`, `"lut"`, `"tonal"` and `"patch"`. The family sections specify their DTOs. Gradient maps use the same `adjustment` getter/setter; there is no `setGradientMap()` convenience method.
 
 Members:
 
 | Member           | Type                             | Behavior                                                                                                                                                                                                       |
 | ---------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `adjustment`     | `AdjustmentData`                 | Read/write; gets a structured clone of the adjustment DTO or sets a new valid adjustment.                                                                                                                      |
-| `adjustmentKind` | `"curves" \| "levels" \| "tone"` | Read-only; current adjustment type.                                                                                                                                                                            |
+| `adjustmentKind` | `AdjustmentData["kind"]` | Read-only; current adjustment type.                                                                                                                                                                            |
 | `setCurves()`    | method                           | Set monotone cubic spline control points for RGB master or per-channel (`red`, `green`, `blue`). Spline uses Fritsch-Carlson interpolation; X values must strictly increase in `[0, 255]`.                     |
-| `setLevels()`    | method                           | Set input black/white, midtone gamma, and output black/white for RGB master or per-channel (`red`, `green`, `blue`). Requires `inputWhite > inputBlack`, `outputWhite >= outputBlack`, and finite `gamma > 0`. |
-| `setTone()`      | method                           | Set exposure (`[-5, 5]`), contrast (`[-100, 100]`), and saturation (`[-100, 100]`).                                                                                                                            |
+| `setLevels()`    | method                           | Set input black/white, midtone gamma, and output black/white for RGB master or per-channel (`red`, `green`, `blue`). Requires finite input black in [0,254], input white in [1,255] with `inputWhite > inputBlack`, gamma in [0.05,10], and output endpoints in [0,255] (reversed output is allowed). |
+| `setTone()`      | method                           | Set exposure (`[-3, 3]`), contrast (`[-100, 100]`), and saturation (`[-100, 100]`).                                                                                                                            |
+| `setLut(source, options?)` | method | Parse Cube text and replace the effect. Options: amount 0–100 (default 100), interpolation tetrahedral (default) or trilinear. See [Color Lookup](#color-lookup-lut-adjustment-layers) for formats, domains, errors and limits. |
 
 Example:
 
@@ -436,6 +729,20 @@ These values currently transform selection regions. They do not yet add layer ro
 - Operations are evaluated in order, starting with an empty mask. A subtract/intersect region alone therefore selects nothing.
 - `document.selection` gets an immutable selection snapshot or `null`. Assign a `MarqueeSelection` or `null`; changes create history and persist in project files.
 - `document.selectAll()` selects the full document rectangle; `document.deselect()` assigns `null`. Null means unrestricted painting; `{ regions: [] }` selects no pixels.
+
+`document.selectPolygon(points: { x: number; y: number }[], operation: "replace" | "add" | "subtract" | "intersect" = "replace"): void` closes a document-space polygon and commits its pixel coverage through the shared command/history boundary. It accepts 3–20,000 vertices with finite coordinates within JavaScript's safe-integer range; fractional coordinates are supported. Even-odd filling handles concave/self-intersecting contours. Coverage uses 4×4 subpixel samples and is clipped to the canvas at its original resolution. Boolean modes append to the existing selection; a subtract/intersect polygon without a prior selection therefore selects nothing. The combined selection may contain at most 128 regions. Invalid inputs or a polygon covering no canvas pixels throw without changing the document/history. Layer locks do not prevent a document-level selection. The resulting selection works with paint clips, masks and project persistence; this method does not create a live vector path.
+
+```js
+// example: polygon-selection
+document.selectPolygon([
+  { x: 10, y: 10 },
+  { x: 80, y: 10 },
+  { x: 10, y: 80 },
+]);
+print("Polygon selection regions:", document.selection.regions.length);
+```
+
+Successful script/plugin runs retain the existing atomic host undo boundary. Plugins need granted `document:write`; no new permission is introduced. Polygon preparation is synchronous scan conversion by horizontal spans, so very large or complex contours can still take time. There is no document-megapixel cutoff or full-size bitmap allocation for solid interiors.
 
 Example: rotate a rectangular selection about its center, preserving its editable region geometry:
 
@@ -853,9 +1160,214 @@ This section is for trusted application code and development-console inspection,
 | `editor.exportPng(control?)` | `Promise<Blob>`; PNG convenience method with the same optional execution controls. |
 
 
-Export controls default to absent. `phase` is `"rendering"` or `"encoding"`; `fraction` is a value from 0 to 1 for known rendering progress, or `null` for indeterminate work. An aborted signal rejects with its reason (normally `AbortError`). PNG/JPEG/WebP check cancellation between rendered tiles/strips and before returning encoded output. Browser encoding and synchronous SVG/PSD work cannot be preempted mid-call; the final host check suppresses a result after cancellation is received. These controls are host-only, are not serialized into REST options, and are unavailable inside isolated Scripts. They do not edit the document or create history entries.
+`ExportOptions.format` accepts `"png" | "jpeg" | "webp" | "svg" | "psd" | "tiff"`. Other options are `quality?: number` (JPEG default 0.92, WebP default 0.9), `backgroundColor?: string` (JPEG, default white), `psdMode?: "layers" | "flatten"` (default layers) and `tiffVariant?: "auto" | "classic" | "big"` (default auto). Results contain `blob`, `mimeType`, `extension` and `report`; review the report's preserved/degraded features and warnings before delivery.
+
+Export controls default to absent. `phase` is `"rendering"` or `"encoding"`; `fraction` is a value from 0 to 1 for known rendering progress, or `null` for indeterminate work. An aborted signal rejects with its reason (normally `AbortError`). PNG/JPEG/WebP/PSD/TIFF check cancellation between rendered tiles/strips and before returning encoded output. Host SVG serialization yields between bounded path fragments and reports indeterminate encoding progress. Browser encoding, synchronous constructor `toSvg` calls and an individual PSD strip cannot be preempted mid-call; the final host check suppresses a result after cancellation is received. These controls are host-only, are not serialized into REST options, and are unavailable inside isolated Scripts. They do not edit the document or create history entries. A throwing progress callback rejects export without returning partial output.
+
+Host `editor.export({format: "svg"}, control?)` also exports visible raster layers outside native backdrop prefixes alongside editable vector paths. Rasters without enabled nonzero tone effects or erasures embed source-resolution PNG pixels; repeated instances share one definition with independent authored size/full affine placement. PNG re-encoding excludes original source-file metadata, including EXIF orientation tags (decoded orientation is already applied). It preserves original source Blob bytes in the project. Embedded images retain all decoded pixels, including those hidden by masks/canvas clipping; SVG is not a redaction format. Choose flattened PNG when hidden content must not be delivered.
+
+Enabled nonzero raster tone effects or any erasure operations instead bake raw raster content at document resolution over the expanded shadow support region. This preserves native sample/effect/erase ordering and clips off-support pixels. Masks, layer/group opacity, blend modes and overlay/shadow filters remain in the SVG hierarchy, with surrounding paths still editable. Reports distinguish source-resolution images from these rendered images and identify lost tone/erasure editability. Save a project to retain original sources and editable operations. Adjustments and Blend If retain native appearance through reported backdrop-prefix rendering, described below. Host SVG also retains editable text and supported smart-object contents as described below.
+
+Images use the native streamed PNG exporter, retaining compressed/base64 output without a document-sized host canvas/RGBA plane. Real source decoding, viewer working memory and PNG format geometry still limit output; there is no arbitrary import cap. Raster and bitmap-mask sources are captured together before the first progress callback, and checked across preparation and final encoding. Missing sources reject (`Missing image asset`); replacement/in-place bitmap changes or repository disposal reject with a retry/disposal error. Cancellation rejects with the signal reason and releases current render surfaces. Known `rendering` fractions combine image/native-mask preparation, followed by indeterminate `encoding`. Individual native rendering/encoding calls remain cooperative, not preemptible. These are trusted host services: `VectorLayer.toSvg` stays synchronous, and isolated scripts/plugins gain no image bytes, export/download API or new permissions.
 
 Directly accessing `editor.document` bypasses script isolation: ordinary setters create individual host history entries unless wrapped in a synchronous transaction. `editor.runScript` already handles snapshotting, validation, revision checking and a single host history entry; prefer it when executing user-authored script text. Never evaluate user scripts in the page context.
+
+### Local SVG import
+
+These are **trusted application services**, unavailable inside isolated Scripts/plugins or headless REST sessions:
+
+| Method | Current behavior |
+| --- | --- |
+| `editor.inspectSvg(file, control = {})` | `Promise<SvgImportReport>`; inert XML inspection in a dedicated terminable worker. No document mutation or image-decoding guarantee. |
+| `editor.openSvg(file, options = {}, control = {})` | `Promise<SvgImportReport>`; prepares and opens a complete new native document. `options.mode` defaults to `"editable"`; the other value is `"flatten"`. Unknown options/modes reject. |
+
+The file picker and canvas drop show **Import SVG** preflight. **Import editable**, **Import flattened**, and **Cancel** are explicit choices; unsupported editable features disable that choice. A host call with the default mode rejects unsupported artwork; it never silently falls back. Reports include version 1, resolved integer `width`/`height`, `canImportEditable`, `featuresPreserved`, `featuresDegraded`, `unsupportedFeatures`, `additionalIssues`, XML `elements`, native `layers` and unique embedded `images`. At most 256 unsupported findings are displayed; additional findings are counted. Inspection does not decode or certify every embedded image. Errors during decoding still reject the complete import.
+
+Supported editable artwork includes path commands listed above, rectangles/rounded rectangles, circles/ellipses, lines/polylines/polygons, nested groups, literal solid CSS colors resolved to 8-bit sRGB, inherited paint/currentColor/visibility, per-paint and group opacity, full affine transforms, root viewBox alignment and independent local `use` references. Compound/even-odd/open fills become editable vector masks over a solid cover path; their original Bézier contours stay editable in the mask. Open stroke contours remain open. Native stroke caps/joins, miter limits, inherited dash arrays and signed offsets remain editable. SVG defaults are butt caps, miter joins and limit 4, independently of legacy native round defaults. Absolute numeric/CSS-unit dash lengths are converted to local user units; percentage lengths, pathLength calibration, non-scaling strokes, markers and SVG2 arcs/miter-clip joins require explicit flattened import, as do gradients/paint servers, text, CSS selectors/geometry/transforms, clipping/filter/mask graphs, nested viewports and other unrepresented features. SVG `use` master/DOM identity is not retained.
+
+Embedded static PNG/JPEG/WebP data URLs retain their original compressed bytes, native decoded dimensions and editable placement. Image `preserveAspectRatio` supports meet/slice/none; slice adds an editable vector crop mask. Missing image dimensions use intrinsic aspect/dimensions. Root dimensions support pixels and absolute 96-dpi CSS units. Missing/relative root dimensions resolve from the viewBox, or 300×150 when absent; fractional viewport pixels round up. These conversions are reported. Native Canvas and SVG curve/clip/image sampling differ, so editable import is not pixel-exact. Arc approximations have no universal error guarantee. Original SVG XML, IDs, CSS rules, and editor metadata are not archived or round-tripped. Save a native project for subsequent edits.
+
+Flattened import decodes a normalized self-contained SVG as a browser image, then streams native PNG tiles/strips into one raster layer. It retains the inspected viewport and rendered pixels, discarding source vector/text/effect editing, original XML and off-canvas content. It does not insert markup into the live page. Scripts, event handlers, foreign HTML, SMIL/CSS animations, detected animated embedded PNG/WebP, DOCTYPE/entities, processing instructions and external resources are rejected before either mode; no external image, font or stylesheet fetching is added. [SVG image processing modes](https://www.w3.org/TR/SVG2/conform.html) supply a second browser boundary; image mode alone can allow animation, so static admission is separate. XML parsing uses pinned [xmldom](https://github.com/xmldom/xmldom) in the worker; endpoint-to-center arc conversion follows [SVG implementation notes](https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes).
+
+`control.signal` supports cancellation; `onProgress({phase,fraction})` uses `reading`, `inspecting`, `decoding` or `rendering`, with a fraction in [0,1] or `null`. Callback errors reject. The XML worker terminates on completion/error/cancellation. Native image decode and individual render calls cannot be preempted mid-call; final checks suppress cancelled/stale publication and release provisional bitmaps, asset stores, workers and tile surfaces. Starting a later open, changing/closing the starting document, switching tabs, disposing the target asset store or modifying its revision rejects the pending import. Existing edited tabs remain open. Preparation creates no active-document history entry; the imported document starts at revision zero and subsequent edits use normal commands/undo. There is no arbitrary source-byte/megapixel cutoff. Existing native layer/depth/path/mask budgets can reject editable reconstruction; browser decode, numeric precision and memory still impose real limits in either mode.
+
+The strict path helper is also available in isolated Scripts without file privileges:
+
+<!-- example: svg-import-path -->
+```js
+const curve = VectorPath.fromSvgPath("M0 0q10 20 20 0t20 0");
+print(curve.points.length); // 3
+try {
+  VectorPath.fromSvgPath("M0 0M10 10");
+} catch (error) {
+  print(error.message); // one SVG contour is required
+}
+document.name = "Edited import";
+```
+
+### Native backdrop composition in SVG export
+
+Trusted host `editor.export({format: "svg"}, control?)` retains adjustment layers and enabled Blend If through the native compositor. Within each visible isolated sibling stack, it renders from the first sibling through the last visible, nonzero-opacity adjustment or enabled Blend If layer into a document-resolution PNG. This preserves the real backdrop, adjustment ordering, all eleven current adjustment kinds, masks, styles, blend modes, opacity and alpha rules. A hidden or zero-opacity dependency does not trigger rendering. Separate groups retain their own isolated backdrops. Later artwork and outer parent masks/styles/opacity remain separate in SVG; an affected parent Blend If instead requires its own preceding siblings to be included.
+
+The export report lists affected stack endings by group/layer name and explains the loss of editable internal artwork, text, paint, adjustment/Blend If settings, masks/styles/blending and off-support pixels. This is native rendered appearance, not editable SVG adjustment filters or a general SVG round-trip. Save a project for the complete model. Source files and command history remain unchanged. PNG re-encoding excludes original file metadata; unmodified raster/clone images outside these prefixes can still contain hidden pixels, and SVG is not a redaction format.
+
+Native prefix images cover the original conservative shadow-chain support at native document resolution. Their pixels are placed in the document plane under the retained affine parent hierarchy; unlinked masks/filter masks rebase with the output origin, while masks inside retained smart-master definitions keep their master plane. Bounded native tiles/strips avoid a document-sized host canvas/RGBA plane. Compressed/base64 output, resident source decoding and viewer/filter allocations still consume memory and obey actual format/device limits; no arbitrary import-resolution cap is added.
+
+Reachable raster/clone/patch/bitmap-mask sources are captured before the first progress callback, including dependencies inside a rendered prefix. Referenced fonts are pinned at the start of font preparation, before native measurement/rendering, and checked through final encoding. Existing rendering progress/Cancel and source/font lifetime guards span preparation and final encoding. Missing/replaced/disposed sources, pending/changed fonts, numeric/native-render failures and cancellation reject without partial output or source/history changes. Later host edits cannot rewrite the captured export. Signatures/options, schemas, separate REST sessions and isolated script/plugin grants remain unchanged.
+
+`VectorLayer.toSvg(width = 1920, height = 1080)` remains synchronous in the layer's immediate parent plane. Enabled Blend If now rejects with a native-backdrop-preparation error directing callers to host export, rather than silently ignoring its semantics. Hidden/zero-opacity layers still yield an empty canvas. Raw private SVG helpers likewise reject unprepared visible adjustments/Blend If. Isolated scripts may create validated layers, but cannot obtain this native preparation or download files themselves.
+
+Run this in **Scripts** as one undo step, then choose **Export… → SVG**. The tone adjustment and conditional overlay become one native prefix; the later green path stays editable.
+
+<!-- example: svg-native-backdrop -->
+```js
+document.resize(160, 112);
+const base = document.layers.add(new PaintLayer({ name: "Base" }));
+base.strokes.add(new PaintFill({
+  bounds: { x: 8, y: 8, width: 88, height: 56 },
+  color: "#804020",
+}));
+document.layers.add(new AdjustmentLayer({
+  name: "Exposure",
+  adjustment: { kind: "tone", exposure: 1, contrast: 0, saturation: 0 },
+}));
+const conditional = document.layers.add(new VectorLayer({
+  name: "Conditional overlay",
+}));
+conditional.paths.add(VectorPath.rectangle(
+  { x: 16, y: 16, width: 64, height: 32 }, 0,
+  { fill: "#20a0e0", stroke: null },
+));
+conditional.styles = new LayerStyle({
+  blendIf: { enabled: true, underlying: [0, 0, 100, 120] },
+});
+const after = document.layers.add(new VectorLayer({ name: "Editable after" }));
+after.paths.add(VectorPath.rectangle(
+  { x: 112, y: 16, width: 16, height: 16 }, 0,
+  { fill: "#00ff00", stroke: null },
+));
+print("Native SVG backdrop ready");
+```
+
+### Editable text in SVG export
+
+Host `editor.export({format: "svg"}, control?)` retains visible nonempty text layers outside native backdrop prefixes as editable SVG `text` elements, one per visual line from the shared point/paragraph layout. It preserves family references, font size/weight/style, color/alpha, supported native letter/word spacing and kerning, physical left/center/right alignment, LTR/RTL direction, full affine hierarchy and separate masks/styles/opacity/blending. Native `fillText` normalizes tab, carriage return and form feed to individual spaces; exported line text does the same. Empty lines retain their explicit baseline positions. Complete line content remains available in XML, including masked/off-canvas text; use flattened PNG when that content must not be delivered. Paragraph lines retain their measured positions, but SVG does not retain native paragraph reflow settings or consumed soft-break source spacing. Font embedding, glyph outlining and script download methods remain unsupported.
+
+The browser measures each line's top-to-alphabetic baseline offset using the same font settings as native rendering. For nonzero word spacing, two reusable hidden SVG text nodes compare native and SVG full-line responses against zero spacing. When advances differ, the host tries whitespace-only `tspan word-spacing="0"` runs for ASCII spaces, NBSP and boundary spaces. It accepts a correction only when both full-line advance and outer non-whitespace character-position responses agree with native ink responses within `max(1/32 px, abs(native spacing response)/64)`. This rejects advance-only matches that move serif/RTL glyphs incorrectly. The original root word-spacing, line text and one shaped text chunk per visual line remain intact; spans have no independent x/y/dx/dy positions. Whole graphemes are mandatory after native ASCII normalization. Without native segmentation, or when a proposed span would split a space-plus-mark/ZWJ cluster, this optional styling is declined. Boundary-trimmed ink/character comparisons remain the fallback for signed advances and other unsupported corrections, but must also respect complete boundary graphemes. These local measurements improve the verified NBSP/boundary cases; they do not prove universal Canvas/SVG glyph parity. Combining-mark, some font/kerning/tracking and fractional affine cases still differ, as the export report warns. Preparation releases its hidden host and 1×1 measurement canvas on success/failure/cancel, caches repeated lines by derived spacing, yields between batches/candidates and within long-line character-position reads using the shared 8 ms scheduling target. Every 16 character-position pairs check cancellation; deadline yields recheck captured fonts and sources. This retains every measured edge rather than sampling long lines. One native measurement/layout read cannot be preempted. A registered font needed by the text must already be loaded. Missing family names can resolve to browser fallback and are not proof of font availability. Font files are never copied: another viewer, including an SVG image decoder without the page's web fonts, can substitute fonts and shape/hint text differently. The export report states this; use PNG for rendered text appearance and a project for the complete original text model. Affine glyph edges can differ from Canvas even with the same system font.
+
+Preparation captures registered faces in referenced font families, including family lists, and rechecks face identity, status and descriptors through image/mask work and final encoding. A relevant change rejects with a retry-after-fonts-ready error; unrelated font families do not invalidate output. Pending fonts, invalid browser font/color assignments, unavailable baseline metrics, nonfinite prepared positions and XML 1.0-invalid text fail explicitly without editing the document or returning partial output. Later host document edits retain their own history and cannot rewrite the captured export snapshot. Source-resolution raster/mask preparation and existing script/plugin isolation remain unchanged.
+
+The following runs in **Scripts** as one ordinary document transaction. Then choose **Export… → SVG** in the editor; exporting is still a separate UI/host operation.
+
+<!-- example: svg-live-text -->
+```js
+document.resize(240, 120);
+document.layers.add(new TextLayer({
+  text: "Canoli\nStudio",
+  fontFamily: "monospace",
+  fontSize: 24,
+  lineHeight: 1.4,
+  letterSpacing: 1,
+  color: "#2050a0",
+  x: 16,
+  y: 18,
+}));
+print("Editable SVG text ready");
+```
+
+The following whitespace example preserves its leading spaces and NBSP in both the native project and SVG text. The exporter may add whitespace-only inline spacing to match the current native renderer; it never rewrites the authored text or typography. Other fonts/viewers remain subject to the limits above.
+
+<!-- example: svg-whitespace -->
+```js
+document.resize(400, 160);
+document.layers.add(new TextLayer({
+  name: "Whitespace caption",
+  text: "  alpha\u00a0beta gamma",
+  fontFamily: "monospace",
+  fontSize: 24,
+  wordSpacing: 8,
+  fontKerning: "normal",
+  color: "#2050a0",
+  x: 24,
+  y: 24,
+}));
+print("Whitespace SVG ready");
+```
+
+### Smart-object contents in SVG export
+
+Host `editor.export({format: "svg"}, control?)` expands visible unfiltered smart-object instances through the shared component resolver. Supported vector, raster, text and paint master contents outside native backdrop prefixes retain their existing SVG editability, full instance/master scale and affine placement, nested/scoped masks and styles. Generated master-canvas boundaries remain editable rectangular vector masks. Instance opacity, fill opacity, blend modes, outer masks and styles remain separate. Disabled filter entries do not force rasterization. Full-frame raster masters retain their erasures; conversion no longer drops those operations.
+
+An instance with any enabled smart filter instead renders its native filtered content and filter mask into a document-resolution PNG over expanded shadow support. This preserves native master-plane filtering before resampling; the SVG still applies the instance's outer mask/styles/opacity separately. Filtered master contents, filters, filter-mask geometry and off-support pixels lose editability and are reported as baked. Inside that rendered instance, native paint, text, adjustments and nested smart objects contribute pixels. Adjustments and Blend If in expanded masters use the native sibling-prefix composition described below; paint outside those prefixes retains editable dab/fill geometry. Font references for editable text and raster-image pixel/metadata disclosures still apply.
+
+SVG instances are independently expanded; shared component/master identity is not retained in the file. Save a project to preserve shared editing, filters, original sources and full off-canvas data. Linked local-image masters use the existing embedded snapshot; SVG export neither follows local paths nor refreshes external files. Complete unmodified raster pixels and editable line text can include masked/off-canvas content; SVG is not redaction.
+
+The same logical component render budget (4,096 nodes / 64 expansion levels) applies, including descendants of filtered instances. Missing/cyclic definitions, budget overflow, missing/replaced native image/filter-mask dependencies, pending/changed referenced fonts, unavailable native rendering and cancellation fail explicitly without partial output or changes to document/history/source bytes. Filtered text fonts are checked even though their glyphs become pixels. Unused masters' image/font data is not prepared, although registry validation still checks the complete graph. PNG preparation uses bounded tiles/strips; resident sources, compressed/base64 output and viewer/filter allocations still consume memory. No arbitrary image-resolution cap, general SVG import or new REST/script/plugin export/font/file privilege is added.
+
+This example runs in **Scripts** as one undo step; use **Export… → SVG** afterward. The first instance retains its vector shape and canvas clip; the second includes an enabled native filter and is rendered to pixels, with the losses shown in the dialog.
+
+<!-- example: svg-smart-objects -->
+```js
+document.resize(240, 140);
+const master = new Document({ width: 64, height: 48 });
+const shape = master.layers.add(new VectorLayer());
+shape.paths.add(VectorPath.rectangle(
+  { x: -8, y: -4, width: 40, height: 28 }, 0,
+  { fill: "#804020", stroke: null },
+));
+const key = document.defineComponent(master);
+document.placeSmartObject(key, { x: 16, y: 16 });
+const filtered = document.placeSmartObject(key, { x: 120, y: 16 });
+filtered.setFilters([new SmartToneFilter({ exposure: 1 })]);
+print("Smart SVG ready");
+```
+
+### Paint in SVG export
+
+Trusted host `editor.export({format: "svg"}, control?)` exports visible nonempty paint layers outside native backdrop prefixes as editable vector dabs and fill rectangles, including paint inside unfiltered smart masters. Brush softness uses radial gradients; pencil stamps remain pixel-aligned rectangles. Native segment spacing, interpolated pressure, per-dab flow/pressure alpha and whole-stroke opacity are retained. Eraser strokes and `PaintFill({erase: true})` mask only earlier paint; later strokes remain visible. Layer/group placement, affine transforms, masks, overlay/shadow filters, fill/layer opacity and CSS blend modes remain separate.
+
+Existing constructors/defaults are unchanged: `BrushStroke` defaults to size 24, hardness 0.7, opacity/flow 1, spacing 0.25, pressure sizing enabled and pressure opacity disabled; points without pressure use 1. `PencilStroke` defaults to size 1 and hardness 1. Pressure sizing uses at least 0.05 of nominal size. Flow below 1 and enabled pressure opacity each use a minimum factor of 0.01, matching native replay even at an authored value of zero. Brush spacing is at least 0.5 local pixels, using the segment's minimum pressure (at least 0.05); pencil spacing uses the native Chebyshev grid. Legacy stored brush strokes lacking spacing retain the native 0.12 fallback. These describe existing native rules, not new mutation options.
+
+Stroke selection clips use native fractional coverage embedded as PNG tiles. Preparation covers the conservative union of transformed selection bounds plus two native pixels, clipped to output support; empty selections use no tiles. Ordinary layer/group masks retain their complete density/inversion/feather support. Clone operations embed their sanitized decoded source snapshots at native source resolution, with separate editable brush masks and placement. Image/mask progress, cancellation, source lifetime and cleanup use the existing host export boundary. Complete clone snapshots can retain pixels hidden outside the painted area; metadata exclusion does not make SVG redaction. Use flattened PNG when hidden content must not be delivered.
+
+The SVG contains rendered primitives, not the original brush commands, control-point sequence or editable brush settings. Dabs outside conservative output/shadow support are excluded; projects retain all original data. Dense strokes/deep eraser groups can exceed viewer XML/filter complexity or working memory. Edge/gradient quantization and affine antialiasing can differ from native PNG even when geometry is correct. Raster clips and clone images retain finite native resolution; the complete SVG is not infinitely scalable.
+
+Missing/replaced/disposed clone sources, missing native coverage support, invalid literal paint colors and cancellation reject without partial output or history/source changes. Native and SVG rendering reject visible stamp indices beyond safe integer precision with `Stroke stamp indices exceed numeric precision`; move extremely distant geometry closer before rendering. This avoids a non-advancing replay loop without imposing an image-resolution cap or altering stored geometry. Export signatures, document/project schemas, isolated script/plugin privileges and separate REST sessions are unchanged. There is no `PaintLayer.toSvg` or isolated-script file-download method; adjustments and Blend If use the reported native backdrop-prefix composition described above.
+
+Run this in **Scripts** as one undo step, then use **Export… → SVG**. Paint remains editable as dab/fill/eraser geometry; save a project for the complete brush model.
+
+<!-- example: svg-paint -->
+```js
+document.resize(160, 112);
+const paint = document.layers.add(new PaintLayer({ x: 12, y: 12 }));
+paint.strokes.add(new PaintFill({
+  bounds: { x: 8, y: 8, width: 96, height: 64 },
+  color: "#804020",
+}));
+paint.strokes.add(new BrushStroke({
+  points: [{ x: 16, y: 32, pressure: 0.4 }, { x: 96, y: 32 }],
+  size: 18,
+  hardness: 0.6,
+  color: "#20c080",
+  flow: 0.5,
+  opacity: 0.7,
+  pressureOpacity: true,
+  clip: new MarqueeSelection({
+    shape: "ellipse", x: 24, y: 16, width: 48, height: 32,
+  }),
+}));
+paint.strokes.add(new EraserStroke({
+  points: [{ x: 32, y: 32 }, { x: 64, y: 32 }],
+  size: 24,
+  hardness: 0.5,
+  opacity: 0.75,
+}));
+paint.strokes.add(new PaintFill({
+  bounds: { x: 40, y: 24, width: 16, height: 16 },
+  color: "#0000ff",
+}));
+print("Editable SVG paint ready");
+```
 
 The document also exposes integration hooks: `subscribe(listener)` registers a state-change listener and returns an unsubscribe function; `onCommand(listener)` observes dispatched commands and returns an unsubscribe function; `getSnapshot()` returns the current editor state (`document`, `selectedId`, `past`, `future`, `revision`). Treat snapshots as read-only and listeners as non-throwing. `onHistoryNavigation(listener: (direction: "undo" | "redo") => void): () => void` observes completed undo/redo navigation and returns an unsubscribe function. Empty history navigation emits nothing; listener callbacks must not throw. This DOM hook does not create an additional undo entry; subscriptions inside Scripts observe only the temporary worker document, never host history. Command listeners are not a complete history event stream: undo/redo and active-layer changes do not emit mutation commands; pixel selection does. These hooks are for application adapters; subscriptions created inside Scripts observe only that temporary worker instance and end with the run.
 
@@ -943,11 +1455,11 @@ Brush-based painted masks and asset-backed bitmap masks are described below. Bit
 
 `new LayerMask({ paths, fillRule = "evenodd", enabled = true, inverted = false, density = 1, feather = 0 })` accepts an array of **closed** `VectorPath` objects instead of a selection. Supply exactly one geometry source (`paths`, `selection`, or painted `base`). Open paths throw. Mask geometry is limited to 128 paths and 20,000 total anchors, with at least one anchor per path; curved closed paths can use fewer than three anchors. An empty path array hides all content before inversion/density.
 
-Only anchors and their incoming/outgoing control handles are copied; path IDs, fill/stroke colors and widths are not mask data. All contours are filled as one compound path. `"evenodd"` alternates coverage at each nested contour, producing holes without reversing path direction. `"nonzero"` uses winding direction. Get `mask.fillRule` for vector masks (`null` for selection masks); change it with `mask.with({ fillRule })`. Invalid rules throw.
+All primary and additional contours are copied. Only anchors and their incoming/outgoing control handles are copied; path IDs, fill/stroke colors and widths are not mask data. All contours are filled as one compound path. `"evenodd"` alternates coverage at each nested contour, producing holes without reversing path direction. `"nonzero"` uses winding direction. Get `mask.fillRule` for vector masks (`null` for selection masks); change it with `mask.with({ fillRule })`. Invalid rules throw.
 
 `mask.paths` returns independent detached `VectorPath` objects, always closed with no fill/stroke styling. Edit those paths and assign `layer.mask = layer.mask.with({ paths })` to commit. Reading `paths` on a selection mask or `selection` on a vector mask throws. `with({ paths })` or `with({ selection })` can replace the geometry kind while retaining enabled/inversion/density/feather/position/linking; switching to paths defaults to even-odd unless a rule is supplied. Detached edits do not affect the layer until assigned.
 
-`layer.maskFromPaths(source: VectorLayer)` requires both layers to be attached to the same document and the source to contain closed paths. It copies **all** source paths into the target's local coordinate space, accounting for source/target ancestor translations. Empty/open sources fail without changing the target. The source layer is not changed or hidden. Later source edits do not update the copied mask. The target's locks/history apply; a locked source may still be read. The inspector offers eligible vector layers as **Mask path source**; create/replace from paths captures the same snapshot.
+`layer.maskFromPaths(source: VectorLayer)` requires both layers to be attached to the same document and the source to contain closed paths. It copies **all** source paths into the target's local coordinate space, accounting for source/target ancestor translations. Empty/open sources fail without changing the target. The source layer is not changed or hidden. Later source edits do not update the copied mask. Capture uses the common source fill rule when any source path has additional contours or an explicit rule; mixed rules reject without mutation. Legacy single-contour sources with no explicit rule retain the previous even-odd capture default. Direct `new LayerMask({paths})` continues to use its explicitly documented even-odd default; supply `fillRule` when copying nonzero artwork. The target's locks/history apply; a locked source may still be read. The inspector offers eligible vector layers as **Mask path source**; create/replace from paths captures the same snapshot.
 
 <!-- example: bezier-mask -->
 
@@ -1108,12 +1620,76 @@ All attached layers expose `layer.maskFromBitmap(assetId)`.
 
 #### Alpha matting and background removal
 
-Alpha matting (`rasterLayer.refineEdge(options)` and `document.removeBackground(targetLayer)`) isolates complex foreground objects (such as fine hair, fur, foliage, and translucent fabrics) by computing soft fractional alpha coverage:
+`await raster.refineEdge(options = {}, control = {})` returns the output raster's attached `LayerMask`. `await document.removeBackground(targetLayer = document.selectedLayer, options = {}, control = {})` returns the output `RasterLayer`. The trusted editor facades forward these arguments. An attached, unlocked raster owned by this document and a configured application host are required. Other layer kinds, detached/foreign layers, locked ancestors and synchronous `document.transaction` callbacks reject. Hidden rasters can be sampled.
 
-- **Zero Destructive Mutation**: Original raster source image bytes in `AssetStore` are never altered byte-for-byte. The computed alpha channel is encoded as a separate bitmap mask asset and non-destructively attached to the layer.
-- **Single-Transaction Undo**: Background removal and edge refinement are applied through the single command `mask.setFromMatting`, allowing `document.undo()` to revert the entire operation in exactly one history step.
-- **Color Decontamination**: Unmixes background color bleeding from foreground semi-transparent edge pixels using local background radiance estimation: $\hat{F} = (I - (1 - \alpha) B) / \alpha$.
-- **Project Persistence**: Bitmap mask assets are tracked via `referencedAssets(doc.toJSON())` and automatically persisted in `.luma` project files.
+Both methods start with the target's enabled, nonzero-density mask, otherwise the current document selection, otherwise the local Select Subject heuristic described below. An explicit trimap skips automatic Subject preparation when no mask/selection exists. Foreground/background/refine marks override the generated labels in stroke order. Input pixels are the original raster before its effects, opacity and ancestor compositing, with native source dimensions separate from placed dimensions. Full ancestor/layer transforms and placed scaling map document coverage to source coordinates.
+
+| Option | Default | Contract |
+| --- | --- | --- |
+| `solver` | `"closed-form"` | Global sparse matting Laplacian; `"color-line"` explicitly selects the former local estimator. |
+| `radius` | `10` | Finite 0–50 original-source pixels; unknown-band radius (and local estimation support for Color line). |
+| `smoothness` (`smooth` alias) | `10` | Finite 0–100; blends color-guided bilateral smoothing at `smoothness/100` on unknown pixels (10 means 10% strength). |
+| `edgeFeather` (`feather` alias) | `0` | Finite 0–50 original-source pixels; fractional three-box feather on unknown pixels through the native WASM kernel. |
+| `contrast` | `0` | Finite −100–100; unknown alpha is scaled around 0.5 by `2^(contrast/50)` and clipped. Positive values sharpen. |
+| `shiftEdge` | `0` | Finite −100–100; square erosion/dilation by `round(radius*shiftEdge/100)` before automatic trimap generation. Explicit trimaps bypass this step. |
+| `decontaminate` | `false` | Correct transition RGB in a separate foreground asset; requires new-layer output. |
+| `decontaminateAmount` | `1` | Finite 0–1 mix of original and estimated corrected RGB. |
+| `outputTo` | `"mask"`, or `"new-layer"` when decontaminating | Mask output retains the source raster asset. New-layer output places a refined raster immediately above the source in the same parent and hides the original; it returns/selects that raster. |
+| `trimap` | absent | Owned copy of `Uint8Array`, exactly native width × height; labels 0 background, 128 unknown, 255 foreground. |
+| `trimapAssetId` | absent | Alternative native-sized image asset whose decoded alpha bytes are exactly 0/128/255. RGB is ignored. Cannot be combined with `trimap`. |
+| `trimapStrokes` | `[]` | At most 256 strokes/20,000 total points. Each has `mode: "foreground"|"background"|"refine"`, finite diameter `size` 0.5–512 and nonempty `{x,y}` points in original-source coordinates. Circular dabs follow existing Quick Selection seed rasterization. |
+| `viewMode`, `previewMode` | absent | UI-only choice: `marching-ants`, `overlay`, `on-black`, `on-white`, `on-transparency`; does not alter native output. |
+
+Unknown keys, nonfinite/out-of-range values, conflicting aliases, wrong trimap geometry/labels and `decontaminate:true, outputTo:"mask"` reject without committing. With radius zero, existing fractional coverage is retained before smoothing/contrast/feather adjustments, except unknown cells painted with refine marks are re-estimated. Existing enabled masks are sampled on the document pixel grid at native source centers, baking density/inversion/world-space feather into a new relative matte. Output retains the input mask's linked/unlinked behavior (linked by default), with a source-to-layer or source-to-world bitmap basis. This resampling can flatten mask detail finer than the source grid; it is not universal appearance parity for arbitrary vector/painted masks or transforms.
+
+The default **closed-form** solver assembles the color matting Laplacian from [Levin, Lischinski and Weiss, equations 12–13](https://www.cs.jhu.edu/~misha/ReadingSeminar/Papers/Levin06.pdf). Each native pixel centers an overlapping 3×3 window clipped at image edges; zero-alpha source pixels are omitted from its color statistics. RGB is encoded sRGB divided by 255, with covariance regularization epsilon `1e-7`. Known foreground/background are exact hard constraints, not soft penalties. Unknown rows retain all 5×5-stencil connections across capture/PNG tile seams; one global system is solved before output, without substituting independent tile solutions. Radius zero freezes existing fractional priors except painted unknown marks; zero-alpha pixels retain their prior/zero coverage. A connected unknown component without any hard constraint retains its genuine prior and is reported unresolved; without a prior it rejects. A component with only foreground or only background constraints can converge to that constant coverage; this does not establish subject identity.
+
+The float64 solver uses incomplete-Cholesky IC(0)-preconditioned conjugate gradients, at most 2,000 iterations, and requires actual `||Ax-b|| / max(1,||b||) <= 1e-7` before success. A budgeted RGB-aware coarse correction may augment it for at least 4,096 unknowns; that path tightens the actual residual to **1e-9**, retaining the same iteration ceiling. Nonconvergence, lost precision, incomplete capture and graph allocation failure reject without approximate/late commit. Alpha is then clipped/rounded to bytes and the requested smoothing/contrast/feather is applied to unknown labels. These post-adjustments need not minimize the original quadratic. Assembly stores only unknown rows, with a 192 MiB estimated graph/work-vector/lookup budget. IC(0) uses the existing stencil, sorted by actual capture insertion order, and may shift its own factorization diagonal to obtain a positive factor; the matte Laplacian remains unchanged. The extra factor is budgeted separately. If it cannot fit or factor safely, global CG uses Jacobi preconditioning and reports that choice in private diagnostics. This preserves the former graph capacity. Map overhead and whole-process memory are not measured by that estimate. More known marks reduce unknown work. An operation failure does not cap imports or reduce source resolution; users may explicitly choose Color line. Capture, solve iterations/residual and encoding are reported as real phases, with termination on cancellation.
+
+The global worker packs sparse rows in place after component classification/factorization, reusing finished union metadata for iteration bounds. This avoids repeatedly scanning absent/opposite-triangle entries without adding graph buffers or changing the existing capacity. Floating-point reduction order can change last-bit roundoff and iteration counts; the same actual residual/known-label requirements still govern success. A physical allocation failure in the optional factor also retains the global Jacobi route. No new option, script deadline, permission or approximate-success path is introduced.
+
+The optional coarse correction uses local `[1,R,G,B]` columns on native 16×16 cells and a globally coupled `PᵀAP` band solve, with a small ridge on that coarse matrix only. It supplies a starting correction and augments the base preconditioner; every successful final matte is still solved on all native unknown rows. Unconstrained components retain their genuine priors and do not enter this correction. Additional band/bookkeeping memory must fit after reserving the existing base/eligible IC(0) capacity; a bounded band-factor work estimate also applies. Missing optional capacity, allocation or positive coarse factorization retains the base global solver. These are operation budgets, not image/file limits or downsampling. RGB and prior alpha share existing exact-integer sample storage. Coarse setup is part of the actual solve phase and can precede iteration one. Isolated scripts still have the same five-second wall deadline, including that work.
+
+Explicit **color-line** uses Gaussian-weighted nearby visible known foreground/background colors and projects unknown pixels onto that local line, with search radius `clamp(round(radius),3,25)`. Nearly equal colors use relative spatial weights. Missing local foreground/background retains a genuine prior; no prior and no local evidence rejects. This optional legacy estimator is not a KNN/Laplacian solver. The exported synchronous `solveAlphaMatte` helper remains this local reference; the awaited methods own global preparation. Its legacy Gaussian feather differs from the native job's fractional three-box feather.
+
+Both modes exclude hidden RGB from color evidence and keep known labels fixed. Smoothing uses a color-guided radius `clamp(round(smoothness/20),1,5)` and a proportional strength `smoothness/100`; zero bypasses smoothing. Color correction samples background within eight source pixels, unmixes `(I-(1-alpha)*B)/max(alpha,0.12)`, clips to bytes, and blends by amount only for relative alpha strictly between 0.05 and 0.98. With no background evidence it retains original RGB. Confidence zero means unscored. Independent SciPy direct-solve and synthetic mixture/strand/translucency fixtures verify numerical behavior; held-out natural hair, glass, fur, foliage and translucent-fabric quality and semantic selection remain T19 gates. No evaluated natural-image accuracy follows from solver convergence.
+
+<!-- example: closed-form-matting -->
+
+```js
+// Select a raster and make an initial selection/mask, or use automatic Subject evidence.
+const raster = document.selectedLayer;
+if (!(raster instanceof RasterLayer)) throw new Error("Select a raster layer first.");
+const matte = await raster.refineEdge({
+  solver: "closed-form",
+  radius: 10,
+  smoothness: 0,
+});
+print("Refined mask", matte.kind);
+```
+
+Original compressed image bytes remain unchanged. Corrected PNGs retain intrinsic source alpha, while the separate white-RGB PNG mask stores relative coverage; compositing multiplies them once. Automatically derived source-alpha priors are normalized to relative coverage so partial source alpha is not squared. New-layer output retains outer source placement/appearance settings and hides the source; mask-only output changes no RGB. The complete asset/command change is one undo entry. Current and redo-only workspace history, project saving and reopening retain referenced assets. Document schema 25/project 3/workspace 2 remain unchanged.
+
+Trusted controls accept `AbortSignal` and `onProgress({completed,total,phase?,iteration?,relativeResidual?})`. Global jobs count capture tiles, one complete solve, and encoding tiles; solve callbacks report actual iterations/residual while that solve item remains pending. Color-line or radius-zero jobs needing no estimation can encode directly. The dialog keeps actual progress, Cancel and Escape available; display-only previews fit within 512 × 512, scale their controls/marks separately and never become native output. Final work captures up to 512 × 64 core pixels plus support padding, assembles the global unknown graph in a private worker, then recaptures native tiles for postprocessing/encoding. Local Color line uses one pass. Mask tiles and row strips target about 4 MB. Dual streaming PNG encoders retain compressed output rather than a full output RGBA plane/canvas. An extreme-width scanline can exceed the strip target. Browser image decoding/output bitmaps remain resident; automatic Subject preparation still needs its full native RGBA plane under the existing 256 MiB WASM maximum. Actual allocation, decoder, source/capture, compressed output, RLE/history and process limits can fail. No arbitrary image-size import cap or downsampling is added. Cancellation, source/session ownership or revision changes discard private assets and prevent late commit.
+
+Isolated scripts await the same host from their validated staged snapshot; pixels, workers and asset stores stay outside script globals. Use panel cancellation instead of callbacks/signals (sandbox controls reject). Preparation is sequential and shares the retouch host's 32-owned-asset budget: a corrected job uses two slots, mask-only one. Existing runtime/command/result limits still apply. A later script failure discards the complete operation. apiVersion-2 plugins require current `document:read`, `document:write`, `assets:read` and `assets:write` grants during preparation and final staged commit; installation remains inert.
+
+This example keeps the current mask/selection exactly at radius zero, or starts with automatic Subject coverage if neither exists, and places a separately masked raster above the hidden original. Select a raster and optionally make a selection first:
+
+<!-- example: native-background-removal -->
+
+```js
+const source = document.selectedLayer;
+if (!(source instanceof RasterLayer)) throw new Error("Select a raster layer first.");
+const isolated = await document.removeBackground(source, {
+  radius: 0,
+  smoothness: 0,
+  outputTo: "new-layer",
+});
+print("Foreground", isolated.name, isolated.mask.kind);
+```
+
+Headless sessions use the separate PNG-source `POST /api/v1/documents/:id/refine-edge` contract in [API.md](API.md#native-refine-edge-and-background-removal). It does not render browser scenes or synchronize with the editor.
 
 ### Subdivide a Bézier segment
 
@@ -1658,3 +2234,457 @@ document.resizeImage(document.width * 2, document.height * 2);
 ```
 
 This differs from `document.resize(width, height)`, which changes only canvas bounds. Image resizing transforms root placement once, including hidden and locked artwork, and preserves lock/visibility flags. Document-space masks, selections, guides and captured root layer-comp positions follow the scale. Nested local geometry remains editable. Pixel-based effect settings (shadow offsets/blur, mask feather, smart-filter radii) keep their existing values. Raster sources are not destructively resampled; rendering/export uses the existing interpolation at the new output dimensions. Direct calls, isolated scripts and REST `document.resizeImage` share validation and history.
+
+### Expand, contract and feather the pixel selection
+
+`await document.modifySelection(options: { operation: "expand" | "contract" | "feather"; radius: number }, control = {}): Promise<void>` modifies the current combined pixel selection. `radius` is required and must be an integer from 1 through 128 document pixels; unknown option fields fail validation. Expand takes the maximum and Contract the minimum of 8-bit coverage within a circular disk of the given radius. Fractional alpha is retained. Feather applies the existing three-pass box blur, with each pass's half-width equal to `radius / 3` and fractional endpoint weights. It is an approximate softening kernel, not a claim of a Gaussian standard deviation.
+
+All operations combine the selection's ordered add/subtract/intersect regions first, sample at native document resolution, treat pixels outside the canvas as unselected, clip the result to the canvas, and return one pixel-coverage region (or `{ regions: [] }` when no selected pixels remain). They do not modify artwork/source bytes or impose an image import limit. Locked layers do not block document selection edits. The resulting selection works with paint clips, copy/clear, non-destructive layer masks, undo/redo and portable projects.
+
+Preparation runs in a dedicated image worker, using padded 512-pixel output tiles and sparse RLE retention. Do not call it inside a synchronous `document.transaction`; await each modification before continuing. A plain `new Document` needs a configured application host for this operation. The browser editor and isolated script runtime configure it. Missing selection/host, invalid options/results, cancellation, or document/session changes reject without committing prepared coverage. An empty explicit selection stays empty. Each trusted-host call makes one undo entry; an entire successful Scripts/plugin run retains its usual single atomic undo entry. Scripts may prepare at most 32 selection modifications/Color Range preparations/alpha-channel loads/Quick Selection preparations in total per run, within the existing script time/result budgets.
+
+```js
+// example: modify-selection
+document.selection = new MarqueeSelection({
+  shape: "rectangle", x: 20, y: 20, width: 20, height: 20,
+});
+await document.modifySelection({ operation: "expand", radius: 2 });
+await document.modifySelection({ operation: "contract", radius: 1 });
+await document.modifySelection({ operation: "feather", radius: 3 });
+print("Modified selection", document.selection.regions.length);
+```
+
+Trusted application code may pass `control: { signal?: AbortSignal; onProgress?: ({ completed, total }) => void }`. Progress counts completed native output tiles; cancellation terminates active pixel work. Isolated scripts use the Scripts panel's Stop action and do not accept host progress callbacks or AbortSignal controls. Plugins require currently granted `document:write`; no image-asset permission is needed because the operation reads selection geometry only. Large or fragmented selections can still take time and retain substantial serialized coverage; tiling is a working-buffer bound, not an infinite-size guarantee.
+
+### Color Balance and Vibrance adjustment layers
+
+`new AdjustmentLayer({ adjustment: { kind: "color-balance", shadows, midtones, highlights, preserveLuminosity } })` creates an editable Color Balance layer. Each range is `{ red, green, blue }`, with all nine values required, finite and between -100 and 100. Positive red/green/blue values move toward Red/Green/Blue; negative values move toward Cyan/Magenta/Yellow. `preserveLuminosity` is a required boolean. The trusted DOM module exports `defaultColorBalanceAdjustment()` with zeroed channels and luminosity preservation enabled. These helper exports are not Scripts-panel globals.
+
+`new AdjustmentLayer({ adjustment: { kind: "vibrance", vibrance, saturation } })` creates Vibrance. Both values are required finite numbers from -100 to 100; the trusted `defaultVibranceAdjustment()` returns zeros. Vibrance weights the saturation change toward less chromatic pixels. Neutral pixels stay neutral; the effect does not detect skin, faces or objects. The separate saturation control applies a uniform chroma multiplier.
+
+Replace an attached layer's `.adjustment` through its constructor handle to commit validated, undoable edits. Normal masks, opacity, fill opacity, blending, visibility and stack order apply; locked targets/ancestors reject changes. Invalid, missing or unknown fields and nonfinite/out-of-range numbers reject atomically. Ordinary successful Scripts/plugin runs remain a single history entry. Installation remains inert and plugins need currently granted `document:write` for these edits. Model schema 17 persists both types; valid schemas 1–16 migrate on opening, and schema 16 or earlier data containing either new type is rejected. The project container and workspace snapshot versions are unchanged.
+
+```js
+// example: chromatic-adjustments
+const balance = document.layers.add(new AdjustmentLayer({
+  name: "Warm midtones",
+  adjustment: {
+    kind: "color-balance",
+    shadows: { red: 0, green: 0, blue: 0 },
+    midtones: { red: 15, green: 0, blue: -8 },
+    highlights: { red: 0, green: 0, blue: 0 },
+    preserveLuminosity: true,
+  },
+}));
+const vibrance = document.layers.add(new AdjustmentLayer({
+  name: "Gentle vibrance",
+  adjustment: { kind: "vibrance", vibrance: 25, saturation: 0 },
+}));
+print("Chromatic adjustments", balance.adjustmentKind, vibrance.adjustmentKind);
+```
+
+The processing contract is encoded-sRGB straight RGB with alpha copied unchanged. Let `l = .3*r + .59*g + .11*b` on normalized channels. Color Balance uses weights `shadows=max(0,1-2*l)`, `highlights=max(0,2*l-1)`, `midtones=1-shadows-highlights`; each channel receives its weighted range value divided by 100. Without luminosity preservation, output clamps to [0,1]. With preservation, it uses the [W3C SetLum/ClipColor helper](https://www.w3.org/TR/compositing-1/#blendingnonseparable) to restore the original encoded luma and fit the gamut. This is not a linear-light or physical luminance guarantee, nor a Photoshop formula/parity claim.
+
+For Vibrance, `chroma=max(r,g,b)-min(r,g,b)` and `scale=max(0,1+(saturation+vibrance*(1-chroma))/100)`. RGB scales away from its original luma by this factor, then uses SetLum/ClipColor. All RGB output rounds to 8-bit bytes; alpha is unchanged. Production pixels run in the existing WASM image worker or supported WGSL viewport, with the normal Canvas/WASM fallback for unsupported frames. Hardware GPU performance/presentation and wider color-fidelity gates require separate evidence.
+
+Chromatic GPU conformance fixtures compare premultiplied 8-bit output with the WASM/Canvas reference: alpha must match exactly, maximum RGB difference is three byte levels, and mean difference is below one byte across the sampled transparent/partial-alpha, masked and opacity-adjusted compositions. These are software-adapter correctness checks; they do not establish hardware performance or every possible composition's fidelity.
+
+
+## Gradient map adjustment layers
+
+Create an editable gradient map with `new AdjustmentLayer({ name?, adjustment: { kind: "gradient-map", stops, reverse } })`; add it through `document.layers.add(...)`. Replace `layer.adjustment` to edit it through shared validation, commands and history. `stops` and `reverse` are required. Each stop is exactly `{ position: number, color: string }`: 2–32 stops in strictly increasing order, positions finite in [0,1], colors six-digit `#RRGGBB` (case-insensitive). Duplicate/unsorted positions, unknown fields, CSS color names, shorthand/alpha hex, missing fields and out-of-range/nonfinite numbers throw without committing. Colors are opaque mapping colors; source alpha is preserved. Stops need not reach 0 and 1: brightness outside the stop range uses the nearest endpoint color.
+
+The processing space is **encoded sRGB**, at the existing 8-bit pixel boundary. For straight RGB bytes, brightness is `(.2126*r + .7152*g + .0722*b)/255`. This weighted encoded brightness is not physical linear-light luminance or an ICC conversion. If `reverse` is true, sample `1 - brightness`. Interpolate adjacent stop RGB channels linearly in encoded space, clamp outside endpoints, then round to byte values. Alpha is copied unchanged. Mask, density, opacity/fill, blend mode, ordering, group placement and Blend If use the existing adjustment-layer compositor. Original image assets are unchanged. Export uses bounded 1024-pixel WASM worker tiles; the supported WebGPU viewport uses the same stop mapping in WGSL. The neutral black-to-white default produces grayscale, rather than an identity color transform.
+
+Trusted application code can import `defaultGradientMapAdjustment()` from `src/dom`; each call returns independent black/white endpoint stops with `reverse: false`. This helper is not a sandbox global. In Scripts/plugins use explicit settings:
+
+```js
+// example: gradient-map
+const gradient = document.layers.add(new AdjustmentLayer({
+  name: "Indigo to gold",
+  adjustment: {
+    kind: "gradient-map",
+    stops: [
+      { position: 0, color: "#171b46" },
+      { position: 0.45, color: "#b65a74" },
+      { position: 1, color: "#ffe4a0" }
+    ],
+    reverse: false
+  }
+}));
+gradient.opacity = 0.75;
+document.selectedLayer = gradient;
+print("Gradient stops", gradient.adjustment.stops.length);
+```
+
+Document schema **18** stores gradient maps. Valid schemas 1–17 migrate on opening; a gradient map mislabeled as an older schema rejects explicitly. Project container v3 and workspace snapshot v2 are unchanged. Projects, recovery, workspace undo/redo history and recorded recipes retain the full stop list, with no external LUT/asset dependency. Plugin installation remains inert; execution requires currently granted `document:write` at commit. REST accepts the same DTO through existing `layer.add`/`layer.update` commands in its separate headless session.
+
+WGSL uses float32 stop coordinates and premultiplied RGBA8 surfaces; the WASM reference uses float64 arithmetic on straight byte pixels. Coordinates that collapse to a single float32 value use the Canvas/WASM fallback. Extremely tight transitions can differ at float32 sampling precision. Conformance tests measure representative multi-stop/masked/partial-alpha fixtures with maximum premultiplied RGB error 3 bytes, mean under 1 byte and unchanged alpha. These fixture tolerances do not establish all-image/hardware/color-fidelity parity.
+
+
+## Native TIFF export (trusted application code)
+
+`await editor.export({format: "tiff", tiffVariant?: "auto" | "classic" | "big"}, control?): Promise<ExportResult>` exports one flattened native-resolution RGBA8 image, with lossless Deflate tiles, unassociated alpha and the output sRGB ICC profile. The result uses `mimeType: "image/tiff"` and `extension: "tif"`. It preserves the visible native composition, including masks, adjustment/backdrop ordering, affine groups, paint, text and reachable smart masters. Editable layers, hidden/off-canvas content, saved alpha channels and original sources remain in the native project. Source EXIF/GPS, authored metadata and source font files are not included. Resolution metadata is explicitly 72 DPI without changing pixel dimensions; this is not CMYK, HDR or print-grade color management.
+
+The default `"auto"` chooses classic TIFF when the actual compressed payload plus directory fit its unsigned 32-bit address range; otherwise it chooses BigTIFF. `"classic"` rejects overflow with an instruction to choose Automatic or BigTIFF. `"big"` always writes BigTIFF, even for small images. Unknown variants reject. BigTIFF requires a compatible reader. Image dimensions must be positive safe integers no greater than 0xffffffff per TIFF geometry; those file-format boundaries do not limit document/import resolution. Browser allocation, Blob and exact safe-integer file-address limits can still reject. Real files exceeding 4 GiB have not been validated; automatic boundary tests use synthetic sizes without huge allocations. [LibTIFF's format specification](https://libtiff.gitlab.io/libtiff/specification/bigtiff.html) documents the container distinction.
+
+Export captures the immutable document and referenced asset/font lifetimes before the first progress callback. Source removal/replacement/closure, asset-store disposal, referenced family changes or pending referenced fonts reject instead of returning mixed-generation pixels. Unrelated asset/font changes and later undoable host document edits do not change the captured output. Unreferenced assets, unused masters and hidden-layer sources/fonts do not become dependencies. Referenced registered font descriptors are pinned through encoding; platform fonts unavailable to FontFaceSet cannot be monitored as OS resources.
+
+Rendering yields between tiles and reports `rendering` fractions from 0 to 1, then indeterminate `encoding`. Cancellation is checked around rendering, compression, every callback and final assembly; native rendering/readback calls remain non-preemptible. Storage uses at-most-2048×64 padded tiles and compressed Blob parts. Native sampling uses PNG's same bounded grid and crops only after rendering, preserving seam rounding even for widths that require shorter native strips. There is no document-sized export canvas or full RGBA array. Original decoded sources remain resident, and output Blob data, tile tables and directory memory grow with output size; this is not disk-backed output or a whole-process peak-memory guarantee.
+
+Example for a trusted host adapter, outside Scripts:
+
+```js
+const result = await editor.export({ format: "tiff", tiffVariant: "auto" }, {
+  signal: controller.signal,
+  onProgress: progress => updateExportStatus(progress),
+});
+// Review result.report, then offer result.blob as a .tif download.
+```
+
+This constructor example runs in Scripts. It creates editable artwork for user-initiated TIFF export; it does not give scripts filesystem access.
+
+<!-- example: tiff-composition -->
+```js
+document.resize(2081, 160);
+const artwork = document.layers.add(new PaintLayer({ name: "TIFF artwork" }));
+artwork.strokes.add(new PaintFill({
+  bounds: { x: 2020, y: 50, width: 60, height: 90 },
+  color: "#ff8040", opacity: 0.5,
+}));
+document.layers.add(new TextLayer({
+  name: "TIFF caption", text: "Canoli Studio",
+  fontFamily: "monospace", fontSize: 28,
+  x: 1820, y: 58, color: "#3060a0",
+}));
+print("TIFF composition ready");
+```
+
+TIFF input, multipage output, higher precision, editable TIFF layers and general independent-reader/device acceptance remain open F11 work. This host method adds no REST export endpoint or isolated script/plugin export capability.
+
+## Rendered PSD export (trusted application code)
+
+`await editor.export({format: "psd", psdMode?: "layers" | "flatten"}, control?)` returns the existing `{blob, mimeType, extension, report}` result. `psdMode` defaults to `"layers"`; invalid modes throw. The Export dialog exposes both choices plus Cancel. These are trusted browser-host methods, not sandbox globals or REST routes. Scripts/plugins create editable content through the existing constructors; user-initiated export renders it without granting scripts download/filesystem access.
+
+`"layers"` retains independent top-level objects as named pixel layers with visibility, 8-bit opacity and blend mode. Plain integer-positioned, untransformed rasters without shadows retain their placed pixel rectangle, including off-canvas content. Placed sizes are rendered at their actual geometry, rather than substituting the original asset dimensions. Other shapes/text/paint/smart objects/transforms/effects render in document space and clip to the document canvas. Isolated groups bake their children into a single pixel layer. Masks, fill opacity, styles, erasures, text and shape editability, smart filters and component links become pixels. They are not native editable Photoshop constructs.
+
+A top-level adjustment or enabled Blend If depends on its preceding backdrop. Export merges the bottom portion through the last such layer into one pixel layer, respecting current visibility; independent objects above remain separate. Hidden content inside that merged portion is not retained. Hidden independent layers above it retain their pixel content and hidden flag. An adjustment inside an isolated group affects that group only. `"flatten"` renders the current visible composition into one pixel layer; hidden content and separate layer settings are not retained. The capability report states these losses before export. Save `.luma` for full editability.
+
+The merged image is separately rendered through the same native reference compositor used by PNG. Encoding uses bounded native tiles/strips and compressed Blob parts, without allocating a document-sized canvas or RGBA array. The writer emits 8-bit RGB/RLE, sRGB ICC, 72 DPI resolution metadata, Unicode names and merged transparency. Per-layer channels store straight RGBA losslessly; the merged preview stores RGB matted over white, with negative layer count indicating transparency. Recovering straight RGB from this 8-bit preview can amplify rounding at low alpha; layer channels retain their original byte precision. The current fixture gates measure premultiplied error, not universal exact straight-RGB equality. Positive-count files from the earlier Canoli writer are recognized by their `LUMA` ICC CMM identifier together with the earlier container layout and retain legacy straight-alpha decoding. Standard positive-count files treat any extra alpha channel as separate data, not merged transparency. General extra-alpha/advanced Photoshop constructs and wider color fidelity are not established by that compatibility path.
+
+PSD v1 is limited to 30,000 pixels per dimension, 32,767 layer records, 32-bit section lengths and a 2 GB output file. These are format boundaries, not image-import or document limits. Unsupported dimensions/modes, missing assets, native-size mismatch, device allocation failures and cancellation reject without exposing a partial file. PSB export is not implemented. Cancellation checks between tiles/strips and before returning; encoding within one strip remains synchronous. Progress counts rendered rows, reports `"rendering"` with a fraction, then `"encoding"` with `fraction: null`. Document/history/source assets are not edited by export.
+
+Example for an application adapter (not the Scripts panel):
+
+```js
+const result = await editor.export({ format: "psd", psdMode: "layers" }, {
+  signal: controller.signal,
+  onProgress: progress => updateExportStatus(progress)
+});
+// Review result.report; expose result.blob through the application's download UI.
+```
+
+The low-level `documentToPsd(documentData, assetResolver, options?)` helper has no browser renderer. It supports only ordinary, unscaled, integer-placed raster records without masks/styles/active tone/erasures, and rejects richer content or missing assets instead of silently omitting it. Use the host export above for rendered documents. Its raw/RLE options remain independent from the host's RLE writer.
+
+
+For trusted import adapters, `editor.openPsd(buffer, {mode?: "layered" | "flatten", legacyStraightAlpha?: boolean})` and the pure `psdToDocument`/`parsePsd` helpers accept `legacyStraightAlpha`. When absent, it automatically recognizes the older Canoli ICC identifier and container layout. Explicit `false` forces standard positive-count extra-alpha handling. Set it to `true` only for unmarked legacy Canoli files written without ICC metadata; the old positive-count straight-RGBA encoding cannot otherwise be distinguished from a standard separate alpha channel. It does not override modern negative-count transparency. The UI preflight uses standard/automatic recognition; the override is host-only. Reusing the ICC profile in a normally structured file does not by itself trigger legacy handling. Independent inbound fixtures generated with psd-tools test both signaled merged transparency and an opaque image with a separate zero-filled alpha channel.
+
+
+## White Balance adjustment layers
+
+Create `new AdjustmentLayer({ name?, adjustment: { kind: "white-balance", temperature, tint } })`, attach it through `document.layers.add(...)`, and replace `layer.adjustment` to edit through shared commands/history. Both numeric fields are required finite numbers: `temperature` is 2000–25000 K, `tint` is -100–100. Fractional values are accepted. Missing/unknown fields, invalid kinds, nonfinite or out-of-range values throw without committing. Locked layers/ancestors reject edits; failed transactions/scripts roll back atomically. There is no `setWhiteBalance()` convenience method.
+
+The trusted `defaultWhiteBalanceAdjustment()` export from `src/dom` returns `{kind:"white-balance", temperature:6504, tint:0}`. That exact default is byte-identical, including hidden RGB under zero alpha. The helper is not a sandbox global. Scripts/plugins use explicit parameters:
+
+```js
+// example: white-balance
+const balance = document.layers.add(new AdjustmentLayer({
+  name: "White balance correction",
+  adjustment: { kind: "white-balance", temperature: 9000, tint: 12 }
+}));
+balance.opacity = 0.85;
+document.selectedLayer = balance;
+print("White balance", balance.adjustment.temperature, balance.adjustment.tint);
+```
+
+This corrects an assumed illuminant in an already rendered image. Higher temperature warms the correction; positive tint adds magenta. It does not estimate scene illumination, read camera RAW multipliers or recover clipped source data. The temperature control uses a D65-calibrated Planckian approximation; it is not a claim of camera-specific RAW calibration or exact physical source CCT. The 2000–25000 domain keeps the combined temperature/tint model within supported illuminants; it is not an image import limit.
+
+Processing contract: decode straight 8-bit sRGB to linear RGB with the standard sRGB transfer curve. Obtain Planckian xy with [Kang et al. (2002), as implemented by Colour Science](https://colour.readthedocs.io/en/develop/generated/colour.temperature.CCT_to_xy_Kang2002.html), then convert to CIE 1960 uv (`u=4*x/(-2*x+12*y+3)`, `v=6*y/(-2*x+12*y+3)`). Offset the curve by `uv(D65)-uv(Kang(6504))`, where D65 xy is (0.3127,0.3290). Tint moves `0.00005*tint` along the green normal `(dv/dT,-du/dT)/length` of the analytic curve tangent. Convert back to XYZ with Y=1. Adapt that source white to D65 using the [Bradford transform](https://colour.readthedocs.io/en/develop/generated/colour.adaptation.matrix_chromatic_adaptation_VonKries.html), conjugated by the editor's sRGB/XYZ matrices. Clamp corrected linear RGB to [0,1], encode sRGB and round to bytes. Alpha is copied unchanged; gamut clipping and brightness shifts are possible. Masks, opacity/fill, blend modes, Blend If, group ordering and undo remain shared adjustment-layer behavior.
+
+Actual pixels run in the WASM image worker on bounded reference/export tiles, using float64 matrix math and a 256-entry sRGB decode table; supported WebGPU viewport frames use the corresponding float32 WGSL transform on premultiplied RGBA8 surfaces. The JavaScript implementation is a conformance reference, not the production pixel loop. Exact neutral defaults bypass the transform in both backends. The SwiftShader comparison fixture requires exact alpha, maximum premultiplied RGB error at most 3 bytes and mean RGB error below 1 byte, across temperature/tint extrema, masks, opacity, normal/multiply blending and alpha bytes 0/1/64/128/255. This is fixture conformance, not a universal error bound. Independent whitepoint/Bradford fixtures come from Colour Science 0.4.6 via `scripts/generate-white-balance-reference.py`; their numerical tangent is compared within 1e-8 for XYZ and 1e-7 for matrix entries. Broader device/color-fidelity gates require separate evidence; this does not establish linear/HDR/print or Photoshop parity.
+
+Schema **19** stores these records. Valid schemas 1–18 migrate on opening/history restoration; new white-balance records under old schema labels reject explicitly. Outer project container v3/workspace v2 remain unchanged. Source assets are immutable; projects/recovery/workspace current and redo-only history and offline recipes retain both values. Plugins remain inert until run and require current document-write permission at host commit. REST uses the same strict DTO through existing layer.add/layer.update commands in its separate session; no new endpoint or browser synchronization is added.
+
+
+## Color Lookup (LUT) adjustment layers
+
+`AdjustmentLayer.setLut(source: string, options?: {amount?: number, interpolation?: "tetrahedral" | "trilinear"}): void` parses standard Adobe/IRIDAS Cube 1.0 text and replaces the adjustment through shared validation/history. Options default to amount 100 and tetrahedral interpolation. Unknown options, missing/malformed tables, nonfinite numbers, invalid ranges and locked targets throw atomically. Explicit null options/values are invalid. `setLut` works before or after attachment; a detached layer can be prepared before its one-entry insertion.
+
+```js
+// example: lut
+const look = new AdjustmentLayer({ name: "Color lookup" });
+look.setLut(`TITLE "Swap red and blue"
+LUT_3D_SIZE 2
+0 0 0
+0 0 1
+0 1 0
+0 1 1
+1 0 0
+1 0 1
+1 1 0
+1 1 1`, { amount: 75, interpolation: "tetrahedral" });
+document.layers.add(look);
+document.selectedLayer = look;
+print("Lookup", look.adjustment.lut.title, look.adjustment.amount);
+```
+
+The constructor/setter DTO is `{kind:"lut", lut:{title, dimension, size, domainMin, domainMax, data}, amount, interpolation}`. Every field is required and unknown fields reject. `title` is at most 240 characters without quotes/newlines; `dimension` is 1 or 3. Cube 1.0 specifies size 2–65536 for 1D and 2–256 per axis for 3D. Domains are three finite numbers each with positive finite spans. `data` is canonical base64 of exactly `3 * size` (1D) or `3 * size**3` (3D) little-endian finite float32 values, in red-fastest RGB order. Negative and greater-than-one table values are retained. `amount` is finite 0–100, including fractions; `interpolation` is exactly `"tetrahedral"` or `"trilinear"`. Use `setLut()` rather than constructing packed bytes manually.
+
+Trusted module exports from `src/dom` include `parseCubeLut(text): CubeLutData`, `serializeCubeLut(lut): string` and `defaultLutAdjustment(): LutAdjustmentData`. These helpers are not sandbox globals; isolated scripts use `AdjustmentLayer.setLut`. The default is an identity 1D table, amount 100, tetrahedral setting. Current `adjustment` getter/setter and constructor accept the full DTO. Returned settings are copies. Masks, opacity/fill, blend modes, Blend If, reorder, locks and undo use ordinary adjustment behavior.
+
+Supported files contain exactly one 1D or 3D table, optional quoted TITLE, DOMAIN_MIN/MAX, blank lines, # comments, BOM and CR/LF/CRLF separators. Keywords use standard uppercase spelling. Table rows contain three decimal/scientific numbers; counts and duplicate/misplaced directives are checked. Combined shaper+3D files, Resolve-specific INPUT_RANGE directives, other LUT formats and embedded color-space transforms reject explicitly. The importer does not silently discard unsupported sections. TITLE is inert text. Import/export .cube runs in a terminable worker. Imported bytes are also independently validated in cancellable chunks before command commit, with stale-target/lock checks. Reset returns the identity default; undo restores the imported table. Export .cube preserves the table/domain/title, without baking amount, masks or surrounding layers; save .luma for the complete editable effect.
+
+Processing uses straight encoded sRGB byte inputs normalized to [0,1], mapped by each domain, and clamped to table endpoints. 1D performs independent linear channel interpolation. 3D uses the chosen tetrahedral (default) or trilinear interpolation, with red-fastest indexing. Clamp interpolated outputs to [0,1], mix with original normalized RGB by amount/100, then round once to output bytes. Alpha is unchanged and zero amount is byte-identical. This does not automatically convert camera-log, scene-linear, HDR or ACES input; apply a LUT designed for the actual image encoding. Format/interpolation references: [Cube 1.0 specification](https://kono.phpage.fr/images/a/a1/Adobe-cube-lut-specification-1.0.pdf), [OpenColorIO's IRIDAS reader](https://github.com/AcademySoftwareFoundation/OpenColorIO/blob/main/src/OpenColorIO/fileformats/FileFormatIridasCube.cpp). Independent fixtures use Colour Science's separate Cube reader/writer and interpolators.
+
+Actual pixels execute in WASM on bounded native tiles with float32 tables and float64 coordinates/interpolation, or the corresponding float32 WGSL viewport shader. Decoded tables and GPU storage buffers have separate bounded caches; these do not cap image resolution. Tables exceeding GPU buffer budgets, float32-inexact domains/spans or extreme table magnitudes use the actual Canvas/WASM fallback without changing settings. Device/browser allocation failures remain possible for large standard tables. Export completion times and interactive latency require separate measurement; no hardware GPU, print, HDR or universal interchange fidelity claim follows from fixture tests.
+
+Schema 20 stores packed tables in ordinary adjustment records; valid schemas 1–19 migrate, while new LUT records under older labels reject. Project container v3 and workspace v2 remain unchanged. Original assets are immutable. Projects, recovery, current/redo-only workspace history and recipes carry the table without an external file, network lookup or new asset permission. Plugin installation remains inert; commands require current document-write grants at commit. REST accepts the same strict DTO through existing commands in its separate session; it adds no pixel-rendering endpoint or browser synchronization. Existing script source/time, command-complexity and REST request-body limits still apply independently of LUT format size; a large table may not fit a particular automation request.
+
+
+## Color Range selection
+
+`await document.selectColorRange(options: ColorRangeOptions, control?: ColorRangeControl): Promise<void>` prepares native color coverage and commits a single selection edit. It requires a configured application host, runs outside synchronous `Document.transaction`, validates the host result, and rejects a changed revision or cancelled operation without committing coverage. The script runner applies successful staged script commands atomically; a later error discards them together. Source artwork/asset bytes and locks remain unchanged; locked artwork can be sampled because the operation edits document selection.
+
+```js
+// example: color-range
+await document.selectColorRange({
+  colors: ["#ff0000"],
+  exclude: [],
+  fuzziness: 0,
+  invert: false,
+  operation: "replace",
+  source: { kind: "merged" }
+});
+print("Selected color range", document.selection.regions.length);
+```
+
+Options are strict. `colors` requires 1–32 six-digit RGB hex strings. `exclude` defaults to [], with up to 32 colors. `fuzziness` is finite 0–200 (default 40), including fractional values; zero matches exact encoded RGB bytes. `invert` defaults false. `operation` is replace (default), add, subtract or intersect. Source defaults to `{kind:"merged"}` (visible composite); `{kind:"layer", layerId}` samples that visible branch with its world placement and ancestor transforms/masks; `{kind:"asset", assetId, x?, y?}` samples the original decoded image at native dimensions and integer document offset (default 0,0). Asset sampling ignores placed-layer effects/transforms. Unknown/missing/invalid fields and missing layers/assets throw. Hidden layers remain hidden in source rendering; transparent pixels never gain Color Range coverage. The browser uses rendered/decoded 8-bit sRGB surfaces; premultiplication and color-management behavior can affect recovered RGB at low alpha.
+
+Processing: decode sRGB, transform through the editor's published D65 XYZ/Bradford D50 matrices and D50 whitepoint to CIELAB. Use Euclidean CIE1976 distance. For each include/exclude list, take the largest `max(0,1-distance/fuzziness)` match (or exact RGB match at zero fuzziness). Compute `match=include*(1-exclude)`; invert changes this to `1-match` among visible source pixels. Round `sourceAlpha*match` to coverage bytes. Final Boolean selection composition uses the existing fractional-alpha selection rules; subtracting a fractional selection from itself can leave coverage. This is a documented editor model, not Photoshop Color Range compatibility, CIEDE2000, skin detection, localized-cluster matching or automatic subject segmentation. References: [CIE1976 difference](https://colour.readthedocs.io/en/latest/generated/colour.difference.delta_E_CIE1976.html), [Photoshop's separately implemented Color Range workflow](https://helpx.adobe.com/photoshop/desktop/make-selections/freehand-selections/select-a-color-range-in-photoshop.html).
+
+Trusted host controls accept AbortSignal and `onProgress({completed,total})`; final sampling runs on bounded native Canvas tiles and a dedicated WASM image worker. Cancellation terminates the operation's workers, and source/session/revision checks precede commit. Isolated scripts/plugins use Scripts-panel cancellation; callback functions/signals cannot cross that bridge. Existing script time, command-complexity, recipe and memory limits remain. Prepared pixel coverage—not source sampling instructions—is recorded for deterministic offline recipes/redo. Project/document schemas are unchanged (current document 25, project 3, workspace 2); projects, recovery and current/redo-only workspace history retain existing pixel-selection data.
+
+Plugins require apiVersion 2 and current `document:read`, `document:write` and `assets:read` grants for Color Range. Installation is inert, returned coverage does not expose source pixel buffers, and read/write revocation is checked during preparation and again at final script commit. REST remains a separate headless session: `POST /api/v1/documents/:id/color-range` takes expectedRevision plus the same options, requiring an explicit asset source. It supports uploaded unmarked/explicit-sRGB noninterlaced 8-bit PNG (gray/RGB/palette, optional alpha/tRNS), with CRC/order/filter/row validation and bounded scanline inflation. Profiled/HDR, animated, interlaced, 16-bit PNG and other source formats reject explicitly. It reads raw PNG pixels without EXIF orientation, layer effects, browser composition or ICC conversion. Supply a normalized sRGB PNG when those operations are needed. It is not browser synchronization or a headless scene renderer. Existing asset/body limits remain; errors preserve selection/history, stale revisions return 409, client disconnect/document deletion cancels work.
+
+
+## Alpha channels
+
+`new AlphaChannel({name?: string, selection?: MarqueeSelection} = {})` creates a detached, independent selection channel. Name defaults to "Alpha channel" and must contain 1–240 characters. Selection defaults to an empty black channel; pass a `MarqueeSelection` instance, never a plain mutation object. White coverage selects and black excludes; fractional coverage, Boolean regions, affine geometry and native RLE are retained with the same rasterization as ordinary selections. Channels are independent of source artwork and do not change the rendered image on their own. These are saved alpha channels; RGB/CMYK component editing, spot colors and PSD alpha-channel interchange remain unimplemented.
+
+`document.alphaChannels` is an iterable collection with `length`, `items`, `at(index)` (including negative indices), `getById(id)` (undefined if absent), `add(channel)` and `capture(name = "Alpha channel")`. `add` accepts an unattached `AlphaChannel` instance. `capture` copies the active selection and returns an attached channel; null selection throws, while an explicitly empty selection is valid. At most 64 channels are stored per document, independently of image resolution.
+
+Channel members:
+
+- `id`: stable read-only identity.
+- `name`: read/write validated name.
+- `selection`: read/write `MarqueeSelection`; reads return independent values, and assignments replace the complete coverage expression.
+- `toJSON()`: owned `{id, name, selection}` serialization.
+- `captureSelection()`: replace this channel from its owning document's current non-null selection.
+- `duplicate(name = (this.name + " copy").slice(0,240))`: independent new channel/identity, attached to the same document when the original is attached.
+- `move(direction: "up" | "down")`: reorder one position in the channel list; up means toward index zero. End-of-list movement leaves ordering unchanged.
+- `remove()`: remove an attached channel without changing the active selection or existing masks.
+- `await load(options?: {operation?: "replace" | "add" | "subtract" | "intersect", invert?: boolean}, control?: ChannelLoadControl): Promise<void>`: rasterize the saved channel at native canvas resolution and commit one selection edit. Defaults are replace and false. Inversion covers the current canvas, including black pixels outside saved regions. A null prior selection is treated as empty for Boolean operations, as in Color Range. Byte coverage uses add `max(a,b)`, subtract `a*(1-b/255)` and intersect `min(a,b)`, rounded once after independently rasterizing each complete expression. Fractional self-subtraction can leave coverage.
+
+Attached changes use shared commands, validation and undo; handles resolve by ID across undo/redo and throw while removed. A channel cannot be attached twice or shared between documents; duplicate it to create independent data. Loading requires a configured application host, rejects synchronous transactions, unknown options, invalid host output, cancellation and any intervening revision. It uses dedicated bounded native WASM selection tiles, bounded scanline bands and RLE, never a full document canvas. Trusted controls accept `AbortSignal` and `onProgress({completed,total})`; isolated scripts/plugins use panel cancellation and cannot transfer callbacks/signals. Script loads share the 32-selection-preparation budget with Color Range and modification. Later script errors discard all staged edits.
+
+```js
+// example: alpha-channels
+const channel = document.alphaChannels.add(new AlphaChannel({
+  name: "Saved soft edge",
+  selection: new MarqueeSelection({
+    shape: "ellipse", x: 4, y: 4, width: 24, height: 16
+  })
+}));
+await channel.load({operation: "replace"});
+print("Loaded channel", channel.name, document.alphaChannels.length);
+```
+
+The Inspector's Alpha channels section saves/renames/updates/duplicates/reorders/removes channels, previews bounded grayscale coverage, and loads with Boolean/inverse controls, progress/cancel/errors. To refine a channel, load it, edit the document selection with the usual tools, and call `captureSelection()` or Update from selection. Existing `layer.maskFromSelection(document.selection)` converts a loaded channel into a separate mask. No image bytes are modified or granted to scripts. Legacy apiVersion-1 and apiVersion-2 plugins use their current document-read/write grants; asset permissions are unnecessary. Installation stays inert, and revocation/removal prevents pending commits.
+
+Document schema 21 adds optional `alphaChannels`; valid v1–v20 documents migrate without altering their contents, while alpha channels under older schema labels reject explicitly. Project container 3 and workspace 2 remain unchanged, including retained undo/redo. Crop translates channel geometry with the canvas origin; image resize scales it with artwork; canvas resize keeps geometry fixed and changes clipping. Loaded selection coverage records for deterministic offline recipe replay. Channel management commands currently report unsupported recipe steps rather than silently claiming replay. Normal image exports render artwork, not the channel preview. PSD export reports omitted saved channels; save `.luma` for complete editable data.
+
+REST sessions have the same strict `alphaChannel.set`, `.remove` and `.reorder` commands plus `POST /api/v1/documents/:id/alpha-channel-load` with `{expectedRevision,id,operation?,invert?}`. The actual Node worker uses the same native coverage compositor, without source images or browser scene rendering. Invalid/missing channels return 400; stale revisions return 409; disconnect/deletion/revision changes cancel preparation. The four-worker selection-service concurrency budget and existing request/complexity limits remain. Large/dense RLE and process/browser memory remain practical limitations, without a document megapixel cap.
+
+
+## Quick Selection brush
+
+`await document.selectQuickSelection(options: QuickSelectionOptions, control?: QuickSelectionControl): Promise<void>` grows a native selection from painted source pixels. This is deterministic local region growing, not semantic subject detection or a model call. It requires a configured application host and runs outside synchronous transactions.
+
+Options are strict:
+
+| Field | Default | Contract |
+| --- | --- | --- |
+| `points` | required | 1–20,000 document-space `{x,y}` points with finite coordinates in the safe-integer range. |
+| `size` | 32 | Finite diameter, 0.5–512 native document pixels. |
+| `tolerance` | 32 | Finite 0–255 addition to each sampled color deviation limit. |
+| `edgeThreshold` | 64 | Finite 0–255 maximum per-channel RGB difference across a connected neighbor edge. |
+| `operation` | add | replace, add, subtract or intersect, using ordinary fractional selection composition. |
+| `source` | `{kind:"merged"}` | Visible composite, `{kind:"layer",layerId}` visible isolated branch with ancestor appearance, or `{kind:"asset",assetId,x?,y?}` original decoded image at an integer offset. Same source semantics as Color Range. |
+
+The polyline creates circular dabs with center spacing at most `max(.25,size/8)` pixels. Seed pixels have centers inside those dabs, plus the pixel under each dab center so subpixel brushes can seed a pixel. Segments are clipped to source bounds expanded by the radius before interpolation. Invisible seed pixels are ignored. All visible painted pixels are positive constraints, so paint inside the intended region; including background in a stroke can teach the model to select it.
+
+For each encoded-sRGB channel, compute the mean and population standard deviation of the unique visible seed pixels. An unpainted pixel is eligible when its RGB components lie within `tolerance + 2*standardDeviation` of those means. Four-connected growth additionally requires every crossed edge's maximum RGB component difference to be at most edgeThreshold. Painted seeds remain included even when they have different colors. Fully transparent pixels are barriers; selected pixels retain source alpha as fractional coverage, and disconnected matching colors remain excluded until seeded separately. At zero tolerance a varied stroke still admits its sampled variation; zero edgeThreshold only crosses identical RGB neighbors. Browser canvas decoding/premultiplication can affect recovered RGB at low alpha. This defined brush model does not claim Photoshop Quick Selection parity, automatic object identity or hair/translucent-edge matting quality.
+
+```js
+// example: quick-selection
+await document.selectQuickSelection({
+  points: [{x: 4.5, y: 4.5}, {x: 6.5, y: 4.5}],
+  size: 2,
+  tolerance: 24,
+  edgeThreshold: 64,
+  operation: "replace",
+  source: {kind: "merged"}
+});
+print("Quick Selection regions", document.selection.regions.length);
+```
+
+The rail/palette select Quick Selection with Shift+W; W remains Magic wand. Diameter, color tolerance, edge threshold, source and operation use custom controls. The visible brush marks are a transient seed preview; release starts actual native growth with progress, Cancel Quick Selection and Escape. Add is the default. Shift adds, Alt subtracts and Shift+Alt intersects, captured at stroke start. Locked artwork can be sampled. Escape, pointer cancellation, blur, tool/settings changes and stale revisions discard drafts or pending work. Typing shortcuts stay native in editable fields.
+
+Successful application is one selection transaction. Missing sources, invalid options/host output, no visible painted pixels, cancellation, source/session/revision changes and allocation failures reject without changing selection/history or original assets. Trusted controls accept AbortSignal and `onProgress({completed,total})`; isolated scripts/plugins use panel cancellation. Scripts share a sequential 32-preparation budget across selection modification, Color Range, alpha-channel loading, Quick Selection and Select Subject, plus existing execution/result limits. A later script error discards staged edits. Plugins require apiVersion 2 and current document-read/write/assets-read grants during preparation and at final staged commit; installation remains inert and no source RGB buffers enter the sandbox.
+
+Source readback uses at-most-512-square native tiles and yields to queued input between tiles after approximately eight milliseconds of work; individual rendering/allocation tasks can still take longer. Connectivity currently retains a full native RGBA plane plus a byte state plane in a private WASM worker (roughly five bytes per source pixel, plus spans/frontier/output and temporary capture/decoding buffers). The compiled WASM memory has a 256 MiB maximum; actual available browser/process memory may be lower. Large or dense work can exceed working memory or command/result budgets; failures are explicit. This does not limit imports, discard original pixels or change viewport/cache budgets. Bounded source readback is not a claim that global connectivity has constant memory. Worker termination stops cancelled growth.
+
+Results reuse existing selection data in document schema 25/project 3/workspace 2. Masks, saved alpha channels, undo/redo, projects/workspaces and offline recipes retain final native coverage, not dependence on live source sampling. REST remains a separate headless session: `POST /api/v1/documents/:id/quick-selection` accepts expectedRevision plus options and requires an explicit uploaded asset source. A real Node worker decodes the same noninterlaced 8-bit unmarked/explicit-sRGB PNG subset as Color Range, clips native pixels to the canvas and runs the same WASM grower. It does not render browser scenes, orient EXIF or convert ICC data. Invalid/unsupported data returns 400, stale revisions 409; disconnect, deletion and revision changes cancel preparation. Existing upload/body/complexity limits and the four-worker selection-service concurrency budget remain.
+
+The T19 mask-loss/fabricated-source findings have been corrected by the separate native Select Subject path below. Quick Selection remains independent. Semantic detection, challenging-edge matting quality and wider device/latency gates are still unfinished T19 work.
+
+
+## Select Subject
+
+`await document.selectSubject(options?: SelectSubjectOptions, control?: SelectSubjectControl): Promise<SelectionData>` prepares native raster coverage through the configured browser/isolated host or the separate headless REST host. It replaces the current selection in one ordinary command transaction and returns an owned copy. Independent Documents without a configured host reject. Call outside synchronous transactions.
+
+Options are strict: `targetLayerId?: string` defaults to the selected layer; `threshold?: number` is finite in [0,1], default 0.35; `expandRadius?: number` is an integer in [0,64], default 0 original-source pixels. The target must be an existing raster with an available source asset. Missing, non-raster or unsupported sources reject; no white canvas or central rectangle is substituted. Original source pixels are sampled before layer adjustments, masks, opacity and blending. Hidden/locked rasters can be sampled. Native source width/height remain independent of placed dimensions; the output carries the complete parent/layer affine transform and placed-to-source scale. Selection rendering clips to the document normally; retained source coverage can extend outside the canvas.
+
+The current algorithm is a deterministic **border-contrast heuristic**, not learned/semantic object recognition or an evaluated hair/transparency matte. The border is `max(1,min(16,floor(min(width,height)/20)))` source pixels thick. If a majority of border pixels are fully transparent, intrinsic source alpha is used as foreground evidence. Otherwise visible border pixels define a mean encoded-RGB background. Each visible pixel receives `(0.7*colorDistance + 0.3*edgeMagnitude) * spatialWeight`: Euclidean encoded-RGB distance divided by `sqrt(3*255^2)`, luminance Sobel magnitude divided by 1020 (zero on the outermost row/column), and `0.3 + 0.7*exp(-distanceFromCenterSquared/(2*(max(width,height)*0.45)^2))`. Luminance weights are 0.299/0.587/0.114; zero-alpha neighbors contribute zero luminance regardless of hidden RGB bytes. A positive score is selected when its ratio to the source maximum is at least threshold; maxima at or below 1e-12 produce no foreground. Selected coverage copies original byte alpha. No automatic hole closing, minimum-area removal or fabricated fallback is applied. Thin and disconnected evidence can survive. Expand applies the existing grayscale disk dilation on the source plane, clipped to its native bounds, before world placement. Its radius is not measured in document pixels after scaling.
+
+Uniform/transparent images with no evidence reject with `No foreground found` and preserve the previous selection/history. A complex or weakly contrasting scene can still be selected incorrectly; normalized contrast is not a calibrated confidence score. The exported synchronous `detectSalientSubject` reference reports confidence 0 (unscored), genuine pixel alpha and zero-sized bounds when empty. `maskToSelectionData(mask,width,height,bounds?)` now RLE-encodes the actual nonzero bounding crop, preserving holes and fractional bytes; optional bounds place/scale that crop, and empty masks return no regions. These helpers run synchronously and are not the browser job API.
+
+```js
+// example: subject-selection
+await document.selectSubject({threshold: 0.35, expandRadius: 0});
+print("Subject regions", document.selection.regions.length);
+```
+
+Trusted controls accept `AbortSignal` and `onProgress({completed,total})`; the editor facade forwards them. Source capture uses <=512-square canvases with task yields after approximately eight milliseconds of work. The dedicated native worker holds a full RGBA source plane and bounded score/output bands, without full-image float/label planes or a full-image canvas. Its WASM memory maximum remains 256 MiB, and actual process memory, source decoding, private capture, RLE and history consume additional space. Allocation or command/result limits can fail without changing the document. No image import limit or destructive downsampling is added. Cancellation terminates the private worker, and final validation rejects source/session/revision changes or invalid results. The UI shares the command/shortcut handlers and offers real progress, Cancel Select Subject and Escape; late output cannot commit after cancellation.
+
+Scripts/plugins await the same native host preparation from the validated staged snapshot. No source RGB crosses the sandbox boundary. A later script failure discards staged edits. Scripts share the sequential 32-selection-preparation and existing time/result budgets; panel cancellation applies instead of sandbox callbacks/signals. apiVersion-2 plugins require current document-read/write/assets-read grants during preparation and final commit, including late revocation. Installation remains inert. Document schema 25/project 3/workspace 2, masks, saved alpha channels and offline selection recipes retain the final coverage without a schema change.
+
+`POST /api/v1/documents/:id/select-subject` accepts expectedRevision plus these options, normally with explicit targetLayerId in a headless session. The server resolves its own raster/asset geometry and transforms, decodes a genuine noninterlaced 8-bit unmarked/explicit-sRGB PNG in a private worker, and runs the same native kernel. Unsupported PNG/profile/depth and invalid/no-foreground inputs return 400; stale revisions return 409. Disconnect/deletion/revision changes cancel preparation. The four-worker selection budget and existing upload/body limits remain shared. Browser-only formats/orientation/color conversion are not added, and headless state does not synchronize with tabs.
+
+Refine Edge/removeBackground now use the separate native tiled host contract above, including transformed inputs, isolated scripts/plugins and applied corrected RGB. Remaining T19 work includes semantic selection quality, challenging-edge held-out evaluation and wider device/latency gates. The global closed-form solver is now delivered; an additional KNN variant is not claimed. Green integration checks do not establish those quality gates.
+
+
+### Local photographed matting evaluation
+
+The optional developer workflow uses the public training data from [Rhemann et al., CVPR 2009](https://www.alphamatting.com/datasets.php). It pins archive hashes, retains images in an external local cache, validates native decoded source bytes/trimap labels and never uploads results. Image IDs divisible by three are a reserved local holdout; both supplied trimaps stay with their image. This is not the website's hidden test competition or a commercial dataset license claim.
+
+```bash
+python3 scripts/prepare-matting-evaluation.py --cache /tmp/canoli-matting-natural --download
+node --import tsx scripts/benchmark-matting-natural.ts --dataset=/tmp/canoli-matting-natural --output=/tmp/canoli-matting-natural/development.json --split=development
+python3 scripts/score-matting-natural.py --self-test
+python3 scripts/score-matting-natural.py --dataset /tmp/canoli-matting-natural --report /tmp/canoli-matting-natural/development.json --output /tmp/canoli-matting-natural/development-scored.json
+```
+
+The preparation/scoring tools require Pillow, NumPy and SciPy; these are offline evaluation tools, not browser/runtime dependencies. The benchmark records every success/failure, source hashes, CG diagnostics, native alpha output and neutral/default smoothing scores. Scoring verifies the actual reference-alpha hash and prepared labels against independently decoded entries in the pinned official trimap archive; changing labels to other valid levels must also reject. Do not exclude failed cases from availability claims. Gradient/connectivity measures are explicitly defined local implementations, not certified website/MATLAB scores. Optional direct SciPy checks and actual-browser checks are available:
+
+```bash
+python3 scripts/reference-matting-natural.py --dataset /tmp/canoli-matting-natural --case GT01-Trimap1 --output /tmp/canoli-matting-natural/direct-GT01.alpha
+CANOLI_MATTING_DATASET=/tmp/canoli-matting-natural CANOLI_MATTING_REPORT=/tmp/canoli-matting-natural/development.json npx playwright test --config playwright.matting.config.ts
+```
+
+The explicit browser configuration requires the local dataset and a completed successful reference report for its selected cases; it does not silently download data or join the default test suite. It checks actual worker/output bytes, history, original bytes, queued input and existing script timeout cleanup. The isolated script's existing five-second wall limit still applies to host preparation; larger photographed jobs can time out even when the trusted native editor call succeeds. No partial assets/history may leak from that timeout. Natural-image scores and numerical convergence do not establish semantic accuracy, universal hair/glass quality, real-user acceptability or hardware/device latency.
+
+Run the reserved split only after freezing the candidate, then score it with the same tool:
+
+```bash
+node --import tsx scripts/benchmark-matting-natural.ts --dataset=/tmp/canoli-matting-natural --output=/tmp/canoli-matting-natural/holdout.json --split=holdout
+python3 scripts/score-matting-natural.py --dataset /tmp/canoli-matting-natural --report /tmp/canoli-matting-natural/holdout.json --output /tmp/canoli-matting-natural/holdout-scored.json
+```
+
+`scripts/report-matting-natural.py` additionally requires matplotlib. It checks complete split membership, unique cases, source/manifest/output hashes, convergence and exact known labels, then aggregates both strengths and compares only matched successful development cases. Its JSON and numerical plot contain no photographs or alpha arrays. A historical baseline must come from an actual archived run; `--preconditioner=jacobi` on current code retains the new proportional smoothing and cannot reconstruct the old postprocessing baseline.
+
+For subsequent solver comparisons, set `--baseline-label`, `--candidate-label` and `--baseline-description` to the actual measured versions. The report preserves each run's options, hashes and every case; labels do not change the scope or metrics. Previously reserved images remain a validation cohort, not a fresh unseen test set with every rerun.
+
+The developer benchmark accepts `--coarse=false` to measure the base preconditioner alone; default is true and recorded in its options. Resume rejects changes to that flag or the selected base preconditioner, source hashes, manifest or image scope. This is an offline research control, not a new `refineEdge` option or sandbox capability. Reports record the actual coarse memory/cell/band/ridge diagnostics and verify the 1e-9 gate when active.
+
+```bash
+MPLCONFIGDIR=/tmp/canoli-matplotlib python3 scripts/report-matting-natural.py \
+  --dataset /tmp/canoli-matting-natural \
+  --baseline /tmp/canoli-matting-natural/baseline-scored.json \
+  --development /tmp/canoli-matting-natural/development-scored.json \
+  --holdout /tmp/canoli-matting-natural/holdout-scored.json \
+  --date 2026-10-16 \
+  --output /tmp/canoli-matting-natural/summary.json \
+  --figure /tmp/canoli-matting-natural/summary.png
+```
+
+The initial IC(0)/Smooth [2026-10-16 evidence](../docs/benchmarks/matting-natural-2026-10-16.json) retained all 54 candidate cases: 35/36 development and 18/18 reserved cases converged, versus 24/36 historical development cases. At that stage GT13-Trimap2 rejected at 2,000 iterations. On the 24 matched successes, default-output mean unknown-region alpha error decreased 4.0% and local gradient error 2.5%, while local connectivity error increased 28.8%. Those joint preconditioning/smoothing results with supplied trimaps do not establish universal quality improvement or an official ranking. The reserved split is from public training data; photographed toy fibres/fur, foliage and fine structures do not establish real-human hair, glass, translucent-fabric or foreground-RGB correction quality. The [numerical plot](../docs/benchmarks/matting-natural-2026-10-16.png) retains those historical cohorts and tradeoff.
+
+The later [sparse-row study](../docs/benchmarks/matting-sparse-2026-10-16.json) retained 53/54 successful cases and compared all 106 neutral/default outputs to the previous IC(0) version: at most one byte difference, below 0.000485 mean byte per image. Three sequential paired Node runs on GT04-Trimap2 reduced median solve time from 34.96 to 30.78 seconds and complete native pipeline time from 36.54 to 32.24 seconds, with byte-identical outputs and 797 iterations in every measured pair. This was a single-case throughput improvement, not a broad latency or quality gate. The [paired timings](../docs/benchmarks/matting-sparse-performance-2026-10-16.png) retain all repeats. Photographed browser observations at that stage took 2.83–46.25 seconds under overlapping work, with main-thread long tasks up to 129 ms. GT13-Trimap2 still rejected in that version.
+
+The pre-WASM [RGB-aware coarse-correction evidence](../docs/benchmarks/matting-coarse-2026-10-16.json) records **36/36 development and 18/18 reserved cases converging**, all with verified native residual <=1e-9 within 2,000 CG iterations. The formerly failing GT13-Trimap2 now converges in 1,184 iterations. Five independent NumPy/SciPy native references pass the unchanged <=1-byte maximum/<0.02-byte mean alpha gates. Three match exactly. The other foliage trimap exposes an earlier four-byte worst numerical error; the tighter current solve is within one byte of its direct reference. Previous-output differences are reported rather than mistaken for reference errors. All 54 cases retain exact known labels; supplied trimaps still do not evaluate semantic selection. Those photographed browser observations took 1.97–53.47 seconds, with long tasks up to 102 ms; this does not establish universal responsiveness or natural-quality acceptance. Broader hair/glass/translucency, connectivity, corrected-RGB, semantic and device gates remain open. The [coarse-correction plot](../docs/benchmarks/matting-coarse-quality-2026-10-16.png) shows availability and matched-cohort scores.
+
+
+Native closed-form workers now optionally use float64 WASM for packed matrix multiplication and IC(0) substitutions. The native Laplacian, RGB coarse correction, hard labels, genuine priors, final pixels, 2,000-iteration ceiling and recomputed residual gates are unchanged. The private kernel instance isolates persistent graph memory from ordinary pixel operations. Its additional scratch/metadata/page/bookkeeping/transient-chunk estimate fits only after the existing base/factor/coarse reservations within 192 MiB; otherwise the global JavaScript route remains available. Physical optional allocation failure also retains that route, including after some chunks have migrated. Graph memory estimates do not prove whole-process/GC/decoder peak memory. Public options, project/document schemas, permissions and the isolated five-second deadline are unchanged.
+
+The offline benchmark additionally accepts `--iterations=wasm|javascript` (default `wasm`) to compare the current iteration implementations; this is not a scripting option. Resume checks this control alongside coarse/base-preconditioner controls, source hashes, manifest and image scope. Reports include private `iterationBackend`/`iterationBytes` diagnostics and hash the adapter, ABI, actual WASM and both worker integration sources.
+
+
+The [private-WASM evaluation](../docs/benchmarks/matting-wasm-2026-10-16.json) retains 36/36 development and 18/18 previously reserved public-training cases converging at <=1e-9. All 108 neutral/default native mattes are byte-identical to the prior RGB-coarse version, with unchanged iteration counts and five independent direct-reference checks. Maximum estimated graph/coarse/optional-WASM work is 154,931,800 bytes (147.75 MiB); this is not a whole-process peak-memory measurement.
+
+Three eligible sequential paired Node repeats per input reduce median solve time from 8.16 to 5.98 seconds on GT04-Trimap2 and 52.61 to 32.59 seconds on GT13-Trimap2. Complete native pipeline medians change 9.58 to 7.38 and 53.75 to 33.75 seconds, respectively. The first GT04 pair overlapped the build and is retained but excluded as warmup, with a replacement pair measured. All eligible neutral/default outputs are byte-identical. The [performance figure](../docs/benchmarks/matting-wasm-performance-2026-10-16.png) shows every eligible repeat; these are two-input container throughput results, not broad speedup, browser p95, input-to-photon or hardware GPU guarantees.
+
+Four sequential photographed Chromium checks additionally confirm the actual WASM backend, every output alpha byte, original compressed source bytes and one-step undo/redo. Preparation observations are 1.60/7.25/3.16/33.02 seconds (GT01/GT04/GT25/GT13); one queued Hand callback responds in 0.9/1.0/1.2/1.1 ms. Long tasks remain, up to 104 ms. They are separate observations from the paired Node study, not a controlled browser speed comparison. The GT04 isolated script still reaches its unchanged five-second wall limit with no edit or private-asset leak. The genuine 10000×5000 seam fixture has 5,355 unknowns, not a dense 50 MP graph; it retains reference pixels, original bytes, project restoration and one revision, converging in 18 iterations while capture/solve/encoding takes 13.89 seconds. Broader latency, peak-memory/device and natural-quality gates remain open.
+
+
+## Design checks
+
+`await document.preflight(options = {}, control = {}): Promise<PreflightReport>` inspects a stable document snapshot without changing layers, selections, history or assets. `EditorApplication.preflight(options, control)` delegates to the active document. Open **Design checks** from the tool rail or command palette for the same policy, a navigable findings list and a downloadable version-1 JSON report. There is no default shortcut; the registered action can use custom shortcut settings.
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `outputDpi` | `72` | Positive finite inspection DPI applied to the native document pixel grid. Does not change image metadata or export settings. |
+| `minimumPpi` | `72` | Positive finite minimum original-source sampling density at that DPI. |
+| `checkBounds` | `true` | Flag non-group authored bounds beyond the canvas, with 1e-7 document-pixel numerical tolerance. |
+| `checkFonts` | `true` | Inspect nonempty text's family references; availability depends on the execution environment. |
+| `includeHidden` | `false` | Include hidden and zero-opacity subtrees when true. |
+
+Unknown options, non-finite/nonpositive DPI/PPI and invalid external metadata reject. Trusted host `control.signal` aborts inspection; isolated scripts use Scripts-panel cancellation and cannot pass AbortSignal. Run outside synchronous `Document.transaction` callbacks. No image is decoded, resized, uploaded or sent to a provider by this operation. Browser/REST worker payloads omit unrelated selections, masks, effects/LUT tables, erasures and clone tiles.
+
+<!-- example: design-checks -->
+
+```js
+const report = await document.preflight({
+  outputDpi: 300,
+  minimumPpi: 150,
+});
+print("Design checks", report.counts);
+for (const finding of report.findings.slice(0, 10)) {
+  print(finding.layerName, finding.code, finding.message);
+}
+```
+
+Active isolated scripts/plugins obtain asset dimensions through the existing permission-checked `host.assets.list` service and inspect their private document snapshot, including earlier staged edits. Plugins need `document:read` and `assets:read`; write permission is unnecessary for inspection alone. Installation remains inert. Asset calls check current grants, including revocation before a later call. A later script error discards any other staged edits as usual. New detached `Document` instances can inspect their own geometry without a host; absent asset metadata produces `asset-unchecked` information rather than fabricated missing-asset errors.
+
+Trusted editor calls use a dedicated geometry worker plus local font-family probes against loaded web fonts or `local(...)`. They do not enumerate installed families, request Local Font Access, read font files or make network requests. At most eight probes run together; each has a two-second observation deadline. Pending web fonts and timeout/unsupported/composite-family cases remain `unknown`; a failed local resolution is `unavailable`, not proof that a font is absent from the operating system. Face/weight/italic fidelity and licensing are not established. Isolated scripts, detached documents and REST have no browser-font evidence and report `font-unchecked` information. This avoids exposing host font availability through plugin scripts.
+
+Reports contain `version: 1`, document ID, the inspected document instance's `revision`, normalized `options`, `layersChecked`, `findings`, `totalFindings`, `truncated`, severity `counts`, per-family `fonts` and explicit `limitations`. In isolated scripts, revision refers to the private snapshot-backed Document instance, not the browser's revision counter. Each finding contains `code`, `severity`, the selectable root `layerId`, breadcrumb `layerName`, instance/descendant ID `path`, and a message; source/family/bounds/effective-PPI evidence appears where relevant. Codes are `bounds-outside`, `low-resolution`, `asset-missing`, `asset-unchecked`, `font-unavailable`, `font-unchecked`, and `measurement-unavailable`. Reports are returned data, not editable document objects or readiness certificates.
+
+Raster PPI is `outputDpi / sigmaMax`, where `sigmaMax` is the largest singular value of the composed native-source-pixel-to-document transform, including ancestor/instance placement, nonuniform scale, rotation and shear. A relative 1e-12 comparison tolerance avoids threshold roundoff. Original source dimensions come from the asset repository, not thumbnails. Embedded asset masters use their actual source dimensions; document masters inspect each reachable placement with its own composed scale. Their internal bounds are not classified against the root canvas because masters have separate clipping artboards; their font/source references are checked conservatively even when masks or clipping may hide them.
+
+This is metadata/geometry inspection: bounds are not rendered-pixel coverage; masks, effects, clipping stacks, occlusion and intentional bleed need review. It does not evaluate print bleed conformance, alignment, text legibility/contrast, focus, compression, generated quality or separately resized export variants. There is no automatic fix, export block, AI judgment or print-ready badge. The report may flag references that do not contribute visible pixels.
+
+Inspection stops explicitly above 4,096 visited placements or a 64-level path. At most 512 findings are retained in a report; `totalFindings` and severity counts include all findings within a completed inspection and `truncated` makes this visible in UI/JSON. These are inspection work/output budgets, not document or import limits. Genuine 50 MP sources are inspected through their native metadata without document-sized pixel allocation. Completed reports bind their document/revision/options and cannot be accepted after a revision change; browser hosts also reject changed/closed/switched sessions and changed source assets. The UI marks a previously completed report out of date after document or policy changes or a browser loading event for a referenced font family and disables its download/selection actions until refreshed. JSON exports include names, IDs and measurements, without source pixels or font files.
+
+
+Native SVG backdrop frame rebasing can quantize transformed source edges differently from the direct PNG working origin; retained SVG master clips and outer mask/filter rasterization add their own edge differences. Pixel residuals remain reported alongside exact interior colors, transformed contour/shadow-support coverage, area and centroid checks. Native PNG remains the flattened reference; editable parent geometry is retained. Source/font guards now also run around each cooperative encoding-progress callback, so a stale callback stops further encoding and returns no file.

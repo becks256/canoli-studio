@@ -68,9 +68,12 @@ export interface MattingResult {
    */
   trimap: Uint8Array;
   /**
-   * Confidence score from 0.0 to 1.0 based on foreground/background separability.
+   * Zero means unscored; no calibrated quality confidence is available.
    */
   confidence: number;
+  /** Pixels retaining a supplied prior because local color evidence is absent. */
+  unresolvedPixels?: number;
+  unresolved?: Uint8Array;
 }
 
 export interface SegmentationCandidate {
@@ -86,6 +89,7 @@ export interface SegmentationCandidate {
   mask: Uint8Array;
   width: number;
   height: number;
+  /** Zero means unscored; this local heuristic has no calibrated confidence. */
   confidence: number;
   label: string;
 }
@@ -97,31 +101,11 @@ export interface EdgeRefinementKernel {
   regularizationEpsilon?: number;
 }
 
-export interface SelectSubjectOptions {
-  /**
-   * Optional layer ID to segment. Defaults to the active/selected raster layer.
-   */
-  targetLayerId?: string;
-  /**
-   * Saliency sensitivity threshold (0.0 to 1.0, default 0.35).
-   */
-  threshold?: number;
-  /**
-   * Expansion / padding radius for the resulting selection in pixels (default 0).
-   */
-  expandRadius?: number;
-}
+export type { SelectSubjectOptions, SelectSubjectControl } from '../../core/subject-selection';
 
 export type RefineEdgePreviewMode =
   "marching-ants" | "overlay" | "on-black" | "on-white" | "on-transparency";
 
 export type MattingViewMode = RefineEdgePreviewMode;
 
-export interface RefineEdgeOptions extends MattingOptions {
-  previewMode?: RefineEdgePreviewMode;
-  viewMode?: RefineEdgePreviewMode;
-  smooth?: number;
-  feather?: number;
-  shiftEdge?: number;
-  outputTo?: "mask" | "new-layer";
-}
+export type {RefineEdgeOptions,RefineEdgeControl,TrimapStroke} from '../../core/matting';

@@ -1,418 +1,85 @@
-/**
- * Refine Edge / Matting Dialog (T19 / A04).
- * Provides interactive edge refinement preview with 5 view modes,
- * mathematical local KNN alpha matting, and color decontamination.
- */
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {Dialog} from './Dialog';
+import {Button,Select} from './controls';
+import type {EditorApplication} from '../editor';
+import {previewMatting} from '../engine/preview-matting';
+import type {MattingTileResult} from '../engine/matting-tile';
+import type {RefineEdgeOptions,RefineEdgeControl,RefineEdgeProgress,TrimapStroke} from '../core/matting';
+import type {MattingViewMode} from '../intelligence/matting/types';
 
-import { useEffect, useRef, useState } from "react";
-import { Dialog } from "./Dialog";
-import { Button, IconButton, Select } from "./controls";
-import { Eye, Sparkles, X } from "lucide-react";
-import type { EditorApplication } from "../editor";
-import { RasterLayer } from "../dom";
-import type {
-  MattingViewMode,
-  RefineEdgeOptions,
-} from "../intelligence/matting/types";
-import {
-  detectSalientSubject,
-  generateTrimapFromMask,
-  erodeMask,
-  dilateMask,
-} from "../intelligence/matting/segmentation";
-import {
-  solveAlphaMatte,
-  decontaminateColors,
-} from "../intelligence/matting/engine";
-import { rasterizeSelection } from "../ai/diff/engine";
-import { createCanvas, release } from "../engine/canvas";
-
-export interface RefineEdgeDialogProps {
-  editor: EditorApplication;
-  onClose(): void;
-  onApply(options: RefineEdgeOptions): void;
-}
-
-export function RefineEdgeDialog({
-  editor,
-  onClose,
-  onApply,
-}: RefineEdgeDialogProps) {
-  const selected = editor.document.selectedLayer;
-  const isRaster = selected instanceof RasterLayer;
-
-  const [viewMode, setViewMode] = useState<MattingViewMode>("overlay");
-  const [radius, setRadius] = useState<number>(10);
-  const [smooth, setSmooth] = useState<number>(10);
-  const [feather, setFeather] = useState<number>(0);
-  const [contrast, setContrast] = useState<number>(0);
-  const [shiftEdge, setShiftEdge] = useState<number>(0);
-  const [decontaminate, setDecontaminate] = useState<boolean>(false);
-  const [decontaminateAmount, setDecontaminateAmount] = useState<number>(100);
-
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const sourceImageRef = useRef<ImageData | null>(null);
-  const initialMaskRef = useRef<Uint8Array | null>(null);
-
-  // Initialize source image data and initial mask on mount
-  useEffect(() => {
-    if (!isRaster || !selected) return;
-
-    try {
-      const asset = editor.assetStore.get(selected.assetId);
-      const canvas = createCanvas(asset.width, asset.height);
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(asset.bitmap, 0, 0);
-      const imgData = ctx.getImageData(0, 0, asset.width, asset.height);
-      release(canvas);
-      sourceImageRef.current = imgData;
-
-      // Extract initial mask
-      if (editor.document.selection) {
-        const selData = editor.document.selection
-          .translated(-selected.x, -selected.y)
-          .toJSON();
-        initialMaskRef.current = rasterizeSelection(
-          selData,
-          asset.width,
-          asset.height,
-        );
-      } else {
-        const seg = detectSalientSubject(imgData);
-        initialMaskRef.current = seg.mask;
-      }
-    } catch (err) {
-      console.error("Failed to load source layer image:", err);
-    }
-  }, [editor, selected, isRaster]);
-
-  // Re-render preview whenever parameters or viewMode change
-  useEffect(() => {
-    const imgData = sourceImageRef.current;
-    const initMask = initialMaskRef.current;
-    const canvas = canvasRef.current;
-    if (!imgData || !initMask || !canvas) return;
-
-    setIsProcessing(true);
-
-    try {
-      // 1. Shift edge if requested
-      let workingMask = initMask;
-      if (shiftEdge > 0) {
-        workingMask = dilateMask(
-          initMask,
-          imgData.width,
-          imgData.height,
-          Math.round(shiftEdge / 10),
-        );
-      } else if (shiftEdge < 0) {
-        workingMask = erodeMask(
-          initMask,
-          imgData.width,
-          imgData.height,
-          Math.round(-shiftEdge / 10),
-        );
-      }
-
-      // 2. Generate trimap
-      const trimap = generateTrimapFromMask(
-        workingMask,
-        imgData.width,
-        imgData.height,
-        radius,
-      );
-
-      // 3. Solve alpha matte
-      const matte = solveAlphaMatte(imgData, trimap, {
-        radius,
-        smooth,
-        feather,
-        contrast,
-        shiftEdge,
-      });
-
-      // 4. Optionally decontaminate colors
-      let previewRgba: Uint8Array | Uint8ClampedArray = imgData.data;
-      if (decontaminate) {
-        previewRgba = decontaminateColors(
-          imgData,
-          matte.alpha,
-          decontaminateAmount / 100,
-        );
-      }
-
-      // 5. Render onto preview canvas
-      canvas.width = imgData.width;
-      canvas.height = imgData.height;
-      const ctx = canvas.getContext("2d")!;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const previewImg = ctx.createImageData(canvas.width, canvas.height);
-      const out = previewImg.data;
-      const numPixels = canvas.width * canvas.height;
-
-      if (viewMode === "marching-ants") {
-        // Black and white silhouette
-        for (let i = 0; i < numPixels; i++) {
-          const a = matte.alpha[i];
-          out[i * 4] = a;
-          out[i * 4 + 1] = a;
-          out[i * 4 + 2] = a;
-          out[i * 4 + 3] = 255;
-        }
-      } else if (viewMode === "overlay") {
-        // Ruby overlay on masked regions
-        for (let i = 0; i < numPixels; i++) {
-          const a = matte.alpha[i] / 255;
-          const r = previewRgba[i * 4];
-          const g = previewRgba[i * 4 + 1];
-          const b = previewRgba[i * 4 + 2];
-          // Tint non-foreground red
-          const bgWeight = (1 - a) * 0.6;
-          out[i * 4] = Math.round(r * a + 255 * bgWeight);
-          out[i * 4 + 1] = Math.round(g * a);
-          out[i * 4 + 2] = Math.round(b * a);
-          out[i * 4 + 3] = 255;
-        }
-      } else if (viewMode === "on-black") {
-        for (let i = 0; i < numPixels; i++) {
-          const a = matte.alpha[i] / 255;
-          out[i * 4] = Math.round(previewRgba[i * 4] * a);
-          out[i * 4 + 1] = Math.round(previewRgba[i * 4 + 1] * a);
-          out[i * 4 + 2] = Math.round(previewRgba[i * 4 + 2] * a);
-          out[i * 4 + 3] = 255;
-        }
-      } else if (viewMode === "on-white") {
-        for (let i = 0; i < numPixels; i++) {
-          const a = matte.alpha[i] / 255;
-          const bg = (1 - a) * 255;
-          out[i * 4] = Math.round(previewRgba[i * 4] * a + bg);
-          out[i * 4 + 1] = Math.round(previewRgba[i * 4 + 1] * a + bg);
-          out[i * 4 + 2] = Math.round(previewRgba[i * 4 + 2] * a + bg);
-          out[i * 4 + 3] = 255;
-        }
-      } else {
-        // on-transparency
-        for (let i = 0; i < numPixels; i++) {
-          const a = matte.alpha[i];
-          out[i * 4] = previewRgba[i * 4];
-          out[i * 4 + 1] = previewRgba[i * 4 + 1];
-          out[i * 4 + 2] = previewRgba[i * 4 + 2];
-          out[i * 4 + 3] = a;
-        }
-      }
-
-      ctx.putImageData(previewImg, 0, 0);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [
-    viewMode,
-    radius,
-    smooth,
-    feather,
-    contrast,
-    shiftEdge,
-    decontaminate,
-    decontaminateAmount,
-  ]);
-
-  const handleApply = () => {
-    onApply({
-      radius,
-      smooth,
-      feather,
-      contrast,
-      shiftEdge,
-      viewMode,
-      decontaminate,
-      decontaminateAmount: decontaminate ? decontaminateAmount / 100 : 0,
-    });
-    onClose();
-  };
-
-  return (
-    <Dialog
-      titleId="refine-edge-title"
-      className="refine-edge-dialog"
-      onClose={onClose}
-    >
-      <div className="refine-edge-header">
-        <div className="refine-edge-title-row">
-          <Sparkles size={18} className="text-accent" />
-          <h2 id="refine-edge-title">Refine Edge / Matting</h2>
+export function RefineEdgeDialog({editor,onClose,onApply}:{editor:EditorApplication;onClose():void;onApply(options:RefineEdgeOptions,control:RefineEdgeControl):Promise<void>}){
+  const [snapshot]=useState(()=>{const layer=editor.document.selectedLayer?.toJSON();return{document:editor.document,data:editor.document.getSnapshot().document,revision:editor.document.getSnapshot().revision,layer,asset:layer?.kind==='raster'?editor.assetStore.get(layer.assetId):undefined};});
+  const selected=snapshot.layer,isRaster=selected?.kind==='raster',asset=snapshot.asset;
+  const [viewMode,setViewMode]=useState<MattingViewMode>('overlay'),[radius,setRadius]=useState(10),[smooth,setSmooth]=useState(10),[feather,setFeather]=useState(0),[contrast,setContrast]=useState(0),[shiftEdge,setShiftEdge]=useState(0);
+  const [decontaminate,setDecontaminate]=useState(false),[amount,setAmount]=useState(100),[output,setOutput]=useState<'mask'|'new-layer'>('mask'),[solver,setSolver]=useState<'closed-form'|'color-line'>('closed-form');
+  const [mode,setMode]=useState<TrimapStroke['mode']>('refine'),[size,setSize]=useState(20),[strokes,setStrokes]=useState<TrimapStroke[]>([]),[draft,setDraft]=useState<TrimapStroke|null>(null);
+  const [preview,setPreview]=useState<MattingTileResult|null>(null),[processing,setProcessing]=useState(false),[working,setWorking]=useState(false),[error,setError]=useState(''),[progress,setProgress]=useState<RefineEdgeProgress>({completed:0,total:1});
+  const canvas=useRef<HTMLCanvasElement|null>(null),previewAbort=useRef<AbortController|null>(null),applyAbort=useRef<AbortController|null>(null),draftRef=useRef<TrimapStroke|null>(null),frame=useRef<number|null>(null);
+  const options=useMemo(()=>({solver,radius,smooth,feather,contrast,shiftEdge,decontaminate,decontaminateAmount:amount/100,outputTo:output,trimapStrokes:strokes}),[solver,radius,smooth,feather,contrast,shiftEdge,decontaminate,amount,output,strokes]);
+  const check=()=>{if(editor.document!==snapshot.document||editor.document.getSnapshot().revision!==snapshot.revision)throw new Error('The document changed. Close Refine Edge and reopen it for the current revision.');};
+  const close=()=>{previewAbort.current?.abort();applyAbort.current?.abort();draftRef.current=null;onClose();};
+  useEffect(()=>()=>{previewAbort.current?.abort();applyAbort.current?.abort();if(frame.current!==null)cancelAnimationFrame(frame.current);},[]);
+  useEffect(()=>snapshot.document.subscribe(()=>{previewAbort.current?.abort();if(!applyAbort.current)setError('The document changed. Close Refine Edge and reopen it for the current revision.');}),[snapshot.document]);
+  useEffect(()=>{
+    if(!isRaster||!selected||applyAbort.current)return;
+    const abort=new AbortController();previewAbort.current=abort;setProcessing(true);setError('');
+    const timer=setTimeout(()=>{void(async()=>{
+      try{check();const value=await previewMatting(snapshot.data,editor.assetStore,selected.id,options,abort.signal,check);if(!abort.signal.aborted)setPreview(value);}
+      catch(cause){if(!abort.signal.aborted)setError(cause instanceof Error?cause.message:String(cause));}
+      finally{if(previewAbort.current===abort){setProcessing(false);previewAbort.current=null;}}
+    })();},75);
+    return()=>{clearTimeout(timer);abort.abort();};
+  },[editor,snapshot,isRaster,selected,options]);
+  useEffect(()=>{
+    if(!preview||!canvas.current)return;
+    const target=canvas.current;target.width=preview.width;target.height=preview.height;const context=target.getContext('2d')!,image=context.createImageData(preview.width,preview.height),data=image.data;
+    for(let i=0;i<preview.alpha.length;i++){
+      const a=preview.alpha[i]*preview.rgba[i*4+3]/65025,base=i*4;
+      for(let c=0;c<3;c++)data[base+c]=viewMode==='marching-ants'?Math.round(a*255):viewMode==='on-white'?Math.round(preview.rgba[base+c]*a+255*(1-a)):viewMode==='on-black'?Math.round(preview.rgba[base+c]*a):viewMode==='overlay'?Math.round(preview.rgba[base+c]*(.4+.6*a)+(c===0?153*(1-a):0)):preview.rgba[base+c];
+      data[base+3]=viewMode==='on-transparency'?Math.round(a*255):255;
+    }context.putImageData(image,0,0);
+  },[preview,viewMode]);
+  const point=(event:React.PointerEvent<HTMLCanvasElement>)=>{const box=event.currentTarget.getBoundingClientRect();return{x:(event.clientX-box.x)*asset!.width/box.width,y:(event.clientY-box.y)*asset!.height/box.height};};
+  const publish=()=>{if(frame.current!==null)return;frame.current=requestAnimationFrame(()=>{frame.current=null;setDraft(draftRef.current?{...draftRef.current,points:[...draftRef.current.points]}:null);});};
+  const hasForeground=useMemo(()=>!!preview?.alpha.some((value,i)=>value>0&&preview.rgba[i*4+3]>0),[preview]);
+  const finish=()=>{const stroke=draftRef.current;draftRef.current=null;setDraft(null);if(stroke?.points.length)setStrokes(value=>[...value,stroke]);};
+  const slider=(id:string,label:string,value:number,set:(value:number)=>void,min:number,max:number,step=1)=><div className="refine-edge-slider-row"><label htmlFor={id}>{label} ({value})</label><input id={id} type="range" min={min} max={max} step={step} value={value} disabled={working} onChange={event=>set(Number(event.target.value))}/></div>;
+  return <Dialog titleId="refine-edge-title" className="refine-edge-dialog" onClose={close}>
+    <div className="refine-edge-header"><h2 id="refine-edge-title">Refine Edge</h2><Button onClick={close}>Close</Button></div>
+    {!isRaster?<p role="alert">Select a raster layer to refine its edge.</p>:<div className="refine-edge-body">
+      <div className={`refine-edge-canvas-container ${viewMode==='on-transparency'?'checkerboard-bg':''}`}>
+        <div style={{position:'relative',display:'inline-block',width:preview?.width??Math.min(512,asset!.width),maxWidth:'100%',lineHeight:0}}>
+          <canvas ref={canvas} data-testid="refine-edge-preview-canvas" aria-label="Paint native trimap marks" style={{display:'block',width:'100%',height:'auto',touchAction:'none'}}
+            onPointerDown={event=>{if(working||!preview)return;event.preventDefault();event.currentTarget.setPointerCapture(event.pointerId);draftRef.current={mode,size,points:[point(event)]};publish();}}
+            onPointerMove={event=>{const stroke=draftRef.current;if(!stroke)return;const next=point(event),last=stroke.points.at(-1)!;if(Math.hypot(next.x-last.x,next.y-last.y)<.25)return;if(strokes.reduce((n,value)=>n+value.points.length,0)+stroke.points.length>=20000){setError('Trimap marks support at most 20,000 points. Undo or clear marks to continue.');return;}stroke.points.push(next);publish();}}
+            onPointerUp={finish} onPointerCancel={()=>{draftRef.current=null;setDraft(null);}}/>
+          {draft&&<svg viewBox={`0 0 ${asset!.width} ${asset!.height}`} preserveAspectRatio="none" style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none'}} data-testid="trimap-draft"><circle cx={draft.points[0].x} cy={draft.points[0].y} r={draft.size/2} fill={draft.mode==='foreground'?'#89d5a2':draft.mode==='background'?'#f5aea0':'#9ec7ee'}/><polyline points={draft.points.map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke={draft.mode==='foreground'?'#89d5a2':draft.mode==='background'?'#f5aea0':'#9ec7ee'} strokeWidth={draft.size} strokeLinecap="round" strokeLinejoin="round"/></svg>}
         </div>
-        <IconButton label="Close" onClick={onClose}>
-          <X size={16} />
-        </IconButton>
+        {(processing||working)&&<div role="status" className="refine-edge-processing-indicator">{working?(progress.phase==='solve'?`Solving matte · iteration ${progress.iteration??0}`:progress.phase==='encode'?'Encoding native matte…':'Preparing native matte…'):'Updating preview…'}{working&&<progress aria-label="Matting progress" value={progress.completed} max={progress.total}/>}</div>}
       </div>
-
-      {!isRaster ? (
-        <div className="refine-edge-error">
-          <p>Please select a raster layer in the document to refine edges.</p>
-          <div className="refine-edge-actions">
-            <Button onClick={onClose}>Close</Button>
-          </div>
-        </div>
-      ) : (
-        <div className="refine-edge-body">
-          {/* Canvas Preview Area */}
-          <div
-            className={`refine-edge-canvas-container ${viewMode === "on-transparency" ? "checkerboard-bg" : ""}`}
-          >
-            <canvas
-              ref={canvasRef}
-              data-testid="refine-edge-preview-canvas"
-              className="refine-edge-preview-canvas"
-            />
-            {isProcessing && (
-              <div className="refine-edge-processing-indicator">
-                <span>Refining matte...</span>
-              </div>
-            )}
-          </div>
-
-          {/* Controls Sidebar */}
-          <div className="refine-edge-controls">
-            {/* View Mode */}
-            <div className="refine-edge-group">
-              <label className="refine-edge-label">
-                <Eye size={14} />
-                <span>View Mode</span>
-              </label>
-              <Select
-                label="View Mode"
-                hideLabel
-                value={viewMode}
-                options={[
-                  { value: "overlay", label: "Overlay / Ruby" },
-                  { value: "on-black", label: "On Black" },
-                  { value: "on-white", label: "On White" },
-                  { value: "on-transparency", label: "On Transparency" },
-                  { value: "marching-ants", label: "Black & White" },
-                ]}
-                onChange={(val) => setViewMode(val as MattingViewMode)}
-              />
-            </div>
-
-            {/* Edge Detection */}
-            <div className="refine-edge-group">
-              <div className="refine-edge-group-title">Edge Detection</div>
-              <div className="refine-edge-slider-row">
-                <label htmlFor="refine-radius">Radius ({radius} px)</label>
-                <input
-                  id="refine-radius"
-                  type="range"
-                  min="1"
-                  max="50"
-                  value={radius}
-                  onChange={(e) => setRadius(Number(e.target.value))}
-                />
-              </div>
-            </div>
-
-            {/* Adjust Edge */}
-            <div className="refine-edge-group">
-              <div className="refine-edge-group-title">Adjust Edge</div>
-              <div className="refine-edge-slider-row">
-                <label htmlFor="refine-smooth">Smooth ({smooth})</label>
-                <input
-                  id="refine-smooth"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={smooth}
-                  onChange={(e) => setSmooth(Number(e.target.value))}
-                />
-              </div>
-              <div className="refine-edge-slider-row">
-                <label htmlFor="refine-feather">Feather ({feather} px)</label>
-                <input
-                  id="refine-feather"
-                  type="range"
-                  min="0"
-                  max="50"
-                  value={feather}
-                  onChange={(e) => setFeather(Number(e.target.value))}
-                />
-              </div>
-              <div className="refine-edge-slider-row">
-                <label htmlFor="refine-contrast">Contrast ({contrast}%)</label>
-                <input
-                  id="refine-contrast"
-                  type="range"
-                  min="-100"
-                  max="100"
-                  value={contrast}
-                  onChange={(e) => setContrast(Number(e.target.value))}
-                />
-              </div>
-              <div className="refine-edge-slider-row">
-                <label htmlFor="refine-shift-edge">
-                  Shift Edge ({shiftEdge}%)
-                </label>
-                <input
-                  id="refine-shift-edge"
-                  type="range"
-                  min="-100"
-                  max="100"
-                  value={shiftEdge}
-                  onChange={(e) => setShiftEdge(Number(e.target.value))}
-                />
-              </div>
-            </div>
-
-            {/* Output & Decontamination */}
-            <div className="refine-edge-group">
-              <div className="refine-edge-group-title">
-                Color Decontamination
-              </div>
-              <label className="refine-edge-checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={decontaminate}
-                  onChange={(e) => setDecontaminate(e.target.checked)}
-                />
-                <span>Decontaminate Colors</span>
-              </label>
-
-              {decontaminate && (
-                <div className="refine-edge-slider-row mt-2">
-                  <label htmlFor="refine-decontaminate-amount">
-                    Amount ({decontaminateAmount}%)
-                  </label>
-                  <input
-                    id="refine-decontaminate-amount"
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={decontaminateAmount}
-                    onChange={(e) =>
-                      setDecontaminateAmount(Number(e.target.value))
-                    }
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="refine-edge-actions">
-              <Button data-testid="refine-edge-cancel" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                data-testid="refine-edge-apply"
-                variant="primary"
-                onClick={handleApply}
-              >
-                Apply
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </Dialog>
-  );
+      <div className="refine-edge-controls">
+        <Select label="View Mode" value={viewMode} options={[{value:'overlay',label:'Overlay / Ruby'},{value:'on-black',label:'On Black'},{value:'on-white',label:'On White'},{value:'on-transparency',label:'On Transparency'},{value:'marching-ants',label:'Black & White'}]} onChange={value=>setViewMode(value as MattingViewMode)}/>
+        <p className="text-muted">Preview uses a scaled source. Apply processes native pixels.</p>
+        <Select label="Matting solver" value={solver} disabled={working} options={[{value:'closed-form',label:'Closed form (global)'},{value:'color-line',label:'Color line (local)'}]} onChange={value=>setSolver(value as typeof solver)}/>
+        <fieldset disabled={working}><legend>Trimap marks</legend><Select label="Trimap brush" value={mode} options={[{value:'foreground',label:'Foreground'},{value:'background',label:'Background'},{value:'refine',label:'Unknown edge'}]} onChange={value=>setMode(value as TrimapStroke['mode'])}/>
+          {slider('refine-brush-size','Brush diameter',size,setSize,.5,512,.5)}
+          <Button disabled={!strokes.length||working} onClick={()=>setStrokes(value=>value.slice(0,-1))}>Undo mark</Button><Button disabled={!strokes.length||working} onClick={()=>setStrokes([])}>Clear marks</Button>
+        </fieldset>
+        {slider('refine-radius','Radius',radius,setRadius,0,50)}{slider('refine-smooth','Smooth',smooth,setSmooth,0,100)}{slider('refine-feather','Feather',feather,setFeather,0,50,.5)}{slider('refine-contrast','Contrast',contrast,setContrast,-100,100)}{slider('refine-shift-edge','Shift Edge',shiftEdge,setShiftEdge,-100,100)}
+        <label className="refine-edge-checkbox-label"><input type="checkbox" checked={decontaminate} disabled={working} onChange={event=>{setDecontaminate(event.target.checked);if(event.target.checked)setOutput('new-layer');}}/>Decontaminate Colors</label>
+        {decontaminate&&slider('refine-decontaminate-amount','Amount',amount,setAmount,0,100)}
+        <Select label="Matting output" value={output} disabled={working} options={decontaminate?[{value:'new-layer',label:'New layer with matte'}]:[{value:'mask',label:'Layer mask'},{value:'new-layer',label:'New layer with matte'}]} onChange={value=>setOutput(value as typeof output)}/>
+        {decontaminate&&<p className="text-muted">Corrected colors go to a new layer; the original stays in the document.</p>}
+        {preview&&preview.unresolvedPixels>0&&<p className="text-muted">Some preview pixels retain the initial mask where foreground/background constraints are missing.</p>}
+        {preview&&!hasForeground&&<p className="text-muted">No foreground in the preview. Paint foreground marks or change the selection.</p>}
+        {error&&<p role="alert">{error}</p>}
+        <div className="refine-edge-actions"><Button data-testid="refine-edge-cancel" onClick={close}>{working?'Cancel matting':'Cancel'}</Button><Button data-testid="refine-edge-apply" variant="primary" disabled={working||processing||!hasForeground||!!error||!!draft} onClick={()=>{void(async()=>{
+          const abort=new AbortController();applyAbort.current=abort;previewAbort.current?.abort();setWorking(true);setError('');setProgress({completed:0,total:1});
+          try{check();await onApply(options,{signal:abort.signal,onProgress:setProgress});if(!abort.signal.aborted)onClose();}
+          catch(cause){if(!abort.signal.aborted)setError(cause instanceof Error?cause.message:String(cause));}
+          finally{if(applyAbort.current===abort)applyAbort.current=null;setWorking(false);}
+        })();}}>Apply</Button></div>
+      </div>
+    </div>}
+  </Dialog>;
 }

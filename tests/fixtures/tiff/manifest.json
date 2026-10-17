@@ -1,0 +1,197 @@
+{
+  "generator": "system libtiff/Pillow/NumPy",
+  "pillow": "10.3.0",
+  "libtiff": "4.6.0",
+  "cases": [
+    {
+      "file": "rgba-1.tif",
+      "reference": "rgba-1.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "d448343630f4192204435c5e1f82b8de8dce555b0572a5fb7da46636501f1d8a",
+      "big": false
+    },
+    {
+      "file": "rgba-5.tif",
+      "reference": "rgba-5.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "eb7c5f5f3a7e501d8a0bdc9d1c898739d549b9f5bf4b3a26dbc44ee34876d95a",
+      "big": false
+    },
+    {
+      "file": "rgba-8.tif",
+      "reference": "rgba-8.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "9d08dab6b4fa9caf194fa70de3ff1cb843313751e9af61dda4376bd047df891c",
+      "big": false
+    },
+    {
+      "file": "rgba-32773.tif",
+      "reference": "rgba-32773.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "44dfd7aacbf8b25456964176ca098d8f605a0ea4c3192792359162d6f7882791",
+      "big": false
+    },
+    {
+      "file": "big-tiled-deflate.tif",
+      "reference": "big-tiled-deflate.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "6f1b5c8fe65bf364015c362007ea8b6bad03079e913d8ce8ca6debda4e07d37d",
+      "big": true
+    },
+    {
+      "file": "big-endian-lzw.tif",
+      "reference": "big-endian-lzw.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "8ba3d98f54fc881b19f6e43c7217dd6b2a1f60a3d6ea13c1b1c9f4479df885d4",
+      "big": false
+    },
+    {
+      "file": "planar-deflate.tif",
+      "reference": "planar-deflate.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "6cdf059963ce7286f81acfd7bd993617bb09b24f31d54776f307b2c9e8ac084f",
+      "big": false
+    },
+    {
+      "file": "gray16-le.tif",
+      "reference": "gray16-le.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": true,
+      "sha256": "43d8c74c9605962420a43fd075eab3ddde5277e8fd5637446600eb1faa0cbad7",
+      "big": false
+    },
+    {
+      "file": "gray16-be.tif",
+      "reference": "gray16-be.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": true,
+      "sha256": "eadda3cb202dcbbbdda1491a3eef8802148825a83d8865be24d5e75000e7afc4",
+      "big": false
+    },
+    {
+      "file": "associated.tif",
+      "reference": "associated.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "c6d917a727599ebca45ee6eaded74ad3d5957da3ec79df7b8cf4c96d6f51e721",
+      "big": false
+    },
+    {
+      "file": "orientation-2.tif",
+      "reference": "orientation-2.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 2,
+      "allowPrecisionLoss": false,
+      "sha256": "5618056202a4a38316a370d3021746b7349d8b0f245ec93a4e3bdcda57c3735d",
+      "big": false
+    },
+    {
+      "file": "orientation-3.tif",
+      "reference": "orientation-3.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 3,
+      "allowPrecisionLoss": false,
+      "sha256": "2847325f2077c4ca9b4196bb0fa4a10103a0e53cd1a0f4c3ae9c5b855c448c2e",
+      "big": false
+    },
+    {
+      "file": "orientation-4.tif",
+      "reference": "orientation-4.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 4,
+      "allowPrecisionLoss": false,
+      "sha256": "6b906c489248b1a483b728fa5dbde2b38499d5ffe2879acdb048aa5bdfffc76a",
+      "big": false
+    },
+    {
+      "file": "orientation-5.tif",
+      "reference": "orientation-5.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 5,
+      "allowPrecisionLoss": false,
+      "sha256": "92fd38677a24361096d73c2d938602a066b06a2ea72410902546891b7a612711",
+      "big": false
+    },
+    {
+      "file": "orientation-6.tif",
+      "reference": "orientation-6.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 6,
+      "allowPrecisionLoss": false,
+      "sha256": "0d9a575b47c48b4fde80d2309bc01ca42dc08bc8eb1bf7f0be6c09980a81d902",
+      "big": false
+    },
+    {
+      "file": "orientation-7.tif",
+      "reference": "orientation-7.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 7,
+      "allowPrecisionLoss": false,
+      "sha256": "c22ef6755805aa493852ba1b81ec1bf2217b09a7e725e0f208e599c0cd9ac5fa",
+      "big": false
+    },
+    {
+      "file": "orientation-8.tif",
+      "reference": "orientation-8.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 8,
+      "allowPrecisionLoss": false,
+      "sha256": "a21d7e4c8407fcac55fbe9967137ecaf1610ff72b33235d3e76c4ba160088a37",
+      "big": false
+    },
+    {
+      "file": "palette.tif",
+      "reference": "palette.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "920da433586d6e7d17c5086004dda10f53f487580841de5a635de227dcc0509d",
+      "big": false
+    },
+    {
+      "file": "bilevel.tif",
+      "reference": "bilevel.png",
+      "width": 211,
+      "height": 173,
+      "orientation": 1,
+      "allowPrecisionLoss": false,
+      "sha256": "2c9cf32bfa20d45c3cd1b94f0479a7eee3342aa9044af7312a18e19857efb4fb",
+      "big": false
+    }
+  ]
+}

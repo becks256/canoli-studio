@@ -7,6 +7,71 @@ export const fullscreen = /* wgsl */ `
 }
 `;
 
+/** Separate stop buffer keeps ordinary paint/composite uniforms small. */
+export const gradientMap = fullscreen + /* wgsl */ `
+struct Params { count: f32, reverse: f32, unused: vec2f, stops: array<vec4f, 32> }
+@group(0) @binding(0) var source: texture_2d<f32>;
+@group(0) @binding(1) var backdrop: texture_2d<f32>;
+@group(0) @binding(2) var<uniform> p: Params;
+@fragment fn fragment(@builtin(position) position: vec4f) -> @location(0) vec4f {
+  let xy = vec2i(position.xy);
+  // Keep the common processing bind-group shape; source and backdrop are identical here.
+  let s = (textureLoad(source, xy, 0) + textureLoad(backdrop, xy, 0)) * 0.5;
+  let rgb = floor(clamp(s.rgb / max(s.a, 0.000001), vec3f(0), vec3f(1)) * 255 + 0.5) / 255;
+  var value = dot(rgb, vec3f(0.2126, 0.7152, 0.0722));
+  if (p.reverse > 0.5) { value = 1 - value; }
+  var upper = 1u;
+  while (upper < u32(p.count) - 1u && value > p.stops[upper].x) { upper++; }
+  let low = p.stops[upper - 1u]; let high = p.stops[upper];
+  let t = clamp((value - low.x) / (high.x - low.x), 0.0, 1.0);
+  let color = floor(clamp(mix(low.yzw, high.yzw, t), vec3f(0), vec3f(1)) * 255 + 0.5) / 255;
+  return vec4f(color * s.a, s.a);
+}
+`;
+
+/** Portable float32 table in a read-only storage buffer; interpolation is explicit. */
+export const lookup = fullscreen + /* wgsl */ `
+struct Params { a: vec4f, minimum: vec4f, span: vec4f, unused: vec4f, extra: vec4f }
+@group(0) @binding(0) var source: texture_2d<f32>;
+@group(0) @binding(1) var backdrop: texture_2d<f32>;
+@group(0) @binding(2) var<uniform> p: Params;
+@group(0) @binding(3) var<storage, read> table: array<f32>;
+fn at(index: u32) -> vec3f { return vec3f(table[index], table[index+1u], table[index+2u]); }
+@fragment fn fragment(@builtin(position) position: vec4f) -> @location(0) vec4f {
+  let xy=vec2i(position.xy);let s=(textureLoad(source,xy,0)+textureLoad(backdrop,xy,0))*0.5;
+  if(p.a.z==0.0) {return s;}
+  let rgb=floor(clamp(s.rgb/max(s.a,0.000001),vec3f(0),vec3f(1))*255+0.5)/255;
+  let n=u32(p.a.x);let pos=clamp((rgb-p.minimum.xyz)/p.span.xyz,vec3f(0),vec3f(1))*f32(n-1u);
+  let low=vec3u(min(floor(pos),vec3f(f32(n-2u))));let f=pos-vec3f(low);
+  var value=vec3f(0);
+  if(p.a.y==1.0) {
+    for(var c=0u;c<3u;c++) {let a=low[c]*3u+c;value[c]=table[a]+(table[a+3u]-table[a])*f[c];}
+  } else {
+    let sr=3u;let sg=3u*n;let sb=3u*n*n;let base=low.x*sr+low.y*sg+low.z*sb;
+    if(p.a.w>0.5) {
+      var sa=sr;var sd=sg;var fa=f.x;var fd=f.y;var fe=f.z;
+      if(f.x>=f.y) {
+        if(f.y>=f.z) {} else if(f.x>=f.z) {sd=sb;fd=f.z;fe=f.y;}
+        else {sa=sb;sd=sr;fa=f.z;fd=f.x;fe=f.y;}
+      } else {
+        if(f.z>=f.y) {sa=sb;sd=sg;fa=f.z;fd=f.y;fe=f.x;}
+        else if(f.z>=f.x) {sa=sg;sd=sb;fa=f.y;fd=f.z;fe=f.x;}
+        else {sa=sg;sd=sr;fa=f.y;fd=f.x;fe=f.z;}
+      }
+      let a=at(base);let b=at(base+sa);let d=at(base+sa+sd);let e=at(base+sr+sg+sb);
+      value=a+fa*(b-a)+fd*(d-b)+fe*(e-d);
+    } else {
+      for(var b=0u;b<2u;b++) {for(var g=0u;g<2u;g++) {for(var r=0u;r<2u;r++) {
+        let weight=select(1-f.x,f.x,r==1u)*select(1-f.y,f.y,g==1u)*select(1-f.z,f.z,b==1u);
+        value+=at(base+r*sr+g*sg+b*sb)*weight;
+      }}}
+    }
+  }
+  let color=mix(rgb,clamp(value,vec3f(0),vec3f(1)),p.a.z/100);
+  return vec4f(floor(clamp(color,vec3f(0),vec3f(1))*255+0.5)/255*s.a,s.a);
+}
+`;
+
 export const processing =
   fullscreen +
   /* wgsl */ `
@@ -100,6 +165,29 @@ fn channel(c:vec3f)->f32 {
       let corrected = pow(norm, vec3f(invG));
       let out = clamp((p.b.x + corrected * outR) / 255.0, vec3f(0.0), vec3f(1.0));
       return vec4f(byte(out) * s.a, s.a);
+    }
+    case 11u: { // White balance: Bradford adaptation in linear sRGB
+      if (p.a.y > 0.5) { return s; }
+      let rgb = byte(straight(s));
+      let linear = select(rgb / 12.92, pow((rgb + vec3f(0.055)) / 1.055, vec3f(2.4)), rgb > vec3f(0.04045));
+      let corrected = clamp(vec3f(dot(p.b.xyz, linear), dot(p.c.xyz, linear), dot(p.d.xyz, linear)), vec3f(0), vec3f(1));
+      let encoded = select(corrected * 12.92, 1.055 * pow(corrected, vec3f(1.0 / 2.4)) - vec3f(0.055), corrected > vec3f(0.0031308));
+      return vec4f(byte(encoded) * s.a, s.a);
+    }
+    case 9u: { // Color Balance; ranges partition encoded RGB luma
+      if(all(p.b.xyz==vec3f(0)) && all(p.c.xyz==vec3f(0)) && all(p.d.xyz==vec3f(0))) { return s; }
+      let rgb=byte(straight(s)); let l=lum(rgb);
+      let shadows=max(0.0,1-2*l);let highlights=max(0.0,2*l-1);let midtones=1-shadows-highlights;
+      var result=rgb+(p.b.xyz*shadows+p.c.xyz*midtones+p.d.xyz*highlights)/100;
+      if(p.a.y>0.5) { result=setLum(result,l); }
+      return vec4f(byte(result)*s.a,s.a);
+    }
+    case 10u: { // Vibrance weights saturation toward less chromatic colors
+      if(p.a.y==0 && p.a.z==0) { return s; }
+      let rgb=byte(straight(s));let l=lum(rgb);
+      let scale=max(0.0,1+(p.a.z+p.a.y*(1-sat(rgb)))/100);
+      let result=setLum(vec3f(l)+(rgb-vec3f(l))*scale,l);
+      return vec4f(byte(result)*s.a,s.a);
     }
     case 8u: { // encoded-sRGB HSL; preserve backdrop alpha
       let rgb=byte(straight(s));

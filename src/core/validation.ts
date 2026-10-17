@@ -1,4 +1,6 @@
 import { layerCompSchema } from "./layer-comps";
+import { alphaChannelSchema } from './alpha-channels';
+import { polygonSelectionSchema } from "./lasso";
 import { smartFiltersSchema } from "./smart/filters";
 import { componentDefinitionSchema } from "./smart/manager";
 import { TONE_LIMITS } from "./tone";
@@ -17,6 +19,7 @@ import {
   pathSchema,
 } from "./drawing";
 import { z } from "zod";
+import { vectorBooleanOperandsSchema } from './vector-boolean';
 import type { EditorCommand } from "./commands";
 import { validateDocument, createDocument } from "./model";
 import type { LayerData } from "./model";
@@ -71,6 +74,12 @@ const patch = z
     align: z.enum(["left", "center", "right"]).optional(),
     lineHeight: z.number().min(0.5).max(10).optional(),
     letterSpacing: z.number().min(-50).max(500).optional(),
+    wordSpacing: z.number().min(-50).max(500).optional(),
+    fontKerning: z.enum(['auto', 'normal', 'none']).optional(),
+    paragraphJustify: z.enum(["none","inter-word"]).optional(),
+    wrapWidth: dimension.nullable().optional(),
+    paragraphSpacing: z.number().min(0).max(10000).optional(),
+    firstLineIndent: z.number().min(-10000).max(10000).optional(),
     fontWeight: identifier.optional(),
     fontStyle: z.enum(["normal", "italic"]).optional(),
     direction: z.enum(["ltr", "rtl"]).optional(),
@@ -108,6 +117,9 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
     z
       .object({ type: z.literal("layerComp.set"), comp: layerCompSchema })
       .strict(),
+    z.object({type:z.literal('alphaChannel.set'),channel:alphaChannelSchema}).strict(),
+    z.object({type:z.literal('alphaChannel.remove'),id:identifier}).strict(),
+    z.object({type:z.literal('alphaChannel.reorder'),id:identifier,direction:z.enum(['up','down'])}).strict(),
     z.object({ type: z.literal("layerComp.remove"), id: identifier }).strict(),
     z.object({ type: z.literal("layerComp.apply"), id: identifier }).strict(),
     z
@@ -181,6 +193,7 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
         selection: selectionSchema.nullable(),
       })
       .strict(),
+    polygonSelectionSchema.extend({ type: z.literal("selection.polygon") }),
     z
       .object({
         type: z.literal("layer.place"),
@@ -207,12 +220,13 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
     z
       .object({ type: z.literal("path.add"), id: identifier, path: pathSchema })
       .strict(),
+    z.object({type:z.literal('paths.replace'),operands:vectorBooleanOperandsSchema,result:pathSchema.nullable()}).strict(),
     z
       .object({
         type: z.literal("path.update"),
         id: identifier,
         pathId: identifier,
-        patch: pathSchema.omit({ id: true }).partial(),
+        patch: z.object(pathSchema.shape).omit({ id: true }).partial().strict(),
       })
       .strict(),
     z

@@ -45,6 +45,9 @@ export function TypographyPanel({
   onPreview,
 }: TypographyPanelProps) {
   const family = layer.fontFamily;
+  const wordSpacingSupported = typeof CanvasRenderingContext2D !== 'undefined' && 'wordSpacing' in CanvasRenderingContext2D.prototype;
+  const kerningSupported = typeof CanvasRenderingContext2D !== 'undefined' && 'fontKerning' in CanvasRenderingContext2D.prototype;
+  const paragraphSupported = typeof Intl.Segmenter === 'function';
   const localFonts = useSyncExternalStore(subscribeSystemFonts, getSystemFonts);
   const [fontMessage, setFontMessage] = useState("");
   const [loadingFonts, setLoadingFonts] = useState(false);
@@ -101,6 +104,28 @@ export function TypographyPanel({
           });
         }}
       />
+      <Select label="Text layout" value={layer.wrapWidth === undefined ? 'point' : 'paragraph'} disabled={disabled || (!paragraphSupported && layer.wrapWidth === undefined)}
+        options={[{value:'point',label:'Point text'},{value:'paragraph',label:'Paragraph text'}]}
+        onChange={value=>onAction(()=>{layer.wrapWidth=value==='paragraph'?layer.width:undefined;})} />
+      {layer.wrapWidth !== undefined && <>
+        <NumberField label="Paragraph width" layout="stacked" value={layer.wrapWidth} min={1} max={Number.MAX_SAFE_INTEGER} step={1} suffix="px" disabled={disabled || !paragraphSupported}
+          onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{wrapWidth:value}})}
+          onCommit={value=>onAction(()=>{layer.wrapWidth=value;})} />
+        <p>Text wraps to the paragraph width. Long unbreakable text can extend beyond it. Corner handles adjust width and keep font size; height grows with the lines.</p>
+      </>}
+      {!paragraphSupported && <p role="status">This browser cannot wrap paragraph text. Use Point text or Reset paragraph, or open the project in a supporting browser.</p>}
+      <Select label="Justification" layout="stacked" value={layer.paragraphJustify??'none'} disabled={disabled || !wordSpacingSupported || layer.wrapWidth===undefined}
+        options={[{value:'none',label:'None'},{value:'inter-word',label:'Inter-word'}]}
+        onChange={value=>onAction(()=>{layer.paragraphJustify=value as 'none'|'inter-word';})} />
+      {layer.paragraphJustify==='inter-word' && <p>Wrapped lines expand native word spacing to the available width. Final lines, forced breaks and unbreakable text keep their spacing. Paragraph text mode is required. If native spacing cannot fit a line, choose Kerning Normal or Reset paragraph.</p>}
+      {!wordSpacingSupported && <p>Paragraph justification requires native word spacing. Reset paragraph clears unsupported justification.</p>}
+      <Slider label="Paragraph spacing" value={layer.paragraphSpacing??0} min={0} max={10000} step={1} suffix="px" disabled={disabled}
+        onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{paragraphSpacing:value}})}
+        onCommit={value=>onAction(()=>{layer.paragraphSpacing=value;})} />
+      <Slider label="First-line indent" value={layer.firstLineIndent??0} min={-10000} max={10000} step={1} suffix="px" disabled={disabled}
+        onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{firstLineIndent:value}})}
+        onCommit={value=>onAction(()=>{layer.firstLineIndent=value;})} />
+      <Button disabled={disabled} onClick={()=>onAction(()=>layer.resetParagraph())}>Reset paragraph</Button>
       <Select
         label="Font"
         layout="stacked"
@@ -283,6 +308,23 @@ export function TypographyPanel({
           })
         }
       />
+      <Select
+        label="Kerning"
+        value={layer.fontKerning ?? 'auto'}
+        disabled={disabled || !kerningSupported}
+        options={[{value:'auto',label:'Auto'},{value:'normal',label:'Normal'},{value:'none',label:'None'}]}
+        onChange={value=>onAction(()=>{layer.fontKerning=value as 'auto'|'normal'|'none';})}
+      />
+      <Slider
+        label="Word spacing"
+        value={layer.wordSpacing ?? 0}
+        min={-50} max={500} step={0.5} suffix="px"
+        disabled={disabled || !wordSpacingSupported}
+        onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{wordSpacing:value}})}
+        onCommit={value=>onAction(()=>{layer.wordSpacing=value;})}
+      />
+      {(!wordSpacingSupported || !kerningSupported) && <p role="status">This browser lacks {![wordSpacingSupported,kerningSupported].some(Boolean)?'native word spacing and kerning':!wordSpacingSupported?'native word spacing':'native kerning control'}. Nondefault unsupported text requires a supporting browser or Reset spacing.</p>}
+      <Button disabled={disabled} onClick={()=>onAction(()=>layer.resetSpacing())}>Reset spacing</Button>
       <SegmentedControl
         label="Direction"
         value={layer.direction ?? "ltr"}

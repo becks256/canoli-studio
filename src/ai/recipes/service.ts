@@ -39,6 +39,7 @@ export class RecipeService {
         width: asset.width,
         height: asset.height,
         blob: asset.blob,
+        ...(asset.tiff?{tiff:{...asset.tiff}}:{}),
       });
     }
   }

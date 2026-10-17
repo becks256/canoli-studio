@@ -307,7 +307,7 @@ describe("PSD / PSB Interchange Engine (F11)", () => {
   });
 });
 
-it.each(['raw', 'rle'] as const)('honors %s compression for the composite and preserves planar RGBA', async(compression)=>{
+it.each(['raw', 'rle'] as const)('honors %s compression with straight layer RGBA and a white-matted merged preview', async(compression)=>{
   const doc=createDocument('Compression',3,2);
   const layer=createRaster('source','Pixels',3,2);
   doc.children.push(layer);
@@ -322,8 +322,56 @@ it.each(['raw', 'rle'] as const)('honors %s compression for the composite and pr
   for(let section=0;section<3;section++)offset+=4+view.getUint32(offset);
   expect(view.getUint16(offset)).toBe(compression==='raw'?PsdCompression.Raw:PsdCompression.Rle);
   const parsed=parsePsd(bytes);
-  expect([...parsed.composite!.data]).toEqual([...pixels.data]);
+  // 8-bit white matting quantizes the merged preview at partial alpha; the
+  // independent-reader regression checks the stored white-matted channels too.
+  const preview=new Uint8ClampedArray([
+    255,0,0,255, 0,255,0,128, 0,0,255,255,
+    12,34,56,255, 80,92,124,64, 210,180,150,255,
+  ]);
+  expect(parsed.composite!.data).toEqual(preview);
   expect([...parsed.layers[0].imageData!.data]).toEqual([...pixels.data]);
   const flat=psdToDocument(bytes,{mode:'flatten'});
-  expect([...flat.assets.values()][0].data).toEqual(pixels.data);
+  expect([...flat.assets.values()][0].data).toEqual(preview);
+});
+
+it('retains legacy positive-count straight-alpha files while rejecting unrendered rich content',async()=>{
+  const doc=createDocument('Legacy',1,1),layer=createRaster('Source','source',1,1);doc.children=[layer];
+  const source=new ImageData(new Uint8ClampedArray([80,120,150,128]),1,1);
+  const bytes=await documentToPsd(doc,()=>source,{compression:'raw'});
+  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+  let section=26;
+  for(let i=0;i<2;i++)section+=4+view.getUint32(section);
+  expect(view.getInt16(section+8)).toBe(-1);
+  view.setInt16(section+8,1); // Legacy writer did not flag or white-matte transparency.
+  const composite=section+4+view.getUint32(section)+2;
+  bytes.set(source.data,composite); // One-pixel planar RGBA has the same byte order.
+  // Recreate the old writer's exact section layout (no global-mask length).
+  const end=section+4+view.getUint32(section),legacy=new Uint8Array(bytes.length-4);
+  legacy.set(bytes.subarray(0,end-4));legacy.set(bytes.subarray(end),end-4);
+  new DataView(legacy.buffer).setUint32(section,view.getUint32(section)-4);
+  expect(parsePsd(legacy).composite!.data).toEqual(source.data);
+  expect(parsePsd(legacy,{legacyStraightAlpha:false}).composite!.data[3]).toBe(255);
+  // A standard positive-count file may reuse Canoli's ICC profile without using
+  // its old container layout. Its extra alpha channel must not hide the image.
+  expect(parsePsd(bytes).composite!.data[3]).toBe(255);
+  layer.effects=[{id:'tone',kind:'tone',enabled:true,exposure:1,contrast:0,saturation:0}];
+  await expect(documentToPsd(doc,()=>source)).rejects.toThrow(/rendered PSD export/);
+  layer.effects=[];layer.width=2;
+  await expect(documentToPsd(doc,()=>source)).rejects.toThrow(/Scaled raster/);
+  layer.width=1;await expect(documentToPsd(doc,()=>null)).rejects.toThrow(/Missing image/);
+});
+
+it('imports independent psd-tools transparency and separate-alpha fixtures without confusing extra channels',()=>{
+  const bytes=fs.readFileSync('tests/fixtures/psd/psd-tools-transparency.psd');
+  const parsed=parsePsd(bytes);
+  expect(parsed.layers.map(layer=>layer.name)).toEqual(['Base transparency','Top','Hidden']);
+  expect([...parsed.layers[0].imageData!.data.slice(0,4)]).toEqual([80,120,150,128]);
+  expect([...parsed.composite!.data.slice(0,4)]).toEqual([80,120,149,128]);
+  expect([...parsed.composite!.data.slice(8,12)]).toEqual([200,30,60,255]);
+  const layered=psdToDocument(bytes,{mode:'layered'});
+  expect(layered.document.children).toHaveLength(3);expect(layered.document.children[2].visible).toBe(false);
+  const opaque=fs.readFileSync('tests/fixtures/psd/psd-tools-extra-alpha.psd');
+  expect([...parsePsd(opaque).composite!.data.slice(0,4)]).toEqual([30,100,210,255]);
+  expect([...parsePsd(opaque,{legacyStraightAlpha:true}).composite!.data.slice(0,4)]).toEqual([30,100,210,0]);
+  expect([...psdToDocument(opaque,{mode:'flatten',legacyStraightAlpha:true}).assets.values()][0].data[3]).toBe(0);
 });

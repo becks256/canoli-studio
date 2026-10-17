@@ -1,0 +1,209 @@
+{
+  "date": "2026-10-15",
+  "scope": "F11 rendered 8-bit RGB PSD subset; full roadmap remains active",
+  "validation": {
+    "buildPassed": true,
+    "unitApiTests": 763,
+    "unitTestFiles": 107,
+    "distinctDevelopmentBrowserTests": 38,
+    "productionBrowserTests": 15,
+    "finalAffectedPsdBrowserRecheck": 11,
+    "whitespacePassed": true
+  },
+  "independentRenderedOutput": {
+    "reader": "psd-tools",
+    "version": "1.24.0",
+    "cases": [
+      {
+        "sha256": "36a072267f1c5019b5eb76b3712c43cf8f719695d0137a9fcc031e4edec53b77",
+        "size": [
+          96,
+          64
+        ],
+        "preview": {
+          "maxPremultipliedRgbError": 0.9960784313725526,
+          "maxAlphaError": 0.0
+        },
+        "recomposed": {
+          "maxPremultipliedRgbError": 1.1999999999999957,
+          "maxAlphaError": 0.0
+        },
+        "layers": [
+          {
+            "name": "Merged through Gradient",
+            "bbox": [
+              0,
+              0,
+              96,
+              64
+            ],
+            "visible": true,
+            "opacity": 255,
+            "blendMode": "norm"
+          },
+          {
+            "name": "Top pixel layer",
+            "bbox": [
+              0,
+              0,
+              96,
+              64
+            ],
+            "visible": true,
+            "opacity": 153,
+            "blendMode": "mul "
+          },
+          {
+            "name": "Hidden work",
+            "bbox": [
+              0,
+              0,
+              96,
+              64
+            ],
+            "visible": false,
+            "opacity": 255,
+            "blendMode": "norm"
+          }
+        ]
+      },
+      {
+        "sha256": "5361443714676156ea632b5f1058cc6e5fea4c3514438e01448ee4de3057e7c0",
+        "size": [
+          96,
+          64
+        ],
+        "preview": {
+          "maxPremultipliedRgbError": 0.9960784313725526,
+          "maxAlphaError": 0.0
+        },
+        "recomposed": {
+          "maxPremultipliedRgbError": 0.898039215686282,
+          "maxAlphaError": 0.0
+        },
+        "layers": [
+          {
+            "name": "Untitled",
+            "bbox": [
+              0,
+              0,
+              96,
+              64
+            ],
+            "visible": true,
+            "opacity": 255,
+            "blendMode": "norm"
+          }
+        ]
+      }
+    ],
+    "limitations": "Encoded 8-bit sRGB fixture comparison with ICC conversion disabled; not a Photoshop, native editable-effects or general color-fidelity claim."
+  },
+  "independentStoredPreviewChannels": {
+    "reader": "Pillow",
+    "version": "10.3.0",
+    "results": [
+      {
+        "fixture": "alpha-raw",
+        "sha256": "a3367d318611f4eb05aa524180ff8dfa74a59233ee168d3db6ce2ab258c721c5",
+        "width": 3,
+        "height": 2,
+        "exactWhiteMattedMergedChannels": true
+      },
+      {
+        "fixture": "layers-raw",
+        "sha256": "9b032aa457b65546a5619ddbf665e2e2330c3a413fa0f7e3a27bb38f58702c6d",
+        "width": 2,
+        "height": 2,
+        "exactWhiteMattedMergedChannels": true
+      },
+      {
+        "fixture": "multiply-raw",
+        "sha256": "8a94b1c79d8bd22601c22c174e1e0e14c6332b1d02337f8ad106d78845c22c7e",
+        "width": 2,
+        "height": 2,
+        "exactWhiteMattedMergedChannels": true
+      },
+      {
+        "fixture": "alpha-rle",
+        "sha256": "70a444117a65a13823b29a5ccf8e5668b434d576f4d91305605cd32978ed1476",
+        "width": 3,
+        "height": 2,
+        "exactWhiteMattedMergedChannels": true
+      },
+      {
+        "fixture": "layers-rle",
+        "sha256": "86d2002410d5a58a73cb226f5784f6b11628edce82caa0762ed133d20049129a",
+        "width": 2,
+        "height": 2,
+        "exactWhiteMattedMergedChannels": true
+      },
+      {
+        "fixture": "multiply-rle",
+        "sha256": "f6a118f5a86256eef0d97da53f16774fed15c0472d2825384f6f6e1031eab778",
+        "width": 2,
+        "height": 2,
+        "exactWhiteMattedMergedChannels": true
+      }
+    ],
+    "limitations": "Stored white-matted preview channel decoding only; does not prove editable layer semantics, blend modes other than normal/multiply, effects, ICC conversion, or Photoshop compatibility."
+  },
+  "independentInboundFixtures": {
+    "writer": "psd-tools",
+    "version": "1.24.0",
+    "fixtures": [
+      {
+        "path": "tests/fixtures/psd/psd-tools-extra-alpha.psd",
+        "bytes": 330,
+        "sha256": "f2e522f63a9ddbba974aea4eacb62567f574f0401acdf2ec1b238c272490938a"
+      },
+      {
+        "path": "tests/fixtures/psd/psd-tools-transparency.psd",
+        "bytes": 646,
+        "sha256": "5677f26cdd278bb0b6e7223f6aacf77d796e148a4c9d4b3f0c528bb3dda858c6"
+      }
+    ],
+    "transparencyAndExtraAlphaImportPassed": true,
+    "generator": "scripts/generate-independent-psd.py"
+  },
+  "native50MpPsd": {
+    "width": 10000,
+    "height": 5000,
+    "source": "gray PaintFill plus gradient map adjustment",
+    "elapsedMs": 8861.8,
+    "largestReturnedRenderTilePixels": 51200,
+    "bytes": 6400704,
+    "sha256": "b0e42ac420837c1e6450b81c53300a9f1b253329f46ecd6109fbf2f0f49734f5",
+    "rgbaSamples": [
+      127,
+      0,
+      128,
+      255
+    ],
+    "sampleCoordinates": [
+      [
+        0,
+        0
+      ],
+      [
+        2047,
+        63
+      ],
+      [
+        2048,
+        64
+      ],
+      [
+        9999,
+        4999
+      ]
+    ],
+    "independentPillowDimensionsAndSamplesPassed": true
+  },
+  "existingRealImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "pngExportElapsedMs": 3317
+  },
+  "resourceLimits": "Exporter works in bounded native tiles and approximately 1 MB strips, retaining compressed Blob data. Peak heap, process memory, input-latency percentiles and hardware GPU performance were not measured. Timings are individual container runs.",
+  "remaining": "Native editable Photoshop text, masks, adjustment parameters, group hierarchy, smart/linked/filter data, PSB output, deeper formats and general color/interchange gates remain outstanding. ICC conversion is disabled in the independent encoded-pixel comparison."
+}

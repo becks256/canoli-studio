@@ -1,0 +1,14 @@
+{
+  "fixture": "tests/selection-modification.e2e.ts: native 50 MP coverage remains tiled and reports progress while editing stays available",
+  "environment": "Headless Chromium in the local container; no hardware GPU or cross-device claim. Exact browser build and heap usage were not recorded.",
+  "document": { "width": 10000, "height": 5000, "selection": "full canvas" },
+  "operation": { "operation": "contract", "radius": 1 },
+  "output": { "width": 10000, "height": 5000, "tiles": 200, "tileEdge": 512 },
+  "measurements": [
+    { "run": "initial feature browser suite", "elapsedMs": 2407, "timerResponseMs": 99.09999999403954 },
+    { "run": "final regression suite", "elapsedMs": 2432.9000000059605, "timerResponseMs": 103.19999998807907 }
+  ],
+  "timerScope": "setTimeout(0) response while the async operation is pending, immediately after newDocument/selectAll. This includes pending document/render work and is not isolated input-to-visible latency.",
+  "correctness": "Native coverage dimensions, boundary/interior alpha, 200-tile progress completion and compact RLE assertions passed.",
+  "limitations": "No heap measurement or broad responsiveness gate passed. Large radii and fragmented coverage can remain expensive. Original image assets were not decoded by this selection-only fixture; the separate real 50 MP import/save/reopen/export regression passed."
+}

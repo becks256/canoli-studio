@@ -1,0 +1,3274 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T16:09:45.309236+00:00",
+  "scope": "T16 F06/F11 editable SVG paint, native stroke-clip support and numeric replay failure cleanup. Full professional-editor roadmap remains active/incomplete.",
+  "previousGoalTurn": "No roadmap implementation progress in the intervening rebrand follow-up; corrected stale generated branding, then resumed pending SVG paint against current source.",
+  "sourceSha256": {
+    "src/core/svg-smart.ts": "743ff0575957b1d5de2133c3c2d7bd9f43cf424539e367611e37717e0c62fe3a",
+    "src/core/smart/resolve.ts": "b090bb4067b8e554609aaa0d7230dd5a9a9e4553c7f3a5753040e94a3bb4deb5",
+    "src/core/smart/manager.ts": "7bb1032a468754b11a04efdebe89094051c9edaa2f355da39af806e7e2c81824",
+    "src/core/smart/types.ts": "c2480e89ed81520cf548437799ca1dfbb6af8404269302f34db2b79c1196581b",
+    "src/core/smart/filters.ts": "bd83f8af134fc9b610dcb24e2ada68bf00d4bbed3cfba5169938743b4333f55c",
+    "src/core/svg-images.ts": "8a33d0fe7b5090dc976f5f2d20dd6fa12c43c407b45b9d530b3f1f3d592bfe25",
+    "src/core/svg-styles.ts": "7359c5151fb7f5001972c5429fd13341d76058e01d1f73450b4c88d087944210",
+    "src/core/svg-export.ts": "99615e19a1b5514c1f7c2c02f1b240be74a3b878f1c65d95dfd3c4df7c795690",
+    "src/core/svg-masks.ts": "0428d9038667c4b535fb135c997b3487f45eeca024d966892a5b86041c727557",
+    "src/core/svg-text.ts": "a56618b60bb162ee854e17b3060ff270eec8bcda57f067c0695b8cd4a876649b",
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/engine/svg-images.ts": "292c6a47383e5d604500f074acce3850cf88b18b052e4b1d42d661acbf545dbf",
+    "src/engine/svg-text.ts": "8fc888a69fcaec44e5623e73a91536e9ce630930efd2c676fefe761438bf0fde",
+    "src/engine/export.ts": "e347cdad51247d1b819d6c7ecea93840d6980226effb2a4f1b2cc98505e15a39",
+    "src/engine/svg-masks.ts": "518385ce19d2d7aa4ef5bc938a83a7ab6580afdf6513794886864d2965bbe46b",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/engine/smart-filters.ts": "305b7dc9915fef5596d34487d9354a033cef542b077c9c87723f6fdf0c9b8ed5",
+    "src/engine/filter-mask-coverage.ts": "43bc9a7c8678c1d5e968ef82408250fb01aa51cdb67448685d389fd42c882f17",
+    "src/engine/png.ts": "e9e40b8aaa9e10ecbf342a3c0459951550a578f55571e3d5d0d2d79a02f60a34",
+    "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+    "src/engine/drawing.ts": "d4067b62abdacadb9649013a4942ebf982e061f782a1b8dd5b1ec1652aaf54ff",
+    "src/core/model.ts": "4d5df5de545880b0f9b5e88a4579750c86d85b6bb45723f8d3c72b67ea3533a9",
+    "src/core/assets.ts": "9324070e12ce89a7733f0886fd4f939dbbc396764e8066b8f5d82b82155628fb",
+    "src/dom/index.ts": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "src/ui/ExportDialog.tsx": "e85201c2e6ba99a522f905fa0fcf0763f8225aeb8aa641e5a12363380eed8cbd",
+    "tests/svg-smart.test.ts": "aa0e60a2cb2d35825c4f67dba17b4917b19a62968157cf11e1c1c9b63d872e1d",
+    "tests/svg-smart.e2e.ts": "1d75b8d1284fcf468140316bbecd409aa08c395c9a969ebbd998b0e26e0f8388",
+    "tests/smart-resolve.test.ts": "81a520030c0699d65e1fed1f08f8cdfd1f2757a0d74c47fde191635f2adcd21b",
+    "tests/export.test.ts": "19fcd30cdbb8de6eafbcad8380f4e831ed466b2d05d8a83feb6fba1e54072240",
+    "tests/svg-export.test.ts": "6c3d739b31d417ab8711396575dc03aaa58c438ea210df83b96105ccc2f5ed6b",
+    "tests/foundation-increments.e2e.ts": "fe4f0fbecd4952e9d3ff0b140cb10751f0452a1794a22d6d8670566e92b47718",
+    "tests/production.e2e.ts": "1037d0c439a30fea945e6831f9088e9b54d4ad542f0e4d29313ae98d8b9b2e4e",
+    "docs/REQUIREMENTS.md": "40dc313d2c26832d5395ff692c05d25d701744ddeefdd3e3258c4e5613b47f12",
+    "docs/API.md": "e63835d0816990e1f7987bdfd8368f1bd616526174f2f3aa2eef47360fe3b89d",
+    "docs/SCRIPTING_API.md": "e6d6031b9c6ea9fdaca368470529307f832f9bed681e8754b94f384079b28f11",
+    "docs/ARCHITECTURE.md": "b9812938adced08cc131c1919b96edd441d1e45c9b10d32986fb3a5518471953",
+    "docs/SYSTEM_DESIGN.md": "3d9bc64c36897ab48ab127ca49a013da6733a3f70fda0315a494c382fa4edc38",
+    "docs/DESIGN_SYSTEM.md": "905b9b841f7af577ebd3864c6e9001c76a405eb590126515d6682af2c43f1d58",
+    "docs/PLUGINS.md": "b8ee65dd5264177bab0ff6b6b2a604c8ebadd369c8852e759648232242e48f61",
+    "docs/FEATURE_STRATEGY.md": "65f55a7e28073637cfdbfa4256f00928451c5c41c551ae2c18b8a84b660cbad4",
+    "README.md": "c6aac38800591f9471c59e64370e27e284fd7db652c4dddf1194df5666dad221",
+    "src/generated/script-runtime.js": "ce207fb1e87b3e795d80b882dee693083c41203467fca94c52ba4783583dbde1",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+    "tests/fixtures/matting/native-50mp.png": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/svg-images.e2e.ts": "e1e384ab45409ac3d4f488bf0ae40efceb394f2f73db70ec87ee894a66ee696a",
+    "tests/svg-styles.e2e.ts": "e0c3e8f8bf7531074be05d3a52324f3271aeb7e91cb99b604c0ac4048ad30982",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/svg-text.e2e.ts": "962ca2f54ddeef9225d5721f7dcad46e13cf882d7e6683e19051126a9a974a61",
+    "tests/smart-raster.e2e.ts": "7cbd1ba3565913198427fee8dde99f6e29cf5448c19d9a88da95718f6fd1ec18",
+    "tests/smart-filters.e2e.ts": "1ee5b65dfc2a5603042ab9b11a78def3ce9b223038c3d330e3e362d536dfb578",
+    "tests/smart-linked.e2e.ts": "8b4cd1362232f83316528ed34ed00de4ba8ad9b8237ad63f64bcf07f9a31bba7",
+    "tests/smart-filters-ui.e2e.ts": "b2362dc87bef55b6828211490a3afc320b8ab2f471c35438a6884c651322c42d",
+    "tests/smart-transfer.e2e.ts": "370c1aeac9009f2e281d212cd7ac9aa60afa387b8c34a87bcefb5c3d6180864a",
+    "tests/smart-resolve.e2e.ts": "1cd05d6031f1f7c7386f18a4f85a1f7bdc8d289639ff5c80020d6c0236aa524e",
+    "tests/smart-filter-masks.e2e.ts": "a4eb4490276d366992a5f53173ca580147dcb20e6524449cb63d98e881f8d357",
+    "tests/smart-edit.e2e.ts": "1ab4f5d923401f2d3c234a7141f469441018f9265810b69956c5589571c1bd37",
+    "tests/smart-conversion.e2e.ts": "ef10588dd2b0a30bc991bce48af31bc935231967171e33d890c1063314e154a5",
+    "tests/smart-document.e2e.ts": "732a7ffc34b9888bb254b20d1304097c605eecdd5b2db0bb67fb114d5d6759af",
+    "tests/smart-filter-mask-ui.e2e.ts": "c06b21b7c403f95d0a00042ee6d6f081958b31bd641b5f03907137a6e4416390",
+    "src/core/paint-stamps.ts": "2638f6500edf6c7e449dae832e9179ac58d3f0e4b91d8fc4bbfcec7e5c92d5be",
+    "src/core/svg-paint.ts": "2610504a2111229b27a7d29a6ba661bdb1613e433801ee8cc39742261aab64f7",
+    "src/core/drawing.ts": "7b68c114f5e97ca5bb31368222df9300fdff0fd9c9dc02635c584a1295999d8c",
+    "src/engine/gpu/renderer.ts": "c0581c2bcb6c0cde50efbbf88176a34fa3dc45b2f1e6504f0e1c86b572c17191",
+    "src/engine/gpu/shaders.ts": "e29a255a5f49776ed980e1c5ea59f2b5ede04382349ac95664304b6eddd0bf76",
+    "tests/svg-paint.test.ts": "3c39f24053434feb260a3d5162bc18afea25ab8bf51c05f320e8d8cf8f54cf88",
+    "tests/svg-paint.e2e.ts": "0784081188e3f58bbbf2e4709e373d65088670d224e84d19c0cbd4dffb81ebec",
+    "tests/webgpu.e2e.ts": "8afdf8c2980d40be97bc71b2e871b190c59d7afefb9bf00457bd8b02c80e760e",
+    "tests/paint-scratch.e2e.ts": "16b143e3c1d55f9e9ac27de7f518713f20973614751c2e3c824a7e4559d44d51",
+    "tests/committed-paint.e2e.ts": "7d9dd83b241e5efe3bbbded6fc19dceba6ecaef48b0b15d90784ac3c07e451e4",
+    "tests/clone-preview.e2e.ts": "9eab46ebbacad76c9885613060f2c800b562891f5b3c048e791000727835a87b",
+    "tests/filter-mask-paint.e2e.ts": "f8be90dd81ea2b4112781a552689de08245f01bf638292ea50a4ed83c4faa21b",
+    "tests/tools.e2e.ts": "ecda64c77e7a444f8cd16dd45e622ba569942349f607f0f561bb9ae2c4b08e82",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "tests/seo.test.ts": "4438445889c0b5d85866e8de65ee937f2b0f1eeae974338e9244175d5b0818a5",
+    "scripts/build-docs.mjs": "44f9f906344930385de05c3c9ef8279c837c14b5e5def9c957e2f5daef049947"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "includes": [
+        "actual WASM",
+        "isolated scripting runtime",
+        "all nine current developer docs",
+        "TypeScript",
+        "production bundling"
+      ]
+    },
+    "unitAndApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": true,
+      "tests": 934,
+      "files": 130
+    },
+    "focusedSvgUnits": {
+      "command": "npx vitest run tests/svg-paint.test.ts tests/svg-export.test.ts tests/svg-images.test.ts tests/svg-masks.test.ts tests/svg-smart.test.ts tests/svg-styles.test.ts tests/svg-text.test.ts --maxWorkers=2",
+      "passed": true,
+      "tests": 50,
+      "files": 7
+    },
+    "developmentBrowser": {
+      "command": "npx playwright test tests/svg-*.e2e.ts tests/paint-scratch.e2e.ts tests/committed-paint.e2e.ts tests/clone-preview.e2e.ts tests/filter-mask-paint.e2e.ts tests/webgpu.e2e.ts tests/masks.e2e.ts tests/export-cancellation.e2e.ts tests/raster-editing.e2e.ts tests/foundation-increments.e2e.ts tests/metadata.e2e.ts tests/editor.e2e.ts tests/tools.e2e.ts tests/smart-*.e2e.ts --reporter=line",
+      "passed": true,
+      "tests": 282,
+      "byFile": {
+        "tests/clone-preview.e2e.ts": 13,
+        "tests/committed-paint.e2e.ts": 2,
+        "tests/editor.e2e.ts": 8,
+        "tests/export-cancellation.e2e.ts": 5,
+        "tests/filter-mask-paint.e2e.ts": 6,
+        "tests/foundation-increments.e2e.ts": 4,
+        "tests/masks.e2e.ts": 16,
+        "tests/metadata.e2e.ts": 4,
+        "tests/paint-scratch.e2e.ts": 4,
+        "tests/raster-editing.e2e.ts": 14,
+        "tests/smart-conversion.e2e.ts": 2,
+        "tests/smart-document.e2e.ts": 4,
+        "tests/smart-edit.e2e.ts": 3,
+        "tests/smart-filter-mask-ui.e2e.ts": 3,
+        "tests/smart-filter-masks.e2e.ts": 2,
+        "tests/smart-filters-ui.e2e.ts": 3,
+        "tests/smart-filters.e2e.ts": 3,
+        "tests/smart-linked.e2e.ts": 6,
+        "tests/smart-raster.e2e.ts": 6,
+        "tests/smart-resolve.e2e.ts": 2,
+        "tests/smart-transfer.e2e.ts": 2,
+        "tests/svg-export.e2e.ts": 7,
+        "tests/svg-images.e2e.ts": 16,
+        "tests/svg-masks.e2e.ts": 20,
+        "tests/svg-paint.e2e.ts": 27,
+        "tests/svg-smart.e2e.ts": 26,
+        "tests/svg-styles.e2e.ts": 16,
+        "tests/svg-text.e2e.ts": 33,
+        "tests/tools.e2e.ts": 10,
+        "tests/webgpu.e2e.ts": 15
+      }
+    },
+    "postCleanupPaintAndWebGpu": {
+      "command": "npx playwright test tests/webgpu.e2e.ts tests/svg-paint.e2e.ts --reporter=line",
+      "passed": true,
+      "tests": 44,
+      "webGpuTests": 16,
+      "paintTests": 28,
+      "reason": "After broad run, added finally-based GPU stroke buffer cleanup for actual numeric rejection. All other product source unchanged; normal geometry/pixels unchanged."
+    },
+    "productionBrowser": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": true,
+      "tests": 33
+    },
+    "distinctBrowserChecks": 317,
+    "method": "All 282 broad development cases pass before the GPU error-cleanup correction; two additional focused cases verify reflected/sheared stroke-clip coverage and GPU rejection/recovery, all 44 final paint/software-WebGPU cases pass afterward (42 repeat, two added), and 33 final production cases pass. The initial 27 focused paint cases and final repeated cases are not counted twice. Final build/full units/TypeScript/SEO/diff checks follow cleanup."
+  },
+  "paintFixtures": {
+    "50mp": {
+      "elapsed": 1875.5,
+      "bytes": 300252,
+      "dimensions": [
+        "10000",
+        "5000"
+      ],
+      "sourceSize": [
+        10000,
+        5000
+      ],
+      "clipTiles": [
+        {
+          "x": 2045,
+          "y": 61,
+          "width": 7,
+          "height": 7
+        }
+      ],
+      "samples": [
+        {
+          "x": 2046,
+          "y": 63,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 2047,
+          "y": 63,
+          "svg": [
+            0,
+            0,
+            255,
+            128
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            128
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 63,
+          "svg": [
+            0,
+            0,
+            255,
+            128
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            128
+          ]
+        },
+        {
+          "x": 2049,
+          "y": 64,
+          "svg": [
+            0,
+            0,
+            255,
+            128
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            128
+          ]
+        },
+        {
+          "x": 2049,
+          "y": 65,
+          "svg": [
+            0,
+            0,
+            255,
+            128
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            128
+          ]
+        },
+        {
+          "x": 2050,
+          "y": 64,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 2048,
+          "y": 66,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "sourceUnchanged": true,
+      "unchanged": true,
+      "revision": 3,
+      "after": 3
+    },
+    "affine-clip": {
+      "mode": "affine-clip",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "affine-fill-clip": {
+      "mode": "affine-fill-clip",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 0,
+      "rectangles": 1,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "affine": {
+      "mode": "affine",
+      "alpha": 65,
+      "premult": 31.67058823529412,
+      "geometry": {
+        "area": 2280.619607843137,
+        "cx": 77.01191798582428,
+        "cy": 48.008186629708476,
+        "interiorErrors": 0,
+        "expectedArea": 2295.239001665004,
+        "circles": [
+          {
+            "x": 16,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 21.714285714285715,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 27.428571428571427,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 33.14285714285714,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 38.857142857142854,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 44.57142857142857,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 50.285714285714285,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 56,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 61.71428571428571,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 67.42857142857143,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 73.14285714285714,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 78.85714285714286,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 84.57142857142857,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 90.28571428571429,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 96,
+            "y": 32,
+            "r": 12
+          }
+        ]
+      },
+      "alternatives": {
+        "arc": {
+          "alpha": 65,
+          "premult": 31.67058823529412
+        },
+        "cubic": {
+          "alpha": 67,
+          "premult": 34.090196078431376
+        }
+      },
+      "differences": [
+        {
+          "x": 129,
+          "y": 57,
+          "svg": 72,
+          "png": 48
+        },
+        {
+          "x": 129,
+          "y": 58,
+          "svg": 23,
+          "png": 11
+        },
+        {
+          "x": 128,
+          "y": 59,
+          "svg": 192,
+          "png": 168
+        },
+        {
+          "x": 128,
+          "y": 60,
+          "svg": 44,
+          "png": 29
+        },
+        {
+          "x": 125,
+          "y": 62,
+          "svg": 204,
+          "png": 218
+        },
+        {
+          "x": 121,
+          "y": 63,
+          "svg": 240,
+          "png": 255
+        },
+        {
+          "x": 122,
+          "y": 63,
+          "svg": 179,
+          "png": 244
+        },
+        {
+          "x": 123,
+          "y": 63,
+          "svg": 115,
+          "png": 166
+        },
+        {
+          "x": 124,
+          "y": 63,
+          "svg": 51,
+          "png": 76
+        }
+      ],
+      "meanAlpha": 0.015736607142857142,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "cancel": {
+      "action": "cancel",
+      "invoked": true,
+      "returned": false,
+      "error": "AbortError: signal is aborted without reason",
+      "prepared": 2,
+      "released": true,
+      "retry": true,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "clipped": {
+      "mode": "clipped",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "clone-alpha": {
+      "mode": "clone-alpha",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 1,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            32,
+            96,
+            80,
+            128
+          ],
+          "png": [
+            32,
+            96,
+            80,
+            128
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            96,
+            96,
+            80,
+            255
+          ],
+          "png": [
+            96,
+            96,
+            80,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            160,
+            96,
+            80,
+            255
+          ],
+          "png": [
+            160,
+            96,
+            80,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution clone snapshots with editable brush coverage and placement",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "clone": {
+      "mode": "clone",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 1,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            32,
+            96,
+            80,
+            255
+          ],
+          "png": [
+            32,
+            96,
+            80,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            96,
+            96,
+            80,
+            255
+          ],
+          "png": [
+            96,
+            96,
+            80,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            160,
+            96,
+            80,
+            255
+          ],
+          "png": [
+            160,
+            96,
+            80,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution clone snapshots with editable brush coverage and placement",
+          "Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "dispose": {
+      "action": "dispose",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: The target asset store was disposed during the operation.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "empty-clip": {
+      "mode": "empty-clip",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "erase-fill": {
+      "mode": "erase-fill",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 0,
+      "rectangles": 4,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 7,
+      "after": 7,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "erase-then-paint": {
+      "mode": "erase-then-paint",
+      "alpha": 1,
+      "premult": 1.596078431372547,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0.010881696428571428,
+      "holes": 0,
+      "circles": 7,
+      "rectangles": 3,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 7,
+      "after": 7,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "eraser": {
+      "mode": "eraser",
+      "alpha": 1,
+      "premult": 1.596078431372547,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0.010881696428571428,
+      "holes": 0,
+      "circles": 7,
+      "rectangles": 2,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            64
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            64
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "fill": {
+      "mode": "fill",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 0,
+      "rectangles": 1,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            31,
+            179
+          ],
+          "png": [
+            128,
+            64,
+            31,
+            179
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            31,
+            179
+          ],
+          "png": [
+            128,
+            64,
+            31,
+            179
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            31,
+            179
+          ],
+          "png": [
+            128,
+            64,
+            31,
+            179
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "flow": {
+      "mode": "flow",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            31,
+            148
+          ],
+          "png": [
+            128,
+            64,
+            31,
+            148
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            127,
+            63,
+            31,
+            175
+          ],
+          "png": [
+            127,
+            63,
+            31,
+            175
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            127,
+            63,
+            31,
+            175
+          ],
+          "png": [
+            127,
+            63,
+            31,
+            175
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "gpu-precision-before": {
+      "rejected": true,
+      "reason": "Stroke stamp indices exceed numeric precision. Move extremely distant geometry closer before rendering.",
+      "allocated": 1,
+      "retained": 1,
+      "pixel": [
+        32,
+        112,
+        64,
+        255
+      ]
+    },
+    "gpu-precision-final": {
+      "rejected": true,
+      "reason": "Stroke stamp indices exceed numeric precision. Move extremely distant geometry closer before rendering.",
+      "allocated": 1,
+      "retained": 0,
+      "retainedBytes": 0,
+      "backend": "webgpu",
+      "pixel": [
+        32,
+        112,
+        64,
+        255
+      ],
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "hard": {
+      "mode": "hard",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "large-cancel": {
+      "returned": false,
+      "error": "AbortError: signal is aborted without reason",
+      "encoding": 2,
+      "circles": 20000,
+      "bytes": 1681341,
+      "unchanged": true,
+      "revision": 3,
+      "after": 3
+    },
+    "masked-style": {
+      "mode": "masked-style",
+      "alpha": 2,
+      "premult": 2.0313725490196077,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0.04397321428571429,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 1,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            103,
+            110,
+            41,
+            144
+          ],
+          "png": [
+            103,
+            110,
+            41,
+            144
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            82,
+            87,
+            86,
+            181
+          ],
+          "png": [
+            82,
+            87,
+            85,
+            181
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            82,
+            87,
+            86,
+            181
+          ],
+          "png": [
+            82,
+            87,
+            85,
+            181
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            255,
+            2
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            2
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "numeric": {
+      "errors": {
+        "svg": "Error: Stroke stamp indices exceed numeric precision. Move extremely distant geometry closer before rendering.",
+        "png": "Error: Stroke stamp indices exceed numeric precision. Move extremely distant geometry closer before rendering."
+      },
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "overlap-opacity": {
+      "mode": "overlap-opacity",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            128
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            128
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            128
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            128
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            128
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            128
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "pencil": {
+      "mode": "pencil",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 0,
+      "rectangles": 81,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "pressure": {
+      "mode": "pressure",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 68,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            127,
+            63,
+            32,
+            255
+          ],
+          "png": [
+            127,
+            63,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            63,
+            30,
+            255
+          ],
+          "png": [
+            128,
+            63,
+            30,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            126,
+            62,
+            29,
+            243
+          ],
+          "png": [
+            126,
+            62,
+            29,
+            243
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "production": {
+      "alpha": 1,
+      "premult": 1.596078431372547,
+      "errors": 0,
+      "circles": 53,
+      "erasers": 1,
+      "sourceImages": 0,
+      "clipTiles": 1,
+      "laterFill": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "outside": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sampled-clip": {
+      "mode": "sampled-clip",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            16
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            16
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "smart-paint": {
+      "mode": "smart-paint",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 8,
+      "after": 8,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Smart-object instance placement, masks, styles and supported contents",
+          "Unfiltered master vector/raster/text/paint contents and editable master-canvas clipping",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Smart-object master links and shared component identity"
+        ]
+      }
+    },
+    "soft": {
+      "mode": "soft",
+      "alpha": 0,
+      "premult": 0,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 5,
+      "after": 5,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "source-replace": {
+      "action": "source-replace",
+      "invoked": true,
+      "returned": false,
+      "error": "Error: An image source changed during SVG export. Retry with the current assets.",
+      "prepared": 2,
+      "released": true,
+      "retry": false,
+      "unchanged": true,
+      "revision": 2,
+      "after": 2
+    },
+    "two-erasers": {
+      "mode": "two-erasers",
+      "alpha": 1,
+      "premult": 1.596078431372547,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0.010881696428571428,
+      "holes": 0,
+      "circles": 8,
+      "rectangles": 4,
+      "images": 0,
+      "masks": 2,
+      "unchanged": true,
+      "revision": 8,
+      "after": 8,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            255,
+            127
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            127
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    },
+    "zero-fill": {
+      "mode": "zero-fill",
+      "alpha": 2,
+      "premult": 2,
+      "geometry": {
+        "area": 0,
+        "cx": 0,
+        "cy": 0,
+        "interiorErrors": 0,
+        "expectedArea": 0,
+        "circles": []
+      },
+      "alternatives": {},
+      "differences": [],
+      "meanAlpha": 0.05457589285714286,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 1,
+      "images": 0,
+      "masks": 1,
+      "unchanged": true,
+      "revision": 9,
+      "after": 9,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            255,
+            3
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            3
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            255,
+            130
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            130
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            0,
+            0,
+            255,
+            130
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            130
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            255,
+            2
+          ],
+          "png": [
+            0,
+            0,
+            255,
+            2
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.",
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.",
+          "SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks",
+          "Native-resolution layer/group/stroke mask coverage in embedded PNG tiles",
+          "Color overlays and document-space drop shadows as editable SVG filters"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs",
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    }
+  },
+  "pixelSummary": {
+    "appearanceFixtures": 22,
+    "nonAffineFixtures": 21,
+    "nonAffineByteExactAlphaAndPremultiplied": 16,
+    "nonAffineMaxAlpha": 2,
+    "nonAffineMaxPremultiplied": 2.0313725490196077,
+    "affine": {
+      "mode": "affine",
+      "alpha": 65,
+      "premult": 31.67058823529412,
+      "geometry": {
+        "area": 2280.619607843137,
+        "cx": 77.01191798582428,
+        "cy": 48.008186629708476,
+        "interiorErrors": 0,
+        "expectedArea": 2295.239001665004,
+        "circles": [
+          {
+            "x": 16,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 21.714285714285715,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 27.428571428571427,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 33.14285714285714,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 38.857142857142854,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 44.57142857142857,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 50.285714285714285,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 56,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 61.71428571428571,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 67.42857142857143,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 73.14285714285714,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 78.85714285714286,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 84.57142857142857,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 90.28571428571429,
+            "y": 32,
+            "r": 12
+          },
+          {
+            "x": 96,
+            "y": 32,
+            "r": 12
+          }
+        ]
+      },
+      "alternatives": {
+        "arc": {
+          "alpha": 65,
+          "premult": 31.67058823529412
+        },
+        "cubic": {
+          "alpha": 67,
+          "premult": 34.090196078431376
+        }
+      },
+      "differences": [
+        {
+          "x": 129,
+          "y": 57,
+          "svg": 72,
+          "png": 48
+        },
+        {
+          "x": 129,
+          "y": 58,
+          "svg": 23,
+          "png": 11
+        },
+        {
+          "x": 128,
+          "y": 59,
+          "svg": 192,
+          "png": 168
+        },
+        {
+          "x": 128,
+          "y": 60,
+          "svg": 44,
+          "png": 29
+        },
+        {
+          "x": 125,
+          "y": 62,
+          "svg": 204,
+          "png": 218
+        },
+        {
+          "x": 121,
+          "y": 63,
+          "svg": 240,
+          "png": 255
+        },
+        {
+          "x": 122,
+          "y": 63,
+          "svg": 179,
+          "png": 244
+        },
+        {
+          "x": 123,
+          "y": 63,
+          "svg": 115,
+          "png": 166
+        },
+        {
+          "x": 124,
+          "y": 63,
+          "svg": 51,
+          "png": 76
+        }
+      ],
+      "meanAlpha": 0.015736607142857142,
+      "holes": 0,
+      "circles": 15,
+      "rectangles": 0,
+      "images": 0,
+      "masks": 0,
+      "unchanged": true,
+      "revision": 6,
+      "after": 6,
+      "sourceUnchanged": true,
+      "samples": [
+        {
+          "x": 28,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 60,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 92,
+          "y": 42,
+          "svg": [
+            128,
+            64,
+            32,
+            255
+          ],
+          "png": [
+            128,
+            64,
+            32,
+            255
+          ]
+        },
+        {
+          "x": 85,
+          "y": 62,
+          "svg": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "png": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Original paint command settings and off-support brush dabs"
+        ]
+      }
+    }
+  },
+  "genuine50MP": {
+    "paint": "Original 10000x5000 image/source bytes preserved; native-resolution selection coverage is one 7x7 tile; seven independent native-coordinate 8x8 decoded SVG crops agree with native readback and expected paint alpha. This is not a full 50 MP composite SVG decode.",
+    "fullPngWorkflow": "Existing editor.e2e.ts import/WASM-edit/save/reopen/full-resolution PNG gate passes separately; timing is a single observation in broad log."
+  },
+  "diagnosticsAndCorrections": [
+    "Initial blanket affine pixel gate failed; all 15 authored circle positions/radii, transformed centroid, continuous union area within 1%, and fully solid/transparent coverage outside a two-local-pixel edge band are independently checked. Alternative SVG arc paths give identical maximum error; cubic circle approximations are worse. Product retains exact circles; diagnostics preserve residual errors.",
+    "Stroke support unit fixture initially distinguished negative zero from zero for an empty region; assertion now checks meaningful zero dimensions. No geometry algorithm was weakened.",
+    "Actual software-WebGPU numeric rejection retained one real buffer before cleanup. Final case checks every allocated buffer destroyed, no stale output, unchanged document, and a successful independent valid frame afterward."
+  ],
+  "limitations": [
+    "Original brush control points/settings and off-support dabs are not SVG brush commands; editable dabs/fills/alpha masks represent rendered geometry. Projects retain complete original data.",
+    "Clone snapshots and stroke/layer native coverage remain finite-resolution pixels; complete source snapshots can contain hidden pixels. Source file metadata is excluded.",
+    "Dense dabs and deep eraser sequences may exceed viewer XML/filter/memory capacity. Browser calls and individual native jobs remain cooperative rather than preemptible.",
+    "Affine/gradient antialiasing and intermediate quantization differ from native Canvas; no universal byte parity or cross-viewer/device fidelity claim.",
+    "Software WebGPU runs real WGSL, not hardware GPU performance. No p95/input-to-photon/long-task or whole-process peak-memory claim.",
+    "SVG adjustments/Blend If outside filtered native leaves, general SVG import/round-trip, shared symbols/master identity, broader formats and all remaining roadmap requirements remain open."
+  ],
+  "localLogs": {
+    "build": {
+      "path": "/tmp/canoli-svg-paint-build.log",
+      "sha256": "94dc560e4af5ba46fa26438662dd1377ab5e2302fdff1f703e3f99347e06877e"
+    },
+    "build-final": {
+      "path": "/tmp/canoli-svg-paint-build-final.log",
+      "sha256": "b3f24789e2972e4e79b36bd3e718f2980f4e77e04eef0e06306560a098f9f317"
+    },
+    "unit": {
+      "path": "/tmp/canoli-svg-paint-unit.log",
+      "sha256": "dd20ecc090766eed075bed1424f56b3fbdd7e41e595bb3183f7e40bef8334209"
+    },
+    "unit-final": {
+      "path": "/tmp/canoli-svg-paint-unit-final.log",
+      "sha256": "0c3a56d8113af62847fc1f57d72c97f1294653b1d73d7b5b141ae92f44d33f49"
+    },
+    "focused": {
+      "path": "/tmp/canoli-svg-paint-focused.log",
+      "sha256": "280ff5952b1179fa1a71851653a957e43f7a05f34ec5752f45e4dfbff2a78674"
+    },
+    "focused-final": {
+      "path": "/tmp/canoli-svg-paint-focused-final.log",
+      "sha256": "020753242eec14ddc19d287bebdaef815ab17f7c201cd1f7f395b36c63006bf2"
+    },
+    "initial": {
+      "path": "/tmp/canoli-svg-paint-initial.log",
+      "sha256": "3835f57b1ab9d284bd1de9949e896f9afff7876783f67c4cfefbe6d2d2c2ef1e"
+    },
+    "geometry": {
+      "path": "/tmp/canoli-svg-paint-geometry.log",
+      "sha256": "fd14eb132e92ff652e0501aae02d233163bad1ea5edae0f89857cba995ed75f1"
+    },
+    "arc-trial": {
+      "path": "/tmp/canoli-svg-paint-arc-trial.log",
+      "sha256": "23892a14be4afe67252d4ad9a56657219deb992b2abf18278efadc48f3ac4007"
+    },
+    "complete": {
+      "path": "/tmp/canoli-svg-paint-complete.log",
+      "sha256": "68ebcc014bcaf209a62d44909c4a7abc9e5209237a764b173c262f90a80dfa6c"
+    },
+    "bounded": {
+      "path": "/tmp/canoli-svg-paint-bounded.log",
+      "sha256": "cc37b9604f71661c5bdd9892bdb3b2a4e520a9954c17a9c56cee00274ca6826f"
+    },
+    "browser": {
+      "path": "/tmp/canoli-svg-paint-browser.log",
+      "sha256": "d4b737111ed1c4b9bf9c5fe2af1a63fa024fc2fd7f8db0540548605b53a11afa"
+    },
+    "cleanup-focused": {
+      "path": "/tmp/canoli-svg-paint-cleanup-focused.log",
+      "sha256": "e500a51bdab6fe97eaec6073e5390d7bf6684637ed825ce9e1183d1332550d61"
+    },
+    "gpu-final": {
+      "path": "/tmp/canoli-svg-paint-gpu-final.log",
+      "sha256": "b4ef79b4f85f575bf10ce253dae6b8a602dd4c31a5e7956aef342bf2c32416b1"
+    },
+    "production": {
+      "path": "/tmp/canoli-svg-paint-production.log",
+      "sha256": "8dd158521a69cadab186129f3a95211e8892a7a54b6f528e7bc8d14ede81da5d"
+    },
+    "final-checks": {
+      "path": "/tmp/canoli-svg-paint-final-checks.log",
+      "sha256": "460a930ddb06e9a56e744e3375858537f8bac574b47cbd6381d33a75e24b0eae"
+    }
+  }
+}

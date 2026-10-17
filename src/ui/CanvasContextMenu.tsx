@@ -35,7 +35,7 @@ export interface CanvasContextMenuProps {
   locked: boolean;
   onChooseTool(tool: Tool): void;
   onAddLayer(): void;
-  onAddAdjustmentLayer(kind: "curves" | "levels" | "tone" | "hsl"): void;
+  onAddAdjustmentLayer(kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut"): void;
   onGenerateLayer?(): void;
   onGenerativeFill?(): void;
   onDuplicateLayer(): void;
@@ -626,6 +626,8 @@ export function CanvasContextMenu({
           >
             HSL
           </button>
+          {(["color-balance","vibrance","gradient-map","white-balance","lut"] as const).map(kind=><button key={kind} type="button" className="button subtle button-sm" disabled={disabled}
+            onClick={()=>{onAddAdjustmentLayer(kind);onClose();}}>{kind==="color-balance"?"Color Balance":kind==="gradient-map"?"Gradient Map":kind==="white-balance"?"White Balance":kind==="lut"?"Color Lookup (LUT)":"Vibrance"}</button>)}
         </div>
         {onGenerateLayer && (
           <button

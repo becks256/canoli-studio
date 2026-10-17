@@ -1,8 +1,16 @@
 export { adjustHsl } from "./hsl";
+export { adjustChromatic } from "./chromatic";
+export { adjustGradientMap } from "./gradient-map";
+export { adjustWhiteBalance } from "./white-balance";
+export { adjustLookup } from "./lookup";
+export { selectColorRange } from "./color-range";
+export { quickSelectionInit, quickSelectionSpan, quickSelectionAlpha } from './quick-selection';
+export { subjectModel, subjectMaximum, subjectAlpha } from './subject-selection';
 export { spatialFilter } from "./spatial-filter";
 export { donorValidity } from "./donor";
 // A small, allocation-free ABI. The host owns the RGBA buffer and memory growth.
 export { poissonSolve } from "./poisson";
+export { mattingMultiply, mattingCondition } from './matting';
 // This module can be replaced by Rust/C++ without changing the document model.
 export function bufferOffset(): usize {
   return __heap_base;

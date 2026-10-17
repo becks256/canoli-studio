@@ -1,3 +1,6 @@
+import {vectorFillData,type VectorFillOptions} from './vector-gradient';
+import {vectorStrokeData,type VectorStrokeOptions} from './vector-stroke';
+import {parseSvgContours} from './svg-path-import';
 /**
  * Vector shape primitives, SVG path serialization, and SVG parsing
  * for Ticket T16 / F07 ("Vector and shape editing").
@@ -10,12 +13,13 @@
 
 import { id } from "./model";
 import type { PathAnchor, Point, Rect, VectorPathData } from "./drawing";
-import type { VectorLayerData } from "./model";
+export { formatSvgPathD, exportPathSvg } from "./svg-path";
+export { exportVectorLayerSvg } from "./svg-export";
 
 // Standard cubic Bézier constant for 90-degree circular arc: 4 * (sqrt(2) - 1) / 3
 export const KAPPA = 0.5522847498307936;
 
-export interface ShapeOptions {
+export interface ShapeOptions extends VectorStrokeOptions, VectorFillOptions {
   fill?: string | null;
   stroke?: string | null;
   strokeWidth?: number;
@@ -54,6 +58,8 @@ export function createRectanglePath(
       fill,
       stroke,
       strokeWidth,
+      ...vectorStrokeData(options),
+    ...vectorFillData(options),
     };
   }
 
@@ -103,6 +109,8 @@ export function createRectanglePath(
     fill,
     stroke,
     strokeWidth,
+    ...vectorStrokeData(options),
+    ...vectorFillData(options),
   };
 }
 
@@ -159,6 +167,8 @@ export function createEllipsePath(
     fill: options.fill ?? null,
     stroke: options.stroke === undefined ? "#d5e79b" : options.stroke,
     strokeWidth: options.strokeWidth ?? 2,
+    ...vectorStrokeData(options),
+    ...vectorFillData(options),
   };
 }
 
@@ -195,205 +205,14 @@ export function createPolygonPath(
     fill: options.fill ?? null,
     stroke: options.stroke === undefined ? "#d5e79b" : options.stroke,
     strokeWidth: options.strokeWidth ?? 2,
+    ...vectorStrokeData(options),
+    ...vectorFillData(options),
   };
 }
 
-/**
- * Converts a VectorPathData to an SVG path `d` attribute string.
- */
-export function formatSvgPathD(
-  path: Pick<VectorPathData, "points" | "closed">,
-): string {
-  if (path.points.length === 0) return "";
-  const first = path.points[0];
-  const parts: string[] = [`M ${first.x.toFixed(2)} ${first.y.toFixed(2)}`];
-  const count = path.points.length;
-  const limit = path.closed ? count : count - 1;
-
-  for (let i = 0; i < limit; i++) {
-    const current = path.points[i];
-    const next = path.points[(i + 1) % count];
-    const isLinear =
-      current.out.x === current.x &&
-      current.out.y === current.y &&
-      next.in.x === next.x &&
-      next.in.y === next.y;
-
-    if (isLinear) {
-      parts.push(`L ${next.x.toFixed(2)} ${next.y.toFixed(2)}`);
-    } else {
-      parts.push(
-        `C ${current.out.x.toFixed(2)} ${current.out.y.toFixed(2)}, ${next.in.x.toFixed(2)} ${next.in.y.toFixed(2)}, ${next.x.toFixed(2)} ${next.y.toFixed(2)}`,
-      );
-    }
-  }
-
-  if (path.closed) {
-    parts.push("Z");
-  }
-
-  return parts.join(" ");
-}
-
-/**
- * Generates an SVG `<path>` element string for a single VectorPathData.
- */
-export function exportPathSvg(path: VectorPathData): string {
-  const d = formatSvgPathD(path);
-  const fill = path.fill && path.closed ? path.fill : "none";
-  const stroke = path.stroke && path.strokeWidth > 0 ? path.stroke : "none";
-  const strokeWidth = path.strokeWidth > 0 ? path.strokeWidth : 1;
-
-  return `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />`;
-}
-
-/**
- * Generates a complete, valid SVG document for a VectorLayerData.
- */
-export function exportVectorLayerSvg(
-  layer: VectorLayerData,
-  width: number,
-  height: number,
-): string {
-  const pathElements = layer.paths
-    .map((p) => `    ${exportPathSvg(p)}`)
-    .join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
-  <g id="${layer.id}" opacity="${layer.opacity}">
-${pathElements}
-  </g>
-</svg>`;
-}
-
-/**
- * Parses SVG path `d` data string into an array of PathAnchors with in/out control points.
- * Supports commands: M, L, H, V, C, S, Z (both absolute and relative).
- */
-export function parseSvgPath(
-  d: string,
-): (Point & { in?: Point; out?: Point })[] {
-  const anchors: (Point & { in?: Point; out?: Point })[] = [];
-  const tokens = d.match(/([a-df-z]|[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?)/gi);
-  if (!tokens || tokens.length === 0) return anchors;
-
-  let cursor = 0;
-  let currentX = 0;
-  let currentY = 0;
-  let startX = 0;
-  let startY = 0;
-  let prevControlX = 0;
-  let prevControlY = 0;
-  let lastCommand = "";
-
-  const readNum = (): number => {
-    if (cursor >= tokens.length) return 0;
-    const num = parseFloat(tokens[cursor++]);
-    return isNaN(num) ? 0 : num;
-  };
-
-  while (cursor < tokens.length) {
-    const token = tokens[cursor];
-    if (/^[a-df-z]$/i.test(token)) {
-      lastCommand = tokens[cursor++];
-    }
-
-    const isRel = lastCommand === lastCommand.toLowerCase();
-    const cmd = lastCommand.toUpperCase();
-
-    if (cmd === "M") {
-      const x = readNum() + (isRel ? currentX : 0);
-      const y = readNum() + (isRel ? currentY : 0);
-      currentX = startX = x;
-      currentY = startY = y;
-      prevControlX = x;
-      prevControlY = y;
-      anchors.push({ x, y, in: { x, y }, out: { x, y } });
-      // Implicit subsequent pairs after M are treated as L commands
-      lastCommand = isRel ? "l" : "L";
-    } else if (cmd === "L") {
-      const x = readNum() + (isRel ? currentX : 0);
-      const y = readNum() + (isRel ? currentY : 0);
-      currentX = x;
-      currentY = y;
-      prevControlX = x;
-      prevControlY = y;
-      anchors.push({ x, y, in: { x, y }, out: { x, y } });
-    } else if (cmd === "H") {
-      const x = readNum() + (isRel ? currentX : 0);
-      currentX = x;
-      prevControlX = x;
-      prevControlY = currentY;
-      anchors.push({
-        x,
-        y: currentY,
-        in: { x, y: currentY },
-        out: { x, y: currentY },
-      });
-    } else if (cmd === "V") {
-      const y = readNum() + (isRel ? currentY : 0);
-      currentY = y;
-      prevControlX = currentX;
-      prevControlY = y;
-      anchors.push({
-        x: currentX,
-        y,
-        in: { x: currentX, y },
-        out: { x: currentX, y },
-      });
-    } else if (cmd === "C") {
-      const cp1x = readNum() + (isRel ? currentX : 0);
-      const cp1y = readNum() + (isRel ? currentY : 0);
-      const cp2x = readNum() + (isRel ? currentX : 0);
-      const cp2y = readNum() + (isRel ? currentY : 0);
-      const x = readNum() + (isRel ? currentX : 0);
-      const y = readNum() + (isRel ? currentY : 0);
-
-      if (anchors.length > 0) {
-        anchors[anchors.length - 1].out = { x: cp1x, y: cp1y };
-      }
-      anchors.push({ x, y, in: { x: cp2x, y: cp2y }, out: { x, y } });
-      currentX = x;
-      currentY = y;
-      prevControlX = cp2x;
-      prevControlY = cp2y;
-    } else if (cmd === "S") {
-      // Smooth cubic curve: cp1 is reflection of prevControl across current point
-      const cp1x = 2 * currentX - prevControlX;
-      const cp1y = 2 * currentY - prevControlY;
-      const cp2x = readNum() + (isRel ? currentX : 0);
-      const cp2y = readNum() + (isRel ? currentY : 0);
-      const x = readNum() + (isRel ? currentX : 0);
-      const y = readNum() + (isRel ? currentY : 0);
-
-      if (anchors.length > 0) {
-        anchors[anchors.length - 1].out = { x: cp1x, y: cp1y };
-      }
-      anchors.push({ x, y, in: { x: cp2x, y: cp2y }, out: { x, y } });
-      currentX = x;
-      currentY = y;
-      prevControlX = cp2x;
-      prevControlY = cp2y;
-    } else if (cmd === "Z") {
-      currentX = startX;
-      currentY = startY;
-      prevControlX = startX;
-      prevControlY = startY;
-      if (
-        anchors.length > 1 &&
-        Math.hypot(
-          anchors[anchors.length - 1].x - anchors[0].x,
-          anchors[anchors.length - 1].y - anchors[0].y,
-        ) < 0.05
-      ) {
-        anchors[0].in = anchors[anchors.length - 1].in;
-        anchors.pop();
-      }
-    } else {
-      // Skip unrecognized token to avoid infinite loop
-      cursor++;
-    }
-  }
-
-  return anchors;
+/** Single-contour SVG path conversion. Invalid or compound data rejects explicitly. */
+export function parseSvgPath(d:string):(Point & {in?:Point;out?:Point})[]{
+ const {contours}=parseSvgContours(d);
+ if(contours.length>1)throw new Error('VectorPath accepts one SVG contour. Import the SVG document for compound geometry.');
+ return contours[0]?.points??[];
 }

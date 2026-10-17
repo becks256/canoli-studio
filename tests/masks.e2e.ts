@@ -1,3 +1,4 @@
+import {expectPenControl} from './pen-control-position';
 import { test, expect } from "@playwright/test";
 
 test("mask inspector supports keyboard toggles, density, undo and script/project round trips", async ({
@@ -1263,10 +1264,8 @@ test("Pen mask target edits anchors and handles with keyboard, cancellation and 
   };
   // Accumulated layer origin 25,15 plus mask offset 5,5.
   await drag([60, 60], [70, 65]);
-  await expect(controls.locator("rect").first()).toHaveAttribute("x", "66");
-  await expect(controls.locator("rect").first()).toHaveAttribute("y", "61");
-  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cx", "85");
-  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cy", "65");
+  await expectPenControl(controls.locator("rect").first(), 70, 65);
+  await expectPenControl(controls.locator("circle").nth(1), 85, 65);
   expect(await read()).toEqual(before);
   await page.mouse.up();
   expect(await read()).toEqual({
@@ -1279,14 +1278,12 @@ test("Pen mask target edits anchors and handles with keyboard, cancellation and 
   await page.keyboard.press("Control+Shift+z");
   const moved = await read();
   await drag([85, 65], [95, 75]);
-  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cx", "95");
-  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cy", "75");
+  await expectPenControl(controls.locator("circle").nth(1), 95, 75);
   await page.keyboard.press("Escape");
   await page.mouse.up();
   expect(await read()).toEqual(moved);
   await drag([85, 65], [95, 75]);
-  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cx", "95");
-  await expect(controls.locator("circle").nth(1)).toHaveAttribute("cy", "75");
+  await expectPenControl(controls.locator("circle").nth(1), 95, 75);
   await page.mouse.up();
   expect((await read()).anchor).toEqual({
     x: 40,

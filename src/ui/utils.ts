@@ -2,6 +2,7 @@ import type { AffineTransform } from "../core/affine";
 import type { LayerPatch } from "../core/commands";
 import type { Point } from "../core/drawing";
 import { measureTextBounds } from "../core/model";
+import type {TextStyle} from '../core/text-style';
 
 /**
  * Triggers a browser file download using an ephemeral object URL anchor.
@@ -32,6 +33,7 @@ export interface ResizeDragState {
   layerText?: string;
   layerFontFamily?: string;
   layerLineHeight?: number;
+  layerTextStyle?: TextStyle;
   layerKind: "raster" | "text";
 }
 
@@ -133,7 +135,14 @@ export function computeResizePatch(
   newWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newWidth));
   newHeight = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newHeight));
 
-  if (layerKind === "text" && layerFontSize && layerText) {
+  if (layerKind === "text" && layerFontSize && (layerText || drag.layerTextStyle?.wrapWidth != null)) {
+    if (drag.layerTextStyle?.wrapWidth != null) {
+      const wrapWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, layerWidth+effectiveDx));
+      const bounds = measureTextBounds(layerText??'', layerFontSize, layerFontFamily??'sans-serif', layerLineHeight??1.2, {...drag.layerTextStyle, wrapWidth});
+      return {wrapWidth,
+        x: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='sw'?layerX+layerWidth-bounds.width:layerX)),
+        y: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='ne'?layerY+layerHeight-bounds.height:layerY))};
+    }
     const scale =
       Math.abs(effectiveDx) > Math.abs(effectiveDy)
         ? (layerWidth + effectiveDx) / layerWidth
@@ -147,10 +156,11 @@ export function computeResizePatch(
       ),
     );
     const newBounds = measureTextBounds(
-      layerText,
+      layerText??'',
       newFontSize,
       layerFontFamily ?? "sans-serif",
       layerLineHeight ?? 1.2,
+      drag.layerTextStyle,
     );
     let textX = layerX;
     let textY = layerY;

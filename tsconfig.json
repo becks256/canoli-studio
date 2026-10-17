@@ -16,11 +16,13 @@
   },
   "include": [
     "src",
+    "benchmarks",
     "server",
     "tests",
     "vite.config.ts",
     "playwright.config.ts",
-    "playwright.production.config.ts"
+    "playwright.production.config.ts",
+    "playwright.matting.config.ts"
   ],
   "exclude": ["assembly"]
 }

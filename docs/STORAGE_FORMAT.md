@@ -4,7 +4,9 @@ Implemented first storage slice, 2026-09-22. This is partial delivery of roadmap
 
 ## Portable `.luma` container v3
 
-The browser now retains original compressed image bytes as `Blob` objects rather than eager base64 strings. New downloads have MIME `application/x-luma` and keep the `.luma` extension. The inner document schema is version 16: RLE pixel selection coverage and raster erasure records (v15 added HSL adjustments) (v14 added layer comps, v13 linked local-image snapshots, v12 smart-filter masks, v11 ordered smart filters, v10 embedded components, v9 retouch patches, v8 tonal strokes, v7 guides, v6 layer affine bases, v5 affine selections, v4 adjustment layers, v3 masks and v2 authored metadata). Valid inner v1–v15 documents migrate to v16 when opened. Older readers reject unsupported schemas rather than discard their new fields. The outer container remains version 3. The loader still accepts legacy version-1 JSON/base64 project files and converts their assets to blobs without altering their bytes. The reader accepts v1 JSON and v2 binary input; new saves write v3. Older builds cannot open v3 downloads.
+Schema 27 adds optional paragraphJustify (none/inter-word); schema 26 added text wrapWidth (nullable point/paragraph frame), paragraphSpacing and firstLineIndent; schema 25 introduced wordSpacing/fontKerning. Absent legacy paragraph values retain point layout and 0/0 spacing/indent without injecting fields. New fields under older root/history labels reject; valid v1–v26 roots/history upgrade to 27. Project 3/workspace 2 and original asset bytes remain unchanged. Complete authored text and paragraph settings persist independently of local fonts; derived visual lines and font files are not stored.
+
+The browser now retains original compressed image bytes as `Blob` objects rather than eager base64 strings. New downloads have MIME `application/x-luma` and keep the `.luma` extension. The inner document schema is version 27: optional native inter-word paragraph justification (v26 added paragraph wrapping, spacing and first-line indent) (v25 added word spacing and font kerning) (v24 added native compound contours and fill rules) (v23 added vector gradient fills) (v22 added vector stroke styles) (v21 added saved alpha channels) (v20 added portable LUT tables) (v19 added White Balance adjustment records) (v18 added gradient maps) (v17 added Color Balance and Vibrance) (v16 added RLE pixel selection coverage and raster erasures; v15 added HSL adjustments) (v14 added layer comps, v13 linked local-image snapshots, v12 smart-filter masks, v11 ordered smart filters, v10 embedded components, v9 retouch patches, v8 tonal strokes, v7 guides, v6 layer affine bases, v5 affine selections, v4 adjustment layers, v3 masks and v2 authored metadata). Valid inner v1–v26 documents migrate to v27 when opened. Older readers reject unsupported schemas rather than discard their new fields. The outer container remains version 3. The loader still accepts legacy version-1 JSON/base64 project files and converts their assets to blobs without altering their bytes. The reader accepts v1 JSON and v2 binary input; new saves write v3. Older builds cannot open v3 downloads.
 
 The binary layout is:
 
@@ -54,7 +56,7 @@ Document schema v4 introduces `AdjustmentLayerData` with `kind: "adjustment"`. T
 
 Adjustment layers store no asset references or pixel dimensions; serialization encodes their adjustment parameters (curves control points, levels channel ranges, and tone parameters) directly in the manifest JSON. Layer masks attached to adjustment layers serialize in the same format as raster/group masks.
 
-The historical schema notes above refer to the container version used when those features first shipped. Current saves use outer v3 with inner document schema v8; those are independent version numbers. V2 binary input uses the original 16-byte header and no checksums, while v3 uses a 48-byte header. No arbitrary file-size or megapixel restriction was introduced.
+The historical schema notes above refer to the container version used when those features first shipped. Current saves use outer v3 with inner document schema v24; those are independent version numbers. V2 binary input uses the original 16-byte header and no checksums, while v3 uses a 48-byte header. No arbitrary file-size or megapixel restriction was introduced.
 
 Schema 6 also supports optional `mask.basis`, an invertible affine matrix with zero e/f translation. Mask x/y remain the offset; linked coverage composes the layer world matrix, offset and basis, while unlinked coverage uses offset and basis alone. Older schema versions reject this field. Missing bases retain identity behavior.
 
@@ -183,3 +185,38 @@ Asset display filenames retain their complete string through import, copying and
 Optional `layerComps` stores document-owned presentation snapshots with unique comp and target IDs. Visibility, local placement/dimensions and common appearance are selected by capture flags; source bytes and layer contents are not duplicated. Missing layer targets remain valid for recoverable deletion workflows. Older schemas reject this field before migration. Readers still accept schemas 1–13, and DOM reconstruction upgrades current/retained-history documents to 14. Binary project format remains version 3; workspace value version remains 2.
 
 Browser workspace checkpoints now encode project manifests and retained history in a module worker. The project/container versions and on-disk representation are unchanged. In-memory history shares immutable subtrees; JSON encoding still repeats historical values, so saved history size depends on document content and retained edits.
+
+
+Schema 18 gradient maps embed 2–32 strictly ordered `{position, color}` stops and `reverse` in the adjustment layer. Colors are six-digit encoded-sRGB hex; alpha belongs to the existing backdrop. Full settings persist in projects, recovery, workspace history and recipe commands without additional assets or external files. Older schema labels cannot contain this new adjustment kind.
+
+
+Schema 19 stores White Balance `{kind:"white-balance", temperature, tint}` in the normal adjustment layer. Both validated values persist without new asset dependencies. Schema-18 and older labels reject this new kind, while valid old projects/history migrate to the current schema. Outer container v3 and workspace v2 remain unchanged.
+
+
+Schema 20 embeds portable LUT records: `{kind:"lut", lut:{title, dimension, size, domainMin, domainMax, data}, amount, interpolation}`. The canonical base64 payload is exactly a red-fastest RGB float32 table in little-endian order. Validators check all decoded values, lengths and domains; source files are not required after import. Tables and redo-only edits persist through project/workspace/history/recipes without new asset references. Current saves use inner schema 24; valid earlier roots upgrade and earlier labels reject LUT records. Project container 3 and workspace snapshot 2 remain unchanged. Standard-format size and actual device allocation/automation limits are distinct from image resolution.
+
+
+Color Range results reuse existing pixel-selection RLE records (introduced in document schema 16). Current document schema is 24, project container 3 and workspace 2. Portable selection/history/recipe records contain final coverage, not a dependency on live source sampling, an external file or a future renderer. Current and redo-only selections survive workspace restoration; source image bytes remain original. Dense color coverage can still require substantial serialized RLE and encounter actual browser/process or automation limits.
+
+
+## Schema 21: saved alpha channels
+
+Optional document `alphaChannels` stores up to 64 ordered `{id,name,selection}` values with unique channel IDs. Selection uses the existing fractional/affine/RLE representation; there are no new source assets or external references. Omitted means no saved channels. Pre-21 labels containing this field reject, even when empty; valid v1–v20 data otherwise migrates unchanged to 21. Project container 3 and workspace 2 are unchanged, and the same validation applies to current and redo-only history. Crop rebases geometry; image resize scales it; canvas resize keeps it fixed. Dense coverage can exceed script/command/request or process-memory budgets without introducing an image-resolution cap.
+
+
+## Schema 22: native vector stroke styles
+
+Vector paths optionally store strokeCap (butt/round/square), strokeJoin (miter/round/bevel), strokeMiterLimit (finite ratio ≥1), strokeDashArray (up to 256 nonnegative finite local-unit lengths), and strokeDashOffset (finite signed local-unit displacement). Style magnitudes are bounded by safe integer precision, with fractions allowed. Absent fields preserve legacy round/round/4/solid/0 semantics without rewriting older paths. Odd dash arrays repeat; all-zero arrays are solid. Pre-22 labels containing any new field reject before migration; valid older roots and retained workspace history otherwise upgrade normally. New saves retain styles and original image bytes in container 3; workspace snapshot 2 remains unchanged. No source-size/megapixel cap or precision/print guarantee is introduced.
+
+
+Schema 23 stores optional nullable path `fillGradient` values: strict linear/radial local geometry, ordered hex/opacity stops and optional affine paint transform. Solid fill remains available beneath active gradients. Paths without the field retain their exact legacy records; pre-23 labels containing it reject. Current/redo-only project/workspace history preserves complete values, without new asset references or outer container changes.
+
+
+### Native compound paths (schema 24)
+
+Optional VectorPath `fillRule` and `subpaths` retain closed additional boundaries with `{id, points, closed:true}`. Primary fields remain backward-shaped. Fill rule defaults nonzero; holes/islands share path paint. All contours together support 20,000 anchors and 128 contours, with scoped unique IDs. Valid v1–v23 roots and retained history upgrade to v24 without injecting fields or changing assets; older version labels containing either new field reject even when validation proofs are cached. Container 3/workspace 2, checksums, binary markers and image bytes are unchanged. Duplication creates independent contour IDs; redo stores final geometry. Recipes can retain full layer-add templates; standalone path edits remain unsupported.
+
+
+### Completed Boolean geometry
+
+Boolean editing uses existing schema-24 VectorPath/subpath values and canonical nonzero result winding, with no container/workspace version change. The first path ID/style is retained; additional result contour IDs are newly allocated. `paths.replace` commits final geometry atomically and removes other operand paths/empty operand vector layers. Retained history/project/workspace snapshots keep native cubic boundaries, including holes and disconnected areas; reopen and undo do not rerun Paper.js or depend on live source geometry. Pixels and original compressed images remain unchanged. Existing full layer-add recipe templates can carry final compounds; standalone replacement recording remains unsupported.

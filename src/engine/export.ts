@@ -1,17 +1,33 @@
 import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
-import type { DocumentData, VectorLayerData } from "../core/model";
+import type { DocumentData } from "../core/model";
 import { allLayers } from "../core/model";
 import type { DocumentRenderer } from "./renderer";
 import { exportPng, encodeRgbaPng } from "./png";
 import { createCanvas, release } from "./canvas";
-import { exportPathSvg } from "../core/shapes";
-import { documentToPsd } from "../core/interchange/psd/bridge";
+import { exportSvgBlob } from "../core/svg-export";
+import { planSvgMasks } from '../core/svg-masks';
+import { prepareSvgMasks } from './svg-masks';
+import {planSvgStyles} from '../core/svg-styles';
+import {planSvgImages} from '../core/svg-images';
+import {svgArtwork} from '../core/svg-styles';
+import {captureSvgSources,prepareSvgImages} from './svg-images';
+import {prepareSvgTexts} from './svg-text';
+import {planSvgTexts} from '../core/svg-text';
+import {planSvgSmart,type SvgSmartPlan} from '../core/svg-smart';
+import {planSvgPaint} from '../core/svg-paint';
+import {planSvgComposition,type SvgCompositionPlan} from '../core/svg-composition';
+import { exportPsd } from "./psd";
+import { planPsdExport, type PsdExportMode } from "../core/interchange/psd/export-plan";
+import {exportTiff} from './tiff';
+import {validateTiffVariant,type TiffVariant} from '../core/tiff';
 
-export type ExportFormat = "png" | "jpeg" | "webp" | "svg" | "psd";
+export type ExportFormat = "png" | "jpeg" | "webp" | "svg" | "psd" | "tiff";
 
 export interface ExportOptions {
   format: ExportFormat;
+  psdMode?: PsdExportMode;
+  tiffVariant?: TiffVariant;
   quality?: number; // 0.01 to 1.0 (for JPEG and WebP)
   backgroundColor?: string; // background fill for JPEG (default: "#ffffff")
 }
@@ -39,21 +55,33 @@ export function getExportCapabilityReport(
   document: DocumentData,
   options: ExportOptions,
 ): ExportCapabilityReport {
+  const smart=options.format==='svg'?planSvgSmart(document):undefined;
+  return describeExport(document,options,smart,smart?planSvgComposition(smart.document):undefined);
+}
+function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSmartPlan,composition?:SvgCompositionPlan):ExportCapabilityReport{
+  if(composition)document=composition.document;else if(smart)document=smart.document;
   const format = options.format;
   const layers = allLayers(document.children);
   const hasVectors = layers.some((l) => l.kind === "vector");
-  const hasRasters = layers.some(
-    (l) => l.kind === "raster" || l.kind === "paint",
-  );
   const hasAdjustments = layers.some((l) => l.kind === "adjustment");
   const hasText = layers.some((l) => l.kind === "text");
-  const hasNonVectorLayers = hasRasters || hasAdjustments || hasText;
 
   const warnings: string[] = [];
   const featuresPreserved: string[] = [];
   const featuresDegradedOrOmitted: string[] = [];
 
   switch (format) {
+    case "tiff":
+      const variant=validateTiffVariant(options.tiffVariant);
+      featuresPreserved.push('Native document resolution and visible composition','Lossless Deflate-compressed 8-bit sRGB pixels','Unassociated RGBA transparency','Embedded output sRGB ICC profile');
+      warnings.push('TIFF is one flattened image. Save a Canoli Studio project for editable layers, masks, text, effects and original sources.');
+      warnings.push('Resolution metadata is 72 DPI; pixel dimensions are unchanged. Source EXIF/GPS and authored metadata are not copied.');
+      if(variant==='big')warnings.push('BigTIFF requires a compatible viewer. Some TIFF applications support only classic TIFF.');
+      else if(variant==='auto')warnings.push('Automatic selects classic TIFF when its actual output fits; larger files use BigTIFF and require a compatible viewer.');
+      else warnings.push('Classic TIFF uses 32-bit file addresses. If the output exceeds that format, choose Automatic or BigTIFF.');
+      featuresDegradedOrOmitted.push('Editable layers, masks, typography, effects and component links','Higher-bit-depth, CMYK/HDR and multipage output','Source-file and authored metadata');
+      if(document.alphaChannels?.length)featuresDegradedOrOmitted.push('Saved alpha channels');
+      break;
     case "png":
       featuresPreserved.push(
         "Full alpha channel (transparency)",
@@ -104,38 +132,113 @@ export function getExportCapabilityReport(
       break;
 
     case "svg":
-      if (!hasVectors) {
+      if (!document.children.some(svgArtwork)) {
         warnings.push(
-          "The document contains no vector layers. The resulting SVG will be an empty canvas.",
+          "The document contains no visible vector, raster, text or paint artwork. The resulting SVG will be an empty canvas.",
         );
-      } else {
+      }
+      if(hasVectors){
         featuresPreserved.push(
           "Infinitely scalable Bézier vector paths",
           "Fill, stroke, and stroke-width styling",
+          "Editable stroke caps, joins, miter limits, dash arrays and dash offsets",
+          "Editable linear and radial vector gradient fills, opacity stops and affine paint coordinates",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
         );
       }
-      if (hasNonVectorLayers) {
-        warnings.push(
-          "SVG export extracts only vector layers. Raster, paint, text, and adjustment layers cannot be preserved as vector paths and will be omitted.",
-        );
-        featuresDegradedOrOmitted.push(
-          "Raster and paint layers",
-          "Adjustment layers",
-          "Text layers",
-        );
+      const rasterPlans=planSvgImages(document).filter(plan=>plan.layer.kind==='raster'&&!plan.prefix);
+      if(composition?.prefixes){
+        featuresPreserved.push('Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes');
+        warnings.push(`SVG renders ${composition.prefixes} affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.`);
+        warnings.push(`Native backdrop stacks end at: ${composition.stacks.map(name=>JSON.stringify(name)).join(', ')}.`);
+        warnings.push('Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.');
+        featuresDegradedOrOmitted.push('Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes');
       }
+      const paintPlans=planSvgPaint(document);
+      if(paintPlans.length){
+        featuresPreserved.push('Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks');
+        if(paintPlans.some(plan=>plan.layer.strokes.some(stroke=>stroke.kind==='clone')))featuresPreserved.push('Native-resolution clone snapshots with editable brush coverage and placement');
+        warnings.push('SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.');
+        featuresDegradedOrOmitted.push('Original paint command settings and off-support brush dabs');
+      }
+      if(smart&&(smart.expanded||smart.filtered)){
+        featuresPreserved.push('Smart-object instance placement, masks, styles and supported contents');
+        if(smart.expanded)featuresPreserved.push(composition?.prefixes?'Unfiltered master contents and canvas clipping, editable outside native backdrop prefixes':'Unfiltered master vector/raster/text/paint contents and editable master-canvas clipping');
+        warnings.push('SVG expands smart-object instances independently. Shared master links and component identity are not retained; save a project to keep them.');
+        featuresDegradedOrOmitted.push('Smart-object master links and shared component identity');
+        if(smart.filtered){
+          featuresPreserved.push('Native-rendered smart filters and filter masks in document-resolution PNG pixels');
+          warnings.push('Active smart filters and their master contents/filter masks are baked into document-resolution PNG images clipped to expanded shadow support. Outer masks and styles remain separate outside native backdrop prefixes; save a project for editable filters and masters.');
+          featuresDegradedOrOmitted.push('Editable smart filters, filter-mask geometry and filtered master contents/off-support pixels');
+        }
+      }
+      if(planSvgTexts(document).length){
+        featuresPreserved.push('Editable SVG text with measured line baselines, typography, alignment and direction');
+        if (planSvgTexts(document).some(layer => layer.wrapWidth != null || layer.paragraphSpacing || layer.firstLineIndent || layer.paragraphJustify==='inter-word'))
+          warnings.push('Paragraph text is exported as editable positioned lines. Original paragraph reflow settings and soft-break source spacing are retained in the native project, not portable SVG layout.');
+        if(planSvgTexts(document).some(layer=>layer.paragraphJustify==='inter-word'))featuresPreserved.push('Editable per-line native inter-word justification spacing');
+        warnings.push('SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model.');
+        if (planSvgTexts(document).some(layer => layer.paragraphJustify==='inter-word' || (layer.wordSpacing && /(?:^|\n)[ \t\r\f\u00a0]|[ \t\r\f\u00a0](?:\n|$)/u.test(layer.text)))) {
+          warnings.push('Native Canvas and SVG text can space glyphs differently at whitespace boundaries, even with the same local font. Choose PNG for the editor’s rendered glyph appearance.');
+          featuresDegradedOrOmitted.push('Guaranteed Canvas/SVG boundary-space glyph placement');
+          if(planSvgTexts(document).some(layer=>layer.paragraphJustify==='inter-word'))warnings.push('Fractional text positions, tracking and nonbreaking spaces can produce additional Canvas/SVG glyph-placement differences. Save a native project for the complete text model; use PNG for the rendered appearance.');
+        }
+        featuresDegradedOrOmitted.push('Embedded font files and guaranteed cross-viewer text appearance');
+      }
+      if(rasterPlans.length){
+        if(rasterPlans.some(plan=>!plan.rendered)){
+          featuresPreserved.push('Native-resolution raster imagery as embedded PNG pixels, without original source-file metadata');
+          warnings.push('SVG embeds complete decoded source images, including pixels hidden by masks or canvas clipping. Choose PNG for flattened delivery. Original source-file metadata is excluded.');
+        }
+        if(rasterPlans.some(plan=>plan.rendered)){
+          featuresPreserved.push('Rendered raster tone effects and erasures in document-resolution PNG pixels, without original source-file metadata');
+          warnings.push('Raster tone effects and erasures are baked into document-resolution PNG images clipped to the expanded output support. Save a project to retain editable raster operations and original sources.');
+          featuresDegradedOrOmitted.push('Editable raster tone effects/erasures and off-support pixels of processed rasters');
+        }
+      }
+      const vectorTree = layers.filter(layer => layer.kind === "vector" || layer.kind === "group"||layer.kind==='raster'||layer.kind==='text'||layer.kind==='smart-object'||layer.kind==='paint');
+      const svgMasks=planSvgMasks(document);
+      if(svgMasks.some(plan=>plan.vector))featuresPreserved.push('Editable unfeathered vector layer/group masks, density and inversion');
+      if(svgMasks.some(plan=>!plan.vector)){
+        featuresPreserved.push('Native-resolution layer/group/stroke mask coverage in embedded PNG tiles');
+        warnings.push('Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.');
+        featuresDegradedOrOmitted.push('Editable geometry and unlimited scaling of rasterized mask coverage');
+      }
+      if(planSvgStyles(document).length){
+        featuresPreserved.push('Color overlays and document-space drop shadows as editable SVG filters');
+        warnings.push('SVG layer effects require a viewer supporting SVG filters. Viewers may rasterize effects internally; blur, edge sampling and working-memory limits can differ from native PNG rendering.');
+      }
+      if (vectorTree.some(layer => layer.blendMode !== "normal"))
+        warnings.push("SVG blend modes require a viewer supporting CSS mix-blend-mode and isolation. Native backdrop prefixes retain their internal blending in pixels.");
+      if (document.alphaChannels?.length)
+        featuresDegradedOrOmitted.push("Saved alpha channels");
       break;
 
     case "psd":
-      if (layers.some((layer) => layer.kind === "raster" && layer.erasures?.length))
-        warnings.push("PSD export cannot preserve raster erasures yet; use a Canoli Studio project or PNG.");
+      const plan = planPsdExport(document, options.psdMode);
+      if(document.alphaChannels?.length){
+        warnings.push('Saved alpha channels are omitted from PSD export. Save a Canoli Studio project to retain them.');
+        featuresDegradedOrOmitted.push('Saved alpha channels');
+      }
       featuresPreserved.push(
-        "Individual raster layers preserved with coordinates and names",
-        "Layer opacity and blend modes",
+        "Rendered composition and transparency at native document resolution",
         "8-bit RGB channels with PackBits RLE compression",
         "Embedded ICC color profile (sRGB)",
-        "Standard Photoshop composite image",
+        "Merged preview with transparency",
       );
+      if (document.width > 30000 || document.height > 30000)
+        warnings.push("PSD dimensions cannot exceed 30,000 pixels per side. Choose PNG or save a Canoli Studio project; PSB export is not implemented.");
+      if (options.psdMode === "flatten") {
+        warnings.push("All visible artwork is merged into one pixel layer. Hidden content and editable layer settings are not retained.");
+        featuresDegradedOrOmitted.push("Separate layers and editable effects");
+      } else {
+        featuresPreserved.push("Independent top-level layers retained as named pixel layers", "Layer opacity and blend modes");
+        if (plan.mergedThrough >= 0) {
+          warnings.push(`The bottom ${plan.mergedThrough + 1} top-level layers are merged through “${document.children[plan.mergedThrough].name}” to preserve adjustment or Blend If appearance, including current visibility. Hidden content in that merged portion is not retained.`);
+          featuresDegradedOrOmitted.push("Layer separation and adjustment settings in the merged portion");
+        }
+      }
       if (hasVectors) {
         warnings.push(
           "Vector shape layers are rasterized into pixel layers in PSD export.",
@@ -152,10 +255,18 @@ export function getExportCapabilityReport(
       }
       if (hasAdjustments) {
         warnings.push(
-          "Adjustment layers are flattened into underlying raster layers.",
+          "Adjustment appearance is baked into pixels; adjustment parameters are not editable in the PSD.",
         );
         featuresDegradedOrOmitted.push("Non-destructive adjustment layers");
       }
+      if (layers.some(layer => layer.kind === "group")) {
+        warnings.push("Groups are rendered as pixel layers. Their child layers and hierarchy are baked together.");
+        featuresDegradedOrOmitted.push("Group hierarchy and child-layer editability");
+      }
+      if (layers.some(layer => layer.kind === "smart-object"))
+        featuresDegradedOrOmitted.push("Editable smart objects, linked sources and smart filters (rendered to pixels)");
+      warnings.push("Masks, effects, fill opacity and transforms are baked into pixels. Complex layer content is clipped to the document canvas; ordinary placed rasters retain their pixel bounds. Save .luma to retain full editability.");
+      featuresDegradedOrOmitted.push("Editable masks, transforms, styles, paint operations and metadata");
       break;
   }
 
@@ -180,32 +291,37 @@ export async function exportDocument(
   control?: ExportControl,
 ): Promise<ExportResult> {
   checkExport(control);
+  // TIFF captures sources/fonts before the first user progress callback.
+  if(options.format==='tiff'){
+    const report=getExportCapabilityReport(document,options);
+    const blob=await exportTiff(document,assets,renderer,validateTiffVariant(options.tiffVariant),control);
+    return{blob,mimeType:'image/tiff',extension:'tif',report};
+  }
+  const smart=options.format==='svg'?planSvgSmart(document):undefined;
+  const composition=smart?planSvgComposition(smart.document):undefined;
+  const authored=document;if(composition)document=composition.document;
+  const currentSources=options.format==='svg'?captureSvgSources(document,assets,control,[...smart!.filteredAssets,...composition!.nativeAssets]):()=>checkExport(control);
   control?.onProgress?.({phase:"rendering",fraction:null});
-  const report = getExportCapabilityReport(document, options);
+  const report = describeExport(authored, options,smart,composition);
 
   if (options.format === "svg") {
-    const vectorLayers = allLayers(document.children).filter(
-      (l): l is VectorLayerData => l.kind === "vector" && l.visible,
-    );
-    const layerElements: string[] = [];
-    for (const layer of vectorLayers) {
-      const transform =
-        layer.x !== 0 || layer.y !== 0
-          ? ` transform="translate(${layer.x}, ${layer.y})"`
-          : "";
-      const opacity = layer.opacity < 1 ? ` opacity="${layer.opacity}"` : "";
-      const paths = layer.paths
-        .map((path) => `    ${exportPathSvg(path)}`)
-        .join("\n");
-      layerElements.push(
-        `  <g id="${layer.id}"${opacity}${transform}>\n${paths}\n  </g>`,
-      );
-    }
-    const svgText = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${document.width} ${document.height}" width="${document.width}" height="${document.height}">
-${layerElements.join("\n")}
-</svg>`;
-    const blob = new Blob([svgText], { type: "image/svg+xml" });
+    currentSources();
+    const texts=await prepareSvgTexts(document,control,currentSources,[...smart!.filteredTexts,...composition!.nativeTexts]);
+    const currentSvg=()=>{currentSources();texts.check();};
+    const hasImages=planSvgImages(document).length>0,hasNativeMasks=planSvgMasks(document).some(plan=>!plan.vector);
+    const imageShare=hasImages?(hasNativeMasks?0.5:1):0;
+    const stage=(start:number,share:number):ExportControl=>({signal:control?.signal,onProgress:p=>{
+      currentSvg();
+      if(p.phase==='rendering'&&p.fraction!==null)control?.onProgress?.({phase:'rendering',fraction:start+p.fraction*share});
+    }});
+    const images=await prepareSvgImages(document,assets,renderer,stage(0,imageShare),currentSvg);
+    currentSvg();
+    const masks=await prepareSvgMasks(document,assets,renderer,stage(imageShare,1-imageShare));
+    currentSvg();
+    const blob = await exportSvgBlob(document,{signal:control?.signal,onProgress:p=>{
+      currentSvg();control?.onProgress?.(p);currentSvg();
+    }},masks,images,texts.layouts);
+    currentSvg();
     return {
       blob,
       mimeType: "image/svg+xml",
@@ -215,32 +331,7 @@ ${layerElements.join("\n")}
   }
 
   if (options.format === "psd") {
-    const psdBytes = await documentToPsd(
-      document,
-      async (assetId) => {
-        if (!assets.has(assetId)) return null;
-        const asset = assets.get(assetId);
-        const canvas = createCanvas(asset.width, asset.height);
-        try {
-          const ctx = canvas.getContext("2d")!;
-          ctx.drawImage(asset.bitmap, 0, 0);
-          return ctx.getImageData(0, 0, asset.width, asset.height);
-        } finally {
-          release(canvas);
-        }
-      },
-      { embedIcc: true, includeComposite: true },
-    );
-    const blob = new Blob(
-      [
-        new Uint8Array(
-          psdBytes.buffer as ArrayBuffer,
-          psdBytes.byteOffset,
-          psdBytes.byteLength,
-        ),
-      ],
-      { type: "image/vnd.adobe.photoshop" },
-    );
+    const blob = await exportPsd(document, assets, renderer, options.psdMode, control);
     return {
       blob,
       mimeType: "image/vnd.adobe.photoshop",
@@ -248,6 +339,7 @@ ${layerElements.join("\n")}
       report,
     };
   }
+
 
   if (options.format === "png") {
     const blob = await exportPng(document, assets, renderer, control);

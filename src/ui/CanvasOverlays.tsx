@@ -34,12 +34,18 @@ export function CanvasOverlays({
   const mask = selected?.mask;
   const pathTransform =
     editingMask && mask && world ? maskTransform(mask, world) : world;
+  // SVG implementations may round local coordinates and translations
+  // separately to float precision. Keep the former absolute-coordinate path
+  // when cancellation could lose a visible fraction of a screen pixel.
+  // This is a display-precision fallback, never a document-coordinate limit.
+  const sharePenTranslation = !!pathTransform &&
+    Math.max(Math.abs(pathTransform.e), Math.abs(pathTransform.f)) * zoom * 2 ** -23 <= 1 / 1024;
   const localPaths = editingMask
     ? mask?.kind === "vector"
       ? mask.paths.map((path, index) => ({ ...path, id: `mask-${index}` }))
       : []
     : selected?.kind === "vector"
-      ? selected.paths
+      ? selected.paths.flatMap(path => [path, ...(path.subpaths ?? []).map(contour => ({ ...contour, id: `${path.id}/${contour.id}` }))])
       : [];
   const selectedAnchor = controller.selectedMaskAnchor;
   return (
@@ -63,6 +69,14 @@ export function CanvasOverlays({
         </pattern>
       </defs>
       {state.lassoPoints && <path data-testid="lasso-preview" d={state.lassoPoints.map((p,i)=>`${i ? "L" : "M"}${p.x} ${p.y}`).join(" ")+" Z"} fill="none" stroke="url(#selection-hatch)" strokeWidth={1.5/zoom} strokeDasharray={`${5/zoom} ${3/zoom}`} />}
+      {state.quickSelectionPoints&&<g data-testid="quick-selection-seeds" fill="none" stroke="white" opacity={.4}>
+        <circle cx={state.quickSelectionPoints[0].x} cy={state.quickSelectionPoints[0].y} r={state.settings.quickSize/2} fill="white" stroke="none"/>
+        <polyline points={state.quickSelectionPoints.map(point=>`${point.x},${point.y}`).join(' ')} strokeWidth={state.settings.quickSize} strokeLinecap="round" strokeLinejoin="round"/>
+      </g>}
+      {controller.drawingPolygonLasso && state.lassoPoints?.slice(0, controller.polygonLassoPointCount).map((point, index) => (
+        <circle key={index} cx={point.x} cy={point.y} r={(index === 0 ? 4 : 2.5)/zoom}
+          fill="var(--color-app)" stroke="var(--color-accent)" strokeWidth={1.5/zoom} />
+      ))}
       {document.selection?.regions.map((r, index) =>
         r.shape === "pixels" ? (
           <g key={index} transform={r.transform ? `matrix(${r.transform.a} ${r.transform.b} ${r.transform.c} ${r.transform.d} ${r.transform.e} ${r.transform.f})` : undefined}>
@@ -183,11 +197,11 @@ export function CanvasOverlays({
         </g>
       )}
       {tool === "pen" && pathTransform && localPaths.length > 0 && (
-        <g data-testid="pen-controls">
+        <g data-testid="pen-controls" transform={`translate(${sharePenTranslation ? pathTransform.e : 0} ${sharePenTranslation ? pathTransform.f : 0})`}>
           {localPaths.map((path, pathIndex) => (
             <PenPathControls key={path.id} points={path.points}
               a={pathTransform.a} b={pathTransform.b} c={pathTransform.c}
-              d={pathTransform.d} e={pathTransform.e} f={pathTransform.f}
+              d={pathTransform.d} e={sharePenTranslation ? 0 : pathTransform.e} f={sharePenTranslation ? 0 : pathTransform.f}
               zoom={zoom} outline={editingMask}
               contour={pathIndex === controller.maskContourIndex}
               active={editingMask ? (selectedAnchor?.layerId === selected?.id &&
@@ -221,14 +235,14 @@ export function CanvasOverlays({
         />
       )}
       {showBrushCursor && cursor &&
-        ["brush", "pencil", "eraser", "clone", "heal", "dodge", "burn"].includes(
+        ["brush", "pencil", "eraser", "clone", "heal", "dodge", "burn", "quick-select"].includes(
           tool,
         ) && (
           <g>
             <circle
               cx={cursor.x}
               cy={cursor.y}
-              r={state.settings.size / 2}
+              r={(tool==='quick-select'?state.settings.quickSize:state.settings.size) / 2}
               fill="none"
               stroke="#101810"
               strokeWidth={2 / zoom}
@@ -236,7 +250,7 @@ export function CanvasOverlays({
             <circle
               cx={cursor.x}
               cy={cursor.y}
-              r={state.settings.size / 2}
+              r={(tool==='quick-select'?state.settings.quickSize:state.settings.size) / 2}
               fill="none"
               stroke="white"
               strokeWidth={1 / zoom}
@@ -277,8 +291,11 @@ type PenPathProps = {
   a: number; b: number; c: number; d: number; e: number; f: number;
   zoom: number; outline: boolean; contour: boolean; active: number;
 };
+// Keep handles in the document plane so scaling/shearing artwork does not
+// change their screen size. Translation alone belongs on the shared group:
+// moving a layer must not rewrite every anchor/handle coordinate in the DOM.
 const PenPathControls = memo(function PenPathControls(props: PenPathProps) {
-  const { a, b, c, d, e, f, zoom, outline, contour, active } = props;
+  const { a, b, c, d, e, f, zoom, outline, contour } = props;
   const coordinate = (p: Point) => `${a*p.x+c*p.y+e} ${b*p.x+d*p.y+f}`;
   const points = props.points;
   return <g>
@@ -288,12 +305,46 @@ const PenPathControls = memo(function PenPathControls(props: PenPathProps) {
         const next = points[(i+1)%points.length];
         return `C ${coordinate(p.out)} ${coordinate(next.in)} ${coordinate(next)}`;
       }).join(" ") + " Z"} />}
-    {points.map((point,index) => <PenAnchor key={index} x={a*point.x+c*point.y+e} y={b*point.x+d*point.y+f}
+    {points.length <= PEN_CONTROL_BLOCK ? penAnchors(props, 0) :
+      Array.from({length: Math.ceil(points.length / PEN_CONTROL_BLOCK)}, (_, block) =>
+        <PenControlBlock key={block} {...props} start={block * PEN_CONTROL_BLOCK}
+          points={points.slice(block * PEN_CONTROL_BLOCK, (block + 1) * PEN_CONTROL_BLOCK)} />)}
+  </g>;
+}, samePenGeometry);
+
+const PEN_CONTROL_BLOCK = 64;
+type PenControlBlockProps = PenPathProps & {start: number};
+
+// A changed anchor must not recreate every React element in a long path.
+// Blocks add no SVG wrappers, omit no controls and preserve drawing order.
+function penAnchors({points, a, b, c, d, e, f, zoom, active}: PenPathProps, start: number) {
+  return points.map((point, offset) =>
+    <PenAnchor key={start + offset} x={a*point.x+c*point.y+e} y={b*point.x+d*point.y+f}
       inX={a*point.in.x+c*point.in.y+e} inY={b*point.in.x+d*point.in.y+f}
       outX={a*point.out.x+c*point.out.y+e} outY={b*point.out.x+d*point.out.y+f}
-      zoom={zoom} active={index===active} />)}
-  </g>;
+      zoom={zoom} active={start + offset === active} />);
+}
+
+const PenControlBlock = memo(function PenControlBlock(props: PenControlBlockProps) {
+  return <>{penAnchors(props, props.start)}</>;
 }, (previous, next) => {
+  if (previous.start !== next.start || previous.a !== next.a || previous.b !== next.b ||
+      previous.c !== next.c || previous.d !== next.d || previous.e !== next.e ||
+      previous.f !== next.f || previous.zoom !== next.zoom) return false;
+  if (previous.points.length !== next.points.length) return false;
+  const end = previous.start + previous.points.length;
+  const activeHere = (value: PenControlBlockProps) =>
+    value.active >= value.start && value.active < end ? value.active : -1;
+  if (activeHere(previous) !== activeHere(next)) return false;
+  for (let i = 0; i < previous.points.length; i++) {
+    const p = previous.points[i], q = next.points[i];
+    if (p !== q && (p.x !== q.x || p.y !== q.y || p.in.x !== q.in.x || p.in.y !== q.in.y ||
+        p.out.x !== q.out.x || p.out.y !== q.out.y)) return false;
+  }
+  return true;
+});
+
+function samePenGeometry(previous: PenPathProps, next: PenPathProps) {
   if (previous.a!==next.a || previous.b!==next.b || previous.c!==next.c ||
       previous.d!==next.d || previous.e!==next.e || previous.f!==next.f ||
       previous.zoom!==next.zoom || previous.outline!==next.outline ||
@@ -304,4 +355,4 @@ const PenPathControls = memo(function PenPathControls(props: PenPathProps) {
     return p.x===q.x && p.y===q.y && p.in.x===q.in.x && p.in.y===q.in.y &&
       p.out.x===q.out.x && p.out.y===q.out.y;
   });
-});
+}

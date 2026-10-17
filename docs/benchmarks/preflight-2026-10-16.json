@@ -1,0 +1,218 @@
+{
+  "date": "2026-10-16",
+  "scope": "A12 deterministic preflight subset, not full A12 or roadmap completion",
+  "reportVersion": 1,
+  "documentSchema": 21,
+  "sourceHashes": {
+    "src/core/preflight.ts": "0ba746ae6572231b301442525c31fe7407c453fd94c760941524badb35bcf174",
+    "src/core/preflight-view.ts": "41281c04f505f151abcd4e8cdb230abb6dd1601d308d0d252d9713f8d9cb8dbb",
+    "src/core/font-references.ts": "f1388502908bde164a883b961a5dd46e0822bfbc37d89142b6ba81580ea951f7",
+    "src/engine/preflight.ts": "9d79f9df05cc3799faacf8346d05a7a6d248c75647337548bcf02746fa02f984",
+    "src/engine/preflight.worker.ts": "b3b7121914f4cadda2514506738843a98d6e7b8715c1983495c0abca05ab4a94",
+    "src/engine/font-availability.ts": "bbbb0740ef427fedeb14d9593e412124149b509843923dcad20a046c9353daf5",
+    "src/dom/index.ts": "696c61f902d0170c02236781a4c0b84a74968f205edc2b6e841eddcacf482885",
+    "src/editor.ts": "ce3762227cb903b81883bcfb4c1d28cd7695b6c37d21d2dee73526b7fd7c962e",
+    "src/scripting/runtime.ts": "b7b159a899a10b3b069b3041eeb9cb44b40db6a1651daf2a8bb3c9bea00b30a7",
+    "src/ui/font-availability.ts": "3b6b63dbc391737fa603b2cad2044b4bda1253cc0e83a1353335e5610d11fcfe",
+    "src/ui/PreflightDialog.tsx": "ce14e6bfdd544f689d0f73c09def669f8387222f21a257f5b9e0d1b8f0576db9",
+    "src/ui/ToolRail.tsx": "ca1d1484424fcca19a1ea1132c62c48ce0790af7b0d209b39e244cdc5275297e",
+    "src/ui/App.tsx": "ee3804706d9b8ee29bc39f2c325ca77846ee5d9c49a689250e05b47932c6388d",
+    "src/ui/styles.css": "2c4680bd49bf5dbeca88a4f0e9582d5c62df1f4262a792ebf04c88cbdbe0942a",
+    "server/preflight.ts": "fa607a7f4f9c853585269ea252b5f868e9f4af5406668815e44bf80e22ae43d0",
+    "server/preflight-worker.mjs": "fc86be92b9e3238dc9c2292041a6af0f41ed58b1916e69146e57b1020ef27b2b",
+    "server/app.ts": "c365c35c0d3e2ea19d6def5f1e80fa9f4cafa86526017fb8591be56834119218",
+    "tests/preflight.test.ts": "f8bc8bb426fca155b2173715cc601a0ada9003a8b0fa4c10f26fd3f15e88abdb",
+    "tests/preflight-api.test.ts": "04d52943a61273b6c79b96bf33f17736ced21073725cf4ff506dccc468d38e48",
+    "tests/preflight.e2e.ts": "32e396efb3b28cea3ad62211ba6bea0b38d677c941bdfe01da1a3d6b0362b50f",
+    "tests/production.e2e.ts": "22e7adf5fe8246fd4d4ab0f7c404e8ea660dc3390f08dfcc1a84f7cd07062df5"
+  },
+  "validation": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "tests": null,
+      "logSha256": "372fe493cdc7a600b6963a273761df2a9c289a93e48e520cc5f970baacb2563f"
+    },
+    "unitApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": true,
+      "tests": 882,
+      "logSha256": "80f5d883dec2cf4c79d7b22177a0484467787b34a1414d7a330489c09e097da4",
+      "files": 123
+    },
+    "focused": {
+      "command": "npx vitest run tests/preflight.test.ts tests/preflight-api.test.ts",
+      "passed": true,
+      "tests": 18,
+      "logSha256": "68da3db31e66581bd0819bad44bfa834308dcfeaeb9882e270c9a10983af63ba"
+    },
+    "developmentBrowser": {
+      "command": "npx playwright test tests/preflight.e2e.ts tests/font-availability.e2e.ts tests/plugins.e2e.ts tests/script-runtime-phases.e2e.ts tests/editor.e2e.ts:125",
+      "passed": true,
+      "tests": 19,
+      "logSha256": "1ac0341c952e8a85e30d6c383f2abd34ff421b8781e90cd819333843451da4d8",
+      "skipped": [
+        {
+          "test": "real installed fonts populate the picker and change rendered text",
+          "reason": "Existing real Local Font Access gate is unsupported/unavailable in this Chromium environment; not counted as passed. Preflight does not enumerate installed fonts."
+        }
+      ]
+    },
+    "productionBrowser": {
+      "command": "npm run test:production",
+      "passed": true,
+      "tests": 26,
+      "logSha256": "75381aab7f6d5db757734f1cddf53fad4dbdec5210ecfd7845db1bc159fe8f31"
+    },
+    "metadataDocs": {
+      "command": "npx vitest run tests/seo.test.ts",
+      "passed": true,
+      "tests": 5,
+      "logSha256": "90b0aafc0d4de3c461d1997786318a80140b2409027bfcc91436486f5c4a9b7d"
+    },
+    "iterationNote": "Full unit/API coverage follows numerical, compact-payload and font-probe changes. The later referenced-font-only UI invalidation correction is verified by the final build, 19 development and 26 production browser checks."
+  },
+  "defaultPolicy": {
+    "outputDpi": 72,
+    "minimumPpi": 72,
+    "checkBounds": true,
+    "checkFonts": true,
+    "includeHidden": false
+  },
+  "proof": {
+    "nativeSampling": "Analytic worst-direction singular-value fixture under shear, rotation and nested scale; original asset dimensions, not proxies",
+    "readOnly": "Exact document/history/selection/source checks in real browser, OO and REST; scripts inspect staged geometry and roll back on a later error",
+    "privateWorkers": "Actual late output rejects on cancel, revision and away/back session changes; UI Cancel checks terminates the worker",
+    "fontEvidence": "Unavailable local family, unverified timeouts/pending web fonts, referenced-family invalidation and unrelated-family stability tested; no font evidence exposed through script/REST",
+    "permission": "Inert read-only plugin installation; active asset-read dispatch checks current grants; documented example runs in isolation",
+    "payload": "Selections/channels, masks, effects/LUT tables, raster erasures and clone tiles excluded from geometry-worker payload",
+    "truncation": "1056 placement fixture retains 512 of 1024 findings with complete counts; work limits reject explicitly"
+  },
+  "native50Mp": {
+    "report": {
+      "version": 1,
+      "documentId": "7a70aeab-65d6-441a-b5dd-faad35251b9e",
+      "revision": 1,
+      "options": {
+        "outputDpi": 72,
+        "minimumPpi": 72,
+        "checkBounds": true,
+        "checkFonts": false,
+        "includeHidden": false
+      },
+      "findings": [],
+      "totalFindings": 0,
+      "truncated": false,
+      "layersChecked": 1,
+      "counts": {
+        "error": 0,
+        "warning": 0,
+        "info": 0
+      },
+      "fonts": [],
+      "limitations": [
+        "Bounds describe authored geometry, not rendered pixels. Masks, effects, clipping stacks, occlusion and intentional bleed require review.",
+        "Embedded-master bounds are clipped by their artboards and are not classified against the root canvas. Reachable font/source references are checked conservatively.",
+        "Inspection policy applies to native document dimensions, not separately resized exports.",
+        "Resolution measures original source sampling under affine placement, including shear. It does not assess focus, compression, detail or generated quality.",
+        "Font checks cover family resolution in the inspection environment, not exact face/weight fidelity, licensing or availability on another device.",
+        "Bleed conformance, alignment, text legibility, contrast, print readiness and inferred design judgments are not evaluated."
+      ]
+    },
+    "elapsedMs": 91.5,
+    "responseMs": 1.699999999254942,
+    "tasks": [],
+    "revision": 1,
+    "afterRevision": 1,
+    "sourceUnchanged": true
+  },
+  "browserSampleReport": {
+    "version": 1,
+    "documentId": "001757c4-f341-4d7e-874c-08618054594f",
+    "revision": 7,
+    "options": {
+      "outputDpi": 300,
+      "minimumPpi": 200,
+      "checkBounds": true,
+      "checkFonts": true,
+      "includeHidden": false
+    },
+    "findings": [
+      {
+        "code": "low-resolution",
+        "severity": "warning",
+        "layerId": "2e53fe5d-7e9a-4f43-b9ca-00bdc5c05f49",
+        "layerName": "color-line.png",
+        "path": [
+          "2e53fe5d-7e9a-4f43-b9ca-00bdc5c05f49"
+        ],
+        "message": "Worst-direction sampling is 150.0 PPI; the inspection policy requires 200 PPI at 300 output DPI.",
+        "assetId": "d745c38f-6ca7-4b28-9d75-b5c987cc6fc4",
+        "effectivePpi": 150
+      },
+      {
+        "code": "bounds-outside",
+        "severity": "warning",
+        "layerId": "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d",
+        "layerName": "Headline",
+        "path": [
+          "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d"
+        ],
+        "message": "Authored bounds extend beyond the canvas. Review intentional bleed and clipping; masks, effects and occlusion are not evaluated.",
+        "bounds": {
+          "x": -20,
+          "y": 20,
+          "width": 71,
+          "height": 38
+        }
+      },
+      {
+        "code": "font-unavailable",
+        "severity": "warning",
+        "layerId": "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d",
+        "layerName": "Headline",
+        "path": [
+          "0bcf578f-cfd3-4cdf-b1be-6c81cb9aac5d"
+        ],
+        "message": "The browser could not resolve this font family; fallback may be used.",
+        "family": "Canoli Preflight Missing Font 517892"
+      }
+    ],
+    "totalFindings": 3,
+    "truncated": false,
+    "layersChecked": 2,
+    "counts": {
+      "error": 0,
+      "warning": 3,
+      "info": 0
+    },
+    "fonts": [
+      {
+        "family": "Canoli Preflight Missing Font 517892",
+        "status": "unavailable"
+      }
+    ],
+    "limitations": [
+      "Bounds describe authored geometry, not rendered pixels. Masks, effects, clipping stacks, occlusion and intentional bleed require review.",
+      "Embedded-master bounds are clipped by their artboards and are not classified against the root canvas. Reachable font/source references are checked conservatively.",
+      "Inspection policy applies to native document dimensions, not separately resized exports.",
+      "Resolution measures original source sampling under affine placement, including shear. It does not assess focus, compression, detail or generated quality.",
+      "Font checks cover family resolution in the inspection environment, not exact face/weight fidelity, licensing or availability on another device.",
+      "Bleed conformance, alignment, text legibility, contrast, print readiness and inferred design judgments are not evaluated."
+    ]
+  },
+  "general50MpPngExportMs": 3349.0,
+  "measurementScope": "Single native-metadata browser observation, not p95, input-to-photon, browser-independent speed, peak-memory or hardware GPU evidence. Original source already decoded/resident from import; preflight itself does not decode it.",
+  "resolvedBrowserRegression": {
+    "previousLogSha256": "1d26259018cc0e565548c0f710dadac2f83c31ee3505243eb62ab8cc2170a99f",
+    "observed": "An unrelated UI web-font loading event marked the report stale after viewport resize.",
+    "fix": "Watch only requested document-family names; final browser case explicitly loads an unrelated font and keeps report actions enabled. Referenced pending font loading still marks reports stale."
+  },
+  "remaining": [
+    "Bleed conformance and native/export-variant integration",
+    "Alignment, text legibility/contrast and rendered-pixel visibility",
+    "Inferred design suggestions and real-user acceptance",
+    "Broader device/latency/peak-memory and other professional-editor roadmap requirements"
+  ],
+  "generatorSource": "from pathlib import Path\nimport json,hashlib,re\nrepo=Path.cwd()\ndef sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()\nchecks={\n 'build':('/tmp/canoli-preflight-build-final.log','npm run build','\u2713 built in',None),\n 'unitApi':('/tmp/canoli-preflight-unit-all-final.log','npm test -- --maxWorkers=2','882 passed',882),\n 'focused':('/tmp/canoli-preflight-focused.log','npx vitest run tests/preflight.test.ts tests/preflight-api.test.ts','18 passed',18),\n 'developmentBrowser':('/tmp/canoli-preflight-browser-final-rerun.log','npx playwright test tests/preflight.e2e.ts tests/font-availability.e2e.ts tests/plugins.e2e.ts tests/script-runtime-phases.e2e.ts tests/editor.e2e.ts:125','19 passed',19),\n 'productionBrowser':('/tmp/canoli-preflight-production.log','npm run test:production','26 passed',26),\n 'metadataDocs':('/tmp/canoli-preflight-seo.log','npx vitest run tests/seo.test.ts','5 passed',5),\n}\nvalidation={}\nfor key,(path,command,marker,count) in checks.items():\n log=Path(path).read_text();assert marker in log and not re.search(r'^\\s*[1-9][0-9]* failed',log,re.M),key\n validation[key]={'command':command,'passed':True,'tests':count,'logSha256':sha(path)}\nvalidation['unitApi']['files']=123\nvalidation['developmentBrowser']['skipped']=[{'test':'real installed fonts populate the picker and change rendered text','reason':'Existing real Local Font Access gate is unsupported/unavailable in this Chromium environment; not counted as passed. Preflight does not enumerate installed fonts.'}]\nvalidation['iterationNote']='Full unit/API coverage follows numerical, compact-payload and font-probe changes. The later referenced-font-only UI invalidation correction is verified by the final build, 19 development and 26 production browser checks.'\nsources=['src/core/preflight.ts','src/core/preflight-view.ts','src/core/font-references.ts','src/engine/preflight.ts','src/engine/preflight.worker.ts','src/engine/font-availability.ts','src/dom/index.ts','src/editor.ts','src/scripting/runtime.ts','src/ui/font-availability.ts','src/ui/PreflightDialog.tsx','src/ui/ToolRail.tsx','src/ui/App.tsx','src/ui/styles.css','server/preflight.ts','server/preflight-worker.mjs','server/app.ts','tests/preflight.test.ts','tests/preflight-api.test.ts','tests/preflight.e2e.ts','tests/production.e2e.ts']\nreport={\n 'date':'2026-10-16','scope':'A12 deterministic preflight subset, not full A12 or roadmap completion',\n 'reportVersion':1,'documentSchema':21,'sourceHashes':{p:sha(repo/p) for p in sources},'validation':validation,\n 'defaultPolicy':{'outputDpi':72,'minimumPpi':72,'checkBounds':True,'checkFonts':True,'includeHidden':False},\n 'proof':{'nativeSampling':'Analytic worst-direction singular-value fixture under shear, rotation and nested scale; original asset dimensions, not proxies','readOnly':'Exact document/history/selection/source checks in real browser, OO and REST; scripts inspect staged geometry and roll back on a later error','privateWorkers':'Actual late output rejects on cancel, revision and away/back session changes; UI Cancel checks terminates the worker','fontEvidence':'Unavailable local family, unverified timeouts/pending web fonts, referenced-family invalidation and unrelated-family stability tested; no font evidence exposed through script/REST','permission':'Inert read-only plugin installation; active asset-read dispatch checks current grants; documented example runs in isolation','payload':'Selections/channels, masks, effects/LUT tables, raster erasures and clone tiles excluded from geometry-worker payload','truncation':'1056 placement fixture retains 512 of 1024 findings with complete counts; work limits reject explicitly'},\n 'native50Mp':json.loads(Path('/tmp/canoli-preflight-50mp.json').read_text()),\n 'browserSampleReport':json.loads(Path('/tmp/canoli-preflight-report.json').read_text()),\n 'general50MpPngExportMs':float(re.search(r'50 MP full-resolution export: ([0-9.]+) ms',Path('/tmp/canoli-preflight-browser-final-rerun.log').read_text())[1]),\n 'measurementScope':'Single native-metadata browser observation, not p95, input-to-photon, browser-independent speed, peak-memory or hardware GPU evidence. Original source already decoded/resident from import; preflight itself does not decode it.',\n 'resolvedBrowserRegression':{'previousLogSha256':sha('/tmp/canoli-preflight-browser-final.log'),'observed':'An unrelated UI web-font loading event marked the report stale after viewport resize.','fix':'Watch only requested document-family names; final browser case explicitly loads an unrelated font and keeps report actions enabled. Referenced pending font loading still marks reports stale.'},\n 'remaining':['Bleed conformance and native/export-variant integration','Alignment, text legibility/contrast and rendered-pixel visibility','Inferred design suggestions and real-user acceptance','Broader device/latency/peak-memory and other professional-editor roadmap requirements'],\n 'generatorSource':Path(__file__).read_text(),\n}\nassert report['native50Mp']['sourceUnchanged']\nassert report['native50Mp']['revision']==report['native50Mp']['afterRevision'] and report['native50Mp']['report']['findings']==[]\nout=repo/'docs/benchmarks/preflight-2026-10-16.json';out.write_text(json.dumps(report,indent=2,allow_nan=False)+'\\n');print('Final preflight evidence:',out.stat().st_size,'bytes; 882 unit/API, 45 browser passed, 1 existing font gate skipped.')\n"
+}

@@ -1,3 +1,4 @@
+import {expectPenControl} from './pen-control-position';
 import {test,expect} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 
@@ -35,8 +36,7 @@ for(const {paths, anchors} of [{paths:20,anchors:4},{paths:200,anchors:4},{paths
  for(let i=1;i<=30;i++){await page.mouse.move(box.x+20+i*2,box.y+20+i);await page.waitForTimeout(16);}
  expect(await page.evaluate(()=>window.luma.editor.document.getSnapshot().revision)).toBe(revision);
  await expect(page.getByTestId('pen-controls').locator('rect')).toHaveCount(paths*anchors);
- await expect(page.getByTestId('pen-controls').locator('rect').first()).toHaveAttribute('x','76');
- await expect(page.getByTestId('pen-controls').locator('rect').first()).toHaveAttribute('y','46');
+ await expectPenControl(page.getByTestId('pen-controls').locator('rect').first(), 80, 50);
  await page.mouse.up();
  await expect.poll(()=>page.evaluate(()=>(window as any).penTiming.frames.some((f:{phase:string})=>f.phase==='commit'))).toBe(true);
  if (trace) {

@@ -30,5 +30,7 @@ export function resizeImage(document: DocumentData, width: number, height: numbe
   for (const guide of document.guides ?? [])
     guide.position *= guide.orientation === 'vertical' ? sx : sy;
   document.selection = transformSelection(document.selection, scale);
+  for(const channel of document.alphaChannels??[])
+    channel.selection=transformSelection(channel.selection,scale)!;
   document.width = width; document.height = height;
 }

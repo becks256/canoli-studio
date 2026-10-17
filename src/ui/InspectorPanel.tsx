@@ -1,4 +1,9 @@
+import { LutControls } from "./LutControls";
+import { WhiteBalanceControls } from "./WhiteBalanceControls";
+import { GradientMapControls } from "./GradientMapControls";
 import { LayerCompsPanel } from "./LayerCompsPanel";
+import { AlphaChannelsPanel } from './AlphaChannelsPanel';
+import { ChromaticAdjustmentControls } from "./ChromaticAdjustmentControls";
 import { SmartFilterMaskPanel } from "./SmartFilterMaskPanel";
 import { SmartFiltersPanel } from "./SmartFiltersPanel";
 import { GuidesPanel } from "./GuidesPanel";
@@ -31,7 +36,7 @@ import type { BlendMode, DocumentData, LayerData } from "../core/model";
 import { BLEND_MODES, allLayers, findParent, toneOf } from "../core/model";
 import { defaultStyle } from "../core/drawing";
 import type { EditorCommand } from "../core/commands";
-import { IconButton, NumberField, Select, Slider, TextInput } from "./controls";
+import { Button, IconButton, NumberField, Select, Slider, TextInput } from "./controls";
 import { InspectorSection } from "./InspectorSection";
 import { PathProperties } from "./ToolOptions";
 import { LayerStylesPanel } from "./LayerStylesPanel";
@@ -42,6 +47,11 @@ import { HistogramView } from "./HistogramView";
 import {
   defaultCurvesAdjustment,
   defaultHslAdjustment,
+  defaultColorBalanceAdjustment,
+  defaultVibranceAdjustment,
+  defaultGradientMapAdjustment,
+  defaultWhiteBalanceAdjustment,
+  defaultLutAdjustment,
   defaultLevelsAdjustment,
   defaultToneAdjustment,
 } from "../core/adjustments";
@@ -65,6 +75,7 @@ export interface InspectorPanelProps {
   onAttempt(action: () => void): void;
   onSelectedAction(action: (layer: Layer) => void): void;
   onOpenHelp(): void;
+  onCombinePaths(): void;
 }
 
 export function InspectorPanel({
@@ -84,6 +95,7 @@ export function InspectorPanel({
   onAttempt,
   onSelectedAction,
   onOpenHelp,
+  onCombinePaths,
 }: InspectorPanelProps) {
   const tone = selected?.kind === "raster" ? toneOf(selected) : null;
   const selectedWorld = selected
@@ -423,10 +435,13 @@ export function InspectorPanel({
             />
           )}
           {selectedObject instanceof VectorLayer && (
+            <InspectorSection title="Boolean paths"><Button disabled={busy||locked} onClick={onCombinePaths}>Combine vector paths…</Button></InspectorSection>
+          )}
+          {selectedObject instanceof VectorLayer && (
             <PathProperties
               layer={selectedObject}
               anchorCount={selected.kind === "vector" ?
-                (selected.paths.find(path => path.id === selectedPathId) ?? selected.paths.at(-1))?.points.length ?? 0 : 0}
+                (() => { const path = selected.paths.find(path => path.id === selectedPathId) ?? selected.paths.at(-1); return path ? path.points.length + (path.subpaths ?? []).reduce((sum, c) => sum + c.points.length, 0) : 0; })() : 0}
               path={
                 selectedObject.paths.get(selectedPathId ?? "") ??
                 selectedObject.paths.at(selectedObject.paths.length - 1)
@@ -439,6 +454,7 @@ export function InspectorPanel({
                 })
               }
               onPreview={onPreview}
+              previewGradient={preview?.type === "path.update" && preview.id === selected.id ? preview.patch.fillGradient : undefined}
               previewStrokeWidth={
                 preview?.type === "path.update" && preview.id === selected.id
                   ? preview.patch.strokeWidth
@@ -506,6 +522,15 @@ export function InspectorPanel({
                                   ? defaultLevelsAdjustment()
                                   : kind === "hsl"
                                     ? defaultHslAdjustment()
+                                    : kind === "color-balance"
+                                      ? defaultColorBalanceAdjustment()
+                                      : kind === "vibrance"
+                                        ? defaultVibranceAdjustment()
+                                        : kind === "gradient-map"
+                                          ? defaultGradientMapAdjustment()
+                                          : kind === "white-balance"
+                                            ? defaultWhiteBalanceAdjustment()
+                                            : kind === "lut" ? defaultLutAdjustment()
                                     : defaultToneAdjustment(),
                           });
                         }
@@ -530,6 +555,11 @@ export function InspectorPanel({
                     { value: "tonal", label: "Tonal strokes", disabled: true },
                     { value: "patch", label: "Retouch patch", disabled: true },
                     { value: "hsl", label: "Hue / Saturation / Lightness" },
+                    { value: "color-balance", label: "Color Balance" },
+                    { value: "vibrance", label: "Vibrance" },
+                    { value: "gradient-map", label: "Gradient Map" },
+                    { value: "white-balance", label: "White Balance" },
+                    { value: "lut", label: "Color Lookup (LUT)" },
                     { value: "curves", label: "Curves" },
                     { value: "levels", label: "Levels" },
                     { value: "tone", label: "Tone (Exposure / Contrast)" },
@@ -539,6 +569,11 @@ export function InspectorPanel({
                       if (layer instanceof AdjustmentLayer) {
                         if (kind === "hsl")
                           layer.adjustment = defaultHslAdjustment();
+                        else if (kind === "color-balance") layer.adjustment = defaultColorBalanceAdjustment();
+                        else if (kind === "white-balance") layer.adjustment = defaultWhiteBalanceAdjustment();
+                        else if (kind === "lut") layer.adjustment = defaultLutAdjustment();
+                        else if (kind === "gradient-map") layer.adjustment = defaultGradientMapAdjustment();
+                        else if (kind === "vibrance") layer.adjustment = defaultVibranceAdjustment();
                         else if (kind === "curves")
                           layer.setCurves(defaultCurvesAdjustment());
                         else if (kind === "levels")
@@ -601,6 +636,23 @@ export function InspectorPanel({
                   />
                 )}
 
+                {selected.adjustment.kind === "lut" && <LutControls key={selected.id}
+                  adjustment={selected.adjustment} disabled={locked || busy}
+                  onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
+                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
+                {selected.adjustment.kind === "white-balance" && <WhiteBalanceControls
+                  adjustment={selected.adjustment} disabled={locked || busy}
+                  onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
+                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
+                {selected.adjustment.kind === "gradient-map" && <GradientMapControls
+                  key={selected.id} adjustment={selected.adjustment} disabled={locked || busy}
+                  onPreview={adjustment => onPreview({type: "layer.update", id: selected.id, patch: {adjustment}})}
+                  onCancel={() => onPreview(null)}
+                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if (layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
+                {(selected.adjustment.kind === "color-balance" || selected.adjustment.kind === "vibrance") && <ChromaticAdjustmentControls
+                  adjustment={selected.adjustment} disabled={locked||busy}
+                  onPreview={adjustment=>onPreview({type:"layer.update",id:selected.id,patch:{adjustment}})}
+                  onCommit={adjustment=>{onPreview(null);onSelectedAction(layer=>{if(layer instanceof AdjustmentLayer)layer.adjustment=adjustment;});}} />}
                 {selected.adjustment.kind === "hsl" &&
                   (["hue", "saturation", "lightness"] as const).map((key) => (
                     <Slider
@@ -775,6 +827,7 @@ export function InspectorPanel({
         disabled={busy}
         onAttempt={onAttempt}
       />
+      <AlphaChannelsPanel key={`channels:${dom.id}`} document={dom} disabled={busy} onAttempt={onAttempt}/>
       <GuidesPanel
         document={dom}
         visible={guidesVisible}

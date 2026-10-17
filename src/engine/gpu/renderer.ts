@@ -1,3 +1,6 @@
+import { lutValues, type CubeLutData } from "../../core/lut";
+import { isImmutable } from "../../core/immutable";
+import { whiteBalanceMatrix, WHITE_BALANCE_NEUTRAL } from "../../core/white-balance";
 import { checkRenderCurrent } from "../render-control";
 import { contentSignature } from "../content-signature";
 import { findLayer } from "../../core/model";
@@ -19,7 +22,8 @@ import { visitStrokeStamps } from "../drawing";
 import type { LayerMaskData } from "../../core/masks";
 import { workingSize, previewMask } from "../renderer";
 import type { CanvasRenderer, RenderOptions } from "../renderer";
-import { processing, selection, stamps } from "./shaders";
+import { processing, selection, stamps, gradientMap, lookup } from "./shaders";
+import { packGradientStops } from "../../core/gradient-map";
 
 interface Surface {
   texture: GPUTexture;
@@ -39,6 +43,7 @@ export interface ViewportFrame {
   present(canvas: HTMLCanvasElement): void;
   dispose(): void;
   /** Explicit diagnostic readback, never used by viewport presentation. Premultiplied RGBA8. */
+  /** Diagnostic raw texture bytes: premultiplied, encoded-sRGB RGBA8. */
   readPixels?(): Promise<Uint8Array>;
 }
 
@@ -48,6 +53,11 @@ export class WebGpuRenderer {
   readonly ready: Promise<boolean>;
   private device: GPUDevice | null = null;
   private pipeline!: GPURenderPipeline;
+  private gradientMapPipeline!: GPURenderPipeline;
+  private lookupPipeline!: GPURenderPipeline;
+  private lookupBuffers = new Map<string, { buffer: GPUBuffer; bytes: number }>();
+  private lookupBytes = 0;
+  private lookupCompatibility = new WeakMap<CubeLutData, boolean>();
   private stampPipeline!: GPURenderPipeline;
   private maskPipeline!: GPURenderPipeline;
   private presentation = new Map<GPUTextureFormat, GPURenderPipeline>();
@@ -99,8 +109,8 @@ export class WebGpuRenderer {
       state: this.state,
       reason: this.reason,
       ...this.counters,
-      retainedBytes: this.cacheBytes + (this.active?.surface.bytes ?? 0),
-      allocatedBytes: this.bytes,
+      retainedBytes: this.cacheBytes + (this.active?.surface.bytes ?? 0) + this.lookupBytes,
+      allocatedBytes: this.bytes + this.lookupBytes,
     };
   }
   private async initialize(allowSoftware: boolean) {
@@ -151,6 +161,16 @@ export class WebGpuRenderer {
           entryPoint: "fragment",
           targets: [{ format: "rgba8unorm" }],
         },
+      });
+      const gradientModule = device.createShaderModule({ code: gradientMap });
+      this.gradientMapPipeline = await device.createRenderPipelineAsync({
+        layout: "auto", vertex: { module: gradientModule, entryPoint: "vertex" },
+        fragment: { module: gradientModule, entryPoint: "fragment", targets: [{ format: "rgba8unorm" }] },
+      });
+      const lookupModule = device.createShaderModule({ code: lookup });
+      this.lookupPipeline = await device.createRenderPipelineAsync({
+        layout: "auto", vertex: { module: lookupModule, entryPoint: "vertex" },
+        fragment: { module: lookupModule, entryPoint: "fragment", targets: [{ format: "rgba8unorm" }] },
       });
       const stampModule = device.createShaderModule({ code: stamps });
       this.stampPipeline = await device.createRenderPipelineAsync({
@@ -309,10 +329,11 @@ export class WebGpuRenderer {
     values: number[],
     target?: GPUTexture,
     pipeline = this.pipeline,
+    table?: GPUBuffer,
   ): Surface | null {
     const device = this.device!;
     const result = target ? null : this.make(source.width, source.height);
-    const params = new Float32Array(20);
+    const params = new Float32Array(Math.max(20, values.length));
     params.set(values);
     const uniform = this.buffer(params);
     const bind = device.createBindGroup({
@@ -321,6 +342,7 @@ export class WebGpuRenderer {
         { binding: 0, resource: source.texture.createView() },
         { binding: 1, resource: backdrop.texture.createView() },
         { binding: 2, resource: { buffer: uniform } },
+        ...(table ? [{ binding: 3, resource: { buffer: table } }] : []),
       ],
     });
     const encoder = device.createCommandEncoder();
@@ -341,6 +363,27 @@ export class WebGpuRenderer {
     device.queue.submit([encoder.finish()]);
     uniform.destroy();
     return result;
+  }
+  private lookupSupported(lut: CubeLutData): boolean {
+    const hit = this.lookupCompatibility.get(lut); if (hit !== undefined) return hit;
+    const bytes = 12 * (lut.dimension === 1 ? lut.size : lut.size ** 3);
+    const safe = bytes <= 32 * 1024 * 1024 && bytes <= (this.device?.limits.maxStorageBufferBindingSize ?? 0) &&
+      lut.domainMin.every((value, c) => Math.fround(value) === value && Math.fround(lut.domainMax[c]) === lut.domainMax[c] &&
+        Math.fround(lut.domainMax[c] - value) === lut.domainMax[c] - value && lut.domainMax[c] - value >= 1.1754943508222875e-38) &&
+      lutValues(lut).every(value => Math.abs(value) <= 65504);
+    if (isImmutable(lut)) this.lookupCompatibility.set(lut, safe);
+    return safe;
+  }
+  private lookupBuffer(lut: CubeLutData): GPUBuffer {
+    const hit = this.lookupBuffers.get(lut.data);
+    if (hit) { this.lookupBuffers.delete(lut.data); this.lookupBuffers.set(lut.data, hit); return hit.buffer; }
+    const values = lutValues(lut), bytes = values.byteLength;
+    while (this.lookupBuffers.size && (this.lookupBuffers.size >= 4 || this.lookupBytes + bytes > 32 * 1024 * 1024)) {
+      const key = this.lookupBuffers.keys().next().value!, entry = this.lookupBuffers.get(key)!;
+      entry.buffer.destroy(); this.lookupBytes -= entry.bytes; this.lookupBuffers.delete(key);
+    }
+    const buffer = this.buffer(values, GPUBufferUsage.STORAGE);
+    this.lookupBuffers.set(lut.data, { buffer, bytes }); this.lookupBytes += bytes; return buffer;
   }
   private signature(layer: LayerData) {
     const existing = this.signatures.get(layer);
@@ -534,68 +577,71 @@ export class WebGpuRenderer {
         linearInverse.d,
       ]),
     );
-    const group = device.createBindGroup({
-      layout: this.stampPipeline.getBindGroupLayout(0),
-      entries: [{ binding: 0, resource: { buffer: uniform } }],
-    });
-    let values: number[] = [];
-    const flush = () => {
-      if (!values.length) return;
-      const instances = this.buffer(
-        new Float32Array(values),
-        GPUBufferUsage.VERTEX,
-      );
-      const encoder = device.createCommandEncoder(),
-        pass = encoder.beginRenderPass({
-          colorAttachments: [
-            {
-              view: surface.texture.createView(),
-              loadOp: "load",
-              storeOp: "store",
-            },
-          ],
-        });
-      pass.setPipeline(this.stampPipeline);
-      pass.setBindGroup(0, group);
-      pass.setVertexBuffer(0, instances);
-      pass.draw(6, values.length / 5);
-      pass.end();
-      device.queue.submit([encoder.finish()]);
-      instances.destroy();
-      this.counters.stamps += values.length / 5;
-      values = [];
-    };
-    visitStrokeStamps(
-      (p) => {
-        let size =
-            stroke.size *
-            (stroke.pressureSize === false ? 1 : Math.max(0.05, p.pressure)),
-          cx = p.x,
-          cy = p.y;
-        if (stroke.kind === "pencil") {
-          size = Math.max(1, Math.round(size));
-          cx = Math.floor(cx - size / 2) + size / 2;
-          cy = Math.floor(cy - size / 2) + size / 2;
-        }
-        const center = matrix.point({ x: cx, y: cy });
-        values.push(
-          center.x,
-          center.y,
-          size / 2,
-          size / 2,
-          Math.max(0.01, stroke.flow ?? 1) *
-            (stroke.pressureOpacity ? Math.max(0.01, p.pressure) : 1),
+    try {
+      const group = device.createBindGroup({
+        layout: this.stampPipeline.getBindGroupLayout(0),
+        entries: [{ binding: 0, resource: { buffer: uniform } }],
+      });
+      let values: number[] = [];
+      const flush = () => {
+        if (!values.length) return;
+        const instances = this.buffer(
+          new Float32Array(values),
+          GPUBufferUsage.VERTEX,
         );
-        if (values.length >= 4096 * 5) flush();
-      },
-      stroke,
-      matrix
-        .inverse()
-        .bounds({ x: 0, y: 0, width: space.width, height: space.height }),
-      from,
-    );
-    flush();
-    uniform.destroy();
+        const encoder = device.createCommandEncoder(),
+          pass = encoder.beginRenderPass({
+            colorAttachments: [
+              {
+                view: surface.texture.createView(),
+                loadOp: "load",
+                storeOp: "store",
+              },
+            ],
+          });
+        pass.setPipeline(this.stampPipeline);
+        pass.setBindGroup(0, group);
+        pass.setVertexBuffer(0, instances);
+        pass.draw(6, values.length / 5);
+        pass.end();
+        device.queue.submit([encoder.finish()]);
+        instances.destroy();
+        this.counters.stamps += values.length / 5;
+        values = [];
+      };
+      visitStrokeStamps(
+        (p) => {
+          let size =
+              stroke.size *
+              (stroke.pressureSize === false ? 1 : Math.max(0.05, p.pressure)),
+            cx = p.x,
+            cy = p.y;
+          if (stroke.kind === "pencil") {
+            size = Math.max(1, Math.round(size));
+            cx = Math.floor(cx - size / 2) + size / 2;
+            cy = Math.floor(cy - size / 2) + size / 2;
+          }
+          const center = matrix.point({ x: cx, y: cy });
+          values.push(
+            center.x,
+            center.y,
+            size / 2,
+            size / 2,
+            Math.max(0.01, stroke.flow ?? 1) *
+              (stroke.pressureOpacity ? Math.max(0.01, p.pressure) : 1),
+          );
+          if (values.length >= 4096 * 5) flush();
+        },
+        stroke,
+        matrix
+          .inverse()
+          .bounds({ x: 0, y: 0, width: space.width, height: space.height }),
+        from,
+      );
+      flush();
+    } finally {
+      uniform.destroy();
+    }
   }
   private color(value: string) {
     return [1, 3, 5].map((i) => parseInt(value.slice(i, i + 2), 16) / 255);
@@ -779,6 +825,12 @@ export class WebGpuRenderer {
           !node.styles?.dropShadow.enabled &&
           (node.kind !== "adjustment" ||
             node.adjustment.kind === "hsl" ||
+            (node.adjustment.kind === "gradient-map" && node.adjustment.stops.every((stop, i, stops) =>
+              i === 0 || Math.fround(stop.position) > Math.fround(stops[i - 1].position))) ||
+            (node.adjustment.kind === "lut" && this.lookupSupported(node.adjustment.lut)) ||
+            node.adjustment.kind === "white-balance" ||
+            node.adjustment.kind === "color-balance" ||
+            node.adjustment.kind === "vibrance" ||
             node.adjustment.kind === "tone" ||
             (node.adjustment.kind === "levels" &&
               !node.adjustment.red &&
@@ -881,7 +933,29 @@ export class WebGpuRenderer {
         if (layer.kind === "group")
           source = await compose(layer.children, world);
         else if (layer.kind === "adjustment") {
-          if (layer.adjustment.kind === "hsl") {
+          if (layer.adjustment.kind === "lut") {
+            const effect = layer.adjustment, lut = effect.lut;
+            source = this.pass(target, target, [lut.size, lut.dimension, effect.amount, Number(effect.interpolation === "tetrahedral"),
+              ...lut.domainMin, 0, ...lut.domainMax.map((value, c) => value - lut.domainMin[c]), 0],
+              undefined, this.lookupPipeline, this.lookupBuffer(lut))!;
+          } else if (layer.adjustment.kind === "white-balance") {
+            const effect = layer.adjustment, matrix = whiteBalanceMatrix(effect);
+            source = this.pass(target, target, [11, Number(effect.temperature === WHITE_BALANCE_NEUTRAL && effect.tint === 0), 0, 0,
+              ...matrix[0], 0, ...matrix[1], 0, ...matrix[2], 0])!;
+          } else if (layer.adjustment.kind === "gradient-map") {
+            const effect = layer.adjustment;
+            const values = new Array<number>(132).fill(0);
+            values.splice(0, 4 + effect.stops.length * 4, effect.stops.length, Number(effect.reverse), 0, 0, ...packGradientStops(effect.stops));
+            source = this.pass(target, target, values, undefined, this.gradientMapPipeline)!;
+          } else if (layer.adjustment.kind === "color-balance") {
+            const effect=layer.adjustment;
+            source=this.pass(target,target,[9,Number(effect.preserveLuminosity),0,0,
+              effect.shadows.red,effect.shadows.green,effect.shadows.blue,0,
+              effect.midtones.red,effect.midtones.green,effect.midtones.blue,0,
+              effect.highlights.red,effect.highlights.green,effect.highlights.blue,0])!;
+          } else if (layer.adjustment.kind === "vibrance") {
+            source=this.pass(target,target,[10,layer.adjustment.vibrance,layer.adjustment.saturation])!;
+          } else if (layer.adjustment.kind === "hsl") {
             const effect = layer.adjustment;
             source = this.pass(target, target, [
               8,
@@ -1188,6 +1262,9 @@ export class WebGpuRenderer {
     if (this.active) this.destroy(this.active.surface);
     this.active = null;
     this.signatures = new WeakMap();
+    for (const entry of this.lookupBuffers.values()) entry.buffer.destroy();
+    this.lookupBuffers.clear(); this.lookupBytes = 0;
+    this.lookupCompatibility = new WeakMap();
   }
   dispose() {
     this.disposed = true;

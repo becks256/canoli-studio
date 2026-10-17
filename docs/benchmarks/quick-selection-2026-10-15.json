@@ -1,0 +1,224 @@
+{
+  "date": "2026-10-15",
+  "feature": "F02/T06 native Quick Selection brush",
+  "versions": {
+    "documentSchema": 21,
+    "projectContainer": 3,
+    "workspaceSnapshot": 2,
+    "schemaChanged": false
+  },
+  "environment": {
+    "browser": "Chromium through Playwright in local container",
+    "backend": "Actual AssemblyScript/WASM in dedicated browser and Node workers",
+    "hardwareGpuMeasured": false,
+    "heapOrPeakMemoryMeasured": false
+  },
+  "contract": {
+    "pointLimit": 20000,
+    "diameter": {
+      "minimum": 0.5,
+      "maximum": 512,
+      "default": 32
+    },
+    "tolerance": {
+      "minimum": 0,
+      "maximum": 255,
+      "default": 32
+    },
+    "edgeThreshold": {
+      "minimum": 0,
+      "maximum": 255,
+      "default": 64
+    },
+    "defaultOperation": "add",
+    "operations": [
+      "replace",
+      "add",
+      "subtract",
+      "intersect"
+    ],
+    "sources": [
+      "visible merged document",
+      "isolated layer branch with world transforms/ancestor appearance",
+      "original asset at explicit offset"
+    ],
+    "connectivity": 4,
+    "colorModel": "Per-channel encoded RGB seed mean, tolerance plus twice population standard deviation; visible painted pixels are forced seeds",
+    "edge": "Maximum adjacent encoded RGB component jump <= edgeThreshold",
+    "alpha": "Transparent barriers; selected coverage retains native source alpha",
+    "brushPreview": "Transient positive seed marks, not a grown-mask preview",
+    "sourcePixelsModified": false,
+    "undo": "One shared selection transaction",
+    "scriptSharedPreparationLimit": 32,
+    "restSharedWorkerLimit": 4
+  },
+  "memory": {
+    "initialPages": 1,
+    "maximumPages": 4096,
+    "pageBytes": 65536,
+    "maximumBytes": 268435456,
+    "maximumSourceTileSide": 512,
+    "maximumNativeFrontierBatchRuns": 4096,
+    "maximumOutputBandPixels": 1000000,
+    "fullDocumentCanvasAllocated": false,
+    "fullNativeSourcePlaneAllocated": true,
+    "nativeWasmBytesPerSourcePixel": 5,
+    "note": "Global connectivity retains native RGBA and byte state planes, plus actual seed spans/frontier/output. Browser capture, source decoding, retained RLE, validation and history add memory. The WASM maximum and actual memory availability limit this operation, not document import size."
+  },
+  "nativeBrowser50Mp": {
+    "milliseconds": 2013.699999988079,
+    "width": 10000,
+    "height": 5000,
+    "samples": [
+      255,
+      255,
+      255,
+      255,
+      0,
+      0,
+      0
+    ],
+    "revisionDelta": 1,
+    "progressFirst": {
+      "completed": 0,
+      "total": 100000200
+    },
+    "progressLast": {
+      "completed": 100000200,
+      "total": 100000200
+    },
+    "selectionRestored": true,
+    "originalUnchanged": true,
+    "inputResponseMs": 88.09999999403954,
+    "inputDuringCapture": true,
+    "handVisibleDuringCapture": true,
+    "longTasks": [
+      {
+        "start": 2881.800000011921,
+        "duration": 106
+      },
+      {
+        "start": 4845.9000000059605,
+        "duration": 135
+      }
+    ]
+  },
+  "captureResponsiveness": {
+    "beforeCooperativeYield": {
+      "milliseconds": 2279.4000000059605,
+      "inputResponseMs": 939.8999999761581,
+      "longTasks": [
+        {
+          "start": 3168.2999999821186,
+          "duration": 988
+        },
+        {
+          "start": 4306.399999976158,
+          "duration": 82
+        },
+        {
+          "start": 5425.299999982119,
+          "duration": 135
+        }
+      ]
+    },
+    "firstCooperativeRun": {
+      "milliseconds": 2159.4000000059605,
+      "width": 10000,
+      "height": 5000,
+      "samples": [
+        255,
+        255,
+        255,
+        255,
+        0,
+        0,
+        0
+      ],
+      "revisionDelta": 1,
+      "progressFirst": {
+        "completed": 0,
+        "total": 100000200
+      },
+      "progressLast": {
+        "completed": 100000200,
+        "total": 100000200
+      },
+      "selectionRestored": true,
+      "originalUnchanged": true,
+      "inputResponseMs": 72.90000000596046,
+      "inputDuringCapture": true,
+      "handVisibleDuringCapture": true,
+      "longTasks": [
+        {
+          "start": 3109.4000000059605,
+          "duration": 114
+        },
+        {
+          "start": 3350,
+          "duration": 111
+        },
+        {
+          "start": 5225.699999988079,
+          "duration": 138
+        }
+      ]
+    },
+    "yield": "Task boundary between source tiles after about 8ms of work; recheck cancellation/ownership after resumption",
+    "measurement": "A queued zero-delay callback invokes the actual Hand toolbar control after the first captured tile. The tightened test verifies its pressed state before the first source-capture completion and response <250ms.",
+    "caveat": "Individual observations, not gesture p95, OS pointer-to-photon timing, a controlled multi-trial benchmark or cross-device responsiveness. The baseline phase flags were overwritten at duplicate progress values; only baseline elapsed/input timing and long-task entries are retained. Long tasks overlapping the operation include other browser work and may begin before its start."
+  },
+  "nativeRest50Mp": {
+    "width": 10000,
+    "height": 5000,
+    "milliseconds": 4278.099056,
+    "samples": [
+      255,
+      255,
+      255,
+      255,
+      0,
+      0,
+      0
+    ]
+  },
+  "existingRealImage50MpRoundTrip": {
+    "importOriginalsWasmEditSaveReopenFullResolutionExportPassed": true,
+    "exportElapsedMs": 3551
+  },
+  "fixture": {
+    "path": "tests/fixtures/color-range/native-50mp.png",
+    "sha256": "1e6acdb4bdf16b25b2231f76bf066283db1d8cdec732b416248563473f434a47",
+    "dimensions": [
+      10000,
+      5000
+    ],
+    "description": "Actual PNG with red/blue native components, distant regions and a diagonally touching island; four-connectivity excludes the disconnected island."
+  },
+  "validation": {
+    "build": "npm run build passed, including WASM, isolated runtime, developer docs, TypeScript and Vite",
+    "unitApiTestsPassed": 813,
+    "unitTestFiles": 116,
+    "unitCommand": "npm test -- --maxWorkers=2",
+    "distinctDevelopmentBrowserTestsPassed": 61,
+    "quickSelectionDevelopmentCasesPassed": 9,
+    "productionBrowserTestsPassed": 21,
+    "totalDistinctBrowserTestsPassed": 82,
+    "independentKernelOracle": "Pixel-queue traversal compared with actual native scanline output across nine color/edge settings, including partial alpha and multiple seeds",
+    "resumableFrontier": "More than 4096 isolated painted runs",
+    "documentedExampleExecutedInIsolatedRuntime": true,
+    "lateWorkerCancellationAndPluginAssetReadRevocationPassed": true,
+    "maskPngAndSavedChannelProjectWorkspaceRedoCoveragePassed": true,
+    "sourceBytesPreserved": true,
+    "productionNoDeveloperGlobals": true,
+    "initialRestrictedUnitRun": "765 pass, 48 skip, five suite failures due to local-port EPERM; complete authorized rerun passed all 813",
+    "whitespace": "git diff --check passed"
+  },
+  "remaining": [
+    "T19 legacy Select Subject discards computed mask into bounds and fabricates white/central fallbacks; correction and actual hair/transparency quality gates remain unfinished",
+    "High source/working memory and dense RLE/command limits",
+    "Long tasks remain; no universal responsiveness claim",
+    "Semantic detection, matting equivalence and Photoshop parity not established",
+    "Hardware GPU, broader corpus/device and full roadmap gates remain open"
+  ]
+}

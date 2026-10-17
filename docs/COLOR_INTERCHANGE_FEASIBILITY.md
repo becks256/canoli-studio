@@ -6,6 +6,10 @@
 **Status:** Approved & Implemented in Prototype  
 **Date:** 2026-09-28
 
+Current export behavior was corrected on 2026-10-15: the browser renders all content through the editor compositor, retains independent pixel layers, merges backdrop-dependent prefixes and offers explicit flattening. Editable Photoshop text/masks/adjustments/group hierarchy and PSB output remain unsupported. Merged preview RGB is white-matted; see SCRIPTING_API.md for precision and the current supported subset. Historical prototype descriptions below do not establish professional color/interchange parity.
+
+Current TIFF output (2026-10-17) is a flattened lossless Deflate RGBA8 sRGB image with unassociated alpha and embedded output ICC. Automatic/classic/BigTIFF choices use actual output addressing. TIFF input, higher precision/CMYK/HDR, editable/multipage output and real files exceeding 4 GiB remain unverified or unimplemented. See SCRIPTING_API.md for the exact trusted host contract.
+
 ---
 
 ## 1. Executive Summary

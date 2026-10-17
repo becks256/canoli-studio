@@ -15,6 +15,8 @@ export interface ComponentExpansionBudget {
   preserveFiltered?: boolean;
   /** @internal Renderer-only read view; public defaults remain defensive. */
   retainImmutable?: boolean;
+  /** @internal SVG export keeps generated master-canvas clips as editable geometry. */
+  vectorCanvasClips?: boolean;
 }
 /** Ephemeral render tree only. Never replace authored definitions with this expansion. */
 export function resolveSmartDocument(
@@ -193,6 +195,7 @@ export function resolveSmartDocument(
         width: layer.width,
         height: layer.height,
         effects: structuredClone(sole.effects),
+        erasures: sole.erasures ? structuredClone(sole.erasures) : undefined,
       };
     }
     const scope = [...path, layer.id, layer.componentId];
@@ -206,7 +209,10 @@ export function resolveSmartDocument(
         layer.width / master.width,
         layer.height / master.height,
       ).toJSON(),
-      mask: {
+      mask: budget.vectorCanvasClips ? {
+        kind:'vector',enabled:true,inverted:false,density:1,linked:true,fillRule:'nonzero',
+        paths:[{points:[{x:0,y:0},{x:master.width,y:0},{x:master.width,y:master.height},{x:0,y:master.height}].map(point=>({...point,in:{...point},out:{...point}}))}],
+      } : {
         kind: "selection",
         enabled: true,
         inverted: false,

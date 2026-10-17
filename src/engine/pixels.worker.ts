@@ -1,8 +1,24 @@
+import type { LutAdjustmentData } from "../core/lut";
+import type { ColorRangeSettings } from "../core/color-range";
+import type { WhiteBalanceAdjustmentData } from "../core/white-balance";
+import type { GradientMapAdjustmentData } from "../core/gradient-map";
 import { featherRegion } from "./feather-region";
+import { modifySelectionCoverage } from "./selection-modification";
+import { composeChannelSelection } from './channel-selection';
+import { growQuickSelection } from './quick-selection';
+import { selectNativeSubject } from './subject-selection';
+import type { SubjectRequest } from '../core/subject-selection';
+import {prepareMattingTile,refineMattingTile,type MattingTileRequest} from './matting-tile';
+import {wasmMattingIterations} from './matting-iterations';
+import {ClosedFormMatting} from '../intelligence/matting/closed-form';
+import type { QuickSelectionRequest } from '../core/quick-selection';
+import type { ChannelCoverageRequest } from '../core/alpha-channels';
+import type { SelectionModificationRequest } from "../core/selection-modification";
 import { encodeCapturedPng } from "./png";
 import { prepareClipboard, type ClipboardRequest } from "./clipboard";
 import { encodeCoverage, wandCoverage, type CoverageRequest } from "../core/pixel-selection";
-import { applyHsl } from "./wasm";
+import { applyHsl, applyChromatic, applyGradientMap, applyWhiteBalance, applyLookup, applyColorRange } from "./wasm";
+import type { ChromaticAdjustmentData } from "../core/adjustments";
 import type { HslAdjustmentData } from "../core/adjustments";
 import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
 import {
@@ -47,6 +63,7 @@ kernel
     self.postMessage({ type: "fatal", error: error.message }),
   );
 
+let matting:ClosedFormMatting|undefined;
 self.onmessage = async (
   event: MessageEvent<{
     id: number;
@@ -82,6 +99,11 @@ self.onmessage = async (
       coverage?: Uint8Array | Uint8ClampedArray;
     };
     hsl?: HslAdjustmentData;
+    chromatic?: ChromaticAdjustmentData;
+    gradientMap?: GradientMapAdjustmentData;
+    whiteBalance?: WhiteBalanceAdjustmentData;
+    lookup?: LutAdjustmentData;
+    colorRange?:ColorRangeSettings;
     effects?: ToneEffectData[];
     underlying?: Uint8ClampedArray;
     blend?: BlendIfData;
@@ -98,10 +120,43 @@ self.onmessage = async (
     coverage?: CoverageRequest;
     png?: { width: number; height: number };
     clipboard?: ClipboardRequest;
+    selectionModification?: SelectionModificationRequest;
+    channelSelection?: ChannelCoverageRequest;
+    quickSelection?: QuickSelectionRequest;
+    subject?: SubjectRequest;
+    matting?: MattingTileRequest;
+    mattingBegin?:{width:number;height:number};
+    mattingAccumulate?:MattingTileRequest;
+    mattingSolve?:boolean;
   }>,
 ) => {
   try {
     const data = event.data;
+    if(data.mattingBegin){matting?.dispose();matting=new ClosedFormMatting(data.mattingBegin.width,data.mattingBegin.height);self.postMessage({id:data.id});return;}
+    if(data.mattingAccumulate){if(!matting)throw new Error('Missing matting session.');matting.add({...data.mattingAccumulate,...prepareMattingTile(data.pixels,data.mattingAccumulate)});self.postMessage({id:data.id});return;}
+    if(data.mattingSolve){if(!matting)throw new Error('Missing matting session.');const mattingDiagnostics=await matting.solve((iteration,residual)=>self.postMessage({id:data.id,type:'progress',progress:{completed:iteration,total:2000,relativeResidual:residual}}),2000,'ic0',true,wasmMattingIterations(await kernel));self.postMessage({id:data.id,mattingDiagnostics});return;}
+    if(data.matting){
+      const mattingTile=refineMattingTile(await kernel,data.pixels,data.matting,matting);
+      self.postMessage({id:data.id,mattingTile},{transfer:[mattingTile.alpha.buffer as ArrayBuffer,mattingTile.rgba.buffer as ArrayBuffer]});return;
+    }
+    if(data.subject){
+      const selectionResult=await selectNativeSubject(await kernel,data.pixels,data.subject,progress=>self.postMessage({id:data.id,type:'progress',progress}));
+      self.postMessage({id:data.id,selectionResult});return;
+    }
+    if(data.quickSelection){
+      const selectionResult=await growQuickSelection(await kernel,data.pixels,data.quickSelection,progress=>self.postMessage({id:data.id,type:'progress',progress}));
+      self.postMessage({id:data.id,selectionResult});return;
+    }
+    if(data.channelSelection){
+      const selectionResult=await composeChannelSelection(await kernel,data.channelSelection,progress=>self.postMessage({id:data.id,type:'progress',progress}));
+      self.postMessage({id:data.id,selectionResult});return;
+    }
+    if (data.selectionModification) {
+      const selectionResult = await modifySelectionCoverage(await kernel, data.selectionModification,
+        progress => self.postMessage({id:data.id,type:"progress",progress}));
+      self.postMessage({id:data.id,selectionResult});
+      return;
+    }
     if (data.png) {
       const { width, height } = data.png;
       const png = await encodeCapturedPng(data.pixels, width, height);
@@ -128,6 +183,29 @@ self.onmessage = async (
     }
     if (data.hsl) {
       const pixels = applyHsl(await kernel, data.pixels, data.hsl);
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
+    }
+    if(data.colorRange){
+      const colorRangeCoverage=applyColorRange(await kernel,data.pixels,data.colorRange);
+      self.postMessage({id:data.id,colorRangeCoverage},{transfer:[colorRangeCoverage.buffer]});return;
+    }
+    if (data.lookup) {
+      const pixels = applyLookup(await kernel, data.pixels, data.lookup);
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer as ArrayBuffer] }); return;
+    }
+    if (data.whiteBalance) {
+      const pixels = applyWhiteBalance(await kernel, data.pixels, data.whiteBalance);
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
+    }
+    if (data.gradientMap) {
+      const pixels = applyGradientMap(await kernel, data.pixels, data.gradientMap);
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
+    }
+    if (data.chromatic) {
+      const pixels = applyChromatic(await kernel, data.pixels, data.chromatic);
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }

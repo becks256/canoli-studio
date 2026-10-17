@@ -1,4 +1,14 @@
+import {SvgImportDialog} from './SvgImportDialog';
+import {TiffImportDialog} from './TiffImportDialog';
+import type {RefineEdgeProgress} from '../core/matting';
+import {PreflightDialog} from './PreflightDialog';
 import { CanvasCursor } from "./CanvasCursor";
+import { ColorRangeDialog } from "./ColorRangeDialog";
+import { SelectionModifyDialog } from "./SelectionModifyDialog";
+import { VectorBooleanDialog } from './VectorBooleanDialog';
+import { SubjectSelectionProgress } from './SubjectSelectionProgress';
+import type { SelectionModificationProgress } from '../core/selection-modification';
+import type { SelectionModificationOptions } from "../core/selection-modification";
 import { PanelResizeHandle } from "./PanelResizeHandle";
 import { usePanelLayout } from "./hooks/usePanelLayout";
 import { ShortcutHints } from "./ShortcutHints";
@@ -37,6 +47,11 @@ import { AdjustmentLayer, LayerGroup, PaintLayer, RasterLayer, TextLayer } from 
 import {
   defaultCurvesAdjustment,
   defaultHslAdjustment,
+  defaultColorBalanceAdjustment,
+  defaultVibranceAdjustment,
+  defaultGradientMapAdjustment,
+  defaultWhiteBalanceAdjustment,
+  defaultLutAdjustment,
   defaultLevelsAdjustment,
   defaultToneAdjustment,
 } from "../core/adjustments";
@@ -132,6 +147,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     editor.recovery.getSnapshot,
   );
   const [showRecovery, setShowRecovery] = useState(false);
+  const [showPreflight,setShowPreflight]=useState(false);
   const backendState = useSyncExternalStore(
     editor.renderer.subscribeBackend,
     editor.renderer.getBackendSnapshot,
@@ -158,7 +174,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     editor.tools.configure({ paintTarget: "layer", penEditTarget: "layer" });
   }, [editor, dom, state.selectedId, selectedMaskKind, selectedFilterMaskKind]);
   useEffect(() => {
-    if (editor.tools.drawingMaskContour || editor.tools.crop.active)
+    if (editor.tools.drawingMaskContour || editor.tools.drawingPolygonLasso || editor.tools.drawingQuickSelection || editor.tools.crop.active)
       editor.tools.cancel();
   }, [editor, dom, state.revision]);
   const toolSizes = useRef({ brush: 24, pencil: 1, eraser: 24 });
@@ -221,12 +237,23 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showImageSizeDialog, setShowImageSizeDialog] = useState(false);
   const [showArtboardDialog, setShowArtboardDialog] = useState(false);
   const [showCropDialog, setShowCropDialog] = useState(false);
+  const [selectionModification, setSelectionModification] = useState<SelectionModificationOptions['operation'] | null>(null);
+  const [showColorRange,setShowColorRange]=useState(false);
+  const [showVectorBoolean,setShowVectorBoolean]=useState(false);
+  const [subjectProgress,setSubjectProgress]=useState<SelectionModificationProgress|null>(null);
+  const subjectAbort=useRef<AbortController|null>(null);
+  const [mattingProgress,setMattingProgress]=useState<RefineEdgeProgress|null>(null);
+  const mattingAbort=useRef<AbortController|null>(null);
+  useEffect(()=>()=>mattingAbort.current?.abort(),[]);
+  useEffect(()=>()=>subjectAbort.current?.abort(),[]);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [showRecipeDialog, setShowRecipeDialog] = useState(false);
   const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [showColorDialog, setShowColorDialog] = useState(false);
   const [showRefineEdgeDialog, setShowRefineEdgeDialog] = useState(false);
+  const [svgFile,setSvgFile]=useState<File|null>(null);
+  const [tiffFile,setTiffFile]=useState<File|null>(null);
   const [psdPreflight, setPsdPreflight] = useState<{
     fileName: string;
     buffer: Uint8Array;
@@ -300,6 +327,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         layerText?: string;
         layerFontFamily?: string;
         layerLineHeight?: number;
+        layerTextStyle?: import('../core/text-style').TextStyle;
         id: string;
         layerKind: "raster" | "text";
         patch: LayerPatch;
@@ -528,7 +556,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     });
   }
   function addAdjustmentLayer(
-    kind: "curves" | "levels" | "tone" | "hsl" = "curves",
+    kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" = "curves",
   ) {
     attempt(() => {
       const existingNames = new Set(
@@ -541,6 +569,15 @@ export function App({ editor }: { editor: EditorApplication }) {
             ? "Levels"
             : kind === "hsl"
               ? "HSL"
+              : kind === "color-balance"
+                ? "Color Balance"
+                : kind === "vibrance"
+                  ? "Vibrance"
+                  : kind === "gradient-map"
+                    ? "Gradient Map"
+                    : kind === "white-balance"
+                      ? "White Balance"
+                      : kind === "lut" ? "Color Lookup"
               : "Tone";
       let index = 1;
       while (existingNames.has(`${prefix} ${index}`)) index++;
@@ -553,6 +590,15 @@ export function App({ editor }: { editor: EditorApplication }) {
               ? defaultLevelsAdjustment()
               : kind === "hsl"
                 ? defaultHslAdjustment()
+                : kind === "color-balance"
+                  ? defaultColorBalanceAdjustment()
+                  : kind === "vibrance"
+                    ? defaultVibranceAdjustment()
+                    : kind === "gradient-map"
+                      ? defaultGradientMapAdjustment()
+                      : kind === "white-balance"
+                        ? defaultWhiteBalanceAdjustment()
+                        : kind === "lut" ? defaultLutAdjustment()
                 : defaultToneAdjustment(),
       });
       clearPreview();
@@ -694,6 +740,13 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: SHORTCUT_BINDINGS["select-all"],
       run: () => attempt(() => dom.selectAll()),
     },
+    ...(["expand", "contract", "feather"] as const).map(operation => ({
+      id: `selection-${operation}`, label: `${operation[0].toUpperCase()+operation.slice(1)} selection…`, keys: [],
+      enabled: () => !busy && !!state.document.selection,
+      run: () => { editor.tools.cancel(); setSelectionModification(operation); },
+    })),
+    {id:'select-color-range',label:'Select Color Range…',keys:[],enabled:()=>!busy,run:()=>{editor.tools.cancel();setShowColorRange(true);}},
+    {id:'save-alpha-channel',label:'Save selection as alpha channel',keys:[],enabled:()=>!busy&&!!state.document.selection&&dom.alphaChannels.length<64,run:()=>attempt(()=>{dom.alphaChannels.capture(`Alpha ${dom.alphaChannels.length+1}`);})},
     {
       id: "deselect",
       label: "Deselect pixels",
@@ -702,7 +755,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     },
     {
       id: "finish-path",
-      label: tool === "crop" ? "Apply crop" : "Finish path",
+      label: tool === "crop" ? "Apply crop" : tool === "lasso" ? "Finish polygon selection" : "Finish path",
       keys: SHORTCUT_BINDINGS["finish-path"],
       run: () =>
         attempt(() =>
@@ -710,7 +763,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             ? editor.tools.crop.apply()
             : editor.tools.finishPath(),
         ),
-      enabled: () => tool === "pen" || tool === "crop",
+      enabled: () => tool === "pen" || tool === "crop" || editor.tools.drawingPolygonLasso,
     },
     ...([-1, 1] as const).map((direction) => ({
       id: `brush-size-${direction}`,
@@ -763,6 +816,8 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: SHORTCUT_BINDINGS["export"],
       run: () => setShowExportDialog(true),
     },
+    {id:'design-checks',label:'Design checks',keys:[],run:()=>setShowPreflight(true),enabled:()=>!busy},
+    {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>!busy},
     {
       id: "undo",
       label: "Undo",
@@ -795,7 +850,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     },
     {
       id: "delete",
-      label: tool === "crop" ? "Clear crop frame" : "Delete layer",
+      label: tool === "crop" ? "Clear crop frame" : editor.tools.drawingPolygonLasso ? "Remove last polygon corner" : "Delete layer",
       keys: SHORTCUT_BINDINGS["delete"],
       run: () =>
         attempt(() => {
@@ -803,17 +858,17 @@ export function App({ editor }: { editor: EditorApplication }) {
             editor.tools.crop.start(null);
             return;
           }
-          if (tool === "pen" && editor.tools.removeLastAnchor()) return;
+          if ((tool === "pen" || editor.tools.drawingPolygonLasso) && editor.tools.removeLastAnchor()) return;
           if (state.document.selection && (selectedObject instanceof PaintLayer || selectedObject instanceof RasterLayer))
             editor.tools.fillSelection(true);
           else if (dom.selectedLayers.length > 1) dom.layerSelection.remove();
           else selectedObject?.remove();
         }),
-      enabled: () => tool === "crop" || (!!selected && !locked),
+      enabled: () => tool === "crop" || editor.tools.drawingPolygonLasso || (!!selected && !locked),
     },
-    ...(["curves", "levels", "tone", "hsl"] as const).map((kind) => ({
+    ...(["curves", "levels", "tone", "hsl", "color-balance", "vibrance", "gradient-map", "white-balance", "lut"] as const).map((kind) => ({
       id: `new-${kind}-adjustment`,
-      label: `New ${kind === "hsl" ? "HSL (Hue / Saturation / Lightness)" : kind[0].toUpperCase() + kind.slice(1)} adjustment layer`,
+      label: `New ${kind === "hsl" ? "HSL (Hue / Saturation / Lightness)" : kind === "color-balance" ? "Color Balance" : kind === "gradient-map" ? "Gradient Map" : kind === "white-balance" ? "White Balance" : kind === "lut" ? "Color Lookup (LUT)" : kind[0].toUpperCase() + kind.slice(1)} adjustment layer`,
       keys: [],
       run: () => addAdjustmentLayer(kind),
       enabled: () => !busy && !locked,
@@ -953,12 +1008,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       label: "Select subject",
       keys: SHORTCUT_BINDINGS["selectSubject"],
       run: () => {
-        if (!busy) {
-          void task(async () => {
-            await editor.selectSubject();
-            notify("Subject selected");
-          });
-        }
+        if (!busy) void handleSelectSubject();
       },
     },
     {
@@ -1036,6 +1086,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     editor,
     busy,
     modalOpen:
+      showPreflight ||
       showRecovery ||
       showPalette ||
       showHelp ||
@@ -1044,6 +1095,11 @@ export function App({ editor }: { editor: EditorApplication }) {
       showImageSizeDialog ||
       showArtboardDialog ||
       showCropDialog ||
+      !!selectionModification ||
+      showColorRange ||
+      showVectorBoolean ||
+      !!subjectProgress ||
+      !!mattingProgress ||
       showExportDialog ||
       showGenerateDialog ||
       showRecipeDialog ||
@@ -1052,6 +1108,8 @@ export function App({ editor }: { editor: EditorApplication }) {
       showRefineEdgeDialog ||
       !!psdPreflight,
     onDismissModals: () => {
+      subjectAbort.current?.abort();
+      mattingAbort.current?.abort();
       setShowRecovery(false);
       setShowPalette(false);
       setShowHelp(false);
@@ -1060,6 +1118,9 @@ export function App({ editor }: { editor: EditorApplication }) {
       setShowImageSizeDialog(false);
       setShowArtboardDialog(false);
       setShowCropDialog(false);
+      setSelectionModification(null);
+      setShowColorRange(false);
+      setShowVectorBoolean(false);
       setShowExportDialog(false);
       setShowGenerateDialog(false);
       setShowRecipeDialog(false);
@@ -1246,6 +1307,14 @@ export function App({ editor }: { editor: EditorApplication }) {
             selected.kind === "text" ? selected.fontFamily : undefined,
           layerLineHeight:
             selected.kind === "text" ? selected.lineHeight : undefined,
+          layerTextStyle: selected.kind === 'text' ? {
+            fontSize:selected.fontSize, fontFamily:selected.fontFamily,
+            fontWeight:selected.fontWeight, fontStyle:selected.fontStyle,
+            letterSpacing:selected.letterSpacing, wordSpacing:selected.wordSpacing,
+            fontKerning:selected.fontKerning, direction:selected.direction,
+            wrapWidth:selected.wrapWidth, paragraphSpacing:selected.paragraphSpacing, paragraphJustify:selected.paragraphJustify,
+            firstLineIndent:selected.firstLineIndent,
+          } : undefined,
           id: selected.id,
           layerKind: selected.kind,
           patch: {},
@@ -1357,7 +1426,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       return;
     const point = toCanvasPoint(event);
     updateCursor(point);
-    if (editor.tools.getSnapshot().drawing) {
+    if (editor.tools.getSnapshot().drawing || (editor.tools.drawingPolygonLasso && gesture.current?.kind !== "pan")) {
       attempt(() => {
         const samples = event.nativeEvent.getCoalescedEvents?.() ?? [];
         for (const sample of samples)
@@ -1594,6 +1663,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
   }
 
+  const handleImportFile=(file:File)=>{
+    if(file.type==='image/svg+xml'||/\.svg$/i.test(file.name)){setSvgFile(file);return;}
+    if(['image/tiff','image/x-tiff'].includes(file.type)||/\.tiff?$/i.test(file.name)){setTiffFile(file);return;}
+    void task(async()=>{await editor.importImage(file);notify('Image added');});
+  };
+
   const handlePsdFile = async (file: File) => {
     try {
       const buffer = new Uint8Array(await file.arrayBuffer());
@@ -1632,27 +1707,31 @@ export function App({ editor }: { editor: EditorApplication }) {
 
   const handleSelectSubject = async () => {
     await task(async () => {
+      const abort=new AbortController();subjectAbort.current=abort;setSubjectProgress({completed:0,total:1});
       try {
-        await editor.selectSubject();
+        await editor.selectSubject({}, {signal:abort.signal,onProgress:setSubjectProgress});
         notify("Subject selected");
       } catch (err) {
+        if(abort.signal.aborted)return;
         notify(
           `Select subject failed: ${err instanceof Error ? err.message : String(err)}`,
         );
-      }
+      }finally{if(subjectAbort.current===abort)subjectAbort.current=null;setSubjectProgress(null);}
     });
   };
 
   const handleRemoveBackground = async () => {
     await task(async () => {
+      const abort=new AbortController();mattingAbort.current=abort;setMattingProgress({completed:0,total:1});
       try {
-        await editor.removeBackground();
+        await editor.removeBackground(undefined,{}, {signal:abort.signal,onProgress:setMattingProgress});
         notify("Background removed");
       } catch (err) {
+        if(abort.signal.aborted)return;
         notify(
           `Remove background failed: ${err instanceof Error ? err.message : String(err)}`,
         );
-      }
+      }finally{if(mattingAbort.current===abort)mattingAbort.current=null;setMattingProgress(null);}
     });
   };
 
@@ -1663,16 +1742,12 @@ export function App({ editor }: { editor: EditorApplication }) {
           ref={importInput}
           data-testid="import-input"
           type="file"
-          accept="image/png,image/jpeg,image/webp"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg,image/tiff,.tif,.tiff"
           hidden
           onChange={(event) => {
             const file = event.target.files?.[0];
             event.target.value = "";
-            if (file)
-              void task(async () => {
-                await editor.importImage(file);
-                notify("Image added");
-              });
+            if(file)handleImportFile(file);
           }}
         />
         <input
@@ -1760,6 +1835,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onOpenScripts={() => setShowScripts(true)}
             onOpenPlugins={() => setShowPlugins(true)}
             onOpenHelp={() => setShowHelp(true)}
+            onOpenPreflight={()=>setShowPreflight(true)}
             onOpenRecovery={() => setShowRecovery(true)}
           />
           <LayersPanel
@@ -1953,6 +2029,8 @@ export function App({ editor }: { editor: EditorApplication }) {
               hasSelection={!!state.document.selection}
               disabled={busy || locked}
               onAction={attempt}
+              onModifySelection={() => { editor.tools.cancel(); setSelectionModification("expand"); }}
+              onColorRange={()=>{editor.tools.cancel();setShowColorRange(true);}}
               onOpenImageSize={() => { editor.tools.cancel(); setShowImageSizeDialog(true); }}
               onOpenArtboard={() => setShowArtboardDialog(true)}
               onOpenCrop={() => {
@@ -1970,6 +2048,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                 if (
                   busy ||
                   editor.tools.getSnapshot().drawing ||
+                  editor.tools.drawingPolygonLasso ||
                   gesture.current
                 )
                   return;
@@ -1998,10 +2077,7 @@ export function App({ editor }: { editor: EditorApplication }) {
               onDrop={(event) => {
                 event.preventDefault();
                 const file = event.dataTransfer.files[0];
-                if (file)
-                  void task(async () => {
-                    await editor.importImage(file);
-                  });
+                if(file)handleImportFile(file);
               }}
             >
               {guidesVisible && (
@@ -2198,7 +2274,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                     </div>
                   )}
               </div>
-              <CanvasCursor viewport={viewport} enabled={customCursors} tool={tool} spacePan={spacePan} size={toolState.settings.size} zoom={zoom} />
+              <CanvasCursor viewport={viewport} enabled={customCursors} tool={tool} spacePan={spacePan} size={tool==='quick-select'?toolState.settings.quickSize:toolState.settings.size} zoom={zoom} />
               {!dom.layers.length &&
                 !dom.guides.length &&
                 (tool === "move" || tool === "hand") && (
@@ -2224,7 +2300,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                       Open sample composition <ChevronRight size={13} />
                     </button>
                     <small>
-                      PNG, JPG, WEBP · Original resolution preserved
+                      PNG, JPG, WEBP, SVG · Original resolution preserved
                     </small>
                   </div>
                 )}
@@ -2351,6 +2427,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onAttempt={attempt}
             onSelectedAction={selectedAction}
             onOpenHelp={() => setShowHelp(true)}
+            onCombinePaths={()=>{editor.tools.cancel();setShowVectorBoolean(true);}}
           />
         </div>
         {(error || message) && (
@@ -2373,6 +2450,12 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showPlugins && (
           <PluginPanel editor={editor} onClose={() => setShowPlugins(false)} />
         )}
+        {selectionModification && <SelectionModifyDialog operation={selectionModification}
+          onApply={(options,control) => dom.modifySelection(options,control)} onClose={() => setSelectionModification(null)} />}
+        {showColorRange&&<ColorRangeDialog editor={editor} onClose={()=>setShowColorRange(false)}/>}
+        {showVectorBoolean&&<VectorBooleanDialog key={dom.id} document={dom} onClose={()=>setShowVectorBoolean(false)} onResult={path=>{if(editor.document===dom)editor.tools.selectVectorPath(path);}}/>}
+        {subjectProgress&&<SubjectSelectionProgress progress={subjectProgress} onCancel={()=>subjectAbort.current?.abort()}/>}
+        {mattingProgress&&<SubjectSelectionProgress title="Remove Background" description={mattingProgress.phase==='solve'?`Solving the global matte · iteration ${mattingProgress.iteration??0}`:"Refining the selected raster's native matte…"} progress={mattingProgress} onCancel={()=>mattingAbort.current?.abort()}/>}
         {showCropDialog && (
           <CropDialog
             width={dom.width}
@@ -2495,6 +2578,8 @@ export function App({ editor }: { editor: EditorApplication }) {
             onClose={() => setShowColorDialog(false)}
           />
         )}
+        {svgFile&&<SvgImportDialog file={svgFile} editor={editor} onClose={()=>setSvgFile(null)} onBusyChange={setBusy} onImported={()=>notify("SVG imported")}/>}
+        {tiffFile&&<TiffImportDialog file={tiffFile} editor={editor} onClose={()=>setTiffFile(null)} onBusyChange={setBusy} onImported={()=>notify("TIFF page imported")}/>}
         {psdPreflight && (
           <PsdImportDialog
             fileName={psdPreflight.fileName}
@@ -2505,21 +2590,14 @@ export function App({ editor }: { editor: EditorApplication }) {
             onClose={() => setPsdPreflight(null)}
           />
         )}
+        {showPreflight&&<PreflightDialog editor={editor} onClose={()=>setShowPreflight(false)}/>}
         {showRefineEdgeDialog && (
           <RefineEdgeDialog
             editor={editor}
             onClose={() => setShowRefineEdgeDialog(false)}
-            onApply={async (options) => {
-              await task(async () => {
-                try {
-                  await editor.refineEdge(options);
-                  notify("Edge refined");
-                } catch (err) {
-                  notify(
-                    `Refine edge failed: ${err instanceof Error ? err.message : String(err)}`,
-                  );
-                }
-              });
+            onApply={async (options,control) => {
+              await editor.refineEdge(options,control);
+              notify("Edge refined");
             }}
           />
         )}

@@ -1,3 +1,7 @@
+import {gradientStopColor,type VectorGradientData} from '../core/vector-gradient';
+import {applyTextStyle, measureStyledText,assertTextStyleSupport} from '../core/text-style';
+import {vectorStrokeValues,zeroLengthStrokePoint,strokeDashAtOrigin} from '../core/vector-stroke';
+import {strokeStamps,paintStampSize,paintStampAlpha} from '../core/paint-stamps';
 import { checkRenderCurrent } from "./render-control";
 import { yieldTask } from "./task-yield";
 import { strokeIntersectsRegion } from "./stroke-region";
@@ -10,7 +14,8 @@ import type {
   TextLayerData,
   VectorLayerData,
 } from "../core/model";
-import { pathBounds, strokeBounds } from "../core/drawing";
+import { pathBounds, pathContours, strokeBounds } from "../core/drawing";
+import {layoutText, type TextLayout} from '../core/text-layout';
 import type {
   BrushStrokeData,
   Rect,
@@ -78,23 +83,10 @@ function stamp(
   stroke: BrushStrokeData,
   point: StrokePoint,
 ) {
-  const usePressureSize = stroke.pressureSize ?? true;
-  const usePressureOpacity = stroke.pressureOpacity ?? false;
-
-  const size = usePressureSize
-    ? stroke.size * Math.max(0.05, point.pressure)
-    : stroke.size;
+  const size = paintStampSize(stroke, point);
   const radius = size / 2;
-
-  const flow = stroke.flow ?? 1;
   const prevAlpha = context.globalAlpha;
-  let alpha = prevAlpha;
-  if (flow < 1) {
-    alpha *= Math.max(0.01, flow);
-  }
-  if (usePressureOpacity) {
-    alpha *= Math.max(0.01, point.pressure);
-  }
+  const alpha = paintStampAlpha(stroke, point, prevAlpha);
   if (alpha !== prevAlpha) {
     context.globalAlpha = alpha;
   }
@@ -132,72 +124,6 @@ function stamp(
   context.arc(point.x, point.y, radius, 0, Math.PI * 2);
   context.fill();
   if (alpha !== prevAlpha) context.globalAlpha = prevAlpha;
-}
-function* strokeStamps(
-  stroke: BrushStrokeData,
-  visible: Rect,
-  from = 0,
-) {
-  const padding = stroke.size / 2 + 2;
-  const inView = (p: StrokePoint) =>
-    p.x >= visible.x - padding &&
-    p.x <= visible.x + visible.width + padding &&
-    p.y >= visible.y - padding &&
-    p.y <= visible.y + visible.height + padding;
-  if (from === 0 && inView(stroke.points[0])) yield stroke.points[0];
-  for (let i = Math.max(1, from); i < stroke.points.length; i++) {
-    const a = stroke.points[i - 1],
-      b = stroke.points[i];
-    const dx = b.x - a.x,
-      dy = b.y - a.y;
-    const length =
-      stroke.kind === "pencil"
-        ? Math.max(Math.abs(dx), Math.abs(dy))
-        : Math.hypot(dx, dy);
-    const spacingFactor = stroke.spacing ?? 0.12;
-    const spacing =
-      stroke.kind === "pencil"
-        ? 1
-        : Math.max(
-            0.5,
-            stroke.size *
-              spacingFactor *
-              Math.max(0.05, Math.min(a.pressure, b.pressure)),
-          );
-    const count = Math.max(1, Math.ceil(length / spacing));
-    // Clip the parameter interval before stepping, retaining the same stamp grid
-    // on every viewport/export tile to avoid seams.
-    let low = 0,
-      high = 1;
-    for (const [start, delta, min, max] of [
-      [a.x, dx, visible.x - padding, visible.x + visible.width + padding],
-      [a.y, dy, visible.y - padding, visible.y + visible.height + padding],
-    ]) {
-      if (delta === 0) {
-        if (start < min || start > max) {
-          high = -1;
-          break;
-        }
-      } else {
-        const t0 = (min - start) / delta,
-          t1 = (max - start) / delta;
-        low = Math.max(low, Math.min(t0, t1));
-        high = Math.min(high, Math.max(t0, t1));
-      }
-    }
-    for (
-      let step = Math.max(1, Math.ceil(low * count));
-      step <= Math.min(count, Math.floor(high * count));
-      step++
-    ) {
-      const t = step / count;
-      yield {
-        x: a.x + dx * t,
-        y: a.y + dy * t,
-        pressure: a.pressure + (b.pressure - a.pressure) * t,
-      };
-    }
-  }
 }
 export function visitStrokeStamps(
   visit: (point: StrokePoint) => void,
@@ -434,8 +360,9 @@ export async function drawPaint(
 }
 export function tracePath(
   context: CanvasRenderingContext2D,
-  path: Pick<VectorPathData, "points" | "closed">,
+  path: Pick<VectorPathData, "points" | "closed" | "subpaths">,
   begin = true,
+  nativeLines = false,
 ) {
   const first = path.points[0];
   if (begin) context.beginPath();
@@ -444,7 +371,8 @@ export function tracePath(
   for (let i = 1; i < count + (path.closed ? 1 : 0); i++) {
     const previous = path.points[i - 1],
       point = path.points[i % count];
-    context.bezierCurveTo(
+    if(nativeLines&&previous.out.x===previous.x&&previous.out.y===previous.y&&point.in.x===point.x&&point.in.y===point.y)context.lineTo(point.x,point.y);
+    else context.bezierCurveTo(
       previous.out.x,
       previous.out.y,
       point.in.x,
@@ -454,6 +382,7 @@ export function tracePath(
     );
   }
   if (path.closed) context.closePath();
+  for (const contour of path.subpaths ?? []) tracePath(context, contour, false, nativeLines);
 }
 /** Compound Bézier coverage. Fill/stroke styling from source paths is irrelevant. */
 export function vectorMask(
@@ -523,6 +452,17 @@ export function vectorMask(
     if (tile) release(tile);
   }
 }
+/** Gradient transforms affect paint coordinates without changing the path. */
+function vectorFill(context:CanvasRenderingContext2D,value:VectorGradientData,rule:CanvasFillRule):void{
+ context.save();
+ try{
+  const t=value.transform;if(t)context.transform(t.a,t.b,t.c,t.d,t.e,t.f);
+  const a=value.start,b=value.end;
+  const gradient=value.kind==='linear'?context.createLinearGradient(a.x,a.y,b.x,b.y):context.createRadialGradient(value.start.x,value.start.y,value.start.radius,value.end.x,value.end.y,value.end.radius);
+  for(const stop of value.stops)gradient.addColorStop(stop.position,gradientStopColor(stop));
+  context.fillStyle=gradient;context.fill(rule);
+ }finally{context.restore();}
+}
 export function drawVectors(
   layer: VectorLayerData,
   target: HTMLCanvasElement,
@@ -534,20 +474,76 @@ export function drawVectors(
   applyTransform(context, space, world);
   for (const path of layer.paths) {
     if (!overlaps(world.bounds(pathBounds(path)), space, 0, 0)) continue;
-    tracePath(context, path);
-    if (path.fill && path.closed) {
-      context.fillStyle = path.fill;
-      context.fill();
+    // Line commands have the same geometry but avoid cubic path-measure
+    // sampling differences in dashed strokes. Mask tessellation stays stable.
+    tracePath(context, path,true,true);
+    if ((path.fillGradient||path.fill) && path.closed) {
+      if(path.fillGradient)vectorFill(context,path.fillGradient,path.fillRule??'nonzero');
+      else{context.fillStyle=path.fill!;context.fill(path.fillRule??'nonzero');}
     }
     if (path.stroke && path.strokeWidth > 0) {
       context.lineWidth = path.strokeWidth;
-      context.lineCap = "round";
-      context.lineJoin = "round";
+      const style=vectorStrokeValues(path);
+      context.lineCap=style.strokeCap;
+      context.lineJoin=style.strokeJoin;
+      context.miterLimit=style.strokeMiterLimit;
+      context.setLineDash(style.strokeDashArray);
+      context.lineDashOffset=style.strokeDashOffset;
       context.strokeStyle = path.stroke;
       context.stroke();
+      for (const contour of pathContours(path)) {
+      const point=zeroLengthStrokePoint(contour);
+      if(point){
+        // Canvas prunes zero-length subpaths. Preserve the SVG/native cap
+        // semantics explicitly without double-painting an existing stroke.
+        if(style.strokeCap!=='butt'&&!(contour.closed&&style.strokeDashArray.some(length=>length>0))&&strokeDashAtOrigin(style.strokeDashArray,style.strokeDashOffset)){
+          const r=path.strokeWidth/2;context.fillStyle=path.stroke;
+          if(style.strokeCap==='square')context.fillRect(point.x-r,point.y-r,r*2,r*2);
+          else{context.beginPath();context.arc(point.x,point.y,r,0,Math.PI*2);context.fill();}
+        }
+      }
+      }
     }
   }
   context.restore();
+}
+
+function textInkBounds(context: CanvasRenderingContext2D, layer: TextLayerData, layout?: TextLayout) {
+  const lines = (layout ?? layoutText(layer, (text,spacing) => measureStyledText(context,text,layer,spacing), layer.width)).lines;
+  let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+  const metrics = new Map<string, TextMetrics>();
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if ('wordSpacing' in context) context.wordSpacing = `${line.wordSpacing??layer.wordSpacing??0}px`;
+    const key = `${line.wordSpacing??layer.wordSpacing??0}\0${line.text}`;
+    let ink = metrics.get(key);
+    if (!ink) { ink = context.measureText(line.text); metrics.set(key, ink); }
+    const { actualBoundingBoxLeft: l, actualBoundingBoxRight: r,
+      actualBoundingBoxAscent: a, actualBoundingBoxDescent: d } = ink;
+    // Missing metrics must keep the full reference surface, including effects.
+    if (![l, r, a, d].every(Number.isFinite)) return undefined;
+    if (l + r > 0 && a + d > 0) {
+      left = Math.min(left, line.x - l); right = Math.max(right, line.x + r);
+      top = Math.min(top, line.y - a);
+      bottom = Math.max(bottom, line.y + d);
+    }
+  }
+  return left === Infinity ? { x: 0, y: 0, width: 0, height: 0 }
+    : { x: left, y: top, width: right - left, height: bottom - top };
+}
+
+let textInkContext: CanvasRenderingContext2D | undefined;
+/** Fresh native metrics, never persisted across font loads or text edits. */
+export function measureTextInk(layer: TextLayerData) {
+  const context = textInkContext ??= createCanvas(1, 1).getContext("2d")!;
+  assertTextStyleSupport(context, layer);
+  context.save();
+  try {
+    applyTextStyle(context, layer);
+    context.textAlign = layer.align;
+    context.textBaseline = "top";
+    return textInkBounds(context, layer);
+  } finally { context.restore(); }
 }
 
 export function drawText(
@@ -558,52 +554,22 @@ export function drawText(
   measureInk = false,
 ) {
   const context = target.getContext("2d")!;
+  assertTextStyleSupport(context, layer);
   context.save();
-  applyTransform(context, space, world);
-  const fontStyle = layer.fontStyle ?? "normal";
-  const fontWeight = layer.fontWeight ?? "normal";
-  context.font = `${fontStyle} ${fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
-  if (layer.letterSpacing !== undefined && "letterSpacing" in context) {
-    (context as any).letterSpacing = `${layer.letterSpacing}px`;
-  }
-  if (layer.direction && "direction" in context) {
-    (context as any).direction = layer.direction;
-  }
-  context.fillStyle = layer.color;
-  context.textAlign = layer.align;
-  context.textBaseline = "top";
-  const lines = layer.text.split("\n");
-  const lineHeightPx = layer.fontSize * layer.lineHeight;
-  let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
-  let reliable = true;
-  const metrics = new Map<string, TextMetrics>();
-  for (let i = 0; i < lines.length; i++) {
-    let lineX = 0;
-    if (layer.align === "center") {
-      lineX = layer.width / 2;
-    } else if (layer.align === "right") {
-      lineX = layer.width;
+  try {
+    applyTransform(context, space, world);
+    applyTextStyle(context, layer);
+    context.fillStyle = layer.color;
+    context.textAlign = layer.align;
+    context.textBaseline = "top";
+    const layout = layoutText(layer, (text,spacing) => measureStyledText(context,text,layer,spacing), layer.width);
+    for (const line of layout.lines) {
+      if ('wordSpacing' in context) context.wordSpacing = `${line.wordSpacing??layer.wordSpacing??0}px`;
+      context.fillText(line.text, line.x, line.y);
     }
-    context.fillText(lines[i], lineX, i * lineHeightPx);
-    if (measureInk) {
-      let ink = metrics.get(lines[i]);
-      if (!ink) { ink = context.measureText(lines[i]); metrics.set(lines[i], ink); }
-      const { actualBoundingBoxLeft: l, actualBoundingBoxRight: r,
-        actualBoundingBoxAscent: a, actualBoundingBoxDescent: d } = ink;
-      if (![l, r, a, d].every(Number.isFinite)) reliable = false;
-      else if (l + r > 0 && a + d > 0) {
-        left = Math.min(left, lineX - l); right = Math.max(right, lineX + r);
-        top = Math.min(top, i * lineHeightPx - a);
-        bottom = Math.max(bottom, i * lineHeightPx + d);
-      }
-    }
-  }
-  context.restore();
-  // Only crop retained pixels, never change the original drawing surface/grid.
-  // Unavailable ink metrics conservatively retain the entire rendered surface.
-  if (!measureInk || !reliable) return undefined;
-  return left === Infinity ? { x: 0, y: 0, width: 0, height: 0 }
-    : { x: left, y: top, width: right - left, height: bottom - top };
+    const ink = measureInk ? textInkBounds(context, layer, layout) : undefined;
+    return ink;
+  } finally {context.restore();}
 }
 
 /** Composite one mask stroke from an unmodified coverage surface. */

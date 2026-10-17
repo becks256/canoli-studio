@@ -5,6 +5,7 @@ import { blendColors } from "./blend";
  */
 
 import type { DocumentData, LayerData } from "../../model";
+import { createRaster } from "../../model";
 import { ByteWriter } from "./stream";
 import { encodePackBits } from "./packbits";
 import {
@@ -14,6 +15,8 @@ import {
   type PsdExportOptions,
 } from "./types";
 import { STANDARD_PROFILES } from "../../color/icc";
+import { validatePsdDimensions } from "./export-plan";
+import { mattePreviewChannel } from "./composite";
 
 export interface LayerPixelSource {
   layer: LayerData;
@@ -25,7 +28,17 @@ export async function buildPsd(
   layersWithPixels: LayerPixelSource[],
   options: PsdExportOptions = {},
 ): Promise<Uint8Array> {
+  validatePsdDimensions(document.width, document.height);
+  if (!layersWithPixels.length) layersWithPixels = [{
+    layer: createRaster("Background", "psd:empty", 1, 1),
+    imageData: { width: 1, height: 1, data: new Uint8ClampedArray(4), colorSpace: "srgb" } as ImageData,
+  }];
+  if (layersWithPixels.length > 32767) throw new Error("PSD cannot represent more than 32,767 layer records.");
   const writer = new ByteWriter();
+  const finish = () => {
+    if (writer.position > 0x7fffffff) throw new Error("This output exceeds PSD's 2 GB file limit. PSB export is not implemented.");
+    return writer.getBuffer();
+  };
   const width = document.width;
   const height = document.height;
 
@@ -81,8 +94,8 @@ export async function buildPsd(
   const layerInfoWriter = new ByteWriter();
 
   const layerCount = layersWithPixels.length;
-  // Positive layer count = normal layers
-  layerInfoWriter.writeInt16(layerCount);
+  // A negative count identifies the fourth merged channel as transparency.
+  layerInfoWriter.writeInt16(-layerCount);
 
   // Pre-encode channels for all layers to calculate channel lengths
   interface EncodedChannel {
@@ -241,8 +254,10 @@ export async function buildPsd(
 
   const layerInfoBuf = layerInfoWriter.getBuffer();
   // Pad layerInfo to even 4 bytes
-  layerMaskWriter.writeUint32(layerInfoBuf.length);
+  layerMaskWriter.writeUint32(layerInfoBuf.length + layerInfoBuf.length % 2);
   layerMaskWriter.writeBytes(layerInfoBuf);
+  if (layerInfoBuf.length % 2) layerMaskWriter.writeUint8(0);
+  layerMaskWriter.writeUint32(0); // Global layer mask information.
 
   const layerMaskBuf = layerMaskWriter.getBuffer();
   writer.writeUint32(layerMaskBuf.length);
@@ -301,10 +316,10 @@ export async function buildPsd(
     for (let channel = 0; channel < 4; channel++) {
       const plane = new Uint8Array(width * height);
       for (let pixel = 0; pixel < plane.length; pixel++)
-        plane[pixel] = compPixels[pixel * 4 + channel];
+        plane[pixel] = channel < 3 ? mattePreviewChannel(compPixels[pixel * 4 + channel], compPixels[pixel * 4 + 3]) : compPixels[pixel * 4 + channel];
       writer.writeBytes(plane);
     }
-    return writer.getBuffer();
+    return finish();
   }
 
   // Encode composite channels with PackBits
@@ -318,7 +333,8 @@ export async function buildPsd(
       const row = new Uint8Array(width);
       const rowStart = y * width * 4;
       for (let x = 0; x < width; x++) {
-        row[x] = compPixels[rowStart + x * 4 + c];
+        const index = rowStart + x * 4;
+        row[x] = c < 3 ? mattePreviewChannel(compPixels[index + c], compPixels[index + 3]) : compPixels[index + c];
       }
       const comp = encodePackBits(row);
       compScanlines.push(comp);
@@ -335,5 +351,5 @@ export async function buildPsd(
     writer.writeBytes(compScanlines[i]);
   }
 
-  return writer.getBuffer();
+  return finish();
 }

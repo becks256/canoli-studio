@@ -109,7 +109,7 @@ test.describe("Color Management and PSD Interchange (T17: F10, F11)", () => {
       grid.getByText("Preserved features", { exact: false }),
     ).toBeVisible();
     await expect(
-      grid.getByText("Individual raster layers preserved", { exact: false }),
+      grid.getByText("Independent top-level layers retained", { exact: false }),
     ).toBeVisible();
 
     // 5. Verify Export button shows PSD extension

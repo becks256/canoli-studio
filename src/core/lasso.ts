@@ -1,4 +1,14 @@
 import type { Point, SelectionData } from './drawing';
+import { z } from 'zod';
+
+/** Document-space vertices; bounded by the same capture budget as freeform lasso. */
+export const polygonSelectionSchema = z.object({
+  points: z.array(z.object({
+    x: z.number().finite().min(-Number.MAX_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER),
+    y: z.number().finite().min(-Number.MAX_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER),
+  }).strict()).min(3).max(20000),
+  operation: z.enum(['replace', 'add', 'subtract', 'intersect']).default('replace'),
+}).strict();
 
 /** Even-odd 4×4 scan conversion; emit coverage spans without visiting interior pixels. */
 export function lassoSelection(points: Point[], documentWidth: number, documentHeight: number): SelectionData {

@@ -1,0 +1,888 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-16T13:20:40.910077+00:00",
+  "scope": "F02/F07/F11 SVG vector and native mask coverage. Full roadmap remains active and incomplete.",
+  "sourceSha256": {
+    "src/core/svg-masks.ts": "378b6f4536f63bc20ef0e500686d152bfadd24b03622ec893d21c77392c152dd",
+    "src/core/svg-export.ts": "e4d507eefb713c78bd980c98e055948873a8c7e393065dce0278e651d0eb2c9b",
+    "src/core/svg-path.ts": "74e430642ac5caa4d070cc7d6689ea512efd997541c0c7b0bded3a16b3c1d7e0",
+    "src/engine/svg-masks.ts": "9153d75e6fddbc46365b7f60361b8728219a200cf9f23179edd0527b860f9347",
+    "src/engine/export.ts": "4e73ac7d5c7564f4f4e3e742fda55c8c3505a2f98558745fc525e35fe227729a",
+    "src/engine/masks.ts": "be6ce6f583aa75ada03969440f98d5059e9d4bdc769051803fd6c65ff030c989",
+    "src/engine/renderer.ts": "6e8976053a0102f3176768e45c94dac5cf3b3a5a35df7e7e7b0a8b0cb6f70f35",
+    "src/dom/index.ts": "f7687bc782372841b20ab3f12131aed6bb0ada99456ca507dc0edda1ea04d19e",
+    "src/editor.ts": "757ff76cbea3987e78ff81e8d748004d4602646bc2a1138013db464abe3043f8",
+    "tests/svg-masks.test.ts": "f3da8176fc5d5896fdc94fa6870e1d27de0984583b59eb5bc8a9559b6e2dd420",
+    "tests/svg-masks.e2e.ts": "2693bd5a9a7525856686055c0579ddf4079dcd5b84f220b62fdad7a2110e83e7",
+    "tests/svg-export.test.ts": "4c01c0b6c6a56a32f4d611e880e660a74928df49cccec13492f908001d78a194",
+    "tests/svg-export.e2e.ts": "edd4eee7996d70c82f32952f681a7879cd2257d18abe7e45736ac78d8527e95f",
+    "tests/masks.e2e.ts": "bcb440f5d57c1bc1379a5af720bb884895a1aa25463cf6d484339dab609796f9",
+    "tests/export-cancellation.e2e.ts": "729a80aa8a8428538861d3b9b9476af2d5d101f5b2f8d9e9439814b2b01118dd",
+    "tests/editor.e2e.ts": "488a997668d6f4f52a1e819f03c10111b6088707eb97a9f14ef2a2b9457e0ea3",
+    "tests/production.e2e.ts": "8f382fcbbc567254d70c460ed4f232d98086286a449f2bc63bedd5b59d95000a",
+    "docs/SCRIPTING_API.md": "6dcd531bc0a67970d891946c8faed126167604d88f053eb0cd0e00b1e14d84d3",
+    "docs/ARCHITECTURE.md": "687b32e4d92eebe9c5ea5e8e7b28d087bb08614757323994b6eea6d43f962f46",
+    "docs/REQUIREMENTS.md": "e9f8b72502f1dbec25e254614feb0bad425c549643bbbd823d4edb7763795043",
+    "docs/API.md": "e67faa4ee229236062fd514d8961ad65d39cb51758f06d51c4ff5b64983f98bc",
+    "docs/SYSTEM_DESIGN.md": "4d658f2da8f4afff8b40f6460777e3634a1418e0549763224712109a6d1f0f2d",
+    "docs/DESIGN_SYSTEM.md": "21b9ad52d027dc504f327af2f88c607627042345b65bdb24c60a2758594bce80",
+    "docs/PLUGINS.md": "030ad3fa5603164c429f86ab85991d4eba85f05a02923be3be44607f192d3369",
+    "docs/FEATURE_STRATEGY.md": "059b2b9ac17730b8ae931cc1ee16e2b1394986af7e8edff9ef7d2303652781f7",
+    "public/wasm/pixels.wasm": "60b8164df0c18ad971a5558d83e93c79188e687c6c8a24536b62bf71c408d82e",
+    "src/generated/script-runtime.js": "febf34112ac24f0e552755bf5242e04bfd25d9cd825362b308b4ba6431d7b0b3"
+  },
+  "verification": {
+    "build": {
+      "command": "npm run build",
+      "passed": true,
+      "includes": [
+        "actual WASM",
+        "isolated scripting bundle",
+        "developer docs",
+        "TypeScript",
+        "production bundle"
+      ],
+      "finalNote": "Final rebuild includes documentation-only plugin/design notes added after broad runtime validation; production app bundle hash name remains index-B8qPR0Ls.js."
+    },
+    "unitApi": {
+      "command": "npm test -- --maxWorkers=2",
+      "testsPassed": 899,
+      "filesPassed": 125
+    },
+    "developmentBrowser": {
+      "command": "npx playwright test tests/svg-masks.e2e.ts tests/svg-export.e2e.ts tests/masks.e2e.ts tests/export-cancellation.e2e.ts tests/editor.e2e.ts --grep 'SVG|mask|export|50 MP' --reporter=line",
+      "passed": 49,
+      "breakdown": {
+        "newSvgMaskChecks": 20,
+        "existingSvgChecks": 7,
+        "existingNativeMaskChecks": 16,
+        "exportCancellationChecks": 5,
+        "real50MpImportEditSaveReopenPng": 1
+      }
+    },
+    "productionBrowser": {
+      "command": "npm run test:production -- --reporter=line",
+      "passed": 28,
+      "newMaskedSvgDownload": true,
+      "noDeveloperGlobals": true
+    },
+    "finalSeoDocs": {
+      "command": "npx vitest run tests/seo.test.ts --maxWorkers=2",
+      "passed": 5
+    },
+    "distinctBrowserChecks": 77,
+    "whitespace": "git diff --check passes"
+  },
+  "maskComparisons": {
+    "vector": {
+      "mode": "vector",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        0,
+        255,
+        0,
+        255,
+        0
+      ],
+      "embedded": 0,
+      "vectorMaskPaths": 1,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "vector-inverted": {
+      "mode": "vector-inverted",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        255,
+        0,
+        255,
+        0,
+        255
+      ],
+      "embedded": 0,
+      "vectorMaskPaths": 1,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "vector-density": {
+      "mode": "vector-density",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        102,
+        255,
+        102,
+        255,
+        102
+      ],
+      "embedded": 0,
+      "vectorMaskPaths": 1,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "empty-inverted": {
+      "mode": "empty-inverted",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        255,
+        255,
+        255,
+        255,
+        255
+      ],
+      "embedded": 0,
+      "vectorMaskPaths": 1,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "nonzero": {
+      "mode": "nonzero",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        0,
+        255,
+        255,
+        255,
+        0
+      ],
+      "embedded": 0,
+      "vectorMaskPaths": 1,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "unlinked": {
+      "mode": "unlinked",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        0,
+        0,
+        0,
+        255,
+        0
+      ],
+      "embedded": 0,
+      "vectorMaskPaths": 1,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 6,
+      "afterRevision": 6,
+      "report": {
+        "format": "svg",
+        "warnings": [],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Editable unfeathered vector layer/group masks, density and inversion"
+        ],
+        "featuresDegradedOrOmitted": []
+      }
+    },
+    "paint": {
+      "mode": "paint",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        113,
+        212,
+        212,
+        212,
+        113
+      ],
+      "embedded": 1,
+      "vectorMaskPaths": 0,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "feathered-selection": {
+      "mode": "feathered-selection",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        64,
+        64,
+        134,
+        255,
+        64
+      ],
+      "embedded": 1,
+      "vectorMaskPaths": 0,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "sampled": {
+      "mode": "sampled",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "embedded": 1,
+      "vectorMaskPaths": 0,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "bitmap": {
+      "mode": "bitmap",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        64,
+        255,
+        160,
+        64,
+        64
+      ],
+      "embedded": 1,
+      "vectorMaskPaths": 0,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 4,
+      "afterRevision": 4,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    },
+    "painted-vector": {
+      "mode": "painted-vector",
+      "maxAlpha": 0,
+      "maxPremult": 0,
+      "meanAlpha": 0,
+      "samples": [
+        0,
+        255,
+        179,
+        255,
+        0
+      ],
+      "embedded": 1,
+      "vectorMaskPaths": 0,
+      "artworkPaths": 1,
+      "leakedRgb": false,
+      "sourceUnchanged": true,
+      "errors": 0,
+      "unchanged": true,
+      "revision": 5,
+      "afterRevision": 5,
+      "report": {
+        "format": "svg",
+        "warnings": [
+          "Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged."
+        ],
+        "featuresPreserved": [
+          "Infinitely scalable B\u00e9zier vector paths",
+          "Fill, stroke, and stroke-width styling",
+          "Nested group order, visibility and full affine transforms",
+          "Isolated layer/group opacity, fill opacity and CSS blend modes",
+          "Native-resolution layer/group mask coverage in embedded PNG tiles"
+        ],
+        "featuresDegradedOrOmitted": [
+          "Editable geometry and unlimited scaling of rasterized mask coverage"
+        ]
+      }
+    }
+  },
+  "nestedFeatheredTileSeams": {
+    "maxAlpha": 1,
+    "maxPremult": 2.019607843137255,
+    "samples": [
+      {
+        "x": 1000,
+        "y": 12,
+        "svg": 17,
+        "png": 16
+      },
+      {
+        "x": 1000,
+        "y": 30,
+        "svg": 15,
+        "png": 15
+      },
+      {
+        "x": 1000,
+        "y": 48,
+        "svg": 29,
+        "png": 29
+      },
+      {
+        "x": 1023,
+        "y": 12,
+        "svg": 29,
+        "png": 28
+      },
+      {
+        "x": 1023,
+        "y": 30,
+        "svg": 34,
+        "png": 33
+      },
+      {
+        "x": 1023,
+        "y": 48,
+        "svg": 65,
+        "png": 65
+      },
+      {
+        "x": 1024,
+        "y": 12,
+        "svg": 29,
+        "png": 28
+      },
+      {
+        "x": 1024,
+        "y": 30,
+        "svg": 34,
+        "png": 33
+      },
+      {
+        "x": 1024,
+        "y": 48,
+        "svg": 65,
+        "png": 65
+      },
+      {
+        "x": 1025,
+        "y": 12,
+        "svg": 29,
+        "png": 28
+      },
+      {
+        "x": 1025,
+        "y": 30,
+        "svg": 34,
+        "png": 33
+      },
+      {
+        "x": 1025,
+        "y": 48,
+        "svg": 65,
+        "png": 65
+      },
+      {
+        "x": 2047,
+        "y": 12,
+        "svg": 37,
+        "png": 38
+      },
+      {
+        "x": 2047,
+        "y": 30,
+        "svg": 63,
+        "png": 63
+      },
+      {
+        "x": 2047,
+        "y": 48,
+        "svg": 33,
+        "png": 33
+      },
+      {
+        "x": 2048,
+        "y": 12,
+        "svg": 37,
+        "png": 38
+      },
+      {
+        "x": 2048,
+        "y": 30,
+        "svg": 63,
+        "png": 63
+      },
+      {
+        "x": 2048,
+        "y": 48,
+        "svg": 33,
+        "png": 33
+      },
+      {
+        "x": 2049,
+        "y": 12,
+        "svg": 37,
+        "png": 38
+      },
+      {
+        "x": 2049,
+        "y": 30,
+        "svg": 63,
+        "png": 63
+      },
+      {
+        "x": 2049,
+        "y": 48,
+        "svg": 33,
+        "png": 33
+      },
+      {
+        "x": 2099,
+        "y": 12,
+        "svg": 19,
+        "png": 19
+      },
+      {
+        "x": 2099,
+        "y": 30,
+        "svg": 19,
+        "png": 19
+      },
+      {
+        "x": 2099,
+        "y": 48,
+        "svg": 13,
+        "png": 12
+      }
+    ],
+    "maskCount": 2,
+    "tiles": 6
+  },
+  "lifecycle": {
+    "cancel": {
+      "action": "cancel",
+      "error": "AbortError: signal is aborted without reason",
+      "invoked": true,
+      "prepared": 1,
+      "released": true,
+      "progress": [
+        0,
+        0.3333333333333333
+      ],
+      "retry": true,
+      "unchanged": true,
+      "revision": 3,
+      "afterRevision": 3
+    },
+    "source-remove": {
+      "action": "source-remove",
+      "error": "Error: A mask source changed during SVG export. Retry with the current assets.",
+      "invoked": true,
+      "prepared": 1,
+      "released": true,
+      "progress": [
+        0,
+        0.3333333333333333
+      ],
+      "retry": false,
+      "unchanged": true,
+      "revision": 3,
+      "afterRevision": 3
+    },
+    "source-replace": {
+      "action": "source-replace",
+      "error": "Error: A mask source changed during SVG export. Retry with the current assets.",
+      "invoked": true,
+      "prepared": 1,
+      "released": true,
+      "progress": [
+        0,
+        0.3333333333333333
+      ],
+      "retry": false,
+      "unchanged": true,
+      "revision": 3,
+      "afterRevision": 3
+    },
+    "dispose": {
+      "action": "dispose",
+      "error": "Error: The target asset store was disposed during the operation.",
+      "invoked": true,
+      "prepared": 1,
+      "released": true,
+      "progress": [
+        0,
+        0.3333333333333333
+      ],
+      "retry": false,
+      "unchanged": true,
+      "revision": 3,
+      "afterRevision": 3
+    }
+  },
+  "native50MpSvgMask": {
+    "dimensions": [
+      "10000",
+      "5000"
+    ],
+    "tileCount": 50,
+    "maxTile": 1024,
+    "samples": [
+      64,
+      255,
+      255,
+      64,
+      64,
+      64,
+      255,
+      64,
+      64,
+      64
+    ],
+    "elapsed": 19682.89999999851,
+    "bytes": 1581310,
+    "progressFirst": 0,
+    "progressLast": 1,
+    "sourceDimensions": [
+      10000,
+      5000
+    ],
+    "sourceUnchanged": true,
+    "unchanged": true,
+    "revision": 5,
+    "afterRevision": 5
+  },
+  "native50MpScope": "Real original 10000x5000 PNG source remains resident and its compressed bytes/dimensions are unchanged. Export retains native SVG geometry and fifty at-most-1024-square native coverage tiles. Exact alpha is decoded from ten small native-coordinate crops of the real output, including subtract holes across tile seams. This does not establish a full 50 MP SVG raster decode or peak browser memory.",
+  "separate50MpPngGate": {
+    "description": "Actual image import, source preservation, WASM edit, save/reopen and native-size PNG export",
+    "passed": true,
+    "observedExportMs": 3495
+  },
+  "productionOracle": {
+    "masks": 2,
+    "pngTiles": 1,
+    "samples": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        255,
+        0,
+        0,
+        192
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        255,
+        0,
+        0,
+        192
+      ]
+    ],
+    "oneUndoRemovesPrecedingScriptEdits": true
+  },
+  "independentEvidence": [
+    "Compound rectangle/hole SVG masks have direct expected interior samples for normal, inverted, partial-density and empty-inverted coverage; actual PNG comparison covers every output pixel.",
+    "All eleven parametrized full-coverage comparisons against actual native PNG are byte-exact for alpha and premultiplied RGB in this Chromium environment.",
+    "Two nested native masks retain six PNG tiles, with maximum one alpha-level and 2.019607843137255 premultiplied-value difference against native PNG under nested opacity/fill rounding.",
+    "All decoded native coverage PNGs have white RGB wherever alpha is nonzero, including a colored original bitmap with alpha 255/128/16/0. Original compressed source bytes are unchanged.",
+    "Actual export-owned native tile surfaces are released after first-tile cancellation, source removal/replacement and repository disposal. Cancellation can retry successfully; all scenarios leave document/revision unchanged.",
+    "Standalone attached-layer unlinked-mask output excludes ancestors and retains the mask in the correct parent-plane pixel position.",
+    "The exact documented masked SVG constructor example runs in the real isolated script runtime without changing active work.",
+    "Native mask editing, feather, painted corrections, cache/preview, history, project reopening and export regressions run against the shared final inversion/density helper."
+  ],
+  "limits": [
+    "Native PNG mask preparation took 19682.9 ms in the single 50 MP trial. This is not a speedup, p95, input-to-photon, long-task, memory or universal responsiveness result.",
+    "Coverage buffers are bounded per tile plus existing feather/stroke buffers; compressed/base64 mask output and browser decoding still consume memory.",
+    "Native mask calls and browser PNG encoding cannot be preempted mid-call; cancellation checks surround awaits and tile/path boundaries.",
+    "Rasterized mask geometry/scaling is degraded and reported. Synchronous standalone toSvg rejects active masks requiring native preparation.",
+    "SVG Blend If, overlays/shadows, general SVG document import, non-vector/smart content, wider formats and broader fidelity/device gates remain incomplete.",
+    "No REST SVG renderer, new plugin privilege, public mutation DTO or document/project/workspace schema is added."
+  ],
+  "harnessCorrection": "Initial lifecycle fixture counted actual viewport mask calls together with export calls, producing two surfaces. Final fixture tracks only the svg: job key, verifying exactly one actual export surface and its cleanup without weakening the allocation assertion. Initial eleven format cases passed; lifecycle correction and all subsequent checks pass in the final 49-case run.",
+  "localLogs": {
+    "/tmp/canoli-svg-masks-build.log": {
+      "sha256": "faf6c2888abbcf5a809fb4db4c1fb71f79cf18bd4b111b1f7207b9eddef82320",
+      "tail": [
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.07s"
+      ]
+    },
+    "/tmp/canoli-svg-masks-build-final.log": {
+      "sha256": "143ec00888df2ea8b3ea47297a6741635505f24e05fef269bdbbb2e2830c78ea",
+      "tail": [
+        "   \u001b[38;5;246m\u2502\u001b[0m",
+        " \u001b[38;5;246m2 \u2502\u001b[0m \"use client\";",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500  ",
+        " \u001b[38;5;240m  \u2502\u001b[0m       \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 module level directive may not be preserved",
+        " \u001b[38;5;240m  \u2502\u001b[0m ",
+        " \u001b[38;5;240m  \u2502\u001b[0m \u001b[38;5;115mHelp\u001b[0m: For more information, see https://rolldown.rs/in-depth/directives#other-directives",
+        "\u001b[38;5;246m\u2500\u2500\u2500\u256f\u001b[0m",
+        "",
+        "\u2713 built in 1.06s"
+      ]
+    },
+    "/tmp/canoli-svg-masks-unit.log": {
+      "sha256": "516a5bde21eff509f7532e40993b482f56220e94d38d0ae09fe80c9402499acd",
+      "tail": [
+        "",
+        " Test Files  125 passed (125)",
+        "      Tests  899 passed (899)",
+        "   Start at  09:17:02",
+        "   Duration  61.51s (tests 75%, import 21%, transform 4%, worker 1%)",
+        "",
+        "    Isolate  125 workers spawned \u00b7 ~123ms startup each (spawn + environment, per file)",
+        "             at least ~7.56s faster with isolate: false \u2014 reuses workers across files instead of one per file",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-masks-browser.log": {
+      "sha256": "fcbee4ad4685486139876b4bb587a69c4138992e2fb70fd7ebe7cc294e71464a",
+      "tail": [
+        "[42/49] tests/svg-masks.e2e.ts:46:1 \u203a nested feathered SVG masks retain coverage across native tile boundaries",
+        "[43/49] tests/svg-masks.e2e.ts:62:84 \u203a native SVG mask preparation rejects cancel and releases actual tile surfaces",
+        "[44/49] tests/svg-masks.e2e.ts:62:84 \u203a native SVG mask preparation rejects source-remove and releases actual tile surfaces",
+        "[45/49] tests/svg-masks.e2e.ts:62:84 \u203a native SVG mask preparation rejects source-replace and releases actual tile surfaces",
+        "[46/49] tests/svg-masks.e2e.ts:62:84 \u203a native SVG mask preparation rejects dispose and releases actual tile surfaces",
+        "[47/49] tests/svg-masks.e2e.ts:82:1 \u203a a missing bitmap mask fails explicitly without emitting unmasked artwork",
+        "[48/49] tests/svg-masks.e2e.ts:89:1 \u203a standalone attached-layer SVG rebases an unlinked mask into its parent plane",
+        "[49/49] tests/svg-masks.e2e.ts:98:1 \u203a genuine 50 MP source remains original while native SVG mask tiles preserve seam coverage",
+        "  49 passed (2.1m)"
+      ]
+    },
+    "/tmp/canoli-svg-masks-production.log": {
+      "sha256": "3c1db68078b89e3e059e672196e88c7e40d934ec3ecac96e09df3615a223acb8",
+      "tail": [
+        "[21/28] tests/production.e2e.ts:835:1 \u203a production Quick Selection brush and isolated refinement export real nonrectangular masks",
+        "[22/28] tests/production.e2e.ts:874:1 \u203a production Select Subject preserves genuine source alpha through UI, isolated scripting and exported masks",
+        "[23/28] tests/production.e2e.ts:896:1 \u203a production Refine Edge exposes corrected-layer output and isolated native matting exports real corrected RGB",
+        "[24/28] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves wide-unknown with bundled workers and no developer globals",
+        "[25/28] tests/production.e2e.ts:916:59 \u203a production global closed-form refinement solves distant-native-patch with bundled workers and no developer globals",
+        "[26/28] tests/production.e2e.ts:928:1 \u203a production Design checks inspect native source metadata and export a read-only report through bundled workers",
+        "[27/28] tests/production.e2e.ts:936:1 \u203a production SVG download preserves nested placement and isolated opacity from actual script constructors",
+        "[28/28] tests/production.e2e.ts:966:1 \u203a production SVG masks preserve vector holes and native coverage through the real download flow",
+        "  28 passed (51.8s)"
+      ]
+    },
+    "/tmp/canoli-svg-masks-seo.log": {
+      "sha256": "2e4436ff9a0238bfa0e012923dcb4b45a07219832f7c3569eb5e5f95bc505096",
+      "tail": [
+        "",
+        " RUN  v5.0.1 /home/kestrel/projects/luma-editor",
+        "",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  5 passed (5)",
+        "   Start at  09:19:48",
+        "   Duration  180ms (transform 53%, import 21%, tests 20%, worker 6%)",
+        ""
+      ]
+    },
+    "/tmp/canoli-svg-masks-initial.log": {
+      "sha256": "1fac83f4b17114b25fca2b292df62ed5e4bd3ef2ecc8350deec96d12a367cf58",
+      "tail": [
+        "[4/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG empty-inverted mask retains real coverage and editable artwork",
+        "[5/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG nonzero mask retains real coverage and editable artwork",
+        "[6/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG unlinked mask retains real coverage and editable artwork",
+        "[7/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG paint mask retains real coverage and editable artwork",
+        "[8/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG feathered-selection mask retains real coverage and editable artwork",
+        "[9/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG sampled mask retains real coverage and editable artwork",
+        "[10/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG bitmap mask retains real coverage and editable artwork",
+        "[11/11] tests/svg-masks.e2e.ts:4:178 \u203a SVG painted-vector mask retains real coverage and editable artwork",
+        "  11 passed (21.8s)"
+      ]
+    },
+    "/tmp/canoli-svg-masks-lifecycle.log": {
+      "sha256": "39c5d6ce2a07ef38a640d3049d94666e5eaa53a73d6635fe65b771d01a739314",
+      "tail": [
+        "",
+        "",
+        "[6/6] tests/svg-masks.e2e.ts:76:1 \u203a a missing bitmap mask fails explicitly without emitting unmasked artwork",
+        "  4 failed",
+        "    tests/svg-masks.e2e.ts:56:84 \u203a native SVG mask preparation rejects cancel and releases actual tile surfaces ",
+        "    tests/svg-masks.e2e.ts:56:84 \u203a native SVG mask preparation rejects source-remove and releases actual tile surfaces ",
+        "    tests/svg-masks.e2e.ts:56:84 \u203a native SVG mask preparation rejects source-replace and releases actual tile surfaces ",
+        "    tests/svg-masks.e2e.ts:56:84 \u203a native SVG mask preparation rejects dispose and releases actual tile surfaces ",
+        "  2 passed (18.0s)"
+      ]
+    }
+  }
+}

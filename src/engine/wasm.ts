@@ -1,7 +1,15 @@
+import { colorRangeOptionsSchema, colorRangeSamples, type ColorRangeOptions } from "../core/color-range";
+import { BRADFORD_D65_TO_D50, SRGB_TO_XYZ_D65, WHITE_POINT_D50, multiplyMatrix3x3 } from "../core/color/spaces";
+import { lutAdjustmentSchema, lutValues, type LutAdjustmentData } from "../core/lut";
+import { whiteBalanceAdjustmentSchema, whiteBalanceMatrix, WHITE_BALANCE_NEUTRAL, type WhiteBalanceAdjustmentData } from "../core/white-balance";
+import { srgbToLinear } from "../core/color/spaces";
 import {
   hslAdjustmentSchema,
   type HslAdjustmentData,
+  chromaticAdjustmentSchema,
+  type ChromaticAdjustmentData,
 } from "../core/adjustments";
+import { gradientMapAdjustmentSchema, packGradientStops, type GradientMapAdjustmentData } from "../core/gradient-map";
 import {
   gaussianWeights,
   spatialFilterSupport,
@@ -26,8 +34,23 @@ export interface SelectionTile {
   stepXY?: number;
   stepYX?: number;
 }
+interface QuickSelectionKernel {
+  quickSelectionInit(pixels:number,state:number,count:number,spans:number,spanCount:number,values:number,tolerance:number):void;
+  quickSelectionSpan(pixels:number,state:number,count:number,width:number,start:number,end:number,dy:number,values:number,output:number,capacity:number,force:boolean):void;
+  quickSelectionAlpha(pixels:number,state:number,start:number,count:number,output:number):void;
+}
 
-export interface PixelKernel {
+export interface PixelKernel extends QuickSelectionKernel {
+  mattingMultiply(graph:number,chunkSize:number,rowStride:number,chunkBytes:number,count:number,input:number,output:number):void;
+  mattingCondition(graph:number,chunkSize:number,rowStride:number,chunkBytes:number,count:number,input:number,output:number,diagonal:number,hasFactor:boolean):void;
+  subjectModel(pixels:number,width:number,height:number,values:number):void;
+  subjectMaximum(pixels:number,width:number,height:number,start:number,count:number,values:number):void;
+  subjectAlpha(pixels:number,width:number,height:number,start:number,count:number,values:number,threshold:number,output:number):void;
+  adjustWhiteBalance(ptr: number, length: number, values: number, neutral: boolean): void;
+  adjustLookup(ptr: number, length: number, table: number, params: number, size: number, dimension: number, tetrahedral: boolean): void;
+  selectColorRange(ptr:number,length:number,values:number,includes:number,excludes:number,fuzziness:number,invert:boolean):void;
+  adjustGradientMap(ptr: number, length: number, stops: number, count: number, reverse: boolean): void;
+  adjustChromatic(ptr: number, length: number, values: number, vibrance: boolean): void;
   adjustHsl(
     ptr: number,
     length: number,
@@ -185,17 +208,21 @@ export function wasmPoissonSolver(kernel: PixelKernel): PoissonLinearSolver {
   };
 }
 
+const compiledKernels=new WeakMap<PixelKernel,WebAssembly.Module>();
+/** Private memory for long-lived graph work; unrelated pixel requests cannot overwrite it. */
+export function forkPixelKernel(kernel:PixelKernel):PixelKernel {
+  const module=compiledKernels.get(kernel);
+  if(!module)throw new Error('Missing compiled image kernel.');
+  return instantiateCompiledKernel(module);
+}
+function instantiateCompiledKernel(module:WebAssembly.Module):PixelKernel {
+  const instance=new WebAssembly.Instance(module,{env:{abort:()=>{throw new Error('Image processing failed inside WASM.');}}});
+  const kernel=instance.exports as unknown as PixelKernel;compiledKernels.set(kernel,module);return kernel;
+}
 export async function instantiateKernel(
   bytes: BufferSource,
 ): Promise<PixelKernel> {
-  const { instance } = await WebAssembly.instantiate(bytes, {
-    env: {
-      abort: () => {
-        throw new Error("Image processing failed inside WASM.");
-      },
-    },
-  });
-  return instance.exports as unknown as PixelKernel;
+  return instantiateCompiledKernel(await WebAssembly.compile(bytes));
 }
 
 export function renderSelection(
@@ -772,4 +799,89 @@ export function applyHsl(
     offset,
     input.byteLength,
   ).slice();
+}
+
+/** Worker/reference ABI; snapshots caller data and reacquires views after memory growth. */
+export function applyChromatic(kernel: PixelKernel,pixels: Uint8ClampedArray,adjustment: ChromaticAdjustmentData):Uint8ClampedArray {
+  const settings=chromaticAdjustmentSchema.parse(adjustment);
+  if(pixels.length%4||pixels.length>0x7fffffff)throw new Error('Chromatic adjustments require complete RGBA pixels within the kernel tile range.');
+  const input=pixels.slice(),offset=Math.ceil(kernel.bufferOffset()/8)*8;
+  const valuesOffset=Math.ceil((offset+input.byteLength)/8)*8;
+  const values=settings.kind==='vibrance'?[settings.vibrance,settings.saturation]:[
+    settings.shadows.red,settings.shadows.green,settings.shadows.blue,
+    settings.midtones.red,settings.midtones.green,settings.midtones.blue,
+    settings.highlights.red,settings.highlights.green,settings.highlights.blue,
+    Number(settings.preserveLuminosity),
+  ];
+  const required=valuesOffset+values.length*8;
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Uint8ClampedArray(kernel.memory.buffer,offset,input.byteLength).set(input);
+  new Float64Array(kernel.memory.buffer,valuesOffset,values.length).set(values);
+  kernel.adjustChromatic(offset,input.byteLength,valuesOffset,settings.kind==='vibrance');
+  return new Uint8ClampedArray(kernel.memory.buffer,offset,input.byteLength).slice();
+}
+
+/** Snapshot settings and pixels before growing WASM memory; never detach caller data. */
+export function applyGradientMap(kernel: PixelKernel, pixels: Uint8ClampedArray, adjustment: GradientMapAdjustmentData): Uint8ClampedArray {
+  const settings = gradientMapAdjustmentSchema.parse(adjustment);
+  if (pixels.length % 4 || pixels.length > 0x7fffffff)
+    throw new Error("Gradient maps require complete RGBA pixels within the kernel tile range.");
+  const input = pixels.slice(), offset = Math.ceil(kernel.bufferOffset() / 8) * 8;
+  const values = packGradientStops(settings.stops), stops = Math.ceil((offset + input.byteLength) / 8) * 8;
+  const required = stops + values.length * 8;
+  if (required > kernel.memory.buffer.byteLength)
+    kernel.memory.grow(Math.ceil((required - kernel.memory.buffer.byteLength) / 65536));
+  new Uint8ClampedArray(kernel.memory.buffer, offset, input.byteLength).set(input);
+  new Float64Array(kernel.memory.buffer, stops, values.length).set(values);
+  kernel.adjustGradientMap(offset, input.byteLength, stops, settings.stops.length, settings.reverse);
+  return new Uint8ClampedArray(kernel.memory.buffer, offset, input.byteLength).slice();
+}
+
+
+const whiteBalanceDecode = Float64Array.from({length: 256}, (_, value) => srgbToLinear(value / 255));
+export function applyColorRange(kernel:PixelKernel,pixels:Uint8ClampedArray,options:ColorRangeOptions):Uint8Array {
+  const settings=colorRangeOptionsSchema.parse(options);
+  if(pixels.length%4||pixels.length>0x7fffffff)throw new Error('Color Range requires complete RGBA pixels within the kernel tile range.');
+  const matrix=multiplyMatrix3x3(BRADFORD_D65_TO_D50,SRGB_TO_XYZ_D65);
+  const whites=[WHITE_POINT_D50.X,WHITE_POINT_D50.Y,WHITE_POINT_D50.Z];
+  const samples=[...colorRangeSamples(settings.colors),...colorRangeSamples(settings.exclude)].flat();
+  const values=[...matrix.flatMap((row,i)=>row.map(value=>value/whites[i])),...whiteBalanceDecode,...samples];
+  const offset=Math.ceil(kernel.bufferOffset()/8)*8,params=Math.ceil((offset+pixels.byteLength)/8)*8,required=params+values.length*8;
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Uint8ClampedArray(kernel.memory.buffer,offset,pixels.length).set(pixels);
+  new Float64Array(kernel.memory.buffer,params,values.length).set(values);
+  kernel.selectColorRange(offset,pixels.length,params,settings.colors.length,settings.exclude.length,settings.fuzziness,settings.invert);
+  const rgba=new Uint8Array(kernel.memory.buffer,offset,pixels.length),coverage=new Uint8Array(pixels.length/4);
+  for(let i=0;i<coverage.length;i++)coverage[i]=rgba[i*4+3];
+  return coverage;
+}
+/** Float32 portable table, float64 domain/amount and owned RGBA output. */
+export function applyLookup(kernel: PixelKernel, pixels: Uint8ClampedArray, adjustment: LutAdjustmentData): Uint8ClampedArray {
+  const settings = lutAdjustmentSchema.parse(adjustment), { lut } = settings;
+  if (pixels.length % 4 || pixels.length > 0x7fffffff) throw new Error("LUT processing requires complete RGBA pixels within the kernel tile range.");
+  const input = pixels.slice(), table = lutValues(lut);
+  const offset = Math.ceil(kernel.bufferOffset() / 8) * 8, params = Math.ceil((offset + input.byteLength) / 8) * 8;
+  const tableOffset = params + 56, required = tableOffset + table.byteLength;
+  if (required > kernel.memory.buffer.byteLength) kernel.memory.grow(Math.ceil((required - kernel.memory.buffer.byteLength) / 65536));
+  new Uint8ClampedArray(kernel.memory.buffer, offset, input.byteLength).set(input);
+  new Float64Array(kernel.memory.buffer, params, 7).set([...lut.domainMin, ...lut.domainMax.map((value, i) => value - lut.domainMin[i]), settings.amount]);
+  new Float32Array(kernel.memory.buffer, tableOffset, table.length).set(table);
+  kernel.adjustLookup(offset, input.byteLength, tableOffset, params, lut.size, lut.dimension, settings.interpolation === "tetrahedral");
+  return new Uint8ClampedArray(kernel.memory.buffer, offset, input.byteLength).slice();
+}
+/** Owned input/output and aligned parameters; every view is acquired after memory growth. */
+export function applyWhiteBalance(kernel: PixelKernel, pixels: Uint8ClampedArray, adjustment: WhiteBalanceAdjustmentData): Uint8ClampedArray {
+  const settings = whiteBalanceAdjustmentSchema.parse(adjustment);
+  if (pixels.length % 4 || pixels.length > 0x7fffffff)
+    throw new Error("White balance requires complete RGBA pixels within the kernel tile range.");
+  const input = pixels.slice(), values = whiteBalanceMatrix(settings).flat();
+  const offset = Math.ceil(kernel.bufferOffset() / 8) * 8, valuesOffset = Math.ceil((offset + input.byteLength) / 8) * 8;
+  const required = valuesOffset + (9 + 256) * 8;
+  if (required > kernel.memory.buffer.byteLength)
+    kernel.memory.grow(Math.ceil((required - kernel.memory.buffer.byteLength) / 65536));
+  new Uint8ClampedArray(kernel.memory.buffer, offset, input.byteLength).set(input);
+  new Float64Array(kernel.memory.buffer, valuesOffset, 9).set(values);
+  new Float64Array(kernel.memory.buffer, valuesOffset + 72, 256).set(whiteBalanceDecode);
+  kernel.adjustWhiteBalance(offset, input.byteLength, valuesOffset, settings.temperature === WHITE_BALANCE_NEUTRAL && settings.tint === 0);
+  return new Uint8ClampedArray(kernel.memory.buffer, offset, input.byteLength).slice();
 }

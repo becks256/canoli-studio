@@ -19,6 +19,11 @@ const instance = (componentId: string): SmartObjectInstanceData => ({
   width: 16,
   height: 16,
 });
+
+it('full-frame raster masters retain editable erasures when resolved without another clipping boundary',async()=>{
+ const{Document,RasterLayer}=await import('../src/dom'),doc=new Document(),master=new Document({width:16,height:16}),image=master.layers.add(new RasterLayer({assetId:'pixels',width:16,height:16}));image.clear();doc.placeSmartObject(doc.defineComponent(master));const before=doc.toJSON(),resolved=resolveSmartDocument(before,new ComponentRegistry(before.components));
+ expect(resolved.children[0].kind).toBe('raster');if(resolved.children[0].kind!=='raster')throw new Error('Expected raster');const original=master.toJSON().children[0];if(original.kind!=='raster')throw new Error('Expected original raster');expect(resolved.children[0].erasures).toEqual(original.erasures);resolved.children[0].erasures![0].width=8;expect(doc.toJSON()).toEqual(before);
+});
 it("resolves multiple nested placements to unique deterministic IDs without changing authored definitions", () => {
   const leaf = {
     id: "leaf",

@@ -1,3 +1,5 @@
+import {vectorGradientSchema,vectorFillRuleSchema,type VectorFillOptions} from './vector-gradient';
+import {vectorStrokeSchema,vectorStrokeValues,type VectorStrokeOptions} from './vector-stroke';
 import { pixelCoverageSchema, coverageAt, type PixelCoverage } from "./pixel-selection";
 import { AffineTransform } from "./affine";
 import type { AffineData } from "./affine";
@@ -77,13 +79,25 @@ export interface PathAnchor extends Point {
   in: Point;
   out: Point;
 }
-export interface VectorPathData {
+export interface VectorContourData {
+  id: string;
+  points: PathAnchor[];
+  closed: true;
+}
+export interface VectorPathData extends VectorStrokeOptions, VectorFillOptions {
   id: string;
   points: PathAnchor[];
   closed: boolean;
   fill: string | null;
   stroke: string | null;
   strokeWidth: number;
+  fillRule?: "nonzero" | "evenodd";
+  subpaths?: VectorContourData[];
+}
+
+/** The primary contour retains the legacy path ID; additional contours share paint. */
+export function pathContours(path: Pick<VectorPathData, "points" | "closed" | "subpaths">) {
+  return [{ points: path.points, closed: path.closed }, ...(path.subpaths ?? [])];
 }
 
 const coordinate = z
@@ -189,19 +203,35 @@ export const paintOperationSchema: z.ZodType<PaintOperationData> =
       .strict(),
   ]);
 export const PATH_POINT_LIMIT = 20000;
+const anchorsSchema = z.array(point.extend({ in: point, out: point })).min(1).max(PATH_POINT_LIMIT);
+export const vectorContourSchema = z.object({
+  id: identifier, points: anchorsSchema, closed: z.literal(true),
+}).strict();
 export const pathSchema = z
   .object({
     id: identifier,
-    points: z
-      .array(point.extend({ in: point, out: point }))
-      .min(1)
-      .max(PATH_POINT_LIMIT),
+    points: anchorsSchema,
     closed: z.boolean(),
     fill: colorSchema.nullable(),
     stroke: colorSchema.nullable(),
     strokeWidth: z.number().min(0).max(1024),
+    ...vectorStrokeSchema.shape,
+    fillGradient:vectorGradientSchema.nullable().optional(),
+    fillRule: vectorFillRuleSchema.optional(),
+    subpaths: z.array(vectorContourSchema).max(127).optional(),
   })
-  .strict();
+  .strict().superRefine((path, context) => {
+    if (path.subpaths?.length && !path.closed)
+      context.addIssue({ code: "custom", message: "Compound paths require a closed primary contour." });
+    const ids = new Set([path.id]);
+    let count = path.points.length;
+    for (const contour of path.subpaths ?? []) {
+      if (ids.has(contour.id)) context.addIssue({ code: "custom", message: "Duplicate contour ID." });
+      ids.add(contour.id); count += contour.points.length;
+    }
+    if (count > PATH_POINT_LIMIT)
+      context.addIssue({ code: "custom", message: "A compound path supports up to 20000 total anchors." });
+  });
 export function defaultStyle(): LayerStyleData {
   return {
     blendIf: {
@@ -324,13 +354,17 @@ export function pathBounds(path: VectorPathData): Rect {
     top = Infinity,
     right = -Infinity,
     bottom = -Infinity;
-  for (const p of path.points) {
+  for (const contour of pathContours(path)) for (const p of contour.points) {
     left = Math.min(left, p.x, p.in.x, p.out.x);
     top = Math.min(top, p.y, p.in.y, p.out.y);
     right = Math.max(right, p.x, p.in.x, p.out.x);
     bottom = Math.max(bottom, p.y, p.in.y, p.out.y);
   }
-  const r = path.strokeWidth / 2;
+  const style=vectorStrokeValues(path);
+  // Control hull plus conservative stroke support: square dash caps may occur
+  // anywhere on a curve; miter reach is bounded by its explicit limit.
+  const factor=path.stroke?Math.max(style.strokeCap==='square'?Math.SQRT2:1,style.strokeJoin==='miter'?style.strokeMiterLimit:1):1;
+  const r = path.strokeWidth / 2*factor;
   return {
     x: left - r,
     y: top - r,

@@ -8,6 +8,7 @@ import {
   MarqueeSelection,
 } from "./values";
 import { VectorPath } from "./index";
+import { pathContours } from "../core/drawing";
 
 export interface MaskPaint {
   stroke: BrushStroke | PencilStroke;
@@ -108,9 +109,9 @@ export class LayerMask {
         ...(options.basis ? { basis: options.basis.toJSON() } : {}),
       });
     } else if (options.paths) {
-      const paths = options.paths.map((path) => {
+      const paths = options.paths.flatMap((path) => {
         if (!path.closed) throw new Error("Vector masks require closed paths.");
-        return { points: path.points };
+        return pathContours(path.toJSON()).map(contour => ({ points: contour.points }));
       });
       this.data = layerMaskSchema.parse({
         kind: "vector",
