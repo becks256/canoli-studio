@@ -23,13 +23,23 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { Document, LayerGroup, RasterLayer, VectorLayer } from "../src/dom";
 import { AssetStore } from "../src/core/assets";
-import { BLEND_MODES, id, findLayer } from "../src/core/model";
+import { BLEND_MODES, id, findLayer, allLayers, type DocumentData } from "../src/core/model";
+import {visitLayerAssets} from '../src/core/asset-references';
+import { validateWetPaintAssets, wetDocumentOperations,commandHasWetPaint } from '../src/core/wet-assets';
+import { execute } from '../src/core/commands';
+import { wetServerAssets } from './wet-assets';
 import {
   commandRequestSchema,
   createDocumentSchema,
   parseCommands,
   revisionSchema,
 } from "../src/core/validation";
+
+/** Legacy raster/clone DTO references remain metadata-only; authored textures require a session source. */
+function validateTextureSources(document:DocumentData,assets:AssetStore){
+  const trees=[document.children,...(document.components??[]).flatMap(definition=>definition.source.kind==='document'?[definition.source.document.children]:[])];
+  for(const tree of trees)for(const layer of allLayers(tree))visitLayerAssets(layer,(reference,role)=>{if(role==='texture')assets.get(reference.assetId);});
+}
 
 function safeTokenCompare(
   provided: string | undefined,
@@ -529,13 +539,11 @@ export function createApiServer(options: ApiServerOptions = {}) {
           });
           return;
         }
-        const layer = document.applyTonalSculpt(
-          parsed.path,
-          parsed.mode,
-          parsed.range,
-          parsed.exposure,
-          parsed.options,
-        );
+        let layer!:ReturnType<Document['applyTonalSculpt']>;
+        document.transaction('Tonal sculpt',()=>{
+          layer = document.applyTonalSculpt(parsed.path,parsed.mode,parsed.range,parsed.exposure,parsed.options);
+          validateTextureSources(document._read(),session.assets);
+        });
         send(response, 200, { ...snapshot(document), layerId: layer.id });
         return;
       }
@@ -551,9 +559,23 @@ export function createApiServer(options: ApiServerOptions = {}) {
           return;
         }
         const commands = parseCommands(parsed.commands);
-        document.transaction(parsed.label ?? "REST transaction", () =>
-          commands.forEach((command) => document._dispatch(command)),
-        );
+        if (commands.some(commandHasWetPaint) || !wetDocumentOperations(document._read()).next().done) {
+          const candidate = execute(document._read(), { type: 'transaction', label: parsed.label ?? 'REST transaction', commands });
+          try {
+            await validateWetPaintAssets(candidate, wetServerAssets(session.assets, () => {
+              if (sessions.get(document.id) !== session || document.getSnapshot().revision !== parsed.expectedRevision) throw new Error('Document changed during wet-paint validation.');
+            }));
+          } catch (error) {
+            if (document.getSnapshot().revision !== parsed.expectedRevision) { send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision}); return; }
+            throw error;
+          }
+          if (sessions.get(document.id) !== session) { send(response,404,{error:'Document not found.'}); return; }
+          if (document.getSnapshot().revision !== parsed.expectedRevision) { send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision}); return; }
+        }
+        document.transaction(parsed.label ?? "REST transaction", () => {
+          commands.forEach((command) => document._dispatch(command));
+          validateTextureSources(document._read(),session.assets);
+        });
         send(response, 200, snapshot(document));
         return;
       }

@@ -1,4 +1,9 @@
+import type { RedEyeAdjustmentData } from "../core/red-eye";
 import type { LutAdjustmentData } from "../core/lut";
+import type { TextureMaskSettings } from '../core/brush-texture';
+import type { WetPaintLoadSettings, WetPaintMixSettings } from '../core/wet-paint';
+import { loadWetPaint, mixWetPaint } from './wet-paint';
+import { prepareBrushTexture } from './wasm';
 import type { ColorRangeSettings } from "../core/color-range";
 import type { WhiteBalanceAdjustmentData } from "../core/white-balance";
 import type { GradientMapAdjustmentData } from "../core/gradient-map";
@@ -17,7 +22,7 @@ import type { SelectionModificationRequest } from "../core/selection-modificatio
 import { encodeCapturedPng } from "./png";
 import { prepareClipboard, type ClipboardRequest } from "./clipboard";
 import { encodeCoverage, wandCoverage, type CoverageRequest } from "../core/pixel-selection";
-import { applyHsl, applyChromatic, applyGradientMap, applyWhiteBalance, applyLookup, applyColorRange } from "./wasm";
+import { applyEncodedFrequencyBand, applyLinearBlend, applyRedEye, applyHsl, applyChromatic, applyGradientMap, applyWhiteBalance, applyLookup, applyColorRange } from "./wasm";
 import type { ChromaticAdjustmentData } from "../core/adjustments";
 import type { HslAdjustmentData } from "../core/adjustments";
 import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
@@ -100,10 +105,17 @@ self.onmessage = async (
     };
     hsl?: HslAdjustmentData;
     chromatic?: ChromaticAdjustmentData;
+    frequencyEncoding?: {low:Uint8ClampedArray;band:"high"|"correction"};
+    linearBlend?: { backdrop: Uint8ClampedArray; opacity: number; mode: "linear-light" | "linear-burn" };
+    redEye?: RedEyeAdjustmentData;
     gradientMap?: GradientMapAdjustmentData;
     whiteBalance?: WhiteBalanceAdjustmentData;
     lookup?: LutAdjustmentData;
     colorRange?:ColorRangeSettings;
+    brushTexture?: TextureMaskSettings;
+    brushTextureSupport?:Uint8ClampedArray;
+    wetPaintLoad?:WetPaintLoadSettings;
+    wetPaintMix?:{carried:Float32Array;coverage:Uint8Array;settings:WetPaintMixSettings};
     effects?: ToneEffectData[];
     underlying?: Uint8ClampedArray;
     blend?: BlendIfData;
@@ -190,12 +202,38 @@ self.onmessage = async (
       const colorRangeCoverage=applyColorRange(await kernel,data.pixels,data.colorRange);
       self.postMessage({id:data.id,colorRangeCoverage},{transfer:[colorRangeCoverage.buffer]});return;
     }
+    if (data.brushTexture) {
+      const pixels = prepareBrushTexture(await kernel, data.pixels, data.brushTexture,data.brushTextureSupport);
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
+    }
+    if (data.wetPaintLoad) {
+      const wetPaintCarried = loadWetPaint(await kernel, data.pixels, data.wetPaintLoad);
+      self.postMessage({ id:data.id, wetPaintCarried }, { transfer:[wetPaintCarried.buffer] });
+      return;
+    }
+    if (data.wetPaintMix) {
+      const {carried,coverage,settings}=data.wetPaintMix;
+      const wetPaint=mixWetPaint(await kernel,data.pixels,carried,coverage,settings);
+      self.postMessage({id:data.id,wetPaint},{transfer:[wetPaint.pixels.buffer,wetPaint.carried.buffer]});
+      return;
+    }
     if (data.lookup) {
       const pixels = applyLookup(await kernel, data.pixels, data.lookup);
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer as ArrayBuffer] }); return;
     }
     if (data.whiteBalance) {
       const pixels = applyWhiteBalance(await kernel, data.pixels, data.whiteBalance);
+      self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
+    }
+    if(data.frequencyEncoding){const pixels=applyEncodedFrequencyBand(await kernel,data.pixels,data.frequencyEncoding.low,data.frequencyEncoding.band);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});return;}
+    if (data.linearBlend) {
+      const pixels=applyLinearBlend(await kernel,data.pixels,data.linearBlend.backdrop,data.linearBlend.opacity,data.linearBlend.mode);
+      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});return;
+    }
+    if (data.redEye) {
+      const pixels = applyRedEye(await kernel, data.pixels, data.redEye);
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
     }

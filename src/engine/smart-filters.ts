@@ -6,6 +6,13 @@ import { createCanvas, release } from "./canvas";
 import type { CanvasCache } from "./cache";
 import type { FilterTileCache } from "./filter-tile-cache";
 
+export interface FrequencyTileSharing {
+  cache:FilterTileCache;
+  key:string;
+  signature:string;
+  canCache():boolean;
+}
+
 interface CompletedFilterTile {
   cache: CanvasCache;
   key: string;
@@ -82,9 +89,11 @@ export async function filteredMasterTile(
     cache: FilterTileCache;
     key: string;
     signature: string;
+    sourceSignature?: string;
     canCache(): boolean;
     completed?: CompletedFilterTile;
   },
+  sharing?:FrequencyTileSharing,
 ): Promise<{ canvas: HTMLCanvasElement; x: number; y: number }> {
   const padded = filteredTileRegion(region, filters);
   const completed = retention?.completed;
@@ -111,19 +120,24 @@ export async function filteredMasterTile(
     constant === 0
       ? undefined
       : retention?.cache.read(key, retention.signature, !!activeMask);
-  const needsSource =
+  const common=retention?{cache:retention.cache,key:retention.key,signature:retention.sourceSignature??retention.signature,canCache:retention.canCache}:sharing;
+  const lowKey=(index:number,sigma:number)=>common?`${common.key}:frequency-low:${JSON.stringify([padded,sigma,filters.slice(0,index).map(({id:_id,...value})=>value)])}`:'';
+  const solo=filters.length===1&&filters[0].kind==='frequency-band'&&filters[0].enabled?filters[0]:undefined;
+  const needsRaw =
     constant === 0
       ? !retainedOriginal
       : !retained || (!!activeMask && !retained.original);
+  const shared=needsRaw&&solo&&common?common.cache.read(lowKey(0,solo.sigma),common.signature,true):undefined;
+  const needsSource=needsRaw&&!shared?.original;
   const canvas = needsSource
     ? await render(padded)
     : createCanvas(padded.width, padded.height, true);
   try {
     const context = canvas.getContext("2d")!;
     let original: Uint8ClampedArray | undefined =
-      retainedOriginal ?? retained?.original;
+      retainedOriginal ?? retained?.original ?? shared?.original?.slice();
     let pixels: Uint8ClampedArray;
-    let sourcePixels: Uint8ClampedArray | undefined;
+    let sourcePixels: Uint8ClampedArray | undefined=shared?.original;
     if (needsSource) {
       // Master artboards clip input before filtering; blur may extend beyond them afterward.
       context.clearRect(0, 0, Math.max(0, -padded.x), padded.height);
@@ -152,8 +166,15 @@ export async function filteredMasterTile(
     else if (retained) pixels = retained.filtered;
     else {
       pixels = sourcePixels!;
-      for (const filter of filters) {
-        if (!filter.enabled) continue;
+      for (const [index,filter] of filters.entries()) {
+        if (!filter.enabled || filter.kind === "native-composition" || filter.kind === "document-tone") continue;
+        if(filter.kind==='frequency-band'){
+          const key=lowKey(index,filter.sigma);
+          let low:Uint8ClampedArray|undefined=(solo&&index===0?shared?.filtered:undefined)??common?.cache.read(key,common.signature,false)?.filtered;
+          if(!low){low=await processor.spatialFilter(pixels,padded.width,padded.height,{kind:'frequency-band',band:'low',sigmaX:filter.sigma});
+            if(common?.canCache())common.cache.write(key,common.signature,pixels,low);}
+          pixels=filter.band==='low'?low:await processor.encodeFrequencyBand(pixels,low,filter.band);continue;
+        }
         pixels =
           filter.kind === "tone"
             ? await processor.process(pixels, [filter])

@@ -48,9 +48,9 @@ it("validates the current schema, migrates older documents, isolates settings an
   const layer = doc.layers.add(new AdjustmentLayer({ adjustment: settings })); settings.stops[0].color = "#123456";
   expect(layer.adjustment).toEqual(colors);
   layer.mask = new LayerMask({ selection: new MarqueeSelection({ shape: "rectangle", x: 0, y: 0, width: 10, height: 10 }) });
-  const saved = doc.toJSON(); expect(saved.schemaVersion).toBe(27); expect(Document.fromJSON(saved).toJSON()).toEqual(saved); expect(Document.fromJSON({...saved,schemaVersion:18}).toJSON()).toEqual(saved);
+  const saved = doc.toJSON(); expect(saved.schemaVersion).toBe(37); expect(Document.fromJSON(saved).toJSON()).toEqual(saved); expect(Document.fromJSON({...saved,schemaVersion:18}).toJSON()).toEqual(saved);
   for (let schemaVersion = 1; schemaVersion <= 18; schemaVersion++) {
-    expect(Document.fromJSON({ ...empty, schemaVersion }).toJSON().schemaVersion).toBe(27);
+    expect(Document.fromJSON({ ...empty, schemaVersion }).toJSON().schemaVersion).toBe(37);
   }
   expect(() => validateDocument({ ...saved, schemaVersion: 17 })).toThrow(/schema version 18/);
   const before = doc.getSnapshot();

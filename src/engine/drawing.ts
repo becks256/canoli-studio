@@ -1,7 +1,13 @@
+import {hasWetMask,nativeWetMask} from './wet-mask';
+import type {PaintStampPoint} from '../core/paint-stamps';
+import { compositeWetPaint } from './wet-composite';
+import { drawNativeWetContent, hasWetContent } from './wet-native';
+import {TexturedStrokeRaster} from './textured-stroke';
+import type {BrushTextureSampler} from './brush-texture';
 import {gradientStopColor,type VectorGradientData} from '../core/vector-gradient';
 import {applyTextStyle, measureStyledText,assertTextStyleSupport} from '../core/text-style';
 import {vectorStrokeValues,zeroLengthStrokePoint,strokeDashAtOrigin} from '../core/vector-stroke';
-import {strokeStamps,paintStampSize,paintStampAlpha} from '../core/paint-stamps';
+import {strokeStamps,paintStampSize,paintStampAlpha,paintStampGeometry,sameStrokePoint} from '../core/paint-stamps';
 import { checkRenderCurrent } from "./render-control";
 import { yieldTask } from "./task-yield";
 import { strokeIntersectsRegion } from "./stroke-region";
@@ -26,6 +32,7 @@ import type {
 import { createCanvas, release, applyTransform } from "./canvas";
 import type { RenderSpace } from "./canvas";
 import type { CanvasCache } from "./cache";
+import {hasMaskRefinements} from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
 
 export function overlaps(bounds: Rect, space: RenderSpace, x: number, y: number) {
@@ -81,14 +88,31 @@ export async function selectionMask(
 function stamp(
   context: CanvasRenderingContext2D,
   stroke: BrushStrokeData,
-  point: StrokePoint,
+  point: PaintStampPoint,
 ) {
   const size = paintStampSize(stroke, point);
   const radius = size / 2;
   const prevAlpha = context.globalAlpha;
   const alpha = paintStampAlpha(stroke, point, prevAlpha);
+  if(size<=0||alpha<=0)return;
   if (alpha !== prevAlpha) {
     context.globalAlpha = alpha;
+  }
+  const tip=stroke.tip||point.copy?paintStampGeometry(stroke,point):null;
+  if(tip&&(point.copy||tip.rx!==tip.ry||tip.sin!==0)){
+    context.save();
+    try{
+      context.translate(tip.cx,tip.cy);context.transform(tip.a,tip.b,tip.c,tip.d,0,0);
+      const color=stroke.kind==='clone'||stroke.kind==='eraser'?'#000000':stroke.color;
+      if(stroke.kind==='pencil'){context.fillStyle=color;context.fillRect(-tip.rx,-tip.ry,tip.rx*2,tip.ry*2);}
+      else{
+        context.scale(tip.rx,tip.ry);
+        if(stroke.hardness>=0.999)context.fillStyle=color;
+        else{const gradient=context.createRadialGradient(0,0,stroke.hardness,0,0,1);gradient.addColorStop(0,color);gradient.addColorStop(1,`${color}00`);context.fillStyle=gradient;}
+        context.beginPath();context.arc(0,0,1,0,Math.PI*2);context.fill();
+      }
+    }finally{context.restore();if(alpha!==prevAlpha)context.globalAlpha=prevAlpha;}
+    return;
   }
   if (stroke.kind === "pencil") {
     const width = Math.max(1, Math.round(size));
@@ -126,7 +150,7 @@ function stamp(
   if (alpha !== prevAlpha) context.globalAlpha = prevAlpha;
 }
 export function visitStrokeStamps(
-  visit: (point: StrokePoint) => void,
+  visit: (point: PaintStampPoint) => void,
   stroke: BrushStrokeData,
   visible: Rect,
   from = 0,
@@ -159,6 +183,7 @@ function visibleLocalBounds(space: RenderSpace, world: AffineTransform): Rect {
 /** One append-only gesture surface. Never apply clip/opacity to this surface:
  * doing so repeatedly would darken overlaps or erode antialiased mask edges. */
 export class ActiveStrokeRaster {
+  private texture:TexturedStrokeRaster|null=null;
   private canvas: HTMLCanvasElement | null = null;
   private signature = "";
   private points: StrokePoint[] = [];
@@ -167,10 +192,19 @@ export class ActiveStrokeRaster {
     return space.width * space.height * 4 <= 16 * 1024 * 1024;
   }
   clear() {
+    this.texture?.dispose();this.texture=null;
     if (this.canvas) release(this.canvas);
     this.canvas = null;
     this.points = [];
     this.signature = "";
+  }
+  async drawTexture(stroke:BrushStrokeData,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform,assets:AssetStore,processor:PixelProcessor,textures?:BrushTextureSampler,isCancelled?:()=>boolean){
+    if(!stroke.texture)throw new Error('A textured stroke requires an image source.');
+    if(this.canvas)release(this.canvas);
+    this.canvas=null;this.points=[];this.signature='';
+    this.texture??=new TexturedStrokeRaster(processor,0,textures);
+    await this.texture.draw(stroke,stroke.texture,assets,target,space,world,{isCancelled});
+    this.appendedPoints+=stroke.points.length-this.texture.lastReplay.from;
   }
   draw(
     stroke: BrushStrokeData,
@@ -180,6 +214,7 @@ export class ActiveStrokeRaster {
     y: number,
     world = AffineTransform.translation(x, y),
   ) {
+    if(this.texture){this.texture.dispose();this.texture=null;}
     const { points, ...settings } = stroke;
     const signature = JSON.stringify([settings, space, world]);
     const reusable =
@@ -187,10 +222,7 @@ export class ActiveStrokeRaster {
       points.length >= this.points.length &&
       this.points.every(
         (p, i) =>
-          p === points[i] ||
-          (p.x === points[i].x &&
-            p.y === points[i].y &&
-            p.pressure === points[i].pressure),
+          sameStrokePoint(p,points[i]),
       );
     if (!reusable) this.clear();
     // Oversized effect halos use the normal ephemeral path rather than retain
@@ -230,7 +262,10 @@ export async function drawPaint(
   canCache: () => boolean = () => true,
   cloneSource?: ClonePreviewSource,
   isCancelled?: () => boolean,
+  textures?:BrushTextureSampler,
+  native = false,
 ) {
+  if (!native && hasWetContent(layer)) return drawNativeWetContent(layer, assets, target, space, world, processor, isCancelled, textures);
   const targetContext = target.getContext("2d")!;
   // Replay-local scratch keeps the sampling grid and per-stroke isolation.
   let scratch: HTMLCanvasElement | undefined;
@@ -239,6 +274,7 @@ export async function drawPaint(
   try {
     for (const stroke of layer.strokes) {
       checkRenderCurrent(isCancelled);
+      if (stroke.kind === 'wet') { await compositeWetPaint(stroke, assets, target, space, world, processor, isCancelled); continue; }
       // Cold replays yield between strokes and stamp batches. Active previews
       // keep their fast path and no partially drawn layer is presented.
       if (performance.now() >= deadline) {
@@ -267,6 +303,13 @@ export async function drawPaint(
             stroke.bounds.width,
             stroke.bounds.height,
           );
+        } else if(stroke.texture){
+          context.resetTransform();
+          if(active&&stroke.kind!=='clone')await active.drawTexture(stroke,surface,space,world,assets,processor,textures,isCancelled);
+          else{
+            const raster=new TexturedStrokeRaster(processor,0,textures);
+            try{await raster.draw(stroke,stroke.texture,assets,surface,space,world,{isCancelled});}finally{raster.dispose();}
+          }
         } else if (active && stroke.kind !== "clone") {
           context.resetTransform();
           active.draw(stroke, surface, space, 0, 0, world);
@@ -583,8 +626,17 @@ export async function drawMaskStroke(
   active?: ActiveStrokeRaster,
   world = AffineTransform.translation(x, y),
   scratch?: HTMLCanvasElement,
+  assets?:AssetStore,
+  textures?:BrushTextureSampler,
+  isCancelled?:()=>boolean,
 ) {
   const { stroke, mode } = entry;
+  if(stroke.kind==='wet'){
+    if(stroke.opacity===0||!overlaps(world.bounds(strokeBounds(stroke)),space,0,0))return;
+    if(!assets)throw new Error('Prepared wet mask coverage requires its image asset store.');
+    await compositeWetPaint(stroke,assets,output,space,world,processor,isCancelled);return;
+  }
+  if(stroke.texture&&!assets)throw new Error('Textured mask coverage requires its image asset store.');
   if (!overlaps(world.bounds(strokeBounds(stroke)), space, 0, 0)) return;
   // The retained coverage stays unmodified. Without clipping it can be blended
   // directly, avoiding an intermediate full-tile surface and drawImage copy.
@@ -596,7 +648,8 @@ export async function drawMaskStroke(
       target.globalAlpha = stroke.opacity;
       target.globalCompositeOperation =
         mode === "hide" ? "destination-out" : "source-over";
-      active.draw({ ...stroke, color: "#ffffff" }, output, space, x, y, world);
+      if(stroke.texture)await active.drawTexture({...stroke,color:'#ffffff'},output,space,world,assets!,processor,textures,isCancelled);
+      else active.draw({ ...stroke, color: "#ffffff" }, output, space, x, y, world);
     } finally {
       target.restore();
     }
@@ -609,7 +662,14 @@ export async function drawMaskStroke(
     context.resetTransform();
     context.clearRect(0, 0, surface.width, surface.height);
     const white = { ...stroke, color: "#ffffff" };
-    if (active) active.draw(white, surface, space, x, y, world);
+    if(stroke.texture){
+      if(active)await active.drawTexture(white,surface,space,world,assets!,processor,textures,isCancelled);
+      else{
+        const raster=new TexturedStrokeRaster(processor,0,textures);
+        try{await raster.draw(white,stroke.texture,assets!,surface,space,world,{isCancelled});}finally{raster.dispose();}
+      }
+    }
+    else if (active) active.draw(white, surface, space, x, y, world);
     else {
       applyTransform(context, space, world);
       drawStroke(context, white, visibleLocalBounds(space, world));
@@ -668,7 +728,12 @@ export async function paintedMask(
   processor: PixelProcessor,
   world = AffineTransform.translation(x, y),
   bitmap?: ImageBitmap | HTMLCanvasElement,
+  assets?:AssetStore,
+  textures?:BrushTextureSampler,
+  isCancelled?:()=>boolean,
+  nativeWetResolved=false,
 ): Promise<HTMLCanvasElement> {
+  if(!nativeWetResolved&&hasWetMask(mask)){if(!assets)throw new Error('Prepared wet mask coverage requires its image asset store.');return nativeWetMask(mask,space,processor,world,bitmap,assets,textures,isCancelled);}
   const output =
     mask.kind === "selection"
       ? await selectionMask(mask.selection, space, x, y, processor, world)
@@ -677,11 +742,18 @@ export async function paintedMask(
         : mask.kind === "bitmap" && bitmap
           ? bitmapMask(bitmap, space, x, y, world)
           : createCanvas(space.width, space.height);
-  const scratch = mask.strokes?.length
+  const scratch = hasMaskRefinements(mask)
     ? createCanvas(space.width, space.height)
     : undefined;
   try {
     const target = output.getContext("2d")!;
+    if (mask.kind === "raster-erasures") {
+      target.fillStyle="#ffffff";target.fillRect(0,0,space.width,space.height);
+      for(const entry of mask.erasures){
+        await drawPaint({id:`erasure-mask:${entry.stroke.id}`,name:"Raster erasure coverage",kind:"paint",x:0,y:0,visible:true,locked:false,opacity:1,blendMode:"normal",strokes:[entry.stroke]},assets!,output,space,
+          world.multiply(AffineTransform.scale(mask.width/entry.width,mask.height/entry.height)),processor,undefined,undefined,undefined,undefined,isCancelled,textures);
+      }
+    }
     if (mask.kind === "paint") {
       target.fillStyle = "#ffffff";
       target.globalAlpha = mask.base;
@@ -699,6 +771,9 @@ export async function paintedMask(
         undefined,
         world,
         scratch,
+        assets,
+        textures,
+        isCancelled,
       );
     return output;
   } catch (error) {

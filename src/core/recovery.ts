@@ -5,6 +5,7 @@ import type { ProjectAssetSource } from "./project";
 import { referencedAssets, validateDocument } from "./model";
 import type { DocumentData } from "./model";
 import { serializeProject } from "./project";
+import { tiffDecodeOptionsSchema, type TiffDecodeSettings } from "./interchange/tiff/types";
 
 export interface RecoveryEntry {
   version?: 2;
@@ -28,6 +29,7 @@ export interface RecoveryAsset {
   width: number;
   height: number;
   blob: Blob;
+  tiff?: TiffDecodeSettings;
   checksum?: string;
 }
 const digest = async (bytes: BufferSource) =>
@@ -62,6 +64,7 @@ async function assetDigest(asset: RecoveryAsset): Promise<string> {
         height: asset.height,
         type: asset.blob.type,
         bytes: await blobDigest(asset.blob),
+        ...(asset.tiff ? { tiff: asset.tiff } : {}),
       }),
     ),
   );
@@ -168,12 +171,15 @@ export class RecoveryRepository {
     // Capture original blobs before yielding: switching documents can dispose the live store.
     const originals = [...referencedAssets(document)].map((assetId) => {
       const asset = assets.get(assetId);
+      if (asset.blob.type === "image/tiff" && !asset.tiff)
+        throw new Error("TIFF recovery requires saved page and precision settings.");
       return {
         id: asset.id,
         name: asset.name,
         width: asset.width,
         height: asset.height,
         blob: asset.blob,
+        ...(asset.tiff ? { tiff: tiffDecodeOptionsSchema.parse(asset.tiff) } : {}),
       };
     });
     const checked: RecoveryAsset[] = [];
@@ -277,6 +283,7 @@ export class RecoveryRepository {
       keys.map((key, index) => [key, snapshot.assets[index]]),
     );
     const history = checkpoints(snapshot.entry);
+    let missingTiffSettings = false;
     for (let skipped = 0; skipped < history.length; skipped++) {
       const entry = history[skipped];
       try {
@@ -291,6 +298,10 @@ export class RecoveryRepository {
           const asset = byKey.get(key);
           if (!asset || !(asset.blob instanceof Blob))
             throw new Error("Missing recovery image.");
+          if (asset.blob.type === "image/tiff" && !asset.tiff) {
+            missingTiffSettings = true;
+            throw new Error("Missing TIFF recovery settings.");
+          }
           if (
             (entry.version === 2 || asset.checksum) &&
             (await assetDigest(asset)) !== asset.checksum
@@ -310,7 +321,8 @@ export class RecoveryRepository {
       }
     }
     throw new Error(
-      "No intact recovery checkpoint remains. The current document is unchanged.",
+      "No intact recovery checkpoint remains. The current document is unchanged." +
+      (missingTiffSettings ? " A TIFF source is missing its saved page and precision settings." : ""),
     );
   }
 

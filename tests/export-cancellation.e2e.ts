@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-for(const format of ['png','jpeg','webp','psd','tiff'] as const)test(`${format} export cancels between strips and a subsequent export succeeds`,async({page})=>{
+for(const format of ['png','jpeg','webp','psd','psb','tiff','pdf'] as const)test(`${format} export cancels between strips and a subsequent export succeeds`,async({page})=>{
   await page.goto('/');
   const result=await page.evaluate(async(format)=>{
     const {editor,PaintLayer,PaintFill}=window.luma;editor.newDocument({width:800,height:2400});
@@ -13,14 +13,14 @@ for(const format of ['png','jpeg','webp','psd','tiff'] as const)test(`${format} 
     const blob=await editor.exportPng();const bitmap=await createImageBitmap(blob);
     const size=[bitmap.width,bitmap.height];bitmap.close();
     const cancelled=[];
-    for(const format of ['png','jpeg','webp','svg','psd','tiff'] as const){
+    for(const format of ['png','jpeg','webp','svg','psd','psb','tiff','pdf'] as const){
       try{await editor.export({format},{signal:abort.signal});cancelled.push(false);}
       catch(e){cancelled.push((e as Error).name==='AbortError');}
     }
     return {error,fractions,size,cancelled};
   },format);
   expect(result.error).toBe('AbortError');expect(result.fractions.at(-1)).toBeLessThan(1);
-  expect(result.size).toEqual([800,2400]);expect(result.cancelled).toEqual(Array(6).fill(true));
+  expect(result.size).toEqual([800,2400]);expect(result.cancelled).toEqual(Array(8).fill(true));
 });
 
 test('export dialog exposes progress and cancellation without downloading partial output',async({page})=>{

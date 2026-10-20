@@ -1,5 +1,6 @@
 /** Internal working-tile contract; document smart-filter serialization is a separate boundary. */
 export type SpatialFilterOptions =
+  | { kind: "frequency-band"; band: "low" | "high" | "correction"; sigmaX: number; sigmaY?: number }
   | {
       kind: "gaussian-blur";
       sigmaX: number;
@@ -17,8 +18,10 @@ export function spatialFilterSupport(options: SpatialFilterOptions): {
   x: number;
   y: number;
 } {
-  if (!options || !["gaussian-blur", "unsharp-mask"].includes(options.kind))
+  if (!options || !["gaussian-blur", "unsharp-mask", "frequency-band"].includes(options.kind))
     throw new Error("Unknown spatial filter.");
+  if (options.kind === "frequency-band" && !["low", "high", "correction"].includes(options.band))
+    throw new Error("Frequency band must be low or high.");
   const sigmas = [options.sigmaX, options.sigmaY ?? options.sigmaX];
   // Finite convolution support is a worker allocation/work budget, not an image import limit.
   if (

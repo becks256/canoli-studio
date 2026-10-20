@@ -1,3 +1,7 @@
+import { createFrequencySeparation } from "./frequency-separation";
+import { frequencyRadiusOwner } from "../core/frequency-separation";
+import type { FrequencySeparationOptions } from "../core/frequency-separation";
+export type { FrequencySeparationOptions } from "../core/frequency-separation";
 import { captureVectorBoolean, vectorBooleanOperationSchema, vectorBooleanResultSchema, type VectorBooleanOperation, type VectorBooleanSelection, type VectorBooleanResult, type VectorBooleanControl } from '../core/vector-boolean';
 export type { VectorBooleanOperation, VectorBooleanProgress, VectorBooleanControl } from '../core/vector-boolean';
 import {vectorFillData,type VectorFillOptions,type VectorGradientData} from '../core/vector-gradient';
@@ -37,6 +41,9 @@ import { SmartFilter } from "./smart-filters";
 export {
   SmartFilter,
   GaussianBlurFilter,
+  FrequencyBandFilter,
+  NativeCompositionFilter,
+  DocumentToneFilter,
   UnsharpMaskFilter,
   SmartToneFilter,
 } from "./smart-filters";
@@ -46,6 +53,10 @@ import {
 } from "../core/smart/filters";
 import { ComponentRegistry } from "../core/smart/manager";
 import type { SmartObjectInstanceData } from "../core/smart/types";
+import { RedEyeAdjustment } from "./red-eye";
+export { RedEyeAdjustment } from "./red-eye";
+export { defaultRedEyeAdjustment } from "../core/red-eye";
+export type { RedEyeAdjustmentData } from "../core/red-eye";
 import { PatchAdjustment, TonalStroke } from "./retouch";
 import {
   healSpotRequestSchema,
@@ -73,20 +84,30 @@ import { splitPathSegment } from "../core/bezier";
 import { layerTransform } from "../core/spatial";
 import { LayerMask } from "./masks";
 export { LayerMask } from "./masks";
+export type { RasterErasureMaskSource } from "./masks";
 import { LayerMetadata } from "./metadata";
 export { LayerMetadata } from "./metadata";
 import {
   BlendIf,
+  PressureCurve,
+  BrushTip,
+  BrushSymmetry,
+  BrushTexture,
   BrushStroke,
+  WetPaintStroke,
   MarqueeSelection,
   PaintOperation,
 } from "./values";
 import {
   tonalSculptSchema,
-  type TonalSculptOptions,
+  type TonalSculptOptions as TonalSculptDataOptions,
 } from "../core/retouch/tonal-sculpt";
 import type { DodgeBurnMode, DodgeBurnRange } from "../core/retouch/types";
-export type { TonalSculptOptions } from "../core/retouch/tonal-sculpt";
+import type {PressureCurveData} from '../core/pressure-curve';
+import type {BrushSymmetryData} from '../core/brush-symmetry';
+import type {BrushTextureData} from '../core/brush-texture';
+import type {BrushTipData,PenTiltData} from '../core/brush-tip';
+export type TonalSculptOptions=Omit<TonalSculptDataOptions,'pressureCurve'|'tip'|'symmetry'|'texture'>&{pressureCurve?:PressureCurve|PressureCurveData|null;tip?:BrushTip|BrushTipData|null;symmetry?:BrushSymmetry|BrushSymmetryData|null;texture?:BrushTexture|BrushTextureData|null};
 import { defaultStyle, pathSchema, styleSchema, vectorContourSchema, pathContours } from "../core/drawing";
 import type { VectorContourData } from "../core/drawing";
 import type {
@@ -102,15 +123,25 @@ import type {
 export type { SelectionData } from "../core/drawing";
 export {
   BlendIf,
+  PressureCurve,
+  BrushTip,
+  BrushSymmetry,
+  BrushTexture,
   MarqueeSelection,
   PaintOperation,
   BrushStroke,
+  WetPaintStroke,
   EraserStroke,
   PencilStroke,
   CloneStroke,
   PaintFill,
 } from "./values";
-export type { BrushOptions } from "./values";
+export type { BrushOptions,BrushTipOptions,WetPaintStrokeOptions } from "./values";
+export type { WetPaintStrokeData, WetPaintTileData } from '../core/wet-operation';
+export type {PressureCurveData,PressureKnot} from '../core/pressure-curve';
+export type {BrushSymmetryData} from '../core/brush-symmetry';
+export type {BrushTextureData,BrushTextureSource} from '../core/brush-texture';
+export type {BrushTipData,PenTiltData} from '../core/brush-tip';
 import {
   KAPPA,
   createRectanglePath,
@@ -179,6 +210,7 @@ import {
 import type {
   AdjustmentLayerData,
   BlendMode,
+  LayerBlendMode,
   DocumentData,
   GroupLayerData,
   LayerData,
@@ -242,6 +274,10 @@ export interface ToneOptions {
  */
 export class Document {
   /** Register or replace an embedded master; source edits remain detached until this call. */
+  createFrequencySeparation(source: RasterLayer, snapshot: RasterLayer, options: FrequencySeparationOptions = {}): LayerGroup {
+    return createFrequencySeparation(this, source, snapshot, options);
+  }
+
   defineComponent(
     source: Document,
     options: { id?: string; name?: string } = {},
@@ -650,18 +686,24 @@ export class Document {
     return this.layers.add(new AdjustmentLayer(layer));
   }
   applyTonalSculpt(
-    path: (Point & { pressure?: number })[],
+    path: (Point & { pressure?: number;tilt?:PenTiltData })[],
     mode: DodgeBurnMode,
     range: DodgeBurnRange,
     exposure: number,
     options: TonalSculptOptions = {},
   ): AdjustmentLayer {
+    const curve=options.pressureCurve;
+    const normalized={...options,
+      ...(options.symmetry===undefined?{}:{symmetry:options.symmetry instanceof BrushSymmetry?options.symmetry.toJSON():options.symmetry??undefined}),
+      ...(options.texture===undefined?{}:{texture:options.texture instanceof BrushTexture?options.texture.toJSON():options.texture??undefined}),
+      ...(curve===undefined?{}:{pressureCurve:curve instanceof PressureCurve?curve.toJSON():curve??undefined}),
+      ...(options.tip===undefined?{}:{tip:options.tip instanceof BrushTip?options.tip.toJSON():options.tip??undefined})};
     const parsed = tonalSculptSchema.parse({
       path,
       mode,
       range,
       exposure,
-      options,
+      options:normalized,
     });
     const {
       name,
@@ -881,6 +923,13 @@ export abstract class Layer {
   get document(): Document | null {
     return this.owner ?? this._parent?.document ?? null;
   }
+  /** Group controlling frequency filters in this document plane, including this group itself. */
+  get frequencyGroup(): LayerGroup | null {
+    const document=this.document;
+    if(!document || !this.isAttached)return null;
+    const owner=frequencyRadiusOwner(document._read(),this.id);
+    return owner ? document.getLayer(owner.id) as LayerGroup : null;
+  }
   get isAttached() {
     return !!this.document && !!findLayer(this.document._read(), this.id);
   }
@@ -1028,7 +1077,7 @@ export abstract class Layer {
   get blendMode() {
     return this._read().blendMode;
   }
-  set blendMode(value: BlendMode) {
+  set blendMode(value: LayerBlendMode) {
     this.update({ blendMode: value });
   }
   toJSON(): LayerData {
@@ -1361,6 +1410,11 @@ export class SmartObjectLayer extends Layer {
 }
 
 export class RasterLayer extends Layer {
+  /** Apply a prepared native replacement in the same order as erase/clear. */
+  applyWetPaint(stroke: WetPaintStroke): void {
+    if (!(stroke instanceof WetPaintStroke)) throw new Error('Use a WetPaintStroke value.');
+    this.appendErasure(stroke);
+  }
   /** Non-destructive alpha erasure in layer-local coordinates. */
   erase(stroke: EraserStroke): void {
     if (!(stroke instanceof EraserStroke)) throw new Error("Use an EraserStroke value.");
@@ -1444,10 +1498,16 @@ export class RasterLayer extends Layer {
 
 export class LayerGroup extends Layer {
   readonly layers: LayerCollection;
-  constructor(options: LayerOptions = {}) {
+  constructor(options: Omit<LayerOptions, 'blendMode'> & {blendMode?:LayerBlendMode;frequencyRadius?:number|null} = {}) {
     super({ ...createGroup(options.name), ...options });
     validateDocument({ ...createDocument(), children: [this.data] });
     this.layers = new LayerCollection(this);
+  }
+  get frequencyRadius(): number | null {
+    return (this._read() as GroupLayerData).frequencyRadius ?? null;
+  }
+  set frequencyRadius(value: number | null) {
+    this.update({frequencyRadius:value});
   }
 }
 
@@ -2259,7 +2319,7 @@ export class TextLayer extends Layer {
 }
 
 export interface AdjustmentLayerOptions extends LayerOptions {
-  adjustment?: AdjustmentData | PatchAdjustment;
+  adjustment?: AdjustmentData | PatchAdjustment | RedEyeAdjustment;
 }
 
 export class AdjustmentLayer extends Layer {
@@ -2268,7 +2328,7 @@ export class AdjustmentLayer extends Layer {
     super({
       ...createAdjustmentLayer(
         options.name ?? "Adjustment",
-        adjustment instanceof PatchAdjustment
+        adjustment instanceof PatchAdjustment || adjustment instanceof RedEyeAdjustment
           ? adjustment.toJSON()
           : adjustment,
       ),
@@ -2287,6 +2347,11 @@ export class AdjustmentLayer extends Layer {
 
   get adjustmentKind(): AdjustmentData["kind"] {
     return (this._read() as AdjustmentLayerData).adjustment.kind;
+  }
+
+  setRedEye(value: RedEyeAdjustment): void {
+    if (!(value instanceof RedEyeAdjustment)) throw new Error("Expected a RedEyeAdjustment.");
+    this.adjustment = value.toJSON();
   }
 
   setPatch(patch: PatchAdjustment): void {

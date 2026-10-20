@@ -1,4 +1,9 @@
+import { separateFrequencies,prepareFrequencySeparation } from "./engine/frequency-separation";
+import type { FrequencySeparationOptions } from "./core/frequency-separation";
+import {captureFrequencyRadius} from './core/frequency-separation';
 import { captureVectorBoolean, vectorBooleanSelectionSchema } from './core/vector-boolean';
+import {remapLayerAssets} from './core/asset-references';
+import {BrushTextureSourceOwner} from './brushes/texture-source';
 import type { VectorBooleanRequest, VectorBooleanControl, VectorBooleanResult } from './core/vector-boolean';
 import { prepareVectorBoolean } from './engine/prepare-vector-boolean';
 import {inspectSvgFile,prepareSvgImport} from './engine/svg-import';
@@ -42,6 +47,9 @@ import {
 import { WorkspaceAutosave } from "./workspace/autosave";
 import { DocumentSession } from "./workspace/document-session";
 import { ToolController } from "./tools";
+import { BrushPresetLibrary } from './brushes/library';
+import {BrushPreset,type BrushTool} from './brushes/presets';
+import {verifyPresetSource} from './brushes/sources';
 import { AssetStore } from "./core/assets";
 import { loadProject, serializeProject } from "./core/project";
 import {
@@ -92,15 +100,37 @@ import type { ApplyCandidateOptions } from "./ai/jobs/types";
 import type { ApplyMaskedEditOptions } from "./ai/jobs/apply";
 import { BatchRunnerService } from "./ai/batch";
 import {
-  psdToDocument,
   type PsdImportOptions,
   type PsdImportResult,
 } from "./core/interchange/psd";
 import type { StandardRgbSpaceId, SoftProofOptions } from "./core/color/types";
-import { createCanvas, release } from "./engine/canvas";
+import {inspectPhotoshop,decodePhotoshop} from './engine/photoshop-import';
+import { validateWetPaintAssets } from './core/wet-assets';
+import { wetBrowserAssets } from './engine/wet-composite';
+import { applyPreparedWetPaint, createPreparedWetPaintJob, type ApplyWetPaintOptions, type WetBrushBuilder } from './engine/wet-authoring';
+export type { ApplyWetPaintOptions } from './engine/wet-authoring';
+import type {PhotoshopInput,PhotoshopInspection,PhotoshopImportControl} from './core/photoshop-import';
 
 /** Application services own assets and I/O; the DOM itself is browser-independent. */
 export class EditorApplication {
+  separateFrequencies(layerId: string, options: FrequencySeparationOptions = {}, control: {signal?: AbortSignal} = {}) {
+    const generation=this.ioGeneration;
+    return separateFrequencies(this,layerId,options,control,()=>{if(generation!==this.ioGeneration||this.retouchDisposed)throw new Error('The editor session changed during frequency separation.');});
+  }
+  prepareFrequencySeparation(layerId:string,control:{signal?:AbortSignal}={}) {
+    const generation=this.ioGeneration;
+    return prepareFrequencySeparation(this,layerId,control,()=>{if(generation!==this.ioGeneration||this.retouchDisposed)throw new Error('The editor session changed during frequency separation.');});
+  }
+  /** Trusted host editing; isolated scripts use prepared values/shared commands. */
+  applyWetPaint(brush: BrushStroke, options: ApplyWetPaintOptions = {}) {
+    const generation = this.ioGeneration;
+    return applyPreparedWetPaint(this, brush, options, () => { if (generation !== this.ioGeneration || this.retouchDisposed) throw new Error('The wet-paint application session changed.'); });
+  }
+  /** @internal Pointer tools share private preparation and the public commit path. */
+  _beginWetPaint(brush: WetBrushBuilder, options: ApplyWetPaintOptions = {}) {
+    const generation = this.ioGeneration;
+    return createPreparedWetPaintJob(this, brush, options, () => { if (generation !== this.ioGeneration || this.retouchDisposed) throw new Error('The wet-paint application session changed.'); });
+  }
   readonly pixels = new RasterEditing(this);
   get recovery() {
     return this.activeSession.recovery;
@@ -128,12 +158,17 @@ export class EditorApplication {
     }
   >();
   private ioGeneration = 0;
+  private photoshopJobs=new Set<AbortController>();
+  private photoshopCommits=new Set<AbortController>();
   private idleRetouchProcessor: PixelProcessor | null = null;
   private retouchProcessors = new Set<PixelProcessor>();
   private retouchDisposed = false;
   readonly renderer = new AdaptiveRenderer();
   readonly scripts = new ScriptRunner();
   readonly tools = new ToolController(this);
+  readonly brushPresets = new BrushPresetLibrary();
+  readonly brushTextureSource = new BrushTextureSourceOwner();
+  private presetApplyAbort:AbortController|null=null;
   readonly plugins = new PluginRegistry(browserPluginStorage());
   readonly ai: GenerationJobService;
   readonly recipes: RecipeService;
@@ -830,7 +865,7 @@ export class EditorApplication {
     if (!roots.length) throw new Error("Select artwork to copy first.");
     const snapshot = source.toJSON();
     const copies = roots.map((layer) => {
-      const copy = structuredClone(layer.toJSON());
+      const copy = structuredClone(captureFrequencyRadius(snapshot,layer.toJSON()));
       const world = layerTransform(snapshot, layer.id)!.toJSON();
       copy.x = world.e;
       copy.y = world.f;
@@ -874,34 +909,23 @@ export class EditorApplication {
     ) => {
       const layerIds = new Map<string, string>();
       for (const node of allLayers(layers)) {
+        remapLayerAssets(node,replacements);
         const previousId = node.id;
         node.id = id();
         layerIds.set(previousId, node.id);
         if (node.kind === "smart-object" && remapComponents)
           node.componentId = componentIds[node.componentId];
         if (node.kind === "raster") {
-          node.assetId = replacements.get(node.assetId)!;
           for (const effect of node.effects) effect.id = id();
         }
         if (node.kind === "smart-object") {
-          if (node.filterMask?.kind === "bitmap")
-            node.filterMask.assetId = replacements.get(
-              node.filterMask.assetId,
-            )!;
           for (const entry of node.filterMask?.strokes ?? [])
             entry.stroke.id = id();
         }
-        if (node.mask?.kind === "bitmap")
-          node.mask.assetId = replacements.get(node.mask.assetId)!;
-        if (node.kind === "adjustment" && node.adjustment.kind === "patch")
-          node.adjustment.assetId = replacements.get(node.adjustment.assetId)!;
         for (const entry of node.mask?.strokes ?? []) entry.stroke.id = id();
         if (node.kind === "paint")
           for (const stroke of node.strokes) {
             stroke.id = id();
-            if (stroke.kind === "clone")
-              for (const tile of stroke.tiles)
-                tile.assetId = replacements.get(tile.assetId)!;
           }
         if (node.kind === "vector")
           for (const path of node.paths) {
@@ -955,6 +979,7 @@ export class EditorApplication {
           asset.name,
           replacements.get(asset.id)!,
           false,
+          {tiff:asset.tiff},
         );
         if (copy.width !== asset.width || copy.height !== asset.height)
           throw new Error(
@@ -1204,6 +1229,7 @@ export class EditorApplication {
     const session = this.sessions.find((item) => item.document === document);
     if (!session) throw new Error("Document is not open in this workspace.");
     if (session === this.activeSession) return;
+    for(const job of this.photoshopCommits)job.abort(new Error('Document session changed during Photoshop import. Try again.'));
     void this.recovery.flush();
     this.ioGeneration++;
     this.tools.reset();
@@ -1289,52 +1315,39 @@ export class EditorApplication {
     catch(error){prepared.assets.dispose();throw error;}
   }
 
+  async inspectPsd(source:PhotoshopInput,control:PhotoshopImportControl={}):Promise<PhotoshopInspection>{
+    if(this.retouchDisposed)throw new Error('Editor disposed during Photoshop import.');
+    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.throwIfAborted();control.signal?.addEventListener('abort',cancel,{once:true});this.photoshopJobs.add(abort);
+    try{return await inspectPhotoshop(source,{signal:abort.signal,onProgress:control.onProgress});}
+    finally{control.signal?.removeEventListener('abort',cancel);this.photoshopJobs.delete(abort);}
+  }
+
   async openPsd(
-    buffer: ArrayBuffer | Uint8Array,
+    buffer: PhotoshopInput,
     options: PsdImportOptions = {},
+    control:PhotoshopImportControl={},
   ): Promise<PsdImportResult> {
-    const result = psdToDocument(buffer, options);
-    const newAssets = new AssetStore();
-
-    for (const [assetId, imgData] of result.assets) {
-      const canvas = createCanvas(imgData.width, imgData.height);
-      try {
-        const ctx = canvas.getContext("2d")!;
-        ctx.putImageData(imgData, 0, 0);
-        const blob = await new Promise<Blob>((resolve, reject) => {
-          if (typeof canvas.toBlob === "function") {
-            canvas.toBlob((b) =>
-              b ? resolve(b) : reject(new Error("Failed to create blob")),
-            );
-          } else {
-            resolve(new Blob([imgData.data.buffer], { type: "image/png" }));
-          }
-        });
-        const bitmap =
-          typeof createImageBitmap === "function"
-            ? await createImageBitmap(blob)
-            : (canvas as unknown as ImageBitmap);
-        newAssets.install(
-          {
-            id: assetId,
-            name: "PSD Asset",
-            width: imgData.width,
-            height: imgData.height,
-            blob,
-            bitmap,
-            thumbnail: "",
-          },
-          false,
-        );
-      } finally {
-        if (typeof createImageBitmap === "function") {
-          release(canvas);
-        }
+    control.signal?.throwIfAborted();
+    for(const job of this.photoshopCommits)job.abort(new Error('Document session changed during Photoshop import. Try again.'));
+    const generation=++this.ioGeneration,owner=this.document,assets=this.assets,revision=owner.getSnapshot().revision,alive=assets.captureLifetime();
+    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.photoshopJobs.add(abort);this.photoshopCommits.add(abort);
+    const current=()=>{abort.signal.throwIfAborted();alive();if(this.ioGeneration!==generation||this.document!==owner||this.assets!==assets||owner.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===owner))throw new Error('Document session changed during Photoshop import. Try again.');};
+    const unsubscribe=owner.subscribe(()=>{if(owner.getSnapshot().revision!==revision)abort.abort(new Error('Document session changed during Photoshop import. Try again.'));});
+    let newAssets:AssetStore|null=null;
+    try{
+      current();const decoded=await decodePhotoshop(buffer,options,{signal:abort.signal,onProgress:value=>{current();control.onProgress?.(value);current();}});current();
+      newAssets=new AssetStore();const images=new Map<string,ImageData>();let index=0;
+      for(const entry of decoded.entries){
+        current();control.onProgress?.({phase:'installing',fraction:index/decoded.entries.length});current();
+        const asset=await newAssets.add(entry.png,'Photoshop layer',entry.id,false,{signal:abort.signal});current();
+        if(asset.width!==entry.width||asset.height!==entry.height)throw new Error('Decoded Photoshop layer dimensions changed during import.');
+        images.set(entry.id,new ImageData(entry.pixels,entry.width,entry.height));index++;
       }
-    }
-
-    this.replace(Document.fromJSON(result.document), newAssets);
-    return result;
+      current();control.onProgress?.({phase:'installing',fraction:1});current();
+      const document=Document.fromJSON(decoded.document);this.photoshopCommits.delete(abort);this.replace(document,newAssets);
+      return{document:decoded.document,report:decoded.report,assets:images};
+    }catch(error){newAssets?.dispose();throw error;}
+    finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);this.photoshopJobs.delete(abort);this.photoshopCommits.delete(abort);}
   }
 
   newDocument(
@@ -1456,9 +1469,9 @@ export class EditorApplication {
   async export(options: ExportOptions, control?: ExportControl): Promise<ExportResult> {
     checkExport(control);
     const result = await exportDocument(
-      // SVG/TIFF are pure readers. Pin the immutable model before yielding instead
+      // Native read-only exporters pin the immutable model before yielding instead
       // of cloning all paths and unrelated raster/effect data on the UI thread.
-      options.format === "svg" || options.format === "tiff" ? this.document._read() : this.document.toJSON(),
+      ['svg','tiff','pdf','psd','psb'].includes(options.format) ? this.document._read() : this.document.toJSON(),
       this.assets,
       this.renderer,
       options,
@@ -1471,8 +1484,27 @@ export class EditorApplication {
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {
     return getExportCapabilityReport(
-      options.format === "svg" || options.format === "tiff" ? this.document._read() : this.document.toJSON(), options,
+      ['svg','tiff','pdf','psd','psb'].includes(options.format) ? this.document._read() : this.document.toJSON(), options,
     );
+  }
+
+  /** Trusted preference operation. Preparation never inserts an asset into a document. */
+  async applyBrushPreset(preset:BrushPreset,options:{signal?:AbortSignal;selectTool?(tool:BrushTool):void}={}):Promise<BrushTool>{
+    const owned=new BrushPreset(preset.toJSON(),preset.source),signal=options.signal,selectTool=options.selectTool;signal?.throwIfAborted();
+    this.presetApplyAbort?.abort(new DOMException('Brush preset application was replaced.','AbortError'));
+    const abort=new AbortController();this.presetApplyAbort=abort;
+    const cancel=()=>abort.abort(signal?.reason);signal?.addEventListener('abort',cancel,{once:true});
+    const document=this.document,revision=document.getSnapshot().revision,state=this.tools.getSnapshot(),source=this.brushTextureSource.source,generation=this.ioGeneration;
+    const draft=new BrushTextureSourceOwner();
+    const check=()=>{abort.signal.throwIfAborted();if(this.presetApplyAbort!==abort||this.ioGeneration!==generation||this.document!==document||document.getSnapshot().revision!==revision||this.tools.getSnapshot()!==state||this.brushTextureSource.source!==source)throw new Error('The document or brush changed while preparing this preset. Retry from the current tool.');};
+    try{
+      if(owned.source){
+        const original=await verifyPresetSource(owned.source,abort.signal);check();
+        const asset=await draft.import(original.blob,original.name,{signal:abort.signal,tiff:original.tiff});check();
+        if(asset.width!==original.width||asset.height!==original.height)throw new Error('Brush source dimensions do not match its original pixels.');
+      }
+      check();selectTool?.(owned.tool);return this.tools.applyBrushPreset(owned,owned.source?draft:undefined);
+    }finally{signal?.removeEventListener('abort',cancel);if(this.presetApplyAbort===abort)this.presetApplyAbort=null;draft.dispose();}
   }
 
   async runScript(code: string) {
@@ -1517,6 +1549,8 @@ export class EditorApplication {
       snapshot = document.toJSON();
     let retouch: ScriptRetouch | undefined;
     const selectionAbort = new AbortController();
+    const scriptCommitAbort = new AbortController(), scriptCommitDeadline = performance.now() + 5000;
+    let unsubscribeScriptCancellation = () => {};
     let selectionBusy = false;
     let selectionCount = 0;
     let imageSelectionPrepared=false;
@@ -1564,7 +1598,7 @@ export class EditorApplication {
       isTrustedScript: !pluginContext,
     });
     try {
-      const result = await this.scripts.run(document, code, {
+      const pendingScript = this.scripts.run(document, code, {
         hostBridge: {
           dispatch: (service, method, args) => {
             if(service==='assets'&&pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required to inspect asset metadata.');
@@ -1647,6 +1681,9 @@ export class EditorApplication {
           },
         },
       });
+      unsubscribeScriptCancellation = this.scripts.subscribeCancellation(() => scriptCommitAbort.abort(new Error('Script stopped. No script edits were applied.')));
+      const result = await pendingScript;
+      scriptCommitAbort.signal.throwIfAborted();
       if (
         this.document !== document ||
         document.getSnapshot().revision !==
@@ -1683,12 +1720,30 @@ export class EditorApplication {
         commands: result.commands,
       };
       const next = execute(document.toJSON(), command);
-      const installed = retouch ? retouch.installReferenced(next, assets) : [];
+      let installed: string[] = [];
+      const installedRecords = new Map<string, ReturnType<AssetStore['get']>>();
       try {
-        for (const assetId of referencedAssets(next)) assets.get(assetId);
+        const sources = retouch ? retouch.validationSources(assets) : assets;
+        const pinned = [...referencedAssets(next)].map(id => { const source = sources.get(id); return { id, source, bitmap: source.bitmap, blob: source.blob, width: source.width, height: source.height }; });
+        const needsWrite = result.commands.length > 0 || result.selectedId !== selectedId || JSON.stringify(result.selectedIds) !== JSON.stringify(selectedIds) || hostBridge.inBandRevisions > 0;
+        const checkWetCommit = () => {
+          scriptCommitAbort.signal.throwIfAborted();
+          if (performance.now() > scriptCommitDeadline) throw new Error('Script exceeded its 5-second time limit. No script edits were applied.');
+          if (this.ioGeneration !== generation || this.document !== document || this.assets !== assets || document.getSnapshot().revision !== revision + hostBridge.inBandRevisions) throw new Error('The document changed while the script ran. No script edits were applied.');
+          if (pluginContext) {
+            const grants = this.plugins.getGrantedPermissions(pluginContext.pluginId);
+            if (!grants.includes('document:read') || (needsWrite && !grants.includes('document:write')) || (imageSelectionPrepared && !grants.includes('assets:read'))) throw new Error('Plugin permissions changed. No script edits were applied.');
+          }
+          for (const entry of pinned) { const source = sources.get(entry.id); if (source !== entry.source || source.bitmap !== entry.bitmap || source.blob !== entry.blob || source.width !== entry.width || source.height !== entry.height || source.bitmap.width !== entry.width || source.bitmap.height !== entry.height) throw new Error('Script source assets changed. No script edits were applied.'); }
+        };
+        await validateWetPaintAssets(next, wetBrowserAssets(sources, checkWetCommit));
+        checkWetCommit();
+        installed = retouch ? retouch.installReferenced(next, assets) : [];
+        for (const id of installed) installedRecords.set(id, assets.get(id));
         document._dispatch(command);
       } catch (error) {
-        for (const assetId of installed) assets.remove(assetId);
+        const current = document.getSnapshot(), retained = new Set([current.document, ...current.past.map(entry => entry.document), ...current.future.map(entry => entry.document)].flatMap(state => [...referencedAssets(state)]));
+        for (const assetId of installed) if (!retained.has(assetId) && assets.has(assetId) && assets.get(assetId) === installedRecords.get(assetId)) assets.remove(assetId);
         throw error;
       }
       document.selectLayers(
@@ -1696,12 +1751,15 @@ export class EditorApplication {
       );
       return result.logs;
     } finally {
+      unsubscribeScriptCancellation();
       selectionAbort.abort();
       retouch?.dispose();
     }
   }
 
   dispose() {
+    this.retouchDisposed = true;
+    for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
     for(const controller of this.booleanControllers)controller.abort(new Error('Editor disposed during the Boolean operation.'));
     this.booleanControllers.clear();
     this.retouchDisposed = true;
@@ -1712,6 +1770,9 @@ export class EditorApplication {
     this.workspaceAutosave.dispose();
     this.projectEncoder.dispose();
     this.tools.cancel();
+    this.presetApplyAbort?.abort(new DOMException('Editor disposed during preset preparation.','AbortError'));this.presetApplyAbort=null;
+    this.brushPresets.dispose();
+    this.brushTextureSource.dispose();
     this.scripts.cancel();
     this.unsubscribe();
     this.renderer.dispose();

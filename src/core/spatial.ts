@@ -1,3 +1,4 @@
+import { isActiveWetPaint } from './wet-operation';
 import type { DocumentData, LayerData } from "./model";
 import { AffineTransform } from "./affine";
 import { pathBounds, strokeBounds } from "./drawing";
@@ -23,13 +24,14 @@ export function unionBounds(rects: Bounds[]): Bounds | undefined {
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
 export function localBounds(node: LayerData): Bounds | undefined {
+  if (node.kind === 'raster' && node.erasures?.some(entry => isActiveWetPaint(entry.stroke))) return unionBounds([{ x: 0, y: 0, width: node.width, height: node.height }, ...node.erasures.filter(entry => isActiveWetPaint(entry.stroke)).map(entry => AffineTransform.scale(node.width / entry.width, node.height / entry.height).bounds(strokeBounds(entry.stroke)))]);
   if (
     node.kind === "raster" ||
     node.kind === "text" ||
     node.kind === "smart-object"
   )
     return { x: 0, y: 0, width: node.width, height: node.height };
-  if (node.kind === "paint") return unionBounds(node.strokes.map(strokeBounds));
+  if (node.kind === "paint") return unionBounds(node.strokes.filter(stroke => stroke.kind !== 'wet' || isActiveWetPaint(stroke)).map(strokeBounds));
   if (node.kind === "vector") return unionBounds(node.paths.map(pathBounds));
   if (node.kind === "group") {
     return unionBounds(

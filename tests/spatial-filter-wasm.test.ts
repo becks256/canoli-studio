@@ -62,7 +62,7 @@ function reference(
         channels.forEach((value, c) => {
           output[p + c] = output[p + 3] ? byte(value / alpha) : 0;
         });
-      } else if (input[p + 3] && alpha > 0) {
+      } else if (options.kind === "unsharp-mask" && input[p + 3] && alpha > 0) {
         channels.forEach((value, c) => {
           const delta = input[p + c] - value / alpha;
           if (Math.abs(delta) >= (options.threshold ?? 0))

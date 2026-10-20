@@ -1,7 +1,10 @@
+import {symmetryMatrices} from '../core/brush-symmetry';
+import {BrushSymmetryGuides} from './BrushSymmetryDialog';
 import { useSelectionOutlines } from "./hooks/useSelectionOutlines";
 import { memo, useSyncExternalStore } from "react";
 import type { DocumentData, LayerData } from "../core/model";
 import type { Point } from "../core/drawing";
+import {paintStampSize,paintStampGeometry} from '../core/paint-stamps';
 import { maskTransform } from "../core/masks";
 import { layerTransform } from "../core/spatial";
 import type { Tool, ToolController } from "../tools";
@@ -56,6 +59,7 @@ export function CanvasOverlays({
       viewBox={`0 0 ${document.width} ${document.height}`}
       aria-hidden="true"
     >
+      {(["smudge","mixer","brush","pencil","eraser","clone","heal","dodge","burn"].includes(tool))&&<BrushSymmetryGuides data={state.settings.symmetry} width={document.width} height={document.height}/>}
       <defs>
         <pattern
           id="selection-hatch"
@@ -125,24 +129,24 @@ export function CanvasOverlays({
       )}
       {tool === "heal" && state.healingStroke && (
         <g data-testid="healing-stroke-preview" opacity={0.35}>
-          <circle
+          {state.healingStroke.tip||state.healingStroke.symmetry ? [state.healingStroke.points[0],...(state.healingStroke.points.length>1?[state.healingStroke.points.at(-1)!]:[])].flatMap(point=>symmetryMatrices(state.healingStroke!.symmetry).map((copy,i)=>i?{...point,copy}:point)).map((point,index)=>{
+            const shape=paintStampGeometry(state.healingStroke!,point);
+            return <ellipse key={index} rx={shape.rx} ry={shape.ry} transform={`matrix(${shape.a} ${shape.b} ${shape.c} ${shape.d} ${shape.cx} ${shape.cy})`} fill="var(--color-accent)"/>;
+          }) : <circle
             cx={state.healingStroke.points[0].x}
             cy={state.healingStroke.points[0].y}
             r={
-              (state.healingStroke.size / 2) *
-              (state.healingStroke.pressureSize === false
-                ? 1
-                : state.healingStroke.points[0].pressure)
+              paintStampSize(state.healingStroke,state.healingStroke.points[0])/2
             }
             fill="var(--color-accent)"
-          />
+          />}
           <polyline
             points={state.healingStroke.points
               .map((point) => `${point.x},${point.y}`)
               .join(" ")}
             fill="none"
             stroke="var(--color-accent)"
-            strokeWidth={state.healingStroke.size}
+            strokeWidth={(state.healingStroke.tip||state.healingStroke.symmetry)?1.5/zoom:state.healingStroke.size}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -235,7 +239,7 @@ export function CanvasOverlays({
         />
       )}
       {showBrushCursor && cursor &&
-        ["brush", "pencil", "eraser", "clone", "heal", "dodge", "burn", "quick-select"].includes(
+        ["smudge", "mixer", "brush", "pencil", "eraser", "clone", "heal", "dodge", "burn", "quick-select"].includes(
           tool,
         ) && (
           <g>

@@ -1,5 +1,8 @@
+export { encodeFrequencyBand } from "./frequency-band";
 export { adjustHsl } from "./hsl";
 export { adjustChromatic } from "./chromatic";
+export { compositeLinearBlend } from "./linear-blend";
+export { adjustRedEye } from "./red-eye";
 export { adjustGradientMap } from "./gradient-map";
 export { adjustWhiteBalance } from "./white-balance";
 export { adjustLookup } from "./lookup";
@@ -465,5 +468,63 @@ export function mixFiltered(
       );
     }
     store<u8>(p + 3, roundedAlpha);
+  }
+}
+/** Initialize a spatial paint reservoir. Hidden RGB contributes no pigment. */
+export function loadWetPaint(pixels: usize, carried: usize, length: i32, red: f64, green: f64, blue: f64, alpha: f64, amount: f64): void {
+  const paintAlpha = alpha / 255.0;
+  for (let i: i32 = 0; i < length; i += 4) {
+    const p = pixels + <usize>i, r = carried + <usize>i * 4;
+    const sourceAlpha = <f64>load<u8>(p + 3) / 255.0;
+    const resultAlpha = sourceAlpha * (1.0 - amount) + paintAlpha * amount;
+    for (let c: usize = 0; c < 3; c++) {
+      const paint = c == 0 ? red : c == 1 ? green : blue;
+      const value = (<f64>load<u8>(p + c) * sourceAlpha * (1.0 - amount) + paint * paintAlpha * amount) / 255.0;
+      store<f32>(r + c * 4, <f32>min(resultAlpha, max(0.0, value)));
+    }
+    store<f32>(r + 12, <f32>resultAlpha);
+  }
+}
+
+/** One immutable-source dab tile. Reservoir pickup reads pre-deposit pixels,
+ * so splitting a dab into output tiles cannot feed its own partial writes back.
+ * Whole-stroke opacity/selection belong to the later original/result composite. */
+export function mixWetPaint(pixels: usize, carried: usize, coverage: usize, length: i32, flow: f64, wetness: f64, pickup: f64): void {
+  for (let i: i32 = 0; i < length; i += 4) {
+    const p = pixels + <usize>i, r = carried + <usize>i * 4;
+    const strength = flow * <f64>load<u8>(coverage + <usize>(i / 4)) / 255.0;
+    if (strength <= 0.0) continue;
+    const sourceAlpha = <f64>load<u8>(p + 3) / 255.0;
+    const carriedAlpha = <f64>load<f32>(r + 12);
+    const deposit = strength * (1.0 - wetness);
+    const acquire = strength * pickup;
+    const resultAlpha = sourceAlpha + (carriedAlpha - sourceAlpha) * deposit;
+    const nextAlpha = carriedAlpha + (sourceAlpha - carriedAlpha) * acquire;
+    const roundedAlpha = channel(resultAlpha * 255.0);
+    for (let c: usize = 0; c < 3; c++) {
+      const source = <f64>load<u8>(p + c) / 255.0 * sourceAlpha;
+      const paint = <f64>load<f32>(r + c * 4);
+      if (deposit > 0.0) store<u8>(p + c, roundedAlpha == 0 ? 0 : channel((source + (paint - source) * deposit) / resultAlpha * 255.0));
+      store<f32>(r + c * 4, <f32>min(nextAlpha, max(0.0, paint + (source - paint) * acquire)));
+    }
+    if (deposit > 0.0) store<u8>(p + 3, roundedAlpha);
+    store<f32>(r + 12, <f32>nextAlpha);
+  }
+}
+
+/** White coverage mask from owned, encoded-sRGB RGBA working pixels. */
+export function brushTextureMask(ptr: usize, length: i32, luminance: bool, invert: bool, support:usize): void {
+  for (let i = 0; i < length; i += 4) {
+    const pixel = ptr + <usize>i;
+    let alpha = <i32>load<u8>(pixel + 3);
+    if (luminance) {
+      const value = 2126 * <i32>load<u8>(pixel) + 7152 * <i32>load<u8>(pixel + 1) + 722 * <i32>load<u8>(pixel + 2);
+      const ink = invert ? value : 2550000 - value;
+      alpha = (alpha * ink + 1275000) / 2550000;
+    } else if (invert) alpha = max(0,(support ? <i32>load<u8>(support+<usize>i+3) : 255)-alpha);
+    store<u8>(pixel, 255);
+    store<u8>(pixel + 1, 255);
+    store<u8>(pixel + 2, 255);
+    store<u8>(pixel + 3, <u8>alpha);
   }
 }

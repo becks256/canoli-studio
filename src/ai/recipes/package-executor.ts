@@ -1,4 +1,5 @@
 import { AssetStore } from "../../core/assets";
+import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
 import { id } from "../../core/model";
 import type { Document } from "../../dom";
 import type { Recipe } from "./types";
@@ -7,47 +8,23 @@ import { executeRecipe } from "./executor";
 
 /** Remap only the artwork references represented in the package contract. */
 function remapSources(recipe: Recipe, ids: Map<string, string>): void {
-  const remap = (node: Record<string, unknown>) => {
+  const remap = (node: {assetId:string}) => {
     const replacement = ids.get(String(node.assetId));
     if (!replacement)
       throw new Error("Recipe package source mapping is incomplete.");
     node.assetId = replacement;
   };
-  const mask = (value: unknown) => {
-    if (
-      value &&
-      typeof value === "object" &&
-      (value as { kind?: string }).kind === "bitmap"
-    )
-      remap(value as Record<string, unknown>);
-  };
-  const adjustment = (value: unknown) => {
-    if (
-      value &&
-      typeof value === "object" &&
-      (value as { kind?: string }).kind === "patch"
-    )
-      remap(value as Record<string, unknown>);
-  };
   const layer = (value: unknown) => {
     if (!value || typeof value !== "object") return;
     const node = value as Record<string, unknown>;
-    if (node.kind === "raster") remap(node);
-    mask(node.mask);
-    if (node.kind === "adjustment") adjustment(node.adjustment);
+    visitLayerTemplateAssets(value,remap);
     if (node.kind === "group" && Array.isArray(node.children))
       node.children.forEach(layer);
-    if (node.kind === "paint" && Array.isArray(node.strokes))
-      for (const stroke of node.strokes) {
-        if (stroke?.kind === "clone" && Array.isArray(stroke.tiles))
-          stroke.tiles.forEach(remap);
-      }
   };
   for (const step of recipe.steps) {
     if (step.action.type === "layer.add") layer(step.action.layerTemplate);
     if (step.action.type === "layer.update") {
-      mask(step.action.patch.mask);
-      adjustment(step.action.patch.adjustment);
+      visitLayerPatchAssets(step.action.patch,remap);
     }
   }
 }

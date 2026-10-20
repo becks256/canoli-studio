@@ -2,6 +2,7 @@ node_modules/
 dist/
 public/wasm/*.wasm
 *.tsbuildinfo
+__pycache__/
 test-results/
 playwright-report/
 .env*

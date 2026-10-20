@@ -15,6 +15,7 @@ export function uniformFilterMaskCoverage(
   // Native mask feather uses finite support of 3 * ceil(feather / 3).
   const halo = 3 * Math.ceil((mask.feather ?? 0) / 3);
   for (const entry of mask.strokes) {
+    if(entry.mode==='wet'&&entry.stroke.opacity===0)continue;
     const bounds = basis.bounds(strokeBounds(entry.stroke));
     if (
       bounds.x + bounds.width >= region.x - halo &&
@@ -40,6 +41,7 @@ export function regionalFilterMask(
   return {
     ...mask,
     strokes: mask.strokes.filter((entry) => {
+      if(entry.mode==='wet'&&entry.stroke.opacity===0)return false;
       const bounds = basis.bounds(strokeBounds(entry.stroke));
       return (
         bounds.x + bounds.width >= region.x - halo &&

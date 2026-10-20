@@ -3,6 +3,9 @@ import { layerMaskSchema } from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
 import {
   BrushStroke,
+  EraserStroke,
+  PaintFill,
+  WetPaintStroke,
   PencilStroke,
   PaintOperation,
   MarqueeSelection,
@@ -10,11 +13,10 @@ import {
 import { VectorPath } from "./index";
 import { pathContours } from "../core/drawing";
 
-export interface MaskPaint {
-  stroke: BrushStroke | PencilStroke;
-  mode: "hide" | "reveal";
-}
+export type MaskPaint = {stroke:BrushStroke|PencilStroke;mode:"hide"|"reveal"}|{stroke:WetPaintStroke;mode:"wet"};
+export interface RasterErasureMaskSource {width:number;height:number;operations:readonly {width:number;height:number;stroke:EraserStroke|PaintFill}[]}
 interface MaskSettings {
+  rasterErasures?: RasterErasureMaskSource;
   basis?: AffineTransform;
   strokes?: MaskPaint[];
   x?: number;
@@ -27,6 +29,7 @@ interface MaskSettings {
 }
 export type LayerMaskOptions = MaskSettings &
   (
+    | { rasterErasures: RasterErasureMaskSource; selection?:never; paths?:never; fillRule?:never; base?:never; assetId?:never }
     | {
         selection: MarqueeSelection;
         paths?: never;
@@ -70,7 +73,10 @@ export class LayerMask {
       y = 0,
       linked = true,
     } = options;
+    const native=options.rasterErasures;
+    if(native&&options.fillRule!==undefined)throw new Error("Fill rule applies only to vector masks.");
     const sources = [
+      !!native,
       options.base !== undefined,
       !!options.selection,
       !!options.paths,
@@ -92,7 +98,11 @@ export class LayerMask {
               mode,
             })),
           };
-    if (options.base !== undefined) {
+    if (native) {
+      this.data=layerMaskSchema.parse({kind:'raster-erasures',width:native.width,height:native.height,
+        erasures:native.operations.map(entry=>({width:entry.width,height:entry.height,stroke:entry.stroke.toJSON()})),...strokeSettings,enabled,inverted,density,feather,x,y,linked,
+        ...(options.basis?{basis:options.basis.toJSON()}:{})});
+    } else if (options.base !== undefined) {
       this.data = layerMaskSchema.parse({
         kind: "paint",
         base: options.base,
@@ -157,6 +167,9 @@ export class LayerMask {
       });
     }
   }
+  get rasterErasures(): RasterErasureMaskSource | null {
+    return this.data.kind==='raster-erasures'?{width:this.data.width,height:this.data.height,operations:this.data.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill}))}:null;
+  }
   get base() {
     return this.data.kind === "paint" ? this.data.base : null;
   }
@@ -164,13 +177,14 @@ export class LayerMask {
     return this.data.kind === "bitmap" ? this.data.assetId : null;
   }
   get strokes(): MaskPaint[] {
-    return (this.data.strokes ?? []).map(({ stroke, mode }) => ({
-      stroke: PaintOperation.fromJSON(stroke) as BrushStroke | PencilStroke,
-      mode,
-    }));
+    return (this.data.strokes ?? []).map(entry => entry.mode==='wet'?{mode:'wet',stroke:PaintOperation.fromJSON(entry.stroke) as WetPaintStroke}:{mode:entry.mode,stroke:PaintOperation.fromJSON(entry.stroke) as BrushStroke|PencilStroke});
   }
   paint(stroke: BrushStroke | PencilStroke, mode: "hide" | "reveal" = "hide") {
     return this.with({ strokes: [...this.strokes, { stroke, mode }] });
+  }
+  applyWetPaint(stroke:WetPaintStroke):LayerMask {
+    if(!(stroke instanceof WetPaintStroke))throw new Error('Use a WetPaintStroke value for prepared mask coverage.');
+    return this.with({strokes:[...this.strokes,{mode:'wet',stroke}]});
   }
   get basis() {
     return this.data.basis
@@ -227,6 +241,7 @@ export class LayerMask {
     return this.data.density;
   }
   with(values: Partial<LayerMaskOptions>) {
+    if([values.base!==undefined,!!values.selection,!!values.paths,!!values.assetId,!!values.rasterErasures].filter(Boolean).length>1)throw new Error("Choose one mask geometry source.");
     if (values.base !== undefined && (values.selection || values.paths))
       throw new Error("Choose one mask geometry source.");
     if (values.selection && values.paths)
@@ -255,6 +270,10 @@ export class LayerMask {
         ? { strokes }
         : {}),
     };
+    if(values.rasterErasures || (this.data.kind==='raster-erasures'&&values.base===undefined&&values.selection===undefined&&values.paths===undefined&&values.assetId===undefined)){
+      if(values.fillRule!==undefined)throw new Error('Fill rule applies only to vector masks.');
+      return new LayerMask({...settings,rasterErasures:values.rasterErasures??this.rasterErasures!});
+    }
     if (
       values.base !== undefined ||
       (this.data.kind === "paint" &&
@@ -316,10 +335,8 @@ export class LayerMask {
     const basis = value.basis
       ? AffineTransform.fromJSON(value.basis)
       : undefined;
-    const strokes = value.strokes?.map(({ stroke, mode }) => ({
-      stroke: PaintOperation.fromJSON(stroke) as BrushStroke | PencilStroke,
-      mode,
-    }));
+    const strokes:MaskPaint[]|undefined = value.strokes?.map(entry=>entry.mode==='wet'?{mode:'wet',stroke:PaintOperation.fromJSON(entry.stroke) as WetPaintStroke}:{mode:entry.mode,stroke:PaintOperation.fromJSON(entry.stroke) as BrushStroke|PencilStroke});
+    if(value.kind==='raster-erasures')return new LayerMask({...value,basis,strokes,rasterErasures:{width:value.width,height:value.height,operations:value.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill}))}});
     if (value.kind === "paint")
       return new LayerMask({ ...value, basis, strokes });
     if (value.kind === "bitmap")

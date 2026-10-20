@@ -1,0 +1,15 @@
+{
+  "generator": "psd-tools",
+  "version": "1.10.9",
+  "source": "tests/fixtures/matting/native-50mp.png",
+  "sourceSha256": "b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f",
+  "width": 10000,
+  "height": 5000,
+  "channels": 3,
+  "precision": 8,
+  "format": "PSD v1 with RLE merged RGB",
+  "layers": 0,
+  "fileSha256": "4dadb7b537610a879aa5f4329ad03d2ac1d152be2f3e56049a187e27497a001e",
+  "referenceSha256": "aeafdb7be1a895e862493b7ef787ea29714d0b7f53a9a3affd72fbca3f30c5c1",
+  "limits": "Opaque RGB fixture intentionally discards the source PNG alpha before constructing input; reference is the exact PSD RGB input, not the earlier RGBA source."
+}

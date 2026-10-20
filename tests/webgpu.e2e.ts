@@ -18,6 +18,22 @@ test.use({
   },
 });
 
+test('a visible native pass-through group selects reference fallback after a real GPU frame',async({page})=>{
+ await page.goto('/');const result=await page.evaluate(async()=>{
+  const {Document,LayerGroup,VectorLayer,VectorPath,editor}=window.luma;
+  const {AdaptiveRenderer}=await import(/* @vite-ignore */String('/src/engine/adaptive.ts'));
+  const renderer=new AdaptiveRenderer({allowSoftwareAdapter:true}),model=new Document({width:32,height:24});
+  const base=model.layers.add(new VectorLayer());base.paths.add(VectorPath.rectangle({x:0,y:0,width:32,height:24},0,{fill:'#ff0000',stroke:null}));
+  const group=model.layers.add(new LayerGroup()),child=group.layers.add(new VectorLayer({blendMode:'multiply'}));child.paths.add(VectorPath.rectangle({x:8,y:4,width:16,height:16},0,{fill:'#00ff00',stroke:null}));
+  const canvas=document.createElement('canvas');
+  try{
+   const normal=await renderer.prepareViewport(model.getSnapshot().document,editor.assetStore),initialBackend=normal.backend;normal.dispose();
+   group.blendMode='pass-through';const frame=await renderer.prepareViewport(model.getSnapshot().document,editor.assetStore),backend=frame.backend;frame.present(canvas);frame.dispose();
+   const c=canvas.getContext('2d')!;return{initialBackend,backend,inside:[...c.getImageData(12,12,1,1).data],outside:[...c.getImageData(1,1,1,1).data]};
+  }finally{canvas.width=canvas.height=0;renderer.dispose();}
+ });expect(result).toEqual({initialBackend:'webgpu',backend:'canvas2d',inside:[0,0,0,255],outside:[255,0,0,255]});
+});
+
 test("GPU reference uploads preserve a complete layer matrix without double transformation", async ({
   page,
 }) => {
@@ -244,7 +260,7 @@ test("WebGPU executes real shaders, retains textures, and renders brush/pencil p
         size: 16,
         hardness: 1,
       }).toJSON();
-      if (stroke.kind === "fill") throw new Error("Expected brush");
+
       await read({
         paintPreview: {
           layerId: paint.id,
@@ -465,7 +481,7 @@ test("GPU soft strokes and Boolean clipping retain preview/commit parity across 
       clip,
     });
     const data = stroke.toJSON();
-    if (data.kind === "fill") throw new Error("Expected brush");
+
     let maxDifference = 0,
       meanDifference = 0,
       previewsMatch = true;
@@ -1314,8 +1330,7 @@ test("GPU affine brush and pencil stamps preserve clips, pressure, cache invalid
               height: 23,
             }),
           }).toJSON();
-          if (stroke.kind === "fill")
-            throw new Error("Expected a brush stroke");
+
           const prefix = { ...stroke, points: stroke.points.slice(0, 2) };
           gpu.stroke(prefix, space, 0, 0, true, world);
           const appended = await read(

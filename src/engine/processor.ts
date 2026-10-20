@@ -1,4 +1,8 @@
+import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
 import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSettings } from "../core/color-range";
+import { textureMaskOptionsSchema, type TextureMaskOptions, type TextureMaskSettings } from '../core/brush-texture';
+import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadOptions, type WetPaintLoadSettings, type WetPaintMixOptions, type WetPaintMixSettings, type WetPaintResult } from '../core/wet-paint';
+import { validateWetPixels, validateWetCarried, validateWetCoverage } from './wet-paint';
 import { lutAdjustmentSchema, type LutAdjustmentData } from "../core/lut";
 import { whiteBalanceAdjustmentSchema, type WhiteBalanceAdjustmentData } from "../core/white-balance";
 import { gradientMapAdjustmentSchema, type GradientMapAdjustmentData } from "../core/gradient-map";
@@ -17,7 +21,7 @@ import {
   chromaticAdjustmentSchema,
   type ChromaticAdjustmentData,
 } from "../core/adjustments";
-import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
+import { spatialFilterSupport, type SpatialFilterOptions } from "../core/smart/spatial-filter";
 import type {
   DonorSearchOptions,
   DonorSearchResult,
@@ -88,6 +92,8 @@ export class PixelProcessor {
           request.resolve(event.data.donorResult);
         else if (event.data.poissonResult)
           request.resolve(event.data.poissonResult);
+        else if (event.data.wetPaint) request.resolve(event.data.wetPaint);
+        else if (event.data.wetPaintCarried) request.resolve(event.data.wetPaintCarried);
         else request.resolve(event.data.pixels);
       };
     });
@@ -96,15 +102,20 @@ export class PixelProcessor {
   }
 
   /** Snapshot inputs before worker readiness; callers keep their source buffers. */
-  spatialFilter(
+  async spatialFilter(
     pixels: Uint8ClampedArray,
     width: number,
     height: number,
     options: SpatialFilterOptions,
   ): Promise<Uint8ClampedArray> {
-    return this.request(pixels.slice(), {
+    spatialFilterSupport(options);
+    if (!(pixels instanceof Uint8ClampedArray) || ![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0) || pixels.length!==width*height*4)
+      throw new Error("Invalid spatial-filter tile geometry.");
+    const length=pixels.length,result=await this.request(pixels.slice(), {
       spatialFilter: { width, height, options: { ...options } },
     });
+    if (!(result instanceof Uint8ClampedArray) || result.length!==length)throw new Error("Invalid spatial-filter worker result.");
+    return result;
   }
   process(
     pixels: Uint8ClampedArray,
@@ -143,6 +154,26 @@ export class PixelProcessor {
     if (pixels.length%4) return Promise.reject(new Error("Chromatic adjustments require complete RGBA pixels."));
     return this.request(pixels.slice(), { chromatic: chromaticAdjustmentSchema.parse(adjustment) });
   }
+  async encodeFrequencyBand(pixels:Uint8ClampedArray,low:Uint8ClampedArray,band:'high'|'correction'):Promise<Uint8ClampedArray>{
+    if(!(pixels instanceof Uint8ClampedArray)||!(low instanceof Uint8ClampedArray)||pixels.length%4||pixels.length!==low.length||!['high','correction'].includes(band))throw new Error('Invalid frequency encoding planes.');
+    const length=pixels.length,result=await this.request(pixels.slice(),{frequencyEncoding:{low:low.slice(),band}});
+    if(!(result instanceof Uint8ClampedArray)||result.length!==length)throw new Error('Invalid frequency encoding worker result.');return result;
+  }
+  async linearBlend(pixels: Uint8ClampedArray, backdrop: Uint8ClampedArray, opacity = 1, mode: "linear-light" | "linear-burn" = "linear-light"): Promise<Uint8ClampedArray> {
+    if (!(pixels instanceof Uint8ClampedArray) || !(backdrop instanceof Uint8ClampedArray) || pixels.length % 4 || pixels.length !== backdrop.length || !Number.isFinite(opacity) || opacity < 0 || opacity > 1 || !["linear-light","linear-burn"].includes(mode)) throw new Error("Invalid linear-blend tile.");
+    const length=pixels.length,result=await this.request(pixels.slice(), { linearBlend: {backdrop:backdrop.slice(),opacity,mode} });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length) throw new Error("Invalid Linear Light worker result.");
+    return result;
+  }
+  async redEye(pixels: Uint8ClampedArray, adjustment: RedEyeAdjustmentData): Promise<Uint8ClampedArray> {
+    if (!(pixels instanceof Uint8ClampedArray) || pixels.length % 4 || pixels.length > 0x7fffffff)
+      throw new Error("Red-eye correction requires complete RGBA pixels within the kernel tile range.");
+    const settings = redEyeAdjustmentSchema.parse(adjustment), length = pixels.length;
+    const result = await this.request(pixels.slice(), { redEye: settings });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+      throw new Error("Invalid red-eye worker result.");
+    return result;
+  }
   gradientMap(pixels: Uint8ClampedArray, adjustment: GradientMapAdjustmentData): Promise<Uint8ClampedArray> {
     if (pixels.length % 4) return Promise.reject(new Error("Gradient maps require complete RGBA pixels."));
     return this.request(pixels.slice(), { gradientMap: gradientMapAdjustmentSchema.parse(adjustment) });
@@ -156,6 +187,37 @@ export class PixelProcessor {
   }
   colorRange(pixels:Uint8ClampedArray,options:ColorRangeOptions):Promise<Uint8Array> {
     return this.request(pixels.slice(),{colorRange:colorRangeOptionsSchema.parse(options)});
+  }
+  /** Snapshot before readiness; neither source bytes nor caller buffers transfer. */
+  async brushTexture(pixels: Uint8ClampedArray, options: TextureMaskOptions = {},support?:Uint8ClampedArray): Promise<Uint8ClampedArray> {
+    if (!(pixels instanceof Uint8ClampedArray) || pixels.length % 4 || pixels.length > 16_000_000)
+      throw new Error('Texture conversion requires complete RGBA pixels in a working tile of at most 4,000,000 pixels.');
+    if(support!==undefined&&(!(support instanceof Uint8ClampedArray)||support.length!==pixels.length))throw new Error('Texture support must match its RGBA working tile.');
+    const settings = textureMaskOptionsSchema.parse(options), length = pixels.length;
+    const result = await this.request(pixels.slice(), { brushTexture: settings,brushTextureSupport:support?.slice() });
+    if (!(result instanceof Uint8ClampedArray) || result.length !== length)
+      throw new Error('The texture worker returned invalid coverage pixels.');
+    return result;
+  }
+  /** Prepare carried pigment in the worker without losing sub-byte alpha. */
+  async loadWetPaint(pixels: Uint8ClampedArray, options: WetPaintLoadOptions = {}): Promise<Float32Array> {
+    validateWetPixels(pixels);
+    const settings = wetPaintLoadSchema.parse(options), length = pixels.length;
+    const result = await this.request(pixels.slice(), { wetPaintLoad: settings });
+    validateWetCarried(result, length);
+    return result;
+  }
+  /** Capture every input before worker readiness; callers retain all buffers. */
+  async mixWetPaint(pixels: Uint8ClampedArray, carried: Float32Array, coverage: Uint8Array, options: WetPaintMixOptions = {}): Promise<WetPaintResult> {
+    validateWetPixels(pixels);
+    validateWetCarried(carried, pixels.length);
+    validateWetCoverage(coverage, pixels.length);
+    const settings = wetPaintMixSchema.parse(options), length = pixels.length;
+    const result = await this.request(pixels.slice(), { wetPaintMix: { carried: carried.slice(), coverage: coverage.slice(), settings } });
+    if (!result || !(result.pixels instanceof Uint8ClampedArray) || result.pixels.length !== length)
+      throw new Error('The wet paint worker returned invalid destination pixels.');
+    validateWetCarried(result.carried, length);
+    return result;
   }
   applyLut(
     pixels: Uint8ClampedArray,
@@ -317,10 +379,17 @@ export class PixelProcessor {
       };
       hsl?: HslAdjustmentData;
       chromatic?: ChromaticAdjustmentData;
+      frequencyEncoding?: {low:Uint8ClampedArray;band:"high"|"correction"};
+      linearBlend?: { backdrop: Uint8ClampedArray; opacity: number; mode: "linear-light" | "linear-burn" };
+      redEye?: RedEyeAdjustmentData;
       gradientMap?: GradientMapAdjustmentData;
       whiteBalance?: WhiteBalanceAdjustmentData;
       lookup?: LutAdjustmentData;
       colorRange?:ColorRangeSettings;
+      brushTexture?: TextureMaskSettings;
+      brushTextureSupport?:Uint8ClampedArray;
+      wetPaintLoad?:WetPaintLoadSettings;
+      wetPaintMix?:{carried:Float32Array;coverage:Uint8Array;settings:WetPaintMixSettings};
       effects?: ToneEffectData[];
       underlying?: Uint8ClampedArray;
       blend?: BlendIfData;
@@ -368,6 +437,10 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
+    if(payload.brushTextureSupport)tryTransfer(payload.brushTextureSupport.buffer);
+    if(payload.frequencyEncoding)tryTransfer(payload.frequencyEncoding.low.buffer);
+    if(payload.linearBlend)tryTransfer(payload.linearBlend.backdrop.buffer);
+    if(payload.wetPaintMix){tryTransfer(payload.wetPaintMix.carried.buffer);tryTransfer(payload.wetPaintMix.coverage.buffer);}
     if (payload.filteredMix) {
       // Both mixing entry points supply exclusively owned buffers here.
       tryTransfer(payload.filteredMix.filtered.buffer);

@@ -1,4 +1,8 @@
+import {projectNativeMask} from "./projected-mask";
+import {frequencyIdentitySource} from './frequency-identity';
+import {yieldTask} from './task-yield';
 import { maskSignature } from "./mask-signature";
+import {BrushTextureSampler} from './brush-texture';
 import { checkRenderCurrent } from "./render-control";
 import type { ClonePreviewSource } from "./clone-preview";
 import type { TonalStrokeData } from "../core/adjustments";
@@ -9,6 +13,7 @@ import {
   regionalFilterMask,
 } from "./filter-mask-coverage";
 import { FilterTileCache } from "./filter-tile-cache";
+import { drawNativeWetContent, hasWetContent } from './wet-native';
 import { filteredMasterTile, drawCompletedFilterTile } from "./smart-filters";
 import { smartFilterHalo } from "../core/smart/filters";
 import type { SmartObjectInstanceData } from "../core/smart/types";
@@ -18,7 +23,7 @@ import { resolveSmartDocument } from "../core/smart/resolve";
 import type { DodgeBurnOptions } from "../core/retouch/types";
 import { renderTonalStroke } from "./retouch";
 import { blendAdjustedTile } from "./adjustment-blend";
-import { localTransform } from "../core/spatial";
+import { localTransform, localBounds } from "../core/spatial";
 import { maskTransform, maskGeometry } from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
 import { maskCoverage, PaintedMaskRaster, applyMaskSettings } from "./masks";
@@ -94,6 +99,10 @@ export interface RenderOptions {
   outputSize?: { width: number; height: number };
 }
 interface CanvasRenderOptions extends RenderOptions {
+  /** Bounded sharing within one render only, including uncached reference/export work. */
+  frequencyScratch?:FilterTileCache;
+  /** Shared by recursive native tiles so source shortcuts still allow input/cancellation. */
+  taskBudget?:{deadline:number};
   componentDepth?: number;
   /** Internal basis for isolated GPU reference rendering; never serialized. */
   rootTransform?: AffineTransform;
@@ -109,7 +118,7 @@ export interface DocumentRenderer {
   /** Optional native coverage service for vector exports with rasterized masks. */
   renderMaskCoverage?(
     mask:LayerMaskData,space:RenderSpace,x:number,y:number,key:string,
-    retain?:boolean,world?:AffineTransform,assets?:AssetStore,
+    retain?:boolean,world?:AffineTransform,assets?:AssetStore,isCancelled?:()=>boolean,
   ):Promise<HTMLCanvasElement>;
   clearCache(): void;
   dispose(): void;
@@ -143,6 +152,7 @@ export function workingSize(
  * independent of bounded buffers, stroke tiles and effect halos. */
 export class CanvasRenderer implements DocumentRenderer {
   readonly processor = new PixelProcessor();
+  private readonly brushTextures=new BrushTextureSampler(this.processor);
   private cache = new CanvasCache();
   private filterTiles = new FilterTileCache();
   private maskPaint = new PaintedMaskRaster(this.cache);
@@ -197,6 +207,7 @@ export class CanvasRenderer implements DocumentRenderer {
     retain = true,
     world = AffineTransform.translation(x, y),
     assets?: AssetStore,
+    isCancelled?:()=>boolean,
   ) {
     const epoch = this.epoch;
     let bitmap: ImageBitmap | HTMLCanvasElement | undefined;
@@ -218,6 +229,9 @@ export class CanvasRenderer implements DocumentRenderer {
         : undefined,
       world,
       bitmap,
+      assets,
+      retain?this.brushTextures:undefined,
+      ()=>this.epoch!==epoch||!!isCancelled?.(),
     );
   }
 
@@ -291,6 +305,28 @@ export class CanvasRenderer implements DocumentRenderer {
       }
   }
 
+  private async documentTone(layer:SmartObjectInstanceData,registry:ComponentRegistry,assets:AssetStore,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions){
+    const effects=(layer.smartFilters??[]).filter(effect=>effect.enabled&&effect.kind==='document-tone').map(effect=>({...effect,kind:'tone' as const})) as ToneEffectData[];
+    if(!effects.length)return;
+    const preview=options.paintPreview,mask=layer.filterMask&&preview?.filterMask&&preview.maskMode&&preview.layerId===layer.id?{...layer.filterMask,strokes:[...(layer.filterMask.strokes??[]),{mode:preview.maskMode,stroke:preview.stroke}]}:layer.filterMask;
+    let coverage:HTMLCanvasElement|undefined;
+    try{
+      if(mask?.enabled&&mask.density>0){
+        const source=registry.get(layer.componentId).source,width=source.kind==='asset'?source.width:source.document.width,height=source.kind==='asset'?source.height:source.document.height;
+        const nativeWorld=world.multiply(AffineTransform.scale(layer.width/width,layer.height/height)),offset=maskTransform(mask,new AffineTransform());
+        const basis=mask.linked===false?nativeWorld.inverse().multiply(options.documentTransform??new AffineTransform()).multiply(offset):offset;
+        coverage=await projectNativeMask(space,nativeWorld,region=>{const origin=basis.point({x:0,y:0});return this.renderMaskCoverage(regionalFilterMask(mask,region,basis),{...region,sx:1,sy:1},origin.x,origin.y,`document-tone-mask:${layer.id}`,options.cache!==false,basis,assets,options.isCancelled);},options.isCancelled);
+      }
+      const c=target.getContext('2d')!;
+      for(let ty=0;ty<space.height;ty+=1024)for(let tx=0;tx<space.width;tx+=1024){
+        checkRenderCurrent(options.isCancelled);const w=Math.min(1024,space.width-tx),h=Math.min(1024,space.height-ty),image=c.getImageData(tx,ty,w,h),original=coverage?image.data.slice():undefined;
+        let pixels=await this.processor.process(image.data,effects);checkRenderCurrent(options.isCancelled);
+        if(coverage&&original&&mask)pixels=await this.processor.mixFilteredOwned(original,pixels,coverage.getContext('2d')!.getImageData(tx,ty,w,h).data,mask.density,mask.inverted);
+        checkRenderCurrent(options.isCancelled);const adjusted=c.createImageData(w,h);adjusted.data.set(pixels);c.putImageData(adjusted,tx,ty);
+      }
+    }finally{if(coverage)release(coverage);}
+  }
+
   private async smart(
     layer: SmartObjectInstanceData,
     registry: ComponentRegistry,
@@ -317,6 +353,7 @@ export class CanvasRenderer implements DocumentRenderer {
             ],
           };
     const sourceDocument = { ...master, components: registry.values() };
+    const frequencyIdentity=frequencyIdentitySource(master,registry,assets);
     const nativeWorld = world.multiply(
       AffineTransform.scale(
         layer.width / master.width,
@@ -369,18 +406,19 @@ export class CanvasRenderer implements DocumentRenderer {
                 filterMask.kind === "bitmap"
                   ? assets.get(filterMask.assetId).bitmap
                   : undefined,
+                assets,
+                options.cache===false?undefined:this.brushTextures,
+                options.isCancelled,
               );
             },
           }
         : undefined;
     const inverse = placement.inverse();
-    const filters = layer.smartFilters ?? [];
-    const filterSignature = JSON.stringify([
-      registry.values(),
-      filters,
-      master.width,
-      master.height,
-    ]);
+    const filters = (layer.smartFilters ?? []).filter(filter=>filter.kind!=="document-tone");
+    const lastNative=filters.filter(filter=>filter.enabled).at(-1);
+    const nativeFrame = !lastNative || lastNative.kind === "native-composition" || lastNative.kind === "frequency-band";
+    const sourceSignature=JSON.stringify([[...registry.reachableFrom(layer.componentId)].sort().map(id=>registry.get(id)),master.width,master.height]);
+    const filterSignature=JSON.stringify([sourceSignature,filters]);
     const retention =
       options.cache === false
         ? undefined
@@ -388,6 +426,7 @@ export class CanvasRenderer implements DocumentRenderer {
             cache: this.filterTiles,
             key: `filter:${this.assetIds.get(assets)}:${layer.componentId}`,
             signature: filterSignature,
+            sourceSignature,
             completed:
               mask && filterMask
                 ? {
@@ -410,10 +449,22 @@ export class CanvasRenderer implements DocumentRenderer {
       Math.abs(inverse.a) + Math.abs(inverse.c),
       Math.abs(inverse.b) + Math.abs(inverse.d),
     );
-    const step = Math.max(1, Math.min(256, Math.floor(512 / nativePerPixel)));
+    // A unit native frequency plane can cover the outer tile's two-pixel
+    // overscan in one request. Keep affine sampling and large-halo budgets on
+    // the established grid; source/document resolution is independent.
+    const nativeFrequency = filters.length===1 && filters[0].kind==='frequency-band' &&
+      placement.a===1 && placement.b===0 && placement.c===0 && placement.d===1 &&
+      Number.isSafeInteger(placement.e) && Number.isSafeInteger(placement.f);
+    const paddedEdge=512+4+2*halo;
+    const tileLimit=nativeFrequency && paddedEdge<=8192 && paddedEdge*paddedEdge<=4_000_000?512:256;
+    const step = Math.max(1, Math.min(tileLimit, Math.floor(512 / nativePerPixel)));
     const context = target.getContext("2d")!;
     for (let ty = 0; ty < target.height; ty += step)
       for (let tx = 0; tx < target.width; tx += step) {
+        if(options.taskBudget && performance.now()>=options.taskBudget.deadline){
+          await yieldTask();
+          options.taskBudget.deadline=performance.now()+8;
+        }
         checkRenderCurrent(options.isCancelled);
         const width = Math.min(step, target.width - tx),
           height = Math.min(step, target.height - ty);
@@ -449,7 +500,7 @@ export class CanvasRenderer implements DocumentRenderer {
             placement.f,
           );
           if (
-            drawCompletedFilterTile(
+            !nativeFrame && drawCompletedFilterTile(
               retention?.completed,
               tileRegion,
               filters,
@@ -459,7 +510,7 @@ export class CanvasRenderer implements DocumentRenderer {
             continue;
           const tile = await filteredMasterTile(
             (region) =>
-              this.render(sourceDocument, assets, {
+              this.render(frequencyIdentity?.unchanged(region)?{...sourceDocument,children:[frequencyIdentity.raster]}:sourceDocument, assets, {
                 region,
                 outputSize: { width: region.width, height: region.height },
                 maxPixels: region.width * region.height,
@@ -467,6 +518,8 @@ export class CanvasRenderer implements DocumentRenderer {
                 cache: options.cache,
                 readback: true,
                 componentDepth: (options.componentDepth ?? 0) + 1,
+                frequencyScratch:options.frequencyScratch,
+                taskBudget:options.taskBudget,
                 isCancelled: options.isCancelled,
               }),
             this.processor,
@@ -476,9 +529,22 @@ export class CanvasRenderer implements DocumentRenderer {
             master.height,
             mask,
             retention,
+            options.frequencyScratch?{cache:options.frequencyScratch,key:`filter:${this.assetIds.get(assets)}:${layer.componentId}`,signature:sourceSignature,canCache:()=>this.epoch===epoch&&!options.isCancelled?.()}:undefined,
           );
           try {
-            context.drawImage(tile.canvas, tile.x, tile.y);
+            if(nativeFrame){
+              const left=Math.max(0,tile.x),top=Math.max(0,tile.y),right=Math.min(master.width,tile.x+tile.canvas.width),bottom=Math.min(master.height,tile.y+tile.canvas.height);
+              if(right>left&&bottom>top){
+                if(left===tile.x&&top===tile.y&&right===tile.x+tile.canvas.width&&bottom===tile.y+tile.canvas.height)context.drawImage(tile.canvas,tile.x,tile.y);
+                else {
+                  // Use the actual image boundary, preserving Canvas edge-clamp sampling
+                  // and geometric antialiasing instead of interpolating into padded transparency.
+                  const edge=createCanvas(right-left,bottom-top,true);
+                  try{edge.getContext('2d')!.drawImage(tile.canvas,left-tile.x,top-tile.y,right-left,bottom-top,0,0,right-left,bottom-top);context.drawImage(edge,left,top);}
+                  finally{release(edge);}
+                }
+              }
+            }else context.drawImage(tile.canvas, tile.x, tile.y);
           } finally {
             release(tile.canvas);
           }
@@ -494,6 +560,9 @@ export class CanvasRenderer implements DocumentRenderer {
     options: CanvasRenderOptions = {},
   ): Promise<HTMLCanvasElement> {
     checkRenderCurrent(options.isCancelled);
+    if(!options.taskBudget)options={...options,taskBudget:{deadline:performance.now()+8}};
+    const ownedFrequencyScratch=options.frequencyScratch?undefined:new FilterTileCache(8*1024*1024);
+    if(ownedFrequencyScratch)options={...options,frequencyScratch:ownedFrequencyScratch};
     const registry = document.components?.length
       ? new ComponentRegistry(document.components)
       : undefined;
@@ -533,7 +602,7 @@ export class CanvasRenderer implements DocumentRenderer {
       nodes.some(
         (layer) =>
           layer.styles?.blendIf.enabled ||
-          layer.kind === "adjustment" ||
+          layer.kind === "adjustment" || layer.blendMode === "linear-light" || layer.blendMode === "linear-burn" ||
           (layer.kind === "group" && needsReadback(layer.children)),
       );
     const output = createCanvas(
@@ -566,6 +635,7 @@ export class CanvasRenderer implements DocumentRenderer {
       current: RenderSpace,
       parent: AffineTransform,
       isolated?: LayerData,
+      externalBackdrop = false,
     ) => {
       const targetContext = target.getContext("2d")!;
       for (const layer of nodes) {
@@ -574,6 +644,50 @@ export class CanvasRenderer implements DocumentRenderer {
         const world = parent.multiply(localTransform(layer));
         const style = layer.styles ?? defaultStyle(),
           shadow = style.dropShadow;
+        if (layer.blendMode === 'pass-through') {
+          if (layer.kind !== 'group') throw new Error('Only groups support pass-through blending.');
+          const maskData = previewMask(layer, preview);
+          const opacity = isolated === layer ? 1 : layer.opacity;
+          if (opacity === 1 && !(maskData?.enabled && maskData.density > 0)) {
+            await paint(layer.children, target, current, world, undefined, true);
+            continue;
+          }
+          // Children see the real sibling backdrop. Blend the complete result
+          // back with that backdrop once in premultiplied space; never apply
+          // group opacity separately to each child or mask the backdrop itself.
+          const before = createCanvas(current.width, current.height);
+          let after: HTMLCanvasElement | undefined;
+          let coverage: HTMLCanvasElement | undefined;
+          try {
+            after = createCanvas(current.width, current.height, needsReadback(layer.children));
+            before.getContext('2d')!.drawImage(target, 0, 0);
+            after.getContext('2d')!.drawImage(target, 0, 0);
+            await paint(layer.children, after, current, world, undefined, true);
+            if (maskData?.enabled && maskData.density > 0) {
+              const rawWorld = maskTransform(maskData, world);
+              const maskWorld = maskData.linked === false && options.documentTransform
+                ? options.documentTransform.multiply(rawWorld) : rawWorld;
+              const origin = maskWorld.point({x:0,y:0});
+              coverage = await this.renderMaskCoverage(maskData,current,origin.x,origin.y,`${scope}:pass:${layer.id}`,!!cache,maskWorld,assets,options.isCancelled);
+              applyMaskSettings(coverage,maskData);
+              const c = coverage.getContext('2d')!;
+              c.globalCompositeOperation='destination-in';c.globalAlpha=opacity;c.fillStyle='#fff';c.fillRect(0,0,current.width,current.height);
+            } else {
+              coverage=createCanvas(current.width,current.height);
+              const c=coverage.getContext('2d')!;c.globalAlpha=opacity;c.fillStyle='#fff';c.fillRect(0,0,current.width,current.height);
+            }
+            const b=before.getContext('2d')!,a=after.getContext('2d')!;
+            b.globalCompositeOperation='destination-out';b.drawImage(coverage,0,0);
+            a.globalCompositeOperation='destination-in';a.drawImage(coverage,0,0);
+            checkRenderCurrent(options.isCancelled);
+            targetContext.save();
+            try {
+              targetContext.globalAlpha=1;targetContext.globalCompositeOperation='copy';targetContext.drawImage(before,0,0);
+              targetContext.globalCompositeOperation='lighter';targetContext.drawImage(after,0,0);
+            } finally {targetContext.restore();}
+          } finally {release(before);if(after)release(after);if(coverage)release(coverage);}
+          continue;
+        }
         // The halo is expressed in output pixels and propagated into child
         // rendering. Export strip boundaries therefore do not clip shadows.
         const haloX = shadow.enabled
@@ -590,7 +704,7 @@ export class CanvasRenderer implements DocumentRenderer {
           const placement = renderTransform(current, world);
           const ink = layer.kind === "text" ? measureTextInk(layer) : undefined;
           const bounds = layer.kind === "raster"
-            ? [{ x: 0, y: 0, width: layer.width, height: layer.height }]
+            ? [localBounds(layer)!]
             : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
             : ink ? [ink] : undefined;
           // Unsupported glyph metrics take the full reference path. Logical
@@ -657,7 +771,9 @@ export class CanvasRenderer implements DocumentRenderer {
         // Cache unstyled content; opacity/blending and backdrop-dependent
         // Blend If are evaluated on every composition. Ancestors of a live
         // stroke are recomposed from their cached, unchanged children.
+        const nativeWetPreview = (layer.kind === 'paint' || (layer.kind === 'raster' && preview?.stroke.kind === 'eraser')) && hasWetContent(layer) && preview?.layerId === layer.id && !preview.maskMode ? preview : undefined;
         const cacheable =
+          !nativeWetPreview &&
           !(preview?.filterMask && preview.layerId === layer.id) &&
           (!affected.has(layer.id) ||
             layer.kind === "paint" || layer.kind === "raster" ||
@@ -670,7 +786,7 @@ export class CanvasRenderer implements DocumentRenderer {
         const signature = cacheable && cache ? this.signature(layer) : "";
         const patchBackdrop = layer.kind === "adjustment" && layer.adjustment.kind === "patch"
           ? nodes.slice(0, nodes.indexOf(layer)) : [];
-        const retainPatch = !!cache && layer.kind === "adjustment" && layer.adjustment.kind === "patch" &&
+        const retainPatch = !externalBackdrop && !!cache && layer.kind === "adjustment" && layer.adjustment.kind === "patch" &&
           isImmutable(layer) && !affected.has(layer.id) && !layer.mask && layer.opacity === 1 &&
           (layer.fillOpacity ?? 1) === 1 && layer.blendMode === "normal" &&
           !style.blendIf.enabled && !style.colorOverlay.enabled && !shadow.enabled &&
@@ -689,7 +805,7 @@ export class CanvasRenderer implements DocumentRenderer {
           }
         }
 
-        const finishedStyle = !!cache && cacheable && isImmutable(layer) &&
+        const finishedStyle = layer.blendMode !== "linear-light" && layer.blendMode !== "linear-burn" && !!cache && cacheable && isImmutable(layer) &&
           !affected.has(layer.id) && !style.blendIf.enabled &&
           (shadow.enabled || !!(layer.mask?.enabled && layer.mask.density > 0));
         let finishedSignature = "";
@@ -698,13 +814,13 @@ export class CanvasRenderer implements DocumentRenderer {
           targetContext.save();
           try {
             targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
-            targetContext.globalCompositeOperation = layer.blendMode === "normal" ? "source-over" : layer.blendMode;
+            targetContext.globalCompositeOperation = layer.blendMode === "normal" || (layer.blendMode === "linear-light" || layer.blendMode === "linear-burn") ? "source-over" : layer.blendMode;
             if (cache!.draw(key, finishedSignature, targetContext)) continue;
           } finally { targetContext.restore(); }
         }
         // Composite a retained, unchanged surface synchronously. No cache-owned
         // canvas escapes across an await, and no postprocessing mutates it.
-        const rawComposite = cacheable && !affected.has(layer.id) &&
+        const rawComposite = layer.blendMode !== "linear-light" && layer.blendMode !== "linear-burn" && cacheable && !affected.has(layer.id) &&
           !shadow.enabled && !style.blendIf.enabled &&
           (layer.fillOpacity ?? 1) === 1 &&
           !(layer.mask?.enabled && layer.mask.density > 0);
@@ -715,7 +831,7 @@ export class CanvasRenderer implements DocumentRenderer {
           try {
             targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
             targetContext.globalCompositeOperation =
-              layer.blendMode === "normal" ? "source-over" : layer.blendMode;
+              layer.blendMode === "normal" || (layer.blendMode === "linear-light" || layer.blendMode === "linear-burn") ? "source-over" : layer.blendMode;
             if (cache.draw(key, compositeSignature, targetContext)) continue;
           } finally { targetContext.restore(); }
         }
@@ -748,6 +864,9 @@ export class CanvasRenderer implements DocumentRenderer {
                 world,
                 options,
               );
+              await this.documentTone(layer,registry,assets,content,padded,world,options);
+            } else if ((layer.kind === 'raster' || layer.kind === 'paint') && hasWetContent(layer)) {
+              await drawNativeWetContent(layer, assets, content, padded, world, this.processor, options.isCancelled, options.cache === false ? undefined : this.brushTextures, nativeWetPreview);
             } else if (layer.kind === "raster") {
               const basis = contentSignature({ ...layer, erasures: [] });
               const previous = cache ? this.rasterPrefixes.get(key) : undefined;
@@ -759,7 +878,7 @@ export class CanvasRenderer implements DocumentRenderer {
                 cache!.read(key, previous.signature, content);
               if (reusable) start = previous.layer.erasures?.length ?? 0;
               else await this.raster(layer, assets, content, padded, world);
-              for (const entry of erasures.slice(start)) await drawPaint({ ...layer, kind: "paint", strokes: [entry.stroke] }, assets, content, padded, world.multiply(AffineTransform.scale(layer.width / entry.width, layer.height / entry.height)), this.processor, undefined, cache, canCache, undefined, options.isCancelled);
+              for (const entry of erasures.slice(start)) await drawPaint({ ...layer, kind: "paint", strokes: [entry.stroke] }, assets, content, padded, world.multiply(AffineTransform.scale(layer.width / entry.width, layer.height / entry.height)), this.processor, undefined, cache, canCache, undefined, options.isCancelled,options.cache===false?undefined:this.brushTextures);
               if (cache && canCache() && isImmutable(layer)) {
                 this.rasterPrefixes.delete(key);
                 this.rasterPrefixes.set(key, { layer, signature, basis });
@@ -791,6 +910,7 @@ export class CanvasRenderer implements DocumentRenderer {
                 canCache,
                 undefined,
                 options.isCancelled,
+                options.cache===false?undefined:this.brushTextures,
               );
               if (cache && canCache() && isImmutable(layer)) {
                 this.paintPrefixes.delete(key);
@@ -871,7 +991,7 @@ export class CanvasRenderer implements DocumentRenderer {
               } else if (layer.adjustment.kind === "tonal") {
                 const backdrop = nodes.slice(0, nodes.indexOf(layer));
                 const committed = layer.adjustment.strokes;
-                const reusable = !!cache && isImmutable(committed) &&
+                const reusable = !externalBackdrop && !!cache && isImmutable(committed) &&
                   backdrop.every(node => isImmutable(node) && !affected.has(node.id));
                 for (let ty = 0; ty < padded.height; ty += 1024)
                   for (let tx = 0; tx < padded.width; tx += 1024) {
@@ -898,7 +1018,7 @@ export class CanvasRenderer implements DocumentRenderer {
                     }
                     for (const stroke of committed.slice(start))
                       pixels = await renderTonalStroke(pixels, stroke.brush, stroke,
-                        tileSpace, this.processor, world);
+                        tileSpace, this.processor, world,assets,options.cache===false?undefined:this.brushTextures,options.isCancelled);
                     if (reusable && canCache() && (!previous || start !== committed.length)) {
                       const signature = String(++this.tonalVersion);
                       cache!.writePixels(prefixKey, signature, pixels);
@@ -910,7 +1030,7 @@ export class CanvasRenderer implements DocumentRenderer {
                     // A live preview must never become the retained committed prefix.
                     if (preview?.layerId === layer.id && preview.tonal)
                       pixels = await renderTonalStroke(pixels, preview.stroke, preview.tonal,
-                        tileSpace, this.processor, world);
+                        tileSpace, this.processor, world,assets,options.cache===false?undefined:this.brushTextures,options.isCancelled);
                     image.data.set(pixels);
                     c.putImageData(image, tx, ty);
                   }
@@ -928,6 +1048,16 @@ export class CanvasRenderer implements DocumentRenderer {
                     const width = Math.min(1024, padded.width - tx), height = Math.min(1024, padded.height - ty);
                     const image = c.getImageData(tx, ty, width, height);
                     image.data.set(await this.processor.whiteBalance(image.data, layer.adjustment));
+                    c.putImageData(image, tx, ty);
+                  }
+              } else if (layer.adjustment.kind === "red-eye") {
+                for (let ty = 0; ty < padded.height; ty += 1024)
+                  for (let tx = 0; tx < padded.width; tx += 1024) {
+                    const width = Math.min(1024, padded.width - tx), height = Math.min(1024, padded.height - ty);
+                    checkRenderCurrent(options.isCancelled);
+                    const image = c.getImageData(tx, ty, width, height);
+                    image.data.set(await this.processor.redEye(image.data, layer.adjustment));
+                    checkRenderCurrent(options.isCancelled);
                     c.putImageData(image, tx, ty);
                   }
               } else if (layer.adjustment.kind === "gradient-map") {
@@ -1014,7 +1144,7 @@ export class CanvasRenderer implements DocumentRenderer {
             // raw surface copies pixels and evicts reusable committed layers.
             if (cacheable && isImmutable(layer) && canCache()) {
               const bounds = layer.kind === "raster"
-                ? [{ x: 0, y: 0, width: layer.width, height: layer.height }]
+                ? [localBounds(layer)!]
                 : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
                 : layer.kind === "text" && textInk ? [textInk] : null;
               if (bounds) {
@@ -1032,6 +1162,7 @@ export class CanvasRenderer implements DocumentRenderer {
             }
           }
           if (
+            !nativeWetPreview &&
             (layer.kind === "paint" || (layer.kind === "raster" && preview?.stroke.kind === "eraser")) &&
             !preview?.maskMode &&
             layer.id === preview?.layerId
@@ -1048,6 +1179,7 @@ export class CanvasRenderer implements DocumentRenderer {
               canCache,
               preview.cloneSource,
               options.isCancelled,
+              options.cache===false?undefined:this.brushTextures,
             );
           }
           const c = content.getContext("2d")!,
@@ -1082,6 +1214,7 @@ export class CanvasRenderer implements DocumentRenderer {
                 !!cache,
                 maskWorld,
                 assets,
+                options.isCancelled,
               );
               if (canCache()) cache?.write(maskKey, maskSignature, mask);
             }
@@ -1244,12 +1377,20 @@ export class CanvasRenderer implements DocumentRenderer {
               }
               cache!.write(key, finishedSignature, result, 1, finishedBounds);
             }
-            targetContext.save();
-            targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
-            targetContext.globalCompositeOperation =
-              layer.blendMode === "normal" ? "source-over" : layer.blendMode;
-            targetContext.drawImage(result, 0, 0);
-            targetContext.restore();
+            if ((layer.blendMode === "linear-light" || layer.blendMode === "linear-burn") && isolated !== layer) {
+              for(let ty=0;ty<current.height;ty+=1024)for(let tx=0;tx<current.width;tx+=1024){
+                checkRenderCurrent(options.isCancelled);
+                const w=Math.min(1024,current.width-tx),h=Math.min(1024,current.height-ty);
+                const image=targetContext.getImageData(tx,ty,w,h);
+                image.data.set(await this.processor.linearBlend(r.getImageData(tx,ty,w,h).data,image.data,layer.opacity,layer.blendMode));
+                checkRenderCurrent(options.isCancelled);targetContext.putImageData(image,tx,ty);
+              }
+            } else {
+              targetContext.save();
+              targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
+              targetContext.globalCompositeOperation = layer.blendMode === "normal" || (layer.blendMode === "linear-light" || layer.blendMode === "linear-burn") ? "source-over" : layer.blendMode;
+              targetContext.drawImage(result, 0, 0);targetContext.restore();
+            }
           }
         } finally {
           release(content);
@@ -1269,6 +1410,8 @@ export class CanvasRenderer implements DocumentRenderer {
     } catch (error) {
       release(output);
       throw error;
+    } finally {
+      ownedFrequencyScratch?.clear();
     }
   }
   /** End in-flight view work while retaining document/asset-scoped pixels. */
@@ -1277,6 +1420,7 @@ export class CanvasRenderer implements DocumentRenderer {
     this.filterTiles.clear();
     this.maskPaint.clear();
     this.activeStroke.clear();
+    this.brushTextures.clear();
   }
   clearCache() {
     this.resetView();

@@ -1,4 +1,5 @@
 import { LutControls } from "./LutControls";
+import { RedEyeControls } from "./RedEyeControls";
 import { WhiteBalanceControls } from "./WhiteBalanceControls";
 import { GradientMapControls } from "./GradientMapControls";
 import { LayerCompsPanel } from "./LayerCompsPanel";
@@ -6,6 +7,8 @@ import { AlphaChannelsPanel } from './AlphaChannelsPanel';
 import { ChromaticAdjustmentControls } from "./ChromaticAdjustmentControls";
 import { SmartFilterMaskPanel } from "./SmartFilterMaskPanel";
 import { SmartFiltersPanel } from "./SmartFiltersPanel";
+import {FrequencyRadiusControls} from './FrequencyRadiusControls';
+import {frequencyRadiusOwner} from '../core/frequency-separation';
 import { GuidesPanel } from "./GuidesPanel";
 import { AffineTransform } from "../core/affine";
 import { layerBounds, layerTransform, parentId } from "../core/spatial";
@@ -32,7 +35,7 @@ import {
   AdjustmentLayer,
 } from "../dom";
 import type { Layer } from "../dom";
-import type { BlendMode, DocumentData, LayerData } from "../core/model";
+import {GROUP_BLEND_MODES, type LayerBlendMode, type DocumentData, type LayerData} from "../core/model";
 import { BLEND_MODES, allLayers, findParent, toneOf } from "../core/model";
 import { defaultStyle } from "../core/drawing";
 import type { EditorCommand } from "../core/commands";
@@ -51,6 +54,7 @@ import {
   defaultVibranceAdjustment,
   defaultGradientMapAdjustment,
   defaultWhiteBalanceAdjustment,
+  defaultRedEyeAdjustment,
   defaultLutAdjustment,
   defaultLevelsAdjustment,
   defaultToneAdjustment,
@@ -97,6 +101,8 @@ export function InspectorPanel({
   onOpenHelp,
   onCombinePaths,
 }: InspectorPanelProps) {
+  const frequencyOwner=selected?frequencyRadiusOwner(viewDocument,selected.id):null;
+  const frequencyGroup=frequencyOwner?dom.getLayer(frequencyOwner.id) as LayerGroup:null;
   const tone = selected?.kind === "raster" ? toneOf(selected) : null;
   const selectedWorld = selected
     ? layerTransform(viewDocument, selected.id)
@@ -334,21 +340,23 @@ export function InspectorPanel({
               }
             />
           </InspectorSection>
+          {frequencyGroup&&frequencyOwner?.frequencyRadius!=null&&<FrequencyRadiusControls key={`${dom.id}:${frequencyGroup.id}`} document={dom} group={frequencyGroup} value={frequencyOwner.frequencyRadius} busy={busy} onPreview={onPreview} onAttempt={onAttempt}/>}
           <InspectorSection title="Appearance">
+            {selected.blendMode==='pass-through'&&<p className="panel-description">Children blend with the surrounding stack. Choose Normal to use group styles or fill opacity.</p>}
             <Select
               label="Blend mode"
               hideLabel
               className="wide-select"
               value={selected.blendMode}
               disabled={locked || busy}
-              options={BLEND_MODES.map((mode) => ({
+              options={(selected.kind==='group'?GROUP_BLEND_MODES:BLEND_MODES).map((mode) => ({
                 value: mode,
                 label:
                   mode[0].toUpperCase() + mode.slice(1).replaceAll("-", " "),
               }))}
               onChange={(val) =>
                 onSelectedAction((layer) => {
-                  layer.blendMode = val as BlendMode;
+                  layer.blendMode = val as LayerBlendMode;
                 })
               }
             />
@@ -379,7 +387,7 @@ export function InspectorPanel({
               min={0}
               max={100}
               suffix="%"
-              disabled={locked || busy}
+              disabled={locked || busy || selected.blendMode==='pass-through'}
               onPreview={(value) =>
                 onPreview({
                   type: "layer.update",
@@ -401,6 +409,7 @@ export function InspectorPanel({
                 document={dom}
                 layer={selectedObject}
                 value={selected.smartFilters ?? []}
+                sharedRadius={frequencyOwner?.frequencyRadius??undefined}
                 disabled={locked || busy || !wasmReady}
                 onPreview={onPreview}
                 onAttempt={onAttempt}
@@ -487,7 +496,7 @@ export function InspectorPanel({
             key={selected.id}
             onCancel={() => onPreview(null)}
             value={selected.styles ?? defaultStyle()}
-            disabled={locked || busy}
+            disabled={locked || busy || selected.blendMode==='pass-through'}
             onPreview={(styles) =>
               onPreview({
                 type: "layer.update",
@@ -516,7 +525,7 @@ export function InspectorPanel({
                           const kind = layer.adjustmentKind;
                           layer.update({
                             adjustment:
-                              kind === "curves"
+                              kind === "red-eye" ? defaultRedEyeAdjustment() : kind === "curves"
                                 ? defaultCurvesAdjustment()
                                 : kind === "levels"
                                   ? defaultLevelsAdjustment()
@@ -558,6 +567,7 @@ export function InspectorPanel({
                     { value: "color-balance", label: "Color Balance" },
                     { value: "vibrance", label: "Vibrance" },
                     { value: "gradient-map", label: "Gradient Map" },
+                    { value: "red-eye", label: "Red Eye" },
                     { value: "white-balance", label: "White Balance" },
                     { value: "lut", label: "Color Lookup (LUT)" },
                     { value: "curves", label: "Curves" },
@@ -570,6 +580,7 @@ export function InspectorPanel({
                         if (kind === "hsl")
                           layer.adjustment = defaultHslAdjustment();
                         else if (kind === "color-balance") layer.adjustment = defaultColorBalanceAdjustment();
+                        else if (kind === "red-eye") layer.adjustment = defaultRedEyeAdjustment();
                         else if (kind === "white-balance") layer.adjustment = defaultWhiteBalanceAdjustment();
                         else if (kind === "lut") layer.adjustment = defaultLutAdjustment();
                         else if (kind === "gradient-map") layer.adjustment = defaultGradientMapAdjustment();
@@ -637,6 +648,10 @@ export function InspectorPanel({
                 )}
 
                 {selected.adjustment.kind === "lut" && <LutControls key={selected.id}
+                  adjustment={selected.adjustment} disabled={locked || busy}
+                  onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
+                  onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
+                {selected.adjustment.kind === "red-eye" && <RedEyeControls key={selected.id}
                   adjustment={selected.adjustment} disabled={locked || busy}
                   onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
                   onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}

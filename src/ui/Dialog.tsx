@@ -5,11 +5,13 @@ export function Dialog({
   titleId,
   className = "",
   onClose,
+  localEscape=false,
   children,
 }: {
   titleId: string;
   className?: string;
   onClose(): void;
+  localEscape?:boolean;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -29,6 +31,7 @@ export function Dialog({
       ref={ref}
       className={`shortcut-dialog ${className}`}
       aria-labelledby={titleId}
+      onKeyDown={event=>{if(localEscape&&event.key==="Escape")event.stopPropagation();}}
       onCancel={(event) => {
         event.preventDefault();
         close.current();

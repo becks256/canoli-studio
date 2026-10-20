@@ -4,7 +4,9 @@ import { freeze } from "../src/core/immutable";
 import { maskGeometrySignature, maskSignature } from "../src/engine/mask-signature";
 
 function fixture() {
-  return new LayerMask({ base: 1, strokes: [{ mode: "hide", stroke: new BrushStroke({ points: [{ x: 3, y: 4 }] }) }] }).toJSON();
+  const mask=new LayerMask({ base: 1, strokes: [{ mode: "hide", stroke: new BrushStroke({ points: [{ x: 3, y: 4 }] }) }] }).toJSON();
+  const entry=mask.strokes![0];if(mask.kind!=='paint'||entry.mode==='wet')throw new Error('Expected ordinary painted mask fixture.');
+  return {...mask,strokes:[entry]};
 }
 it("retains immutable stroke keys across mask wrappers and distinguishes changed geometry", () => {
   const mask = freeze(fixture());

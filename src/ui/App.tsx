@@ -1,3 +1,11 @@
+import { FrequencySeparationDialog } from "./FrequencySeparationDialog";
+import {BrushSymmetryDialog} from './BrushSymmetryDialog';
+import {pointerPenTilt} from '../core/brush-tip';
+import {BrushTipDialog} from './BrushTipDialog';
+import {BrushTextureDialog} from './BrushTextureDialog';
+import {useBrushTexturePreview} from './hooks/useBrushTexturePreview';
+import {BrushPresetsDialog} from './BrushPresetsDialog';
+import {PressureCurveDialog} from './PressureCurveDialog';
 import {SvgImportDialog} from './SvgImportDialog';
 import {TiffImportDialog} from './TiffImportDialog';
 import type {RefineEdgeProgress} from '../core/matting';
@@ -52,6 +60,7 @@ import {
   defaultGradientMapAdjustment,
   defaultWhiteBalanceAdjustment,
   defaultLutAdjustment,
+  defaultRedEyeAdjustment,
   defaultLevelsAdjustment,
   defaultToneAdjustment,
 } from "../core/adjustments";
@@ -62,6 +71,7 @@ import { allLayers, findLayer, findParent, isLocked } from "../core/model";
 import {
   hitTest,
   layerBounds,
+  localBounds,
   unionBounds,
   parentSpaceDelta,
   layerTransform,
@@ -85,16 +95,8 @@ import { GenerateAssetDialog } from "./GenerateAssetDialog";
 import { RecipeDialog } from "./RecipeDialog";
 import { BatchRunnerDialog } from "./BatchRunnerDialog";
 import { ColorProfileDialog } from "./ColorProfileDialog";
-import { PsdImportDialog } from "./PsdImportDialog";
+import {PhotoshopImportDialog} from "./PhotoshopImportDialog";
 import { RefineEdgeDialog } from "./RefineEdgeDialog";
-import {
-  parsePsd,
-  getPsdCapabilityReport,
-} from "../core/interchange/psd/parser";
-import type {
-  PsdParsedDocument,
-  PsdCapabilityReport,
-} from "../core/interchange/psd/types";
 import { STANDARD_PROFILES } from "../core/color/icc";
 import type { GenerationCandidate } from "../ai/jobs/types";
 import { ScriptPanel } from "./ScriptPanel";
@@ -170,18 +172,21 @@ export function App({ editor }: { editor: EditorApplication }) {
       ? filterMaskTarget.filterMask?.kind
       : undefined;
   useEffect(() => {
+    if(editor.document!==dom||dom.getSnapshot().selectedId!==state.selectedId)return;
     setMoveTarget("layer");
+    if(editor.tools.hasCurrentWetGesture)return;
     editor.tools.configure({ paintTarget: "layer", penEditTarget: "layer" });
   }, [editor, dom, state.selectedId, selectedMaskKind, selectedFilterMaskKind]);
   useEffect(() => {
     if (editor.tools.drawingMaskContour || editor.tools.drawingPolygonLasso || editor.tools.drawingQuickSelection || editor.tools.crop.active)
       editor.tools.cancel();
   }, [editor, dom, state.revision]);
-  const toolSizes = useRef({ brush: 24, pencil: 1, eraser: 24 });
+  const toolSizes = useRef({ brush: 24, pencil: 1, eraser: 24, smudge:24, mixer:24 });
   const toolState = useSyncExternalStore(
     editor.tools.subscribe,
     editor.tools.getUiSnapshot,
   );
+  useEffect(()=>{if(toolState.error)setError(toolState.error);},[toolState.error]);
   const [customCursors, setCustomCursors] = useState(() => {
     try { return localStorage.getItem("luma.custom-cursors.v1") !== "false"; } catch { return true; }
   });
@@ -222,6 +227,12 @@ export function App({ editor }: { editor: EditorApplication }) {
   const panelLayout = usePanelLayout(setError);
   const [showPalette, setShowPalette] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showPressureCurve,setShowPressureCurve]=useState(false);
+  const [showBrushTip,setShowBrushTip]=useState(false);
+  const [showBrushTexture,setShowBrushTexture]=useState(false);
+  const texturePreview=useBrushTexturePreview(editor.brushTextureSource,toolState.settings.texture,editor.renderer.processor);
+  const [showBrushSymmetry,setShowBrushSymmetry]=useState(false);
+  const [showBrushPresets,setShowBrushPresets]=useState(false);
   const [shortcutPreferences, setShortcutPreferences] = useState<{
     bindings: ShortcutOverrides;
     error?: string;
@@ -235,6 +246,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showScripts, setShowScripts] = useState(false);
   const [showPlugins, setShowPlugins] = useState(false);
   const [showImageSizeDialog, setShowImageSizeDialog] = useState(false);
+  const [frequencySource,setFrequencySource]=useState<string|null>(null);
   const [showArtboardDialog, setShowArtboardDialog] = useState(false);
   const [showCropDialog, setShowCropDialog] = useState(false);
   const [selectionModification, setSelectionModification] = useState<SelectionModificationOptions['operation'] | null>(null);
@@ -254,12 +266,8 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showRefineEdgeDialog, setShowRefineEdgeDialog] = useState(false);
   const [svgFile,setSvgFile]=useState<File|null>(null);
   const [tiffFile,setTiffFile]=useState<File|null>(null);
-  const [psdPreflight, setPsdPreflight] = useState<{
-    fileName: string;
-    buffer: Uint8Array;
-    parsed: PsdParsedDocument;
-    report: PsdCapabilityReport;
-  } | null>(null);
+  const [photoshopFile,setPhotoshopFile]=useState<{file:File;id:number}|null>(null);
+  const photoshopRequest=useRef(0);
   const [generateDialogModality, setGenerateDialogModality] = useState<
     "text-to-image" | "cutout" | "texture" | "masked-edit"
   >("text-to-image");
@@ -323,6 +331,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         layerY: number;
         layerWidth: number;
         layerHeight: number;
+        layerContentBounds?: import('../core/drawing').Rect;
         layerFontSize?: number;
         layerText?: string;
         layerFontFamily?: string;
@@ -347,14 +356,16 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
   }, [dom.id, state.revision]);
   const activePreview = toolState.preview ?? preview;
+  const wetPreview=toolState.wetPreview?.isCurrent()?toolState.wetPreview:null;
   const viewDocument = useMemo(() => {
+    if(wetPreview)return wetPreview.document;
     if (!activePreview) return state.document;
     try {
       return execute(state.document, activePreview);
     } catch {
       return state.document;
     }
-  }, [state.document, activePreview]);
+  }, [state.document, activePreview,wetPreview]);
   const selected = findLayer(viewDocument, state.selectedId);
   const movingMask =
     tool === "move" && moveTarget === "mask" && !!selected?.mask;
@@ -389,9 +400,10 @@ export function App({ editor }: { editor: EditorApplication }) {
       (selected.kind !== "raster" && selected.kind !== "text")
     )
       return undefined;
+    const content = selected.kind === 'raster' && selected.erasures?.some(entry => entry.stroke.kind === 'wet' && entry.stroke.opacity > 0) ? localBounds(selected)! : { x: 0, y: 0, width: selected.width, height: selected.height };
     const corner = layerTransform(viewDocument, selected.id)!.point({
-      x: right ? selected.width : 0,
-      y: bottom ? selected.height : 0,
+      x: content.x + (right ? content.width : 0),
+      y: content.y + (bottom ? content.height : 0),
     });
     return {
       left: (corner.x - bounds.x) * zoom - 5,
@@ -414,13 +426,15 @@ export function App({ editor }: { editor: EditorApplication }) {
     editor.tools.cancel();
     setPreview(null);
     updateCursor(null);
-    if (tool === "pencil")
+    if(tool === "smudge" || tool === "mixer")toolSizes.current[tool]=editor.tools.getSnapshot().settings.size;
+    else if (tool === "pencil")
       toolSizes.current.pencil = editor.tools.getSnapshot().settings.size;
     else if (tool === "eraser")
       toolSizes.current.eraser = editor.tools.getSnapshot().settings.size;
     else if (["brush", "clone", "heal", "dodge", "burn"].includes(tool))
       toolSizes.current.brush = editor.tools.getSnapshot().settings.size;
-    if (next === "pencil")
+    if(next === "smudge" || next === "mixer")editor.tools.configure({size:toolSizes.current[next]});
+    else if (next === "pencil")
       editor.tools.configure({ size: toolSizes.current.pencil });
     else if (next === "eraser")
       editor.tools.configure({ size: toolSizes.current.eraser });
@@ -556,14 +570,17 @@ export function App({ editor }: { editor: EditorApplication }) {
     });
   }
   function addAdjustmentLayer(
-    kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" = "curves",
+    kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" | "red-eye" = "curves",
   ) {
     attempt(() => {
+      const pupilSelection = kind === "red-eye" ? dom.selection : null;
+      if (kind === "red-eye" && (!pupilSelection || !pupilSelection.toJSON().regions.length))
+        throw new Error("Select the red pupils first, then add a Red Eye adjustment.");
       const existingNames = new Set(
         allLayers(dom.toJSON().children).map((l) => l.name),
       );
       const prefix =
-        kind === "curves"
+        kind === "red-eye" ? "Red Eye" : kind === "curves"
           ? "Curves"
           : kind === "levels"
             ? "Levels"
@@ -584,7 +601,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       const layer = new AdjustmentLayer({
         name: `${prefix} ${index}`,
         adjustment:
-          kind === "curves"
+          kind === "red-eye" ? defaultRedEyeAdjustment() : kind === "curves"
             ? defaultCurvesAdjustment()
             : kind === "levels"
               ? defaultLevelsAdjustment()
@@ -618,6 +635,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         } else {
           dom.layers.add(layer);
         }
+        if (pupilSelection) layer.maskFromSelection(pupilSelection);
       });
       dom.selectedLayer = layer;
     });
@@ -679,6 +697,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: SHORTCUT_BINDINGS["hand"],
       run: () => chooseTool("hand"),
     },
+    ...(["smudge","mixer"] as const).map(key=>({id:key,label:key==="smudge"?"Smudge tool":"Mixer brush",keys:[],run:()=>chooseTool(key)})),
     ...TOOL_SHORTCUTS.map(([key, label, binding]) => ({
       id: key,
       label,
@@ -866,9 +885,11 @@ export function App({ editor }: { editor: EditorApplication }) {
         }),
       enabled: () => tool === "crop" || editor.tools.drawingPolygonLasso || (!!selected && !locked),
     },
-    ...(["curves", "levels", "tone", "hsl", "color-balance", "vibrance", "gradient-map", "white-balance", "lut"] as const).map((kind) => ({
+    {id:"frequency-separation",label:"Frequency separation…",keys:[],enabled:()=>!busy&&!locked&&selectedObject instanceof RasterLayer,
+      run:()=>{if(selectedObject instanceof RasterLayer){editor.tools.cancel();setFrequencySource(selectedObject.id);}}},
+    ...(["curves", "levels", "tone", "hsl", "color-balance", "vibrance", "gradient-map", "white-balance", "lut", "red-eye"] as const).map((kind) => ({
       id: `new-${kind}-adjustment`,
-      label: `New ${kind === "hsl" ? "HSL (Hue / Saturation / Lightness)" : kind === "color-balance" ? "Color Balance" : kind === "gradient-map" ? "Gradient Map" : kind === "white-balance" ? "White Balance" : kind === "lut" ? "Color Lookup (LUT)" : kind[0].toUpperCase() + kind.slice(1)} adjustment layer`,
+      label: `New ${kind === "hsl" ? "HSL (Hue / Saturation / Lightness)" : kind === "color-balance" ? "Color Balance" : kind === "gradient-map" ? "Gradient Map" : kind === "white-balance" ? "White Balance" : kind === "lut" ? "Color Lookup (LUT)" : kind === "red-eye" ? "Red Eye" : kind[0].toUpperCase() + kind.slice(1)} adjustment layer`,
       keys: [],
       run: () => addAdjustmentLayer(kind),
       enabled: () => !busy && !locked,
@@ -1090,6 +1111,11 @@ export function App({ editor }: { editor: EditorApplication }) {
       showRecovery ||
       showPalette ||
       showHelp ||
+      showPressureCurve ||
+      showBrushTip ||
+      showBrushTexture ||
+      showBrushSymmetry ||
+      showBrushPresets ||
       showScripts ||
       showPlugins ||
       showImageSizeDialog ||
@@ -1106,8 +1132,13 @@ export function App({ editor }: { editor: EditorApplication }) {
       showBatchDialog ||
       showColorDialog ||
       showRefineEdgeDialog ||
-      !!psdPreflight,
+      !!photoshopFile,
     onDismissModals: () => {
+      setShowPressureCurve(false);
+      setShowBrushTip(false);
+      setShowBrushTexture(false);
+      setShowBrushSymmetry(false);
+      setShowBrushPresets(false);
       subjectAbort.current?.abort();
       mattingAbort.current?.abort();
       setShowRecovery(false);
@@ -1127,7 +1158,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       setShowBatchDialog(false);
       setShowColorDialog(false);
       setShowRefineEdgeDialog(false);
-      setPsdPreflight(null);
+      setPhotoshopFile(null);
       setPreviewCandidate(null);
     },
     onSetSpacePan: setSpacePan,
@@ -1140,12 +1171,26 @@ export function App({ editor }: { editor: EditorApplication }) {
     },
   });
 
+  // Unrelated status renders must not invalidate stationary cursor geometry.
+  // Read current tool data at draw time, including preferences changed before
+  // React flushes; these dependencies invalidate real geometry/viewport edits.
+  const cursorAdapters = useMemo(() => ({
+    footprint(tool: Tool, tilt?: ReturnType<typeof pointerPenTilt>) {
+      return editor.tools.brushCursorAxes(tool, tilt, !!editor.tools.getSnapshot().settings.texture);
+    },
+    copies(tool: Tool, event: PointerEvent) {
+      if (!editor.tools.getSnapshot().settings.symmetry) return null;
+      return editor.tools.brushCursorCopies(tool, toCanvasPoint(event), event.pointerType === 'pen' ? pointerPenTilt(event) : undefined);
+    },
+  }), [editor, dom, state.document, state.selectedIds, toolState.settings, toolState.drawing, zoom, pan, viewportSize, panelLayout.widths.layers, panelLayout.widths.inspector, viewDocument.width, viewDocument.height]);
+
   const { rendering, renderBackend, paintedRegion } = useCanvasRenderer({
     editor,
     viewDocument,
-    assets,
+    assets:wetPreview?.assets??assets,
     renderRegion,
     zoom,
+    wetPreview,
     paintPreview: editor.tools.getSnapshot().paintPreview,
     previewGesture: preview && activePreview === preview ? gesture.current : null,
     gestureRef: gesture,
@@ -1300,6 +1345,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           layerY: selected.y,
           layerWidth: selected.width,
           layerHeight: selected.height,
+          layerContentBounds: selected.kind === 'raster' && selected.erasures?.some(entry => entry.stroke.kind === 'wet' && entry.stroke.opacity > 0) ? localBounds(selected) : undefined,
           layerFontSize:
             selected.kind === "text" ? selected.fontSize : undefined,
           layerText: selected.kind === "text" ? selected.text : undefined,
@@ -1350,7 +1396,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         .closest("[data-crop-handle]")
         ?.getAttribute("data-crop-handle") as CropHandle | undefined;
       attempt(() =>
-        editor.tools.begin(tool, point, modifiers(event), zoom, cropHandle),
+        editor.tools.begin(tool, point, modifiers(event,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness)), zoom, cropHandle),
       );
       return;
     }
@@ -1430,8 +1476,8 @@ export function App({ editor }: { editor: EditorApplication }) {
       attempt(() => {
         const samples = event.nativeEvent.getCoalescedEvents?.() ?? [];
         for (const sample of samples)
-          editor.tools.move(toCanvasPoint(sample), modifiers(sample));
-        editor.tools.move(point, modifiers(event));
+          editor.tools.move(toCanvasPoint(sample), modifiers(sample,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness)));
+        editor.tools.move(point, modifiers(event,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness)));
       });
       return;
     }
@@ -1602,7 +1648,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (editor.tools.getSnapshot().drawing) {
       // Capture the final endpoint even if pointerup arrives before the next
       // animation frame. Pointer moves have already accumulated all samples.
-      attempt(() => editor.tools.move(toCanvasPoint(event), modifiers(event)));
+      attempt(() => editor.tools.move(toCanvasPoint(event), modifiers(event,!!toolState.settings.pressureCurve,!!(toolState.settings.tip?.tiltAngle||toolState.settings.tip?.tiltRoundness))));
       void task(() => editor.tools.end());
       return;
     }
@@ -1669,41 +1715,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     void task(async()=>{await editor.importImage(file);notify('Image added');});
   };
 
-  const handlePsdFile = async (file: File) => {
-    try {
-      const buffer = new Uint8Array(await file.arrayBuffer());
-      const parsed = parsePsd(buffer);
-      const report = getPsdCapabilityReport(parsed);
-      setPsdPreflight({
-        fileName: file.name,
-        buffer,
-        parsed,
-        report,
-      });
-    } catch (err) {
-      notify(
-        `Failed to inspect PSD: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-  };
-
-  const handlePsdImportCommit = async (mode: "layered" | "flatten") => {
-    if (!psdPreflight) return;
-    await task(async () => {
-      try {
-        await editor.openPsd(psdPreflight.buffer, { mode });
-        notify(
-          `Imported PSD "${psdPreflight.fileName}" (${mode === "layered" ? "as layers" : "flattened"})`,
-        );
-      } catch (err) {
-        notify(
-          `Failed to import PSD: ${err instanceof Error ? err.message : String(err)}`,
-        );
-      } finally {
-        setPsdPreflight(null);
-      }
-    });
-  };
+  const handlePsdFile=(file:File)=>setPhotoshopFile({file,id:++photoshopRequest.current});
 
   const handleSelectSubject = async () => {
     await task(async () => {
@@ -2011,6 +2023,11 @@ export function App({ editor }: { editor: EditorApplication }) {
               </button>
             </div>
             <ToolOptions
+              onBrushPresets={()=>{editor.tools.cancel();setShowBrushPresets(true);}}
+              onBrushSymmetry={()=>{editor.tools.cancel();setShowBrushSymmetry(true);}}
+              onBrushTip={()=>{editor.tools.cancel();setShowBrushTip(true);}}
+              onBrushTexture={()=>{editor.tools.cancel();setShowBrushTexture(true);}}
+              onPressureCurve={()=>{editor.tools.cancel();setShowPressureCurve(true);}}
               tool={tool}
               moveTarget={movingMask ? "mask" : "layer"}
               hasMask={!!selected?.mask}
@@ -2274,7 +2291,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                     </div>
                   )}
               </div>
-              <CanvasCursor viewport={viewport} enabled={customCursors} tool={tool} spacePan={spacePan} size={tool==='quick-select'?toolState.settings.quickSize:toolState.settings.size} zoom={zoom} />
+              <CanvasCursor viewport={viewport} enabled={customCursors} copies={cursorAdapters.copies} texturePreview={texturePreview.url} footprint={cursorAdapters.footprint} tool={tool} spacePan={spacePan} size={tool==='quick-select'?toolState.settings.quickSize:toolState.settings.size} zoom={zoom} />
               {!dom.layers.length &&
                 !dom.guides.length &&
                 (tool === "move" || tool === "hand") && (
@@ -2471,6 +2488,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onClose={() => setShowCropDialog(false)}
           />
         )}
+        {frequencySource&&<FrequencySeparationDialog editor={editor} layerId={frequencySource} onClose={()=>setFrequencySource(null)} onBusyChange={setBusy} onCreated={()=>notify("Frequency layers created")}/>}
         {showImageSizeDialog && (
           <ArtboardDialog mode="image" currentWidth={dom.width} currentHeight={dom.height}
             onResize={(width, height) => { editor.tools.cancel(); dom.resizeImage(width, height); notify(`Resized image to ${width} × ${height} px`); }}
@@ -2500,6 +2518,11 @@ export function App({ editor }: { editor: EditorApplication }) {
             }}
           />
         )}
+        {showBrushPresets&&<BrushPresetsDialog library={editor.brushPresets} sourceOwner={editor.brushTextureSource} tool={tool as import('../brushes/presets').BrushTool} settings={toolState.settings} onClose={()=>setShowBrushPresets(false)} onApply={async(preset,signal)=>{await editor.applyBrushPreset(preset,{signal,selectTool:chooseTool});setShowBrushPresets(false);}}/>}
+        {showBrushSymmetry&&<BrushSymmetryDialog symmetry={toolState.settings.symmetry} width={dom.width} height={dom.height} onClose={()=>setShowBrushSymmetry(false)} onApply={symmetry=>{editor.tools.configure({symmetry});setShowBrushSymmetry(false);}}/>}
+        {showBrushTip&&<BrushTipDialog tip={toolState.settings.tip} pencil={tool==="pencil"} onClose={()=>setShowBrushTip(false)} onApply={tip=>{editor.tools.configure({tip});setShowBrushTip(false);}}/>}
+        {showBrushTexture&&<BrushTextureDialog editor={editor} onClose={()=>setShowBrushTexture(false)}/>}
+        {showPressureCurve&&<PressureCurveDialog curve={toolState.settings.pressureCurve} onClose={()=>setShowPressureCurve(false)} onApply={curve=>{editor.tools.configure({pressureCurve:curve});setShowPressureCurve(false);}}/>}
         {showHelp && (
           <ShortcutDialog
             shortcuts={shortcuts}
@@ -2580,16 +2603,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         )}
         {svgFile&&<SvgImportDialog file={svgFile} editor={editor} onClose={()=>setSvgFile(null)} onBusyChange={setBusy} onImported={()=>notify("SVG imported")}/>}
         {tiffFile&&<TiffImportDialog file={tiffFile} editor={editor} onClose={()=>setTiffFile(null)} onBusyChange={setBusy} onImported={()=>notify("TIFF page imported")}/>}
-        {psdPreflight && (
-          <PsdImportDialog
-            fileName={psdPreflight.fileName}
-            parsedPsd={psdPreflight.parsed}
-            report={psdPreflight.report}
-            onImportLayers={() => handlePsdImportCommit("layered")}
-            onImportFlattened={() => handlePsdImportCommit("flatten")}
-            onClose={() => setPsdPreflight(null)}
-          />
-        )}
+        {photoshopFile&&<PhotoshopImportDialog key={photoshopFile.id} file={photoshopFile.file} editor={editor} onClose={()=>setPhotoshopFile(null)} onBusyChange={setBusy} onImported={()=>notify("Photoshop file imported")}/>}
         {showPreflight&&<PreflightDialog editor={editor} onClose={()=>setShowPreflight(false)}/>}
         {showRefineEdgeDialog && (
           <RefineEdgeDialog
@@ -2619,6 +2633,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onChooseTool={chooseTool}
             onAddLayer={addLayer}
             onAddAdjustmentLayer={addAdjustmentLayer}
+            onFrequencySeparation={selectedObject instanceof RasterLayer ? () => setFrequencySource(selectedObject.id) : undefined}
             onSelectSubject={handleSelectSubject}
             onRemoveBackground={handleRemoveBackground}
             onRefineEdge={() => setShowRefineEdgeDialog(true)}

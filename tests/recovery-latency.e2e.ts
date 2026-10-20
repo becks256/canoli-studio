@@ -33,7 +33,7 @@ for(const points of [1000,4000]) test(`recovery save with ${64*points} retained 
   const nativeBytes=new TextEncoder().encode(JSON.stringify({id:entry.id,document:entry.document,savedAt:entry.savedAt,assetKeys:entry.assetKeys}));
   const nativeChecksum=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',nativeBytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
   return {saveMs,input,checksumMatchesNative:entry.checksum===nativeChecksum,longTasks:state.entries.filter((entry:{start:number;duration:number})=>entry.start+entry.duration>start && entry.start<end),revisionUnchanged:e.document.getSnapshot().revision===revision,
-   points:layer.kind==='paint'?layer.strokes.reduce((sum,stroke)=>sum+(stroke.kind==='fill'?0:stroke.points.length),0):0};
+   points:layer.kind==='paint'?layer.strokes.reduce((sum,stroke)=>sum+((stroke.kind==='fill' || stroke.kind === 'wet')?0:stroke.points.length),0):0};
  });
  expect(result.checksumMatchesNative).toBe(true);expect(result.points).toBe(64*points);expect(result.revisionUnchanged).toBe(true);expect(result.input.selected).toBe(true);
  console.log('recovery-latency',JSON.stringify(result));

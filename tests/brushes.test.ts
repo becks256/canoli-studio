@@ -279,3 +279,27 @@ it("keeps full brush bounds when pressure controls opacity but not size", () => 
   expect(bounds.x + bounds.width).toBeGreaterThanOrEqual(150);
   expect(bounds.y + bounds.height).toBeGreaterThanOrEqual(150);
 });
+
+it('validates pressure settings before cancelling a live gesture and captures finite low samples',async()=>{
+ const {PressureCurve}=await import('../src/dom'),editor=new EditorApplication();
+ try{
+  const controller=editor.tools;controller.configure({pressureCurve:PressureCurve.linear().toJSON(),smoothing:0});const before=editor.document.toJSON();
+  controller.begin('brush',{x:20,y:20},{alt:false,shift:false,pressure:0},1);controller.move({x:30,y:20},{alt:false,shift:false,pressure:.02});expect(controller.getSnapshot().drawing).toBe(true);
+  expect(()=>controller.configure({pressureCurve:{points:[]}})).toThrow();expect(controller.getSnapshot().drawing).toBe(true);
+  controller.configure({pressureCurve:PressureCurve.firm().toJSON()});expect(controller.getSnapshot().drawing).toBe(false);expect(controller.getSnapshot().paintPreview).toBeNull();expect(editor.document.toJSON()).toEqual(before);
+  controller.configure({pressureCurve:PressureCurve.linear().toJSON()});controller.begin('brush',{x:20,y:20},{alt:false,shift:false,pressure:0},1);controller.move({x:30,y:20},{alt:false,shift:false,pressure:.02});await controller.end();
+  const layer=editor.document.toJSON().children[0];if(layer.kind!=='paint')throw new Error('Missing pressure paint');const stroke=layer.strokes[0];if((stroke.kind==='fill' || stroke.kind === 'wet'))throw new Error('Missing brush');expect(stroke.points.map(point=>point.pressure)).toEqual([0,.02]);
+ }finally{editor.dispose();}
+});
+
+it('validates a preset before cancelling gestures, then changes future settings without target/history/source edits',async()=>{
+ const {BrushPreset}=await import('../src/brushes/presets'),editor=new EditorApplication();
+ try{
+  const tools=editor.tools;tools.configure({paintTarget:'layer',color:'#123456'});const before=editor.document.toJSON();
+  tools.begin('brush',{x:20,y:20},{alt:false,shift:false,pressure:1},1);
+  const preset=BrushPreset.capture('Fine','pencil',{...tools.getSnapshot().settings,size:2,pressureSize:false});
+  expect(()=>tools.applyBrushPreset({toJSON:()=>({...preset.toJSON(),settings:{...preset.settings,size:NaN}})} as typeof preset)).toThrow();expect(tools.getSnapshot().drawing).toBe(true);
+  expect(tools.applyBrushPreset(preset)).toBe('pencil');expect(tools.getSnapshot().drawing).toBe(false);expect(tools.getSnapshot().settings.size).toBe(2);expect(tools.getSnapshot().settings.color).toBe('#123456');expect(editor.document.toJSON()).toEqual(before);
+  tools.configure({paintTarget:'filter-mask-reveal'});tools.applyBrushPreset(preset);expect(tools.getSnapshot().settings.paintTarget).toBe('filter-mask-reveal');expect(editor.document.toJSON()).toEqual(before);expect(editor.assetStore.values()).toHaveLength(0);
+ }finally{editor.dispose();}
+});

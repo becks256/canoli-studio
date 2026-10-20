@@ -5,6 +5,8 @@ export interface PanelWidths {
 export const PANEL_LAYOUT_KEY = "luma.panel-widths.v1";
 export const PANEL_MIN = { layers: 190, inspector: 230 };
 export const PANEL_MAX = 480;
+// Two-column tool rail, two resize handles, and the minimum canvas column.
+export const PANEL_RESERVED_WIDTH = 88 + 12 + 200;
 export function defaultPanelWidths(viewport: number): PanelWidths {
   return viewport <= 1100
     ? { layers: 190, inspector: 230 }
@@ -26,7 +28,7 @@ export function fitPanelWidths(
   const excess =
     widths.layers +
     widths.inspector -
-    (Math.max(760, viewport) - 54 - 12 - 200);
+    (Math.max(760, viewport) - PANEL_RESERVED_WIDTH);
   if (excess > 0) {
     const available =
       widths.layers + widths.inspector - PANEL_MIN.layers - PANEL_MIN.inspector;

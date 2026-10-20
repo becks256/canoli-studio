@@ -1,8 +1,120 @@
 # Scripting API
 
+## Shared frequency radius and native preview (schema 37)
+
+`new LayerGroup({frequencyRadius?:number|null, ...options})` and writable `group.frequencyRadius` provide one radius for every descendant FrequencyBandFilter in that document plane. Values are finite 0–4096/3 original-master pixels. Omission/null means inherit the nearest enclosing group; if none exists, each filter uses its own serialized sigma. Nested explicit group values override outer values. Entering a component master starts a separate scope. The current frequency factory creates one controlling Frequencies group, so low, high and precision planes stay consistent when the radius changes. Valid legacy schema-36 groups have no controller and keep their independent settings.
+
+Read-only `layer.frequencyGroup:LayerGroup|null` returns the nearest controlling group for an attached layer, including a group itself; removed/detached/uncontrolled layers return null. The getter locates a controller in the same document, never inside an unrelated component source. Assign the controller's radius through its OO setter for one shared layer.update command, validation, preview and undo. The protected correction child stays locked and its serialized filter fallback/strokes remain unchanged; parent parameter changes affect its derived rendering just as parent transforms do. The controller's own/ancestor locks apply. Raw smartFilters snapshots retain per-filter fallback sigma; those values apply when no group controls them. Use the group property to change an active shared radius.
+
+<!-- example: frequency-shared-radius -->
+```js
+const selected = document.selectedLayer;
+const controller = selected && selected.frequencyGroup;
+if (!controller) throw new Error("Select a band or retouch layer inside a frequency group.");
+controller.frequencyRadius = 6;
+print("Shared native radius", controller.frequencyRadius);
+```
+
+Conversion, rasterization, isolated Photoshop planes and cross-document copies capture the effective inherited radius when crossing a document/component boundary, preserving the rendered setting. Whole groups retain their editable controller. Schema 37 rejects old labels for this field, including embedded masters; project 3/workspace 2 and original assets retain their formats/bytes. Unknown/invalid values and group-only fields on other layer kinds reject atomically through existing commands. A null value also belongs to schema 37.
+
+Trusted application preview uses `await editor.prepareFrequencySeparation(layerId,{signal?}?)`. It captures the full neutral native source once in a private asset store and returns a prepared object with readonly `bounds:{x,y,width,height}` in original-image coordinates, including expanded wet ink. It publishes no document/history/output assets until commit:
+
+- `await prepared.preview({sigma,center?:{x,y}},{signal?}?)` returns an owned frame with `original`, `low`, `high` canvases, `region` and idempotent `dispose()`. The native sample is at most 256×192 pixels, with a real full-resolution Gaussian halo; originals are not downsampled. Center defaults to the captured source center and clamps to its bounds. Finite centers are required. Color/detail panes retain original sample alpha; masks, ordinary post-placement erasures and layer tone/styles remain on final artwork, rather than being baked into these neutral bands.
+- `await prepared.commit({sigma?,name?},{signal?}?)` uses the same full native capture to create the regular editable workflow in one host undo. It is a once-only operation after success. Failed preflight on an otherwise current source can retry with other settings, using a fresh private model. No failed attempt consumes the retained base snapshot or publishes output assets.
+- `prepared.dispose()` aborts future use and releases private image ownership. Previously returned preview frames remain independently owned until disposed. Dispose on close/cancel and after commit. Source/document/selection/revision/bitmap/blob/native-dimension changes reject before publication; closing a session invalidates its preparation. No duplicate in-flight commit or preview after commit/disposal is accepted.
+
+The dialog uses two native panes, original comparison, pointer/keyboard panning and a single preview queue that drops obsolete requests. Sliders remain editable while a worker finishes; only the latest complete frame is displayed. Create waits for the chosen preview, and cancel/Escape leaves the document untouched. Capture/commit status and errors are real asynchronous state. Preview halos retain the existing 4 MP/8192-edge working budget; an expensive radius can reject without imposing an image-resolution limit. These trusted canvas APIs are not isolated script/plugin bindings or REST render services; existing prepared-data scripting remains available.
+
+The shared group radius can be recorded/replayed as an ordinary `layer.update` recipe step against existing frequency contents. This does not make the asynchronous native capture operation a new recipe action. Workspace contents links and original source assets retain their existing ownership and explicit Apply to source boundary.
+
+## Frequency separation and native composition (schema 36)
+
+`document.createFrequencySeparation(source: RasterLayer, snapshot: RasterLayer, options?: {sigma?: number, name?: string}): LayerGroup` assembles an editable workflow from **prepared native pixels**. Both layers must be distinct, attached to this document, and have unlocked ancestry. The snapshot must have positive integer dimensions, normal blending, full opacity/fill, no effects, erasures, enabled styles or mask. Its `transform` maps native snapshot pixels into the original raster's local coordinates, including any offset for expanded wet ink. It is not automatically resized to the source's displayed dimensions. The factory validates structure; callers remain responsible for supplying an authentic neutral source capture.
+
+Options default to `{sigma:4, name:"Frequency separation"}`. Sigma is finite 0–4096/3 original-image pixels; name contains 1–240 characters. Unknown fields, null values, invalid snapshots, foreign layers and locked ancestry throw before mutation. The operation runs one synchronous transaction: preserve the original raster's ID/assets, hide it, consume the temporary snapshot, and insert a group carrying the source's transform, opacity/fill, blending, mask, styles and metadata. The source remains available for comparison and recovery. The current factory adds a schema 37 shared-radius controller to the native band group and selects the outer group. The trusted browser command selects its nested **Frequency layers — edit contents** instance instead, for direct access to Edit contents.
+
+The nested native composition contains **Low frequency — color and tone**, **High frequency — detail**, and a locked **Precision correction — keep above bands** layer. Each band contains a captured-source smart instance and a separate empty PaintLayer for retouching. Low uses normal blending; high uses `linear-light`; correction uses `linear-burn`. Captured source alpha is retained as an editable bitmap group mask. Original ordinary erasures remain ordered in a separate coverage mask after placement/tone. When active wet replacements exist, the neutral native capture includes their entire ordered sequence and expanded bounds. Edit the retouch layers through existing Edit contents, then Apply to source. Source assets remain unchanged.
+
+New immutable smart-filter constructors share generated IDs and `enabled:true` defaults. Constructors accept only their listed options; null and unknown fields reject. Each supports `id?:string` and `enabled?:boolean`:
+
+| Constructor | Other options and semantics |
+| --- | --- |
+| `new FrequencyBandFilter(options?)` | `band:"low"\|"high"\|"correction"` (default `"high"`), `sigma:4`, finite 0–4096/3 master pixels. Produces an opaque RGB8 plane using finite 3-sigma, premultiplied encoded-RGB Gaussian sampling. |
+| `new NativeCompositionFilter(options?)` | No numeric options. Composes the native master's RGBA image before instance resampling, with the native image-frame edge boundary. |
+| `new DocumentToneFilter(options?)` | `exposure:0` (−3–3), `contrast:0` and `saturation:0` (−100–100). Executes after instance placement in document pixels, before the ordinary layer mask. Uses the existing tone rule. |
+
+DocumentToneFilter entries must follow every native-phase entry, including disabled entries; invalid ordering rejects the full filter command. Existing per-instance filter masks still apply: native filters mix before placement, document-tone filters mix with projected native mask coverage after placement. Feathering remains in the native mask plane; density/inversion remain separate settings. NativeCompositionFilter fixes native sampling/edge behavior and has no independently tunable pixel effect.
+
+For channel bytes O (original) and L (rounded low), detail H is `round(127.5+(O-L)/2)`. Linear Light computes `clamp(L+2*H-255,0,255)`. Its unavoidable RGB8 rounding bit is removed by correction C: 254 when O<255 and O−L is even, otherwise 255. Linear Burn computes `max(0,B+C-255)`, yielding O exactly on the native grid. This is encoded RGB processing, not scene-linear or HDR frequency separation. Preserve the correction layer above both bands and keep their radii consistent when editing the initial decomposition. General blend modes use the same source-over alpha/opacity behavior as the other blend modes.
+
+`new LayerMask({rasterErasures:{width,height,operations}, ...settings})` represents ordinary raster eraser/clear coverage without baking it into source RGB. Width/height are finite positive original local dimensions. Each ordered operation is `{width,height,stroke:EraserStroke|PaintFill}` with positive dimensions captured when authored; a PaintFill must have `erase:true`. Wet paint and non-clear fills reject. At most 2048 operations are accepted, using the existing stroke validation/budgets. Geometry starts with opaque coverage and replays operations in their captured coordinate planes. Choose exactly one geometry source; fillRule is invalid. Common mask defaults remain enabled=true, inverted=false, density=1, feather=0, x=y=0, linked=true, identity basis, no refinement strokes. `mask.rasterErasures` returns an independent source value or null; `mask.with(...)` retains it unless replacing geometry. Original texture references in erasures participate in ordinary asset validation/persistence.
+
+The trusted application method is `await editor.separateFrequencies(layerId, options?, {signal?:AbortSignal}?)`. It privately captures full native source pixels, assembles bands, probes rendering, then commits once. Abort, source-asset replacement, session/document/revision/selection changes, locks or rendering errors reject without publishing prepared layers/assets. Native tile/halo budgets may reject an expensive radius with a useful message; there is no image-resolution/file-size cutoff or viewport downsampling of originals. This application method is not exposed inside isolated scripts or as a headless REST rendering endpoint.
+
+The following isolated recipe uses existing asset inspection and smart-object rasterization services to prepare a selected raster. Those asynchronous calls must run outside a synchronous transaction; the whole successful script still commits one host undo entry. Existing five-second/host-repair execution limits apply, so use the browser command for large captures.
+
+<!-- example: frequency-separation -->
+```js
+const source = document.selectedLayer;
+if (!(source instanceof RasterLayer)) throw new Error("Select a raster image first.");
+const native = await host.assets.get(source.assetId);
+const working = source.duplicate();
+const capture = document.layers.add(new LayerGroup({name:"Native capture"}));
+working.moveTo(capture);
+working.transform = new AffineTransform();
+working.width = native.width;
+working.height = native.height;
+working.opacity = 1;
+working.fillOpacity = 1;
+working.blendMode = "normal";
+working.visible = true;
+working.mask = null;
+working.styles = new LayerStyle();
+working.resetAdjustments();
+const erasures = source.toJSON().erasures || [];
+if (!erasures.some(entry => entry.stroke.kind === "wet" && entry.stroke.opacity > 0)) {
+  working.update({erasures:[]});
+}
+const temporary = document.createSmartObject([capture]);
+const componentId = temporary.componentId;
+const snapshot = await temporary.rasterize();
+document.removeComponent(componentId);
+snapshot.transform = AffineTransform.scale(source.width/native.width, source.height/native.height)
+  .multiply(snapshot.transform);
+const result = document.createFrequencySeparation(source, snapshot, {sigma:2});
+print("Frequency layers ready: " + result.name);
+```
+
+## RedEyeAdjustment (schema 35)
+
+`new RedEyeAdjustment({threshold?: number, strength?: number} = {})` creates an immutable value with read-only `threshold` and `strength` getters and a detached `toJSON()`. Defaults are 32 encoded RGB8 levels and 100 percent. Threshold accepts finite 0–255; strength accepts finite 0–100, including fractions. Missing/undefined fields use defaults; null, unknown fields, nonfinite or out-of-range values reject. The DTO is `{kind:"red-eye", threshold, strength}` with both numeric fields required. `new AdjustmentLayer({adjustment: new RedEyeAdjustment(...)})` accepts the constructor value. `layer.setRedEye(value)` requires a `RedEyeAdjustment`, replaces the adjustment through one validated command, and obeys attached layer/ancestor locks. `.adjustment` still returns/accepts detached DTOs.
+
+This is manual red-dominance correction, not automatic eye detection. Isolate pupils with `layer.maskFromSelection(selection)` after attaching the layer, so transformed parents are handled correctly. The UI's New Red Eye adjustment requires an active selection and captures its mask in the creation transaction. Script/REST authors may create an unmasked adjustment deliberately; it can affect any red-dominant area. Existing mask controls, opacity, blending and stack order remain editable. Reset restores threshold 32 and strength 100 without replacing the mask.
+
+For straight encoded RGB8, let `d = R - max(G,B)`. If alpha is nonzero, `d > 0` and `d >= threshold`, replace red with `round(R + ((G+B)/2 - R) * strength/100)`. Other channels and alpha are unchanged; zero strength is identity. Integer channel differences make fractional thresholds equivalent to rounding the threshold upward. No linear-light, calibrated portrait quality or semantic eye-detection claim is made. The worker uses actual WASM in bounded tiles; the supported GPU viewport uses WGSL. Native exports use the reference compositor; SVG/Photoshop adjustment prefixes may bake with the existing warnings. Original assets are retained unchanged. Schema 35 records reject under older labels, including embedded masters; valid older roots still migrate. Project/workspace remain v3/v2. No new host/network service, permission or REST/browser synchronization is added.
+
+This runnable synthetic study demonstrates the constructor and selection workflow without requiring a portrait:
+
+<!-- example: red-eye-correction -->
+```js
+document.resize(96, 48);
+const study = document.layers.add(new PaintLayer({name: "Synthetic red-eye study"}));
+study.strokes.add(new PaintFill({bounds: {x:0,y:0,width:96,height:48}, color:"#d8b098"}));
+const left = new MarqueeSelection({shape:"ellipse",x:14,y:10,width:16,height:16});
+const right = new MarqueeSelection({shape:"ellipse",x:62,y:10,width:16,height:16});
+const pupils = left.combine(right);
+study.strokes.add(new PaintFill({bounds:{x:0,y:0,width:96,height:48},color:"#f01828",clip:pupils}));
+const correction = document.layers.add(new AdjustmentLayer({
+  name: "Pupil correction", adjustment: new RedEyeAdjustment({threshold:32,strength:100})
+}));
+correction.maskFromSelection(pupils);
+document.selectedLayer = correction;
+print("Red-eye study ready; threshold " + correction.adjustment.threshold);
+```
+
 Canoli Studio scripts use JavaScript and an object-oriented document model to control the open composition. This guide describes the current implementation in [src/dom/index.ts](../src/dom/index.ts) and [src/scripting](../src/scripting). It is a prototype API; Photoshop scripting compatibility and a published, stable SDK are not implemented.
 
-The current document schema is **27**. Earlier schema numbers in adjustment-family sections identify the version that introduced those records; current constructors and restoration upgrade valid older documents to schema 27. Portable project container v3 and workspace v2 are separate versions.
+The current document schema is **37**. Earlier schema numbers in adjustment-family sections identify the version that introduced those records; current constructors and restoration upgrade valid older documents to schema 37. Portable project container v3 and workspace v2 are separate versions.
 
 For reusable installable commands, see [Plugins and extensions](PLUGINS.md). Plugin commands receive these same bindings and obey the same runtime limits, with additional host-enforced document permissions.
 
@@ -27,8 +139,13 @@ The **Developer docs** link in the tool rail and Scripts panel opens this guide 
 - [ToneAdjustment](#toneadjustment)
 - [AdjustmentCollection](#adjustmentcollection)
 - [PaintLayer and strokes](#paintlayer-and-strokes)
+- [Prepared wet paint](#prepared-wet-paint-schema-33)
+- [Image-backed brush textures](#image-backed-brush-textures-schema-32)
 - [VectorLayer and paths](#vectorlayer-and-paths)
 - [TextLayer](#textlayer)
+- [Shared radius and native preview](#shared-frequency-radius-and-native-preview-schema-37)
+- [Frequency separation](#frequency-separation-and-native-composition-schema-36)
+- [Red-eye correction](#redeyeadjustment-schema-35)
 - [AdjustmentLayer](#adjustmentlayer)
 - [LayerStyle, BlendIf, and MarqueeSelection](#layerstyle-blendif-and-marqueeselection)
 - [Transactions, history and ownership](#transactions-history-and-ownership)
@@ -78,25 +195,31 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `document`                                                   | A snapshot-backed `Document` representing the active composition at the start of the run. It is the editor document model, not the HTML document.            |
 | `Document`                                                   | Constructor for a separate in-memory document. Creating one does not open or replace the active composition.                                                 |
 | `SmartObjectLayer`                                           | Constructor for a placed instance of an embedded shared master.                                                                                              |
-| `GaussianBlurFilter`, `UnsharpMaskFilter`, `SmartToneFilter` | Immutable filter values for per-instance smart-filter stacks.                                                                                                |
+| `GaussianBlurFilter`, `UnsharpMaskFilter`, `SmartToneFilter`, `FrequencyBandFilter`, `NativeCompositionFilter`, `DocumentToneFilter` | Immutable filter values for per-instance smart-filter stacks.                                                                                                |
 | `RasterLayer`                                                | Constructor for an image layer referring to an existing asset.                                                                                               |
 | `LayerGroup`                                                 | Constructor for an ordered group of layers.                                                                                                                  |
-| `PaintLayer`                                                 | Constructor for a paint layer containing brush, pencil, clone, or fill strokes.                                                                              |
+| `PaintLayer`                                                 | Constructor for ordered brush/pencil/clone/fill strokes and prepared wet replacements.                                                                              |
 | `VectorLayer`                                                | Constructor for a vector layer containing Bézier vector paths.                                                                                               |
 | `VectorPath`                                                 | Constructor for editable vector paths with anchors, control handles, fill, and stroke.                                                                       |
 | `TextLayer`                                                  | Constructor for text layers with font, size, color, alignment, and line height.                                                                              |
 | `AdjustmentLayer`                                            | Constructor for non-destructive adjustment layers modifying preceding backdrop pixels; see AdjustmentLayer for current families.                                 |
+| `RedEyeAdjustment` | Immutable threshold/strength correction value; isolate pupils with an editable mask. See [Red-eye correction](#redeyeadjustment-schema-35). |
 | `PatchAdjustment`                                            | Immutable corrected-RGB asset descriptor for an alpha-preserving patch adjustment.                                                                           |
 | `TonalStroke`                                                | Constructor capturing a brush/pencil path and dodge/burn settings for a tonal adjustment layer.                                                              |
+| `BrushSymmetry` | Immutable mirror/radial or explicit affine stroke copies; original ink remains implicit. |
+| `BrushTexture` | Immutable reference to an existing image asset used as brush coverage; see image-backed brush textures below. |
+| `BrushTip` | Immutable authored tip angle/roundness and optional spherical pen-tilt response. |
+| `PressureCurve` | Immutable normalized brush pressure response with editable knots and Linear/Soft/Firm presets. |
 | `BrushStroke`                                                | Constructor for soft brush strokes with color, size, hardness, opacity, and pressure points.                                                                 |
 | `EraserStroke`                                               | Constructor for eraser strokes using destination-out compositing to erase paint content.                                                                     |
 | `PencilStroke`                                               | Constructor for hard, precise pencil marks.                                                                                                                  |
 | `CloneStroke`                                                | Constructor for clone brush strokes referencing sampled image tiles.                                                                                         |
+| `WetPaintStroke` | Prepared native color/alpha replacement; pixels are authoritative, with brush metadata retained. |
 | `PaintFill`                                                  | Constructor for solid color canvas fills.                                                                                                                    |
 | `AffineTransform`                                            | Immutable affine matrix constructor and composition helpers for transformed selections.                                                                      |
 | `AlphaChannel` | Constructor for a saved independent selection channel. |
 | `MarqueeSelection`                                           | Constructor for geometric or pixel-coverage selections.                                                                                                        |
-| `LayerMask`                                                  | Constructor for an immutable selection or Bézier layer mask.                                                                                                 |
+| `LayerMask`                                                  | Constructor for immutable selection, vector, paint, bitmap or raster-erasure coverage with ordered operations.                                                                                                 |
 | `LayerMetadata`                                              | Constructor for user-authored layer descriptions, attribution and keywords.                                                                                  |
 | `LayerStyle`                                                 | Style object managing Blend If, color overlays, and drop shadows.                                                                                            |
 | `BlendIf`                                                    | Constructor for luminance/channel tonal blend ranges.                                                                                                        |
@@ -129,6 +252,7 @@ There is no fixed megapixel cap. All current documents use sRGB. Browser decodin
 | `id`                             | Read-only string            | Stable document identifier.                                                                                                                                              |
 | `name`                           | Read/write string           | Rename through the shared command/history system.                                                                                                                        |
 | `width`, `height`                | Read/write numbers          | Canvas dimensions in pixels. Setting either dimension resizes the canvas through the shared command/history system.                                                      |
+| `createFrequencySeparation(source, snapshot, options?)` | `LayerGroup` | Assemble prepared native frequency bands in one transaction; preserve hidden original. See [schema-36 contract](#frequency-separation-and-native-composition-schema-36). |
 | `crop({ x, y, width, height })`  | `void`                      | Rebase the canvas to a rectangle, preserving off-canvas artwork and original assets. One undoable command. See Canvas cropping below.                                    |
 | `resizeImage(width, height)` | `void` | Scales canvas and artwork together; positive safe-integer dimensions. See Resize the image and artwork below. |
 | `resize(width, height)`          | `void`                      | Resizes canvas dimensions atomically as one undoable command. Validates positive safe integers.                                                                          |
@@ -153,7 +277,7 @@ To inspect metadata as text, use `JSON.stringify(document.toJSON())`. Editing th
 Signatures:
 
 - `new RasterLayer({ assetId, width, height, ...options })`
-- `new LayerGroup(options = {})`
+- `new LayerGroup({frequencyRadius?: number | null, ...options} = {})`
 
 Shared constructor options and writable properties:
 
@@ -186,6 +310,7 @@ Shared read-only properties and methods:
 | `kind`                         | `"raster"`, `"paint"`, `"vector"` or `"group"` | Node type; `instanceof RasterLayer` / `LayerGroup` also works.                                                                                                                                                                                |
 | `document`                     | `Document` or `null`                           | Owning document, including through a parent group. Ownership is retained after removal.                                                                                                                                                       |
 | `isAttached`                   | boolean                                        | Whether the owning document currently contains this node.                                                                                                                                                                                     |
+| `frequencyGroup` | `LayerGroup \| null` (read-only) | Nearest shared frequency-radius controller in this document plane; null when detached or uncontrolled. |
 | `update(patch)`                | `undefined`                                    | Apply the supplied writable properties together; omitted properties retain their values. Raster width/height are also accepted. Unknown properties are rejected.                                                                              |
 | `duplicate()`                  | New layer/group of the same kind               | Insert immediately above the source in the same parent. New IDs for copied nodes/effects/strokes/paths; shared source assets; root copy offset +24/+24 and name suffixed `" copy"`. Requires attachment.                                      |
 | `remove()`                     | `undefined`                                    | Remove the node and, for a group, its subtree. Requires attachment.                                                                                                                                                                           |
@@ -196,6 +321,8 @@ Shared read-only properties and methods:
 | `toJSON()`                     | `LayerData` object                             | Deep metadata copy. A group includes its subtree; a raster includes effects and its asset reference.                                                                                                                                          |
 
 `moveTo` defaults to preserving local coordinates; opt into `preservePosition` when reparenting between offset groups. `moveBefore(target)` and `moveAfter(target)` place below/above a sibling target, adopting its parent and preserving document position. Targets must belong to the same document. Layer-row dragging uses these placement methods. Groups cannot contain themselves or an ancestor. The API has no public `parent` property or multi-selection yet; traverse collections when you need ancestry.
+
+`LayerGroup.frequencyRadius: number | null` is writable through ordinary shared commands. Null inherits; a finite value from 0 through 4096/3 controls descendant frequency filters. See [shared radius](#shared-frequency-radius-and-native-preview-schema-37) for locks, scope, legacy behavior and native capture.
 
 ## LayerCollection
 
@@ -258,7 +385,7 @@ Access strokes via `paintLayer.strokes` (`StrokeCollection`):
 | `length`      | Read-only number           | Number of paint operations.                                            |
 | `at(index)`   | `PaintOperation` or `null` | Zero-based access.                                                     |
 | `get(id)`     | `PaintOperation` or `null` | Find stroke by ID.                                                     |
-| `add(stroke)` | The stroke instance        | Append a `BrushStroke`, `PencilStroke`, `CloneStroke`, or `PaintFill`. |
+| `add(stroke)` | The stroke instance        | Append a `BrushStroke`, `PencilStroke`, `EraserStroke`, `CloneStroke`, `WetPaintStroke`, or `PaintFill`. |
 | `remove(id)`  | `void`                     | Remove a stroke by ID.                                                 |
 | Iteration     | Strokes in paint order     | `for…of` and spread are supported.                                     |
 
@@ -651,9 +778,9 @@ Adjustment layers modify the preceding backdrop layers non-destructively in enco
 | Option       | Type             | Default                                      | Validation                                       |
 | ------------ | ---------------- | -------------------------------------------- | ------------------------------------------------ |
 | `name`       | string           | `"Adjustment"`                               | Nonempty, at most 240 characters.                |
-| `adjustment` | `AdjustmentData` | Default curves (`[{x:0,y:0},{x:255,y:255}]`) | Valid adjustment DTO from the families below. |
+| `adjustment` | `AdjustmentData` or `PatchAdjustment` or `RedEyeAdjustment` | Default curves (`[{x:0,y:0},{x:255,y:255}]`) | Valid adjustment DTO or one of these constructor values. |
 
-Current adjustment kinds are `"curves"`, `"levels"`, `"tone"`, `"hsl"`, `"color-balance"`, `"vibrance"`, `"gradient-map"`, `"white-balance"`, `"lut"`, `"tonal"` and `"patch"`. The family sections specify their DTOs. Gradient maps use the same `adjustment` getter/setter; there is no `setGradientMap()` convenience method.
+Current adjustment kinds are `"curves"`, `"levels"`, `"tone"`, `"hsl"`, `"color-balance"`, `"vibrance"`, `"gradient-map"`, `"white-balance"`, `"lut"`, `"tonal"`, `"patch"` and `"red-eye"`. The family sections specify their DTOs. Gradient maps use the same `adjustment` getter/setter; there is no `setGradientMap()` convenience method.
 
 Members:
 
@@ -664,6 +791,7 @@ Members:
 | `setCurves()`    | method                           | Set monotone cubic spline control points for RGB master or per-channel (`red`, `green`, `blue`). Spline uses Fritsch-Carlson interpolation; X values must strictly increase in `[0, 255]`.                     |
 | `setLevels()`    | method                           | Set input black/white, midtone gamma, and output black/white for RGB master or per-channel (`red`, `green`, `blue`). Requires finite input black in [0,254], input white in [1,255] with `inputWhite > inputBlack`, gamma in [0.05,10], and output endpoints in [0,255] (reversed output is allowed). |
 | `setTone()`      | method                           | Set exposure (`[-3, 3]`), contrast (`[-100, 100]`), and saturation (`[-100, 100]`).                                                                                                                            |
+| `setRedEye(value)` | method | Require an immutable `RedEyeAdjustment` and replace the effect through one normal command. Invalid values or locked ancestry reject without edits. See [Red-eye correction](#redeyeadjustment-schema-35). |
 | `setLut(source, options?)` | method | Parse Cube text and replace the effect. Options: amount 0–100 (default 100), interpolation tetrahedral (default) or trilinear. See [Color Lookup](#color-lookup-lut-adjustment-layers) for formats, domains, errors and limits. |
 
 Example:
@@ -1160,7 +1288,7 @@ This section is for trusted application code and development-console inspection,
 | `editor.exportPng(control?)` | `Promise<Blob>`; PNG convenience method with the same optional execution controls. |
 
 
-`ExportOptions.format` accepts `"png" | "jpeg" | "webp" | "svg" | "psd" | "tiff"`. Other options are `quality?: number` (JPEG default 0.92, WebP default 0.9), `backgroundColor?: string` (JPEG, default white), `psdMode?: "layers" | "flatten"` (default layers) and `tiffVariant?: "auto" | "classic" | "big"` (default auto). Results contain `blob`, `mimeType`, `extension` and `report`; review the report's preserved/degraded features and warnings before delivery.
+`ExportOptions.format` accepts `"png" | "jpeg" | "webp" | "svg" | "psd" | "psb" | "tiff" | "pdf"`. Other options are `quality?: number` (JPEG default 0.92, WebP default 0.9), `backgroundColor?: string` (JPEG, default white), `psdMode?: "layers" | "flatten"` (PSD/PSB, default layers), `tiffVariant?: "auto" | "classic" | "big"` (default auto) and `pdfDpi?: number` (PDF physical sizing, default 72). Results contain `blob`, `mimeType`, `extension` and `report`; review the report's preserved/degraded features and warnings before delivery.
 
 Export controls default to absent. `phase` is `"rendering"` or `"encoding"`; `fraction` is a value from 0 to 1 for known rendering progress, or `null` for indeterminate work. An aborted signal rejects with its reason (normally `AbortError`). PNG/JPEG/WebP/PSD/TIFF check cancellation between rendered tiles/strips and before returning encoded output. Host SVG serialization yields between bounded path fragments and reports indeterminate encoding progress. Browser encoding, synchronous constructor `toSvg` calls and an individual PSD strip cannot be preempted mid-call; the final host check suppresses a result after cancellation is received. These controls are host-only, are not serialized into REST options, and are unavailable inside isolated Scripts. They do not edit the document or create history entries. A throwing progress callback rejects export without returning partial output.
 
@@ -1373,6 +1501,87 @@ The document also exposes integration hooks: `subscribe(listener)` registers a s
 
 Underscore-prefixed members (`_dispatch`, `_read`, `_attach`, etc.), worker messaging, and store internals are not supported scripting API. JSON/command types are transport formats, not alternate live object setters. Public SDK packaging, general API stability guarantees and a script library remain future work. Versioned command plugin packages and document permissions are available through the separate Plugins panel.
 
+## Prepared wet paint (schema 33)
+
+`new WetPaintStroke({brush, tiles, nativeTransform?, opacity?, load?, mix?})` creates an immutable prepared replacement value. Add it to `PaintLayer.strokes`, or call `RasterLayer.applyWetPaint(stroke): void`. Raster replacements retain their order relative to erase/clear, capture the current logical width/height, and preserve the original image asset. Attached mutations use ordinary commands, ancestor locks, transactions and undo. DTOs use `kind: "wet"` and require schema 33, including retained history and embedded masters. Older valid documents migrate; falsely old wet records reject. Project v3/workspace v2 are unchanged.
+
+`brush` is a `BrushStroke`/`PencilStroke` value or its complete DTO, without clone tiles. It records the footprint, path, captured selection, opacity, flow, pressure, tilt, symmetry and optional texture. These settings describe preparation: **the supplied pixels are authoritative**, and editing metadata does not rerun the simulation. Eraser/clone/fill footprints reject. `tiles` is a nonempty array of `{x,y,width,height,assetId,coverage:{assetId}}`. Geometry is integral native pixels with positive extents and safe numeric addressing. `nativeTransform` maps native tile coordinates into layer-local coordinates and defaults to identity. Explicit null opacity/nativeTransform rejects; only omitted/undefined values use defaults. Zero operation opacity keeps metadata and asset references but does not select native reconstruction, GPU fallback, expanded visual bounds or SVG prefix baking. Independent operation `opacity` defaults to 1 and blends the complete replacement once, including overlapping tiles. The brush's opacity/selection must already be baked into supplied pixels; outer DTO `clip` is always null.
+
+Both image references must resolve to decoded, noninterlaced RGB8/RGBA8 PNG assets whose actual dimensions match their tile. Output alpha must be at most coverage alpha at every native pixel: output is already masked, coverage removes destination pixels, and output is added once. This permits reducing alpha. Coverage RGB is ignored. Browser/script commits and REST decode/check native alpha before publishing; invalid/missing/replaced sources reject the entire transaction. This derived-output contract does not restrict original-image or brush-texture import formats/resolution. Native tile coordinates, count and original dimensions have no arbitrary image-tier cap; working buffers, storage quota and numeric/format precision can still fail explicitly.
+
+`load` accepts `{color?: [r,g,b,a], load?: number}`; channels are integral 0–255 and load is 0–1, defaulting to opaque black and 0. `mix` accepts `{flow?,wetness?,pickup?}`, each 0–1, defaulting to 1/0/0.5. Unknown keys/nonfinite or out-of-range values reject. These normalized settings are retained metadata on prepared values. Read-only members are `id`, `kind`, `opacity`, `brush`, `tiles`, `nativeTransform`, `load`, `mix`, and `toJSON()`; returned arrays/DTOs are owned copies.
+
+This isolated example requires two already imported PNG image layers named **Wet output** and **Wet coverage**, with matching original pixel dimensions and valid premasked output. Source layers are kept as imported; use hidden source layers if their images should appear only in the replacement. No files, pixels, native simulation or export service is exposed to the sandbox.
+
+<!-- example: wet-prepared -->
+
+```js
+const output = [...document.layers].find(layer => layer.name === 'Wet output');
+const coverage = [...document.layers].find(layer => layer.name === 'Wet coverage');
+if (!(output instanceof RasterLayer) || !(coverage instanceof RasterLayer)) {
+  throw new Error('Import Wet output and Wet coverage PNG images first.');
+}
+const paint = new PaintLayer({name: 'Prepared wet paint'});
+paint.strokes.add(new WetPaintStroke({
+  brush: new PencilStroke({points: [{x: 3.5, y: 4.5}], pressureSize: false}),
+  tiles: [{x: 3, y: 4, width: output.width, height: output.height,
+    assetId: output.assetId, coverage: {assetId: coverage.assetId}}]
+}));
+document.layers.add(paint);
+print('Prepared wet paint ready');
+```
+
+Use original dimensions without resizing the two source layers. The host validates actual decoded dimensions and alpha, rather than trusting their display geometry. Plugins need their existing `document:write` grant; installation remains inert, and no new permission/file/network boundary is added. Browser rendering composes replacements on a native content plane before layer transforms/appearance. Unsupported GPU compositions use complete Canvas fallback. SVG bakes affected paint-layer sibling prefixes and discloses lost editability; save a project for complete sources and operations.
+
+### Prepared mask coverage (schema 34)
+
+`mask.applyWetPaint(stroke: WetPaintStroke): LayerMask` returns a new immutable mask with one prepared replacement appended. Assign it to `layer.mask` or `instance.filterMask` to commit through the shared commands, locks, transaction and undo path. Ordinary `mask.paint` still accepts only BrushStroke/PencilStroke and Hide/Reveal; it does not accept WetPaintStroke. Constructors, `with({strokes})`, `strokes` getters and `toJSON()` preserve the ordered union `{mode:"hide"|"reveal", stroke:BrushStroke|PencilStroke}` or `{mode:"wet", stroke:WetPaintStroke}`. Clone/fill or a mode/value mismatch rejects. Ordinary and wet operations share the existing 2,048-operation / 200,000-total-point mask budget (20,000 points per brush); wet point counts use the retained brush metadata, not native tile count. There is no arbitrary image/native-tile count tier.
+
+Raw coverage is reconstructed in the mask's native coordinate plane before its linked/unlinked/master transform, then mask-wide feather, inversion and density apply once. Bitmap originals and vector/selection/base geometry remain unchanged and editable. Prepared output alpha is authoritative coverage; RGB is ignored. Prepared alpha must already be bounded by its native coverage PNG, just as for layer replacements. Independent operation opacity applies once; zero-opacity records retain validated references and metadata while bypassing native reconstruction and preserving pure-vector SVG masks. Both ordinary and filter masks require schema 34 for this new operation, including retained history and embedded masters; normal layer wet values still date from schema 33. Project3/workspace2 containers stay unchanged. Old readers may reject new document schemas.
+
+Import valid one-pixel PNG layers named **Wet output** and **Wet coverage** before running the example. Output alpha must not exceed coverage alpha. The script references those existing originals; it does not read files, fetch pixels or run a simulation.
+
+<!-- example: wet-mask-prepared -->
+
+```js
+const output = [...document.layers].find(layer => layer.name === "Wet output");
+const coverage = [...document.layers].find(layer => layer.name === "Wet coverage");
+if (!(output instanceof RasterLayer) || !(coverage instanceof RasterLayer)) {
+  throw new Error("Import Wet output and Wet coverage PNG layers first.");
+}
+const layer = new PaintLayer({name: "Prepared mask demo"});
+layer.strokes.add(new PaintFill({bounds: {x: 0, y: 0, width: 16, height: 16}, color: "#2a5968"}));
+layer.mask = new LayerMask({base: 1}).applyWetPaint(new WetPaintStroke({
+  brush: new PencilStroke({points: [{x: 4.5, y: 4.5}], size: 1, pressureSize: false}),
+  tiles: [{x: 4, y: 4, width: 1, height: 1, assetId: output.assetId, coverage: {assetId: coverage.assetId}}],
+}));
+document.layers.add(layer);
+output.visible = false;
+coverage.visible = false;
+document.selectedLayer = layer;
+print("Prepared mask ready");
+```
+
+### Wet preparation (trusted application code)
+
+`await editor.applyWetPaint(brush, options?): Promise<WetPaintStroke|null>` runs actual native spatial preparation and atomically commits the result. `brush` is a BrushStroke/PencilStroke whose coordinates are **target-local**, while captured document selection is transformed into that plane. `options` accepts only `mode?: "smudge"|"mixer"` (default smudge), `target?: "layer"|"mask"|"filter-mask"` (default layer), `targetId?: string` (default selected layer), `respectSelection?: boolean` (default true), `load?`, `mix?`, `signal?: AbortSignal`, and `onProgress?: ({dabs,workingTiles}) => void`. An explicit brush clip takes precedence over document selection; false respectSelection clears both. For layer pixels, no selected target creates a paint layer; an existing target must be a paint/image layer. Mask targets require an existing mask; filter-mask targets require a smart object with an existing filter mask. All layer kinds/groups may receive ordinary mask coverage. Locked ancestry rejects. Targets are never silently redirected.
+
+For mask/filter-mask targets, brush coordinates are **mask-local native pixels**, before its x/y/basis/linking transform. Filter-mask coordinates are in the smart master plane, independently of instance size. Selection is captured through that complete mapping. Preparation samples raw mask coverage, ignoring enabled/inverted/density/feather and artwork/filter appearance; these settings remain stored and apply afterward. Mask load RGB normalizes to white, with alpha retained from a valid `load.color` tuple (default alpha255). Mixer alpha255 loads revealed coverage; alpha0 loads hidden coverage. Smudge defaults load0 and transports existing coverage. The UI Hide/Reveal target supplies that initial alpha; current load/wetness/pickup and brush opacity/flow still apply. Foreground RGB is not a mask control. Source identities, revision/cancellation, private previews, no-op and atomic publication contracts are the same as layer pixels.
+
+Preparation samples the target's neutral content, including preceding ordered operations, before its opacity/mask/styles/tone effects or parent appearance. Raster sampling uses original pixels independently of current logical size; source blobs remain unchanged. Foreground defaults to the brush's opaque RGB. Smudge defaults load to 0 and wetness to 0; mixer defaults load to 1 and wetness to 0.25. Partial load/mix options override those mode defaults; remaining mix flow/pickup defaults are 1/0.5. This is finite encoded-sRGB pigment transport, not a physical/spectral model.
+
+```js
+const stroke = new PencilStroke({
+  points: [{x: 10.5, y: 20.5}, {x: 30.5, y: 20.5}],
+  size: 3, pressureSize: false, color: '#ff0000'
+});
+const result = await editor.applyWetPaint(stroke, {
+  mode: 'mixer', mix: {wetness: 0, pickup: 0}, signal: controller.signal
+});
+```
+
+Import constructors from the host DOM module and provide an AbortController as `controller`. No changed pixels returns null without history/assets. Abort, callback errors, quota/source-lifetime failures or changed document/revision/active selection/session reject without late publication. Private storage is disposed before commit; staged assets publish only after validation and remain for undo/redo. Original-first symmetry order, separate spatial pigment per copy, once-only selection/brush opacity, native replacement and complete path replay are preserved. Numerical work uses at most 4 million pixels/request and native composition at most 4 million pixels/4096 pixels per side per working surface; these are working budgets, not source limits. This adapter does not implement incremental live gestures, mixer/smudge tool controls, mask/filter-mask painting or preset integration. Those roadmap gates remain open.
+
 ## Maintaining this contract
 
 Update this guide whenever a constructor, public member, default, validation rule, runtime binding, budget or history behavior changes. Keep the [API overview](API.md), [requirements](REQUIREMENTS.md) and [architecture](ARCHITECTURE.md) consistent. Keep examples runnable in the Scripts panel without invented assets or page globals.
@@ -1532,7 +1741,7 @@ print(layer.mask.x, layer.mask.y, layer.mask.linked);
 
 ### Painted masks
 
-`new LayerMask({ base, strokes = [], ...settings })` creates brush-based coverage. `base` is required and finite in 0–1: 1 initially reveals everything, 0 hides everything, and intermediate values give uniform coverage. Settings (`x`, `y`, `linked`, `enabled`, `inverted`, `density`, `feather`) have the same defaults and meaning as other masks. Supply exactly one geometry source: `base`, `selection`, or `paths`. Painted masks record brush operations and rasterize them at rendering time; they do not yet import grayscale bitmap masks. Selection and vector masks can also receive strokes directly, retaining their own geometry beneath the refinements.
+`new LayerMask({ base, strokes = [], ...settings })` creates brush-based coverage. `base` is required and finite in 0–1: 1 initially reveals everything, 0 hides everything, and intermediate values give uniform coverage. Settings (`x`, `y`, `linked`, `enabled`, `inverted`, `density`, `feather`) have the same defaults and meaning as other masks. Supply exactly one geometry source: `base`, `selection`, or `paths`. Painted masks record brush operations and rasterize them at rendering time; bitmap coverage is available through the separate assetId geometry source. Selection and vector masks can also receive strokes directly, retaining their own geometry beneath the refinements.
 
 `mask.paint(stroke, mode = "hide")` returns a new immutable mask with one operation appended. Assign the result to `layer.mask` to commit. Only `BrushStroke` and `PencilStroke` without source tiles are accepted; clone and fill operations are rejected. Mode is `"hide"` or `"reveal"`. The stroke's color is ignored: pressure, size, hardness and clipping determine coverage, and opacity applies once to the complete stroke. Hide multiplies existing coverage by `(1 - stroke coverage × opacity)`; Reveal composites opaque coverage over it. Inversion, density and feather are mask-wide settings applied after these operations, so inversion reverses the apparent hide/reveal result.
 
@@ -2076,6 +2285,9 @@ Images decode in a private store before a single destination transaction install
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `new GaussianBlurFilter(options?)` | `sigma: 1`, `enabled: true`, generated `id`. Sigma is finite, 0–4096/3 master pixels.                        |
 | `new UnsharpMaskFilter(options?)`  | `sigma: 1`, `amount: 1` (0–5), `threshold: 0` (0–255), `enabled: true`, generated `id`.                      |
+| `new FrequencyBandFilter(options?)` | `sigma:4`, `band:"high"`; low/high/correction, native encoded RGB8. See the schema-36 contract above. |
+| `new NativeCompositionFilter(options?)` | Native RGBA composition before resampling; generated ID, enabled=true. |
+| `new DocumentToneFilter(options?)` | Tone defaults/ranges as SmartToneFilter, but after placement; must trail all native entries. |
 | `new SmartToneFilter(options?)`    | `exposure: 0` (−3–3), `contrast: 0` (−100–100), `saturation: 0` (−100–100), `enabled: true`, generated `id`. |
 
 Sigma describes Gaussian standard deviation. Filters execute first-to-last in the master pixel plane, before instance resizing/affine placement, layer masks and styles. A 2× instance scales the visible blur radius by 2× without changing its master or source image. Blur uses transparent padding and may extend beyond the master artboard; unsharp preserves alpha. The parent composition may still clip the resulting instance. Disabled filters remain serialized but do not render. Filter masks are described below. The Inspector exposes the same stacks through paired slider/number controls, enabling, reordering and removal.
@@ -2101,7 +2313,7 @@ Saved automation recipes now record name selectors as `{ by: "name", pattern: "A
 
 ### Smart-object filter masks
 
-`SmartObjectLayer.filterMask` gets an immutable `LayerMask` value or `null`. Set it with a `LayerMask` constructor (or `null` to remove). It masks the entire ordered filter stack, independently of the ordinary layer mask. White coverage reveals the filtered result; black reveals the retained original. Density, inversion, feather, selection/vector/bitmap sources and painted refinements use existing LayerMask values. Disabled masks or zero density reveal the complete filtered result. Filtering and masked mixing happen before instance resampling and the ordinary layer mask/styles.
+`SmartObjectLayer.filterMask` gets an immutable `LayerMask` value or `null`. Set it with a `LayerMask` constructor (or `null` to remove). It masks the entire ordered filter stack, independently of the ordinary layer mask. White coverage reveals the filtered result; black reveals the retained original. Density, inversion, feather, selection/vector/bitmap sources and painted refinements use existing LayerMask values. Disabled masks or zero density reveal the complete filtered result. Native filtering and its masked mixing happen before instance resampling. Trailing DocumentToneFilter entries mix with projected native coverage after placement and before the ordinary layer mask/styles.
 
 Linked filter-mask geometry is measured in native master pixels. With `linked: false`, geometry is measured in the containing document (the master document for a nested instance); moving/resizing the instance does not move that geometry. Feather is measured in native master pixels. Changing `linked` through `.with()` changes coordinate interpretation; `instance.setFilterMaskLinked(linked)` preserves the current coverage position while changing that interpretation. Brush, Pencil and Eraser support Filter mask targets as described below.
 
@@ -2322,6 +2534,92 @@ Document schema **18** stores gradient maps. Valid schemas 1–17 migrate on ope
 WGSL uses float32 stop coordinates and premultiplied RGBA8 surfaces; the WASM reference uses float64 arithmetic on straight byte pixels. Coordinates that collapse to a single float32 value use the Canvas/WASM fallback. Extremely tight transitions can differ at float32 sampling precision. Conformance tests measure representative multi-stop/masked/partial-alpha fixtures with maximum premultiplied RGB error 3 bytes, mean under 1 byte and unchanged alpha. These fixture tolerances do not establish all-image/hardware/color-fidelity parity.
 
 
+## PSB export and large Photoshop input (trusted application code)
+
+`await editor.export({format:"psb", psdMode?:"layers"|"flatten"}, control?): Promise<ExportResult>` returns `image/vnd.adobe.photoshop` with extension `psb`, using PSB version 2. Mode defaults to `layers`, sharing PSD's supported folder, child pixel-record and user-mask plan, ordinary/pass-through modes, locks and scoped dependency merges. Group fill folds into opacity; only unstyled Normal pixel fill remains separate. Text/vector/paint/smart editability, non-Normal pixel fill/masks, effects and original mask controls/linkage/off-canvas coverage bake with preflight losses. `flatten` emits one visible-canvas layer. See [the normative hierarchy contract](#native-photoshop-folder-and-user-mask-export). PSB output remains RGB8, lossless PackBits, merged transparency, output sRGB ICC and explicit 72 DPI; higher precision, CMYK, full native Photoshop type/effect/adjustment serialization and desktop certification are unfinished.
+
+PSB supports dimensions 1–300,000 per side, compared with PSD's 1–30,000, and retains at most 32,767 layer records. Channel lengths and layer-info/layer-mask section lengths use eight bytes; RLE scanline counts use four bytes for layers and merged data. Resource/extra-data lengths remain four bytes. Browser addressing must remain exact safe integers. The writer retains compressed Blob planes and bounded strips, not document-sized canvases/full uncompressed layer buffers. Original bitmaps, row width, output, parser/reader planes and device memory remain real constraints. These format/addressing rules are separate from document/import geometry; no arbitrary megapixel/file-size import cap is introduced. Synthetic large-length tests are not actual multi-GiB output proof.
+
+PSD/PSB source/font capture now covers the actual planned output planes before any progress callback, including independent hidden or opacity-zero top-level layers. Flattening ignores hidden sources it does not render. Referenced removal/replacement/closed bitmaps, disposal, pending/changed referenced fonts, aborted signals and throwing callbacks reject without a file; unrelated resources and later document edits remain valid. Native surfaces release on every path. Progress/cancel use the existing host `ExportControl`; rendering starts at fraction 0, then advances by native rows, followed by encoding with fraction null. Native calls remain non-preemptible within a frame. Font files, source EXIF/GPS, original project data and saved channels are not embedded.
+
+`editor.openPsd(buffer, options?)` still handles both PSD/PSB through its existing signature/result. Import now correctly reads four-byte PSB RLE row counts in layer and merged channels, rejects invalid header/address fields, and encodes decoded layer pixels into PNG strips before native image decoding. It no longer creates a source-sized canvas. Publication rechecks I/O generation, owner document/revision/session and asset lifetime; late edits, replacement or disposal discard private assets. Existing edited tabs stay open. The parser still synchronously materializes input/decoded planes; this is not a worker/streamed-file parser or complete low-memory import. Original decoded layer pixels persist as PNG sources; the complete original Photoshop container/private metadata is not archived. Non-RGB8/unsupported Photoshop constructs retain the separately documented prototype limits. Public import buffers are not detached or rewritten.
+
+This adds no isolated export/file/download/font capability, REST rendering endpoint, batch PSB format or document/project/workspace schema. The low-level `buildPsd`/`documentToPsd` prototype remains PSD v1; use trusted browser export for rendered PSB. After creating artwork in Scripts, export PSB through the UI:
+
+<!-- example: psb-composition -->
+
+```js
+document.resize(38417, 160);
+const paint = document.layers.add(new PaintLayer({ name: "PSB artwork" }));
+paint.strokes.add(new PaintFill({
+  bounds: { x: 38000, y: 20, width: 400, height: 120 },
+  color: "#804020", opacity: 0.5,
+}));
+document.layers.add(new TextLayer({
+  name: "PSB caption", text: "Canoli Studio",
+  fontFamily: "monospace", fontSize: 28, x: 38010, y: 60,
+}));
+print("PSB composition ready");
+```
+
+### PSD/PSB private encoding and cancellation
+
+Trusted Photoshop export keeps the same signatures/defaults, native grid, RGB8/white-matte fidelity and errors described above. Captured native pixel strips now encode in a private module worker; only export-owned copies transfer, never original source buffers/bitmaps. Host checks source/font lifetimes before and after each reply and validates row-table/Blob extents. Abort terminates pending encoding; a native canvas call already executing remains non-preemptible. Worker load/runtime/message errors or invalid results reject without a file, and every success/failure terminates the private worker. Reused packet buffers and one Blob per channel/strip reduce allocations without changing file bytes. No worker/file/pixel capability is exposed to isolated scripts/plugins or REST, and no public option/schema changes. Source/output/reader memory and residual native-frame delays remain real limits; this is not a universal responsiveness guarantee.
+
+## PDF export (trusted application code)
+
+`await editor.export({format: "pdf", pdfDpi?: number}, control?): Promise<ExportResult>` returns `application/pdf`, extension `pdf`, as one PDF 1.7 raster page. `pdfDpi` defaults to 72 and must be a positive finite number. DPI changes physical page size (`document pixels / DPI` inches) without resampling or changing document geometry/history. The dialog provides 1–1,000,000 DPI entry and a physical-size preview. Invalid settings, nonrepresentable physical pages, native allocation/encoding failures and cancellation reject without a file. The capability report explains physical-page errors so users can change DPI while retaining the document. Large physical pages use UserUnit scaling (MediaBox dimensions at most 14,400, UserUnit at most 75,000); viewer compatibility remains a real constraint, not an import-size cap.
+
+The native compositor renders the same bounded grid as PNG, including masks, text, affine groups, paint, smart filters and adjustment/backdrop ordering. Row buffers feed lossless RGB/alpha Deflate streams; one image matrix avoids independent tile-placement rounding at non-72 DPI. Output contains a native 8-bit RGB image, a soft mask when nonopaque, the output sRGB ICC and Canoli Studio producer/creator. It has no searchable/selectable text, editable vectors/layers/filters, original files, source/authored metadata, font files, hidden/off-canvas artwork or saved channels. This is not PDF/X, PDF/A, CMYK/spot-color, bleed/trim marks or print-readiness certification. Save a native project for editability and source retention. Other readers may apply different color conversion, scaling and transparency rounding.
+
+`control` uses the existing host-only `{signal?, onProgress?}` contract: rendering fractions count native grid regions, then encoding reports `fraction:null`. Capture pins the immutable model, visible referenced raster/clone/patch/bitmap-mask/master dependencies and relevant registered fonts before the first callback. Document edits after capture do not change output; removed/replaced/closed referenced sources, a disposed store, pending/changed referenced fonts, cancellation or throwing callbacks reject. Unrelated resources may change. Row compression observes cancellation; native rendering/color conversion already in progress cannot be interrupted mid-call. Native tile canvases release on every exit. Compressed output and source bitmaps remain resident; readers may decode full image planes. Row streaming is not a whole-process/reader peak-memory guarantee or disk-backed export.
+
+PDF uses an eight-byte cross-reference offset field and exact safe-integer browser addressing. Synthetic large-offset tests do not establish actual multi-GiB output or universal reader acceptance. This trusted method adds no REST rendering route, isolated script/plugin export/download/file/font privilege or document/project/workspace schema. Scripts can create ordinary artwork for user-initiated export:
+
+<!-- example: pdf-composition -->
+
+```js
+document.resize(2081, 160);
+const paint = document.layers.add(new PaintLayer({ name: "PDF artwork" }));
+paint.strokes.add(new PaintFill({
+  bounds: { x: 1900, y: 20, width: 180, height: 120 },
+  color: "#804020", opacity: 0.5,
+}));
+document.layers.add(new TextLayer({
+  name: "PDF caption", text: "Canoli Studio",
+  fontFamily: "monospace", fontSize: 28, x: 1910, y: 60,
+}));
+print("PDF composition ready");
+```
+
+## TIFF import (trusted application code)
+
+`await editor.inspectTiff(file: File, control?: TiffImportControl): Promise<TiffImportReport>` inspects classic TIFF/BigTIFF in a terminable local worker without opening a document. The report contains `version: 1`, `bigTiff`, `littleEndian` and `pages`. Each page reports its zero-based `index`, raw `width`/`height`, `orientation`, sample `bits`/`samples`, numeric `compression`/`photometric`/`planar`, `hasIcc`, `canDecode`, `requiresPrecisionLoss`, `unsupported` and `warnings`.
+
+`await editor.openTiff(file: File, options?: {page?: number, allowPrecisionLoss?: boolean}, control?: TiffImportControl): Promise<TiffImportReport>` opens one selected page as a new raster document. `page` defaults to 0 and must be a nonnegative safe integer naming an existing page; `allowPrecisionLoss` defaults to false. Unknown option fields reject. The file's TIFF signature is validated independently of its filename/MIME label. The picker/drop workflow shows the report, page choice and explicit 16-bit-to-8-bit checkbox before decoding. Existing edited tabs remain open. The imported document starts at revision zero; subsequent edits use ordinary constructors/commands/history.
+
+Both methods accept `control: {signal?: AbortSignal, onProgress?: (progress: {phase: "inspecting" | "decoding", fraction: number | null}) => void}`. Inspection reports indeterminate progress; decoding reports row completion from 0 to 1. An aborted signal terminates the worker; throwing progress callbacks reject. Missing/unsupported pages, malformed offsets/tables/streams, unsupported profiles, worker failures, browser decoding/allocation failures and a changed/disposed target session reject without publishing a partial document or its assets. Page changes, document edits, replacement imports and tab closure during `openTiff` invalidate the result. Native image decoding already in progress cannot be interrupted mid-call; its result is discarded if cancellation wins.
+
+Supported input: classic/BigTIFF, either byte order, unsigned RGB/grayscale/palette/bilevel samples, raw/LZW/Deflate/PackBits, strips/tiles, chunky/separate planes, horizontal integer prediction, supported associated/unassociated alpha and orientations 1–8. RGB/grayscale 16-bit samples require explicit precision-loss consent and are rounded to 8-bit editing values. Signed/float samples, JPEG/fax codecs, CMYK/Lab/YCbCr and unsupported extra channels reject with the report's reasons. Embedded RGB ICC declarations are passed through the intermediate PNG to browser color management; unprofiled samples are interpreted as sRGB. Broader color/device fidelity is unverified.
+
+`AssetStore` retains the complete original TIFF Blob and immutable `{page, allowPrecisionLoss}` settings separately from the decoded editing bitmap. Original dimensions stay in source coordinates; orientation is a non-destructive affine layer transform, with document dimensions swapped for orientations 5–8. Native projects, workspace/history, recovery checkpoints, cross-document copies and portable recipe assets retain the bytes and decode settings. Only the selected page is editable; TIFF layers/private editing metadata are not reconstructed. Project container 3/workspace 2/document schema 27 are unchanged. Recovery includes decode settings in its source integrity key; older recovery sources without those settings invalidate the checkpoint. Recovery tries an intact prior revision or reports the missing settings without replacing current work or deleting the records; it cannot reconstruct an unrecorded choice.
+
+The parser budgets 256 pages, 4,096 tags per directory and 16 MiB per ICC profile, and rejects addresses beyond exact JavaScript integer addressing. These are parser/metadata budgets, not megapixel/file-size import cutoffs. Pixel decompression streams source rows instead of allocating a complete uncompressed strip; PNG output, decoded bitmaps, active tile/plane codec state, browser color conversion and saving/reopening still consume source-dependent memory. Large files can fail on the actual device. This is local host functionality, not an isolated script/plugin file service or a new REST endpoint.
+
+After importing through the UI, this example runs in Scripts and undoes as one ordinary edit:
+
+<!-- example: tiff-import-edit -->
+
+```js
+const source = document.layers.at(0);
+if (!(source instanceof RasterLayer)) {
+  throw new Error("Import a TIFF page first.");
+}
+source.adjustments.add(new ToneAdjustment({ exposure: 0.5 }));
+document.selectedLayer = source;
+print("TIFF source remains editable");
+```
+
 ## Native TIFF export (trusted application code)
 
 `await editor.export({format: "tiff", tiffVariant?: "auto" | "classic" | "big"}, control?): Promise<ExportResult>` exports one flattened native-resolution RGBA8 image, with lossless Deflate tiles, unassociated alpha and the output sRGB ICC profile. The result uses `mimeType: "image/tiff"` and `extension: "tif"`. It preserves the visible native composition, including masks, adjustment/backdrop ordering, affine groups, paint, text and reachable smart masters. Editable layers, hidden/off-canvas content, saved alpha channels and original sources remain in the native project. Source EXIF/GPS, authored metadata and source font files are not included. Resolution metadata is explicitly 72 DPI without changing pixel dimensions; this is not CMYK, HDR or print-grade color management.
@@ -2360,19 +2658,19 @@ document.layers.add(new TextLayer({
 print("TIFF composition ready");
 ```
 
-TIFF input, multipage output, higher precision, editable TIFF layers and general independent-reader/device acceptance remain open F11 work. This host method adds no REST export endpoint or isolated script/plugin export capability.
+Multipage output, higher precision, editable TIFF layers and general independent-reader/device acceptance remain open F11 work. This host method adds no REST export endpoint or isolated script/plugin export capability. TIFF input has the separately bounded contract above.
 
 ## Rendered PSD export (trusted application code)
 
 `await editor.export({format: "psd", psdMode?: "layers" | "flatten"}, control?)` returns the existing `{blob, mimeType, extension, report}` result. `psdMode` defaults to `"layers"`; invalid modes throw. The Export dialog exposes both choices plus Cancel. These are trusted browser-host methods, not sandbox globals or REST routes. Scripts/plugins create editable content through the existing constructors; user-initiated export renders it without granting scripts download/filesystem access.
 
-`"layers"` retains independent top-level objects as named pixel layers with visibility, 8-bit opacity and blend mode. Plain integer-positioned, untransformed rasters without shadows retain their placed pixel rectangle, including off-canvas content. Placed sizes are rendered at their actual geometry, rather than substituting the original asset dimensions. Other shapes/text/paint/smart objects/transforms/effects render in document space and clip to the document canvas. Isolated groups bake their children into a single pixel layer. Masks, fill opacity, styles, erasures, text and shape editability, smart filters and component links become pixels. They are not native editable Photoshop constructs.
+`"layers"` retains supported nested folders and child pixel records with names, visibility, 8-bit opacity, blend mode and locks. Normal and pass-through group modes remain distinct. User masks are separate editable pixel coverage with enabled state; mask geometry/linkage/density/inversion/feather controls and off-canvas coverage bake. Unstyled group fill folds into exported group opacity; unstyled Normal pixel fill remains separate, while non-Normal pixel fill and its mask bake into pixels. Styled groups retain an outer folder with one rendered child. Plain integer-positioned, untransformed rasters without shadows retain their placed pixel rectangle, including off-canvas artwork. Other text/vector/paint/smart objects/transforms/effects render in document space and clip to the document canvas. They do not become native editable Photoshop text/vector/effect constructs. See [the exact hierarchy/mask contract](#native-photoshop-folder-and-user-mask-export).
 
-A top-level adjustment or enabled Blend If depends on its preceding backdrop. Export merges the bottom portion through the last such layer into one pixel layer, respecting current visibility; independent objects above remain separate. Hidden content inside that merged portion is not retained. Hidden independent layers above it retain their pixel content and hidden flag. An adjustment inside an isolated group affects that group only. `"flatten"` renders the current visible composition into one pixel layer; hidden content and separate layer settings are not retained. The capability report states these losses before export. Save `.luma` for full editability.
+An adjustment or enabled Blend If depends on its preceding backdrop. Export merges through the last dependent child in the nearest isolated group scope. Pass-through carries that dependency outward until isolation or the document root. Later independent siblings retain their records. Hidden content inside a merged portion is omitted; independent hidden layers retain pixel content and visibility. Styled groups likewise bake their visible contents, omitting hidden descendants. `"flatten"` renders the current visible composition into one pixel layer; hidden content and separate layer settings are not retained. The capability report states these losses before export. Save `.luma` for full editability.
 
 The merged image is separately rendered through the same native reference compositor used by PNG. Encoding uses bounded native tiles/strips and compressed Blob parts, without allocating a document-sized canvas or RGBA array. The writer emits 8-bit RGB/RLE, sRGB ICC, 72 DPI resolution metadata, Unicode names and merged transparency. Per-layer channels store straight RGBA losslessly; the merged preview stores RGB matted over white, with negative layer count indicating transparency. Recovering straight RGB from this 8-bit preview can amplify rounding at low alpha; layer channels retain their original byte precision. The current fixture gates measure premultiplied error, not universal exact straight-RGB equality. Positive-count files from the earlier Canoli writer are recognized by their `LUMA` ICC CMM identifier together with the earlier container layout and retain legacy straight-alpha decoding. Standard positive-count files treat any extra alpha channel as separate data, not merged transparency. General extra-alpha/advanced Photoshop constructs and wider color fidelity are not established by that compatibility path.
 
-PSD v1 is limited to 30,000 pixels per dimension, 32,767 layer records, 32-bit section lengths and a 2 GB output file. These are format boundaries, not image-import or document limits. Unsupported dimensions/modes, missing assets, native-size mismatch, device allocation failures and cancellation reject without exposing a partial file. PSB export is not implemented. Cancellation checks between tiles/strips and before returning; encoding within one strip remains synchronous. Progress counts rendered rows, reports `"rendering"` with a fraction, then `"encoding"` with `fraction: null`. Document/history/source assets are not edited by export.
+PSD v1 is limited to 30,000 pixels per dimension, 32,767 layer records (including folder headers/dividers), 32-bit section lengths and a 2 GB output file. These are format boundaries, not image-import or document limits. Unsupported dimensions/modes, missing assets, native-size mismatch, device allocation failures and cancellation reject without exposing a partial file. Choose the separately documented PSB export for larger Photoshop documents. Cancellation checks between tiles/strips and before returning; encoding within one strip remains synchronous. Progress counts rendered pixel and mask rows, reports `"rendering"` with a fraction, then `"encoding"` with `fraction: null`. Document/history/source assets are not edited by export.
 
 Example for an application adapter (not the Scripts panel):
 
@@ -2688,3 +2986,303 @@ Inspection stops explicitly above 4,096 visited placements or a 64-level path. A
 
 
 Native SVG backdrop frame rebasing can quantize transformed source edges differently from the direct PNG working origin; retained SVG master clips and outer mask/filter rasterization add their own edge differences. Pixel residuals remain reported alongside exact interior colors, transformed contour/shadow-support coverage, area and centroid checks. Native PNG remains the flattened reference; editable parent geometry is retained. Source/font guards now also run around each cooperative encoding-progress callback, so a stale callback stops further encoding and returns no file.
+
+
+## Photoshop inspection and import workers (trusted application code)
+
+`await editor.inspectPsd(source, control?): Promise<PhotoshopInspection>` accepts immutable `Blob`/`File`, `ArrayBuffer` or `Uint8Array` input. It returns `{version:1, header, layers, resolution?, report}`. Layer metadata includes name, width/height, blend key, byte opacity and group markers; no decoded ImageData/composite, original resource views or ICC bytes are returned. This is a read-only file operation: later document edits do not invalidate its report. The parser currently decodes full input planes inside the worker before preparing metadata; it is not a metadata-only/streaming parser or a constant-memory guarantee.
+
+`await editor.openPsd(source, options?, control?): Promise<PsdImportResult>` now accepts those same source types, retaining the earlier byte-buffer calls and options `{mode?:"layered"|"flatten", legacyStraightAlpha?:boolean, convertCmyk?:boolean, preserveMasks?:boolean}`. Unknown option fields or invalid types reject. Existing defaults and prototype pixel/color/precision/mask/group limitations remain. Its result still contains `{document, report, assets:Map<string,ImageData>}`; the decoded map is separate from installed PNG source bitmaps. Mutating that returned DTO/map does not mutate the attached document or installed assets. Preserve a native project for the complete current editor model; imported decoded layer PNGs persist, not the complete original Photoshop container/private metadata.
+
+`control` is host-only `{signal?:AbortSignal,onProgress?:(value:{phase:"inspecting"|"decoding"|"encoding"|"installing",fraction:number|null})=>void}`. Fractions are local to each phase. Callbacks must not throw; a thrown callback rejects and discards pending work. Pre-aborted signals reject before a worker is created. Cancellation/disposal terminates inspection/parse/PNG preparation workers, including synchronous parsing inside them. A native bitmap decode already executing cannot be preempted; its late private assets are discarded. Worker load/runtime/message errors, invalid metadata/document/source identities/extents, native decode failures, owner revision/session changes and cancellation publish no partial imported document. A successful import opens a new tab and preserves edited documents. Ordinary selection changes do not count as document revisions; owner edits/replacement/tab switches do. A later inspection can run after normal failure/cancellation; disposed editors reject.
+
+Blob/File sources cross the private boundary as immutable blobs. Mutable legacy buffers are snapshotted and remain attached/unchanged. Dedicated workers own complete compressed input/decoded planes and PNG staging. Import transfers newly decoded RGBA buffers back only to preserve the legacy ImageData result; host validation and actual decoded-PNG dimensions guard publication. The host installs private assets and constructs the OO document after all checks. Original source buffers/bitmaps never transfer. Complete planes, returned decoded images, source bitmaps, PNG output and native decoding retain real memory costs; no arbitrary megapixel/file-size import cap is added.
+
+The UI now opens a cancellable inspection state before decoding, pages layer/message lists without dropping report records, retains Cancel/close/Escape during import, and supports retry after failure. Inspector color/precision/mask/ICC warnings describe prototype losses; absence of additional reported losses is not full Photoshop fidelity. This adds no isolated script/plugin file/raw-pixel/font/network privilege, REST import route/browser synchronization, public command or document/project/workspace schema change. The low-level synchronous `parsePsd`/`psdToDocument` helpers remain available; trusted browser workflows use the workers.
+
+After importing through the application, isolated Scripts can edit the ordinary raster layer using the shared OO mutation/history path:
+
+<!-- example: photoshop-import-edit -->
+
+```js
+const imported = document.layers.at(0);
+if (!(imported instanceof RasterLayer)) throw new Error("Import a Photoshop raster layer first.");
+document.transaction("Adjust imported Photoshop", () => {
+  imported.x += 1;
+  imported.opacity = 0.8;
+});
+document.selectedLayer = imported;
+print("Imported Photoshop pixels remain editable");
+```
+
+
+The verified Photoshop pixel subset is 8-bit RGB/Grayscale with Raw, PackBits, ZIP or ZIP with prediction, in both PSD and PSB. The trusted worker path decodes ZIP layer channels and the merged planar stream through native `DecompressionStream("deflate")`; 8-bit prediction resets at each row and channel boundary. Layer alpha and correctly signaled merged transparency retain the existing straight/white-matted interpretation. Native Deflate support is required for ZIP; its absence, malformed/truncated/checksum-invalid streams or decompressed output shorter/longer than declared geometry reject the operation without publishing partial work. ZIP channel output allocation follows declared geometry, with no arbitrary megapixel or file-size cutoff. Complete input/decoded planes, native sources and output still consume data-dependent memory. Raw/RLE retains strict 8-bit row/extent validation. Neutral grayscale expands one source channel into RGB. Unsupported higher-precision ZIP/other codecs remain explicit in reports; only an actually decoded layer/composite path is offered. Full 16/32-bit, CMYK/color management, masks and group reconstruction remain incomplete, with resource/precision/profile losses disclosed.
+
+
+### Low-level asynchronous Photoshop adapters
+
+Trusted engine modules may call `await parsePsdAsync(buffer, {legacyStraightAlpha?})` to obtain `PsdParsedDocument`, or `await psdToDocumentAsync(buffer, options?)` to obtain the same `PsdImportResult` as the synchronous bridge. Both accept `ArrayBuffer | Uint8Array`; options/defaults and report/alpha interpretation match their synchronous counterparts. Keep the supplied bytes stable until resolution. The async parser shares the Raw/RLE structure and validation core and adds 8-bit native ZIP/prediction decoding. Its returned planes are owned decoded arrays; resource views can reference input bytes. These low-level methods do not install a document/assets, start a worker or provide host abort/progress controls; application code should use `editor.inspectPsd`/`editor.openPsd` for isolation, cancellation, ownership validation and atomic publication. The synchronous `parsePsd`/`psdToDocument` compatibility helpers still report ZIP as unsupported instead of returning invented pixels. No isolated script/plugin import privilege or REST endpoint is added.
+
+
+## Photoshop raster-mask input (trusted application code)
+
+For supported RGB8/Gray8 PSD/PSB input, `preserveMasks` defaults to `true`. The decoded user-mask channel now becomes a native bitmap-mask PNG source with its original mask resolution, rather than a rectangle. Artwork pixels and mask pixels remain separate. The returned `PsdImportResult.assets` map includes both artwork and bitmap-mask `ImageData`; its IDs exactly match document asset references. Native project/workspace persistence carries both PNG sources through the existing model. Original complete Photoshop containers/private metadata are still not archived.
+
+Mask rectangles have their own dimensions and Raw/RLE/ZIP/prediction channels. Outside coverage is the declared 0/255 background. White-background masks store complemented bitmap alpha with native inversion, so outside pixels remain white without allocating a document-sized padding image. The native `inverted` value therefore describes the normalized bitmap representation, not a literal copy of the Photoshop bit. Its combined visible effect preserves source inversion. Disabled state and density are retained. Empty rectangles use a constant native paint mask. PSD coordinate bit 0 maps layer-relative coordinates to a linked local mask; absolute coordinates use an unlinked document-space mask. Separate Photoshop UI linkage metadata is not inferred. `Layer.setMaskLinked` can change this native relationship while preserving world placement.
+
+Non-raster/non-group masks, nonzero Photoshop feathering, combined/extended or rendered/vector-mask semantics and higher-precision masks remain unsupported for layered import. Preflight detects standalone vmsk/vsms tags as well as user-mask record losses and disables the layered path; an available merged composite remains the normal fallback. `preserveMasks:false` explicitly omits masks and reports the loss, allowing otherwise-supported layer data. It does not bypass unsupported image-channel compression. `getPsdCapabilityReport(parsed, {preserveMasks?:boolean})` uses the same default and policy as both bridge adapters. Invalid mask bounds/background, truncated mask fields/channels, corrupt ZIP data and worker/source/publication errors reject without partial assets. Worker cancellation and the existing host controls/ownership checks apply to both image and mask sources.
+
+Imported bitmap sources support ordinary OO mask replacement, enable/density/inversion, linking and shared undo. `LayerMask` is a value object: use `with` and assign it back to the attached layer. No file/source access is added to isolated Scripts/plugins or REST.
+
+<!-- example: photoshop-mask-edit -->
+
+```js
+const imported = document.layers.at(0);
+if (!(imported instanceof RasterLayer) || !imported.mask) {
+  throw new Error("Import a Photoshop layer with a supported raster mask first.");
+}
+document.transaction("Adjust imported pixel mask", () => {
+  imported.mask = imported.mask.with({ enabled: !imported.mask.enabled, density: 0.25 });
+  imported.x += 1;
+});
+print("Imported pixel mask remains editable");
+```
+
+Import still retains full input/decoded planes, legacy returned images, native bitmaps and PNG output. Private conversion reuses its decoded mask storage rather than allocating another full mask image. This does not establish constant process memory, multi-GiB/device or full Photoshop fidelity. Document/project/workspace schemas remain 27/3/2; no arbitrary file/megapixel limit or new dependency/host privilege is introduced.
+
+
+## Native pass-through groups and Photoshop hierarchy (schema 28)
+
+`new LayerGroup({blendMode?: LayerBlendMode, ...options})` retains all existing group options and defaults to `"normal"` (isolated). `LayerBlendMode` adds `"pass-through"` to the sixteen ordinary blend modes; only groups accept that value. `group.blendMode = "pass-through"` and `group.update({blendMode:"pass-through"})` use the same shared commands, locks, atomic transaction validation and undo as other attached edits. Raster/paint/vector/text/adjustment targets reject pass-through. Explicit pass-through under schema 1–27 rejects, while valid older roots/history migrate to 28 without changing normal-group semantics or injecting fields. Project container 3/workspace 2 stay unchanged.
+
+Pass-through children blend and apply adjustments against their surrounding sibling backdrop; a normal parent still supplies an isolated scope. Group opacity and an enabled mask interpolate the completed group result against that backdrop once in premultiplied color/alpha. They do not attenuate each child separately. Translation/affine hierarchy, mask coordinates, child effects and ordinary visibility/locks retain existing semantics. A pass-through group's own `fillOpacity` must be 1 and its own color overlay, drop shadow and Blend If must be disabled. Setting an incompatible mode/style/fill rejects atomically; choose Normal before enabling these settings. Mask density/inversion/feather remain native controls, distinct from unsupported imported Photoshop feather semantics. Visible pass-through groups currently select the complete document's Canvas2D/WASM viewport fallback. No GPU or universal frame-rate claim is made.
+
+The async Photoshop import/inspection adapters now reconstruct well-formed nested PSD/PSB section boundaries into editable `LayerGroup` objects. They preserve child order, Unicode names (within the existing native 240-character limit), absolute-to-local placement, supported ordinary/pass-through group modes, opacity/visibility and protection. Partial Photoshop protection, including transparency-only flags, maps conservatively to a full native lock with a report warning; folder expansion state is not imported. Supported user pixel masks also attach to groups as independent PNG assets. Native editing budgets remain 64 total layers/groups and nesting depth 8, distinct from image-size/import-memory limits. Malformed boundaries reject editable conversion; over-budget/unsupported modes, clipping layers, effects, nondefault group/non-Normal fill or Blend If retain explicit preflight merged fallback when an actual composite exists. Unknown constructs and broader native Photoshop type/adjustment/vector/feather/precision/color fidelity are unfinished. Complete original Photoshop containers are not archived.
+
+PNG/native project output retains the native composition and complete editable state respectively. PSD/PSB now retain supported folder/user-mask records as described below, merging unsupported backdrop dependencies only within their real isolation scope. SVG host preparation still rasterizes the dependent native prefix instead of substituting browser CSS isolation semantics; later content keeps its supported representation. Preflight discloses baked editability. Synchronous standalone SVG/low-level PSD helpers without native preparation reject richer content. Cancellation/source/font ownership checks still govern output. These remain RGB8 appearance paths with documented byte rounding and incomplete Photoshop color/effect fidelity.
+
+After importing a supported Photoshop document with a group as its second root layer, run this in Scripts. Both changes return as one host transaction and one Undo restores the imported placement/opacity; invalid or locked targets reject without partial changes. No file/network/export access is granted to the script.
+
+<!-- example: photoshop-group-edit -->
+```js
+const group = document.layers.at(1);
+if (!(group instanceof LayerGroup)) {
+  throw new Error("Import a Photoshop document with a second-layer group first.");
+}
+document.transaction("Edit imported group", () => {
+  group.x += 2;
+  group.opacity = 0.5;
+});
+print("Imported group remains editable", group.blendMode);
+```
+
+## Native Photoshop folder and user-mask export
+
+Trusted `editor.export({format:"psd"|"psb", psdMode?:"layers"|"flatten"}, control?)` keeps its signatures and default `layers` mode. This extends the rendered Photoshop contract above without adding a script/plugin export capability or REST renderer. Folder records preserve nesting/order, Unicode names, own visibility, quantized opacity, Normal/ordinary/pass-through blend modes and full locks. Integer world-space group origins are retained where representable; affine transforms bake into descendants. Empty folders, including a document containing only folders, remain folders. A well-formed group-only import may return an empty assets map; an empty or malformed non-folder decoder result still rejects. Native import editing budgets remain 64 total nodes and depth 8, independently of image dimensions.
+
+Unstyled layer/group masks export as channel `-2`, with final native coverage over the document rectangle and a separate enabled/disabled flag. Even a disabled bitmap source is pinned and sampled. Export forces sampling on, then bakes density/inversion/feather into coverage; disabled output remains disabled. Native vector, painted and bitmap masks become editable Photoshop pixel masks, not editable path/stroke/control metadata. Coverage outside the document, mask geometry, linkage and separate density/inversion/feather controls are not retained. The exported mask uses absolute document-space placement; separate Photoshop UI linkage metadata is not preserved. Original sources and full controls remain in `.luma`. A custom host renderer missing `renderMaskCoverage` rejects masked `layers` export explicitly; use the native renderer or choose `flatten`.
+
+Photoshop groups expose only overall Opacity, according to [Adobe's guide](https://helpx.adobe.com/photoshop/desktop/create-manage-layers/apply-layer-effects/set-layer-opacity-and-blending-modes.html). An unstyled Canoli group's fill therefore multiplies its exported opacity, losing the separate fill control while retaining current transparency. An unstyled Normal pixel layer retains separate fill (`iOpa`); non-Normal pixel fill and its attached mask bake into the pixel channel because special Photoshop fill-blending semantics are not implemented. Import likewise retains nondefault fill only on supported Normal non-group records; nondefault group/non-Normal fill requires the real merged fallback. These are explicit preflight boundaries, not a claim that broader Photoshop fill behavior is validated.
+
+A styled group keeps its outer folder metadata and a single `Rendered <name>` child containing its visible native contents, fill, mask and styles. Internal children, hidden descendants and separate effect/mask controls are lost. Unsupported adjustments/Blend If merge only the prefix required by their true isolation scope; pass-through dependencies can reach the outer scope or root. Preflight names folded group fill, baked non-Normal fill, styled folders and actual scoped merges. Full Photoshop type/vector/adjustment/effect serialization, original source-container retention, high precision/color and independent desktop acceptance remain open.
+
+The writer counts folder headers/dividers toward the format record limit, emits native PSD/PSB length/RLE fields and includes mask rows in progress. Mask strips cross the same private per-export worker as artwork using a validated one-channel response. Cancellation, worker errors/malformed replies, missing/disposed assets and native allocation failures release temporary surfaces, terminate the worker and produce no partial download; retry may start a fresh operation. Original document/history/assets are unchanged. No schema change is needed: document 28, project 3 and workspace 2 remain current. Source bitmaps, compressed output and row tables still require data-dependent memory; bounded strips do not prove a whole-process memory bound or 60fps.
+
+The following isolated Scripts example authors ordinary native content. Export through the application UI afterward; it does not give the script file or download access.
+
+<!-- example: photoshop-native-hierarchy -->
+
+```js
+document.resize(32, 24);
+const backdrop = document.layers.add(new PaintLayer({name:"Backdrop"}));
+backdrop.strokes.add(new PaintFill({bounds:{x:0,y:0,width:32,height:24},color:"#804020"}));
+const folder = document.layers.add(new LayerGroup({name:"Native folder",opacity:0.5,fillOpacity:0.5}));
+folder.mask = new LayerMask({selection:new MarqueeSelection({shape:"rectangle",x:4,y:4,width:24,height:16})});
+const content = folder.layers.add(new PaintLayer({name:"Filled child",opacity:0.5,fillOpacity:0.5}));
+content.strokes.add(new PaintFill({bounds:{x:0,y:0,width:32,height:24},color:"#408020"}));
+folder.layers.add(new LayerGroup({name:"Empty pass",blendMode:"pass-through"}));
+document.selectedLayer = folder;
+print("Native folder export ready");
+```
+
+## Brush pressure response (schema 29)
+
+`new PressureCurve({points: [{input, output}, ...]})` creates an immutable response value. It accepts 2–16 finite knots in `[0,1]`; inputs must increase strictly, begin at 0 and end at 1, and outputs must not decrease. Outputs may start above zero or end below one to author a minimum/maximum response. Unknown fields, duplicate/unordered inputs, decreasing outputs, nonfinite/out-of-range values and invalid knot counts throw. `PressureCurve.linear()`, `.soft()` and `.firm()` return normalized preset values. `.points` and `.toJSON()` return owned copies; editing those copies or constructor input does not change the curve.
+
+`BrushOptions.pressureCurve?: PressureCurve | PressureCurveData | null` applies to `BrushStroke`, `PencilStroke`, `EraserStroke` and `CloneStroke`. Absent/null selects the existing response and omits the field from serialized data: pressure-size retains its 5% minimum and pressure-opacity its 1% minimum. An explicit curve uses its complete output range, including true zero. Zero size or alpha emits no dab; pencil rounding does not turn a zero-size response into a visible pixel. The independent flow behavior and whole-stroke opacity remain unchanged. The getter `stroke.pressureCurve` returns an immutable value or null. Strokes are immutable values; add a replacement through the existing stroke collection/transaction to change recorded artwork.
+
+`pressureSize` defaults to true; `pressureOpacity` defaults to false. The curve affects only enabled dynamics. It is evaluated after interpolation of recorded point pressure, so the original stored samples are not replaced with curve outputs. Size, alpha, spacing, bounds, native Canvas replay, SVG dabs and supported WebGPU stamps share this response. Completely zero-response segments need no stamp iteration; the existing half-pixel minimum spacing and numerical-precision checks still govern nonempty replay. SVG retains the rendered dab geometry/coverage, not the original brush-command/curve controls. Subpixel strokes can require the reference Canvas path; this adds no universal GPU/performance guarantee.
+
+`document.applyTonalSculpt(path, mode, range, exposure, options?)` also accepts `options.pressureCurve` as a PressureCurve value, strict DTO or null shorthand. HTTP tonal-sculpt options use the serialized DTO form. `TonalStroke` captures the curve through its BrushStroke value.
+
+The Pressure response button in brush, pencil, eraser, clone, dodge/burn and healing controls opens the custom curve editor. Default response retains the existing minima; choosing Linear creates an explicit full-range curve. Presets, graph and paired slider/numeric knot controls support add/remove, validation, Apply, Cancel and Escape. Tool settings affect new strokes and remain transient; authored stroke curves persist. Existing strokes are not rewritten. The trusted host `editor.tools.configure({pressureCurve: curveData | null})` validates/copies settings before publication and cancels an active gesture when its curve changes. Invalid settings leave the gesture/settings intact. The host ToolController is not an isolated-script API or a persistent brush-preset library.
+
+For explicit curves with enabled dynamics, browser pen pressure preserves finite zero/low values before the existing smoothing step; mouse input retains its normal fixed pressure. Default response keeps its prior normalization. Recorded points may therefore reflect normalization/smoothing, not raw hardware samples. Coalesced input and the final release endpoint follow the existing gesture contract. Physical tablet, tilt, textured-tip, mixer/smudge, wider brush-library and sustained F06/F14 acceptance remain unfinished.
+
+Document schema 29 retains optional `pressureCurve: {points:[{input,output},...]}` on brush records, including painted masks/filter masks, raster erasures, tonal strokes and embedded document masters. Valid v1–v28 documents/history migrate; older root labels containing the new brush field reject. Project 3 and workspace 2 remain unchanged. Shared OO/REST commands keep locks, atomic batches, revision conflicts and undo/redo. Serialized brush DTOs omit the field for default response; explicit null is constructor/tool shorthand and is invalid in the strict serialized brush DTO. Installation remains inert; isolated Scripts/plugins gain the pure `PressureCurve` constructor through existing document-write commands, without new file, network, asset-byte or export privileges.
+
+<!-- example: pressure-response -->
+
+```js
+document.resize(320, 180);
+const study = document.layers.add(new PaintLayer({name:"Pressure studies"}));
+const responses = [PressureCurve.linear(), PressureCurve.soft(), PressureCurve.firm()];
+const colors = ["#3060a0", "#408020", "#a04060"];
+for (let row = 0; row < responses.length; row++) {
+  const y = 36 + row * 54;
+  study.strokes.add(new BrushStroke({
+    points: [{x:32,y,pressure:0}, {x:96,y,pressure:0.25},
+      {x:192,y,pressure:0.5}, {x:288,y,pressure:1}],
+    size:32, hardness:1, color:colors[row],
+    pressureSize:true, pressureOpacity:true, pressureCurve:responses[row]
+  }));
+}
+document.selectedLayer = study;
+print("Pressure response study ready");
+```
+
+
+## Brush presets: trusted host preferences
+
+The browser's Brush presets library saves tool/dynamics values independently of documents. Trusted application code uses the immutable BrushPreset value and EditorApplication.brushPresets service; exact signatures, bounds, optimistic revisions, portable packs and recovery behavior are in [BRUSH_PRESETS.md](BRUSH_PRESETS.md). ToolController.applyBrushPreset validates before cancelling/configuring future gestures and returns the tool name for UI selection. These are host APIs, not new isolated constructor/global services. Scripts still author complete BrushStroke/PencilStroke/EraserStroke/CloneStroke/TonalStroke values through existing commands. A stroke/project does not depend on a saved preset reference. Document 29/project 3/workspace 2 and script isolation remain unchanged.
+
+## Brush tip shape and pen tilt (schema 30)
+
+`new BrushTip(options = {})` creates an immutable tip value. Options are `roundness` (finite .01–1, default 1), `angle` (finite -180–180 degrees, default 0), `tiltAngle` and `tiltRoundness` (booleans, default false), and `tiltCurve` (`PressureCurve`, strict curve DTO, or null; default null/linear). Getters expose those values; `.with(options)` returns a new validated tip and `.toJSON()` returns an owned DTO. Invalid geometry, curves, or unknown fields throw before an attached document edit. Positive angles rotate clockwise in the downward-positive stroke plane.
+
+`BrushOptions.tip?: BrushTip | BrushTipData | null` is supported by BrushStroke, PencilStroke, EraserStroke and CloneStroke; absent/null omits the field and retains legacy round/square rendering. `stroke.tip` returns an immutable BrushTip or null. A strict serialized tip requires `roundness` and `angle`; nullable input is constructor shorthand, not serialized brush data. Nondefault tips remain captured by value in each stroke, independently of tool preferences and library presets. A shaped pencil is a hard rectangle: its pressure-scaled width and roundness-scaled height round to whole local pixels, with a minimum of one pixel only for a positive size. Explicit zero pressure response remains empty. A rotated rectangle has conservative corner-aware bounds.
+
+Each stroke point can additionally carry `tilt: {altitude, azimuth}` in **radians**. Altitude is 0–π/2 (horizontal to upright); azimuth is 0–2π clockwise from local +X. Both fields are required, finite, and strictly validated. Missing orientation acts upright. `tiltAngle` adds azimuth to the authored angle when inclined. For `tiltRoundness`, let `t = 1 - altitude/(π/2)` and `f` be the authored curve or linear response: effective roundness is `max(.01, roundness * (1 - f(t)))`. Tilt does not change authored pressure samples. Replay interpolates altitude linearly and azimuth along the shortest angular arc. It retains orientation-only changes at one position; smoothing interpolates orientation together with position/pressure. Spacing accounts for endpoint roundness while retaining the existing minimum replay step of .5 document pixels. Extremely thin/rotated geometry can require the complete Canvas fallback rather than GPU rendering.
+
+Browser pen input prefers valid Pointer Events spherical orientation, falling back to the standard tiltX/tiltY projection. The ambiguous exactly horizontal non-axis tiltX/tiltY pair resolves to azimuth zero unless the browser supplies spherical angles. This sensor convention is not a claim of physical-tablet verification. Projected direction is transformed through the inverse linear layer/mask plane; altitude is preserved. Fresh paint/healing uses the document plane; reused paint, raster erasures and tonal layers use their layer plane. Filter-mask painting includes the smart master's pixel scaling. Mouse input uses static angle/roundness. Cursors show nominal full-pressure support in the same plane; shaped healing guides show endpoint footprints and a connecting centerline.
+
+The **Brush tip…** dialog edits a local draft. Preview tilt/direction controls affect only its diagram. Tilt response opens the shared knot editor; Cancel/Escape returns to the tip draft, and applying a curve does not publish tool settings until **Apply tip**. Cancel leaves settings/history unchanged. Use default tip restores legacy rendering for future strokes. The trusted host accepts `editor.tools.configure({tip: tipData | null})`: it validates/owns data before cancelling an active gesture when settings change. Invalid input leaves gesture and settings intact. No new global shortcut is introduced.
+
+`document.applyTonalSculpt(path, mode, range, exposure, options?)` accepts these optional point orientations and `options.tip` using the same constructor/null shorthand. LayerMask painted entries, filter masks, raster erasures, TonalStroke and healing requests retain the same validated brush records. Isolated scripts/plugins receive only the pure BrushTip constructor through existing permissions and host validation. REST uses strict serialized tip/point DTOs and existing revision/undo/lock rules; it remains a separate headless document service.
+
+Document schema 30 admits tip and spherical point metadata in every brush-bearing context, including embedded masters and restored history. Valid schemas 1–29 migrate without inserting fields; older labels containing either new field reject. Project container 3 and workspace 2 stay unchanged. Tip-bearing saved presets/packs use version 2; version-1 presets retain their original shape and reset future tools to default tips. See [brush-library compatibility](BRUSH_PRESETS.md). Native Canvas, SVG and supported WGSL share stamp geometry; edge antialiasing can vary between engines. This does not complete textured tips, symmetry, mixer/smudge, hardware-tablet validation or universal 60fps.
+
+<!-- example: brush-tip-shape -->
+
+```js
+const layer = document.layers.add(new PaintLayer({name: "Tilt study"}));
+layer.strokes.add(new BrushStroke({
+  points: [{x: 80.5, y: 80.5, pressure: 1,
+    tilt: {altitude: Math.PI / 4, azimuth: Math.PI / 2}}],
+  size: 80, hardness: 1, color: "#ff0000", pressureSize: false,
+  tip: new BrushTip({roundness: 1, angle: 0,
+    tiltAngle: true, tiltRoundness: true,
+    tiltCurve: PressureCurve.linear()})
+}));
+document.selectedLayer = layer;
+print("Tilt study ready");
+```
+
+The single hard stamp is 40 pixels wide and 80 pixels tall, centered at (80.5, 80.5), in the new layer's document coordinate plane. Its tip and spherical sample remain editable stroke data through undo and project reload.
+
+## Brush symmetry replay (schema 31)
+
+`BrushSymmetry` is an immutable value containing `copies`, an array of 1–31 finite invertible `AffineTransform` values or strict affine DTOs. The original copy is implicit; identity and duplicate copy matrices reject. Unknown fields and singular matrices reject before an attached edit. `.copies` returns immutable matrix values in an owned array; `.toJSON()` returns owned serialized data. This metadata budget permits at most 32 total copies and does not limit image dimensions.
+
+Factories are `BrushSymmetry.mirrorVertical(x)`, `.mirrorHorizontal(y)`, `.bothAxes({x,y})` and `.radial({x,y}, count)` with 2–32 integer sectors. Mirror lines/centers use stroke-plane coordinates. `.transformed(mapping)` conjugates each copy with `mapping * copy * mapping.inverse()` to preserve complete ink geometry when moving between coordinate planes. Generic affine matrices support this conjugation through nonuniformly scaled/sheared layers; they are not restricted to rotations after conversion.
+
+`BrushOptions.symmetry?: BrushSymmetry | BrushSymmetryData | null` applies to BrushStroke, PencilStroke, EraserStroke and CloneStroke. Absent/null selects ordinary ink and omits serialized metadata. `stroke.symmetry` returns a BrushSymmetry or null. Strict serialized brush data requires `{copies:[{a,b,c,d,e,f},...]}`; null is constructor/tool shorthand only. All copies share the original recorded point pressure/tilt and brush settings. The complete already-shaped tip footprint, including pixel-anchored pencil geometry, is transformed; merely reflecting a point does not suffice. Original-first, copy-array order applies at each interpolated dab. Overlapping copies accumulate flow on one stroke surface; captured selection clipping and whole-stroke opacity apply once to that surface. No original point is replaced or dropped.
+
+Canvas/SVG/supported WGSL share geometry. Viewport clipping maps each copy's visible region back into the original plane and merges native stamp-index ranges, retaining replay order without scanning the gap between distant copies. Bounds/culling and clone source capture include reflected/rotated support. Numerical precision failures reject rendering or use the complete Canvas fallback; they do not truncate source resolution. Pixel-edge antialiasing remains backend dependent.
+
+`document.applyTonalSculpt(path, mode, range, exposure, options?)` accepts `options.symmetry` using the same immutable value/DTO/null shorthand. Painted ordinary/filter masks, raster erasures, tonal and healing requests retain the same brush contract. Schema 31 admits the field in every brush-bearing context and retained history; falsely old labels reject, valid old roots/history migrate without injected fields. Project 3/workspace 2 remain separate formats. REST uses serialized values with the existing strict command/lock/revision/undo rules. Isolated scripts/plugins receive only the pure BrushSymmetry constructor, with no new file/network/export/asset privileges. REST continues to own separate headless documents.
+
+Trusted tool configuration accepts `editor.tools.configure({symmetry: data | null})` in **document coordinates**. Settings validate before cancelling active gestures or publishing values. Actual painting captures conjugated layer/mask/native-master-plane metadata; healing/new paint uses the document plane. The Symmetry dialog and guide/cursor feedback are described below. Portable preset/pack v3 retains the same document-space setting; legacy v1/v2 presets clear symmetry when applied.
+
+<!-- example: brush-symmetry -->
+
+```js
+const layer = document.layers.add(new PaintLayer({name: "Four-way ink"}));
+layer.strokes.add(new BrushStroke({
+  points: [{x: 16.5, y: 32.5}], size: 12, hardness: 1,
+  color: "#ff0000", pressureSize: false,
+  symmetry: BrushSymmetry.radial({x: 32.5, y: 32.5}, 4)
+}));
+document.selectedLayer = layer;
+print("Four-way ink ready");
+```
+
+The four hard circular stamps have centers (16.5,32.5), (32.5,16.5), (48.5,32.5) and (32.5,48.5). They remain one self-contained stroke and one attached add operation through undo and project reload. This does not complete textured tips, mixer/smudge, physical-device verification or full F06/F14.
+
+
+### Symmetry controls and feedback
+
+Open **Symmetry…** from Brush/Pencil/Eraser/Clone/Dodge/Burn/Healing options. Choose Off, Vertical mirror, Horizontal mirror, Both axes or Radial. Exact line/center fields accept finite fractional document-pixel coordinates within safe integer bounds; they are not constrained to the current canvas. Radial sectors accepts integer 2–32; invalid drafts disable Apply. Center on canvas explicitly moves supported drafts to the current canvas midpoint. Cancel/Escape preserves settings and history; Apply affects future strokes only. Opening the modal cancels transient gestures. Custom affine copies remain intact unless replaced with another mode; the dialog preserves unchanged values rather than reconstructing approximate inferred geometry.
+
+Guides identify supported mirror lines/radial sectors. Nominal full-pressure ghost cursors use the complete current layer/mask/tilt plane and document-space copies. Their SVG is bounded to the visible viewport, with screen-width contrast strokes and at most 32 retained copy groups; offscreen copies remain in stroke metadata and exports. Panning/zooming changes presentation, not captured geometry. Changing symmetry cancels the current gesture after all dynamics validate. Tool preferences remain transient across reload; stored strokes and named v3 presets retain their own values. Preset coordinates are absolute document pixels; applying to a differently sized document does not silently recenter them. Reopen Symmetry and use Center on canvas when desired. See [brush preset compatibility](BRUSH_PRESETS.md) for format compatibility and storage conflicts.
+
+## Image-backed brush textures (schema 32)
+
+`new BrushTexture({assetId, channel?, invert?})` creates an immutable reference to an image already imported into the document's AssetStore. `assetId` is a nonempty string of at most 240 characters; `channel` is `"luminance"` (default) or `"alpha"`; `invert` defaults to false. Unknown fields, invalid enums and nonboolean inversion reject. Read-only getters expose these three values. `.with(partialOptions)` creates another validated value; `.toJSON()` returns an owned `{assetId, channel, invert}` DTO. Constructors do not read or import files and do not prove an asset exists. The host checks referenced assets before applying isolated results or external commands.
+
+`BrushStroke`, `PencilStroke`, `EraserStroke` and `CloneStroke` accept `texture: BrushTexture | BrushTextureData | null` in their existing options. Omitted/null options preserve the ordinary tip and serialize no texture field; the `.texture` getter returns null. A supplied DTO must include all three fields. A serialized stroke's optional `texture` field cannot be null. Invalid records reject before committing. `Document.applyTonalSculpt(..., options)` accepts the same texture option; mask/refinement strokes, filter masks, raster erasures and embedded component content retain it through their ordinary commands, locks and undo. Schema labels below 32 reject texture metadata, including retained history. Valid older documents upgrade without inserting texture fields. Project v3/workspace v2 remain unchanged.
+
+Coverage stretches the complete source image over each normalized ellipse or pencil rectangle before applying existing hardness, flow, pressure, tip orientation and symmetry. Texture angle remains meaningful on a round tip. Alpha mode uses source alpha; inverted alpha uses the projected opaque source-image support minus projected alpha, so inversion never adds ink outside the projected image. Encoded luminance uses `(2126R + 7152G + 722B) / 10000`: black is ink by default and white is ink when inverted, multiplied by source alpha. Transparent pixels stay transparent in luminance mode. Coverage rounds half up to 8-bit alpha. This is encoded-channel coverage, not ICC-managed/linear-light luminance. Brush projection uses native Canvas smoothing; pencil projection uses nearest-neighbor sampling. Captured selection and whole-stroke opacity apply once after dab-flow accumulation. Clone textures modulate the captured destination-relative source field; they do not replace it.
+
+Native replay samples original bitmap pixels directly into bounded visible tiles; it does not store a resized thumbnail as the tip. Original Blob bytes, dimensions and TIFF page/precision settings remain project/workspace/recipe sources. Working tile/cache/prefix budgets do not cap source resolution. Texture paint currently selects complete Canvas/WASM viewport fallback; masks can use native coverage with GPU composition. SVG embeds streamed source-resolution white/alpha PNG coverage and references it from dab masks. It retains visible dabs, but not original texture bytes, color channels, asset identity or editable brush dynamics. SVG sampling/edge rounding can differ from native Canvas. Source/output/browser memory remains data dependent.
+
+Import an image and select its unlocked raster layer before running this example. The source layer is hidden, not removed; its original asset also remains referenced by the textured stroke. The entire run is one undo entry. No file, network, export or additional plugin capability is granted by `BrushTexture`.
+
+<!-- example: brush-texture -->
+
+```js
+const source = document.selectedLayer;
+if (!(source instanceof RasterLayer)) {
+  throw new Error("Import and select an unlocked texture image first.");
+}
+const texture = new BrushTexture({assetId: source.assetId, channel: "luminance"});
+const ink = document.layers.add(new PaintLayer({name: "Image-backed ink"}));
+ink.strokes.add(new BrushStroke({
+  points: [{x: 32.5, y: 32.5}], size: 32, hardness: 1,
+  pressureSize: false, color: "#ff0000", texture
+}));
+source.visible = false;
+document.selectedLayer = ink;
+print("Image-backed ink ready");
+```
+
+This authored API/compositor integration is in verification. Active-tool texture controls, texture-aware cursors and per-gesture source ownership are now connected and in verification. Portable source-bearing brush presets are now connected and in verification. Existing metadata-only preset packs do not carry texture sources. Mixer/smudge, physical-tablet testing, hardware-GPU/display and sustained all-tool frame-rate gates remain open.
+
+### Recipe layer-template defaults
+
+Portable recipe `layer.add` templates may omit `strokes` on a paint layer, `paths` on a vector layer, or `adjustment` on an adjustment layer. Execution fills these fields from the existing constructors (empty paint/path collections and the default Curves adjustment). Supplied complete artwork remains unchanged. Source collection/remapping accepts these partial templates while still requiring concrete asset IDs for supplied texture/image references. A package of default layers contains no image sources and commits through the ordinary atomic recipe/undo boundary.
+
+### Trusted shared image ownership
+
+`sourceStore.shareTo(destinationStore, assetId, sharedId?): Readonly<ImageAsset>` is a trusted host AssetStore operation, separate from isolated document constructors. The source must be fully imported, its native bitmap/dimensions must still agree, and both stores must be open. Omitted `sharedId` creates a fresh ID; an explicit ID must contain 1–240 characters and cannot collide with an installed or pending destination asset. Sharing the same source ID into the same store is a no-op. Other calls create a distinct frozen record referencing the same original Blob and bitmap, with copied/frozen TIFF page/precision choices. There is no image resampling, file read, command, document revision, undo entry or automatic metadata analysis.
+
+Both stores hold explicit bitmap ownership. Removing/disposing one reference keeps other references alive; the last removal closes the bitmap exactly once. Returned image records and bitmaps are borrowed: do not modify or close them. Ordinary `install(asset, analyzeMetadata=true)` retains its adoption contract for caller-owned, unshared assets; adopting a shared/borrowed record rejects and must use `shareTo`. Duplicate/pending IDs, missing/stale sources and disposed stores reject before a new shared reference is installed. Store disposal is terminal and idempotent; new import, install, share or lifetime capture rejects afterward. Existing captured lifetime guards still reject disposal during asynchronous work.
+
+This adds no image-byte access, AssetStore constructor or shared ownership method to Scripts/plugins/REST. It supports global texture preferences and document-local gesture capture. Original-byte portable texture presets are now connected and in verification.
+
+The trusted `EditorApplication.brushTextureSource` service owns the current original source independently of open documents. Its borrowed `.source` is an immutable ImageAsset or null. `capture(store, assetId)` synchronously retains an existing ready source; invalid input leaves the current/pending source intact. `import(blob, name, options={})` privately decodes using the existing AssetImportOptions (`signal`, progress and TIFF choices), then replaces only on success. A newer capture/import, clear, cancellation or disposal prevents stale decode publication. Decode failure preserves the previous ready source. `ensureIn(destinationStore)` synchronously returns/reuses a live document-local lease, creating a fresh ID if an earlier reference was removed/reused. `clear()` releases the preference reference; `dispose()` is terminal/idempotent and is called by application disposal. Documents retaining a lease remain alive independently. These trusted services now support textured pointer tools and UI source controls/cursors, in verification. Portable texture presets are now connected and in verification; none of these services are isolated script/plugin bindings.
+
+Recapturing the same original bitmap/Blob/name/dimensions/TIFF choices preserves the existing preference and its document-local references while cancelling an older pending replacement. Script repair and matting preview now retain borrowed inputs with explicit leases and release their private views completely; prepared script output remains alive in the document after successful atomic commit. The isolated `document.assetStore` remains null, and neither AssetStore nor BrushTextureSourceOwner is a script binding.
+
+
+### Trusted texture tool preferences
+
+`editor.tools.configure({texture: {channel: "alpha" | "luminance", invert: boolean} | null})` selects coverage for future gestures. The internal strict preference parser defaults omitted channel/invert to luminance/false. Null disables texture and retains the ready source for reuse. Enabling requires a ready `editor.brushTextureSource.source`; invalid texture/tip/symmetry/pressure values throw before cancelling the current gesture. Preferences carry no asset ID and are transient across workspace reloads. Each gesture captures its own authored BrushTexture and document lease, including masks, filter-mask master planes, erasures, tonal brushes and healing.
+
+`sourceOwner.captureFrom(otherOwner)` synchronously captures the other owner's ready original without a document insertion; missing/disposed sources throw before replacement. `sourceOwner.leaseIn(destinationStore)` returns `{asset, created}` and reports whether a new reference was installed; `ensureIn` remains the asset-only convenience. Borrowed ImageAsset records/bitmaps must never be closed or adopted through install. `editor.tools.applyBrushTexture(draftOwner, preference)` validates coverage and ready source, captures that draft into the application owner, then cancels the previous gesture and configures future strokes. The caller still owns/disposes the draft. Invalid drafts/preferences preserve active source/settings. These are trusted application adapters, not constructors/members available to isolated Scripts, plugins or REST.
+
+The visible Texture dialog provides file/document-source selection, TIFF review, channel/inversion, a bounded coverage proxy, and Apply/Cancel. No pixel data or preference source is uploaded. Existing metadata-only preset formats 1–3 cannot save textures: enabled texture capture throws an explicit source-bearing-pack error rather than discarding bytes. Applying an older preset disables texture. Original-byte portable packs and sustained/device acceptance remain unfinished.
+
+
+Texture gesture continuation, queued previews and final commit also validate the captured store/record/bitmap identity. Removing or replacing the asset under the same ID cancels/rejects the stale gesture without document/history edits or deletion of the foreign replacement. This guard supplements document revision checks; asset IDs alone are not an ownership proof.
+
+
+## Source-bearing brush presets — 2026-10-18, in verification
+
+Preset/pack v4 carries image-backed coverage preferences and exact original Blob sources with native dimensions, MIME/name, SHA-256 and TIFF page/precision choices. Source-free JSON versions 1–3 remain readable/exportable. Binary packs use a checksummed 48-byte header, strict manifest and contiguous original-blob slices; readers reject missing/unused references, corrupted extents/checksums and native decode/dimension mismatches before any import commit. Portable source IDs are remapped and cannot bind to document asset IDs. The single existing IndexedDB v1 preset store now atomically stores optional source blobs alongside their preset; no physical schema migration is needed. Older strict readers reject these newer records while preserving bytes.
+
+The library verifies actual stored source contents before writes and retains last-valid snapshots on failures. Read-only keepalive requests maintain the native write lock across asynchronous checks; only active request callbacks queue changes. Recovery v2 preserves raw records and original blobs, including invalid preset metadata, and compares complete content fingerprints under that lock before reset. Same-size byte changes and stale revisions cannot be erased with an old backup. Legacy JSON recovery remains available for source-free records; unsupported raw non-JSON values still fail without deleting data.
+
+The custom preset dialog connects source-aware save/update/rename/duplicate/delete/import/export/download/recovery and shows source name/dimensions/coverage. Applying privately verifies/decodes an original, guards abort/supersession/document/tool/source changes, then uses normal tool selection/configuration; errors retain prior ready preferences and newer human edits. Preferences stay outside document undo; actual strokes still use shared OO commands/history and collision-safe document leases. Original images stay independent of viewport/cursor proxies, library deletion and closed source documents. This adds no isolated script/plugin file privilege, paid provider, upload, REST/browser sync or document schema bump. See [BRUSH_PRESETS.md](BRUSH_PRESETS.md) for signatures, binary contract, errors and limits. Complete native/production verification and wider F06/F14/device gates remain open.
+
+Trusted browser APIs: `new BrushPreset(data, source?)`, `captureBrushPreset(name, tool, settings, sourceOwner, includeColor=false, signal?)`, `parseBrushPack(file, signal?)`, `exportBrushPack(presets, signal?)`, `editor.brushPresets.importFile(file, signal?)`, `exportFile(ids?, signal?)`, `exportRecoveryFile(signal?)`, `resetFromRecoveryFile(file, signal?)` and `editor.applyBrushPreset(preset, {signal?, selectTool?}={})` are asynchronous where file/verification work is required. Capture retains a ready original across hashing; Apply prepares privately and calls the optional trusted UI selector only after validation. Constructor shape validation alone is not a checksum/native verification proof. Missing source records, malformed packs, decode failures, changed sessions/preferences and cancellation reject before publication. Source-free JSON helpers remain compatible; attempted texture loss is rejected. These names are not bindings available to isolated Scripts/plugins or headless REST sessions.

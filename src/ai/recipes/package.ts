@@ -1,4 +1,5 @@
 import { z } from "zod";
+import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
 import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from "../../core/interchange/tiff/types";
 import type { Recipe } from "./types";
 import { recipeSchema } from "./schema";
@@ -49,42 +50,17 @@ export function recipeAssetIds(recipe: Recipe): Set<string> {
       throw new Error("Portable recipes require concrete source asset IDs.");
     result.add(value);
   };
-  const mask = (value: unknown) => {
-    if (
-      value &&
-      typeof value === "object" &&
-      (value as { kind?: string }).kind === "bitmap"
-    )
-      add((value as { assetId?: unknown }).assetId);
-  };
-  const adjustment = (value: unknown) => {
-    if (
-      value &&
-      typeof value === "object" &&
-      (value as { kind?: string }).kind === "patch"
-    )
-      add((value as { assetId?: unknown }).assetId);
-  };
   const layer = (value: unknown) => {
     if (!value || typeof value !== "object") return;
     const node = value as Record<string, unknown>;
-    if (node.kind === "raster") add(node.assetId);
-    mask(node.mask);
-    if (node.kind === "adjustment") adjustment(node.adjustment);
+    visitLayerTemplateAssets(value,reference=>add(reference.assetId));
     if (node.kind === "group" && Array.isArray(node.children))
       node.children.forEach(layer);
-    if (node.kind === "paint" && Array.isArray(node.strokes)) {
-      for (const stroke of node.strokes)
-        if (stroke?.kind === "clone" && Array.isArray(stroke.tiles)) {
-          for (const tile of stroke.tiles) add(tile.assetId);
-        }
-    }
   };
   for (const step of recipe.steps) {
     if (step.action.type === "layer.add") layer(step.action.layerTemplate);
     if (step.action.type === "layer.update") {
-      mask(step.action.patch.mask);
-      adjustment(step.action.patch.adjustment);
+      visitLayerPatchAssets(step.action.patch,reference=>add(reference.assetId));
     }
   }
   return result;

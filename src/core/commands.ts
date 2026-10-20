@@ -52,6 +52,7 @@ import type {
   TextLayerData,
   AdjustmentLayerData,
   ToneEffectData,
+  LayerBlendMode,
 } from "./model";
 
 export type LayerPatch = Partial<
@@ -66,11 +67,10 @@ export type LayerPatch = Partial<
     | "opacity"
     | "fillOpacity"
     | "styles"
-    | "blendMode"
     | "x"
     | "y"
   >
-> &
+> & { blendMode?: LayerBlendMode; frequencyRadius?: number | null } &
   Partial<Pick<RasterLayerData, "width" | "height" | "erasures">> &
   Partial<
     Pick<
@@ -467,6 +467,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
       return;
     }
     case "layer.update":
+      if ("frequencyRadius" in command.patch && layer.kind !== "group") throw new Error("A shared frequency radius requires a group.");
       if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
       if (layer.kind !== 'text' && ['text','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
         throw new Error('Typography properties require a text layer.');
@@ -482,6 +483,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "locked",
               "opacity",
               "fillOpacity",
+              "frequencyRadius",
               "styles",
               "blendMode",
               "x",

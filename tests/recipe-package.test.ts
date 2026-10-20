@@ -94,3 +94,17 @@ it("collects nested image, bitmap-mask and clone references while rejecting unre
   };
   expect(() => recipeAssetIds(nested)).toThrow("concrete");
 });
+
+it('bundles texture-only assets from nested artwork, mask refinements, erasures and tonal patches',()=>{
+ const nested=structuredClone(recipe),texture=(assetId:string)=>({assetId,channel:'alpha',invert:false});
+ nested.steps[0].action={type:'layer.add',layerTemplate:{kind:'group',name:'Textured group',children:[{kind:'paint',strokes:[{kind:'brush',texture:texture('paint-grain')}]},{kind:'raster',assetId:'original',erasures:[{stroke:{kind:'eraser',texture:texture('erase-grain')}}]}]}};
+ nested.steps.push({id:'mask',name:'Refinement',action:{type:'layer.update',target:{kind:'selected'},patch:{mask:{kind:'paint',strokes:[{mode:'hide',stroke:{kind:'brush',texture:texture('mask-grain')}}]},filterMask:{kind:'paint',strokes:[{mode:'hide',stroke:{kind:'brush',texture:texture('filter-grain')}}]},adjustment:{kind:'tonal',strokes:[{brush:{kind:'brush',texture:texture('tonal-grain')}}]}}}} as never);
+ expect(recipeAssetIds(nested)).toEqual(new Set(['paint-grain','original','erase-grain','mask-grain','filter-grain','tonal-grain']));
+});
+
+it('packages constructor-default templates without treating absent stroke/adjustment arrays as complete DTOs',async()=>{
+ const {Document}=await import('../src/dom'),{executeRecipe}=await import('../src/ai/recipes/executor'),minimal=structuredClone(recipe);
+ minimal.steps=(['paint','vector','adjustment'] as const).map(kind=>({id:kind,name:kind,action:{type:'layer.add',layerTemplate:{kind,name:kind}}}));
+ expect(recipeAssetIds(minimal)).toEqual(new Set());const file=await serializeRecipePackage(minimal,{get(){throw new Error('No image sources should be read.');}}),restored=await readRecipePackage(file);expect(restored.assets).toHaveLength(0);
+ const doc=new Document(),result=executeRecipe(restored.recipe,doc);expect(result.success,result.error).toBe(true);expect(doc.toJSON().children.map(layer=>layer.kind)).toEqual(['paint','vector','adjustment']);doc.undo();expect(doc.layers.length).toBe(0);
+});

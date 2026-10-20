@@ -1,4 +1,6 @@
 import {vectorStrokeKeys} from './vector-stroke';
+import {visitLayerAssets} from './asset-references';
+import {assertBrushVersion} from './drawing';
 import {applyTextStyle, measureStyledText, UnsupportedTextStyleError} from './text-style';
 import {layoutText, NativeJustificationError, assertParagraphStyle, type ParagraphStyle} from './text-layout';
 import { yieldTask } from "./task-yield";
@@ -18,7 +20,7 @@ import { affineSchema } from "./transform-schema";
 import type { AffineData } from "./affine";
 import { adjustmentSchema, defaultCurvesAdjustment } from "./adjustments";
 import type { AdjustmentData } from "./adjustments";
-import { layerMaskSchema } from "./masks";
+import { layerMaskSchema,assertMaskOperationVersion } from "./masks";
 import type { LayerMaskData } from "./masks";
 import { authoredMetadataSchema } from "./metadata";
 import type { AuthoredMetadataData } from "./metadata";
@@ -36,7 +38,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 27;
+export const SCHEMA_VERSION = 37;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -57,8 +59,12 @@ export const BLEND_MODES = [
   "saturation",
   "color",
   "luminosity",
+  "linear-light",
+  "linear-burn",
 ] as const;
 export type BlendMode = (typeof BLEND_MODES)[number];
+export const GROUP_BLEND_MODES = ['pass-through', ...BLEND_MODES] as const;
+export type LayerBlendMode = (typeof GROUP_BLEND_MODES)[number];
 
 export interface ToneEffectData {
   id: string;
@@ -94,8 +100,11 @@ export interface RasterLayerData extends LayerBaseData {
   erasures?: import("./drawing").RasterErasureData[];
 }
 
-export interface GroupLayerData extends LayerBaseData {
+export interface GroupLayerData extends Omit<LayerBaseData, 'blendMode'> {
   kind: "group";
+  blendMode: LayerBlendMode;
+  /** Shared native-pixel radius for descendant frequency filters in this document plane. */
+  frequencyRadius?: number | null;
   children: LayerData[];
 }
 
@@ -167,6 +176,16 @@ export interface DocumentData {
     | 24
     | 25
     | 26
+    | 27
+    | 28
+    | 29
+    | 30
+    | 31
+    | 32
+    | 33
+    | 34
+    | 35
+    | 36
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -521,7 +540,10 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 24 &&
       value.schemaVersion !== 25 &&
       value.schemaVersion !== 26 &&
-      value.schemaVersion !== 27) ||
+      value.schemaVersion !== 27 &&
+      value.schemaVersion !== 28 &&
+      value.schemaVersion !== 29 &&
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -529,7 +551,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–27), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–37), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -575,6 +597,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       channelIds.add(channel.id);yield;
     }
   }
+  const checkBrush=(brush:{kind?:string;brush?:import('./drawing').BrushStrokeData;pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[];clip:unknown})=>{if(brush.kind==='wet'){if(Number(value.schemaVersion)<33)throw new Error('Prepared wet paint requires schema version 33.');if(!brush.brush)throw new Error('Missing wet-paint brush metadata.');checkBrush(brush.brush);}assertBrushVersion(brush,Number(value.schemaVersion));checkSelection(brush.clip);};
   checkSelection(value.selection);
   const ids = new Set<string>();
   let count = 0;
@@ -591,7 +614,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
         typeof node.visible !== "boolean" ||
         typeof node.locked !== "boolean" ||
         !number(node.opacity, 0, 1) ||
-        !BLEND_MODES.includes(node.blendMode as BlendMode) ||
+        !GROUP_BLEND_MODES.includes(node.blendMode as LayerBlendMode) ||
         !number(node.x, -MAX_COORDINATE, MAX_COORDINATE) ||
         !number(node.y, -MAX_COORDINATE, MAX_COORDINATE)
       ) {
@@ -599,8 +622,21 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
+      if (node.blendMode === 'pass-through') {
+        if (node.kind !== 'group' || Number(value.schemaVersion) < 28)
+          throw new Error('Pass-through blending requires a group and document schema 28.');
+        const style = node.styles === undefined ? undefined : styleSchema.parse(node.styles);
+        if ((node.fillOpacity ?? 1) !== 1 || style?.dropShadow.enabled || style?.colorOverlay.enabled || style?.blendIf.enabled)
+          throw new Error('Pass-through groups require full fill opacity and disabled group styles. Use Normal to isolate group effects.');
+      }
       if (node.kind !== 'text' && ('wordSpacing' in node || 'fontKerning' in node))
         throw new Error('Word spacing and font kerning require a text layer.');
+      if (node.frequencyRadius !== undefined) {
+        if (node.kind !== 'group' || Number(value.schemaVersion) < 37)
+          throw new Error('A shared frequency radius requires a group and schema version 37.');
+        if (node.frequencyRadius !== null && !number(node.frequencyRadius, 0, 4096 / 3))
+          throw new Error('Frequency radius must be finite and between 0 and 4096/3 native pixels.');
+      }
       if (node.kind !== 'text' && ('paragraphJustify' in node || 'wrapWidth' in node || 'paragraphSpacing' in node || 'firstLineIndent' in node))
         throw new Error('Paragraph layout requires a text layer.');
       if (node.transform !== undefined) {
@@ -616,11 +652,12 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
             "Layer masks require document schema version 3 or later.",
           );
         const mask = layerMaskSchema.parse(node.mask);
+        assertMaskOperationVersion(mask,Number(value.schemaVersion));
         if (mask.basis && Number(value.schemaVersion) < 6)
           throw new Error("Mask bases require schema version 6.");
         if (mask.kind === "selection") checkSelection(mask.selection);
         for (const paint of mask.strokes ?? [])
-          checkSelection(paint.stroke.clip);
+          checkBrush(paint.stroke);
       }
       if (node.metadata != null) {
         if (value.schemaVersion === 1)
@@ -632,6 +669,8 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       ids.add(node.id as string);
       if (node.fillOpacity !== undefined && !number(node.fillOpacity, 0, 1))
         throw new Error("Fill opacity must be between 0 and 1.");
+      if ((node.blendMode === "linear-light" || node.blendMode === "linear-burn") && Number(value.schemaVersion) < 36)
+        throw new Error("Linear Light requires schema version 36.");
       if (node.styles !== undefined) styleSchema.parse(node.styles);
       if (node.kind === "group") yield* walk(node.children, depth + 1);
       else if (node.kind === "smart-object") {
@@ -641,13 +680,16 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           if (Number(value.schemaVersion) < 12)
             throw new Error("Smart-filter masks require schema version 12.");
           const mask = layerMaskSchema.parse(node.filterMask);
+          assertMaskOperationVersion(mask,Number(value.schemaVersion));
           if (mask.kind === "selection") checkSelection(mask.selection);
-          for (const paint of mask.strokes ?? []) checkSelection(paint.stroke.clip);
+          for (const paint of mask.strokes ?? []) checkBrush(paint.stroke);
         }
         if (node.smartFilters !== undefined) {
           if (Number(value.schemaVersion) < 11)
             throw new Error("Smart filters require schema version 11.");
           smartFiltersSchema.parse(node.smartFilters);
+          if (Number(value.schemaVersion) < 36 && (node.smartFilters as any[]).some(f => f.kind === "frequency-band" || f.kind === "native-composition" || f.kind === "document-tone"))
+            throw new Error("Frequency bands require schema version 36.");
         }
         if (
           !text(node.componentId) ||
@@ -668,7 +710,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           if (Number(value.schemaVersion) < 16 || !Array.isArray(node.erasures) || node.erasures.length > 2048) throw new Error("Invalid raster erasures; schema version 16 is required.");
           for (const entry of node.erasures) {
             const { stroke } = validateDrawing(rasterErasureSchema, entry);
-            checkSelection(stroke.clip);
+            checkBrush(stroke);
             yield;
           }
         }
@@ -715,7 +757,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           if(node.kind==='vector'&&Number(value.schemaVersion)<23&&'fillGradient' in (entry as object))throw new Error('Vector gradients require schema version 23.');
           if(node.kind==='vector'&&Number(value.schemaVersion)<24&&('subpaths' in (entry as object)||'fillRule' in (entry as object)))throw new Error('Compound paths and fill rules require schema version 24.');
           if(node.kind==='vector'&&Number(value.schemaVersion)<22&&vectorStrokeKeys.some(key=>key in (entry as object)))throw new Error('Vector stroke styles require schema version 22.');
-          if ("clip" in parsed) checkSelection(parsed.clip);
+          if ("clip" in parsed) {if(parsed.kind!=='fill')checkBrush(parsed);else checkSelection(parsed.clip);}
           if (entryIds.has(parsed.id))
             throw new Error("Duplicate drawing object ID.");
           entryIds.add(parsed.id);
@@ -773,9 +815,11 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           throw new Error("White balance requires schema version 19.");
         if (node.adjustment.kind === "lut" && Number(value.schemaVersion) < 20)
           throw new Error("Imported LUTs require schema version 20.");
+        if (node.adjustment.kind === "red-eye" && Number(value.schemaVersion) < 35)
+          throw new Error("Red-eye correction requires schema version 35.");
         const adjustment = adjustmentSchema.parse(node.adjustment);
         if (adjustment.kind === "tonal")
-          for (const stroke of adjustment.strokes) checkSelection(stroke.brush.clip);
+          for (const stroke of adjustment.strokes) checkBrush(stroke.brush);
       } else throw new Error("Unsupported layer type.");
       yield;
     }
@@ -808,17 +852,6 @@ export function referencedAssets(document: DocumentData): Set<string> {
   const assets = document.components
     ? new ComponentRegistry(document.components).assetIds()
     : new Set<string>();
-  for (const layer of allLayers(document.children)) {
-    if (layer.kind === "raster") assets.add(layer.assetId);
-    if (layer.kind === "adjustment" && layer.adjustment.kind === "patch")
-      assets.add(layer.adjustment.assetId);
-    if (layer.kind === "smart-object" && layer.filterMask?.kind === "bitmap")
-      assets.add(layer.filterMask.assetId);
-    if (layer.mask?.kind === "bitmap") assets.add(layer.mask.assetId);
-    if (layer.kind === "paint")
-      for (const stroke of layer.strokes)
-        if (stroke.kind === "clone")
-          for (const tile of stroke.tiles) assets.add(tile.assetId);
-  }
+  for (const layer of allLayers(document.children))visitLayerAssets(layer,reference=>assets.add(reference.assetId));
   return assets;
 }

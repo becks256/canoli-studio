@@ -84,6 +84,10 @@ describe("UI Utils", () => {
   });
 
   describe("modifiers", () => {
+    it('preserves real zero and low pen pressure for explicit response curves',()=>{
+      for(const pressure of [0,.001,.02,.5,1])expect(modifiers({altKey:false,shiftKey:false,pointerType:'pen',pressure},true).pressure).toBe(pressure);
+      expect(modifiers({altKey:false,shiftKey:false,pointerType:'mouse',pressure:0},true).pressure).toBe(1);
+    });
     it("extracts keyboard modifiers and default mouse pressure", () => {
       const result = modifiers({
         altKey: true,

@@ -31,6 +31,125 @@ test('TIFF selected pages survive retained redo workspace and portable recipe ex
  },bytes);await info.attach('tiff-workspace-recipe',{body:JSON.stringify(result),contentType:'application/json'});expect(result.redoTiff?.page).toBe(2);expect(result.redoLayers).toBe(2);expect(result.packed?.page).toBe(2);expect(result.applied?.page).toBe(2);expect(result.same).toBe(true);expect(result.originalPreserved).toBe(true);
 });
 
+test('TIFF recovery retains selected-page pixels after reload and detects changed decode settings', async ({page}, info) => {
+ await page.goto('/');
+ const bytes = [...await readFile(base+'multipage.tif')];
+ const captured = await page.evaluate(async bytes => {
+  const {editor} = window.luma;
+  await editor.openTiff(new File([new Uint8Array(bytes)], 'Recover page three.tif', {type:'image/tiff'}), {page:2});
+  editor.document.name = 'Recover page three';
+  await editor.recovery.flush();
+  const hash = async (blob:Blob) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', await blob.arrayBuffer()))];
+  return {png:await hash(await editor.exportPng()), source:await hash(editor.assetStore.values()[0].blob)};
+ }, bytes);
+ await page.reload();
+ await page.getByRole('button', {name:'Recover work', exact:true}).click();
+ await page.locator('.recovery-row').filter({hasText:'Recover page three'}).getByRole('button', {name:'Restore', exact:true}).click();
+ await expect(page.getByLabel('Document name', {exact:true})).toHaveValue('Recover page three');
+ const restored = await page.evaluate(async () => {
+  const {editor} = window.luma, asset = editor.assetStore.values()[0];
+  const hash = async (blob:Blob) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', await blob.arrayBuffer()))];
+  return {tiff:asset.tiff, png:await hash(await editor.exportPng()), source:await hash(asset.blob)};
+ });
+ expect(restored).toEqual({...captured, tiff:{page:2, allowPrecisionLoss:false}});
+ const integrity = await page.evaluate(async () => {
+  const {editor} = window.luma, repo = editor.recovery.repository, asset = editor.assetStore.values()[0];
+  const {readProject} = await import(/* @vite-ignore */String('/src/core/project.ts'));
+  // Same original bytes and asset ID, but a different page is a distinct recoverable source.
+  await repo.save('tiff-settings-integrity', editor.document.toJSON(), {get:() => ({...asset, tiff:{page:0, allowPrecisionLoss:false}})});
+  editor.document.name = 'Latest page three';
+  await repo.save('tiff-settings-integrity', editor.document.toJSON(), editor.assetStore);
+  const entry = (await repo.list()).find(e => e.id === 'tiff-settings-integrity')!;
+  const differentKeys = entry.assetKeys[0] !== entry.previous![0].assetKeys[0];
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+   const request = indexedDB.open('luma-recovery');
+   request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error);
+  });
+  try {
+   const tx = db.transaction('assets', 'readwrite'), store = tx.objectStore('assets'), request = store.get(entry.assetKeys[0]);
+   request.onsuccess = () => store.put({...request.result, tiff:{page:1, allowPrecisionLoss:false}}, entry.assetKeys[0]);
+   await new Promise<void>((resolve,reject) => {tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error);});
+  } finally { db.close(); }
+  const result = await repo.restore('tiff-settings-integrity'), project = await readProject(result.blob);
+  await repo.remove('tiff-settings-integrity');
+  return {differentKeys, skipped:result.skipped, tiff:project.entries[0].tiff};
+ });
+ expect(integrity).toEqual({differentKeys:true, skipped:1, tiff:{page:0,allowPrecisionLoss:false}});
+ await info.attach('tiff-recovery', {body:JSON.stringify({restored,integrity}),contentType:'application/json'});
+});
+
+test('16-bit TIFF recovery retains explicit precision consent and editable output', async ({page}) => {
+ await page.goto('/');
+ const bytes=[...await readFile(base+'gray16-be.tif')];
+ const result=await page.evaluate(async bytes=>{
+  const {editor}=window.luma;
+  await editor.openTiff(new File([new Uint8Array(bytes)],'Precision recovery.tif',{type:'image/tiff'}),{allowPrecisionLoss:true});
+  const repo=editor.recovery.repository, document=editor.document.toJSON();
+  await repo.save('tiff-precision',document,editor.assetStore);
+  const {loadProject}=await import(/* @vite-ignore */String('/src/core/project.ts'));
+  const {exportPng}=await import(/* @vite-ignore */String('/src/engine/png.ts'));
+  const loaded=await loadProject(await repo.project('tiff-precision'));
+  try {
+   const asset=loaded.assets.values()[0],hash=async(blob:Blob)=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',await blob.arrayBuffer()))];
+   const restored=await exportPng(loaded.document,loaded.assets,editor.renderer);
+   return {tiff:asset.tiff,original:await hash(asset.blob),expected:await hash(editor.assetStore.values()[0].blob),samePixels:JSON.stringify(await hash(restored))===JSON.stringify(await hash(await editor.exportPng()))};
+  } finally {loaded.assets.dispose();await repo.remove('tiff-precision');}
+ },bytes);
+ expect(result.tiff).toEqual({page:0,allowPrecisionLoss:true});
+ expect(result.original).toEqual(result.expected);expect(result.samePixels).toBe(true);
+});
+
+test('legacy TIFF recovery without decode settings fails explicitly or uses an intact prior checkpoint', async ({page}) => {
+ await page.goto('/');
+ const bytes=[...await readFile(base+'multipage.tif')];
+ const result=await page.evaluate(async bytes=>{
+  const {editor,Document}=window.luma;
+  await editor.openTiff(new File([new Uint8Array(bytes)],'Legacy page three.tif',{type:'image/tiff'}),{page:2});
+  const before=JSON.stringify(editor.document.toJSON()),repo=editor.recovery.repository,asset=editor.assetStore.values()[0];
+  const original={id:asset.id,name:asset.name,width:asset.width,height:asset.height,blob:asset.blob};
+  // Reproduce pre-checksum records without inventing a page from current defaults.
+  const legacy=async(id:string)=>repo.persist({id,document:editor.document.toJSON(),savedAt:Date.now(),assetKeys:[id+':original']},[original]);
+  let saveError='',restoreError='';
+  try {await repo.save('missing-tiff-settings',editor.document.toJSON(),{get:()=>original});}catch(error){saveError=String(error);}
+  await legacy('legacy-tiff-only');
+  try {await repo.restore('legacy-tiff-only');}catch(error){restoreError=String(error);}
+  const stillRetained=(await repo.list()).some(e=>e.id==='legacy-tiff-only');
+  await repo.save('legacy-tiff-fallback',new Document({name:'Intact older work'}).toJSON(),{get:()=>{throw new Error('No source needed');}});
+  await legacy('legacy-tiff-fallback');
+  const recovered=await repo.restore('legacy-tiff-fallback'),{readProject}=await import(/* @vite-ignore */String('/src/core/project.ts'));
+  const project=await readProject(recovered.blob);
+  await repo.remove('legacy-tiff-only');await repo.remove('legacy-tiff-fallback');
+  return {saveError,restoreError,stillRetained,unchanged:before===JSON.stringify(editor.document.toJSON()),skipped:recovered.skipped,name:project.document.name};
+ },bytes);
+ expect(result.saveError).toContain('TIFF recovery requires saved page and precision settings');
+ expect(result.restoreError).toContain('TIFF source is missing its saved page and precision settings');
+ expect(result.stillRetained).toBe(true);expect(result.unchanged).toBe(true);
+ expect(result.skipped).toBe(1);expect(result.name).toBe('Intact older work');
+});
+
+test('unsupported TIFF preflight and cancellation preserve existing edited artwork', async ({page}) => {
+ await page.goto('/');
+ const before=await page.evaluate(()=>{
+  const {editor,TextLayer}=window.luma;
+  editor.document.layers.add(new TextLayer({text:'Keep this artwork'}));
+  return JSON.stringify(editor.document.toJSON());
+ });
+ const bytes=new Uint8Array(await readFile(base+'rgba-1.tif')),view=new DataView(bytes.buffer),directory=view.getUint32(4,true),count=view.getUint16(directory,true);
+ for(let i=0;i<count;i++){const at=directory+2+i*12;if(view.getUint16(at,true)===259)view.setUint16(at+8,7,true);}
+ await page.getByTestId('import-input').setInputFiles({name:'unsupported.tif',mimeType:'image/tiff',buffer:Buffer.from(bytes)});
+ const dialog=page.getByRole('dialog',{name:'Import TIFF',exact:true});
+ await expect(dialog).toContainText('Compression 7');
+ await expect(dialog.getByRole('button',{name:'Import TIFF page',exact:true})).toBeDisabled();
+ await dialog.getByRole('button',{name:'Cancel',exact:true}).click();
+ expect(await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()))).toBe(before);
+ await page.getByTestId('import-input').setInputFiles(base+'multipage.tif');
+ await expect(dialog.getByRole('button',{name:'Import TIFF page',exact:true})).toBeEnabled();
+ await dialog.getByRole('button',{name:'Import TIFF page',exact:true}).click();
+ await expect(dialog).not.toBeVisible();
+ await page.evaluate(()=>{const e=window.luma.editor;e.activateDocument(e.documentSessions.find(s=>s.document.name==='Untitled')!.document);});
+ expect(await page.evaluate(()=>JSON.stringify(window.luma.editor.document.toJSON()))).toBe(before);
+});
+
 test('50 MP single-strip BigTIFF imports off-thread, reopens original bytes and exports every native pixel',async({page},info)=>{
  test.setTimeout(180000);const bytes=[...await readFile(base+'native-50mp.tif')];await page.goto('/');
  const result=await page.evaluate(async bytes=>{

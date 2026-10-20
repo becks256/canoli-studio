@@ -12,6 +12,7 @@ import {
 } from "../model";
 import { layerTransform, localBounds, parentId, unionBounds } from "../spatial";
 import { ComponentRegistry } from "./manager";
+import {captureFrequencyRadius} from '../frequency-separation';
 
 /** Move a contiguous sibling selection into an editable embedded document. */
 export function convertLayers(
@@ -87,7 +88,7 @@ export function convertLayers(
     height,
   );
   master.id = componentId;
-  master.children = structuredClone(selected);
+  master.children = structuredClone(selected.map(layer=>captureFrequencyRadius(document,layer)));
   const registry = new ComponentRegistry(document.components);
   for (const node of allLayers(master.children)) {
     const world = layerTransform(document, node.id)!;

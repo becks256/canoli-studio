@@ -1,8 +1,11 @@
+import {symmetryMatrices} from '../core/brush-symmetry';
+import {brushSupportRadius} from '../core/brush-tip';
 import type { BrushStrokeData, Rect } from '../core/drawing';
 
 /** Conservative support of all linearly interpolated brush stamps. */
 export function strokeIntersectsRegion(stroke: BrushStrokeData, rect: Rect, margin = 2): boolean {
-  const padding = stroke.size / 2 + margin;
+  if(stroke.symmetry){const {symmetry,...plain}=stroke;return symmetryMatrices(symmetry).some(matrix=>strokeIntersectsRegion(plain,matrix.inverse().bounds(rect),margin));}
+  const padding = brushSupportRadius(stroke.size,stroke.kind==='pencil',stroke.tip) + margin;
   if (!Number.isFinite(padding)) return true;
   const slack = 1e-10 * (1 + Math.abs(rect.x) + Math.abs(rect.y) + rect.width + rect.height + padding);
   const left = rect.x - padding - slack, top = rect.y - padding - slack;
@@ -30,7 +33,17 @@ export function strokeIntersectsRegion(stroke: BrushStrokeData, rect: Rect, marg
 
 /** Integer native-pixel bounds containing every stamp that can touch this tile. */
 export function strokeCaptureRegion(stroke: BrushStrokeData, rect: Rect): Rect | null {
-  const padding = stroke.size / 2 + 2;
+  if(stroke.symmetry){
+    const {symmetry,...plain}=stroke;
+    let left=Infinity,top=Infinity,right=-Infinity,bottom=-Infinity;
+    for(const matrix of symmetryMatrices(symmetry)){
+      const local=strokeCaptureRegion(plain,matrix.inverse().bounds(rect));if(!local)continue;
+      const area=matrix.bounds(local),x0=Math.max(rect.x,Math.floor(area.x)),y0=Math.max(rect.y,Math.floor(area.y)),x1=Math.min(rect.x+rect.width,Math.ceil(area.x+area.width)),y1=Math.min(rect.y+rect.height,Math.ceil(area.y+area.height));
+      if(x1<=x0||y1<=y0)continue;left=Math.min(left,x0);top=Math.min(top,y0);right=Math.max(right,x1);bottom=Math.max(bottom,y1);
+    }
+    return right>left&&bottom>top?{x:left,y:top,width:right-left,height:bottom-top}:null;
+  }
+  const padding = brushSupportRadius(stroke.size,stroke.kind==='pencil',stroke.tip) + 2;
   let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
   for (let i = 0; i < stroke.points.length; i++) {
     const a = stroke.points[Math.max(0, i - 1)], b = stroke.points[i];

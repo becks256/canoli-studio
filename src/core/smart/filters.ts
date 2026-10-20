@@ -7,8 +7,17 @@ const sigma = z
   .finite()
   .min(0)
   .max(4096 / 3);
+export const frequencyBandFilterSchema = z.object({ ...common, kind: z.literal("frequency-band"), sigma, band: z.enum(["low", "high", "correction"]) }).strict();
+export const nativeCompositionFilterSchema=z.object({...common,kind:z.literal("native-composition")}).strict();
+export const documentToneFilterSchema=z.object({...common,kind:z.literal("document-tone"),
+  exposure:z.number().finite().min(TONE_LIMITS.exposure.min).max(TONE_LIMITS.exposure.max),
+  contrast:z.number().finite().min(TONE_LIMITS.contrast.min).max(TONE_LIMITS.contrast.max),
+  saturation:z.number().finite().min(TONE_LIMITS.saturation.min).max(TONE_LIMITS.saturation.max)}).strict();
 export const smartFilterSchema = z.discriminatedUnion("kind", [
   z.object({ ...common, kind: z.literal("gaussian-blur"), sigma }).strict(),
+  frequencyBandFilterSchema,
+  nativeCompositionFilterSchema,
+  documentToneFilterSchema,
   z
     .object({
       ...common,
@@ -44,14 +53,14 @@ export const smartFiltersSchema = z
     (filters) =>
       new Set(filters.map((filter) => filter.id)).size === filters.length,
     "Smart-filter IDs must be unique within the instance.",
-  );
+  ).refine(filters=>{let documentPhase=false;return filters.every(filter=>{if(filter.kind==='document-tone')documentPhase=true;return !documentPhase||filter.kind==='document-tone';});},'Document tone must follow all native filters.');
 export type SmartFilterData = z.infer<typeof smartFilterSchema>;
 export function smartFilterHalo(filters: readonly SmartFilterData[]): number {
   return filters.reduce(
     (sum, filter) =>
       sum +
       (filter.enabled &&
-      filter.kind !== "tone" &&
+      filter.kind !== "tone" && filter.kind !== "native-composition" && filter.kind !== "document-tone" &&
       !(filter.kind === "unsharp-mask" && filter.amount === 0)
         ? Math.ceil(3 * filter.sigma)
         : 0),

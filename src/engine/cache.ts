@@ -57,7 +57,12 @@ export class CanvasCache {
     while (this.bytes + bytes > this.budget || this.entries.size >= 256)
       this.remove(this.entries.keys().next().value!);
     const canvas = createCanvas(Math.max(1, width), Math.max(1, height));
-    if (width && height) canvas.getContext("2d")!.drawImage(source, x, y, width, height, 0, 0, width, height);
+    try {
+      if (width && height) canvas.getContext("2d")!.drawImage(source, x, y, width, height, 0, 0, width, height);
+    } catch (error) {
+      release(canvas);
+      throw error;
+    }
     const id = Symbol();
     this.entries.set(id, { key, signature, canvas, bytes, x, y });
     let group = this.variants.get(key);

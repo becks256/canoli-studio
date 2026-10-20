@@ -1,0 +1,22 @@
+{
+  "generator": "psd-tools",
+  "version": "1.10.9",
+  "cases": [
+    {
+      "file": "rle-30001.psb",
+      "reference": "rle-30001.png",
+      "width": 30001,
+      "height": 3,
+      "sha256": "90c96fb381ff030ddcf642019b915b9f2529ac48c6c3eb2a87df79a0cb272460",
+      "referenceSha256": "c72795d6049b3fe9a9bd6bea8b5c1fe9ab77e45f268acc8245421eb35f9e1b4c"
+    },
+    {
+      "file": "rle-100000.psb",
+      "reference": "rle-100000.png",
+      "width": 100000,
+      "height": 3,
+      "sha256": "f30d274185fac03e5d686378658f6b581667f9339f2d3625a1399dfdaa8c966c",
+      "referenceSha256": "ef5628ea231d4c91b807a4591187ab3f2802a7abf29e591eb8befbce8014e3a3"
+    }
+  ]
+}

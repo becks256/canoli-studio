@@ -30,6 +30,11 @@ export function ToolOptions({
   documentBusy,
   onModifySelection,
   onColorRange,
+  onPressureCurve,
+  onBrushTip,
+  onBrushTexture,
+  onBrushSymmetry,
+  onBrushPresets,
 }: {
   tool: Tool;
   moveTarget: "layer" | "mask";
@@ -53,10 +58,16 @@ export function ToolOptions({
   documentBusy: boolean;
   onModifySelection?(): void;
   onColorRange?(): void;
+  onPressureCurve?(): void;
+  onBrushTip?(): void;
+  onBrushTexture?(): void;
+  onBrushSymmetry?(): void;
+  onBrushPresets?(): void;
 }) {
+  const wet=tool==="smudge"||tool==="mixer";
   const tonal = tool === "dodge" || tool === "burn";
   const brush =
-    tonal ||
+    wet || tonal ||
     tool === "heal" ||
     tool === "brush" ||
     tool === "pencil" ||
@@ -74,6 +85,8 @@ export function ToolOptions({
             artboard: "Artboard",
             crop: "Crop",
             brush: "Brush",
+            smudge: "Smudge",
+            mixer: "Mixer brush",
             dodge: "Dodge",
             burn: "Burn",
             pencil: "Pencil",
@@ -210,7 +223,7 @@ export function ToolOptions({
           )}
         </>
       )}
-      {((brush && !tonal && tool !== "eraser" && tool !== "heal") ||
+      {((brush && !tonal && tool !== "eraser" && tool !== "heal" && (!wet || settings.paintTarget==='layer')) ||
         (tool === "pen" && settings.penEditTarget === "layer") ||
         tool === "marquee" ||
         tool === "fill") && (
@@ -225,8 +238,8 @@ export function ToolOptions({
           <span>{settings.color.toUpperCase()}</span>
         </label>
       )}
-      {(tool === "brush" || tool === "pencil" || tool === "eraser") &&
-        (hasPaintMask || hasFilterMask) && (
+      {(tool === "brush" || tool === "pencil" || tool === "eraser" || wet) &&
+        (hasPaintMask || hasFilterMask || wet) && (
           <Select
             label="Paint target"
             value={settings.paintTarget}
@@ -256,6 +269,7 @@ export function ToolOptions({
             }
           />
         )}
+      {wet && <><span className="section-caption">{settings.paintTarget==='layer'?'Edits layer pixels.':'Edits raw mask coverage; color is ignored. Hide/Reveal sets the initial foreground coverage.'}</span>{(["load","wetness","pickup"] as const).map(key=><Slider key={key} label={key==="load"?(settings.paintTarget==='layer'?"Initial foreground load":"Initial coverage load"):key==="wetness"?"Wetness":"Pickup"} suffix="%" value={settings[tool][key]*100} min={0} max={100} disabled={disabled||documentBusy} onPreview={value=>controller.configure({[tool]:{...settings[tool],[key]:value/100}})} onCommit={value=>controller.configure({[tool]:{...settings[tool],[key]:value/100}})}/>)}</>}
       {tonal && (
         <>
           <Select
@@ -336,7 +350,7 @@ export function ToolOptions({
             onPreview={(v) => controller.configure({ opacity: v / 100 })}
             onCommit={(v) => controller.configure({ opacity: v / 100 })}
           />
-          {(tonal || tool === "brush" || tool === "eraser") && (
+          {(wet || tonal || tool === "brush" || tool === "eraser") && (
             <Slider
               label="Flow"
               suffix="%"
@@ -351,9 +365,9 @@ export function ToolOptions({
           <Slider
             label="Spacing"
             suffix="%"
-            value={Math.round(settings.spacing * 100)}
+            value={settings.spacing * 100}
             min={1}
-            max={200}
+            max={1000}
             disabled={disabled}
             onPreview={(v) => controller.configure({ spacing: v / 100 })}
             onCommit={(v) => controller.configure({ spacing: v / 100 })}
@@ -361,13 +375,18 @@ export function ToolOptions({
           <Slider
             label="Smoothing"
             suffix="%"
-            value={Math.round(settings.smoothing * 100)}
+            value={settings.smoothing * 100}
             min={0}
             max={90}
             disabled={disabled}
             onPreview={(v) => controller.configure({ smoothing: v / 100 })}
             onCommit={(v) => controller.configure({ smoothing: v / 100 })}
           />
+          {onBrushPresets&&<Button disabled={documentBusy} onClick={onBrushPresets}>Brush presets…</Button>}
+          {onBrushSymmetry&&<Button disabled={documentBusy} onClick={onBrushSymmetry}>Symmetry…</Button>}
+          {onBrushTip&&<Button disabled={documentBusy} onClick={onBrushTip}>Brush tip…</Button>}
+          {onBrushTexture&&<Button disabled={documentBusy} onClick={onBrushTexture}>{settings.texture?'Texture on…':'Texture…'}</Button>}
+          {onPressureCurve&&<Button disabled={disabled} onClick={onPressureCurve}>Pressure response…</Button>}
           <label className="check-field">
             <input
               type="checkbox"

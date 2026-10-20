@@ -1,0 +1,17 @@
+import {test,expect} from '@playwright/test';
+
+test('SVG and Photoshop plane extraction preserve an inherited frequency radius without rewriting its fallback',async({page})=>{
+ await page.goto('/');const result=await page.evaluate(async()=>{
+  const {editor,RasterLayer,LayerGroup,FrequencyBandFilter}=window.luma;editor.newDocument({width:96,height:64});const canvas=new OffscreenCanvas(64,32),context=canvas.getContext('2d')!,image=context.createImageData(64,32);
+  for(let y=0;y<32;y++)for(let x=0;x<64;x++)image.data.set([(31*x+7*y)%256,(9*x+43*y)%256,(17*x+11*y)%256,255],(y*64+x)*4);context.putImageData(image,0,0);
+  const asset=await editor.assetStore.add(await canvas.convertToBlob(),'Native frequency source',undefined,false),group=editor.document.layers.add(new LayerGroup({frequencyRadius:5})),nested=group.layers.add(new LayerGroup()),raster=nested.layers.add(new RasterLayer({assetId:asset.id,width:64,height:32})),instance=raster.convertToSmartObject();instance.setFilters([new FrequencyBandFilter({sigma:1,band:'low'})]);
+  const sample=async(blob:Blob)=>{const bitmap=await createImageBitmap(blob),c=document.createElement('canvas');c.width=96;c.height=64;try{c.getContext('2d')!.drawImage(bitmap,0,0);return[...c.getContext('2d')!.getImageData(0,0,96,64).data];}finally{bitmap.close();c.width=c.height=0;}};
+  const native=await sample(await editor.exportPng());group.frequencyRadius=1;const fallback=await sample(await editor.exportPng());editor.document.undo();
+  const svg=await editor.export({format:'svg'}),url=URL.createObjectURL(svg.blob),svgImage=new Image(),c=document.createElement('canvas');c.width=96;c.height=64;let svgPixels:number[];try{svgImage.src=url;await svgImage.decode();c.getContext('2d')!.drawImage(svgImage,0,0);svgPixels=[...c.getContext('2d')!.getImageData(0,0,96,64).data];}finally{URL.revokeObjectURL(url);c.width=c.height=0;}
+  const {parsePsd}=await import(/* @vite-ignore */String('/src/core/interchange/psd/parser.ts')),{planPsdExport}=await import(/* @vite-ignore */String('/src/core/interchange/psd/export-plan.ts')),{allLayers}=await import(/* @vite-ignore */String('/src/core/model.ts'));
+  const plan=planPsdExport(editor.document.toJSON()),captured=plan.layers.flatMap((plane:import('../src/core/interchange/psd/export-plan').PsdRenderedLayer)=>allLayers(plane.document.children)).filter((layer:import('../src/core/model').LayerData)=>layer.kind==='smart-object').map((layer:import('../src/core/model').LayerData)=>layer.kind==='smart-object'&&layer.smartFilters?.[0]);
+  const outputs=[];for(const format of ['psd','psb'] as const){const output=await editor.export({format,psdMode:'layers'}),parsed=parsePsd(new Uint8Array(await output.blob.arrayBuffer()));outputs.push({format,pixels:[...parsed.composite!.data]});}
+  const delta=(pixels:number[])=>pixels.reduce((maximum,value,index)=>Math.max(maximum,Math.abs(value-native[index])),0);
+  return{changed:JSON.stringify(native)!==JSON.stringify(fallback),svg:delta(svgPixels),photoshop:outputs.map(({format,pixels})=>({format,delta:delta(pixels)})),captured,sourceFallback:instance.smartFilters[0],radius:group.frequencyRadius};
+ });expect(result.changed).toBe(true);expect(result.svg).toBeLessThanOrEqual(1);expect(result.photoshop).toEqual([{format:'psd',delta:0},{format:'psb',delta:0}]);expect(result.captured).toEqual([expect.objectContaining({kind:'frequency-band',sigma:5})]);expect(result.sourceFallback).toMatchObject({sigma:1});expect(result.radius).toBe(5);
+});

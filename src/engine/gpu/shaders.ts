@@ -104,6 +104,8 @@ fn component(b:f32,s:f32,m:u32)->f32 {
     case 5u: { return max(b,s); }
     case 6u: { if(b==0) {return 0;} if(s>=1) {return 1;} return min(1,b/(1-s)); }
     case 7u: { if(b>=1) {return 1;} if(s==0) {return 0;} return 1-min(1,(1-b)/s); }
+    case 16u: { return clamp(b+2*s-1,0.0,1.0); }
+    case 17u: { return max(0.0,b+s-1); }
     case 8u: { return select(2*b*s,1-2*(1-b)*(1-s),s>0.5); }
     case 9u: {
       if(s<=0.5) {return b-(1-2*s)*b*(1-b);}
@@ -165,6 +167,14 @@ fn channel(c:vec3f)->f32 {
       let corrected = pow(norm, vec3f(invG));
       let out = clamp((p.b.x + corrected * outR) / 255.0, vec3f(0.0), vec3f(1.0));
       return vec4f(byte(out) * s.a, s.a);
+    }
+    case 12u: { // Manual red-eye correction on canonical straight RGB8
+      if (s.a == 0 || p.a.z == 0) { return s; }
+      let rgb = floor(clamp(straight(s),vec3f(0),vec3f(1))*255+0.5);
+      let excess = rgb.r-max(rgb.g,rgb.b);
+      if (excess <= 0 || excess < p.a.y) { return s; }
+      let red = floor(rgb.r+((rgb.g+rgb.b)*0.5-rgb.r)*p.a.z/100+0.5);
+      return vec4f(vec3f(red,rgb.g,rgb.b)/255*s.a,s.a);
     }
     case 11u: { // White balance: Bradford adaptation in linear sRGB
       if (p.a.y > 0.5) { return s; }
@@ -233,7 +243,7 @@ fn channel(c:vec3f)->f32 {
         s=vec4f(straight(s)*a,a);
       }
       s*=p.a.y;
-      if(u32(p.a.z)==16u) {return b*(1-s.a);} // paint clear
+      if(u32(p.a.z)==255u) {return b*(1-s.a);} // internal paint clear, outside public blend indices
       let mixed=blend(straight(b),straight(s),u32(p.a.z));
       return vec4f((1-s.a)*b.rgb+(1-b.a)*s.rgb+s.a*b.a*mixed,s.a+b.a*(1-s.a));
     }
@@ -246,32 +256,47 @@ struct Params { size:vec2f, hardness:f32, pencil:f32, color:vec4f, linear:vec4f,
 struct Vertex {
   @builtin(position) position:vec4f,
   @location(0) @interpolate(flat) rect:vec4f,
-  @location(1) @interpolate(flat) opacity:f32
+  @location(1) @interpolate(flat) opacity:f32,
+  @location(2) @interpolate(flat) rotation:vec4f
 }
 @group(0) @binding(0) var<uniform> p:Params;
-fn extent(radius:vec2f)->vec2f {
-  return abs(p.linear.xy)*radius.x+abs(p.linear.zw)*radius.y;
+fn extent(radius:vec2f,rotation:vec4f)->vec2f {
+  let x=p.linear.xy*rotation.x+p.linear.zw*rotation.y;
+  let y=p.linear.xy*rotation.z+p.linear.zw*rotation.w;
+  return abs(x)*radius.x+abs(y)*radius.y;
 }
-@vertex fn vertex(@builtin(vertex_index) index:u32,@location(0) rect:vec4f,@location(1) opacity:f32)->Vertex {
+fn inverseX(rotation:vec4f)->vec2f {
+  return vec2f(rotation.w*p.inverse.x-rotation.z*p.inverse.y,-rotation.y*p.inverse.x+rotation.x*p.inverse.y)/(rotation.x*rotation.w-rotation.y*rotation.z);
+}
+fn inverseY(rotation:vec4f)->vec2f {
+  return vec2f(rotation.w*p.inverse.z-rotation.z*p.inverse.w,-rotation.y*p.inverse.z+rotation.x*p.inverse.w)/(rotation.x*rotation.w-rotation.y*rotation.z);
+}
+@vertex fn vertex(@builtin(vertex_index) index:u32,@location(0) rect:vec4f,@location(1) opacity:f32,@location(2) rotation:vec4f)->Vertex {
   let corners=array<vec2f,6>(vec2f(-1,-1),vec2f(1,-1),vec2f(-1,1),vec2f(-1,1),vec2f(1,-1),vec2f(1,1));
-  let pixel=rect.xy+corners[index]*(extent(rect.zw)+vec2f(1));
+  let pixel=rect.xy+corners[index]*(extent(rect.zw,rotation)+vec2f(1));
   var out:Vertex;
   out.position=vec4f(pixel.x/p.size.x*2-1,1-pixel.y/p.size.y*2,0,1);
-  out.rect=rect; out.opacity=opacity; return out;
+  out.rect=rect; out.opacity=opacity;out.rotation=rotation;return out;
 }
 @fragment fn fragment(v:Vertex)->@location(0) vec4f {
-  // Fully covered hard interiors need no multisampling; reserve it for edges.
+  let ix=inverseX(v.rotation);let iy=inverseY(v.rotation);
   let delta=v.position.xy-v.rect.xy;
-  let center=(p.inverse.xy*delta.x+p.inverse.zw*delta.y)/v.rect.zw;
-  let halfPixel=(abs(p.inverse.xy)+abs(p.inverse.zw))*0.5/v.rect.zw;
+  let center=(ix*delta.x+iy*delta.y)/v.rect.zw;
+  let halfPixel=(abs(ix)+abs(iy))*0.5/v.rect.zw;
   let farthest=abs(center)+halfPixel;
   if((p.pencil>0 && all(farthest<=vec2f(1))) ||
      (p.pencil==0 && p.hardness>=0.999 && length(farthest)<=1)) {
     return vec4f(p.color.rgb*v.opacity,v.opacity);
   }
+  // New elliptical soft interiors follow the native gradient at the pixel center.
+  // Retain the established circular sampling path for legacy artwork.
+  if(p.pencil==0 && v.rect.z!=v.rect.w && length(farthest)<=1) {
+    let alpha=clamp((1-length(center))/max(1-p.hardness,0.000001),0,1)*v.opacity;
+    return vec4f(p.color.rgb*alpha,alpha);
+  }
   var alpha=0.0;
-  if(p.pencil>0 && p.linear.y==0 && p.linear.z==0) {
-    let radius=extent(v.rect.zw);
+  if(p.pencil>0 && p.linear.y==0 && p.linear.z==0 && v.rotation.y==0 && v.rotation.z==0) {
+    let radius=extent(v.rect.zw,v.rotation);
     let lo=max(v.position.xy-vec2f(0.5),v.rect.xy-radius);
     let hi=min(v.position.xy+vec2f(0.5),v.rect.xy+radius);
     let coverage=max(hi-lo,vec2f(0)); alpha=coverage.x*coverage.y;
@@ -279,8 +304,8 @@ fn extent(radius:vec2f)->vec2f {
     let grid=select(4u,8u,p.hardness>=0.999 || p.pencil>0);
     for(var y=0u;y<grid;y++) { for(var x=0u;x<grid;x++) {
       let pos=v.position.xy-vec2f(0.5)+(vec2f(f32(x),f32(y))+vec2f(0.5))/f32(grid);
-      let delta=pos-v.rect.xy;
-      let local=(p.inverse.xy*delta.x+p.inverse.zw*delta.y)/v.rect.zw;
+      let d=pos-v.rect.xy;
+      let local=(ix*d.x+iy*d.y)/v.rect.zw;
       let r=length(local);
       if(p.pencil>0) { alpha+=select(0.0,1.0,all(abs(local)<=vec2f(1))); }
       else if(p.hardness>=0.999) { alpha+=select(0.0,1.0,r<=1); }

@@ -72,7 +72,7 @@ test("incremental brush/pencil previews match full replay with clipping, styles 
         opacity: 0.45,
         clip,
       }).toJSON();
-      if (data.kind === "fill") throw new Error("Expected stroke");
+
       for (const count of [1, 13, 45, 80, 25, 80]) {
         const stroke = { ...data, points: data.points.slice(0, count) };
         const options = {
@@ -151,7 +151,7 @@ test("warm layers and old active segments are not repainted", async ({
       points: Array.from({ length: 60 }, (_, i) => ({ x: 20 + i * 3, y: 100 })),
       size: 12,
     }).toJSON();
-    if (data.kind === "fill") throw new Error("Expected brush");
+
     const arc = CanvasRenderingContext2D.prototype.arc;
     let stamps = 0;
     CanvasRenderingContext2D.prototype.arc = function (...args) {
@@ -239,7 +239,7 @@ test("pointer bursts publish once per frame, retain all samples and cancel clean
     if (!(layer instanceof PaintLayer))
       throw new Error("Missing committed paint");
     const stroke = layer.strokes.at(0)!.toJSON();
-    if (stroke.kind === "fill") throw new Error("Expected brush");
+    if ((stroke.kind === "fill" || stroke.kind === 'wet')) throw new Error("Expected brush");
     const committed = history();
     editor.document.undo();
     const undoLayers = editor.document.layers.length;

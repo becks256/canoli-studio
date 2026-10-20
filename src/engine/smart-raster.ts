@@ -13,6 +13,7 @@ import { layerTransform, parentId } from "../core/spatial";
 import { exportPng } from "./png";
 import type { DocumentRenderer } from "./renderer";
 import { release } from "./canvas";
+import {captureFrequencyRadius} from '../core/frequency-separation';
 
 /** Bake the instance's content and affine placement; keep outer compositing properties editable. */
 export async function prepareSmartRaster(
@@ -42,7 +43,7 @@ export async function prepareSmartRaster(
   const isolated = structuredClone(document);
   isolated.children = [
     {
-      ...structuredClone(instance),
+      ...structuredClone(captureFrequencyRadius(document,instance)),
       x: world.e,
       y: world.f,
       transform: { a: world.a, b: world.b, c: world.c, d: world.d, e: 0, f: 0 },

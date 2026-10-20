@@ -1,3 +1,12 @@
+import {brushSymmetrySchema,symmetryMatrices,type BrushSymmetryData} from './core/brush-symmetry';
+import {brushTipSchema,transformPenTilt,interpolatePenTilt,samePenTilt,type BrushTipData,type PenTiltData} from './core/brush-tip';
+import {paintStampGeometry} from './core/paint-stamps';
+import {pressureCurveSchema,type PressureCurveData} from './core/pressure-curve';
+import { BrushPreset, type BrushTool } from './brushes/presets';
+import {BrushTextureSourceOwner,brushTexturePreferenceSchema,type BrushTexturePreference} from './brushes/texture-source';
+import type {AssetStore,ImageAsset} from './core/assets';
+import {referencedAssets} from './core/model';
+import type {BrushTextureData} from './core/brush-texture';
 import { strokeCaptureRegion, strokeIntersectsRegion } from "./engine/stroke-region";
 import { freeze } from "./core/immutable";
 import { ClonePreviewSource } from "./engine/clone-preview";
@@ -10,6 +19,7 @@ import type { SelectionModificationProgress } from './core/selection-modificatio
 import type { EditorApplication } from "./editor";
 import {
   RasterLayer,
+  BrushSymmetry,
   BrushStroke,
   SmartObjectLayer,
   AdjustmentLayer,
@@ -28,7 +38,7 @@ import {
 } from "./dom";
 import type { Document, Layer, ShapeOptions } from "./dom";
 import type { EditorCommand } from "./core/commands";
-import { isLocked } from "./core/model";
+import { isLocked, findLayer } from "./core/model";
 import type { LayerMaskData } from "./core/masks";
 import { maskOrigin, maskTransform } from "./core/masks";
 import { hitTestPath, splitPathSegment } from "./core/bezier";
@@ -49,8 +59,15 @@ import type {
 } from "./core/drawing";
 import { release } from "./engine/canvas";
 import type { PaintPreview } from "./engine/renderer";
+import {maskStrokePointCount} from './core/masks';
+import type { PreparedWetPaintJob } from './engine/wet-authoring';
+import type { WetPaintPreview } from './engine/wet-preview';
+
+import {DEFAULT_SMUDGE,DEFAULT_MIXER,wetToolSettingsSchema,type WetToolSettings} from './brushes/wet-settings';
 
 export type Tool =
+  | "smudge"
+  | "mixer"
   | "quick-select"
   | "wand"
   | "move"
@@ -71,6 +88,8 @@ export type Tool =
   | "text"
   | "fill";
 export interface ToolSettings {
+  smudge: WetToolSettings;
+  mixer: WetToolSettings;
   quickSize:number;
   quickTolerance:number;
   quickEdgeThreshold:number;
@@ -98,6 +117,10 @@ export interface ToolSettings {
   smoothing: number;
   pressureSize: boolean;
   pressureOpacity: boolean;
+  pressureCurve: PressureCurveData|null;
+  tip:BrushTipData|null;
+  symmetry:BrushSymmetryData|null;
+  texture:BrushTexturePreference;
   color: string;
   penWidth: number;
   penFill: boolean;
@@ -109,6 +132,8 @@ export interface ToolSettings {
   cloneAligned: boolean;
 }
 interface ToolState {
+  wetPreview: WetPaintPreview | null;
+  error: string | null;
   quickSelectionPoints:Point[]|null;
   quickSelectionProgress:SelectionModificationProgress|null;
   lassoPoints: Point[] | null;
@@ -127,6 +152,7 @@ interface BaseGesture {
   document: Document;
   revision: number;
   generation: number;
+  textureLease?:{assets:AssetStore;asset:Readonly<ImageAsset>;created:boolean};
 }
 interface PaintGesture extends BaseGesture {
   inputTransform: AffineTransform;
@@ -142,6 +168,21 @@ interface PaintGesture extends BaseGesture {
   offset: Point | null;
   stroke: BrushStrokeData;
   cloneSource?: ClonePreviewSource;
+}
+interface WetGesture extends BaseGesture {
+  kind: 'wet';
+  selectionId:string|null;
+  maxPoints:number;
+  tool: 'smudge' | 'mixer';
+  inputTransform: AffineTransform;
+  settings: ToolSettings;
+  points: StrokePoint[];
+  processed: number;
+  previewed: number;
+  abort: AbortController;
+  ready: Promise<PreparedWetPaintJob>;
+  running: Promise<void> | null;
+  finishing: boolean;
 }
 interface LassoGesture extends BaseGesture {
   kind: "lasso";
@@ -244,6 +285,7 @@ interface PatchGesture extends BaseGesture {
   settings: ToolSettings;
 }
 type Gesture =
+  | WetGesture
   | QuickSelectionGesture
   | HealGesture
   | PatchGesture
@@ -258,14 +300,19 @@ type Gesture =
 
 /** Stateful tool orchestration; previews are commands, commits use the public DOM. */
 export class ToolController {
+  private startingGesture:BaseGesture|null=null;
   private quickAbort:AbortController|null=null;
   private patchAbort: AbortController | null = null;
   private state: ToolState = {
+    wetPreview: null,
+    error: null,
     quickSelectionPoints:null,
     quickSelectionProgress:null,
     healingStroke: null,
     patchOffset: null,
     settings: {
+      smudge: DEFAULT_SMUDGE,
+      mixer: DEFAULT_MIXER,
       quickSize:32,
       quickTolerance:32,
       quickEdgeThreshold:64,
@@ -288,6 +335,10 @@ export class ToolController {
       smoothing: 0,
       pressureSize: true,
       pressureOpacity: false,
+      pressureCurve: null,
+      tip:null,
+      symmetry:null,
+      texture:null,
       color: "#d5e79b",
       penWidth: 3,
       penFill: false,
@@ -335,6 +386,52 @@ export class ToolController {
     );
   }
   getSnapshot = () => this.state;
+  /** Current gestures may begin before React flushes a selection preference reset. */
+  get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&(gesture.document.selectedLayer?.id??null)===gesture.selectionId;}
+
+  /** Trusted cursor adapter: use the same stroke plane as begin(), without mutations. */
+  brushCursorAxes(tool: Tool, tilt?: PenTiltData, includeDefault=false) {
+    const settings = this.state.settings, tip = settings.tip;
+    if ((!tip&&!includeDefault) || !['smudge','mixer','brush','pencil','eraser','clone','heal','dodge','burn'].includes(tool)) return null;
+    const doc = this.editor.document, snapshot = doc._read(), selected = doc.selectedLayer, gesture = this.gesture;
+    let world = new AffineTransform();
+    if (gesture?.kind === 'wet' || gesture?.kind === 'paint' || gesture?.kind === 'mask-paint') world = gesture.inputTransform.inverse();
+    else if ((['brush','pencil','eraser','smudge','mixer'].includes(tool)) && settings.paintTarget !== 'layer') {
+      const filter = settings.paintTarget.startsWith('filter-mask-');
+      // Read immutable geometry directly: hover must not clone painted-mask
+      // point arrays or construct an entire smart-master Document per frame.
+      const record = selected ? findLayer(snapshot, selected.id) : null;
+      const mask = filter ? record?.kind === 'smart-object' ? record.filterMask : null : record?.mask;
+      if (selected && mask) {
+        let plane = layerTransform(snapshot, selected.id)!;
+        if (filter && selected instanceof SmartObjectLayer) {
+          const source = snapshot.components!.find(component=>component.id === selected.componentId)!.source;
+          const master = source.kind === 'document' ? source.document : source;
+          plane = plane.multiply(AffineTransform.scale(selected.width / master.width, selected.height / master.height));
+        }
+        world = maskTransform(mask, plane);
+      }
+    } else if (tool !== 'heal' && selected && (
+      tool === 'dodge' || tool === 'burn'
+        ? selected instanceof AdjustmentLayer && selected.adjustmentKind === 'tonal'
+        : selected instanceof PaintLayer || ['eraser','smudge','mixer'].includes(tool) && selected instanceof RasterLayer
+    )) world = layerTransform(doc._read(), selected.id)!;
+    const localTilt = tilt && (tip?.tiltAngle || tip?.tiltRoundness) ? transformPenTilt(tilt, world.inverse()) : undefined;
+    const pose = paintStampGeometry({kind:tool === 'pencil' ? 'pencil' : 'brush',size:settings.size,pressureSize:false,tip:tip??undefined},{x:0,y:0,pressure:1,tilt:localTilt},!!settings.texture);
+    return {
+      a:(world.a*pose.cos+world.c*pose.sin)*pose.rx,
+      b:(world.b*pose.cos+world.d*pose.sin)*pose.rx,
+      c:(-world.a*pose.sin+world.c*pose.cos)*pose.ry,
+      d:(-world.b*pose.sin+world.d*pose.cos)*pose.ry,
+    };
+  }
+  /** Nominal world-space footprints; offsets are relative to the pointer. */
+  brushCursorCopies(tool:Tool,point:Point,tilt?:PenTiltData){
+    if(!this.state.settings.symmetry)return null;
+    const axes=this.brushCursorAxes(tool,tilt,true);if(!axes)return null;
+    return symmetryMatrices(this.state.settings.symmetry).map(copy=>{const center=copy.point(point);return{x:center.x-point.x,y:center.y-point.y,
+      a:copy.a*axes.a+copy.c*axes.b,b:copy.b*axes.a+copy.d*axes.b,c:copy.a*axes.c+copy.c*axes.d,d:copy.b*axes.c+copy.d*axes.d};});
+  }
   private uiSnapshot: ToolState | null = null;
   /** High-frequency paint pixels are consumed directly by the viewport. */
   getUiSnapshot = () => {
@@ -391,7 +488,40 @@ export class ToolController {
     if(!hadMaskPoint&&!this.state.penTarget&&this.state.selectedPath?.layerId===selectedPath?.layerId&&this.state.selectedPath?.pathId===selectedPath?.pathId&&mode===this.state.settings.penEditTarget)return;
     this.publish({selectedPath,penTarget:null,settings:mode===this.state.settings.penEditTarget?this.state.settings:{...this.state.settings,penEditTarget:mode}});
   }
+  /** Trusted host preference operation; validates before discarding any gesture. */
+  applyBrushPreset(preset: BrushPreset,preparedSource?:BrushTextureSourceOwner): BrushTool {
+    const owned = new BrushPreset(preset.toJSON(),preset.source);
+    if(owned.texture){
+      const ready=preparedSource?.source,source=owned.source!;
+      if(!ready||ready.blob!==source.blob||ready.width!==source.width||ready.height!==source.height||ready.name!==source.name||ready.tiff?.page!==source.tiff?.page||ready.tiff?.allowPrecisionLoss!==source.tiff?.allowPrecisionLoss)throw new Error('Prepare the original preset source before applying a textured brush.');
+      this.editor.brushTextureSource.captureFrom(preparedSource!);
+    }
+    this.cancel();
+    this.configure(owned.toToolSettings());
+    return owned.tool;
+  }
+  /** Commit a validated dialog draft without changing document history. */
+  applyBrushTexture(source:BrushTextureSourceOwner,preference:BrushTexturePreference){
+    const texture=freeze(brushTexturePreferenceSchema.parse(preference));
+    if(texture&&!source.source)throw new Error('Choose a brush texture source first.');
+    if(source.source)this.editor.brushTextureSource.captureFrom(source);
+    this.cancel();
+    this.configure({texture});
+  }
   configure(patch: Partial<ToolSettings>) {
+    for (const key of ['smudge','mixer'] as const) if (patch[key] !== undefined) {
+      patch = {...patch,[key]:freeze(wetToolSettingsSchema.parse(patch[key]))};
+    }
+    if(patch.texture!==undefined)patch={...patch,texture:freeze(brushTexturePreferenceSchema.parse(patch.texture))};
+    if(patch.symmetry!==undefined)patch={...patch,symmetry:patch.symmetry===null?null:freeze(brushSymmetrySchema.parse(patch.symmetry))};
+    if(patch.tip!==undefined)patch={...patch,tip:patch.tip===null?null:freeze(brushTipSchema.parse(patch.tip))};
+    if(patch.pressureCurve!==undefined)patch={...patch,pressureCurve:patch.pressureCurve===null?null:freeze(pressureCurveSchema.parse(patch.pressureCurve))};
+    if(patch.texture&&!this.editor.brushTextureSource.source)throw new Error('Choose a brush texture source first.');
+    if(this.gesture?.kind==='wet' && (Object.keys(patch) as (keyof ToolSettings)[]).some(key=>JSON.stringify(patch[key])!==JSON.stringify(this.state.settings[key])))this.cancel();
+    if(patch.texture!==undefined&&JSON.stringify(patch.texture)!==JSON.stringify(this.state.settings.texture))this.cancel();
+    if(patch.symmetry!==undefined&&JSON.stringify(patch.symmetry)!==JSON.stringify(this.state.settings.symmetry))this.cancel();
+    if(patch.tip!==undefined&&JSON.stringify(patch.tip)!==JSON.stringify(this.state.settings.tip))this.cancel();
+    if(patch.pressureCurve!==undefined&&JSON.stringify(patch.pressureCurve)!==JSON.stringify(this.state.settings.pressureCurve))this.cancel();
     if((this.drawingQuickSelection||this.quickAbort)&&(['quickSize','quickTolerance','quickEdgeThreshold','quickSampling','quickSelectionMode'] as const).some(key=>patch[key]!==undefined&&patch[key]!==this.state.settings[key]))this.cancel();
     if (patch.lassoMode !== undefined && patch.lassoMode !== this.state.settings.lassoMode)
       this.cancel();
@@ -416,6 +546,8 @@ export class ToolController {
     this.publish({ settings: { ...this.state.settings, ...patch } });
   }
   cancel() {
+    if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
+    this.state.wetPreview?.dispose();
     this.quickAbort?.abort();this.quickAbort=null;
     this.publish({quickSelectionPoints:null,quickSelectionProgress:null});
     this.patchAbort?.abort();
@@ -427,8 +559,10 @@ export class ToolController {
     this.cancelFrame();
     this.generation++;
     if(this.gesture?.kind === "paint")this.gesture.cloneSource?.dispose();
+    if(this.gesture)this.releaseTexture(this.gesture);
     this.gesture = null;
     this.publish({
+      wetPreview:null,
       preview: null,
       lassoPoints: null,
       paintPreview: null,
@@ -438,6 +572,8 @@ export class ToolController {
     });
   }
   reset() {
+    if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
+    this.state.wetPreview?.dispose();
     this.quickAbort?.abort();this.quickAbort=null;
     this.publish({quickSelectionPoints:null,quickSelectionProgress:null});
     this.patchAbort?.abort();
@@ -450,8 +586,10 @@ export class ToolController {
     this.cancelFrame();
     this.generation++;
     if(this.gesture?.kind === "paint")this.gesture.cloneSource?.dispose();
+    if(this.gesture)this.releaseTexture(this.gesture);
     this.gesture = null;
     this.publish({
+      wetPreview:null,
       preview: null,
       lassoPoints: null,
       paintPreview: null,
@@ -582,20 +720,46 @@ export class ToolController {
       );
     return { doc, selected };
   }
+  /** Capture document-space preference into a stroke's local affine plane once. */
+  private symmetryIn(mapping:AffineTransform){return this.state.settings.symmetry?new BrushSymmetry(this.state.settings.symmetry).transformed(mapping).toJSON():null;}
+  private captureTexture(gesture:BaseGesture):BrushTextureData|null{
+    const preference=this.state.settings.texture;if(!preference)return null;
+    const assets=this.editor.assetStore,{asset,created}=this.editor.brushTextureSource.leaseIn(assets);
+    gesture.textureLease={assets,asset,created};
+    return {assetId:asset.id,...preference};
+  }
+  private releaseTexture(gesture:BaseGesture){
+    const lease=gesture.textureLease;if(!lease?.created||!lease.assets.has(lease.asset.id)||lease.assets.get(lease.asset.id)!==lease.asset)return;
+    const state=gesture.document.getSnapshot();
+    if([state.document,...state.past.map(entry=>entry.document),...state.future.map(entry=>entry.document)]
+      .some(document=>referencedAssets(document).has(lease.asset.id)))return;
+    lease.assets.remove(lease.asset.id);
+  }
+  private textureCurrent(gesture:BaseGesture){
+    const lease=gesture.textureLease;if(!lease)return true;
+    return this.editor.assetStore===lease.assets&&lease.assets.has(lease.asset.id)&&
+      lease.assets.get(lease.asset.id)===lease.asset&&lease.asset.bitmap.width===lease.asset.width&&lease.asset.bitmap.height===lease.asset.height;
+  }
   private point(
     point: Point,
     origin: Point,
     pressure: number,
     inputTransform?: AffineTransform,
+    tilt?:PenTiltData,
   ): StrokePoint {
     const hasDynamics =
       this.state.settings.pressureSize || this.state.settings.pressureOpacity;
-    const p = hasDynamics ? Math.max(0.05, Math.min(1, pressure || 0.5)) : 1;
+    const p = hasDynamics
+      ? this.state.settings.pressureCurve
+        ? Math.max(0,Math.min(1,Number.isFinite(pressure)?pressure:.05))
+        : Math.max(0.05, Math.min(1, pressure || 0.5))
+      : 1;
     return {
       ...(inputTransform
         ? inputTransform.point(point)
         : { x: point.x - origin.x, y: point.y - origin.y }),
       pressure: p,
+      ...(tilt&&(this.state.settings.tip?.tiltAngle||this.state.settings.tip?.tiltRoundness)?{tilt:transformPenTilt(tilt,inputTransform)}:{}),
     };
   }
   private assertPolygonLasso(draft: PolygonLassoDraft) {
@@ -646,9 +810,16 @@ export class ToolController {
     this.cancel();
   }
   begin(
+    tool:Tool,point:Point,modifiers:{alt:boolean;shift:boolean;pressure:number;tilt?:PenTiltData},zoom:number,cropHandle?:CropHandle,
+  ){
+    try{this.beginGesture(tool,point,modifiers,zoom,cropHandle);}
+    catch(error){if(this.startingGesture)this.releaseTexture(this.startingGesture);throw error;}
+    finally{this.startingGesture=null;}
+  }
+  private beginGesture(
     tool: Tool,
     point: Point,
-    modifiers: { alt: boolean; shift: boolean; pressure: number },
+    modifiers: { alt: boolean; shift: boolean; pressure: number;tilt?:PenTiltData },
     zoom: number,
     cropHandle?: CropHandle,
   ) {
@@ -675,11 +846,35 @@ export class ToolController {
       this.publish({ cloneSource: point, cloneOffset: null });
       return;
     }
-    const base = {
+    const base:BaseGesture = {
       document: doc,
       revision: doc.getSnapshot().revision,
       generation: this.generation,
     };
+    this.startingGesture=base;
+    if(tool==='smudge'||tool==='mixer'){
+      const selected=doc.selectedLayer,settings=structuredClone(this.state.settings),target=settings.paintTarget==='layer'?'layer':settings.paintTarget.startsWith('filter-mask-')?'filter-mask':'mask';
+      const mask=target==='layer'?null:target==='filter-mask'?selected instanceof SmartObjectLayer?selected.filterMask:null:selected?.mask;
+      if(target!=='layer'&&!mask)throw new Error(target==='filter-mask'?'Choose a smart object with a filter mask.':'Choose a layer with a mask.');
+      if(target==='layer'&&selected&&!(selected instanceof PaintLayer)&&!(selected instanceof RasterLayer))throw new Error('Choose an image or paint layer for Smudge or Mixer.');
+      const maskData=mask?.toJSON(),maxPoints=maskData?Math.min(20000,200000-(maskData.strokes??[]).reduce((total,entry)=>total+maskStrokePointCount(entry),0)):20000;
+      if(maskData&&((maskData.strokes?.length??0)>=2048||maxPoints<1))throw new Error('This mask has reached its stroke or point budget.');
+      let world=selected?layerTransform(doc._read(),selected.id)!:new AffineTransform();
+      if(target==='filter-mask'&&selected instanceof SmartObjectLayer){const master=doc.getComponent(selected.componentId);world=world.multiply(AffineTransform.scale(selected.width/master.width,selected.height/master.height));}
+      if(maskData)world=maskTransform(maskData,world);
+      const inputTransform=world.inverse();
+      const first=this.point(point,{x:0,y:0},modifiers.pressure,inputTransform,modifiers.tilt),abort=new AbortController();
+      const dynamics=settings[tool],symmetry=this.symmetryIn(inputTransform);
+      const ready=this.editor._beginWetPaint(assets=>new BrushStroke({
+        size:settings.size,hardness:settings.hardness,opacity:settings.opacity,flow:settings.flow,spacing:settings.spacing,
+        pressureSize:settings.pressureSize,pressureOpacity:settings.pressureOpacity,
+        ...(settings.pressureCurve?{pressureCurve:settings.pressureCurve}:{}),...(settings.tip?{tip:settings.tip}:{}),...(symmetry?{symmetry}:{}),
+        texture:settings.texture?{assetId:this.editor.brushTextureSource.leaseIn(assets).asset.id,...settings.texture}:null,
+        color:settings.color,points:[first],clip:transformSelection(doc.selection?.toJSON(),inputTransform),
+      }),{mode:tool,target,signal:abort.signal,load:{load:dynamics.load,...(maskData?{color:[255,255,255,settings.paintTarget.endsWith('hide')?0:255] as [number,number,number,number]}:{})},mix:{wetness:dynamics.wetness,pickup:dynamics.pickup,flow:1}});
+      const gesture:WetGesture={...base,kind:'wet',selectionId:selected?.id??null,maxPoints,tool,inputTransform,settings,points:[first],processed:1,previewed:0,abort,ready,running:null,finishing:false};
+      this.gesture=gesture;this.publish({drawing:true,error:null});void this.pumpWet(gesture).catch(()=>{});return;
+    }
     if(tool==='quick-select'){
       const settings=this.state.settings,layer=doc.selectedLayer;
       if(settings.quickSampling==='layer'&&!layer)throw new Error('Choose a source layer for Quick Selection.');
@@ -691,8 +886,9 @@ export class ToolController {
       const settings = { ...this.state.settings };
       const stroke = new BrushStroke({
         ...settings,
+        texture:this.captureTexture(base),
         color: "#ffffff",
-        points: [this.point(point, { x: 0, y: 0 }, modifiers.pressure)],
+        points: [this.point(point, { x: 0, y: 0 }, modifiers.pressure,undefined,modifiers.tilt)],
         clip: doc.selection,
       }).toJSON() as BrushStrokeData;
       this.gesture = { ...base, kind: "heal", stroke, settings };
@@ -767,7 +963,7 @@ export class ToolController {
         20000,
         200000 -
           (data.strokes ?? []).reduce(
-            (total, entry) => total + entry.stroke.points.length,
+            (total, entry) => total + (entry.stroke.kind==='wet'?entry.stroke.brush.points.length:entry.stroke.points.length),
             0,
           ),
       );
@@ -795,7 +991,7 @@ export class ToolController {
       }
       const inputTransform = maskWorld.inverse();
       const stroke = new (tool === "pencil" ? PencilStroke : BrushStroke)({
-        points: [this.point(point, origin, modifiers.pressure, inputTransform)],
+        points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
         size: this.state.settings.size,
         hardness: this.state.settings.hardness,
         opacity: this.state.settings.opacity,
@@ -803,6 +999,10 @@ export class ToolController {
         spacing: this.state.settings.spacing,
         pressureSize: this.state.settings.pressureSize,
         pressureOpacity: this.state.settings.pressureOpacity,
+        ...(this.state.settings.pressureCurve?{pressureCurve:this.state.settings.pressureCurve}:{}),
+        ...(this.state.settings.tip?{tip:this.state.settings.tip}:{}),
+        ...(this.state.settings.symmetry?{symmetry:this.symmetryIn(inputTransform)!}:{}),
+        texture:this.captureTexture(base),
         color: "#ffffff",
         clip: transformSelection(doc.selection?.toJSON(), inputTransform),
       }).toJSON() as BrushStrokeData;
@@ -943,15 +1143,15 @@ export class ToolController {
       origin,
       inputTransform,
       clip: transformSelection(doc.selection?.toJSON(), inputTransform),
-      points: [this.point(point, origin, modifiers.pressure, inputTransform)],
-      settings: { ...this.state.settings },
+      points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
+      settings: { ...this.state.settings,symmetry:this.symmetryIn(inputTransform) },
       offset,
       stroke: new (tool === "pencil"
         ? PencilStroke
         : tool === "eraser"
           ? EraserStroke
           : BrushStroke)({
-        points: [this.point(point, origin, modifiers.pressure, inputTransform)],
+        points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
         size: this.state.settings.size,
         hardness: this.state.settings.hardness,
         opacity: this.state.settings.opacity,
@@ -959,10 +1159,16 @@ export class ToolController {
         spacing: this.state.settings.spacing,
         pressureSize: this.state.settings.pressureSize,
         pressureOpacity: this.state.settings.pressureOpacity,
+        ...(this.state.settings.pressureCurve?{pressureCurve:this.state.settings.pressureCurve}:{}),
+        ...(this.state.settings.tip?{tip:this.state.settings.tip}:{}),
+        ...(this.state.settings.symmetry?{symmetry:this.symmetryIn(inputTransform)!}:{}),
+        texture:this.captureTexture(base),
         color: this.state.settings.color,
         clip: transformSelection(doc.selection?.toJSON(), inputTransform),
       }).toJSON() as BrushStrokeData,
     };
+    // captureTexture runs during construction, after the base object was spread.
+    if(base.textureLease)this.gesture.textureLease=base.textureLease;
     // Place an empty transient layer once. Pointer movement never clones or
     // validates the document; only the final DOM commit enters history.
     if (fresh)
@@ -1297,7 +1503,7 @@ export class ToolController {
   }
   move(
     point: Point,
-    modifiers: { shift: boolean; alt: boolean; pressure: number },
+    modifiers: { shift: boolean; alt: boolean; pressure: number;tilt?:PenTiltData },
   ) {
     if (this.polygonLasso) {
       const draft = this.polygonLasso;
@@ -1320,6 +1526,19 @@ export class ToolController {
     }
     const gesture = this.gesture;
     if (!gesture || gesture.kind === "fill") return;
+    if(!this.textureCurrent(gesture)){this.cancel();throw new Error('The brush texture source changed during this gesture. Try again.');}
+    if(gesture.kind==='wet'){
+      if(gesture.finishing)return;
+      try{this.assertCurrent(gesture);}catch(error){this.cancel();throw error;}
+      let next=this.point(point,{x:0,y:0},modifiers.pressure,gesture.inputTransform,modifiers.tilt);
+      const last=gesture.points.at(-1)!,factor=1-Math.min(.9,gesture.settings.smoothing),tilt=interpolatePenTilt(last.tilt,next.tilt,factor);
+      next={x:last.x+(next.x-last.x)*factor,y:last.y+(next.y-last.y)*factor,pressure:last.pressure!+(next.pressure!-last.pressure!)*factor,...(tilt?{tilt}:{})};
+      if(next.x===last.x&&next.y===last.y&&next.pressure===last.pressure&&samePenTilt(next.tilt,last.tilt))return;
+      if(gesture.points.length>=gesture.maxPoints){this.cancel();throw new Error('This wet stroke has reached its target point limit.');}
+      gesture.points.push(next);
+      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{this.paintFrame=null;if(this.gesture===gesture)void this.pumpWet(gesture).catch(()=>{});});
+      return;
+    }
     if(gesture.kind==='quick-selection'){
       try{this.assertCurrent(gesture);}catch(error){this.cancel();throw error;}
       const last=gesture.points.at(-1)!;if(Math.hypot(point.x-last.x,point.y-last.y)<.25)return;
@@ -1329,15 +1548,18 @@ export class ToolController {
       return;
     }
     if (gesture.kind === "heal") {
-      let next = this.point(point, { x: 0, y: 0 }, modifiers.pressure);
+      let next = this.point(point, { x: 0, y: 0 }, modifiers.pressure,undefined,modifiers.tilt);
       const last = gesture.stroke.points.at(-1)!;
       const factor = 1 - Math.min(0.9, gesture.settings.smoothing);
+      const nextTilt=interpolatePenTilt(last.tilt,next.tilt,factor);
       next = {
+        ...(nextTilt?{tilt:nextTilt}:{}),
         x: last.x + (next.x - last.x) * factor,
         y: last.y + (next.y - last.y) * factor,
         pressure: last.pressure + (next.pressure - last.pressure) * factor,
       };
-      if (Math.hypot(next.x - last.x, next.y - last.y) < 0.25) return;
+      if (Math.hypot(next.x - last.x, next.y - last.y) < 0.25&&
+          (!gesture.stroke.pressureCurve||next.pressure===last.pressure)&&samePenTilt(next.tilt,last.tilt)) return;
       if (gesture.stroke.points.length >= 20000)
         throw new Error(
           "Finish this healing stroke before adding more points.",
@@ -1428,18 +1650,22 @@ export class ToolController {
         gesture.origin,
         modifiers.pressure,
         gesture.inputTransform,
+        modifiers.tilt,
       );
       const last = gesture.stroke.points.at(-1)!;
       const smoothing = this.state.settings.smoothing ?? 0;
       if (smoothing > 0) {
         const factor = 1 - Math.min(0.9, smoothing);
+        const nextTilt=interpolatePenTilt(last.tilt,p.tilt,factor);
         p = {
+          ...(nextTilt?{tilt:nextTilt}:{}),
           x: last.x + (p.x - last.x) * factor,
           y: last.y + (p.y - last.y) * factor,
           pressure: last.pressure + (p.pressure - last.pressure) * factor,
         };
       }
-      if (Math.hypot(p.x - last.x, p.y - last.y) < 0.25) return;
+      if (Math.hypot(p.x - last.x, p.y - last.y) < 0.25&&
+          (!gesture.stroke.pressureCurve||p.pressure===last.pressure)&&samePenTilt(p.tilt,last.tilt)) return;
       if (gesture.stroke.points.length >= gesture.maxPoints)
         throw new Error("This mask stroke has reached its point limit.");
       gesture.stroke.points.push(p);
@@ -1456,18 +1682,22 @@ export class ToolController {
         gesture.origin,
         modifiers.pressure,
         gesture.inputTransform,
+        modifiers.tilt,
       );
       const last = gesture.points.at(-1)!;
       const smoothing = gesture.settings.smoothing ?? 0;
       if (smoothing > 0) {
         const factor = 1 - Math.min(0.9, smoothing);
+        const nextTilt=interpolatePenTilt(last.tilt,p.tilt,factor);
         p = {
+          ...(nextTilt?{tilt:nextTilt}:{}),
           x: last.x + (p.x - last.x) * factor,
           y: last.y + (p.y - last.y) * factor,
           pressure: last.pressure + (p.pressure - last.pressure) * factor,
         };
       }
-      if (Math.hypot(p.x - last.x, p.y - last.y) < 0.25) return;
+      if (Math.hypot(p.x - last.x, p.y - last.y) < 0.25&&
+          (!gesture.settings.pressureCurve||p.pressure===last.pressure)&&samePenTilt(p.tilt,last.tilt)) return;
       if (gesture.points.length >= 20000)
         throw new Error("Finish this stroke before adding more points.");
       gesture.points.push(p);
@@ -1552,6 +1782,10 @@ export class ToolController {
       spacing: gesture.settings.spacing,
       pressureSize: gesture.settings.pressureSize,
       pressureOpacity: gesture.settings.pressureOpacity,
+      ...(gesture.settings.pressureCurve?{pressureCurve:gesture.settings.pressureCurve}:{}),
+      ...(gesture.settings.tip?{tip:gesture.settings.tip}:{}),
+      ...(gesture.settings.symmetry?{symmetry:gesture.settings.symmetry}:{}),
+      ...(gesture.stroke.texture?{texture:gesture.stroke.texture}:{}),
       color: gesture.settings.color,
       clip: gesture.clip,
     };
@@ -1564,6 +1798,7 @@ export class ToolController {
           : new BrushStroke(options);
   }
   private updateMaskPreview(gesture: MaskPaintGesture) {
+    if(!this.textureCurrent(gesture)){this.cancel();return;}
     this.publish({
       paintPreview: {
         layerId: gesture.layer.id,
@@ -1575,6 +1810,7 @@ export class ToolController {
   }
 
   private updatePaintPreview(gesture: PaintGesture) {
+    if(!this.textureCurrent(gesture)){this.cancel();return;}
     if (gesture.tool === "clone" && !gesture.cloneSource) {
       const snapshot=gesture.document.getSnapshot().document,assets=this.editor.assetStore;
       const inverse=gesture.inputTransform;
@@ -1637,12 +1873,66 @@ export class ToolController {
     return { type: "transaction", label: "Drawing preview", commands };
   }
   private assertCurrent(gesture: BaseGesture) {
+    if(!this.textureCurrent(gesture))throw new Error('The brush texture source changed during this gesture. Try again.');
     if (
       gesture.generation !== this.generation ||
       this.editor.document !== gesture.document ||
       gesture.document.getSnapshot().revision !== gesture.revision
     )
       throw new Error("The document changed during this gesture. Try again.");
+  }
+  private releaseWet(gesture: WetGesture) {
+    gesture.abort.abort(new Error('Wet stroke cancelled.'));
+    void gesture.ready.then(job=>job.dispose(),()=>{}).catch(()=>{});
+  }
+  /** Preserve every accepted sample; only prefix publication is coalesced. */
+  private pumpWet(gesture: WetGesture): Promise<void> {
+    if(gesture.running)return gesture.running;
+    const run=(async()=>{
+      const job=await gesture.ready;
+      while(this.gesture===gesture&&!gesture.abort.signal.aborted){
+        this.assertCurrent(gesture);
+        const count=gesture.points.length;
+        if(gesture.processed<count){await job.append(gesture.points.slice(gesture.processed,count));gesture.processed=count;}
+        // Input can arrive while an earlier append is awaiting native work.
+        // Pointer-up freezes input, then drains every still-buffered sample.
+        if(gesture.finishing){if(gesture.processed<gesture.points.length)continue;break;}
+        if(gesture.previewed===gesture.processed)break;
+        const frame=await job.preview();
+        if(this.gesture!==gesture||gesture.abort.signal.aborted){frame?.dispose();break;}
+        try{this.assertCurrent(gesture);}catch(error){frame?.dispose();throw error;}
+        gesture.previewed=gesture.processed;
+        const previous=this.state.wetPreview;
+        this.publish({wetPreview:frame});
+        previous?.dispose();
+      }
+    })();
+    gesture.running=run;
+    void run.catch(error=>{
+      if(this.gesture===gesture&&!gesture.abort.signal.aborted){
+        this.cancel();this.publish({error:error instanceof Error?error.message:'Wet painting failed.'});
+      }
+    }).finally(()=>{if(gesture.running===run)gesture.running=null;});
+    return run;
+  }
+  private async endWet(gesture: WetGesture) {
+    gesture.finishing=true;
+    try{
+      await this.pumpWet(gesture);
+      if(this.gesture!==gesture||gesture.abort.signal.aborted)return;
+      this.assertCurrent(gesture);
+      const job=await gesture.ready;
+      await job.commit();
+    }finally{
+      this.releaseWet(gesture);
+      if(this.gesture===gesture){
+        this.gesture=null;
+        const frame=this.state.wetPreview;
+        this.publish({wetPreview:null,drawing:false});
+        frame?.dispose();
+      }
+      await gesture.ready.then(job=>job.dispose(),()=>{});
+    }
   }
   async end() {
     if (this.crop.dragging) {
@@ -1652,6 +1942,7 @@ export class ToolController {
     this.cancelFrame();
     const gesture = this.gesture;
     if (!gesture) return;
+    if(gesture.kind==='wet'){await this.endWet(gesture);return;}
     this.gesture = null;
     // Keep the displayed frame, but stop source work for previews that can no
     // longer be updated. Durable capture owns its own sampling resources.
@@ -1827,6 +2118,7 @@ export class ToolController {
         this.publish({ cloneOffset: gesture.offset });
     } finally {
       if(gesture.kind === "paint")gesture.cloneSource?.dispose();
+      this.releaseTexture(gesture);
       if (!committed)
         stagedTiles.forEach((tile) => assets.remove(tile.assetId));
       this.publish({

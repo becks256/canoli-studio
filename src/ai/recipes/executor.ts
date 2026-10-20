@@ -13,7 +13,7 @@ import {
 } from "../../core/model";
 import { execute } from "../../core/commands";
 import type { EditorCommand, LayerPatch } from "../../core/commands";
-import type { Document } from "../../dom";
+import {PaintLayer,VectorLayer,type Document} from "../../dom";
 import type {
   EditPlan,
   PlannedStepChange,
@@ -499,6 +499,12 @@ export function compileEditPlan(
 
             let newLayerData: LayerData;
             switch (templateKind) {
+              case "paint":
+                newLayerData = new PaintLayer({name:templateName}).toJSON();
+                break;
+              case "vector":
+                newLayerData = new VectorLayer({name:templateName}).toJSON();
+                break;
               case "adjustment":
                 newLayerData = createAdjustmentLayer(
                   templateName,

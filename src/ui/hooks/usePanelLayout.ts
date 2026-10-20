@@ -3,6 +3,7 @@ import {
   defaultPanelWidths,
   fitPanelWidths,
   PANEL_LAYOUT_KEY,
+  PANEL_RESERVED_WIDTH,
   readPanelWidths,
 } from "../panel-layout";
 import type { PanelWidths } from "../panel-layout";
@@ -60,7 +61,7 @@ export function usePanelLayout(onError: (message: string) => void) {
       Math.min(
         480,
         Math.max(760, viewport) -
-          266 -
+          PANEL_RESERVED_WIDTH -
           widths[side === "layers" ? "inspector" : "layers"],
       ),
   };

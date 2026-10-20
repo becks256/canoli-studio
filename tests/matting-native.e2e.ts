@@ -60,33 +60,48 @@ test('the documented background-removal example executes in the actual isolated 
 test('real staged PNG decoding is discarded on cancellation or revision changes without adding assets',async({page})=>{
   const labels=await trimap(page);for(const mode of ['cancel','revision']){
     await page.evaluate(async({trimapAssetId,mode})=>{
-      const {editor}=window.luma,{AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts')),add=AssetStore.prototype.add;let release!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;});
-      (window as any).matteRelease=release;(window as any).matteReady=false;
-      AssetStore.prototype.add=async function(...args:Parameters<typeof add>){const asset=await add.apply(this,args);if(String(args[1]).endsWith(' — matte')){(window as any).matteReady=true;await gate;}return asset;};
+      // Patch the live host class: Vite can version the loaded AssetStore URL,
+      // making a separate bare import another class that never observes staging.
+      const {editor}=window.luma,prototype=Object.getPrototypeOf(editor.assetStore) as typeof editor.assetStore,add=prototype.add;let release!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;});
+      (window as any).matteRelease=release;(window as any).matteReady=false;(window as any).matteFinished=false;(window as any).matteOutcome='';
+      prototype.add=async function(...args:Parameters<typeof add>){const asset=await add.apply(this,args);if(String(args[1]).endsWith(' — matte')){(window as any).matteReady=true;await gate;}return asset;};
       const abort=new AbortController();(window as any).matteAbort=abort;(window as any).matteBefore=editor.document.toJSON();(window as any).matteCount=editor.assetStore.values().length;
-      (window as any).mattePending=editor.refineEdge({radius:25,smoothness:0,trimapAssetId},{signal:abort.signal}).then(()=>'',error=>String(error)).finally(()=>{AssetStore.prototype.add=add;});(window as any).matteMode=mode;
-    },{trimapAssetId:labels,mode});await page.waitForFunction(()=>(window as any).matteReady);
+      (window as any).mattePending=editor.refineEdge({radius:25,smoothness:0,trimapAssetId},{signal:abort.signal}).then(()=>'',error=>String(error)).then(error=>{(window as any).matteOutcome=error;return error;}).finally(()=>{prototype.add=add;(window as any).matteFinished=true;});(window as any).matteMode=mode;
+    },{trimapAssetId:labels,mode});await page.waitForFunction(()=>(window as any).matteReady||(window as any).matteFinished);
+    const staged=await page.evaluate(()=>({ready:(window as any).matteReady,outcome:(window as any).matteOutcome}));expect(staged.ready,staged.outcome||'Native preparation finished without the required staged PNG gate.').toBe(true);
     const result=await page.evaluate(async()=>{const {editor}=window.luma;if((window as any).matteMode==='cancel')(window as any).matteAbort.abort();else editor.document.name='Concurrent';(window as any).matteRelease();return{error:await(window as any).mattePending,before:(window as any).matteBefore,after:editor.document.toJSON(),countBefore:(window as any).matteCount,countAfter:editor.assetStore.values().length};});
     expect(result.error).toMatch(/abort|changed|cancel/i);expect(result.countAfter).toBe(result.countBefore);expect(result.after).toEqual(mode==='revision'?{...result.before,name:'Concurrent'}:result.before);
   }
 });
 
-test('dialog native processing can be cancelled after actual worker output without a late commit',async({page})=>{
+test('dialog native processing can be cancelled after actual worker output without a late commit',async({page},info)=>{
   await page.getByRole('button',{name:'Refine',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Refine Edge',exact:true});await expect(dialog.getByTestId('refine-edge-apply')).toBeEnabled();
   const before=await page.evaluate(async()=>{
-    const {PixelProcessor}=await import(/* @vite-ignore */String('/src/engine/processor.ts')),native=PixelProcessor.prototype.mattingTile;
-    PixelProcessor.prototype.mattingTile=async function(...args:Parameters<typeof native>){const result=await native.apply(this,args);(window as any).matteArrived=true;await new Promise(resolve=>setTimeout(resolve,500));(window as any).matteForwarded=true;return result;};return window.luma.editor.document.toJSON();
-  });await dialog.getByTestId('refine-edge-apply').click();await page.waitForFunction(()=>(window as any).matteArrived);await dialog.getByRole('button',{name:'Cancel matting',exact:true}).click();await page.waitForFunction(()=>(window as any).matteForwarded);expect(await page.evaluate(()=>window.luma.editor.document.toJSON())).toEqual(before);
+    const url=performance.getEntriesByType('resource').map(entry=>entry.name).find(name=>new URL(name).pathname==='/src/engine/processor.ts');
+    if(!url)throw new Error('The native pixel processor dependency has not loaded.');
+    const {PixelProcessor}=await import(/* @vite-ignore */url),native=PixelProcessor.prototype.mattingTile,editor=window.luma.editor,nativeApply=editor.refineEdge.bind(editor);
+    const gate=new Promise<void>(resolve=>{(window as any).matteRelease=resolve;});(window as any).matteProcessorUrl=url;
+    PixelProcessor.prototype.mattingTile=async function(...args:Parameters<typeof native>){const result=await native.apply(this,args);(window as any).matteArrived=true;await gate;(window as any).matteForwarded=true;return result;};
+    editor.refineEdge=async(...args:Parameters<typeof nativeApply>)=>{try{return await nativeApply(...args);}finally{(window as any).matteWasAborted=!!args[1]?.signal?.aborted;(window as any).matteSettled=true;}};
+    return{document:editor.document.toJSON(),assets:editor.assetStore.values().length};
+  });
+  await dialog.getByTestId('refine-edge-apply').click();await page.waitForFunction(()=>(window as any).matteArrived);await dialog.getByRole('button',{name:'Cancel matting',exact:true}).click();await page.evaluate(()=>(window as any).matteRelease());await page.waitForFunction(()=>(window as any).matteForwarded&&(window as any).matteSettled);
+  const result=await page.evaluate(()=>({document:window.luma.editor.document.toJSON(),assets:window.luma.editor.assetStore.values().length,allSourcesLive:window.luma.editor.assetStore.values().every(asset=>asset.bitmap.width===asset.width),processorUrl:(window as any).matteProcessorUrl,arrived:!!(window as any).matteArrived,forwarded:!!(window as any).matteForwarded,settled:!!(window as any).matteSettled,aborted:!!(window as any).matteWasAborted}));
+  await info.attach('native-ui-matting-cancellation',{body:JSON.stringify(result),contentType:'application/json'});expect(result.document).toEqual(before.document);expect(result.assets).toBe(before.assets);expect(result).toMatchObject({allSourcesLive:true,arrived:true,forwarded:true,settled:true,aborted:true});
 });
 
 test('isolated corrected-output scripts are atomic and late asset-write revocation discards private assets',async({page})=>{
   const labels=await trimap(page),source=`await document.selectedLayer.refineEdge({solver:'color-line',radius:25,smoothness:0,decontaminate:true,trimapAssetId:${JSON.stringify(labels)}});`;
   const initial=await page.evaluate(async source=>{const {editor}=window.luma,before=editor.document.toJSON(),count=editor.assetStore.values().length;try{await editor.runScript(source+'throw new Error("Later failure");');}catch{}return{before,after:editor.document.toJSON(),count,afterCount:editor.assetStore.values().length};},source);expect(initial.after).toEqual(initial.before);expect(initial.afterCount).toBe(initial.count);
   await page.evaluate(async source=>{
-    const {editor}=window.luma,{ScriptRetouch}=await import(/* @vite-ignore */String('/src/scripting/retouch.ts')),native=ScriptRetouch.prototype.prepare;
-    ScriptRetouch.prototype.prepare=async function(...args:Parameters<typeof native>){const result=await native.apply(this,args);(window as any).mattePrepared=true;return result;};
-    editor.plugins.install({format:'luma-plugin',apiVersion:2,id:'test.matting',name:'Matting',version:'1.0.0',permissions:['document:read','document:write','assets:read','assets:write'],commands:[{id:'run',title:'Run',source:source+'await new Promise(resolve=>setTimeout(resolve,400));'}]});(window as any).mattePending=editor.runPlugin('test.matting','run').then(()=>'',error=>String(error));
-  },source);await page.waitForFunction(()=>(window as any).mattePrepared);const result=await page.evaluate(async()=>{const {editor}=window.luma;editor.plugins.revokePermission('test.matting','assets:write');return{error:await(window as any).mattePending,document:editor.document.toJSON(),count:editor.assetStore.values().length};});expect(result.error).toContain('assets:write');expect(result.document).toEqual(initial.before);expect(result.count).toBe(initial.count);
+    // Hook the actual dependency URL, including Vite's version query. A bare
+    // import can create another class and leave the real preparation unobserved.
+    const url=performance.getEntriesByType('resource').map(entry=>entry.name).find(name=>new URL(name).pathname==='/src/scripting/retouch.ts')??'/src/scripting/retouch.ts';
+    const {editor}=window.luma,{ScriptRetouch}=await import(/* @vite-ignore */url),native=ScriptRetouch.prototype.prepare;
+    const gate=new Promise<void>(resolve=>{(window as any).releaseMatte=resolve;});
+    ScriptRetouch.prototype.prepare=async function(...args:Parameters<typeof native>){const result=await native.apply(this,args);(window as any).mattePrepared=true;await gate;return result;};
+    editor.plugins.install({format:'luma-plugin',apiVersion:2,id:'test.matting',name:'Matting',version:'1.0.0',permissions:['document:read','document:write','assets:read','assets:write'],commands:[{id:'run',title:'Run',source}]});(window as any).matteSettled=false;(window as any).mattePending=editor.runPlugin('test.matting','run').then(()=>'',error=>String(error)).then(value=>{(window as any).matteSettled=true;(window as any).matteError=value;return value;});
+  },source);await page.waitForFunction(()=>(window as any).mattePrepared||(window as any).matteSettled);const preparation=await page.evaluate(()=>({prepared:!!(window as any).mattePrepared,error:(window as any).matteError}));expect(preparation.prepared,JSON.stringify(preparation)).toBe(true);const result=await page.evaluate(async()=>{const {editor}=window.luma;editor.plugins.revokePermission('test.matting','assets:write');(window as any).releaseMatte();return{error:await(window as any).mattePending,document:editor.document.toJSON(),count:editor.assetStore.values().length};});expect(result.error).toContain('assets:write');expect(result.document).toEqual(initial.before);expect(result.count).toBe(initial.count);
 });
 
 test('corrected RGB and matte assets survive redo-only workspace restoration',async({page})=>{

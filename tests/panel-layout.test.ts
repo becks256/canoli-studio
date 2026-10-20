@@ -10,7 +10,7 @@ it("keeps panel minimums and canvas room across narrow and wide windows", () => 
     expect(widths.layers).toBeGreaterThanOrEqual(190);
     expect(widths.inspector).toBeGreaterThanOrEqual(230);
     expect(
-      widths.layers + widths.inspector + 54 + 12 + 200,
+      widths.layers + widths.inspector + 88 + 12 + 200,
     ).toBeLessThanOrEqual(viewport);
   }
   expect(defaultPanelWidths(1000)).toEqual({ layers: 190, inspector: 230 });

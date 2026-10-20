@@ -1,5 +1,26 @@
 # Plugins and extensions
 
+## Shared frequency parameter (schema37)
+
+LayerGroup.frequencyRadius and read-only Layer.frequencyGroup are ordinary OO model surfaces. Plugin commands may update the group through the existing document-write grant and shared validation/revision/undo boundary; locks and native source references remain checked. Original child data and protected locks are preserved. Schema37 group records use existing project/recipe/package transport; installation remains inert. Native preview/preparation canvases belong to the trusted application and add no isolated host service, file/network access or provider privilege.
+
+## Frequency values and existing capture services (schema 36)
+
+Isolated commands receive FrequencyBandFilter, NativeCompositionFilter and DocumentToneFilter constructors, LayerMask rasterErasures geometry, the two new blend-mode strings and Document.createFrequencySeparation. These are validated OO values/shared commands. The [documented recipe](SCRIPTING_API.md#frequency-separation-and-native-composition-schema-36) additionally uses existing host.assets.get and smart-object rasterization, requiring the existing asset-read/asset-write/document-write grants and execution limits. The trusted browser separateFrequencies helper adds no plugin host service. Installation stays inert; host commit rechecks permissions/revision/assets and publishes one undo. No raw file/network/provider privilege is added.
+
+## Red-eye adjustment values
+
+`RedEyeAdjustment` is available in the existing isolated constructor bindings. It creates parametric adjustment data only; use an attached `AdjustmentLayer` and normal masks/commands for edits. Existing `document:write` permission, revision validation, atomic undo and inert installation rules apply. No new permission, host service or network capability is added. [Constructor defaults, errors and example](SCRIPTING_API.md#redeyeadjustment-schema-35) use document schema 35; ordinary prepared-mask records retain schema 34 and package versions are unchanged.
+
+## Prepared wet mask values (schema34)
+
+Existing isolated commands may assign immutable LayerMask.applyWetPaint results using prepared PNG assets already available to the document. Ordinary/filter/embedded masks use shared model, locks, assets, alpha validation and atomic history. Permissions and file/network boundaries are unchanged; no brush simulation, direct pixel/file access or new host service is granted. Invalid alpha, including inert metadata, rejects the complete command run before publication. Installation remains inert.
+
+
+Retained wet-stroke sessions are internal host engine workspaces, not new plugin bindings or permissions. Prepared WetPaintStroke remains the isolated value surface. Explicit null opacity/nativeTransform reject before staged edits commit. Zero operation opacity retains valid source references/history while remaining inactive for rendering routes and SVG baking. Installation and existing document/asset grants keep their current behavior.
+
+Schema-33 `WetPaintStroke` is a prepared-data value in the existing isolated constructor runtime. Attaching requires document-write permission, with no new permission or preparation/file/network service. Output/coverage reference existing PNG assets; the host checks native dimensions/premasked alpha and cancellation/revision/grants before commit. Installation remains inert. Trusted application native preparation is not exposed to plugins. See [prepared wet paint](SCRIPTING_API.md#prepared-wet-paint-schema-33) for defaults, errors and a runnable example.
+
 Schema-25 text wordSpacing/fontKerning setters and resetSpacing use the existing isolated constructor runtime, document-write permission and shared commands/history. They introduce no font-file access, font enumeration, network/asset permission or install-time execution. Native font metrics vary between isolated workers, the browser and headless REST; these settings do not embed fonts or claim portable shaping. A failed script, invalid value or revoked/missing grant rolls back ordinary staged edits. See the TextLayer guide and its tested spacing example.
 
 Canoli Studio supports local command plugins: install a JSON package, review its access and JavaScript, then run its named commands from the **Plugins** panel (tool rail, or **Mod+Shift+L**). Commands use the same constructor-based [scripting API](SCRIPTING_API.md) as the Scripts panel. This is the first extension surface; a marketplace, custom panels, background services, external network access and native/WASM plugin modules are not implemented.
@@ -68,6 +89,14 @@ Users can inspect permissions in the **Plugins** panel and dynamically grant or 
 Commands have the same five-second deadline, 256-command and payload-complexity budgets as [scripts](SCRIPTING_API.md#errors-and-limits). A thrown exception, invalid output, missing image asset, timeout, cancellation or document revision conflict applies no plugin edits. **Stop plugin**, Escape or closing the panel cancels a pending run. No activation or load hook runs at installation/startup. Concurrent runs are not a supported plugin service.
 
 The worker has no page DOM, `editor` service, credentials, image import/export service, local storage, external network or external code loading. Permissions do not grant these capabilities. Plugins cannot import one another or install additional plugins. This prototype sandbox has a time limit but no strict heap quota and has not undergone a hostile-plugin security review. The UI therefore exposes source review and does not present installed code as vetted. Use packages from authors you trust.
+
+## Trusted PDF output
+
+PDF output remains trusted user-initiated host/UI functionality. Plugin constructors may prepare ordinary editable artwork; later export rasterizes it with reported losses. No PDF export/download, source-byte/font-file capability, file access, background execution or new grant is added. Installation remains inert, and existing isolated revision/undo/asset/permission checks remain unchanged. See the PDF host contract and constructor example in SCRIPTING_API.md.
+
+## TIFF source boundary
+
+TIFF inspection/import is trusted picker/drop/application functionality. Plugin constructors can edit the resulting ordinary raster layer and reference its existing asset ID under their current grants. Original TIFF bytes/page settings persist through host project, workspace, recovery and recipe operations; they are not exposed to plugin code. No TIFF file/decode/download capability, source-byte access or permission is introduced. Installation remains inert, and isolated execution retains revision, asset and final grant validation. See SCRIPTING_API.md for the host-only contract and constructor example.
 
 ## Persistence and lifecycle
 
@@ -209,3 +238,40 @@ Whitespace-only SVG calibration remains a trusted host export operation. Plugin-
 
 
 TIFF export is trusted browser-host/UI functionality. Plugins may author ordinary editable content using their existing granted constructors/commands; they do not receive `editor.export`, downloads, filesystem, font enumeration or a new permission. Installation remains inert. User-initiated TIFF output flattens current native pixels, excludes source metadata/font files and preserves native project sources/editability separately. See SCRIPTING_API.md for the host-only export contract.
+
+
+### PSB host delivery boundary
+
+Trusted browser PSB export shares the rendered PSD plan and existing host progress/cancel controls. It grants no isolated plugin file/download/export/font access, no new permission or package version, and no REST/browser synchronization. Plugins can create ordinary artwork through granted OO commands; user-initiated host export owns output/source/font validation. Existing inert installation, permission rechecks, isolated execution, assets/revisions and undo remain unchanged.
+
+
+Private PSD/PSB encoding workers are trusted host implementation details. They expose no new plugin worker/raw-pixel/file/font/network/download permission, command surface or package/schema revision. Installation stays inert and isolated command commits retain grant/revision/asset validation and shared undo.
+
+
+Photoshop inspection/import workers are trusted host file services, not isolated plugin capabilities. The new source/progress/abort overloads do not grant sandbox file, raw-buffer, font, network or download access and add no package/schema revision. Inert installation, permissions, isolated command commits and shared undo/revision/asset validation remain unchanged.
+
+
+### Schema-28 group compatibility
+
+Plugins using the existing isolated OO runtime may construct/edit group-only `blendMode:"pass-through"` through normal document commands. Host validation enforces own-style/fill restrictions, locks, source ownership and revision checks; failed batches publish nothing. Older schema labels cannot contain the new mode. A plugin requiring it must target a compatible runtime; normal remains the default for existing groups. Installation stays inert and no file/export/network or REST/browser synchronization privilege is added. See SCRIPTING_API.md for current signatures, defaults and rendering/export limitations.
+
+### Photoshop folder/pixel-mask host output
+
+User-initiated host export can retain supported folder records and separate user pixel-mask coverage from plugin-authored ordinary OO content. This grants no export/download/file/raw-pixel capability to isolated plugins. Existing document/asset grants, permission rechecks, inert installation, revision/atomic-command validation and undo remain unchanged. `.luma` retains full controls; PSD/PSB reports scoped baking, folded group fill, non-Normal pixel fill/masks and mask-control/off-canvas losses. See SCRIPTING_API.md for the current host-only contract.
+
+### Schema-29 pressure values
+
+The isolated constructor runtime exposes pure PressureCurve values for existing BrushStroke/PencilStroke/EraserStroke/CloneStroke and tonal brush commands. Existing document-write grants, host result/asset/revision validation, locks and atomic undo apply; invalid fields or revoked permissions cannot publish edits. Installation stays inert and no new permission/package version, file/export/network or browser/REST bridge is added. Projects retain optional pressure-curve brush data under document schema 29. Plugins requiring it must use a compatible runtime; older readers reject the field rather than silently discard it. See SCRIPTING_API.md for precise defaults and limits.
+
+
+### Data-only brush packs
+
+User-imported brush packs contain strict v1 preference values and execute no code. They are separate from plugin packages and cannot carry commands/assets/scripts or grant permissions. Installation remains inert; isolated plugin commands gain no file, local library or UI-tool access. Plugin-authored strokes continue using existing constructor/command/revision/asset validation. See [BRUSH_PRESETS.md](BRUSH_PRESETS.md).
+
+The immutable BrushTip constructor is available alongside BrushStroke and PressureCurve. Tip and spherical pen-orientation metadata use document schema 30 and normal strict host validation. This grants no additional permission, file/network capability, host ToolController access or install-time execution. The scripting guide defines complete signatures, coordinate units and response behavior.
+
+The pure immutable BrushSymmetry constructor joins brush values in the isolated runtime. Symmetry remains self-contained schema-31 metadata on normal brush commands, with implicit original ink and validated affine copies. Existing document permissions, host validation, locks, revisions and undo apply. This grants no host ToolController, file, network, export or install-time execution capability. Public signatures and coordinate-plane behavior are defined in SCRIPTING_API.md.
+
+## Authored brush textures
+
+`BrushTexture` is a pure constructor referencing an already imported asset ID. Plugin commands may use it in ordinary brush-bearing metadata under their current document grants; the host validates references before atomic publication and rechecks permissions. It grants no source bytes, file/import/export service, network access or additional permission. Installation remains inert. Source controls and source-bearing portable brush presets are separate work in progress. See the schema-32 constructor contract in SCRIPTING_API.md.

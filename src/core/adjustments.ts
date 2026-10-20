@@ -1,3 +1,6 @@
+import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "./red-eye";
+export { defaultRedEyeAdjustment } from "./red-eye";
+export type { RedEyeAdjustmentData } from "./red-eye";
 import { maskStrokeSchema } from "./masks";
 import type { BrushStrokeData } from "./drawing";
 import type { DodgeBurnOptions } from "./retouch/types";
@@ -132,6 +135,7 @@ export function defaultColorBalanceAdjustment(): ColorBalanceAdjustmentData {
 export function defaultVibranceAdjustment(): VibranceAdjustmentData { return {kind:"vibrance",vibrance:0,saturation:0}; }
 
 export type AdjustmentData =
+  | RedEyeAdjustmentData
   | LutAdjustmentData
   | WhiteBalanceAdjustmentData
   | GradientMapAdjustmentData
@@ -210,6 +214,7 @@ export const toneAdjustmentSchema = z
   .strict();
 
 export const adjustmentSchema = z.discriminatedUnion("kind", [
+  redEyeAdjustmentSchema,
   lutAdjustmentSchema,
   whiteBalanceAdjustmentSchema,
   gradientMapAdjustmentSchema,
@@ -385,6 +390,8 @@ export interface AdjustmentLuts {
 export function computeAdjustmentLuts(
   adjustment: AdjustmentData,
 ): AdjustmentLuts {
+  if (adjustment.kind === "red-eye")
+    throw new Error("Red-eye correction requires cross-channel pixel processing.");
   if (adjustment.kind === "lut")
     throw new Error("Imported LUTs require domain-aware table processing, not a channel lookup table.");
   if (adjustment.kind === "white-balance")

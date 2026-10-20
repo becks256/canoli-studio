@@ -1,6 +1,8 @@
 import { isImmutable } from "../immutable";
+import {visitMaskAssets} from '../asset-references';
+import {assertBrushVersion} from '../drawing';
 import { rebindLayerComps } from "../layer-comps";
-import { layerMaskSchema } from "../masks";
+import { layerMaskSchema,assertMaskOperationVersion } from "../masks";
 import { smartFiltersSchema } from "./filters";
 import { z } from "zod";
 import {
@@ -91,6 +93,8 @@ function inspectDocument(input: unknown, retainImmutable = false): {
           ),
         };
       }
+      if ((layer.blendMode === "linear-light" || layer.blendMode === "linear-burn") && Number((input as SmartDocumentData).schemaVersion) < 36)
+        throw new Error("Linear Light requires schema version 36.");
       if (layer.kind === "smart-object") {
         if (Number((input as SmartDocumentData).schemaVersion) < 10)
           throw new Error("Smart objects require schema version 10.");
@@ -99,12 +103,16 @@ function inspectDocument(input: unknown, retainImmutable = false): {
           if (Number((input as SmartDocumentData).schemaVersion) < 12)
             throw new Error("Smart-filter masks require schema version 12.");
           const mask = layerMaskSchema.parse(layer.filterMask);
-          if (mask.kind === "bitmap") filterAssets.add(mask.assetId);
+          assertMaskOperationVersion(mask,Number((input as SmartDocumentData).schemaVersion));
+          visitMaskAssets(mask,reference=>filterAssets.add(reference.assetId));
+          for(const entry of mask.strokes??[])assertBrushVersion(entry.stroke.kind==='wet'?entry.stroke.brush:entry.stroke,Number((input as SmartDocumentData).schemaVersion));
         }
         if (layer.smartFilters !== undefined) {
           if (Number((input as SmartDocumentData).schemaVersion) < 11)
             throw new Error("Smart filters require schema version 11.");
           smartFiltersSchema.parse(layer.smartFilters);
+          if (Number((input as SmartDocumentData).schemaVersion) < 36 && layer.smartFilters.some(f => f.kind === "frequency-band" || f.kind === "native-composition" || f.kind === "document-tone"))
+            throw new Error("Frequency bands require schema version 36.");
         }
         z.number()
           .finite()

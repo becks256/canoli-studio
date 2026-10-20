@@ -31,11 +31,13 @@ export function* svgDocumentChunks(document: SvgDocument, rasterMasks?:SvgRaster
   function* layers(nodes: LayerData[],parent:AffineTransform): Generator<string> {
     for (const layer of nodes) {
       if (!layer.visible || layer.opacity === 0) continue;
-      if(layer.kind==='adjustment'||layer.styles?.blendIf.enabled)throw new Error('Adjustments and Blend If require native backdrop preparation. Use host editor.export({format: "svg"}).');
+      if(layer.kind==='adjustment'||layer.styles?.blendIf.enabled||(layer.kind==='group'&&layer.blendMode==='pass-through'))throw new Error('Adjustments, pass-through groups and Blend If require native backdrop preparation. Use host editor.export({format: "svg"}).');
       if (layer.kind !== 'group' && layer.kind !== 'vector'&&layer.kind!=='raster'&&layer.kind!=='text'&&layer.kind!=='smart-object'&&layer.kind!=='paint') continue;
       const matrix = localTransform(layer),world=parent.multiply(matrix);
       const transform = [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map(svgNumber).join(' ');
-      if (!BLEND_MODES.includes(layer.blendMode)) throw new Error('Unsupported SVG blend mode.');
+      if(layer.mask?.kind==='raster-erasures')throw new Error('Raster erasure coverage requires native SVG composition preparation.');
+      if ((layer.blendMode==='linear-light'||layer.blendMode==='linear-burn')) throw new Error('Linear Light requires native SVG composition preparation.');
+      if (layer.blendMode==='pass-through'||!BLEND_MODES.includes(layer.blendMode)) throw new Error('Unsupported SVG blend mode.');
       // Generated XML-safe IDs avoid collisions/whitespace in arbitrary model IDs.
       // The exact authored identifier is retained as inert, escaped metadata.
       yield `<g id="canoli-layer-${++ordinal}" data-layer-id="${svgAttribute(layer.id)}" transform="matrix(${transform})" opacity="${svgNumber(layer.opacity)}" style="isolation:isolate;mix-blend-mode:${layer.blendMode}">\n`;

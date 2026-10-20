@@ -8,13 +8,19 @@ import {
 } from "../src/dom";
 import { EditorApplication } from "../src/editor";
 import { getExportCapabilityReport } from "../src/engine/export";
+import {encodePhotoshopStrip} from '../src/engine/photoshop-strip';
 
 if (typeof globalThis.Worker === "undefined") {
-  globalThis.Worker = class MockWorker {
-    postMessage() {}
-    addEventListener() {}
-    removeEventListener() {}
-    terminate() {}
+  globalThis.Worker = class MockWorker extends EventTarget {
+    private photoshop:boolean;private closed=false;
+    onmessage:((event:{data:unknown})=>void)|null=null;
+    constructor(url:string|URL){super();this.photoshop=String(url).includes('photoshop-export.worker');}
+    postMessage(input:unknown,transfer:Transferable[]=[]){
+      if(!this.photoshop)return;
+      const value=structuredClone(input,{transfer}) as {id:number;pixels:Uint8ClampedArray;width:number;rows:number;encoding:'layer'|'preview'|'both'};
+      queueMicrotask(()=>{if(!this.closed)this.onmessage?.({data:{id:value.id,channels:encodePhotoshopStrip(value.pixels,value.width,value.rows,value.encoding)}});});
+    }
+    terminate() {this.closed=true;}
   } as unknown as typeof Worker;
 }
 
@@ -221,5 +227,7 @@ describe("multi-format export engine with capability reports (F11)", () => {
     expect(psdResult.extension).toBe("psd");
     expect(psdResult.mimeType).toBe("image/vnd.adobe.photoshop");
     expect(psdResult.blob.size).toBeGreaterThan(0);
+    const psbResult=await editor.export({format:'psb'});
+    expect(psbResult.extension).toBe('psb');expect(psbResult.blob.size).toBeGreaterThan(0);
   });
 });

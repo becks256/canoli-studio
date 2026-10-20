@@ -1,3 +1,7 @@
+import {brushSymmetrySchema} from '../brush-symmetry';
+import {brushTextureSchema} from '../brush-texture';
+import {brushTipSchema,penTiltSchema} from '../brush-tip';
+import {pressureCurveSchema} from '../pressure-curve';
 import { z } from "zod";
 import { tonalStrokeSchema } from "../adjustments";
 
@@ -12,6 +16,10 @@ export const tonalSculptOptionsSchema = z
     spacing: z.number().finite().optional(),
     pressureSize: z.boolean().optional(),
     pressureOpacity: z.boolean().optional(),
+    pressureCurve: pressureCurveSchema.optional(),
+    tip:brushTipSchema.optional(),
+    symmetry:brushSymmetrySchema.optional(),
+    texture:brushTextureSchema.optional(),
     protectTones: z.boolean().optional(),
     clipSelection: z.boolean().optional(),
   })
@@ -26,6 +34,7 @@ export const tonalSculptSchema = z
             x: z.number().finite(),
             y: z.number().finite(),
             pressure: z.number().finite().min(0).max(1).optional(),
+            tilt:penTiltSchema.optional(),
           })
           .strict(),
       )

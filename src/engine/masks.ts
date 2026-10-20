@@ -1,6 +1,10 @@
+import {hasWetMask} from './wet-mask';
 import { featherRegion } from "./feather-region";
+import type {AssetStore} from '../core/assets';
+import type {BrushTextureSampler} from './brush-texture';
 import { AffineTransform } from "../core/affine";
 import { maskGeometrySignature } from "./mask-signature";
+import {hasMaskRefinements} from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
 import type { PixelProcessor } from "./processor";
 import type { RenderSpace } from "./canvas";
@@ -86,9 +90,12 @@ export class PaintedMaskRaster {
     bitmap?: ImageBitmap | HTMLCanvasElement,
     retainFull = true,
     readback = false,
+    assets?:AssetStore,
+    textures?:BrushTextureSampler,
+    isCancelled?:()=>boolean,
   ) {
-    if (!mask.strokes?.length || !canCache())
-      return paintedMask(mask, space, x, y, processor, world, bitmap);
+    if (hasWetMask(mask) || !mask.strokes?.length || !canCache())
+      return paintedMask(mask, space, x, y, processor, world, bitmap,assets,textures,isCancelled);
     const location = JSON.stringify([space, world]);
     const cacheKey = `painted:${key}:${location}`;
     const prefix = mask.strokes.slice(0, -1);
@@ -115,6 +122,9 @@ export class PaintedMaskRaster {
           processor,
           world,
           bitmap,
+          assets,
+          textures,
+          isCancelled,
         );
         this.replays++;
       }
@@ -133,6 +143,10 @@ export class PaintedMaskRaster {
         processor,
         active,
         world,
+        undefined,
+        assets,
+        textures,
+        isCancelled,
       );
       if (active) this.appended += active.appendedPoints - before;
       if (canCache() && retainFull)
@@ -164,8 +178,11 @@ const rawCoverage = (
   retention: MaskRetention | undefined,
   world: AffineTransform,
   bitmap?: ImageBitmap | HTMLCanvasElement,
+  assets?:AssetStore,
+  textures?:BrushTextureSampler,
+  isCancelled?:()=>boolean,
 ) =>
-  mask.kind === "paint" || mask.strokes?.length
+  mask.kind === "raster-erasures" || mask.kind === "paint" || hasMaskRefinements(mask)
     ? retention
       ? retention.paint.render(
           mask,
@@ -179,8 +196,11 @@ const rawCoverage = (
           bitmap,
           retention.retainFull,
           retention.readback,
+          assets,
+          textures,
+          isCancelled,
         )
-      : paintedMask(mask, space, x, y, processor, world, bitmap)
+      : paintedMask(mask, space, x, y, processor, world, bitmap,assets,textures,isCancelled)
     : mask.kind === "selection"
       ? selectionMask(mask.selection, space, x, y, processor, world)
       : mask.kind === "vector"
@@ -199,10 +219,13 @@ export async function maskCoverage(
   retention?: MaskRetention,
   world = AffineTransform.translation(x, y),
   bitmap?: ImageBitmap | HTMLCanvasElement,
+  assets?:AssetStore,
+  textures?:BrushTextureSampler,
+  isCancelled?:()=>boolean,
 ): Promise<HTMLCanvasElement> {
   const feather = mask.feather ?? 0;
   if (!feather)
-    return rawCoverage(mask, space, x, y, processor, retention, world, bitmap);
+    return rawCoverage(mask, space, x, y, processor, retention, world, bitmap,assets,textures,isCancelled);
   const radiusX = (feather * space.sx) / 3,
     radiusY = (feather * space.sy) / 3;
   const haloX = 3 * Math.ceil(radiusX),
@@ -239,7 +262,7 @@ export async function maskCoverage(
           width: width + haloX * 2,
           height: height + haloY * 2,
         };
-        if (mask.kind === "selection" && !mask.strokes?.length) {
+        if (mask.kind === "selection" && !hasMaskRefinements(mask)) {
           const inverse = world.inverse();
           const origin = inverse.point({ x: padded.x, y: padded.y });
           const pixels = await processor.featheredSelection({
@@ -263,6 +286,9 @@ export async function maskCoverage(
           retention,
           world,
           bitmap,
+          assets,
+          textures,
+          isCancelled,
         );
         try {
           const c = source.getContext("2d")!;

@@ -3,6 +3,7 @@ import type { RefObject } from "react";
 import type { EditorApplication } from "../../editor";
 import type { DocumentData } from "../../core/model";
 import type { RenderOptions, RenderRegion } from "../../engine/renderer";
+import type { WetPaintPreview } from '../../engine/wet-preview';
 
 export interface UseCanvasRendererOptions {
   editor: EditorApplication;
@@ -11,6 +12,7 @@ export interface UseCanvasRendererOptions {
   renderRegion: RenderRegion;
   zoom: number;
   paintPreview: RenderOptions["paintPreview"];
+  wetPreview?: WetPaintPreview | null;
   previewGesture?: object | null;
   gestureRef?: RefObject<object | null>;
   backendState: unknown;
@@ -32,6 +34,7 @@ export function useCanvasRenderer({
   renderRegion,
   zoom,
   paintPreview,
+  wetPreview,
   previewGesture,
   gestureRef,
   backendState,
@@ -78,6 +81,9 @@ export function useCanvasRenderer({
     zoom: number;
     fontRevision: number;
     backendState: unknown;
+    hostAssets: typeof assets;
+    wetPreview?: WetPaintPreview | null;
+    release?: () => void;
   } | null>(null);
   const renderTarget = useRef<typeof latestRender.current>(null);
   const renderActive = useRef(false);
@@ -100,6 +106,8 @@ export function useCanvasRenderer({
       target.document === job.document &&
       target.assets === job.assets &&
       target.region === job.region &&
+      target.fontRevision === job.fontRevision &&
+      target.backendState === job.backendState &&
       target.options.scale === job.options.scale;
 
     const sameGesture = target && job.gesture &&
@@ -111,13 +119,19 @@ export function useCanvasRenderer({
       target.fontRevision === job.fontRevision &&
       target.backendState === job.backendState;
 
+    const sameWet=target&&job.wetPreview&&target.wetPreview?.owner===job.wetPreview.owner&&
+      job.wetPreview.isCurrent()&&target.sourceDocument===job.sourceDocument&&
+      target.hostAssets===job.hostAssets&&target.region===job.region&&target.zoom===job.zoom&&
+      target.fontRevision===job.fontRevision&&target.backendState===job.backendState;
+
     return !!(
       editor.document.getSnapshot().document !== job.sourceDocument ||
-      editor.assetStore !== job.assets ||
+      editor.assetStore !== job.hostAssets ||
+      (job.wetPreview&&!job.wetPreview.isCurrent()) ||
       job.options.paintPreview?.cloneSource?.isDisposed ||
       (job.gesture && (gestureRef?.current !== job.gesture ||
         editor.document.getSnapshot().document !== job.sourceDocument)) ||
-      (!sameStroke && !sameGesture && job.key !== renderVersion.current) ||
+      (!sameStroke && !sameGesture && !sameWet && job.key !== renderVersion.current) ||
       !displayHost.current
     );
   };
@@ -125,12 +139,16 @@ export function useCanvasRenderer({
 
   useLayoutEffect(() => {
     const key = ++renderVersion.current;
+    latestRender.current?.release?.();
     latestRender.current = {
       document: viewDocument,
       gesture: previewGesture,
       sourceDocument: editor.document.getSnapshot().document,
       zoom, fontRevision, backendState,
       assets,
+      hostAssets:wetPreview?.hostAssets??assets,
+      wetPreview,
+      release:wetPreview&&!wetPreview.isDisposed?wetPreview.retain():undefined,
       key,
       region: renderRegion,
       options: {
@@ -148,27 +166,28 @@ export function useCanvasRenderer({
       if (showRenderingStatus) setRendering(true);
       try {
         while (latestRender.current) {
-          // Paint is already frame-batched by ToolController. A transform uses
-          // the frame boundary requested when its previous preparation started;
+          // Paint is already frame-batched by ToolController. Transforms and
+          // wet prefixes share the boundary their previous preparation requested;
           // if that boundary passed during preparation, do not wait a new frame.
           // This permits at most one start per animation frame for the gesture.
           const queued = latestRender.current;
           if (!queued.options.paintPreview) {
             const prior = gestureFrame.current;
-            await (queued.gesture && prior?.gesture === queued.gesture
-              ? prior.ready
-              : new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+            const cadence = queued.gesture ?? queued.wetPreview?.owner;
+            if (cadence && prior?.gesture === cadence) await prior.ready;
+            else if (!queued.wetPreview) await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
           }
           if (!latestRender.current) break;
           const job = latestRender.current;
           latestRender.current = null;
-          if (job.options.paintPreview?.cloneSource?.isDisposed) continue;
-          gestureFrame.current = job.gesture ? {
-            gesture: job.gesture,
+          const cadence = job.gesture ?? job.wetPreview?.owner;
+          gestureFrame.current = cadence ? {
+            gesture: cadence,
             ready: new Promise<void>((resolve) => requestAnimationFrame(() => resolve())),
           } : null;
           job.options = { ...job.options, isCancelled: () => isObsolete(job) };
           try {
+            if(isObsolete(job))continue;
             let result = await editor.renderer.prepareViewport(
               job.document,
               job.assets,
@@ -206,8 +225,7 @@ export function useCanvasRenderer({
                   job.assets,
                   job.options,
                 );
-                if (job.options.paintPreview?.cloneSource?.isDisposed ||
-                    job.key !== renderVersion.current || !displayHost.current) {
+                if (isObsolete(job)) {
                   continue;
                 }
                 present();
@@ -224,7 +242,7 @@ export function useCanvasRenderer({
                 cause instanceof Error ? cause.message : "Rendering failed.",
               );
             }
-          }
+          } finally { job.release?.(); }
         }
       } finally {
         renderActive.current = false;
@@ -248,8 +266,10 @@ export function useCanvasRenderer({
           editor.document.getSnapshot().document !== sourceDocument) return;
       seenPreview = next;
       const key = ++renderVersion.current;
+      latestRender.current?.release?.();
       latestRender.current = {
         document: viewDocument, assets, key, region: renderRegion,
+        hostAssets:assets,
         gesture: previewGesture, sourceDocument, zoom, fontRevision, backendState,
         options: { region: renderRegion, scale: Math.min(1, zoom * window.devicePixelRatio), paintPreview: next },
       };
@@ -263,6 +283,7 @@ export function useCanvasRenderer({
     renderRegion,
     zoom,
     paintPreview,
+    wetPreview,
     previewGesture,
     gestureRef,
     backendState,
@@ -273,6 +294,7 @@ export function useCanvasRenderer({
   useEffect(
     () => () => {
       renderVersion.current++;
+      latestRender.current?.release?.();
       latestRender.current = null;
       renderTarget.current = null;
       onCleanupCursorRef.current?.();

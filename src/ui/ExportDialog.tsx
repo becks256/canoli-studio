@@ -2,7 +2,7 @@ import type { ExportControl, ExportProgress } from "../engine/export-control";
 import { exportFontFamilies, fontAvailability } from "./font-availability";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Dialog } from "./Dialog";
-import { Button, IconButton, Select, Slider, ColorField } from "./controls";
+import { Button, IconButton, Select, Slider, ColorField, NumberField } from "./controls";
 import { AlertTriangle, CheckCircle, Info, X } from "lucide-react";
 import type { DocumentData } from "../core/model";
 import type { ExportFormat, ExportOptions } from "../engine/export";
@@ -24,6 +24,7 @@ export function ExportDialog({
   const [format, setFormat] = useState<ExportFormat>("png");
   const [psdMode, setPsdMode] = useState<"layers" | "flatten">("layers");
   const [tiffVariant,setTiffVariant]=useState<"auto"|"classic"|"big">("auto");
+  const [pdfDpi,setPdfDpi]=useState(72);
   const [quality, setQuality] = useState(90);
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const [exporting, setExporting] = useState(false);
@@ -81,8 +82,9 @@ export function ExportDialog({
       backgroundColor,
       psdMode,
       tiffVariant,
+      pdfDpi,
     });
-  }, [document, format, quality, backgroundColor, psdMode,tiffVariant]);
+  }, [document, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi]);
 
   const handleExport = async () => {
     const run = new AbortController();
@@ -96,6 +98,7 @@ export function ExportDialog({
         backgroundColor,
         psdMode,
         tiffVariant,
+        pdfDpi,
       }, {signal:run.signal,onProgress:setProgress});
       if (!run.signal.aborted) onClose();
     } finally {
@@ -137,23 +140,30 @@ export function ExportDialog({
             },
             { value: "webp", label: "WebP — Modern efficient web image" },
             { value: "tiff", label: "TIFF — Lossless raster with transparency and ICC profile" },
+            { value: "pdf", label: "PDF — Native-resolution raster page with transparency" },
             { value: "svg", label: "SVG — Scalable Bézier vector paths" },
             {
               value: "psd",
               label:
                 "PSD — Adobe Photoshop layered interchange with ICC profile",
             },
+            {value:'psb',label:'PSB — Photoshop large document, layers and folders'},
           ]}
           onChange={(val) => setFormat(val as ExportFormat)}
         />
 
-        {format === "psd" && <Select label="PSD layers" layout="stacked" value={psdMode} disabled={busy || exporting}
+        {(format === "psd"||format==='psb') && <Select label={format==='psb'?'PSB layers':'PSD layers'} layout="stacked" value={psdMode} disabled={busy || exporting}
           options={[{ value: "layers", label: "Keep independent layers; merge dependent effects" }, { value: "flatten", label: "Flatten visible composition into one layer" }]}
           onChange={value => setPsdMode(value as "layers" | "flatten")} />}
 
         {format==='tiff'&&<Select label="TIFF compatibility" layout="stacked" value={tiffVariant} disabled={busy||exporting}
           options={[{value:'auto',label:'Automatic — TIFF or BigTIFF as needed'},{value:'classic',label:'Classic TIFF — widest compatibility'},{value:'big',label:'BigTIFF — requires a compatible viewer'}]}
           onChange={value=>setTiffVariant(value as 'auto'|'classic'|'big')} />}
+
+        {format==='pdf'&&<div>
+          <NumberField label="PDF resolution" value={pdfDpi} min={1} max={1000000} suffix="DPI" disabled={busy||exporting} onChange={setPdfDpi}/>
+          <p>Physical page size: {(document.width/pdfDpi).toFixed(3)} × {(document.height/pdfDpi).toFixed(3)} inches. Native pixels stay unchanged.</p>
+        </div>}
 
         <div className="export-dimension-info">
           <span>

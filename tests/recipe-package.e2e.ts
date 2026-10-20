@@ -601,3 +601,10 @@ test("package loading rejects a changed selected target without editing", async 
   expect(result.correctTarget).toBe(true);
   expect(result.undone).toBe(true);
 });
+
+test('portable constructor-default templates execute atomically without image sources and restore exact undo',async({page})=>{
+ await page.goto('/');const result=await page.evaluate(async()=>{
+  const {editor}=window.luma,{serializeRecipePackage}=await import(/* @vite-ignore */String('/src/ai/recipes/package.ts'));editor.newDocument({width:64,height:64});const before=JSON.stringify(editor.document.toJSON()),recipe={schemaVersion:1,id:'constructor-defaults',name:'Constructor defaults',description:'',version:1,parameters:[],steps:['paint','vector','adjustment'].map(kind=>({id:kind,name:kind,action:{type:'layer.add',layerTemplate:{kind,name:kind}}}))};
+  const file=await serializeRecipePackage(recipe,{get(){throw new Error('Default templates have no image sources.');}});await editor.recipes.executeRecipePackage(file);const kinds=editor.document.toJSON().children.map(layer=>layer.kind),revision=editor.document.getSnapshot().revision;editor.document.undo();return{kinds,oneRevision:revision===1,undo:JSON.stringify(editor.document.toJSON())===before,assets:editor.assetStore.values().length};
+ });expect(result).toEqual({kinds:['paint','vector','adjustment'],oneRevision:true,undo:true,assets:0});
+});

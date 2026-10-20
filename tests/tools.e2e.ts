@@ -626,17 +626,51 @@ test("developer docs link, anchors and documented scripts work in the actual san
   ];
   expect(examples.length).toBeGreaterThanOrEqual(8);
   for (const [, name, code] of examples) {
-    const result = await page.evaluate(async (code) => {
+    const fixture = ({
+      "tiff-import-edit": "tests/fixtures/tiff/rgba-1.tif",
+      "photoshop-import-edit": "tests/fixtures/psd/masks/black-raw.psd",
+      "photoshop-mask-edit": "tests/fixtures/psd/masks/black-raw.psd",
+      "photoshop-group-edit": "tests/fixtures/psd/groups/normal.psd",
+    } as Record<string, string>)[name];
+    const bytes = fixture ? [...await readFile(fixture)] : null;
+    const needsFixture = Boolean(fixture) || ['wet-prepared','wet-mask-prepared'].includes(name);
+    const result = await page.evaluate(async ({ code, fixture, bytes, name, needsFixture }) => {
       const e = window.luma.editor;
-      await e.openSample();
+      if (['wet-prepared','wet-mask-prepared'].includes(name)) {
+        const { encodeRgbaPng } = await import(/* @vite-ignore */ String('/src/engine/png.ts'));
+        e.newDocument({ width: 16, height: 16 });
+        for (const [title, rgba] of [['Wet output', [255, 0, 0, 128]], ['Wet coverage', [255, 255, 255, 255]]] as const) {
+          const asset = await e.assetStore.add(await encodeRgbaPng(Uint8Array.from(rgba), 1, 1), title, undefined, false);
+          e.document.layers.add(new window.luma.RasterLayer({ name: title, assetId: asset.id, width: 1, height: 1, visible: false }));
+        }
+      } else if (bytes && fixture?.endsWith(".tif"))
+        await e.openTiff(new File([new Uint8Array(bytes)], fixture, {type:"image/tiff"}));
+      else if (bytes)
+        await e.openPsd(new Uint8Array(bytes), {mode:"layered"});
+      else await e.openSample();
+      const before = JSON.stringify(e.document.toJSON());
+      const sources = async () => Promise.all(e.assetStore.values().map(async asset =>
+        [asset.id, [...new Uint8Array(await crypto.subtle.digest("SHA-256", await asset.blob.arrayBuffer()))]]));
+      const originalSources = needsFixture ? await sources() : null;
       try {
         const logs = await e.runScript(code);
+        if (needsFixture) {
+          const edited = before !== JSON.stringify(e.document.toJSON());
+          e.document.undo();
+          return {logs, edited, exactUndo:before === JSON.stringify(e.document.toJSON()),
+            sameSources:JSON.stringify(originalSources) === JSON.stringify(await sources())};
+        }
         return { logs };
       } catch (error) {
         return { error: (error as Error).message };
       }
-    }, code);
+    }, {code, fixture, bytes, name, needsFixture});
     expect(result.error, name).toBeUndefined();
+    if (needsFixture) {
+      expect(result.edited, name).toBe(true);
+      expect(result.exactUndo, name).toBe(true);
+      expect(result.sameSources, name).toBe(true);
+    }
   }
 });
 

@@ -6,9 +6,9 @@
 **Status:** Approved & Implemented in Prototype  
 **Date:** 2026-09-28
 
-Current export behavior was corrected on 2026-10-15: the browser renders all content through the editor compositor, retains independent pixel layers, merges backdrop-dependent prefixes and offers explicit flattening. Editable Photoshop text/masks/adjustments/group hierarchy and PSB output remain unsupported. Merged preview RGB is white-matted; see SCRIPTING_API.md for precision and the current supported subset. Historical prototype descriptions below do not establish professional color/interchange parity.
+Current Photoshop export renders through the native compositor and offers explicit flattening. PSD/PSB layers now retain supported nested folders, ordinary/pass-through modes, pixel child records and document-bounded user pixel-mask coverage. Group fill folds into opacity; only unstyled Normal pixel fill remains separate, with non-Normal fill/masks and unsupported effects/dependencies baking in real isolation scopes. Original mask controls/linkage/off-canvas coverage, native type/vector/adjustment/effect controls and broader color/precision/desktop fidelity remain unproven. PSB uses eight-byte section/channel lengths and four-byte RLE rows. White-matted merged-preview precision and normative limits are in SCRIPTING_API.md. Historical prototype descriptions below do not establish professional color/interchange parity.
 
-Current TIFF output (2026-10-17) is a flattened lossless Deflate RGBA8 sRGB image with unassociated alpha and embedded output ICC. Automatic/classic/BigTIFF choices use actual output addressing. TIFF input, higher precision/CMYK/HDR, editable/multipage output and real files exceeding 4 GiB remain unverified or unimplemented. See SCRIPTING_API.md for the exact trusted host contract.
+Current TIFF output (2026-10-17) is a flattened lossless Deflate RGBA8 sRGB image with unassociated alpha and embedded output ICC. Automatic/classic/BigTIFF choices use actual output addressing. Input supports a reported unsigned RGB/grayscale/palette/bilevel raw/LZW/Deflate/PackBits strip/tile/planar subset, either endian and orientations 1–8, with explicit selected page and 16-bit-to-8-bit consent. Original bytes and decode settings persist separately from decoded editing pixels. RGB ICC is delegated to browser color management; this is not broader profile conformance. Higher precision editing/CMYK/HDR, JPEG/fax input, editable/multipage output, real files exceeding 4 GiB and broad device/color/heap gates remain unverified or unimplemented. See SCRIPTING_API.md for the exact trusted host contracts.
 
 ---
 
@@ -117,6 +117,12 @@ The implemented ICC engine (`src/core/color/icc.ts`) operates directly on raw bi
 
 ---
 
+## Raster PDF delivery and output-profile correction
+
+PDF delivery now supports one native-resolution lossless RGB raster page, transparency soft mask, output sRGB ICC and DPI-based physical sizing. Canonical tiled readback feeds row-streamed RGB/alpha compression; a single PDF image placement avoids independent tile edge shifts. PDF/X/PDF/A, CMYK/spot colors, bleed/trim, searchable/editable content, import, batch and server rendering remain outside this increment. Independent MuPDF decoding/rendering and exact stored samples are the current verification boundary, not universal viewer/print/device/heap conformance. The writer's large-offset tests are synthetic; actual multi-GiB output remains unverified.
+
+That independent reader exposed a prior output-profile error: generated sRGB/P3 profiles encoded gamma 2.2, while native pixels use the sRGB piecewise curve. Future profiles now use 4,096-entry ICC-v2 curve tables, including the dark toe. Adobe RGB's gamma and linear-sRGB identity are retained. Independent LittleCMS sample conversion checks sRGB exports; broader P3/device/profile conformance remains open. Original source profiles and previously exported files are not modified. This shared output-profile repair also affects newly generated TIFF/PSD profiles and requires their regression suites.
+
 ## 3. Photoshop Interchange Engine (PSD/PSB) (F11)
 
 ### 3.1 Adobe Photoshop Binary File Format Breakdown
@@ -208,12 +214,12 @@ When exporting:
 
 ## 4. Capability Matrix & Preflight Audit
 
-The table below delineates Canoli Studio's current capability matrix for PSD interchange:
+The table below is the historical prototype capability matrix, not the current acceptance matrix. The current rendered PSD/PSB boundary is specified in SCRIPTING_API.md; wider color/editability claims in this table remain unverified.
 
 | Feature Category    | PSD Feature                                           | Import Support               | Export Support        | Preflight Classification              |
 | :------------------ | :---------------------------------------------------- | :--------------------------- | :-------------------- | :------------------------------------ |
 | **Document Specs**  | Version 1 (PSD, $\le 30\text{k}\times 30\text{k}$)    | Full                         | Full                  | Preserved                             |
-|                     | Version 2 (PSB, $\le 300\text{k}\times 300\text{k}$)  | Full                         | Planned Phase 5       | Warning (Exports as PSD v1)           |
+|                     | Version 2 (PSB, $\le 300\text{k}\times 300\text{k}$)  | RGB8 subset; memory dependent | Rendered RGB8 subset | PSB-compatible reader required       |
 |                     | Resolution (DPI / 0x03ED)                             | Full                         | Full (72 DPI default) | Preserved                             |
 |                     | Embedded ICC Profile (0x040F)                         | Full (Extracted & Inspected) | Full (Embedded)       | Preserved                             |
 | **Color Modes**     | RGB (8-bit per channel)                               | Full                         | Full                  | Preserved                             |
@@ -264,8 +270,8 @@ Canoli Studio will **retain its zero-dependency, specification-compliant in-tree
 
 - Target: Display P3 viewport acceleration with WebGPU color space configuration.
 - Native Canvas 2D context options `{ colorSpace: "display-p3" }` where supported.
-- Non-destructive user layer mask export to PSD channel `-2`.
-- Layer group hierarchy preservation in PSD export.
+- Implemented RGB8 subset: separate user pixel-mask coverage in channel `-2`; original mask controls/off-canvas fidelity remain open.
+- Implemented supported nested PSD/PSB folder records; native effects/type/adjustments and broader Photoshop hierarchy fidelity remain open.
 
 ### Phase 5: Print Prepress & Enterprise Interchange
 
@@ -284,3 +290,26 @@ The feasibility prototype is validated by comprehensive unit, integration, and e
 - **PSD Interchange Tests (`tests/psd-interchange.test.ts`)**: 11 tests verifying PackBits RLE encoding/decoding, big-endian binary stream handling, multi-layer PSD construction, round-trip fidelity, CMYK/16-bit capability reporting, and verification against synthetic disk fixtures (`basic-rgb-8bit.psd`, `cmyk-unsupported.psd`, `16bit-gradient.psd`).
 - **Export Engine Tests (`tests/export.test.ts`)**: Verifying PSD export format, capability report generation, and valid MIME type output.
 - **End-to-End Browser Tests (`tests/color-interchange.e2e.ts`)**: Verifying the UI Color Profile dialog, ICC tag inspection, soft-proofing toggles, PSD preflight inspection dialog, and canvas import.
+
+
+### Current PSB verification boundary
+
+The browser rendered writer extends the [Adobe Photoshop file format](https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/) version-2 length/RLE rules. Independent tests use released psd-tools 1.10.9 in a temporary environment, not an application dependency. The newer 1.24.0 reader rejects axes beyond 30,000 even for version 2; this reader limitation is recorded rather than treating failure as an editor dimension cap. Independent external RLE fixtures exercise 30,001 and 100,000 pixel axes, including rows larger than 65,535 compressed bytes. Small layered cases force independent recomposition; large flattened cases compare native decoded layer/merged samples to PNG. These are encoded RGB8 tests with reader ICC conversion disabled, not Photoshop desktop, complete color/editability, real multi-GiB, physical-device or peak-memory acceptance.
+
+
+### Current Photoshop input execution boundary
+
+The browser now performs full parse and PNG staging in cancellable private workers, returning only metadata for preflight. It still materializes input/decoded planes and does not reconstruct full Photoshop group/mask/color/precision semantics. Reports now identify inspected-but-unapplied/unretained ICC data, prototype unverified CMYK interpretation, rectangular mask coverage and omitted group appearance; these are explicit remaining fidelity gates, not completed color work. Low-level synchronous helpers remain separate. See SCRIPTING_API.md for host signatures, legacy buffer/result ownership, errors and memory boundaries.
+
+
+### Eight-bit Photoshop ZIP input
+
+The trusted worker path now decodes native zlib ZIP and byte-predicted ZIP in 8-bit RGB/Gray PSD/PSB layer and merged channels. The shared parser preserves unsupported ZIP reports for synchronous adapters and higher precision. Independent psd-tools fixtures cover RGB/Gray alpha, prediction/channel/row boundaries, 100,000-pixel PSB rows and native 50 MP ZIP source pixels. No claim of high-precision/CMYK/HDR, ICC application, full editable mask/group semantics, whole-file streaming, original-container retention or independent Photoshop desktop acceptance follows from codec support. Adobe defines compression codes and planar merged ordering in its [file-format specification](https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/); predictor fixtures use released psd-tools without the app codec.
+
+
+Supported eight-bit Photoshop user-mask channels now retain independent pixel coverage through the existing native bitmap-mask and asset transport. Original-resolution source grids, bounds, black/white outside coverage, inversion, disabled state, density and coordinate planes are retained. Nonzero Photoshop feather and extended/combined/rendered/vector masks remain explicit unsupported layered paths; a supplied merged image can still import. Separate UI linkage metadata, full desktop/color/precision semantics and whole-process memory acceptance are not established by independent codec/source-grid tests.
+
+
+### Current hierarchy increment (2026-10-17)
+
+The earlier prototype group-import limitation is superseded for supported nested PSD/PSB raster groups: native OO hierarchy/order/placement, group opacity/visibility, ordinary/pass-through modes, conservative locks and supported user pixel masks now persist. Source PNGs and native group state survive project/workspace transport. Native pass-through currently uses Canvas/WASM fallback and rejects incompatible own fill/styles. Rendered PSD/PSB/SVG output bakes the dependent backdrop prefix; editable Photoshop group output is still unsupported. This does not establish full Photoshop effects/clipping/type/vector/feather/ICC/precision fidelity, complete container retention, streamed-file memory bounds or desktop/hardware/device interoperability.

@@ -73,6 +73,8 @@ test("panel constraints retain canvas space and a failed save restores prior wid
   await page.setViewportSize({ width: 900, height: 900 });
   const bounds = await page.locator(".canvas-column").boundingBox();
   expect(bounds!.width).toBeGreaterThanOrEqual(200);
+  await page.setViewportSize({ width: 760, height: 900 });
+  await expect.poll(async () => (await page.locator(".canvas-column").boundingBox())!.width).toBeGreaterThanOrEqual(200);
   const before = await handle.getAttribute("aria-valuenow");
   await page.evaluate(() => {
     const original = Storage.prototype.setItem;

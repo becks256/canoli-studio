@@ -34,6 +34,8 @@ export const PSD_BLEND_MODE_MAP: Record<string, BlendMode> = {
   mul: "multiply",
   scrn: "screen",
   over: "overlay",
+  lLit: "linear-light",
+  lbrn: "linear-burn",
   hLit: "hard-light",
   sLit: "soft-light",
   diff: "difference",
@@ -49,6 +51,8 @@ export const LUMA_TO_PSD_BLEND_MAP: Record<BlendMode, string> = {
   multiply: "mul ",
   screen: "scrn",
   overlay: "over",
+  "linear-light": "lLit",
+  "linear-burn": "lbrn",
   "hard-light": "hLit",
   "soft-light": "sLit",
   difference: "diff",
@@ -94,6 +98,7 @@ export interface PsdLayerRecord {
   blendModeSig: string; // '8BIM'
   blendModeKey: string; // 'norm', 'mul ', etc.
   opacity: number; // 0 - 255
+  fillOpacity?: number; // iOpa byte, effective default 255
   clipping: number;
   flags: {
     transparencyProtected: boolean;
@@ -103,6 +108,10 @@ export interface PsdLayerRecord {
   name: string;
   isGroup?: boolean;
   isGroupEnd?: boolean;
+  hasVectorMask?: boolean;
+  groupBlendModeKey?: string;
+  protectedFlags?: number;
+  unsupportedAppearance?: string[];
   mask?: {
     top: number;
     left: number;
@@ -110,15 +119,22 @@ export interface PsdLayerRecord {
     right: number;
     defaultColor: number;
     disabled: boolean;
+    relativeToLayer?: boolean;
+    inverted?: boolean;
+    density?: number;
+    feather?: number;
+    unsupportedFeatures?: string[];
   };
 }
 
 export interface PsdParsedLayer extends PsdLayerRecord {
+  unsupportedCompression?: boolean;
   imageData?: ImageData;
   maskData?: ImageData;
 }
 
 export interface PsdParsedDocument {
+  unsupportedCompositeCompression?: boolean;
   header: PsdHeader;
   resources: Map<number, PsdImageResource>;
   layers: PsdParsedLayer[];

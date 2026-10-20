@@ -23,7 +23,11 @@ export interface ScriptRunnerOptions {
 
 export class ScriptRunner {
   private cancelCurrent: (() => void) | null = null;
+  private cancellation = new Set<() => void>();
+  /** Host commit validation can remain cancellable after worker execution. */
+  subscribeCancellation(listener: () => void) { this.cancellation.add(listener); return () => { this.cancellation.delete(listener); }; }
   cancel() {
+    for (const listener of this.cancellation) listener();
     this.cancelCurrent?.();
   }
 

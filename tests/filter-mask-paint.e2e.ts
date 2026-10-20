@@ -114,7 +114,8 @@ test("brush paints filter-mask coverage in native coordinates with selection cli
   expect(after.ordinary).toBeNull();
   expect(after.mask.strokes).toHaveLength(1);
   expect(after.mask.strokes![0].mode).toBe("hide");
-  expect(after.mask.strokes![0].stroke.points[0].x).toBeCloseTo(24, 1);
+  const maskStroke=after.mask.strokes![0].stroke;if(maskStroke.kind==='wet')throw new Error('Expected ordinary filter-mask brush.');
+  expect(maskStroke.points[0].x).toBeCloseTo(24,1);
   expect(await pixels(page)).toEqual([255, 0, 0, 255, 54, 54, 54, 255]);
   await page.evaluate(() => window.luma.editor.document.undo());
   expect((await state(page)).mask).toEqual(before.mask);

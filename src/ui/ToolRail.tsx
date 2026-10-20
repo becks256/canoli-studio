@@ -1,5 +1,7 @@
 import {
   Search,
+  Fingerprint,
+  Blend,
   ClipboardCheck,
   Sun,
   Moon,
@@ -14,6 +16,7 @@ import {
   HelpCircle,
   ImagePlus,
   MousePointer2,
+  MousePointerSquareDashed,
   Paintbrush,
   PaintBucket,
   Pencil,
@@ -22,6 +25,7 @@ import {
   Scan,
   Lasso,
   Stamp,
+  SquareDashed,
   Bandage,
   WandSparkles,
   Type,
@@ -63,101 +67,106 @@ export function ToolRail({
 }: ToolRailProps) {
   return (
     <nav className="tool-rail" aria-label="Editor tools">
-      <IconButton
-        shortcutId="command-palette"
-        label="Find a command (Mod+K)"
-        disabled={busy}
-        onClick={onOpenPalette}
-      >
-        <Search size={19} />
-      </IconButton>
-      <IconButton
-        shortcutId="move"
-        label="Move tool (V)"
-        aria-pressed={tool === "move" && !spacePan}
-        className={`tool-button ${tool === "move" && !spacePan ? "active" : ""}`}
-        onClick={() => onChooseTool("move")}
-      >
-        <MousePointer2 size={19} />
-      </IconButton>
-      <IconButton
-        shortcutId="hand"
-        label="Hand tool (H)"
-        aria-pressed={tool === "hand" || spacePan}
-        className={`tool-button ${tool === "hand" || spacePan ? "active" : ""}`}
-        onClick={() => onChooseTool("hand")}
-      >
-        <Hand size={19} />
-      </IconButton>
-      {(
-        [
-          ["marquee", "Marquee tool (M)", Scan],
-          ["lasso", "Lasso tool (L)", Lasso],
-          ["wand", "Magic wand tool (W)", WandSparkles],
-          ["quick-select", "Quick selection (Shift+W)", Paintbrush],
-          ["fill", "Paint bucket (G)", PaintBucket],
-          ["brush", "Brush tool (B)", Paintbrush],
-          ["dodge", "Dodge tool (O)", Sun],
-          ["burn", "Burn tool (Shift+O)", Moon],
-          ["pencil", "Pencil tool (N)", Pencil],
-          ["eraser", "Eraser tool (E)", Eraser],
-          ["pen", "Vector pen (P)", PenTool],
-          ["text", "Text tool (T)", Type],
-          ["clone", "Clone brush (S)", Stamp],
-          ["patch", "Patch tool (J)", Bandage],
-          ["heal", "Spot Healing (Shift+J)", WandSparkles],
-          ["artboard", "Artboard editor (A)", Frame],
-          ["crop", "Crop canvas (C)", Crop],
-        ] as const
-      ).map(([key, label, Icon]) => (
+      <div className="rail-tools">
         <IconButton
-          key={key}
-          shortcutId={key}
-          label={label}
-          aria-pressed={tool === key}
-          className={`tool-button ${tool === key ? "active" : ""}`}
+          shortcutId="command-palette"
+          label="Find a command (Mod+K)"
+          className="tool-button"
           disabled={busy}
-          onClick={() => onChooseTool(key)}
+          onClick={onOpenPalette}
         >
-          <Icon size={19} />
+          <Search size={19} />
         </IconButton>
-      ))}
-      <span className="rail-divider" />
-      <IconButton
-        shortcutId="import"
-        label="Import image (Mod+O)"
-        className="tool-button"
-        disabled={busy}
-        onClick={onImport}
-      >
-        <ImagePlus size={19} />
-      </IconButton>
-      <IconButton
-        label="New document"
-        className="tool-button"
-        disabled={busy}
-        onClick={onNewDocument}
-      >
-        <FilePlus2 size={19} />
-      </IconButton>
-      <IconButton
-        shortcutId="scripts"
-        label="Scripts (Mod+Shift+K)"
-        className="tool-button"
-        disabled={busy}
-        onClick={onOpenScripts}
-      >
-        <Code2 size={19} />
-      </IconButton>
-      <IconButton
-        shortcutId="plugins"
-        label="Plugins (Mod+Shift+L)"
-        className="tool-button"
-        disabled={busy}
-        onClick={onOpenPlugins}
-      >
-        <Puzzle size={19} />
-      </IconButton>
+        <IconButton
+          shortcutId="move"
+          label="Move tool (V)"
+          aria-pressed={tool === "move" && !spacePan}
+          className={`tool-button ${tool === "move" && !spacePan ? "active" : ""}`}
+          onClick={() => onChooseTool("move")}
+        >
+          <MousePointer2 size={19} />
+        </IconButton>
+        <IconButton
+          shortcutId="hand"
+          label="Hand tool (H)"
+          aria-pressed={tool === "hand" || spacePan}
+          className={`tool-button ${tool === "hand" || spacePan ? "active" : ""}`}
+          onClick={() => onChooseTool("hand")}
+        >
+          <Hand size={19} />
+        </IconButton>
+        {(
+          [
+            ["marquee", "Marquee tool (M)", Scan],
+            ["lasso", "Lasso tool (L)", Lasso],
+            ["wand", "Magic wand tool (W)", WandSparkles],
+            ["quick-select", "Quick selection (Shift+W)", MousePointerSquareDashed],
+            ["fill", "Paint bucket (G)", PaintBucket],
+            ["brush", "Brush tool (B)", Paintbrush],
+            ["smudge", "Smudge tool", Fingerprint],
+            ["mixer", "Mixer brush", Blend],
+            ["dodge", "Dodge tool (O)", Sun],
+            ["burn", "Burn tool (Shift+O)", Moon],
+            ["pencil", "Pencil tool (N)", Pencil],
+            ["eraser", "Eraser tool (E)", Eraser],
+            ["pen", "Vector pen (P)", PenTool],
+            ["text", "Text tool (T)", Type],
+            ["clone", "Clone brush (S)", Stamp],
+            ["patch", "Patch tool (J)", SquareDashed],
+            ["heal", "Spot Healing (Shift+J)", Bandage],
+            ["artboard", "Artboard editor (A)", Frame],
+            ["crop", "Crop canvas (C)", Crop],
+          ] as const
+        ).map(([key, label, Icon]) => (
+          <IconButton
+            key={key}
+            shortcutId={key}
+            label={label}
+            aria-pressed={tool === key}
+            className={`tool-button ${tool === key ? "active" : ""}`}
+            disabled={busy}
+            onClick={() => onChooseTool(key)}
+          >
+            <Icon size={19} />
+          </IconButton>
+        ))}
+        <span className="rail-divider" />
+        <IconButton
+          shortcutId="import"
+          label="Import image (Mod+O)"
+          className="tool-button"
+          disabled={busy}
+          onClick={onImport}
+        >
+          <ImagePlus size={19} />
+        </IconButton>
+        <IconButton
+          label="New document"
+          className="tool-button"
+          disabled={busy}
+          onClick={onNewDocument}
+        >
+          <FilePlus2 size={19} />
+        </IconButton>
+        <IconButton
+          shortcutId="scripts"
+          label="Scripts (Mod+Shift+K)"
+          className="tool-button"
+          disabled={busy}
+          onClick={onOpenScripts}
+        >
+          <Code2 size={19} />
+        </IconButton>
+        <IconButton
+          shortcutId="plugins"
+          label="Plugins (Mod+Shift+L)"
+          className="tool-button"
+          disabled={busy}
+          onClick={onOpenPlugins}
+        >
+          <Puzzle size={19} />
+        </IconButton>
+      </div>
       <div className="rail-bottom">
         <IconButton label="Design checks" className="tool-button" onClick={onOpenPreflight} disabled={busy}><ClipboardCheck size={18}/></IconButton>
         <IconButton

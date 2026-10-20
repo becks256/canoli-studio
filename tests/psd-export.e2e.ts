@@ -148,12 +148,14 @@ test("isolated group adjustments stay local and top-level Blend If merges its ac
       const expected = rendered.getContext("2d")!.getImageData(0, 0, 32, 16).data; rendered.width = rendered.height = 0;
       let max = 0; for (let i = 0; i < expected.length; i++) max = Math.max(max, Math.abs(expected[i] - parsed.composite!.data[i]));
       results.push({ blendIf, max, names: parsed.layers.map((layer: any) => layer.name),
-        group: parsed.layers.find((layer: any) => layer.name === "Isolated")?.imageData?.data.some((value: number, i: number) => i % 4 === 3 && value > 0) });
+        group: parsed.layers.find((layer: any) => layer.name === "Isolated")?.isGroup ?? false,
+        child: parsed.layers.find((layer: any) => layer.name === "Merged through Adjustment")?.imageData?.data.some((value: number, i: number) => i % 4 === 3 && value > 0),
+        scopedMerge: output.report.warnings.some(value => value.includes('group isolation scope')) });
     }
     return results;
   });
-  expect(results[0]).toMatchObject({ max: 0, names: ["Background", "Isolated", "Dependent"], group: true });
-  expect(results[1]).toMatchObject({ max: 0, names: ["Merged through Dependent"] });
+  expect(results[0]).toMatchObject({ max: 0, names: ["Background", "</Layer group>", "Merged through Adjustment", "Isolated", "Dependent"], group: true, child: true, scopedMerge: true });
+  expect(results[1]).toMatchObject({ max: 0, names: ["Merged through Dependent"], group: false });
 });
 
 test("50 MP rendered PSD preserves native dimensions and edge pixels with bounded native tiles", async ({ page }) => {

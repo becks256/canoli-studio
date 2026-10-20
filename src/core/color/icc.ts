@@ -17,6 +17,7 @@ import {
   SRGB_TO_XYZ_D65,
   WHITE_POINT_D50,
   xyzD65ToD50,
+  srgbToLinear,
 } from "./spaces";
 
 function readAscii(view: DataView, offset: number, length: number): string {
@@ -283,14 +284,19 @@ export function buildStandardIccProfile(
   const gXyzBuf = makeXyzTag(gD50);
   const bXyzBuf = makeXyzTag(bD50);
 
-  // 7, 8, 9: rTRC, gTRC, bTRC (curveType with 1 entry = pure gamma, or 0 entries = identity)
+  // ICC v2 curve tables retain the sRGB toe used by both sRGB and Display P3.
+  // A single gamma 2.2 value incorrectly darkens near-black encoded samples.
+  const sampled = space === "srgb" || space === "display-p3";
   const gamma =
-    space === "adobe-rgb" ? 2.19921875 : space === "linear-srgb" ? 1.0 : 2.2;
-  const trcBuf = new Uint8Array(14);
+    space === "adobe-rgb" ? 2.19921875 : 1.0;
+  const count = sampled ? 4096 : 1;
+  const trcBuf = new Uint8Array(12 + count * 2);
   const trcView = new DataView(trcBuf.buffer);
   writeAscii(trcView, 0, "curv");
-  trcView.setUint32(8, 1, false); // 1 entry: gamma in u8.8
-  trcView.setUint16(12, Math.round(gamma * 256.0), false);
+  trcView.setUint32(8, count, false);
+  if (sampled) for (let i = 0; i < count; i++)
+    trcView.setUint16(12 + i * 2, Math.round(srgbToLinear(i / (count - 1)) * 65535), false);
+  else trcView.setUint16(12, Math.round(gamma * 256.0), false);
 
   const tagList = [
     { sig: "desc", data: descBuf },

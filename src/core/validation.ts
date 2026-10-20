@@ -10,7 +10,7 @@ import { cropBoundsSchema } from "./crop";
 import { layerMaskSchema } from "./masks";
 import { authoredMetadataSchema } from "./metadata";
 import { adjustmentSchema } from "./adjustments";
-import { BLEND_MODES } from "./model";
+import { GROUP_BLEND_MODES } from "./model";
 import {
   rasterErasureSchema,
   selectionSchema,
@@ -65,8 +65,9 @@ const patch = z
     locked: z.boolean().optional(),
     opacity: z.number().min(0).max(1).optional(),
     fillOpacity: z.number().min(0).max(1).optional(),
+    frequencyRadius: z.number().finite().min(0).max(4096/3).nullable().optional(),
     styles: styleSchema.optional(),
-    blendMode: z.enum(BLEND_MODES).optional(),
+    blendMode: z.enum(GROUP_BLEND_MODES).optional(),
     text: z.string().max(10000).optional(),
     fontSize: z.number().min(1).max(Number.MAX_SAFE_INTEGER).optional(),
     fontFamily: identifier.optional(),

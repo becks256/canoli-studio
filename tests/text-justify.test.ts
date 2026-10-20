@@ -54,7 +54,7 @@ describe('native inter-word paragraph justification',()=>{
    // Paragraph fields are valid only starting with 26.
    const legacy=doc.toJSON();if(schemaVersion<26)for(const node of legacy.children)if(node.kind==='text')delete node.wrapWidth;
    if(schemaVersion<26)for(const node of legacy.children)if(node.kind==='text'){node.width=60;}
-   const restored=Document.fromJSON({...legacy,schemaVersion});expect(restored.toJSON().schemaVersion).toBe(27);expect(restored.toJSON().children[0]).not.toHaveProperty('paragraphJustify');
+   const restored=Document.fromJSON({...legacy,schemaVersion});expect(restored.toJSON().schemaVersion).toBe(37);expect(restored.toJSON().children[0]).not.toHaveProperty('paragraphJustify');
   }
   for(const paragraphJustify of ['none','inter-word'] as const){const data=new Document();data.layers.add(new TextLayer({paragraphJustify}));for(const source of [data.toJSON(),data.getSnapshot().document])expect(()=>Document.fromJSON({...source,schemaVersion:26})).toThrow(/version 27/);}
   const state=doc.getSnapshot(),old=(document:ReturnType<Document['toJSON']>)=>({...document,schemaVersion:26 as const}),restored=Document._fromWorkspace(old(doc.toJSON()),{version:1,past:state.past.map(e=>({...e,document:old(e.document)})),future:[]});restored.undo();expect(restored.name).toBe('Untitled');restored.redo();expect(restored.toJSON()).toEqual(doc.toJSON());

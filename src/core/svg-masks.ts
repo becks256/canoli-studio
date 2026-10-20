@@ -1,6 +1,6 @@
 import type {DocumentData,LayerData} from './model';
 import type {LayerMaskData} from './masks';
-import {maskTransform} from './masks';
+import {maskTransform,hasMaskRefinements} from './masks';
 import {AffineTransform} from './affine';
 import {localTransform} from './spatial';
 import {svgNumber,svgPathCommands} from './svg-path';
@@ -48,7 +48,7 @@ export function planSvgMasks(document:SvgDocument):SvgMaskPlan[]{
       if(!svgArtwork(layer))continue;
       const world=parent.multiply(localTransform(layer)),mask=layer.mask;
       if(mask?.enabled&&mask.density>0)plans.push({layerId:layer.id,id:`canoli-mask-${plans.length+1}`,world,mask,
-        vector:mask.kind==='vector'&&!mask.strokes?.length&&!(mask.feather??0)});
+        vector:mask.kind==='vector'&&!hasMaskRefinements(mask)&&!(mask.feather??0)});
       if(layer.kind==='paint')for(let i=0;i<layer.strokes.length;i++){
         const stroke=layer.strokes[i];if(!stroke.clip)continue;
         plans.push({layerId:svgPaintClipKey(layer.id,i),id:`canoli-mask-${plans.length+1}`,world,vector:false,region:strokeClipRegion(stroke.clip,world,support),mask:{kind:'selection',enabled:true,inverted:false,density:1,linked:true,selection:stroke.clip}});

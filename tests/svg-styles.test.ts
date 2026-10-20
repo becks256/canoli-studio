@@ -23,7 +23,7 @@ describe('SVG effect preservation',()=>{
  it('reports preserved overlays/shadows and native backdrop baking separately',()=>{
   const{document,layer}=scene();layer.styles=new LayerStyle({colorOverlay:{enabled:true,color:'#ffffff',opacity:0.5}});let report=getExportCapabilityReport(document.toJSON(),{format:'svg'});
   expect(report.featuresPreserved.join(' ')).toContain('document-space drop shadows');expect(report.featuresDegradedOrOmitted).not.toContain('Blend If');
-  const raw=document.toJSON();const group=raw.children[0];if(group.kind!=='group')throw new Error('fixture');group.children[0].styles!.blendIf.enabled=true;report=getExportCapabilityReport(raw,{format:'svg'});expect(report.featuresPreserved.join(' ')).toContain('Native adjustment layers and Blend If');expect(report.featuresDegradedOrOmitted.join(' ')).toContain('native backdrop prefixes');
+  const raw=document.toJSON();const group=raw.children[0];if(group.kind!=='group')throw new Error('fixture');group.children[0].styles!.blendIf.enabled=true;report=getExportCapabilityReport(raw,{format:'svg'});expect(report.featuresPreserved.join(' ')).toContain('Native adjustment layers, pass-through groups and Blend If');expect(report.featuresDegradedOrOmitted.join(' ')).toContain('native backdrop prefixes');
  });
  it('retains off-canvas vector mask support for a visible shadow without editing the source',()=>{
   const{document,layer}=scene();layer.x=-25;layer.fillOpacity=0;layer.styles=new LayerStyle({dropShadow:{enabled:true,color:'#000000',opacity:1,x:25,y:0,blur:0}});layer.mask=new LayerMask({paths:[VectorPath.rectangle({x:0,y:0,width:32,height:24})]});

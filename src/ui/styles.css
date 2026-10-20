@@ -262,15 +262,29 @@ select {
   display: flex;
 }
 .tool-rail {
+  min-height: 0;
   width: var(--rail-width);
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 15px 0;
+  padding: 8px 6px;
   flex-shrink: 0;
   border-right: 1px solid var(--color-border);
-  gap: 7px;
+  gap: 8px;
   background: var(--color-app);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.tool-rail > * { flex-shrink: 0; }
+.rail-tools,
+.tool-rail .rail-bottom {
+  display: grid;
+  grid-template-columns: repeat(2, 32px);
+  gap: 4px;
+}
+.tool-rail .tool-button {
+  width: 32px;
+  height: 32px;
 }
 .tool-button {
   width: 36px;
@@ -290,10 +304,11 @@ select {
   color: var(--color-on-accent);
 }
 .rail-divider {
-  width: 20px;
+  grid-column: 1 / -1;
+  width: 100%;
   height: 1px;
   background: var(--color-border);
-  margin: 9px 0;
+  margin: 4px 0;
 }
 .rail-bottom {
   margin-top: auto;
@@ -1462,14 +1477,6 @@ dialog::backdrop {
   border-top: 1px solid var(--color-border);
 }
 
-.tool-rail {
-  overflow-y: auto;
-}
-.tool-rail .rail-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
 .docs-link {
   display: flex;
   align-items: center;
@@ -6217,3 +6224,52 @@ input[type="color"] {
 .vector-gradient-stop > label { display:flex; align-items:center; justify-content:space-between; font-size:11px; }
 .vector-gradient-controls details > summary { cursor:pointer; font-size:11px; }
 .boolean-path-list { display: grid; gap: 8px; max-height: 240px; overflow: auto; margin: 12px 0; padding: 8px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+
+.pressure-curve-dialog { width: min(620px, calc(100vw - 32px)); }
+.pressure-curve-graph { width: 220px; max-width: 100%; height: 220px; display: block; margin: 12px auto; }
+.pressure-curve-points { display: grid; gap: 8px; }
+.pressure-curve-point { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.pressure-curve-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+.pressure-curve-point .slider-field { min-width: 0; margin: 4px 0; }
+@media (max-width: 600px) {
+  .pressure-curve-point { grid-template-columns: minmax(0, 1fr); }
+  .pressure-curve-point > button { justify-self: end; }
+}
+
+.brush-presets-dialog { width: min(860px, calc(100vw - 32px)); }
+.brush-presets-layout { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 1.4fr); gap: 24px; }
+.brush-presets-list { display: grid; align-content: start; gap: 6px; max-height: 420px; overflow: auto; padding: 2px; }
+.brush-preset-row { text-align: left; padding: 12px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-panel); color: var(--color-text); display: grid; gap: 6px; overflow-wrap: anywhere; }
+.brush-preset-row.selected { border-color: var(--color-accent); }
+.brush-preset-row span, .brush-preset-details dt { color: var(--color-text-secondary); font-size: 11px; }
+.brush-preset-details { min-width: 0; overflow-wrap: anywhere; }
+.brush-preset-details h3 { margin-top: 0; }
+.brush-preset-details dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 16px; }
+.brush-preset-details dd { margin: 0; }
+.brush-preset-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.brush-preset-footer { justify-content: flex-end; margin-bottom: 0; }
+@media (max-width: 650px) { .brush-presets-layout { grid-template-columns: minmax(0, 1fr); } .brush-presets-list { max-height: 200px; } }
+
+.brush-tip-dialog { width: min(640px, calc(100vw - 32px)); }
+.brush-texture-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow-y: auto; }
+.brush-texture-preview { display: block; margin: 12px auto; background: var(--color-canvas); border: 1px solid var(--color-border); }
+.brush-tip-preview { display: block; width: 280px; max-width: 100%; height: 180px; margin: 12px auto; }
+.brush-tip-settings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.brush-tip-settings .slider-field { min-width: 0; }
+.brush-tip-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+.brush-tip-actions.end { justify-content: flex-end; }
+@media(max-width:600px) { .brush-tip-settings { grid-template-columns: minmax(0, 1fr); gap: 0; } }
+
+.brush-symmetry-dialog { width: min(640px, calc(100vw - 32px)); }
+.brush-symmetry-preview { display: block; width: 100%; height: 200px; margin: 20px auto; overflow: hidden; }
+
+.frequency-separation-dialog { width: min(680px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow-y: auto; }
+.frequency-preview-panes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.frequency-preview-panes figure { min-width: 0; margin: 0; }
+.frequency-preview-panes figcaption { color: var(--color-text-secondary); font-size: 11px; margin-bottom: 8px; }
+.frequency-preview-surface { min-height: 192px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: repeating-conic-gradient(var(--color-panel) 0% 25%, var(--color-app) 0% 50%) 50% / 12px 12px; }
+.frequency-preview-surface canvas { display: block; max-width: 100%; height: auto; touch-action: none; cursor: grab; }
+.frequency-preview-surface canvas:active { cursor: grabbing; }
+.frequency-preview-caption { display: flex; gap: 12px; align-items: center; margin-top: 10px; color: var(--color-text-secondary); font-size: 11px; }
+@media (max-width: 560px) { .frequency-preview-panes { grid-template-columns: minmax(0, 1fr); } .frequency-preview-caption { flex-wrap: wrap; } }

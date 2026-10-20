@@ -4,9 +4,10 @@ import {AffineTransform} from './affine';
 import {localTransform} from './spatial';
 import {svgNumber} from './svg-path';
 import type {SmartObjectInstanceData} from './smart/types';
-import {svgPaintCloneKey} from './svg-paint';
+import type {BrushTextureData} from './brush-texture';
+import {svgPaintCloneKey,svgPaintTextureKey} from './svg-paint';
 
-export interface SvgRasterPlan {layer:RasterLayerData|SmartObjectInstanceData;world:AffineTransform;rendered:boolean;prefix?:readonly LayerData[]}
+export interface SvgRasterPlan {layer:RasterLayerData|SmartObjectInstanceData;world:AffineTransform;rendered:boolean;prefix?:readonly LayerData[];texture?:BrushTextureData}
 export interface SvgImage {id:string;dataUrl:string;width:number;height:number;x:number;y:number;space:'source'|'document'}
 export type SvgImages=ReadonlyMap<string,SvgImage>;
 export function planSvgImages(document:SvgDocument):SvgRasterPlan[]{
@@ -14,10 +15,15 @@ export function planSvgImages(document:SvgDocument):SvgRasterPlan[]{
  function walk(nodes:LayerData[],parent:AffineTransform){for(const layer of nodes){
   if(!layer.visible||layer.opacity===0)continue;
   const world=parent.multiply(localTransform(layer));
-  if(layer.kind==='raster'){const prefix=document.svgNativePrefixes?.get(layer.id);plans.push({layer,world,prefix,rendered:!!prefix||!!layer.erasures?.length||layer.effects.some(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0))});}
+  if(layer.kind==='raster'){const prefix=document.svgNativePrefixes?.get(layer.id);plans.push({layer,world,prefix,rendered:!!prefix||!!layer.erasures?.some(entry=>entry.stroke.kind!=='wet'||entry.stroke.opacity>0)||layer.effects.some(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0))});}
   if(layer.kind==='smart-object')plans.push({layer,world,rendered:true});
   if(layer.kind==='paint')for(let s=0;s<layer.strokes.length;s++){
-   const stroke=layer.strokes[s];if(stroke.kind!=='clone')continue;
+   const stroke=layer.strokes[s];
+   if(stroke.kind!=='fill'&&stroke.kind!=='wet'&&stroke.texture){
+    const image:RasterLayerData={...layer,kind:'raster',id:svgPaintTextureKey(layer.id,s),assetId:stroke.texture.assetId,x:0,y:0,width:1,height:1,effects:[],mask:null,styles:undefined,opacity:1,fillOpacity:1,blendMode:'normal',transform:undefined};
+    plans.push({layer:image,world:new AffineTransform(),rendered:false,texture:stroke.texture});
+   }
+   if(stroke.kind!=='clone')continue;
    for(let t=0;t<stroke.tiles.length;t++){
     const tile=stroke.tiles[t],image:RasterLayerData={...layer,kind:'raster',id:svgPaintCloneKey(layer.id,s,t),assetId:tile.assetId,x:tile.x,y:tile.y,width:tile.width,height:tile.height,effects:[],mask:null,styles:undefined,opacity:1,fillOpacity:1,blendMode:'normal',transform:undefined};
     plans.push({layer:image,world:world.multiply(AffineTransform.translation(tile.x,tile.y)),rendered:false});

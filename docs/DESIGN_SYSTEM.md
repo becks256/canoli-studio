@@ -1,5 +1,31 @@
 # Canoli Studio design system
 
+## Native frequency preview and shared-radius interactions
+
+Use the custom modal with two native-pixel panes: Color and tone, and Fine detail. Separation radius pairs a slider/exact input. Show original is an explicit pressed-state comparison, using retained pixels. Pan either pane by dragging or focused arrow keys; Shift moves 10 pixels. Explain neutral source bands and retained final-layer appearance. Report the rendered radius/coordinates, show genuine capture/preview/commit state, and keep Cancel/close/Escape available. Prevent stale frames from replacing newer choices. Keep commit errors visible after preparation settles; allow retry of the same current capture and setting without changing the document first. Keep the panes readable/scrollable in short or narrow windows.
+
+A selected band or retouch layer exposes Frequency separation group controls in Properties. Shared separation radius changes the controlling group in one undo, with transient preview/Escape and normal group/ancestor locks. The correction child remains protected. Hide individual sigma fields while a group controls them; explain the shared scope. Existing projects without a controller retain per-band controls. Add no rail tool/default shortcut or component library.
+
+## Frequency separation — workflow in verification
+
+Expose Frequency separation… through command search and the raster canvas menu. Reuse the custom Dialog, paired Separation radius slider/exact input, clear Create/Cancel actions, real preparation status and inline errors. Radius is in original image pixels. Cancel/close/Escape abort private preparation. Explain the retained hidden original, two editable retouch bands, alpha mask and protected precision layer. Select the composition instance after creation so existing Edit contents/Apply to source are immediately available. Add no rail tool or default shortcut. Smart-filter cards distinguish native composition, frequency band and post-placement document tone; disallow reordering document tone before native filters. Native preview and coupled controls follow the interaction contract above.
+
+## Red-eye correction interaction
+
+Reuse the existing adjustment inspector and command/context creation surfaces; add no rail tool or default shortcut. New Red Eye adjustment requires a pupil selection, with a useful error if absent. Capture an editable mask, preserving the selection geometry under transformed parents. Pair Red excess threshold and Correction strength sliders with exact numeric entry. Preview gestures cancel with Escape; commits create one undo entry. Reset retains the mask. Respect busy/ancestor locks. Explain that the mask isolates pupils and the operation corrects red-dominant pixels rather than detecting eyes.
+
+## Wet mask controls — implementation in verification
+
+Expose ordinary Mask Hide/Reveal and Filter mask Hide/Reveal in the existing Paint target selector for Smudge/Mixer. Use Initial coverage load for mask targets, retain Initial foreground load for layer pixels, and hide irrelevant foreground RGB controls while editing coverage. Explain that Hide/Reveal sets the initially loaded coverage and mask-wide settings remain separate. Keep the existing sliders/exact inputs, pressure/tip/texture/symmetry/preset controls and footprint cursors. Prefixes show actual private native coverage; Escape cancels and pointer release commits one mask history entry. No new shortcut or component library. Pending selection preference effects must not cancel a current gesture deliberately started after that selection changed.
+
+
+## Wet tool interaction — in verification
+
+Smudge and Mixer brush use the existing rail, searchable/customizable registry actions, brush controls, black/white footprint cursors, symmetry guides and preset dialog. No default keyboard chord is added. Each tool remembers its size; each mode retains independent Initial foreground load, Wetness and Pickup controls in percentages. Pair sliders with exact number entry. Use normal tool opacity/flow/dynamics and foreground color. Keep layer and mask targets explicit in the options row; never silently redirect a selected mask. Preview actual native output, keep one undo entry at release, and cancel the gesture with Escape or pointer cancellation. Tool preferences and saved presets remain outside document undo.
+
+
+Prepared wet paint may extend ink beyond an original raster. Selection outlines and corner handles use expanded ink bounds; resizing scales the logical source plane and keeps the opposite visual corner fixed. Original source dimensions/bytes and ordered operations remain unchanged. Preserve live preview, Escape cancellation and one undo entry. This is existing Move-tool behavior for prepared content, not a new mixer/smudge tool surface.
+
 Pen control rendering retains all authored anchors and handles, their screen dimensions and original overlapping-marker order. Internal React blocks may skip unchanged controls during a drag; they must not hide, cluster or cap geometry. Edits across block boundaries and the final partial block must preserve live preview, Escape cancellation and one-step undo for artwork and masks.
 
 Typography uses the existing native Select for Kerning (Auto/Normal/None) and paired Slider/number input for Word spacing (-50…500 px). Keep these independent of Tracking; all previews support Escape and commits support undo. Disable mutations under busy/ancestor-lock state. Feature-detect native Canvas support, disable unavailable controls and explain the current limitation. Keep Reset spacing available to restore tracking/word spacing 0 and kerning Auto atomically, including for projects carrying unsupported settings. No new keyboard shortcut or component library is introduced.
@@ -7,6 +33,14 @@ Typography uses the existing native Select for Kerning (Auto/Normal/None) and pa
 Use **Canoli Studio** as the product wordmark, retaining the existing abstract mark and semantic color tokens. The editor header uses a compact, single-line wordmark; developer documentation and sharing previews use the same spelling and capitalization.
 
 At widths up to 1500 CSS pixels, the header uses compact action icons with accessible names and hover titles. The document-name input stays visible; the action row scrolls horizontally when the controls exceed the remaining width.
+
+## TIFF import interaction
+
+Reuse the custom Dialog, Select and Button controls for local TIFF preflight. Show filename, page count/choice, oriented pixel dimensions, sample precision, unsupported reasons and conversion warnings. A 16-bit page requires an explicit unchecked precision-loss checkbox; reset consent when changing pages and disable import for unsupported pages. Keep progress/status and Cancel/close/Escape available during native work. No partial document is shown on failure; explain the error inside the dialog and allow retry. Existing edited tabs remain open after successful import. Do not imply reconstructed TIFF layers, higher precision editing or verified print color.
+
+## PDF export interaction
+
+PDF export reuses the existing format selector/report and custom NumberField for physical DPI (default 72), with an inches preview and explicit unchanged native pixels. Keep the field disabled while exporting and preserve progress/Cancel/close/Escape. Invalid physical-page geometry belongs in the capability warnings so changing DPI remains possible. Explain rasterization, unsearchable text and absent PDF/X/CMYK/prepress; do not imply a print-ready certificate or present codec/object details in the user flow.
 
 ## Direction
 
@@ -37,6 +71,7 @@ Source: `src/ui/tokens.css`. Use semantic variables for new components instead o
 - **Spacing:** a 4 px base with 8/12/16/20/24/32 px steps.
 - **Corners:** 4 px small controls (`--radius-sm`), 7 px standard controls (`--radius-md` / `--radius-control`), 12 px floating surfaces (`--radius-lg`), 18 px dialogs (`--radius-dialog`).
 - **Icons:** normally 14–19 px, 1.7 px strokes; standalone icons require accessible labels and tooltips.
+- **Tool rail:** an 88 px rail uses two columns of 32 px buttons with 4 px gaps. Tools and file/extension actions share the upper grid; studio utilities use a matching grid at the bottom. Keep all actions visible at laptop height, with vertical scrolling for shorter windows. Quick Selection uses the dashed selection-and-pointer mark, Spot Healing the bandage, and Patch a dashed outline; Brush and Magic wand retain their own marks.
 - **Motion:** brief state transitions only; respect reduced-motion preferences.
 
 ## Components and rules
@@ -233,7 +268,7 @@ Layer-style colors use the reusable `ColorInput`: native picker input previews a
 
 ### App-drawn canvas cursors
 
-Canvas cursors use paired black and white outlines over artwork. Circular tools, including Eraser, show the current diameter multiplied by viewport zoom with a small center mark. Move, text, hand/grabbing, resize and rotation indicators communicate the active interaction; other precision tools use a crosshair. Cursor movement updates an independent overlay once per animation frame, without React state updates. Leaving the viewport, touch input, pointer cancellation, context menus and lost focus hide the custom cursor and restore the native pointer. Buttons and text fields retain native cursors.
+Canvas cursors use paired black and white outlines over artwork. Circular tools, including Eraser, show the current diameter multiplied by viewport zoom with a small center mark. Move, text, hand/grabbing, resize and rotation indicators communicate the active interaction; other precision tools use a crosshair. Cursor movement updates an independent overlay once per animation frame, without React state updates. Preserve the existing synchronous stationary-cursor refresh for real geometry/preferences; unrelated status renders keep the existing glyph without rereading layout. Panel fitting and keyboard resizing reserve the 88 px rail, both 6 px dividers and at least 200 px of canvas column at supported window widths. Leaving the viewport, touch input, pointer cancellation, context menus and lost focus hide the custom cursor and restore the native pointer. Buttons and text fields retain native cursors.
 
 Users can restore system canvas cursors through the command palette (Use system canvas cursors); the reciprocal action restores custom cursors. This preference persists locally and does not affect document history. In system mode the size outline remains available, including for Eraser.
 
@@ -263,7 +298,7 @@ Use the existing Adjustment section, type selector, Reset action and paired slid
 Gradient map Inspector controls use a labeled dark-to-light color ramp, native color pickers, exact percentage position fields, per-stop removal, Add gradient stop, and reversal. Positions remain ordered; invalid/duplicate values cannot commit. Two stops are required and the documented adjustment budget is 32. Color picker input previews without history; completion commits once and Escape restores the prior value. Shared Reset restores black/white endpoints and forward mapping. Locked layers disable mutations. The existing scrolling Inspector contains long stop lists; color is accompanied by labeled controls, not used as the sole meaning of an action.
 
 
-The PSD export section uses the shared Select for "Keep independent layers; merge dependent effects" versus "Flatten visible composition into one layer". Its capability report names the actual dependency merge and baked features before export. Cancel and progress use the existing dialog lifecycle; cancellation must produce no partial download. The PSD choice does not imply editable Photoshop text, masks, adjustments or group hierarchy.
+The PSD export section uses the shared Select for "Keep independent layers; merge dependent effects" versus "Flatten visible composition into one layer". Its capability report names the actual dependency merge and baked features before export. Cancel and progress use the existing dialog lifecycle; cancellation must produce no partial download. The PSD/PSB choices retain supported folders and user pixel masks; preflight discloses baked mask controls, group fill, non-Normal pixel fill and effects. Native Photoshop text/vector/adjustment/effect controls remain unsupported.
 
 
 White Balance uses the shared paired Slider/number fields for Temperature (K) and Tint, with a short caption explaining correction direction and the neutral setting. Input previews without document history; commit adds one shared edit and Escape restores the prior value. Reset restores 6504 K and zero tint; locked layers disable controls. Creation/type switching follow the existing adjustment palette, context menu and Inspector patterns, without a new global shortcut.
@@ -282,7 +317,7 @@ Use the collapsible Inspector section and existing TextInput/Select/Button contr
 
 ### Quick Selection brush
 
-Use the rail's brush mark with the distinct Quick Selection label and Shift+W binding; W stays Magic wand. The canvas cursor shows native brush diameter. Frame-paced translucent seed marks are a draft, not a claimed grown mask. On release show real progress and an enabled Cancel Quick Selection action; Escape also cancels. Diameter/color/edge controls use paired sliders, with explicit source and Boolean mode controls. The hint tells users to paint inside the region and explains release/Alt/Escape. Preserve native editing keys, document-level operation over locked artwork, source appearance and one undo entry. Show real failures rather than a fabricated selection or success status.
+Use the rail's dashed selection-and-pointer mark with the Quick Selection label and Shift+W binding; W stays Magic wand. The canvas cursor shows native brush diameter. Frame-paced translucent seed marks are a draft, not a claimed grown mask. On release show real progress and an enabled Cancel Quick Selection action; Escape also cancels. Diameter/color/edge controls use paired sliders, with explicit source and Boolean mode controls. The hint tells users to paint inside the region and explains release/Alt/Escape. Preserve native editing keys, document-level operation over locked artwork, source appearance and one undo entry. Show real failures rather than a fabricated selection or success status.
 
 ### Select Subject progress and honest results
 
@@ -368,3 +403,52 @@ The Export dialog retains its existing font and glyph-placement warnings. Host w
 
 
 TIFF uses the existing Export dialog and native Select for TIFF compatibility: Automatic (default), Classic TIFF and BigTIFF. Show native pixel dimensions, flattening/metadata/72 DPI disclosures and the compatible-viewer warning before download. Keep compatibility/format controls disabled during work; progress and Cancel remain visible. Cancellation produces no partial download and allows retry. Use existing semantic controls/tokens; no new shortcut or UI library.
+
+
+### PSB large-document delivery
+
+Offer PSB beside PSD in the existing Export format selector. Both share the Rendered layers/Flatten choice with the selected format in its accessible label. Show PSD's axis-limit guidance and PSB's compatible-reader/rendered-RGB8 losses before download; retain normal progress, Cancel, retry and dismiss behavior. Photoshop preflight names PSD or PSB from the actual inspected version, not the filename. Successful import remains a new document tab, preserving existing edited work. Reuse current Dialog/Select/Button/tokens and shortcuts; do not add a component library or imply editable Photoshop effects/type/masks/groups.
+
+
+Photoshop export retains the existing progress/Cancel/retry interface while private encoding runs off-thread. Cancel must discard pending output and leave artwork/history intact; worker failures use existing export error handling and allow retry. Keep worker/packet implementation details out of the product controls. Native rendering and broader frame/memory limits remain separate verification work.
+
+
+### Photoshop file inspection and cancellation
+
+Open a custom Dialog immediately after file selection, with filename, Inspecting status, Cancel/close/Escape and an inline error/Inspect again action. Replace loading content with existing version-aware preflight metadata after inspection; never retain raw planes for UI preview. Page layer/message lists in groups of 100 while retaining complete counts and access to every record. Keep progress and Cancel/close/Escape active during decoding/preparation/install, disable import/mode changes while running, and support retry after errors. An unavailable merged composite disables flattening. Successful import opens a new tab and keeps edited work. Describe actual prototype ICC/CMYK/mask/group losses; do not label missing additional findings as full fidelity. Keep worker/packet details out of product controls; reuse the custom tokens/components and keyboard registry.
+
+
+### Pass-through group controls
+
+Only a selected group offers Pass-through in the existing Blend mode Select. Normal remains the default. In pass-through mode disable own Fill opacity and Layer styles controls with the explanation: “Children blend with the surrounding stack. Choose Normal to use group styles or fill opacity.” Group Opacity and mask controls remain available through existing paired inputs and shared undo. Mode changes use one command; unsupported combinations surface the normal action error. No shortcut/component library is added. Backend status reports Standard rendering for this currently unsupported WebGPU composition.
+
+### Pressure response controls
+
+Use the existing Button, Dialog, Select and paired Slider/number components. The brush controls open Pressure response with Default, Linear, Soft, Firm and Custom choices. Default explains existing minima; explicit curves show a normalized graph and paired slider/exact numeric knot controls. Slider movement previews the local draft; Escape restores the knot at gesture start. On narrow viewports, knot controls stack while each slider retains its adjacent numeric entry. Input endpoints stay fixed, outputs remain editable, interior knots can be added/removed, and ordering errors disable Apply with an inline alert. Apply changes new-stroke settings, Cancel/Escape discards the draft, and focus returns to the initiating control. Register the modal with normal shortcut isolation. Keep graph/fields usable on narrow viewports and avoid implying measured tablet/hardware behavior. Tool preferences stay outside document undo; recorded artwork retains its authored curve.
+
+
+### Brush preset library
+
+Use the custom Dialog, Button, TextInput and existing semantic tokens. Brush presets opens a searchable named row list and selected-value summary, with explicit Apply and double-click apply. Built-in rows are read-only; Duplicate creates an editable copy. Show tool, size, dynamics, optional foreground and relevant clone/tonal/healing settings. Save/Update clearly identify the current tool. Keep name/color/selection mutations disabled during writes, preserve Cancel/close/Escape, restore trigger focus, and stack list/details on narrow viewports without horizontal overflow. A remote edit marks the selected draft stale until explicit reload, rather than replacing typed text. Storage errors retain current-brush and last-valid exports, retry and a raw backup-first recovery reset; never auto-clear bad data. Tool preferences do not add document history. Spacing's paired Slider/number control covers 1–1000%, matching the supported engine setting.
+
+The library pages visible rows in groups of 100; search covers the complete saved collection. This is a UI rendering budget, not a limit on saved presets or imported image resolution.
+
+Spacing and smoothing preserve fractional percentages in both the toolbar and preset summaries; applying/importing a preset must not round displayed values to integer percentages.
+
+Brush tip uses the existing custom modal, paired sliders/exact fields, checkboxes and buttons. Static angle/roundness and optional tilt orientation/flattening edit a draft; diagram-only pen controls never affect artwork. Tilt response temporarily replaces the tip modal with the shared curve editor; Cancel/Escape returns to the retained draft and restores trigger focus. Apply response updates only that draft; Apply tip publishes future tool settings. Default restores legacy shape, and Cancel preserves current settings/history. Narrow layouts stack fields. Shaped cursors use the complete layer/mask plane and screen-width contrast strokes; nominal full-pressure size remains the existing policy. Healing shows shaped endpoint footprints and a thin connecting guide. No global shortcut is added.
+
+Symmetry uses the custom local-draft modal with native mode Select, exact fractional document-pixel line/center NumberFields and paired integer 2–32 radial-sector controls. Off, vertical/horizontal mirrors, both axes and radial modes expose only relevant fields. Center on canvas is explicit; custom copy data is preserved until another mode replaces it. Cancel/Escape preserves tool/history; Apply affects future strokes. No global shortcut is added. A marker diagram communicates copies, not brush size. Guides and contrasting ghost cursors are pointer-transparent; hover updates retained SVG nodes without React pointer state. Cursor SVG dimensions follow the visible viewport, while offscreen copies remain authored data. Narrow layouts stack and scroll existing modal content. Use semantic color/focus/text tokens in both themes.
+
+
+## Image-backed brush texture controls
+
+Use the custom Texture dialog from brush-family ToolOptions. The dialog edits a private source/channel/inversion draft; Apply affects future strokes and Cancel/Escape discards all draft work. File failures keep the last ready source visible. TIFF sources show page geometry, limitations and explicit precision-loss consent before Use TIFF page as texture. Keep Cancel available during preparation and abort/dispose pending work on close. Document source choices show original names/dimensions. The 128-square white-ink coverage preview is a proxy on the canvas surround, with original-dimension/source retention text. Cursor coverage uses the same bounded proxy inside existing transformed outlines and symmetry copies; hover remains outside React pointer updates. Keep the dialog within narrow-screen bounds and enable vertical scrolling. Current metadata-only preset capture explains the missing source-bearing format instead of silently stripping texture.
+
+
+## Source-bearing brush presets — 2026-10-18, in verification
+
+Preset/pack v4 carries image-backed coverage preferences and exact original Blob sources with native dimensions, MIME/name, SHA-256 and TIFF page/precision choices. Source-free JSON versions 1–3 remain readable/exportable. Binary packs use a checksummed 48-byte header, strict manifest and contiguous original-blob slices; readers reject missing/unused references, corrupted extents/checksums and native decode/dimension mismatches before any import commit. Portable source IDs are remapped and cannot bind to document asset IDs. The single existing IndexedDB v1 preset store now atomically stores optional source blobs alongside their preset; no physical schema migration is needed. Older strict readers reject these newer records while preserving bytes.
+
+The library verifies actual stored source contents before writes and retains last-valid snapshots on failures. Read-only keepalive requests maintain the native write lock across asynchronous checks; only active request callbacks queue changes. Recovery v2 preserves raw records and original blobs, including invalid preset metadata, and compares complete content fingerprints under that lock before reset. Same-size byte changes and stale revisions cannot be erased with an old backup. Legacy JSON recovery remains available for source-free records; unsupported raw non-JSON values still fail without deleting data.
+
+The custom preset dialog connects source-aware save/update/rename/duplicate/delete/import/export/download/recovery and shows source name/dimensions/coverage. Applying privately verifies/decodes an original, guards abort/supersession/document/tool/source changes, then uses normal tool selection/configuration; errors retain prior ready preferences and newer human edits. Preferences stay outside document undo; actual strokes still use shared OO commands/history and collision-safe document leases. Original images stay independent of viewport/cursor proxies, library deletion and closed source documents. This adds no isolated script/plugin file privilege, paid provider, upload, REST/browser sync or document schema bump. See [BRUSH_PRESETS.md](BRUSH_PRESETS.md) for signatures, binary contract, errors and limits. Complete native/production verification and wider F06/F14/device gates remain open.

@@ -57,7 +57,7 @@
   --shadow-canvas: 0 20px 70px #00000040, 0 1px 2px #00000055;
   --focus-ring: 0 0 0 2px var(--color-app), 0 0 0 4px var(--color-accent);
   --duration-fast: 120ms;
-  --rail-width: 54px;
+  --rail-width: 88px;
   --layers-width: 230px;
   --inspector-width: 268px;
   --header-height: 64px;

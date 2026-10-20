@@ -1,6 +1,7 @@
+import {pointerPenTilt,type PenTiltData} from '../core/brush-tip';
 import type { AffineTransform } from "../core/affine";
 import type { LayerPatch } from "../core/commands";
-import type { Point } from "../core/drawing";
+import type { Point, Rect } from "../core/drawing";
 import { measureTextBounds } from "../core/model";
 import type {TextStyle} from '../core/text-style';
 
@@ -35,6 +36,8 @@ export interface ResizeDragState {
   layerLineHeight?: number;
   layerTextStyle?: TextStyle;
   layerKind: "raster" | "text";
+  /** Expanded ink bounds; logical image geometry still addresses its source. */
+  layerContentBounds?: Rect;
 }
 
 /**
@@ -68,6 +71,15 @@ export function computeResizePatch(
         transforms.local.b * offsetX +
         transforms.local.d * offsetY,
     };
+  }
+  if (drag.layerKind === 'raster' && drag.layerContentBounds) {
+    const bounds = drag.layerContentBounds;
+    const frame = computeResizePatch({ ...drag, layerContentBounds: undefined, layerWidth: bounds.width, layerHeight: bounds.height }, dx, dy, shiftKey);
+    const minimum = Math.max(1 / drag.layerWidth, 1 / drag.layerHeight);
+    let sx = Math.max(1 / drag.layerWidth, frame.width! / bounds.width), sy = Math.max(1 / drag.layerHeight, frame.height! / bounds.height);
+    if (shiftKey) sx = sy = Math.max(minimum, sx, sy);
+    const anchorX = bounds.x + (drag.handle.includes('w') ? bounds.width : 0), anchorY = bounds.y + (drag.handle.includes('n') ? bounds.height : 0);
+    return { width: drag.layerWidth * sx, height: drag.layerHeight * sy, x: drag.layerX + anchorX * (1 - sx), y: drag.layerY + anchorY * (1 - sy) };
   }
   const {
     handle,
@@ -206,6 +218,7 @@ export function canvasPoint(
 }
 
 export interface ToolModifier {
+  tilt?:PenTiltData;
   alt: boolean;
   shift: boolean;
   pressure: number;
@@ -219,11 +232,17 @@ export function modifiers(event: {
   shiftKey: boolean;
   pointerType?: string;
   pressure?: number;
-}): ToolModifier {
+  tiltX?:number;tiltY?:number;altitudeAngle?:number;azimuthAngle?:number;
+},preservePenPressure=false,captureTilt=false): ToolModifier {
   return {
+    ...(captureTilt&&event.pointerType==='pen'?{tilt:pointerPenTilt(event)}:{}),
     alt: event.altKey,
     shift: event.shiftKey,
-    pressure: event.pointerType === "pen" ? event.pressure || 0.05 : 1,
+    pressure: event.pointerType === "pen"
+      ? preservePenPressure
+        ? Number.isFinite(event.pressure)?Math.max(0,Math.min(1,event.pressure!)):.05
+        : event.pressure || 0.05
+      : 1,
   };
 }
 

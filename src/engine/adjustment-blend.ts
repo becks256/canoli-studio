@@ -27,8 +27,11 @@ export async function blendAdjustedTile(
       for (let i = 3; i < coverage.length; i += 4)
         coverage[i] = Math.round((coverage[i] * mask[i]) / 255);
   }
-  let colors = adjusted.data;
-  if (mode !== "normal") {
+  let colors: Uint8ClampedArray = adjusted.data;
+  if (mode === "linear-light" || mode === "linear-burn") {
+    const backdrop=new Uint8ClampedArray(target.data);for(let i=3;i<backdrop.length;i+=4)backdrop[i]=255;
+    colors=await processor.linearBlend(opaque,backdrop,1,mode);
+  } else if (mode !== "normal") {
     const canvas = createCanvas(target.width, target.height, true);
     const source = createCanvas(target.width, target.height, true);
     try {

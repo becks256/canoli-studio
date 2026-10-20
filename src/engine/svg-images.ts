@@ -6,16 +6,19 @@ import {planSvgImages,type SvgImage,type SvgImages,type SvgRasterPlan} from '../
 import {planSvgMasks,type SvgDocument} from '../core/svg-masks';
 import type {Rect} from '../core/drawing';
 import type {LayerMaskData} from '../core/masks';
+import {visitMaskAssets} from '../core/asset-references';
 import {svgEffectRegion} from '../core/svg-styles';
 import {exportPng} from './png';
 import {release} from './canvas';
 import type {DocumentRenderer} from './renderer';
 import {checkExport,type ExportControl} from './export-control';
+import {BrushTextureSampler} from './brush-texture';
+import {PixelProcessor} from './processor';
 
 /** Pin every image dependency across both raster and mask preparation/encoding. */
 export function captureSvgSources(document:DocumentData,assets:AssetStore,control?:ExportControl,additional:Iterable<string>=[]):()=>void{
  const ids=new Set([...planSvgImages(document).flatMap(plan=>plan.layer.kind==='raster'&&!plan.prefix?[plan.layer.assetId]:[]),...additional]);
- for(const plan of planSvgMasks(document))if(plan.mask.kind==='bitmap')ids.add(plan.mask.assetId);
+ for(const plan of planSvgMasks(document))visitMaskAssets(plan.mask,reference=>ids.add(reference.assetId));
  const pinned=[...ids].map(id=>{const source=assets.get(id);return{source,bitmap:source.bitmap,blob:source.blob,width:source.width,height:source.height};});
  const alive=ids.size?assets.captureLifetime():()=>{};
  return()=>{
@@ -51,13 +54,16 @@ function prefixFrame(document:DocumentData,plan:SvgRasterPlan,region:Rect):Docum
 /** Sanitized PNG pixels, never source-file metadata; no new source-resolution cap. */
 export async function prepareSvgImages(document:DocumentData,assets:AssetStore,renderer:DocumentRenderer,control?:ExportControl,check:()=>void=()=>{}):Promise<SvgImages>{
  const plans=planSvgImages(document),output=new Map<string,SvgImage>(),shared=new Map<string,SvgImage>();
+ let textureProcessor:PixelProcessor|undefined,textureSampler:BrushTextureSampler|undefined;
  const current=()=>{checkExport(control);check();};current();
  const guarded:DocumentRenderer={
   async render(...args){current();const canvas=await renderer.render(...args);try{current();return canvas;}catch(error){release(canvas);throw error;}},
   clearCache(){renderer.clearCache();},dispose(){},
  };
- for(let i=0;i<plans.length;i++){
-  const plan=plans[i],layer=plan.layer,cached=layer.kind==='raster'&&!plan.rendered?shared.get(layer.assetId):undefined;
+ try{for(let i=0;i<plans.length;i++){
+  const plan=plans[i],layer=plan.layer;
+  const shareKey=layer.kind==='raster'&&!plan.rendered?(plan.texture?`texture:${JSON.stringify([plan.texture.assetId,plan.texture.channel,plan.texture.invert])}`:`image:${layer.assetId}`):undefined;
+  const cached=shareKey?shared.get(shareKey):undefined;
   current();if(cached){output.set(layer.id,cached);control?.onProgress?.({phase:'rendering',fraction:(i+1)/plans.length});current();continue;}
   const source=layer.kind==='raster'&&!plan.prefix?assets.get(layer.assetId):undefined;
   if(source&&(source.width!==source.bitmap.width||source.height!==source.bitmap.height))throw new Error('Raster source dimensions do not match the decoded image.');
@@ -69,12 +75,25 @@ export async function prepareSvgImages(document:DocumentData,assets:AssetStore,r
   };
   const neutral=layer.kind==='raster'?{...layer,...placement,effects:plan.rendered?layer.effects:[],erasures:plan.rendered?layer.erasures:[]} satisfies RasterLayerData:{...layer,...placement,id:'svg-filtered-image',filterMask:layer.filterMask?.linked===false?{...layer.filterMask,x:(layer.filterMask.x??0)-region.x,y:(layer.filterMask.y??0)-region.y}:layer.filterMask};
   const frame=plan.prefix?prefixFrame(document,plan,region):{...document,width:region.width,height:region.height,children:[neutral],components:layer.kind==='smart-object'?document.components:[],layerComps:undefined};
-  const blob=await exportPng(frame,assets,guarded,{signal:control?.signal,onProgress:p=>{
+  let imageRenderer=guarded;
+  if(plan.texture){
+   textureProcessor??=new PixelProcessor();textureSampler??=new BrushTextureSampler(textureProcessor,0);
+   const sampler=textureSampler,texture=plan.texture;
+   imageRenderer={
+    async render(_document,_assets,options){
+     current();const region=options?.region;if(!region)throw new Error('SVG texture encoding requires an explicit working tile.');
+     const canvas=await sampler.prepare(assets,texture,{width:region.width,height:region.height,sourceRect:region,smoothing:false},{signal:control?.signal});
+     try{current();return canvas;}catch(error){release(canvas);throw error;}
+    },clearCache(){},dispose(){},
+   };
+  }
+  const blob=await exportPng(frame,assets,imageRenderer,{signal:control?.signal,onProgress:p=>{
    current();if(p.phase==='rendering'&&p.fraction!==null)control?.onProgress?.({phase:'rendering',fraction:(i+p.fraction)/plans.length});
   }});current();
   const encoded=await dataUrl(blob);current();
   const image:SvgImage={id:`canoli-image-${i+1}`,dataUrl:encoded,width:region.width,height:region.height,x:region.x,y:region.y,space:plan.rendered?'document':'source'};
-  output.set(layer.id,image);if(layer.kind==='raster'&&!plan.rendered)shared.set(layer.assetId,image);
+  output.set(layer.id,image);if(shareKey)shared.set(shareKey,image);
  }
  return output;
+ }finally{textureSampler?.dispose();textureProcessor?.dispose();}
 }

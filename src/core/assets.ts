@@ -19,14 +19,26 @@ export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
 }
 export interface AssetImportOptions extends TiffImportControl {tiff?:TiffDecodeOptions}
 
+interface SharedBitmap {
+  readonly bitmap: ImageBitmap;
+  owners: number;
+}
+const sharedRecords = new WeakSet<ImageAsset>();
+
 export class AssetStore {
   readonly metadata = new MetadataService();
   readonly analysis = new AnalysisService();
   private assets = new Map<string, ImageAsset>();
   private generation = 0;
   private pending = new Set<string>();
+  private disposed = false;
+  private shared = new Map<string, SharedBitmap>();
+  private assertOpen() {
+    if (this.disposed) throw new Error('The asset store is disposed.');
+  }
   /** Guards asynchronous ownership transfers against disposal of their target store. */
   captureLifetime(): () => void {
+    this.assertOpen();
     const generation = this.generation;
     return () => {
       if (generation !== this.generation)
@@ -48,7 +60,9 @@ export class AssetStore {
   }
 
   install(asset: ImageAsset, analyzeMetadata = true): ImageAsset {
-    if (this.assets.has(asset.id)) throw new Error("Duplicate asset ID.");
+    this.assertOpen();
+    if (this.assets.has(asset.id) || this.pending.has(asset.id)) throw new Error("Duplicate asset ID.");
+    if (sharedRecords.has(asset)) throw new Error('Use shareTo for a borrowed shared asset.');
     this.assets.set(asset.id, asset);
     if (analyzeMetadata) {
       this.metadata.analyze(asset.id, {
@@ -61,6 +75,36 @@ export class AssetStore {
     return asset;
   }
 
+  /** Explicit shared ownership; returned records/bitmap are borrowed and immutable.
+   * Ordinary install continues to adopt a caller-owned bitmap without sharing it. */
+  shareTo(destination: AssetStore, assetId: string, sharedId = id()): Readonly<ImageAsset> {
+    this.assertOpen();
+    destination.assertOpen();
+    if (typeof sharedId !== 'string' || !sharedId || sharedId.length > 240) throw new Error('A shared asset requires an ID of 1–240 characters.');
+    if (this.pending.has(assetId)) throw new Error('The source image import has not finished.');
+    const source = this.get(assetId), bitmap = source.bitmap;
+    if (source.id !== assetId || !Number.isSafeInteger(source.width) || !Number.isSafeInteger(source.height) ||
+        source.width <= 0 || source.height <= 0 || source.width !== bitmap.width || source.height !== bitmap.height)
+      throw new Error('The source bitmap or its original dimensions changed.');
+    if (destination === this && sharedId === assetId) return source;
+    if (destination.assets.has(sharedId) || destination.pending.has(sharedId)) throw new Error('Duplicate asset ID.');
+    let lease = this.shared.get(assetId);
+    if (lease && lease.bitmap !== bitmap) throw new Error('The shared source bitmap changed.');
+    const copy: ImageAsset = Object.freeze({
+      id: sharedId, name: source.name, width: source.width, height: source.height,
+      blob: source.blob, bitmap, thumbnail: source.thumbnail,
+      ...(source.tiff ? {tiff: Object.freeze(tiffDecodeOptionsSchema.parse(source.tiff))} : {}),
+    });
+    lease ??= {bitmap, owners: 1};
+    this.shared.set(assetId, lease);
+    destination.assets.set(sharedId, copy);
+    destination.shared.set(sharedId, lease);
+    sharedRecords.add(source);
+    sharedRecords.add(copy);
+    lease.owners++;
+    return copy;
+  }
+
   async add(
     blob: Blob,
     name: string,
@@ -68,6 +112,7 @@ export class AssetStore {
     analyzeMetadata = true,
     options: AssetImportOptions = {},
   ): Promise<ImageAsset> {
+    this.assertOpen();
     options.signal?.throwIfAborted();
     if (!["image/png", "image/jpeg", "image/webp", "image/tiff"].includes(blob.type))
       throw new Error("Use a PNG, JPEG, WebP or supported TIFF image.");
@@ -98,6 +143,7 @@ export class AssetStore {
         "The browser could not decode this image. Check the file format and available device memory.",
       );
     }
+    let published: ImageAsset | undefined;
     try {
       options.signal?.throwIfAborted();
       if (generation !== this.generation)
@@ -128,6 +174,7 @@ export class AssetStore {
         ...(tiff?{tiff}:{}),
       };
       this.assets.set(assetId, asset);
+      published = asset;
       if (analyzeMetadata)
         this.metadata.analyze(assetId, {
           blob,
@@ -135,28 +182,51 @@ export class AssetStore {
           width: asset.width,
           height: asset.height,
         });
+      if (generation !== this.generation || this.assets.get(assetId) !== asset)
+        throw new Error('The asset store changed during import.');
       return asset;
     } catch (error) {
-      bitmap.close();
+      if (!published) bitmap.close();
+      else if (this.assets.get(assetId) === published) {
+        this.assets.delete(assetId);
+        this.release(assetId, published);
+        try { this.metadata.remove(assetId); } catch { /* Preserve the import error after releasing its image. */ }
+      }
       throw error;
     } finally {
       this.pending.delete(assetId);
     }
   }
 
+  private release(assetId: string, asset: ImageAsset) {
+    const lease = this.shared.get(assetId);
+    this.shared.delete(assetId);
+    if (!lease) asset.bitmap.close();
+    else if (--lease.owners === 0) lease.bitmap.close();
+  }
+
   remove(assetId: string) {
-    this.metadata.remove(assetId);
-    const asset = this.assets.get(assetId);
-    if (asset) {
-      asset.bitmap.close();
-      this.assets.delete(assetId);
+    try { this.metadata.remove(assetId); }
+    finally {
+      const asset = this.assets.get(assetId);
+      if (asset) {
+        this.assets.delete(assetId);
+        this.release(assetId, asset);
+      }
     }
   }
 
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
     this.generation++;
-    this.metadata.dispose();
-    this.assets.forEach((asset) => asset.bitmap.close());
+    let failure: unknown;
+    try { this.metadata.dispose(); } catch (error) { failure = error; }
+    for (const [assetId, asset] of this.assets) {
+      this.assets.delete(assetId);
+      try { this.release(assetId, asset); } catch (error) { failure ??= error; }
+    }
     this.assets.clear();
+    if (failure) throw failure;
   }
 }

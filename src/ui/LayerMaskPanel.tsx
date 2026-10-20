@@ -135,7 +135,7 @@ export function LayerMaskPanel({
       {value && (
         <>
           <p className="section-caption">
-            {value.kind === "vector"
+            {value.kind === "raster-erasures" ? "Raster erasure coverage" : value.kind === "vector"
               ? "Bézier path mask"
               : value.kind === "paint"
                 ? "Painted mask"

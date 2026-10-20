@@ -23,6 +23,8 @@ function component(b: number, s: number, mode: BlendMode): number {
     case 'lighten': return Math.max(b,s);
     case 'color-dodge': return b===0 ? 0 : s===1 ? 1 : Math.min(1,b/(1-s));
     case 'color-burn': return b===1 ? 1 : s===0 ? 0 : 1-Math.min(1,(1-b)/s);
+    case 'linear-burn': return Math.max(0,b+s-1);
+    case 'linear-light': return Math.max(0,Math.min(1,b+2*s-1));
     case 'hard-light': return s<=0.5 ? 2*b*s : 1-2*(1-b)*(1-s);
     case 'soft-light': return s<=0.5 ? b-(1-2*s)*b*(1-b) : b+(2*s-1)*((b<=0.25?((16*b-12)*b+4)*b:Math.sqrt(b))-b);
     case 'difference': return Math.abs(b-s);

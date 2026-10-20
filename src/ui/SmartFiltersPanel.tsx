@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import {
   GaussianBlurFilter,
+  FrequencyBandFilter,
+  NativeCompositionFilter,
+  DocumentToneFilter,
   UnsharpMaskFilter,
   SmartToneFilter,
   SmartObjectLayer,
@@ -16,11 +19,26 @@ import "./SmartFiltersPanel.css";
 
 const names = {
   "gaussian-blur": "Gaussian blur",
+  "frequency-band": "Frequency band",
+  "native-composition": "Native composition",
+  "document-tone": "Document tone",
   "unsharp-mask": "Unsharp mask",
   tone: "Tone",
 };
 function construct(data: SmartFilterData): SmartFilter {
   switch (data.kind) {
+    case "document-tone": {
+      const { kind: _, ...options } = data;
+      return new DocumentToneFilter(options);
+    }
+    case "native-composition": {
+      const { kind: _, ...options } = data;
+      return new NativeCompositionFilter(options);
+    }
+    case "frequency-band": {
+      const { kind: _, ...options } = data;
+      return new FrequencyBandFilter(options);
+    }
     case "gaussian-blur":
       return new GaussianBlurFilter(data);
     case "unsharp-mask":
@@ -40,7 +58,8 @@ type Field = {
   scale?: "quadratic";
 };
 function fields(filter: SmartFilterData): Field[] {
-  if (filter.kind === "tone")
+  if(filter.kind === "native-composition") return [];
+  if (filter.kind === "tone" || filter.kind === "document-tone")
     return [
       {
         key: "exposure",
@@ -55,14 +74,14 @@ function fields(filter: SmartFilterData): Field[] {
     ];
   const radius: Field = {
     key: "sigma",
-    label: filter.kind === "gaussian-blur" ? "Blur size" : "Sharpen size",
+    label: filter.kind === "frequency-band" ? "Separation radius" : filter.kind === "gaussian-blur" ? "Blur size" : "Sharpen size",
     min: 0,
     max: 4096 / 3,
     step: 0.1,
     suffix: "px",
     scale: "quadratic",
   };
-  return filter.kind === "gaussian-blur"
+  return filter.kind === "gaussian-blur" || filter.kind === "frequency-band"
     ? [radius]
     : [
         radius,
@@ -75,6 +94,7 @@ export function SmartFiltersPanel({
   document,
   layer,
   value,
+  sharedRadius,
   disabled,
   onPreview,
   onAttempt,
@@ -82,6 +102,7 @@ export function SmartFiltersPanel({
   document: Document;
   layer: SmartObjectLayer;
   value: readonly SmartFilterData[];
+  sharedRadius?: number;
   disabled: boolean;
   onPreview(command: EditorCommand | null): void;
   onAttempt(action: () => void): void;
@@ -142,18 +163,19 @@ export function SmartFiltersPanel({
   };
   const add = () => {
     const filter =
-      kind === "gaussian-blur"
+      kind === "document-tone" ? new DocumentToneFilter() : kind === "native-composition" ? new NativeCompositionFilter() : kind === "frequency-band" ? new FrequencyBandFilter() : kind === "gaussian-blur"
         ? new GaussianBlurFilter()
         : kind === "unsharp-mask"
           ? new UnsharpMaskFilter()
           : new SmartToneFilter();
-    commit([...value, filter.toJSON()]);
+    const next=[...value],boundary=next.findIndex(f=>f.kind==='document-tone');
+    next.splice(kind==='document-tone'||boundary<0?next.length:boundary,0,filter.toJSON());commit(next);
   };
   return (
     <InspectorSection title="Smart filters" badge={value.length || undefined}>
       <p className="section-description">
         Filters run from top to bottom. Sizes follow the artwork when scaled;
-        the original stays intact.
+        the original stays intact. Document tone runs after placement and before layer masks.
       </p>
       <div className="smart-filter-add">
         <Select
@@ -193,14 +215,14 @@ export function SmartFiltersPanel({
                   <div className="smart-filter-actions">
                     <IconButton
                       label={`Move ${names[filter.kind]} earlier`}
-                      disabled={disabled || index === 0}
+                      disabled={disabled || index === 0 || (filter.kind==='document-tone')!==(value[index-1]?.kind==='document-tone')}
                       onClick={() => move(index, -1)}
                     >
                       <ArrowUp size={13} />
                     </IconButton>
                     <IconButton
                       label={`Move ${names[filter.kind]} later`}
-                      disabled={disabled || index === value.length - 1}
+                      disabled={disabled || index === value.length - 1 || (filter.kind==='document-tone')!==(value[index+1]?.kind==='document-tone')}
                       onClick={() => move(index, 1)}
                     >
                       <ArrowDown size={13} />
@@ -216,6 +238,9 @@ export function SmartFiltersPanel({
                     </IconButton>
                   </div>
                 </div>
+                {filter.kind === "frequency-band" && <Select label="Frequency band" value={filter.band} disabled={disabled}
+                  options={[{value:"low",label:"Low: color and tone"},{value:"high",label:"High: detail"},{value:"correction",label:"Precision correction"}]}
+                  onChange={band => commit(value.map((f,i)=>i===index?{...filter,band:band as "low"|"high"|"correction"}:f))} />}
                 <label className="check-field">
                   <input
                     type="checkbox"
@@ -227,7 +252,8 @@ export function SmartFiltersPanel({
                   />
                   Enabled
                 </label>
-                {fields(filter).map((field) => (
+                {filter.kind==='frequency-band'&&sharedRadius!==undefined&&<p className="section-description">Radius follows the shared frequency group controls.</p>}
+                {fields(filter).filter(field=>!(filter.kind==='frequency-band'&&sharedRadius!==undefined&&field.key==='sigma')).map((field) => (
                   <Slider
                     key={field.key}
                     label={field.label}

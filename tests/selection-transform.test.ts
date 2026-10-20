@@ -95,7 +95,7 @@ it("migrates old documents and round-trips transformed selection, clips and mask
     ...new Document().toJSON(),
     schemaVersion: 4,
   });
-  expect(doc.toJSON().schemaVersion).toBe(27);
+  expect(doc.toJSON().schemaVersion).toBe(37);
   const selection = new MarqueeSelection({
     shape: "ellipse",
     x: 2,

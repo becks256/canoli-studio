@@ -114,8 +114,9 @@ it("render views share only validated immutable input while public placement res
   expect((expanded.children[0] as SmartObjectInstanceData).filterMask).toBe((frozen.children[0] as SmartObjectInstanceData).filterMask);
   const publicCopy = registry.validatePlacements(frozen);
   publicCopy.name = "Mutable copy";
-  (publicCopy.children[0] as SmartObjectInstanceData).filterMask!.strokes![0].stroke.points[0].x = 99;
-  expect((frozen.children[0] as SmartObjectInstanceData).filterMask!.strokes![0].stroke.points[0].x).toBe(1);
+  const copiedStroke=(publicCopy.children[0] as SmartObjectInstanceData).filterMask!.strokes![0].stroke,frozenStroke=(frozen.children[0] as SmartObjectInstanceData).filterMask!.strokes![0].stroke;
+  if(copiedStroke.kind==='wet'||frozenStroke.kind==='wet')throw new Error('Expected ordinary fixture coverage.');
+  copiedStroke.points[0].x=99;expect(frozenStroke.points[0].x).toBe(1);
   const shallow = Object.freeze(input);
   const detached = registry.validatedView(shallow);
   input.children[0].name = "Later mutation";

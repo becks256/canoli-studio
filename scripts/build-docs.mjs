@@ -30,6 +30,7 @@ const generatedPages = [
   ["DESIGN_SYSTEM", "Design system"],
   ["SYSTEM_DESIGN", "System design"],
   ["TOOLS_MILESTONE", "Tools milestone"],
+  ["BRUSH_PRESETS", "Saved brush presets"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

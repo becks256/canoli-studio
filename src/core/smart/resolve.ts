@@ -71,7 +71,7 @@ export function resolveSmartDocument(
       );
     }
   }
-  const basis = (layer: LayerBaseData) =>
+  const basis = (layer: Pick<LayerBaseData, 'x' | 'y' | 'transform'>) =>
     AffineTransform.translation(layer.x, layer.y).multiply(
       layer.transform
         ? AffineTransform.fromJSON(layer.transform)
@@ -83,6 +83,7 @@ export function resolveSmartDocument(
     scoped: boolean,
     path: string[],
     depth: number,
+    frequencyRadius?: number,
   ): LayerData {
     enter(depth);
     const world = parent.multiply(basis(layer));
@@ -90,6 +91,9 @@ export function resolveSmartDocument(
       ...layer,
       id: scoped ? allocate([...path, layer.id]) : layer.id,
     };
+    if (layer.kind === 'smart-object' && frequencyRadius !== undefined && layer.smartFilters?.some(filter => filter.kind === 'frequency-band' && filter.sigma !== frequencyRadius)) {
+      (properties as typeof layer).smartFilters = layer.smartFilters.map(filter => filter.kind === 'frequency-band' ? {...filter,sigma:frequencyRadius} : filter);
+    }
     if (scoped && properties.mask?.linked === false) {
       const relative = world
         .inverse()
@@ -114,7 +118,7 @@ export function resolveSmartDocument(
         ...properties,
         kind: "group",
         children: layer.children.map((child) =>
-          expand(child, world, scoped, [...path, layer.id], depth + 1),
+            expand(child, world, scoped, [...path, layer.id], depth + 1, layer.frequencyRadius ?? frequencyRadius),
         ),
       };
     if (layer.kind !== "smart-object") return properties as LayerData;

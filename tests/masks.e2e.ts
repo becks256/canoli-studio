@@ -877,9 +877,8 @@ test("painted-mask prefixes and active stamps are reused without changing previe
         const before = renderer.maskDiagnostics,
           drawsBefore = textDraws;
         base = structuredClone(base);
-        base.strokes
-          .at(-1)!
-          .stroke.points.push({ x: 570, y: 45, pressure: 0.7 });
+        const appended=base.strokes.at(-1)!.stroke;if(appended.kind==='wet')throw new Error('Expected ordinary active coverage.');
+        appended.points.push({x:570,y:45,pressure:.7});
         group.update({ mask: base });
         const actual = await draw();
         const after = renderer.maskDiagnostics;
@@ -894,7 +893,8 @@ test("painted-mask prefixes and active stamps are reused without changing previe
         differences.push(max);
         // Editing an earlier point must reset active coverage, rather than append over stale pixels.
         base = structuredClone(base);
-        base.strokes.at(-1)!.stroke.points[0].y = 65;
+        const changedStroke=base.strokes.at(-1)!.stroke;if(changedStroke.kind==='wet')throw new Error('Expected ordinary changed coverage.');
+        changedStroke.points[0].y=65;
         group.update({ mask: base });
         const changed = await draw(),
           reference = await draw(false);

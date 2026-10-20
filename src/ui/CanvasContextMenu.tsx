@@ -35,7 +35,8 @@ export interface CanvasContextMenuProps {
   locked: boolean;
   onChooseTool(tool: Tool): void;
   onAddLayer(): void;
-  onAddAdjustmentLayer(kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut"): void;
+  onAddAdjustmentLayer(kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" | "red-eye"): void;
+  onFrequencySeparation?(): void;
   onGenerateLayer?(): void;
   onGenerativeFill?(): void;
   onDuplicateLayer(): void;
@@ -86,6 +87,7 @@ export function CanvasContextMenu({
   onChooseTool,
   onAddLayer,
   onAddAdjustmentLayer,
+  onFrequencySeparation,
   onGenerateLayer,
   onGenerativeFill,
   onDuplicateLayer,
@@ -561,6 +563,17 @@ export function CanvasContextMenu({
 
         <div className="context-menu-divider" />
         <span className="context-section-label">Layers</span>
+        {onFrequencySeparation && (
+          <button
+            type="button"
+            className="context-action-btn"
+            role="menuitem"
+            disabled={disabled}
+            onClick={() => { onFrequencySeparation(); onClose(); }}
+          >
+            Frequency separation…
+          </button>
+        )}
         <button
           type="button"
           className="context-action-btn"
@@ -626,8 +639,8 @@ export function CanvasContextMenu({
           >
             HSL
           </button>
-          {(["color-balance","vibrance","gradient-map","white-balance","lut"] as const).map(kind=><button key={kind} type="button" className="button subtle button-sm" disabled={disabled}
-            onClick={()=>{onAddAdjustmentLayer(kind);onClose();}}>{kind==="color-balance"?"Color Balance":kind==="gradient-map"?"Gradient Map":kind==="white-balance"?"White Balance":kind==="lut"?"Color Lookup (LUT)":"Vibrance"}</button>)}
+          {(["color-balance","vibrance","gradient-map","white-balance","lut","red-eye"] as const).map(kind=><button key={kind} type="button" className="button subtle button-sm" disabled={disabled}
+            onClick={()=>{onAddAdjustmentLayer(kind);onClose();}}>{kind==="color-balance"?"Color Balance":kind==="gradient-map"?"Gradient Map":kind==="white-balance"?"White Balance":kind==="lut"?"Color Lookup (LUT)":kind==="red-eye"?"Red Eye":"Vibrance"}</button>)}
         </div>
         {onGenerateLayer && (
           <button

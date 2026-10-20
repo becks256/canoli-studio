@@ -1,4 +1,6 @@
 import { AffineTransform } from "../core/affine";
+import type {AssetStore} from '../core/assets';
+import type {BrushTextureSampler} from './brush-texture';
 import { maskStrokeSchema } from "../core/masks";
 import { strokeBounds, type BrushStrokeData } from "../core/drawing";
 import type { DodgeBurnOptions } from "../core/retouch/types";
@@ -15,13 +17,16 @@ export async function renderTonalStroke(
   space: RenderSpace,
   processor: PixelProcessor,
   world = new AffineTransform(),
+  assets?:AssetStore,
+  textures?:BrushTextureSampler,
+  isCancelled?:()=>boolean,
 ): Promise<Uint8ClampedArray> {
   space = { ...space };
   if (source.length !== space.width * space.height * 4)
     throw new Error("Invalid retouch render tile geometry.");
   const captured = source.slice();
   const options = { ...adjustment, flow: 1 };
-  const coverage = await renderRetouchCoverage(brush, space, processor, world);
+  const coverage = await renderRetouchCoverage(brush, space, processor, world,assets,textures,isCancelled);
   let left = space.width, top = space.height, right = -1, bottom = -1;
   for (let p = 0; p < coverage.length; p++) {
     if (!coverage[p]) continue;
@@ -56,6 +61,9 @@ export async function renderRetouchCoverage(
   space: RenderSpace,
   processor: PixelProcessor,
   world = new AffineTransform(),
+  assets?:AssetStore,
+  textures?:BrushTextureSampler,
+  isCancelled?:()=>boolean,
 ): Promise<Uint8Array> {
   space = { ...space };
   if (
@@ -119,6 +127,10 @@ export async function renderRetouchCoverage(
             processor,
             undefined,
             world,
+            undefined,
+            assets,
+            textures,
+            isCancelled,
           );
           const left = Math.max(cx, pixelX),
             top = Math.max(cy, pixelY);

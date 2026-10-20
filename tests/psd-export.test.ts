@@ -1,15 +1,29 @@
-import { expect, it } from "vitest";
+import { expect, it, beforeEach, afterEach, vi } from "vitest";
+import {encodePhotoshopStrip} from '../src/engine/photoshop-strip';
 import { Document, PaintLayer, AdjustmentLayer, LayerGroup, LayerStyle, defaultGradientMapAdjustment } from "../src/dom";
-import type { AssetStore } from "../src/core/assets";
+import { AssetStore } from "../src/core/assets";
 import type { DocumentRenderer, RenderOptions } from "../src/engine/renderer";
 import { exportPsd } from "../src/engine/psd";
 import { getExportCapabilityReport } from "../src/engine/export";
-import { parsePsd } from "../src/core/interchange/psd/parser";
+import { parsePsd, getPsdCapabilityReport } from "../src/core/interchange/psd/parser";
 
 if (typeof globalThis.ImageData === "undefined") globalThis.ImageData = class {
   width: number; height: number; data: Uint8ClampedArray;
   constructor(width: number, height: number) { this.width = width; this.height = height; this.data = new Uint8ClampedArray(width * height * 4); }
 } as unknown as typeof ImageData;
+
+// Node layout tests use the real strip codec with a task/message adapter.
+// Browser coverage exercises actual module workers and transfer/termination.
+beforeEach(()=>vi.stubGlobal('Worker',class extends EventTarget {
+ onmessage:((event:{data:unknown})=>void)|null=null;
+ onerror=null;onmessageerror=null;private closed=false;
+ postMessage(input:Parameters<typeof structuredClone>[0],transfer:Transferable[]){
+  const value=structuredClone(input,{transfer}) as {id:number;pixels:Uint8ClampedArray;width:number;rows:number;encoding:'layer'|'preview'|'both'};
+  queueMicrotask(()=>{if(!this.closed)this.onmessage?.({data:{id:value.id,channels:encodePhotoshopStrip(value.pixels,value.width,value.rows,value.encoding)}});});
+ }
+ terminate(){this.closed=true;}
+}));
+afterEach(()=>vi.unstubAllGlobals());
 
 function fixture() {
   const calls: { x: number; y: number; width: number; height: number }[] = [], canvases: HTMLCanvasElement[] = [];
@@ -23,7 +37,7 @@ function fixture() {
       canvases.push(canvas); return canvas;
     }, clearCache() {}, dispose() {},
   } as DocumentRenderer;
-  return { renderer, calls, canvases, assets: {} as AssetStore };
+  return { renderer, calls, canvases, assets: new AssetStore() };
 }
 
 it("assembles native RLE rows across bounded tiles without changing source state or retaining canvases", async () => {
@@ -60,12 +74,13 @@ it("rejects format limits and aborts between strips, releasing rendered surfaces
   await expect(exportPsd(doc.toJSON(), assets, renderer, "layers", { signal: abort.signal })).rejects.toMatchObject({ name: "AbortError" });
 });
 
-it("preflight describes the real dependency merge, group baking and explicit flatten choice", () => {
+it("preflight describes scoped dependency merging, native folders and explicit flatten choice", () => {
   const doc = new Document(); doc.layers.add(new PaintLayer());
   const group = doc.layers.add(new LayerGroup({ name: "Isolated" })); group.layers.add(new AdjustmentLayer({ adjustment: defaultGradientMapAdjustment() }));
   const before = getExportCapabilityReport(doc.toJSON(), { format: "psd" });
   expect(before.warnings.some(value => /bottom \d/.test(value))).toBe(false);
-  expect(before.warnings.some(value => value.includes("child layers and hierarchy"))).toBe(true);
+  expect(before.featuresPreserved.join(' ')).toContain('Nested folder hierarchy');
+  expect(before.warnings.join(' ')).toContain('group isolation scope');
   const top = doc.layers.add(new PaintLayer({ name: "Blend dependent" }));
   top.styles = new LayerStyle({ blendIf: { enabled: true } });
   const report = getExportCapabilityReport(doc.toJSON(), { format: "psd" });
@@ -73,4 +88,15 @@ it("preflight describes the real dependency merge, group baking and explicit fla
   const flat = getExportCapabilityReport(doc.toJSON(), { format: "psd", psdMode: "flatten" });
   expect(flat.warnings.some(value => value.includes("one pixel layer"))).toBe(true);
   expect(flat.featuresPreserved).not.toContain("Layer opacity and blend modes");
+});
+
+it('retains real Normal fill tags but requires the actual merged image for unsupported fill semantics',async()=>{
+  const doc=new Document({width:12,height:8});doc.layers.add(new PaintLayer({fillOpacity:.4}));
+  const {renderer,assets}=fixture(),bytes=new Uint8Array(await(await exportPsd(doc.toJSON(),assets,renderer)).arrayBuffer()),parsed=parsePsd(bytes);
+  expect(parsed.layers[0].fillOpacity).toBe(102);expect(getPsdCapabilityReport(parsed).canImportAsLayers).toBe(true);
+  const offset=Buffer.from(bytes).indexOf('8BIMnorm');expect(offset).toBeGreaterThan(0);
+  const nonNormal=bytes.slice();nonNormal.set(new TextEncoder().encode('div '),offset+4);
+  const report=getPsdCapabilityReport(parsePsd(nonNormal));expect(report.hasComposite).toBe(true);expect(report.canImportAsLayers).toBe(false);expect(report.warnings.join(' ')).toContain('fill-opacity semantics require the merged composite');
+  parsed.layers[0].isGroup=true;parsed.layers[0].imageData=undefined;
+  expect(getPsdCapabilityReport(parsed).warnings.join(' ')).toContain('fill-opacity semantics require the merged composite');
 });

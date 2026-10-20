@@ -57,6 +57,10 @@ export async function prepareHealingStroke(
     captured,
     { ...window, sx: 1, sy: 1 },
     processor,
+    undefined,
+    assets,
+    undefined,
+    ()=>signal?.aborted??false,
   );
   signal?.throwIfAborted();
   const pixels = await sampleRetouchRegion(

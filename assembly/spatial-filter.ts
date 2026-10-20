@@ -14,6 +14,7 @@ export function spatialFilter(
   unsharp: bool,
   amount: f64,
   threshold: f64,
+  band: i32,
 ): void {
   for (let y: i32 = 0; y < height; y++)
     for (let x: i32 = 0; x < width; x++) {
@@ -55,7 +56,16 @@ export function spatialFilter(
         alpha += load<f64>(source + 24) * weight;
       }
       const output = ptr + <usize>((y * width + x) * 4);
-      if (unsharp) {
+      if (band > 0) {
+        // The coverage mask belongs to the enclosing group, not these opaque color planes.
+        for (let channel: i32 = 0; channel < 3; channel++) {
+          const address = output + <usize>channel;
+          const low = alpha > 0 ? <f64>byte((channel === 0 ? red : channel === 1 ? green : blue) / alpha) : 0.0;
+          const original = <f64>load<u8>(address);
+          store<u8>(address, band === 1 ? <u8>low : band === 2 ? byte(127.5 + (original - low) / 2.0) : <u8>(255 - (original < 255.0 && ((<i32>original - <i32>low) & 1) == 0 ? 1 : 0)));
+        }
+        store<u8>(output + 3, 255);
+      } else if (unsharp) {
         if (load<u8>(output + 3) === 0 || alpha <= 0) continue;
         for (let channel: i32 = 0; channel < 3; channel++) {
           const address = output + <usize>channel;

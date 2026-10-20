@@ -1,3 +1,6 @@
+import {brushSymmetrySchema,symmetryBounds,type BrushSymmetryData} from './brush-symmetry';
+import {brushTextureSchema,type BrushTextureData} from './brush-texture';
+import {brushTipSchema,penTiltSchema,brushSupportRadius,type BrushTipData,type PenTiltData} from './brush-tip';
 import {vectorGradientSchema,vectorFillRuleSchema,type VectorFillOptions} from './vector-gradient';
 import {vectorStrokeSchema,vectorStrokeValues,type VectorStrokeOptions} from './vector-stroke';
 import { pixelCoverageSchema, coverageAt, type PixelCoverage } from "./pixel-selection";
@@ -5,6 +8,8 @@ import { AffineTransform } from "./affine";
 import type { AffineData } from "./affine";
 import { affineSchema } from "./transform-schema";
 import { z } from "zod";
+import { wetPaintOperationSchema, wetPaintBounds, type WetPaintStrokeData } from './wet-operation';
+import {pressureCurveSchema,pressureSizeResponse,type PressureCurveData} from './pressure-curve';
 
 export interface Point {
   x: number;
@@ -12,6 +17,7 @@ export interface Point {
 }
 export interface StrokePoint extends Point {
   pressure: number;
+  tilt?: PenTiltData;
 }
 export interface Rect extends Point {
   width: number;
@@ -61,9 +67,19 @@ export interface BrushStrokeData {
   spacing?: number;
   pressureSize?: boolean;
   pressureOpacity?: boolean;
+  pressureCurve?: PressureCurveData;
+  tip?: BrushTipData;
+  symmetry?: BrushSymmetryData;
+  texture?: BrushTextureData;
   color: string;
   clip: SelectionData | null;
   tiles: CloneTile[];
+}
+export function assertBrushVersion(brush:{pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[]},version:number){
+  if(version<29&&brush.pressureCurve!==undefined)throw new Error('Brush pressure curves require schema version 29.');
+  if(version<30&&(brush.tip!==undefined||brush.points?.some(point=>point.tilt!==undefined)))throw new Error('Brush tips and pen tilt require schema version 30.');
+  if(version<31&&brush.symmetry!==undefined)throw new Error('Brush symmetry requires schema version 31.');
+  if(version<32&&brush.texture!==undefined)throw new Error('Brush textures require schema version 32.');
 }
 export interface FillData {
   id: string;
@@ -74,7 +90,7 @@ export interface FillData {
   clip: SelectionData | null;
   erase: boolean;
 }
-export type PaintOperationData = BrushStrokeData | FillData;
+export type PaintOperationData = BrushStrokeData | FillData | WetPaintStrokeData;
 export interface PathAnchor extends Point {
   in: Point;
   out: Point;
@@ -164,14 +180,12 @@ export const styleSchema: z.ZodType<LayerStyleData> = z
       .strict(),
   })
   .strict();
-export const paintOperationSchema: z.ZodType<PaintOperationData> =
-  z.discriminatedUnion("kind", [
-    z
+export const brushStrokeSchema = z
       .object({
         id: identifier,
         kind: z.enum(["brush", "pencil", "clone", "eraser"]),
         points: z
-          .array(point.extend({ pressure: unit }))
+          .array(point.extend({ pressure: unit, tilt:penTiltSchema.optional() }))
           .min(1)
           .max(20000),
         size: z.number().min(0.1).max(2048),
@@ -181,6 +195,10 @@ export const paintOperationSchema: z.ZodType<PaintOperationData> =
         spacing: z.number().min(0.01).max(10).optional(),
         pressureSize: z.boolean().optional(),
         pressureOpacity: z.boolean().optional(),
+        pressureCurve: pressureCurveSchema.optional(),
+        tip: brushTipSchema.optional(),
+        symmetry: brushSymmetrySchema.optional(),
+        texture: brushTextureSchema.optional(),
         color: colorSchema,
         clip: selectionSchema.nullable(),
         tiles: z.array(rect.extend({ assetId: identifier })).max(4096),
@@ -189,7 +207,12 @@ export const paintOperationSchema: z.ZodType<PaintOperationData> =
       .refine(
         (stroke) => stroke.kind !== "clone" || stroke.tiles.length > 0,
         "Clone strokes require a source image.",
-      ),
+      );
+export const wetStrokeSchema = wetPaintOperationSchema(brushStrokeSchema);
+export const paintOperationSchema: z.ZodType<PaintOperationData> =
+  z.discriminatedUnion('kind', [
+    brushStrokeSchema,
+    wetStrokeSchema,
     z
       .object({
         id: identifier,
@@ -330,23 +353,21 @@ export function containsSelection(
   return inside;
 }
 export function strokeBounds(stroke: PaintOperationData): Rect {
+  if (stroke.kind === 'wet') return wetPaintBounds(stroke);
   if (stroke.kind === "fill") return { ...stroke.bounds };
   let left = Infinity,
     top = Infinity,
     right = -Infinity,
     bottom = -Infinity;
   for (const p of stroke.points) {
-    const r =
-      (stroke.size *
-        (stroke.pressureSize === false ? 1 : Math.max(0.05, p.pressure))) /
-        2 +
-      1;
+    const size=stroke.size*(stroke.pressureSize===false?1:pressureSizeResponse(p.pressure,stroke.pressureCurve));
+    const r=brushSupportRadius(size,stroke.kind==='pencil',stroke.tip)+(stroke.kind==='pencil'&&stroke.tip?2:1);
     left = Math.min(left, p.x - r);
     top = Math.min(top, p.y - r);
     right = Math.max(right, p.x + r);
     bottom = Math.max(bottom, p.y + r);
   }
-  return { x: left, y: top, width: right - left, height: bottom - top };
+  return symmetryBounds({ x: left, y: top, width: right - left, height: bottom - top },stroke.symmetry);
 }
 export function pathBounds(path: VectorPathData): Rect {
   // The control-point hull contains the entire Bézier curve.
@@ -377,5 +398,5 @@ export function pathBounds(path: VectorPathData): Rect {
 export interface RasterErasureData { width: number; height: number; stroke: PaintOperationData }
 export const rasterErasureSchema: z.ZodType<RasterErasureData> = z.object({
   width: dimension, height: dimension,
-  stroke: paintOperationSchema.refine(stroke => stroke.kind === 'eraser' || (stroke.kind === 'fill' && stroke.erase), 'Raster erasure requires an eraser or clear operation.'),
+  stroke: paintOperationSchema.refine(stroke => stroke.kind === 'wet' || stroke.kind === 'eraser' || (stroke.kind === 'fill' && stroke.erase), 'Raster modifiers require wet paint, an eraser or a clear operation.'),
 }).strict();

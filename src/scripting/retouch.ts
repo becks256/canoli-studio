@@ -34,7 +34,8 @@ export class ScriptRetouch {
     assets: AssetStore,
     private readonly check: () => void,
   ) {
-    for (const asset of assets.values()) this.view.install(asset, false);
+    try { for (const asset of assets.values()) assets.shareTo(this.view,asset.id,asset.id); }
+    catch(error){this.view.dispose();throw error;}
   }
   async prepare(
     commands: unknown,
@@ -226,7 +227,7 @@ export class ScriptRetouch {
     try {
       for (const assetId of referencedAssets(document)) {
         if (this.owned.has(assetId)) {
-          destination.install(this.view.get(assetId), false);
+          this.view.shareTo(destination,assetId,assetId);
           installed.push(assetId);
         } else destination.get(assetId);
       }
@@ -240,10 +241,18 @@ export class ScriptRetouch {
       throw error;
     }
   }
+  /** Host-only read access before any prepared asset is installed globally. */
+  validationSources(destination: AssetStore): Pick<AssetStore, 'get' | 'captureLifetime'> {
+    const viewAlive = this.view.captureLifetime(), destinationAlive = destination.captureLifetime();
+    const check = () => { this.assertActive(); viewAlive(); destinationAlive(); };
+    return {
+      get: id => { check(); if (this.owned.has(id)) { if (destination.has(id)) throw new Error('Prepared repair asset ID collided with another source.'); return this.view.get(id); } return destination.get(id); },
+      captureLifetime: () => check,
+    };
+  }
   dispose() {
     this.abort.abort(new Error("Script retouch stopped."));
-    for (const assetId of this.owned) this.view.remove(assetId);
     this.owned.clear();
-    this.view.metadata.dispose();
+    this.view.dispose();
   }
 }

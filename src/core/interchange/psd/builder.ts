@@ -36,7 +36,7 @@ export async function buildPsd(
   if (layersWithPixels.length > 32767) throw new Error("PSD cannot represent more than 32,767 layer records.");
   const writer = new ByteWriter();
   const finish = () => {
-    if (writer.position > 0x7fffffff) throw new Error("This output exceeds PSD's 2 GB file limit. PSB export is not implemented.");
+    if (writer.position > 0x7fffffff) throw new Error("This output exceeds PSD's 2 GB file limit. Use trusted browser PSB export.");
     return writer.getBuffer();
   };
   const width = document.width;
@@ -207,6 +207,7 @@ export async function buildPsd(
 
     // Blend mode signature & key
     layerInfoWriter.writeAscii("8BIM");
+    if(l.blendMode==='pass-through')throw new Error('Pass-through groups require rendered Photoshop export.');
     const blendKey = LUMA_TO_PSD_BLEND_MAP[l.blendMode] ?? "norm";
     layerInfoWriter.writeAscii(blendKey, 4);
 
@@ -297,6 +298,7 @@ export async function buildPsd(
         if (outA > 0) {
           const source: [number, number, number] = [lData[srcIdx]/255, lData[srcIdx+1]/255, lData[srcIdx+2]/255];
           const backdrop: [number, number, number] = [compPixels[dstIdx]/255, compPixels[dstIdx+1]/255, compPixels[dstIdx+2]/255];
+          if(l.blendMode==='pass-through')throw new Error('Pass-through groups require rendered Photoshop export.');
           const blended = blendColors(backdrop, source, l.blendMode);
           for (let channel = 0; channel < 3; channel++) {
             const premultiplied = srcA * ((1-dstA)*source[channel] + dstA*blended[channel]) +

@@ -1,5 +1,54 @@
 import { expect, test } from "@playwright/test";
 
+test('unrelated tool notifications do not reread stationary cursor layout; size updates remain immediate and original document stays unchanged', async ({page}) => {
+  await page.goto('/');
+  await page.getByRole('button',{name:'Move tool (V)',exact:true}).click();
+  await page.evaluate(()=>window.luma.editor.newDocument({width:800,height:600}));
+  await page.getByRole('button',{name:'Eraser tool (E)',exact:true}).click();
+  await page.keyboard.press('Control+1');
+  await page.evaluate(()=>window.luma.editor.tools.configure({size:40}));
+  const viewport=page.getByLabel('Editing canvas',{exact:true}),box=(await viewport.boundingBox())!;
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  const cursor=page.getByTestId('canvas-custom-cursor');
+  await expect(cursor.locator('svg > circle').first()).toHaveAttribute('r','20');
+  await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
+  const result=await page.evaluate(async()=>{
+    const host=document.querySelector<HTMLDivElement>('[aria-label="Editing canvas"]')!,canvas=document.querySelector<HTMLDivElement>('.canvas-wrap')!,cursor=document.querySelector<HTMLElement>('[data-testid="canvas-custom-cursor"]')!;
+    const original=[host,canvas].map(node=>({node,rect:node.getBoundingClientRect,descriptor:Object.getOwnPropertyDescriptor(node,'getBoundingClientRect')}));
+    const reads=[0,0],editor=window.luma.editor,before=editor.document.getSnapshot(),settings=editor.tools.getSnapshot().settings;
+    const request=window.requestAnimationFrame,cancel=window.cancelAnimationFrame,held=new Map<number,FrameRequestCallback>();let nextFrame=10_000_000;
+    original.forEach(({node,rect},index)=>Object.defineProperty(node,'getBoundingClientRect',{configurable:true,value(){reads[index]++;return rect.call(node);}}));
+    const wait=async(ready:()=>boolean)=>{
+      const until=performance.now()+5000;
+      while(!ready()){
+        if(performance.now()>until)throw new Error('The real UI did not finish its notification/settings commit.');
+        await new Promise(resolve=>setTimeout(resolve,0));
+      }
+      await new Promise(resolve=>setTimeout(resolve,0));
+    };
+    try{
+      for(let index=0;index<3;index++){
+        const message=`Cursor layout regression notification ${index}`;
+        Reflect.get(editor.tools,'publish').call(editor.tools,{error:message});
+        await wait(()=>document.querySelector('.toast[role="alert"]')?.textContent?.includes(message)===true);
+      }
+      const unrelatedReads=[...reads],settingsUnchanged=editor.tools.getSnapshot().settings===settings;
+      window.requestAnimationFrame=callback=>{const key=++nextFrame;held.set(key,callback);return key;};
+      window.cancelAnimationFrame=key=>{if(!held.delete(key))cancel.call(window,key);};
+      editor.tools.configure({size:80});
+      await wait(()=>document.querySelector<HTMLInputElement>('input[aria-label="Size value"]')?.value==='80');
+      const geometryReads=reads.map((value,index)=>value-unrelatedReads[index]),radius=cursor.querySelector('svg > circle')?.getAttribute('r');
+      window.dispatchEvent(new Event('blur'));
+      return{unrelatedReads,settingsUnchanged,geometryReads,radius,hiddenImmediately:cursor.style.display==='none'&&!host.hasAttribute('data-custom-cursor-active'),documentUnchanged:editor.document.getSnapshot()===before};
+    }finally{
+      window.requestAnimationFrame=request;window.cancelAnimationFrame=cancel;
+      for(const {node,descriptor}of original)if(descriptor)Object.defineProperty(node,'getBoundingClientRect',descriptor);else Reflect.deleteProperty(node,'getBoundingClientRect');
+      for(const callback of held.values())request.call(window,callback);held.clear();
+    }
+  });
+  expect(result).toEqual({unrelatedReads:[0,0],settingsUnchanged:true,geometryReads:[1,0],radius:'40',hiddenImmediately:true,documentUnchanged:true});
+});
+
 test('custom eraser cursor follows size and zoom, supports hand mode and restores the system pointer outside the canvas', async ({page}) => {
   await page.goto('/');
   await page.getByRole('button',{name:'Move tool (V)',exact:true}).click();
@@ -13,10 +62,10 @@ test('custom eraser cursor follows size and zoom, supports hand mode and restore
   const cursor=page.getByTestId('canvas-custom-cursor');
   await expect(cursor).toBeVisible();
   await expect(cursor).toHaveAttribute('data-cursor-kind','eraser');
-  await expect(cursor.locator('circle').first()).toHaveAttribute('r','20');
+  await expect(cursor.locator('svg > circle').first()).toHaveAttribute('r','20');
   expect(await viewport.evaluate(node=>getComputedStyle(node).cursor)).toBe('none');
   await page.keyboard.press('-');
-  await expect.poll(()=>cursor.locator('circle').first().getAttribute('r')).not.toBe('20');
+  await expect.poll(()=>cursor.locator('svg > circle').first().getAttribute('r')).not.toBe('20');
   await page.keyboard.down('Space');
   await expect(cursor).toHaveAttribute('data-cursor-kind','hand');
   await page.keyboard.up('Space');

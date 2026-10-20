@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { affineSchema } from "./transform-schema";
 import { AffineTransform } from "./affine";
-import { paintOperationSchema, pathSchema, selectionSchema } from "./drawing";
+import { rasterErasureSchema, paintOperationSchema, pathSchema, selectionSchema } from "./drawing";
 
+import type { WetPaintStrokeData } from "./wet-operation";
 import type { BrushStrokeData } from "./drawing";
 
 export const maskStrokeSchema = z
@@ -16,12 +17,17 @@ export const maskStrokeSchema = z
     ) as z.ZodType<BrushStrokeData>,
   })
   .strict();
+export const wetMaskStrokeSchema=z.object({mode:z.literal('wet'),stroke:paintOperationSchema.refine(value=>value.kind==='wet','Wet mask operations require prepared native pixels.') as z.ZodType<WetPaintStrokeData>}).strict();
+export const maskOperationSchema=z.discriminatedUnion('mode',[maskStrokeSchema,wetMaskStrokeSchema]);
+export type MaskOperationData=z.infer<typeof maskOperationSchema>;
+export const maskStrokePointCount=(entry:MaskOperationData)=>entry.stroke.kind==='wet'?entry.stroke.brush.points.length:entry.stroke.points.length;
+export function assertMaskOperationVersion(mask:LayerMaskData,version:number){if(mask.kind==='raster-erasures'&&version<36)throw new Error('Raster erasure masks require schema version 36.');if(version<34&&(mask.strokes??[]).some(entry=>entry.mode==='wet'))throw new Error('Wet mask coverage requires schema version 34.');}
 export const maskStrokesSchema = z
-  .array(maskStrokeSchema)
+  .array(maskOperationSchema)
   .max(2048)
   .refine(
     (strokes) =>
-      strokes.reduce((sum, entry) => sum + entry.stroke.points.length, 0) <=
+      strokes.reduce((sum, entry) => sum + maskStrokePointCount(entry), 0) <=
       200000,
     "A mask supports at most 200,000 stroke points.",
   );
@@ -49,6 +55,8 @@ const settings = {
 const maskPath = z.object({ points: pathSchema.shape.points }).strict();
 /** Geometry uses document-pixel units in a linked layer or unlinked document coordinate plane, before layer styles. */
 export const layerMaskSchema = z.discriminatedUnion("kind", [
+  z.object({kind:z.literal("raster-erasures"),width:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),height:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),
+    erasures:z.array(rasterErasureSchema.refine(entry=>entry.stroke.kind!=="wet","Raster erasure coverage accepts only eraser and clear operations.")).max(2048),...settings}).strict(),
   z
     .object({
       kind: z.literal("paint"),
@@ -86,6 +94,8 @@ export const layerMaskSchema = z.discriminatedUnion("kind", [
     .strict(),
 ]);
 export type LayerMaskData = z.infer<typeof layerMaskSchema>;
+/** Inert prepared records retain metadata/assets without changing geometry routing. */
+export const hasMaskRefinements=(mask:LayerMaskData)=>!!mask.strokes?.some(entry=>entry.mode!=='wet'||entry.stroke.opacity>0);
 
 /** Linked offsets are local to the layer; unlinked offsets are document-space. */
 export function maskTransform(
@@ -119,7 +129,7 @@ export function maskGeometry(mask: LayerMaskData) {
         ? [mask.paths, mask.fillRule]
         : mask.kind === "bitmap"
           ? mask.assetId
-          : mask.base,
+          : mask.kind === "raster-erasures" ? [mask.width,mask.height,mask.erasures] : mask.base,
     mask.strokes ?? [],
   ];
 }

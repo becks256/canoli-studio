@@ -3,6 +3,7 @@ import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
 import type { DocumentRenderer } from "./renderer";
+import {yieldTask} from './task-yield';
 
 const crcTable = Uint32Array.from({ length: 256 }, (_, index) => {
   let value = index;
@@ -70,6 +71,7 @@ export async function exportPng(
       checkExport(control);
       const rows = Math.min(rowsPerStrip, height - y);
       const strip = new Uint8Array(rowBytes * rows); // filter byte 0 for each row
+      let deadline=performance.now()+8;
       for (let x = 0; x < width; x += RASTER_EXPORT_COLUMNS) {
         const tileWidth = Math.min(RASTER_EXPORT_COLUMNS, width - x);
         const tile = await renderer.render(document, assets, {
@@ -89,6 +91,11 @@ export async function exportPng(
             );
         } finally {
           tile.width = tile.height = 0;
+        }
+        if(performance.now()>=deadline){
+          await yieldTask();
+          checkExport(control);
+          deadline=performance.now()+8;
         }
       }
       await writer.write(strip);

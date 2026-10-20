@@ -21,13 +21,16 @@ import { exportPsd } from "./psd";
 import { planPsdExport, type PsdExportMode } from "../core/interchange/psd/export-plan";
 import {exportTiff} from './tiff';
 import {validateTiffVariant,type TiffVariant} from '../core/tiff';
+import {exportPdf} from './pdf';
+import {pdfPageGeometry} from '../core/pdf';
 
-export type ExportFormat = "png" | "jpeg" | "webp" | "svg" | "psd" | "tiff";
+export type ExportFormat = "png" | "jpeg" | "webp" | "svg" | "psd" | "psb" | "tiff" | "pdf";
 
 export interface ExportOptions {
   format: ExportFormat;
   psdMode?: PsdExportMode;
   tiffVariant?: TiffVariant;
+  pdfDpi?: number; // Physical page sizing only; native pixels are not resampled.
   quality?: number; // 0.01 to 1.0 (for JPEG and WebP)
   backgroundColor?: string; // background fill for JPEG (default: "#ffffff")
 }
@@ -71,6 +74,18 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
   const featuresDegradedOrOmitted: string[] = [];
 
   switch (format) {
+    case "pdf": {
+      let geometry:ReturnType<typeof pdfPageGeometry>|undefined;
+      try{geometry=pdfPageGeometry(document.width,document.height,options.pdfDpi);}catch(error){warnings.push(error instanceof Error?error.message:String(error));}
+      featuresPreserved.push('Native-resolution visible composition on one PDF page','Lossless 8-bit RGB image with a transparency soft mask','Embedded output sRGB ICC profile');
+      if(geometry)featuresPreserved.push(`Physical page sizing at ${geometry.dpi} DPI without resampling`);
+      warnings.push('PDF artwork is rasterized at document resolution. Text is not searchable or selectable, and vectors, layers, masks, effects and component links are not independently editable. Save a Canoli Studio project for full editability.');
+      warnings.push('Only the canvas is exported. Hidden/off-canvas content, saved alpha channels, source EXIF/GPS, authored metadata and font files are excluded. Viewer color conversion, transparency and scaling can affect appearance.');
+      warnings.push('This is an RGB PDF 1.7 raster page, not PDF/X, PDF/A, CMYK/spot-color output, bleed/trim/crop marks or a print-readiness guarantee.');
+      if(geometry&&geometry.userUnit>1)warnings.push('This large physical page uses PDF UserUnit scaling and requires a compatible viewer.');
+      featuresDegradedOrOmitted.push('Editable or searchable text, vector geometry and document layers','Higher precision, CMYK/spot colors and print-production conformance','Source/authored metadata, hidden artwork and saved channels');
+      break;
+    }
     case "tiff":
       const variant=validateTiffVariant(options.tiffVariant);
       featuresPreserved.push('Native document resolution and visible composition','Lossless Deflate-compressed 8-bit sRGB pixels','Unassociated RGBA transparency','Embedded output sRGB ICC profile');
@@ -149,15 +164,24 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       }
       const rasterPlans=planSvgImages(document).filter(plan=>plan.layer.kind==='raster'&&!plan.prefix);
       if(composition?.prefixes){
-        featuresPreserved.push('Native adjustment layers and Blend If with isolated backdrops in document-resolution PNG prefixes');
-        warnings.push(`SVG renders ${composition.prefixes} affected sibling stack(s) through the last visible adjustment or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.`);
+        featuresPreserved.push('Native adjustment layers, pass-through groups and Blend If in document-resolution PNG prefixes');
+        warnings.push(`SVG renders ${composition.prefixes} affected sibling stack(s) through the last visible adjustment, pass-through group or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.`);
         warnings.push(`Native backdrop stacks end at: ${composition.stacks.map(name=>JSON.stringify(name)).join(', ')}.`);
         warnings.push('Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.');
         featuresDegradedOrOmitted.push('Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes');
+        if(composition.wetPaint){
+          featuresPreserved.push('Prepared wet-paint color and transparency in native PNG backdrop prefixes');
+          featuresDegradedOrOmitted.push('Editable wet-paint operations and preceding artwork inside native backdrop prefixes');
+          warnings.push('Wet-paint layers require native replacement compositing. SVG bakes the affected sibling prefix through each wet-paint layer; save a project to retain ordered operations, original sources and brush metadata.');
+        }
       }
       const paintPlans=planSvgPaint(document);
       if(paintPlans.length){
         featuresPreserved.push('Editable paint dab/fill geometry, pressure/flow coverage, stroke opacity and ordered erasure masks');
+        if(paintPlans.some(plan=>plan.layer.strokes.some(stroke=>stroke.kind!=='fill'&&stroke.kind!=='wet'&&stroke.texture))){
+          featuresPreserved.push('Embedded native-resolution brush texture coverage images with oriented per-dab alpha masks');
+          warnings.push('Textured SVG paint embeds complete source-resolution coverage images, including coverage outside visible dabs; choose PNG for flattened delivery. Original texture bytes, color channels, source identity and brush dynamics remain native-project data. Viewer image filtering and rounding can differ from the native reference.');
+        }
         if(paintPlans.some(plan=>plan.layer.strokes.some(stroke=>stroke.kind==='clone')))featuresPreserved.push('Native-resolution clone snapshots with editable brush coverage and placement');
         warnings.push('SVG paint uses vector dabs/fills and ordered alpha masks, not the original brush command model. Dabs outside conservative output support are excluded. Deep eraser sequences and dense paint can exceed viewer complexity or memory limits; edge/gradient rounding can differ from native PNG. Save a project for brush settings and complete strokes.');
         featuresDegradedOrOmitted.push('Original paint command settings and off-support brush dabs');
@@ -216,9 +240,10 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       break;
 
     case "psd":
-      const plan = planPsdExport(document, options.psdMode);
+    case "psb":
+      const label=format.toUpperCase(),plan = planPsdExport(document, options.psdMode,format);
       if(document.alphaChannels?.length){
-        warnings.push('Saved alpha channels are omitted from PSD export. Save a Canoli Studio project to retain them.');
+        warnings.push(`Saved alpha channels are omitted from ${label} export. Save a Canoli Studio project to retain them.`);
         featuresDegradedOrOmitted.push('Saved alpha channels');
       }
       featuresPreserved.push(
@@ -227,21 +252,47 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
         "Embedded ICC color profile (sRGB)",
         "Merged preview with transparency",
       );
-      if (document.width > 30000 || document.height > 30000)
-        warnings.push("PSD dimensions cannot exceed 30,000 pixels per side. Choose PNG or save a Canoli Studio project; PSB export is not implemented.");
+      if (document.width > (format==='psb'?300000:30000) || document.height > (format==='psb'?300000:30000))
+        warnings.push(format==='psb'?'PSB dimensions cannot exceed 300,000 pixels per side. Choose another output or save a native project.':'PSD dimensions cannot exceed 30,000 pixels per side. Choose PSB, PNG or save a native project.');
+      if(format==='psb')warnings.push('PSB uses large-document lengths and requires a PSB-compatible reader. This remains an 8-bit RGB pixel-layer, folder and pixel-mask subset, not editable Photoshop text, vector paths, adjustment parameters or effects. Real multi-GiB and broader reader/device/memory acceptance remain unverified.');
       if (options.psdMode === "flatten") {
         warnings.push("All visible artwork is merged into one pixel layer. Hidden content and editable layer settings are not retained.");
         featuresDegradedOrOmitted.push("Separate layers and editable effects");
       } else {
-        featuresPreserved.push("Independent top-level layers retained as named pixel layers", "Layer opacity and blend modes");
+        featuresPreserved.push("Independent top-level layers retained as named pixel layers or folders", "Layer opacity and blend modes");
+        featuresPreserved.push('Separate fill opacity on retained unstyled Normal pixel layers');
+        if(plan.records.some(entry=>entry.kind==='group'))featuresPreserved.push('Nested folder hierarchy, supported pass-through blending, visibility and locks');
+        if(plan.masks.length){
+          featuresPreserved.push('Editable pixel-mask channels with retained enabled state');
+          warnings.push('Separate masks retain final native coverage as editable document-bounded pixels. Vector/selection/paint identity, linkage, density, inversion and feather controls and off-canvas mask coverage are baked.');
+          featuresDegradedOrOmitted.push('Original mask geometry and coverage controls');
+        }
+        if(plan.records.some(entry=>entry.kind==='group'&&!entry.group.visible)||plan.layers.some(layer=>!layer.visible||layer.left<0||layer.top<0||layer.left+layer.width>document.width||layer.top+layer.height>document.height))
+          warnings.push('Layered output retains independent hidden artwork and supported placed-raster pixels outside the canvas. Choose Flatten for visible-canvas-only delivery.');
         if (plan.mergedThrough >= 0) {
-          warnings.push(`The bottom ${plan.mergedThrough + 1} top-level layers are merged through “${document.children[plan.mergedThrough].name}” to preserve adjustment or Blend If appearance, including current visibility. Hidden content in that merged portion is not retained.`);
+          warnings.push(`The bottom ${plan.mergedThrough + 1} top-level layers are merged through “${document.children[plan.mergedThrough].name}” to preserve unsupported adjustment or conditional blending appearance, including current visibility. Hidden content in that merged portion is not retained.`);
           featuresDegradedOrOmitted.push("Layer separation and adjustment settings in the merged portion");
+        }
+        if(plan.scopedMerges.length>(plan.mergedThrough>=0?1:0)){
+          warnings.push(`Unsupported adjustment/Blend If stacks are merged within their group isolation scope: ${plan.scopedMerges.map(name=>`“${name}”`).join(', ')}.`);
+          featuresDegradedOrOmitted.push('Internal layer separation and adjustment controls in merged group prefixes');
+        }
+        if(plan.bakedGroups.length){
+          warnings.push(`Styled group contents are rendered into one pixel child inside their retained folder: ${plan.bakedGroups.map(name=>`“${name}”`).join(', ')}. Their original children, masks, fill controls and effects are baked; hidden descendants inside those contents are omitted.`);
+          featuresDegradedOrOmitted.push('Original child editability and controls inside styled groups');
+        }
+        if(plan.foldedGroupFill.length){
+          warnings.push(`Photoshop groups expose overall opacity without a separate Fill control. Canoli group fill is folded into exported group opacity: ${plan.foldedGroupFill.map(name=>`“${name}”`).join(', ')}. Save a native project for the original separate controls.`);
+          featuresDegradedOrOmitted.push('Separate group fill and opacity controls');
+        }
+        if(plan.bakedLayerFill.length){
+          warnings.push(`Non-Normal layer fill and any attached masks are baked into pixel alpha to retain Canoli appearance without assuming Photoshop fill/blend equivalence: ${plan.bakedLayerFill.map(name=>`“${name}”`).join(', ')}.`);
+          featuresDegradedOrOmitted.push('Separate fill/mask controls on non-Normal layers');
         }
       }
       if (hasVectors) {
         warnings.push(
-          "Vector shape layers are rasterized into pixel layers in PSD export.",
+          `Vector shape layers are rasterized into pixel layers in ${label} export.`,
         );
         featuresDegradedOrOmitted.push(
           "Editable vector Bézier paths (rasterized)",
@@ -249,24 +300,22 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       }
       if (hasText) {
         warnings.push(
-          "Text layers are rendered to pixel layers in PSD export.",
+          `Text layers are rendered to pixel layers in ${label} export.`,
         );
         featuresDegradedOrOmitted.push("Editable text typography (rasterized)");
       }
       if (hasAdjustments) {
         warnings.push(
-          "Adjustment appearance is baked into pixels; adjustment parameters are not editable in the PSD.",
+          `Adjustment appearance is baked into pixels; adjustment parameters are not editable in the ${label}.`,
         );
         featuresDegradedOrOmitted.push("Non-destructive adjustment layers");
       }
-      if (layers.some(layer => layer.kind === "group")) {
-        warnings.push("Groups are rendered as pixel layers. Their child layers and hierarchy are baked together.");
-        featuresDegradedOrOmitted.push("Group hierarchy and child-layer editability");
-      }
+      if (layers.filter(layer=>layer.kind==='group').length>plan.records.filter(entry=>entry.kind==='group').length)
+        featuresDegradedOrOmitted.push('Group hierarchy inside rendered styles or merged backdrop prefixes');
       if (layers.some(layer => layer.kind === "smart-object"))
         featuresDegradedOrOmitted.push("Editable smart objects, linked sources and smart filters (rendered to pixels)");
-      warnings.push("Masks, effects, fill opacity and transforms are baked into pixels. Complex layer content is clipped to the document canvas; ordinary placed rasters retain their pixel bounds. Save .luma to retain full editability.");
-      featuresDegradedOrOmitted.push("Editable masks, transforms, styles, paint operations and metadata");
+      warnings.push("Styles, paint operations and affine transforms are rendered into pixels. Group transforms are baked into descendant pixels; supported integer group origins and ordinary placed-raster bounds are retained. Other rendered content is clipped to document support. Save .luma to retain complete source editability.");
+      featuresDegradedOrOmitted.push("Original affine transforms, styles, paint operations and metadata");
       break;
   }
 
@@ -291,6 +340,15 @@ export async function exportDocument(
   control?: ExportControl,
 ): Promise<ExportResult> {
   checkExport(control);
+  if(options.format==='psd'||options.format==='psb'){
+    const report=getExportCapabilityReport(document,options),blob=await exportPsd(document,assets,renderer,options.psdMode,control,options.format);
+    return{blob,mimeType:'image/vnd.adobe.photoshop',extension:options.format,report};
+  }
+  if(options.format==='pdf'){
+    const report=getExportCapabilityReport(document,options);
+    const blob=await exportPdf(document,assets,renderer,options.pdfDpi,control);
+    return{blob,mimeType:'application/pdf',extension:'pdf',report};
+  }
   // TIFF captures sources/fonts before the first user progress callback.
   if(options.format==='tiff'){
     const report=getExportCapabilityReport(document,options);
@@ -329,17 +387,6 @@ export async function exportDocument(
       report,
     };
   }
-
-  if (options.format === "psd") {
-    const blob = await exportPsd(document, assets, renderer, options.psdMode, control);
-    return {
-      blob,
-      mimeType: "image/vnd.adobe.photoshop",
-      extension: "psd",
-      report,
-    };
-  }
-
 
   if (options.format === "png") {
     const blob = await exportPng(document, assets, renderer, control);

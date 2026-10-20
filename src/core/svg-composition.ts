@@ -1,5 +1,6 @@
+import { isActiveWetPaint } from './wet-operation';
 import type {DocumentData,LayerData,RasterLayerData,TextLayerData} from './model';
-import type {LayerMaskData} from './masks';
+import {visitLayerAssets} from './asset-references';
 import type {SvgDocument} from './svg-masks';
 import {svgEffectRegion} from './svg-styles';
 
@@ -7,6 +8,7 @@ export interface SvgCompositionPlan {
  document:DocumentData&SvgDocument;
  prefixes:number;
  adjustments:number;
+ wetPaint:number;
  blendIf:number;
  stacks:readonly string[];
  nativeAssets:ReadonlySet<string>;
@@ -20,25 +22,22 @@ export interface SvgCompositionPlan {
  */
 export function planSvgComposition(document:DocumentData):SvgCompositionPlan{
  const prefixes=new Map<string,readonly LayerData[]>(),nativeAssets=new Set<string>(),nativeTexts:TextLayerData[]=[],stacks:string[]=[];
- let adjustments=0,blendIf=0;
- function mask(value?:LayerMaskData|null){if(value?.enabled&&value.density>0&&value.kind==='bitmap')nativeAssets.add(value.assetId);}
+ let adjustments=0,blendIf=0,wetPaint=0;
  function inspect(nodes:readonly LayerData[],native:boolean){for(const layer of nodes){
   if(!layer.visible||layer.opacity===0)continue;
   if(native){
-   mask(layer.mask);if(layer.kind==='smart-object')mask(layer.filterMask);
-   if(layer.kind==='raster')nativeAssets.add(layer.assetId);
-   else if(layer.kind==='paint'){for(const stroke of layer.strokes)if(stroke.kind==='clone')for(const tile of stroke.tiles)nativeAssets.add(tile.assetId);}
-   else if(layer.kind==='text')nativeTexts.push(layer);
-   if(layer.kind==='adjustment'&&layer.adjustment.kind==='patch')nativeAssets.add(layer.adjustment.assetId);
+   visitLayerAssets(layer,reference=>nativeAssets.add(reference.assetId));
+   if(layer.kind==='text')nativeTexts.push(layer);
   }else{
    if(layer.kind==='adjustment')adjustments++;
+   if(layer.kind==='paint'&&layer.strokes.some(isActiveWetPaint))wetPaint++;
    if(layer.styles?.blendIf.enabled)blendIf++;
   }
   if(layer.kind==='group')inspect(layer.children,native);
  }}
  function walk(nodes:LayerData[],path:string[]=[]):LayerData[]{
   let through=-1;
-  nodes.forEach((layer,i)=>{if(layer.visible&&layer.opacity>0&&(layer.kind==='adjustment'||layer.styles?.blendIf.enabled))through=i;});
+  nodes.forEach((layer,i)=>{if(layer.visible&&layer.opacity>0&&(layer.mask?.kind==='raster-erasures'||layer.kind==='adjustment'||(layer.blendMode==='linear-light'||layer.blendMode==='linear-burn')||layer.styles?.blendIf.enabled||(layer.kind==='group'&&layer.blendMode==='pass-through')||(layer.kind==='paint'&&layer.strokes.some(isActiveWetPaint))))through=i;});
   const output:LayerData[]=[];
   if(through>=0){
    const prefix=nodes.slice(0,through+1),last=nodes[through];
@@ -52,5 +51,5 @@ export function planSvgComposition(document:DocumentData):SvgCompositionPlan{
  }
  inspect(document.children,false);
  const children=walk(document.children);
- return{document:prefixes.size?{...document,children,svgNativePrefixes:prefixes,svgSupport:svgEffectRegion(document)}:document,prefixes:prefixes.size,adjustments,blendIf,stacks,nativeAssets,nativeTexts};
+ return{document:prefixes.size?{...document,children,svgNativePrefixes:prefixes,svgSupport:svgEffectRegion(document)}:document,prefixes:prefixes.size,adjustments,wetPaint,blendIf,stacks,nativeAssets,nativeTexts};
 }
