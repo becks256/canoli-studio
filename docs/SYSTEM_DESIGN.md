@@ -1,5 +1,13 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Ordinary paint crop and retained-buffer invariant
+
+Untextured coverage on the same output-pixel lattice must be independent of viewport/export crop boundaries. Canonical native cells retain complete contributing primitives; oversized projected geometry uses bounded numerical pixel coverage. Preserve original sample indices, pressure, tilt, copy order and source geometry. Apply selection and whole-stroke opacity after raw stamp accumulation. Opaque shortcuts require certified complete pixels and identical destination bytes, rather than approximate edge coverage.
+
+Accepted active prefixes own mutable inputs. Yielded extensions stay private until current-generation publication; cancellation preserves a reusable accepted prefix and releases failed stages. One task deadline spans consecutive numerical primitives as well as pixel blocks. Every retained native padding surface counts toward the mask LRU alongside the raw viewport, including size changes at an existing key. Working-surface budgets never become authored image or geometry limits. Logical owned-buffer checks do not establish browser process-memory or physical-display acceptance.
+
+Normalize lattice indices only when an integral projected coordinate round-trips exactly through its inverse scale; preserve genuinely fractional origins. Retention epochs do not cancel independent reads. A busy mask-cache producer owns an exclusive lease: a second reader uses private work, and eviction/cache clearing retires the owner until its lease releases. Explicit caller cancellation still stops work and prevents partial publication.
+
 ## Shared native frequency radius and preview ownership — schema 37
 
 A group radius is a parent parameter, not a rewrite of locked band records. The nearest explicit finite value controls descendant native frequency filters in the same document plane; null inherits and component entry resets scope. Resolver-derived sigma never mutates serialized fallback values. Preserve effective scope when extracting artwork for rasterization, conversion, isolated Photoshop output or another document. LayerGroup commands enforce group/ancestor locks, field age and atomic history normally.

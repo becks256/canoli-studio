@@ -8,6 +8,16 @@ export interface RenderSpace {
   sx: number;
   sy: number;
 }
+/** Recover an exact integral pixel index after its inverse scale operation.
+ * This changes the lattice index only, never authored/render-space geometry. */
+export function projectedPixelOrigin(origin:number,scale:number){
+  const projected=origin*scale,integer=Math.round(projected);
+  return Number.isSafeInteger(integer)&&origin===integer/scale?integer:projected;
+}
+export function canonicalCellOffset(origin:number,scale:number,size:number){
+  const projected=projectedPixelOrigin(origin,scale),remainder=projected%size;
+  return -Math.floor(remainder<0?remainder+size:remainder);
+}
 export function createCanvas(
   width: number,
   height: number,

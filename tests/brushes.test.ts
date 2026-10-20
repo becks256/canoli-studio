@@ -53,6 +53,8 @@ if (typeof globalThis.document === "undefined") {
               scale() {},
               rotate() {},
               beginPath() {},
+              rect() {},
+              clip() {},
               closePath() {},
               moveTo() {},
               lineTo() {},

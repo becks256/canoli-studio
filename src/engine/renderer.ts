@@ -231,7 +231,7 @@ export class CanvasRenderer implements DocumentRenderer {
       bitmap,
       assets,
       retain?this.brushTextures:undefined,
-      ()=>this.epoch!==epoch||!!isCancelled?.(),
+      isCancelled,
     );
   }
 

@@ -19,6 +19,7 @@ import {
 } from "./drawing";
 
 import { CanvasCache } from "./cache";
+type ActiveMaskEntry={raster:ActiveStrokeRaster;bytes:number;busy:boolean;retired:boolean};
 
 /** Shared final coverage settings, after raw feathering and before masking artwork. */
 export function applyMaskSettings(canvas:HTMLCanvasElement,mask:LayerMaskData){
@@ -35,7 +36,7 @@ export function applyMaskSettings(canvas:HTMLCanvasElement,mask:LayerMaskData){
 export class PaintedMaskRaster {
   private active = new Map<
     string,
-    { raster: ActiveStrokeRaster; bytes: number }
+    ActiveMaskEntry
   >();
   private bytes = 0;
   private hits = 0;
@@ -54,29 +55,37 @@ export class PaintedMaskRaster {
     };
   }
   clear() {
-    for (const entry of this.active.values()) entry.raster.clear();
+    for (const entry of this.active.values()) this.retire(entry);
     this.active.clear();
     this.bytes = 0;
   }
+  private retire(entry:ActiveMaskEntry){entry.retired=true;if(!entry.busy)entry.raster.clear();}
   private surface(key: string, bytes: number) {
-    if (bytes > this.budget) return undefined;
     const found = this.active.get(key);
     if (found) {
+      // An independent reader must not supersede a yielded cache producer.
+      // It can replay privately while that producer owns its active surface.
+      if(found.busy)return undefined;
       this.active.delete(key);
-      this.active.set(key, found);
-      return found.raster;
+      if(found.bytes===bytes&&bytes<=this.budget){
+        this.active.set(key, found);
+        return found;
+      }
+      this.retire(found);
+      this.bytes-=found.bytes;
     }
+    if (bytes > this.budget) return undefined;
     while (this.bytes + bytes > this.budget || this.active.size >= 64) {
       const oldest = this.active.keys().next().value!;
       const entry = this.active.get(oldest)!;
-      entry.raster.clear();
+      this.retire(entry);
       this.active.delete(oldest);
       this.bytes -= entry.bytes;
     }
-    const raster = new ActiveStrokeRaster();
-    this.active.set(key, { raster, bytes });
+    const entry:ActiveMaskEntry={raster:new ActiveStrokeRaster(),bytes,busy:false,retired:false};
+    this.active.set(key,entry);
     this.bytes += bytes;
-    return raster;
+    return entry;
   }
   async render(
     mask: LayerMaskData,
@@ -130,12 +139,15 @@ export class PaintedMaskRaster {
       }
       if (!cachedPrefix && canCache())
         this.cache.write(cacheKey + ":prefix", prefixSignature, output);
-      const active = canCache()
-        ? this.surface(cacheKey, space.width * space.height * 4)
+      const last=mask.strokes.at(-1)!;
+      const entry = canCache()&&last.stroke.kind!=='wet'
+        ? this.surface(cacheKey,ActiveStrokeRaster.retainedBytes(last.stroke,space,world))
         : undefined;
+      const active=entry?.raster;
+      if(entry)entry.busy=true;
       const before = active?.appendedPoints ?? 0;
-      await drawMaskStroke(
-        mask.strokes.at(-1)!,
+      try{await drawMaskStroke(
+        last,
         output,
         space,
         x,
@@ -147,7 +159,7 @@ export class PaintedMaskRaster {
         assets,
         textures,
         isCancelled,
-      );
+      );}finally{if(entry){entry.busy=false;if(entry.retired)entry.raster.clear();}}
       if (active) this.appended += active.appendedPoints - before;
       if (canCache() && retainFull)
         this.cache.write(

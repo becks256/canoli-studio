@@ -1,5 +1,13 @@
 # Canoli Studio editor requirements
 
+## Ordinary paint crop consistency
+
+Untextured brush, pencil, eraser and clone coverage, fills, ordinary masks and filter masks must retain exact pixels across crops on the same output-pixel lattice and between cold/incremental replay. Preserve complete authored geometry when projected footprints exceed scratch budgets; do not cap or downsample source geometry. Numerical work must yield across long runs of accelerated stamps, reject superseded/resized presentation, own mutable accepted input and keep cancelled extensions private. Mask cache budgets include retained native padding and changing reservations at existing keys.
+
+Verify exact affine/scale/seam pixels, real oversized edits, source-coordinate precision, mutable-prefix invalidation, cancellation/input responsiveness and observed owned Canvas allocations. Existing source/history/project, 50 MP, export and supported-GPU tests remain required. Canonical antialiasing can change edge pixels relative to the former crop-sensitive renderer without changing authored data or persistent formats. Textured/wet crop stability, representative quality, sustained/editor-wide latency, hardware/tablet and process-memory acceptance remain open.
+
+Include non-binary fractional zooms and numerical/native vector coverage in lattice tests. Cache resets must not cancel independent direct mask reads; simultaneous readers at the same cache key retain their own exact results, and retiring an in-flight owner releases its buffers after the current read completes. Explicit caller cancellation remains authoritative.
+
 ## F05 live frequency preview and shared controls — functionally verified
 
 Prepare a full neutral native source privately once per dialog. Show actual low/detail native crops with original alpha, original comparison and pointer/keyboard panning; changing radius must show the latest actual worker result without queuing every intermediate slider value. Closing/cancel/Escape must release private resources and leave document/history/assets untouched. Create reuses that original-resolution capture and commits once. No fabricated progress, viewport downsampling of originals or new import cap.
