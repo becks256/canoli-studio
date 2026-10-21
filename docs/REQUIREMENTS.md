@@ -1,5 +1,11 @@
 # Canoli Studio editor requirements
 
+## Bitmap projection precision
+
+Large affine bitmap placements must retain native pixels and representable source geometry in raster layers, bitmap masks, textures, native wet reconstruction and filtered projections. Keep the existing Canvas path at ordinary placements; use double-precision sampling when projected coordinates cannot reliably retain subpixel geometry. Axis-aligned image edges retain the established half-pixel tie rule; sheared image edges use actual pixel area. Nearest and encoded-sRGB premultiplied-byte bilinear sampling must use the unchanged original bitmap, with bounded native reads and no source-size intermediate.
+
+Gathering must yield for cancellation and queued UI tasks. A texture batch may have only one numerical native reader active at a time; complete all captures before the existing validated worker conversion. Abort, source replacement/closure, clear and disposal must reject private results and prevent late conversion/publication. Cache retirement alone preserves independent readers. Capture mutable native canvases once and close private bitmap snapshots on success or rejection; never close borrowed original bitmaps. Mask retention distinguishes bitmap identities/dimensions. Verify mirrored/fractional/affine pixels, real oversized textured strokes, native 50 MP source/project preservation, software-GPU parity, full-batch event-loop turns and real production script/undo/reopen behavior. Working budgets are independent of original resolution. This does not establish general latency, process memory, physical-device or complete F14 acceptance.
+
 ## Ordinary paint crop consistency
 
 Untextured brush, pencil, eraser and clone coverage, fills, ordinary masks and filter masks must retain exact pixels across crops on the same output-pixel lattice and between cold/incremental replay. Preserve complete authored geometry when projected footprints exceed scratch budgets; do not cap or downsample source geometry. Numerical work must yield across long runs of accelerated stamps, reject superseded/resized presentation, own mutable accepted input and keep cancelled extensions private. Mask cache budgets include retained native padding and changing reservations at existing keys.

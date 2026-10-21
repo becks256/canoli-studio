@@ -1,3 +1,4 @@
+import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
 import { AffineTransform } from '../core/affine';
 import type { AssetStore } from '../core/assets';
 import type { WetPaintStrokeData } from '../core/wet-operation';
@@ -41,9 +42,9 @@ export async function compositeWetPaint(stroke: WetPaintStrokeData, assets: Asse
       check(); const bounds = placement.bounds(tile);
       if (bounds.x + bounds.width < 0 || bounds.y + bounds.height < 0 || bounds.x > target.width || bounds.y > target.height) continue;
       await validateWetPaintTile(tile, provider); check();
-      const mask = coverage.getContext('2d')!; mask.resetTransform(); mask.clearRect(0, 0, coverage.width, coverage.height); mask.setTransform(placement.a, placement.b, placement.c, placement.d, placement.e, placement.f); mask.drawImage(assets.get(tile.coverage.assetId).bitmap, tile.x, tile.y);
+      const mask = coverage.getContext('2d')!; mask.resetTransform(); mask.clearRect(0, 0, coverage.width, coverage.height); mask.setTransform(placement.a, placement.b, placement.c, placement.d, placement.e, placement.f); const coverageBitmap=assets.get(tile.coverage.assetId).bitmap;if(bitmapProjectionRequiresPrecision(placement,coverageBitmap.width,coverageBitmap.height))await drawProjectedBitmap(mask,coverageBitmap,placement.multiply(AffineTransform.translation(tile.x,tile.y)),{isCancelled});else mask.drawImage(coverageBitmap,tile.x,tile.y);
       context.resetTransform(); context.globalCompositeOperation = 'destination-out'; context.drawImage(coverage, 0, 0);
-      context.globalCompositeOperation = 'lighter'; context.setTransform(placement.a, placement.b, placement.c, placement.d, placement.e, placement.f); context.drawImage(assets.get(tile.assetId).bitmap, tile.x, tile.y);
+      context.globalCompositeOperation = 'lighter'; context.setTransform(placement.a, placement.b, placement.c, placement.d, placement.e, placement.f); const outputBitmap=assets.get(tile.assetId).bitmap;if(bitmapProjectionRequiresPrecision(placement,outputBitmap.width,outputBitmap.height))await drawProjectedBitmap(context,outputBitmap,placement.multiply(AffineTransform.translation(tile.x,tile.y)),{isCancelled});else context.drawImage(outputBitmap,tile.x,tile.y);
     }
     check(); const after = context.getImageData(0, 0, raw.width, raw.height).data;
     if (stroke.opacity === 1) { const result = target.getContext('2d')!; result.save(); try { result.resetTransform(); result.globalCompositeOperation = 'copy'; result.globalAlpha = 1; result.drawImage(raw, 0, 0); } finally { result.restore(); } return; }

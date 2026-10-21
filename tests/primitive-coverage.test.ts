@@ -100,3 +100,14 @@ it('lattice index normalization preserves genuinely fractional authored origins,
   expect(canonicalCellOffset(origin,1,256)).toBe(-Math.floor(remainder<0?remainder+256:remainder));
  }
 });
+
+
+it('huge circle chords do not turn an ulp into visible missing edge coverage',()=>{
+ for(const radius of [1024e9,1024e12]){
+  const sample=primitiveCoverage({a:radius,b:0,c:0,d:radius,e:-radius+.5,f:0},false,1);
+  // Stable sagitta expansion of the exact circle integral over y=[16,17].
+  // Its omitted term is far below this tolerance for these radii.
+  const expected=.5-(16*16+16+1/3)/(2*radius);
+  expect(sample(0,16)).toBeCloseTo(expected,9);
+ }
+});

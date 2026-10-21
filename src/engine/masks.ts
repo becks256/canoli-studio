@@ -218,7 +218,7 @@ const rawCoverage = (
       : mask.kind === "vector"
         ? vectorMask(mask, space, x, y, world)
         : mask.kind === "bitmap" && bitmap
-          ? bitmapMask(bitmap, space, x, y, world)
+          ? bitmapMask(bitmap, space, x, y, world,isCancelled)
           : createCanvas(space.width, space.height);
 
 /** Feather raw coverage before inversion/density; finite support preserves tile parity. */

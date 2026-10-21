@@ -1,3 +1,4 @@
+import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
 import { AffineTransform } from '../core/affine';
 import type { AssetStore } from '../core/assets';
 import { strokeBounds, type BrushStrokeData } from '../core/drawing';
@@ -46,7 +47,7 @@ export async function drawNativeWetContent(layer: PaintLayerData | RasterLayerDa
         if (preview) await drawPaint({ ...layer, kind: 'paint', strokes: [preview.stroke] }, assets, canvas, nativeSpace, AffineTransform.scale(source.width / layer.width, source.height / layer.height), processor, undefined, undefined, () => true, preview.cloneSource, isCancelled, textures, true);
       } else if (layer.kind === 'paint') for (const stroke of operations) await drawPaint({ ...layer, strokes: [stroke] }, assets, canvas, nativeSpace, new AffineTransform(), processor, undefined, undefined, () => true, stroke.id === preview?.stroke.id ? preview.cloneSource : undefined, isCancelled, textures, true);
       check(); context.save();
-      try { context.resetTransform(); context.beginPath(); context.rect(clip.x,clip.y,clip.width,clip.height); context.clip(); context.setTransform(placement.a, placement.b, placement.c, placement.d, placement.e, placement.f); context.drawImage(canvas, left, top); }
+      try { context.resetTransform(); context.beginPath(); context.rect(clip.x,clip.y,clip.width,clip.height); context.clip(); context.setTransform(placement.a, placement.b, placement.c, placement.d, placement.e, placement.f); if(bitmapProjectionRequiresPrecision(placement,canvas.width,canvas.height))await drawProjectedBitmap(context,canvas,placement.multiply(AffineTransform.translation(left,top)),{isCancelled});else context.drawImage(canvas, left, top); }
       finally { context.restore(); }
     } finally { release(canvas); }
     if (performance.now() >= deadline) { await yieldTask(); check(); deadline = performance.now() + 4; }

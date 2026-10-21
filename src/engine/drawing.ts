@@ -1,3 +1,4 @@
+import {drawProjectedBitmap} from './bitmap-projection';
 import {RawStrokeCoverage} from './paint-coverage';
 import {isImmutable} from '../core/immutable';
 import {hasWetMask,nativeWetMask} from './wet-mask';
@@ -31,7 +32,7 @@ import type {
   StrokePoint,
   VectorPathData,
 } from "../core/drawing";
-import { createCanvas, release, applyTransform,canonicalCellOffset } from "./canvas";
+import { createCanvas, release, applyTransform,renderTransform,canonicalCellOffset } from "./canvas";
 import type { RenderSpace } from "./canvas";
 import type { CanvasCache } from "./cache";
 import {hasMaskRefinements} from "../core/masks";
@@ -624,19 +625,19 @@ export async function drawMaskStroke(
   }
 }
 
-export function bitmapMask(
+export async function bitmapMask(
   bitmap: ImageBitmap | HTMLCanvasElement,
   space: RenderSpace,
   x: number,
   y: number,
   world = AffineTransform.translation(x, y),
-): HTMLCanvasElement {
+  isCancelled?:()=>boolean,
+): Promise<HTMLCanvasElement> {
   const canvas = createCanvas(space.width, space.height);
-  const context = canvas.getContext("2d")!;
-  applyTransform(context, space, world);
-  context.drawImage(bitmap, 0, 0);
-  context.resetTransform();
-  return canvas;
+  try{
+    await drawProjectedBitmap(canvas.getContext('2d')!,bitmap,renderTransform(space,world),{isCancelled});
+    return canvas;
+  }catch(error){release(canvas);throw error;}
 }
 
 /** Replay mask coverage, not artwork color. Opacity applies once per stroke. */
@@ -660,7 +661,7 @@ export async function paintedMask(
       : mask.kind === "vector"
         ? vectorMask(mask, space, x, y, world)
         : mask.kind === "bitmap" && bitmap
-          ? bitmapMask(bitmap, space, x, y, world)
+          ? await bitmapMask(bitmap, space, x, y, world,isCancelled)
           : createCanvas(space.width, space.height);
   const scratch = hasMaskRefinements(mask)
     ? createCanvas(space.width, space.height)

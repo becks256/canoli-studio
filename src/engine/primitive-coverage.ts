@@ -20,6 +20,12 @@ function gauss(order:number):readonly (readonly [number,number])[]{
 }
 const ROW_NODES=gauss(16),COLUMN_NODES=gauss(8);
 const clamp=(value:number)=>Math.max(0,Math.min(1,value));
+// Multiplying (r-t)*(r+t) is stable near the circle endpoint, but can lose
+// one ulp near t=0; a huge projected radius magnifies that into visible pixels.
+function chord(radius:number,t:number){
+  return Math.sqrt(Math.max(0,Math.abs(t)<radius*.5?radius*radius-t*t:(radius-t)*(radius+t)));
+}
+
 type Point={x:number;y:number};
 export interface PrimitiveCoverageSampler {
   (x:number,y:number):number;
@@ -76,7 +82,7 @@ export function primitiveCoverage(frame:AffineData,pencil:boolean,hardness:numbe
       for(const edge of [0,1]){
         const t=(edge-originX)/(radiusX*radius);
         if(Math.abs(t)>=1)continue;
-        const mid=originY+verticalSlope*(edge-originX),span=vertical*radius*Math.sqrt(Math.max(0,(1-t)*(1+t)));
+        const mid=originY+verticalSlope*(edge-originX),span=vertical*radius*chord(1,t);
         add(mid-span);add(mid+span);
       }
     }
@@ -87,14 +93,14 @@ export function primitiveCoverage(frame:AffineData,pencil:boolean,hardness:numbe
       if(half<=0)continue;
       for(const [node,weight] of ROW_NODES){
         const v=mid+half*node,t=(v-originY)/radiusY;
-        const mx=originX+horizontalSlope*(v-originY),span=horizontal*Math.sqrt(Math.max(0,(1-t)*(1+t)));
+        const mx=originX+horizontalSlope*(v-originY),span=horizontal*chord(1,t);
         const left=Math.max(0,mx-span),right=Math.min(1,mx+span);
         if(right<=left)continue;
         let line=right-left;
         if(!hard){
           line=0;const xs=[left,right];
           if(mx>left&&mx<right)xs.push(mx);
-          if(Math.abs(t)<hardness){const inner=horizontal*Math.sqrt(Math.max(0,(hardness-t)*(hardness+t)));for(const u of [mx-inner,mx+inner])if(u>left&&u<right)xs.push(u);}
+          if(Math.abs(t)<hardness){const inner=horizontal*chord(hardness,t);for(const u of [mx-inner,mx+inner])if(u>left&&u<right)xs.push(u);}
           xs.sort((a,b)=>a-b);
           for(let j=1;j<xs.length;j++){
             const hx=(xs[j]-xs[j-1])*.5,cx=xs[j-1]+hx;
@@ -145,7 +151,7 @@ export function primitiveCoverage(frame:AffineData,pencil:boolean,hardness:numbe
         }
       }else{
         const t=dy/radiusY;if(Math.abs(t)>=solidRadius)return null;
-        const center=frame.e+horizontalSlope*dy,span=horizontal*Math.sqrt(Math.max(0,(solidRadius-t)*(solidRadius+t)));
+        const center=frame.e+horizontalSlope*dy,span=horizontal*chord(solidRadius,t);
         low=Math.max(low,center-span);high=Math.min(high,center+span);
       }
     }

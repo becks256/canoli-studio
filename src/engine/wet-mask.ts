@@ -1,3 +1,4 @@
+import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
 import {AffineTransform} from '../core/affine';
 import type {LayerMaskData} from '../core/masks';
 import type {AssetStore} from '../core/assets';
@@ -23,7 +24,7 @@ export async function nativeWetMask(mask:LayerMaskData,space:RenderSpace,process
       check();const {x:left,y:top,width:nativeWidth,height:nativeHeight}=tile.native,clip=tile.output;
       const native=await paintedMask(mask,{x:left,y:top,width:nativeWidth,height:nativeHeight,sx:1,sy:1},0,0,processor,new AffineTransform(),bitmap,assets,textures,isCancelled,true);
       try{
-        check();context.save();try{context.resetTransform();context.beginPath();context.rect(clip.x,clip.y,clip.width,clip.height);context.clip();context.setTransform(placement.a,placement.b,placement.c,placement.d,placement.e,placement.f);context.drawImage(native,left,top);}finally{context.restore();}
+        check();context.save();try{context.resetTransform();context.beginPath();context.rect(clip.x,clip.y,clip.width,clip.height);context.clip();context.setTransform(placement.a,placement.b,placement.c,placement.d,placement.e,placement.f);if(bitmapProjectionRequiresPrecision(placement,native.width,native.height))await drawProjectedBitmap(context,native,placement.multiply(AffineTransform.translation(left,top)),{isCancelled});else context.drawImage(native,left,top);}finally{context.restore();}
       }finally{release(native);}
       if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+4;}
     }

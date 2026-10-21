@@ -1,3 +1,4 @@
+import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
 import {pixelWorkGrid, nativeSamplingGrid} from './pixel-work-grid';
 import {projectNativeMask} from "./projected-mask";
 import {frequencyIdentitySource,nativeFrequencyRasterSource} from './frequency-identity';
@@ -171,6 +172,8 @@ export class CanvasRenderer implements DocumentRenderer {
   private paintPrefixes = new Map<string, { layer: PaintLayerData; signature: string; basis: string }>();
   private assetIds = new WeakMap<AssetStore, number>();
   private nextAssetId = 0;
+  private maskSourceIds=new WeakMap<object,number>();
+  private nextMaskSourceId=0;
   private epoch = 0;
   private readonly fonts =
     typeof globalThis.document === "undefined"
@@ -210,30 +213,17 @@ export class CanvasRenderer implements DocumentRenderer {
     assets?: AssetStore,
     isCancelled?:()=>boolean,
   ) {
-    const epoch = this.epoch;
-    let bitmap: ImageBitmap | HTMLCanvasElement | undefined;
-    if (mask.kind === "bitmap" && assets && assets.has(mask.assetId)) {
-      bitmap = assets.get(mask.assetId).bitmap;
-    }
-    return maskCoverage(
-      mask,
-      space,
-      x,
-      y,
-      this.processor,
-      retain
-        ? {
-            paint: this.maskPaint,
-            key,
-            canCache: () => this.epoch === epoch,
-          }
-        : undefined,
-      world,
-      bitmap,
-      assets,
-      retain?this.brushTextures:undefined,
-      isCancelled,
+    const epoch = this.epoch,lifetime=assets?.captureLifetime();
+    const source=mask.kind==='bitmap'&&assets?.has(mask.assetId)?assets.get(mask.assetId):undefined;
+    const bitmap=source?.bitmap;
+    if(bitmap){let identity=this.maskSourceIds.get(bitmap);if(identity===undefined)this.maskSourceIds.set(bitmap,identity=++this.nextMaskSourceId);key+=`:source:${identity}:${bitmap.width}:${bitmap.height}`;}
+    const check=()=>{checkRenderCurrent(isCancelled);lifetime?.();if(source&&(!assets!.has(source.id)||assets!.get(source.id)!==source||source.bitmap!==bitmap))throw new Error('Mask source changed during projection.');return false;};
+    check();const output=await maskCoverage(
+      mask,space,x,y,this.processor,
+      retain?{paint:this.maskPaint,key,canCache:()=>{check();return this.epoch===epoch;}}:undefined,
+      world,bitmap,assets,retain?this.brushTextures:undefined,check,
     );
+    try{check();return output;}catch(error){release(output);throw error;}
   }
 
   private async raster(
@@ -242,6 +232,7 @@ export class CanvasRenderer implements DocumentRenderer {
     target: HTMLCanvasElement,
     space: RenderSpace,
     world: AffineTransform,
+    isCancelled?:()=>boolean,
   ) {
     const context = target.getContext("2d")!,
       asset = assets.get(layer.assetId);
@@ -262,24 +253,16 @@ export class CanvasRenderer implements DocumentRenderer {
         e.enabled &&
         (e.exposure !== 0 || e.contrast !== 0 || e.saturation !== 0),
     );
+    const mapping=placement.multiply(AffineTransform.scale(layer.width/asset.width,layer.height/asset.height)),bitmap=asset.bitmap,lifetime=assets.captureLifetime();
+    const checkSource=()=>{lifetime();checkRenderCurrent(isCancelled);if(!assets.has(asset.id)||assets.get(asset.id)!==asset||asset.bitmap!==bitmap)throw new Error('Raster source changed during projection.');};
     const draw = (target: CanvasRenderingContext2D, tileX = 0, tileY = 0) => {
-      target.save();
-      try {
-        target.setTransform(
-          placement.a,
-          placement.b,
-          placement.c,
-          placement.d,
-          placement.e - tileX,
-          placement.f - tileY,
-        );
-        target.drawImage(asset.bitmap, 0, 0, layer.width, layer.height);
-      } finally {
-        target.restore();
-      }
+      checkSource();
+      const matrix=AffineTransform.translation(-tileX,-tileY).multiply(mapping);
+      if(bitmapProjectionRequiresPrecision(matrix,asset.width,asset.height))return drawProjectedBitmap(target,bitmap,matrix,{isCancelled:()=>{checkSource();return false;}});
+      target.save();try{target.setTransform(placement.a,placement.b,placement.c,placement.d,placement.e-tileX,placement.f-tileY);target.drawImage(bitmap,0,0,layer.width,layer.height);}finally{target.restore();}
     };
     if (!effects.length) {
-      draw(context);
+      const drawing=draw(context);if(drawing)await drawing;checkSource();
       return;
     }
     for (let ty = top; ty < bottom; ty += 1024)
@@ -291,11 +274,12 @@ export class CanvasRenderer implements DocumentRenderer {
         );
         try {
           const c = tile.getContext("2d")!;
-          draw(c, tx, ty);
+          const drawing=draw(c,tx,ty);if(drawing)await drawing;
           const pixels = await this.processor.process(
             c.getImageData(0, 0, tile.width, tile.height).data,
             effects,
           );
+          checkSource();
           const adjusted = c.createImageData(tile.width, tile.height);
           adjusted.data.set(pixels);
           c.putImageData(adjusted, 0, 0);
@@ -516,7 +500,7 @@ export class CanvasRenderer implements DocumentRenderer {
             placement.f,
           );
           if (
-            !nativeFrame && drawCompletedFilterTile(
+            !nativeFrame && !bitmapProjectionRequiresPrecision(placement,tileRegion.width,tileRegion.height) && drawCompletedFilterTile(
               retention?.completed,
               tileRegion,
               filters,
@@ -551,16 +535,16 @@ export class CanvasRenderer implements DocumentRenderer {
             if(nativeFrame){
               const left=Math.max(0,tile.x),top=Math.max(0,tile.y),right=Math.min(master.width,tile.x+tile.canvas.width),bottom=Math.min(master.height,tile.y+tile.canvas.height);
               if(right>left&&bottom>top){
-                if(left===tile.x&&top===tile.y&&right===tile.x+tile.canvas.width&&bottom===tile.y+tile.canvas.height)context.drawImage(tile.canvas,tile.x,tile.y);
+                if(left===tile.x&&top===tile.y&&right===tile.x+tile.canvas.width&&bottom===tile.y+tile.canvas.height){if(bitmapProjectionRequiresPrecision(placement,tile.canvas.width,tile.canvas.height))await drawProjectedBitmap(context,tile.canvas,placement.multiply(AffineTransform.translation(tile.x,tile.y)),{isCancelled:options.isCancelled});else context.drawImage(tile.canvas,tile.x,tile.y);}
                 else {
                   // Use the actual image boundary, preserving Canvas edge-clamp sampling
                   // and geometric antialiasing instead of interpolating into padded transparency.
                   const edge=createCanvas(right-left,bottom-top,true);
-                  try{edge.getContext('2d')!.drawImage(tile.canvas,left-tile.x,top-tile.y,right-left,bottom-top,0,0,right-left,bottom-top);context.drawImage(edge,left,top);}
+                  try{edge.getContext('2d')!.drawImage(tile.canvas,left-tile.x,top-tile.y,right-left,bottom-top,0,0,right-left,bottom-top);if(bitmapProjectionRequiresPrecision(placement,edge.width,edge.height))await drawProjectedBitmap(context,edge,placement.multiply(AffineTransform.translation(left,top)),{isCancelled:options.isCancelled});else context.drawImage(edge,left,top);}
                   finally{release(edge);}
                 }
               }
-            }else context.drawImage(tile.canvas, tile.x, tile.y);
+            }else if(bitmapProjectionRequiresPrecision(placement,tile.canvas.width,tile.canvas.height))await drawProjectedBitmap(context,tile.canvas,placement.multiply(AffineTransform.translation(tile.x,tile.y)),{isCancelled:options.isCancelled});else context.drawImage(tile.canvas, tile.x, tile.y);
           } finally {
             release(tile.canvas);
           }
@@ -893,7 +877,7 @@ export class CanvasRenderer implements DocumentRenderer {
                 (previous.layer.erasures ?? []).every((entry, i) => entry === erasures[i]) &&
                 cache!.read(key, previous.signature, content);
               if (reusable) start = previous.layer.erasures?.length ?? 0;
-              else await this.raster(layer, assets, content, padded, world);
+              else await this.raster(layer, assets, content, padded, world,options.isCancelled);
               for (const entry of erasures.slice(start)) await drawPaint({ ...layer, kind: "paint", strokes: [entry.stroke] }, assets, content, padded, world.multiply(AffineTransform.scale(layer.width / entry.width, layer.height / entry.height)), this.processor, undefined, cache, canCache, undefined, options.isCancelled,options.cache===false?undefined:this.brushTextures);
               if (cache && canCache() && isImmutable(layer)) {
                 this.rasterPrefixes.delete(key);
@@ -977,13 +961,8 @@ export class CanvasRenderer implements DocumentRenderer {
                       const context = surface.getContext("2d")!;
                       const m = renderTransform(tileSpace, world);
                       context.setTransform(m.a, m.b, m.c, m.d, m.e, m.f);
-                      context.drawImage(
-                        bitmap,
-                        0,
-                        0,
-                        patch.width,
-                        patch.height,
-                      );
+                      if(bitmapProjectionRequiresPrecision(m,patch.width,patch.height))await drawProjectedBitmap(context,bitmap,m.multiply(AffineTransform.scale(patch.width/bitmap.width,patch.height/bitmap.height)),{isCancelled:options.isCancelled});
+                      else context.drawImage(bitmap,0,0,patch.width,patch.height);
                       const corrected = context.getImageData(
                         x - tx,
                         y - ty,

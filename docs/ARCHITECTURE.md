@@ -1,5 +1,13 @@
 # Architecture
 
+## Precision bitmap projection
+
+`engine/bitmap-projection.ts` preserves the ordinary Canvas draw path and selects a double-precision reference path when projected coordinates exceed the subpixel precision range of float32 drawing. It samples native 64×64 source patches through a 64-entry LRU, interpolates recovered encoded-sRGB premultiplied bytes, then writes bounded output patches. Axis-aligned image edges preserve existing half-pixel ties; affine image support uses exact square/pixel intersection. Original image resolution and bytes remain asset-owned. Mutable native canvases receive one privately owned ImageBitmap snapshot, closed on success or failure. Numerical loops check source/cancellation and yield at shared task boundaries.
+
+Raster/mask/texture, native wet and filtered projection callers share this boundary. Ordinary raster draws retain their original five-argument Canvas call and transform order. Raster and mask preparation pin source identity/lifetime; retained mask keys include bitmap identity and dimensions. Texture batches wait for capture/cache/error arrivals before flushing the existing worker conversion. Numerical captures run serially with a shared two-millisecond yield deadline, bounding active native tile retention to one reader per batch; clear/disposal/source changes reject before late worker conversion. Cache retirement remains separate from cancellation. A circle-chord expression selects the stable form near the center and near the endpoint, preventing one floating-point ulp from becoming visible missing coverage at huge radii.
+
+The native reader cache is a per-operation working bound, not a whole-process memory measurement. Original decoded assets, returned patches, renderer caches and other concurrent jobs retain independent ownership/budgets. Public OO mutation/history, document37/project3/workspace2, isolated scripting/plugin permissions and separate REST sessions are unchanged.
+
 ## Native frequency working partitions
 
 `engine/pixel-work-grid.ts` partitions independent raster work by aspect ratio. Linear Light/Burn retains the former 1024×1024 pixel budget, with at most 8192 pixels on a working edge. Pixel equations and worker snapshot/result validation stay unchanged; cancellation is checked before and after each awaited blend before publishing pixels.

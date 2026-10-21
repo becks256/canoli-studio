@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Large bitmap precision and ownership invariant
+
+A source bitmap's full geometry survives precision fallback. Recover native premultiplied bytes through bounded patch reads; choose numerical sampling from projected-coordinate precision, without limiting or resizing originals. Preserve axis-aligned half-pixel ties and integrate affine support in the output pixel plane. Only one numerical reader is active per texture batch; its 64 native 64×64 entries are bounded independently of source dimensions. Share a task deadline across captures and reject clear/disposal/source changes before worker conversion/publication. Cache retirement cannot cancel independent reads. Mutable native canvases are snapshotted once, private copies close exactly once, and original ImageBitmaps remain borrowed. Source identities participate in retained bitmap-mask keys. Renderer/schema/history/isolation contracts remain unchanged; memory and latency claims require separate measured evidence.
+
 ## Native raster work partition invariant
 
 Rectangular frequency sampling may reduce requests only without increasing estimated halo work. Include both nested composition projection margins before selecting a preferred 1,000,000-pixel job; retain existing native-source/placement eligibility, 256/512/1024 fallbacks and the 4 MP/8192-edge allocation checks. Independent Linear Light/Burn partitions retain the previous 1,048,576-pixel budget and 8192 working edges. Awaited work rechecks cancellation before publication. No working-grid choice changes original geometry, pixel equations, assets, OO mutation/history, persistent schemas or isolation.
