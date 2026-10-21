@@ -242,3 +242,25 @@ it("rejects oversized cumulative filter work before any canvas allocation", asyn
   ).rejects.toThrow(/working-tile budget/);
   expect(renders).toBe(0);
 });
+
+it('empty coverage retains each filter contract after dense requests reuse kernel memory',()=>{
+ const width=13,height=9,input=fixture(width,height);for(let i=3;i<input.length;i+=4)input[i]=0;const saved=input.slice();
+ for(const options of [{kind:'gaussian-blur',sigmaX:2},{kind:'unsharp-mask',sigmaX:2,amount:1},{kind:'frequency-band',band:'low',sigmaX:2},{kind:'frequency-band',band:'high',sigmaX:2},{kind:'frequency-band',band:'correction',sigmaX:2}]satisfies SpatialFilterOptions[]){
+  applySpatialFilter(kernel,fixture(width,height),width,height,options);const output=applySpatialFilter(kernel,input,width,height,options),expected=input.slice();
+  for(let p=0;p<width*height;p++){
+   if(options.kind==='gaussian-blur')expected.fill(0,p*4,p*4+4);
+   else if(options.kind==='frequency-band'){
+    for(let c=0;c<3;c++){const original=input[p*4+c];expected[p*4+c]=options.band==='low'?0:options.band==='high'?Math.min(255,Math.round(127.5+original/2)):255-(original<255&&original%2===0?1:0);}
+    expected[p*4+3]=255;
+   }
+  }
+  expect(output).toEqual(expected);expect(input).toEqual(saved);
+ }
+});
+for(const kind of ['gaussian-blur','unsharp-mask']as const)it(`${kind} preserves independent convolution across empty rows and source margins`,()=>{
+ const width=13,height=9,options:SpatialFilterOptions={kind,sigmaX:1.3,sigmaY:.7,amount:1.5,threshold:12};
+ for(const shape of ['corner','row','column','center']){
+  const input=fixture(width,height);for(let y=0;y<height;y++)for(let x=0;x<width;x++){const visible=shape==='corner'?x===0&&y===0:shape==='row'?y===4:shape==='column'?x===6:x>=5&&x<=7&&y>=3&&y<=5;input[(y*width+x)*4+3]=visible?128:0;}
+  const saved=input.slice(),output=applySpatialFilter(kernel,input,width,height,options),expected=reference(input,width,height,options);expect(Math.max(...output.map((v,i)=>Math.abs(v-expected[i])))).toBeLessThanOrEqual(1);expect(input).toEqual(saved);
+ }
+});

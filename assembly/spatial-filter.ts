@@ -16,15 +16,23 @@ export function spatialFilter(
   threshold: f64,
   band: i32,
 ): void {
-  for (let y: i32 = 0; y < height; y++)
+  // Transparent samples contribute positive zero to every accumulator. Trim
+  // only empty row margins, preserving the order of all retained operations.
+  let top = height, bottom: i32 = -1;
+  for (let y: i32 = 0; y < height; y++) {
+    let left: i32 = 0, right = width - 1;
+    while (left < width && load<u8>(ptr + <usize>((y * width + left) * 4 + 3)) === 0) left++;
+    while (right >= left && load<u8>(ptr + <usize>((y * width + right) * 4 + 3)) === 0) right--;
+    if (left <= right) { if (y < top) top = y; bottom = y; }
     for (let x: i32 = 0; x < width; x++) {
       let red: f64 = 0,
         green: f64 = 0,
         blue: f64 = 0,
         alpha: f64 = 0;
-      for (let dx: i32 = -radiusX; dx <= radiusX; dx++) {
+      const first = -radiusX > left - x ? -radiusX : left - x;
+      const last = radiusX < right - x ? radiusX : right - x;
+      for (let dx: i32 = first; dx <= last; dx++) {
         const sx = x + dx;
-        if (sx < 0 || sx >= width) continue;
         const source = ptr + <usize>((y * width + sx) * 4);
         const weight = load<f64>(weightsX + <usize>((dx + radiusX) * 8));
         const coverage = (<f64>load<u8>(source + 3) / 255) * weight;
@@ -39,15 +47,19 @@ export function spatialFilter(
       store<f64>(output + 16, blue);
       store<f64>(output + 24, alpha);
     }
+  }
+  // Horizontal filtering cannot introduce coverage in an empty source row.
+  // Keep the existing output order and skip only those identically zero rows.
   for (let y: i32 = 0; y < height; y++)
     for (let x: i32 = 0; x < width; x++) {
       let red: f64 = 0,
         green: f64 = 0,
         blue: f64 = 0,
         alpha: f64 = 0;
-      for (let dy: i32 = -radiusY; dy <= radiusY; dy++) {
+      const first = -radiusY > top - y ? -radiusY : top - y;
+      const last = radiusY < bottom - y ? radiusY : bottom - y;
+      for (let dy: i32 = first; dy <= last; dy++) {
         const sy = y + dy;
-        if (sy < 0 || sy >= height) continue;
         const source = scratch + <usize>((sy * width + x) * 32);
         const weight = load<f64>(weightsY + <usize>((dy + radiusY) * 8));
         red += load<f64>(source) * weight;
