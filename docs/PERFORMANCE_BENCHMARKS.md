@@ -645,3 +645,27 @@ This is one synthetic offscreen full-native low-retouch workload. Headless anima
 A full64-sample/1,000,000-pixel numerical texture batch initially starts all64 native captures before a queued timer can run. Serial gathering with a shared task deadline observes the timer before any native capture starts, then returns all64 outputs with every byte correct. This proves a task boundary in this fixture, not input-to-display p95 or physical60fps. Clear/dispose stop subsequent numerical probes and late worker conversion; cache retirement completes independent reads. Mutable Canvas inputs retain captured pixels and private bitmap snapshots close once on success/cancellation.
 
 The genuine50MP fixture retains its original10000×5000 decoded dimensions and exact source Blob through project reopening; complete extreme-view PNGs match an independent Pillow oracle and observed working canvases stay within4MP/8192 edges. This is scoped allocation evidence, not whole-process memory acceptance. All37 ordinary scene pairs and independently decoded74 PNGs remain exactly equal to the committed renderer. Existing editor-wide/sustained/release/device/quality/process-memory gates and the previous input-latency misses remain open.
+
+
+### 2026-10-21 — Texture input candidates deferred
+
+[Sealed input-optimization evaluation](benchmarks/texture-input-optimization-evaluation-2026-10-21.json) records three separate unprofiled normal-production studies on Linux/Chromium153.0.8010.12, AMD Ryzen9 3900X. Each study uses three alternating pairs against the unchanged1ceb9b2 renderer,12 tool/target/size fixtures and20 newly matching trusted inputs per gesture. The following values are median per-run p95 in milliseconds, written control→prototype. Each column has its own contemporaneous control. Do not pool baselines across studies.
+
+| Fixture | Mask endpoints | Both coverage bounds | Opaque regions only |
+| --- | ---: | ---: | ---: |
+| brush-layer | 14.0→15.2 | 13.2→14.1 | 14.8→14.3 |
+| eraser-filter-mask | 21.3→22.7 | 24.4→24.8 | 20.9→27.1 |
+| large-brush-layer | 16.7→17.1 | 14.8→17.0 | 17.0→15.4 |
+| large-eraser-filter-mask | 37.6→39.0 | 32.0→33.2 | 32.9→32.6 |
+| large-pencil-mask | 30.1→32.3 | 30.6→38.8 | 33.0→32.1 |
+| medium-brush-layer | 15.6→15.2 | 14.8→17.1 | 14.7→15.0 |
+| medium-eraser-filter-mask | 25.1→23.9 | 25.6→29.3 | 27.1→27.1 |
+| medium-pencil-mask | 29.6→28.3 | 31.9→40.1 | 31.3→29.8 |
+| near-large-brush-layer | 19.1→14.3 | 16.9→15.5 | 16.1→16.0 |
+| near-large-eraser-filter-mask | 29.9→35.2 | 31.7→31.6 | 30.7→31.6 |
+| near-large-pencil-mask | 33.0→31.7 | 31.4→39.8 | 31.3→32.6 |
+| pencil-mask | 12.7→14.7 | 12.4→12.9 | 14.3→14.2 |
+
+None is adopted. The endpoint experiment removes84 of105 diagnostic mixing requests but fails to improve large filter-mask input latency. Retaining both conservative bounds worsens all three large pencil-mask medians. Opaque-only retention reduces native coverage readbacks in a saturated-prefix regression while preserving the required one-pixel allocation probe, but its clean input results remain mixed; large individual inputs still reach81.6ms. Reduced traffic alone is not acceptance. Further mask-preparation and tile/RPC scheduling work remains necessary.
+
+Independent decoding checks all648 complete PNGs and648 checksummed projects across the18 runs. Every variant/control appearance is RGBA-exact; all21 points, one intended operation, original texture bytes and exact model/pixel undo survive. All216 native long-task controls are positive; no overlapping gesture long task is observed. Measured engine/WASM/release identities are frozen within every run, and no competing builds/tests or application edits run. Main engine behavior is unchanged. These paced synthetic Canvas-copy observations do not prove physical presentation, sustained/editor-wide response, representative-photo quality, hardware/tablet behavior or process-peak memory. The full original roadmap and33ms input gate remain open.
