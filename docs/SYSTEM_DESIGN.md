@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Bilateral source and finite-support invariant
+
+Bilateral denoise reads only original native neighbors in a finite square aperture. Its spatial sigma is radius/2 and its color sigma is encoded RGB root-mean-square distance. Coverage weights exclude hidden transparent RGB; normalization precedes strength interpolation and final byte rounding. Every output alpha and hidden zero-alpha pixel is copied from the center. No intermediate separable approximation or evolving output is sampled. Per-worker range/spatial caches retain at most 1560608/8712 bytes, independent of original geometry; callers and WASM receive private copies. Three explicit zero settings bypass resampling and SVG rasterization. Enabled native support remains additive across the filter stack. Root and embedded-master records require schema 39; all mutations use existing shared commands/undo/revisions/assets/isolation, with separate REST sessions.
+
 ## Median rank and source invariant
 
 Median denoise reads immutable native master RGBA. Each output channel is the lower alpha-weighted median of its finite square neighborhood; coverage and zero-alpha hidden RGB are copied exactly from the center. No source asset is rewritten, downsampled or replaced. Histograms slide over original samples, never previously filtered output. Cumulative support is additive across enabled filters; disabled/zero-radius entries are inert. Native crops include full support and transparent artboard padding, so retained and uncached tile interiors agree with whole-image processing. The fixed histogram workspace is 3096 bytes plus private input/output. Median data requires schema 38 at both root and embedded-master boundaries. UI/OO/REST/scripts use existing commands and ownership/undo, without new isolated privileges or browser/REST synchronization.

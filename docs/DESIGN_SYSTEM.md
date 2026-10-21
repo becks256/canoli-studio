@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Bilateral denoise controls
+
+Add Bilateral denoise to Smart filters. Reuse stack cards, enable/order/remove actions and existing paired controls: Denoise radius (integer 0–16 px), Color tolerance (0–255) and Denoise strength (0–1). Number fields allow fractional tolerance/strength and reject fractional radius. Preserve transient pointer/key previews, Escape cancellation, single committed undo and existing disabled/stale-target rules. Explain that smoothing retains strong color edges while larger settings can soften detail and transparency stays intact. No new shortcut/dialog/component library is introduced.
+
 ## Median denoise controls
 
 Expose Median denoise in the existing Smart filters type selector. Use the same stack cards, enabled checkbox, ordering/removal buttons and paired slider/number controls. Denoise radius is labeled in px, integer 0–32; exact fields reject fractions. Pointer/key gestures preview transiently, Escape cancels, and release commits one undo. Retain the normal disabled/locked/stale-target rules. Explain briefly that the filter removes isolated speckles, larger radii can soften fine detail and transparency stays intact. No new shortcut or separate dialog is needed.

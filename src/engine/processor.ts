@@ -1,5 +1,6 @@
 import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
 import { medianRadiusSchema } from '../core/smart/median-filter';
+import {bilateralOptionsSchema,type BilateralFilterOptions} from '../core/smart/bilateral-filter';
 import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSettings } from "../core/color-range";
 import { textureMaskOptionsSchema, type TextureMaskOptions, type TextureMaskSettings } from '../core/brush-texture';
 import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadOptions, type WetPaintLoadSettings, type WetPaintMixOptions, type WetPaintMixSettings, type WetPaintResult } from '../core/wet-paint';
@@ -100,6 +101,15 @@ export class PixelProcessor {
     });
     // Readiness remains rejectable for callers, even if shutdown precedes first use.
     void this.ready.catch(() => {});
+  }
+
+  async bilateralFilter(pixels:Uint8ClampedArray,width:number,height:number,options:BilateralFilterOptions):Promise<Uint8ClampedArray> {
+    const settings=bilateralOptionsSchema.parse(options);
+    if(!(pixels instanceof Uint8ClampedArray)||![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0)||width>8192||height>8192||width*height>4_000_000||pixels.length!==width*height*4)
+      throw new Error('Invalid bilateral-filter tile geometry.');
+    const length=pixels.length,result=await this.request(pixels.slice(),{bilateralFilter:{width,height,options:settings}});
+    if(!(result instanceof Uint8ClampedArray)||result.length!==length)throw new Error('Invalid bilateral-filter worker result.');
+    return result;
   }
 
   /** Capture before readiness/transfer; the caller keeps its original pixels. */
@@ -371,6 +381,7 @@ export class PixelProcessor {
         options: SpatialFilterOptions;
       };
       medianFilter?: {width:number;height:number;radius:number};
+      bilateralFilter?: {width:number;height:number;options:BilateralFilterOptions};
       donorSearch?: {
         width: number;
         height: number;

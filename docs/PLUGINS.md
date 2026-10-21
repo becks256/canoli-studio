@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Bilateral denoise value (schema 39)
+
+BilateralDenoiseFilter is available to existing isolated command code with the [scripting defaults, errors and example](SCRIPTING_API.md#bilateral-denoise-schema-39). It is an immutable authored value, applied through SmartObjectLayer/shared commands under existing document:write grants and host revision/asset validation. Installation stays inert and a successful script commits one undo entry. There is no additional pixel/file/network/provider service or permission. Root/embedded records require schema 39; project, workspace and plugin/recipe transport versions are unchanged.
+
 ## Median denoise value (schema 38)
 
 Existing isolated commands receive MedianFilter, with the same defaults/ranges and example as the [scripting guide](SCRIPTING_API.md#median-denoise-schema-38). It is a validated immutable value applied through SmartObjectLayer/shared commands. Existing document:write permission, host revision/asset validation and one-undo script commit apply; plugin installation remains inert. There is no pixel, file, font, network or provider service added by this filter. Project 3, workspace 2 and package API versions stay unchanged.

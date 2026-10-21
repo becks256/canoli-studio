@@ -1,5 +1,6 @@
 import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
 import { medianRadiusSchema } from '../core/smart/median-filter';
+import {bilateralOptionsSchema,bilateralWeights,type BilateralFilterOptions} from '../core/smart/bilateral-filter';
 import { colorRangeOptionsSchema, colorRangeSamples, type ColorRangeOptions } from "../core/color-range";
 import { textureMaskOptionsSchema, type TextureMaskOptions } from '../core/brush-texture';
 import { BRADFORD_D65_TO_D50, SRGB_TO_XYZ_D65, WHITE_POINT_D50, multiplyMatrix3x3 } from "../core/color/spaces";
@@ -44,6 +45,7 @@ interface QuickSelectionKernel {
 }
 
 export interface PixelKernel extends QuickSelectionKernel {
+  bilateralFilter(input:number,output:number,spatial:number,range:number,width:number,height:number,radius:number,amount:number):void;
   medianFilter(input:number,output:number,scratch:number,width:number,height:number,radius:number):void;
   encodeFrequencyBand(source:number,low:number,length:number,correction:boolean):void;
   compositeLinearBlend(source: number, backdrop: number, length: number, opacity: number, mode: number): void;
@@ -676,6 +678,26 @@ export function wasmDonorValidity(kernel: PixelKernel): DonorValidity {
     );
     return new Uint8Array(kernel.memory.buffer, output, count).slice();
   };
+}
+
+/** Full 2D worker kernel; source ownership and center alpha remain unchanged. */
+export function applyBilateralFilter(kernel:PixelKernel,pixels:Uint8ClampedArray,
+  width:number,height:number,options:BilateralFilterOptions):Uint8ClampedArray {
+  const settings=bilateralOptionsSchema.parse(options);
+  if(!(pixels instanceof Uint8ClampedArray)||![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0)||
+    width>8192||height>8192||width*height>4_000_000||pixels.length!==width*height*4)
+    throw new Error('Invalid bilateral-filter tile geometry.');
+  if(settings.radius===0||settings.colorSigma===0||settings.amount===0)return pixels.slice();
+  const length=pixels.length,input=pixels.buffer===kernel.memory.buffer?pixels.slice():pixels;
+  const weights=bilateralWeights(settings.radius,settings.colorSigma),ptr=Math.ceil(kernel.bufferOffset()/8)*8,output=ptr+length;
+  const spatial=Math.ceil((output+length)/8)*8,range=spatial+weights.spatial.byteLength,required=range+weights.range.byteLength;
+  if(!Number.isSafeInteger(required)||required>0x7fffffff)throw new Error('Bilateral-filter working buffers exceed the WASM addressable range.');
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Uint8ClampedArray(kernel.memory.buffer,ptr,length).set(input);
+  new Float64Array(kernel.memory.buffer,spatial,weights.spatial.length).set(weights.spatial);
+  new Float64Array(kernel.memory.buffer,range,weights.range.length).set(weights.range);
+  kernel.bilateralFilter(ptr,output,spatial,range,width,height,settings.radius,settings.amount);
+  return new Uint8ClampedArray(kernel.memory.buffer,output,length).slice();
 }
 
 /** Private output and a fixed 3096-byte histogram workspace; original RGBA stays untouched. */

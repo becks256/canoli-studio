@@ -32,7 +32,7 @@ test('documented isolated recipe prepares native pixels and commits one host und
  const result=await page.evaluate(async code=>{
   const {editor}=window.luma,before=editor.document.toJSON(),past=editor.document.getSnapshot().past.length,assets=editor.assetStore.values().length;
   const logs=await editor.runScript(code!);const after=editor.document.toJSON(),history=editor.document.getSnapshot().past.length-past;editor.document.undo();return{logs,history,undo:JSON.stringify(editor.document.toJSON())===JSON.stringify(before),assets:editor.assetStore.values().length-assets,schema:after.schemaVersion,originalHidden:after.children[0].visible===false};
- },code);expect(result).toMatchObject({history:1,undo:true,assets:1,schema:38,originalHidden:true});expect(result.logs.join(' ')).toContain('Frequency layers ready');
+ },code);expect(result).toMatchObject({history:1,undo:true,assets:1,schema:39,originalHidden:true});expect(result.logs.join(' ')).toContain('Frequency layers ready');
 });
 
 test('abort, human edits, selection changes and replaced assets reject private capture without output leaks',async({page})=>{
@@ -169,7 +169,7 @@ test('prepared native previews match actual bands, preserve source alpha and nev
    const abort=new AbortController();abort.abort();let cancelled=false;try{await prepared.preview({sigma:2},{signal:abort.signal});}catch{cancelled=true;}
    await prepared.commit({sigma:3});const after=editor.document.toJSON(),history=editor.document.getSnapshot().past.length-past;editor.document.undo();return{results,untouched,assetsUnchanged,historyUnchanged,cancelled,history,undo:JSON.stringify(editor.document.toJSON())===JSON.stringify(before),schema:after.schemaVersion};
   }finally{prepared.dispose();canvas.width=canvas.height=0;}
- });expect(result.untouched).toBe(true);expect(result.assetsUnchanged).toBe(true);expect(result.historyUnchanged).toBe(true);expect(result.cancelled).toBe(true);expect(result.history).toBe(1);expect(result.undo).toBe(true);expect(result.schema).toBe(38);for(const row of result.results){expect(row.error).toBeLessThanOrEqual(1);expect(row.alphaError).toBe(0);expect(row.released).toBe(true);expect(row.dimensions).toEqual([64,64,64]);}
+ });expect(result.untouched).toBe(true);expect(result.assetsUnchanged).toBe(true);expect(result.historyUnchanged).toBe(true);expect(result.cancelled).toBe(true);expect(result.history).toBe(1);expect(result.undo).toBe(true);expect(result.schema).toBe(39);for(const row of result.results){expect(row.error).toBeLessThanOrEqual(1);expect(row.alphaError).toBe(0);expect(row.released).toBe(true);expect(row.dimensions).toEqual([64,64,64]);}
 });
 
 test('live native preview responds to radius, pans with keyboard/pointer, compares original and cancels without document edits',async({page})=>{

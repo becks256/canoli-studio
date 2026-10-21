@@ -111,6 +111,8 @@ function inspectDocument(input: unknown, retainImmutable = false): {
           if (Number((input as SmartDocumentData).schemaVersion) < 11)
             throw new Error("Smart filters require schema version 11.");
           smartFiltersSchema.parse(layer.smartFilters);
+          if(Number((input as SmartDocumentData).schemaVersion)<39&&layer.smartFilters.some(f=>f.kind==='bilateral-denoise'))
+            throw new Error('Bilateral denoise filters require schema version 39.');
           if (Number((input as SmartDocumentData).schemaVersion) < 38 && layer.smartFilters.some(f=>f.kind==='median'))
             throw new Error('Median filters require schema version 38.');
           if (Number((input as SmartDocumentData).schemaVersion) < 36 && layer.smartFilters.some(f => f.kind === "frequency-band" || f.kind === "native-composition" || f.kind === "document-tone"))

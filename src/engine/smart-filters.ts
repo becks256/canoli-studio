@@ -168,6 +168,9 @@ export async function filteredMasterTile(
       pixels = sourcePixels!;
       for (const [index,filter] of filters.entries()) {
         if (!isActiveSmartFilter(filter) || filter.kind === "native-composition" || filter.kind === "document-tone") continue;
+        if(filter.kind==='bilateral-denoise'){
+          pixels=await processor.bilateralFilter(pixels,padded.width,padded.height,{radius:filter.radius,colorSigma:filter.colorSigma,amount:filter.amount});continue;
+        }
         if (filter.kind === 'median') {
           pixels=await processor.medianFilter(pixels,padded.width,padded.height,filter.radius);
           continue;

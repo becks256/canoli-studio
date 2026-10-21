@@ -1,5 +1,30 @@
 # Scripting API
 
+## Bilateral denoise (schema 39)
+
+`new BilateralDenoiseFilter(options?: {radius?:number; colorSigma?:number; amount?:number; enabled?:boolean; id?:string})` creates an immutable smart-filter value. Defaults: integer radius 2 (0–16 native master pixels), colorSigma 25 (finite 0–255 encoded byte levels), amount 0.5 (finite 0–1), enabled true and generated nonblank ID. Null, nonfinite/out-of-range values, fractional radius and unknown fields reject. Serialized data is `{kind:"bilateral-denoise",id,enabled,radius,colorSigma,amount}`; root/embedded-master records require schema 39. Older documents remain readable without added defaults/filters. Project 3/workspace 2 and recipe/plugin transport versions are unchanged.
+
+The full 2D square neighborhood uses spatial sigma radius/2 and RGB root-mean-square range sigma colorSigma. Neighbor weight is alpha * exp(-2*(dx²+dy²)/radius²) * exp(-(dr²+dg²+db²)/(6*colorSigma²)). Normalize weighted RGB, blend that mean with the original center by amount, then round once to bytes. Center alpha and zero-alpha hidden RGB stay intact. Transparent/outside-artboard samples have no influence. Radius 0, colorSigma 0, amount 0 or disabled entries bypass processing and resampling/SVG baking. Larger settings can soften fine detail. This is local encoded RGB8 smoothing, not RAW/scene-linear development, a learned noise model or a camera-quality claim.
+
+Use existing SmartObjectLayer.addFilter/setFilters and detached smartFilters snapshots. Ordered execution is in master pixels before placement; existing filter masks blend original/filtered native pixels. Locks, duplicate IDs, stale host revisions, synchronous transactions and one-undo isolated commits retain their existing contracts. Internal worker tiles/tables are budgeted independently of original-image dimensions. Isolated scripts author filter values, not worker pixel jobs; REST retains its separate session and does not render/synchronize browser output.
+
+<!-- example: bilateral-denoise -->
+```js
+const selected = document.selectedLayer;
+const target = selected instanceof RasterLayer
+  ? selected.convertToSmartObject()
+  : selected;
+if (!(target instanceof SmartObjectLayer))
+  throw new Error("Select a raster image or smart object.");
+target.addFilter(new BilateralDenoiseFilter({
+  radius: 3, colorSigma: 20, amount: 0.75
+}));
+document.selectedLayer = target;
+print("Bilateral denoise ready");
+```
+
+A successful script commits one undo entry, including conversion if needed; failure discards both. Original source bytes stay in the project. Smart filters exposes the same controls, ordering, disabling and removal with transient preview/Escape.
+
 ## Median denoise (schema 38)
 
 `new MedianFilter(options?: {radius?:number; enabled?:boolean; id?:string})` creates an immutable smart-filter value. Defaults: radius 1, enabled true, generated nonblank ID. Radius accepts integers 0–32 in native master pixels; 0 is a byte-exact no-op. Null, nonfinite, fractional, out-of-range and unknown options reject. Serialized data is `{kind:"median",id,enabled,radius}` and requires schema 38, including inside component masters. Existing documents remain readable and acquire no new filters automatically.
@@ -218,7 +243,7 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `document`                                                   | A snapshot-backed `Document` representing the active composition at the start of the run. It is the editor document model, not the HTML document.            |
 | `Document`                                                   | Constructor for a separate in-memory document. Creating one does not open or replace the active composition.                                                 |
 | `SmartObjectLayer`                                           | Constructor for a placed instance of an embedded shared master.                                                                                              |
-| `GaussianBlurFilter`, `MedianFilter`, `UnsharpMaskFilter`, `SmartToneFilter`, `FrequencyBandFilter`, `NativeCompositionFilter`, `DocumentToneFilter` | Immutable filter values for per-instance smart-filter stacks.                                                                                                |
+| `GaussianBlurFilter`, `MedianFilter`, `BilateralDenoiseFilter`, `UnsharpMaskFilter`, `SmartToneFilter`, `FrequencyBandFilter`, `NativeCompositionFilter`, `DocumentToneFilter` | Immutable filter values for per-instance smart-filter stacks.                                                                                                |
 | `RasterLayer`                                                | Constructor for an image layer referring to an existing asset.                                                                                               |
 | `LayerGroup`                                                 | Constructor for an ordered group of layers.                                                                                                                  |
 | `PaintLayer`                                                 | Constructor for ordered brush/pencil/clone/fill strokes and prepared wet replacements.                                                                              |
@@ -2306,6 +2331,7 @@ Images decode in a private store before a single destination transaction install
 
 | Constructor                        | Options and defaults                                                                                         |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `new BilateralDenoiseFilter(options?)` | Integer radius 2 (0–16), colorSigma 25 (0–255), amount 0.5 (0–1), enabled true, generated ID. |
 | `new MedianFilter(options?)` | Integer `radius:1` (0–32), enabled true, generated ID; alpha-preserving median denoise. |
 | `new GaussianBlurFilter(options?)` | `sigma: 1`, `enabled: true`, generated `id`. Sigma is finite, 0–4096/3 master pixels.                        |
 | `new UnsharpMaskFilter(options?)`  | `sigma: 1`, `amount: 1` (0–5), `threshold: 0` (0–255), `enabled: true`, generated `id`.                      |

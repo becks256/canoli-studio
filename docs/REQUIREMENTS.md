@@ -1,5 +1,11 @@
 # Canoli Studio editor requirements
 
+## Edge-preserving bilateral denoise (F12 increment, schema 39)
+
+Smart filters includes Bilateral denoise with exact paired controls for integer Denoise radius 0–16 px (default 2), Color tolerance 0–255 (default 25), and Denoise strength 0–1 (default 0.5). Preview/Escape, enable/order/remove, locks and single committed undo follow existing controls. Zero in any parameter must preserve unfiltered affine pixels and editable SVG geometry. Invalid/null/nonfinite/fractional radius and unknown options reject through UI/OO/commands and strict REST. Larger neighborhoods/tolerance/strength may soften detail.
+
+Use a complete two-dimensional alpha-weighted bilateral RGB8 mean before instance placement. Preserve center alpha, hidden zero-alpha RGB and original assets/dimensions. Independent equations, controlled fine-noise reduction/edge fixtures, native halo crops/cache/masks, project/PNG round trips and a true 50 MP source verify the increment. Controlled noise results do not establish camera/photo quality, RAW development, high-precision denoise, universal speed or full F12/F14 completion. Broader photographic, device/memory and roadmap gates remain open.
+
 ## Median denoise (F12 increment, schema 38)
 
 Users can convert a raster to a smart object and add Median denoise from Smart filters. Radius defaults to 1 native pixel, accepts integers 0–32, and zero restores unchanged pixels. Controls must reject fractional input, support exact typing and cancellable keyboard/pointer previews, and share ordinary history, enable/reorder/remove and lock behavior. The filter removes isolated bright/dark speckles with an alpha-weighted per-channel lower median; it preserves center alpha, ignores transparent neighbors and keeps original assets immutable. Larger radii may remove fine detail; it is not a RAW/develop or complete noise-reduction suite.

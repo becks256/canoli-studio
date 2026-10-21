@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import {
   GaussianBlurFilter,
   MedianFilter,
+  BilateralDenoiseFilter,
   FrequencyBandFilter,
   NativeCompositionFilter,
   DocumentToneFilter,
@@ -19,6 +20,7 @@ import { InspectorSection } from "./InspectorSection";
 import "./SmartFiltersPanel.css";
 
 const names = {
+  'bilateral-denoise':'Bilateral denoise',
   median: 'Median denoise',
   "gaussian-blur": "Gaussian blur",
   "frequency-band": "Frequency band",
@@ -29,6 +31,9 @@ const names = {
 };
 function construct(data: SmartFilterData): SmartFilter {
   switch (data.kind) {
+    case 'bilateral-denoise': {
+      const {kind:_,...options}=data;return new BilateralDenoiseFilter(options);
+    }
     case 'median': {
       const {kind:_,...options}=data;
       return new MedianFilter(options);
@@ -55,7 +60,7 @@ function construct(data: SmartFilterData): SmartFilter {
 }
 type Field = {
   key:
-    "radius" | "sigma" | "amount" | "threshold" | "exposure" | "contrast" | "saturation";
+    "radius" | "colorSigma" | "sigma" | "amount" | "threshold" | "exposure" | "contrast" | "saturation";
   label: string;
   min: number;
   max: number;
@@ -64,6 +69,11 @@ type Field = {
   scale?: "quadratic";
 };
 function fields(filter: SmartFilterData): Field[] {
+  if(filter.kind==='bilateral-denoise')return [
+    {key:'radius',label:'Denoise radius',min:0,max:16,step:1,suffix:'px'},
+    {key:'colorSigma',label:'Color tolerance',min:0,max:255,step:.1},
+    {key:'amount',label:'Denoise strength',min:0,max:1,step:.05},
+  ];
   if (filter.kind === 'median') return [{key:'radius',label:'Denoise radius',min:0,max:32,step:1,suffix:'px'}];
   if(filter.kind === "native-composition") return [];
   if (filter.kind === "tone" || filter.kind === "document-tone")
@@ -170,7 +180,7 @@ export function SmartFiltersPanel({
   };
   const add = () => {
     const filter =
-      kind === 'median' ? new MedianFilter() : kind === "document-tone" ? new DocumentToneFilter() : kind === "native-composition" ? new NativeCompositionFilter() : kind === "frequency-band" ? new FrequencyBandFilter() : kind === "gaussian-blur"
+      kind === 'bilateral-denoise' ? new BilateralDenoiseFilter() : kind === 'median' ? new MedianFilter() : kind === "document-tone" ? new DocumentToneFilter() : kind === "native-composition" ? new NativeCompositionFilter() : kind === "frequency-band" ? new FrequencyBandFilter() : kind === "gaussian-blur"
         ? new GaussianBlurFilter()
         : kind === "unsharp-mask"
           ? new UnsharpMaskFilter()
@@ -261,6 +271,7 @@ export function SmartFiltersPanel({
                 </label>
                 {filter.kind==='frequency-band'&&sharedRadius!==undefined&&<p className="section-description">Radius follows the shared frequency group controls.</p>}
                 {filter.kind==='median'&&<p className="section-description">Removes isolated speckles. Larger radii can soften fine detail; transparency stays intact.</p>}
+                {filter.kind==='bilateral-denoise'&&<p className="section-description">Smooths fine noise while retaining strong color edges. Larger settings can soften detail; transparency stays intact.</p>}
                 {fields(filter).filter(field=>!(filter.kind==='frequency-band'&&sharedRadius!==undefined&&field.key==='sigma')).map((field) => (
                   <Slider
                     key={field.key}
@@ -271,7 +282,7 @@ export function SmartFiltersPanel({
                     min={field.min}
                     max={field.max}
                     step={field.step}
-                    integer={filter.kind === 'median'}
+                    integer={filter.kind === 'median' || (filter.kind==='bilateral-denoise'&&field.key==='radius')}
                     scale={field.scale}
                     suffix={field.suffix}
                     disabled={disabled || !filter.enabled}

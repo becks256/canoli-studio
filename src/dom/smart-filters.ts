@@ -1,5 +1,6 @@
 import { id } from "../core/model";
 import { medianFilterSchema } from '../core/smart/median-filter';
+import {bilateralFilterSchema,type BilateralFilterOptions} from '../core/smart/bilateral-filter';
 import { documentToneFilterSchema, nativeCompositionFilterSchema, frequencyBandFilterSchema, smartFilterSchema, type SmartFilterData } from "../core/smart/filters";
 export abstract class SmartFilter {
   private readonly data: SmartFilterData;
@@ -21,6 +22,13 @@ export abstract class SmartFilter {
   }
 }
 type Options = { id?: string; enabled?: boolean };
+export class BilateralDenoiseFilter extends SmartFilter {
+  constructor(options:Options & Partial<BilateralFilterOptions>={}) {
+    const settings=bilateralFilterSchema.omit({kind:true}).partial().strict().parse(options);
+    super({kind:'bilateral-denoise',id:settings.id??id(),enabled:settings.enabled??true,
+      radius:settings.radius??2,colorSigma:settings.colorSigma??25,amount:settings.amount??.5});
+  }
+}
 export class MedianFilter extends SmartFilter {
   constructor(options: Options & { radius?: number } = {}) {
     const settings = medianFilterSchema.omit({kind:true}).partial().strict().parse(options);

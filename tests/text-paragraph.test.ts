@@ -68,7 +68,7 @@ describe('paragraph layout and shared mutation contracts', () => {
   it('upgrades every valid earlier root/history without injecting paragraph properties', () => {
     const doc=new Document();doc.layers.add(new TextLayer({text:'Legacy'}));doc.name='Later';
     for(let schemaVersion=1;schemaVersion<SCHEMA_VERSION;schemaVersion++){
-      const restored=Document.fromJSON({...doc.toJSON(),schemaVersion});expect(restored.toJSON().schemaVersion).toBe(38);
+      const restored=Document.fromJSON({...doc.toJSON(),schemaVersion});expect(restored.toJSON().schemaVersion).toBe(39);
       for(const key of ['wrapWidth','paragraphSpacing','firstLineIndent'])expect(restored.toJSON().children[0]).not.toHaveProperty(key);
     }
     const state=doc.getSnapshot(),old=(value:ReturnType<Document['toJSON']>)=>({...value,schemaVersion:25 as const});

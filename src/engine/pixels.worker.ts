@@ -26,6 +26,7 @@ import { applyEncodedFrequencyBand, applyLinearBlend, applyRedEye, applyHsl, app
 import type { ChromaticAdjustmentData } from "../core/adjustments";
 import type { HslAdjustmentData } from "../core/adjustments";
 import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
+import type {BilateralFilterOptions} from '../core/smart/bilateral-filter';
 import {
   findRetouchDonor,
   type DonorSearchOptions,
@@ -37,6 +38,7 @@ import type { DodgeBurnOptions } from "../core/retouch/types";
 import {
   applySpatialFilter,
   applyMedianFilter,
+  applyBilateralFilter,
   featherAlpha,
   applyBlendIf,
   applyTone,
@@ -86,6 +88,7 @@ self.onmessage = async (
       options: SpatialFilterOptions;
     };
     medianFilter?: {width:number;height:number;radius:number};
+    bilateralFilter?: {width:number;height:number;options:BilateralFilterOptions};
     donorSearch?: {
       width: number;
       height: number;
@@ -261,6 +264,10 @@ self.onmessage = async (
       );
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
       return;
+    }
+    if(data.bilateralFilter){
+      const {width,height,options}=data.bilateralFilter,pixels=applyBilateralFilter(await kernel,data.pixels,width,height,options);
+      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});return;
     }
     if (data.medianFilter) {
       const {width,height,radius}=data.medianFilter;

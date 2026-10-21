@@ -42,6 +42,7 @@ export {
   SmartFilter,
   GaussianBlurFilter,
   MedianFilter,
+  BilateralDenoiseFilter,
   FrequencyBandFilter,
   NativeCompositionFilter,
   DocumentToneFilter,
