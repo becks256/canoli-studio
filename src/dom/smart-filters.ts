@@ -1,4 +1,5 @@
 import { id } from "../core/model";
+import { medianFilterSchema } from '../core/smart/median-filter';
 import { documentToneFilterSchema, nativeCompositionFilterSchema, frequencyBandFilterSchema, smartFilterSchema, type SmartFilterData } from "../core/smart/filters";
 export abstract class SmartFilter {
   private readonly data: SmartFilterData;
@@ -20,6 +21,12 @@ export abstract class SmartFilter {
   }
 }
 type Options = { id?: string; enabled?: boolean };
+export class MedianFilter extends SmartFilter {
+  constructor(options: Options & { radius?: number } = {}) {
+    const settings = medianFilterSchema.omit({kind:true}).partial().strict().parse(options);
+    super({kind:'median', id:settings.id ?? id(), enabled:settings.enabled ?? true, radius:settings.radius ?? 1});
+  }
+}
 export class GaussianBlurFilter extends SmartFilter {
   constructor(options: Options & { sigma?: number } = {}) {
     super({

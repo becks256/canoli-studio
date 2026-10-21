@@ -1,4 +1,5 @@
 import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
+import { medianRadiusSchema } from '../core/smart/median-filter';
 import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSettings } from "../core/color-range";
 import { textureMaskOptionsSchema, type TextureMaskOptions, type TextureMaskSettings } from '../core/brush-texture';
 import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadOptions, type WetPaintLoadSettings, type WetPaintMixOptions, type WetPaintMixSettings, type WetPaintResult } from '../core/wet-paint';
@@ -99,6 +100,17 @@ export class PixelProcessor {
     });
     // Readiness remains rejectable for callers, even if shutdown precedes first use.
     void this.ready.catch(() => {});
+  }
+
+  /** Capture before readiness/transfer; the caller keeps its original pixels. */
+  async medianFilter(pixels:Uint8ClampedArray,width:number,height:number,radius:number):Promise<Uint8ClampedArray> {
+    medianRadiusSchema.parse(radius);
+    if (!(pixels instanceof Uint8ClampedArray) || ![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0) || width>8192 || height>8192 || width*height>4_000_000 || pixels.length!==width*height*4)
+      throw new Error('Invalid median-filter tile geometry.');
+    const length=pixels.length, result=await this.request(pixels.slice(),{medianFilter:{width,height,radius}});
+    if (!(result instanceof Uint8ClampedArray) || result.length!==length)
+      throw new Error('Invalid median-filter worker result.');
+    return result;
   }
 
   /** Snapshot inputs before worker readiness; callers keep their source buffers. */
@@ -358,6 +370,7 @@ export class PixelProcessor {
         height: number;
         options: SpatialFilterOptions;
       };
+      medianFilter?: {width:number;height:number;radius:number};
       donorSearch?: {
         width: number;
         height: number;

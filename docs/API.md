@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Median smart filter (schema 38)
+
+The existing strict smartObject.filters command accepts `{id:string,kind:"median",enabled:boolean,radius:number}`. Radius must be an integer 0–32 native master pixels; fields are required in serialized commands, unknown fields reject, and zero is inert. The OO value is `new MedianFilter({radius?:number,id?:string,enabled?:boolean})`, defaulting to radius 1, generated ID and enabled true. Apply through `SmartObjectLayer.addFilter` or `setFilters`. Revision conflicts, locked instances/ancestors, invalid values and duplicate IDs reject atomically through the existing command endpoint; undo/redo retain the complete stack. Headless REST stores these edits in its separate session and does not render or synchronize browser pixels. Project/schema admission checks include embedded masters; transport versions are unchanged. See the [scripting example](SCRIPTING_API.md#median-denoise-schema-38).
+
 ## Shared frequency controls (schema 37)
 
 Existing strict layer.update patches accept `frequencyRadius:number|null` only on a group. Finite values span0–4096/3 native master pixels; null inherits an enclosing controller or restores individual filter fallbacks. The nearest group controls descendant frequency filters in its document plane; component masters have independent scopes. A group/ancestor lock, wrong layer kind, invalid value or stale expectedRevision rejects the whole batch; changing one group radius is one undoable command and does not unlock/mutate protected correction children. The public OO surface is LayerGroup.frequencyRadius and Layer.frequencyGroup. Schema37 field-age checks include embedded masters. Existing36 filters remain readable and independent until placed under an explicit controller.

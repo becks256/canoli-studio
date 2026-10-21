@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Median denoise controls
+
+Expose Median denoise in the existing Smart filters type selector. Use the same stack cards, enabled checkbox, ordering/removal buttons and paired slider/number controls. Denoise radius is labeled in px, integer 0–32; exact fields reject fractions. Pointer/key gestures preview transiently, Escape cancels, and release commits one undo. Retain the normal disabled/locked/stale-target rules. Explain briefly that the filter removes isolated speckles, larger radii can soften fine detail and transparency stays intact. No new shortcut or separate dialog is needed.
+
 ## Native frequency preview and shared-radius interactions
 
 Use the custom modal with two native-pixel panes: Color and tone, and Fine detail. Separation radius pairs a slider/exact input. Show original is an explicit pressed-state comparison, using retained pixels. Pan either pane by dragging or focused arrow keys; Shift moves 10 pixels. Explain neutral source bands and retained final-layer appearance. Report the rendered radius/coordinates, show genuine capture/preview/commit state, and keep Cancel/close/Escape available. Prevent stale frames from replacing newer choices. Keep commit errors visible after preparation settles; allow retry of the same current capture and setting without changing the document first. Keep the panes readable/scrollable in short or narrow windows.

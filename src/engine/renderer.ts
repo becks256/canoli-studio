@@ -20,7 +20,7 @@ import {
 import { FilterTileCache } from "./filter-tile-cache";
 import { drawNativeWetContent, hasWetContent } from './wet-native';
 import { filteredMasterTile, drawCompletedFilterTile } from "./smart-filters";
-import { smartFilterHalo } from "../core/smart/filters";
+import { smartFilterHalo, isActiveSmartFilter } from "../core/smart/filters";
 import type { SmartObjectInstanceData } from "../core/smart/types";
 import { createDocument, createRaster } from "../core/model";
 import { ComponentRegistry } from "../core/smart/manager";
@@ -409,7 +409,7 @@ export class CanvasRenderer implements DocumentRenderer {
         : undefined;
     const inverse = placement.inverse();
     const filters = (layer.smartFilters ?? []).filter(filter=>filter.kind!=="document-tone");
-    const lastNative=filters.filter(filter=>filter.enabled).at(-1);
+    const lastNative=filters.filter(isActiveSmartFilter).at(-1);
     const nativeFrame = !lastNative || lastNative.kind === "native-composition" || lastNative.kind === "frequency-band";
     const sourceSignature=JSON.stringify([[...registry.reachableFrom(layer.componentId)].sort().map(id=>registry.get(id)),master.width,master.height]);
     const filterSignature=JSON.stringify([sourceSignature,filters]);

@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Median denoise value (schema 38)
+
+Existing isolated commands receive MedianFilter, with the same defaults/ranges and example as the [scripting guide](SCRIPTING_API.md#median-denoise-schema-38). It is a validated immutable value applied through SmartObjectLayer/shared commands. Existing document:write permission, host revision/asset validation and one-undo script commit apply; plugin installation remains inert. There is no pixel, file, font, network or provider service added by this filter. Project 3, workspace 2 and package API versions stay unchanged.
+
 ## Shared frequency parameter (schema37)
 
 LayerGroup.frequencyRadius and read-only Layer.frequencyGroup are ordinary OO model surfaces. Plugin commands may update the group through the existing document-write grant and shared validation/revision/undo boundary; locks and native source references remain checked. Original child data and protected locks are preserved. Schema37 group records use existing project/recipe/package transport; installation remains inert. Native preview/preparation canvases belong to the trusted application and add no isolated host service, file/network access or provider privilege.

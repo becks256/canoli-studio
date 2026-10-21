@@ -41,6 +41,7 @@ import { SmartFilter } from "./smart-filters";
 export {
   SmartFilter,
   GaussianBlurFilter,
+  MedianFilter,
   FrequencyBandFilter,
   NativeCompositionFilter,
   DocumentToneFilter,

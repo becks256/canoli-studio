@@ -1,4 +1,5 @@
 export { encodeFrequencyBand } from "./frequency-band";
+export { medianFilter } from "./median-filter";
 export { adjustHsl } from "./hsl";
 export { adjustChromatic } from "./chromatic";
 export { compositeLinearBlend } from "./linear-blend";

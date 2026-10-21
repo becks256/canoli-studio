@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import {
   GaussianBlurFilter,
+  MedianFilter,
   FrequencyBandFilter,
   NativeCompositionFilter,
   DocumentToneFilter,
@@ -18,6 +19,7 @@ import { InspectorSection } from "./InspectorSection";
 import "./SmartFiltersPanel.css";
 
 const names = {
+  median: 'Median denoise',
   "gaussian-blur": "Gaussian blur",
   "frequency-band": "Frequency band",
   "native-composition": "Native composition",
@@ -27,6 +29,10 @@ const names = {
 };
 function construct(data: SmartFilterData): SmartFilter {
   switch (data.kind) {
+    case 'median': {
+      const {kind:_,...options}=data;
+      return new MedianFilter(options);
+    }
     case "document-tone": {
       const { kind: _, ...options } = data;
       return new DocumentToneFilter(options);
@@ -49,7 +55,7 @@ function construct(data: SmartFilterData): SmartFilter {
 }
 type Field = {
   key:
-    "sigma" | "amount" | "threshold" | "exposure" | "contrast" | "saturation";
+    "radius" | "sigma" | "amount" | "threshold" | "exposure" | "contrast" | "saturation";
   label: string;
   min: number;
   max: number;
@@ -58,6 +64,7 @@ type Field = {
   scale?: "quadratic";
 };
 function fields(filter: SmartFilterData): Field[] {
+  if (filter.kind === 'median') return [{key:'radius',label:'Denoise radius',min:0,max:32,step:1,suffix:'px'}];
   if(filter.kind === "native-composition") return [];
   if (filter.kind === "tone" || filter.kind === "document-tone")
     return [
@@ -163,7 +170,7 @@ export function SmartFiltersPanel({
   };
   const add = () => {
     const filter =
-      kind === "document-tone" ? new DocumentToneFilter() : kind === "native-composition" ? new NativeCompositionFilter() : kind === "frequency-band" ? new FrequencyBandFilter() : kind === "gaussian-blur"
+      kind === 'median' ? new MedianFilter() : kind === "document-tone" ? new DocumentToneFilter() : kind === "native-composition" ? new NativeCompositionFilter() : kind === "frequency-band" ? new FrequencyBandFilter() : kind === "gaussian-blur"
         ? new GaussianBlurFilter()
         : kind === "unsharp-mask"
           ? new UnsharpMaskFilter()
@@ -253,6 +260,7 @@ export function SmartFiltersPanel({
                   Enabled
                 </label>
                 {filter.kind==='frequency-band'&&sharedRadius!==undefined&&<p className="section-description">Radius follows the shared frequency group controls.</p>}
+                {filter.kind==='median'&&<p className="section-description">Removes isolated speckles. Larger radii can soften fine detail; transparency stays intact.</p>}
                 {fields(filter).filter(field=>!(filter.kind==='frequency-band'&&sharedRadius!==undefined&&field.key==='sigma')).map((field) => (
                   <Slider
                     key={field.key}
@@ -263,6 +271,7 @@ export function SmartFiltersPanel({
                     min={field.min}
                     max={field.max}
                     step={field.step}
+                    integer={filter.kind === 'median'}
                     scale={field.scale}
                     suffix={field.suffix}
                     disabled={disabled || !filter.enabled}

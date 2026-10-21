@@ -1,5 +1,5 @@
 import type { SmartFilterData } from "../core/smart/filters";
-import { smartFilterHalo } from "../core/smart/filters";
+import { smartFilterHalo, isActiveSmartFilter } from "../core/smart/filters";
 import type { RenderRegion } from "./renderer";
 import type { PixelProcessor } from "./processor";
 import { createCanvas, release } from "./canvas";
@@ -167,7 +167,11 @@ export async function filteredMasterTile(
     else {
       pixels = sourcePixels!;
       for (const [index,filter] of filters.entries()) {
-        if (!filter.enabled || filter.kind === "native-composition" || filter.kind === "document-tone") continue;
+        if (!isActiveSmartFilter(filter) || filter.kind === "native-composition" || filter.kind === "document-tone") continue;
+        if (filter.kind === 'median') {
+          pixels=await processor.medianFilter(pixels,padded.width,padded.height,filter.radius);
+          continue;
+        }
         if(filter.kind==='frequency-band'){
           const key=lowKey(index,filter.sigma);
           let low:Uint8ClampedArray|undefined=(solo&&index===0?shared?.filtered:undefined)??common?.cache.read(key,common.signature,false)?.filtered;

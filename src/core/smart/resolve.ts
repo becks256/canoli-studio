@@ -1,4 +1,5 @@
 import { AffineTransform } from "../affine";
+import { isActiveSmartFilter } from './filters';
 import { maskTransform } from "../masks";
 import {
   base,
@@ -149,7 +150,7 @@ export function resolveSmartDocument(
         },
       };
     }
-    if (layer.smartFilters?.some((filter) => filter.enabled)) {
+    if (layer.smartFilters?.some(isActiveSmartFilter)) {
       if (!budget.preserveFiltered)
         throw new Error(
           "Filtered smart objects require the native-plane renderer.",

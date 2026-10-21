@@ -1,5 +1,28 @@
 # Scripting API
 
+## Median denoise (schema 38)
+
+`new MedianFilter(options?: {radius?:number; enabled?:boolean; id?:string})` creates an immutable smart-filter value. Defaults: radius 1, enabled true, generated nonblank ID. Radius accepts integers 0–32 in native master pixels; 0 is a byte-exact no-op. Null, nonfinite, fractional, out-of-range and unknown options reject. Serialized data is `{kind:"median",id,enabled,radius}` and requires schema 38, including inside component masters. Existing documents remain readable and acquire no new filters automatically.
+
+The filter independently selects each encoded RGB8 channel's lower alpha-weighted median in a `(2*radius+1)` square. It preserves the center alpha and zero-alpha hidden RGB; transparent neighbors and outside-artboard padding have no influence. It runs in stack order before instance placement and ordinary layer masks/styles, with the existing filter mask blending original/filtered pixels. A larger radius removes more fine detail. This is useful for isolated bright/dark speckles, not a claim of RAW or general noise-model support.
+
+Use the existing addFilter/setFilters methods; settings from smartFilters are detached snapshots. Locks, duplicate IDs, shared masters, transactions, stale host revisions and script rollback retain their existing contracts. Worker tiles have allocation/work budgets independent of original-image dimensions. Isolated scripts author filter values, not direct worker/pixel jobs. Headless REST retains its separate session and does not render browser output.
+
+<!-- example: median-denoise -->
+```js
+const selected = document.selectedLayer;
+const target = selected instanceof RasterLayer
+  ? selected.convertToSmartObject()
+  : selected;
+if (!(target instanceof SmartObjectLayer))
+  throw new Error("Select a raster image or smart object.");
+target.addFilter(new MedianFilter({ radius: 1 }));
+document.selectedLayer = target;
+print("Denoise ready");
+```
+
+The successful script commits one undo entry. A failure discards conversion and filter changes together. Original raster bytes remain in the project. The Smart filters Inspector exposes the same radius, enable, ordering and removal operations with transient preview and Escape cancellation.
+
 ## Shared frequency radius and native preview (schema 37)
 
 `new LayerGroup({frequencyRadius?:number|null, ...options})` and writable `group.frequencyRadius` provide one radius for every descendant FrequencyBandFilter in that document plane. Values are finite 0–4096/3 original-master pixels. Omission/null means inherit the nearest enclosing group; if none exists, each filter uses its own serialized sigma. Nested explicit group values override outer values. Entering a component master starts a separate scope. The current frequency factory creates one controlling Frequencies group, so low, high and precision planes stay consistent when the radius changes. Valid legacy schema-36 groups have no controller and keep their independent settings.
@@ -195,7 +218,7 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `document`                                                   | A snapshot-backed `Document` representing the active composition at the start of the run. It is the editor document model, not the HTML document.            |
 | `Document`                                                   | Constructor for a separate in-memory document. Creating one does not open or replace the active composition.                                                 |
 | `SmartObjectLayer`                                           | Constructor for a placed instance of an embedded shared master.                                                                                              |
-| `GaussianBlurFilter`, `UnsharpMaskFilter`, `SmartToneFilter`, `FrequencyBandFilter`, `NativeCompositionFilter`, `DocumentToneFilter` | Immutable filter values for per-instance smart-filter stacks.                                                                                                |
+| `GaussianBlurFilter`, `MedianFilter`, `UnsharpMaskFilter`, `SmartToneFilter`, `FrequencyBandFilter`, `NativeCompositionFilter`, `DocumentToneFilter` | Immutable filter values for per-instance smart-filter stacks.                                                                                                |
 | `RasterLayer`                                                | Constructor for an image layer referring to an existing asset.                                                                                               |
 | `LayerGroup`                                                 | Constructor for an ordered group of layers.                                                                                                                  |
 | `PaintLayer`                                                 | Constructor for ordered brush/pencil/clone/fill strokes and prepared wet replacements.                                                                              |
@@ -2283,6 +2306,7 @@ Images decode in a private store before a single destination transaction install
 
 | Constructor                        | Options and defaults                                                                                         |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `new MedianFilter(options?)` | Integer `radius:1` (0–32), enabled true, generated ID; alpha-preserving median denoise. |
 | `new GaussianBlurFilter(options?)` | `sigma: 1`, `enabled: true`, generated `id`. Sigma is finite, 0–4096/3 master pixels.                        |
 | `new UnsharpMaskFilter(options?)`  | `sigma: 1`, `amount: 1` (0–5), `threshold: 0` (0–255), `enabled: true`, generated `id`.                      |
 | `new FrequencyBandFilter(options?)` | `sigma:4`, `band:"high"`; low/high/correction, native encoded RGB8. See the schema-36 contract above. |

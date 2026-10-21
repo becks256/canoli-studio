@@ -1,4 +1,5 @@
 import type {DocumentData,LayerData,TextLayerData} from '../core/model';
+import {isActiveSmartFilter} from '../core/smart/filters';
 import type {LayerMaskData} from '../core/masks';
 import type {AssetStore} from '../core/assets';
 import {captureExportFonts} from './export-fonts';
@@ -25,7 +26,7 @@ export function captureRasterExportDocuments(documents:readonly DocumentData[],a
   else if(layer.kind==='paint'){for(const stroke of layer.strokes)visitBrushAssets(stroke,reference=>ids.add(reference.assetId));}
   else if(layer.kind==='group')walk(layer.children,depth+1);
   else if(layer.kind==='smart-object'){
-   if(layer.smartFilters?.some(filter=>filter.enabled))mask(layer.filterMask);
+   if(layer.smartFilters?.some(isActiveSmartFilter))mask(layer.filterMask);
    const definition=definitions.get(layer.componentId);if(!definition)throw new Error(`Missing component: ${layer.componentId}`);
    if(definition.source.kind==='asset')ids.add(definition.source.assetId);else{enter(depth+1);walk(definition.source.document.children,depth+2);}
   }

@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Median rank and source invariant
+
+Median denoise reads immutable native master RGBA. Each output channel is the lower alpha-weighted median of its finite square neighborhood; coverage and zero-alpha hidden RGB are copied exactly from the center. No source asset is rewritten, downsampled or replaced. Histograms slide over original samples, never previously filtered output. Cumulative support is additive across enabled filters; disabled/zero-radius entries are inert. Native crops include full support and transparent artboard padding, so retained and uncached tile interiors agree with whole-image processing. The fixed histogram workspace is 3096 bytes plus private input/output. Median data requires schema 38 at both root and embedded-master boundaries. UI/OO/REST/scripts use existing commands and ownership/undo, without new isolated privileges or browser/REST synchronization.
+
 ## Large bitmap precision and ownership invariant
 
 A source bitmap's full geometry survives precision fallback. Recover native premultiplied bytes through bounded patch reads; choose numerical sampling from projected-coordinate precision, without limiting or resizing originals. Preserve axis-aligned half-pixel ties and integrate affine support in the output pixel plane. Only one numerical reader is active per texture batch; its 64 native 64×64 entries are bounded independently of source dimensions. Share a task deadline across captures and reject clear/disposal/source changes before worker conversion/publication. Cache retirement cannot cancel independent reads. Mutable native canvases are snapshotted once, private copies close exactly once, and original ImageBitmaps remain borrowed. Source identities participate in retained bitmap-mask keys. Renderer/schema/history/isolation contracts remain unchanged; memory and latency claims require separate measured evidence.

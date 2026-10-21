@@ -36,6 +36,7 @@ import type { PoissonBlendOptions } from "../core/retouch/types";
 import type { DodgeBurnOptions } from "../core/retouch/types";
 import {
   applySpatialFilter,
+  applyMedianFilter,
   featherAlpha,
   applyBlendIf,
   applyTone,
@@ -84,6 +85,7 @@ self.onmessage = async (
       height: number;
       options: SpatialFilterOptions;
     };
+    medianFilter?: {width:number;height:number;radius:number};
     donorSearch?: {
       width: number;
       height: number;
@@ -258,6 +260,12 @@ self.onmessage = async (
         inverted,
       );
       self.postMessage({ id: data.id, pixels }, { transfer: [pixels.buffer] });
+      return;
+    }
+    if (data.medianFilter) {
+      const {width,height,radius}=data.medianFilter;
+      const pixels=applyMedianFilter(await kernel,data.pixels,width,height,radius);
+      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer]});
       return;
     }
     if (data.spatialFilter) {

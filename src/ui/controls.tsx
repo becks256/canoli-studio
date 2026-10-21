@@ -75,6 +75,7 @@ export interface NumberFieldProps {
   onChange?(value: number): void;
   disabled?: boolean;
   step?: number | "any";
+  integer?: boolean;
   hideLabel?: boolean;
   suffix?: string;
   layout?: "inline" | "stacked";
@@ -94,6 +95,7 @@ export function NumberField({
   onChange,
   disabled = false,
   step = "any",
+  integer = false,
   hideLabel = false,
   suffix = "",
   layout = "inline",
@@ -117,7 +119,7 @@ export function NumberField({
     dirty.current = false;
     const trimmed = draft.trim();
     const parsed = Number(trimmed);
-    if (trimmed && Number.isFinite(parsed) && parsed >= min && parsed <= max) {
+    if (trimmed && Number.isFinite(parsed) && parsed >= min && parsed <= max && (!integer || Number.isInteger(parsed))) {
       if (parsed !== value) {
         onCommit?.(parsed);
         onChange?.(parsed);
@@ -236,6 +238,7 @@ export function Slider({
   min,
   max,
   step = 1,
+  integer = false,
   onPreview,
   onCommit,
   disabled = false,
@@ -247,6 +250,7 @@ export function Slider({
   min: number;
   max: number;
   step?: number;
+  integer?: boolean;
   suffix?: string;
   scale?: "linear" | "quadratic";
   disabled?: boolean;
@@ -376,6 +380,8 @@ export function Slider({
           value={value}
           min={min}
           max={max}
+          integer={integer}
+          step={integer ? 1 : 'any'}
           disabled={disabled}
           hideLabel
           onCommit={onCommit}

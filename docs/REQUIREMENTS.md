@@ -1,5 +1,11 @@
 # Canoli Studio editor requirements
 
+## Median denoise (F12 increment, schema 38)
+
+Users can convert a raster to a smart object and add Median denoise from Smart filters. Radius defaults to 1 native pixel, accepts integers 0–32, and zero restores unchanged pixels. Controls must reject fractional input, support exact typing and cancellable keyboard/pointer previews, and share ordinary history, enable/reorder/remove and lock behavior. The filter removes isolated bright/dark speckles with an alpha-weighted per-channel lower median; it preserves center alpha, ignores transparent neighbors and keeps original assets immutable. Larger radii may remove fine detail; it is not a RAW/develop or complete noise-reduction suite.
+
+OO MedianFilter, isolated scripts/plugins and strict REST smartObject.filters commands share validation/history. Native tiled viewport/export, filter masks, project reopening and original bytes must agree. Legacy documents migrate without injected filters; median values require schema 38 in roots and embedded masters. Higher-precision denoise, real-camera quality evaluation, RAW/lens/merge workflows and the remaining F12/F14 roadmap gates remain open.
+
 ## Bitmap projection precision
 
 Large affine bitmap placements must retain native pixels and representable source geometry in raster layers, bitmap masks, textures, native wet reconstruction and filtered projections. Keep the existing Canvas path at ordinary placements; use double-precision sampling when projected coordinates cannot reliably retain subpixel geometry. Axis-aligned image edges retain the established half-pixel tie rule; sheared image edges use actual pixel area. Nearest and encoded-sRGB premultiplied-byte bilinear sampling must use the unchanged original bitmap, with bounded native reads and no source-size intermediate.

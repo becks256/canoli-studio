@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { TONE_LIMITS } from "../tone";
+import { medianFilterSchema } from './median-filter';
 const common = { id: z.string().min(1).max(240), enabled: z.boolean() };
 // Authored sigma is in master pixels; the worker halo limit is independent of document geometry.
 const sigma = z
@@ -14,6 +15,7 @@ export const documentToneFilterSchema=z.object({...common,kind:z.literal("docume
   contrast:z.number().finite().min(TONE_LIMITS.contrast.min).max(TONE_LIMITS.contrast.max),
   saturation:z.number().finite().min(TONE_LIMITS.saturation.min).max(TONE_LIMITS.saturation.max)}).strict();
 export const smartFilterSchema = z.discriminatedUnion("kind", [
+  medianFilterSchema,
   z.object({ ...common, kind: z.literal("gaussian-blur"), sigma }).strict(),
   frequencyBandFilterSchema,
   nativeCompositionFilterSchema,
@@ -55,6 +57,10 @@ export const smartFiltersSchema = z
     "Smart-filter IDs must be unique within the instance.",
   ).refine(filters=>{let documentPhase=false;return filters.every(filter=>{if(filter.kind==='document-tone')documentPhase=true;return !documentPhase||filter.kind==='document-tone';});},'Document tone must follow all native filters.');
 export type SmartFilterData = z.infer<typeof smartFilterSchema>;
+/** Zero-radius median must also bypass native resampling and SVG rasterization. */
+export function isActiveSmartFilter(filter: SmartFilterData): boolean {
+  return filter.enabled && !(filter.kind === 'median' && filter.radius === 0);
+}
 export function smartFilterHalo(filters: readonly SmartFilterData[]): number {
   return filters.reduce(
     (sum, filter) =>
@@ -62,7 +68,7 @@ export function smartFilterHalo(filters: readonly SmartFilterData[]): number {
       (filter.enabled &&
       filter.kind !== "tone" && filter.kind !== "native-composition" && filter.kind !== "document-tone" &&
       !(filter.kind === "unsharp-mask" && filter.amount === 0)
-        ? Math.ceil(3 * filter.sigma)
+        ? filter.kind === 'median' ? filter.radius : Math.ceil(3 * filter.sigma)
         : 0),
     0,
   );

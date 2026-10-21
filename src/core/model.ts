@@ -38,7 +38,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 37;
+export const SCHEMA_VERSION = 38;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -186,6 +186,7 @@ export interface DocumentData {
     | 34
     | 35
     | 36
+    | 37
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -543,7 +544,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -551,7 +552,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–37), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–38), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -688,6 +689,8 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           if (Number(value.schemaVersion) < 11)
             throw new Error("Smart filters require schema version 11.");
           smartFiltersSchema.parse(node.smartFilters);
+          if (Number(value.schemaVersion) < 38 && (node.smartFilters as any[]).some(f=>f.kind==='median'))
+            throw new Error('Median filters require schema version 38.');
           if (Number(value.schemaVersion) < 36 && (node.smartFilters as any[]).some(f => f.kind === "frequency-band" || f.kind === "native-composition" || f.kind === "document-tone"))
             throw new Error("Frequency bands require schema version 36.");
         }
