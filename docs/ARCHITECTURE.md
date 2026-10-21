@@ -1,5 +1,11 @@
 # Architecture
 
+## Native frequency working partitions
+
+`engine/pixel-work-grid.ts` partitions independent raster work by aspect ratio. Linear Light/Burn retains the former 1024×1024 pixel budget, with at most 8192 pixels on a working edge. Pixel equations and worker snapshot/result validation stay unchanged; cancellation is checked before and after each awaited blend before publishing pixels.
+
+Recognized native frequency sampling may combine rectangles only when request count falls and estimated total halo work does not increase. Both width-first and height-first candidates include projection/filter margins and prefer at most 1,000,000 sampled pixels, within the existing 4 MP/8192-edge allocation checks. Composition accounts for both nested projection margins. Literal unchanged raster-band eligibility and exact integer unit placement are unchanged; complex masters, affine/fractional placement and masks retain their existing eligibility/fallback behavior. The original 256/512/1024 grids remain available for large halos or unimproved partitions. Document/source geometry is independent of these working budgets.
+
 ## Canonical ordinary paint coverage
 
 `engine/paint-coverage.ts` owns raw untextured brush/pencil/eraser/clone coverage and fill geometry. Complete contributing native primitives replay into canonical 256-pixel cells with a support halo and an eight-pixel gradient phase. Rebasing preserves source coordinates at large translations. Scratch allocation stays within 4 MP/8192 edges; larger projected primitives use `primitive-coverage.ts` pixel-area integration and `paint-premultiplied.ts` destination-byte composition, without shrinking authored geometry. Proven solid strips at unit flow can overwrite exact opaque RGB; all uncertain edges keep integration. Soft coverage bounds bypass integration only when every possible value produces identical stored bytes.

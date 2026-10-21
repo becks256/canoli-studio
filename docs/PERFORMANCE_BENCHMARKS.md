@@ -617,3 +617,22 @@ A separate unprofiled offscreen native50MP full-frame low-retouch study compares
 ### Literal-raster native band overscan
 
 The [band-overscan follow-up](benchmarks/frequency-band-overscan-2026-10-20.json) compares unchanged512-pixel composition cores with512 versus1024 native band sampling cores. The larger read is eligible only over a literal unchanged native raster, without a filter mask, under the same4MP/8192-edge halo budget. Three alternating unprofiled50MP pairs observe median32243.4→29017.1ms (10.0% locally),3081→1580 Gaussian requests and70432320→68432000 sampled pixels. All six complete outputs match RGBA exactly and contain the intended retouch; source/model identities remain unchanged. All six native long-task controls are observed and no overlapping export task is reported. No competing tests/builds ran. This is one synthetic full-frame low-retouch fixture on the same named host/browser, with headless callbacks as scheduling proxies. It does not establish general speed, physical display, sustained/editor-wide or process-memory acceptance. A29-second export still needs work.
+
+
+### 2026-10-21 — Rectangular native frequency and blend work
+
+[Sealed strip-batching evidence](benchmarks/frequency-strip-batching-2026-10-21.json) compares the committed 1024-band/512-composition renderer against aspect-aware native sampling and independent blend partitions. Three clean alternating unprofiled pairs on Linux, Chromium153.0.8010.12, AMD Ryzen9 3900X observe:
+
+| Full-frame 50 MP low-retouch export | Reference | Candidate |
+| --- | ---: | ---: |
+| Median elapsed time | 29162.1 ms | 21795.6 ms |
+| Gaussian requests | 1580 | 395 |
+| Gaussian sampled pixels | 68432000 | 66458000 |
+| High/correction encoding requests | 3160 | 790 |
+| Encoding pixels | 136864000 | 132916000 |
+| Linear Light/Burn requests | 3160 | 790 |
+| Blended pixels | 107170560 | 106532640 |
+
+Median elapsed time is 25.3% lower locally. Independent complete RGBA decoding matches all six 10000×5000 outputs and the frozen reference. All contain the intended edit, preserve model/source hashes and have positive native long-task controls; no overlapping export long task is observed. All 37 scene pairs (74 independently decoded PNGs) match exactly, including texture/wet/erase/outer-mask variants. Application engine/WASM and all39 previous benchmark artifacts remain byte-identical throughout measurement. No competing builds/tests ran.
+
+This is one synthetic offscreen full-native low-retouch workload. Headless animation callbacks are scheduling proxies. No general/editor-wide input, sustained-use, physical GPU/tablet/display, portrait-quality or process-memory acceptance follows. A roughly22-second export and the previously measured large filter-mask input misses still require work.

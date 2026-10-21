@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native raster work partition invariant
+
+Rectangular frequency sampling may reduce requests only without increasing estimated halo work. Include both nested composition projection margins before selecting a preferred 1,000,000-pixel job; retain existing native-source/placement eligibility, 256/512/1024 fallbacks and the 4 MP/8192-edge allocation checks. Independent Linear Light/Burn partitions retain the previous 1,048,576-pixel budget and 8192 working edges. Awaited work rechecks cancellation before publication. No working-grid choice changes original geometry, pixel equations, assets, OO mutation/history, persistent schemas or isolation.
+
 ## Ordinary paint crop and retained-buffer invariant
 
 Untextured coverage on the same output-pixel lattice must be independent of viewport/export crop boundaries. Canonical native cells retain complete contributing primitives; oversized projected geometry uses bounded numerical pixel coverage. Preserve original sample indices, pressure, tilt, copy order and source geometry. Apply selection and whole-stroke opacity after raw stamp accumulation. Opaque shortcuts require certified complete pixels and identical destination bytes, rather than approximate edge coverage.

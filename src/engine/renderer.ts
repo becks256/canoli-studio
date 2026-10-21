@@ -1,3 +1,4 @@
+import {pixelWorkGrid, nativeSamplingGrid} from './pixel-work-grid';
 import {projectNativeMask} from "./projected-mask";
 import {frequencyIdentitySource,nativeFrequencyRasterSource} from './frequency-identity';
 import {yieldTask} from './task-yield';
@@ -466,16 +467,23 @@ export class CanvasRenderer implements DocumentRenderer {
     const tileLimit=nativeFrequency && paddedEdge<=8192 && paddedEdge*paddedEdge<=4_000_000
       ?nativeBandOverscan&&bandPaddedEdge<=8192&&bandPaddedEdge*bandPaddedEdge<=4_000_000?1024:512:256;
     const step = Math.max(1, Math.min(tileLimit, Math.floor((nativeBandOverscan?tileLimit:512) / nativePerPixel)));
+    // Rectangular native requests avoid repeatedly processing the halo of a
+    // narrow export strip. Composition includes both nested projection margins.
+    const coalesce = nativeBandOverscan ||
+      (nativeFrequency && filters[0].kind === 'native-composition' && frequencyIdentity !== null);
+    const grid = coalesce
+      ? nativeSamplingGrid(target.width, target.height, step, samplingHalo, filters[0].kind === 'native-composition' ? 8 : 4)
+      : {columns: step, rows: step};
     const context = target.getContext("2d")!;
-    for (let ty = 0; ty < target.height; ty += step)
-      for (let tx = 0; tx < target.width; tx += step) {
+    for (let ty = 0; ty < target.height; ty += grid.rows)
+      for (let tx = 0; tx < target.width; tx += grid.columns) {
         if(options.taskBudget && performance.now()>=options.taskBudget.deadline){
           await yieldTask();
           options.taskBudget.deadline=performance.now()+8;
         }
         checkRenderCurrent(options.isCancelled);
-        const width = Math.min(step, target.width - tx),
-          height = Math.min(step, target.height - ty);
+        const width = Math.min(grid.columns, target.width - tx),
+          height = Math.min(grid.rows, target.height - ty);
         const bounds = inverse.bounds({ x: tx, y: ty, width, height });
         const left = Math.max(-halo - 2, Math.floor(bounds.x) - 2),
           top = Math.max(-halo - 2, Math.floor(bounds.y) - 2);
@@ -1386,13 +1394,16 @@ export class CanvasRenderer implements DocumentRenderer {
               cache!.write(key, finishedSignature, result, 1, finishedBounds);
             }
             if ((layer.blendMode === "linear-light" || layer.blendMode === "linear-burn") && isolated !== layer) {
-              for(let ty=0;ty<current.height;ty+=1024)for(let tx=0;tx<current.width;tx+=1024){
-                checkRenderCurrent(options.isCancelled);
-                const w=Math.min(1024,current.width-tx),h=Math.min(1024,current.height-ty);
-                const image=targetContext.getImageData(tx,ty,w,h);
-                image.data.set(await this.processor.linearBlend(r.getImageData(tx,ty,w,h).data,image.data,layer.opacity,layer.blendMode));
-                checkRenderCurrent(options.isCancelled);targetContext.putImageData(image,tx,ty);
-              }
+              const grid = pixelWorkGrid(current.width, current.height);
+              for (let ty = 0; ty < current.height; ty += grid.rows)
+                for (let tx = 0; tx < current.width; tx += grid.columns) {
+                  checkRenderCurrent(options.isCancelled);
+                  const w = Math.min(grid.columns, current.width - tx), h = Math.min(grid.rows, current.height - ty);
+                  const image = targetContext.getImageData(tx, ty, w, h);
+                  image.data.set(await this.processor.linearBlend(r.getImageData(tx, ty, w, h).data, image.data, layer.opacity, layer.blendMode));
+                  checkRenderCurrent(options.isCancelled);
+                  targetContext.putImageData(image, tx, ty);
+                }
             } else {
               targetContext.save();
               targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
