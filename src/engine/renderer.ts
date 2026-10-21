@@ -1,3 +1,4 @@
+import {nativeToneSamplingGrid} from './smart-filter-grid';
 import {canonicalCellOffset} from './canvas';
 import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
 import {NativeCanvasGrid} from './native-canvas-grid';
@@ -467,9 +468,9 @@ export class CanvasRenderer implements DocumentRenderer {
     // narrow export strip. Composition includes both nested projection margins.
     const coalesce = nativeBandOverscan ||
       (nativeFrequency && filters[0].kind === 'native-composition' && frequencyIdentity !== null);
-    const grid = coalesce
+    const grid = nativeToneSamplingGrid(target.width,target.height,placement,filters,mask?filterMask?.feather??0:0) ?? (coalesce
       ? nativeSamplingGrid(target.width, target.height, step, samplingHalo, filters[0].kind === 'native-composition' ? 8 : 4)
-      : {columns: step, rows: step};
+      : {columns: step, rows: step});
     const context = target.getContext("2d")!;
     for (let ty = canonicalSampling?canonicalCellOffset(space.y,space.sy,grid.rows):0; ty < target.height; ty += grid.rows)
       for (let tx = canonicalSampling?canonicalCellOffset(space.x,space.sx,grid.columns):0; tx < target.width; tx += grid.columns) {

@@ -436,3 +436,10 @@ A spatial convolution may omit only contributions proven to be positive zero. Tr
 ### Paired spatial-output invariant
 
 Reuse immutable source loads between neighboring horizontal output pixels only when each output receives exactly its own original weights in ascending sample order. Handle distinct leading/trailing taps, clipped/empty support, zero-radius axes and one-pixel/odd tails independently. Share vertical weight/address work without sharing accumulators or mixing neighboring channels. Inline output encoding preserves all existing alpha/hidden-RGB/threshold rules, including an invisible unsharp pixel followed by visible content. Private scratch, source snapshots, worker result validation and native allocation budgets remain unchanged. These are scalar instructions with the existing module ABI/features; no approximate reduction or SIMD-only compatibility path is permitted.
+
+
+### Exact tone-only request coalescing
+
+Combine native pointwise tone requests only at exact unit projected scale and integer translation. Retain current sampling for active spatial/frequency/native-composition stacks and any resampling, affine or fractional placement. The bounded planner includes projection/mask-feather support before allocation and retains the 256-pixel fallback when a larger partition is unsafe or unhelpful. Original source/document dimensions are independent of these partitions.
+
+Native primitive/image rasterization must already be independent of request clipping. Preserve exact worker equations, mask inversion/density, source and retained-buffer ownership, cache publication, cancellation and complete authored samples. Fewer worker round trips are not performance acceptance by themselves: use trusted inputs with a newly matching pixel, complete source/project/image/undo validation and separate physical-display/sustained/quality/process-memory gates.

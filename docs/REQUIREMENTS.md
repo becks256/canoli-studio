@@ -741,3 +741,8 @@ The earlier331-pixel Gaussian timeout is reproduced on the committed engine unde
 ### Native convolution reuse and geometry fidelity — 2026-10-21
 
 Adjacent spatial outputs must preserve every original Gaussian/unsharp/frequency contribution and its floating-point order while reusing source/weight reads. Independent accumulators, clipped/empty support, zero-support axes, even/odd dimensions and single-column tails must retain native output and source ownership. Do not combine output pixels, approximate a Gaussian, add an unsupported-only module requirement or downsample the source. A scalar optimization must keep existing worker/ABI, scratch and4MP/8192-edge native work contracts. Kernel and controlled export measurements remain separate from33ms input, editor-wide/sustained, hardware, quality and process-memory acceptance.
+
+
+### Native pointwise filter-mask interaction
+
+A native tone-only smart stack may share bounded requests when placement requires no resampling and all existing complete pixels, mask semantics, source bytes/dimensions and cache/cancellation/history behavior remain exact. Spatial/mixed stacks and fractional/affine/resampled placement retain their current work rules. Include mask-feather support and projection margins in the preferred 1 MP/8192-edge partition; preserve existing true allocation errors rather than imposing an image-size cap. Verify source vectors/transformed rasters/bitmaps, styled text, cached and irregular regions, real worker equations and native 50 MP project preservation. Synthetic paced input-to-matching-canvas-copy results do not establish general 60fps, physical presentation, sustained/editor-wide, representative-quality or process-memory acceptance.
