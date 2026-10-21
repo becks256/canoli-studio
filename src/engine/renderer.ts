@@ -1,4 +1,6 @@
+import {canonicalCellOffset} from './canvas';
 import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
+import {NativeCanvasGrid} from './native-canvas-grid';
 import {pixelWorkGrid, nativeSamplingGrid} from './pixel-work-grid';
 import {projectNativeMask} from "./projected-mask";
 import {frequencyIdentitySource,nativeFrequencyRasterSource} from './frequency-identity';
@@ -259,7 +261,13 @@ export class CanvasRenderer implements DocumentRenderer {
       checkSource();
       const matrix=AffineTransform.translation(-tileX,-tileY).multiply(mapping);
       if(bitmapProjectionRequiresPrecision(matrix,asset.width,asset.height))return drawProjectedBitmap(target,bitmap,matrix,{isCancelled:()=>{checkSource();return false;}});
-      target.save();try{target.setTransform(placement.a,placement.b,placement.c,placement.d,placement.e-tileX,placement.f-tileY);target.drawImage(bitmap,0,0,layer.width,layer.height);}finally{target.restore();}
+      if(matrix.a===1&&matrix.b===0&&matrix.c===0&&matrix.d===1&&Number.isSafeInteger(matrix.e)&&Number.isSafeInteger(matrix.f)){
+        target.save();try{target.setTransform(placement.a,placement.b,placement.c,placement.d,placement.e-tileX,placement.f-tileY);target.drawImage(bitmap,0,0,layer.width,layer.height);}finally{target.restore();}return;
+      }
+      const local={...space,x:space.x+tileX/space.sx,y:space.y+tileY/space.sy,width:target.canvas.width,height:target.canvas.height},grid=new NativeCanvasGrid(target,local,matrix.bounds({x:0,y:0,width:asset.width,height:asset.height}));
+      try{for(const cell of grid.cells()){
+        checkSource();const c=grid.canvas.getContext('2d')!,m=renderTransform(cell.space,world);c.save();try{c.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);c.drawImage(bitmap,0,0,layer.width,layer.height);}finally{c.restore();}grid.present(cell);
+      }}finally{grid.dispose();}
     };
     if (!effects.length) {
       const drawing=draw(context);if(drawing)await drawing;checkSource();
@@ -434,6 +442,7 @@ export class CanvasRenderer implements DocumentRenderer {
       Math.abs(inverse.a) + Math.abs(inverse.c),
       Math.abs(inverse.b) + Math.abs(inverse.d),
     );
+    const canonicalSampling=placement.a!==1||placement.b!==0||placement.c!==0||placement.d!==1||!Number.isSafeInteger(placement.e)||!Number.isSafeInteger(placement.f);
     // A unit native frequency plane can cover the outer tile's two-pixel
     // overscan in one request. Keep affine sampling and large-halo budgets on
     // the established grid; source/document resolution is independent.
@@ -450,7 +459,10 @@ export class CanvasRenderer implements DocumentRenderer {
     const bandPaddedEdge=1024+4+2*samplingHalo;
     const tileLimit=nativeFrequency && paddedEdge<=8192 && paddedEdge*paddedEdge<=4_000_000
       ?nativeBandOverscan&&bandPaddedEdge<=8192&&bandPaddedEdge*bandPaddedEdge<=4_000_000?1024:512:256;
-    const step = Math.max(1, Math.min(tileLimit, Math.floor((nativeBandOverscan?tileLimit:512) / nativePerPixel)));
+    // Full resampling cells include rounding, overscan and the cumulative
+    // filter halo inside the established 4 MP sampling allocation budget.
+    const canonicalLimit=canonicalSampling?Math.floor((1994-2*halo)/nativePerPixel):Infinity;
+    const step = Math.max(1, Math.min(tileLimit, Math.floor((nativeBandOverscan?tileLimit:512) / nativePerPixel),canonicalLimit));
     // Rectangular native requests avoid repeatedly processing the halo of a
     // narrow export strip. Composition includes both nested projection margins.
     const coalesce = nativeBandOverscan ||
@@ -459,15 +471,15 @@ export class CanvasRenderer implements DocumentRenderer {
       ? nativeSamplingGrid(target.width, target.height, step, samplingHalo, filters[0].kind === 'native-composition' ? 8 : 4)
       : {columns: step, rows: step};
     const context = target.getContext("2d")!;
-    for (let ty = 0; ty < target.height; ty += grid.rows)
-      for (let tx = 0; tx < target.width; tx += grid.columns) {
+    for (let ty = canonicalSampling?canonicalCellOffset(space.y,space.sy,grid.rows):0; ty < target.height; ty += grid.rows)
+      for (let tx = canonicalSampling?canonicalCellOffset(space.x,space.sx,grid.columns):0; tx < target.width; tx += grid.columns) {
         if(options.taskBudget && performance.now()>=options.taskBudget.deadline){
           await yieldTask();
           options.taskBudget.deadline=performance.now()+8;
         }
         checkRenderCurrent(options.isCancelled);
-        const width = Math.min(grid.columns, target.width - tx),
-          height = Math.min(grid.rows, target.height - ty);
+        const width = canonicalSampling?grid.columns:Math.min(grid.columns, target.width - tx),
+          height = canonicalSampling?grid.rows:Math.min(grid.rows, target.height - ty);
         const bounds = inverse.bounds({ x: tx, y: ty, width, height });
         const left = Math.max(-halo - 2, Math.floor(bounds.x) - 2),
           top = Math.max(-halo - 2, Math.floor(bounds.y) - 2);
@@ -531,20 +543,28 @@ export class CanvasRenderer implements DocumentRenderer {
             retention,
             options.frequencyScratch?{cache:options.frequencyScratch,key:`filter:${this.assetIds.get(assets)}:${layer.componentId}`,signature:sourceSignature,canCache:()=>this.epoch===epoch&&!options.isCancelled?.()}:undefined,
           );
+          const drawSampled=(bitmap:HTMLCanvasElement,sourceX:number,sourceY:number)=>{
+            if(bitmapProjectionRequiresPrecision(placement,bitmap.width,bitmap.height))return drawProjectedBitmap(context,bitmap,placement.multiply(AffineTransform.translation(sourceX,sourceY)),{isCancelled:options.isCancelled});
+            if(!canonicalSampling){context.drawImage(bitmap,sourceX,sourceY);return;}
+            const nativeGrid=new NativeCanvasGrid(context,space);
+            try{for(const cell of nativeGrid.cells({x:tx,y:ty,width,height})){
+              checkRenderCurrent(options.isCancelled);const c=nativeGrid.canvas.getContext('2d')!,m=renderTransform(cell.space,nativeWorld);c.save();try{c.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);c.drawImage(bitmap,sourceX,sourceY);}finally{c.restore();}nativeGrid.present(cell);
+            }}finally{nativeGrid.dispose();}
+          };
           try {
             if(nativeFrame){
               const left=Math.max(0,tile.x),top=Math.max(0,tile.y),right=Math.min(master.width,tile.x+tile.canvas.width),bottom=Math.min(master.height,tile.y+tile.canvas.height);
               if(right>left&&bottom>top){
-                if(left===tile.x&&top===tile.y&&right===tile.x+tile.canvas.width&&bottom===tile.y+tile.canvas.height){if(bitmapProjectionRequiresPrecision(placement,tile.canvas.width,tile.canvas.height))await drawProjectedBitmap(context,tile.canvas,placement.multiply(AffineTransform.translation(tile.x,tile.y)),{isCancelled:options.isCancelled});else context.drawImage(tile.canvas,tile.x,tile.y);}
+                if(left===tile.x&&top===tile.y&&right===tile.x+tile.canvas.width&&bottom===tile.y+tile.canvas.height){const drawing=drawSampled(tile.canvas,tile.x,tile.y);if(drawing)await drawing;}
                 else {
                   // Use the actual image boundary, preserving Canvas edge-clamp sampling
                   // and geometric antialiasing instead of interpolating into padded transparency.
                   const edge=createCanvas(right-left,bottom-top,true);
-                  try{edge.getContext('2d')!.drawImage(tile.canvas,left-tile.x,top-tile.y,right-left,bottom-top,0,0,right-left,bottom-top);if(bitmapProjectionRequiresPrecision(placement,edge.width,edge.height))await drawProjectedBitmap(context,edge,placement.multiply(AffineTransform.translation(left,top)),{isCancelled:options.isCancelled});else context.drawImage(edge,left,top);}
+                  try{edge.getContext('2d')!.drawImage(tile.canvas,left-tile.x,top-tile.y,right-left,bottom-top,0,0,right-left,bottom-top);const drawing=drawSampled(edge,left,top);if(drawing)await drawing;}
                   finally{release(edge);}
                 }
               }
-            }else if(bitmapProjectionRequiresPrecision(placement,tile.canvas.width,tile.canvas.height))await drawProjectedBitmap(context,tile.canvas,placement.multiply(AffineTransform.translation(tile.x,tile.y)),{isCancelled:options.isCancelled});else context.drawImage(tile.canvas, tile.x, tile.y);
+            }else {const drawing=drawSampled(tile.canvas,tile.x,tile.y);if(drawing)await drawing;}
           } finally {
             release(tile.canvas);
           }

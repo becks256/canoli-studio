@@ -417,3 +417,10 @@ Keep complete small native texture projections and canonical large sampling cell
 
 
 Larger native frequency-band reads require a literal unchanged full-frame raster and unit integer placement, with no filter mask. A larger parent sampling rectangle must not change the bounds on which arbitrary native geometry or transformed image edges rasterize. Compute halo-inclusive working extents before choosing1024/512/256 cores; preserve every input pixel and the existing real allocation errors. The eligibility query is read-only and introduces no alternative mutation path. Source-image size remains independent of these work partitions.
+
+
+### Deterministic native Canvas coverage across request clipping
+
+Canvas image filtering and curve coverage can depend on clipping bounds. Keep complete projected footprints when a document-anchored rectangle plus gutters fits4MP and8192 working edges; otherwise rasterize complete256-pixel cells with two-pixel gutters, then copy their visible cores. Apply this to transformed source rasters, ordinary bitmap masks and vector drawing. Preserve native integer placement and the existing extreme-coordinate numerical path. Do not snap authored geometry or substitute viewport proxies for original assets.
+
+An affine smart instance also fixes its output sampling-cell origin/extent and final bitmap projection. Include cumulative spatial support and integer-rounding/overscan margins before choosing a complete core. Ordinary native frequency sampling keeps its prior partitions. Working surfaces stay private and release on every exit; original bitmap lifetimes and immutable commands/history are unchanged. Per-surface limits are not a whole-process memory guarantee. The separate large-halo planning fixture stubs processing; its predecessor's real331-pixel Gaussian timeout remains a performance limitation, not a passed native-blur gate.

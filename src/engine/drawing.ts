@@ -1,4 +1,6 @@
-import {drawProjectedBitmap} from './bitmap-projection';
+import {nativeVectorFootprint} from './native-vector-footprint';
+import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
+import {NativeCanvasGrid} from './native-canvas-grid';
 import {RawStrokeCoverage} from './paint-coverage';
 import {isImmutable} from '../core/immutable';
 import {hasWetMask,nativeWetMask} from './wet-mask';
@@ -427,7 +429,7 @@ function vectorFill(context:CanvasRenderingContext2D,value:VectorGradientData,ru
   context.fillStyle=gradient;context.fill(rule);
  }finally{context.restore();}
 }
-export function drawVectors(
+function drawVectorsNative(
   layer: VectorLayerData,
   target: HTMLCanvasElement,
   space: RenderSpace,
@@ -470,6 +472,12 @@ export function drawVectors(
     }
   }
   context.restore();
+}
+
+export function drawVectors(layer:VectorLayerData,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform){
+  const bounds=nativeVectorFootprint(layer);if(!bounds)return;
+  const grid=new NativeCanvasGrid(target.getContext('2d')!,space,renderTransform(space,world).bounds(bounds));
+  try{for(const cell of grid.cells()){drawVectorsNative(layer,grid.canvas,cell.space,world);grid.present(cell);}}finally{grid.dispose();}
 }
 
 function textInkBounds(context: CanvasRenderingContext2D, layer: TextLayerData, layout?: TextLayout) {
@@ -635,7 +643,15 @@ export async function bitmapMask(
 ): Promise<HTMLCanvasElement> {
   const canvas = createCanvas(space.width, space.height);
   try{
-    await drawProjectedBitmap(canvas.getContext('2d')!,bitmap,renderTransform(space,world),{isCancelled});
+    const mapping=renderTransform(space,world),native=mapping.a===1&&mapping.b===0&&mapping.c===0&&mapping.d===1&&Number.isSafeInteger(mapping.e)&&Number.isSafeInteger(mapping.f);
+    if(native||bitmapProjectionRequiresPrecision(mapping,bitmap.width,bitmap.height))await drawProjectedBitmap(canvas.getContext('2d')!,bitmap,mapping,{isCancelled});
+    else{
+      const width=bitmap.width,height=bitmap.height;if(!width||!height)throw new Error('Bitmap source changed during projection.');const grid=new NativeCanvasGrid(canvas.getContext('2d')!,space,mapping.bounds({x:0,y:0,width,height}));
+      try{for(const cell of grid.cells()){
+        checkRenderCurrent(isCancelled);if(bitmap.width!==width||bitmap.height!==height||!width||!height)throw new Error('Bitmap source changed during projection.');
+        const c=grid.canvas.getContext('2d')!,matrix=renderTransform(cell.space,world);c.save();try{c.setTransform(matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f);c.drawImage(bitmap,0,0);}finally{c.restore();}grid.present(cell);
+      }}finally{grid.dispose();}
+    }
     return canvas;
   }catch(error){release(canvas);throw error;}
 }

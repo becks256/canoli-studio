@@ -669,3 +669,19 @@ The genuine50MP fixture retains its original10000×5000 decoded dimensions and e
 None is adopted. The endpoint experiment removes84 of105 diagnostic mixing requests but fails to improve large filter-mask input latency. Retaining both conservative bounds worsens all three large pencil-mask medians. Opaque-only retention reduces native coverage readbacks in a saturated-prefix regression while preserving the required one-pixel allocation probe, but its clean input results remain mixed; large individual inputs still reach81.6ms. Reduced traffic alone is not acceptance. Further mask-preparation and tile/RPC scheduling work remains necessary.
 
 Independent decoding checks all648 complete PNGs and648 checksummed projects across the18 runs. Every variant/control appearance is RGBA-exact; all21 points, one intended operation, original texture bytes and exact model/pixel undo survive. All216 native long-task controls are positive; no overlapping gesture long task is observed. Measured engine/WASM/release identities are frozen within every run, and no competing builds/tests or application edits run. Main engine behavior is unchanged. These paced synthetic Canvas-copy observations do not prove physical presentation, sustained/editor-wide response, representative-photo quality, hardware/tablet behavior or process-peak memory. The full original roadmap and33ms input gate remain open.
+
+
+### 2026-10-21 — Native Canvas clipping consistency
+
+[Sealed native-canvas coverage evidence](benchmarks/canonical-canvas-coverage-2026-10-21.json.gz) records a correctness correction discovered while investigating tonal request aggregation. That aggregation prototype is deferred: changing native sampling rectangles changes bitmap-mask, transformed-raster and vector pixels. The committed control also disagrees between full viewport and native PNG in those cases and affine smart-object projection.
+
+Four unchanged-scale regression cases now have exact complete RGBA across viewport, three irregular cropped regions and streamed PNG. Independent Pillow decoding checks16 complete1080×440 images. A separate native image/cubic-command reference, composed in independent layer planes and processed by actual worker tone, matches every corrected large-vector RGBA byte without using the engine grid/vector helper. Original model/source bytes and1024×384 native source dimensions remain unchanged. Rendered appearances can change where the previous clipping-dependent rasterizer disagreed; this is not a byte-identical-renderer claim.
+
+| Regression | Prior viewport/export differing pixels | Prior maximum byte difference | Corrected differing pixels |
+| --- | ---: | ---: | ---: |
+| bitmap-mask | 11 | 4 | 0 |
+| affine-raster | 784 | 255 | 0 |
+| vector | 1226 | 255 | 0 |
+| affine-smart | 1727 | 255 | 0 |
+
+The first414-case native run passes412 cases, fails the unchanged narrow-raster reference with16 alpha bytes versus its1-byte bound, and times out on real331-pixel Gaussian processing after120seconds. Complete small projected footprints restore the original reference without changing its tolerance; larger geometry retains canonical cells. A subsequent413/414 run exposes inert extreme-miter metadata selecting a different working frame. Geometry-derived join bounds fix that case; the unchanged source/SVG assertions pass in30 focused browser checks and four new unit checks. The final candidate passes414 native/browser/WGSL checks and86 normal-production workflows. The large-halo allocation-planning check explicitly stubs processing and is not native Gaussian speed/output evidence. No new input-p95, pan/zoom, sustained/editor-wide, physical-display/GPU/tablet, representative-photo or process-memory acceptance is claimed. Those gates and the original roadmap remain open.
