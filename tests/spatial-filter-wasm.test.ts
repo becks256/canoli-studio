@@ -264,3 +264,9 @@ for(const kind of ['gaussian-blur','unsharp-mask']as const)it(`${kind} preserves
   const saved=input.slice(),output=applySpatialFilter(kernel,input,width,height,options),expected=reference(input,width,height,options);expect(Math.max(...output.map((v,i)=>Math.abs(v-expected[i])))).toBeLessThanOrEqual(1);expect(input).toEqual(saved);
  }
 });
+
+it('adjacent outputs and odd tails preserve independent convolution for zero and nonzero axis support',()=>{
+ for(const kind of ['gaussian-blur','unsharp-mask']as const)for(const width of [1,2,3,4,15,16,17])for(const [sigmaX,sigmaY]of [[0,1.3],[1.3,0],[1.3,.7]]){
+  const height=9,input=fixture(width,height);for(let y=0;y<height;y++)for(let x=0;x<width;x++)input[(y*width+x)*4+3]=(x+y)%3===0?0:128;const saved=input.slice(),options:SpatialFilterOptions={kind,sigmaX,sigmaY,amount:1.5,threshold:12},output=applySpatialFilter(kernel,input,width,height,options),expected=reference(input,width,height,options);expect(Math.max(...output.map((v,i)=>Math.abs(v-expected[i])))).toBeLessThanOrEqual(1);expect(input).toEqual(saved);
+ }
+});

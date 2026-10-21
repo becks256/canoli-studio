@@ -736,3 +736,8 @@ Actual Gaussian processing with a331-pixel sigma did not finish within120seconds
 ### Actual large-halo Gaussian verification — 2026-10-21
 
 The earlier331-pixel Gaussian timeout is reproduced on the committed engine under the unchanged120-second browser timeout. A later exact support refinement removes only zero-alpha margin contributions. Its real-processing regression, separate from the existing explicitly stubbed allocation-planning test, must complete affine viewport and native PNG rendering with unchanged complete pixels, source bytes/dimensions and model data. All jobs retain the existing4MP/8192-edge budget. Empty, sparse and dense requests must preserve Gaussian, unsharp and all frequency-band semantics across reused worker memory. Passing this particular sparse case does not establish general large-dense-blur,33ms input, editor-wide/sustained, physical-device, quality or process-memory acceptance. Final validation is recorded in the roadmap and benchmark evidence.
+
+
+### Native convolution reuse and geometry fidelity — 2026-10-21
+
+Adjacent spatial outputs must preserve every original Gaussian/unsharp/frequency contribution and its floating-point order while reusing source/weight reads. Independent accumulators, clipped/empty support, zero-support axes, even/odd dimensions and single-column tails must retain native output and source ownership. Do not combine output pixels, approximate a Gaussian, add an unsupported-only module requirement or downsample the source. A scalar optimization must keep existing worker/ABI, scratch and4MP/8192-edge native work contracts. Kernel and controlled export measurements remain separate from33ms input, editor-wide/sustained, hardware, quality and process-memory acceptance.

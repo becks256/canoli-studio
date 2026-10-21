@@ -431,3 +431,8 @@ A footprint query must remain linear in contour size, including long coincident 
 ### Exact transparent support in spatial filtering
 
 A spatial convolution may omit only contributions proven to be positive zero. Trim row margins from actual input alpha, then exclude globally empty rows from the vertical pass; horizontal filtering does not move coverage between rows. Preserve retained tap order and all Float64 weights/intermediates, output order, threshold/rounding and mode-specific hidden-RGB/alpha behavior. Empty calls must not expose scratch from previous dense requests. Do not approximate a Gaussian, renormalize clipped support, infer transparent RGB as coverage or turn these work bounds into source limits. The worker/ABI and existing native allocation checks remain authoritative.
+
+
+### Paired spatial-output invariant
+
+Reuse immutable source loads between neighboring horizontal output pixels only when each output receives exactly its own original weights in ascending sample order. Handle distinct leading/trailing taps, clipped/empty support, zero-radius axes and one-pixel/odd tails independently. Share vertical weight/address work without sharing accumulators or mixing neighboring channels. Inline output encoding preserves all existing alpha/hidden-RGB/threshold rules, including an invisible unsharp pixel followed by visible content. Private scratch, source snapshots, worker result validation and native allocation budgets remain unchanged. These are scalar instructions with the existing module ABI/features; no approximate reduction or SIMD-only compatibility path is permitted.
