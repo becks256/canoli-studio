@@ -13,3 +13,13 @@ it('leaves non-miter coverage and square-cap support conservative',()=>{
 it('keeps the prior conservative hull for an unresolved almost-reversing tangent',()=>{
  const p=VectorPath.fromSvgPath('M0 0L1000 0L0 .00000001',{fill:null,stroke:'#ff0000',strokeWidth:16,strokeJoin:'miter',strokeMiterLimit:12}).toJSON();expect(nativeVectorFootprint({paths:[p]})).toEqual(pathBounds(p));
 });
+it('bounds maximum-size coincident contours with linear coordinate work and unchanged support',()=>{
+ for(const closed of [false,true])for(const count of [128,256,512,20000]){
+  let reads=0;
+  const coordinate=()=>new Proxy({x:32,y:32},{get(target,key){if(key==='x'||key==='y')reads++;return Reflect.get(target,key);}});
+  const points=Array.from({length:count},()=>new Proxy({x:32,y:32,in:coordinate(),out:coordinate()},{get(target,key){if(key==='x'||key==='y')reads++;return Reflect.get(target,key);}}));
+  const value={...path(12),closed,points},expected={x:24,y:24,width:16,height:16};
+  expect(nativeVectorFootprint({paths:[value]})).toEqual(expected);
+  expect(reads).toBeLessThanOrEqual(64*count);
+ }
+});
