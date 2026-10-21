@@ -9,7 +9,7 @@ export class CanvasCache {
   private entries = new Map<symbol, Entry>();
   private variants = new Map<string, Map<string, symbol>>();
   private bytes = 0;
-  constructor(readonly budget = 64 * 1024 * 1024) {}
+  constructor(readonly budget = 64 * 1024 * 1024, private readonly readback = false) {}
   get byteLength() { return this.bytes; }
   hasCanvas(key: string, signature: string): boolean {
     const id = this.variants.get(key)?.get(signature);
@@ -56,7 +56,7 @@ export class CanvasCache {
     if (bytes > this.budget) return;
     while (this.bytes + bytes > this.budget || this.entries.size >= 256)
       this.remove(this.entries.keys().next().value!);
-    const canvas = createCanvas(Math.max(1, width), Math.max(1, height));
+    const canvas = createCanvas(Math.max(1, width), Math.max(1, height), this.readback);
     try {
       if (width && height) canvas.getContext("2d")!.drawImage(source, x, y, width, height, 0, 0, width, height);
     } catch (error) {

@@ -1,5 +1,5 @@
 import {projectNativeMask} from "./projected-mask";
-import {frequencyIdentitySource} from './frequency-identity';
+import {frequencyIdentitySource,nativeFrequencyRasterSource} from './frequency-identity';
 import {yieldTask} from './task-yield';
 import { maskSignature } from "./mask-signature";
 import {BrushTextureSampler} from './brush-texture';
@@ -452,12 +452,20 @@ export class CanvasRenderer implements DocumentRenderer {
     // A unit native frequency plane can cover the outer tile's two-pixel
     // overscan in one request. Keep affine sampling and large-halo budgets on
     // the established grid; source/document resolution is independent.
-    const nativeFrequency = filters.length===1 && filters[0].kind==='frequency-band' &&
+    const nativeFrequency = filters.length===1 && (filters[0].kind==='frequency-band' ||
+      (filters[0].kind==='native-composition' && frequencyIdentity!==null)) &&
       placement.a===1 && placement.b===0 && placement.c===0 && placement.d===1 &&
       Number.isSafeInteger(placement.e) && Number.isSafeInteger(placement.f);
-    const paddedEdge=512+4+2*halo;
-    const tileLimit=nativeFrequency && paddedEdge<=8192 && paddedEdge*paddedEdge<=4_000_000?512:256;
-    const step = Math.max(1, Math.min(tileLimit, Math.floor(512 / nativePerPixel)));
+    const samplingHalo=filters[0]?.kind==='native-composition'&&frequencyIdentity?Math.max(halo,frequencyIdentity.samplingHalo):halo;
+    const paddedEdge=512+4+2*samplingHalo;
+    // A native band over one literal raster can absorb its parent's composition
+    // overscan in one request. Full projection/appearance graphs keep their
+    // existing sampling grid; halo budgets still precede every allocation.
+    const nativeBandOverscan=nativeFrequency&&filters[0].kind==='frequency-band'&&!filterMask&&nativeFrequencyRasterSource(master,assets)!==null;
+    const bandPaddedEdge=1024+4+2*samplingHalo;
+    const tileLimit=nativeFrequency && paddedEdge<=8192 && paddedEdge*paddedEdge<=4_000_000
+      ?nativeBandOverscan&&bandPaddedEdge<=8192&&bandPaddedEdge*bandPaddedEdge<=4_000_000?1024:512:256;
+    const step = Math.max(1, Math.min(tileLimit, Math.floor((nativeBandOverscan?tileLimit:512) / nativePerPixel)));
     const context = target.getContext("2d")!;
     for (let ty = 0; ty < target.height; ty += step)
       for (let tx = 0; tx < target.width; tx += step) {
@@ -1420,7 +1428,7 @@ export class CanvasRenderer implements DocumentRenderer {
     this.filterTiles.clear();
     this.maskPaint.clear();
     this.activeStroke.clear();
-    this.brushTextures.clear();
+    this.brushTextures.retireCache();
   }
   clearCache() {
     this.resetView();
@@ -1436,6 +1444,7 @@ export class CanvasRenderer implements DocumentRenderer {
     this.fonts?.removeEventListener("loadingdone", this.fontsChanged);
     this.fonts?.removeEventListener("loadingerror", this.fontsChanged);
     this.clearCache();
+    this.brushTextures.dispose();
     this.processor.dispose();
   }
 }

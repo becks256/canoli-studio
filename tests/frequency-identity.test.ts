@@ -36,3 +36,9 @@ it('retains real sampling-budget errors and rejects unequal legacy radii unless 
  const original=detail.smartFilters[0];if(original.kind!=='frequency-band')throw new Error();const {kind:_,...options}=original;detail.setFilters([new FrequencyBandFilter({...options,sigma:3})]);
  expect(inspect(document)).toBeNull();group.frequencyRadius=2;expect(inspect(document)).not.toBeNull();
 });
+it('retains the effective native Gaussian halo for composition working-budget decisions',()=>{
+ const document=scene(),group=document.layers.at(0) as LayerGroup;
+ expect(inspect(document)?.samplingHalo).toBe(6);
+ group.frequencyRadius=2.25;expect(inspect(document)?.samplingHalo).toBe(7);
+ group.frequencyRadius=280;expect(inspect(document)?.samplingHalo).toBe(840);
+});

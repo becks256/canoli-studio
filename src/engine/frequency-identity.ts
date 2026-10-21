@@ -11,7 +11,7 @@ const neutral=(layer:LayerData)=>layer.visible&&layer.opacity===1&&(layer.fillOp
 /** Exact native RGB8 reconstruction outside retouch ink, never an approximate preview.
  * The strict shape deliberately declines altered filters, transforms, masks or styles.
  * The returned raster is private render data; authored bands/strokes remain untouched. */
-export function frequencyIdentitySource(master:Pick<DocumentData,'width'|'height'|'children'>,registry:ComponentRegistry,assets:AssetStore):{raster:RasterLayerData;unchanged(region:Rect):boolean}|null{
+export function frequencyIdentitySource(master:Pick<DocumentData,'width'|'height'|'children'>,registry:ComponentRegistry,assets:AssetStore):{raster:RasterLayerData;samplingHalo:number;unchanged(region:Rect):boolean}|null{
   if(master.children.length!==1)return null;
   const group=master.children[0];
   if(group.kind!=='group'||group.children.length!==3||group.blendMode!=='normal'||!group.visible||group.opacity!==1||(group.fillOpacity??1)!==1||group.x!==0||group.y!==0||!identity(group.transform)||group.styles?.dropShadow.enabled||group.styles?.colorOverlay.enabled||group.styles?.blendIf.enabled)return null;
@@ -52,5 +52,17 @@ export function frequencyIdentitySource(master:Pick<DocumentData,'width'|'height
   if(asset.width!==master.width||asset.height!==master.height||asset.bitmap.width!==master.width||asset.bitmap.height!==master.height)return null;
   const ink=retouches.filter(paint=>paint.strokes.length).map(paint=>localBounds(paint));
   if(ink.some(bounds=>!bounds))return null;
-  return{raster,unchanged(region){return ink.every(bounds=>bounds!.x+bounds!.width+2<region.x||bounds!.y+bounds!.height+2<region.y||bounds!.x-2>region.x+region.width||bounds!.y-2>region.y+region.height);}};
+  return{raster,samplingHalo:halo/2,unchanged(region){return ink.every(bounds=>bounds!.x+bounds!.width+2<region.x||bounds!.y+bounds!.height+2<region.y||bounds!.x-2>region.x+region.width||bounds!.y-2>region.y+region.height);}};
+}
+
+
+/** A literal native pixel plane, without resampling, appearance or authored
+ * replacements. Larger band sampling must not change arbitrary master canvas
+ * bounds: native bitmap edge coverage can depend on those bounds. */
+export function nativeFrequencyRasterSource(master:Pick<DocumentData,'width'|'height'|'children'>,assets:Pick<AssetStore,'get'>):RasterLayerData|null {
+  if(master.children.length!==1)return null;
+  const raster=master.children[0];
+  if(raster.kind!=='raster'||raster.blendMode!=='normal'||!neutral(raster)||raster.width!==master.width||raster.height!==master.height||raster.effects.length||raster.erasures?.length)return null;
+  const asset=assets.get(raster.assetId);
+  return asset.width===master.width&&asset.height===master.height&&asset.bitmap.width===master.width&&asset.bitmap.height===master.height?raster:null;
 }

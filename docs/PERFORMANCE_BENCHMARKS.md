@@ -588,3 +588,32 @@ This is internal read-only preparation. The production release changes only thre
 Manual selection-masked red-eye correction passes actual WASM/worker processing and 120 actual-WGSL comparisons on Chromium SwiftShader software WebGPU. Observed maximum premultiplied RGB error is one byte, maximum mean RGB error 0.0916667 and alpha mismatches zero across threshold boundaries, partial alpha, masks, opacity and normal/multiply blending. The native feature suite exports a full 50 MP PNG while preserving source bytes, native region detail, editable masks and project reopening. Final build, 1,363 unit/API cases, 38 focused browser regressions, seven final feature checks and 83 production workflows passed. A guide-only final release change was verified with two affected production checks; all app/worker/WASM/other guide files remain byte-identical to the full production-tested release. [Source/release and check evidence](benchmarks/red-eye-2026-10-18.json).
 
 This is numerical and functional evidence, not real-hardware presentation latency, portrait-quality evaluation, complete F05/F14 acceptance or a 60fps claim. Existing wet-gesture and editor-wide performance failures remain open. Working tile budgets do not cap source/document geometry.
+
+
+## Textured input and native composition — 2026-10-20
+
+The [sealed alternating studies](benchmarks/texture-frequency-production-performance-2026-10-20.json) compare twelve synthetic opaque-texture fixtures through normal production UI, with twenty paced trusted movements per gesture and three runs per variant. Native matching-canvas-copy timestamps precede the one-pixel validation read; every sample must newly match known exact RGBA. Saved original/edited/undo projects independently preserve source blobs, all21 points and exactly one authored operation. Complete PNG/model undo and native75ms long-task controls are verified. The reference is the pre-texture-correction release; changed legacy edge appearance is recorded separately from speed.
+
+| Fixture | Reference median run p95 (ms) | Current median run p95 (ms) |
+| --- | ---: | ---: |
+| Small brush/layer | 13.4 | 14.0 |
+| Small pencil/mask | 7.9 | 14.7 |
+| Small eraser/filter mask | 23.4 | 21.2 |
+| 2048 brush/layer | 20.3 | 14.3 |
+| 2048 pencil/mask | 95.7 | 31.6 |
+| 2048 eraser/filter mask | 34.9 | 34.5 |
+| 1800 brush/layer | 17.9 | 14.6 |
+| 1800 pencil/mask | 89.0 | 31.9 |
+| 1800 eraser/filter mask | 37.7 | 36.8 |
+| 900 brush/layer | 13.9 | 14.0 |
+| 900 pencil/mask | 55.1 | 32.4 |
+| 900 eraser/filter mask | 22.8 | 28.3 |
+
+Two current fixture medians still fail33ms, and individual900-pixel pencil runs exceed33ms. No overlapping gesture long task is observed. Six final appearances remain identical to the old renderer; three brush-edge and three filter-mask appearances change. An independent32768-subrow circle-area integral matches every current alpha pixel in all three circle fixtures, but does not establish broader image quality. These results do not establish sustained/editor-wide, physical/tablet/display or whole-process-memory acceptance.
+
+A separate unprofiled offscreen native50MP full-frame low-retouch study compares corrected256/512 composition cores. Three alternating pairs on Linux/Chromium153.0.8010.12, AMD Ryzen9 3900X, observe median37313.6→32177.7ms (13.8% locally),3160→3081 Gaussian requests and71064000→70432320 sampled pixels. Independent complete RGBA decoding matches all six outputs; source/model hashes remain unchanged and all outputs differ from the original. Native long-task controls are positive and no overlapping export long task is reported. Animation-gap p95 is19.9–20.3ms, a headless scheduling proxy. No competing builds/tests ran. A roughly32-second export and the remaining input misses still require work; no general60fps or complete F14 claim is made.
+
+
+### Literal-raster native band overscan
+
+The [band-overscan follow-up](benchmarks/frequency-band-overscan-2026-10-20.json) compares unchanged512-pixel composition cores with512 versus1024 native band sampling cores. The larger read is eligible only over a literal unchanged native raster, without a filter mask, under the same4MP/8192-edge halo budget. Three alternating unprofiled50MP pairs observe median32243.4→29017.1ms (10.0% locally),3081→1580 Gaussian requests and70432320→68432000 sampled pixels. All six complete outputs match RGBA exactly and contain the intended retouch; source/model identities remain unchanged. All six native long-task controls are observed and no overlapping export task is reported. No competing tests/builds ran. This is one synthetic full-frame low-retouch fixture on the same named host/browser, with headless callbacks as scheduling proxies. It does not establish general speed, physical display, sustained/editor-wide or process-memory acceptance. A29-second export still needs work.
