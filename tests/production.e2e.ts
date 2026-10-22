@@ -1,10 +1,39 @@
 import {checkAvif} from './helpers/avif';
 import { test, expect } from "@playwright/test";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, readdir } from "node:fs/promises";
 import {encodeRgbaPng} from "../src/engine/png";
 import {spawnSync} from 'node:child_process';
 import {readProject} from '../src/core/project';
 import {readBrushContainer} from '../src/brushes/container';
+
+async function productionRawWorker(){
+  const files=(await readdir('dist/assets')).filter(name=>name.endsWith('.js')),matches:string[]=[];
+  for(const file of files)if((await readFile('dist/assets/'+file,'utf8')).includes('Invalid RAW worker request.'))matches.push(file);
+  expect(matches).toHaveLength(1);return'/assets/'+matches[0];
+}
+test('production internal RAW worker preserves native settings, calibration and independent working pixels without developer globals',async({page},info)=>{
+  const worker=await productionRawWorker(),manifest=JSON.parse(await readFile('tests/fixtures/raw/manifest.json','utf8'))as {cases:{file:string;png:string;options:unknown;width:number;height:number}[]};
+  await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);
+  const download=async(name:string)=>{const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Save project',exact:true}).click();const path=info.outputPath(name);await(await pending).saveAs(path);return readProject(new Blob([new Uint8Array(await readFile(path))]));};
+  const before=await download('raw-worker-before.luma'),results=[];
+  for(const fixture of manifest.cases.filter(value=>!value.file.endsWith('.gz'))){
+    const result=await page.evaluate(async({worker,fixture,bytes,reference})=>{
+      const blob=new File([new Uint8Array(bytes)],fixture.file),run=(mode:'inspect'|'develop')=>new Promise<{report:{displayWidth:number;displayHeight:number;canDevelop:boolean};png:Blob}>((resolve,reject)=>{const instance=new Worker(worker,{type:'module'});instance.onmessage=event=>{if(event.data.progress)return;instance.terminate();if(event.data.error)reject(new Error(event.data.error));else resolve(event.data);};instance.onerror=event=>{instance.terminate();reject(new Error(event.message));};instance.postMessage({blob,mode,options:{allowPrecisionLoss:true,development:fixture.options}});});
+      const preflight=await run('inspect'),decoded=await run('develop'),actual=await createImageBitmap(decoded.png,{colorSpaceConversion:'none'}),expected=await createImageBitmap(new Blob([new Uint8Array(reference)],{type:'image/png'}),{colorSpaceConversion:'none'}),canvas=document.createElement('canvas');canvas.width=actual.width;canvas.height=actual.height;const context=canvas.getContext('2d')!;
+      context.drawImage(actual,0,0);const a=context.getImageData(0,0,actual.width,actual.height).data;context.clearRect(0,0,actual.width,actual.height);context.drawImage(expected,0,0);const b=context.getImageData(0,0,actual.width,actual.height).data;let maximum=0;for(let i=0;i<a.length;i++)maximum=Math.max(maximum,Math.abs(a[i]-b[i]));actual.close();expected.close();canvas.width=canvas.height=0;
+      return{file:fixture.file,maximum,preflight:preflight.report.canDevelop,size:[decoded.report.displayWidth,decoded.report.displayHeight],original:[...new Uint8Array(await blob.arrayBuffer())]};
+    },{worker,fixture,bytes:[...await readFile('tests/fixtures/raw/'+fixture.file)],reference:[...await readFile('tests/fixtures/raw/'+fixture.png)]});
+    expect(result).toMatchObject({maximum:0,preflight:true,size:[fixture.width,fixture.height]});expect(result.original).toEqual([...await readFile('tests/fixtures/raw/'+fixture.file)]);results.push({...result,original:undefined});
+  }
+  const after=await download('raw-worker-after.luma');expect(after.document).toEqual(before.document);expect(after.entries).toHaveLength(0);await info.attach('production-raw-native',{body:JSON.stringify(results),contentType:'application/json'});
+});
+
+test('production internal RAW worker requires output consent before WASM and rejects missing code before a fresh retry',async({page})=>{
+  const worker=await productionRawWorker(),bytes=[...await readFile('tests/fixtures/raw/bayer-rggb.dng')];await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);let loads=0;
+  await page.route('**/canoli_raw_decoder-*.wasm',route=>{loads++;return route.fulfill({status:404,body:'Missing RAW native code'});});
+  const run=(consent:boolean)=>page.evaluate(async({worker,bytes,consent})=>new Promise<string>(resolve=>{const instance=new Worker(worker,{type:'module'});instance.onmessage=event=>{if(event.data.progress)return;instance.terminate();resolve(event.data.error??'Success');};instance.onerror=event=>{instance.terminate();resolve(event.message);};instance.postMessage({blob:new Blob([new Uint8Array(bytes)]),mode:'develop',options:{allowPrecisionLoss:consent}});}),{worker,bytes,consent});
+  expect(await run(false)).toMatch(/consent/);expect(loads).toBe(0);expect(await run(true)).toMatch(/RAW|wasm|fetch|abort/i);expect(loads).toBeGreaterThan(0);await page.unroute('**/canoli_raw_decoder-*.wasm');expect(await run(true)).toBe('Success');
+});
 
 test('production AVIF primary-image review preserves precision choices and original bytes across native project reopening',async({page},info)=>{
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);

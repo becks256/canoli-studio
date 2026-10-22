@@ -1,5 +1,12 @@
 # Canoli Studio System Design & Architecture Specification
 
+## RAW development dependency in progress
+
+Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.
+
+The internal checked decoder produces owned linear RGB16/grayscale16; explicit conversion consent is required before the private worker returns an sRGB RGBA8 working PNG. The build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Reported metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. There is no public `openRaw` or editable RAW document workflow yet: original/derived asset storage, commands, persistence, UI review/development and full application 50 MP acceptance remain in implementation. These trusted file services grant no isolated Scripts/plugin/REST file privilege or live browser/headless synchronization.
+
+
 ## AVIF application import and original-source invariant
 
 AVIF input uses its own primary-item/property-association reader; the strict owned-output validator remains separate. Trusted preflight is read-only. Metadata work has explicit box/table/profile budgets, independent of encoded file size and native image geometry. Internal private workers check high-bit-depth/color-assumption consent before loading the local decoder, validate raw dimensions and return crop/orientation-correct PNG with source ICC identification. Success, failure, throwing callbacks and abort terminate the worker; cancellation remains effective during host result validation. The owned C ABI checks native errors and actual source depth/alpha/CICP before publication. Its pinned libavif 1.3/AOM 3.12 build removes optional default geometry guards while retaining native overflow/allocation checks and a pre-decode PTRDIFF representation check. Full decoded codec memory and real codec/browser limits are explicit; this is not region decoding, an HDR pipeline or a performance acceptance claim.

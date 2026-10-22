@@ -77,6 +77,8 @@ import {prepareAvifImport} from './engine/avif-import';
 import {importParagraphStyles} from './core/paragraph-styles';
 import {inspectTiffFile} from './core/interchange/tiff/client';
 import {inspectAvifFile} from './core/interchange/avif/client';
+import {inspectRawFile} from './core/interchange/raw/client';
+import type {RawImportControl,RawImportReport} from './core/interchange/raw/types';
 import type {AvifDecodeOptions,AvifImportControl,AvifImportReport} from './core/interchange/avif/types';
 import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
 import type {
@@ -1312,6 +1314,9 @@ export class EditorApplication {
 
   /** Trusted local preflight; opening uses the separate guarded import transaction below. */
   async inspectAvif(file:File,control:AvifImportControl={}):Promise<AvifImportReport>{return inspectAvifFile(file,control);}
+
+  /** Trusted, read-only sensor preflight. Application RAW installation is separate. */
+  async inspectRaw(file:File,image=0,control:RawImportControl={}):Promise<RawImportReport>{return inspectRawFile(file,image,control);}
 
   async openAvif(file:File,options:AvifDecodeOptions={},control:AvifImportControl={}):Promise<Readonly<AvifImportReport>>{
     control.signal?.throwIfAborted();

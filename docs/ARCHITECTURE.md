@@ -1,5 +1,12 @@
 # Architecture
 
+## RAW development dependency in progress
+
+Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.
+
+The internal checked decoder produces owned linear RGB16/grayscale16; explicit conversion consent is required before the private worker returns an sRGB RGBA8 working PNG. The build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Reported metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. There is no public `openRaw` or editable RAW document workflow yet: original/derived asset storage, commands, persistence, UI review/development and full application 50 MP acceptance remain in implementation. These trusted file services grant no isolated Scripts/plugin/REST file privilege or live browser/headless synchronization.
+
+
 ## Recovery persistence failure boundary
 
 `RecoveryRepository.persist` guards synchronous transaction setup and request callbacks. A caught failure aborts the entire checkpoint/asset write and is retained as the promise's rejection cause, including when the browser's transaction error is generic. The UI and persistence worker share this path, preserving the previous checkpoint, source bytes and actionable quota name/message without uncaught callback errors.

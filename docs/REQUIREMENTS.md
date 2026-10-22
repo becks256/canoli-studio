@@ -1,5 +1,12 @@
 # Canoli Studio editor requirements
 
+## RAW development dependency in progress
+
+Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.
+
+The internal checked decoder produces owned linear RGB16/grayscale16; explicit conversion consent is required before the private worker returns an sRGB RGBA8 working PNG. The build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Reported metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. There is no public `openRaw` or editable RAW document workflow yet: original/derived asset storage, commands, persistence, UI review/development and full application 50 MP acceptance remain in implementation. These trusted file services grant no isolated Scripts/plugin/REST file privilege or live browser/headless synchronization.
+
+
 ## Recovery failure containment and optional-storage startup
 
 Recovery progress preserves the existing active-document footer behavior. Preserve focused text/caret, selection, native pixels and undo history through pending/saving/saved/error transitions. Errors take priority over the existing project-download indicator; its title still describes actual recovery state. Switching or closing a document must unsubscribe its status, and inactive save completion/failure must not replace the active footer. Closing still awaits the existing recovery flush.

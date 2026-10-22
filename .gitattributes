@@ -1,6 +1,12 @@
 # Preserve exact compiler output and the recorded native artifact digest.
 src/core/interchange/avif/codec/canoli_avif_decoder.js -whitespace linguist-generated=true
+src/core/interchange/raw/codec/canoli_raw_decoder.js -whitespace linguist-generated=true
 # Keep copied upstream notices byte-for-byte, including their original whitespace.
 public/licenses/aom-3.12.1-LICENSE.txt -whitespace
 public/licenses/aom-3.12.1-PATENTS.txt -whitespace
 public/licenses/emscripten-4.0.10-LICENSE.txt -whitespace
+public/licenses/libraw-0.22.2-COPYRIGHT.txt -whitespace
+public/licenses/libraw-0.22.2-LICENSE.LGPL.txt -whitespace
+public/licenses/libraw-0.22.2-LICENSE.CDDL.txt -whitespace
+public/licenses/libraw-0.22.2-NOTICES.txt -whitespace
+public/licenses/zlib-1.3.2-LICENSE.txt -whitespace

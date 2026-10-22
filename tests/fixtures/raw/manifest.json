@@ -1,0 +1,556 @@
+{
+  "generator": "Independent TIFF/DNG writer; pinned upstream native dcraw_emu linear RGB16",
+  "numpy": "1.26.4",
+  "libraw": "0.22.2",
+  "cases": [
+    {
+      "file": "bayer-rggb.dng",
+      "reference": "bayer-rggb.rgb16le",
+      "png": "bayer-rggb.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "1258402999a68f19c322ea6a3e3d4d10ea2dde348073c8b574ec3fe5bb60bb14",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "bayer-grbg.dng",
+      "reference": "bayer-grbg.rgb16le",
+      "png": "bayer-grbg.png",
+      "sha256": "0b707072f3c03b478f894db892bb885b084141ae4e2163a353e5701db9bfed0d",
+      "rgb16Sha256": "d4e4bcdec82be066f1770fde34ea09dc4b3ca94cf9cd7344629f2d3db465a8f7",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "bayer-gbrg.dng",
+      "reference": "bayer-gbrg.rgb16le",
+      "png": "bayer-gbrg.png",
+      "sha256": "67ceae32f3752348e9836c9fab7bdc528a0aea2bee9c5781f5f8047eedc7605e",
+      "rgb16Sha256": "dcd09f35f75cb19de12ec3f13c2cabdef1ed9cb6ac176e51fc605ffd93fb9be4",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "bayer-bggr.dng",
+      "reference": "bayer-bggr.rgb16le",
+      "png": "bayer-bggr.png",
+      "sha256": "304e45ef8037bfe339c5495981b197993722208201704ce8bc6b394fac6cde12",
+      "rgb16Sha256": "f9e715e2b3de3fa51f10b859ca609e202946a59fd09de5924cad70e4b2a71ca5",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "orientation-2.dng",
+      "reference": "orientation-2.rgb16le",
+      "png": "orientation-2.png",
+      "sha256": "1a78e67dfc308e5ac124f58c0bba627fba4fa8e731c69c2bdd2bb9823efb5008",
+      "rgb16Sha256": "04e878ecd8482042efb59a9831f8d3abd35ee2dbe87892f5788609f0b3aba582",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "orientation-3.dng",
+      "reference": "orientation-3.rgb16le",
+      "png": "orientation-3.png",
+      "sha256": "848e94759b909d40a55e096480c42c809f07937724c52b085603146409c7655b",
+      "rgb16Sha256": "8da359a7525f74140f60bb06449618cb5c434fc6f92c8a8c4e12067b8b833af2",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "orientation-4.dng",
+      "reference": "orientation-4.rgb16le",
+      "png": "orientation-4.png",
+      "sha256": "3d9f16fb39924bdad306b336ad4d42af65a7d041fd4edf1ce5ce158bd6ade74c",
+      "rgb16Sha256": "141d90c1d489340a9eb578271bb9ef2b7a1213905b90fe9ba9a2d012917b44b7",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "orientation-5.dng",
+      "reference": "orientation-5.rgb16le",
+      "png": "orientation-5.png",
+      "sha256": "31d97e4b64464a157879e079ccba07fce066185e0e9ddf17fe339a329d393361",
+      "rgb16Sha256": "746a06d086bdbcce53fffe0bdba10a21f586589bd79106879f396aff884561b3",
+      "bytes": 6816,
+      "width": 48,
+      "height": 64,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "orientation-6.dng",
+      "reference": "orientation-6.rgb16le",
+      "png": "orientation-6.png",
+      "sha256": "e4eac71d526f6404d32204e12cdf40cb57b49d3f6b27431e444a86b240083b41",
+      "rgb16Sha256": "f1cae9d59e89e233a70a51eec89bb2417dc31a0914753bcb37db84f2b5169f0c",
+      "bytes": 6816,
+      "width": 48,
+      "height": 64,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "orientation-7.dng",
+      "reference": "orientation-7.rgb16le",
+      "png": "orientation-7.png",
+      "sha256": "f7de1d68f08bf4d394661ab34277937d65a2fef7ae37f9d6bb52c960028d2428",
+      "rgb16Sha256": "fd87d29844a332fe273ab13e99e69f72adc3eb034d00b9bf3b7d0539b4ec1348",
+      "bytes": 6816,
+      "width": 48,
+      "height": 64,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "orientation-8.dng",
+      "reference": "orientation-8.rgb16le",
+      "png": "orientation-8.png",
+      "sha256": "f95dc3fc9ba04aac7b3c4bcfcb2ede2ac648e7985fadcb8aef602d493dadd9c0",
+      "rgb16Sha256": "c0292a4324c44528332cf4b61f58f90936705d3c2ee4b1d7796c57373ff5ffca",
+      "bytes": 6816,
+      "width": 48,
+      "height": 64,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "active-area.dng",
+      "reference": "active-area.rgb16le",
+      "png": "active-area.png",
+      "sha256": "cbea5eb65c2dd98181c7ff07428c74757808aae7ae5d915122f3bad366647e51",
+      "rgb16Sha256": "9229d4c441f5198eb285270aab06453e44b4136c5def853b0e6a52c9216b5deb",
+      "bytes": 6816,
+      "width": 56,
+      "height": 44,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "no-camera-wb.dng",
+      "reference": "no-camera-wb.rgb16le",
+      "png": "no-camera-wb.png",
+      "sha256": "64845778763a260c574772a28d16f1146e48f85be0120ce0d65313d9ecc34c89",
+      "rgb16Sha256": "39e2a4d4e3f90a1f44d6ab97fc14b0976fc20d5c98c0355e8212d0865feb272f",
+      "bytes": 6780,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "auto"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "linear-rgb16.dng",
+      "reference": "linear-rgb16.rgb16le",
+      "png": "linear-rgb16.png",
+      "sha256": "96560beb94e9f471ee050fdacb116450e7c642034fe294cd26a447ea6f97843e",
+      "rgb16Sha256": "0548bbcf7d229f5863a20ad900d4d8236c83cb39564391afd304dcbeb1e1a842",
+      "bytes": 19086,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "monochrome16.dng",
+      "reference": "monochrome16.rgb16le",
+      "png": "monochrome16.png",
+      "sha256": "19797ba440e688c3f57209056a49664157ace97f253b19b39afd09cfbc440979",
+      "rgb16Sha256": "f7653537a1f54f0407e080e330e9a2a183055013ebbdd289e067bd5afbf44524",
+      "bytes": 6676,
+      "width": 64,
+      "height": 48,
+      "channels": 1,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "quality-linear.dng",
+      "reference": "quality-linear.rgb16le",
+      "png": "quality-linear.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "9f1701b6412f63104dfa93dcd58c1856dc1e5cef7358c9a302661b3503769a0a",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "demosaic": "linear"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "quality-vng.dng",
+      "reference": "quality-vng.rgb16le",
+      "png": "quality-vng.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "1463815d6603d0c2b88ce69134c523ab218959c8c2775f6509391d43a77b8813",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "demosaic": "vng"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "quality-ppg.dng",
+      "reference": "quality-ppg.rgb16le",
+      "png": "quality-ppg.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "d0d467bec1e8f0241c65c0dcd8d303dd7784ba243418ec10d2a9dfc2d7f6c108",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "demosaic": "ppg"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "quality-dcb.dng",
+      "reference": "quality-dcb.rgb16le",
+      "png": "quality-dcb.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "de491f472c1f00819019d03f94b031c9a9565285669e8f28bc46ded295149155",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "demosaic": "dcb"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "quality-dht.dng",
+      "reference": "quality-dht.rgb16le",
+      "png": "quality-dht.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "cf32b42ef81e4a7a46d520aa7431dea5a520b05711f81a5d916eb9c88beeb6bd",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "demosaic": "dht"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "quality-aahd.dng",
+      "reference": "quality-aahd.rgb16le",
+      "png": "quality-aahd.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "eaecaf886674c4d2419cee680fb1b63d7eee6a5e0f8d5f726e3ae570d5f8fd87",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "demosaic": "aahd"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "daylight.dng",
+      "reference": "daylight.rgb16le",
+      "png": "daylight.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "73e6f036f4a81d466b74deb7ead90f6047232a27f53146f39e4b3b3ab32c70e4",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "daylight"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "auto-white-balance.dng",
+      "reference": "auto-white-balance.rgb16le",
+      "png": "auto-white-balance.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "39e2a4d4e3f90a1f44d6ab97fc14b0976fc20d5c98c0355e8212d0865feb272f",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "auto"
+      },
+      "synthetic": true
+    },
+    {
+      "file": "custom-white-balance.dng",
+      "reference": "custom-white-balance.rgb16le",
+      "png": "custom-white-balance.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "a3d1f2d3944f9c9a259ba53787db3ae8010a6aa8d3725034c3dbd88fe9c73c20",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "custom",
+        "multipliers": {
+          "red": 2.3,
+          "green": 1,
+          "blue": 0.8
+        }
+      },
+      "synthetic": true
+    },
+    {
+      "file": "exposure-down.dng",
+      "reference": "exposure-down.rgb16le",
+      "png": "exposure-down.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "87839c5650512f32a0c056fd5dd9a975130a4246fbe64663f7900abc41acef85",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "exposure": -2
+      },
+      "synthetic": true
+    },
+    {
+      "file": "exposure-up.dng",
+      "reference": "exposure-up.rgb16le",
+      "png": "exposure-up.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "d7f93aabbb4a39004ba63618922aa8d463c801a8b744677f4cb22fcc5b4c884d",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "exposure": 1.25,
+        "highlightPreservation": 0.5
+      },
+      "synthetic": true
+    },
+    {
+      "file": "highlights-1.dng",
+      "reference": "highlights-1.rgb16le",
+      "png": "highlights-1.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "d7e1609fd3a8e1c643245d4884a0b6fd2ddfefe942a06dd2d072886b6bd62836",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "highlights": 1
+      },
+      "synthetic": true
+    },
+    {
+      "file": "highlights-2.dng",
+      "reference": "highlights-2.rgb16le",
+      "png": "highlights-2.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "e5c8a0ce8ff04f7b8b87e6fc68215d2ecd7bb82a5a22e1b2c4c35d560b7ad058",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "highlights": 2
+      },
+      "synthetic": true
+    },
+    {
+      "file": "highlights-3.dng",
+      "reference": "highlights-3.rgb16le",
+      "png": "highlights-3.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "d7e1609fd3a8e1c643245d4884a0b6fd2ddfefe942a06dd2d072886b6bd62836",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "highlights": 3
+      },
+      "synthetic": true
+    },
+    {
+      "file": "highlights-9.dng",
+      "reference": "highlights-9.rgb16le",
+      "png": "highlights-9.png",
+      "sha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+      "rgb16Sha256": "d7e1609fd3a8e1c643245d4884a0b6fd2ddfefe942a06dd2d072886b6bd62836",
+      "bytes": 6816,
+      "width": 64,
+      "height": 48,
+      "channels": 3,
+      "rawWidth": 64,
+      "rawHeight": 48,
+      "options": {
+        "whiteBalance": "camera",
+        "highlights": 9
+      },
+      "synthetic": true
+    },
+    {
+      "file": "native-50mp.dng.gz",
+      "reference": "native-50mp.rgb16le.gz",
+      "png": "native-50mp.png",
+      "sha256": "cfe25bed379735dfea685695e956838b284106e6527e6aff77e3901ef6ef9d85",
+      "rgb16Sha256": "2318a0fdc66bf94cb4e8cc439c6d58158086c7723ecbc32d53c0161dd9d66620",
+      "bytes": 100000672,
+      "width": 10000,
+      "height": 5000,
+      "channels": 3,
+      "rawWidth": 10000,
+      "rawHeight": 5000,
+      "options": {
+        "whiteBalance": "camera"
+      },
+      "synthetic": true
+    }
+  ],
+  "unsupported": [
+    "no-calibration.dng",
+    "extra-samples.dng"
+  ]
+}

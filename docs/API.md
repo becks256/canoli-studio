@@ -1,5 +1,12 @@
 # REST and scripting APIs
 
+## RAW development dependency in progress
+
+Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.
+
+The internal checked decoder produces owned linear RGB16/grayscale16; explicit conversion consent is required before the private worker returns an sRGB RGBA8 working PNG. The build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Reported metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. There is no public `openRaw` or editable RAW document workflow yet: original/derived asset storage, commands, persistence, UI review/development and full application 50 MP acceptance remain in implementation. These trusted file services grant no isolated Scripts/plugin/REST file privilege or live browser/headless synchronization.
+
+
 ## Trusted recent-file and raster-file opening surfaces
 
 `editor.openImage(file:File, control?:{signal?:AbortSignal}):Promise<RasterLayer>` opens a native-resolution raster in an independent document at revision zero; it preserves existing edited tabs, original bytes and metadata, and rejects cancellation, decode/validation/allocation failure or a changed/disposed owner before publication. Unlike importImage(file), it does not place an image in the active composition. Trusted `editor.recentFiles` exposes local-copy status/subscription, refresh/flush, explicit remember(file,kind), verified read(id,signal?), remove(id) and clear(). Successful file-backed host opens/imports notify the optional service; failed copying does not roll back accepted artwork. Project-download UI records its named output, while saveProject() alone returns a Blob. These are browser-only surfaces, not REST rendering/session synchronization or isolated scripting/file privileges. See [defaults, metadata, lifecycle and examples](SCRIPTING_API.md#recent-files-trusted-browser-host).
