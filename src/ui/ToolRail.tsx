@@ -1,5 +1,6 @@
 import {
   Search,
+  PanelsTopLeft,
   Fingerprint,
   Blend,
   ClipboardCheck,
@@ -47,6 +48,7 @@ export interface ToolRailProps {
   onOpenHelp(): void;
   onOpenRecovery(): void;
   onOpenPreflight(): void;
+  onOpenWorkspace(): void;
   docsUrl?: string;
 }
 
@@ -63,6 +65,7 @@ export function ToolRail({
   onOpenHelp,
   onOpenRecovery,
   onOpenPreflight,
+  onOpenWorkspace,
   docsUrl = `${import.meta.env.BASE_URL}developer/scripting-api.html`,
 }: ToolRailProps) {
   return (
@@ -168,6 +171,7 @@ export function ToolRail({
         </IconButton>
       </div>
       <div className="rail-bottom">
+        <IconButton shortcutId="workspace-layout" label="Workspace layout" className="tool-button" onClick={onOpenWorkspace} disabled={busy}><PanelsTopLeft size={18}/></IconButton>
         <IconButton label="Design checks" className="tool-button" onClick={onOpenPreflight} disabled={busy}><ClipboardCheck size={18}/></IconButton>
         <IconButton
           label="Recover work"

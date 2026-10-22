@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Workspace layout boundary
+
+Docked/named workspace layouts are local browser preferences managed by the user through the rail or command search. Packages gain no preference, UI-docking, storage or file privilege. Existing document grants, inert installation, isolated execution and shared command/history validation are unchanged. Layouts are not stored in plugin packages or native document snapshots.
+
 ## AVIF host export boundary
 
 AVIF is a trusted browser Export/batch delivery format. Its private local encoder worker does not extend package permissions or the isolated scripting runtime. Installation remains inert; plugins may create ordinary permitted artwork through existing commands but cannot invoke host export, acquire pixels/files/fonts, fetch the codec or initiate downloads. User-initiated export retains source/font lifetime validation and unchanged document/history ownership. No plugin manifest/version change.

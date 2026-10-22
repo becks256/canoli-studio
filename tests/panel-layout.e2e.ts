@@ -22,7 +22,7 @@ test("panel resizing supports pointer, keyboard, cancellation, reload and reset 
   await expect
     .poll(() =>
       page.evaluate(
-        () => JSON.parse(localStorage.getItem("luma.panel-widths.v1")!).layers,
+        () => JSON.parse(localStorage.getItem("luma.workspace-layout.v1")!).current.widths.layers,
       ),
     )
     .toBe(initial + 70);
@@ -79,7 +79,7 @@ test("panel constraints retain canvas space and a failed save restores prior wid
   await page.evaluate(() => {
     const original = Storage.prototype.setItem;
     Storage.prototype.setItem = function (key, value) {
-      if (key === "luma.panel-widths.v1") throw new Error("quota");
+      if (key === "luma.workspace-layout.v1") throw new Error("quota");
       return original.call(this, key, value);
     };
   });

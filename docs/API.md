@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Workspace layout is browser UI state
+
+Docking/visibility/order, responsive/preferred widths and named layout management use local browser preferences. They do not mutate document commands/history or add a REST/isolated scripting endpoint. The current envelope `luma.workspace-layout.v1` supersedes read-only legacy panel-width values; failed validation/storage and detected newer-tab state prevent publication. Projects and binary workspace graphs retain their current schemas. See [the user-facing contract](SCRIPTING_API.md#workspace-layout-preferences).
+
 ## Trusted local AVIF output
 
 Browser `editor.export({format:"avif", quality?:number, avifLossless?:boolean, avifSpeed?:number}, control?)` returns `{blob,mimeType:"image/avif",extension:"avif",report}`. Quality defaults to 0.8 (finite 0.01–1), lossless to false, speed to 8 (integer 0–10). Lossless or quality 1 retains captured RGBA8; alpha is always lossless. Output is one flattened native-resolution image, explicitly identified as sRGB, with no source metadata/font/editable content. A private locally served WASM worker supports abort, source/font lifetime rejection and fresh retries; full-frame/codec memory and browser/viewer limits remain. Custom local batch variants accept the same settings and share fitting, snapshots, durable hashes and integrity-checked packages. AVIF-only flags reject on other batch formats. These trusted methods add no REST rendering route or isolated Scripts export privilege. See [signatures, examples and limits](SCRIPTING_API.md#avif-export-trusted-application-code).

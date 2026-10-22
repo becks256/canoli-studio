@@ -104,6 +104,8 @@ import { PluginPanel } from "./PluginPanel";
 import { ToolOptions } from "./ToolOptions";
 import { TypographyPanel, TextProperties } from "./TypographyPanel";
 import { ShortcutDialog } from "./ShortcutDialog";
+import {WorkspaceDock} from "./WorkspaceDock";
+import {WorkspaceLayoutDialog} from "./WorkspaceLayoutDialog";
 import { TopBar } from "./TopBar";
 import { ToolRail } from "./ToolRail";
 import { LayersPanel } from "./LayersPanel";
@@ -227,6 +229,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const panelLayout = usePanelLayout(setError);
   const [showPalette, setShowPalette] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showWorkspaceLayout,setShowWorkspaceLayout]=useState(false);
   const [showPressureCurve,setShowPressureCurve]=useState(false);
   const [showBrushTip,setShowBrushTip]=useState(false);
   const [showBrushTexture,setShowBrushTexture]=useState(false);
@@ -673,7 +676,16 @@ export function App({ editor }: { editor: EditorApplication }) {
     });
   }
 
+  function cancelWorkspaceGesture(){
+    editor.tools.cancel();clearPreview();setSpacePan(false);panelLayout.cancel();
+    if(pendingCopy.current)pendingCopy.current.cancelled=true;
+    capturedPointer.current=null;gesture.current=null;setResizingCursor(null);
+  }
+  function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
+
   const defaultShortcuts = new ShortcutRegistry([
+    {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
+    {id:"workspace-reset",label:"Restore default workspace arrangement",keys:SHORTCUT_BINDINGS["workspace-reset"],run:()=>attempt(()=>{panelLayout.restore();cancelWorkspaceGesture();})},
     {
       id: "command-palette",
       label: "Find a command",
@@ -1112,6 +1124,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       showRecovery ||
       showPalette ||
       showHelp ||
+      showWorkspaceLayout ||
       showPressureCurve ||
       showBrushTip ||
       showBrushTexture ||
@@ -1145,6 +1158,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       setShowRecovery(false);
       setShowPalette(false);
       setShowHelp(false);
+      setShowWorkspaceLayout(false);
       setShowScripts(false);
       setShowPlugins(false);
       setShowImageSizeDialog(false);
@@ -1828,15 +1842,15 @@ export function App({ editor }: { editor: EditorApplication }) {
           onRefineEdge={() => setShowRefineEdgeDialog(true)}
           onSelectSubject={handleSelectSubject}
         />
-        <div
-          className="workspace"
+        <WorkspaceDock
+          layout={panelLayout.layout}
           style={
             {
               "--layers-width": `${panelLayout.widths.layers}px`,
               "--inspector-width": `${panelLayout.widths.inspector}px`,
             } as import("react").CSSProperties
           }
-        >
+          rail={
           <ToolRail
             onOpenPalette={() => setShowPalette(true)}
             tool={tool}
@@ -1849,8 +1863,11 @@ export function App({ editor }: { editor: EditorApplication }) {
             onOpenPlugins={() => setShowPlugins(true)}
             onOpenHelp={() => setShowHelp(true)}
             onOpenPreflight={()=>setShowPreflight(true)}
+            onOpenWorkspace={openWorkspaceLayout}
             onOpenRecovery={() => setShowRecovery(true)}
           />
+          }
+          layers={
           <LayersPanel
             deferThumbnails={toolState.drawing}
             onLoadTransparency={id => { editor.tools.cancel(); void task(() => editor.pixels.loadTransparency(id)); }}
@@ -1917,12 +1934,14 @@ export function App({ editor }: { editor: EditorApplication }) {
             }
             onDeleteLayer={() => attempt(() => dom.layerSelection.remove())}
           />
+          }
+          layersResize={
           <PanelResizeHandle
             label="Resize layers panel"
             value={panelLayout.widths.layers}
             min={190}
             max={panelLayout.max("layers")}
-            direction={1}
+            direction={panelLayout.layout.panels.layers.side==='left'?1:-1}
             disabled={busy}
             onStart={() => {
               editor.tools.cancel();
@@ -1933,6 +1952,8 @@ export function App({ editor }: { editor: EditorApplication }) {
             onCancel={panelLayout.cancel}
             onReset={() => panelLayout.reset("layers")}
           />
+          }
+          canvas={
           <main className="canvas-column">
             <DocumentTabBar
               sessions={sessions ?? []}
@@ -2412,12 +2433,14 @@ export function App({ editor }: { editor: EditorApplication }) {
               </span>
             </footer>
           </main>
+          }
+          inspectorResize={
           <PanelResizeHandle
             label="Resize inspector panel"
             value={panelLayout.widths.inspector}
             min={230}
             max={panelLayout.max("inspector")}
-            direction={-1}
+            direction={panelLayout.layout.panels.inspector.side==='left'?1:-1}
             disabled={busy}
             onStart={() => {
               editor.tools.cancel();
@@ -2428,6 +2451,8 @@ export function App({ editor }: { editor: EditorApplication }) {
             onCancel={panelLayout.cancel}
             onReset={() => panelLayout.reset("inspector")}
           />
+          }
+          inspector={
           <InspectorPanel
             guidesVisible={guidesVisible}
             onGuidesVisible={setGuidesVisible}
@@ -2447,7 +2472,9 @@ export function App({ editor }: { editor: EditorApplication }) {
             onOpenHelp={() => setShowHelp(true)}
             onCombinePaths={()=>{editor.tools.cancel();setShowVectorBoolean(true);}}
           />
-        </div>
+          }
+        />
+
         {(error || message) && (
           <div
             className={`toast ${error ? "error" : ""}`}
@@ -2524,6 +2551,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showBrushTip&&<BrushTipDialog tip={toolState.settings.tip} pencil={tool==="pencil"} onClose={()=>setShowBrushTip(false)} onApply={tip=>{editor.tools.configure({tip});setShowBrushTip(false);}}/>}
         {showBrushTexture&&<BrushTextureDialog editor={editor} onClose={()=>setShowBrushTexture(false)}/>}
         {showPressureCurve&&<PressureCurveDialog curve={toolState.settings.pressureCurve} onClose={()=>setShowPressureCurve(false)} onApply={curve=>{editor.tools.configure({pressureCurve:curve});setShowPressureCurve(false);}}/>}
+        {showWorkspaceLayout&&<WorkspaceLayoutDialog preferences={panelLayout.preferences} loadError={panelLayout.error} onApply={layout=>{panelLayout.apply(layout);cancelWorkspaceGesture();}} onSave={(layout,name,id)=>{panelLayout.save(layout,name,id);cancelWorkspaceGesture();}} onRename={panelLayout.rename} onDelete={panelLayout.remove} onReload={panelLayout.reload} onClose={()=>setShowWorkspaceLayout(false)}/>}
         {showHelp && (
           <ShortcutDialog
             shortcuts={shortcuts}

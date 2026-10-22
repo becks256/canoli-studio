@@ -91,6 +91,8 @@ export function formatShortcut(shortcut: string): string {
 
 // Binding definitions are shared by action registration and keyboard help.
 export const SHORTCUT_BINDINGS: Record<string, string[]> = {
+  "workspace-layout": [],
+  "workspace-reset": [],
   "command-palette": ["Mod+k"],
   plugins: ["Mod+Shift+l"],
   "image-size": ["Mod+Alt+i"],

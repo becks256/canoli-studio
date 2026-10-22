@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Workspace layout interaction
+
+Use the custom Workspace layout modal from the rail and command search. Draft changes apply only through Apply layout or save/update. Give Layers/history and Properties independent Show, left/right dock and precise width controls; support responsive defaults and explicit same-side ordering. Saved layouts have a named selector plus save-as-new, update, rename and delete actions. Explain that save/update also applies and deletion leaves the current arrangement intact. Restore default arrangement selects a draft until Apply; command search also offers direct recovery. The rail remains visible when both docks are hidden. Keep errors within the modal, preserve the draft on rejected writes, and provide explicit Reload saved layouts for detected external changes. Restore focus on dismissal and use actual DOM order matching visual order. Retain native splitter pointer/Escape/keyboard behavior with direction appropriate to each dock side.
+
 ## AVIF export controls
 
 Use the existing Export dialog and custom Batch variant form. AVIF offers a Lossless checkbox, 1–100% colour quality when lossy, and Fast/Balanced/Smaller file compression (8/6/4). Explain always-lossless transparency and quality 100's lossless colour behavior. Retain native dimensions, capability disclosure, actual rendering/indeterminate encoding progress, Cancel and retry. Controls use the existing custom Select/Slider/checkbox fields and disabled/busy states; no new component library or keyboard binding. Batch format controls have an accessible name.

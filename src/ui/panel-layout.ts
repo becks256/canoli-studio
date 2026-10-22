@@ -17,6 +17,7 @@ export function defaultPanelWidths(viewport: number): PanelWidths {
 export function fitPanelWidths(
   input: PanelWidths,
   viewport: number,
+  visible:Record<keyof PanelWidths,boolean>={layers:true,inspector:true},
 ): PanelWidths {
   const widths = {
     layers: Math.max(PANEL_MIN.layers, Math.min(PANEL_MAX, input.layers)),
@@ -26,14 +27,14 @@ export function fitPanelWidths(
     ),
   };
   const excess =
-    widths.layers +
-    widths.inspector -
-    (Math.max(760, viewport) - PANEL_RESERVED_WIDTH);
+    (visible.layers?widths.layers:0) +
+    (visible.inspector?widths.inspector:0) -
+    (Math.max(760, viewport) - panelReservedWidth(visible));
   if (excess > 0) {
     const available =
-      widths.layers + widths.inspector - PANEL_MIN.layers - PANEL_MIN.inspector;
+      (visible.layers?widths.layers-PANEL_MIN.layers:0) + (visible.inspector?widths.inspector-PANEL_MIN.inspector:0);
     const reduction = Math.ceil(
-      (excess * (widths.layers - PANEL_MIN.layers)) / available,
+      (excess * (visible.layers?widths.layers - PANEL_MIN.layers:0)) / available,
     );
     widths.layers -= reduction;
     widths.inspector -= excess - reduction;
@@ -42,6 +43,9 @@ export function fitPanelWidths(
     layers: Math.round(widths.layers),
     inspector: Math.round(widths.inspector),
   };
+}
+export function panelReservedWidth(visible:Record<keyof PanelWidths,boolean>):number{
+ return 88+200+6*(Number(visible.layers)+Number(visible.inspector));
 }
 export function readPanelWidths(
   storage: Pick<Storage, "getItem">,

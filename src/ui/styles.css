@@ -6273,3 +6273,19 @@ input[type="color"] {
 .frequency-preview-surface canvas:active { cursor: grabbing; }
 .frequency-preview-caption { display: flex; gap: 12px; align-items: center; margin-top: 10px; color: var(--color-text-secondary); font-size: 11px; }
 @media (max-width: 560px) { .frequency-preview-panes { grid-template-columns: minmax(0, 1fr); } .frequency-preview-caption { flex-wrap: wrap; } }
+
+/* Persistent workspace slots follow visual and DOM order together. */
+.workspace-panel-dock {display:flex;flex-shrink:0;min-height:0;min-width:0;}
+.workspace-panel-dock[hidden] {display:none;}
+.workspace-layout-dialog {width:min(620px,calc(100vw - 32px));}
+.workspace-layout-panels {display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0;}
+.workspace-layout-panels fieldset {min-width:0;border:1px solid var(--color-border);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:14px;}
+.workspace-layout-panels legend {font-size:var(--text-sm);font-weight:600;padding:0 5px;}
+.workspace-layout-actions {display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;}
+@media(max-width:600px){.workspace-layout-panels {grid-template-columns:1fr;}}
+
+.workspace-panel-dock.dock-left > .inspector {border-left:0;border-right:1px solid var(--color-border);}
+.workspace-panel-dock.dock-right > .layers-panel {border-right:0;border-left:1px solid var(--color-border);}
+
+.workspace-layout-dialog input[type="checkbox"] {accent-color:var(--color-accent);}
+.workspace-layout-dialog .dialog-actions {display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}

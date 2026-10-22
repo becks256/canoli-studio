@@ -1404,6 +1404,12 @@ Current execution budgets:
 
 These are automation/structure budgets, not image megapixel or file-size limits. The isolated worker does not have a strict heap-memory quota; the prototype is not a security-reviewed public plugin runtime. Image import/export, saving files, network integrations, UI/tool control, persistent event automation, arbitrary layer masks, pixel reads, clone-source sampling and AI calls are not exposed in the Scripts panel yet.
 
+## Workspace layout preferences
+
+The **Workspace layout** rail action and command search configure Layers/history and Properties on either side of the canvas, their order, visibility and responsive/preferred widths. Named layouts can be saved, updated, renamed and deleted locally. Save/update also applies; Apply layout commits the detached draft, while Cancel leaves the arrangement unchanged. Restore default arrangement in the dialog is a draft; the command-search action restores directly. Both actions are unassigned by default and can be rebound through Keyboard shortcuts. The tool rail remains available with both panels hidden.
+
+These are browser UI preferences, not document edits or a new DOM constructor/member. They add no isolated Scripts/plugin API, REST route or native project/workspace schema. Original assets, layer selection, history and scene pixels remain under the existing contracts. The strict local envelope uses `luma.workspace-layout.v1`; missing envelopes import existing `luma.panel-widths.v1` values without modifying the old key. Explicit new responsive defaults override legacy widths. Invalid storage, failed writes and detected newer-tab changes are disclosed; reload/recovery is explicit. Layouts are local to this browser, are not embedded in downloaded projects, and are not atomic cross-tab synchronization or floating/tabbed docks.
+
 ## Application integration
 
 This section is for trusted application code and development-console inspection, not code pasted into Scripts. The constructors are exported from [src/dom/index.ts](../src/dom/index.ts). During development only, `window.luma` exposes those constructors plus the application instance as `window.luma.editor`. No global `luma` API is exposed in production.
