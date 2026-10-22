@@ -2,6 +2,8 @@ import { TONE_LIMITS } from "../../core/tone";
 import type { DocumentData, LayerData } from "../../core/model";
 import { allLayers, findLayer, id } from "../../core/model";
 import { execute } from "../../core/commands";
+import {paragraphStyleSchema,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS} from '../../core/paragraph-styles';
+import type {RecipeParagraphStyleTarget} from './types';
 import type { EditorCommand } from "../../core/commands";
 import type {
   Recipe,
@@ -21,6 +23,7 @@ interface RecordingState {
   steps: RecipeStep[];
   unsupported: Set<string>;
   outputs: Map<string, SemanticTarget>;
+  styles:Map<string,RecipeParagraphStyleTarget>;
   lastTarget: string | null;
 }
 
@@ -46,6 +49,7 @@ export class RecipeRecorder {
       steps: this.steps,
       unsupported: this.unsupported,
       outputs: this.createdLayerOutputs,
+      styles:this.styleOutputs,
       lastTarget: this.lastCommandTargetLayerId,
     });
   }
@@ -54,6 +58,7 @@ export class RecipeRecorder {
     this.steps = state.steps;
     this.unsupported = state.unsupported;
     this.createdLayerOutputs = state.outputs;
+    this.styleOutputs=state.styles;
     this.lastCommandTargetLayerId = state.lastTarget;
     this.notify();
   }
@@ -79,6 +84,17 @@ export class RecipeRecorder {
     this.restore(state);
   }
   private createdLayerOutputs = new Map<string, SemanticTarget>(); // creation-time identity for roots and descendants
+  private styleOutputs=new Map<string,RecipeParagraphStyleTarget>();
+
+  private captureStyle(styleId:string,document:DocumentData):RecipeParagraphStyleTarget {
+    const existing=this.styleOutputs.get(styleId);if(existing)return structuredClone(existing);
+    const style=document.paragraphStyles?.find(value=>value.id===styleId);
+    if(!style)throw new Error('Recorded paragraph style is missing from its document.');
+    const parsed=paragraphStyleSchema.parse(style),stepId=`step-${id()}`;
+    this.steps.push({id:stepId,name:`Use paragraph style ${parsed.name}`,action:{type:'paragraphStyle.ensure',name:parsed.name,format:parsed.format}});
+    const reference:RecipeParagraphStyleTarget={by:'stepResult',stepId};
+    this.styleOutputs.set(styleId,reference);return structuredClone(reference);
+  }
   private initialSelectedId: string | null = null;
   private lastCommandTargetLayerId: string | null = null;
   private listeners = new Set<() => void>();
@@ -121,6 +137,7 @@ export class RecipeRecorder {
     this.historyError = undefined;
     this.unsupported.clear();
     this.createdLayerOutputs.clear();
+    this.styleOutputs.clear();
     this.initialSelectedId = selectedId;
     this.lastCommandTargetLayerId = null;
     this.notify();
@@ -207,10 +224,49 @@ export class RecipeRecorder {
     };
 
     switch (command.type) {
+      case 'paragraphStyle.set': {
+        const previous=beforeDoc.paragraphStyles?.find(style=>style.id===command.style.id);
+        const style=paragraphStyleSchema.parse(command.style);
+        if(previous){
+          const reference=this.captureStyle(previous.id,beforeDoc);
+          const stepId=`step-${id()}`;
+          this.steps.push({id:stepId,name:`Update paragraph style ${style.name}`,action:{type:'paragraphStyle.update',style:reference,name:style.name,format:style.format}});
+          this.styleOutputs.set(style.id,{by:'stepResult',stepId});
+        }else{
+          this.styleOutputs.delete(style.id);this.captureStyle(style.id,afterDoc);
+        }
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
+      case 'paragraphStyle.remove': {
+        const reference=this.captureStyle(command.id,beforeDoc);
+        this.steps.push({id:`step-${id()}`,name:'Remove paragraph style',action:{type:'paragraphStyle.remove',style:reference}});
+        this.styleOutputs.delete(command.id);this.lastCommandTargetLayerId=null;this.notify();break;
+      }
+      case 'text.paragraphStyle':
+      case 'text.paragraphOverrides.clear': {
+        const layer=findLayer(beforeDoc,command.id);if(!layer)return;
+        const style=command.type==='text.paragraphStyle'&&command.styleId!==null?this.captureStyle(command.styleId,beforeDoc):null;
+        this.steps.push({id:`step-${id()}`,name:`${command.type==='text.paragraphStyle'?'Apply or detach paragraph style':'Reset paragraph overrides'} on ${layer.name}`,
+          target:targetFromLayer(layer),action:command.type==='text.paragraphStyle'
+            ?{type:'text.paragraphStyle',style,keepOverrides:command.keepOverrides}
+            :{type:'text.paragraphOverrides.clear',keys:command.keys?structuredClone(command.keys):undefined}});
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
       case "layer.update": {
         const layer = findLayer(beforeDoc, command.id);
         if (!layer) return;
         const target = targetFromLayer(layer);
+        const patch={...command.patch};
+        // JSON has no undefined value. Preserve explicit inheritance resets as commands.
+        const resetKeys=layer.kind==='text'&&layer.paragraphStyle
+          ?PARAGRAPH_FORMAT_KEYS.filter(key=>key in patch&&patch[key]===undefined):[];
+        if(resetKeys.length){
+          for(const key of resetKeys)delete patch[key];
+          this.steps.push({id:`step-${id()}`,name:`Reset paragraph overrides on ${layer.name}`,target,
+            action:{type:'text.paragraphOverrides.clear',keys:resetKeys}});
+          this.lastCommandTargetLayerId=null;
+          if(!Object.keys(patch).length){this.notify();return;}
+        }
 
         // Check if we can coalesce into previous layer.update on the SAME layer
         const lastStep = this.steps[this.steps.length - 1];
@@ -221,7 +277,7 @@ export class RecipeRecorder {
         ) {
           lastStep.action.patch = {
             ...lastStep.action.patch,
-            ...command.patch,
+            ...patch,
           };
           this.notify();
           return;
@@ -233,7 +289,7 @@ export class RecipeRecorder {
           target,
           action: {
             type: "layer.update",
-            patch: { ...command.patch },
+            patch,
           },
         });
         this.lastCommandTargetLayerId = layer.id;
@@ -394,6 +450,12 @@ export class RecipeRecorder {
         }
         const cleanTemplate = structuredClone(command.layer) as any;
         delete cleanTemplate.id;
+        const paragraphStyles:Record<string,RecipeParagraphStyleTarget>={};
+        for(const text of paragraphTextLayers([cleanTemplate]))if(text.paragraphStyle){
+          const reference=this.captureStyle(text.paragraphStyle.id,beforeDoc);
+          const key=`style-${Object.keys(paragraphStyles).length}`;
+          paragraphStyles[key]=reference;text.paragraphStyle.id=key;
+        }
 
         const stepId = `step-${id()}`;
         const outputVar = `output_${stepId}`;
@@ -408,6 +470,7 @@ export class RecipeRecorder {
             type: "layer.add",
             layerTemplate: cleanTemplate,
             parentTarget,
+            ...(Object.keys(paragraphStyles).length?{paragraphStyles}:{}),
           },
           outputVar,
         });
@@ -587,6 +650,7 @@ export class RecipeRecorder {
     this.steps = [];
     this.unsupported.clear();
     this.createdLayerOutputs.clear();
+    this.styleOutputs.clear();
     this.notify();
     return recipe;
   }

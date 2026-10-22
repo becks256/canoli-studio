@@ -1,4 +1,6 @@
 import { recipeOutputBindingsUnique, stepConditionSchema } from "./schema";
+import {recipeParagraphStyleTargetSchema} from './schema';
+import {paragraphStyleSchema,paragraphTextLayers,sameParagraphFormat,type ParagraphStyleData} from '../../core/paragraph-styles';
 import type { DocumentData, LayerData } from "../../core/model";
 import {
   allLayers,
@@ -155,6 +157,16 @@ export function compileEditPlan(
   const stepOutputs = new Map<string, string>();
   const outputGroups = new Map<string, string[]>();
   const effectIds = new Map<string, string>();
+  // Style and layer output namespaces are distinct; a style can never select a layer.
+  const styleOutputs=new Map<string,string>();
+  const resolveStyle=(input:unknown,actionValue:(value:unknown)=>unknown):ParagraphStyleData=>{
+    const target=recipeParagraphStyleTargetSchema.parse(input);
+    const style=target.by==='stepResult'
+      ?simDoc.paragraphStyles?.find(value=>value.id===styleOutputs.get(target.stepId))
+      :simDoc.paragraphStyles?.find(value=>value.name.trim().toLocaleLowerCase('en')===String(actionValue(target.name)).trim().toLocaleLowerCase('en'));
+    if(!style)throw new Error('Paragraph style reference is missing, skipped, removed or does not identify a style.');
+    return paragraphStyleSchema.parse(style);
+  };
   const bindOutput = (key: string, layer: LayerData): void => {
     const bind = (binding: string, id: string) => {
       stepOutputs.set(binding, id);
@@ -218,6 +230,10 @@ export function compileEditPlan(
       }
     }
 
+    if(step.action.type.startsWith('paragraphStyle.')&&step.target){
+      errors.push(`Step '${step.name}': Paragraph style library actions do not accept layer targets.`);
+      continue;
+    }
     // Resolve the complete set once; earlier targets cannot change later matches.
     const resolution = step.target
       ? resolveTargets(
@@ -289,6 +305,61 @@ export function compileEditPlan(
         const stepCommands: EditorCommand[] = [];
 
         switch (step.action.type) {
+          case 'paragraphStyle.ensure':
+          case 'paragraphStyle.update': {
+            if(step.target)throw new Error('Paragraph style library actions do not accept layer targets.');
+            const action=step.action;
+            const definition=paragraphStyleSchema.parse({id:id(),name:actionValue(action.name),format:actionValue(action.format)});
+            let command:EditorCommand|undefined;
+            if(action.type==='paragraphStyle.ensure'){
+              const existing=simDoc.paragraphStyles?.find(style=>style.name.trim().toLocaleLowerCase('en')===definition.name.toLocaleLowerCase('en'));
+              if(existing){
+                if(!sameParagraphFormat(paragraphStyleSchema.parse(existing).format,definition.format))
+                  throw new Error(`Paragraph style '${definition.name}' already exists with different formatting. Rename it or review a style update before replay.`);
+                definition.id=existing.id;
+                visualChange=`Reuse paragraph style '${existing.name}'`;
+              }else{
+                command={type:'paragraphStyle.set',style:definition};
+                visualChange=`Create paragraph style '${definition.name}'`;
+              }
+            }else{
+              const previous=resolveStyle(action.style,actionValue);definition.id=previous.id;
+              command={type:'paragraphStyle.set',style:definition};
+              visualChange=`Update paragraph style '${previous.name}' to '${definition.name}' and reflow linked text`;
+            }
+            const previousText=paragraphTextLayers(simDoc.children);
+            if(command){stepCommands.push(command);simDoc=execute(simDoc,command);}
+            for(const layer of paragraphTextLayers(simDoc.children)){
+              const previous=previousText.find(value=>value.id===layer.id);
+              if(previous&&JSON.stringify(previous)!==JSON.stringify(layer)){layersModified++;affectedLayerNames.add(layer.name);}
+            }
+            styleOutputs.set(step.id,definition.id);
+            if(step.outputVar)styleOutputs.set(step.outputVar,definition.id);
+            break;
+          }
+          case 'paragraphStyle.remove': {
+            if(step.target)throw new Error('Paragraph style library actions do not accept layer targets.');
+            const style=resolveStyle(step.action.style,actionValue);
+            const followers=paragraphTextLayers(simDoc.children).filter(layer=>layer.paragraphStyle?.id===style.id);
+            const command:EditorCommand={type:'paragraphStyle.remove',id:style.id};
+            stepCommands.push(command);simDoc=execute(simDoc,command);
+            for(const layer of followers){layersModified++;affectedLayerNames.add(layer.name);}
+            visualChange=`Remove paragraph style '${style.name}' and detach ${followers.length} linked text layers, keeping their appearance`;
+            break;
+          }
+          case 'text.paragraphStyle':
+          case 'text.paragraphOverrides.clear': {
+            if(!targetLayer||targetLayer.kind!=='text')throw new Error('Paragraph style edits require a text layer target.');
+            const action=step.action;
+            const style=action.type==='text.paragraphStyle'&&action.style!==null?resolveStyle(action.style,actionValue):undefined;
+            const command:EditorCommand=action.type==='text.paragraphStyle'
+              ?{type:'text.paragraphStyle',id:targetLayer.id,styleId:style?.id??null,keepOverrides:action.keepOverrides}
+              :{type:'text.paragraphOverrides.clear',id:targetLayer.id,keys:action.keys};
+            stepCommands.push(command);simDoc=execute(simDoc,command);layersModified++;affectedLayerNames.add(targetLayer.name);
+            visualChange=action.type==='text.paragraphOverrides.clear'?`Reset paragraph overrides on '${targetLayer.name}'`
+              :style?`Apply paragraph style '${style.name}' to '${targetLayer.name}'`:`Detach paragraph style from '${targetLayer.name}', keeping its appearance`;
+            break;
+          }
           case "layer.translate": {
             if (!targetLayer)
               throw new Error(`Step '${step.name}' requires a target layer.`);
@@ -564,6 +635,14 @@ export function compileEditPlan(
                 });
             }
 
+            // Root document libraries do not include independently scoped embedded masters.
+            for(const text of paragraphTextLayers([newLayerData]))if(text.paragraphStyle){
+              const reference=step.action.paragraphStyles?.[text.paragraphStyle.id];
+              if(!reference)throw new Error('Linked text templates require a portable paragraphStyles reference for every binding.');
+              const style=resolveStyle(reference,actionValue);
+              text.paragraphStyle={...text.paragraphStyle,id:style.id};
+            }
+
             let parentId: string | undefined = undefined;
             if (step.action.parentTarget) {
               const parentRes = resolveTargets(
@@ -820,6 +899,7 @@ export function compileEditPlan(
             });
             break;
           }
+          default:throw new Error('Unsupported recipe action.');
         }
 
         resolvedCommands.push(...stepCommands);

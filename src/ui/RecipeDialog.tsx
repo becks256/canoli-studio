@@ -22,12 +22,16 @@ import type { EditPlan, Recipe } from "../ai/recipes/types";
 
 export interface RecipeDialogProps {
   editor: EditorApplication;
+  recordingOptions:{name:string;autoParameterizeTone:boolean};
+  onRecordingOptionsChange(options:RecipeDialogProps['recordingOptions']):void;
   onClose(): void;
   onRunSuccess?(recipeName: string): void;
 }
 
 export function RecipeDialog({
   editor,
+  recordingOptions,
+  onRecordingOptionsChange,
   onClose,
   onRunSuccess,
 }: RecipeDialogProps) {
@@ -183,8 +187,7 @@ export function RecipeDialog({
     });
   }, [editor]);
 
-  const [recordName, setRecordName] = useState("Recorded Action");
-  const [autoParamTone, setAutoParamTone] = useState(true);
+  const {name:recordName,autoParameterizeTone:autoParamTone}=recordingOptions;
 
   const handleStartRecord = () => {
     try {
@@ -913,7 +916,7 @@ export function RecipeDialog({
                   type="text"
                   className="input"
                   value={recordName}
-                  onChange={(e) => setRecordName(e.target.value)}
+                  onChange={(e) => onRecordingOptionsChange({...recordingOptions,name:e.target.value})}
                   placeholder="e.g. Vintage Poster Color Grade"
                 />
               </label>
@@ -921,7 +924,7 @@ export function RecipeDialog({
                 <input
                   type="checkbox"
                   checked={autoParamTone}
-                  onChange={(e) => setAutoParamTone(e.target.checked)}
+                  onChange={(e) => onRecordingOptionsChange({...recordingOptions,autoParameterizeTone:e.target.checked})}
                 />
                 <span>
                   Auto-parameterize tone adjustments (exposure, contrast,

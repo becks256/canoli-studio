@@ -261,6 +261,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [showRecipeDialog, setShowRecipeDialog] = useState(false);
+  const [recipeRecordingOptions,setRecipeRecordingOptions]=useState({name:'Recorded Action',autoParameterizeTone:true});
   const [showBatchDialog, setShowBatchDialog] = useState(false);
   const [showColorDialog, setShowColorDialog] = useState(false);
   const [showRefineEdgeDialog, setShowRefineEdgeDialog] = useState(false);
@@ -2549,6 +2550,8 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showRecipeDialog && (
           <RecipeDialog
             editor={editor}
+            recordingOptions={recipeRecordingOptions}
+            onRecordingOptionsChange={setRecipeRecordingOptions}
             onClose={() => setShowRecipeDialog(false)}
             onRunSuccess={(name) => notify(`Recipe "${name}" applied`)}
           />

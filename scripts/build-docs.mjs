@@ -31,6 +31,7 @@ const generatedPages = [
   ["SYSTEM_DESIGN", "System design"],
   ["TOOLS_MILESTONE", "Tools milestone"],
   ["BRUSH_PRESETS", "Saved brush presets"],
+  ["RECIPE_PARAGRAPH_STYLES", "Paragraph styles in recipes"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

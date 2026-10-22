@@ -1,6 +1,13 @@
 import { z } from "zod";
 import type { Recipe } from "./types";
 import { RECIPE_SCHEMA_VERSION } from "./types";
+import {paragraphOverrideKeysSchema} from '../../core/paragraph-styles';
+
+export const recipeParagraphStyleTargetSchema=z.discriminatedUnion('by',[
+  z.object({by:z.literal('name'),name:z.string().trim().min(1).max(80)}).strict(),
+  z.object({by:z.literal('stepResult'),stepId:z.string().min(1).max(120)}).strict(),
+]);
+const recipeParagraphFormatSchema=z.record(z.string(),z.unknown());
 
 export function recipeOutputBindingsUnique(data: {
   steps: { id: string; outputVar?: string }[];
@@ -119,6 +126,11 @@ export const stepConditionSchema = z
   });
 
 export const recipeActionSchema = z.discriminatedUnion("type", [
+  z.object({type:z.literal('paragraphStyle.ensure'),name:z.string().min(1).max(80),format:recipeParagraphFormatSchema}).strict(),
+  z.object({type:z.literal('paragraphStyle.update'),style:recipeParagraphStyleTargetSchema,name:z.string().min(1).max(80),format:recipeParagraphFormatSchema}).strict(),
+  z.object({type:z.literal('paragraphStyle.remove'),style:recipeParagraphStyleTargetSchema}).strict(),
+  z.object({type:z.literal('text.paragraphStyle'),style:recipeParagraphStyleTargetSchema.nullable(),keepOverrides:z.boolean().optional()}).strict(),
+  z.object({type:z.literal('text.paragraphOverrides.clear'),keys:paragraphOverrideKeysSchema.optional()}).strict(),
   z.object({
     type: z.literal("layer.translate"),
     dx: z.union([z.number(), z.string()]),
@@ -156,6 +168,7 @@ export const recipeActionSchema = z.discriminatedUnion("type", [
       })
       .passthrough(),
     parentTarget: semanticTargetSchema.optional(),
+    paragraphStyles:z.record(z.string().min(1),recipeParagraphStyleTargetSchema).optional(),
   }),
   z.object({
     type: z.literal("effect.tone"),

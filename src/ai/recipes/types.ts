@@ -1,6 +1,13 @@
 import type { LayerData, ToneEffectData } from "../../core/model";
 import type { EditorCommand } from "../../core/commands";
 import type { SelectionData } from "../../core/drawing";
+import type {ParagraphFormat} from '../../core/paragraph-styles';
+
+/** Recipe references never contain a source document's style identity. */
+export type RecipeParagraphStyleTarget =
+  | {by:'name';name:string}
+  | {by:'stepResult';stepId:string};
+export type RecipeParagraphFormat = {[K in keyof ParagraphFormat]:ParagraphFormat[K]|string};
 
 export const RECIPE_SCHEMA_VERSION = 1;
 
@@ -59,6 +66,11 @@ export interface StepCondition {
 }
 
 export type RecipeAction =
+  | {type:'paragraphStyle.ensure';name:string;format:RecipeParagraphFormat}
+  | {type:'paragraphStyle.update';style:RecipeParagraphStyleTarget;name:string;format:RecipeParagraphFormat}
+  | {type:'paragraphStyle.remove';style:RecipeParagraphStyleTarget}
+  | {type:'text.paragraphStyle';style:RecipeParagraphStyleTarget|null;keepOverrides?:boolean}
+  | {type:'text.paragraphOverrides.clear';keys?:(keyof ParagraphFormat)[]}
   | { type: "layer.translate"; dx: number | string; dy: number | string }
   | {
       type: "layer.update";
@@ -84,6 +96,8 @@ export type RecipeAction =
         [key: string]: unknown;
       };
       parentTarget?: SemanticTarget;
+      /** Map template-local binding IDs to portable style references, including group text. */
+      paragraphStyles?:Record<string,RecipeParagraphStyleTarget>;
     }
   | {
       type: "effect.tone";
