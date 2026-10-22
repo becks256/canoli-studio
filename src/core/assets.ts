@@ -4,6 +4,7 @@ import { id } from "./model";
 import {decodeTiffFile} from './interchange/tiff/client';
 import {decodeAvifFile} from './interchange/avif/client';
 import {hasAvifBrand} from './interchange/avif/sniff';
+import {ownRawSource,verifyRawSource,type RawImageSource} from './interchange/raw/source';
 import {avifDecodeOptionsSchema,type AvifDecodeOptions,type AvifDecodeSettings,type AvifImportReport} from './interchange/avif/types';
 import {tiffDecodeOptionsSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl} from './interchange/tiff/types';
 
@@ -22,8 +23,10 @@ export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
   readonly avif?: Readonly<AvifDecodeSettings>;
   /** Derived from original bytes on decode; not a second persisted source of truth. */
   readonly avifReport?: Readonly<AvifImportReport>;
+  /** Accepted PNG plus an immutable, complete sensor original and development record. */
+  readonly raw?: Readonly<RawImageSource>;
 }
-export interface AssetImportOptions extends TiffImportControl {tiff?:TiffDecodeOptions;avif?:AvifDecodeOptions}
+export interface AssetImportOptions extends TiffImportControl {tiff?:TiffDecodeOptions;avif?:AvifDecodeOptions;raw?:RawImageSource}
 
 interface SharedBitmap {
   readonly bitmap: ImageBitmap;
@@ -101,6 +104,7 @@ export class AssetStore {
       blob: source.blob, bitmap, thumbnail: source.thumbnail,
       ...(source.tiff ? {tiff: Object.freeze(tiffDecodeOptionsSchema.parse(source.tiff))} : {}),
       ...(source.avif ? {avif: Object.freeze(avifDecodeOptionsSchema.parse(source.avif)),avifReport:source.avifReport} : {}),
+      ...(source.raw ? {raw:ownRawSource(source.raw)} : {}),
     });
     lease ??= {bitmap, owners: 1};
     this.shared.set(assetId, lease);
@@ -125,6 +129,8 @@ export class AssetStore {
       throw new Error("Use a PNG, JPEG, WebP, supported TIFF or AVIF image.");
     if(options.tiff!==undefined&&blob.type!=='image/tiff')throw new Error('TIFF decoding settings require a TIFF source.');
     if(options.avif!==undefined&&blob.type!=='image/avif')throw new Error('AVIF decoding settings require an AVIF source.');
+    const current=this.captureLifetime(),check=()=>{current();options.signal?.throwIfAborted();};
+    const raw=options.raw?await verifyRawSource(options.raw,blob,undefined,undefined,check):undefined;
     const tiff=blob.type==='image/tiff'?Object.freeze(tiffDecodeOptionsSchema.parse(options.tiff??{})):undefined;
     const avif=blob.type==='image/avif'?Object.freeze(avifDecodeOptionsSchema.parse(options.avif??{})):undefined;
     if(!avif){
@@ -149,6 +155,7 @@ export class AssetStore {
       options.signal?.throwIfAborted();
       if (typeof createImageBitmap !== "undefined") {
         bitmap = await createImageBitmap(decoded);
+        if(raw&&(bitmap.width!==raw.report.displayWidth||bitmap.height!==raw.report.displayHeight)){bitmap.close();throw new Error('Decoded RAW working bitmap differs from its accepted dimensions.');}
         if(avifReport&&(bitmap.width!==avifReport.displayWidth||bitmap.height!==avifReport.displayHeight)){bitmap.close();throw new Error('Decoded AVIF bitmap dimensions differ from the inspected presentation.');}
       } else {
         bitmap = {
@@ -194,6 +201,7 @@ export class AssetStore {
         thumbnail: thumbnailDataUrl,
         ...(tiff?{tiff}:{}),
         ...(avif?{avif,avifReport}:{}),
+        ...(raw?{raw}:{}),
       };
       this.assets.set(assetId, asset);
       published = asset;

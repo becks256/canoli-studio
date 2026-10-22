@@ -6304,3 +6304,11 @@ input[type="color"] {
 .recent-files-actions {display:flex;gap:8px;flex-shrink:0;}
 .recent-files-dialog .dialog-actions {display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px;}
 .command-result-description {display:block;color:var(--color-text-muted);font-size:var(--text-xs);font-weight:400;margin-top:4px;}
+
+.raw-development-dialog[open] { display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+.raw-development-dialog .dialog-header, .raw-development-dialog .dialog-footer { flex: 0 0 auto; }
+.raw-development-dialog .dialog-header h2 { margin: 0; min-width: 0; }
+.raw-development-dialog .svg-import-body { min-height: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.raw-development-dialog .svg-import-body p, .raw-development-dialog figure { margin: 0; }
+.raw-development-dialog .dialog-footer { flex-wrap: wrap; }
+.raw-development-preview { display: block; max-width: 100%; max-height: 30vh; object-fit: contain; margin-inline: auto; }

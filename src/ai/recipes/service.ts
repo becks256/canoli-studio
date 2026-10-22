@@ -1,3 +1,4 @@
+import {ownRawSource} from "../../core/interchange/raw/source";
 import { RecipePackageStorage } from "./package-storage";
 import { executeRecipePackage } from "./package-executor";
 import {
@@ -39,7 +40,7 @@ export class RecipeService {
         width: asset.width,
         height: asset.height,
         blob: asset.blob,
-        ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),
+        ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{}),
       });
     }
   }

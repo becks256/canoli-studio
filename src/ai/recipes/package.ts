@@ -1,3 +1,4 @@
+import {rawSourceMetadataSchema,rawSourceMetadata,ownRawSource,verifyRawSource,type RawImageSource} from "../../core/interchange/raw/source";
 import { z } from "zod";
 import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
 import {avifDecodeOptionsSchema,type AvifDecodeSettings} from "../../core/interchange/avif/types";
@@ -13,6 +14,7 @@ export interface RecipeAsset {
   blob: Blob;
   tiff?:TiffDecodeSettings;
   avif?:AvifDecodeSettings;
+  raw?:RawImageSource;
 }
 const magic = new Uint8Array([76, 85, 77, 65, 82, 49, 13, 10]); // LUMAR1\r\n
 const safeInteger = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
@@ -25,6 +27,7 @@ const assetSchema = z
     type: z.enum(["image/png", "image/jpeg", "image/webp", "image/tiff", "image/avif"]),
     tiff:tiffDecodeOptionsSchema.optional(),
     avif:avifDecodeOptionsSchema.optional(),
+    raw:rawSourceMetadataSchema.safeExtend({originalOffset:safeInteger}).optional(),
     offset: safeInteger,
     size: safeInteger,
     sha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -33,7 +36,7 @@ const assetSchema = z
 const manifestSchema = z
   .object({
     format: z.literal("luma-recipe"),
-    version: z.literal(1),
+    version: z.union([z.literal(1),z.literal(2)]),
     recipe: recipeSchema,
     assets: z.array(assetSchema),
   })
@@ -77,12 +80,12 @@ export async function serializeRecipePackage(
   const assets: z.infer<typeof assetSchema>[] = [];
   const blobs: Blob[] = [];
   let offset = 0;
+  const originals=new Map<string,{blob:Blob;entries:z.infer<typeof assetSchema>[]}>();
   for (const id of recipeAssetIds(recipe)) {
     const asset = source.get(id);
     if (asset.id !== id)
       throw new Error("Recipe source asset identity mismatch.");
-    assets.push(
-      assetSchema.parse({
+    const checked=assetSchema.parse({
         id,
         name: asset.name,
         width: asset.width,
@@ -90,21 +93,24 @@ export async function serializeRecipePackage(
         type: asset.blob.type,
         ...(asset.tiff?{tiff:asset.tiff}:{}),
         ...(asset.avif?{avif:asset.avif}:{}),
+        ...(asset.raw?{raw:{...rawSourceMetadata(await verifyRawSource(asset.raw,asset.blob,asset.width,asset.height)),originalOffset:0}}:{}),
         offset,
         size: asset.blob.size,
         sha256: hex(await hash(asset.blob)),
-      }),
-    );
+      });
+    assets.push(checked);
+    if(asset.raw){const key=JSON.stringify([asset.raw.original.sha256,asset.raw.original.type]);let original=originals.get(key);if(!original){original={blob:asset.raw.originalBlob,entries:[]};originals.set(key,original);}original.entries.push(checked);}
     blobs.push(asset.blob);
     offset += asset.blob.size;
     if (!Number.isSafeInteger(offset))
       throw new Error("Recipe package offsets exceed safe integer bounds.");
   }
+  for(const original of originals.values()){for(const entry of original.entries)entry.raw!.originalOffset=offset;blobs.push(original.blob);offset+=original.blob.size;if(!Number.isSafeInteger(offset))throw new Error('Recipe size exceeds numeric addressing precision.');}
   const manifest = new Blob([
-    JSON.stringify({ format: "luma-recipe", version: 1, recipe, assets }),
+    JSON.stringify({ format: "luma-recipe", version: originals.size?2:1, recipe, assets }),
   ]);
   const header = new Uint8Array(48);
-  header.set(magic);
+  header.set(magic);if(originals.size)header[5]=50;
   new DataView(header.buffer).setBigUint64(8, BigInt(manifest.size), true);
   header.set(await hash(manifest), 16);
   return new Blob([header, manifest, ...blobs], {
@@ -119,7 +125,7 @@ export async function readRecipePackage(
   const header = new Uint8Array(await file.slice(0, 48).arrayBuffer());
   if (
     header.length !== 48 ||
-    !magic.every((byte, index) => header[index] === byte)
+    !magic.every((byte, index) => index===5?(header[index]===49||header[index]===50):header[index] === byte)
   )
     throw new Error("Invalid recipe package header.");
   const length = Number(new DataView(header.buffer).getBigUint64(8, true));
@@ -130,6 +136,8 @@ export async function readRecipePackage(
   if (hex(await hash(manifestBlob)) !== hex(header.slice(16)))
     throw new Error("Recipe manifest checksum mismatch.");
   const manifest = manifestSchema.parse(JSON.parse(await manifestBlob.text()));
+  if(manifest.version!==(header[5]===50?2:1)||manifest.version===1&&manifest.assets.some(entry=>entry.raw))throw new Error('RAW sources require recipe package version 2.');
+  const originalRanges=new Map<number,{blob:Blob;size:number;key:string}>();
   const required = recipeAssetIds(manifest.recipe as Recipe);
   const seen = new Set<string>();
   const assets: RecipeAsset[] = [];
@@ -149,16 +157,27 @@ export async function readRecipePackage(
     const blob = file.slice(start + offset, end, entry.type);
     if (hex(await hash(blob)) !== entry.sha256)
       throw new Error(`Recipe asset checksum mismatch: ${entry.id}`);
+    let raw:RawImageSource|undefined;
+    if(entry.raw){
+      const {originalOffset,...metadata}=entry.raw,originalEnd=start+originalOffset+metadata.original.byteLength,key=JSON.stringify([metadata.original.sha256,metadata.original.type,metadata.original.byteLength]);
+      if(!Number.isSafeInteger(originalEnd)||originalEnd>file.size)throw new Error('Truncated recipe RAW original.');
+      let retained=originalRanges.get(originalOffset);
+      if(retained&&retained.key!==key)throw new Error('Conflicting recipe RAW original descriptors.');
+      if(!retained){retained={blob:file.slice(start+originalOffset,originalEnd,metadata.original.type),size:metadata.original.byteLength,key};originalRanges.set(originalOffset,retained);}
+      raw=ownRawSource({...metadata,originalBlob:retained.blob});
+      await verifyRawSource(raw,blob,entry.width,entry.height);
+    }
     assets.push({
       id: entry.id,
       name: entry.name,
       width: entry.width,
       height: entry.height,
       blob,
-      ...(entry.tiff?{tiff:entry.tiff}:{}),...(entry.avif?{avif:entry.avif}:{}),    });
+      ...(entry.tiff?{tiff:entry.tiff}:{}),...(entry.avif?{avif:entry.avif}:{}),...(raw?{raw}:{}),    });
     offset += entry.size;
   }
   if (seen.size !== required.size) throw new Error("Missing recipe assets.");
+  for(const [originalOffset,original] of [...originalRanges].sort((a,b)=>a[0]-b[0])){if(originalOffset!==offset)throw new Error('Invalid recipe RAW original ranges.');offset+=original.size;}
   if (start + offset !== file.size)
     throw new Error("Unexpected trailing recipe package bytes.");
   return { recipe: manifest.recipe as Recipe, assets };

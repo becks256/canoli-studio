@@ -1,3 +1,4 @@
+import {ownRawSource} from "../core/interchange/raw/source";
 import { sendGraph, type GraphChunk } from "./graph-transfer";
 import { isImmutable } from "../core/immutable";
 import type { DocumentData } from "../core/model";
@@ -42,7 +43,7 @@ export class ProjectEncoder {
       for (const id of referencedAssets(entry.document)) ids.add(id);
     const sources = [...ids].map(id => {
       const asset = assets.get(id);
-      return { id: asset.id, name: asset.name, width: asset.width, height: asset.height, blob: asset.blob, ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}) };
+      return { id: asset.id, name: asset.name, width: asset.width, height: asset.height, blob: asset.blob, ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{}) };
     });
     // Capture caller-owned inputs before the first asynchronous transport break.
     const snapshot = isImmutable(document) && [...history.past, ...history.future].every(entry => isImmutable(entry.document))

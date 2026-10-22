@@ -1,3 +1,4 @@
+import {RawDevelopmentDialog,isCameraRawFile,rawFileAccept} from "./RawDevelopmentDialog";
 import { FrequencySeparationDialog } from "./FrequencySeparationDialog";
 import {BrushSymmetryDialog} from './BrushSymmetryDialog';
 import {pointerPenTilt} from '../core/brush-tip';
@@ -54,7 +55,7 @@ import {
   X,
 } from "lucide-react";
 import { EditorApplication } from "../editor";
-import { AdjustmentLayer, LayerGroup, PaintLayer, RasterLayer, TextLayer } from "../dom";
+import { AdjustmentLayer, LayerGroup, PaintLayer, RasterLayer, SmartObjectLayer, TextLayer } from "../dom";
 import {
   defaultCurvesAdjustment,
   defaultHslAdjustment,
@@ -274,6 +275,8 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showRefineEdgeDialog, setShowRefineEdgeDialog] = useState(false);
   const [svgFile,setSvgFile]=useState<File|null>(null);
   const [tiffFile,setTiffFile]=useState<File|null>(null);
+  const [rawFile,setRawFile]=useState<File|null>(null);
+  const [rawLayer,setRawLayer]=useState<SmartObjectLayer|null>(null);
   const [avifFile,setAvifFile]=useState<File|null>(null);
   const [photoshopFile,setPhotoshopFile]=useState<{file:File;id:number}|null>(null);
   const photoshopRequest=useRef(0);
@@ -906,6 +909,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         }),
       enabled: () => tool === "crop" || editor.tools.drawingPolygonLasso || (!!selected && !locked),
     },
+    {id:"develop-raw",label:"Develop RAW…",keys:[],enabled:()=>!busy&&!locked&&selectedObject instanceof SmartObjectLayer&&!!selectedObject.rawDevelopment,run:()=>{if(selectedObject instanceof SmartObjectLayer)setRawLayer(selectedObject);}},
     {id:"frequency-separation",label:"Frequency separation…",keys:[],enabled:()=>!busy&&!locked&&selectedObject instanceof RasterLayer,
       run:()=>{if(selectedObject instanceof RasterLayer){editor.tools.cancel();setFrequencySource(selectedObject.id);}}},
     ...(["curves", "levels", "tone", "hsl", "color-balance", "vibrance", "gradient-map", "white-balance", "lut", "red-eye"] as const).map((kind) => ({
@@ -1735,6 +1739,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   }
 
   const handleImportFile=(file:File)=>{
+    if(isCameraRawFile(file)){setRawFile(file);return;}
     if(file.type==='image/svg+xml'||/\.svg$/i.test(file.name)){setSvgFile(file);return;}
     if(['image/tiff','image/x-tiff'].includes(file.type)||/\.tiff?$/i.test(file.name)){setTiffFile(file);return;}
     if(file.type==='image/avif'||/\.avif$/i.test(file.name)){setAvifFile(file);return;}
@@ -1746,6 +1751,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     if(kind==='svg'){setSvgFile(file);return;}
     if(kind==='tiff'){setTiffFile(file);return;}
     if(kind==='avif'){setAvifFile(file);return;}
+    if(kind==='raw'){setRawFile(file);return;}
     if(kind==='photoshop'){handlePsdFile(file);return;}
     void task(async()=>{if(kind==='project')await editor.openProject(file);else await editor.openImage(file);notify('Local recent-file copy opened');});
   };
@@ -1788,7 +1794,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           ref={importInput}
           data-testid="import-input"
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg,image/tiff,.tif,.tiff,image/avif,.avif"
+          accept={`image/png,image/jpeg,image/webp,image/svg+xml,.svg,image/tiff,.tif,.tiff,image/avif,.avif,${rawFileAccept}`}
           hidden
           onChange={(event) => {
             const file = event.target.files?.[0];
@@ -2491,6 +2497,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onAttempt={attempt}
             onSelectedAction={selectedAction}
             onOpenHelp={() => setShowHelp(true)}
+            onDevelopRaw={layer=>setRawLayer(layer)}
             onCombinePaths={()=>{editor.tools.cancel();setShowVectorBoolean(true);}}
           />
           }
@@ -2657,6 +2664,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         )}
         {svgFile&&<SvgImportDialog file={svgFile} editor={editor} onClose={()=>setSvgFile(null)} onBusyChange={setBusy} onImported={()=>notify("SVG imported")}/>}
         {tiffFile&&<TiffImportDialog file={tiffFile} editor={editor} onClose={()=>setTiffFile(null)} onBusyChange={setBusy} onImported={()=>notify("TIFF page imported")}/>}
+        {(rawFile||rawLayer)&&<RawDevelopmentDialog editor={editor} file={rawFile??undefined} layer={rawLayer??undefined} onClose={()=>{setRawFile(null);setRawLayer(null);}} onBusyChange={setBusy} onApplied={()=>notify(rawFile?'RAW image imported':'RAW development applied')}/>}
         {avifFile&&<AvifImportDialog file={avifFile} editor={editor} onClose={()=>setAvifFile(null)} onBusyChange={setBusy} onImported={()=>notify("AVIF image imported")}/>}
         {photoshopFile&&<PhotoshopImportDialog key={photoshopFile.id} file={photoshopFile.file} editor={editor} onClose={()=>setPhotoshopFile(null)} onBusyChange={setBusy} onImported={()=>notify("Photoshop file imported")}/>}
         {showPreflight&&<PreflightDialog editor={editor} onClose={()=>setShowPreflight(false)}/>}

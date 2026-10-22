@@ -81,6 +81,7 @@ export interface InspectorPanelProps {
   onSelectedAction(action: (layer: Layer) => void): void;
   onOpenHelp(): void;
   onCombinePaths(): void;
+  onDevelopRaw(layer:SmartObjectLayer):void;
 }
 
 export function InspectorPanel({
@@ -101,6 +102,7 @@ export function InspectorPanel({
   onSelectedAction,
   onOpenHelp,
   onCombinePaths,
+  onDevelopRaw,
 }: InspectorPanelProps) {
   const frequencyOwner=selected?frequencyRadiusOwner(viewDocument,selected.id):null;
   const frequencyGroup=frequencyOwner?dom.getLayer(frequencyOwner.id) as LayerGroup:null;
@@ -403,6 +405,7 @@ export function InspectorPanel({
               }
             />
           </InspectorSection>
+          {selectedObject instanceof SmartObjectLayer&&selectedObject.rawDevelopment&&<InspectorSection title="RAW development"><Button disabled={locked||busy} onClick={()=>onDevelopRaw(selectedObject)}>Develop RAW…</Button></InspectorSection>}
           {selected.kind === "smart-object" &&
             selectedObject instanceof SmartObjectLayer && (
               <SmartFiltersPanel

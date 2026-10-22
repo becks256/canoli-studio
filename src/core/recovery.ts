@@ -1,3 +1,4 @@
+import {ownRawSource,rawSourceMetadata,verifyRawSource,type RawImageSource} from "./interchange/raw/source";
 import { persistRecovery, listRecoverySummaries, restoreRecovery } from "./recovery-persistence";
 import { encodeJsonData } from "./json-encoding";
 import { isImmutable } from "./immutable";
@@ -32,6 +33,7 @@ export interface RecoveryAsset {
   blob: Blob;
   tiff?: TiffDecodeSettings;
   avif?: AvifDecodeSettings;
+  raw?:RawImageSource;
   checksum?: string;
 }
 const digest = async (bytes: BufferSource) =>
@@ -57,6 +59,7 @@ function blobDigest(blob: Blob): Promise<string> {
   return hash;
 }
 async function assetDigest(asset: RecoveryAsset): Promise<string> {
+  if(asset.raw)await verifyRawSource(asset.raw,asset.blob,asset.width,asset.height);
   return digest(
     new TextEncoder().encode(
       JSON.stringify({
@@ -68,6 +71,7 @@ async function assetDigest(asset: RecoveryAsset): Promise<string> {
         bytes: await blobDigest(asset.blob),
         ...(asset.tiff ? { tiff: asset.tiff } : {}),
         ...(asset.avif ? { avif: asset.avif } : {}),
+        ...(asset.raw?{raw:rawSourceMetadata(asset.raw)}:{}),
       }),
     ),
   );
@@ -185,6 +189,7 @@ export class RecoveryRepository {
         blob: asset.blob,
         ...(asset.tiff ? { tiff: tiffDecodeOptionsSchema.parse(asset.tiff) } : {}),
         ...(asset.avif ? { avif: avifDecodeOptionsSchema.parse(asset.avif) } : {}),
+        ...(asset.raw?{raw:ownRawSource(asset.raw)}:{}),
       };
     });
     const checked: RecoveryAsset[] = [];

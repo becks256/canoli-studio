@@ -1,10 +1,14 @@
 # REST and scripting APIs
 
-## RAW development dependency in progress
+## RAW development workflow in implementation
 
 Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.
 
-The internal checked decoder produces owned linear RGB16/grayscale16; explicit conversion consent is required before the private worker returns an sRGB RGBA8 working PNG. The build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Reported metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. There is no public `openRaw` or editable RAW document workflow yet: original/derived asset storage, commands, persistence, UI review/development and full application 50 MP acceptance remain in implementation. These trusted file services grant no isolated Scripts/plugin/REST file privilege or live browser/headless synchronization.
+Trusted `editor.openRaw(file, options = {}, control = {})` opens a clean native-resolution smart-object document with a retained sensor original and accepted sRGB8 PNG. Explicit `allowPrecisionLoss:true` is required. `RawDevelopment` values and attached `SmartObjectLayer.rawDevelopment` / `developRaw(value, control)` expose editable parameters through the trusted host; Apply uses one shared master-replacement command and ordinary locks/history. Cancellation, callback failures, supersession and intervening human/session changes discard private work. See [signatures, defaults, errors and limits](SCRIPTING_API.md#raw-input-and-development-trusted-browser-application-code).
+
+Projects with RAW use checksummed container v4, preserving original bytes, accepted pixels, normalized settings and native provenance independently; other projects stay v3. Current/history outputs share deduplicated originals. Workspace/recovery/copy, source-bearing recipe packages v2 and brush packs v6 preserve those records. Accepted PNG reopening and undo/redo do not require the native RAW decoder. The dated implementation roadmap records automated acceptance and outstanding gates for this increment; semantic RAW recipes, isolated Scripts/plugin operations, separate headless REST development and direct RAW batch opening remain unfinished. These trusted file services grant no new isolated file privilege or live browser/headless synchronization.
+
+The checked decoder produces linear RGB16/grayscale16 before explicit RGBA8 sRGB working conversion. Its build omits DNG SDK/RawSpeed/external lossy-JPEG DNG and external ICC-file processing. Metadata support is not proof of valid sensor payloads, device memory or photographic fidelity. Broader camera/color, merge workflows, F10 precision and the complete F12 gates remain open.
 
 
 ## Trusted recent-file and raster-file opening surfaces

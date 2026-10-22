@@ -1,3 +1,4 @@
+import {rawSourceMetadata} from "../core/interchange/raw/source";
 import {z} from 'zod';
 import {BrushPreset,brushPresetPackSchema,exportBrushPresets,parseBrushPresets,type BrushTool} from './presets';
 import {capturePresetSource,presetSourceMetadataSchema,verifyPresetSource,type PresetSource} from './sources';
@@ -6,8 +7,8 @@ import type {ToolSettings} from '../tools';
 import type {BrushTextureSourceOwner} from './texture-source';
 import {brushTexturePreferenceSchema} from './texture-source';
 
-const packSchema=z.object({format:z.literal('canoli-brush-presets'),version:z.union([z.literal(4),z.literal(5)]),presets:brushPresetPackSchema.shape.presets,
-  sources:z.array(presetSourceMetadataSchema.safeExtend({blobIndex:z.number().int().nonnegative().safe()})).min(1),
+const packSchema=z.object({format:z.literal('canoli-brush-presets'),version:z.union([z.literal(4),z.literal(5),z.literal(6)]),presets:brushPresetPackSchema.shape.presets,
+  sources:z.array(presetSourceMetadataSchema.safeExtend({blobIndex:z.number().int().nonnegative().safe(),rawBlobIndex:z.number().int().nonnegative().safe().optional()})).min(1),
 }).strict();
 
 export async function captureBrushPreset(name:string,tool:BrushTool,settings:ToolSettings,owner:BrushTextureSourceOwner,includeColor=false,signal?:AbortSignal){
@@ -24,9 +25,9 @@ export async function exportBrushPack(presets:readonly BrushPreset[],signal?:Abo
   for(const preset of owned){
     const value=preset.toJSON();
     if(preset.source){
-      const source=await verifyPresetSource(preset.source,signal),{blob,id:oldId,...metadata}=source;
+      const source=await verifyPresetSource(preset.source,signal),{blob,id:oldId,raw,...rest}=source,metadata={...rest,...(raw?{raw:rawSourceMetadata(raw)}:{})};
       const key=JSON.stringify(metadata);let id=keys.get(key);
-      if(!id){id=crypto.randomUUID();keys.set(key,id);sources.push({...metadata,id,blobIndex:blobs.length});blobs.push(blob);}
+      if(!id){id=crypto.randomUUID();keys.set(key,id);sources.push({...metadata,id,blobIndex:blobs.length,...(raw?{rawBlobIndex:blobs.length+1}:{})});blobs.push(blob);if(raw)blobs.push(raw.originalBlob);}
       value.texture={...value.texture!,sourceId:id};void oldId;
     }
     data.push(value);
@@ -38,7 +39,7 @@ export async function parseBrushPack(file:Blob,signal?:AbortSignal):Promise<Brus
   const container=await readBrushContainer(file,signal);
   if(!container){const text=await file.text();signal?.throwIfAborted();return parseBrushPresets(text);}
   const pack=packSchema.parse(container.data);brushPresetPackSchema.parse({format:pack.format,version:pack.version,presets:pack.presets});
-  if(pack.sources.length!==container.blobs.length)throw new Error('Brush pack contains unreferenced source data.');
+  if(pack.version<6&&pack.sources.some(source=>source.raw||source.rawBlobIndex!==undefined))throw new Error('RAW-bearing textures require brush pack version 6.');
   const sources=new Map<string,PresetSource>(),indices=new Set<number>(),used=new Set<string>();
   const ids=new Set(pack.sources.map(source=>source.id));
   if(ids.size!==pack.sources.length)throw new Error('Duplicate brush source IDs.');
@@ -46,9 +47,12 @@ export async function parseBrushPack(file:Blob,signal?:AbortSignal):Promise<Brus
   if(used.size!==ids.size)throw new Error('Brush pack contains unused image sources.');
   for(const entry of pack.sources){
     if(sources.has(entry.id)||indices.has(entry.blobIndex)||entry.blobIndex>=container.blobs.length)throw new Error('Duplicate or missing brush source.');
-    const {blobIndex,...metadata}=entry;indices.add(blobIndex);
-    sources.set(entry.id,await verifyPresetSource({...metadata,blob:container.blobs[blobIndex]},signal));
+    const {blobIndex,rawBlobIndex,raw,...metadata}=entry;indices.add(blobIndex);
+    if(!!raw!==(rawBlobIndex!==undefined)||rawBlobIndex!==undefined&&(indices.has(rawBlobIndex)||rawBlobIndex>=container.blobs.length))throw new Error('Missing or duplicate brush RAW original.');
+    if(rawBlobIndex!==undefined)indices.add(rawBlobIndex);
+    sources.set(entry.id,await verifyPresetSource({...metadata,blob:container.blobs[blobIndex],...(raw?{raw:{...raw,originalBlob:container.blobs[rawBlobIndex!]}}:{})},signal));
   }
+  if(indices.size!==container.blobs.length)throw new Error('Brush pack contains unreferenced source data.');
   const remap=new Map<string,PresetSource>();
   for(const [id,source] of sources)remap.set(id,{...source,id:crypto.randomUUID()});
   const presets=pack.presets.map(data=>{

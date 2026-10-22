@@ -35,14 +35,14 @@ export const brushPresetSettingsSchema = z.object({
 }).strict();
 export type BrushPresetSettings = z.infer<typeof brushPresetSettingsSchema>;
 export const brushPresetSchema = z.object({
-  version: z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5)]), id: z.string().min(1).max(240),
+  version: z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5),z.literal(6)]), id: z.string().min(1).max(240),
   name: z.string().trim().min(1).max(120), tool: z.enum(BRUSH_TOOLS),
   settings: brushPresetSettingsSchema, color: colorSchema.optional(),
   texture:z.object({sourceId:z.string().min(1).max(240),channel:z.enum(['alpha','luminance']),invert:z.boolean()}).strict().optional(),
 }).strict().refine(value=>value.version>=2||value.settings.tip===undefined,'Brush tips require preset version 2 or later.').refine(value=>value.version>=3||value.settings.symmetry===undefined,'Brush symmetry requires preset version 3.').refine(value=>value.version>=4||value.texture===undefined,'Image textures require preset version 4.').refine(value=>value.version>=5||(value.tool!=='smudge'&&value.tool!=='mixer'&&value.settings.smudge===undefined&&value.settings.mixer===undefined),'Wet tools and settings require preset version 5.').refine(value=>(value.tool!=='smudge'&&value.tool!=='mixer')||(value.settings.smudge!==undefined&&value.settings.mixer!==undefined),'Wet presets require both tool preferences.');
 export type BrushPresetData = z.infer<typeof brushPresetSchema>;
 export const brushPresetPackSchema = z.object({
-  format: z.literal('canoli-brush-presets'), version: z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5)]),
+  format: z.literal('canoli-brush-presets'), version: z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4),z.literal(5),z.literal(6)]),
   presets: z.array(brushPresetSchema).min(1),
 }).strict().superRefine((pack, context) => {
   if(pack.presets.some(preset=>preset.version>pack.version))context.addIssue({code:'custom',message:'Preset versions require an equal or newer brush pack version.'});
@@ -56,6 +56,7 @@ export class BrushPreset {
   readonly source:PresetSource|null;
   constructor(data: unknown,source?:unknown) { const owned = brushPresetSchema.parse(data); if (owned.color === undefined) delete owned.color;if(owned.texture===undefined)delete owned.texture;if(owned.settings.tip===null)delete owned.settings.tip;if(owned.settings.symmetry===null)delete owned.settings.symmetry;
     this.source=source===undefined||source===null?null:ownPresetSource(source);
+    if(this.source?.raw&&owned.version<6)throw new Error('RAW-bearing textures require preset version 6.');
     if(!!owned.texture!==!!this.source||owned.texture&&owned.texture.sourceId!==this.source!.id)throw new Error('A textured preset requires its matching original source-bearing record.');
     this.data = freeze(owned); Object.freeze(this); }
   static capture(name: string, tool: BrushTool, settings: ToolSettings, includeColor = false,source?:PresetSource): BrushPreset {
@@ -67,7 +68,7 @@ export class BrushPreset {
     if(!wet){delete values.smudge;delete values.mixer;}
     if(values.tip==null)delete values.tip;
     if(values.symmetry==null)delete values.symmetry;
-    return new BrushPreset({version: wet?5:texture?4:values.symmetry?3:values.tip?2:1, id: crypto.randomUUID(), name, tool, settings: values,
+    return new BrushPreset({version: source?.raw?6:wet?5:texture?4:values.symmetry?3:values.tip?2:1, id: crypto.randomUUID(), name, tool, settings: values,
       ...(texture?{texture:{sourceId:source!.id,...texture}}:{}),...(includeColor ? {color: settings.color} : {})},source);
   }
   get id() { return this.data.id; }
@@ -81,7 +82,7 @@ export class BrushPreset {
     if(data.settings.tip==null)delete data.settings.tip;
     if(data.settings.symmetry==null)delete data.settings.symmetry;
     if(data.tool==='smudge'||data.tool==='mixer'){data.settings.smudge??={...DEFAULT_SMUDGE};data.settings.mixer??={...DEFAULT_MIXER};}
-    data.version=Math.max(data.version,data.settings.smudge||data.settings.mixer?5:1,data.texture?4:data.settings.symmetry?3:data.settings.tip?2:1) as 1|2|3|4|5;
+    data.version=Math.max(data.version,data.settings.smudge||data.settings.mixer?5:1,data.texture?4:data.settings.symmetry?3:data.settings.tip?2:1) as 1|2|3|4|5|6;
     return new BrushPreset(data,this.source);
   }
   duplicate(name = `${this.name.slice(0, 115)} copy`): BrushPreset {

@@ -1,4 +1,8 @@
 import { createFrequencySeparation } from "./frequency-separation";
+import {RawDevelopment,type RawDevelopmentControl} from './raw';
+import type {RawDevelopSettings,RawImportReport} from '../core/interchange/raw/types';
+export {RawDevelopment} from './raw';
+export type {RawDevelopmentControl} from './raw';
 import { frequencyRadiusOwner } from "../core/frequency-separation";
 import type { FrequencySeparationOptions } from "../core/frequency-separation";
 export type { FrequencySeparationOptions } from "../core/frequency-separation";
@@ -379,6 +383,13 @@ export class Document {
 
   /** @internal Asynchronous host operation; no renderer or credentials enter isolated scripts. */
   _rasterizeSmartObject?: (layerId: string) => Promise<RasterLayer>;
+  /** @internal Native file development requires a configured application host. */
+  _prepareRawDevelopment?:(layerId:string,settings:RawDevelopSettings,control:RawDevelopmentControl)=>Promise<Readonly<RawImportReport>>;
+  async _developRaw(layerId:string,settings:RawDevelopSettings,control:RawDevelopmentControl):Promise<Readonly<RawImportReport>>{
+    if(this.batch)throw new Error('RAW development cannot run inside a synchronous transaction.');
+    if(!this._prepareRawDevelopment)throw new Error('RAW development requires a configured application host.');
+    return this._prepareRawDevelopment(layerId,settings,control);
+  }
   async _rasterize(layerId: string): Promise<RasterLayer> {
     if (this.batch)
       throw new Error(
@@ -1240,6 +1251,16 @@ function allIds(nodes: LayerData[]): string[] {
 }
 
 export class SmartObjectLayer extends Layer {
+  /** Accepted settings for this shared master; null for ordinary smart objects. */
+  get rawDevelopment():RawDevelopment|null{
+    const document=this.requireDocument(),source=new ComponentRegistry(document._read().components).get(this.componentId).source;
+    const raw=source.kind==='asset'?document.assetStore?.get(source.assetId).raw:undefined;
+    return raw?new RawDevelopment(raw.settings.development):null;
+  }
+  async developRaw(value:RawDevelopment,control:RawDevelopmentControl={}):Promise<Readonly<RawImportReport>>{
+    if(!(value instanceof RawDevelopment))throw new Error('Use a RawDevelopment constructor.');
+    return this.requireDocument()._developRaw(this.id,value.toJSON(),control);
+  }
   constructor(
     options: LayerOptions & {
       componentId: string;

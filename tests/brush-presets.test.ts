@@ -50,7 +50,7 @@ it('wet presets own both tool preferences, enforce their format age and reset th
 });
 it('rejects unsupported versions, hidden code/assets, duplicate IDs and every malformed pack before storage',async()=>{
  const preset=BrushPreset.capture('Safe','brush',settings()),pack=JSON.parse(exportBrushPresets([preset]));
- const invalid=[{...pack,version:6},{...pack,format:'other'},{...pack,code:'execute me'},{...pack,presets:[preset.toJSON(),preset.toJSON()]},{...pack,presets:[]},{...pack,presets:[{...preset.toJSON(),assetId:'remote'}]},{...pack,presets:[{...preset.toJSON(),settings:{...preset.settings,pressureCurve:{points:[]}}}]},{...pack,presets:[{...preset.toJSON(),settings:{...preset.settings,size:Infinity}}]}];
+ const invalid=[{...pack,version:7},{...pack,format:'other'},{...pack,code:'execute me'},{...pack,presets:[preset.toJSON(),preset.toJSON()]},{...pack,presets:[]},{...pack,presets:[{...preset.toJSON(),assetId:'remote'}]},{...pack,presets:[{...preset.toJSON(),settings:{...preset.settings,pressureCurve:{points:[]}}}]},{...pack,presets:[{...preset.toJSON(),settings:{...preset.settings,size:Infinity}}]}];
  const library=new BrushPresetLibrary(),original=library.getSnapshot();
  try{for(const value of invalid) {expect(()=>parseBrushPresets(JSON.stringify(value))).toThrow();await expect(library.importJson(JSON.stringify(value))).rejects.toThrow();expect(library.getSnapshot()).toBe(original);}expect(()=>parseBrushPresets('{')).toThrow(/Invalid brush-pack JSON/);}finally{library.dispose();}
 });

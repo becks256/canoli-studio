@@ -1,3 +1,5 @@
+import {prepareRawImport,developRawComponent} from "./engine/raw-import";
+import {rawSourceMetadata} from "./core/interchange/raw/source";
 import {RecentFilesService} from './workspace/recent-service';
 import { separateFrequencies,prepareFrequencySeparation } from "./engine/frequency-separation";
 import type { FrequencySeparationOptions } from "./core/frequency-separation";
@@ -78,7 +80,7 @@ import {importParagraphStyles} from './core/paragraph-styles';
 import {inspectTiffFile} from './core/interchange/tiff/client';
 import {inspectAvifFile} from './core/interchange/avif/client';
 import {inspectRawFile} from './core/interchange/raw/client';
-import type {RawImportControl,RawImportReport} from './core/interchange/raw/types';
+import type {RawDecodeOptions,RawImportControl,RawImportReport} from './core/interchange/raw/types';
 import type {AvifDecodeOptions,AvifImportControl,AvifImportReport} from './core/interchange/avif/types';
 import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
 import type {
@@ -166,6 +168,7 @@ export class EditorApplication {
   >();
   private ioGeneration = 0;
   private photoshopJobs=new Set<AbortController>();
+  private rawJobs=new Set<AbortController>();
   private avifJobs=new Set<AbortController>();
   private photoshopCommits=new Set<AbortController>();
   private idleRetouchProcessor: PixelProcessor | null = null;
@@ -836,13 +839,14 @@ export class EditorApplication {
             previous.height !== asset.height ||
             JSON.stringify(previous.tiff) !== JSON.stringify(asset.tiff) ||
             JSON.stringify(previous.avif) !== JSON.stringify(asset.avif) ||
+            JSON.stringify(previous.raw?rawSourceMetadata(previous.raw):null)!==JSON.stringify(asset.raw?rawSourceMetadata(asset.raw):null) ||
             (await computeSha256(await previous.blob.arrayBuffer())) !==
               (await computeSha256(await asset.blob.arrayBuffer()))
           )
             throw new Error(
               "An image asset ID conflicts with the source document. Import it with a new identity before applying.",
             );
-        } else await staged.add(asset.blob, asset.name, asset.id, false,{tiff:asset.tiff,avif:asset.avif});
+        } else await staged.add(asset.blob, asset.name, asset.id, false,{tiff:asset.tiff,avif:asset.avif,raw:asset.raw});
         assertCurrent();
       }
       assertCurrent();
@@ -991,7 +995,7 @@ export class EditorApplication {
           asset.name,
           replacements.get(asset.id)!,
           false,
-          {tiff:asset.tiff,avif:asset.avif},
+          {tiff:asset.tiff,avif:asset.avif,raw:asset.raw},
         );
         if (copy.width !== asset.width || copy.height !== asset.height)
           throw new Error(
@@ -1173,6 +1177,16 @@ export class EditorApplication {
       throw new Error(
         "Each document session must own an independent document and asset store.",
       );
+    document._prepareRawDevelopment=async(layerId,settings,control)=>{
+      control.signal?.throwIfAborted();
+      for(const job of this.rawJobs)job.abort(new Error('RAW preparation was replaced.'));
+      const generation=this.ioGeneration,revision=document.getSnapshot().revision,alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+      control.signal?.addEventListener('abort',cancel,{once:true});this.rawJobs.add(abort);
+      const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during RAW development. Try again.');};
+      const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);
+      try{return await developRawComponent(document,assets,layerId,{allowPrecisionLoss:control.allowPrecisionLoss??false,development:settings},{signal:abort.signal,onProgress:control.onProgress},check,()=>{stopDocument();stopEditor();});}
+      finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);this.rawJobs.delete(abort);}
+    };
     document._preflight=(settings,control)=>{
       const snapshot=document.getSnapshot(),generation=this.ioGeneration;
       return preparePreflight(snapshot.document,snapshot.revision,assets,settings,control,()=>{
@@ -1317,6 +1331,22 @@ export class EditorApplication {
 
   /** Trusted, read-only sensor preflight. Application RAW installation is separate. */
   async inspectRaw(file:File,image=0,control:RawImportControl={}):Promise<RawImportReport>{return inspectRawFile(file,image,control);}
+
+  async openRaw(file:File,options:RawDecodeOptions={},control:RawImportControl={}):Promise<Readonly<RawImportReport>>{
+    control.signal?.throwIfAborted();
+    for(const job of this.rawJobs)job.abort(new Error('RAW preparation was replaced.'));
+    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
+    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.rawJobs.add(abort);
+    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during RAW import. Try again.');};
+    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);
+    let prepared:Awaited<ReturnType<typeof prepareRawImport>>|undefined;
+    try{
+      check();prepared=await prepareRawImport(file,options,{signal:abort.signal,onProgress:control.onProgress},check);check();
+      stopDocument();stopEditor();this.rawJobs.delete(abort);
+      this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'raw');return prepared.report;
+    }catch(error){prepared?.assets.dispose();throw error;}
+    finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);this.rawJobs.delete(abort);}
+  }
 
   async openAvif(file:File,options:AvifDecodeOptions={},control:AvifImportControl={}):Promise<Readonly<AvifImportReport>>{
     control.signal?.throwIfAborted();
@@ -1548,7 +1578,7 @@ export class EditorApplication {
     try{
       if(owned.source){
         const original=await verifyPresetSource(owned.source,abort.signal);check();
-        const asset=await draft.import(original.blob,original.name,{signal:abort.signal,tiff:original.tiff,avif:original.avif});check();
+        const asset=await draft.import(original.blob,original.name,{signal:abort.signal,tiff:original.tiff,avif:original.avif,raw:original.raw});check();
         if(asset.width!==original.width||asset.height!==original.height)throw new Error('Brush source dimensions do not match its original pixels.');
       }
       check();selectTool?.(owned.tool);return this.tools.applyBrushPreset(owned,owned.source?draft:undefined);
@@ -1809,6 +1839,7 @@ export class EditorApplication {
     this.ioGeneration++;
     this.retouchDisposed = true;
     for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
+    for(const job of this.rawJobs)job.abort(new Error('Editor disposed during RAW preparation.'));this.rawJobs.clear();
     for(const job of this.avifJobs)job.abort(new Error('Editor disposed during AVIF import.'));this.avifJobs.clear();
     for(const controller of this.booleanControllers)controller.abort(new Error('Editor disposed during the Boolean operation.'));
     this.booleanControllers.clear();

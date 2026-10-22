@@ -35,6 +35,27 @@ test('production internal RAW worker requires output consent before WASM and rej
   expect(await run(false)).toMatch(/consent/);expect(loads).toBe(0);expect(await run(true)).toMatch(/RAW|wasm|fetch|abort/i);expect(loads).toBeGreaterThan(0);await page.unroute('**/canoli_raw_decoder-*.wasm');expect(await run(true)).toBe('Success');
 });
 
+test('production RAW import and development retain the sensor original, exact accepted pixels and shared undo',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);
+  const original=await readFile('tests/fixtures/raw/bayer-rggb.dng');await page.getByTestId('import-input').setInputFiles({name:'Camera original.dng',mimeType:'image/x-adobe-dng',buffer:original});
+  const dialog=page.getByRole('dialog',{name:'Import camera RAW',exact:true}),apply=dialog.getByRole('button',{name:'Import RAW image',exact:true});await expect(dialog).toContainText('64 × 48');await expect(apply).toBeDisabled();await dialog.getByRole('checkbox',{name:'Convert RAW development to 8-bit editing precision',exact:true}).check();await apply.click();await expect(dialog).toHaveCount(0);
+  const download=async(action:()=>Promise<unknown>,name:string)=>{const pending=page.waitForEvent('download');await action();const path=info.outputPath(name);await(await pending).saveAs(path);return path;};
+  const project=async(name:string)=>{const path=await download(()=>page.getByRole('button',{name:'Save project',exact:true}).click(),name);return{path,value:await readProject(new Blob([new Uint8Array(await readFile(path))]))};};
+  const before=await project('raw-before.luma');expect(before.value.document.children[0].kind).toBe('smart-object');expect(Buffer.from(await before.value.entries[0].raw!.originalBlob.arrayBuffer())).toEqual(original);
+  await page.locator('.layer-row').click();await page.getByRole('button',{name:'Develop RAW…',exact:true}).click();const edit=page.getByRole('dialog',{name:'Develop RAW',exact:true});await edit.getByRole('spinbutton',{name:'RAW exposure',exact:true}).fill('1.25');await edit.getByRole('spinbutton',{name:'RAW exposure',exact:true}).press('Enter');await edit.getByRole('spinbutton',{name:'RAW highlight preservation',exact:true}).fill('0.5');await edit.getByRole('spinbutton',{name:'RAW highlight preservation',exact:true}).press('Enter');await edit.getByRole('button',{name:'Apply RAW development',exact:true}).click();await expect(edit).toHaveCount(0);
+  const developed=await project('raw-developed.luma');expect(developed.value.entries[0].raw!.settings.development).toMatchObject({exposure:1.25,highlightPreservation:0.5});expect(Buffer.from(await developed.value.entries[0].raw!.originalBlob.arrayBuffer())).toEqual(original);
+  const png=await download(()=>page.getByRole('button',{name:'Export PNG',exact:true}).click(),'raw-developed.png'),reference=await readFile('tests/fixtures/raw/exposure-up.png');
+  const difference=await page.evaluate(async({actual,expected})=>{const a=await createImageBitmap(new Blob([new Uint8Array(actual)],{type:'image/png'})),b=await createImageBitmap(new Blob([new Uint8Array(expected)],{type:'image/png'})),canvas=new OffscreenCanvas(a.width,a.height),ctx=canvas.getContext('2d')!;ctx.drawImage(a,0,0);const x=ctx.getImageData(0,0,a.width,a.height).data;ctx.clearRect(0,0,a.width,a.height);ctx.drawImage(b,0,0);const y=ctx.getImageData(0,0,a.width,a.height).data;let maximum=0;for(let i=0;i<x.length;i++)maximum=Math.max(maximum,Math.abs(x[i]-y[i]));a.close();b.close();canvas.width=canvas.height=0;return maximum;},{actual:[...await readFile(png)],expected:[...reference]});expect(difference).toBe(0);
+  await page.keyboard.press('Control+z');const undone=await project('raw-undone.luma');expect(undone.value.document).toEqual(before.value.document);
+  await page.reload();expect(await page.evaluate(()=>'luma'in window)).toBe(false);let nativeRequests=0;await page.route('**/*canoli_raw_decoder*.wasm*',route=>{nativeRequests++;return route.fulfill({status:404,body:'No RAW decoder for saved pixels'});});await page.getByTestId('project-input').setInputFiles(developed.path);await expect(page.locator('.layer-row')).toHaveCount(1);const restored=await download(()=>page.getByRole('button',{name:'Export PNG',exact:true}).click(),'raw-reopened.png');expect(await readFile(restored)).toEqual(await readFile(png));expect(nativeRequests).toBe(0);expect(errors).toEqual([]);
+});
+
+test('production RAW recent-file copies repeat review and cancelling a preview leaves the project intact',async({page},info)=>{
+  await page.goto('/');await page.getByTestId('import-input').setInputFiles('tests/fixtures/raw/bayer-rggb.dng');const dialog=page.getByRole('dialog',{name:'Import camera RAW',exact:true});await dialog.getByRole('checkbox',{name:'Convert RAW development to 8-bit editing precision',exact:true}).check();await dialog.getByRole('button',{name:'Preview development',exact:true}).click();await expect(dialog.getByRole('img',{name:'RAW development preview',exact:true})).toBeVisible();await dialog.getByRole('button',{name:'Import RAW image',exact:true}).click();await expect(dialog).toHaveCount(0);
+  const download=async(name:string)=>{const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Save project',exact:true}).click();const path=info.outputPath(name);await(await pending).saveAs(path);return readProject(new Blob([new Uint8Array(await readFile(path))]));};
+  const before=await download('raw-review-before.luma');await page.getByRole('button',{name:'Recent files',exact:true}).click();const recent=page.getByRole('dialog',{name:'Recent files',exact:true});await expect(recent).toContainText('bayer-rggb.dng');await recent.getByRole('button',{name:'Open local copy bayer-rggb.dng',exact:true}).click();await expect(dialog).toBeVisible();await expect(dialog.getByRole('button',{name:'Import RAW image',exact:true})).toBeDisabled();await dialog.getByRole('button',{name:'Cancel',exact:true}).click();const after=await download('raw-review-after.luma');expect(after.document).toEqual(before.document);expect(Buffer.from(await after.entries[0].raw!.originalBlob.arrayBuffer())).toEqual(Buffer.from(await before.entries[0].raw!.originalBlob.arrayBuffer()));
+});
+
 test('production AVIF primary-image review preserves precision choices and original bytes across native project reopening',async({page},info)=>{
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);
   const original=await readFile('tests/fixtures/avif-import/rgb-10.avif');await page.getByTestId('import-input').setInputFiles({name:'Precision.avif',mimeType:'image/avif',buffer:original});
@@ -277,8 +298,8 @@ test('production portable brush presets survive reload and author self-contained
  const checked=spawnSync('python3',['-c',"from PIL import Image;import numpy as np,sys;a=Image.open(sys.argv[1]).convert('RGBA');b=Image.open(sys.argv[2]).convert('RGBA');assert a.size==b.size==(64,64);assert np.array_equal(np.asarray(a),np.asarray(b));assert a.getpixel((32,32))==(255,0,0,int(sys.argv[3])),a.getpixel((32,32));print('Every preset-authored pixel survives deletion of its library preset and native project reopening; center matches independent two-surface native alpha')",png,reopened,String(reference.output[3])],{encoding:'utf8',timeout:30000});expect(checked.status,checked.stderr||checked.stdout).toBe(0);expect(errors).toEqual([]);await info.attach('production-brush-presets',{body:JSON.stringify({portableSettings:pack.presets[0].settings,nativeAlphaReference:reference,sourceIndependentProject:true,exactUndo:true,noDeveloperGlobal:true,independent:checked.stdout}),contentType:'application/json'});
 });
 
-test('production saved-brush documentation works without JavaScript at a narrow viewport',async({browser})=>{
- const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});try{const page=await context.newPage();await page.goto('http://127.0.0.1:4173/developer/brush-presets.html');await expect(page.getByRole('heading',{name:'Saved brush presets',exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);await page.getByRole('link',{name:'Scripting API',exact:true}).click();const references=page.getByRole('link',{name:'BRUSH_PRESETS.md',exact:true});for(const reference of await references.all())await expect(reference).toHaveAttribute('href','brush-presets.html');await references.first().click();await expect(page.getByRole('heading',{name:'Saved brush presets',exact:true})).toBeVisible();}finally{await context.close();}
+test('production saved-brush documentation works without JavaScript at a narrow viewport',async({browser,baseURL})=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});try{const page=await context.newPage();await page.goto(`${baseURL}/developer/brush-presets.html`);await expect(page.getByRole('heading',{name:'Saved brush presets',exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);await page.getByRole('link',{name:'Scripting API',exact:true}).click();const references=page.getByRole('link',{name:'BRUSH_PRESETS.md',exact:true});for(const reference of await references.all())await expect(reference).toHaveAttribute('href','brush-presets.html');await references.first().click();await expect(page.getByRole('heading',{name:'Saved brush presets',exact:true})).toBeVisible();}finally{await context.close();}
 });
 
 test('production documented pressure curves retain native pixels, editable values and exact gesture/script undo',async({page},info)=>{
@@ -534,7 +555,7 @@ test('production documented TIFF exports exact classic/BigTIFF pixels after save
 });
 
 test("docs highlight examples without JavaScript and keep long code keyboard-scrollable", async ({
-  browser,
+  browser,baseURL,
 }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,
@@ -547,7 +568,7 @@ test("docs highlight examples without JavaScript and keep long code keyboard-scr
       ["api", ["bash", "http", "json"]],
       ["plugins", ["json"]],
     ] as const) {
-      await page.goto(`http://127.0.0.1:4173/developer/${path}.html`);
+      await page.goto(`${baseURL}/developer/${path}.html`);
       for (const language of languages) {
         const code = page
           .locator(`.syntax-highlighter code.language-${language}`)
@@ -563,7 +584,7 @@ test("docs highlight examples without JavaScript and keep long code keyboard-scr
         ),
       ).toBe(true);
     }
-    await page.goto("http://127.0.0.1:4173/developer/scripting-api.html");
+    await page.goto(`${baseURL}/developer/scripting-api.html`);
     // Native focusable pre retains text selection/copy and horizontal keyboard scrolling.
     const pre = page.locator(".syntax-highlighter pre").first();
     await pre.focus();
@@ -777,7 +798,7 @@ test("appearance changes preserve rendered pixels, export bytes, and undo histor
 });
 
 test("appearance works with unavailable storage and docs honor the OS without JavaScript", async ({
-  browser,
+  browser,baseURL,
 }) => {
   const context = await browser.newContext({ colorScheme: "light" });
   await context.addInitScript(() => {
@@ -788,7 +809,7 @@ test("appearance works with unavailable storage and docs honor the OS without Ja
     });
   });
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:4173/");
+  await page.goto(`${baseURL}/`);
   await page
     .getByRole("button", { name: "Switch to dark mode", exact: true })
     .click();
@@ -799,7 +820,7 @@ test("appearance works with unavailable storage and docs honor the OS without Ja
     colorScheme: "light",
   });
   const guide = await staticContext.newPage();
-  await guide.goto("http://127.0.0.1:4173/developer/api.html");
+  await guide.goto(`${baseURL}/developer/api.html`);
   expect(
     await guide
       .locator("body")

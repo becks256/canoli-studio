@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 export const RECENT_FILES_DATABASE='luma-recent-files';
 export const RECENT_FILES_LIMIT=20;
-export const recentKindSchema=z.enum(['project','image','svg','tiff','avif','photoshop']);
+export const recentKindSchema=z.enum(['project','image','svg','tiff','avif','raw','photoshop']);
 export type RecentKind=z.infer<typeof recentKindSchema>;
 const extent=z.number().int().nonnegative().safe();
 export const recentEntrySchema=z.object({

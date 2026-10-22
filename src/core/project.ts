@@ -1,3 +1,4 @@
+import {rawSourceMetadataSchema,rawSourceMetadata,ownRawSource,verifyRawSource,type RawImageSource,type RawSourceMetadata} from "./interchange/raw/source";
 import { freezeOwnedData } from "./immutable";
 import { AssetStore } from "./assets";
 import type { SerializedAsset, ImageAsset } from "./assets";
@@ -14,8 +15,8 @@ interface ProjectFile {
   assets: SerializedAsset[];
 }
 
-// Container v3 adds a SHA-256 manifest digest and per-asset checksums.
-// v2 remains readable; document schema versions are independent.
+// v3 adds manifest/asset checksums; v4 retains deduplicated RAW originals.
+// Source-free projects stay v3; v1/v2 remain readable. Document schemas are independent.
 const MAGIC = new Uint8Array([76, 85, 77, 65, 50, 13, 10, 0]);
 interface BinaryAsset {
   id: string;
@@ -28,13 +29,15 @@ interface BinaryAsset {
   sha256?: string;
   tiff?: TiffDecodeSettings;
   avif?: AvifDecodeSettings;
+  raw?: RawSourceMetadata & {originalIndex:number};
 }
 interface BinaryManifest {
   format: "luma";
-  version: 2 | 3;
+  version: 2 | 3 | 4;
   document: DocumentData;
   assets: BinaryAsset[];
   history?: RetainedHistory;
+  rawOriginals?: {type:string;size:number;offset:number;sha256:string}[];
 }
 const hex = (bytes: ArrayBuffer) =>
   Array.from(new Uint8Array(bytes), (byte) =>
@@ -68,7 +71,7 @@ function verifyLinkedSnapshots(
 export interface ProjectAssetSource {
   get(
     id: string,
-  ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob" | "tiff" | "avif">;
+  ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob" | "tiff" | "avif" | "raw">;
 }
 export async function serializeProject(
   document: DocumentData,
@@ -87,11 +90,21 @@ export async function serializeProject(
       assetIds.add(assetId);
   }
   const entries: BinaryAsset[] = [];
+  const rawOriginals:NonNullable<BinaryManifest["rawOriginals"]>=[], originalBlobs:Blob[]=[], originalKeys=new Map<string,number>();
   const blobs: Blob[] = [];
   let offset = 0;
-  for (const assetId of assetIds) {
-    const asset = assets.get(assetId);
+  // Pin every source before RAW verification yields or a live store can be closed.
+  const originals=[...assetIds].map(assetId=>{const asset=assets.get(assetId);return{id:asset.id,name:asset.name,width:asset.width,height:asset.height,blob:asset.blob,
+    ...(asset.tiff?{tiff:tiffDecodeOptionsSchema.parse(asset.tiff)}:{}),...(asset.avif?{avif:avifDecodeOptionsSchema.parse(asset.avif)}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{})};});
+  for (const asset of originals) {
     if(asset.blob.type==='image/avif'&&!asset.avif||asset.avif&&asset.blob.type!=='image/avif')throw new Error('AVIF project sources require matching saved precision and color settings.');
+    let raw:BinaryAsset['raw'];
+    if(asset.raw){
+      const source=await verifyRawSource(asset.raw,asset.blob,asset.width,asset.height),key=JSON.stringify([source.original.sha256,source.original.type]);
+      let originalIndex=originalKeys.get(key);
+      if(originalIndex===undefined){originalIndex=rawOriginals.length;originalKeys.set(key,originalIndex);rawOriginals.push({type:source.original.type,size:source.original.byteLength,offset:0,sha256:source.original.sha256});originalBlobs.push(source.originalBlob);}
+      raw={...rawSourceMetadata(source),originalIndex};
+    }
     entries.push({
       id: asset.id,
       name: asset.name,
@@ -102,6 +115,7 @@ export async function serializeProject(
       offset,
       ...(asset.tiff?{tiff:tiffDecodeOptionsSchema.parse(asset.tiff)}:{}),
       ...(asset.avif?{avif:avifDecodeOptionsSchema.parse(asset.avif)}:{}),
+      ...(raw?{raw}:{}),
     });
     blobs.push(asset.blob);
     offset += asset.blob.size;
@@ -118,9 +132,11 @@ export async function serializeProject(
     ],
     entries,
   );
+  for(const original of rawOriginals){original.offset=offset;offset+=original.size;if(!Number.isSafeInteger(offset))throw new Error("Project size exceeds safely representable offsets.");}
   const manifest: BinaryManifest = {
     format: "luma",
-    version: 3,
+    version: rawOriginals.length?4:3,
+    ...(rawOriginals.length?{rawOriginals}:{}),
     document,
     assets: entries,
     ...(history ? { history } : {}),
@@ -128,11 +144,11 @@ export async function serializeProject(
   const json = new TextEncoder().encode(JSON.stringify(manifest));
   const header = new Uint8Array(48);
   header.set(MAGIC);
-  header[4] = 51;
+  header[4] = manifest.version===4?52:51;
   header.set(new Uint8Array(await crypto.subtle.digest("SHA-256", json)), 16);
   new DataView(header.buffer).setBigUint64(8, BigInt(json.byteLength), true);
   // Blob parts avoid full-source base64 strings and document-sized byte arrays.
-  return new Blob([header, json, ...blobs], { type: "application/x-luma" });
+  return new Blob([header, json, ...blobs,...originalBlobs], { type: "application/x-luma" });
 }
 
 /** Internal editing preparation is opt-in; ordinary readers retain mutable owned data. */
@@ -147,11 +163,13 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     blob: Blob;
     tiff?:TiffDecodeSettings;
     avif?:AvifDecodeSettings;
+    raw?:RawImageSource;
   }[];
 }> {
   const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+  const version4 = header[4] === 52 && MAGIC.every((value,index)=>index===4||header[index]===value);
   const version3 =
-    header[4] === 51 &&
+    (header[4] === 51 || version4) &&
     MAGIC.every((value, index) => index === 4 || header[index] === value);
   const headerSize = version3 ? 48 : 16;
   if (!version3 && !MAGIC.every((value, index) => header[index] === value)) {
@@ -195,7 +213,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
   if (
     !manifest ||
     manifest.format !== "luma" ||
-    manifest.version !== (version3 ? 3 : 2) ||
+    manifest.version !== (version4 ? 4 : version3 ? 3 : 2) ||
     !Array.isArray(manifest.assets)
   )
     throw new Error("Unsupported project manifest.");
@@ -211,7 +229,11 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     manifest.history === undefined
       ? undefined
       : parseRetainedHistory(manifest.history, manifest.document);
+  if(!version4&&(manifest.rawOriginals!==undefined||manifest.assets.some(entry=>entry?.raw!==undefined)))throw new Error('RAW source records require a version-4 project container.');
+  if(version4&&(!Array.isArray(manifest.rawOriginals)||!manifest.rawOriginals.length))throw new Error('Missing RAW original records.');
   let offset = 0;
+  const rawReferences=new Set<number>();
+  const rawBlobs=new Map<number,Blob>();
   const ids = new Set<string>();
   const entries = manifest.assets.map((entry) => {
     if (
@@ -250,6 +272,18 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       entry.type,
     );
     offset += entry.size;
+    let raw:RawImageSource|undefined;
+    if(entry.raw!==undefined){
+      const {originalIndex,...metadata}=entry.raw;
+      if(!Number.isSafeInteger(originalIndex)||originalIndex<0||originalIndex>=(manifest.rawOriginals?.length??0))throw new Error('Invalid RAW original reference.');
+      const original=manifest.rawOriginals![originalIndex],parsed=rawSourceMetadataSchema.parse(metadata);
+      if(!original||original.sha256!==parsed.original.sha256||original.size!==parsed.original.byteLength||original.type!==parsed.original.type)throw new Error('RAW original descriptor differs from the retained source.');
+      if(!Number.isSafeInteger(original.offset)||original.offset<0||!Number.isSafeInteger(original.offset+original.size)||original.offset+original.size>file.size-headerSize-length)throw new Error('Invalid RAW original extent.');
+      let originalBlob=rawBlobs.get(originalIndex);
+      if(!originalBlob){originalBlob=file.slice(headerSize+length+original.offset,headerSize+length+original.offset+original.size,original.type);rawBlobs.set(originalIndex,originalBlob);}
+      raw=ownRawSource({...parsed,originalBlob});
+      rawReferences.add(originalIndex);
+    }
     return {
       id: entry.id,
       name: entry.name,
@@ -258,8 +292,13 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       blob,
       ...(tiff?{tiff}:{}),
       ...(avif?{avif}:{}),
+      ...(raw?{raw}:{}),
     };
   });
+  for(const [index,original] of (manifest.rawOriginals??[]).entries()){
+    if(!rawReferences.has(index)||typeof original.type!=='string'||!Number.isSafeInteger(original.size)||original.size<=0||original.offset!==offset||!Number.isSafeInteger(offset+original.size)||offset+original.size>file.size-headerSize-length||typeof original.sha256!=='string'||!/^[a-f0-9]{64}$/.test(original.sha256))throw new Error('Invalid, unused or truncated RAW original.');
+    offset+=original.size;
+  }
   if (offset !== file.size - headerSize - length)
     throw new Error("Unexpected data after project assets.");
   for (const assetId of referencedAssets(manifest.document))
@@ -274,6 +313,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       if ((await hashBlob(entries[i].blob)) !== manifest.assets[i].sha256)
         throw new Error(`Project asset checksum mismatch: ${entries[i].name}`);
   }
+  for(const entry of entries)if(entry.raw)await verifyRawSource(entry.raw,entry.blob,entry.width,entry.height);
   return {
     document: manifest.document,
     entries,
@@ -348,7 +388,7 @@ export async function loadProject(
         entry.name,
         entry.id,
         rasterAssets.has(entry.id),
-        {tiff:entry.tiff,avif:entry.avif},
+        {tiff:entry.tiff,avif:entry.avif,raw:entry.raw},
       );
       if (asset.width !== entry.width || asset.height !== entry.height)
         throw new Error("Embedded image dimensions do not match the project.");
