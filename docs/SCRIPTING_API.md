@@ -2751,9 +2751,31 @@ console.log(report.displayWidth, report.displayHeight, report.warnings);
 if (!report.canDecode) console.log(report.unsupported);
 ```
 
-Only preflight is connected to `EditorApplication` in this increment. There is **no `editor.openAvif` yet**: picker/drop, AssetStore installation, exact original-source/decode-choice persistence, recovery, recipes, brushes and cross-document copy remain unfinished. Internal worker decoding is under test; it requires explicit `allowPrecisionLoss` (default false) for 10/12-bit to RGBA8 and explicit `assumeSrgb` (default false) for unidentified RGB. These are not isolated scripting options or public document mutations. Existing REST sessions remain separate and gain no AVIF raster host.
+`await editor.openAvif(file: File, options: AvifDecodeOptions = {}, control: AvifImportControl = {}): Promise<Readonly<AvifImportReport>>` opens the supported primary image as a new native-resolution raster document. Options are strict `{allowPrecisionLoss?: boolean, assumeSrgb?: boolean}`, both default false; unknown fields and non-boolean values reject. 10/12-bit input requires `allowPrecisionLoss: true` for conversion to RGBA8 editing. Unidentified container RGB requires `assumeSrgb: true` before decoding. These choices are never inferred from prior imports. Picker/drop/recent-file and brush-texture dialogs offer the same explicit review.
 
-The read-only report describes container properties and cannot prove the AV1 payload's color before decoding. When those properties are unidentified, internal decoding requires fallback consent first, then checks actual native color. Identified sRGB/Display P3/linear-sRGB takes precedence over an assumption, updates the returned decoder report and receives the appropriate PNG identification. Still-unidentified RGB uses the explicit sRGB fallback. PQ/HLG found in either container or AV1 stream rejects, including ICC-bearing cases; fallback consent cannot relabel known HDR as sRGB. This remains an internal decode contract, not an `openAvif` or isolated-script method.
+Preparation owns a private AssetStore and decoder. Success installs an OO Document/RasterLayer at revision zero with empty undo history, retaining existing edited documents. Supported integer crop, rotation and mirror are applied without resampling to the derived bitmap. Asset/layer/document dimensions describe this presentation; report `width`/`height` retain the encoded extent. The complete original AVIF Blob is kept separately from the derived PNG/ImageBitmap. Its normalized frozen `avif: {allowPrecisionLoss, assumeSrgb}` choices survive project/workspace/history/recovery/recipe/brush-pack persistence and cross-document copies. Derived frozen `asset.avifReport` is reconstructed on decode, rather than persisted. Recovery hashes cover choices; missing AVIF settings or settings on another source format reject.
+
+The read-only report describes container properties and cannot prove the AV1 payload's color before decoding. When those properties are unidentified, opening requires fallback consent first, then checks actual native color. Identified sRGB/Display P3/linear-sRGB takes precedence over an assumption, updates the returned report and receives appropriate PNG identification for browser color conversion. Still-unidentified RGB uses the explicit sRGB fallback. PQ/HLG found in either container or AV1 stream rejects, including ICC-bearing cases; fallback consent cannot relabel known HDR. This does not provide HDR tone mapping or a wider high-precision editing pipeline.
+
+```ts
+// Trusted embedding code with a user-selected File and explicit user choices.
+const opened = await editor.openAvif(file, {
+  allowPrecisionLoss: userAccepted8BitConversion,
+  assumeSrgb: userAllowedUnidentifiedColorFallback,
+}, {
+  signal: abortController.signal,
+  onProgress: progress => console.log(progress.phase, progress.fraction),
+});
+console.log(opened.displayWidth, opened.displayHeight, opened.color.kind);
+```
+
+Malformed/unsupported input, absent consent, worker/codec load or native decode/allocation errors, invalid result geometry, browser bitmap failure and throwing progress callbacks reject without publishing a prepared document or asset. The original owner/session/revision/source lifetime and I/O generation must still match. A human edit, new active document, superseding AVIF open or disposed editor cancels pending preparation, including queued decoding. `signal` cancellation stops private workers and discards late results; callbacks' own authored edits are not rolled back. Progress uses `inspecting` (indeterminate) and `decoding` (fraction or null); close/Cancel/Escape remain available in the UI.
+
+Full-frame native input decoding is serial per application context. Queued requests retain original immutable Blobs without a decoder worker or full decoded plane; abort removes a waiting request. This is separate from the AVIF export admission queue and does not impose a megapixel/file-size cap or establish a total process-memory bound. Native codec address space, compressed input/full decoded planes, browser ImageBitmap/canvas allocation and device memory remain real limits. Sequence/timeline content, unsupported derived items/properties, unresolved color and unsupported fractional crop/sample transforms reject with explicit reasons.
+
+These are trusted file services, not isolated Scripts/plugin methods or document commands. `editor.importImage(file)` retains its existing single-argument API: default-compatible AVIF can be placed as a layer; sources needing consent must be prepared through the explicit host import workflow. Isolated commands can reference already installed ordinary assets under existing validation. REST sessions remain separate headless documents and gain no AVIF decoder/upload/renderer route, file privilege or browser synchronization.
+
+Before generic browser decoding, a bounded top-level box/brand scan rejects AVIF bytes declared as PNG/JPEG/WebP/TIFF. This prevents MIME relabeling from bypassing precision/color review; it is routing protection, not proof of a valid AV1 payload. The scan reads box headers and at most the 4 KiB file-type table, skipping compressed image payloads, with the same 16,384-box metadata budget as inspection.
 
 ## AVIF export (trusted application code)
 

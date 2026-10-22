@@ -5,6 +5,41 @@ import {encodeRgbaPng} from "../src/engine/png";
 import {spawnSync} from 'node:child_process';
 import {readProject} from '../src/core/project';
 import {readBrushContainer} from '../src/brushes/container';
+
+test('production AVIF primary-image review preserves precision choices and original bytes across native project reopening',async({page},info)=>{
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);
+  const original=await readFile('tests/fixtures/avif-import/rgb-10.avif');await page.getByTestId('import-input').setInputFiles({name:'Precision.avif',mimeType:'image/avif',buffer:original});
+  const dialog=page.getByRole('dialog',{name:'Import AVIF',exact:true}),apply=dialog.getByRole('button',{name:'Import AVIF image',exact:true});
+  await expect(dialog).toContainText('10 bits per sample');await expect(apply).toBeDisabled();await dialog.getByRole('checkbox',{name:'Convert AVIF to 8-bit editing precision',exact:true}).check();await apply.click();await expect(dialog).toHaveCount(0);
+  const download=async(action:()=>Promise<unknown>,name:string)=>{const pending=page.waitForEvent('download');await action();const path=info.outputPath(name);await(await pending).saveAs(path);return path;};
+  const path=await download(()=>page.getByRole('button',{name:'Save project',exact:true}).click(),'precision.luma'),project=await readProject(new Blob([new Uint8Array(await readFile(path))]));
+  expect(project.entries[0].avif).toEqual({allowPrecisionLoss:true,assumeSrgb:false});expect(Buffer.from(await project.entries[0].blob.arrayBuffer())).toEqual(original);
+  const png=await download(()=>page.getByRole('button',{name:'Export PNG',exact:true}).click(),'before.png');await page.reload();expect(await page.evaluate(()=>'luma'in window)).toBe(false);
+  await page.getByTestId('project-input').setInputFiles(path);await expect(page.locator('.layer-row')).toHaveCount(1);
+  const restored=await download(()=>page.getByRole('button',{name:'Export PNG',exact:true}).click(),'after.png');expect((await readFile(restored)).equals(await readFile(png))).toBe(true);expect(errors).toEqual([]);
+});
+
+test('production AVIF recent-file opening repeats explicit review and cancel preserves artwork',async({page},info)=>{
+  await page.goto('/');await page.getByTestId('import-input').setInputFiles('tests/fixtures/avif-import/unspecified.avif');
+  const dialog=page.getByRole('dialog',{name:'Import AVIF',exact:true}),apply=dialog.getByRole('button',{name:'Import AVIF image',exact:true}),consent=dialog.getByRole('checkbox',{name:'Allow sRGB fallback for unidentified AVIF color',exact:true});
+  await expect(apply).toBeDisabled();await consent.check();await apply.click();await expect(dialog).toHaveCount(0);
+  const before=page.waitForEvent('download');await page.getByRole('button',{name:'Save project',exact:true}).click();const beforePath=info.outputPath('before.luma');await(await before).saveAs(beforePath);
+  await page.getByRole('button',{name:'Recent files',exact:true}).click();const recent=page.getByRole('dialog',{name:'Recent files',exact:true});await recent.getByRole('button',{name:'Open local copy unspecified.avif',exact:true}).click();
+  await expect(consent).not.toBeChecked();await expect(apply).toBeDisabled();await dialog.getByRole('button',{name:'Cancel',exact:true}).click();
+  const after=page.waitForEvent('download');await page.getByRole('button',{name:'Save project',exact:true}).click();const afterPath=info.outputPath('after.luma');await(await after).saveAs(afterPath);
+  const one=await readProject(new Blob([new Uint8Array(await readFile(beforePath))])),two=await readProject(new Blob([new Uint8Array(await readFile(afterPath))]));expect(two.document).toEqual(one.document);expect(two.entries[0].avif).toEqual(one.entries[0].avif);
+});
+
+test('production AVIF native HDR rejection retains editable artwork and supports a valid retry',async({page},info)=>{
+  await page.goto('/');await page.getByTestId('import-input').setInputFiles('tests/fixtures/avif-import/opaque-444.avif');
+  const dialog=page.getByRole('dialog',{name:'Import AVIF',exact:true});await dialog.getByRole('button',{name:'Import AVIF image',exact:true}).click();await expect(dialog).toHaveCount(0);
+  const before=page.waitForEvent('download');await page.getByRole('button',{name:'Export PNG',exact:true}).click();const path=info.outputPath('hdr-before.png');await(await before).saveAs(path);
+  await page.getByTestId('import-input').setInputFiles('tests/fixtures/avif-import/missing-colr-pq.avif');await dialog.getByRole('checkbox',{name:'Convert AVIF to 8-bit editing precision',exact:true}).check();await dialog.getByRole('checkbox',{name:'Allow sRGB fallback for unidentified AVIF color',exact:true}).check();await dialog.getByRole('button',{name:'Import AVIF image',exact:true}).click();
+  await expect(dialog.getByRole('alert')).toContainText('HDR');await dialog.getByRole('button',{name:'Cancel',exact:true}).click();
+  const after=page.waitForEvent('download');await page.getByRole('button',{name:'Export PNG',exact:true}).click();const restored=info.outputPath('hdr-after.png');await(await after).saveAs(restored);expect((await readFile(restored)).equals(await readFile(path))).toBe(true);
+  await page.getByTestId('import-input').setInputFiles('tests/fixtures/avif-import/orientation-6.avif');await dialog.getByRole('button',{name:'Import AVIF image',exact:true}).click();await expect(dialog).toHaveCount(0);await expect(page.locator('.layer-row')).toHaveCount(1);
+});
+
 test('production linked paragraph styles guide, Inspector inheritance, single-script undo and reopened native PNG agree',async({page},info)=>{
   const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);
   const download=async(action:()=>Promise<unknown>,name:string)=>{const pending=page.waitForEvent('download');await action();const path=info.outputPath(name);await(await pending).saveAs(path);return path;};

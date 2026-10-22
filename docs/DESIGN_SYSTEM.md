@@ -64,6 +64,10 @@ Use **Canoli Studio** as the product wordmark, retaining the existing abstract m
 
 At widths up to 1500 CSS pixels, the header uses compact action icons with accessible names and hover titles. The document-name input stays visible; the action row scrolls horizontally when the controls exceed the remaining width.
 
+## AVIF import interaction
+
+Use the custom Dialog/Button and native checkbox controls. Show primary-image display dimensions, precision, color identification, alpha, encoded extent when different, warnings and unsupported reasons. Precision conversion and unidentified-color fallback are separate unchecked choices, reset for every file/recent-file review. Disable Import until required choices are explicit; identified native color takes precedence, and HDR failure stays visible with retry/Cancel. Keep original-byte retention and 8-bit editing limits clear. Progress/Cancel/close/Escape remain available during private work. Success retains edited tabs; failure/cancellation publishes no prepared artwork. Brush-texture review reuses these controls before Use AVIF image as texture; Apply stays disabled while review is pending.
+
 ## TIFF import interaction
 
 Reuse the custom Dialog, Select and Button controls for local TIFF preflight. Show filename, page count/choice, oriented pixel dimensions, sample precision, unsupported reasons and conversion warnings. A 16-bit page requires an explicit unchecked precision-loss checkbox; reset consent when changing pages and disable import for unsupported pages. Keep progress/status and Cancel/close/Escape available during native work. No partial document is shown on failure; explain the error inside the dialog and allow retry. Existing edited tabs remain open after successful import. Do not imply reconstructed TIFF layers, higher precision editing or verified print color.

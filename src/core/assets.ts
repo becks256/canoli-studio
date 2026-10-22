@@ -3,6 +3,7 @@ import { AnalysisService } from "../intelligence/candidates/service";
 import { id } from "./model";
 import {decodeTiffFile} from './interchange/tiff/client';
 import {decodeAvifFile} from './interchange/avif/client';
+import {hasAvifBrand} from './interchange/avif/sniff';
 import {avifDecodeOptionsSchema,type AvifDecodeOptions,type AvifDecodeSettings,type AvifImportReport} from './interchange/avif/types';
 import {tiffDecodeOptionsSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl} from './interchange/tiff/types';
 
@@ -126,6 +127,11 @@ export class AssetStore {
     if(options.avif!==undefined&&blob.type!=='image/avif')throw new Error('AVIF decoding settings require an AVIF source.');
     const tiff=blob.type==='image/tiff'?Object.freeze(tiffDecodeOptionsSchema.parse(options.tiff??{})):undefined;
     const avif=blob.type==='image/avif'?Object.freeze(avifDecodeOptionsSchema.parse(options.avif??{})):undefined;
+    if(!avif){
+      const current=this.captureLifetime(),check=()=>{current();options.signal?.throwIfAborted();};
+      if(await hasAvifBrand(blob,check))throw new Error('AVIF source bytes require image/avif and explicit AVIF decoding choices.');
+      check();
+    }
     if (this.assets.has(assetId) || this.pending.has(assetId))
       throw new Error("Duplicate asset ID.");
     const generation = this.generation;
