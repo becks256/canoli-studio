@@ -26,7 +26,10 @@ export interface DeliveryVariantSpec {
   name: string;
   targetWidth: number;
   targetHeight: number;
-  format: "png" | "jpeg" | "webp";
+  format: "png" | "jpeg" | "webp" | "avif";
+  quality?:number;
+  avifLossless?:boolean;
+  avifSpeed?:number;
   fit: "cover" | "contain" | "fill";
   nameTemplate?: string; // e.g. "{name}_{variant}_{width}x{height}"
 }
@@ -36,7 +39,7 @@ export interface DeliveryDeliverable {
   itemId: string;
   variantId: string;
   variantName: string;
-  format: "png" | "jpeg" | "webp";
+  format: "png" | "jpeg" | "webp" | "avif";
   width: number;
   height: number;
   aspectRatio: string;

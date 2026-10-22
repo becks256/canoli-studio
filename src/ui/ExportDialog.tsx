@@ -26,6 +26,7 @@ export function ExportDialog({
   const [tiffVariant,setTiffVariant]=useState<"auto"|"classic"|"big">("auto");
   const [pdfDpi,setPdfDpi]=useState(72);
   const [quality, setQuality] = useState(90);
+  const [avifQuality,setAvifQuality]=useState(80),[avifLossless,setAvifLossless]=useState(false),[avifSpeed,setAvifSpeed]=useState(8);
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState<ExportProgress | null>(null);
@@ -78,13 +79,14 @@ export function ExportDialog({
   const report = useMemo(() => {
     return getExportCapabilityReport(document, {
       format,
-      quality: quality / 100,
+      quality: (format==='avif'?avifQuality:quality) / 100,
+      avifLossless,avifSpeed,
       backgroundColor,
       psdMode,
       tiffVariant,
       pdfDpi,
     });
-  }, [document, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi]);
+  }, [document, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi,avifQuality,avifLossless,avifSpeed]);
 
   const handleExport = async () => {
     const run = new AbortController();
@@ -94,7 +96,8 @@ export function ExportDialog({
     try {
       await onExport({
         format,
-        quality: quality / 100,
+        quality: (format==='avif'?avifQuality:quality) / 100,
+        avifLossless,avifSpeed,
         backgroundColor,
         psdMode,
         tiffVariant,
@@ -139,6 +142,7 @@ export function ExportDialog({
               label: "JPEG — High compression photo (flattened background)",
             },
             { value: "webp", label: "WebP — Modern efficient web image" },
+            {value:'avif',label:'AVIF — Compressed sRGB image with transparency'},
             { value: "tiff", label: "TIFF — Lossless raster with transparency and ICC profile" },
             { value: "pdf", label: "PDF — Native-resolution raster page with transparency" },
             { value: "svg", label: "SVG — Scalable Bézier vector paths" },
@@ -164,6 +168,13 @@ export function ExportDialog({
           <NumberField label="PDF resolution" value={pdfDpi} min={1} max={1000000} suffix="DPI" disabled={busy||exporting} onChange={setPdfDpi}/>
           <p>Physical page size: {(document.width/pdfDpi).toFixed(3)} × {(document.height/pdfDpi).toFixed(3)} inches. Native pixels stay unchanged.</p>
         </div>}
+
+        {format==='avif'&&<>
+          <label className="checkbox-field"><input type="checkbox" checked={avifLossless} disabled={busy||exporting} onChange={event=>setAvifLossless(event.target.checked)}/>Lossless AVIF</label>
+          {!avifLossless&&<Slider label="AVIF quality" value={avifQuality} min={1} max={100} suffix="%" disabled={busy||exporting} onPreview={setAvifQuality} onCommit={setAvifQuality}/>}
+          <Select label="AVIF compression" layout="stacked" value={String(avifSpeed)} disabled={busy||exporting} options={[{value:'8',label:'Fast'},{value:'6',label:'Balanced'},{value:'4',label:'Smaller file — takes longer'}]} onChange={value=>setAvifSpeed(Number(value))}/>
+          <p>Transparency is always lossless. Quality 100 also preserves colour losslessly.</p>
+        </>}
 
         <div className="export-dimension-info">
           <span>

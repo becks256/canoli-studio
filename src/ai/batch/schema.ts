@@ -11,9 +11,15 @@ export const deliveryVariantSpecSchema = z.object({
   name: z.string().min(1).max(120),
   targetWidth: z.number().int().min(16).max(16384),
   targetHeight: z.number().int().min(16).max(16384),
-  format: z.enum(["png", "jpeg", "webp"]),
+  format: z.enum(["png", "jpeg", "webp", "avif"]),
+  quality:z.number().finite().min(.01).max(1).optional(),
+  avifLossless:z.boolean().optional(),
+  avifSpeed:z.number().int().min(0).max(10).optional(),
   fit: z.enum(["cover", "contain", "fill"]),
   nameTemplate: z.string().min(1).max(240).optional(),
+}).superRefine((variant,context)=>{
+  if(variant.format!=='avif'&&(variant.avifLossless!==undefined||variant.avifSpeed!==undefined))context.addIssue({code:'custom',message:'AVIF settings require an AVIF delivery variant.'});
+  if(variant.format==='png'&&variant.quality!==undefined)context.addIssue({code:'custom',message:'Quality settings require JPEG, WebP or AVIF.'});
 });
 
 export const batchSourceImageSchema = z.object({
@@ -33,7 +39,7 @@ export const deliveryDeliverableSchema = z.object({
   itemId: z.string().min(1).max(64),
   variantId: z.string().min(1).max(64),
   variantName: z.string().min(1).max(120),
-  format: z.enum(["png", "jpeg", "webp"]),
+  format: z.enum(["png", "jpeg", "webp", "avif"]),
   width: z.number().int().min(1),
   height: z.number().int().min(1),
   aspectRatio: z.string().min(1).max(32),

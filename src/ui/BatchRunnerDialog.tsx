@@ -80,8 +80,9 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
   const [customVarWidth, setCustomVarWidth] = useState(1200);
   const [customVarHeight, setCustomVarHeight] = useState(630);
   const [customVarFormat, setCustomVarFormat] = useState<
-    "png" | "jpeg" | "webp"
+    "png" | "jpeg" | "webp" | "avif"
   >("png");
+  const [customVarQuality,setCustomVarQuality]=useState(80),[customVarLossless,setCustomVarLossless]=useState(false),[customVarSpeed,setCustomVarSpeed]=useState(8);
 
   // Preflight estimate
   const [estimate, setEstimate] = useState<{
@@ -400,6 +401,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
       targetWidth: Math.max(16, customVarWidth),
       targetHeight: Math.max(16, customVarHeight),
       format: customVarFormat,
+      ...(customVarFormat==='avif'?{quality:customVarQuality/100,avifLossless:customVarLossless,avifSpeed:customVarSpeed}:{}),
       fit: "cover",
       nameTemplate: `{name}_${customVarName.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
     };
@@ -941,15 +943,21 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           value={customVarFormat}
                           onChange={(e) =>
                             setCustomVarFormat(
-                              e.target.value as "png" | "jpeg" | "webp",
+                              e.target.value as "png" | "jpeg" | "webp" | "avif",
                             )
                           }
                         >
                           <option value="png">PNG</option>
                           <option value="jpeg">JPEG</option>
                           <option value="webp">WebP</option>
+                          <option value="avif">AVIF</option>
                         </select>
                       </div>
+                      {customVarFormat==='avif'&&<>
+                        <label className="checkbox-field"><input type="checkbox" checked={customVarLossless} onChange={event=>setCustomVarLossless(event.target.checked)}/>Lossless AVIF variant</label>
+                        {!customVarLossless&&<label>AVIF quality<input type="number" className="batch-input" min={1} max={100} value={customVarQuality} onChange={event=>setCustomVarQuality(Number(event.target.value))}/></label>}
+                        <label>AVIF compression<select className="batch-select" value={String(customVarSpeed)} onChange={event=>setCustomVarSpeed(Number(event.target.value))}><option value="8">Fast</option><option value="6">Balanced</option><option value="4">Smaller file</option></select></label>
+                      </>}
                       <div className="form-row">
                         <input
                           type="number"

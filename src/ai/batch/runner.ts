@@ -24,6 +24,7 @@ import {
 } from "../../core/model";
 import { fittedRenderer } from "../../engine/fitted-renderer";
 import { exportPng } from "../../engine/png";
+import {exportAvif} from '../../engine/avif';
 import type { DocumentRenderer } from "../../engine/renderer";
 import { CanvasRenderer } from "../../engine/renderer";
 import type { BudgetLedger } from "../jobs/ledger";
@@ -826,6 +827,7 @@ export class BatchRunner {
           item,
           variant,
           config.outputNamingTemplate,
+          signal,
         );
 
         if (signal.aborted) throw new Error("Batch execution aborted");
@@ -858,6 +860,7 @@ export class BatchRunner {
     item: BatchItem,
     variant: DeliveryVariantSpec,
     outputNamingTemplate: string,
+    signal?:AbortSignal,
   ): Promise<DeliveryDeliverable> {
     const delivId = `${item.id}:${variant.id}`;
 
@@ -881,6 +884,8 @@ export class BatchRunner {
     try {
       if (variant.format === "png") {
         blob = await exportPng(variantDoc, assets, deliveryRenderer);
+      } else if(variant.format==='avif'){
+        blob=await exportAvif(variantDoc,assets,deliveryRenderer,{quality:variant.quality,lossless:variant.avifLossless,speed:variant.avifSpeed},{signal},doc);
       } else if (variant.format === "jpeg" || variant.format === "webp") {
         const mimeType =
           variant.format === "jpeg" ? "image/jpeg" : "image/webp";
@@ -904,7 +909,7 @@ export class BatchRunner {
         try {
           if (typeof renderedCanvas.toBlob === "function") {
             const rawBlob = await new Promise<Blob | null>((resolve) => {
-              renderedCanvas.toBlob(resolve, mimeType, 0.92);
+              renderedCanvas.toBlob(resolve, mimeType, variant.quality??0.92);
             });
 
             if (rawBlob) {

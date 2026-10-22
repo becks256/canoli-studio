@@ -23,15 +23,19 @@ import {exportTiff} from './tiff';
 import {validateTiffVariant,type TiffVariant} from '../core/tiff';
 import {exportPdf} from './pdf';
 import {pdfPageGeometry} from '../core/pdf';
+import {exportAvif} from './avif';
+import {avifSettings} from '../core/avif';
 
-export type ExportFormat = "png" | "jpeg" | "webp" | "svg" | "psd" | "psb" | "tiff" | "pdf";
+export type ExportFormat = "png" | "jpeg" | "webp" | "avif" | "svg" | "psd" | "psb" | "tiff" | "pdf";
 
 export interface ExportOptions {
   format: ExportFormat;
   psdMode?: PsdExportMode;
   tiffVariant?: TiffVariant;
   pdfDpi?: number; // Physical page sizing only; native pixels are not resampled.
-  quality?: number; // 0.01 to 1.0 (for JPEG and WebP)
+  quality?: number; // 0.01 to 1.0 (JPEG, WebP and AVIF)
+  avifLossless?:boolean;
+  avifSpeed?:number; // Integer 0 (smallest/slowest) to 10 (fastest), default 8.
   backgroundColor?: string; // background fill for JPEG (default: "#ffffff")
 }
 
@@ -75,6 +79,16 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
   const featuresDegradedOrOmitted: string[] = [];
 
   switch (format) {
+    case 'avif': {
+      const settings=avifSettings({quality:options.quality,lossless:options.avifLossless,speed:options.avifSpeed});
+      featuresPreserved.push('Native document resolution and visible composition','sRGB colour identification','Lossless 8-bit alpha transparency');
+      if(settings.lossless)featuresPreserved.push('Lossless 8-bit colour samples');
+      else{warnings.push(`AVIF colour compression uses quality ${Math.round(settings.quality*100)}%. Colour values can change; transparency remains lossless.`);featuresDegradedOrOmitted.push('Bit-exact colour values in lossy mode');}
+      warnings.push('AVIF is one flattened image and requires a compatible viewer. Save a Canoli Studio project for editable layers, text, masks, effects and original sources.');
+      featuresDegradedOrOmitted.push('Editable layers, typography, vectors, masks and component links','Source EXIF/GPS, authored metadata and font files','Higher-precision, CMYK/HDR and animation');
+      if(document.alphaChannels?.length)featuresDegradedOrOmitted.push('Saved alpha channels');
+      break;
+    }
     case "pdf": {
       let geometry:ReturnType<typeof pdfPageGeometry>|undefined;
       try{geometry=pdfPageGeometry(document.width,document.height,options.pdfDpi);}catch(error){warnings.push(error instanceof Error?error.message:String(error));}
@@ -345,6 +359,10 @@ export async function exportDocument(
   control?: ExportControl,
 ): Promise<ExportResult> {
   checkExport(control);
+  if(options.format==='avif'){
+    const report=getExportCapabilityReport(document,options),blob=await exportAvif(document,assets,renderer,{quality:options.quality,lossless:options.avifLossless,speed:options.avifSpeed},control);
+    return{blob,mimeType:'image/avif',extension:'avif',report};
+  }
   if(options.format==='psd'||options.format==='psb'){
     const report=getExportCapabilityReport(document,options),blob=await exportPsd(document,assets,renderer,options.psdMode,control,options.format);
     return{blob,mimeType:'image/vnd.adobe.photoshop',extension:options.format,report};
