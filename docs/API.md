@@ -12,6 +12,8 @@ Docking/visibility/order, responsive/preferred widths and named layout managemen
 
 ## Trusted local AVIF output
 
+Trusted browser application code also has `editor.inspectAvif(file, control?)`, a **read-only preflight** returning the version-1 primary-image capability report. See [AVIF input preflight](SCRIPTING_API.md#avif-input-preflight-trusted-application-code). This does not open a document or install an asset. AVIF input integration with the picker, original-source persistence, recovery, recipes and cross-document copy is still unfinished. No REST upload/decoder route or isolated Scripts/plugin file privilege is added.
+
 Browser `editor.export({format:"avif", quality?:number, avifLossless?:boolean, avifSpeed?:number}, control?)` returns `{blob,mimeType:"image/avif",extension:"avif",report}`. Quality defaults to 0.8 (finite 0.01–1), lossless to false, speed to 8 (integer 0–10). Lossless or quality 1 retains captured RGBA8; alpha is always lossless. Output is one flattened native-resolution image, explicitly identified as sRGB, with no source metadata/font/editable content. A private locally served WASM worker supports abort, source/font lifetime rejection and fresh retries; full-frame/codec memory and browser/viewer limits remain. Custom local batch variants accept the same settings and share fitting, snapshots, durable hashes and integrity-checked packages. AVIF-only flags reject on other batch formats. These trusted methods add no REST rendering route or isolated Scripts export privilege. See [signatures, examples and limits](SCRIPTING_API.md#avif-export-trusted-application-code).
 
 ## Linked paragraph style commands (schema 40)

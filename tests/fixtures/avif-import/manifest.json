@@ -1,0 +1,268 @@
+{
+  "provenance": {
+    "pillow": "12.0.0",
+    "libavif": "1.3.0",
+    "reference": "native built-in bilinear RGBA8 (libyuv disabled)",
+    "ffmpeg": "ffmpeg version 4.4.2-0ubuntu0.22.04.1 Copyright (c) 2000-2021 the FFmpeg developers"
+  },
+  "cases": [
+    {
+      "file": "orientation-1.avif",
+      "reference": "orientation-1.png",
+      "viewerReference": "orientation-1-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "1305979e3719980928de5f52d27c9c913773800153074cd101f0f06167be29af",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "orientation-2.avif",
+      "reference": "orientation-2.png",
+      "viewerReference": "orientation-2-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "e61ed6fab3c157763ae13a2a7c72f1f6a0ad4478f4bb9dac93b62254eff724a4",
+      "orientation": 2,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "orientation-3.avif",
+      "reference": "orientation-3.png",
+      "viewerReference": "orientation-3-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "7fee622ddd4c5ebccb9e355673adac6040d28a3b03232a1af9d4b2649f1872a6",
+      "orientation": 3,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "orientation-4.avif",
+      "reference": "orientation-4.png",
+      "viewerReference": "orientation-4-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "a5edd5d50e7f72ed8d24c99a17f04825058a3fcf8d51d6a5c82406c36f7e3699",
+      "orientation": 4,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "orientation-5.avif",
+      "reference": "orientation-5.png",
+      "viewerReference": "orientation-5-viewer.png",
+      "width": 13,
+      "height": 17,
+      "sha256": "5f217d89e76d8b1f94f272649874a83a6efeb52e54b87d2de62a38549ebeecff",
+      "orientation": 5,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "orientation-6.avif",
+      "reference": "orientation-6.png",
+      "viewerReference": "orientation-6-viewer.png",
+      "width": 13,
+      "height": 17,
+      "sha256": "32126169f753f64c0f03ffea279177ba86360e80ee9a240a279e1d05bd8ae3a8",
+      "orientation": 6,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "orientation-7.avif",
+      "reference": "orientation-7.png",
+      "viewerReference": "orientation-7-viewer.png",
+      "width": 13,
+      "height": 17,
+      "sha256": "ebbd457cbf1b340e73585d26b6b29d70d8675b42ce6e0e373ff6c2deaf39e117",
+      "orientation": 7,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "orientation-8.avif",
+      "reference": "orientation-8.png",
+      "viewerReference": "orientation-8-viewer.png",
+      "width": 13,
+      "height": 17,
+      "sha256": "231135c2e69c8bd2a7562951955194492ce3949d11f750bb72742f40f6150809",
+      "orientation": 8,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "opaque-420.avif",
+      "reference": "opaque-420.png",
+      "viewerReference": "opaque-420-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "4123b6422fbffd23c7a07e7d3d0c48f1ee187403cfdad0b867d8a4d70dcbc722",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "opaque-422.avif",
+      "reference": "opaque-422.png",
+      "viewerReference": "opaque-422-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "c36550c50ecaddf1bb69d8528e8f992cf846ba7116f4e95e1c753fe40c1f41e0",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "opaque-444.avif",
+      "reference": "opaque-444.png",
+      "viewerReference": "opaque-444-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "8577501190d4207793297815756bce179b2b5e55286bec542f2f81e49566c0be",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "icc.avif",
+      "reference": "icc.png",
+      "viewerReference": "icc-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "76bcc177a63484e35f4311294ec8ffd7985a6cc73afd3569f6e0322159f12a08",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "premultiplied.avif",
+      "reference": "premultiplied.png",
+      "viewerReference": "premultiplied-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "83ba1a17d4c7deedc743bfdaa997c54891e5f82ea60b05380e506989f057379c",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "rgb-10.avif",
+      "reference": "rgb-10.png",
+      "viewerReference": "rgb-10-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "f3cfa0f93d7509055ceb68f818a2e882f4da3fe254fe1985d308d4fcc9deff16",
+      "orientation": 1,
+      "depth": 10,
+      "assumeSrgb": false
+    },
+    {
+      "file": "rgb-12.avif",
+      "reference": "rgb-12.png",
+      "viewerReference": "rgb-12-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "da29e5d57c55b661328e487270ceb71a93993c47bd4e5114a67b8887a6252326",
+      "orientation": 1,
+      "depth": 12,
+      "assumeSrgb": false
+    },
+    {
+      "file": "unspecified.avif",
+      "reference": "unspecified.png",
+      "viewerReference": "unspecified-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "798d1edd3909915eea5e5ee88bff405bea9afee17e8a21f1b2c7593f9da842c7",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": true
+    },
+    {
+      "file": "missing-colr-srgb.avif",
+      "reference": "missing-colr-srgb.png",
+      "viewerReference": "missing-colr-srgb-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "7d0e0400ae10c7f00b24d86be2e829d2116aec6349c911fd19ae53e0b4712cec",
+      "orientation": 1,
+      "depth": 10,
+      "assumeSrgb": true,
+      "nativeResolved": "srgb"
+    },
+    {
+      "file": "missing-colr-unidentified.avif",
+      "reference": "missing-colr-unidentified.png",
+      "viewerReference": "missing-colr-unidentified-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "76e83101d82137dd8dd49efc59bc751488fd100a5115078d8631a730771e1e27",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": true
+    },
+    {
+      "file": "missing-colr-p3.avif",
+      "reference": "missing-colr-p3.png",
+      "viewerReference": "missing-colr-p3-viewer.png",
+      "width": 17,
+      "height": 13,
+      "sha256": "ef76859377aceffc3b6b7f8fe6dd977f67e877b7bf577ff6acd05264d4f4fc13",
+      "orientation": 1,
+      "depth": 10,
+      "assumeSrgb": true,
+      "nativeResolved": "display-p3"
+    },
+    {
+      "file": "crop.avif",
+      "reference": "crop.png",
+      "viewerReference": "crop-viewer.png",
+      "width": 9,
+      "height": 7,
+      "sha256": "3555ae9530b35b1e1670c582ce0725861d36e1830aaefa470fe28f4ccd1e74b4",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "grid.avif",
+      "reference": "grid.png",
+      "viewerReference": "grid-viewer.png",
+      "width": 100,
+      "height": 100,
+      "sha256": "2fd32b1d24ac1997aa7e8ed734372b34e2daa9cda978912bae560b6fd5af761d",
+      "orientation": 1,
+      "depth": 8,
+      "assumeSrgb": false
+    },
+    {
+      "file": "native-wide-40000.avif",
+      "reference": "native-wide-40000.png",
+      "width": 40000,
+      "height": 3,
+      "depth": 8,
+      "orientation": 1,
+      "assumeSrgb": false,
+      "sha256": "4218b933b5c5b72f13bcca7d217d57a7e6c2e6581476902b1786a5a8f564bdd6",
+      "referenceKind": "independent solid RGB source; allow one code value for RGB/YUV round trip"
+    }
+  ],
+  "rejections": [
+    {
+      "file": "missing-colr-pq.avif",
+      "reason": "HDR",
+      "depth": 10,
+      "sha256": "9191eabba53bb06524e0472bbbde8f8e3c149724ec7c12f54b8728c544beeb9d"
+    },
+    {
+      "file": "missing-colr-hlg.avif",
+      "reason": "HDR",
+      "depth": 10,
+      "sha256": "4e177f8a551c018aed90fa55be580b32ddfb7c8fd0bcced6cc8f6e60ce12e7b0"
+    }
+  ]
+}

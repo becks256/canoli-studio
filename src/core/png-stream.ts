@@ -25,11 +25,12 @@ export class PngRowEncoder {
   private reader=this.compression.readable.getReader();
   private collecting:Promise<void>;
   private rows=0;
-  constructor(readonly width:number,readonly height:number,iccDeflated?:Uint8Array){
+  constructor(readonly width:number,readonly height:number,iccDeflated?:Uint8Array,profileName='TIFF source'){
     if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<1||height<1||width>0x7fffffff||height>0x7fffffff)throw new Error('Invalid PNG geometry.');
+    if(iccDeflated&&!/^[\x20-\x7e]{1,79}$/.test(profileName))throw new Error('Invalid PNG profile name.');
     const header=new Uint8Array(13),view=new DataView(header.buffer);view.setUint32(0,width);view.setUint32(4,height);header[8]=8;header[9]=6;
     let color=chunk('sRGB',new Uint8Array([0]));
-    if(iccDeflated){const name=new TextEncoder().encode('TIFF source\0\0'),bytes=new Uint8Array(name.length+iccDeflated.length);bytes.set(name);bytes.set(iccDeflated,name.length);color=chunk('iCCP',bytes);}
+    if(iccDeflated){const name=new TextEncoder().encode(profileName+'\0\0'),bytes=new Uint8Array(name.length+iccDeflated.length);bytes.set(name);bytes.set(iccDeflated,name.length);color=chunk('iCCP',bytes);}
     this.parts=[new Uint8Array([137,80,78,71,13,10,26,10]),chunk('IHDR',header),color];
     this.collecting=(async()=>{while(true){const {value,done}=await this.reader.read();if(done)break;this.parts.push(chunk('IDAT',value));}})();void this.collecting.catch(()=>{});
   }

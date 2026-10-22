@@ -672,6 +672,10 @@ Current: user-initiated native-resolution single-image TIFF export, lossless Def
 
 Acceptance includes independent Pillow/libtiff exact RGBA comparison with native PNG across transparency, affine masks/text/adjustments/smart paint, wide canonical sampling boundaries, and 50 MP source/save/reopen/full output. Allocation budgets constrain working tiles rather than import resolution. Higher precision/CMYK/HDR, editable layers, multipage output, real outputs exceeding 4 GiB, other independent editors and device/peak-memory gates remain open. This does not complete F11 or the full roadmap.
 
+## F11 AVIF input foundation in progress
+
+AVIF input is a separate unfinished F11 increment. Trusted `editor.inspectAvif(file, control?)` exposes read-only primary-image preflight; its internal decoder foundation validates native geometry, crop/orientation, explicit precision/color consent and ICC identification in PNG proxies. This does not complete picker/drop/recent-file import, staged document installation, original AVIF plus exact decode-choice persistence in projects/workspaces/recovery/recipes/brush sources, cross-document copy or production acceptance. Full native 50 MP import/save/reopen/export and broader HDR/tone-map/sample-transform/sequence/color/codec/device/process-memory gates remain required. No arbitrary source megapixel/file-size limit may be introduced.
+
 ## F11 TIFF input increment
 
 Picker/drop must inspect TIFF/BigTIFF locally and present page capabilities, unsupported constructs, conversion warnings and explicit 16-bit-to-8-bit consent before import. Open only the chosen page as a revision-zero raster document, retaining prior edited tabs. Preserve full original file bytes, source dimensions, selected page and precision settings across native project/workspace/history/recovery, portable recipes and cross-document copy. Orientation 1–8 uses affine placement; edits never rewrite the source TIFF.

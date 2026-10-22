@@ -1,0 +1,6 @@
+# Preserve exact compiler output and the recorded native artifact digest.
+src/core/interchange/avif/codec/canoli_avif_decoder.js -whitespace linguist-generated=true
+# Keep copied upstream notices byte-for-byte, including their original whitespace.
+public/licenses/aom-3.12.1-LICENSE.txt -whitespace
+public/licenses/aom-3.12.1-PATENTS.txt -whitespace
+public/licenses/emscripten-4.0.10-LICENSE.txt -whitespace

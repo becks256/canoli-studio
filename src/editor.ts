@@ -75,6 +75,8 @@ import { exportDocument, getExportCapabilityReport } from "./engine/export";
 import {prepareTiffImport} from './engine/tiff-import';
 import {importParagraphStyles} from './core/paragraph-styles';
 import {inspectTiffFile} from './core/interchange/tiff/client';
+import {inspectAvifFile} from './core/interchange/avif/client';
+import type {AvifImportControl,AvifImportReport} from './core/interchange/avif/types';
 import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
 import type {
   ExportOptions,
@@ -1304,6 +1306,9 @@ export class EditorApplication {
   }
 
   async inspectTiff(file:File,control:TiffImportControl={}):Promise<TiffImportReport>{return inspectTiffFile(file,control);}
+
+  /** Trusted local preflight only; installing AVIF assets is a separate import transaction. */
+  async inspectAvif(file:File,control:AvifImportControl={}):Promise<AvifImportReport>{return inspectAvifFile(file,control);}
 
   async openTiff(file:File,options:TiffDecodeOptions={},control:TiffImportControl={}):Promise<TiffImportReport>{
     const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();

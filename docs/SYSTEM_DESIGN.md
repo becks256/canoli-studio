@@ -1,5 +1,11 @@
 # Canoli Studio System Design & Architecture Specification
 
+## AVIF input preflight and decode boundary in progress
+
+AVIF input uses its own primary-item/property-association reader; the strict owned-output validator remains separate. Trusted preflight is read-only. Metadata work has explicit box/table/profile budgets, independent of encoded file size and native image geometry. Internal private workers check high-bit-depth/color-assumption consent before loading the local decoder, validate raw dimensions and return crop/orientation-correct PNG with source ICC identification. Success, failure, throwing callbacks and abort terminate the worker; cancellation remains effective during host result validation. The owned C ABI checks native errors and actual source depth/alpha/CICP before publication. Its pinned libavif 1.3/AOM 3.12 build removes optional default geometry guards while retaining native overflow/allocation checks and a pre-decode PTRDIFF representation check. Full decoded codec memory and real codec/browser limits are explicit; this is not region decoding, an HDR pipeline or a performance acceptance claim.
+
+Application AVIF opening and original-source/decode-choice persistence remain unfinished. Do not enable AssetStore/picker/recipe/brush acceptance until project/workspace/recovery and all asset-copy/validation paths preserve those choices and original bytes. No new isolated Scripts/plugin/REST file privilege or browser/headless synchronization is implied. Sources: [AVIF specification](https://aomediacodec.github.io/av1-avif/v1.2.0.html), [owned wrapper/build](../scripts/avif-decoder/README.md) and [libavif 1.3 API](https://github.com/AOMediaCodec/libavif/blob/v1.3.0/include/avif/avif.h). Exact source revisions, build inputs, artifact identities and real native/WASM decoding tests determine release evidence.
+
 ## Recovery failure propagation invariant
 
 An exception during synchronous request setup or an IndexedDB callback must abort the complete checkpoint/asset write, preserve its original cause and retain prior committed data. Only transaction completion permits saved acknowledgement. UI and worker persistence share this boundary. Active-document status, focused edits, native output, undo state, error-over-download priority and the closure flush contract remain unchanged.
