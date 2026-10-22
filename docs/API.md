@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Trusted local AVIF output
+
+Browser `editor.export({format:"avif", quality?:number, avifLossless?:boolean, avifSpeed?:number}, control?)` returns `{blob,mimeType:"image/avif",extension:"avif",report}`. Quality defaults to 0.8 (finite 0.01–1), lossless to false, speed to 8 (integer 0–10). Lossless or quality 1 retains captured RGBA8; alpha is always lossless. Output is one flattened native-resolution image, explicitly identified as sRGB, with no source metadata/font/editable content. A private locally served WASM worker supports abort, source/font lifetime rejection and fresh retries; full-frame/codec memory and browser/viewer limits remain. Custom local batch variants accept the same settings and share fitting, snapshots, durable hashes and integrity-checked packages. AVIF-only flags reject on other batch formats. These trusted methods add no REST rendering route or isolated Scripts export privilege. See [signatures, examples and limits](SCRIPTING_API.md#avif-export-trusted-application-code).
+
 ## Linked paragraph style commands (schema 40)
 
 Strict commands accept paragraphStyle.set `{style:{id,name,format}}`, paragraphStyle.remove `{id}`, text.paragraphStyle `{id,styleId:string|null,keepOverrides?:boolean}`, and text.paragraphOverrides.clear `{id,keys?:ParagraphFormatKey[]}`. A serialized format contains all documented typography fields; overrides contain only controlled keys. Unknown/null/invalid values, duplicate names/IDs, missing definitions and inconsistent snapshot fields reject. Libraries have at most 128 styles. Removing a style detaches its followers with resolved format retained; applying a style clears overrides unless keepOverrides=true. Reset keys must be unique and known. Existing layer.update edits automatically become local overrides on bound text, and undefined optional controlled values restore inheritance in the OO surface.

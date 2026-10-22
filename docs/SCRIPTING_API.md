@@ -1417,7 +1417,7 @@ This section is for trusted application code and development-console inspection,
 | `editor.exportPng(control?)` | `Promise<Blob>`; PNG convenience method with the same optional execution controls. |
 
 
-`ExportOptions.format` accepts `"png" | "jpeg" | "webp" | "svg" | "psd" | "psb" | "tiff" | "pdf"`. Other options are `quality?: number` (JPEG default 0.92, WebP default 0.9), `backgroundColor?: string` (JPEG, default white), `psdMode?: "layers" | "flatten"` (PSD/PSB, default layers), `tiffVariant?: "auto" | "classic" | "big"` (default auto) and `pdfDpi?: number` (PDF physical sizing, default 72). Results contain `blob`, `mimeType`, `extension` and `report`; review the report's preserved/degraded features and warnings before delivery.
+`ExportOptions.format` accepts `"png" | "jpeg" | "webp" | "avif" | "svg" | "psd" | "psb" | "tiff" | "pdf"`. Other options are `quality?: number` (JPEG default 0.92, WebP default 0.9, AVIF default 0.8), `avifLossless?: boolean` (default false), `avifSpeed?: number` (integer 0–10, default 8), `backgroundColor?: string` (JPEG, default white), `psdMode?: "layers" | "flatten"` (PSD/PSB, default layers), `tiffVariant?: "auto" | "classic" | "big"` (default auto) and `pdfDpi?: number` (PDF physical sizing, default 72). Results contain `blob`, `mimeType`, `extension` and `report`; review the report's preserved/degraded features and warnings before delivery.
 
 Export controls default to absent. `phase` is `"rendering"` or `"encoding"`; `fraction` is a value from 0 to 1 for known rendering progress, or `null` for indeterminate work. An aborted signal rejects with its reason (normally `AbortError`). PNG/JPEG/WebP/PSD/TIFF check cancellation between rendered tiles/strips and before returning encoded output. Host SVG serialization yields between bounded path fragments and reports indeterminate encoding progress. Browser encoding, synchronous constructor `toSvg` calls and an individual PSD strip cannot be preempted mid-call; the final host check suppresses a result after cancellation is received. These controls are host-only, are not serialized into REST options, and are unavailable inside isolated Scripts. They do not edit the document or create history entries. A throwing progress callback rejects export without returning partial output.
 
@@ -2696,6 +2696,45 @@ print("PSB composition ready");
 ### PSD/PSB private encoding and cancellation
 
 Trusted Photoshop export keeps the same signatures/defaults, native grid, RGB8/white-matte fidelity and errors described above. Captured native pixel strips now encode in a private module worker; only export-owned copies transfer, never original source buffers/bitmaps. Host checks source/font lifetimes before and after each reply and validates row-table/Blob extents. Abort terminates pending encoding; a native canvas call already executing remains non-preemptible. Worker load/runtime/message errors or invalid results reject without a file, and every success/failure terminates the private worker. Reused packet buffers and one Blob per channel/strip reduce allocations without changing file bytes. No worker/file/pixel capability is exposed to isolated scripts/plugins or REST, and no public option/schema changes. Source/output/reader memory and residual native-frame delays remain real limits; this is not a universal responsiveness guarantee.
+
+## AVIF export (trusted application code)
+
+`await editor.export({format: "avif", quality?: number, avifLossless?: boolean, avifSpeed?: number}, control?): Promise<ExportResult>` returns one flattened native-resolution still image with `mimeType: "image/avif"`, `extension: "avif"` and a capability report. Quality is finite 0.01–1, default 0.8; `avifLossless` is boolean, default false; speed is an integer 0–10, default 8 (0 takes longest, 10 is fastest). Lossless mode or quality 1 preserves the captured RGBA8 samples exactly. Other qualities compress colour lossily; alpha is always lossless. The Export dialog offers quality 1–100%, Lossless AVIF, and Fast/Balanced/Smaller file compression choices (speeds 8/6/4).
+
+The native compositor captures the same bounded grid as PNG, including affine layers/groups, masks, paint, text, effects, smart filters and adjustment/backdrop order. A private single-thread worker encodes with the locally served, pinned jSquash AVIF/libavif WASM codec. Output uses 8-bit YUV444 colour and an explicit nclx sRGB identifier (primaries 1, transfer 13); lossless colour uses the identity matrix. This does not embed source ICC profiles or provide wide-gamut/HDR/CMYK/high-precision conversion. The report discloses flattened editability, compressed colour in lossy mode, omitted source/authored metadata, font files, saved channels and animation. Save a native project for original files and editable layers.
+
+Host controls use `{signal?: AbortSignal, onProgress?: callback}`. Rendering fractions count completed native regions; encoding is indeterminate. One full capture/codec job runs per application context; waiting jobs allocate no full RGBA plane. Capture pins an immutable document snapshot and visible raster/clone/patch/bitmap-mask/master sources plus relevant registered fonts before the first callback. Later ordinary document edits do not change output. Removed/replaced/closed referenced sources, a disposed store, pending/changed referenced fonts, invalid settings, worker/load/encoding/malformed-result failures, cancellation and throwing callbacks reject without publishing a file. Relevant source/font lifetime is checked while the codec runs. Abort terminates the private worker; native rendering already executing remains cooperative. All outcomes release native tiles, the worker and the capture lease; a later retry starts a fresh encoder.
+
+AVIF requires a full native RGBA frame plus codec working memory, unlike streamed PNG/TIFF. No original is downsampled and no megapixel/file-size import cap is added. Native signed-integer codec geometry, browser allocation, WASM memory and viewer support remain actual limits; allocation/codec failures reject explicitly. Large-source functional evidence is not a whole-process memory or sustained responsiveness guarantee. The host validates the returned still-AVIF container, dimensions, 8-bit planes, required alpha and colour identifier; it does not decode every exported AV1 bitstream. Independent browser tests decode actual output with Pillow/libavif. Browser viewers may apply colour conversion and premultiplied-alpha rounding; native canvas appearance is measured separately from exact stored RGBA samples.
+
+Trusted integration example (not runnable in isolated Scripts):
+
+```ts
+const result = await editor.export({
+  format: "avif", avifLossless: true, avifSpeed: 8,
+}, { signal: controller.signal });
+// The trusted host chooses how to deliver result.blob after reviewing result.report.
+```
+
+Scripts/plugins retain their existing isolation: no encoder, pixel/file/download/network privilege or REST renderer is added. The following maintained Scripts example creates ordinary editable artwork; close Scripts and choose **Export… → AVIF → Lossless AVIF** to download it:
+
+<!-- example: avif-composition -->
+
+```js
+document.resize(2081, 160);
+const paint = document.layers.add(new PaintLayer({ name: "AVIF artwork" }));
+paint.strokes.add(new PaintFill({
+  bounds: { x: 1900, y: 20, width: 180, height: 120 },
+  color: "#804020", opacity: 0.5,
+}));
+document.layers.add(new TextLayer({
+  name: "AVIF caption", text: "Canoli Studio",
+  fontFamily: "monospace", fontSize: 28, x: 1910, y: 60,
+}));
+print("AVIF composition ready");
+```
+
+Trusted `editor.batch.createBatch(config, sources)` delivery variants also accept `format: "avif"`, optional `quality`, `avifLossless` and `avifSpeed` with the same defaults/validation. AVIF-only settings on other formats reject. `quality` is also accepted for JPEG/WebP (their batch default remains 0.92); PNG quality rejects. Existing target geometry and cover/contain/fill rules apply. The fitted renderer pins the real source document while capturing target-sized pixels; originals and editor history remain untouched. The Batch dialog exposes AVIF in custom variants with quality/lossless/compression controls. Configuration snapshots, output hashes, persisted blobs, review, resume/retry and integrity-checked delivery ZIPs retain the existing batch contract. Cancelling a run aborts in-flight AVIF encoding and publishes no partial deliverable; the full frame/codec lease is shared with ordinary export. These are trusted local batch methods, not isolated script methods or live browser REST synchronization.
 
 ## PDF export (trusted application code)
 

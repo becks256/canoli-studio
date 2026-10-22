@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## AVIF export controls
+
+Use the existing Export dialog and custom Batch variant form. AVIF offers a Lossless checkbox, 1–100% colour quality when lossy, and Fast/Balanced/Smaller file compression (8/6/4). Explain always-lossless transparency and quality 100's lossless colour behavior. Retain native dimensions, capability disclosure, actual rendering/indeterminate encoding progress, Cancel and retry. Controls use the existing custom Select/Slider/checkbox fields and disabled/busy states; no new component library or keyboard binding. Batch format controls have an accessible name.
+
 ## Paragraph style controls
 
 For selected text, add a Paragraph styles Inspector section using existing Select/TextInput/Button/InspectorSection controls. The style selector chooses a library entry without editing; Apply paragraph style performs the edit. Show the current linked name and an explicit local-override count/key list. Provide Reset style overrides and Detach paragraph style for linked text. A chosen library entry can be renamed, deleted or updated from the current text without requiring temporary application. New paragraph style name plus Create style from text captures and links in one transaction. Keep text content/frame width independent and explain that base edits affect linked text while local formatting remains an override. Reuse existing busy/lock/error handling; add no global shortcut or component library.

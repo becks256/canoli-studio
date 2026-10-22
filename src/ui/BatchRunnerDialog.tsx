@@ -905,7 +905,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                   </div>
 
                   <div className="variants-list">
-                    {DEFAULT_DELIVERY_VARIANTS.map((v) => {
+                    {[...DEFAULT_DELIVERY_VARIANTS,...selectedVariants.filter(variant=>!DEFAULT_DELIVERY_VARIANTS.some(preset=>preset.id===variant.id))].map((v) => {
                       const isSelected = selectedVariants.some(
                         (sel) => sel.id === v.id,
                       );
@@ -921,7 +921,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           />
                           <span className="variant-chip-name">{v.name}</span>
                           <span className="variant-chip-dims">
-                            {v.targetWidth}×{v.targetHeight}
+                            {v.targetWidth}×{v.targetHeight} · {v.format.toUpperCase()}{v.format==='avif'?(v.avifLossless||v.quality===1?' · Lossless':` · ${Math.round((v.quality??.8)*100)}%`):''}
                           </span>
                         </label>
                       );
@@ -940,6 +940,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                         />
                         <select
                           className="batch-select"
+                          aria-label="Variant format"
                           value={customVarFormat}
                           onChange={(e) =>
                             setCustomVarFormat(
@@ -955,8 +956,8 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                       </div>
                       {customVarFormat==='avif'&&<>
                         <label className="checkbox-field"><input type="checkbox" checked={customVarLossless} onChange={event=>setCustomVarLossless(event.target.checked)}/>Lossless AVIF variant</label>
-                        {!customVarLossless&&<label>AVIF quality<input type="number" className="batch-input" min={1} max={100} value={customVarQuality} onChange={event=>setCustomVarQuality(Number(event.target.value))}/></label>}
-                        <label>AVIF compression<select className="batch-select" value={String(customVarSpeed)} onChange={event=>setCustomVarSpeed(Number(event.target.value))}><option value="8">Fast</option><option value="6">Balanced</option><option value="4">Smaller file</option></select></label>
+                        {!customVarLossless&&<label>AVIF quality<input aria-label="AVIF quality" type="number" className="batch-input" min={1} max={100} value={customVarQuality} onChange={event=>setCustomVarQuality(Number(event.target.value))}/></label>}
+                        <label>AVIF compression<select aria-label="AVIF compression" className="batch-select" value={String(customVarSpeed)} onChange={event=>setCustomVarSpeed(Number(event.target.value))}><option value="8">Fast</option><option value="6">Balanced</option><option value="4">Smaller file</option></select></label>
                       </>}
                       <div className="form-row">
                         <input

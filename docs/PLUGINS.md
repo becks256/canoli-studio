@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## AVIF host export boundary
+
+AVIF is a trusted browser Export/batch delivery format. Its private local encoder worker does not extend package permissions or the isolated scripting runtime. Installation remains inert; plugins may create ordinary permitted artwork through existing commands but cannot invoke host export, acquire pixels/files/fonts, fetch the codec or initiate downloads. User-initiated export retains source/font lifetime validation and unchanged document/history ownership. No plugin manifest/version change.
+
 ## Paragraph styles (schema 40)
 
 Existing isolated command code receives ParagraphStyle and Document.paragraphStyles, plus TextLayer style/override methods, under existing document:read/document:write grants. The host revalidates the same commands, locks, source references and revision before one-undo commit. Installation remains inert; no font enumeration/file/network/pixel/provider service or new permission is added. Libraries and links are document-scoped (including independent embedded masters), persisted in schema 40, with unchanged project/workspace/plugin/recipe transport versions. See the [tested guide](SCRIPTING_API.md#linked-paragraph-styles-schema-40).

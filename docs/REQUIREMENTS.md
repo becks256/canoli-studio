@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Local AVIF delivery (F11/W03 increment)
+
+Export one native-resolution RGBA8 still AVIF locally, with explicit sRGB identification, always-lossless alpha, configurable colour quality, lossless colour and compression speed. Keep source blobs/model/history unchanged. Use a private cancellable encoder worker, validate settings/container/geometry/alpha/colour before publication and release resources on every outcome. Queued exports must not allocate full frames. Pin relevant sources/fonts throughout capture/encoding; revocation rejects and ordinary later edits preserve the captured snapshot. Show real progress, Cancel, retry and honest flattening/colour/metadata/capability reports. Custom batch variants retain settings, fitted native pixels, durable hashes/blobs, resume/review and integrity-checked packages. Verify actual WASM, independent decoding, real UI/production paths and 50 MP output. Full-frame codec memory and browser/viewer limits remain explicit; no source downsampling or arbitrary import cap. AVIF import, isolated exports, REST rendering and broader F10/F11/F14 completion are not implied.
+
 ## Reusable linked paragraph styles (F08 increment, schema 40)
 
 Users can create a named paragraph style from selected text, apply it to other frames, update the base from text, rename/delete it, reset local overrides or detach it. Choosing a library entry does not edit the document; Apply performs one undoable edit. Base changes update every linked frame in that document while preserving per-field overrides, content, wrap width and placement. Local edits equal to the current base remain explicit until reset. Deleting/detaching preserves the current resolved formatting. Invalid definitions, missing links, duplicate IDs/names, stale script revisions, changed locked followers and native layout failures reject atomically.
