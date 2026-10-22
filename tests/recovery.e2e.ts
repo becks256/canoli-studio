@@ -128,7 +128,7 @@ test("tabs retain independent recovery checkpoints", async ({
 });
 
 test("blocked storage reports failure without stopping editing or project downloads", async ({
-  browser,
+  browser, baseURL,
 }) => {
   const context = await browser.newContext();
   await context.addInitScript(() =>
@@ -139,7 +139,7 @@ test("blocked storage reports failure without stopping editing or project downlo
     }),
   );
   const page = await context.newPage();
-  await page.goto("http://127.0.0.1:5173/");
+  await page.goto(baseURL!);
   await page.evaluate(async () => {
     const { editor, TextLayer } = window.luma;
     editor.document.layers.add(new TextLayer({ text: "Still editable" }));
@@ -386,4 +386,16 @@ test("recovery captures mutable callers and immutable revisions independently of
     });
   });
   for(const entry of result){expect(entry.name).toBe(entry.originalName);expect(entry.layer).toMatchObject({kind:'text',text:'Original'});}
+});
+
+for(const target of ['checkpoints','assets'] as const)test(`synchronous ${target} write failures preserve the previous recovery checkpoint and original error`,async({page},info)=>{
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');
+ const result=await page.evaluate(async target=>{
+  const {RecoveryRepository}=await import(/* @vite-ignore */String('/src/core/recovery.ts')),{AssetStore}=await import(/* @vite-ignore */String('/src/core/assets.ts')),{readProject}=await import(/* @vite-ignore */String('/src/core/project.ts')),{Document,RasterLayer}=window.luma;
+  const repository=new RecoveryRepository(),assets=new AssetStore(),doc=new Document({name:'Retained checkpoint',width:8,height:8}),canvas=new OffscreenCanvas(8,8),context=canvas.getContext('2d')!;context.fillStyle='#804020';context.fillRect(0,0,8,8);const first=await assets.add(await canvas.convertToBlob({type:'image/png'}),'Original.png');doc.layers.add(new RasterLayer({assetId:first.id,width:8,height:8}));const id='event-handler-failure';await repository.save(id,doc.getSnapshot().document,assets);const before=await readProject(await repository.project(id));
+  context.fillStyle='#204080';context.fillRect(0,0,8,8);const second=await assets.add(await canvas.convertToBlob({type:'image/png'}),'Later.png');doc.layers.add(new RasterLayer({assetId:second.id,width:8,height:8}));const original=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){if(this.transaction.db.name==='luma-recovery'&&this.name===target)throw new DOMException('Injected '+target+' quota','QuotaExceededError');return original.apply(this,args);};let error={name:'',message:''};
+  try{await repository.save(id,doc.getSnapshot().document,assets);}catch(cause){error={name:(cause as Error).name,message:(cause as Error).message};}finally{IDBObjectStore.prototype.put=original;}
+  try{const after=await readProject(await repository.project(id)),entries=(await repository.list()).find((entry:import('../src/core/recovery').RecoveryEntry)=>entry.id===id)!;return{error,before:JSON.stringify(before.document),after:JSON.stringify(after.document),blobBefore:[...new Uint8Array(await before.entries[0].blob.arrayBuffer())],blobAfter:[...new Uint8Array(await after.entries[0].blob.arrayBuffer())],entryAssets:entries.assetKeys.length,projectAssets:after.entries.length,previous:entries.previous?.length??0};}finally{assets.dispose();}
+ },target);
+ expect(result.error).toEqual({name:'QuotaExceededError',message:'Injected '+target+' quota'});expect(result.after).toBe(result.before);expect(result.blobAfter).toEqual(result.blobBefore);expect(result.entryAssets).toBe(1);expect(result.projectAssets).toBe(1);expect(result.previous).toBe(0);expect(errors).toEqual([]);await info.attach('recovery-write-rollback',{body:JSON.stringify({target,...result,uncaughtErrors:errors}),contentType:'application/json'});
 });

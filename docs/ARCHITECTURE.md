@@ -1,5 +1,11 @@
 # Architecture
 
+## Recovery persistence failure boundary
+
+`RecoveryRepository.persist` guards synchronous transaction setup and request callbacks. A caught failure aborts the entire checkpoint/asset write and is retained as the promise's rejection cause, including when the browser's transaction error is generic. The UI and persistence worker share this path, preserving the previous checkpoint, source bytes and actionable quota name/message without uncaught callback errors.
+
+Recent-file capability detection catches denied global storage access before optional initialization. BroadcastChannel construction and sending are best-effort: notification failure cannot abort startup or misreport an already committed copy as a storage failure. Durable generation remains authoritative without notifications. Active recovery display, commands/history, native pixels, schemas and script/plugin/REST permissions remain unchanged. A footer-subscription isolation prototype is deferred after controlled measurements failed to show a reliable latency benefit; it is not current architecture.
+
 ## Recent file copies and resource commands
 
 `workspace/recent-files.ts` owns the separate `luma-recent-files` IndexedDB database (version 2; entries remain schema 1). `entries`, `blobs` and `state` participate in one transaction for publication, twenty-entry eviction, reference cleanup and generation changes. Payloads are keyed by SHA-256; entries keep exact file metadata, explicit original I/O kind, capture time and MRU rank. A schema-1 database upgrades by adding `state` while retaining existing stores. Invalid metadata remains discoverable; capture fails without overwriting unreadable entries, and cleanup preserves unknown references until explicit recovery. Removing/clearing advances a durable generation; record compares the generation captured before hashing inside its commit transaction. Copies prepared against an old generation reject, including across tabs without notification delivery.

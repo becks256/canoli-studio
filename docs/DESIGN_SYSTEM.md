@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Recovery footer error handling
+
+Keep the existing recovery text and title in the canvas footer, with errors overriding the project-download indicator. Save progress must not disturb a focused field, caret, selected tool or artwork. Bind the display to the active document's controller and retain background editing while saving. A local-copy notification failure does not become a storage-failure badge; an unavailable storage capability is disclosed through Recent files while ordinary editing remains usable.
+
 ## Recent files and resource search
 
 Add a compact Recent files control beside Open, with a local-copy status indicator and descriptive tooltip. The control owns its subscription so background copy status does not rerender the editor. Use the custom Recent files modal with clearly labeled original filename, kind, bytes and saved time; Open local copy, Remove, Reload and Clear local copies are explicit actions. Explain local copies, retention, disk-change behavior and backups in ordinary language. Show actual loading/checking/updating/saving state; cancellation closes safely, errors retain the dialog, and unreadable entries stay visible with opening disabled. Removing copies does not close documents or affect original files.

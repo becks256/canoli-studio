@@ -1,5 +1,13 @@
 # Canoli Studio editor requirements
 
+## Recovery failure containment and optional-storage startup
+
+Recovery progress preserves the existing active-document footer behavior. Preserve focused text/caret, selection, native pixels and undo history through pending/saving/saved/error transitions. Errors take priority over the existing project-download indicator; its title still describes actual recovery state. Switching or closing a document must unsubscribe its status, and inactive save completion/failure must not replace the active footer. Closing still awaits the existing recovery flush.
+
+Optional recent files must never prevent manual editor startup when access to the browser storage capability throws. If the capability cannot be read, disclose unavailability; if notification construction or sending fails, retain normal local copies and their committed status. Notifications remain advisory and durable generation checks still reject stale preparations. No instantaneous cross-tab list refresh is promised without notifications; explicit Reload remains available.
+
+Recovery persistence catches synchronous request-setup and callback failures, aborts the complete checkpoint/asset transaction and rejects with the original cause. Keep the previous checkpoint and source bytes; report actionable quota failures without uncaught page errors. The same atomic path is used by the UI and persistence worker.
+
 ## Recent local files and resource-aware command search (F01/F13/T22 increment)
 
 Remember successful file-backed raster/project/SVG/TIFF/Photoshop opens/imports and explicit project-download requests as disclosed local copies. Keep up to 20 saved entries and the newest 20 pending preparations, sharing byte storage by content hash. Preserve complete original bytes and file name/type/lastModified; same-named changed bytes remain distinct copies. No original resolution/file-size cap, full-file host hashing buffer or source downsampling. Private worker hashing reads at most 1 MiB per slice, validates replies and supports cancellation/disposal.

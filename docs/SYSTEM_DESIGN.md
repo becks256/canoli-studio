@@ -1,5 +1,11 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Recovery failure propagation invariant
+
+An exception during synchronous request setup or an IndexedDB callback must abort the complete checkpoint/asset write, preserve its original cause and retain prior committed data. Only transaction completion permits saved acknowledgement. UI and worker persistence share this boundary. Active-document status, focused edits, native output, undo state, error-over-download priority and the closure flush contract remain unchanged.
+
+Optional local recent-file initialization contains denied storage capability access. Notification failures never change the result of an already committed record/remove/clear transaction. Durable generation checks provide invalidation without a working notification channel. These corrections do not establish complete durability or sustained performance acceptance.
+
 ## Recent-file persistence and delivery invariant
 
 A successful document open/import is independent of its optional background recent-file copy. Only committed, validated entry/blob transactions may appear as persisted copies. Capture retains immutable original file bytes, not viewport images; hashing uses private bounded reads and a separate worker. A single serial queue and the twenty-pending policy bound owned active/queued preparations without changing image/file import geometry. Cross-tab remove/clear advances a durable generation checked at commit, preventing older prepared copies from reappearing. Metadata corruption cannot authorize opening; size and SHA-256 are verified before a File is delivered. Once delivered, that independent immutable file and any opened assets survive recent-list removal.

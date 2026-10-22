@@ -41,3 +41,11 @@ it('a changed durable generation rejects even if a worker ignores notification c
 it('abort/disposal cancel reads, release queued captures and prohibit late publication',async()=>{
  const store=new MemoryStore();let block=false,start!:()=>void;const started=new Promise<void>(resolve=>{start=resolve;});const service=new RecentFilesService(store,async(blob,signal)=>{if(!block)return hash(blob);start();return new Promise<string>((_resolve,reject)=>{signal!.addEventListener('abort',()=>reject(signal!.reason),{once:true});});},true);service.remember(file(),'image');await service.flush();block=true;const abort=new AbortController(),reading=service.read('art.png',abort.signal);await started;abort.abort(new Error('Cancel read'));await expect(reading).rejects.toThrow(/Cancel read/);let publications=0;service.subscribe(()=>{publications++;});service.remember(file('queued.png'),'image');service.dispose();const before=publications;await service.flush();expect(publications).toBe(before);expect(service.getSnapshot().pending).toBe(0);expect(store.writes).toBe(1);await expect(service.read('art.png')).rejects.toThrow(/closed/);
 });
+
+it('a denied browser-storage capability leaves optional recents unavailable without aborting startup',()=>{
+ const previousWindow=Object.getOwnPropertyDescriptor(globalThis,'window'),previousStorage=Object.getOwnPropertyDescriptor(globalThis,'indexedDB'),store=new MemoryStore();let service:RecentFilesService|undefined,accesses=0;
+ try{
+  Object.defineProperty(globalThis,'window',{configurable:true,value:{}});Object.defineProperty(globalThis,'indexedDB',{configurable:true,get(){accesses++;throw new DOMException('Storage blocked','SecurityError');}});
+  expect(()=>{service=new RecentFilesService(store,hash);}).not.toThrow();expect(accesses).toBe(1);expect(service!.getSnapshot()).toMatchObject({available:false,loading:false,pending:0,entries:[]});expect(service!.getSnapshot().error).toContain('unavailable');expect(()=>service!.remember(file(),'image')).not.toThrow();expect(store.writes).toBe(0);
+ }finally{service?.dispose();if(previousWindow)Object.defineProperty(globalThis,'window',previousWindow);else Reflect.deleteProperty(globalThis,'window');if(previousStorage)Object.defineProperty(globalThis,'indexedDB',previousStorage);else Reflect.deleteProperty(globalThis,'indexedDB');}
+});

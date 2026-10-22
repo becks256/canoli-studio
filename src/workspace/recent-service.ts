@@ -3,6 +3,10 @@ import {hashRecentBlob} from './recent-hash';
 
 export interface RecentFilesSnapshot {entries:readonly RecentSummary[];pending:number;loading:boolean;error:string;available:boolean;}
 type Hasher=(blob:Blob,signal?:AbortSignal)=>Promise<string>;
+function recentFilesAvailable(){
+ try{return typeof window!=='undefined'&&typeof indexedDB!=='undefined'&&typeof Worker!=='undefined';}
+ catch{return false;} // Some privacy modes throw when accessing the storage capability itself.
+}
 /** Optional local file history: failure never turns a successful document open/save into failure. */
 export class RecentFilesService {
  private disposed=false;private tail:Promise<unknown>=Promise.resolve();private listeners=new Set<()=>void>();
@@ -10,9 +14,13 @@ export class RecentFilesService {
  private pendingFiles=new Map<AbortController,File>();
  private snapshot:RecentFilesSnapshot;
  private verified=new WeakMap<File,{kind:RecentKind;sha256:string}>();
- constructor(private store:RecentFileStore=new RecentFileRepository(),private hash:Hasher=hashRecentBlob,available=typeof window!=='undefined'&&typeof indexedDB!=='undefined'&&typeof Worker!=='undefined'){
+ constructor(private store:RecentFileStore=new RecentFileRepository(),private hash:Hasher=hashRecentBlob,available=recentFilesAvailable()){
   this.snapshot={entries:[],pending:0,loading:available,error:available?'':'Local recent files are unavailable in this environment.',available};
-  if(available){if(typeof window!=='undefined'&&typeof BroadcastChannel!=='undefined'){this.channel=new BroadcastChannel('luma-recent-files');this.channel.onmessage=event=>{if(event.data?.type==='changed'&&event.data?.version===1){if(['clear','remove'].includes(event.data.action))this.stopPending();void this.refresh().catch(()=>{});}};}void this.refresh().catch(()=>{});}
+  if(available){
+   try{if(typeof window!=='undefined'&&typeof BroadcastChannel!=='undefined'){this.channel=new BroadcastChannel('luma-recent-files');this.channel.onmessage=event=>{if(event.data?.type==='changed'&&event.data?.version===1){if(['clear','remove'].includes(event.data.action))this.stopPending();void this.refresh().catch(()=>{});}};}}
+   catch{/* Notifications are advisory; the durable generation still rejects stale preparations. */}
+   void this.refresh().catch(()=>{});
+  }
  }
  subscribe=(listener:()=>void)=>{this.listeners.add(listener);return()=>{this.listeners.delete(listener);};};
  getSnapshot=()=>this.snapshot;
@@ -20,7 +28,10 @@ export class RecentFilesService {
  private error(cause:unknown){const quota=cause&&typeof cause==='object'&&'name'in cause&&cause.name==='QuotaExceededError';this.publish({error:quota?'The recent-file copy could not be saved because browser storage is full. Keep a project download, remove unneeded local copies, then retry.':cause instanceof Error?cause.message:String(cause),loading:false});}
  private queue<T>(run:()=>Promise<T>):Promise<T>{const next=this.tail.then(()=>{if(this.disposed)throw new Error('Recent files are closed.');return run();});this.tail=next.catch(()=>{});return next;}
  private async list(signal?:AbortSignal){const entries=await this.store.list(signal);signal?.throwIfAborted();this.publish({entries,loading:false,error:''});}
- private changed(action:'record'|'remove'|'clear'){if(!this.disposed)this.channel?.postMessage({type:'changed',version:1,action});}
+ private changed(action:'record'|'remove'|'clear'){
+  try{if(!this.disposed)this.channel?.postMessage({type:'changed',version:1,action});}
+  catch{/* A notification failure cannot turn an already committed copy into a storage error. */}
+ }
  refresh():Promise<void>{
   if(!this.snapshot.available)return Promise.reject(new Error(this.snapshot.error));
   return this.queue(async()=>{try{await this.list();}catch(error){this.error(error);throw error;}});

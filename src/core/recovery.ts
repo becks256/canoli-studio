@@ -80,12 +80,12 @@ const request = <T>(value: IDBRequest<T>) =>
     value.onerror = () =>
       reject(value.error ?? new Error("Recovery storage request failed."));
   });
-const complete = (transaction: IDBTransaction) =>
+const complete = (transaction: IDBTransaction, cause?: () => unknown) =>
   new Promise<void>((resolve, reject) => {
     transaction.oncomplete = () => resolve();
     transaction.onabort = () =>
       reject(
-        transaction.error ?? new Error("Recovery checkpoint was interrupted."),
+        cause?.() ?? transaction.error ?? new Error("Recovery checkpoint was interrupted."),
       );
     transaction.onerror = () => {}; // Abort reports the final failure; never acknowledge a partial write.
   });
@@ -212,32 +212,40 @@ export class RecoveryRepository {
     const tx = db.transaction(["checkpoints", "assets"], "readwrite", {
       durability: "strict",
     });
-    const done = complete(tx);
-    const store = tx.objectStore("assets");
-    const old = tx.objectStore("checkpoints").get(id);
-    old.onsuccess = () => {
-      const previous = old.result as RecoveryEntry | undefined;
-      entry.previous = previous
-        ? checkpoints(previous)
-            .slice(0, 2)
-            .map(({ previous: _history, ...snapshot }) => snapshot)
-        : [];
-      const retained = new Set(
-        checkpoints(entry).flatMap((item) => item.assetKeys),
-      );
-      for (const key of previous
-        ? checkpoints(previous).flatMap((item) => item.assetKeys)
-        : [])
-        if (!retained.has(key)) store.delete(key);
-      tx.objectStore("checkpoints").put(entry);
+    let failure: unknown;
+    const done = complete(tx, () => failure);
+    const fail = (error: unknown) => {
+      failure ??= error;
+      try { tx.abort(); } catch { /* An existing abort still reports the original cause. */ }
     };
-    checked.forEach((asset, index) => {
-      const key = assetKeys[index];
-      const existing = store.getKey(key);
-      existing.onsuccess = () => {
-        if (existing.result === undefined) store.put(asset, key);
-      };
-    });
+    const guard = (run: () => void) => () => { try { run(); } catch (error) { fail(error); } };
+    try {
+      const store = tx.objectStore("assets");
+      const old = tx.objectStore("checkpoints").get(id);
+      old.onsuccess = guard(() => {
+        const previous = old.result as RecoveryEntry | undefined;
+        entry.previous = previous
+          ? checkpoints(previous)
+              .slice(0, 2)
+              .map(({ previous: _history, ...snapshot }) => snapshot)
+          : [];
+        const retained = new Set(
+          checkpoints(entry).flatMap((item) => item.assetKeys),
+        );
+        for (const key of previous
+          ? checkpoints(previous).flatMap((item) => item.assetKeys)
+          : [])
+          if (!retained.has(key)) store.delete(key);
+        tx.objectStore("checkpoints").put(entry);
+      });
+      checked.forEach((asset, index) => {
+        const key = assetKeys[index];
+        const existing = store.getKey(key);
+        existing.onsuccess = guard(() => {
+          if (existing.result === undefined) store.put(asset, key);
+        });
+      });
+    } catch (error) { fail(error); }
     await done;
     return savedAt;
   }
