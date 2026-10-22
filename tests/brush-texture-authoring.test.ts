@@ -32,7 +32,7 @@ for(const context of contexts)it(`retains ${context} texture references and enfo
   }
   const instance=doc.placeSmartObject(doc.defineComponent(master));if(context==='filter-mask')instance.filterMask=mask;
  }
- const saved=doc.toJSON();expect(saved.schemaVersion).toBe(39);expect(Document.fromJSON(saved).toJSON()).toEqual(saved);expect(referencedAssets(saved).has('grain')).toBe(true);
+ const saved=doc.toJSON();expect(saved.schemaVersion).toBe(40);expect(Document.fromJSON(saved).toJSON()).toEqual(saved);expect(referencedAssets(saved).has('grain')).toBe(true);
  const old=structuredClone(saved);old.schemaVersion=31;
  const lower=(definitions:typeof old.components)=>{for(const definition of definitions??[])if(definition.source.kind==='document')definition.source.document.schemaVersion=31;};lower(old.components);
  expect(()=>Document.fromJSON(old)).toThrow(/textures require schema version 32/);
@@ -45,7 +45,7 @@ it('keeps texture transactions atomic, honors locks and retains redo-only textur
  doc.transaction('Textured ink',()=>{layer.strokes.add(stroke);layer.name='Ink';});const after=doc.toJSON();doc.undo();expect(layer.strokes.length).toBe(0);
  const state=doc.getSnapshot(),history={version:1,past:state.past,future:state.future},restored=Document._fromWorkspace({...state.document,schemaVersion:31},history);restored.redo();expect(restored.toJSON()).toEqual(after);
  const bad=structuredClone(history);bad.future[0].document.schemaVersion=31;expect(()=>Document._fromWorkspace(state.document,bad)).toThrow(/schema version 32/);
- const legacy=Document.fromJSON({...before,schemaVersion:31}).toJSON();expect(legacy.schemaVersion).toBe(39);expect(JSON.stringify(legacy)).not.toContain('texture');
+ const legacy=Document.fromJSON({...before,schemaVersion:31}).toJSON();expect(legacy.schemaVersion).toBe(40);expect(JSON.stringify(legacy)).not.toContain('texture');
 });
 
 it('remaps texture and original references throughout ordinary brush-bearing layer records',()=>{

@@ -6,6 +6,7 @@ import {layoutText, NativeJustificationError, assertParagraphStyle, type Paragra
 import { yieldTask } from "./task-yield";
 import { alphaChannelSchema, MAX_ALPHA_CHANNELS, type AlphaChannelData } from './alpha-channels';
 import { z } from "zod";
+import {validateParagraphStyles,type ParagraphStyleData,type ParagraphStyleBinding} from './paragraph-styles';
 import { isImmutable } from "./immutable";
 import { layerCompSchema, type LayerCompData } from "./layer-comps";
 import { smartFiltersSchema } from "./smart/filters";
@@ -38,7 +39,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 39;
+export const SCHEMA_VERSION = 40;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -117,6 +118,7 @@ export interface VectorLayerData extends LayerBaseData {
   paths: VectorPathData[];
 }
 export interface TextLayerData extends LayerBaseData, ParagraphStyle {
+  paragraphStyle?:ParagraphStyleBinding|null;
   kind: "text";
   text: string;
   fontSize: number;
@@ -188,6 +190,7 @@ export interface DocumentData {
     | 36
     | 37
     | 38
+    | 39
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -198,6 +201,7 @@ export interface DocumentData {
   guides?: GuideData[];
   components?: SmartComponentDefinition[];
   layerComps?: LayerCompData[];
+  paragraphStyles?:ParagraphStyleData[];
   alphaChannels?: AlphaChannelData[];
   children: LayerData[];
 }
@@ -545,7 +549,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -553,7 +557,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–39), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–40), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -603,6 +607,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
   checkSelection(value.selection);
   const ids = new Set<string>();
   let count = 0;
+  let hasParagraphStyle=false;
   const walk = function* (nodes: unknown, depth: number): Generator<void> {
     if (!Array.isArray(nodes) || depth > 8)
       throw new Error("Invalid layer tree (maximum nesting: 8).");
@@ -633,6 +638,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       }
       if (node.kind !== 'text' && ('wordSpacing' in node || 'fontKerning' in node))
         throw new Error('Word spacing and font kerning require a text layer.');
+      if(node.paragraphStyle!=null){if(node.kind!=='text')throw new Error('Paragraph styles require a text layer.');hasParagraphStyle=true;}
       if (node.frequencyRadius !== undefined) {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 37)
           throw new Error('A shared frequency radius requires a group and schema version 37.');
@@ -831,6 +837,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     }
   };
   yield* walk(value.children, 0);
+  if(value.paragraphStyles!==undefined||hasParagraphStyle)validateParagraphStyles(value as unknown as DocumentData);
   if (value.components !== undefined && Number(value.schemaVersion) < 10)
     throw new Error("Component definitions require schema version 10.");
   if (checkComponents) {

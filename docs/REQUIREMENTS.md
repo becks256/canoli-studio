@@ -1,5 +1,11 @@
 # Canoli Studio editor requirements
 
+## Reusable linked paragraph styles (F08 increment, schema 40)
+
+Users can create a named paragraph style from selected text, apply it to other frames, update the base from text, rename/delete it, reset local overrides or detach it. Choosing a library entry does not edit the document; Apply performs one undoable edit. Base changes update every linked frame in that document while preserving per-field overrides, content, wrap width and placement. Local edits equal to the current base remain explicit until reset. Deleting/detaching preserves the current resolved formatting. Invalid definitions, missing links, duplicate IDs/names, stale script revisions, changed locked followers and native layout failures reject atomically.
+
+UI, OO, isolated scripts/plugins and strict REST commands share the same behavior. Styles and overrides survive project/workspace history; embedded document scopes remain independent and cross-document copy preserves/remaps needed links without overwriting destination styles. Native pixels and exported resolved typography must match equivalent direct formatting. SVG reports style-link/override loss, while native projects retain full editability. Schema 40 admits libraries/bindings; older roots migrate without new style defaults. Font embedding, based-on/character-run styles, variable fonts/path text and broader language/quality/performance gates remain open.
+
 ## Edge-preserving bilateral denoise (F12 increment, schema 39)
 
 Smart filters includes Bilateral denoise with exact paired controls for integer Denoise radius 0–16 px (default 2), Color tolerance 0–255 (default 25), and Denoise strength 0–1 (default 0.5). Preview/Escape, enable/order/remove, locks and single committed undo follow existing controls. Zero in any parameter must preserve unfiltered affine pixels and editable SVG geometry. Invalid/null/nonfinite/fractional radius and unknown options reject through UI/OO/commands and strict REST. Larger neighborhoods/tolerance/strength may soften detail.

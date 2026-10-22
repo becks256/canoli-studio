@@ -1,4 +1,5 @@
 import { replaceVectorPaths, type VectorBooleanSelection } from './vector-boolean';
+import {paragraphStyleSchema,paragraphStyleLibrarySchema,paragraphOverrideKeysSchema,paragraphFormat,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS,resolveParagraphBinding,sameParagraphFormat,type ParagraphStyleData,type ParagraphFormat} from './paragraph-styles';
 import {vectorStrokeKeys} from './vector-stroke';
 import { isImmutable, shareUnchanged } from "./immutable";
 import { lassoSelection, polygonSelectionSchema } from "./lasso";
@@ -98,6 +99,10 @@ export type LayerPatch = Partial<
 // Serializable commands are the single mutation boundary for UI, automation,
 // and a future AI adapter. No renderer or UI code mutates document nodes.
 export type EditorCommand =
+  | {type:'paragraphStyle.set';style:ParagraphStyleData}
+  | {type:'paragraphStyle.remove';id:string}
+  | {type:'text.paragraphStyle';id:string;styleId:string|null;keepOverrides?:boolean}
+  | {type:'text.paragraphOverrides.clear';id:string;keys?:(keyof ParagraphFormat)[]}
   | { type: "document.guides"; guides: GuideData[] }
   | { type: "document.rename"; name: string }
   | { type: "document.resize"; width: number; height: number }
@@ -189,11 +194,40 @@ export type EditorCommand =
   | { type: "mask.setFromMatting"; id: string; mask: LayerMaskData }
   | { type: "transaction"; label: string; commands: EditorCommand[] };
 
+function reflowText(layer:TextLayerData){
+  const bounds=measureTextBounds(layer.text,layer.fontSize,layer.fontFamily,layer.lineHeight,{
+    letterSpacing:layer.letterSpacing,wordSpacing:layer.wordSpacing,fontKerning:layer.fontKerning,
+    direction:layer.direction,fontWeight:layer.fontWeight,fontStyle:layer.fontStyle,wrapWidth:layer.wrapWidth,
+    paragraphSpacing:layer.paragraphSpacing,firstLineIndent:layer.firstLineIndent,paragraphJustify:layer.paragraphJustify,
+  });
+  layer.width=bounds.width;layer.height=bounds.height;
+}
 function apply(document: DocumentData, command: EditorCommand): void {
   if (command.type === 'paths.replace') { replaceVectorPaths(document, command.operands, command.result); return; }
   if (command.type === "transaction") {
     for (const child of command.commands) apply(document, child);
     return;
+  }
+  if(command.type==='paragraphStyle.set'){
+    const style=paragraphStyleSchema.parse(command.style),entries=[...(document.paragraphStyles??[])],index=entries.findIndex(value=>value.id===style.id);
+    if(index<0)entries.push(style);else entries[index]=style;
+    paragraphStyleLibrarySchema.parse(entries);
+    for(const layer of paragraphTextLayers(document.children))if(layer.paragraphStyle?.id===style.id){
+      const expected={...style.format,...layer.paragraphStyle.overrides};
+      if(!sameParagraphFormat(paragraphFormat(layer),expected)){
+        if(isLocked(document,layer.id))throw new Error('Unlock text and its parent groups before changing a linked paragraph style.');
+        resolveParagraphBinding(layer,style);reflowText(layer);
+      }
+    }
+    document.paragraphStyles=entries;return;
+  }
+  if(command.type==='paragraphStyle.remove'){
+    if(!document.paragraphStyles?.some(style=>style.id===command.id))throw new Error('Paragraph style not found.');
+    for(const layer of paragraphTextLayers(document.children))if(layer.paragraphStyle?.id===command.id){
+      if(isLocked(document,layer.id))throw new Error('Unlock linked text before removing its paragraph style.');
+      delete layer.paragraphStyle;
+    }
+    document.paragraphStyles=document.paragraphStyles.filter(style=>style.id!==command.id);return;
   }
   if (command.type === "component.replaceAll") {
     const before = new ComponentRegistry(document.components);
@@ -370,6 +404,20 @@ function apply(document: DocumentData, command: EditorCommand): void {
     throw new Error("Unlock this layer and its parent groups first.");
   const siblings = findContainer(document.children, layer.id)!;
   switch (command.type) {
+    case 'text.paragraphStyle': {
+      if(layer.kind!=='text')throw new Error('Paragraph styles require a text layer.');
+      if(command.styleId===null){delete layer.paragraphStyle;return;}
+      const style=document.paragraphStyles?.find(value=>value.id===command.styleId);if(!style)throw new Error('Paragraph style not found.');
+      layer.paragraphStyle={id:style.id,overrides:command.keepOverrides?structuredClone(layer.paragraphStyle?.overrides??{}):{}};
+      resolveParagraphBinding(layer,style);reflowText(layer);return;
+    }
+    case 'text.paragraphOverrides.clear': {
+      if(layer.kind!=='text'||!layer.paragraphStyle)throw new Error('Select text with a linked paragraph style.');
+      const style=document.paragraphStyles?.find(value=>value.id===layer.paragraphStyle!.id);if(!style)throw new Error('Paragraph style not found.');
+      layer.paragraphStyle=structuredClone(layer.paragraphStyle);
+      for(const key of command.keys===undefined?PARAGRAPH_FORMAT_KEYS:paragraphOverrideKeysSchema.parse(command.keys))delete layer.paragraphStyle.overrides[key];
+      resolveParagraphBinding(layer,style);reflowText(layer);return;
+    }
     case "smartObject.filterMask": {
       if (layer.kind !== "smart-object")
         throw new Error("Filter masks require a smart-object instance.");
@@ -527,26 +575,15 @@ function apply(document: DocumentData, command: EditorCommand): void {
       }
       Object.assign(layer, command.patch);
       if (layer.kind === "text") {
-        const bounds = measureTextBounds(
-          layer.text,
-          layer.fontSize,
-          layer.fontFamily,
-          layer.lineHeight,
-          {
-            letterSpacing: layer.letterSpacing,
-            wordSpacing: layer.wordSpacing,
-            fontKerning: layer.fontKerning,
-            direction: layer.direction,
-            fontWeight: layer.fontWeight,
-            fontStyle: layer.fontStyle,
-            wrapWidth: layer.wrapWidth,
-            paragraphSpacing: layer.paragraphSpacing,
-            firstLineIndent: layer.firstLineIndent,
-            paragraphJustify: layer.paragraphJustify,
-          },
-        );
-        layer.width = bounds.width;
-        layer.height = bounds.height;
+        if(layer.paragraphStyle){
+          const style=document.paragraphStyles?.find(value=>value.id===layer.paragraphStyle!.id);if(!style)throw new Error('Paragraph style not found.');
+          const overrides={...layer.paragraphStyle.overrides};
+          for(const key of PARAGRAPH_FORMAT_KEYS)if(key in command.patch){
+            const value=command.patch[key];if(value===undefined)delete overrides[key];else(overrides as Record<string,unknown>)[key]=value;
+          }
+          layer.paragraphStyle={id:style.id,overrides};resolveParagraphBinding(layer,style);
+        }
+        reflowText(layer);
       }
       break;
     case "mask.setFromMatting":
@@ -790,6 +827,10 @@ export function execute(
 
 export function describe(command: EditorCommand): string {
   switch (command.type) {
+    case 'paragraphStyle.set':return 'Edit paragraph style';
+    case 'paragraphStyle.remove':return 'Remove paragraph style';
+    case 'text.paragraphStyle':return command.styleId?'Apply paragraph style':'Detach paragraph style';
+    case 'text.paragraphOverrides.clear':return 'Reset paragraph style overrides';
     case 'alphaChannel.set': return 'Save alpha channel';
     case 'alphaChannel.remove': return 'Remove alpha channel';
     case 'alphaChannel.reorder': return 'Reorder alpha channel';

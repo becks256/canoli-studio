@@ -51,7 +51,7 @@ test('Color Balance and Vibrance render masks, export and project reopening with
   });
   expect(result.balanced[0][0]).toBeGreaterThan(80);expect(result.balanced[1]).toEqual([80,120,150,255]);
   expect(result.vibrant[0][2]-result.vibrant[0][0]).toBeGreaterThan(70);expect(result.vibrant[1]).toEqual([80,120,150,255]);
-  expect(result.undone).toEqual(result.balanced);expect(result.reopened).toEqual(result.vibrant);expect(result.after).toEqual(result.original);expect(result.schema).toBe(39);
+  expect(result.undone).toEqual(result.balanced);expect(result.reopened).toEqual(result.vibrant);expect(result.after).toEqual(result.original);expect(result.schema).toBe(40);
 });
 
 test('Vibrance context action and controls retain independent saturation and one-step undo',async({page})=>{

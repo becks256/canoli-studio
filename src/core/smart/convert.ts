@@ -88,6 +88,7 @@ export function convertLayers(
     height,
   );
   master.id = componentId;
+  if(document.paragraphStyles)master.paragraphStyles=structuredClone(document.paragraphStyles);
   master.children = structuredClone(selected.map(layer=>captureFrequencyRadius(document,layer)));
   const registry = new ComponentRegistry(document.components);
   for (const node of allLayers(master.children)) {

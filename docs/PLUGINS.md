@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Paragraph styles (schema 40)
+
+Existing isolated command code receives ParagraphStyle and Document.paragraphStyles, plus TextLayer style/override methods, under existing document:read/document:write grants. The host revalidates the same commands, locks, source references and revision before one-undo commit. Installation remains inert; no font enumeration/file/network/pixel/provider service or new permission is added. Libraries and links are document-scoped (including independent embedded masters), persisted in schema 40, with unchanged project/workspace/plugin/recipe transport versions. See the [tested guide](SCRIPTING_API.md#linked-paragraph-styles-schema-40).
+
 ## Bilateral denoise value (schema 39)
 
 BilateralDenoiseFilter is available to existing isolated command code with the [scripting defaults, errors and example](SCRIPTING_API.md#bilateral-denoise-schema-39). It is an immutable authored value, applied through SmartObjectLayer/shared commands under existing document:write grants and host revision/asset validation. Installation stays inert and a successful script commits one undo entry. There is no additional pixel/file/network/provider service or permission. Root/embedded records require schema 39; project, workspace and plugin/recipe transport versions are unchanged.

@@ -62,6 +62,7 @@ export function getExportCapabilityReport(
   return describeExport(document,options,smart,smart?planSvgComposition(smart.document):undefined);
 }
 function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSmartPlan,composition?:SvgCompositionPlan):ExportCapabilityReport{
+  const hasParagraphStyleMetadata=!!document.paragraphStyles?.length||!!document.components?.some(definition=>definition.source.kind==='document'&&definition.source.document.paragraphStyles?.length);
   if(composition)document=composition.document;else if(smart)document=smart.document;
   const format = options.format;
   const layers = allLayers(document.children);
@@ -147,6 +148,10 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       break;
 
     case "svg":
+      if(hasParagraphStyleMetadata){
+        warnings.push('SVG preserves resolved text formatting but not linked paragraph-style definitions or local-override relationships. Save a native project to retain style editing.');
+        featuresDegradedOrOmitted.push('Linked paragraph styles and override relationships');
+      }
       if (!document.children.some(svgArtwork)) {
         warnings.push(
           "The document contains no visible vector, raster, text or paint artwork. The resulting SVG will be an empty canvas.",

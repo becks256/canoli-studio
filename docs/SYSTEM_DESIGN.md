@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Paragraph style resolution invariant
+
+A text binding refers to exactly one style in its owning document and stores explicit per-field overrides. Concrete text fields must equal the complete base plus overrides under canonical typography defaults. Only shared commands may change an attached binding, base or override; every affected frame reflows through existing native measurement. Root style edits do not cross into embedded document scopes. Converting/copying artwork preserves or remaps its required definitions; no visual dependency may dangle after persistence or transfer. Detachment/deletion preserves resolved typography. Changed effective followers and binding mutations obey locks, and a rejected operation publishes no partial library/geometry/history. Style metadata requires schema 40 in root/embedded documents. Rendering consumes the validated concrete fields, and SVG reports relationship loss instead of advertising portable linked styles.
+
 ## Bilateral source and finite-support invariant
 
 Bilateral denoise reads only original native neighbors in a finite square aperture. Its spatial sigma is radius/2 and its color sigma is encoded RGB root-mean-square distance. Coverage weights exclude hidden transparent RGB; normalization precedes strength interpolation and final byte rounding. Every output alpha and hidden zero-alpha pixel is copied from the center. No intermediate separable approximation or evolving output is sampled. Per-worker range/spatial caches retain at most 1560608/8712 bytes, independent of original geometry; callers and WASM receive private copies. Three explicit zero settings bypass resampling and SVG rasterization. Enabled native support remains additive across the filter stack. Root and embedded-master records require schema 39; all mutations use existing shared commands/undo/revisions/assets/isolation, with separate REST sessions.

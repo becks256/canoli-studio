@@ -31,6 +31,11 @@ import { selectionSchema } from "../core/drawing";
 export type { SelectionModificationOptions, SelectionModificationControl } from "../core/selection-modification";
 import { EraserStroke, PaintFill } from "./values";
 import { LayerCompCollection } from "./layer-comps";
+import {ParagraphStyle,ParagraphStyleCollection} from './paragraph-styles';
+import {z} from 'zod';
+import {paragraphFormat,type ParagraphFormat} from '../core/paragraph-styles';
+export {ParagraphStyle,ParagraphStyleCollection} from './paragraph-styles';
+export type {ParagraphFormat} from '../core/paragraph-styles';
 import { AlphaChannelCollection } from './alpha-channels';
 import { channelLoadSchema, channelLoadOptionsSchema, type ChannelLoadSettings, type ChannelLoadOptions, type ChannelLoadControl } from '../core/alpha-channels';
 export { AlphaChannel, AlphaChannelCollection } from './alpha-channels';
@@ -441,6 +446,7 @@ export class Document {
   /** @internal */
   _prepareHeal?: (request: HealSpotRequest) => Promise<AdjustmentLayerData>;
   readonly layerComps: LayerCompCollection;
+  readonly paragraphStyles:ParagraphStyleCollection;
   readonly alphaChannels: AlphaChannelCollection;
   /** @internal Hosts rasterize saved coverage without exposing source pixels. */
   _prepareChannelLoad?: (settings:ChannelLoadSettings,control:ChannelLoadControl)=>Promise<SelectionData>;
@@ -456,6 +462,7 @@ export class Document {
       this._assetStore = options.assets;
     }
     this.layerComps = new LayerCompCollection(this);
+    this.paragraphStyles=new ParagraphStyleCollection(this);
     this.alphaChannels = new AlphaChannelCollection(this);
     this.guides = new GuideCollection(this);
     this.layers = new LayerCollection(this);
@@ -2166,6 +2173,20 @@ export class PathCollection implements Iterable<VectorPath> {
 }
 
 export class TextLayer extends Layer {
+  get paragraphFormat():ParagraphFormat{return paragraphFormat(this._read() as TextLayerData);}
+  get paragraphStyle():ParagraphStyle|null{
+    const binding=(this._read() as TextLayerData).paragraphStyle;
+    return binding?this.requireDocument().paragraphStyles.getById(binding.id)??null:null;
+  }
+  set paragraphStyle(style:ParagraphStyle|null){this.applyParagraphStyle(style);}
+  get paragraphOverrides():Partial<ParagraphFormat>{return structuredClone((this._read() as TextLayerData).paragraphStyle?.overrides??{});}
+  applyParagraphStyle(style:ParagraphStyle|null,options:{keepOverrides?:boolean}={}){
+    const document=this.requireDocument();
+    if(style!==null&&(!(style instanceof ParagraphStyle)||style.document!==document))throw new Error('Use a paragraph style attached to this document.');
+    const settings=z.object({keepOverrides:z.boolean().optional()}).strict().parse(options);
+    document._dispatch({type:'text.paragraphStyle',id:this.id,styleId:style?.id??null,...settings});
+  }
+  resetParagraphOverrides(keys?:(keyof ParagraphFormat)[]){this.requireDocument()._dispatch({type:'text.paragraphOverrides.clear',id:this.id,...(keys===undefined?{}:{keys})});}
   constructor(options: TextLayerOptions = {}) {
     const {
       text = "Text",

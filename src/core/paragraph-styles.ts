@@ -1,0 +1,75 @@
+import {z} from 'zod';
+import type {DocumentData,LayerData,TextLayerData} from './model';
+
+/** Geometry/text/width belong to each frame; this format is reusable across frames. */
+export const paragraphFormatSchema=z.object({
+  fontSize:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),
+  fontFamily:z.string().min(1).max(240),color:z.string().min(1).max(240),
+  align:z.enum(['left','center','right']),lineHeight:z.number().finite().min(.5).max(10),
+  letterSpacing:z.number().finite().min(-50).max(500),wordSpacing:z.number().finite().min(-50).max(500),
+  fontKerning:z.enum(['auto','normal','none']),fontWeight:z.string().min(1).max(240),fontStyle:z.enum(['normal','italic']),
+  direction:z.enum(['ltr','rtl']),paragraphJustify:z.enum(['none','inter-word']),
+  paragraphSpacing:z.number().finite().min(0).max(10000),firstLineIndent:z.number().finite().min(-10000).max(10000),
+}).strict();
+export type ParagraphFormat=z.infer<typeof paragraphFormatSchema>;
+export const paragraphFormatPatchSchema=paragraphFormatSchema.partial().strict();
+export const paragraphOverrideKeysSchema=z.array(paragraphFormatSchema.keyof()).max(Object.keys(paragraphFormatSchema.shape).length).refine(keys=>new Set(keys).size===keys.length,'Override keys must be unique.');
+export const PARAGRAPH_FORMAT_KEYS=Object.keys(paragraphFormatSchema.shape) as (keyof ParagraphFormat)[];
+export const DEFAULT_PARAGRAPH_FORMAT:Readonly<ParagraphFormat>=Object.freeze({
+  fontSize:32,fontFamily:'sans-serif',color:'#ffffff',align:'left',lineHeight:1.2,letterSpacing:0,wordSpacing:0,
+  fontKerning:'auto',fontWeight:'normal',fontStyle:'normal',direction:'ltr',paragraphJustify:'none',paragraphSpacing:0,firstLineIndent:0,
+});
+export const paragraphStyleSchema=z.object({id:z.string().min(1).max(240),name:z.string().trim().min(1).max(80),format:paragraphFormatSchema}).strict();
+export const paragraphStyleBindingSchema=z.object({id:z.string().min(1).max(240),overrides:paragraphFormatPatchSchema}).strict();
+export const paragraphStyleLibrarySchema=z.array(paragraphStyleSchema).max(128).superRefine((items,context)=>{
+  const ids=new Set<string>(),names=new Set<string>();
+  for(const item of items){const name=item.name.toLocaleLowerCase('en');if(ids.has(item.id)||names.has(name))context.addIssue({code:'custom',message:'Paragraph styles need unique IDs and names.'});ids.add(item.id);names.add(name);}
+});
+export type ParagraphStyleData=z.infer<typeof paragraphStyleSchema>;
+export type ParagraphStyleBinding=z.infer<typeof paragraphStyleBindingSchema>;
+export function paragraphFormat(layer:TextLayerData):ParagraphFormat {
+  const value={...DEFAULT_PARAGRAPH_FORMAT};
+  for(const key of PARAGRAPH_FORMAT_KEYS)if(layer[key]!==undefined)(value as Record<string,unknown>)[key]=layer[key];
+  return paragraphFormatSchema.parse(value);
+}
+export function sameParagraphFormat(a:ParagraphFormat,b:ParagraphFormat){return PARAGRAPH_FORMAT_KEYS.every(key=>a[key]===b[key]);}
+export function paragraphTextLayers(nodes:readonly LayerData[]):TextLayerData[]{
+  return nodes.flatMap(node=>node.kind==='text'?[node]:node.kind==='group'?paragraphTextLayers(node.children):[]);
+}
+/** Derived concrete fields are retained for existing render/export/font-measurement paths. */
+export function resolveParagraphBinding(layer:TextLayerData,style:ParagraphStyleData){
+  if(!layer.paragraphStyle||layer.paragraphStyle.id!==style.id)throw new Error('Paragraph style binding does not match its definition.');
+  Object.assign(layer,style.format,layer.paragraphStyle.overrides);
+}
+export function validateParagraphStyles(document:DocumentData){
+  const text=paragraphTextLayers(document.children);
+  if(document.paragraphStyles===undefined&&!text.some(layer=>layer.paragraphStyle!=null))return;
+  const styles=paragraphStyleLibrarySchema.parse(document.paragraphStyles??[]),byId=new Map(styles.map(style=>[style.id,style]));
+  if(document.paragraphStyles!==undefined&&Number(document.schemaVersion)<40)throw new Error('Paragraph styles require schema version 40.');
+  for(const layer of text){
+    if(layer.paragraphStyle==null)continue;
+    if(Number(document.schemaVersion)<40)throw new Error('Paragraph styles require schema version 40.');
+    const binding=paragraphStyleBindingSchema.parse(layer.paragraphStyle),style=byId.get(binding.id);
+    if(!style)throw new Error('Text refers to a missing paragraph style in its document.');
+    const expected=paragraphFormatSchema.parse({...style.format,...binding.overrides});
+    if(!sameParagraphFormat(paragraphFormat(layer),expected))throw new Error('Text formatting disagrees with its paragraph style and overrides.');
+  }
+}
+
+/** Copy root text links into another document without overwriting unrelated definitions. */
+export function importParagraphStyles(source:DocumentData,target:DocumentData,layers:LayerData[],newId:()=>string){
+  const used=new Set(paragraphTextLayers(layers).map(layer=>layer.paragraphStyle?.id).filter((id):id is string=>!!id));
+  const definitions:ParagraphStyleData[]=[],mapping=new Map<string,string>();
+  const names=new Set((target.paragraphStyles??[]).map(style=>style.name.trim().toLocaleLowerCase('en')));
+  for(const id of used){
+    const sourceStyle=source.paragraphStyles?.find(style=>style.id===id);if(!sourceStyle)throw new Error('Missing source paragraph style.');
+    const original=paragraphStyleSchema.parse(sourceStyle),targetStyle=target.paragraphStyles?.find(style=>style.id===id);
+    const existing=targetStyle?paragraphStyleSchema.parse(targetStyle):undefined;
+    if(existing&&existing.name===original.name&&sameParagraphFormat(existing.format,original.format)){mapping.set(id,id);continue;}
+    const style=structuredClone(original);if(existing)style.id=newId();
+    const base=style.name;let suffix=2;while(names.has(style.name.toLocaleLowerCase('en')))style.name=base.slice(0,70)+` ${suffix++}`;
+    names.add(style.name.toLocaleLowerCase('en'));mapping.set(id,style.id);definitions.push(style);
+  }
+  for(const layer of paragraphTextLayers(layers))if(layer.paragraphStyle)layer.paragraphStyle={...layer.paragraphStyle,id:mapping.get(layer.paragraphStyle.id)!};
+  return definitions;
+}

@@ -92,6 +92,9 @@ export function resolveSmartDocument(
       ...layer,
       id: scoped ? allocate([...path, layer.id]) : layer.id,
     };
+    // Flattened render/export nodes retain resolved typography, not links into
+    // an embedded document's independent style-library namespace.
+    if(scoped&&layer.kind==='text')delete (properties as import('../model').TextLayerData).paragraphStyle;
     if (layer.kind === 'smart-object' && frequencyRadius !== undefined && layer.smartFilters?.some(filter => filter.kind === 'frequency-band' && filter.sigma !== frequencyRadius)) {
       (properties as typeof layer).smartFilters = layer.smartFilters.map(filter => filter.kind === 'frequency-band' ? {...filter,sigma:frequencyRadius} : filter);
     }

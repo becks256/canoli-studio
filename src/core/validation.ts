@@ -1,4 +1,5 @@
 import { layerCompSchema } from "./layer-comps";
+import {paragraphStyleSchema,paragraphOverrideKeysSchema} from './paragraph-styles';
 import { alphaChannelSchema } from './alpha-channels';
 import { polygonSelectionSchema } from "./lasso";
 import { smartFiltersSchema } from "./smart/filters";
@@ -118,6 +119,10 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
     z
       .object({ type: z.literal("layerComp.set"), comp: layerCompSchema })
       .strict(),
+    z.object({type:z.literal('paragraphStyle.set'),style:paragraphStyleSchema}).strict(),
+    z.object({type:z.literal('paragraphStyle.remove'),id:identifier}).strict(),
+    z.object({type:z.literal('text.paragraphStyle'),id:identifier,styleId:identifier.nullable(),keepOverrides:z.boolean().optional()}).strict(),
+    z.object({type:z.literal('text.paragraphOverrides.clear'),id:identifier,keys:paragraphOverrideKeysSchema.optional()}).strict(),
     z.object({type:z.literal('alphaChannel.set'),channel:alphaChannelSchema}).strict(),
     z.object({type:z.literal('alphaChannel.remove'),id:identifier}).strict(),
     z.object({type:z.literal('alphaChannel.reorder'),id:identifier,direction:z.enum(['up','down'])}).strict(),

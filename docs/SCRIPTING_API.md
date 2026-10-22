@@ -1,5 +1,45 @@
 # Scripting API
 
+## Linked paragraph styles (schema 40)
+
+`new ParagraphStyle(options?: {name?:string; format?:Partial<ParagraphFormat>})` creates a detached reusable style with a generated ID and default name "Paragraph style". Add it with `document.paragraphStyles.add(style)` before applying it. Names are trimmed, nonblank, at most 80 characters and case-insensitively unique in a document; IDs are unique. A library holds at most 128 definitions. Unknown/null/nonfinite/out-of-range values reject. Constructor/update fields with undefined are omitted. Serialized definitions require a complete format; snapshots with missing definitions or inconsistent resolved fields reject.
+
+ParagraphFormat contains fontSize (default 32, >=1), fontFamily ("sans-serif"), color ("#ffffff"), align ("left"), lineHeight (1.2, 0.5–10), letterSpacing/wordSpacing (0, -50–500 px), fontKerning ("auto"), fontWeight ("normal"), fontStyle ("normal"), direction ("ltr"), paragraphJustify ("none"), paragraphSpacing (0, 0–10000 px), and firstLineIndent (0, -10000–10000 px). Existing font/string/enum validation and native shaping limits apply. Text content, authored wrapWidth, position and transforms are not style fields.
+
+The collection exposes length, items, iteration, at(index), getById(id) and add(ParagraphStyle). Style handles expose id, name (read/write), format (detached snapshot), toJSON(), update(formatPatch), captureFrom(TextLayer), remove() and read-only document. Detached style values can be updated before attachment; attached name/update/capture/remove operations use shared commands. captureFrom uses that document's text and retains existing explicit local overrides, including on the source frame. Removing a style detaches every linked root text frame, preserving its current formatting; a removed handle rejects until undo restores its ID.
+
+TextLayer exposes paragraphFormat (canonical detached resolved values), paragraphStyle (ParagraphStyle|null, read/write), paragraphOverrides (detached partial values), applyParagraphStyle(style|null, {keepOverrides?:boolean}?) and resetParagraphOverrides(keys?:ParagraphFormatKey[]). Only a style attached to the same document can be applied. Applying/switching clears overrides by default; keepOverrides preserves them. A normal typography setter on bound text records an override even if it equals the current base. Setting an optional controlled property to undefined removes its override and restores inheritance. Reset all or selected unique/known keys to inherit the current base. Detach with null to keep current formatting while ending the link. Changing ordinary frame width/content does not become a style override.
+
+A base update reflows all affected followers in its document with existing font measurement, and preserves their overrides. Native fonts may reject unsupported settings. Any invalid/stale/locked affected target or layout failure rejects the whole transaction without partial styles/text/history. Name-only changes and unchanged effective followers need no text mutation; removing/detaching/changing bindings still obeys locks. Each attached operation is one undo entry, or part of its enclosing synchronous transaction/successful isolated script. Frame widths and content remain independent. REST uses the same strict commands in a separate headless session, with its existing font-environment limitations.
+
+Style scopes stop at embedded-document boundaries. Conversion copies a library into the new master as an independent scope. Cross-document root copies import needed styles, reuse identical definitions, and remap conflicting IDs/names while preserving overrides; embedded masters retain their own scopes. Project/workspace history preserves these links. SVG preserves resolved text formatting but reports loss of native style/override relationships; save a project for full style editing. Schema 40 admits libraries and bindings; older roots/history migrate without added styles. Existing project 3/workspace 2 and recipe/plugin versions stay unchanged. Mixed character/paragraph runs, based-on hierarchies, font embedding, variable axes and path text remain separate work.
+
+<!-- example: paragraph-styles -->
+```js
+const body = document.paragraphStyles.add(new ParagraphStyle({
+  name: "Body", format: {
+    fontFamily: "sans-serif", fontSize: 24, color: "#315b2a",
+    lineHeight: 1.4, paragraphSpacing: 8
+  }
+}));
+const first = document.layers.add(new TextLayer({
+  name: "Body first", text: "Linked typography wraps naturally across frames.",
+  wrapWidth: 240, x: 24, y: 24
+}));
+const second = document.layers.add(new TextLayer({
+  name: "Body second", text: "Local color stays independent of the shared size.",
+  wrapWidth: 240, x: 300, y: 24
+}));
+first.paragraphStyle = body;
+second.paragraphStyle = body;
+second.color = "#a43e29";
+body.update({ fontSize: 28, paragraphSpacing: 10 });
+document.selectedLayer = first;
+print("Paragraph styles ready");
+```
+
+The successful script commits once. Both frames follow the new base size and gap; the second retains its authored color override. Call second.resetParagraphOverrides(["color"]) to inherit the current base color, or set second.paragraphStyle=null to detach while retaining its current appearance.
+
 ## Bilateral denoise (schema 39)
 
 `new BilateralDenoiseFilter(options?: {radius?:number; colorSigma?:number; amount?:number; enabled?:boolean; id?:string})` creates an immutable smart-filter value. Defaults: integer radius 2 (0–16 native master pixels), colorSigma 25 (finite 0–255 encoded byte levels), amount 0.5 (finite 0–1), enabled true and generated nonblank ID. Null, nonfinite/out-of-range values, fractional radius and unknown fields reject. Serialized data is `{kind:"bilateral-denoise",id,enabled,radius,colorSigma,amount}`; root/embedded-master records require schema 39. Older documents remain readable without added defaults/filters. Project 3/workspace 2 and recipe/plugin transport versions are unchanged.
@@ -250,6 +290,7 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `VectorLayer`                                                | Constructor for a vector layer containing Bézier vector paths.                                                                                               |
 | `VectorPath`                                                 | Constructor for editable vector paths with anchors, control handles, fill, and stroke.                                                                       |
 | `TextLayer`                                                  | Constructor for text layers with font, size, color, alignment, and line height.                                                                              |
+| `ParagraphStyle` | Named reusable typography, linked frames and per-field overrides through Document.paragraphStyles. |
 | `AdjustmentLayer`                                            | Constructor for non-destructive adjustment layers modifying preceding backdrop pixels; see AdjustmentLayer for current families.                                 |
 | `RedEyeAdjustment` | Immutable threshold/strength correction value; isolate pupils with an editable mask. See [Red-eye correction](#redeyeadjustment-schema-35). |
 | `PatchAdjustment`                                            | Immutable corrected-RGB asset descriptor for an alpha-preserving patch adjustment.                                                                           |

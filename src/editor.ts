@@ -72,6 +72,7 @@ import { AdaptiveRenderer } from "./engine/adaptive";
 import { ScriptRunner } from "./scripting/runner";
 import { exportDocument, getExportCapabilityReport } from "./engine/export";
 import {prepareTiffImport} from './engine/tiff-import';
+import {importParagraphStyles} from './core/paragraph-styles';
 import {inspectTiffFile} from './core/interchange/tiff/client';
 import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
 import type {
@@ -873,6 +874,7 @@ export class EditorApplication {
       return copy;
     });
     const registry = new ComponentRegistry(snapshot.components);
+    const paragraphStyles=importParagraphStyles(snapshot,target._read(),copies,id);
     const componentRoots = allLayers(copies).flatMap((node) =>
       node.kind === "smart-object" ? [node.componentId] : [],
     );
@@ -950,6 +952,7 @@ export class EditorApplication {
       } // Master references were already remapped by the registry.
     }
     const commands: import("./core/commands").EditorCommand[] = [
+      ...paragraphStyles.map(style=>({type:'paragraphStyle.set' as const,style})),
       ...(definitions.length
         ? [
             {

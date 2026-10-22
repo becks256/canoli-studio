@@ -15,7 +15,7 @@ length = struct.unpack('<Q', container[8:16])[0]
 manifest_bytes = container[48:48 + length]
 assert hashlib.sha256(manifest_bytes).digest() == container[16:48]
 manifest = json.loads(manifest_bytes)
-assert manifest['document']['schemaVersion'] == 39
+assert manifest['document']['schemaVersion'] == 40
 filter_value = manifest['document']['children'][0]['smartFilters'][0]
 assert filter_value['kind'] == 'bilateral-denoise'
 assert (filter_value['radius'], filter_value['colorSigma'], filter_value['amount']) == (3, 20, .75)
@@ -59,4 +59,4 @@ print(json.dumps({'completePixels': 96 * 64, 'pngsIdentical': True,
                   'sourceSha256': asset['sha256'], 'maximumEquationError': maximum_error,
                   'beforeMse': before_error / (96 * 64 * 3),
                   'afterMse': after_error / (96 * 64 * 3), 'noiseMseRatio': ratio,
-                  'alphaExact': True, 'documentSchema': 39}))
+                  'alphaExact': True, 'documentSchema': 40}))

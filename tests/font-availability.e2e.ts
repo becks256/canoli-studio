@@ -246,16 +246,16 @@ test("unsupported font enumeration retains manual family entry", async ({ page }
 
 
 test("real installed fonts populate the picker and change rendered text", async ({ page, context }) => {
+  await page.goto("/");
   const cdp = await context.newCDPSession(page);
   const {targetInfo}=await cdp.send('Target.getTargetInfo');
   expect(targetInfo.browserContextId).toBeTruthy();
   await cdp.send("Browser.setPermission", {
     permission: { name: "local-fonts" },
     setting: "granted",
-    origin: "http://127.0.0.1:5173",
+    origin: new URL(page.url()).origin,
     browserContextId: targetInfo.browserContextId,
   });
-  await page.goto("/");
   expect(await page.evaluate(async()=>(await navigator.permissions.query({name:'local-fonts' as PermissionName})).state)).toBe('granted');
   await page.evaluate(() => {
     const { editor, TextLayer } = window.luma;

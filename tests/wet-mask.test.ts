@@ -38,7 +38,7 @@ it('routes mask assignment through one undo and retains native output, coverage 
 });
 
 it('enforces schema 34 for wet ordinary and filter masks outside immutable validation proofs',()=>{
- expect(SCHEMA_VERSION).toBe(39);const doc=new Document({width:16,height:16}),layer=doc.layers.add(new PaintLayer());layer.mask=mask().applyWetPaint(wet());
+ expect(SCHEMA_VERSION).toBe(40);const doc=new Document({width:16,height:16}),layer=doc.layers.add(new PaintLayer());layer.mask=mask().applyWetPaint(wet());
  const current=freeze(doc.toJSON());validateDocument(current);expect(()=>validateDocument({...current,schemaVersion:33})).toThrow(/schema version 34/);
  const master=new Document({width:16,height:16});master.layers.add(new PaintLayer());const owner=new Document({width:16,height:16}),instance=owner.placeSmartObject(owner.defineComponent(master));instance.filterMask=mask().applyWetPaint(wet());
  const prepared=freeze(owner.toJSON());validateDocument(prepared);expect(()=>validateDocument({...prepared,schemaVersion:33})).toThrow(/schema version 34/);

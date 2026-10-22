@@ -495,7 +495,7 @@ test("Adjustment layer project serialization and load round-trip", async ({
     };
   });
 
-  expect(result.schemaVersion).toBe(39);
+  expect(result.schemaVersion).toBe(40);
   expect(result.layerCount).toBe(2);
   expect(result.kind).toBe("adjustment");
   expect(result.opacity).toBe(0.85);

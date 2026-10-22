@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Paragraph style controls
+
+For selected text, add a Paragraph styles Inspector section using existing Select/TextInput/Button/InspectorSection controls. The style selector chooses a library entry without editing; Apply paragraph style performs the edit. Show the current linked name and an explicit local-override count/key list. Provide Reset style overrides and Detach paragraph style for linked text. A chosen library entry can be renamed, deleted or updated from the current text without requiring temporary application. New paragraph style name plus Create style from text captures and links in one transaction. Keep text content/frame width independent and explain that base edits affect linked text while local formatting remains an override. Reuse existing busy/lock/error handling; add no global shortcut or component library.
+
 ## Bilateral denoise controls
 
 Add Bilateral denoise to Smart filters. Reuse stack cards, enable/order/remove actions and existing paired controls: Denoise radius (integer 0–16 px), Color tolerance (0–255) and Denoise strength (0–1). Number fields allow fractional tolerance/strength and reject fractional radius. Preserve transient pointer/key previews, Escape cancellation, single committed undo and existing disabled/stale-target rules. Explain that smoothing retains strong color edges while larger settings can soften detail and transparency stays intact. No new shortcut/dialog/component library is introduced.

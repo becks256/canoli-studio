@@ -3,6 +3,7 @@ import { RedEyeControls } from "./RedEyeControls";
 import { WhiteBalanceControls } from "./WhiteBalanceControls";
 import { GradientMapControls } from "./GradientMapControls";
 import { LayerCompsPanel } from "./LayerCompsPanel";
+import {ParagraphStylesPanel} from './ParagraphStylesPanel';
 import { AlphaChannelsPanel } from './AlphaChannelsPanel';
 import { ChromaticAdjustmentControls } from "./ChromaticAdjustmentControls";
 import { SmartFilterMaskPanel } from "./SmartFilterMaskPanel";
@@ -472,6 +473,8 @@ export function InspectorPanel({
             />
           )}
           {selectedObject instanceof TextLayer && (
+            <>
+            <ParagraphStylesPanel layer={selectedObject} disabled={locked||busy} onAction={action=>onAttempt(()=>{onPreview(null);action();})}/>
             <TextProperties
               layer={selectedObject}
               disabled={locked || busy}
@@ -483,6 +486,7 @@ export function InspectorPanel({
               }
               onPreview={onPreview}
             />
+            </>
           )}
           {selected.kind === "paint" && (
             <InspectorSection title="Paint operations">
