@@ -6289,3 +6289,18 @@ input[type="color"] {
 
 .workspace-layout-dialog input[type="checkbox"] {accent-color:var(--color-accent);}
 .workspace-layout-dialog .dialog-actions {display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+
+.recent-files-control {position:relative;display:inline-flex;flex-shrink:0;}
+.recent-file-indicator {position:absolute;right:3px;top:3px;width:6px;height:6px;border-radius:50%;pointer-events:none;}
+.recent-file-indicator.pending {background:var(--color-accent);}
+.recent-file-indicator.error {background:var(--color-danger,#b5443a);}
+.recent-files-description {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+.recent-files-dialog {width:min(720px,calc(100vw - 32px));}
+.recent-files-list {list-style:none;padding:0;margin:18px 0;}
+.recent-files-list li {display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0;border-bottom:1px solid var(--color-border);}
+.recent-files-list li > div:first-child {min-width:0;}
+.recent-files-list strong,.recent-files-list small {display:block;overflow-wrap:anywhere;}
+.recent-files-list small {margin-top:5px;color:var(--color-text-muted);font-size:var(--text-xs);}
+.recent-files-actions {display:flex;gap:8px;flex-shrink:0;}
+.recent-files-dialog .dialog-actions {display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.command-result-description {display:block;color:var(--color-text-muted);font-size:var(--text-xs);font-weight:400;margin-top:4px;}

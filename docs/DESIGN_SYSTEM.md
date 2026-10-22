@@ -1,5 +1,11 @@
 # Canoli Studio design system
 
+## Recent files and resource search
+
+Add a compact Recent files control beside Open, with a local-copy status indicator and descriptive tooltip. The control owns its subscription so background copy status does not rerender the editor. Use the custom Recent files modal with clearly labeled original filename, kind, bytes and saved time; Open local copy, Remove, Reload and Clear local copies are explicit actions. Explain local copies, retention, disk-change behavior and backups in ordinary language. Show actual loading/checking/updating/saving state; cancellation closes safely, errors retain the dialog, and unreadable entries stay visible with opening disabled. Removing copies does not close documents or affect original files.
+
+Command search groups actual open sessions and recent copies under Open documents and Recent files, with useful details. Keep selection by stable resource ID when async results change. If the chosen item disappears, show that fact and require deliberate navigation before Enter; do not silently choose another file. Existing focus restoration, native modal controls, typing suppression and shortcut capture apply. The new static Recent files action has no default chord.
+
 ## Workspace layout interaction
 
 Use the custom Workspace layout modal from the rail and command search. Draft changes apply only through Apply layout or save/update. Give Layers/history and Properties independent Show, left/right dock and precise width controls; support responsive defaults and explicit same-side ordering. Saved layouts have a named selector plus save-as-new, update, rename and delete actions. Explain that save/update also applies and deletion leaves the current arrangement intact. Restore default arrangement selects a draft until Apply; command search also offers direct recovery. The rail remains visible when both docks are hidden. Keep errors within the modal, preserve the draft on rejected writes, and provide explicit Reload saved layouts for detected external changes. Restore focus on dismissal and use actual DOM order matching visual order. Retain native splitter pointer/Escape/keyboard behavior with direction appropriate to each dock side.

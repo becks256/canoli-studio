@@ -1,6 +1,8 @@
 export interface ShortcutAction {
   id: string;
   label: string;
+  category?:string;
+  description?:string;
   keys: string[];
   run(): void;
   enabled?(): boolean;
@@ -91,6 +93,7 @@ export function formatShortcut(shortcut: string): string {
 
 // Binding definitions are shared by action registration and keyboard help.
 export const SHORTCUT_BINDINGS: Record<string, string[]> = {
+  "recent-files": [],
   "workspace-layout": [],
   "workspace-reset": [],
   "command-palette": ["Mod+k"],

@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Recent-file privileges
+
+Recent files and open-document command-search entries are trusted browser UI resources. Packages gain no file bytes, browser history, recent-store/IndexedDB access, cross-tab channel, file opener or OS path privilege. Installation remains inert and execution stays within the existing isolated scripting boundary and document grants. The new trusted host recent service and raster-file opener are not globals in plugin/Script workers; REST sessions remain separate.
+
 ## Workspace layout boundary
 
 Docked/named workspace layouts are local browser preferences managed by the user through the rail or command search. Packages gain no preference, UI-docking, storage or file privilege. Existing document grants, inert installation, isolated execution and shared command/history validation are unchanged. Layouts are not stored in plugin packages or native document snapshots.

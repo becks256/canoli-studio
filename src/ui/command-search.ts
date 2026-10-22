@@ -1,6 +1,7 @@
 import type { ShortcutAction } from "./shortcuts";
 
 export function commandCategory(action: ShortcutAction): string {
+  if(action.category)return action.category;
   if (
     [
       "move",
@@ -35,7 +36,7 @@ export function searchCommands(
   return actions
     .map((action, order) => {
       const label = action.label.toLocaleLowerCase();
-      const haystack = `${label} ${commandCategory(action).toLocaleLowerCase()}`;
+      const haystack = `${label} ${commandCategory(action).toLocaleLowerCase()} ${(action.description??'').toLocaleLowerCase()}`;
       let score = 0;
       for (const word of words) {
         const direct = haystack.indexOf(word);

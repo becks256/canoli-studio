@@ -33,7 +33,9 @@ import { AffineTransform } from "../core/affine";
 import { useDocumentViewport } from "./hooks/useDocumentViewport";
 import { DocumentTabBar } from "./DocumentTabBar";
 import { flushSync } from "react-dom";
-import { CommandPalette } from "./CommandPalette";
+import { WorkspaceCommandPalette } from "./WorkspaceCommandPalette";
+import {RecentFilesDialog,RecentFilesButton} from "./RecentFilesDialog";
+import type {RecentKind} from "../workspace/recent-files";
 import {
   useEffect,
   useMemo,
@@ -228,6 +230,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [error, setError] = useState<string | null>(null);
   const panelLayout = usePanelLayout(setError);
   const [showPalette, setShowPalette] = useState(false);
+  const [recentRequest,setRecentRequest]=useState<{id?:string}|null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showWorkspaceLayout,setShowWorkspaceLayout]=useState(false);
   const [showPressureCurve,setShowPressureCurve]=useState(false);
@@ -524,7 +527,9 @@ export function App({ editor }: { editor: EditorApplication }) {
   function save() {
     const name = dom.name;
     void task(async () => {
-      download(await editor.saveProject(), `${fileName(name)}.luma`);
+      const blob=await editor.saveProject(),filename=`${fileName(name)}.luma`;
+      download(blob,filename);
+      editor.recentFiles.remember(new File([blob],filename,{type:blob.type}),'project');
       notify("Project downloaded. Keep this file to reopen your edits.");
     });
   }
@@ -684,6 +689,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
 
   const defaultShortcuts = new ShortcutRegistry([
+    {id:"recent-files",label:"Recent files",keys:SHORTCUT_BINDINGS["recent-files"],run:()=>{cancelWorkspaceGesture();setRecentRequest({});}},
     {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
     {id:"workspace-reset",label:"Restore default workspace arrangement",keys:SHORTCUT_BINDINGS["workspace-reset"],run:()=>attempt(()=>{panelLayout.restore();cancelWorkspaceGesture();})},
     {
@@ -1123,6 +1129,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       showPreflight ||
       showRecovery ||
       showPalette ||
+      !!recentRequest ||
       showHelp ||
       showWorkspaceLayout ||
       showPressureCurve ||
@@ -1157,6 +1164,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       mattingAbort.current?.abort();
       setShowRecovery(false);
       setShowPalette(false);
+      setRecentRequest(null);
       setShowHelp(false);
       setShowWorkspaceLayout(false);
       setShowScripts(false);
@@ -1731,6 +1739,13 @@ export function App({ editor }: { editor: EditorApplication }) {
   };
 
   const handlePsdFile=(file:File)=>setPhotoshopFile({file,id:++photoshopRequest.current});
+  const openRecentFile=(file:File,kind:RecentKind)=>{
+    if(kind==='svg'){setSvgFile(file);return;}
+    if(kind==='tiff'){setTiffFile(file);return;}
+    if(kind==='photoshop'){handlePsdFile(file);return;}
+    void task(async()=>{if(kind==='project')await editor.openProject(file);else await editor.openImage(file);notify('Local recent-file copy opened');});
+  };
+
 
   const handleSelectSubject = async () => {
     await task(async () => {
@@ -1804,6 +1819,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             if (file) handlePsdFile(file);
           }}
         />
+        {recentRequest&&<RecentFilesDialog library={editor.recentFiles} initialId={recentRequest.id} onClose={()=>setRecentRequest(null)} onOpen={openRecentFile}/>}
         {showRecovery && (
           <RecoveryPanel
             editor={editor}
@@ -1831,6 +1847,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             dom.redo();
           }}
           onOpen={() => openInput.current?.click()}
+          recentFilesControl={<RecentFilesButton library={editor.recentFiles} disabled={busy} onOpen={()=>{cancelWorkspaceGesture();setRecentRequest({});}}/>}
           onSave={save}
           onExport={exportPng}
           onExportDialog={() => setShowExportDialog(true)}
@@ -2536,7 +2553,9 @@ export function App({ editor }: { editor: EditorApplication }) {
           />
         )}
         {showPalette && (
-          <CommandPalette
+          <WorkspaceCommandPalette
+            editor={editor}
+            onRecent={entry=>{cancelWorkspaceGesture();setRecentRequest({id:entry.id!});}}
             actions={shortcuts.actions}
             busy={busy}
             onClose={() => setShowPalette(false)}

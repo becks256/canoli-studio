@@ -1,3 +1,4 @@
+import {RecentFilesService} from './workspace/recent-service';
 import { separateFrequencies,prepareFrequencySeparation } from "./engine/frequency-separation";
 import type { FrequencySeparationOptions } from "./core/frequency-separation";
 import {captureFrequencyRadius} from './core/frequency-separation';
@@ -167,6 +168,7 @@ export class EditorApplication {
   readonly renderer = new AdaptiveRenderer();
   readonly scripts = new ScriptRunner();
   readonly tools = new ToolController(this);
+  readonly recentFiles = new RecentFilesService();
   readonly brushPresets = new BrushPresetLibrary();
   readonly brushTextureSource = new BrushTextureSourceOwner();
   private presetApplyAbort:AbortController|null=null;
@@ -1306,7 +1308,7 @@ export class EditorApplication {
   async openTiff(file:File,options:TiffDecodeOptions={},control:TiffImportControl={}):Promise<TiffImportReport>{
     const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
     const check=()=>{control.signal?.throwIfAborted();alive();if(generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during TIFF import. Try again.');};
-    const prepared=await prepareTiffImport(file,options,control,check);try{check();this.replace(prepared.document,prepared.assets);return prepared.report;}catch(error){prepared.assets.dispose();throw error;}
+    const prepared=await prepareTiffImport(file,options,control,check);try{check();this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'tiff');return prepared.report;}catch(error){prepared.assets.dispose();throw error;}
   }
 
   /** Open a complete imported document; preserve existing edited tabs. */
@@ -1314,7 +1316,7 @@ export class EditorApplication {
     const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
     const check=()=>{control.signal?.throwIfAborted();alive();if(generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during SVG import. Try again.');};
     const prepared=await prepareSvgImport(file,options,control,check);
-    try{check();this.replace(prepared.document,prepared.assets);return prepared.report;}
+    try{check();this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'svg');return prepared.report;}
     catch(error){prepared.assets.dispose();throw error;}
   }
 
@@ -1348,6 +1350,7 @@ export class EditorApplication {
       }
       current();control.onProgress?.({phase:'installing',fraction:1});current();
       const document=Document.fromJSON(decoded.document);this.photoshopCommits.delete(abort);this.replace(document,newAssets);
+      if(typeof File!=='undefined'&&buffer instanceof File)this.recentFiles?.remember(buffer,'photoshop');
       return{document:decoded.document,report:decoded.report,assets:images};
     }catch(error){newAssets?.dispose();throw error;}
     finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);this.photoshopJobs.delete(abort);this.photoshopCommits.delete(abort);}
@@ -1365,6 +1368,17 @@ export class EditorApplication {
     const document = Document.fromJSON(sample.document);
     document.selectedLayer = document.getLayer(sample.selectedId);
     this.replace(document, sample.assets);
+  }
+
+  /** Open an image independently; keep existing edited tabs and original pixels. */
+  async openImage(file:File,control:{signal?:AbortSignal}={}):Promise<RasterLayer>{
+    const generation=++this.ioGeneration,owner=this.document,assets=this.assets,revision=owner.getSnapshot().revision,alive=assets.captureLifetime(),staged=new AssetStore();
+    const check=()=>{control.signal?.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==owner||this.assets!==assets||owner.getSnapshot().revision!==revision||!this.sessions.some(session=>session.document===owner))throw new Error('Document session changed during image opening. Try again.');};
+    try{
+      check();const asset=await staged.add(file,file.name,undefined,false,{signal:control.signal});check();
+      const name=file.name.replace(/\.[^.]+$/,'').slice(0,240)||'Untitled',root=new Document({name,width:asset.width,height:asset.height}),raster=new RasterLayer({name:file.name.slice(0,240),assetId:asset.id,width:asset.width,height:asset.height});
+      const document=Document.fromJSON({...root.toJSON(),children:[raster.toJSON()]});document.selectedLayer=document.getLayer(raster.id);check();this.replace(document,staged);this.recentFiles?.remember(file,'image');return document.getLayer(raster.id) as RasterLayer;
+    }catch(error){staged.dispose();throw error;}
   }
 
   async importImage(file: File): Promise<RasterLayer> {
@@ -1406,6 +1420,7 @@ export class EditorApplication {
     }
 
     this.document.selectedLayer = layer;
+    this.recentFiles?.remember(file,'image');
     return layer;
   }
 
@@ -1463,6 +1478,7 @@ export class EditorApplication {
       );
     }
     this.replace(Document.fromJSON(loaded.document), loaded.assets);
+    this.recentFiles?.remember(file,'project');
   }
 
   async exportPng(control?: ExportControl): Promise<Blob> {
@@ -1761,6 +1777,7 @@ export class EditorApplication {
   }
 
   dispose() {
+    this.ioGeneration++;
     this.retouchDisposed = true;
     for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
     for(const controller of this.booleanControllers)controller.abort(new Error('Editor disposed during the Boolean operation.'));
@@ -1774,6 +1791,7 @@ export class EditorApplication {
     this.projectEncoder.dispose();
     this.tools.cancel();
     this.presetApplyAbort?.abort(new DOMException('Editor disposed during preset preparation.','AbortError'));this.presetApplyAbort=null;
+    this.recentFiles.dispose();
     this.brushPresets.dispose();
     this.brushTextureSource.dispose();
     this.scripts.cancel();

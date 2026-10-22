@@ -12,6 +12,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { Button, IconButton } from "./controls";
+import type {ReactNode} from 'react';
 
 export interface TopBarProps {
   documentId: string;
@@ -24,6 +25,7 @@ export interface TopBarProps {
   onUndo(): void;
   onRedo(): void;
   onOpen(): void;
+  recentFilesControl?:ReactNode;
   onSave(): void;
   onExport(): void;
   onExportDialog?(): void;
@@ -47,6 +49,7 @@ export function TopBar({
   onUndo,
   onRedo,
   onOpen,
+  recentFilesControl,
   onSave,
   onExport,
   onExportDialog,
@@ -116,6 +119,7 @@ export function TopBar({
           <FolderOpen size={15} />
           <span>Open</span>
         </Button>
+        {recentFilesControl}
         <Button variant="subtle" aria-label="Save project" title="Save project" onClick={onSave} disabled={busy}>
           <Save size={15} />
           <span>Save project</span>

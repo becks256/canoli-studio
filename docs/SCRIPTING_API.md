@@ -1410,6 +1410,39 @@ The **Workspace layout** rail action and command search configure Layers/history
 
 These are browser UI preferences, not document edits or a new DOM constructor/member. They add no isolated Scripts/plugin API, REST route or native project/workspace schema. Original assets, layer selection, history and scene pixels remain under the existing contracts. The strict local envelope uses `luma.workspace-layout.v1`; missing envelopes import existing `luma.panel-widths.v1` values without modifying the old key. Explicit new responsive defaults override legacy widths. Invalid storage, failed writes and detected newer-tab changes are disclosed; reload/recovery is explicit. Layouts are local to this browser, are not embedded in downloaded projects, and are not atomic cross-tab synchronization or floating/tabbed docks.
 
+## Recent files (trusted browser host)
+
+The top-bar **Recent files** control and command search open saved local copies of successfully opened/imported files and explicit project-download requests. These are exact original bytes stored on this browser, not live links to disk. Open the original again for external disk changes. The list retains twenty saved entries and the newest twenty pending preparations; identical bytes share storage. Equal names with different bytes remain separate copies. Removing/clearing the list leaves open documents and original disk files alone. Browser storage can be unavailable/full/cleared, so retain downloaded projects as backups; this does not replace recovery or named workspace content versions.
+
+`await editor.openImage(file: File, control?: {signal?: AbortSignal}): Promise<RasterLayer>` is trusted host code only. It opens one original-resolution raster as a new constructor-validated document, with selected raster, empty undo history and revision zero. Existing edited documents remain open. The filename without its extension supplies the document name (up to the existing 240-character model limit); raw file metadata and original bytes stay with the asset. `control` defaults to absent; cancellation, unsupported/invalid input, native decode/allocation failure or a changed/disposed target rejects without publishing private pixels. A native image decode already executing remains cooperative; its result is released if stale. No arbitrary megapixel/file-size import cap or source downsampling is introduced. `importImage(file)` retains its existing placement-in-current-composition behavior.
+
+Trusted `editor.recentFiles` is a browser service, unavailable to isolated Scripts/plugins and headless REST:
+
+| Method/member | Behavior |
+| --- | --- |
+| `getSnapshot()` / `subscribe(listener)` | Observable `{entries,pending,loading,error,available}`. Entries include opaque ID, name, kind, byte size, saved time and original lastModified; invalid entries are disclosed with an error and cannot open. |
+| `remember(file, kind): void` | Queue an optional exact local copy. Kind is `project`, `image`, `svg`, `tiff` or `photoshop`. Invalid/copy/storage failure appears in status; it does not throw from already accepted document I/O. Pending older preparations may be superseded by the twenty-entry retention policy. |
+| `flush(): Promise<void>` | Wait for currently queued background work. Inspect snapshot.error and the entries to confirm durability; resolution alone does not certify a successful optional copy. |
+| `refresh(): Promise<void>` | Reload saved summaries; storage failure rejects and retains the previous displayed list with an error. |
+| `read(id, signal?): Promise<{file:File,kind}>` | Validate entry/extent and independently rehash stored bytes in a private worker. Reject missing/corrupt/stale data, cancellation or closure before returning an independent immutable File. Preserve name, MIME and lastModified. |
+| `remove(id)` / `clear()` | Atomically remove local recent data and unreferenced payloads; cancel owned reads/preparations and advance a durable generation, invalidating older cross-tab preparations before commit. Already delivered files remain valid. Storage failure rejects without a partial delete. |
+
+Successful File-backed openProject/openImage/importImage/openSvg/openTiff/openPsd calls notify the service after commit. Byte-array/unnamed Photoshop inputs do not manufacture a filename. saveProject() itself returns a Blob and does not claim a completed OS write or choose a filename; the normal download UI records the exact named Blob it requested. A host with its own save UI can explicitly remember its named output:
+
+```ts
+const blob = await editor.saveProject();
+editor.recentFiles.remember(new File([blob], "Artwork.luma", {
+  type: blob.type,
+}), "project");
+await editor.recentFiles.flush();
+const status = editor.recentFiles.getSnapshot();
+// status.error and status.entries report whether the optional copy was saved.
+```
+
+Capture and verification clone only an immutable Blob handle into a private worker, then read slices of at most 1 MiB. They do not allocate a source-sized host ArrayBuffer or transfer original data buffers. Source decoding, Blob/IndexedDB/native storage and actual process memory retain browser/device limits. There is no authenticity/signature or operating-system file-location claim. A separate version-2 `luma-recent-files` IndexedDB database stores schema-1 entries, shared payloads and a durable removal generation; upgrading an initial version-1 store adds the generation store without rewriting entries. Invalid metadata remains visible beside healthy files and blocks new capture until removed/recovered; unknown references are preserved conservatively. Remove/clear use one transaction for metadata, payload references and generation. Cross-tab messages contain only change notifications; the generation check remains authoritative without them.
+
+Recent-file opening in the UI reuses existing project/format validation and conversion preflight. Raster copies use openImage; SVG/TIFF/Photoshop show their current conversion choices and consent again. File checking can be cancelled before handoff; once handed to an opener its normal lifecycle applies. The palette also lists current open document sessions, using session identities so equal document names/IDs do not collide. Async updates preserve selected result identity; a removed selection requires explicit navigation before Enter. The static Recent files action is unassigned by default and rebindable. No new document/project/workspace schema, editable-field interception or isolated file/storage/network permission is introduced.
+
 ## Application integration
 
 This section is for trusted application code and development-console inspection, not code pasted into Scripts. The constructors are exported from [src/dom/index.ts](../src/dom/index.ts). During development only, `window.luma` exposes those constructors plus the application instance as `window.luma.editor`. No global `luma` API is exposed in production.
