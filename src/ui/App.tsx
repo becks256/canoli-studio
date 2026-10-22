@@ -8,6 +8,7 @@ import {BrushPresetsDialog} from './BrushPresetsDialog';
 import {PressureCurveDialog} from './PressureCurveDialog';
 import {SvgImportDialog} from './SvgImportDialog';
 import {TiffImportDialog} from './TiffImportDialog';
+import {AvifImportDialog} from './AvifImportDialog';
 import type {RefineEdgeProgress} from '../core/matting';
 import {PreflightDialog} from './PreflightDialog';
 import { CanvasCursor } from "./CanvasCursor";
@@ -273,6 +274,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showRefineEdgeDialog, setShowRefineEdgeDialog] = useState(false);
   const [svgFile,setSvgFile]=useState<File|null>(null);
   const [tiffFile,setTiffFile]=useState<File|null>(null);
+  const [avifFile,setAvifFile]=useState<File|null>(null);
   const [photoshopFile,setPhotoshopFile]=useState<{file:File;id:number}|null>(null);
   const photoshopRequest=useRef(0);
   const [generateDialogModality, setGenerateDialogModality] = useState<
@@ -1735,6 +1737,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const handleImportFile=(file:File)=>{
     if(file.type==='image/svg+xml'||/\.svg$/i.test(file.name)){setSvgFile(file);return;}
     if(['image/tiff','image/x-tiff'].includes(file.type)||/\.tiff?$/i.test(file.name)){setTiffFile(file);return;}
+    if(file.type==='image/avif'||/\.avif$/i.test(file.name)){setAvifFile(file);return;}
     void task(async()=>{await editor.importImage(file);notify('Image added');});
   };
 
@@ -1742,6 +1745,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const openRecentFile=(file:File,kind:RecentKind)=>{
     if(kind==='svg'){setSvgFile(file);return;}
     if(kind==='tiff'){setTiffFile(file);return;}
+    if(kind==='avif'){setAvifFile(file);return;}
     if(kind==='photoshop'){handlePsdFile(file);return;}
     void task(async()=>{if(kind==='project')await editor.openProject(file);else await editor.openImage(file);notify('Local recent-file copy opened');});
   };
@@ -1784,7 +1788,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           ref={importInput}
           data-testid="import-input"
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg,image/tiff,.tif,.tiff"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg,image/tiff,.tif,.tiff,image/avif,.avif"
           hidden
           onChange={(event) => {
             const file = event.target.files?.[0];
@@ -2653,6 +2657,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         )}
         {svgFile&&<SvgImportDialog file={svgFile} editor={editor} onClose={()=>setSvgFile(null)} onBusyChange={setBusy} onImported={()=>notify("SVG imported")}/>}
         {tiffFile&&<TiffImportDialog file={tiffFile} editor={editor} onClose={()=>setTiffFile(null)} onBusyChange={setBusy} onImported={()=>notify("TIFF page imported")}/>}
+        {avifFile&&<AvifImportDialog file={avifFile} editor={editor} onClose={()=>setAvifFile(null)} onBusyChange={setBusy} onImported={()=>notify("AVIF image imported")}/>}
         {photoshopFile&&<PhotoshopImportDialog key={photoshopFile.id} file={photoshopFile.file} editor={editor} onClose={()=>setPhotoshopFile(null)} onBusyChange={setBusy} onImported={()=>notify("Photoshop file imported")}/>}
         {showPreflight&&<PreflightDialog editor={editor} onClose={()=>setShowPreflight(false)}/>}
         {showRefineEdgeDialog && (

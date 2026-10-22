@@ -2,6 +2,8 @@ import { MetadataService } from "../intelligence/metadata/service";
 import { AnalysisService } from "../intelligence/candidates/service";
 import { id } from "./model";
 import {decodeTiffFile} from './interchange/tiff/client';
+import {decodeAvifFile} from './interchange/avif/client';
+import {avifDecodeOptionsSchema,type AvifDecodeOptions,type AvifDecodeSettings,type AvifImportReport} from './interchange/avif/types';
 import {tiffDecodeOptionsSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl} from './interchange/tiff/types';
 
 export interface SerializedAsset {
@@ -16,8 +18,11 @@ export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
   bitmap: ImageBitmap;
   thumbnail: string;
   readonly tiff?: Readonly<TiffDecodeSettings>;
+  readonly avif?: Readonly<AvifDecodeSettings>;
+  /** Derived from original bytes on decode; not a second persisted source of truth. */
+  readonly avifReport?: Readonly<AvifImportReport>;
 }
-export interface AssetImportOptions extends TiffImportControl {tiff?:TiffDecodeOptions}
+export interface AssetImportOptions extends TiffImportControl {tiff?:TiffDecodeOptions;avif?:AvifDecodeOptions}
 
 interface SharedBitmap {
   readonly bitmap: ImageBitmap;
@@ -94,6 +99,7 @@ export class AssetStore {
       id: sharedId, name: source.name, width: source.width, height: source.height,
       blob: source.blob, bitmap, thumbnail: source.thumbnail,
       ...(source.tiff ? {tiff: Object.freeze(tiffDecodeOptionsSchema.parse(source.tiff))} : {}),
+      ...(source.avif ? {avif: Object.freeze(avifDecodeOptionsSchema.parse(source.avif)),avifReport:source.avifReport} : {}),
     });
     lease ??= {bitmap, owners: 1};
     this.shared.set(assetId, lease);
@@ -114,21 +120,30 @@ export class AssetStore {
   ): Promise<ImageAsset> {
     this.assertOpen();
     options.signal?.throwIfAborted();
-    if (!["image/png", "image/jpeg", "image/webp", "image/tiff"].includes(blob.type))
-      throw new Error("Use a PNG, JPEG, WebP or supported TIFF image.");
+    if (!["image/png", "image/jpeg", "image/webp", "image/tiff", "image/avif"].includes(blob.type))
+      throw new Error("Use a PNG, JPEG, WebP, supported TIFF or AVIF image.");
     if(options.tiff!==undefined&&blob.type!=='image/tiff')throw new Error('TIFF decoding settings require a TIFF source.');
+    if(options.avif!==undefined&&blob.type!=='image/avif')throw new Error('AVIF decoding settings require an AVIF source.');
     const tiff=blob.type==='image/tiff'?Object.freeze(tiffDecodeOptionsSchema.parse(options.tiff??{})):undefined;
+    const avif=blob.type==='image/avif'?Object.freeze(avifDecodeOptionsSchema.parse(options.avif??{})):undefined;
     if (this.assets.has(assetId) || this.pending.has(assetId))
       throw new Error("Duplicate asset ID.");
     const generation = this.generation;
     this.pending.add(assetId);
     let bitmap: ImageBitmap;
+    let avifReport:Readonly<AvifImportReport>|undefined;
     try {
       let decoded=blob;
       if(tiff){if(typeof createImageBitmap==='undefined')throw new Error('TIFF source pixels require the browser image host.');decoded=(await decodeTiffFile(blob,tiff,{signal:options.signal,onProgress:p=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}})).png;}
+      if(avif){
+        if(typeof createImageBitmap==='undefined')throw new Error('AVIF source pixels require the browser image host.');
+        const result=await decodeAvifFile(blob,avif,{signal:options.signal,onProgress:p=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}});
+        decoded=result.png;Object.freeze(result.report.crop);Object.freeze(result.report.color);Object.freeze(result.report.warnings);Object.freeze(result.report.unsupported);avifReport=Object.freeze(result.report);
+      }
       options.signal?.throwIfAborted();
       if (typeof createImageBitmap !== "undefined") {
         bitmap = await createImageBitmap(decoded);
+        if(avifReport&&(bitmap.width!==avifReport.displayWidth||bitmap.height!==avifReport.displayHeight)){bitmap.close();throw new Error('Decoded AVIF bitmap dimensions differ from the inspected presentation.');}
       } else {
         bitmap = {
           width: 512,
@@ -138,7 +153,7 @@ export class AssetStore {
       }
     } catch (error) {
       this.pending.delete(assetId);
-      if(tiff||options.signal?.aborted)throw error;
+      if(tiff||avif||options.signal?.aborted)throw error;
       throw new Error(
         "The browser could not decode this image. Check the file format and available device memory.",
       );
@@ -172,6 +187,7 @@ export class AssetStore {
         bitmap,
         thumbnail: thumbnailDataUrl,
         ...(tiff?{tiff}:{}),
+        ...(avif?{avif,avifReport}:{}),
       };
       this.assets.set(assetId, asset);
       published = asset;

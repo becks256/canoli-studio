@@ -73,10 +73,11 @@ import { AdaptiveRenderer } from "./engine/adaptive";
 import { ScriptRunner } from "./scripting/runner";
 import { exportDocument, getExportCapabilityReport } from "./engine/export";
 import {prepareTiffImport} from './engine/tiff-import';
+import {prepareAvifImport} from './engine/avif-import';
 import {importParagraphStyles} from './core/paragraph-styles';
 import {inspectTiffFile} from './core/interchange/tiff/client';
 import {inspectAvifFile} from './core/interchange/avif/client';
-import type {AvifImportControl,AvifImportReport} from './core/interchange/avif/types';
+import type {AvifDecodeOptions,AvifImportControl,AvifImportReport} from './core/interchange/avif/types';
 import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
 import type {
   ExportOptions,
@@ -163,6 +164,7 @@ export class EditorApplication {
   >();
   private ioGeneration = 0;
   private photoshopJobs=new Set<AbortController>();
+  private avifJobs=new Set<AbortController>();
   private photoshopCommits=new Set<AbortController>();
   private idleRetouchProcessor: PixelProcessor | null = null;
   private retouchProcessors = new Set<PixelProcessor>();
@@ -831,13 +833,14 @@ export class EditorApplication {
             previous.width !== asset.width ||
             previous.height !== asset.height ||
             JSON.stringify(previous.tiff) !== JSON.stringify(asset.tiff) ||
+            JSON.stringify(previous.avif) !== JSON.stringify(asset.avif) ||
             (await computeSha256(await previous.blob.arrayBuffer())) !==
               (await computeSha256(await asset.blob.arrayBuffer()))
           )
             throw new Error(
               "An image asset ID conflicts with the source document. Import it with a new identity before applying.",
             );
-        } else await staged.add(asset.blob, asset.name, asset.id, false,{tiff:asset.tiff});
+        } else await staged.add(asset.blob, asset.name, asset.id, false,{tiff:asset.tiff,avif:asset.avif});
         assertCurrent();
       }
       assertCurrent();
@@ -986,7 +989,7 @@ export class EditorApplication {
           asset.name,
           replacements.get(asset.id)!,
           false,
-          {tiff:asset.tiff},
+          {tiff:asset.tiff,avif:asset.avif},
         );
         if (copy.width !== asset.width || copy.height !== asset.height)
           throw new Error(
@@ -1307,8 +1310,24 @@ export class EditorApplication {
 
   async inspectTiff(file:File,control:TiffImportControl={}):Promise<TiffImportReport>{return inspectTiffFile(file,control);}
 
-  /** Trusted local preflight only; installing AVIF assets is a separate import transaction. */
+  /** Trusted local preflight; opening uses the separate guarded import transaction below. */
   async inspectAvif(file:File,control:AvifImportControl={}):Promise<AvifImportReport>{return inspectAvifFile(file,control);}
+
+  async openAvif(file:File,options:AvifDecodeOptions={},control:AvifImportControl={}):Promise<Readonly<AvifImportReport>>{
+    control.signal?.throwIfAborted();
+    for(const job of this.avifJobs)job.abort(new Error('Document session changed during AVIF import. Try again.'));
+    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
+    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.avifJobs.add(abort);
+    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during AVIF import. Try again.');};
+    const changed=()=>{try{check();}catch(error){abort.abort(error);}},unsubscribeDocument=document.subscribe(changed),unsubscribeEditor=this.subscribe(changed);
+    let prepared:Awaited<ReturnType<typeof prepareAvifImport>>|undefined;
+    try{
+      check();prepared=await prepareAvifImport(file,options,{signal:abort.signal,onProgress:control.onProgress},check);check();
+      unsubscribeDocument();unsubscribeEditor();this.avifJobs.delete(abort);
+      this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'avif');return prepared.report;
+    }catch(error){prepared?.assets.dispose();throw error;}
+    finally{unsubscribeDocument();unsubscribeEditor();control.signal?.removeEventListener('abort',cancel);this.avifJobs.delete(abort);}
+  }
 
   async openTiff(file:File,options:TiffDecodeOptions={},control:TiffImportControl={}):Promise<TiffImportReport>{
     const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
@@ -1524,7 +1543,7 @@ export class EditorApplication {
     try{
       if(owned.source){
         const original=await verifyPresetSource(owned.source,abort.signal);check();
-        const asset=await draft.import(original.blob,original.name,{signal:abort.signal,tiff:original.tiff});check();
+        const asset=await draft.import(original.blob,original.name,{signal:abort.signal,tiff:original.tiff,avif:original.avif});check();
         if(asset.width!==original.width||asset.height!==original.height)throw new Error('Brush source dimensions do not match its original pixels.');
       }
       check();selectTool?.(owned.tool);return this.tools.applyBrushPreset(owned,owned.source?draft:undefined);
@@ -1785,6 +1804,7 @@ export class EditorApplication {
     this.ioGeneration++;
     this.retouchDisposed = true;
     for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
+    for(const job of this.avifJobs)job.abort(new Error('Editor disposed during AVIF import.'));this.avifJobs.clear();
     for(const controller of this.booleanControllers)controller.abort(new Error('Editor disposed during the Boolean operation.'));
     this.booleanControllers.clear();
     this.retouchDisposed = true;

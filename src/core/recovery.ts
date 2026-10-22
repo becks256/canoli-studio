@@ -5,6 +5,7 @@ import type { ProjectAssetSource } from "./project";
 import { referencedAssets, validateDocument } from "./model";
 import type { DocumentData } from "./model";
 import { serializeProject } from "./project";
+import {avifDecodeOptionsSchema,type AvifDecodeSettings} from "./interchange/avif/types";
 import { tiffDecodeOptionsSchema, type TiffDecodeSettings } from "./interchange/tiff/types";
 
 export interface RecoveryEntry {
@@ -30,6 +31,7 @@ export interface RecoveryAsset {
   height: number;
   blob: Blob;
   tiff?: TiffDecodeSettings;
+  avif?: AvifDecodeSettings;
   checksum?: string;
 }
 const digest = async (bytes: BufferSource) =>
@@ -65,6 +67,7 @@ async function assetDigest(asset: RecoveryAsset): Promise<string> {
         type: asset.blob.type,
         bytes: await blobDigest(asset.blob),
         ...(asset.tiff ? { tiff: asset.tiff } : {}),
+        ...(asset.avif ? { avif: asset.avif } : {}),
       }),
     ),
   );
@@ -171,6 +174,7 @@ export class RecoveryRepository {
     // Capture original blobs before yielding: switching documents can dispose the live store.
     const originals = [...referencedAssets(document)].map((assetId) => {
       const asset = assets.get(assetId);
+      if(asset.blob.type==="image/avif"&&!asset.avif)throw new Error("AVIF recovery requires saved precision and color settings.");
       if (asset.blob.type === "image/tiff" && !asset.tiff)
         throw new Error("TIFF recovery requires saved page and precision settings.");
       return {
@@ -180,6 +184,7 @@ export class RecoveryRepository {
         height: asset.height,
         blob: asset.blob,
         ...(asset.tiff ? { tiff: tiffDecodeOptionsSchema.parse(asset.tiff) } : {}),
+        ...(asset.avif ? { avif: avifDecodeOptionsSchema.parse(asset.avif) } : {}),
       };
     });
     const checked: RecoveryAsset[] = [];
@@ -291,7 +296,7 @@ export class RecoveryRepository {
       keys.map((key, index) => [key, snapshot.assets[index]]),
     );
     const history = checkpoints(snapshot.entry);
-    let missingTiffSettings = false;
+    let missingTiffSettings = false,missingAvifSettings=false;
     for (let skipped = 0; skipped < history.length; skipped++) {
       const entry = history[skipped];
       try {
@@ -306,6 +311,7 @@ export class RecoveryRepository {
           const asset = byKey.get(key);
           if (!asset || !(asset.blob instanceof Blob))
             throw new Error("Missing recovery image.");
+          if(asset.blob.type==="image/avif"&&!asset.avif){missingAvifSettings=true;throw new Error("Missing AVIF recovery settings.");}
           if (asset.blob.type === "image/tiff" && !asset.tiff) {
             missingTiffSettings = true;
             throw new Error("Missing TIFF recovery settings.");
@@ -330,7 +336,8 @@ export class RecoveryRepository {
     }
     throw new Error(
       "No intact recovery checkpoint remains. The current document is unchanged." +
-      (missingTiffSettings ? " A TIFF source is missing its saved page and precision settings." : ""),
+      (missingTiffSettings ? " A TIFF source is missing its saved page and precision settings." : "")+
+      (missingAvifSettings ? " An AVIF source is missing its saved precision and color settings." : ""),
     );
   }
 

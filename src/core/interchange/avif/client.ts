@@ -5,6 +5,19 @@ const progressSchema=z.object({phase:z.enum(['inspecting','decoding']),fraction:
 const inspectedSchema=z.object({report:avifImportReportSchema}).strict();
 const decodedSchema=inspectedSchema.extend({png:z.instanceof(Blob)}).strict();
 type Decoded=z.infer<typeof decodedSchema>;
+// Full-frame decoding is admitted once per application context. Queued imports
+// retain immutable source Blobs, without allocating a worker or decoded plane.
+let active=false;
+const waiting:{start():void}[]=[];
+const pump=()=>{if(!active)waiting.shift()?.start();};
+function acquire(signal?:AbortSignal):Promise<()=>void>{
+  signal?.throwIfAborted();
+  return new Promise((resolve,reject)=>{
+    const cancel=()=>{const index=waiting.indexOf(entry);if(index>=0)waiting.splice(index,1);signal?.removeEventListener('abort',cancel);reject(signal?.reason??new Error('AVIF import cancelled.'));pump();};
+    const entry={start(){if(signal?.aborted){cancel();return;}active=true;signal?.removeEventListener('abort',cancel);let released=false;resolve(()=>{if(released)return;released=true;active=false;pump();});}};
+    waiting.push(entry);signal?.addEventListener('abort',cancel,{once:true});if(signal?.aborted)cancel();else pump();
+  });
+}
 function run(blob:Blob,mode:'inspect',options:AvifDecodeOptions,control:AvifImportControl):Promise<AvifImportReport>;
 function run(blob:Blob,mode:'decode',options:AvifDecodeOptions,control:AvifImportControl):Promise<Decoded>;
 function run(blob:Blob,mode:'inspect'|'decode',options:AvifDecodeOptions,control:AvifImportControl):Promise<AvifImportReport|Decoded>{
@@ -44,4 +57,7 @@ function run(blob:Blob,mode:'inspect'|'decode',options:AvifDecodeOptions,control
   });
 }
 export const inspectAvifFile=async(blob:Blob,control:AvifImportControl={})=>run(blob,'inspect',{},control);
-export const decodeAvifFile=async(blob:Blob,options:AvifDecodeOptions={},control:AvifImportControl={})=>run(blob,'decode',options,control);
+export const decodeAvifFile=async(blob:Blob,options:AvifDecodeOptions={},control:AvifImportControl={})=>{
+  const settings=avifDecodeOptionsSchema.parse(options),release=await acquire(control.signal);
+  try{return await run(blob,'decode',settings,control);}finally{release();}
+};

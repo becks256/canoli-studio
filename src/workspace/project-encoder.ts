@@ -42,7 +42,7 @@ export class ProjectEncoder {
       for (const id of referencedAssets(entry.document)) ids.add(id);
     const sources = [...ids].map(id => {
       const asset = assets.get(id);
-      return { id: asset.id, name: asset.name, width: asset.width, height: asset.height, blob: asset.blob, ...(asset.tiff?{tiff:{...asset.tiff}}:{}) };
+      return { id: asset.id, name: asset.name, width: asset.width, height: asset.height, blob: asset.blob, ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}) };
     });
     // Capture caller-owned inputs before the first asynchronous transport break.
     const snapshot = isImmutable(document) && [...history.past, ...history.future].every(entry => isImmutable(entry.document))

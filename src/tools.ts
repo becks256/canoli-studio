@@ -493,7 +493,7 @@ export class ToolController {
     const owned = new BrushPreset(preset.toJSON(),preset.source);
     if(owned.texture){
       const ready=preparedSource?.source,source=owned.source!;
-      if(!ready||ready.blob!==source.blob||ready.width!==source.width||ready.height!==source.height||ready.name!==source.name||ready.tiff?.page!==source.tiff?.page||ready.tiff?.allowPrecisionLoss!==source.tiff?.allowPrecisionLoss)throw new Error('Prepare the original preset source before applying a textured brush.');
+      if(!ready||ready.blob!==source.blob||ready.width!==source.width||ready.height!==source.height||ready.name!==source.name||ready.tiff?.page!==source.tiff?.page||ready.tiff?.allowPrecisionLoss!==source.tiff?.allowPrecisionLoss||ready.avif?.allowPrecisionLoss!==source.avif?.allowPrecisionLoss||ready.avif?.assumeSrgb!==source.avif?.assumeSrgb)throw new Error('Prepare the original preset source before applying a textured brush.');
       this.editor.brushTextureSource.captureFrom(preparedSource!);
     }
     this.cancel();

@@ -4,6 +4,7 @@ import type { SerializedAsset, ImageAsset } from "./assets";
 import { allLayers, referencedAssets, validateDocument, validateDocumentCooperatively } from "./model";
 import type { DocumentData } from "./model";
 import { parseRetainedHistory, type RetainedHistory } from "./history";
+import {avifDecodeOptionsSchema,type AvifDecodeSettings} from './interchange/avif/types';
 import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from './interchange/tiff/types';
 
 interface ProjectFile {
@@ -26,6 +27,7 @@ interface BinaryAsset {
   offset: number;
   sha256?: string;
   tiff?: TiffDecodeSettings;
+  avif?: AvifDecodeSettings;
 }
 interface BinaryManifest {
   format: "luma";
@@ -66,7 +68,7 @@ function verifyLinkedSnapshots(
 export interface ProjectAssetSource {
   get(
     id: string,
-  ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob" | "tiff">;
+  ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob" | "tiff" | "avif">;
 }
 export async function serializeProject(
   document: DocumentData,
@@ -89,6 +91,7 @@ export async function serializeProject(
   let offset = 0;
   for (const assetId of assetIds) {
     const asset = assets.get(assetId);
+    if(asset.blob.type==='image/avif'&&!asset.avif||asset.avif&&asset.blob.type!=='image/avif')throw new Error('AVIF project sources require matching saved precision and color settings.');
     entries.push({
       id: asset.id,
       name: asset.name,
@@ -98,6 +101,7 @@ export async function serializeProject(
       size: asset.blob.size,
       offset,
       ...(asset.tiff?{tiff:tiffDecodeOptionsSchema.parse(asset.tiff)}:{}),
+      ...(asset.avif?{avif:avifDecodeOptionsSchema.parse(asset.avif)}:{}),
     });
     blobs.push(asset.blob);
     offset += asset.blob.size;
@@ -142,6 +146,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     height: number;
     blob: Blob;
     tiff?:TiffDecodeSettings;
+    avif?:AvifDecodeSettings;
   }[];
 }> {
   const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
@@ -220,7 +225,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       entry.width < 1 ||
       !Number.isSafeInteger(entry.height) ||
       entry.height < 1 ||
-      !["image/png", "image/jpeg", "image/webp", "image/tiff"].includes(entry.type) ||
+      !["image/png", "image/jpeg", "image/webp", "image/tiff", "image/avif"].includes(entry.type) ||
       !Number.isSafeInteger(entry.size) ||
       entry.size <= 0 ||
       entry.offset !== offset ||
@@ -235,6 +240,9 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       throw new Error("Missing or invalid project asset checksum.");
     ids.add(entry.id);
     if(entry.tiff!==undefined&&entry.type!=='image/tiff')throw new Error('TIFF settings on a non-TIFF project asset.');
+    if(entry.avif!==undefined&&entry.type!=='image/avif')throw new Error('AVIF settings on a non-AVIF project asset.');
+    if(entry.type==='image/avif'&&!entry.avif)throw new Error('AVIF project sources require saved precision and color settings.');
+    const avif=entry.type==='image/avif'?avifDecodeOptionsSchema.parse(entry.avif):undefined;
     const tiff=entry.type==='image/tiff'?tiffDecodeOptionsSchema.parse(entry.tiff??{}):undefined;
     const blob = file.slice(
       headerSize + length + offset,
@@ -249,6 +257,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       height: entry.height,
       blob,
       ...(tiff?{tiff}:{}),
+      ...(avif?{avif}:{}),
     };
   });
   if (offset !== file.size - headerSize - length)
@@ -339,7 +348,7 @@ export async function loadProject(
         entry.name,
         entry.id,
         rasterAssets.has(entry.id),
-        {tiff:entry.tiff},
+        {tiff:entry.tiff,avif:entry.avif},
       );
       if (asset.width !== entry.width || asset.height !== entry.height)
         throw new Error("Embedded image dimensions do not match the project.");

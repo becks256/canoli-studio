@@ -128,7 +128,14 @@ it('owns one immutable source per worker, validates PNG/header/schema and termin
 });
 it('cancels pre-start and in-flight workers without accepting late results',async()=>{
   mock(()=>{});const early=new AbortController();early.abort();await expect(inspectAvifFile(source(),{signal:early.signal})).rejects.toThrow();expect(MockWorker.instances).toHaveLength(0);
-  const abort=new AbortController(),pending=decodeAvifFile(source(),{}, {signal:abort.signal});abort.abort(new Error('Import cancelled'));await expect(pending).rejects.toThrow('Import cancelled');expect(MockWorker.instances[0].terminations).toBe(1);MockWorker.instances[0].reply({report,png});
+  const abort=new AbortController(),pending=decodeAvifFile(source(),{}, {signal:abort.signal});await Promise.resolve();abort.abort(new Error('Import cancelled'));await expect(pending).rejects.toThrow('Import cancelled');expect(MockWorker.instances[0].terminations).toBe(1);MockWorker.instances[0].reply({report,png});
+});
+it('queues full-frame imports without a worker and removes an aborted queued request',async()=>{
+  let entered!:()=>void;const started=new Promise<void>(resolve=>entered=resolve);mock(()=>entered());
+  const first=decodeAvifFile(source());await started;
+  const abort=new AbortController(),queued=decodeAvifFile(source(),{}, {signal:abort.signal});abort.abort(new Error('Cancel queued decode'));await expect(queued).rejects.toThrow('Cancel queued decode');expect(MockWorker.instances).toHaveLength(1);
+  const last=decodeAvifFile(source());MockWorker.instances[0].reply({report,png});await first;
+  await vi.waitFor(()=>expect(MockWorker.instances).toHaveLength(2));MockWorker.instances[1].reply({report,png});await last;expect(MockWorker.instances.every(worker=>worker.terminations===1)).toBe(true);
 });
 it('keeps cancellation live after worker completion while the PNG result is being validated',async()=>{
   let release!:(buffer:ArrayBuffer)=>void;const held=new Promise<ArrayBuffer>(resolve=>release=resolve),blob=new Blob([await png.arrayBuffer()],{type:'image/png'});

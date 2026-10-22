@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
+import {avifDecodeOptionsSchema,type AvifDecodeSettings} from "../../core/interchange/avif/types";
 import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from "../../core/interchange/tiff/types";
 import type { Recipe } from "./types";
 import { recipeSchema } from "./schema";
@@ -11,6 +12,7 @@ export interface RecipeAsset {
   height: number;
   blob: Blob;
   tiff?:TiffDecodeSettings;
+  avif?:AvifDecodeSettings;
 }
 const magic = new Uint8Array([76, 85, 77, 65, 82, 49, 13, 10]); // LUMAR1\r\n
 const safeInteger = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
@@ -20,13 +22,14 @@ const assetSchema = z
     name: z.string(),
     width: safeInteger.positive(),
     height: safeInteger.positive(),
-    type: z.enum(["image/png", "image/jpeg", "image/webp", "image/tiff"]),
+    type: z.enum(["image/png", "image/jpeg", "image/webp", "image/tiff", "image/avif"]),
     tiff:tiffDecodeOptionsSchema.optional(),
+    avif:avifDecodeOptionsSchema.optional(),
     offset: safeInteger,
     size: safeInteger,
     sha256: z.string().regex(/^[a-f0-9]{64}$/),
   })
-  .strict();
+  .strict().refine(value=>value.type==='image/avif'?value.avif!==undefined:value.avif===undefined,'AVIF sources require saved precision/color settings; other sources cannot carry them.');
 const manifestSchema = z
   .object({
     format: z.literal("luma-recipe"),
@@ -86,6 +89,7 @@ export async function serializeRecipePackage(
         height: asset.height,
         type: asset.blob.type,
         ...(asset.tiff?{tiff:asset.tiff}:{}),
+        ...(asset.avif?{avif:asset.avif}:{}),
         offset,
         size: asset.blob.size,
         sha256: hex(await hash(asset.blob)),
@@ -151,7 +155,7 @@ export async function readRecipePackage(
       width: entry.width,
       height: entry.height,
       blob,
-      ...(entry.tiff?{tiff:entry.tiff}:{}),    });
+      ...(entry.tiff?{tiff:entry.tiff}:{}),...(entry.avif?{avif:entry.avif}:{}),    });
     offset += entry.size;
   }
   if (seen.size !== required.size) throw new Error("Missing recipe assets.");
