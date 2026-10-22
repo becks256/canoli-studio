@@ -112,7 +112,7 @@ export function CommandPalette({
               {action.label}
               {action.description&&<span className="command-result-description">{action.description}</span>}
             </span>
-            <kbd>{action.keys[0] ? formatShortcut(action.keys[0]) : ""}</kbd>
+            {action.keys[0] && <kbd>{formatShortcut(action.keys[0])}</kbd>}
           </div>
         ))}
       </div>

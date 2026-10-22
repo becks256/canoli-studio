@@ -42,6 +42,8 @@ dialog.command-palette {
 .command-result span {
   display: grid;
   gap: 3px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .command-result small,
 .command-hint {
