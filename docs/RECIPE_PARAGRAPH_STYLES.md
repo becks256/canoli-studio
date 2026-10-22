@@ -62,3 +62,9 @@ Save the JSON below and import it in Recipes. Select a text layer named `Text`, 
 ```
 
 Recorder name and tone-parameterization preferences remain in editor-session UI state when the dialog closes for canvas editing. They reset on application reload; recording data retains its existing session-only lifetime.
+
+## Based-on style definitions
+
+Schema-41 ensure/update actions accept optional `basedOn: {style: selector, overrides: partialFormat}`. Null/omission means independent. The selector is the same name/previous-style-output reference described above; format remains complete and must agree with that parent's resolved format plus overrides. Missing/cyclic/inconsistent references or locked affected followers reject the whole replay. Ensure reuses only identical formatting **and** equivalent inheritance/explicit overrides, rather than treating a flat style as equivalent to a child. Update omission detaches a previously based-on definition while retaining the explicitly supplied full format.
+
+The recorder captures ancestors before children and retains complete override data. Text/group template references map to the child output; transitive parent changes remain live after replay. Names and format/override values follow ordinary parameter/literal rules; override keys and step references are structural. JSON/package/batch versions remain 1/1/unchanged; no source-document base IDs, new asset dependency or provider operation is required. Child reset and reparenting record ordinary definition updates.

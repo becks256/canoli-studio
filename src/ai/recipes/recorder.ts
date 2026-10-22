@@ -91,7 +91,8 @@ export class RecipeRecorder {
     const style=document.paragraphStyles?.find(value=>value.id===styleId);
     if(!style)throw new Error('Recorded paragraph style is missing from its document.');
     const parsed=paragraphStyleSchema.parse(style),stepId=`step-${id()}`;
-    this.steps.push({id:stepId,name:`Use paragraph style ${parsed.name}`,action:{type:'paragraphStyle.ensure',name:parsed.name,format:parsed.format}});
+    const basedOn=parsed.basedOn?{style:this.captureStyle(parsed.basedOn.id,document),overrides:structuredClone(parsed.basedOn.overrides)}:undefined;
+    this.steps.push({id:stepId,name:`Use paragraph style ${parsed.name}`,action:{type:'paragraphStyle.ensure',name:parsed.name,format:parsed.format,...(basedOn?{basedOn}:{})}});
     const reference:RecipeParagraphStyleTarget={by:'stepResult',stepId};
     this.styleOutputs.set(styleId,reference);return structuredClone(reference);
   }
@@ -230,7 +231,8 @@ export class RecipeRecorder {
         if(previous){
           const reference=this.captureStyle(previous.id,beforeDoc);
           const stepId=`step-${id()}`;
-          this.steps.push({id:stepId,name:`Update paragraph style ${style.name}`,action:{type:'paragraphStyle.update',style:reference,name:style.name,format:style.format}});
+          const basedOn=style.basedOn?{style:this.captureStyle(style.basedOn.id,beforeDoc),overrides:structuredClone(style.basedOn.overrides)}:undefined;
+          this.steps.push({id:stepId,name:`Update paragraph style ${style.name}`,action:{type:'paragraphStyle.update',style:reference,name:style.name,format:style.format,...(basedOn?{basedOn}:{})}});
           this.styleOutputs.set(style.id,{by:'stepResult',stepId});
         }else{
           this.styleOutputs.delete(style.id);this.captureStyle(style.id,afterDoc);

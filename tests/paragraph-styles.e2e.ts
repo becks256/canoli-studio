@@ -29,7 +29,7 @@ test('isolated paragraph-style guide updates native pixels, preserves overrides 
       svgWarning:report.warnings.some((w:string)=>w.includes('linked paragraph-style')),schema:restored.schemaVersion};
   },code);
   expect(result).toMatchObject({oneUndo:true,cropDifferences:0,referenceEqual:true,cacheEqual:true,visible:true,failedAtomic:true,undo:true,reopenedEqual:true,modelEqual:true,
-    styleName:'Body',firstSize:28,secondSize:28,overrides:{color:'#a43e29'},updated:true,reset:true,svgWarning:true,schema:40});
+    styleName:'Body',firstSize:28,secondSize:28,overrides:{color:'#a43e29'},updated:true,reset:true,svgWarning:true,schema:41});
   await info.attach('paragraph-style-native',{body:JSON.stringify(result),contentType:'application/json'});
 });
 

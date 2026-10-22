@@ -1,5 +1,5 @@
 import { replaceVectorPaths, type VectorBooleanSelection } from './vector-boolean';
-import {paragraphStyleSchema,paragraphStyleLibrarySchema,paragraphOverrideKeysSchema,paragraphFormat,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS,resolveParagraphBinding,sameParagraphFormat,type ParagraphStyleData,type ParagraphFormat} from './paragraph-styles';
+import {paragraphStyleSchema,resolveParagraphStyleLibrary,paragraphOverrideKeysSchema,paragraphFormat,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS,resolveParagraphBinding,sameParagraphFormat,type ParagraphStyleData,type ParagraphFormat} from './paragraph-styles';
 import {vectorStrokeKeys} from './vector-stroke';
 import { isImmutable, shareUnchanged } from "./immutable";
 import { lassoSelection, polygonSelectionSchema } from "./lasso";
@@ -211,15 +211,18 @@ function apply(document: DocumentData, command: EditorCommand): void {
   if(command.type==='paragraphStyle.set'){
     const style=paragraphStyleSchema.parse(command.style),entries=[...(document.paragraphStyles??[])],index=entries.findIndex(value=>value.id===style.id);
     if(index<0)entries.push(style);else entries[index]=style;
-    paragraphStyleLibrarySchema.parse(entries);
-    for(const layer of paragraphTextLayers(document.children))if(layer.paragraphStyle?.id===style.id){
-      const expected={...style.format,...layer.paragraphStyle.overrides};
+    const resolved=resolveParagraphStyleLibrary(entries),updated=resolved.find(value=>value.id===style.id)!;
+    if(!sameParagraphFormat(updated.format,style.format))throw new Error('Paragraph style formatting disagrees with its base and overrides.');
+    const byId=new Map(resolved.map(value=>[value.id,value]));
+    for(const layer of paragraphTextLayers(document.children))if(layer.paragraphStyle){
+      const definition=byId.get(layer.paragraphStyle.id);if(!definition)throw new Error('Paragraph style not found.');
+      const expected={...definition.format,...layer.paragraphStyle.overrides};
       if(!sameParagraphFormat(paragraphFormat(layer),expected)){
         if(isLocked(document,layer.id))throw new Error('Unlock text and its parent groups before changing a linked paragraph style.');
-        resolveParagraphBinding(layer,style);reflowText(layer);
+        resolveParagraphBinding(layer,definition);reflowText(layer);
       }
     }
-    document.paragraphStyles=entries;return;
+    document.paragraphStyles=resolved;return;
   }
   if(command.type==='paragraphStyle.remove'){
     if(!document.paragraphStyles?.some(style=>style.id===command.id))throw new Error('Paragraph style not found.');
@@ -227,7 +230,10 @@ function apply(document: DocumentData, command: EditorCommand): void {
       if(isLocked(document,layer.id))throw new Error('Unlock linked text before removing its paragraph style.');
       delete layer.paragraphStyle;
     }
-    document.paragraphStyles=document.paragraphStyles.filter(style=>style.id!==command.id);return;
+    document.paragraphStyles=document.paragraphStyles.filter(style=>style.id!==command.id).map(style=>{
+      if(style.basedOn?.id!==command.id)return style;
+      const detached={...style};delete detached.basedOn;return detached;
+    });return;
   }
   if (command.type === "component.replaceAll") {
     const before = new ComponentRegistry(document.components);

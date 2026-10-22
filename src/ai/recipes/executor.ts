@@ -1,6 +1,6 @@
 import { recipeOutputBindingsUnique, stepConditionSchema } from "./schema";
 import {recipeParagraphStyleTargetSchema} from './schema';
-import {paragraphStyleSchema,paragraphTextLayers,sameParagraphFormat,type ParagraphStyleData} from '../../core/paragraph-styles';
+import {paragraphStyleSchema,paragraphTextLayers,sameParagraphFormat,sameParagraphBase,type ParagraphStyleData} from '../../core/paragraph-styles';
 import type { DocumentData, LayerData } from "../../core/model";
 import {
   allLayers,
@@ -309,12 +309,13 @@ export function compileEditPlan(
           case 'paragraphStyle.update': {
             if(step.target)throw new Error('Paragraph style library actions do not accept layer targets.');
             const action=step.action;
-            const definition=paragraphStyleSchema.parse({id:id(),name:actionValue(action.name),format:actionValue(action.format)});
+            const definition=paragraphStyleSchema.parse({id:id(),name:actionValue(action.name),format:actionValue(action.format),
+              ...(action.basedOn?{basedOn:{id:resolveStyle(action.basedOn.style,actionValue).id,overrides:actionValue(action.basedOn.overrides)}}:{})});
             let command:EditorCommand|undefined;
             if(action.type==='paragraphStyle.ensure'){
               const existing=simDoc.paragraphStyles?.find(style=>style.name.trim().toLocaleLowerCase('en')===definition.name.toLocaleLowerCase('en'));
               if(existing){
-                if(!sameParagraphFormat(paragraphStyleSchema.parse(existing).format,definition.format))
+                if(!sameParagraphFormat(paragraphStyleSchema.parse(existing).format,definition.format)||!sameParagraphBase(existing.basedOn,definition.basedOn))
                   throw new Error(`Paragraph style '${definition.name}' already exists with different formatting. Rename it or review a style update before replay.`);
                 definition.id=existing.id;
                 visualChange=`Reuse paragraph style '${existing.name}'`;

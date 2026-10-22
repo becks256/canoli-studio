@@ -287,3 +287,5 @@ The pure immutable BrushSymmetry constructor joins brush values in the isolated 
 ## Authored brush textures
 
 `BrushTexture` is a pure constructor referencing an already imported asset ID. Plugin commands may use it in ordinary brush-bearing metadata under their current document grants; the host validates references before atomic publication and rechecks permissions. It grants no source bytes, file/import/export service, network access or additional permission. Installation remains inert. Source controls and source-bearing portable brush presets are separate work in progress. See the schema-32 constructor contract in SCRIPTING_API.md.
+
+Schema-41 ParagraphStyle basedOn/setBase/overrides/resetOverrides uses existing isolated constructors, document-write permissions and shared host graph/lock/revision/atomic validation. Base handles must belong to the same document; cycles and stale resolved data reject. No source/font bytes, file/network/export capability or package permission is added. Installation remains inert. See SCRIPTING_API.md for signatures, defaults, errors and limits.

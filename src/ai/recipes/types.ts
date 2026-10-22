@@ -8,6 +8,7 @@ export type RecipeParagraphStyleTarget =
   | {by:'name';name:string}
   | {by:'stepResult';stepId:string};
 export type RecipeParagraphFormat = {[K in keyof ParagraphFormat]:ParagraphFormat[K]|string};
+export interface RecipeParagraphBase {style:RecipeParagraphStyleTarget;overrides:Partial<RecipeParagraphFormat>}
 
 export const RECIPE_SCHEMA_VERSION = 1;
 
@@ -66,8 +67,8 @@ export interface StepCondition {
 }
 
 export type RecipeAction =
-  | {type:'paragraphStyle.ensure';name:string;format:RecipeParagraphFormat}
-  | {type:'paragraphStyle.update';style:RecipeParagraphStyleTarget;name:string;format:RecipeParagraphFormat}
+  | {type:'paragraphStyle.ensure';name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
+  | {type:'paragraphStyle.update';style:RecipeParagraphStyleTarget;name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
   | {type:'paragraphStyle.remove';style:RecipeParagraphStyleTarget}
   | {type:'text.paragraphStyle';style:RecipeParagraphStyleTarget|null;keepOverrides?:boolean}
   | {type:'text.paragraphOverrides.clear';keys?:(keyof ParagraphFormat)[]}

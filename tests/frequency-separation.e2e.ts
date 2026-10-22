@@ -32,7 +32,7 @@ test('documented isolated recipe prepares native pixels and commits one host und
  const result=await page.evaluate(async code=>{
   const {editor}=window.luma,before=editor.document.toJSON(),past=editor.document.getSnapshot().past.length,assets=editor.assetStore.values().length;
   const logs=await editor.runScript(code!);const after=editor.document.toJSON(),history=editor.document.getSnapshot().past.length-past;editor.document.undo();return{logs,history,undo:JSON.stringify(editor.document.toJSON())===JSON.stringify(before),assets:editor.assetStore.values().length-assets,schema:after.schemaVersion,originalHidden:after.children[0].visible===false};
- },code);expect(result).toMatchObject({history:1,undo:true,assets:1,schema:40,originalHidden:true});expect(result.logs.join(' ')).toContain('Frequency layers ready');
+ },code);expect(result).toMatchObject({history:1,undo:true,assets:1,schema:41,originalHidden:true});expect(result.logs.join(' ')).toContain('Frequency layers ready');
 });
 
 test('abort, human edits, selection changes and replaced assets reject private capture without output leaks',async({page})=>{

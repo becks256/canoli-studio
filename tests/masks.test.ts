@@ -66,7 +66,7 @@ describe("layer mask contract", () => {
     for (const version of [1, 2, 3] as const) {
       const legacy = new Document().toJSON();
       legacy.schemaVersion = version;
-      expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(40);
+      expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(41);
     }
     const invalid = doc.toJSON();
     invalid.schemaVersion = 2;

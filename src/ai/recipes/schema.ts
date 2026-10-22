@@ -8,6 +8,7 @@ export const recipeParagraphStyleTargetSchema=z.discriminatedUnion('by',[
   z.object({by:z.literal('stepResult'),stepId:z.string().min(1).max(120)}).strict(),
 ]);
 const recipeParagraphFormatSchema=z.record(z.string(),z.unknown());
+const recipeParagraphBaseSchema=z.object({style:recipeParagraphStyleTargetSchema,overrides:recipeParagraphFormatSchema}).strict().nullable().optional();
 
 export function recipeOutputBindingsUnique(data: {
   steps: { id: string; outputVar?: string }[];
@@ -126,8 +127,8 @@ export const stepConditionSchema = z
   });
 
 export const recipeActionSchema = z.discriminatedUnion("type", [
-  z.object({type:z.literal('paragraphStyle.ensure'),name:z.string().min(1).max(80),format:recipeParagraphFormatSchema}).strict(),
-  z.object({type:z.literal('paragraphStyle.update'),style:recipeParagraphStyleTargetSchema,name:z.string().min(1).max(80),format:recipeParagraphFormatSchema}).strict(),
+  z.object({type:z.literal('paragraphStyle.ensure'),name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
+  z.object({type:z.literal('paragraphStyle.update'),style:recipeParagraphStyleTargetSchema,name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
   z.object({type:z.literal('paragraphStyle.remove'),style:recipeParagraphStyleTargetSchema}).strict(),
   z.object({type:z.literal('text.paragraphStyle'),style:recipeParagraphStyleTargetSchema.nullable(),keepOverrides:z.boolean().optional()}).strict(),
   z.object({type:z.literal('text.paragraphOverrides.clear'),keys:paragraphOverrideKeysSchema.optional()}).strict(),

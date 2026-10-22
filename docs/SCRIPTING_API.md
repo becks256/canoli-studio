@@ -1,5 +1,45 @@
 # Scripting API
 
+## Based-on paragraph styles (schema 41)
+
+`new ParagraphStyle({name?, format?:Partial<ParagraphFormat>, basedOn?:ParagraphStyle|null})` may inherit an attached style. Supplied format fields become explicit style overrides; omitted fields inherit the parent. Add the child to the parent's document. Null/omission creates an independent style with the existing defaults. Foreign/detached/missing parents reject. A detached child captures initial values and refreshes inherited values from its still-attached base when added. Scopes stop at embedded documents; copying imports the complete required ancestor chain before its children and preserves inheritance while remapping conflicts.
+
+Style `basedOn:ParagraphStyle|null` is readable/writable. `setBase(base|null, {keepOverrides?:boolean}?)` defaults to inheriting the new parent's full format with no style overrides. `keepOverrides:true` retains existing child overrides; on an independent style it preserves all fourteen current fields as explicit overrides. Null detaches while retaining resolved values. `overrides` returns a detached partial snapshot. `resetOverrides(keys?:ParagraphFormatKey[])` restores selected unique known keys, or all keys when omitted; an empty list clears none. Reset requires a based-on style. `update` sets explicit style overrides even when equal to the parent; undefined update fields remain omitted, so use resetOverrides to restore inheritance. `captureFrom(text)` on a child captures all fourteen fields as overrides, without changing text-local overrides.
+
+Parent updates recompute every transitive descendant style and affected text frame in one shared command/undo entry. Style-level and text-level overrides remain separate. Changed effective locked followers or locked ancestors reject the entire edit; name-only/fully shielded updates remain valid. Cycles, self-parenting, missing bases, duplicate names and inconsistent serialized resolved formats reject without partial edits. Deleting a parent detaches its direct text followers and immediate child styles, retaining all resolved typography; deeper style relationships remain intact. Direct text detachment obeys locks. Child-style detachment with unchanged appearance need not mutate its text followers.
+
+Schema 41 stores `basedOn?:{id:string,overrides:Partial<ParagraphFormat>}|null` beside each style's complete resolved format. These references must form an acyclic graph inside the same library (existing 128-style limit). Schemas 1–40 remain readable; nonnull inheritance under old labels rejects, including embedded masters. Projects/workspaces remain 3/2. REST uses the existing strict paragraphStyle.set/remove DTOs in separate headless sessions, with existing font limitations. Plugins use the same isolated OO boundary and current grants, without installation-time execution or new permissions. Portable recipes capture ancestors and overrides with style-step references; SVG reports lost native relationships while retaining resolved text. Mixed runs, variable fonts/path text, font embedding, wider shaping and full F08 remain open.
+
+<!-- example: paragraph-style-inheritance -->
+```js
+const body = document.paragraphStyles.add(new ParagraphStyle({
+  name: "Body", format: {fontSize:24, color:"#315b2a", lineHeight:1.4}
+}));
+const heading = document.paragraphStyles.add(new ParagraphStyle({
+  name: "Heading", basedOn: body, format: {fontSize:34}
+}));
+const accent = document.paragraphStyles.add(new ParagraphStyle({
+  name: "Accent", basedOn: heading, format: {color:"#a43e29"}
+}));
+const first = document.layers.add(new TextLayer({
+  name:"Inherited first", text:"Base changes reach inherited typography.",
+  wrapWidth:240, x:24, y:24
+}));
+const second = document.layers.add(new TextLayer({
+  name:"Inherited second", text:"Style and text overrides remain independent.",
+  wrapWidth:240, x:300, y:24
+}));
+first.paragraphStyle = heading;
+second.paragraphStyle = accent;
+second.fontSize = 30;
+body.update({fontSize:28, color:"#336699", lineHeight:1.5, paragraphSpacing:12});
+heading.resetOverrides(["fontSize"]);
+document.selectedLayer = first;
+print("Based-on styles ready");
+```
+
+The first frame inherits Body's size 28 and blue color through Heading. Accent retains its red style override; the second frame independently retains its size-30 text override. A successful script commits once. `body.update({fontSize:40})` then enlarges the first frame while keeping the second at 30.
+
 ## Linked paragraph styles (schema 40)
 
 `new ParagraphStyle(options?: {name?:string; format?:Partial<ParagraphFormat>})` creates a detached reusable style with a generated ID and default name "Paragraph style". Add it with `document.paragraphStyles.add(style)` before applying it. Names are trimmed, nonblank, at most 80 characters and case-insensitively unique in a document; IDs are unique. A library holds at most 128 definitions. Unknown/null/nonfinite/out-of-range values reject. Constructor/update fields with undefined are omitted. Serialized definitions require a complete format; snapshots with missing definitions or inconsistent resolved fields reject.
@@ -12,7 +52,7 @@ TextLayer exposes paragraphFormat (canonical detached resolved values), paragrap
 
 A base update reflows all affected followers in its document with existing font measurement, and preserves their overrides. Native fonts may reject unsupported settings. Any invalid/stale/locked affected target or layout failure rejects the whole transaction without partial styles/text/history. Name-only changes and unchanged effective followers need no text mutation; removing/detaching/changing bindings still obeys locks. Each attached operation is one undo entry, or part of its enclosing synchronous transaction/successful isolated script. Frame widths and content remain independent. REST uses the same strict commands in a separate headless session, with its existing font-environment limitations.
 
-Style scopes stop at embedded-document boundaries. Conversion copies a library into the new master as an independent scope. Cross-document root copies import needed styles, reuse identical definitions, and remap conflicting IDs/names while preserving overrides; embedded masters retain their own scopes. Project/workspace history preserves these links. SVG preserves resolved text formatting but reports loss of native style/override relationships; save a project for full style editing. Schema 40 admits libraries and bindings; older roots/history migrate without added styles. Existing project 3/workspace 2 and recipe/plugin versions stay unchanged. Mixed character/paragraph runs, based-on hierarchies, font embedding, variable axes and path text remain separate work.
+Style scopes stop at embedded-document boundaries. Conversion copies a library into the new master as an independent scope. Cross-document root copies import needed styles, reuse identical definitions, and remap conflicting IDs/names while preserving overrides; embedded masters retain their own scopes. Project/workspace history preserves these links. SVG preserves resolved text formatting but reports loss of native style/override relationships; save a project for full style editing. Schema 40 admits libraries and bindings; older roots/history migrate without added styles. Existing project 3/workspace 2 and recipe/plugin versions stay unchanged. Based-on hierarchies use schema 41 as described above. Mixed character/paragraph runs, font embedding, variable axes and path text remain separate work.
 
 <!-- example: paragraph-styles -->
 ```js

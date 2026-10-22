@@ -19,8 +19,8 @@ export const DEFAULT_PARAGRAPH_FORMAT:Readonly<ParagraphFormat>=Object.freeze({
   fontSize:32,fontFamily:'sans-serif',color:'#ffffff',align:'left',lineHeight:1.2,letterSpacing:0,wordSpacing:0,
   fontKerning:'auto',fontWeight:'normal',fontStyle:'normal',direction:'ltr',paragraphJustify:'none',paragraphSpacing:0,firstLineIndent:0,
 });
-export const paragraphStyleSchema=z.object({id:z.string().min(1).max(240),name:z.string().trim().min(1).max(80),format:paragraphFormatSchema}).strict();
 export const paragraphStyleBindingSchema=z.object({id:z.string().min(1).max(240),overrides:paragraphFormatPatchSchema}).strict();
+export const paragraphStyleSchema=z.object({id:z.string().min(1).max(240),name:z.string().trim().min(1).max(80),format:paragraphFormatSchema,basedOn:paragraphStyleBindingSchema.nullable().optional()}).strict();
 export const paragraphStyleLibrarySchema=z.array(paragraphStyleSchema).max(128).superRefine((items,context)=>{
   const ids=new Set<string>(),names=new Set<string>();
   for(const item of items){const name=item.name.toLocaleLowerCase('en');if(ids.has(item.id)||names.has(name))context.addIssue({code:'custom',message:'Paragraph styles need unique IDs and names.'});ids.add(item.id);names.add(name);}
@@ -33,6 +33,27 @@ export function paragraphFormat(layer:TextLayerData):ParagraphFormat {
   return paragraphFormatSchema.parse(value);
 }
 export function sameParagraphFormat(a:ParagraphFormat,b:ParagraphFormat){return PARAGRAPH_FORMAT_KEYS.every(key=>a[key]===b[key]);}
+export function sameParagraphBase(a:ParagraphStyleData['basedOn'],b:ParagraphStyleData['basedOn']){
+  return !a&&!b||!!a&&!!b&&a.id===b.id&&PARAGRAPH_FORMAT_KEYS.every(key=>Object.hasOwn(a.overrides,key)===Object.hasOwn(b.overrides,key)&&a.overrides[key]===b.overrides[key]);
+}
+/** Resolve a bounded DAG without changing inputs. Serialized admission separately checks cached formats. */
+export function resolveParagraphStyleLibrary(input:readonly ParagraphStyleData[]):ParagraphStyleData[]{
+  const entries=paragraphStyleLibrarySchema.parse(input),byId=new Map(entries.map(style=>[style.id,style]));
+  // Admission trims names for uniqueness checks; resolving formats must not rename other records.
+  entries.forEach((style,index)=>{style.name=input[index].name;});
+  const active=new Set<string>(),complete=new Set<string>();
+  const visit=(style:ParagraphStyleData):void=>{
+    if(complete.has(style.id))return;
+    if(active.has(style.id))throw new Error('Paragraph style inheritance cannot contain a cycle.');
+    active.add(style.id);
+    if(style.basedOn){
+      const base=byId.get(style.basedOn.id);if(!base)throw new Error('Paragraph style refers to a missing base in its document.');
+      visit(base);style.format=paragraphFormatSchema.parse({...base.format,...style.basedOn.overrides});
+    }
+    active.delete(style.id);complete.add(style.id);
+  };
+  entries.forEach(visit);return entries;
+}
 export function paragraphTextLayers(nodes:readonly LayerData[]):TextLayerData[]{
   return nodes.flatMap(node=>node.kind==='text'?[node]:node.kind==='group'?paragraphTextLayers(node.children):[]);
 }
@@ -44,8 +65,12 @@ export function resolveParagraphBinding(layer:TextLayerData,style:ParagraphStyle
 export function validateParagraphStyles(document:DocumentData){
   const text=paragraphTextLayers(document.children);
   if(document.paragraphStyles===undefined&&!text.some(layer=>layer.paragraphStyle!=null))return;
-  const styles=paragraphStyleLibrarySchema.parse(document.paragraphStyles??[]),byId=new Map(styles.map(style=>[style.id,style]));
+  const original=paragraphStyleLibrarySchema.parse(document.paragraphStyles??[]),styles=resolveParagraphStyleLibrary(original),byId=new Map(styles.map(style=>[style.id,style]));
   if(document.paragraphStyles!==undefined&&Number(document.schemaVersion)<40)throw new Error('Paragraph styles require schema version 40.');
+  for(const [index,style]of original.entries()){
+    if(style.basedOn&&Number(document.schemaVersion)<41)throw new Error('Paragraph style inheritance requires schema version 41.');
+    if(!sameParagraphFormat(style.format,styles[index].format))throw new Error('Paragraph style formatting disagrees with its base and overrides.');
+  }
   for(const layer of text){
     if(layer.paragraphStyle==null)continue;
     if(Number(document.schemaVersion)<40)throw new Error('Paragraph styles require schema version 40.');
@@ -58,14 +83,21 @@ export function validateParagraphStyles(document:DocumentData){
 
 /** Copy root text links into another document without overwriting unrelated definitions. */
 export function importParagraphStyles(source:DocumentData,target:DocumentData,layers:LayerData[],newId:()=>string){
-  const used=new Set(paragraphTextLayers(layers).map(layer=>layer.paragraphStyle?.id).filter((id):id is string=>!!id));
+  const used=new Set<string>(),byId=new Map((source.paragraphStyles??[]).map(style=>[style.id,style])),active=new Set<string>();
+  const include=(id:string)=>{
+    if(used.has(id))return;if(active.has(id))throw new Error('Paragraph style inheritance cannot contain a cycle.');
+    const style=byId.get(id);if(!style)throw new Error('Missing source paragraph style.');active.add(id);
+    if(style.basedOn)include(style.basedOn.id);active.delete(id);used.add(id);
+  };
+  for(const text of paragraphTextLayers(layers))if(text.paragraphStyle)include(text.paragraphStyle.id);
   const definitions:ParagraphStyleData[]=[],mapping=new Map<string,string>();
   const names=new Set((target.paragraphStyles??[]).map(style=>style.name.trim().toLocaleLowerCase('en')));
   for(const id of used){
     const sourceStyle=source.paragraphStyles?.find(style=>style.id===id);if(!sourceStyle)throw new Error('Missing source paragraph style.');
     const original=paragraphStyleSchema.parse(sourceStyle),targetStyle=target.paragraphStyles?.find(style=>style.id===id);
+    if(original.basedOn)original.basedOn.id=mapping.get(original.basedOn.id)!;
     const existing=targetStyle?paragraphStyleSchema.parse(targetStyle):undefined;
-    if(existing&&existing.name===original.name&&sameParagraphFormat(existing.format,original.format)){mapping.set(id,id);continue;}
+    if(existing&&existing.name===original.name&&sameParagraphFormat(existing.format,original.format)&&sameParagraphBase(existing.basedOn,original.basedOn)){mapping.set(id,id);continue;}
     const style=structuredClone(original);if(existing)style.id=newId();
     const base=style.name;let suffix=2;while(names.has(style.name.toLocaleLowerCase('en')))style.name=base.slice(0,70)+` ${suffix++}`;
     names.add(style.name.toLocaleLowerCase('en'));mapping.set(id,style.id);definitions.push(style);

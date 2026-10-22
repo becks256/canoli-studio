@@ -20,7 +20,7 @@ for(const filter of [false,true])it(`validates native prepared ${filter?'filter'
  const command=(value:ReturnType<typeof mask>)=>filter?{type:'smartObject.filterMask',id:target.id,mask:value}:{type:'layer.update',id:target.id,patch:{mask:value}};
  for(const [coverage,opacity] of [[empty,1],[empty,0],['missing',1]] as const){const bad=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'document.rename',name:'Rejected'},command(mask(coverage,opacity))]});expect(bad.status,JSON.stringify(bad.body)).toBe(400);expect((await request(endpoint)).body.document).toEqual(added.body.document);}
  const changed=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[command(mask(support))]});expect(changed.status,JSON.stringify(changed.body)).toBe(200);
- expect(changed.body.document.schemaVersion).toBe(40);expect(changed.body.document.children[0][filter?'filterMask':'mask'].strokes[0].mode).toBe('wet');
+ expect(changed.body.document.schemaVersion).toBe(41);expect(changed.body.document.children[0][filter?'filterMask':'mask'].strokes[0].mode).toBe('wet');
  expect((await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'document.rename',name:'Stale'}]})).status).toBe(409);
  const undo=await request(endpoint+'/undo',{expectedRevision:changed.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(changed.body.document);
 });
