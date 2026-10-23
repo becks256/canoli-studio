@@ -497,3 +497,7 @@ Use the custom Dialog, Button, Select, exact NumberField and progress controls. 
 ### Native recipe preparation
 
 Keep the existing Recipe Library/portable-package controls and exact parameter fields. RAW dry-run text identifies the receiving original, shared instances and explicit sRGB8 conversion. Run reports actual native phases/progress, retains an available Cancel preparation action and aborts on close/Escape. Keep invalid plans/errors visible and require review/retry after target changes. Imported/recorded recipes remain inert until Run. No new shortcut or component library.
+
+### RAW batch review and recovery
+
+Upload recognizes camera RAW extensions/MIMEs and reviews each original in the existing custom RAW dialog with explicit sRGB8 consent, source limitations, exact WB/demosaic/exposure/highlight controls and genuine preview. Queue RAW image approves only that file; Cancel/Escape skips remaining unreviewed files and preserves earlier approved entries. Show queued RAW settings and retained-original intent. The visible editor stays unchanged. Runner rows show real native preparation progress; Pause/Cancel retain their existing batch meaning. Review explains full sensor originals in RAW delivery packages and exposes verified editable-project downloads alongside variant review. Zero-cost local work needs no unrelated spending approval. Reuse native controls, focus restoration and narrow-dialog layouts; add no shortcut or component library.

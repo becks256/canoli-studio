@@ -1,3 +1,7 @@
+import {isCameraRawFile} from '../../core/interchange/raw/files';
+import {readBatchPreparation} from './preparation';
+import {prepareRawBatchSource,batchRawSourceSchema} from './raw';
+import type {RawDecodeOptions,RawImportControl} from '../../core/interchange/raw/types';
 import { readRecipePackage } from "../recipes/package";
 import { batchItemNames } from "./source-names";
 /**
@@ -38,6 +42,9 @@ export interface BatchServiceOptions {
 
 export class BatchRunnerService {
   private readonly recipes: RecipeService;
+  private disposed=false;
+  private readonly rawControllers=new Set<AbortController>();
+  private assertOpen(){if(this.disposed)throw new Error('The batch service is disposed.');}
   readonly storage: BatchStorage;
   readonly runner: BatchRunner;
   private unsubscribeRunner?: () => void;
@@ -72,10 +79,18 @@ export class BatchRunnerService {
   /**
    * Creates a new BatchRun record in storage from a config and list of source images.
    */
+  async prepareRawSource(file:File,options:RawDecodeOptions={},control:RawImportControl={}){
+    this.assertOpen();const controller=new AbortController();this.rawControllers.add(controller);
+    const signal=control.signal?AbortSignal.any([control.signal,controller.signal]):controller.signal;
+    try{const source=await prepareRawBatchSource(file,options,{...control,signal});this.assertOpen();return source;}
+    finally{this.rawControllers.delete(controller);}
+  }
+
   async createBatch(
     configInput: Partial<BatchConfig> & { name: string; budgetId: string },
     sourceImages: BatchSourceInput[],
   ): Promise<BatchRun> {
+    this.assertOpen();
     configInput = structuredClone(configInput);
     sourceImages = structuredClone(sourceImages);
     const runId = configInput.id || `batch-${id()}`;
@@ -128,6 +143,13 @@ export class BatchRunnerService {
     const items: BatchItem[] = [];
     for (let index = 0; index < sourceImages.length; index++) {
       const { parameters, ...src } = sourceImages[index];
+      if(!src.raw&&isCameraRawFile({name:src.name,type:src.mimeType}))throw new Error('Review RAW settings and explicit precision consent before creating a batch.');
+      if(src.raw){
+        src.raw=batchRawSourceSchema.parse(src.raw);
+        if(!src.blob)throw new Error('RAW batch creation requires complete original bytes.');
+        const verified=await this.prepareRawSource(new File([src.blob],src.raw.originalName,{type:src.blob.type}),src.raw.options);
+        if(verified.width!==src.width||verified.height!==src.height||JSON.stringify(verified.raw!.report)!==JSON.stringify(src.raw.report))throw new Error('RAW batch source metadata changed. Review the source again.');
+      }
       if (src.blob) {
         const digest = await computeSha256(await src.blob.arrayBuffer());
         if (src.sha256 && src.sha256 !== digest)
@@ -177,8 +199,17 @@ export class BatchRunnerService {
       updatedAt: new Date().toISOString(),
     };
 
+    this.assertOpen();
     await this.storage.createRun(run);
     return run;
+  }
+
+  async getPreparedProject(runId:string,itemId:string):Promise<Blob>{
+    this.assertOpen();
+    const run=await this.storage.getRun(runId),item=run?.items.find(value=>value.id===itemId);
+    if(!run||!item)throw new Error('Batch item was not found.');
+    const prepared=await readBatchPreparation(this.storage,run.config,item);
+    prepared.assets.dispose();this.assertOpen();return prepared.blob;
   }
 
   async estimateBatch(runId: string) {
@@ -188,6 +219,7 @@ export class BatchRunnerService {
   }
 
   async start(runId: string): Promise<BatchRun> {
+    this.assertOpen();
     return this.runner.startBatch(runId);
   }
 
@@ -202,6 +234,7 @@ export class BatchRunnerService {
   }
 
   async resume(runId: string): Promise<BatchRun> {
+    this.assertOpen();
     return this.runner.startBatch(runId);
   }
 
@@ -210,6 +243,7 @@ export class BatchRunnerService {
   }
 
   async retryFailed(runId: string): Promise<BatchRun> {
+    this.assertOpen();
     return this.runner.retryFailed(runId);
   }
 
@@ -315,10 +349,24 @@ export class BatchRunnerService {
       entries.push({ name: deliv.filePath, data: blob });
     }
 
+    const preparations=[];
+    for(const item of run.items.filter(item=>item.source.raw)){
+      options.signal?.throwIfAborted();
+      if(item.deliverables.length&&!item.preparation)throw new Error('RAW deliverables have no accepted editable project. Restore the prepared checkpoint before packaging.');
+      if(!item.preparation)continue;
+      const blob=await this.getPreparedProject(runId,item.id),path=`projects/${item.id}.luma`;
+      options.signal?.throwIfAborted();entries.push({name:path,data:blob});
+      preparations.push({itemId:item.id,sourceSha256:item.source.sha256,originalName:item.source.raw!.originalName,options:item.source.raw!.options,projectPath:path,projectSha256:item.preparation.sha256,projectByteLength:blob.size,inputsSha256:item.preparation.inputsSha256});
+    }
+    if(preparations.length){
+      const record={format:'canoli-raw-batch',version:1,batchId:run.id,preparations};
+      entries.push({name:'raw-preparation.json',data:new Blob([JSON.stringify({...record,integrity:{sha256:await computeSha256(JSON.stringify(record))}},null,2)])});
+    }
     return createZipArchiveAsync(entries, options);
   }
 
   dispose(): void {
+    this.disposed=true;for(const controller of this.rawControllers)controller.abort();this.rawControllers.clear();
     this.runner.dispose();
     if (this.unsubscribeRunner) {
       this.unsubscribeRunner();

@@ -1,0 +1,2 @@
+export const isCameraRawFile=(file:Pick<File,'name'|'type'>)=>/\.(dng|nef|nrw|arw|srf|sr2|crw|cr2|cr3|raf|rw2|orf|pef|srw|3fr|fff|iiq|rwl|mos|mrw|x3f|raw)$/i.test(file.name)||/^image\/x-(?:adobe-dng|camera-raw|canon-cr[23]|nikon-nef|sony-arw|fuji-raf|panasonic-rw2|olympus-orf)$/i.test(file.type);
+export const rawFileAccept='.dng,.nef,.nrw,.arw,.srf,.sr2,.crw,.cr2,.cr3,.raf,.rw2,.orf,.pef,.srw,.3fr,.fff,.iiq,.rwl,.mos,.mrw,.x3f,.raw';

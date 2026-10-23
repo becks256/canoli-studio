@@ -477,7 +477,7 @@ test("cleanup preserves all bytes when stored run references cannot be read", as
       new Blob(["keep"]),
     );
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("luma-batch-storage", 1);
+      const request = indexedDB.open("luma-batch-storage");
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });

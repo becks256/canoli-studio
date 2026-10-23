@@ -8,10 +8,9 @@ import {developRawFile} from '../core/interchange/raw/client';
 import {Button,IconButton,NumberField,Select} from './controls';
 import {Dialog} from './Dialog';
 
-export const isCameraRawFile=(file:File)=>/\.(dng|nef|nrw|arw|srf|sr2|crw|cr2|cr3|raf|rw2|orf|pef|srw|3fr|fff|iiq|rwl|mos|mrw|x3f|raw)$/i.test(file.name)||/^image\/x-(?:adobe-dng|camera-raw|canon-cr[23]|nikon-nef|sony-arw|fuji-raf|panasonic-rw2|olympus-orf)$/i.test(file.type);
-export const rawFileAccept='.dng,.nef,.nrw,.arw,.srf,.sr2,.crw,.cr2,.cr3,.raf,.rw2,.orf,.pef,.srw,.3fr,.fff,.iiq,.rwl,.mos,.mrw,.x3f,.raw';
+export {isCameraRawFile,rawFileAccept} from '../core/interchange/raw/files';
 
-export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onApplied}:{editor:EditorApplication;file?:File;layer?:SmartObjectLayer;onClose():void;onBusyChange(value:boolean):void;onApplied():void}){
+export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onApplied,onQueued}:{editor:EditorApplication;file?:File;layer?:SmartObjectLayer;onClose():void;onBusyChange(value:boolean):void;onApplied():void;onQueued?:(source:import('../ai/batch/types').BatchSourceInput)=>void}){
   const [source]=useState(()=>{if(file)return null;if(!layer?.document)throw new Error('Choose a RAW image.');const master=new ComponentRegistry(layer.document._read().components).get(layer.componentId).source;return master.kind==='asset'?layer.document.assetStore?.get(master.assetId).raw??null:null;});
   const [settings,setSettings]=useState<RawDevelopSettings>(()=>source?.settings.development??rawDevelopOptionsSchema.parse({}));
   const [precision,setPrecision]=useState(source?.settings.allowPrecisionLoss??false),[report,setReport]=useState<Readonly<RawImportReport>|null>(source?.report??null),[error,setError]=useState(''),[running,setRunning]=useState(false),[stale,setStale]=useState(false);
@@ -38,18 +37,19 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
       if(previewOnly){const blob=file??source?.originalBlob;if(!blob)throw new Error('The retained RAW original is unavailable.');const result=await developRawFile(blob,options,control);abort.signal.throwIfAborted();setPreview(result.png);}
       else{
         applying.current=true;
-        if(file)await editor.openRaw(file,options,control);
+        if(file&&onQueued){const source=await editor.batch.prepareRawSource(file,options,control);abort.signal.throwIfAborted();onQueued(source);}
+        else if(file)await editor.openRaw(file,options,control);
         else if(layer)await layer.developRaw(new RawDevelopment(settings),{...control,allowPrecisionLoss:precision});
         else throw new Error('Choose a RAW image.');
-        if(!abort.signal.aborted){onApplied();onClose();}
+        if(!abort.signal.aborted){onApplied();if(!onQueued)onClose();}
       }
     }catch(cause){if(!abort.signal.aborted)setError(cause instanceof Error?cause.message:String(cause));}
     finally{applying.current=false;onBusyChange(false);if(!abort.signal.aborted)setRunning(false);}
   };
   const disabled=running||stale,ready=report?.canDevelop&&precision&&!(settings.whiteBalance==='camera'&&!report.hasCameraWhiteBalance&&report.channels>1);
-  return <Dialog titleId="raw-development-title" className="svg-import-dialog raw-development-dialog" onClose={close}>
-    <div className="dialog-header"><h2 id="raw-development-title">{file?'Import camera RAW':'Develop RAW'}</h2><IconButton label="Close RAW development" onClick={close}><X size={18}/></IconButton></div>
-    <div className="svg-import-body"><p><strong>{file?.name??source?.original.name}</strong></p><p>Keep the complete sensor original and editable development settings. Accepted pixels use 8-bit sRGB editing precision. {file?'Open as a smart object in a new document; existing edited documents stay open.':'Apply updates every instance of this shared master in one undo step, preserving layer placement and effects.'}</p>
+  return <Dialog localEscape titleId="raw-development-title" className="svg-import-dialog raw-development-dialog" onClose={close}>
+    <div className="dialog-header"><h2 id="raw-development-title">{onQueued?'Queue camera RAW':file?'Import camera RAW':'Develop RAW'}</h2><IconButton label="Close RAW development" onClick={close}><X size={18}/></IconButton></div>
+    <div className="svg-import-body"><p><strong>{file?.name??source?.original.name}</strong></p><p>Keep the complete sensor original and editable development settings. Accepted pixels use 8-bit sRGB editing precision. {onQueued?'Queue the original with these settings; develop it in the batch without changing the open editor. Cancel skips remaining unreviewed files.':file?'Open as a smart object in a new document; existing edited documents stay open.':'Apply updates every instance of this shared master in one undo step, preserving layer placement and effects.'}</p>
       {!report&&!error&&<p role="status">Inspecting RAW…</p>}
       {report&&<>
         <p>{report.make} {report.model} · {report.displayWidth} × {report.displayHeight} px{report.bitDepth!==null?` · ${report.bitDepth} bits per sample`:''}</p>
@@ -68,6 +68,6 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
       {running&&<div role="status"><p>{progress?.phase==='encoding'?'Preparing working image…':progress?.phase==='developing'?'Developing sensor pixels…':'Inspecting RAW…'}</p><progress aria-label="RAW development progress" max={1} value={progress?.fraction??undefined}/></div>}
       {error&&<p role="alert">{error}</p>}
     </div>
-    <div className="dialog-footer"><Button variant="subtle" onClick={close}>Cancel</Button><Button disabled={!ready||disabled} onClick={()=>void run(true)}>Preview development</Button><Button variant="primary" disabled={!ready||disabled} onClick={()=>void run(false)}>{file?'Import RAW image':'Apply RAW development'}</Button></div>
+    <div className="dialog-footer"><Button variant="subtle" onClick={close}>Cancel</Button><Button disabled={!ready||disabled} onClick={()=>void run(true)}>Preview development</Button><Button variant="primary" disabled={!ready||disabled} onClick={()=>void run(false)}>{onQueued?'Queue RAW image':file?'Import RAW image':'Apply RAW development'}</Button></div>
   </Dialog>;
 }

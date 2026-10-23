@@ -98,7 +98,7 @@ test.describe("T15: Resumable Batch Runner & Delivery Manifest E2E", () => {
     // Verify preflight estimate banner
     const estimateBanner = page.locator(".estimate-banner");
     await expect(estimateBanner).toBeVisible();
-    await expect(estimateBanner).toContainText("Budget Approved");
+    await expect(estimateBanner).toContainText("Ready to run locally");
 
     // 2. Launch Batch Run
     const startBtn = page.getByRole("button", {
@@ -289,7 +289,7 @@ test("batch setup selects a portable package and captures it in the created run"
   );
   await second.getByLabel("Artwork opacity *", { exact: true }).fill("0.25");
   await expect(page.locator(".estimate-banner")).toContainText(
-    "Budget Approved",
+    "Ready to run locally",
   );
   await page.getByRole("button", { name: "Start Resumable Batch" }).click();
   await expect(page.locator(".status-pill.completed")).toBeVisible({
@@ -394,7 +394,7 @@ test("batch preflight visibly rejects enabled AI steps and accepts skipped steps
     .getByLabel("Generate artwork")
     .selectOption("false");
   await expect(page.locator(".estimate-banner")).toContainText(
-    "Budget Approved",
+    "Ready to run locally",
   );
   await expect(
     page.getByRole("button", { name: "Start Resumable Batch" }),

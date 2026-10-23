@@ -1,3 +1,6 @@
+import {batchPreparationSchema} from './schema';
+import type {BatchPreparation} from './types';
+import {rawBlobHash} from '../../core/interchange/raw/source';
 import { z } from "zod";
 /**
  * Persistent Storage for Batch Runs, Checkpoints, and Deliverable Blobs.
@@ -33,6 +36,7 @@ const referenceSchema = z.object({
     z.object({
       id: z.string().min(1),
       deliverables: z.array(z.object({ id: z.string().min(1) })),
+      preparation:batchPreparationSchema.optional(),
     }),
   ),
 });
@@ -42,6 +46,7 @@ function referencedBlobKeys(runs: unknown[]): Set<string> {
     const run = referenceSchema.parse(value);
     for (const item of run.items) {
       keys.add(`src-${item.id}`);
+      if(item.preparation)keys.add(`prepared-${item.id}`);
       item.deliverables.forEach((delivery) => keys.add(delivery.id));
       // Retain legacy outputs written before their per-variant checkpoint.
       run.config.variants.forEach((variant) =>
@@ -65,7 +70,7 @@ export class BatchStorage {
     }
     if (!this.dbPromise) {
       this.dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open("luma-batch-storage", 1);
+        const request = indexedDB.open("luma-batch-storage", 2);
         request.onupgradeneeded = () => {
           const db = request.result;
           if (!db.objectStoreNames.contains("runs"))
@@ -73,7 +78,13 @@ export class BatchStorage {
           if (!db.objectStoreNames.contains("blobs"))
             db.createObjectStore("blobs");
         };
-        request.onsuccess = () => resolve(request.result);
+        let blocked=false;
+        request.onblocked=()=>{blocked=true;reject(new Error('Close older Canoli Studio batch tabs before upgrading batch storage.'));};
+        request.onsuccess = () => {
+          if(blocked){request.result.close();return;}
+          request.result.onversionchange=()=>{request.result.close();this.dbPromise=undefined;};
+          resolve(request.result);
+        };
         request.onerror = () =>
           reject(request.error ?? new Error("Unable to open batch storage."));
       }).catch((error) => {
@@ -233,6 +244,7 @@ export class BatchStorage {
     const keys = (run: BatchRun): string[] =>
       run.items.flatMap((item) => [
         `src-${item.id}`,
+        `prepared-${item.id}`,
         ...item.deliverables.map((delivery) => delivery.id),
         ...run.config.variants.map((variant) => `${item.id}:${variant.id}`),
       ]);
@@ -256,6 +268,24 @@ export class BatchStorage {
     this.memRuns.delete(id);
     // Browser operations read IndexedDB; do not retain deleted source/output bytes.
     this.memBlobs.clear();
+  }
+
+  /** Publish a verified scene and its pointer atomically before any variant is delivered. */
+  async commitPreparation(runId:string,itemId:string,blob:Blob,metadata:BatchPreparation):Promise<void>{
+    const preparation=batchPreparationSchema.parse(metadata);
+    if(blob.size!==preparation.byteLength||await rawBlobHash(blob)!==preparation.sha256)throw new Error('Prepared project integrity verification failed.');
+    const attach=(run:BatchRun|undefined)=>{
+      const item=run?.items.find(value=>value.id===itemId);
+      if(!run||!item||run.status==='cancelled'||item.status!=='running')throw new Error('Batch item is no longer accepting preparation.');
+      if(item.preparation)throw new Error('Batch item already has an accepted prepared scene.');
+      item.preparation=preparation;run.updatedAt=new Date().toISOString();
+    };
+    const db=await this.getDb(),key=`prepared-${itemId}`;
+    if(!db){const run=structuredClone(this.memRuns.get(runId));attach(run);this.memRuns.set(runId,run!);this.memBlobs.set(key,blob);return;}
+    const tx=db.transaction(['runs','blobs'],'readwrite',{durability:'strict'}),done=txComplete(tx);let failure:unknown;
+    const request=tx.objectStore('runs').get(runId);
+    request.onsuccess=()=>{try{attach(request.result);tx.objectStore('blobs').add(blob,key);tx.objectStore('runs').put(request.result);}catch(error){failure=error;tx.abort();}};
+    try{await done;}catch(error){throw failure??error;}
   }
 
   async commitDeliverable(

@@ -1,3 +1,10 @@
+import {isCameraRawFile} from '../../core/interchange/raw/files';
+import {batchRawSourceSchema,rawBatchDocument} from './raw';
+import {readBatchPreparation,preparationInputs} from './preparation';
+import {prepareRawAsset} from '../../engine/raw-import';
+import {serializeProject} from '../../core/project';
+import {rawBlobHash} from '../../core/interchange/raw/source';
+import type {RawImportControl} from '../../core/interchange/raw/types';
 import { Document } from "../../dom";
 import { executeRecipePackage } from "../recipes/package-executor";
 import { readRecipePackage } from "../recipes/package";
@@ -53,6 +60,7 @@ export type BatchEventType =
   | "run_cancelled"
   | "run_completed"
   | "run_failed"
+  | "item_progress"
   | "item_started"
   | "item_completed"
   | "item_failed"
@@ -65,6 +73,7 @@ export interface BatchEvent {
   item?: BatchItem;
   run?: BatchRun;
   error?: string;
+  progress?:Parameters<NonNullable<RawImportControl['onProgress']>>[0];
 }
 
 export interface BatchRunnerOptions {
@@ -168,25 +177,21 @@ export class BatchRunner {
     let totalEstimatedCostCents = 0;
 
     for (const item of items) {
+      if(!item.source.raw&&isCameraRawFile({name:item.source.name,type:item.source.mimeType}))throw new Error('Saved RAW source has no reviewed settings. Create a new batch.');
+      if(item.source.raw){const raw=batchRawSourceSchema.parse(item.source.raw);if(raw.report.displayWidth!==item.source.width||raw.report.displayHeight!==item.source.height)throw new Error('RAW batch source dimensions differ from its native report.');}
+      if(!Number.isFinite(item.estimatedCostCents)||item.estimatedCostCents<0)throw new Error('Batch item cost must be finite and nonnegative.');
       let recipeUnitCostCents = 0;
       if (recipe) {
         // Match the initial item document and merged parameters used by executeItem.
-        const sampleDoc = createDocument(
-          item.name,
-          item.source.width,
-          item.source.height,
-        );
-        const sampleLayer = createRaster(
-          item.name,
-          item.source.assetId || "estimate-source",
-          item.source.width,
-          item.source.height,
-        );
-        sampleDoc.children.push(sampleLayer);
-        const plan = compileEditPlan(recipe, sampleDoc, sampleLayer.id, {
-          ...config.recipeParams,
-          ...item.parameters,
-        });
+        const assetId=item.source.assetId||'estimate-source';
+        let sampleDoc=createDocument(item.name,item.source.width,item.source.height),sampleLayer=createRaster(item.name,assetId,item.source.width,item.source.height) as import('../../core/model').LayerData;
+        if(item.source.raw){
+          const raw=batchRawSourceSchema.parse(item.source.raw);
+          if(raw.report.displayWidth!==item.source.width||raw.report.displayHeight!==item.source.height)throw new Error('RAW batch source dimensions differ from its native report.');
+          const staged=rawBatchDocument(item.name,item.source.width,item.source.height,assetId);sampleDoc=staged.document.toJSON();sampleLayer=staged.layer.toJSON();
+        }else sampleDoc.children.push(sampleLayer);
+        const plan = compileEditPlan(recipe,sampleDoc,sampleLayer.id,{...config.recipeParams,...item.parameters},undefined,
+          item.source.raw?{get(key:string){if(key!==assetId)throw new Error('Recipe source metadata is unavailable.');return{width:item.source.width,height:item.source.height,raw:{report:item.source.raw!.report}};}}:undefined);
         if (!plan.valid)
           return {
             totalEstimatedCostCents: 0,
@@ -219,6 +224,9 @@ export class BatchRunner {
         error: `Total estimated batch cost ($${(totalEstimatedCostCents / 100).toFixed(2)}) exceeds configured batch ceiling ($${(config.budgetCeilingCents / 100).toFixed(2)}).`,
       };
     }
+
+    // Local deterministic work makes no provider call and needs no spending approval.
+    if(totalEstimatedCostCents===0)return {totalEstimatedCostCents,perItemEstimates,approved:true};
 
     // Verify against human-approved budget
     const budget = this.budgetLedger.getBudget(config.budgetId);
@@ -703,7 +711,7 @@ export class BatchRunner {
     }
 
     const startTime = Date.now();
-    const assets = new AssetStore();
+    let assets = new AssetStore();
 
     try {
       const sourceBlob =
@@ -723,17 +731,27 @@ export class BatchRunner {
         );
       }
       item.source.sha256 = digest;
-      const assetId = item.source.assetId || id();
-      const source = await assets.add(sourceBlob, item.name, assetId, false);
-      const docWidth = source.width;
-      const docHeight = source.height;
-      let doc = createDocument(item.name, docWidth, docHeight);
-      const baseLayer = createRaster(item.name, assetId, docWidth, docHeight);
-      doc.children.push(baseLayer);
+      const progress:RawImportControl['onProgress']=value=>this.emit({type:'item_progress',runId,itemId:item.id,progress:value});
+      let doc:DocumentData,baseLayer:import('../../core/model').LayerData,initial:DocumentData|undefined;
+      if(item.preparation){
+        const accepted=await readBatchPreparation(this.storage,config,item,signal);assets.dispose();assets=accepted.assets;doc=accepted.document;baseLayer=doc.children[0];
+      }else{
+        if(item.source.raw){
+          if(item.deliverables.length)throw new Error('RAW outputs have no accepted prepared scene. Restore the checkpoint or create a new batch.');
+          const raw=batchRawSourceSchema.parse(item.source.raw);
+          const source=await prepareRawAsset(assets,sourceBlob,raw.originalName,raw.options,{signal,onProgress:progress},()=>signal.throwIfAborted());
+          if(source.width!==item.source.width||source.height!==item.source.height)throw new Error('RAW native dimensions changed. Review the original before creating a new batch.');
+          const prepared=rawBatchDocument(item.name,source.width,source.height,source.id);doc=prepared.document.toJSON();baseLayer=prepared.layer.toJSON();
+        }else{
+          const assetId=item.source.assetId||id(),source=await assets.add(sourceBlob,item.name,assetId,false);
+          doc=createDocument(item.name,source.width,source.height);baseLayer=createRaster(item.name,assetId,source.width,source.height);doc.children.push(baseLayer);
+        }
+        initial=structuredClone(doc);
+      }
 
       // 3. Apply Recipe if configured
       let actualSpendCents = 0;
-      if (config.recipeId) {
+      if (config.recipeId&&!item.preparation) {
         const recipe = config.recipeSnapshot;
         if (!recipe || recipe.id !== config.recipeId) {
           throw new Error(
@@ -771,7 +789,7 @@ export class BatchRunner {
               stagingDocument,
               mergedParams,
               ()=>signal.throwIfAborted(),
-              {signal},
+              {signal,onProgress:progress},
             );
             if (signal.aborted) throw new Error("Batch execution aborted");
             doc = stagingDocument.toJSON();
@@ -779,12 +797,20 @@ export class BatchRunner {
           } else {
             const stagingDocument=Document.fromJSON(doc);stagingDocument.assetStore=assets;
             stagingDocument.selectedLayer=stagingDocument.getLayer(baseLayer.id)!;
-            const result=await executeRecipeAsync(recipe,stagingDocument,mergedParams,{signal});
+            const result=await executeRecipeAsync(recipe,stagingDocument,mergedParams,{signal,onProgress:progress});
             if(!result.success)throw new Error(result.error??`Recipe '${recipe.name}' failed.`);
             doc=stagingDocument.toJSON();
             actualSpendCents += result.plan.summary.estimatedSpendCents;
           }
         }
+      }
+
+      if(item.source.raw&&!item.preparation){
+        signal.throwIfAborted();
+        const history=JSON.stringify(initial)!==JSON.stringify(doc)?{version:1 as const,past:[{document:initial!,label:'Before batch recipe',canvasChanged:true}],future:[]}:undefined;
+        const project=await serializeProject(doc,assets,history),inputsSha256=await preparationInputs(config,item);
+        const metadata={version:1 as const,sha256:await rawBlobHash(project),byteLength:project.size,inputsSha256};signal.throwIfAborted();
+        await this.storage.commitPreparation(runId,item.id,project,metadata);item.preparation=metadata;signal.throwIfAborted();
       }
 
       // 4. Generate Delivery Variants

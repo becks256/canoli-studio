@@ -1,3 +1,4 @@
+import {RawDevelopmentDialog,isCameraRawFile,rawFileAccept} from './RawDevelopmentDialog';
 import { RecipeParameterFields } from "./RecipeParameterFields";
 import { batchItemNames } from "../ai/batch/source-names";
 import type { Recipe } from "../ai/recipes/types";
@@ -35,7 +36,7 @@ import type {
   DeliveryVariantSpec,
 } from "../ai/batch/types";
 import { DEFAULT_DELIVERY_VARIANTS } from "../ai/batch/types";
-import { verifyDeliveryManifest } from "../ai/batch/manifest";
+import { verifyDeliveryManifest,sanitizeFileName } from "../ai/batch/manifest";
 
 export interface BatchRunnerDialogProps {
   editor: EditorApplication;
@@ -67,6 +68,11 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
     DeliveryVariantSpec[]
   >(DEFAULT_DELIVERY_VARIANTS);
   const [queueItems, setQueueItems] = useState<BatchSourceInput[]>([]);
+  const [rawReviews,setRawReviews]=useState<File[]>([]);
+  const [nativeProgress,setNativeProgress]=useState<Record<string,string>>({});
+  const uploadController=useRef<AbortController|null>(null);
+  useEffect(()=>()=>uploadController.current?.abort(),[]);
+  const close=()=>{uploadController.current?.abort();exportController.current?.abort();onClose();};
 
   const selectedRecipe = selectedPackageId
     ? packages.find((recipe) => recipe.id === selectedPackageId)
@@ -157,6 +163,11 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
   // Subscribe to runner events
   useEffect(() => {
     return editor.batch.subscribe((event) => {
+      if(event.type==='item_progress'){
+        if(event.runId===activeRunId&&event.itemId&&event.progress){const progress=event.progress;setNativeProgress(value=>({...value,[event.itemId!]:`${progress.phase}${progress.fraction===null?'':` ${Math.round(progress.fraction*100)}%`}`}));}
+        return;
+      }
+      if(event.itemId)setNativeProgress(value=>{const next={...value};delete next[event.itemId!];return next;});
       if (event.type === "run_failed")
         setErrorMessage(`Batch stopped: ${event.error}`);
       void refreshRuns();
@@ -338,12 +349,16 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
     if (!files.length) return;
+    const controller=new AbortController();uploadController.current?.abort();uploadController.current=controller;
     setLoading(true);
     setErrorMessage(null);
     try {
+      const raw:File[]=[];
       const newItems: BatchSourceImage[] = [];
       // Decode sequentially and immediately release bitmaps; preserve original file bytes.
       for (const file of files) {
+        controller.signal.throwIfAborted();
+        if(isCameraRawFile(file)){raw.push(file);continue;}
         let bitmap: ImageBitmap;
         try {
           bitmap = await createImageBitmap(file);
@@ -353,6 +368,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
           );
         }
         try {
+          controller.signal.throwIfAborted();
           newItems.push({
             id: `file-${crypto.randomUUID()}`,
             name: file.name,
@@ -366,7 +382,8 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
           bitmap.close();
         }
       }
-      setQueueItems((items) => [...items, ...newItems]);
+      controller.signal.throwIfAborted();
+      setQueueItems((items) => [...items, ...newItems]);setRawReviews(raw);
       setEstimate(null);
     } catch (error) {
       setErrorMessage(String(error));
@@ -506,6 +523,13 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
     }
   };
 
+  const handleDownloadPrepared=async(itemId:string,name:string)=>{
+    if(!activeRunId)return;
+    try{
+      const blob=await editor.batch.getPreparedProject(activeRunId,itemId),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=`${sanitizeFileName(name)}.luma`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }catch(error){setErrorMessage(String(error));}
+  };
+
   // Download deliverable file
   const handleDownloadDeliverable = async (
     delivId: string,
@@ -612,8 +636,8 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
     return Math.round((finished / activeRun.items.length) * 100);
   }, [activeRun]);
 
-  return (
-    <Dialog titleId={titleId} onClose={onClose} className="batch-dialog">
+  return (<>
+    <Dialog titleId={titleId} onClose={close} className="batch-dialog">
       <div className="batch-container">
         {/* Header */}
         <div className="batch-header">
@@ -624,7 +648,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
             </h2>
             <IconButton
               label="Close"
-              onClick={onClose}
+              onClick={close}
               className="batch-close-btn"
             >
               <X size={18} />
@@ -1028,7 +1052,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                       ref={fileInputRef}
                       type="file"
                       multiple
-                      accept="image/*"
+                      accept={`image/*,${rawFileAccept}`}
                       style={{ display: "none" }}
                       disabled={loading}
                       aria-label="Upload batch images"
@@ -1058,6 +1082,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                               {item.width}×{item.height} •{" "}
                               {Math.round(item.byteLength / 1024)} KB
                             </span>
+                            {item.raw&&<span className="queue-item-meta">RAW · {item.raw.options.development.whiteBalance} WB · {item.raw.options.development.exposure} EV · original retained</span>}
                             {selectedRecipe &&
                               selectedRecipe.parameters.length > 0 && (
                                 <details className="queue-parameter-overrides">
@@ -1154,7 +1179,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           <CheckCircle2 size={16} />
                           <span>
                             Estimated Spend: ${(estimate.cost / 100).toFixed(2)}{" "}
-                            • Budget Approved
+                            • {estimate.cost===0?"Ready to run locally":"Budget Approved"}
                           </span>
                         </>
                       ) : (
@@ -1343,6 +1368,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           <td>
                             <span className={`item-status-tag ${item.status}`}>
                               {item.status}
+                              {nativeProgress[item.id]&&<span role="status"> · {nativeProgress[item.id]}</span>}
                               {item.retryCount > 0 &&
                                 ` (retry #${item.retryCount})`}
                             </span>
@@ -1525,6 +1551,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                     </div>
                   )}
 
+                {activeRun.items.some(item=>item.source.raw)&&<p>RAW packages include editable projects with complete sensor originals and accepted pixels, plus a checksummed preparation index.</p>}
                 {/* Review Items Grid */}
                 <div className="review-grid">
                   {reviewItems.map((item) => (
@@ -1532,6 +1559,8 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                       key={item.id}
                       className={`review-card ${item.reviewState}`}
                     >
+                      {item.preparation&&<Button size="sm" onClick={()=>void handleDownloadPrepared(item.id,item.name)}>Download editable RAW project</Button>}
+                      {item.source.raw&&<p>RAW original: {item.source.raw.originalName} · {item.source.raw.options.development.whiteBalance} WB · {item.source.raw.options.development.exposure} EV</p>}
                       <div className="review-card-header">
                         <div className="review-card-title">
                           <h4>{item.name}</h4>
@@ -1653,5 +1682,6 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
         )}
       </div>
     </Dialog>
-  );
+    {rawReviews[0]&&<RawDevelopmentDialog key={rawReviews[0].name+rawReviews.length} editor={editor} file={rawReviews[0]} onClose={()=>setRawReviews([])} onApplied={()=>{}} onBusyChange={()=>{}} onQueued={source=>{setQueueItems(items=>[...items,source]);setRawReviews(files=>files.slice(1));setEstimate(null);}}/>}
+  </>);
 }

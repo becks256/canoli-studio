@@ -2,6 +2,7 @@
  * Zod validation schemas for Batch Runner and Delivery Manifests.
  */
 
+import {batchRawSourceSchema} from './raw';
 import { z } from "zod";
 import { recipeSchema } from "../recipes/schema";
 import type { BatchConfig, BatchItem, DeliveryManifest } from "./types";
@@ -32,7 +33,10 @@ export const batchSourceImageSchema = z.object({
   sha256: z.string().max(128).optional(),
   assetId: z.string().max(64).optional(),
   dataUrl: z.string().optional(),
+  raw:batchRawSourceSchema.optional(),
 });
+
+export const batchPreparationSchema=z.object({version:z.literal(1),sha256:z.string().regex(/^[a-f0-9]{64}$/),byteLength:z.number().int().positive().safe(),inputsSha256:z.string().regex(/^[a-f0-9]{64}$/)}).strict();
 
 export const deliveryDeliverableSchema = z.object({
   id: z.string().min(1).max(129),
@@ -89,6 +93,7 @@ export const batchItemSchema = z.object({
   reviewState: z.enum(["unreviewed", "approved", "rejected", "flagged"]),
   reviewNotes: z.string().max(1000).optional(),
   jobId: z.string().max(64).optional(),
+  preparation:batchPreparationSchema.optional(),
   error: z.string().optional(),
   estimatedCostCents: z.number().min(0),
   actualCostCents: z.number().min(0),

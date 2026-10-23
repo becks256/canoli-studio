@@ -56,6 +56,13 @@ export interface BatchSourceInput extends BatchSourceImage {
   parameters?: Record<string, unknown>;
 }
 
+export interface BatchPreparation {
+  version:1;
+  sha256:string;
+  byteLength:number;
+  inputsSha256:string;
+}
+
 export interface BatchSourceImage {
   id: string;
   name: string;
@@ -67,6 +74,7 @@ export interface BatchSourceImage {
   assetId?: string;
   dataUrl?: string;
   blob?: Blob;
+  raw?:import('./raw').BatchRawSource;
 }
 
 export interface BatchItem {
@@ -82,6 +90,7 @@ export interface BatchItem {
   estimatedCostCents: number;
   actualCostCents: number;
   checkpoint?: DocumentData;
+  preparation?:BatchPreparation;
   deliverables: DeliveryDeliverable[];
   startedAt?: string;
   completedAt?: string;

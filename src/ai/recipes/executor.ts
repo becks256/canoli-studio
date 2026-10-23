@@ -129,7 +129,7 @@ export function compileEditPlan(
   selectedId: string | null = null,
   rawParams: Record<string, unknown> = {},
   availableAssetIds?: ReadonlySet<string>,
-  rawAssets?: {get(id:string):Pick<ImageAsset,'raw'|'width'|'height'>},
+  rawAssets?: {get(id:string):{width:number;height:number;raw?:Pick<NonNullable<ImageAsset['raw']>,'report'>}},
 ): EditPlan {
   const errors: string[] = [];
   if (!recipeOutputBindingsUnique(recipe))
@@ -141,7 +141,7 @@ export function compileEditPlan(
   const plannedSteps: PlannedStepChange[] = [];
   const resolvedCommands: EditorCommand[] = [];
   const rawDevelopments:PlannedRawDevelopment[]=[];
-  const plannedRawAssets=new Map<string,Pick<ImageAsset,'raw'|'width'|'height'>>();
+  const plannedRawAssets=new Map<string,{width:number;height:number;raw?:Pick<NonNullable<ImageAsset['raw']>,'report'>}>();
 
   const { values: params, errors: paramErrors } = resolveParameterValues(
     recipe.parameters,

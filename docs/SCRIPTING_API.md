@@ -2768,7 +2768,7 @@ if (image instanceof SmartObjectLayer) {
 }
 ```
 
-The image asset retains accepted PNG bytes plus a frozen `raw` record: complete original Blob/name/MIME/byte length/SHA-256, normalized consent/settings, accepted native report, decoder WASM SHA-256 and accepted-output SHA-256. Hashes validate content relationships/corruption, not photographic fidelity or authorship. Native project container v4 deduplicates original blobs across current/history outputs; non-RAW projects still use v3. Readers retain v1–3 compatibility; older readers reject v4 rather than silently flattening it. Workspace encoding, recovery digests, asset sharing/cross-document transfer and source-bearing recipe package v2 and brush preset/pack v6 retain both byte streams and settings. Opening a saved RAW project decodes its accepted PNG without the RAW codec. Direct RAW batch opening and broader photographic/quality gates remain outstanding workflow surfaces. Semantic RAW development recipes are described below. The isolated and separate REST development contracts follow below. Internal development retains linear RGB16, checks native error/geometry/copy/corruption results and uses explicit consent before producing the current RGBA8 sRGB working PNG. It does not use the embedded JPEG preview. Full-input/full-plane native memory, WASM address space and native format geometry remain limits, separate from original source resolution; no arbitrary MP/file-size cap is introduced. Physical camera/color/quality, broad DNG/codec coverage, F10 high-precision/HDR composition and broader F12/F14 acceptance remain open. No isolated file/worker/pixel/network/plugin privilege or REST renderer/session synchronization is added.
+The image asset retains accepted PNG bytes plus a frozen `raw` record: complete original Blob/name/MIME/byte length/SHA-256, normalized consent/settings, accepted native report, decoder WASM SHA-256 and accepted-output SHA-256. Hashes validate content relationships/corruption, not photographic fidelity or authorship. Native project container v4 deduplicates original blobs across current/history outputs; non-RAW projects still use v3. Readers retain v1–3 compatibility; older readers reject v4 rather than silently flattening it. Workspace encoding, recovery digests, asset sharing/cross-document transfer and source-bearing recipe package v2 and brush preset/pack v6 retain both byte streams and settings. Opening a saved RAW project decodes its accepted PNG without the RAW codec. Broader photographic/quality gates remain outstanding. Direct RAW batches are described below. Semantic RAW development recipes are described below. The isolated and separate REST development contracts follow below. Internal development retains linear RGB16, checks native error/geometry/copy/corruption results and uses explicit consent before producing the current RGBA8 sRGB working PNG. It does not use the embedded JPEG preview. Full-input/full-plane native memory, WASM address space and native format geometry remain limits, separate from original source resolution; no arbitrary MP/file-size cap is introduced. Physical camera/color/quality, broad DNG/codec coverage, F10 high-precision/HDR composition and broader F12/F14 acceptance remain open. No isolated file/worker/pixel/network/plugin privilege or REST renderer/session synchronization is added.
 
 ## RAW development recipes (trusted browser host)
 
@@ -2791,6 +2791,35 @@ const recipe = {
 const result = await editor.recipes.executeAsync(recipe, {ev: 1.25});
 if (!result.success) throw new Error(result.error);
 ```
+
+## Direct RAW batches (trusted browser host)
+
+`await editor.batch.prepareRawSource(file: File, options: RawDecodeOptions = {}, control: RawImportControl = {}): Promise<BatchSourceInput>` requires explicit `allowPrecisionLoss: true`, inspects the selected sensor image with the actual native worker and hashes the complete original. It returns original Blob/name/MIME/extent/hash and native-size geometry with a strict `raw: {version:1, originalName, options, report}` review record. That record describes source preflight, not accepted pixels. Unsupported settings, missing camera WB, native/codec failures, abort and throwing progress callbacks reject. It does not install document assets or develop a preview. Queue review offers the same exact settings/preview controls as host import; Preview develops real sensor data privately.
+
+`await editor.batch.createBatch(config, sources)` clones source/settings/recipe inputs, verifies RAW inspection and original hashes before atomically persisting the run plus complete original files. Recognized RAW files without review/consent reject. `config` retains the existing required `name` and `budgetId` strings and optional variants/recipe/parameters/concurrency settings. Local deterministic processing estimates zero provider cost and requires no spending approval or account; positive-cost work still requires the existing human-approved budget. Invalid recipes, negative/non-finite costs and unsupported AI actions reject before workers start.
+
+`await editor.batch.start(runId)` starts asynchronously; `await editor.batch.waitForRun(runId)` waits for a terminal state. Native RAW output becomes an asset-backed OO smart object in an independent staging document. Normal semantic recipes and portable recipe packages run against that original; the visible editor/model/history/assets stay unchanged. The runner atomically persists a checksummed editable project and its input fingerprint before publishing the first variant. Projects retain complete sensor originals, native accepted pixels/settings and the pre-recipe state when changed. `item.preparation` contains version 1, SHA-256, byte length and input SHA-256; the Blob is private durable storage, not JSON/base64.
+
+Retry/reload verifies original bytes, the prepared project, source/options/recipe/parameter identity and existing delivery hashes. Accepted scenes reopen without the RAW decoder, skip previously completed variants and preserve their identities. Missing/corrupt or mismatched prepared scenes reject without silently re-developing accepted work. Cancellation terminates private native preparation; a cancelled item accepts no late scene/output. Pause retains the existing behavior of finishing active items before stopping further admissions. Native progress arrives through `item_progress` events without per-progress storage writes. Old interrupted work without a prepared scene can develop only when it has no accepted variants.
+
+`await editor.batch.getPreparedProject(runId, itemId): Promise<Blob>` verifies and returns that editable `.luma` file, or rejects if missing/corrupt/mismatched. Review exposes Download editable RAW project. Existing `exportDeliveryPackageZip(runId, options?)` also includes each prepared RAW project in `projects/` and `raw-preparation.json`: format `canoli-raw-batch`, version 1, batch ID and source/settings/project identities, plus SHA-256 over the compact index before its integrity field. The existing delivery manifest stays version 2; ordinary packages keep their existing contents. These are local downloads containing full sensor originals, not cloud uploads. Batch storage database version 2 protects prepared-project references during cleanup/deletion; an older open tab blocking upgrade gives an actionable error, and legacy sources/results are preserved. Actual browser/native/Blob/IndexedDB quota, full-input/full-plane memory and ZIP-format limits remain; no arbitrary original MP/file-size cap is added.
+
+<!-- example: raw-native-batch -->
+```js
+// Trusted host code supplies a selected camera File as `file`.
+const source = await editor.batch.prepareRawSource(file, {allowPrecisionLoss: true});
+const run = await editor.batch.createBatch({
+  name: "Native RAW delivery", budgetId: "local-processing",
+  variants: [{id: "native", name: "Native PNG", format: "png",
+    targetWidth: source.width, targetHeight: source.height, fit: "fill"}]
+}, [source]);
+await editor.batch.start(run.id);
+const finished = await editor.batch.waitForRun(run.id);
+if (finished.status !== "completed") throw new Error(finished.items[0].error);
+const project = await editor.batch.getPreparedProject(run.id, finished.items[0].id);
+```
+
+These are trusted browser services. Isolated Scripts/plugins gain no file, Blob, batch, export or worker capability; REST documents remain independent. This connected native workflow does not establish photographic camera/profile/color fidelity, broader codecs/merges or complete F10/F12/F14/roadmap acceptance.
 
 ## RAW development in isolated Scripts and plugins
 

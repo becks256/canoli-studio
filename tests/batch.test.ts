@@ -1153,6 +1153,8 @@ describe("T15: Resumable Batch Runner & Delivery Manifest", () => {
         sources,
       );
 
+      run.items[0].estimatedCostCents=1;
+      await storage.saveRun(run);
       await expect(batchService.start(run.id)).rejects.toThrow(
         /human consent is required/i,
       );
