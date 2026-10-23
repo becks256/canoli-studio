@@ -20,7 +20,15 @@ export function hasLensCorrection(value:LensCorrectionData|undefined){
 /** Exact extrema of a cubic on a finite interval; sampling cannot miss a fold between grid points. */
 function positiveCubic(a:number,b:number,c:number,max:number){
   const points=[0,max],A=3*c,B=2*b,C=a;
-  if(A===0){if(B!==0)points.push(-C/B);}else{const d=B*B-4*A*C;if(d>=0){points.push((-B-Math.sqrt(d))/(2*A),(-B+Math.sqrt(d))/(2*A));}}
+  if(A===0){if(B!==0)points.push(-C/B);}else{
+    const d=B*B-4*A*C;
+    if(d>=0){
+      // Avoid subtracting nearly equal values: that can erase an interior extremum
+      // when the cubic term is tiny, allowing a fold between positive endpoints.
+      const root=Math.sqrt(d),q=-.5*(B+(B<0?-root:root));
+      if(q===0)points.push(-B/(2*A));else points.push(q/A,C/q);
+    }
+  }
   return points.filter(t=>t>=0&&t<=max).every(t=>Number.isFinite(t)&&1+t*(a+t*(b+t*c))>0);
 }
 export function validateLensGeometry(value:LensCorrectionData,width:number,height:number){

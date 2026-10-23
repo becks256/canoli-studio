@@ -19,6 +19,12 @@ it('rejects radial folds and nonpositive vignette attenuation across the whole i
  const image={width:64,height:48,channels:3,readRegion(){throw new Error('Must not read');}}as unknown as OwnedRawImage;
  expect(()=>rawLensSampler(image,lensCorrectionSchema.parse({distortion:{k1:-1}}))).toThrow(/folds/);
 });
+for(const k3 of [1e-30,-1e-30])for(const kind of ['radial','vignette']as const)it(`rejects interior ${kind} failure with tiny cubic coefficient ${k3}`,()=>{
+ const lens=lensCorrectionSchema.parse(kind==='radial'?{distortion:{k1:-1,k2:.4,k3}}:{center:{x:0,y:0},vignette:{k1:-1,k2:.2,k3}});
+ expect(()=>validateLensGeometry(lens,64,48)).toThrow(kind==='radial'?/folds/:/positive/);
+ const image={width:64,height:48,channels:3,readRegion(){throw new Error('Must not read invalid geometry');}}as unknown as OwnedRawImage;
+ expect(()=>rawLensSampler(image,lens)).toThrow(kind==='radial'?/folds/:/positive/);
+});
 for(const name of ['barrel','pincushion','chromatic','vignette','combined'])it(`actual native linear RAW ${name} correction matches independent NumPy pixels and preserves the original`,async()=>{
  const manifest=JSON.parse(await readFile('tests/fixtures/raw-lens/manifest.json','utf8')),fixture=manifest.cases.find((value:{name:string})=>value.name===name),original=new Blob([new Uint8Array(await readFile('tests/fixtures/raw/bayer-rggb.dng'))],{type:'image/x-adobe-dng'}),before=await original.arrayBuffer();
  const result=await developServerRaw(original,{allowPrecisionLoss:true,development:{lens:fixture.options}}),reference=new Blob([new Uint8Array(await readFile('tests/fixtures/raw-lens/'+name+'.png'))],{type:'image/png'});
