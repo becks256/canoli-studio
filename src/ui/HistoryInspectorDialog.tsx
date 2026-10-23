@@ -1,7 +1,8 @@
 import {useEffect, useId, useMemo, useRef, useState} from 'react';
 import {X} from 'lucide-react';
 import type {EditorApplication} from '../editor';
-import {historyTimeline, inspectHistoryChange} from '../core/history-inspection';
+import {historyTimeline, inspectHistoryChange, historyBranchTree} from '../core/history-inspection';
+import {HistoryComparisons} from './HistoryComparisons';
 import {Dialog} from './Dialog';
 import {Button, IconButton, Select, TextInput} from './controls';
 
@@ -14,6 +15,8 @@ export function HistoryInspectorDialog({editor, onClose}: {editor: EditorApplica
   const [images, setImages] = useState<{before: string | null; after: string} | null>(null);
   const pending = useRef<AbortController | null>(null), urls = useRef<string[]>([]), alive = useRef(true);
   const timeline = useMemo(() => historyTimeline(capture.state), [capture]);
+  const branchTree = useMemo(() => historyBranchTree(capture.state.branches), [capture]);
+  const branchNames = useMemo(() => new Map(capture.state.branches.map(branch => [branch.id, branch.name])), [capture]);
   const summary = useMemo(() => inspectHistoryChange(position ? timeline[position - 1].document : null, timeline[position].document), [timeline, position]);
   const clearImages = () => {for (const url of urls.current) URL.revokeObjectURL(url); urls.current = []; setImages(null);};
   const cancel = () => {pending.current?.abort(); pending.current = null; setBusy(false);};
@@ -49,6 +52,7 @@ export function HistoryInspectorDialog({editor, onClose}: {editor: EditorApplica
       <section aria-label="Document history branches"><h3>Document branches</h3>
         <p>Create a named branch from the current document state. Switching restores its latest accepted result and retained undo path. Save project and workspace recovery preserve branches and their sources.</p>
         {capture.state.branches.length ? <>
+          <ol className="history-branch-tree" aria-label="History branch ancestry">{branchTree.map(branch => <li key={branch.id} style={{marginInlineStart:Math.min(branch.depth,6)*14}}><Button variant="subtle" disabled={busy} aria-pressed={branch.id===branchId} aria-label={`Inspect branch ${branch.name}`} onClick={()=>{setBranchId(branch.id);setBranchName(branch.name);setDeleteId('');}}><strong>{branch.name}{branch.id===capture.state.activeBranchId?' (active)':''}</strong><span>Level {branch.depth+1} · {branch.parentId?`from ${branchNames.get(branch.parentId)}`:'root'}</span></Button></li>)}</ol>
           <Select label="Saved history branch" value={branchId} options={capture.state.branches.map(branch => ({value: branch.id, label: `${branch.name}${branch.id === capture.state.activeBranchId ? ' (active)' : ''}`}))} onChange={value => {setBranchId(value); setBranchName(capture.state.branches.find(branch => branch.id === value)?.name ?? ''); setDeleteId('');}} disabled={busy}/>
           {selectedBranch && <p>Parent: {capture.state.branches.find(branch => branch.id === selectedBranch.parentId)?.name ?? 'Root branch'}. {selectedBranch.tip.past.length} retained transitions. Fork origin: {selectedBranch.forkDocument.width} × {selectedBranch.forkDocument.height} document pixels.</p>}
         </> : <p>No branches yet. The first branch also preserves the existing route as Main.</p>}
@@ -62,6 +66,7 @@ export function HistoryInspectorDialog({editor, onClose}: {editor: EditorApplica
         {deleteId && selectedBranch && <div><p>Delete “{selectedBranch.name}” and its retained path? Save a project backup first if you need this alternative. Active branches and parents with children cannot be deleted.</p><div className="history-inspector-actions"><Button variant="danger" onClick={() => mutateBranch(() => capture.document.deleteHistoryBranch(deleteId))}>Confirm delete branch</Button><Button onClick={() => setDeleteId('')}>Keep branch</Button></div></div>}
         <p className="field-hint">Each route retains up to 60 transitions. Branch creation and naming are persistent metadata changes, separate from Undo. Switching to another branch ends an active recipe recording with an explicit error; start a new recording there.</p>
       </section>
+      <HistoryComparisons editor={editor} capture={capture} check={check} reload={reload}/>
       <ol className="history-inspector-timeline" aria-label="Retained history states">{timeline.map(item => <li key={item.position}><Button variant="subtle" disabled={busy} aria-pressed={position === item.position} onClick={() => {cancel(); clearImages(); setPosition(item.position); setError('');}} aria-label={`Inspect history state ${item.position}: ${item.label}`}><span>{item.position}. {item.label}</span>{item.position === capture.state.past.length && <strong>Current at capture</strong>}</Button></li>)}</ol>
       <section aria-label="Selected history changes"><h3>{timeline[position].label}</h3>
         {!position ? <p>No earlier state is retained for this baseline.</p> : <>

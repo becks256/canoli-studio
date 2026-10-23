@@ -1,6 +1,7 @@
 import {captureRetainedHistory, retainedDocuments} from './core/history';
 import {freeze} from './core/immutable';
 import {historyTimeline} from './core/history-inspection';
+import {renderHistoryComparison, type HistoryComparisonPreview} from './engine/history-comparison';
 import {PaletteLibrary} from './palettes/service';
 import {ArtworkLibrary} from './library/service';
 import type {ArtworkMetadata} from './library/model';
@@ -288,7 +289,7 @@ export class EditorApplication {
       cached?.state.document === state.document &&
       cached.state.past === state.past &&
       cached.state.future === state.future &&
-      cached.state.branches === state.branches && cached.state.activeBranchId === state.activeBranchId
+      cached.state.branches === state.branches && cached.state.activeBranchId === state.activeBranchId && cached.state.comparisons === state.comparisons
     )
       return cached.project;
     const entry = {
@@ -934,6 +935,27 @@ export class EditorApplication {
       };
       const before=position?await render(timeline[position-1].document):null,after=await render(timeline[position].document);check();return{before,after};
     }catch(cause){if(abort.signal.aborted)throw abort.signal.reason;throw cause;}finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);abort.signal.removeEventListener('abort',disposeRenderer);this.historyPreviews.delete(abort);renderer.dispose();assets.dispose();}
+  }
+
+  async previewHistoryComparison(id: string, control: {signal?: AbortSignal} = {}): Promise<HistoryComparisonPreview> {
+    if (this.historyPreviewClosed) throw new Error('Editor is closed.');
+    control.signal?.throwIfAborted();
+    const target = this.document, snapshot = target.getSnapshot(), comparison = snapshot.comparisons.find(value => value.id === id);
+    if (!comparison) throw new Error('History comparison not found.');
+    const abort = new AbortController(), assets = new AssetStore(), renderer = new CanvasRenderer();
+    const cancel = () => abort.abort(control.signal?.reason), check = () => {
+      abort.signal.throwIfAborted();
+      if (this.historyPreviewClosed || this.document !== target || target.getSnapshot().revision !== snapshot.revision)
+        throw new Error('History changed during comparison preview. Reload the timeline.');
+    }, changed = () => {try {check();} catch (cause) {abort.abort(cause);}};
+    const stopDocument = target.subscribe(changed), stopEditor = this.subscribe(changed), disposeRenderer = () => renderer.dispose();
+    control.signal?.addEventListener('abort', cancel, {once: true}); abort.signal.addEventListener('abort', disposeRenderer, {once: true}); this.historyPreviews.add(abort);
+    try {
+      check(); const ids = new Set([...referencedAssets(comparison.before), ...referencedAssets(comparison.after)]);
+      for (const assetId of ids) this.assetStore.shareTo(assets, assetId, assetId);
+      const value = await renderHistoryComparison(comparison, assets, renderer, check, () => abort.signal.aborted); check(); return value;
+    } catch (cause) {if (abort.signal.aborted) throw abort.signal.reason; throw cause;}
+    finally {stopDocument(); stopEditor(); control.signal?.removeEventListener('abort', cancel); abort.signal.removeEventListener('abort', disposeRenderer); this.historyPreviews.delete(abort); renderer.dispose(); assets.dispose();}
   }
 
   async previewLibraryArtwork(entryId:string,control:{signal?:AbortSignal}={}):Promise<Blob> {
@@ -1583,7 +1605,7 @@ export class EditorApplication {
     const blob = await serializeProject(
       state.document,
       session.assets,
-      state.branches.length ? captureRetainedHistory(state) : undefined,
+      state.branches.length || state.comparisons.length ? captureRetainedHistory(state) : undefined,
     );
     if (this.sessions.includes(session)) {
       session.savedRevision = revision;

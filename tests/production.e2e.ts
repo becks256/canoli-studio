@@ -2042,3 +2042,7 @@ test('production history inspector renders and navigates retained artwork withou
 test('production persistent history branches preserve editable alternatives without developer globals', async ({page}, info) => {
  const {historyBranchesWorkflow}=await import('./helpers/history-branches'); await historyBranchesWorkflow(page, info, true);
 });
+
+test('production saved comparisons retain regions and continue exact alternatives without developer globals',async({page},info)=>{
+ const {historyComparisonsWorkflow}=await import('./helpers/history-comparisons');await historyComparisonsWorkflow(page,info,true);
+});

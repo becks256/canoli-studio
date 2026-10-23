@@ -196,6 +196,8 @@ self.onmessage = async (event) => {
     };
     const branchMutation = () => {throw new Error('Use editor history branches after a script finishes.');};
     document.createHistoryBranch = document.checkoutHistoryBranch = document.renameHistoryBranch = document.deleteHistoryBranch = branchMutation;
+    const comparisonMutation = () => {throw new Error('Use editor history comparisons after a script finishes.');};
+    document.createHistoryComparison = document.updateHistoryComparison = document.deleteHistoryComparison = document.createHistoryBranchFromComparison = comparisonMutation;
     const print = (...values: unknown[]) => {
       if (logs.length < 100)
         logs.push(

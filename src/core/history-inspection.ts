@@ -4,7 +4,7 @@ import {layerBounds, unionBounds} from './spatial';
 
 type TimelineState = Pick<EditorState, 'document' | 'past' | 'future'>;
 let labelSegments: Intl.Segmenter | undefined;
-function displayLabel(label: string) {
+export function displayHistoryLabel(label: string) {
   if (label.length <= 240) return label;
   let end = 0;
   if (typeof Intl.Segmenter === 'function') {
@@ -20,9 +20,22 @@ function displayLabel(label: string) {
 export function historyTimeline(state: TimelineState) {
   const redo = [...state.future].reverse();
   return [{position: 0, label: 'Oldest retained state', labelTruncated: false, document: state.past[0]?.document ?? state.document},
-    ...[...state.past, ...redo].map((entry, index) => ({position: index + 1, label: displayLabel(entry.label), labelTruncated:entry.label.length>240,
+    ...[...state.past, ...redo].map((entry, index) => ({position: index + 1, label: displayHistoryLabel(entry.label), labelTruncated:entry.label.length>240,
       document: index + 1 < state.past.length ? state.past[index + 1].document
         : index + 1 === state.past.length ? state.document : redo[index - state.past.length].document}))];
+}
+
+/** Iterative traversal preserves parent links without deep recursion or repeated ancestry walks. */
+export function historyBranchTree(branches: EditorState['branches']) {
+  const children = new Map<string | null, EditorState['branches']>();
+  for (const branch of branches) {const siblings = children.get(branch.parentId) ?? []; siblings.push(branch); children.set(branch.parentId, siblings);}
+  const result: {id: string; name: string; parentId: string | null; depth: number}[] = [];
+  const stack = (children.get(null) ?? []).map(branch => ({branch, depth: 0})).reverse();
+  while (stack.length) {
+    const {branch, depth} = stack.pop()!; result.push({id: branch.id, name: branch.name, parentId: branch.parentId, depth});
+    for (const child of [...children.get(branch.id) ?? []].reverse()) stack.push({branch: child, depth: depth + 1});
+  }
+  return result;
 }
 
 export interface HistoryLayerChange {

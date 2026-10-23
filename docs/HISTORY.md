@@ -2,7 +2,7 @@
 
 Open **History → Inspect retained history**, or search for **Inspect history** in the command palette. The action has no default shortcut and can be rebound. Select a retained state to inspect the operation leading into it. Selection alone never changes the document. **Preview before and after** renders private reference images; **Move to selected history state** explicitly restores that state. **Reload history timeline** captures newer edits. The displayed current marker describes the captured timeline.
 
-Navigation publishes the destination once, preserves the complete retained redo path, and does not execute old commands, scripts, decoders or generation jobs. Normal Undo/Redo continue from the selected position. A subsequent edit from an earlier state creates a branch and preserves the previous result. Persistent branches now retain their own latest accepted result and linear undo path. Saved comparison regions, cryptographic provenance, authorship and generation billing remain separate unfinished roadmap work. Existing workspace checkpoints and named versions are separate recovery controls.
+Navigation publishes the destination once, preserves the complete retained redo path, and does not execute old commands, scripts, decoders or generation jobs. Normal Undo/Redo continue from the selected position. A subsequent edit from an earlier state creates a branch and preserves the previous result. Persistent branches now retain their own latest accepted result and linear undo path. Saved comparisons below now pin accepted states and regions; cryptographic provenance, authorship and generation billing remain separate unfinished roadmap work. Existing workspace checkpoints and named versions are separate recovery controls.
 
 ## Inspection and previews
 
@@ -37,7 +37,7 @@ The existing loopback REST host owns its own headless documents. These endpoints
 - `POST /api/v1/documents/:id/history` accepts strict `{expectedRevision:number,position:number}` and returns the normal document snapshot. Stale revisions return 409; malformed/noninteger/out-of-range positions return 400 without navigation. No-op navigation preserves the revision.
 - If navigation was accepted before an observer failed, history/undo/redo endpoints return 200 with the actual current snapshot and a `warning` asking the client to inspect before retrying. They do not report an accepted move as rejected. The revision still advances once.
 
-Unbranched documents retain history format 1. Branched history uses strict format 2 inside the existing checksummed native project 3/4 and workspace 2 containers; the document schema is unchanged. Older readers that only accept history 1 reject branched files. Workspace recovery and explicitly history-bearing native files preserve both directions and all branches. Normal browser Save project automatically includes history 2 when branches exist; unbranched downloads still omit linear history. Independent REST downloads require `?history=true` to include history and branches. Accepted source assets must remain available for retained states and are preserved by the existing project/workspace asset validation. Browser eviction, current format/font/precision limits and the broader professional-editor/performance gates still apply.
+Unbranched documents retain history format 1. Branched history uses strict format 2, while saved comparisons use strict format 3, inside the existing checksummed native project 3/4 and workspace 2 containers; the document schema is unchanged. Older readers reject history versions they do not support; a history-2 reader cannot open comparison-bearing history 3. Workspace recovery and explicitly history-bearing native files preserve both directions and all branches. Normal browser Save project automatically includes history 2 when branches exist and history 3 when saved comparisons exist; unbranched downloads still omit linear history. Independent REST downloads require `?history=true` to include history and branches. Accepted source assets must remain available for retained states and are preserved by the existing project/workspace asset validation. Browser eviction, current format/font/precision limits and the broader professional-editor/performance gates still apply.
 
 
 ## Persistent document branches
@@ -77,3 +77,59 @@ History 2 validates all current, past, future, branch-tip, branch-history and fo
 ```
 
 Successful mutations return the ordinary document snapshot plus `activeBranchId` and branch metadata. Stale revisions return 409; unknown branches, malformed/extra fields and prohibited deletion return 400 without publication. Accepted observer failures return 200 with the actual current state and the existing inspect-before-retrying warning. These independent sessions do not synchronize with browser documents or gain image rendering. Use `GET .../project?history=true` for branch-bearing native delivery.
+
+
+## Saved comparison regions and branch ancestry
+
+The inspector displays parent-ordered branch ancestry, active and selected markers, level and parent names. Selecting an ancestry row inspects that branch's metadata; **Switch to branch tip** remains the explicit document mutation. The list scrolls, long names wrap and visual indentation caps at six levels while the full actual level/parent remains displayed. Native buttons retain normal Tab/Enter behavior; this is not an ARIA tree widget with undisclosed keyboard rules.
+
+In **Saved comparisons → Save a new comparison**, choose Before and After from the current document, any retained timeline state or any branch's latest accepted tip. Give the comparison a name and integer document-pixel region. Saving pins both complete immutable snapshots and their accepted source assets. It changes history-management metadata/revision once and leaves live artwork, selection, canvas invalidation and the linear Undo/Redo path intact. The snapshots survive pruning, branch renaming/deletion, normal project downloads, workspace checkpoints, recovery and named versions. Comparisons are never silently evicted. More snapshots/branches require more storage and memory; source images are not downsampled or limited by this metadata feature.
+
+The region uses the common top-left document coordinate plane. x/y are nonnegative safe integers, width/height positive safe integers, and the rectangle must fit within the combined maximum width/height of the two captured canvases. Default: the complete combined extent. Outside either smaller canvas is transparent; off-canvas layer geometry is clipped to that snapshot's canvas. Changing canvas geometry does not infer registration, optical alignment or crop transforms. Select a saved comparison to rename/change its region, preview it or explicitly confirm deletion. Updates retain the original two states; create a new comparison to choose different states. Names trim to 1–120 UTF-16 units and are unique under NFKC/lowercase comparison. Names are independent of branch names.
+
+**Preview saved comparison** privately renders that region on both sides, at no more than 512 pixels per edge and 262,144 working pixels, with no upscaling. Both outputs share identical dimensions and coordinates. A third PNG shows black for unchanged displayed pixels and magenta intensity equal to the maximum channel delta (0–255). Statistics report compared pixels, pixels with any nonzero delta, maximum channel delta, and mean absolute delta over all four channels. RGB values are compared after `round(channel * alpha / 255)`; alpha is compared directly, so invisible RGB does not create a false change. These are displayed sRGB8/premultiplied-RGBA measurements using current browser fonts, not full-resolution, ICC, font-portability or photographic equality claims. Large regions are downscaled; use small native-pixel regions for close inspection. The CPU comparison yields between scanline blocks and checks cancellation.
+
+Previewing neither changes the document nor reruns commands, decoders, model jobs or generation. Source assets are privately leased. Cancel, closing, source document switching/closure, metadata/artwork revisions and editor disposal invalidate pending results and release private canvases/renderers/leases. Stale captures require Reload before metadata edits or continuation. Failed previews display recoverable errors. Object URLs belong to the caller and must be revoked when no longer used.
+
+To edit a pinned state again, enter a new branch name and choose **Continue before as branch** or **Continue after as branch**. This restores the exact accepted snapshot as a new branch with an empty Undo path; only that snapshot was pinned as a comparison side. Existing routes/tips remain accessible. Revision and canvas invalidation advance once, selection is filtered and branch-switch observers invalidate active/paused semantic recording. No old operation is rerun. Subsequent ordinary edits get normal Undo. Deleting a comparison releases its graph references without promising immediate asset-store collection.
+
+### Trusted OO and preview API
+
+```ts
+// Trusted browser hosting code, outside isolated Scripts.
+const doc = editor.document;
+const comparison = doc.createHistoryComparison(
+  'Earlier versus current',
+  {kind: 'timeline', position: 0},
+  {kind: 'current'},
+); // string ID; omitted region defaults to combined canvas extent
+const preview = await editor.previewHistoryComparison(comparison);
+// preview.before, preview.after and preview.difference are PNG Blobs.
+// preview.width, preview.height and preview.statistics describe the displayed grid.
+doc.updateHistoryComparison(comparison, {name: 'Reviewed comparison'});
+doc.createHistoryBranchFromComparison(comparison, 'after', 'Reviewed alternative');
+doc.deleteHistoryComparison(comparison);
+```
+
+- `Document.createHistoryComparison(name:string,before:HistoryTarget,after:HistoryTarget,region?:HistoryRegion):string`. Targets are strict `{kind:'current'}`, `{kind:'timeline',position:number}` or `{kind:'branch',branchId:string}`. Positions use the current retained route; branches identify their accepted tips, independent of their undo cursors. Target inputs are resolved at synchronous acceptance and stored as snapshots/captured labels, not mutable index references. All three required arguments have no defaults; only region defaults as described.
+- `Document.updateHistoryComparison(id:string,changes:{name?:string,region?:HistoryRegion}):void`. Strict fields; omitted values remain unchanged. Empty/identical updates are no-ops, including revision. There is no default ID and no implicit source replacement.
+- `Document.deleteHistoryComparison(id:string):void`. No default; unknown IDs reject. Deletion is separate from artwork Undo and the UI asks for confirmation.
+- `Document.createHistoryBranchFromComparison(id:string,side:'before'|'after',name:string):string`. No defaults. Requires an existing comparison, a valid side and a unique branch name. It restores a new branch with no invented earlier transitions.
+- `EditorApplication.previewHistoryComparison(id:string,control?:{signal?:AbortSignal}):Promise<HistoryComparisonPreview>`. control defaults to `{}`. Returns `{before:Blob,after:Blob,difference:Blob,width:number,height:number,statistics:{comparedPixels,changedPixels,maximumChannelDelta,meanAbsoluteChannelDelta}}`. Rejects unknown IDs, closed owners, stale state, cancellation, renderer/readback/encoding failure. No headless or isolated preview/file service is added.
+
+All four document mutations reject inside synchronous transactions and reentrant history publication/navigation. Malformed targets/regions/names, duplicate names, missing IDs and unsupported sides reject before publication. Metadata updates do not produce artwork command events or fake Undo steps. Accepted metadata observer failure throws **History comparison changed, but an observer failed. Inspect the document before retrying.** Continuation uses the existing accepted-branch failure error. The published change remains accepted; all remaining switch observers are notified. Inspect/reload before retrying.
+
+Isolated Scripts/internal plugins reject all four methods with **Use editor history comparisons after a script finishes.** Earlier commands in a failed execution roll back. Normal attached commands remain validated and undoable; installation and grants remain unchanged.
+
+### Independent REST comparisons
+
+- `GET /api/v1/documents/:id/history-comparisons` returns `{revision,comparisons:[{id,name,beforeLabel,afterLabel,region,beforeSize:{width,height},afterSize:{width,height}}]}`. It does not return source bytes or render images.
+- `GET .../history-comparisons/:comparisonId` returns `{revision,comparison,change}` with the existing bounded/disclosed document/layer-field report between the pinned snapshots. Headless bounds may be unavailable; this report is not a rendered difference.
+- `POST .../history-comparisons` takes one strict tagged object: `{expectedRevision,action:'create',name,before,after,region?}`, `{expectedRevision,action:'update',comparisonId,changes}`, `{expectedRevision,action:'delete',comparisonId}`, or `{expectedRevision,action:'branch',comparisonId,side,name}`. Targets/changes have the same validation/defaults as the OO API.
+- Success returns the normal document snapshot plus `activeBranchId` and comparison metadata. Stale revisions return 409; malformed/extra fields, missing IDs, invalid regions/targets/sides/names return 400 without publication. Accepted observer failure returns 200 with the actual current snapshot and the existing inspect-before-retrying warning.
+
+These are independent headless sessions, not browser synchronization. Native delivery must explicitly request `GET .../project?history=true` to include saved comparisons.
+
+### History 3 persistence
+
+History 3 stores `{version:3,past,future,branches,activeBranchId,comparisons}`. It requires at least one comparison; branches may be empty only with null activeBranchId. Comparison records include exact before/after models, captured operation/branch labels and a validated region. They contain no inferred author/time, model provenance, billing or cryptographic attestation. Admission validates every pinned model and document ID, comparison IDs/names, regions and the existing strict branch graph/active-tip invariants before installing a session. Source closure includes every comparison side throughout native validation/encoding/decoding, worker transport, recovery, branch continuation and staged-asset cleanup. TIFF/AVIF precision choices and RAW originals remain accepted-source data. Current document schema 41, native project 3/4 and workspace 2 envelopes remain unchanged. History 1/2 remain readable; comparison-bearing files require a reader supporting history 3. Removing the last comparison returns to history 2 when branches exist, otherwise history 1. Authenticated operation provenance, broader W05/release quality and the full roadmap remain unfinished.

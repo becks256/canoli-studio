@@ -70,3 +70,17 @@ it('creates, checks out, renames and deletes independent revision-checked histor
     {action:'create', name:'Bad', extra:1}, {action:'rename', branchId:main, name:''}, {action:'checkout', branchId:'invalid'}, {action:'execute', branchId:main},
   ]) expect((await request(path + '/history-branches', {expectedRevision:removed.body.revision, ...payload})).status).toBe(400);
 });
+
+it('creates, inspects, updates and restores saved comparison states with independent revision checks', async()=>{
+ const created=await request('/documents',{name:'Before',width:100,height:80}),path='/documents/'+created.body.document.id;
+ const changed=await request(path+'/commands',{expectedRevision:0,commands:[{type:'document.rename',name:'After'}]});
+ const saved=await request(path+'/history-comparisons',{expectedRevision:changed.body.revision,action:'create',name:'Saved sides',before:{kind:'timeline',position:0},after:{kind:'current'},region:{x:10,y:5,width:20,height:30}});
+ expect(saved.status).toBe(200);const id=saved.body.comparisons[0].id;expect(saved.body.document.name).toBe('After');expect(saved.body.activeBranchId).toBeNull();
+ const inspected=await request(path+'/history-comparisons/'+id);expect(inspected.body.change.documentFields).toEqual(['name']);expect(inspected.body.comparison.region).toEqual({x:10,y:5,width:20,height:30});
+ const stale=await request(path+'/history-comparisons',{expectedRevision:changed.body.revision,action:'delete',comparisonId:id});expect(stale.status).toBe(409);
+ const updated=await request(path+'/history-comparisons',{expectedRevision:saved.body.revision,action:'update',comparisonId:id,changes:{name:'Reviewed'}});expect(updated.body.comparisons[0].name).toBe('Reviewed');
+ const restored=await request(path+'/history-comparisons',{expectedRevision:updated.body.revision,action:'branch',comparisonId:id,side:'before',name:'Restored before'});expect(restored.body.document.name).toBe('Before');expect(restored.body.canUndo).toBe(false);expect(restored.body.activeBranchId).toMatch(/.+/);
+ const removed=await request(path+'/history-comparisons',{expectedRevision:restored.body.revision,action:'delete',comparisonId:id});expect(removed.body.comparisons).toEqual([]);
+ expect((await request(path+'/history-comparisons')).body.comparisons).toEqual([]);expect((await request(path+'/history-comparisons/'+id)).status).toBe(400);
+ for(const payload of [{action:'create',name:'Bad',before:{kind:'current',extra:1},after:{kind:'current'}},{action:'update',comparisonId:id,changes:{extra:1}},{action:'branch',comparisonId:id,side:'constructor',name:'Bad'}])expect((await request(path+'/history-comparisons',{expectedRevision:removed.body.revision,...payload})).status).toBe(400);
+});

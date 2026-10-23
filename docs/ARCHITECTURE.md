@@ -1,5 +1,9 @@
 # Architecture
 
+## Saved comparison ownership and rendering
+
+EditorStore owns immutable pinned comparison pairs/labels/regions and guarded revisioned management; Document exposes constructor-based trusted host methods and exact continuation as a new branch. History 3 extends the existing strict history union; shared captureRetainedHistory/retainedDocuments include every comparison source in native/workspace transport, validation and stage cleanup. EditorApplication privately leases only captured sources for a cancellable regional Canvas reference render; history-comparison computes yielded sRGB8/premultiplied-RGBA differences on the displayed grid. The live renderer/document are untouched. Branch ancestry presentation uses iterative parent-order traversal. Existing document/native/workspace envelopes and isolated grants remain unchanged; see HISTORY.md for compatibility and bounds.
+
 ## Persistent branch ownership
 
 EditorStore owns immutable branch IDs/names/parents, exact fork origins and accepted tips with 60-transition linear paths. Dispatch after Undo creates an alternative; navigation never overwrites the latest accepted tip. Document exposes guarded OO history-management methods and accepted switch observers. Branch changes publish once and invalidate stale work through revision; switching routes invalidates semantic recording rather than faking redo. Shared captureRetainedHistory/retainedDocuments enumerate strict history-2 closure across native serialization, worker transport, recovery, source checks and abandoned-stage cleanup. Native 3/4 and workspace 2 containers remain; older history-1 readers reject history 2. See [HISTORY.md](HISTORY.md).

@@ -46,6 +46,8 @@ export type {ParagraphFormat} from '../core/paragraph-styles';
 import { AlphaChannelCollection } from './alpha-channels';
 import { channelLoadSchema, channelLoadOptionsSchema, type ChannelLoadSettings, type ChannelLoadOptions, type ChannelLoadControl } from '../core/alpha-channels';
 export { AlphaChannel, AlphaChannelCollection } from './alpha-channels';
+import type {HistoryTarget, HistoryRegion, HistoryComparisonChanges} from '../core/history';
+export type {HistoryTarget, HistoryRegion, HistoryComparisonChanges} from '../core/history';
 export type { ChannelLoadOptions, ChannelLoadControl } from '../core/alpha-channels';
 export { LayerComp, LayerCompCollection } from "./layer-comps";
 import { SmartFilter } from "./smart-filters";
@@ -864,7 +866,19 @@ export class Document {
   deleteHistoryBranch(id: string): void {
     this.mutateHistoryBranch(() => this.store.deleteHistoryBranch(id));
   }
-  private mutateHistoryBranch<T>(run: () => T, switchBranch = false): T {
+  createHistoryComparison(name: string, before: HistoryTarget, after: HistoryTarget, region?: HistoryRegion): string {
+    return this.mutateHistoryBranch(() => this.store.createHistoryComparison(name, before, after, region), false, 'comparison');
+  }
+  updateHistoryComparison(id: string, changes: HistoryComparisonChanges): void {
+    this.mutateHistoryBranch(() => this.store.updateHistoryComparison(id, changes), false, 'comparison');
+  }
+  deleteHistoryComparison(id: string): void {
+    this.mutateHistoryBranch(() => this.store.deleteHistoryComparison(id), false, 'comparison');
+  }
+  createHistoryBranchFromComparison(id: string, side: 'before' | 'after', name: string): string {
+    return this.mutateHistoryBranch(() => this.store.createHistoryBranchFromComparison(id, side, name), true);
+  }
+  private mutateHistoryBranch<T>(run: () => T, switchBranch = false, noun: 'branch' | 'comparison' = 'branch'): T {
     if (this.batch) throw new Error('Finish the transaction first.');
     if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
     this.navigatingHistory = true;
@@ -875,7 +889,7 @@ export class Document {
       if (this.store.getSnapshot().revision !== before) {
         if (switchBranch) for (const listener of this.branchListeners)
           try {listener();} catch (cause) {if (!failed) failure = cause; failed = true;}
-        if (failed) throw new Error('History branch changed, but an observer failed. Inspect the document before retrying.', {cause: failure});
+        if (failed) throw new Error(`History ${noun} changed, but an observer failed. Inspect the document before retrying.`, {cause: failure});
       } else if (failed) throw failure;
       return result;
     } finally {this.navigatingHistory = false;}

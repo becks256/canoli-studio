@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Pinned comparison invariants
+
+A saved comparison resolves both selectors synchronously to immutable accepted snapshots. Names/region are revisioned metadata, never fake artwork transitions; pruning or branch deletion cannot retarget them. History-3 admission validates all models/IDs/names/regions and complete source closure before session installation. Private previews use one common regional grid, clip each original canvas and compare displayed premultiplied sRGB8/alpha with bounded allocation and yielded cancellation checks. Continuing a pinned side preserves the old route, creates a new branch with an empty path, filters selection and invalidates recording/pending work. No decoder/model replay or headless/browser synchronization is introduced. Full provenance and broader quality/performance gates remain open. Exact contract: HISTORY.md.
+
 ## Persistent branch invariants
 
 Branch tips represent the latest accepted result, independently of the undo cursor. Editing before that result forks and preserves both routes. Store-owned IDs, acyclic parents and exact fork snapshots survive per-route pruning. History-2 admission verifies every model and active-tip consistency before publication; native source closure includes all graph states. OO host/REST branch management is guarded and revisioned, while isolated branch mutation is forbidden. Alternate-route switches invalidate recorder state and pending previews/jobs; they never replay operations. Broader authenticated provenance and W05 work remain open. See [HISTORY.md](HISTORY.md).

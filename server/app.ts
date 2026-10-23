@@ -1,4 +1,5 @@
 import {captureRetainedHistory} from '../src/core/history';
+import {historyTargetSchema, historyRegionSchema, historyComparisonChangesSchema} from '../src/core/history';
 import {historyTimeline,inspectHistoryChange} from '../src/core/history-inspection';
 import {validateServerProjectSources} from "./project";
 import {inspectServerRaw} from "./raw";
@@ -405,7 +406,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
 
       // Document scoped endpoints: /api/v1/documents/:id/...
       const docMatch = path.match(
-        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|history|history-branches|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
+        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|history|history-branches|history-comparisons|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
         send(response, 404, { error: "Document or endpoint not found." });
@@ -645,6 +646,36 @@ export function createApiServer(options: ApiServerOptions = {}) {
       }
 
       // History navigation shares the ordinary retained-state/recipe boundary.
+      if (subresource === 'history-comparisons') {
+        const metadata = () => document.getSnapshot().comparisons.map(value => ({id: value.id, name: value.name, beforeLabel: value.beforeLabel, afterLabel: value.afterLabel, region: value.region,
+          beforeSize: {width: value.before.width, height: value.before.height}, afterSize: {width: value.after.width, height: value.after.height}}));
+        if (method === 'GET') {
+          const id = docMatch[3];
+          if (id) {
+            z.uuid().parse(id); const value = document.getSnapshot().comparisons.find(value => value.id === id);
+            if (!value) throw new Error('History comparison not found.');
+            send(response, 200, {revision: document.getSnapshot().revision, comparison: metadata().find(value => value.id === id), change: inspectHistoryChange(value.before, value.after)});
+          } else send(response, 200, {revision: document.getSnapshot().revision, comparisons: metadata()});
+          return;
+        }
+        if (method === 'POST' && !docMatch[3]) {
+          const common = {...revisionSchema.shape, comparisonId: z.uuid()};
+          const input = z.discriminatedUnion('action', [
+            z.object({...revisionSchema.shape, action: z.literal('create'), name: z.string().trim().min(1).max(120), before: historyTargetSchema, after: historyTargetSchema, region: historyRegionSchema.optional()}).strict(),
+            z.object({...common, action: z.literal('update'), changes: historyComparisonChangesSchema}).strict(),
+            z.object({...common, action: z.literal('delete')}).strict(),
+            z.object({...common, action: z.literal('branch'), side: z.enum(['before','after']), name: z.string().trim().min(1).max(120)}).strict(),
+          ]).parse(await body(request));
+          if (input.expectedRevision !== document.getSnapshot().revision) {send(response, 409, {error: 'Revision conflict. Read the document and retry.', revision: document.getSnapshot().revision}); return;}
+          const result = navigateHistory(document, () => {
+            if (input.action === 'create') document.createHistoryComparison(input.name, input.before, input.after, input.region);
+            else if (input.action === 'update') document.updateHistoryComparison(input.comparisonId, input.changes);
+            else if (input.action === 'delete') document.deleteHistoryComparison(input.comparisonId);
+            else document.createHistoryBranchFromComparison(input.comparisonId, input.side, input.name);
+          });
+          send(response, 200, {...result, activeBranchId: document.getSnapshot().activeBranchId, comparisons: metadata()}); return;
+        }
+      }
       if (subresource === 'history-branches' && !docMatch[3]) {
         const branches = () => {
           const state = document.getSnapshot();

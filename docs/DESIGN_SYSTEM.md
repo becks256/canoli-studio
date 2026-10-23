@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Saved comparisons and ancestry
+
+Use a scrollable parent-ordered ancestry list of native buttons with actual parent/level, active and selected markers; cap visual indentation without losing depth metadata. Keep explicit Switch separate from inspection. Saved comparisons use the custom inspector section, independent name and state selectors, integer region fields, explicit Save/Preview/Delete/Continue actions and inline deletion confirmation. New comparison creation lives in a native details disclosure. Preserve typing, focus, stale errors, retained modal footer and both themes/short windows. Three labeled image panes disclose downscaling and measured displayed-pixel limits; never imply full-resolution, author or model provenance.
+
 ## Branch controls in history inspection
 
 Use the existing custom inspector section, labeled native branch selector and name input, explicit Create/Rename/Switch buttons, parent-name disclosure and active marker. Creating forks current artwork, not the row selected for inspection. Retain 60-transition and recorder-switch disclosures, stale-capture errors, wrapped controls and independent body scrolling. Disable active/parent deletion and ask for explicit inline confirmation for an inactive leaf. Explain that edits after Undo preserve alternatives rather than replacing the old result. No new shortcut or component library.

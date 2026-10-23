@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Independent saved comparisons
+
+GET `/api/v1/documents/:id/history-comparisons` lists pinned-pair metadata; GET `.../:comparisonId` adds a bounded field-change report. Strict POST create/update/delete/branch actions use expectedRevision and the guarded OO boundary. Stale input returns 409, invalid input 400, accepted observer failure 200 with warning. Explicit `?history=true` native downloads include history-3 snapshots and all source bytes. There is no headless image preview or browser synchronization. Full signatures, metadata, defaults and examples: [HISTORY.md](HISTORY.md#independent-rest-comparisons).
+
 ## Independent branch management
 
 GET/POST `/api/v1/documents/:id/history-branches` expose branch metadata and strict revision-checked create/checkout/rename/delete actions. They use the same guarded Document/Store path and accepted-observer semantics as UI history operations. Invalid input returns 400, stale revisions 409, accepted observer failures 200 plus warning. Native project delivery preserves branches only with `?history=true`. These headless sessions remain separate from the browser. Full request/response/error contracts: [HISTORY.md](HISTORY.md#separate-headless-rest-branches).

@@ -3,6 +3,7 @@ import type { EditorCommand } from "./commands";
 import { createDocument, findLayer, validateDocument, SCHEMA_VERSION } from "./model";
 import type { DocumentData } from "./model";
 import { parseRetainedHistory, retainedDocuments, historyTip, historyBranchName, historyNameKey, type HistoryEntry, type HistoryBranch } from "./history";
+import {comparisonExtent, validateHistoryRegion, resolveHistoryTarget, historyComparisonChangesSchema, type HistoryTarget, type HistoryRegion, type HistoryComparison, type HistoryComparisonChanges} from './history';
 import { freeze, shareUnchanged, isImmutable } from "./immutable";
 export interface EditorState {
   document: DocumentData;
@@ -12,6 +13,7 @@ export interface EditorState {
   future: HistoryEntry[];
   branches: HistoryBranch[];
   activeBranchId: string | null;
+  comparisons: HistoryComparison[];
   revision: number;
   canvasRevision: number;
 }
@@ -57,11 +59,13 @@ export class EditorStore {
       selectedIds: Object.freeze([]),
       past: freeze(intern(retained.past)),
       future: freeze(intern(retained.future)),
-      branches: 'version' in retained && retained.version === 2 ? retained.branches.map(branch => ({...branch,
+      branches: 'version' in retained && retained.version !== 1 ? retained.branches.map(branch => ({...branch,
         forkDocument: shareUnchanged(current, branch.forkDocument),
         tip: {document: shareUnchanged(current, branch.tip.document), past: intern(branch.tip.past)},
       })) : [],
-      activeBranchId: 'version' in retained && retained.version === 2 ? retained.activeBranchId : null,
+      activeBranchId: 'version' in retained && retained.version !== 1 ? retained.activeBranchId : null,
+      comparisons: 'version' in retained && retained.version === 3 ? retained.comparisons.map(value => ({...value,
+        before: shareUnchanged(current, value.before), after: shareUnchanged(current, value.after)})) : [],
       revision: 0,
       canvasRevision: 0,
     });
@@ -177,6 +181,38 @@ export class EditorStore {
     this.publish({...this.state, branches: this.state.branches.filter(branch => branch.id !== id), revision: this.state.revision + 1});
   }
 
+  createHistoryComparison(name: string, beforeTarget: HistoryTarget, afterTarget: HistoryTarget, region?: HistoryRegion): string {
+    name = historyBranchName(name);
+    if (this.state.comparisons.some(value => historyNameKey(value.name) === historyNameKey(name))) throw new Error('A history comparison with this name already exists.');
+    const before = resolveHistoryTarget(this.state, beforeTarget), after = resolveHistoryTarget(this.state, afterTarget);
+    const comparison: HistoryComparison = {id: crypto.randomUUID(), name, before: before.document, after: after.document,
+      beforeLabel: before.label, afterLabel: after.label, region: validateHistoryRegion(region === undefined ? comparisonExtent(before.document, after.document) : region, before.document, after.document)};
+    this.publish({...this.state, comparisons: [...this.state.comparisons, comparison], revision: this.state.revision + 1});
+    return comparison.id;
+  }
+  updateHistoryComparison(id: string, input: HistoryComparisonChanges) {
+    const changes = historyComparisonChangesSchema.parse(input), value = this.state.comparisons.find(value => value.id === id);
+    if (!value) throw new Error('History comparison not found.');
+    const name = changes.name ?? value.name, region = changes.region ? validateHistoryRegion(changes.region, value.before, value.after) : value.region;
+    if (this.state.comparisons.some(value => value.id !== id && historyNameKey(value.name) === historyNameKey(name))) throw new Error('A history comparison with this name already exists.');
+    if (name === value.name && ['x', 'y', 'width', 'height'].every(key => region[key as keyof HistoryRegion] === value.region[key as keyof HistoryRegion])) return;
+    this.publish({...this.state, comparisons: this.state.comparisons.map(item => item.id === id ? {...item, name, region} : item), revision: this.state.revision + 1});
+  }
+  deleteHistoryComparison(id: string) {
+    if (!this.state.comparisons.some(value => value.id === id)) throw new Error('History comparison not found.');
+    this.publish({...this.state, comparisons: this.state.comparisons.filter(value => value.id !== id), revision: this.state.revision + 1});
+  }
+  createHistoryBranchFromComparison(id: string, side: 'before' | 'after', name: string): string {
+    const comparison = this.state.comparisons.find(value => value.id === id);
+    if (!comparison) throw new Error('History comparison not found.');
+    if (side !== 'before' && side !== 'after') throw new Error('Choose the before or after comparison state.');
+    const {branches, activeBranchId} = this.initialBranches(), document = comparison[side];
+    const branch = this.newBranch(name, branches, activeBranchId, {document, past: []});
+    this.publish({...this.state, document, past: [], future: [], ...this.selectionFor(document), branches: [...branches, branch], activeBranchId: branch.id,
+      revision: this.state.revision + 1, canvasRevision: this.state.canvasRevision + 1});
+    return branch.id;
+  }
+
   undo() {
     if (this.state.past.length) this.navigateHistory(this.state.past.length - 1);
   }
@@ -216,6 +252,7 @@ export class EditorStore {
       future: [],
       branches: [],
       activeBranchId: null,
+      comparisons: [],
       revision: this.state.revision + 1,
       canvasRevision: this.state.canvasRevision + 1,
     });

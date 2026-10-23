@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Saved comparison isolation
+
+Pinned host comparisons do not expand package permissions or installation behavior. All four comparison mutation/continuation methods reject in isolated execution, rolling back earlier commands; private preview is not an isolated global. Ordinary plugin edits continue through shared commands. History-3 source retention includes comparison-only accepted originals during staging cleanup, native/project delivery and workspace recovery. Package versions and inert installation remain unchanged. See HISTORY.md.
+
 ## History branch isolation
 
 Persistent host document branches do not expand installed plugin permissions. All four branch mutation methods reject inside isolated execution, and preceding commands in a failed script do not commit. Host source retention includes branch-only snapshots. Ordinary plugin edits after host Undo may create a history branch through the existing shared command path. Package/runtime versions and inert installation remain unchanged. See [HISTORY.md](HISTORY.md).
