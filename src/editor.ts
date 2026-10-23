@@ -1,3 +1,4 @@
+import {historyTimeline} from './core/history-inspection';
 import {PaletteLibrary} from './palettes/service';
 import {ArtworkLibrary} from './library/service';
 import type {ArtworkMetadata} from './library/model';
@@ -189,6 +190,8 @@ export class EditorApplication {
   readonly lensProfiles = new LensLibraryService();
   readonly artworkLibrary = new ArtworkLibrary();
   readonly palettes = new PaletteLibrary();
+  private historyPreviewClosed = false;
+  private historyPreviews = new Set<AbortController>();
   readonly chatGpt = new ChatGptConnections(this);
   readonly brushPresets = new BrushPresetLibrary();
   readonly brushTextureSource = new BrushTextureSourceOwner();
@@ -904,6 +907,34 @@ export class EditorApplication {
     const check=()=>{control.signal?.throwIfAborted();lifetime();if(this.activeSession!==destination||!this.sessions.includes(destination)||target.getSnapshot().revision!==revision)throw new Error('The destination changed while artwork was preparing. Choose it again.');};
     check();const value=await this.artworkLibrary.read(entryId,control.signal);check();const loaded=await loadProject(value.blob,{prepareImmutable:true});
     try{check();return await this.copyArtworkTo(loaded.document,structuredClone(loaded.document.children),loaded.assets,target,{check,signal:control.signal,label:'Place library artwork',shareSources:true,commit:run=>this.artworkLibrary.commitPlacement(value,run,control.signal)});}finally{loaded.assets.dispose();}
+  }
+
+  /** Private reference previews of retained states; never executes recorded commands. */
+  async previewHistory(position:number,control:{signal?:AbortSignal}={}):Promise<{before:Blob|null;after:Blob}> {
+    if(this.historyPreviewClosed)throw new Error('Editor is closed.');
+    control.signal?.throwIfAborted();
+    const target=this.document,snapshot=target.getSnapshot(),timeline=historyTimeline(snapshot);
+    if(!Number.isSafeInteger(position)||position<0||position>=timeline.length)throw new Error('History position is outside the retained timeline.');
+    const abort=new AbortController(),assets=new AssetStore(),renderer=new CanvasRenderer();
+    const cancel=()=>abort.abort(control.signal?.reason),check=()=>{
+      abort.signal.throwIfAborted();
+      if(this.historyPreviewClosed||this.document!==target||target.getSnapshot().revision!==snapshot.revision)
+        throw new Error('History changed during preview. Reload the timeline.');
+    },changed=()=>{try{check();}catch(cause){abort.abort(cause);}};
+    const stopDocument=target.subscribe(changed),stopEditor=this.subscribe(changed),disposeRenderer=()=>renderer.dispose();
+    control.signal?.addEventListener('abort',cancel,{once:true});abort.signal.addEventListener('abort',disposeRenderer,{once:true});this.historyPreviews.add(abort);
+    try {
+      check();const sourceIds=new Set([...referencedAssets(timeline[position].document),...(position?referencedAssets(timeline[position-1].document):[])]);for(const assetId of sourceIds)this.assetStore.shareTo(assets,assetId,assetId);
+      const render=async(document:import('./core/model').DocumentData)=>{
+        let canvas:HTMLCanvasElement|undefined;
+        try {
+          check();canvas=await renderer.render(document,assets,{cache:false,scale:Math.min(1,512/document.width,512/document.height),maxPixels:512*512,maxDimension:512,isCancelled:()=>abort.signal.aborted});
+          check();const blob=await new Promise<Blob>((resolve,reject)=>canvas!.toBlob(value=>{if(abort.signal.aborted)reject(abort.signal.reason);else if(value)resolve(value);else reject(new Error('History preview could not be encoded.'));},'image/png'));
+          check();return blob;
+        }finally{if(canvas){canvas.width=0;canvas.height=0;}}
+      };
+      const before=position?await render(timeline[position-1].document):null,after=await render(timeline[position].document);check();return{before,after};
+    }catch(cause){if(abort.signal.aborted)throw abort.signal.reason;throw cause;}finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);abort.signal.removeEventListener('abort',disposeRenderer);this.historyPreviews.delete(abort);renderer.dispose();assets.dispose();}
   }
 
   async previewLibraryArtwork(entryId:string,control:{signal?:AbortSignal}={}):Promise<Blob> {
@@ -1919,6 +1950,7 @@ export class EditorApplication {
     this.recentFiles.dispose();
     this.artworkLibrary.dispose();
     this.palettes.dispose();
+    this.historyPreviewClosed=true;for(const abort of this.historyPreviews)abort.abort(new DOMException("Editor closed.","AbortError"));this.historyPreviews.clear();
     this.lensProfiles.dispose();
     this.chatGpt.dispose();
     this.brushPresets.dispose();

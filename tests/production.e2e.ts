@@ -2034,3 +2034,7 @@ test('production artwork library preserves native pixels through portable packs,
 test('production palettes persist, transfer and apply through actual UI without developer globals', async ({page}, info) => {
  const {paletteProductionWorkflow}=await import('./helpers/palettes'); await paletteProductionWorkflow(page, info, true);
 });
+
+test('production history inspector renders and navigates retained artwork without developer globals', async ({page}, info) => {
+ const {historyInspectorProductionWorkflow}=await import('./helpers/history-inspector'); await historyInspectorProductionWorkflow(page, info, true);
+});

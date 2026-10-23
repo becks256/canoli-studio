@@ -1,3 +1,4 @@
+import {HistoryInspectorDialog} from './HistoryInspectorDialog';
 import {PaletteLibraryContext,type PalettePickerRequest} from './PaletteColorControl';
 import {PaletteLibraryDialog} from './PaletteLibraryDialog';
 import {ArtworkLibraryDialog} from './ArtworkLibraryDialog';
@@ -245,6 +246,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [accountClient]=useState(()=>new AccountClient());
   const [showAccount,setShowAccount]=useState(false);
   const [showArtworkLibrary,setShowArtworkLibrary]=useState(false);
+  const [showHistoryInspector,setShowHistoryInspector]=useState(false);
   const [showColorPalettes,setShowColorPalettes]=useState(false);
   const [colorPaletteRequest,setColorPaletteRequest]=useState<PalettePickerRequest|null>(null);
   const [showPressureCurve,setShowPressureCurve]=useState(false);
@@ -710,6 +712,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     {id:'account',label:'Account',category:'Workspace',keys:SHORTCUT_BINDINGS.account,allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowAccount(true);}},
     {id:'chatgpt-connection',label:'ChatGPT connection',category:'Workspace',keys:SHORTCUT_BINDINGS['chatgpt-connection'],allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}},
     {id:"color-palettes",label:"Color palettes",keys:SHORTCUT_BINDINGS["color-palettes"],run:()=>{cancelWorkspaceGesture();setShowColorPalettes(true);}},
+    {id:"history-inspector",label:"Inspect history",keys:SHORTCUT_BINDINGS["history-inspector"],run:()=>{cancelWorkspaceGesture();setShowHistoryInspector(true);}},
     {id:"artwork-library",label:"Artwork library",keys:SHORTCUT_BINDINGS["artwork-library"],run:()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}},
     {id:"recent-files",label:"Recent files",keys:SHORTCUT_BINDINGS["recent-files"],run:()=>{cancelWorkspaceGesture();setRecentRequest({});}},
     {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
@@ -1157,7 +1160,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       showWorkspaceLayout ||
       showChatGptConnection ||
       showAccount ||
-      showArtworkLibrary || showColorPalettes || !!colorPaletteRequest ||
+      showHistoryInspector || showArtworkLibrary || showColorPalettes || !!colorPaletteRequest ||
       showPressureCurve ||
       showBrushTip ||
       showBrushTexture ||
@@ -1964,6 +1967,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             selectedLayer={selectedObject}
             locked={locked}
             busy={busy}
+            onInspectHistory={()=>{cancelWorkspaceGesture();setShowHistoryInspector(true);}}
             historyPast={state.past}
             historyFuture={state.future}
             pixels={editor.pixels}
@@ -2617,6 +2621,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showPressureCurve&&<PressureCurveDialog curve={toolState.settings.pressureCurve} onClose={()=>setShowPressureCurve(false)} onApply={curve=>{editor.tools.configure({pressureCurve:curve});setShowPressureCurve(false);}}/>}
         {showWorkspaceLayout&&<WorkspaceLayoutDialog preferences={panelLayout.preferences} loadError={panelLayout.error} onApply={layout=>{panelLayout.apply(layout);cancelWorkspaceGesture();}} onSave={(layout,name,id)=>{panelLayout.save(layout,name,id);cancelWorkspaceGesture();}} onRename={panelLayout.rename} onDelete={panelLayout.remove} onReload={panelLayout.reload} onClose={()=>setShowWorkspaceLayout(false)}/>}
         {(showColorPalettes||colorPaletteRequest)&&<PaletteLibraryDialog library={editor.palettes} color={colorPaletteRequest?.color??toolState.settings.color} onChoose={colorPaletteRequest?.onChoose} onClose={()=>{setShowColorPalettes(false);setColorPaletteRequest(null);}}/>}
+        {showHistoryInspector&&<HistoryInspectorDialog editor={editor} onClose={()=>setShowHistoryInspector(false)}/>}
         {showArtworkLibrary&&<ArtworkLibraryDialog editor={editor} onClose={()=>setShowArtworkLibrary(false)} onPlaced={()=>notify("Placed saved artwork")}/>}
         {showAccount&&<AccountDialog client={accountClient} onClose={()=>setShowAccount(false)}/>}
         {showChatGptConnection&&<ChatGptConnectionDialog editor={editor} onClose={()=>setShowChatGptConnection(false)}/>}

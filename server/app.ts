@@ -1,3 +1,4 @@
+import {historyTimeline,inspectHistoryChange} from '../src/core/history-inspection';
 import {validateServerProjectSources} from "./project";
 import {inspectServerRaw} from "./raw";
 import {importServerRaw,developServerRawComponent} from "./raw-document";
@@ -187,6 +188,15 @@ export function createApiServer(options: ApiServerOptions = {}) {
     canUndo: document.canUndo,
     canRedo: document.canRedo,
   });
+
+  const navigateHistory = (document:Document,run:()=>void) => {
+    const revision=document.getSnapshot().revision;
+    try {run();} catch(cause) {
+      if(document.getSnapshot().revision===revision)throw cause;
+      return {...snapshot(document),warning:'History moved, but an observer failed. Inspect the document before retrying.'};
+    }
+    return snapshot(document);
+  };
 
   const server = createServer(async (request, response) => {
     const origin = request.headers.origin;
@@ -394,7 +404,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
 
       // Document scoped endpoints: /api/v1/documents/:id/...
       const docMatch = path.match(
-        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
+        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|history|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
         send(response, 404, { error: "Document or endpoint not found." });
@@ -633,6 +643,20 @@ export function createApiServer(options: ApiServerOptions = {}) {
         return;
       }
 
+      // History navigation shares the ordinary retained-state/recipe boundary.
+      if (subresource === 'history' && !docMatch[3] && method === 'GET') {
+        const state=document.getSnapshot(),timeline=historyTimeline(state);
+        const position=url.searchParams.has('position')?z.coerce.number().int().min(0).max(timeline.length-1).parse(url.searchParams.get('position')):null;
+        send(response,200,{revision:state.revision,position:state.past.length,length:timeline.length,
+          states:timeline.map(item=>({position:item.position,label:item.label,labelTruncated:item.labelTruncated})),
+          ...(position===null?{}:{change:inspectHistoryChange(position?timeline[position-1].document:null,timeline[position].document)})});return;
+      }
+      if (subresource === 'history' && !docMatch[3] && method === 'POST') {
+        const parsed=z.object({...revisionSchema.shape,position:z.number().int().nonnegative().safe()}).strict().parse(await body(request));
+        if(parsed.expectedRevision!==document.getSnapshot().revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision});return;}
+        send(response,200,navigateHistory(document,()=>document.navigateHistory(parsed.position)));return;
+      }
+
       // POST /api/v1/documents/:id/undo or redo
       if (
         (subresource === "undo" || subresource === "redo") &&
@@ -647,9 +671,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
           });
           return;
         }
-        if (subresource === "undo") document.undo();
-        else document.redo();
-        send(response, 200, snapshot(document));
+        send(response, 200, navigateHistory(document,()=>{if (subresource === "undo") document.undo();else document.redo();}));
         return;
       }
 

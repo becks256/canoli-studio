@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Independent retained-history navigation
+
+`GET /api/v1/documents/:id/history` returns `{revision,position,length,states:[{position,label,labelTruncated}]}`. Optional `?position=N` adds bounded/disclosed `change` metadata; headless font/layout bounds may be unavailable, and no rendered preview is returned. Strict `POST .../history` body `{expectedRevision,position}` moves through the existing OO retained snapshots atomically. Positions are integers 0 through past+future; current is a no-op. Stale requests return 409 and invalid positions/bodies return 400 without navigation. History/undo/redo observer failure after accepted publication returns 200 with the actual snapshot plus `warning`, rather than pretending the accepted move failed. Token/origin policy and independent headless sessions remain unchanged. See HISTORY.md for exact report/retention and browser/isolated boundaries.
+
 ## Local color palette boundary
 
 The browser's local palette library is a trusted UI preference service, not a new REST resource or browser/headless synchronization mechanism. REST clients continue to apply validated literal color values through the existing document commands. Palette pack imports execute no command and change no document history. See COLOR_PALETTES.md.

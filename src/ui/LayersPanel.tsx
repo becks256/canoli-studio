@@ -43,6 +43,7 @@ export interface LayersPanelProps {
   selectedLayer: Layer | null;
   locked: boolean;
   busy: boolean;
+  onInspectHistory(): void;
   historyPast: Array<{ label: string }>;
   historyFuture: Array<{ label: string }>;
   getThumbnail(assetId: string): string;
@@ -74,6 +75,7 @@ export function LayersPanel({
   selectedLayer: selected,
   locked,
   busy,
+  onInspectHistory,
   historyPast,
   historyFuture,
   getThumbnail,
@@ -777,10 +779,11 @@ export function LayersPanel({
         </>
       ) : (
         <div className="history-list">
-          <p className="section-caption">THIS SESSION</p>
+          <p className="section-caption">RETAINED HISTORY</p>
+          <Button disabled={busy} onClick={onInspectHistory}>Inspect retained history</Button>
           <div className="history-entry">
             <span className="history-dot" />
-            Document opened
+            Oldest retained state
           </div>
           {historyPast.map((entry, index) => (
             <div className="history-entry" key={index}>

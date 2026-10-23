@@ -96,6 +96,7 @@ export const SHORTCUT_BINDINGS: Record<string, string[]> = {
   'chatgpt-connection': [],
   account: [],
   "artwork-library": [],
+  "history-inspector": [],
   "color-palettes": [],
   "recent-files": [],
   "workspace-layout": [],

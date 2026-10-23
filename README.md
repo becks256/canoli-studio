@@ -21,6 +21,8 @@ The **Artwork library** saves selected editable layers and original sources loca
 
 **Color palettes** saves named/tagged local sRGB swatches with search, reordering, portable packs and corruption recovery. Palette buttons beside existing color controls apply copied values through normal validation and undo. [Palette workflow, storage and supported color formats](docs/COLOR_PALETTES.md).
 
+**Inspect history** in the History panel or command search shows retained changes and private before/after references, then explicitly moves to a stored state in one publication. Undo/Redo and recipe recording stay aligned without rerunning old commands or generation. [History navigation, immutable snapshots and current limits](docs/HISTORY.md).
+
 ## What works
 
 - Local metadata extraction in a worker, an Asset info inspector, and JSON sidecars with explicit privacy choices.

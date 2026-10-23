@@ -6357,3 +6357,24 @@ input[type="color"] {
 .tool-color > .palette-color-control { display: inline-flex; }
 
 .palette-hex { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); }
+
+.history-inspector-dialog { width: min(900px,calc(100vw - 32px)); display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+.history-inspector-body { min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 14px; overflow-wrap: anywhere; }
+.history-inspector-body > * { flex-shrink: 0; }
+.history-inspector-body p { margin: 0; line-height: 1.6; color: var(--color-text-secondary); }
+.history-inspector-body [role=alert] { color: var(--color-danger); }
+.history-inspector-body h3 { margin: 0; }
+.history-inspector-body section { display: flex; flex-direction: column; gap: 12px; padding: 14px; border: 1px solid var(--color-border); border-radius: var(--radius-control); }
+.history-inspector-timeline { list-style: none; padding: 0; margin: 0; max-height: 240px; overflow: auto; display: flex; flex-direction: column; gap: 6px; }
+.history-inspector-timeline .button { height: auto; min-height: 34px; white-space: normal; width: 100%; justify-content: space-between; text-align: left; }
+.history-inspector-timeline .button[aria-pressed=true] { outline: 1px solid var(--color-accent); outline-offset: -1px; background: var(--color-panel-raised); }
+.history-inspector-timeline strong { font-size: 11px; flex-shrink: 0; }
+.history-change-list { margin: 0; padding-left: 18px; }
+.history-change-list li { margin: 6px 0; }
+.history-change-list span { display: block; font-size: 11px; color: var(--color-text-secondary); }
+.history-inspector-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.history-preview-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.history-preview-pair figure { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.history-preview-pair img { max-width: 100%; max-height: 360px; object-fit: contain; background: var(--color-panel-raised); }
+.history-inspector-body > a { color: var(--color-text); text-underline-offset: 3px; }
+@media(max-width:600px) { .history-preview-pair { grid-template-columns: minmax(0,1fr); } }

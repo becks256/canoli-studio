@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## History inspection grants no extension authority
+
+History reference previews and timeline UI are trusted host controls. As with undo/redo, isolated Scripts/plugins reject document.navigateHistory during atomic execution; failed script commands do not commit. Host navigation still uses existing accepted snapshots, asset ownership, recipe observers and undo history. Installation/permissions stay unchanged. Independent REST navigation does not grant browser control or synchronize documents. See HISTORY.md.
+
 ## Palette library grants no extension access
 
 Local color palette packs are inert strict data, not command packages. Palette storage/pickers add no script global, local file/database/network grant or MCP tool; existing isolated document color commands retain validation and undo. Account deletion/sign-out leaves these independent browser preferences intact. Installation and the package/runtime contract are unchanged.

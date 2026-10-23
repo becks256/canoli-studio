@@ -1,5 +1,13 @@
 # Scripting API
 
+## Retained history navigation (trusted host)
+
+Returned `getSnapshot()` state/selection/history containers and models are immutable; use OO mutations or detached serialization clones. Non-string transaction labels reject before callbacks.
+
+`document.navigateHistory(position:number):void` moves atomically within retained states: 0 is the oldest baseline; `document.getSnapshot().past.length` is current; the maximum is past plus future length. Current is a no-op; invalid/unsafe/noninteger positions and transaction/reentrant calls reject. Accepted observer failures remain accepted and throw an explicit inspect-before-retry error after notifications. Undo/Redo use this path. Existing onHistoryNavigation(direction) receives each crossed direction after the final model publication; recipes never rerun. Scripts/internal plugins forbid this method just as they forbid undo/redo, with **Use editor undo/redo after a script finishes.** No preceding failed-script command commits.
+
+Trusted browser `editor.previewHistory(position:number, control?:{signal?:AbortSignal}):Promise<{before:Blob|null,after:Blob}>` returns adjacent private PNG references (no before at 0), fitted within 512 pixels. Invalid positions, cancellation, closed/disposed/stale documents/revisions and render/encoding failures reject. Caller owns created object URLs. It changes no model/history/selection and grants no isolated file/render API. Full defaults, errors, ownership, observer/reentrancy rules, limits and the independent REST contract are in [HISTORY.md](HISTORY.md). History/project/workspace formats are unchanged; candidate branches and broader provenance remain planned.
+
 ## Local color palettes are outside isolated Scripts
 
 The trusted browser palette picker stores local named sRGB colors independently of documents. It exposes no constructor, global, file/database handle or new isolated permission. Existing attached color assignments still validate and record ordinary document commands/undo; palette management and removal do not recolor artwork. No script signature/default or execution budget changes. See COLOR_PALETTES.md for UI/storage/portable-pack behavior.

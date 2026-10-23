@@ -191,7 +191,7 @@ self.onmessage = async (event) => {
         [...commands],
         request,
       ) as Promise<AdjustmentLayerData>;
-    document.undo = document.redo = () => {
+    document.undo = document.redo = document.navigateHistory = () => {
       throw new Error("Use editor undo/redo after a script finishes.");
     };
     const print = (...values: unknown[]) => {

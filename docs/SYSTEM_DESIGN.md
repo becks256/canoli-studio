@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Atomic retained-history publication
+
+All published and initial state containers, history entries and selected-ID arrays are deeply immutable; non-string transaction labels reject before callbacks or history publication. A history move publishes one accepted snapshot and reorders existing past/future transitions, preserving source closure and offline replay. Revision/canvas invalidation are per publication, not model/job re-execution. Reentrant model writes reject during navigation; observer errors cannot reverse accepted state or skip remaining notifications. Recipe direction notifications account for every crossed transition after publication. Private bounded reference previews lease historical source assets and are invalidated by document/lifetime/revision changes. Metadata reports disclose clipping, omitted records and incomplete comparisons; geometry is not a pixel diff or provenance. Existing history/project/workspace schemas remain unchanged. REST stays headless and Scripts cannot navigate inside atomic execution. See HISTORY.md.
+
 ## Palette storage boundary
 
 Reusable palettes use a distinct lazy local IndexedDB repository with strict data-only pack validation and atomic writes. Durable per-entry revisions and catalog generations govern concurrent edits/imports; BroadcastChannel is advisory. App-owned picker requests pin the document/revision/selected layer and delegate a copied six-digit sRGB value to the original validated control callback. Palette management is outside document snapshots/history, accounts, independent headless REST and isolated plugin grants. Removing palette records leaves accepted colors intact. Complete schema, failure and supported-format boundaries: COLOR_PALETTES.md.

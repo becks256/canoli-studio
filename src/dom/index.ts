@@ -412,6 +412,7 @@ export class Document {
     (command: EditorCommand, before: DocumentData, after: DocumentData) => void
   >();
   private historyListeners = new Set<(direction: "undo" | "redo") => void>();
+  private navigatingHistory = false;
   private _assetStore: AssetStore | null = null;
   /** @internal Read-only host inspection; no result can mutate document/history. */
   _preflight?: (options:PreflightSettings,control:PreflightControl)=>Promise<PreflightReport>;
@@ -854,14 +855,32 @@ export class Document {
   undo() {
     if (this.batch) throw new Error("Finish the transaction first.");
     if (!this.canUndo) return;
-    this.store.undo();
-    this.historyListeners.forEach((listener) => listener("undo"));
+    this.navigateHistory(this.store.getSnapshot().past.length - 1);
   }
   redo() {
     if (this.batch) throw new Error("Finish the transaction first.");
     if (!this.canRedo) return;
-    this.store.redo();
-    this.historyListeners.forEach((listener) => listener("redo"));
+    this.navigateHistory(this.store.getSnapshot().past.length + 1);
+  }
+
+  /** Zero is the oldest retained state; past.length is the current position. */
+  navigateHistory(position: number): void {
+    if (this.batch) throw new Error("Finish the transaction first.");
+    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
+    this.navigatingHistory = true;
+    try {
+      const before = this.store.getSnapshot(), count = Math.abs(position - before.past.length);
+      let failure: unknown, failed = false;
+      try {this.store.navigateHistory(position);} catch (cause) {failure = cause; failed = true;}
+      // A store observer can throw after publication. Recipe observers must still
+      // receive every accepted transition, without seeing intermediate model states.
+      if (this.store.getSnapshot().revision !== before.revision) {
+        const direction = position < before.past.length ? 'undo' : 'redo';
+        for (let index = 0; index < count; index++) for (const listener of this.historyListeners)
+          try {listener(direction);} catch (cause) {if (!failed) failure = cause; failed = true;}
+        if (failed) throw new Error('History moved, but an observer failed. Inspect the document before retrying.', {cause: failure});
+      } else if (failed) throw failure;
+    } finally {this.navigatingHistory = false;}
   }
 
   getLayer(layerId: string | null): Layer | null {
@@ -879,7 +898,9 @@ export class Document {
 
   /** Synchronous, atomic changes; one history entry. Failed batches roll back. */
   transaction(label: string, callback: () => void): void {
+    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
     if (this.batch) throw new Error("Nested transactions are not supported.");
+    if (typeof label !== 'string') throw new Error('A transaction label must be a string.');
     this.batch = [];
     this.staged = this.store.getSnapshot().document;
     try {
@@ -903,6 +924,7 @@ export class Document {
   }
   /** @internal Automation adapters must validate external requests before dispatch. */
   _dispatch(command: EditorCommand) {
+    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
     if (this.batch) {
       this.staged = freeze(execute(this._read(), command));
       this.batch.push(command);

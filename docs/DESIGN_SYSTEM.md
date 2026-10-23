@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## History inspection controls
+
+History provides Inspect retained history; command search provides the same rebindable action without a default chord. Use the custom modal with a captured-current marker, scrollable chronological state buttons, explicit change-field/omission reports, before/after image panes, Reload and Move actions. Selecting a row only inspects; navigation is explicit. Retain footer/Cancel and normal focus/typing/shortcut containment in both themes and short windows. Label the oldest baseline honestly, clip excessive displayed operation labels without changing stored history, and distinguish geometry bounds/incomplete comparisons from pixel differences. Explain that a new edit replaces redo. Captured-state and accepted-observer errors remain visible. No new rail icon/component library.
+
 ## Reusable palette interactions
 
 Use the custom Color palettes dialog from the rail, rebindable command search and a compact accessible palette button beside native color inputs. Keep native labels/disabled states and preview/commit boundaries. The app owns the modal, so a context menu may close without destroying the picker. Search includes named swatches and hex values. Palette selection opens a draft; explicit Save, Reload details and Save as copy distinguish local intent. Pair named swatches with visible hex values; color is not the only label. Reordering has labeled Earlier/Later buttons and native color inputs remain keyboard accessible. Paginate long catalogs/swatches without evicting data. Use a scrolling body and retained Done/Cancel footer, wrapped controls and names, both themes and short viewports. Never hide storage/corruption errors; explain that saved colors are copied values, local only and sRGB8. No default shortcut or component-library dependency is added.

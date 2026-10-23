@@ -36,6 +36,7 @@ const generatedPages = [
   ["SIGN_IN_WITH_CHATGPT", "Sign in with ChatGPT"],
   ["ARTWORK_LIBRARY", "Reusable artwork library"],
   ["COLOR_PALETTES", "Reusable color palettes"],
+  ["HISTORY", "Inspectable retained history"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

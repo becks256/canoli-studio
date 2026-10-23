@@ -45,7 +45,7 @@ export class EditorStore {
         return { ...entry, document };
       }).reverse();
     };
-    this.state = {
+    this.state = freeze({
       document: current,
       selectedId: null,
       selectedIds: Object.freeze([]),
@@ -53,7 +53,7 @@ export class EditorStore {
       future: freeze(intern(retained.future)),
       revision: 0,
       canvasRevision: 0,
-    };
+    });
   }
 
   getSnapshot = () => this.state;
@@ -64,10 +64,10 @@ export class EditorStore {
     };
   };
   private publish(state: EditorState) {
-    freeze(state.document);
-    Object.freeze(state.selectedIds);
-    this.state = state;
-    this.listeners.forEach((listener) => listener());
+    this.state = freeze(state);
+    let failure: unknown, failed = false;
+    for (const listener of [...this.listeners]) try {listener();} catch (cause) {if (!failed) failure = cause; failed = true;}
+    if (failed) throw failure;
   }
 
   select(selectedId: string | null) {
@@ -98,6 +98,8 @@ export class EditorStore {
   }
 
   dispatch(command: EditorCommand) {
+    const label = describe(command);
+    if (typeof label !== 'string') throw new Error('A history operation label must be a string.');
     const document = execute(this.state.document, command);
     if (document === this.state.document)
       return;
@@ -109,7 +111,7 @@ export class EditorStore {
         ...this.state.past,
         {
           document: this.state.document,
-          label: describe(command),
+          label,
           canvasChanged: changesCanvasSpace(command),
         },
       ].slice(-60),
@@ -121,44 +123,31 @@ export class EditorStore {
   }
 
   undo() {
-    const entry = this.state.past.at(-1);
-    if (!entry) return;
-    this.publish({
-      ...this.state,
-      document: entry.document,
-      past: this.state.past.slice(0, -1),
-      future: [
-        ...this.state.future,
-        {
-          document: this.state.document,
-          label: entry.label,
-          canvasChanged: entry.canvasChanged,
-        },
-      ],
-      ...this.selectionFor(entry.document),
-      revision: this.state.revision + 1,
-      canvasRevision: this.state.canvasRevision + Number(entry.canvasChanged),
-    });
+    if (this.state.past.length) this.navigateHistory(this.state.past.length - 1);
   }
 
   redo() {
-    const entry = this.state.future.at(-1);
-    if (!entry) return;
+    if (this.state.future.length) this.navigateHistory(this.state.past.length + 1);
+  }
+
+  /** Move within retained snapshots atomically, without replaying commands or jobs. */
+  navigateHistory(position: number) {
+    const state = this.state, current = state.past.length;
+    if (!Number.isSafeInteger(position) || position < 0 || position > current + state.future.length)
+      throw new Error('History position is outside the retained timeline.');
+    if (position === current) return;
+    const redo = [...state.future].reverse();
+    const documents = [...state.past.map(entry => entry.document), state.document, ...redo.map(entry => entry.document)];
+    const transitions = [...state.past, ...redo];
+    const document = documents[position];
+    const canvasChanged = transitions.slice(Math.min(current, position), Math.max(current, position)).some(entry => entry.canvasChanged);
     this.publish({
-      ...this.state,
-      document: entry.document,
-      future: this.state.future.slice(0, -1),
-      past: [
-        ...this.state.past,
-        {
-          document: this.state.document,
-          label: entry.label,
-          canvasChanged: entry.canvasChanged,
-        },
-      ],
-      ...this.selectionFor(entry.document),
-      revision: this.state.revision + 1,
-      canvasRevision: this.state.canvasRevision + Number(entry.canvasChanged),
+      ...state, document,
+      past: transitions.slice(0, position).map((entry, index) => ({...entry, document: documents[index]})),
+      future: transitions.slice(position).map((entry, index) => ({...entry, document: documents[position + index + 1]})).reverse(),
+      ...this.selectionFor(document),
+      revision: state.revision + 1,
+      canvasRevision: state.canvasRevision + Number(canvasChanged),
     });
   }
 
