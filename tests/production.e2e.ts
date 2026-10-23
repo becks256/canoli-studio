@@ -2021,3 +2021,7 @@ test('production desktop MCP plugin pairs explicitly and preserves native pixels
 });
 
 test('production website account creation and sign-out preserve local artwork through the real identity host',async({page},info)=>accountProductionWorkflow(page,info));
+
+test('production website account export and deletion preserve artwork and undo history',async({page},info)=>{
+ const {accountLifecycleWorkflow}=await import('./helpers/account-lifecycle-browser');await accountLifecycleWorkflow(page,info);
+});

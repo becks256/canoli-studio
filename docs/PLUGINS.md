@@ -2,6 +2,8 @@
 
 ## Website identity grants no plugin permission
 
+Account export/deletion likewise grants no plugin or scripting capability and leaves independently paired local document connections under their existing explicit controls. Account deletion is not a Disconnect action and does not remove local artwork, recovery or saved projects. Credentials and account exports never enter isolated plugin results or document tool data.
+
 T24 website sign-in is separate from internal package permissions and the explicitly paired T23 local document connection. Signed-in account cookies never enter isolated plugin code, project data or MCP document tools. Signing into/out of Canoli does not silently connect documents, change existing explicit grants or authorize provider inference. All existing isolated execution and host commit checks remain. See [identity-only account behavior](SIGN_IN_WITH_CHATGPT.md).
 
 ## Separate ChatGPT desktop plugin — local workflow verified

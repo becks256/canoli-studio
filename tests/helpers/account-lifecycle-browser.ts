@@ -1,0 +1,17 @@
+import {expect,type Page,type TestInfo} from '@playwright/test';
+import {readFile} from 'node:fs/promises';
+import {accountBrowser,accountProject,createAccount} from './account-browser';
+import {scriptedCanoliArtwork} from './chatgpt';
+
+/** A real production editor, signed local issuer and actual downloads/undo. */
+export async function accountLifecycleWorkflow(page:Page,info:TestInfo){
+ const host=await accountBrowser(page.context());try{
+  await page.goto(host.origin);const initial=await accountProject(page,info,'lifecycle-initial.luma');await scriptedCanoliArtwork(page);const before=await accountProject(page,info,'lifecycle-before.luma');
+  const png=async(name:string)=>{const downloading=page.waitForEvent('download',{timeout:180000});await page.getByRole('button',{name:'Export PNG',exact:true}).click();const path=info.outputPath(name);await(await downloading).saveAs(path);return readFile(path);},pixels=await png('lifecycle-before.png');
+  const dialog=await createAccount(page),view=await(await page.request.get(host.origin+'/auth/session')).json();
+  const downloading=page.waitForEvent('download');await dialog.getByRole('button',{name:'Download account data',exact:true}).click();const download=await downloading;expect(download.suggestedFilename()).toBe('canoli-account.json');const exported=info.outputPath('canoli-account.json');await download.saveAs(exported);const text=await readFile(exported,'utf8'),data=JSON.parse(text);expect(data).toMatchObject({format:'canoli-account',schemaVersion:1,account:{id:view.user.id},identities:[{subject:'artist-one'}],activeSessionCount:1});expect(text).not.toContain(view.csrf);expect(text).not.toContain(host.provider.lastToken);
+  await dialog.getByRole('button',{name:'Delete Canoli account…',exact:true}).click();const destructive=dialog.getByRole('button',{name:'Permanently delete Canoli account',exact:true}),input=dialog.getByRole('textbox',{name:'Type DELETE to confirm',exact:true});await expect(destructive).toBeDisabled();await input.fill('delete');await expect(destructive).toBeDisabled();await dialog.getByRole('button',{name:'Cancel account deletion',exact:true}).click();expect((await(await page.request.get(host.origin+'/auth/session')).json()).user.id).toBe(view.user.id);
+  await dialog.getByRole('button',{name:'Delete Canoli account…',exact:true}).click();await expect(input).toHaveValue('');await input.fill('DELETE');await expect(destructive).toBeEnabled();await info.attach('account-deletion-confirmation',{body:await dialog.screenshot(),contentType:'image/png'});await destructive.click();await expect(dialog.getByRole('status').filter({hasText:'Your Canoli account was deleted.'})).toContainText('Your Canoli account was deleted. Local artwork remains open.');expect((await(await page.request.get(host.origin+'/auth/session')).json()).user).toBeNull();await dialog.getByRole('button',{name:'Done',exact:true}).click();
+  expect((await accountProject(page,info,'lifecycle-after.luma')).value.document).toEqual(before.value.document);expect(await png('lifecycle-after.png')).toEqual(pixels);await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();expect((await accountProject(page,info,'lifecycle-undone.luma')).value.document).toEqual(initial.value.document);await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await accountProject(page,info,'lifecycle-redone.luma')).value.document).toEqual(before.value.document);expect(await page.evaluate(()=>'luma'in window)).toBe(false);
+ }finally{await host.close();}
+}

@@ -1,11 +1,11 @@
 import type {IncomingMessage,ServerResponse} from 'node:http';
 import {randomBytes} from 'node:crypto';
 import {z} from 'zod';
-import {AccountStore,type BrowserSession,type AuthTransaction} from './store';
+import {AccountStore,AccountVerificationRequired,type BrowserSession,type AuthTransaction} from './store';
 import {OpenAiIdentityClient,OPENAI_ISSUER,randomToken} from './oidc';
 
 export interface AuthHostOptions {origin:string;store:AccountStore;identity:OpenAiIdentityClient;allowInsecureLoopback?:boolean}
-const actionSchema=z.object({csrf:z.string(),intent:z.enum(['signin','link']).optional(),pendingId:z.string().max(128).optional()}).strict();
+const actionSchema=z.object({csrf:z.string(),intent:z.enum(['signin','link','reauthenticate']).optional(),pendingId:z.string().max(128).optional(),confirmation:z.string().max(16).optional()}).strict();
 function cookie(request:IncomingMessage,name:string){const values=(request.headers.cookie??'').split(';').map(part=>part.trim()).filter(part=>part.startsWith(name+'='));if(values.length!==1)return undefined;return values[0].slice(name.length+1);}
 async function readAction(request:IncomingMessage){let body='';for await(const chunk of request){body+=chunk.toString('utf8');if(Buffer.byteLength(body)>8192)throw new Error('Invalid account request.');}if(request.headers['content-type']?.split(';')[0]==='application/x-www-form-urlencoded'){const form=new URLSearchParams(body);if([...form.keys()].some(key=>form.getAll(key).length!==1))throw new Error('Invalid account request.');return actionSchema.parse(Object.fromEntries(form));}if(request.headers['content-type']?.split(';')[0]!=='application/json')throw new Error('Invalid account request.');return actionSchema.parse(JSON.parse(body));}
 export function createAuthHandler(options:AuthHostOptions){
@@ -52,8 +52,13 @@ export function createAuthHandler(options:AuthHostOptions){
    }
    if(url.pathname==='/auth/confirm'){if(!action.pendingId)throw new Error('Choose the pending account confirmation.');issue(response,options.store.confirm(session,action.pendingId));send(response,200,{ok:true});return true;}
    if(url.pathname==='/auth/cancel'){options.store.cancel(session);send(response,200,{ok:true});return true;}
+   if(url.pathname==='/auth/export'||url.pathname==='/auth/delete'){
+    if(!session.userId){send(response,401,{error:'Sign in before managing account data.'});return true;}
+    if(url.pathname==='/auth/export'){response.setHeader('Content-Disposition','attachment; filename="canoli-account.json"');send(response,200,options.store.exportAccount(session));return true;}
+    options.store.deleteAccount(session,action.confirmation);setCookie(response,'',0);send(response,200,{ok:true});return true;
+   }
    if(url.pathname==='/auth/signout'){options.store.signOut(session);setCookie(response,'',0);send(response,200,{ok:true});return true;}
    send(response,404,{error:'Unknown account endpoint.'});return true;
-  }catch{send(response,400,{error:'The account request could not be completed. Refresh Account and try again.'});return true;}
+  }catch(error){if(error instanceof AccountVerificationRequired)send(response,409,{code:'VERIFICATION_REQUIRED',error:'Verify your current ChatGPT sign-in before continuing.'});else send(response,400,{error:'The account request could not be completed. Refresh Account and try again.'});return true;}
  };
 }

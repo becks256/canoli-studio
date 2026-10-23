@@ -16,7 +16,7 @@ export function createSiteHandler(options:SiteOptions){
    if(request.headers.host!==origin.host){plain(response,403,'Use the configured Canoli site origin.');return;}
    const url=new URL(request.url??'/',origin);
    if(auth&&await auth(request,response))return;
-   if(url.pathname.startsWith('/auth')){response.writeHead(url.pathname==='/auth/session'&&request.method==='GET'?200:503,{'Content-Type':'application/json','Cache-Control':'no-store'});response.end(JSON.stringify(url.pathname==='/auth/session'?{configured:false,csrf:null,user:null,pending:null,signingIn:false,notice:null}:{error:'Account sign-in is not configured on this installation.'}));return;}
+   if(url.pathname.startsWith('/auth')){response.writeHead(url.pathname==='/auth/session'&&request.method==='GET'?200:503,{'Content-Type':'application/json','Cache-Control':'no-store'});response.end(JSON.stringify(url.pathname==='/auth/session'?{configured:false,csrf:null,user:null,pending:null,signingIn:false,notice:null,verificationExpiresIn:0}:{error:'Account sign-in is not configured on this installation.'}));return;}
    if(request.method!=='GET'&&request.method!=='HEAD'){plain(response,405,'Only file reads are supported.');return;}
    const pathname=decodeURIComponent(url.pathname);if(pathname.includes('\\')||pathname.includes('\0')||pathname.split('/').some(part=>part.startsWith('.'))){plain(response,404,'Not found.');return;}
    const extension=extname(pathname),relative=pathname==='/'||!extension?'index.html':pathname.slice(1),type=types[extname(relative)];if(!type){plain(response,404,'Not found.');return;}

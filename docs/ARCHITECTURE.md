@@ -2,6 +2,8 @@
 
 ## Optional website identity host — local signed-fixture workflow verified
 
+Account lifecycle uses private schema-2 SQL transactions and a monotonic authority sequence. Five-minute current-account verification gates linking/deletion; existing-identity reauthentication rotates the cookie, while new linking retains the original verification time. Strict shared account export DTOs whitelist owner metadata outside the editor DOM. Atomic account removal revokes every owner browser and matching proposal; ten-minute hashed identity markers reject anonymous callbacks that predate deletion. Migration retains old users/cookies with no recent-verification authority. Local editor/history/asset and independent plugin/REST boundaries remain unchanged.
+
 `server/auth` owns registered OpenAI identity-only OIDC, private SQLite account/identity/session authority and same-origin CSRF/callback routes. `server/site` optionally serves the built editor and these routes behind one configured origin; it does not proxy or change headless REST sessions. `account/client` and the custom Account dialog keep identity outside the OO document model, isolated runtime, project data and shared editing history. Sign-in opens a separate window, requires explicit new-account/link confirmation and preserves local artwork. One-time browser-bound state/nonce/PKCE, signature verification, session rotation and generation checks reject replay/cancellation/sign-out races. Real OpenAI registration and acceptance remain required. See [the precise deployment/protocol contract](SIGN_IN_WITH_CHATGPT.md).
 
 ## Explicit local ChatGPT document connection — local workflow verified

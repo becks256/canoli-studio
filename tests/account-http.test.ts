@@ -4,6 +4,7 @@ import {readFileSync,readdirSync} from 'node:fs';
 import {dirname,join} from 'node:path';
 import {accountHost} from './helpers/account-host';
 import {createAuthHandler} from '../server/auth/http';
+import {DatabaseSync} from 'node:sqlite';
 
 async function request(host:Awaited<ReturnType<typeof accountHost>>,path:string,options:{cookie?:string;method?:string;body?:unknown;origin?:string;host?:string;headers?:Record<string,string>}={}){
  const body=options.body===undefined?undefined:JSON.stringify(options.body);return new Promise<{status:number;headers:import('node:http').IncomingHttpHeaders;text:string;json:()=>any;cookie:string|undefined}>((resolve,reject)=>{
@@ -28,4 +29,52 @@ describe('same-origin identity HTTP flow',()=>{
  it('links only after signed-in confirmation and never merges a second account with the same email',async()=>{const host=await accountHost();try{let first=await create(host),firstUser=(await request(host,'/auth/session',{cookie:first})).json().user;const link=await verified(host,first,'second-method','link'),pending=(await request(host,'/auth/session',{cookie:first})).json();expect(pending.pending.kind).toBe('link');expect(link.result.status).toBe(200);const accepted=await request(host,'/auth/confirm',{cookie:first,body:{csrf:pending.csrf,pendingId:pending.pending.id}});first=accepted.cookie!;const second=await create(host,'third-user'),secondUser=(await request(host,'/auth/session',{cookie:second})).json().user;expect(firstUser.id).not.toBe(secondUser.id);const signedOut=await request(host,'/auth/signout',{cookie:first,body:{csrf:(await request(host,'/auth/session',{cookie:first})).json().csrf}});expect(signedOut.status).toBe(200);const resumed=await verified(host,undefined,'second-method');expect(resumed.result.cookie).toBeTruthy();expect((await request(host,'/auth/session',{cookie:resumed.result.cookie})).json().user.id).toBe(firstUser.id);}finally{await host.close();}});
  it('uses secure host-only cookies for HTTPS and rejects insecure public session configuration',async()=>{const host=await accountHost(undefined,{publicOrigin:'https://canoli.example'});try{const response=await request(host,'/auth/session');expect(response.headers['set-cookie']![0]).toMatch(/^__Host-canoli-session=.*; Path=\/; HttpOnly; SameSite=Lax; Max-Age=\d+; Secure$/);expect(()=>createAuthHandler({origin:'http://public.example',store:host.store,identity:host.identity,allowInsecureLoopback:true})).toThrow();}finally{await host.close();}});
  it('does not serve dotfiles, private databases, path traversal or write methods as public static content',async()=>{const host=await accountHost();try{for(const path of ['/.env.local','/accounts.sqlite','/%2e%2e%2fpackage.json','/auth/unknown'])expect((await request(host,path)).status).not.toBe(200);expect((await request(host,'/',{body:{}})).status).toBe(405);expect((await request(host,'/developer/chatgpt-plugin.html')).headers['content-type']).toContain('text/html');const sitemap=await request(host,'/sitemap.xml');expect(sitemap.status).toBe(200);expect(sitemap.text).toBe(readFileSync('dist/sitemap.xml','utf8'));}finally{await host.close();}});
+});
+
+describe('account lifecycle HTTP authority',()=>{
+ it('exports only the current account and revokes all of its sessions on explicit deletion',async()=>{
+  const host=await accountHost();try{
+   const owner=await create(host),second=(await verified(host)).result.cookie!,other=await create(host,'unrelated'),view=(await request(host,'/auth/session',{cookie:owner})).json();
+   const exported=await request(host,'/auth/export',{cookie:owner,body:{csrf:view.csrf}}),data=exported.json();
+   expect(exported.status).toBe(200);expect(exported.headers['content-disposition']).toContain('canoli-account.json');expect(exported.headers['cache-control']).toBe('no-store');expect(data).toMatchObject({format:'canoli-account',schemaVersion:1,account:{id:view.user.id},activeSessionCount:2});expect(data.identities.map((identity:any)=>identity.subject)).toEqual(['first-user']);
+   for(const privateValue of [view.csrf,owner.split('=')[1],second.split('=')[1],host.provider.lastToken])expect(exported.text).not.toContain(privateValue);
+   for(const confirmation of ['', 'delete', ' DELETE '])expect((await request(host,'/auth/delete',{cookie:owner,body:{csrf:view.csrf,confirmation}})).status).toBe(400);
+   const deleted=await request(host,'/auth/delete',{cookie:owner,body:{csrf:view.csrf,confirmation:'DELETE'}});expect(deleted.status).toBe(200);expect(deleted.headers['set-cookie']![0]).toContain('Max-Age=0');for(const cookie of [owner,second])expect((await request(host,'/auth/session',{cookie})).status).toBe(401);
+   expect((await request(host,'/auth/session',{cookie:other})).json().user.id).not.toBe(view.user.id);expect((await request(host,'/')).status).toBe(200);
+  }finally{await host.close();}
+ });
+ it('requires authenticated same-origin CSRF authority for export and deletion',async()=>{
+  const host=await accountHost();try{
+   const anonymous=await request(host,'/auth/session'),owner=await create(host),view=(await request(host,'/auth/session',{cookie:owner})).json();
+   for(const path of ['/auth/export','/auth/delete']){
+    expect((await request(host,path,{body:{csrf:'none',confirmation:'DELETE'}})).status).toBe(401);
+    expect((await request(host,path,{cookie:anonymous.cookie,body:{csrf:anonymous.json().csrf,confirmation:'DELETE'}})).status).toBe(401);
+    expect((await request(host,path,{cookie:owner,origin:'https://evil.example',body:{csrf:view.csrf,confirmation:'DELETE'}})).status).toBe(403);
+    expect((await request(host,path,{cookie:owner,body:{csrf:'wrong',confirmation:'DELETE'}})).status).toBe(400);
+   }
+   expect((await request(host,'/auth/session',{cookie:owner})).json().user.id).toBe(view.user.id);
+  }finally{await host.close();}
+ });
+ it('requires fresh verification by an already-linked identity, not a new subject or matching email',async()=>{
+  const host=await accountHost();try{
+   let owner=await create(host);const view=(await request(host,'/auth/session',{cookie:owner})).json(),db=new DatabaseSync(host.database);try{db.prepare('UPDATE browsers SET auth_at=0 WHERE user_id=?').run(view.user.id);}finally{db.close();}
+   expect((await request(host,'/auth/session',{cookie:owner})).json().verificationExpiresIn).toBe(0);
+   for(const path of ['/auth/delete','/auth/openai']){const response=await request(host,path,{cookie:owner,body:{csrf:view.csrf,confirmation:'DELETE',intent:'link'}});expect(response.status).toBe(409);expect(response.json().code).toBe('VERIFICATION_REQUIRED');}
+   const wrong=await verified(host,owner,'new-subject','reauthenticate');expect(wrong.result.status).toBe(400);expect((await request(host,'/auth/session',{cookie:owner})).json()).toMatchObject({user:{id:view.user.id},pending:null,verificationExpiresIn:0});
+   const good=await verified(host,owner,'first-user','reauthenticate');expect(good.result.status).toBe(200);expect(good.result.cookie).toBeTruthy();const previous=owner;owner=good.result.cookie!;expect((await request(host,'/auth/session',{cookie:previous})).status).toBe(401);const fresh=(await request(host,'/auth/session',{cookie:owner})).json();expect(fresh.verificationExpiresIn).toBeGreaterThan(290000);expect((await request(host,'/auth/delete',{cookie:owner,body:{csrf:fresh.csrf,confirmation:'DELETE'}})).status).toBe(200);
+  }finally{await host.close();}
+ });
+ it('rejects a signed anonymous callback held before deletion, and permits only a fresh explicit account creation',async()=>{
+  const host=await accountHost();let release=()=>{};try{
+   const owner=await create(host),ownerView=(await request(host,'/auth/session',{cookie:owner})).json(),attempt=await begin(host),callback=host.provider.grant(attempt.location),hold=host.provider.holdToken();release=hold.release;const pending=request(host,callback.pathname+callback.search,{cookie:attempt.cookie});await hold.entering;
+   expect((await request(host,'/auth/delete',{cookie:owner,body:{csrf:ownerView.csrf,confirmation:'DELETE'}})).status).toBe(200);hold.release();expect((await pending).status).toBe(400);expect((await request(host,'/auth/session',{cookie:attempt.cookie})).json()).toMatchObject({user:null,pending:null});
+   const replacement=await create(host);expect((await request(host,'/auth/session',{cookie:replacement})).json().user.id).not.toBe(ownerView.user.id);
+  }finally{release();await host.close();}
+ });
+ it('erases pre-existing duplicate anonymous confirmation proposals before they can recreate an account',async()=>{
+  const host=await accountHost();try{
+   const proposed=await verified(host),draft=(await request(host,'/auth/session',{cookie:proposed.cookie})).json(),owner=await create(host),view=(await request(host,'/auth/session',{cookie:owner})).json();expect(draft.pending.kind).toBe('create');
+   expect((await request(host,'/auth/delete',{cookie:owner,body:{csrf:view.csrf,confirmation:'DELETE'}})).status).toBe(200);expect((await request(host,'/auth/confirm',{cookie:proposed.cookie,body:{csrf:draft.csrf,pendingId:draft.pending.id}})).status).toBe(400);expect((await request(host,'/auth/session',{cookie:proposed.cookie})).json()).toMatchObject({user:null,pending:null});
+  }finally{await host.close();}
+ });
 });

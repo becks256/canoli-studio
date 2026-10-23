@@ -2,6 +2,8 @@
 
 ## Website account routes are separate — local signed-fixture workflow verified
 
+The same-origin host also provides authenticated POST `/auth/export` and `/auth/delete`, plus the `reauthenticate` sign-in intent. Account deletion requires exact confirmation and recent existing-identity verification and revokes every owned account session; it does not revoke independent REST keys or local plugin grants. Export is account metadata only. These are not `/api/v1` routes or public document constructors. See SIGN_IN_WITH_CHATGPT.md for the complete DTO, lease, migration, errors and deletion retention contract.
+
 The optional same-origin site/auth host supplies `/auth/session`, registered OpenAI sign-in/callback, explicit account confirmation, cancellation, browser sign-out and stale-session recovery. These routes do not authenticate or synchronize this independent `/api/v1` service; its existing Bearer/X-API-Key contract remains unchanged. Identity cookies do not authorize document commands, plugin grants or inference. See [website identity/session routes and errors](SIGN_IN_WITH_CHATGPT.md).
 
 ## Explicit local ChatGPT browser connection — local workflow verified

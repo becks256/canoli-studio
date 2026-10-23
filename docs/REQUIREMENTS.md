@@ -2,6 +2,8 @@
 
 ## T24 identity-only sign-in — local signed-fixture workflow verified
 
+Account metadata export must include only the authenticated owner and no credential/artwork fields. Explicit typed deletion requires recent verification by an existing current-account identity and atomically revokes all owned sessions, profiles, links and matching proposals. Reject anonymous/authenticated pre-deletion callbacks across processes/restarts without affecting other accounts. Legacy migration must be atomic, retain valid cookies/users and require fresh verification for sensitive operations; a newly linked identity cannot renew that authority. Preserve local artwork/history and independent grants. See the account lifecycle contract in SIGN_IN_WITH_CHATGPT.md.
+
 Optional website sign-in must use the actual registered OpenAI Authorization Code/PKCE/OIDC contract, server-side signature/issuer/client/nonce/time checks, one-time browser-bound state and application-owned sessions. Require explicit account creation/link confirmation; never merge by matching email or reassign an existing identity. Preserve local document/history/source data and isolated/plugin/REST boundaries. Cancel, sign-out, stale callbacks, cross-site requests, replay and expired authority must not publish a new session. Unconfigured sites retain useful local editing. Signed fixtures do not prove live OpenAI acceptance. See [Sign in with ChatGPT](SIGN_IN_WITH_CHATGPT.md).
 
 ## Local ChatGPT document connection — local workflow verified

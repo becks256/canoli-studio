@@ -2,6 +2,8 @@
 
 ## Website identity and document authority — local signed-fixture workflow verified
 
+Account export captures only owner metadata in one SQL snapshot. Deletion requires exact typed confirmation, current CSRF/origin and verification within five minutes by an already linked identity. One SQL commit removes the account and all sessions/links/proposals; short-lived identity hashes plus a database-ordered sequence reject old anonymous callbacks across instances/restarts, even within the same millisecond. Fresh later attempts may explicitly create a new account ID. Schema-1 migration is rollback-safe and grants old sessions no recent verification. Logical deletion does not erase SQLite pages/WAL/backups or local artwork. See SIGN_IN_WITH_CHATGPT.md for expiry and HTTP errors.
+
 Identity is a separate optional application boundary. Verified issuer/client/subject resolves accounts; an email match is never account ownership. The durable private SQLite store atomically consumes browser-bound state and confirms identity links, rotates opaque session cookies and rejects cancelled/closed/expired generations after asynchronous token exchange. Source artwork, command history and local document/plugin grants do not live in this store. The optional same-origin static/auth host remains separate from the independent loopback REST service. Only identity scopes are requested; no plan/inference access is implied. See [the current contract and remaining live-provider acceptance](SIGN_IN_WITH_CHATGPT.md).
 
 ## Local MCP authority and commit receipts — local workflow verified

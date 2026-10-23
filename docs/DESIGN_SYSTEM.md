@@ -2,6 +2,8 @@
 
 ## Account and sign-in interaction
 
+Account data download is separate from Save project. Delete Canoli account opens a dedicated confirmation pane with retained Cancel/Done controls, explicit effects, current-identity verification when stale and a custom text input requiring exact DELETE before enabling the danger button. Keep controls at their normal height while the body scrolls. Treat typed editing shortcuts as input operations. Preserve the confirmation pane through same-account verification, clear it when account identity changes, and acknowledge deletion only after a valid server response.
+
 Use the custom Account Dialog, neutral UserRound header icon, explicit status/confirmation/cancel/refresh controls and unassigned Account registry action. Start sign-in with Continue with ChatGPT in a separate named window so local artwork stays open. Show only verified display identity, require Create Canoli account or Link this ChatGPT sign-in before a new identity is attached, and keep matching-email/account distinction readable. Keep body scrolling independent of retained Done/close actions, use semantic tokens in both themes, and expose recoverable errors. Unconfigured installations explain availability without a false functional sign-in button. No invented OpenAI logo, inference claim or keyboard interception is introduced.
 
 ## ChatGPT connection interaction
