@@ -19,7 +19,7 @@ static void notify_raw_progress(int, int, int) {}
 // One module per private worker. The only retained plane is owned linear RGB16.
 static uint8_t *output = nullptr;
 static uint32_t info[32] = {};
-static char texts[5][256] = {};
+static char texts[7][256] = {};
 static char error_message[1024] = {};
 
 class CheckedRaw final : public LibRaw {
@@ -72,7 +72,7 @@ void canoli_raw_release() {
 }
 const uint32_t *canoli_raw_info() { return info; }
 const uint8_t *canoli_raw_pixels() { return output; }
-const char *canoli_raw_text(uint32_t index) { return index < 5 ? texts[index] : nullptr; }
+const char *canoli_raw_text(uint32_t index) { return index < 7 ? texts[index] : nullptr; }
 const char *canoli_raw_error() { return error_message; }
 
 int canoli_raw_process(const uint8_t *bytes, size_t length, int mode, uint32_t shot,
@@ -130,7 +130,7 @@ int canoli_raw_process(const uint8_t *bytes, size_t length, int mode, uint32_t s
         }
         const bool calibrated = data.idata.colors == 1 ||
             (!decoder->get_internal_data_pointer()->internal_output_params.raw_color && finite_matrix && matrix_energy > 0);
-        info[0] = 1; info[1] = s.raw_width; info[2] = s.raw_height;
+        info[0] = 2; info[1] = s.raw_width; info[2] = s.raw_height;
         info[3] = s.width; info[4] = s.height; info[5] = uint32_t(width); info[6] = uint32_t(height);
         info[7] = uint32_t(s.flip); info[8] = data.idata.raw_count; info[9] = shot;
         info[10] = data.idata.filters; info[11] = data.idata.colors; info[12] = data.idata.dng_version;
@@ -138,12 +138,31 @@ int canoli_raw_process(const uint8_t *bytes, size_t length, int mode, uint32_t s
         info[19] = camera_wb; info[20] = calibrated; info[21] = data.color.raw_bps;
         info[22] = data.color.maximum; info[23] = data.color.black;
         info[25] = decoder->has_extra_samples();
+        // Recorded EXIF/makernote values are declarations, not calibrated sensor
+        // geometry. Invalid/missing numeric metadata uses the zero wire sentinel.
+        const auto positive = [](float primary, float fallback = 0.0f) {
+            return std::isfinite(primary) && primary > 0 ? primary :
+                std::isfinite(fallback) && fallback > 0 ? fallback : 0.0f;
+        };
+        const float shooting[] = {
+            positive(data.other.focal_len, data.lens.makernotes.CurFocal),
+            positive(float(data.lens.FocalLengthIn35mmFormat), data.lens.makernotes.FocalLengthIn35mmFormat),
+            positive(data.other.aperture, data.lens.makernotes.CurAp),
+            positive(data.other.shutter), positive(data.other.iso_speed)
+        };
+        static_assert(sizeof(float) == sizeof(uint32_t), "RAW protocol requires 32-bit floats");
+        std::memcpy(info + 26, shooting, sizeof(shooting));
         std::snprintf(texts[0], sizeof(texts[0]), "%.*s", int(sizeof(data.idata.make)), data.idata.make);
         std::snprintf(texts[1], sizeof(texts[1]), "%.*s", int(sizeof(data.idata.model)), data.idata.model);
         const char *decoder_name = decoder->unpack_function_name();
         std::snprintf(texts[2], sizeof(texts[2]), "%s", decoder_name ? decoder_name : "unknown");
         std::snprintf(texts[3], sizeof(texts[3]), "%s", LibRaw::version());
         std::snprintf(texts[4], sizeof(texts[4]), "%.*s", int(sizeof(data.idata.cdesc)), data.idata.cdesc);
+        std::snprintf(texts[5], sizeof(texts[5]), "%.*s", int(sizeof(data.lens.LensMake)), data.lens.LensMake);
+        const bool named_lens = data.lens.Lens[0] != 0;
+        std::snprintf(texts[6], sizeof(texts[6]), "%.*s",
+            int(named_lens ? sizeof(data.lens.Lens) : sizeof(data.lens.makernotes.Lens)),
+            named_lens ? data.lens.Lens : data.lens.makernotes.Lens);
         if (mode == 0) return 0;
         if (info[25]) {
             std::snprintf(error_message, sizeof(error_message), "RAW extra sample channels require a preserved-coverage development pipeline."); return -13;

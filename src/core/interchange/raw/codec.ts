@@ -35,7 +35,11 @@ export function rawDecoder(module:NativeRawModule){
       const heap=module.HEAPU8,pointer=module._canoli_raw_info()>>>0;
       if(!pointer||pointer%4||pointer+128>heap.length)throw new Error('Invalid RAW native information extent.');
       const info=new Uint32Array(heap.buffer,pointer,32).slice();
-      if(info[0]!==1||info[19]>1||info[20]>1||info[13]>1||info[25]>1||info[18]!==mode)throw new Error('Invalid RAW native protocol.');
+      if(info[0]!==2||info[19]>1||info[20]>1||info[13]>1||info[25]>1||info[18]!==mode)throw new Error('Invalid RAW native protocol.');
+      const shootingValues=new Float32Array(info.buffer,26*4,5);
+      if([...shootingValues].some(value=>!Number.isFinite(value)||value<0))throw new Error('Invalid RAW shooting metadata.');
+      const shooting={version:1 as const,lensMake:text(module._canoli_raw_text(5)),lensModel:text(module._canoli_raw_text(6)),
+        focalLength:shootingValues[0]||null,focalLength35mm:shootingValues[1]||null,aperture:shootingValues[2]||null,exposureTime:shootingValues[3]||null,iso:shootingValues[4]||null};
       const unsupported:string[]=[];
       if(!info[20])unsupported.push('Camera color calibration is unavailable; uncalibrated channels cannot be identified as sRGB.');
       if(info[25])unsupported.push('RAW extra sample channels require a preserved-coverage development pipeline.');
@@ -45,8 +49,8 @@ export function rawDecoder(module:NativeRawModule){
       if(info[14])warnings.push(`The native decoder reported processing warning bits ${info[14]}.`);
       const report=rawImportReportSchema.parse({version:1,nativeVersion:text(module._canoli_raw_text(3)),make:text(module._canoli_raw_text(0)),model:text(module._canoli_raw_text(1)),decoder:text(module._canoli_raw_text(2)),cfaDescription:text(module._canoli_raw_text(4)),
         rawWidth:info[1],rawHeight:info[2],width:info[3],height:info[4],displayWidth:info[5],displayHeight:info[6],flip:info[7],imageCount:info[8],image:info[9],filters:info[10],channels:info[11],dngVersion:info[12],foveon:!!info[13],nativeWarnings:info[14],
-        hasCameraWhiteBalance:!!info[19],hasColorMatrix:!!info[20],hasExtraSamples:!!info[25],bitDepth:info[21]||null,whiteLevel:info[22],blackLevel:info[23],canDevelop:unsupported.length===0,unsupported,warnings});
-      Object.freeze(report.unsupported);Object.freeze(report.warnings);Object.freeze(report);
+        hasCameraWhiteBalance:!!info[19],hasColorMatrix:!!info[20],hasExtraSamples:!!info[25],bitDepth:info[21]||null,whiteLevel:info[22],blackLevel:info[23],canDevelop:unsupported.length===0,unsupported,warnings,shooting});
+      Object.freeze(report.shooting);Object.freeze(report.unsupported);Object.freeze(report.warnings);Object.freeze(report);
       if(mode===0)return{report};
       const pixels=module._canoli_raw_pixels()>>>0,width=report.displayWidth,height=report.displayHeight,channels=info[17],length=width*height*channels*2;
       if(!pixels||pixels%2||info[16]!==16||![1,3].includes(channels)||length!==info[15]||pixels+length>heap.length||!Number.isSafeInteger(length)||!report.canDevelop)throw new Error('Invalid RAW native linear pixel result.');

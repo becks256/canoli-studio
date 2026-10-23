@@ -21,6 +21,13 @@ export function parseRawDevelopmentOptions(input:RawDecodeOptions):RawDecodeSett
 }
 
 const dimension=z.number().int().positive().max(0x7fffffff);
+const recordedPositive=z.number().finite().positive().nullable();
+export const rawShootingMetadataSchema=z.object({
+  version:z.literal(1),lensMake:z.string().max(256),lensModel:z.string().max(256),
+  focalLength:recordedPositive,focalLength35mm:recordedPositive,aperture:recordedPositive,
+  exposureTime:recordedPositive,iso:recordedPositive,
+}).strict().readonly();
+export type RawShootingMetadata=z.infer<typeof rawShootingMetadataSchema>;
 export const rawImportReportSchema=z.object({
   version:z.literal(1),nativeVersion:z.string().min(1).max(256),
   make:z.string().max(256),model:z.string().max(256),decoder:z.string().max(256),
@@ -31,6 +38,7 @@ export const rawImportReportSchema=z.object({
   bitDepth:z.number().int().min(1).max(64).nullable(),blackLevel:z.number().int().nonnegative().max(0xffffffff),whiteLevel:z.number().int().nonnegative().max(0xffffffff),
   hasCameraWhiteBalance:z.boolean(),hasColorMatrix:z.boolean(),hasExtraSamples:z.boolean(),nativeWarnings:z.number().int().nonnegative().max(0xffffffff),
   canDevelop:z.boolean(),unsupported:z.array(z.string()),warnings:z.array(z.string()),
+  shooting:rawShootingMetadataSchema.optional(),
 }).strict().superRefine((report,context)=>{
   if(report.image>=report.imageCount||report.canDevelop!==(report.unsupported.length===0)||report.canDevelop&&(!report.hasColorMatrix||report.hasExtraSamples)||!Number.isSafeInteger(report.rawWidth*report.rawHeight*8)||!Number.isSafeInteger(report.displayWidth*report.displayHeight*8))context.addIssue({code:'custom',message:'Inconsistent RAW import report.'});
 });

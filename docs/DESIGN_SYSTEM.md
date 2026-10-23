@@ -505,3 +505,6 @@ Upload recognizes camera RAW extensions/MIMEs and reviews each original in the e
 ### Manual RAW lens controls
 
 Reuse the existing RAW review/development dialog. A Lens correction disclosure explains manual calibration and transparent borders; Enable lens correction reveals exact fields for Scale, radial k1/k2/k3, center x/y, red/blue scales and vignette k1/k2/k3. Preserve parameters when disabled. Report geometric folds/nonpositive attenuation inline and disable Preview/Apply/Queue until valid. Draft edits invalidate previews and Cancel/Escape discards them. Native image geometry stays independent of zoom/canvas placement; Scale crops the corrected field. Reuse native number controls, focus, busy/error and narrow wrapping rules. No new rail tool, shortcut or UI library.
+
+
+RAW review includes a Recorded lens and exposure disclosure showing declared lens identity, focal/equivalent mm, f-number, exposure seconds and ISO. Display unknowns explicitly and format native float32 values with seven significant digits for reading. Keep these read-only source details separate from editable development controls; disclose that they are not verified/calibrated sensor measurements or automatic profile matching. Existing dialog scrolling, actions, Escape/cancellation and preview/commit boundaries remain.

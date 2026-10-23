@@ -55,6 +55,17 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
       {!report&&!error&&<p role="status">Inspecting RAW…</p>}
       {report&&<>
         <p>{report.make} {report.model} · {report.displayWidth} × {report.displayHeight} px{report.bitDepth!==null?` · ${report.bitDepth} bits per sample`:''}</p>
+        {report.shooting&&<details><summary>Recorded lens and exposure</summary><dl>
+          <dt>Lens maker</dt><dd>{report.shooting.lensMake||'Unknown'}</dd>
+          <dt>Lens model</dt><dd>{report.shooting.lensModel||'Unknown'}</dd>
+          {([
+            ['Focal length',report.shooting.focalLength,'mm'],
+            ['35 mm equivalent',report.shooting.focalLength35mm,'mm'],
+            ['Aperture',report.shooting.aperture,''],
+            ['Exposure time',report.shooting.exposureTime,'s'],
+            ['ISO',report.shooting.iso,''],
+          ]as const).map(([label,value,unit])=><div key={label}><dt>{label}</dt><dd>{value===null?'Unknown':`${label==='Aperture'?'f/':''}${new Intl.NumberFormat(undefined,{maximumSignificantDigits:7}).format(value)}${unit?' '+unit:''}`}</dd></div>)}
+        </dl><p>Recorded by the source file; not verified measurements or calibrated sensor geometry. Lens profile matching requires separate calibration.</p></details>}
         {!!report.unsupported.length&&<ul>{report.unsupported.map(text=><li key={text}>{text}</li>)}</ul>}
         {!!report.warnings.length&&<details><summary>Source limitations</summary><ul>{report.warnings.map(text=><li key={text}>{text}</li>)}</ul></details>}
         {file&&report.imageCount>1&&<NumberField layout="stacked" label="RAW image index" value={settings.image} min={0} max={report.imageCount-1} integer disabled={disabled} onCommit={image=>change({image})}/>}

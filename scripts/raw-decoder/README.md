@@ -60,3 +60,13 @@ Primary references:
 - [Native data and processing options](https://www.libraw.org/docs/API-datastruct-eng.html)
 - [Pinned native reference CLI](https://github.com/LibRaw/LibRaw/blob/0.22.2/samples/dcraw_emu.cpp)
 - [DNG specification](https://helpx.adobe.com/camera-raw/desktop/dng-and-file-formats/digital-negative.html)
+
+Native protocol 2 retains the existing exported functions and 128-byte information
+record, adding recorded focal length, 35 mm-equivalent focal length, aperture,
+exposure seconds and ISO as five checked float32 values. Two bounded strings
+carry the declared lens make/model; a missing maker is not inferred from the
+camera maker. Standard metadata takes precedence over available native makernote
+fallbacks. Missing, nonpositive or non-finite declarations become unknown, not
+zero measurements or import failures. These are recorded values, not calibrated
+sensor geometry, measured exposure or a basis for silent lens-profile selection.
+No serial numbers, GPS coordinates or timestamps are exported by this addition.

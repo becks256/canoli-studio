@@ -3,6 +3,7 @@ import {RawDevelopment,type RawDevelopmentControl} from './raw';
 import type {RawDevelopSettings,RawImportReport} from '../core/interchange/raw/types';
 export {RawDevelopment,LensCorrection} from './raw';
 export type {RawDevelopmentControl,RawDevelopmentOptions} from './raw';
+export type {RawImportReport,RawShootingMetadata} from '../core/interchange/raw/types';
 export type {LensCorrectionOptions,LensCorrectionData} from '../core/interchange/raw/lens';
 import { frequencyRadiusOwner } from "../core/frequency-separation";
 import type { FrequencySeparationOptions } from "../core/frequency-separation";

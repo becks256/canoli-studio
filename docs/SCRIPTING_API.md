@@ -2770,6 +2770,27 @@ if (image instanceof SmartObjectLayer) {
 
 The image asset retains accepted PNG bytes plus a frozen `raw` record: complete original Blob/name/MIME/byte length/SHA-256, normalized consent/settings, accepted native report, decoder WASM SHA-256 and accepted-output SHA-256. Hashes validate content relationships/corruption, not photographic fidelity or authorship. Native project container v4 deduplicates original blobs across current/history outputs; non-RAW projects still use v3. Readers retain v1–3 compatibility; older readers reject v4 rather than silently flattening it. Workspace encoding, recovery digests, asset sharing/cross-document transfer and source-bearing recipe package v2 and brush preset/pack v6 retain both byte streams and settings. Opening a saved RAW project decodes its accepted PNG without the RAW codec. Broader photographic/quality gates remain outstanding. Direct RAW batches are described below. Semantic RAW development recipes are described below. The isolated and separate REST development contracts follow below. Internal development retains linear RGB16, checks native error/geometry/copy/corruption results and uses explicit consent before producing the current RGBA8 sRGB working PNG. It does not use the embedded JPEG preview. Full-input/full-plane native memory, WASM address space and native format geometry remain limits, separate from original source resolution; no arbitrary MP/file-size cap is introduced. Physical camera/color/quality, broad DNG/codec coverage, F10 high-precision/HDR composition and broader F12/F14 acceptance remain open. No isolated file/worker/pixel/network/plugin privilege or REST renderer/session synchronization is added.
 
+## Recorded RAW lens and shooting metadata
+
+Native inspection and development reports now include optional `shooting: RawShootingMetadata`. This immutable version-1 DTO contains `lensMake` and `lensModel` (bounded native strings; empty means unknown), and nullable positive finite `focalLength` (mm), `focalLength35mm` (recorded 35 mm-equivalent mm), `aperture` (f-number), `exposureTime` (seconds), and `iso`. Values retain the native float32 precision. Missing, nonpositive or non-finite native declarations become null; a missing lens maker is not inferred from the camera maker. Unsupported private wire versions and malformed reply values reject before publication. The native wire protocol is now 2; the public report stays version 1 and older saved reports remain readable without injected fields.
+
+These values are extracted declarations, not verified measurements, calibrated sensor geometry or automatic lens-profile selection. Do not infer a calibrated crop factor from a rounded 35 mm-equivalent focal length. Lens/camera database matching, calibration interpolation and correction models still require their own acceptance. The review dialog's Recorded lens and exposure disclosure formats values for reading; unknowns stay explicit. The DTO adds no serial number, location or timestamp fields; complete retained originals still contain their original metadata.
+
+Trusted `inspectRaw`, independent REST inspection/development, isolated `developRaw` results and native batch review/prepared projects carry the same report. Reports stay read-only and inspection changes no document/assets/history. Accepted metadata remains with original/working assets through project/workspace/recovery/recipe/brush/copy/batch transport and decoder-independent reopening/undo. No new isolated file/network/decoder privilege or browser/REST synchronization is added. Original pixels, geometry and development settings are unchanged by reading these declarations. See the [pinned native fields](https://www.libraw.org/docs/API-datastruct-eng.html) and checked build manifest for the source of each value.
+
+<!-- example: raw-shooting-metadata -->
+```js
+const image = document.selectedLayer;
+if (!(image instanceof SmartObjectLayer)) throw new Error("Select a RAW smart object.");
+const current = await image.getRawDevelopment();
+if (!current) throw new Error("This image has no retained RAW original.");
+const report = await image.developRaw(current, {allowPrecisionLoss:true});
+print("Recorded lens:", report.shooting?.lensModel || "Unknown");
+print("Recorded focal length (mm):", report.shooting?.focalLength ?? "Unknown");
+```
+
+This example performs native development and commits one ordinary RAW master update. For read-only inspection, trusted hosts use `editor.inspectRaw(file)` and REST clients use `raw-inspect`. Isolated scripts retain the existing document/assets grants, five-second deadline and atomic commit.
+
 ## RAW lens correction
 
 `new LensCorrection(options: LensCorrectionOptions = {})` constructs an immutable version-1 manual calibration value. It reads no files/pixels. `toJSON()` returns an independent copy. `new RawDevelopment({...settings, lens: new LensCorrection(options)})` accepts that value or its strict DTO; omission preserves the previous no-correction behavior without injecting a lens field into legacy settings. `enabled` defaults true; false retains parameters while bypassing processing. Other defaults/ranges are: `center:{x:.5,y:.5}` (each 0–1), `scale:1` (.1–10), `distortion:{k1:0,k2:0,k3:0}` (each -1–1), `chromatic:{red:1,blue:1}` (each .5–2), `vignette:{k1:0,k2:0,k3:0}` (each -1–1). All numbers must be finite; unknown keys and unsupported versions reject. Settings use oriented native image coordinates, not canvas placement or viewport pixels.

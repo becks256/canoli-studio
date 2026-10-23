@@ -1,5 +1,5 @@
 {
-  "protocolVersion": 1,
+  "protocolVersion": 2,
   "libraw": "0.22.2",
   "zlib": "1.3.2",
   "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.10 (b7dc6e5747465580df5984e723b9d1f10d8e804b)",
@@ -9,10 +9,10 @@
     "zlib": "da607da739fa6047df13e66a2af6b8bec7c2a498"
   },
   "sourceFiles": {
-    "scripts/build-raw-decoder.py": "63f6e26b5aa9f1f551499099eb55cae2075c3d6f6dcaef3a9d36e759e8653ff5",
+    "scripts/build-raw-decoder.py": "ba8b111f727929e883ccd2f2e1b81b593bb8215244d3265526a954b78e99bf0e",
     "scripts/raw-decoder/CMakeLists.txt": "d4ae0c70edd6bfbcce82e413b7e2ff9d7e93c0adaafa95e415eecb84e7e07d73",
-    "scripts/raw-decoder/README.md": "27ad59f7130e9efe73abb57c892f2a56ddfe6cf3d3fc722a069ae32367f7644e",
-    "scripts/raw-decoder/decoder.cpp": "59607fa2f0082af9406938c43b23f2cbc4ed173a23064f98b98758f2d985ed62"
+    "scripts/raw-decoder/README.md": "04c5260efaa9bf004ce5a2c45772738f9337c42a198de2461fa9a694173998eb",
+    "scripts/raw-decoder/decoder.cpp": "0f0e63190022c3be7ab087a0d9c8d5f7115d44ddeba3ad770a573b41517051c2"
   },
   "librawSources": [
     "src/libraw_c_api.cpp",
@@ -101,8 +101,8 @@
       "sha256": "f086a70de712b2123f1eeeadb2823069e14dce57f7f722f0180ffe08db96af77"
     },
     "canoli_raw_decoder.wasm": {
-      "bytes": 853407,
-      "sha256": "94d358c22e5d29d47cf7801ee17c1d2ba9fe2d7a1894a322885003c13caae111"
+      "bytes": 854029,
+      "sha256": "ada6cb8c7477381dd4d18a27bf19b4ca84698922410bee285516571a3ff21997"
     }
   },
   "output": "Owned full-resolution linear sRGB RGB16 or grayscale16; separate explicit working-space conversion",
@@ -110,7 +110,8 @@
     "single private worker",
     "zlib",
     "internal X3F decoder",
-    "native demosaicing"
+    "native demosaicing",
+    "recorded lens and shooting metadata"
   ],
   "excluded": [
     "DNG SDK",

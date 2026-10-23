@@ -1,0 +1,34 @@
+{
+  "generator": "Independent EXIF IFD authoring over unchanged synthetic sensor strips",
+  "baseSha256": "34cf1ca16ee5fd818c076821e957da86155848fa78222b38f4607abedf38487b",
+  "cases": [
+    {
+      "file": "recorded.dng",
+      "bytes": 7388,
+      "sha256": "968473b3c57899c17ed624d717e415fc21331ebfd5ae72adabd820516212f3b4"
+    },
+    {
+      "file": "missing-maker.dng",
+      "bytes": 7362,
+      "sha256": "a4d1e25489257fc559faf789143f23b517c363fb3abcfcdb58c49c55042a6c15"
+    },
+    {
+      "file": "invalid-numbers.dng",
+      "bytes": 7388,
+      "sha256": "8049dce76a3b8a9fc76ee550907ea9276d24fed67b293bd04ec556902f0877e2"
+    },
+    {
+      "file": "nonfinite-numbers.dng",
+      "bytes": 7388,
+      "sha256": "f9ece0c6468c2b336fff66fab661854552db688f139018884c8d2e73a73bb7bf"
+    },
+    {
+      "file": "recorded-50mp.dng.gz",
+      "bytes": 100001244,
+      "sha256": "3b67b105616cf6ce0070cc5fca1ededbffc5fc80e255f0ab057713cb0aeff045",
+      "sensorBaseSha256": "cfe25bed379735dfea685695e956838b284106e6527e6aff77e3901ef6ef9d85",
+      "width": 10000,
+      "height": 5000
+    }
+  ]
+}

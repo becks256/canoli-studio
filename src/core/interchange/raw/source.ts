@@ -34,7 +34,7 @@ export function ownRawSource(input:RawImageSource):Readonly<RawImageSource>{
   const metadata=rawSourceMetadata(input),blob=input.originalBlob;
   if(blob.size!==metadata.original.byteLength||blob.type!==metadata.original.type)throw new Error('RAW original extent or MIME type differs from its descriptor.');
   Object.freeze(metadata.original);freeze(metadata.settings.development);Object.freeze(metadata.settings);
-  Object.freeze(metadata.report.unsupported);Object.freeze(metadata.report.warnings);Object.freeze(metadata.report);
+  Object.freeze(metadata.report.shooting);Object.freeze(metadata.report.unsupported);Object.freeze(metadata.report.warnings);Object.freeze(metadata.report);
   const result=Object.freeze({...metadata,originalBlob:blob});owned.add(result);return result;
 }
 export async function verifyRawSource(input:RawImageSource,output:Blob,width?:number,height?:number,check:()=>void=()=>{}):Promise<Readonly<RawImageSource>>{

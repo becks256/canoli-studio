@@ -73,10 +73,10 @@ for source in sorted(args.libraw.rglob('*')):
             notices.append(str(source.relative_to(args.libraw))+'\n'+'\n'.join(legal))
 (root/'public/licenses/libraw-0.22.2-NOTICES.txt').write_text('\n\n'.join(notices)+'\n')
 own = [root/'scripts/build-raw-decoder.py', *sorted((root/'scripts/raw-decoder').glob('*'))]
-metadata = {'protocolVersion': 1, 'libraw': '0.22.2', 'zlib': '1.3.2', 'emscripten': version,
+metadata = {'protocolVersion': 2, 'libraw': '0.22.2', 'zlib': '1.3.2', 'emscripten': version,
             'sourceRevisions': pins, 'sourceFiles': {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in own if p.is_file()},
             'librawSources': sources, 'artifacts': artifacts, 'output': 'Owned full-resolution linear sRGB RGB16 or grayscale16; separate explicit working-space conversion',
-            'features': ['single private worker', 'zlib', 'internal X3F decoder', 'native demosaicing'],
+            'features': ['single private worker', 'zlib', 'internal X3F decoder', 'native demosaicing', 'recorded lens and shooting metadata'],
             'excluded': ['DNG SDK', 'RawSpeed', 'external lossy JPEG DNG', 'external camera/output ICC files', 'OpenMP', 'network/filesystem access'],
             'geometry': 'Optional native memory default lifted; native overflow/representation checks, pre-unpack PTRDIFF geometry, WASM address space and actual allocation limits remain.'}
 (destination/'build.json').write_text(json.dumps(metadata, indent=2)+'\n')

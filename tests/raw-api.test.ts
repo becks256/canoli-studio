@@ -66,3 +66,15 @@ it('headless project delivery validates ordinary PNG pixels and rejects unverifi
     expect((await(await fetch(`${base}/documents/${id}`,{headers:auth})).json()).revision).toBe(1);
   }
 },20000);
+
+it('REST inspection and retained project history expose recorded lens metadata without guessing missing values',async()=>{
+ const id=await document(),bytes=new Uint8Array(await readFile('tests/fixtures/raw-shooting/recorded.dng'));
+ const response=await raw(id,bytes,{},0,'raw-inspect');expect(response.status).toBe(200);const report=(await response.json()).report;
+ expect(report.shooting).toEqual({version:1,lensMake:'Canoli Optics',lensModel:'Canoli Reference 24-70mm F2.8',focalLength:35,focalLength35mm:53,aperture:Math.fround(5.6),exposureTime:Math.fround(.008),iso:400});
+ expect((await(await fetch(`${base}/documents/${id}`,{headers:auth})).json()).revision).toBe(0);
+ expect((await(await fetch(`${base}/documents/${id}/assets`,{headers:auth})).json()).assets).toHaveLength(0);
+ const first=await(await raw(id,bytes)).json(),developed=await fetch(`${base}/documents/${id}/raw-develop`,json('POST',{expectedRevision:1,layerId:first.layerId,options:{allowPrecisionLoss:true,development:{lens:{vignette:{k1:-.1}}}}}));expect(developed.status).toBe(200);expect((await developed.json()).report.shooting).toEqual(report.shooting);
+ const saved=await readProject(await(await fetch(`${base}/documents/${id}/project?history=true`,{headers:auth})).blob());expect(saved.entries).toHaveLength(2);
+ for(const asset of saved.entries){expect(asset.raw!.report.shooting).toEqual(report.shooting);expect(new Uint8Array(await asset.raw!.originalBlob.arrayBuffer())).toEqual(bytes);}
+ const undo=await(await fetch(`${base}/documents/${id}/undo`,json('POST',{expectedRevision:2}))).json();expect(undo.document).toEqual(first.document);
+},30000);
