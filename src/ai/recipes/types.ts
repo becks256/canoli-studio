@@ -72,6 +72,7 @@ export interface RecipeLensCorrection {
   distortion?:{k1?:number|string;k2?:number|string;k3?:number|string};
   chromatic?:{red?:number|string;blue?:number|string};
   vignette?:{k1?:number|string;k2?:number|string;k3?:number|string};
+  profile?:import('../../core/interchange/lens/schema').LensProfileSelectionOptions|string;
 }
 export type RecipeRawDevelopment = {
   [K in keyof import('../../core/interchange/raw/types').RawDevelopOptions]?:

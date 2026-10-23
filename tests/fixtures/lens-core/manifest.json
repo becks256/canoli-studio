@@ -1,0 +1,1885 @@
+{
+  "generator": "Complete native Lensfun XML database/modifier plus real GLib; no owned core or application parser",
+  "profiles": {
+    "poly3": {
+      "version": 1,
+      "maker": "Canoli Optics",
+      "model": "Canoli Reference 24-70mm F2.8",
+      "type": "rectilinear",
+      "mounts": [
+        "Canoli Test Mount"
+      ],
+      "center": {
+        "x": 0.02,
+        "y": -0.01
+      },
+      "focalRange": {
+        "min": 24,
+        "max": 70
+      },
+      "calibrations": [
+        {
+          "cropFactor": 1.5,
+          "aspectRatio": 1.5,
+          "distortion": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                -0.05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                -0.041
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                -0.032
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                -0.023000000000000007
+              ]
+            }
+          ],
+          "chromatic": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                1.001,
+                0.999,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                1.0010299999999999,
+                0.99898,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                1.0010599999999998,
+                0.99896,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                1.0010899999999998,
+                0.99894,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            }
+          ],
+          "vignette": [
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            }
+          ]
+        },
+        {
+          "cropFactor": 2,
+          "aspectRatio": 1.5,
+          "distortion": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                -0.05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                -0.041
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                -0.032
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                -0.023000000000000007
+              ]
+            }
+          ],
+          "chromatic": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                1.001,
+                0.999,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                1.0010299999999999,
+                0.99898,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                1.0010599999999998,
+                0.99896,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                1.0010899999999998,
+                0.99894,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            }
+          ],
+          "vignette": [
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "poly5": {
+      "version": 1,
+      "maker": "Canoli Optics",
+      "model": "Canoli Reference 24-70mm F2.8",
+      "type": "rectilinear",
+      "mounts": [
+        "Canoli Test Mount"
+      ],
+      "center": {
+        "x": 0.02,
+        "y": -0.01
+      },
+      "focalRange": {
+        "min": 24,
+        "max": 70
+      },
+      "calibrations": [
+        {
+          "cropFactor": 1.5,
+          "aspectRatio": 1.5,
+          "distortion": [
+            {
+              "model": "poly5",
+              "focalLength": 24,
+              "terms": [
+                -0.04,
+                0.003
+              ]
+            },
+            {
+              "model": "poly5",
+              "focalLength": 35,
+              "terms": [
+                -0.033,
+                0.003
+              ]
+            },
+            {
+              "model": "poly5",
+              "focalLength": 50,
+              "terms": [
+                -0.026000000000000002,
+                0.003
+              ]
+            },
+            {
+              "model": "poly5",
+              "focalLength": 70,
+              "terms": [
+                -0.019,
+                0.003
+              ]
+            }
+          ],
+          "chromatic": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                1.001,
+                0.999,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                1.0010299999999999,
+                0.99898,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                1.0010599999999998,
+                0.99896,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                1.0010899999999998,
+                0.99894,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            }
+          ],
+          "vignette": [
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            }
+          ]
+        },
+        {
+          "cropFactor": 2,
+          "aspectRatio": 1.5,
+          "distortion": [
+            {
+              "model": "poly5",
+              "focalLength": 24,
+              "terms": [
+                -0.04,
+                0.003
+              ]
+            },
+            {
+              "model": "poly5",
+              "focalLength": 35,
+              "terms": [
+                -0.033,
+                0.003
+              ]
+            },
+            {
+              "model": "poly5",
+              "focalLength": 50,
+              "terms": [
+                -0.026000000000000002,
+                0.003
+              ]
+            },
+            {
+              "model": "poly5",
+              "focalLength": 70,
+              "terms": [
+                -0.019,
+                0.003
+              ]
+            }
+          ],
+          "chromatic": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                1.001,
+                0.999,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                1.0010299999999999,
+                0.99898,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                1.0010599999999998,
+                0.99896,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                1.0010899999999998,
+                0.99894,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            }
+          ],
+          "vignette": [
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "ptlens": {
+      "version": 1,
+      "maker": "Canoli Optics",
+      "model": "Canoli Reference 24-70mm F2.8",
+      "type": "rectilinear",
+      "mounts": [
+        "Canoli Test Mount"
+      ],
+      "center": {
+        "x": 0.02,
+        "y": -0.01
+      },
+      "focalRange": {
+        "min": 24,
+        "max": 70
+      },
+      "calibrations": [
+        {
+          "cropFactor": 1.5,
+          "aspectRatio": 1.5,
+          "distortion": [
+            {
+              "model": "ptlens",
+              "focalLength": 24,
+              "terms": [
+                0.012,
+                -0.045,
+                0.015
+              ]
+            },
+            {
+              "model": "ptlens",
+              "focalLength": 35,
+              "terms": [
+                0.01,
+                -0.037,
+                0.013
+              ]
+            },
+            {
+              "model": "ptlens",
+              "focalLength": 50,
+              "terms": [
+                0.008,
+                -0.028999999999999998,
+                0.011
+              ]
+            },
+            {
+              "model": "ptlens",
+              "focalLength": 70,
+              "terms": [
+                0.006,
+                -0.020999999999999998,
+                0.009
+              ]
+            }
+          ],
+          "chromatic": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                1.001,
+                0.999,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                1.0010299999999999,
+                0.99898,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                1.0010599999999998,
+                0.99896,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                1.0010899999999998,
+                0.99894,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            }
+          ],
+          "vignette": [
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            }
+          ]
+        },
+        {
+          "cropFactor": 2,
+          "aspectRatio": 1.5,
+          "distortion": [
+            {
+              "model": "ptlens",
+              "focalLength": 24,
+              "terms": [
+                0.012,
+                -0.045,
+                0.015
+              ]
+            },
+            {
+              "model": "ptlens",
+              "focalLength": 35,
+              "terms": [
+                0.01,
+                -0.037,
+                0.013
+              ]
+            },
+            {
+              "model": "ptlens",
+              "focalLength": 50,
+              "terms": [
+                0.008,
+                -0.028999999999999998,
+                0.011
+              ]
+            },
+            {
+              "model": "ptlens",
+              "focalLength": 70,
+              "terms": [
+                0.006,
+                -0.020999999999999998,
+                0.009
+              ]
+            }
+          ],
+          "chromatic": [
+            {
+              "model": "poly3",
+              "focalLength": 24,
+              "terms": [
+                1.001,
+                0.999,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 35,
+              "terms": [
+                1.0010299999999999,
+                0.99898,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 50,
+              "terms": [
+                1.0010599999999998,
+                0.99896,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            },
+            {
+              "model": "poly3",
+              "focalLength": 70,
+              "terms": [
+                1.0010899999999998,
+                0.99894,
+                5e-05,
+                -4e-05,
+                1e-05,
+                -2e-05
+              ]
+            }
+          ],
+          "vignette": [
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.18,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 24,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.16799999999999998,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.17099999999999999,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 35,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15899999999999997,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.162,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 50,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.15,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 4,
+              "focusDistance": 1000,
+              "terms": [
+                -0.153,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            },
+            {
+              "model": "pa",
+              "focalLength": 70,
+              "aperture": 8,
+              "focusDistance": 1000,
+              "terms": [
+                -0.141,
+                0.02,
+                0.001
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "file": "poly3-exact.f32le",
+      "model": "poly3",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 35,
+      "cropFactor": 1.5,
+      "aperture": 4,
+      "focusDistance": 1,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "db00efe7a18d8e026e56d6226695f702bc18d78e0def5d41ee9b0643c6e8cf1d"
+    },
+    {
+      "file": "poly3-interpolated.f32le",
+      "model": "poly3",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "29c44ae57c45137f412eb3fd50b1f08d04908ad547e61b2da38a9c0e4c4c0c8a"
+    },
+    {
+      "file": "poly3-crop.f32le",
+      "model": "poly3",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 2.1,
+      "aperture": 5.6,
+      "focusDistance": null,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "c6e04983ef08c60c6a9437120efc1d42a361447bd2c9cc9931a0bd308a41afaa"
+    },
+    {
+      "file": "poly3-oriented.f32le",
+      "model": "poly3",
+      "width": 96,
+      "height": 128,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 6,
+      "sha256": "1c1969172651ac12fb3b544fac45b65e5024fc6230353fb37721f199a1ab5547"
+    },
+    {
+      "file": "poly3-native-50mp.f32le",
+      "model": "poly3",
+      "width": 10000,
+      "height": 5000,
+      "left": 8192,
+      "top": 3072,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "ee6889add772de3d00314272d4c77d3bb35a89fd1848eacc0886fc84604ae0ba"
+    },
+    {
+      "file": "poly5-exact.f32le",
+      "model": "poly5",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 35,
+      "cropFactor": 1.5,
+      "aperture": 4,
+      "focusDistance": 1,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "8643fc13384fca757b2150627899281804b09d8961376de8925881c80d5ec214"
+    },
+    {
+      "file": "poly5-interpolated.f32le",
+      "model": "poly5",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "03df8474d82a7b87ae9f0482674a8cd3b97fce24bf67093b7c32b024d427e443"
+    },
+    {
+      "file": "poly5-crop.f32le",
+      "model": "poly5",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 2.1,
+      "aperture": 5.6,
+      "focusDistance": null,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "b43bb44abf6f32d0ee02e548a502fd73effa90f5ec9e1d5cf7f849636c29dce9"
+    },
+    {
+      "file": "poly5-oriented.f32le",
+      "model": "poly5",
+      "width": 96,
+      "height": 128,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 6,
+      "sha256": "ae8d3ef02401b9e51df9f0430f160589d42449da89144b8e51c64661f68c7499"
+    },
+    {
+      "file": "poly5-native-50mp.f32le",
+      "model": "poly5",
+      "width": 10000,
+      "height": 5000,
+      "left": 8192,
+      "top": 3072,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "c8d205fe2a98ead414dfd03e82493920ad3d9b9cfecba8dceee97cb76e752a5c"
+    },
+    {
+      "file": "ptlens-exact.f32le",
+      "model": "ptlens",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 35,
+      "cropFactor": 1.5,
+      "aperture": 4,
+      "focusDistance": 1,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "3950db47077ae274c2f8a69cb06adae829c28712f689c7207cdf5fa04bc9608f"
+    },
+    {
+      "file": "ptlens-interpolated.f32le",
+      "model": "ptlens",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "100c37ec3818341bdda8c13ae062cf10dfd210ba6e69618517e388a53c0927a0"
+    },
+    {
+      "file": "ptlens-crop.f32le",
+      "model": "ptlens",
+      "width": 64,
+      "height": 48,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 2.1,
+      "aperture": 5.6,
+      "focusDistance": null,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "4f3d5454a62bf59812dad044b7f164c822063c04f817f8ae0b67e17675df5c65"
+    },
+    {
+      "file": "ptlens-oriented.f32le",
+      "model": "ptlens",
+      "width": 96,
+      "height": 128,
+      "left": 0,
+      "top": 0,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 6,
+      "sha256": "6368bc4df960ac365fbadb873c79673132b8bdb8843bcb7cbec8c62b7e8afdc7"
+    },
+    {
+      "file": "ptlens-native-50mp.f32le",
+      "model": "ptlens",
+      "width": 10000,
+      "height": 5000,
+      "left": 8192,
+      "top": 3072,
+      "focalLength": 43,
+      "cropFactor": 1.5,
+      "aperture": 5.6,
+      "focusDistance": 10,
+      "scale": 1.05,
+      "flip": 0,
+      "sha256": "0d42ad444391ca0b3bcafe535254d1bda7588061dad381a17d268c6d1abcf749"
+    }
+  ]
+}

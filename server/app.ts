@@ -423,7 +423,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
         finally{response.off('close',close);}return;
       }
       if(subresource==='raw-develop'&&!subresourceId&&method==='POST'){
-        const parsed=z.object({...revisionSchema.shape,layerId:z.string().min(1).max(240),options:rawDecodeOptionsSchema}).strict().parse(await body(request)),revision=document.getSnapshot().revision;
+        const parsed=z.object({...revisionSchema.shape,layerId:z.string().min(1).max(240),options:rawDecodeOptionsSchema}).strict().parse(await body(request,16_000_000)),revision=document.getSnapshot().revision;
         if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
         const layer=document.getLayer(parsed.layerId);if(!(layer instanceof SmartObjectLayer))throw new Error('Choose an attached RAW smart object.');
         const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('RAW request disconnected.'));};response.on('close',close);

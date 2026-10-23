@@ -1,5 +1,11 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Calibrated RAW profile invariant — in implementation
+
+Native project files with explicit retained history use the shared validated restoration constructor when opened, just like workspace records. Loading must not discard already verified undo/redo artwork; failed construction releases prepared assets before session publication. History-free files remain clean snapshots.
+
+Supported complete Lensfun calibration snapshots are immutable settings values, separate from manual coefficients. Only disposable private RAW workers own the native modifier. Geometry admission precedes demosaicing; source-position float32 gains precede bilinear sampling and one final RGB16 quantization/sRGB8 transfer. Absolute pixel callbacks prevent partition-dependent scanline drift, while bounded coordinate jobs and source/gain tiles remain independent of original geometry. Enabled profiles require separate lens-native provenance; disabled profiles load no lens native dependency. Shared host commands preserve original/accepted assets, locks, revision/grant validation, one-step history and catalog/decoder-independent accepted reopening. Source calibration declarations are not proof of physical quality. XML/catalog/matching and wider roadmap gates remain unfinished; precise contracts are in SCRIPTING_API.md.
+
 ## RAW development workflow in implementation
 
 Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.

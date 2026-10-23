@@ -1,0 +1,50 @@
+{
+  "protocolVersion": 1,
+  "lensfun": "0.3.99.0",
+  "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.10 (b7dc6e5747465580df5984e723b9d1f10d8e804b)",
+  "sourceRevisions": {
+    "lensfun": "b98997f7f1c020d0fac3136c2abbf06126385971",
+    "emsdk": "62a853cd3b3134398ce85cde8bb5cbb2ef0194cb"
+  },
+  "sourceFiles": {
+    "scripts/build-lens-correction.py": "3a4262df6130becbc204b309edd4f5a293fbda4156c3edc32857074f357f8d67",
+    "scripts/lens-correction/README.md": "e2d72b134944c241a29b412da39b373b6270bca7ae6838b6c33e86de35d98b51",
+    "scripts/lens-correction/core.cpp": "50d1b6c7405d6ee78c70dda8b860346b7feb56de8225f9f68bc089c926a81941",
+    "scripts/lens-correction/glib.h": "100041b5dbc97d12f78142bc53e4a7150c57c4553604317483e08e4d3466c497",
+    "scripts/lens-correction/oracle.cpp": "4683862520d32c8767141644cf9818b5028f8d47324c3e76e2c225c031cf88f2"
+  },
+  "upstreamFiles": {
+    "libs/lensfun/lens.cpp": "96981c7f1903435f4a4880eec628d1564f37cad7ba003fff8b6455b64916a2f5",
+    "libs/lensfun/modifier.cpp": "98de6d7e4c92932d9791d3ad46996d31368c0d8156b770fab049e50ecd0e23a5",
+    "libs/lensfun/mod-coord.cpp": "86c16af921548e8d96b65b204d859eee97b0eb788f4436f12fcf6a3694886fc1",
+    "libs/lensfun/mod-subpix.cpp": "96cb690bd6b73fe4f871ea62e8ba33f118fb09e10f9a26f702c8bfc058ae474f",
+    "libs/lensfun/mod-color.cpp": "4dfc21971d05a25899f26a35f85c397374ee3a9d3f3575a2a10f051fd091c8ea",
+    "libs/lensfun/auxfun.cpp": "6cd8c542767ab9e407d3c6d27b1084876a3210590b905c1dd08ae7fd48a16560",
+    "libs/lensfun/lensfunprv.h": "21340e2f81ef8675590f41b1da24f8ec177f3670b22836df8a17bbfc2bf845d8",
+    "include/lensfun/lensfun.h.in": "2f6d3b41a34456075ab6298f719b34fcc2b531c63b47b7463f31986714a23b1e"
+  },
+  "generatedInterpolationSha256": "8142a8fd1f22160678c666b82e2206050bb87823a9220b1639895e3829392f06",
+  "artifacts": {
+    "canoli_lens_correction.js": {
+      "bytes": 20369,
+      "sha256": "13306c0e32f77329ac2e288dc66229317a380acef7e64c95580932bc948d1689"
+    },
+    "canoli_lens_correction.wasm": {
+      "bytes": 272284,
+      "sha256": "b43f6f38948f66f624a24e22e6ac6df4f91d638171020e0045403d5a801828d4"
+    }
+  },
+  "included": [
+    "upstream scalar calibration interpolation",
+    "upstream distortion/TCA/vignette coordinate and gain models",
+    "owned checked C ABI, scratch budgets and output lifetime"
+  ],
+  "excluded": [
+    "GLib runtime, parser, locale and container services",
+    "database XML parsing/matching/loading",
+    "projection/perspective API",
+    "network and filesystem",
+    "SSE/SSE2"
+  ],
+  "geometry": "Native original geometry is independent of bounded coordinate/gain scratch requests. Actual WASM representation and allocation failures remain."
+}

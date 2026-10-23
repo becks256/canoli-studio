@@ -1,8 +1,9 @@
 import { createFrequencySeparation } from "./frequency-separation";
 import {RawDevelopment,type RawDevelopmentControl} from './raw';
 import type {RawDevelopSettings,RawImportReport} from '../core/interchange/raw/types';
-export {RawDevelopment,LensCorrection} from './raw';
-export type {RawDevelopmentControl,RawDevelopmentOptions} from './raw';
+export {RawDevelopment,LensCorrection,LensProfile} from './raw';
+export type {RawDevelopmentControl,RawDevelopmentOptions,LensProfileCorrectionOptions} from './raw';
+export type {LensProfileOptions,LensProfileData,LensProfileSelectionOptions,LensProfileSelectionData} from '../core/interchange/lens/schema';
 export type {RawImportReport,RawShootingMetadata} from '../core/interchange/raw/types';
 export type {LensCorrectionOptions,LensCorrectionData} from '../core/interchange/raw/lens';
 import { frequencyRadiusOwner } from "../core/frequency-separation";
@@ -490,7 +491,7 @@ export class Document {
     document.store = store;
     return document;
   }
-  /** @internal Workspace restoration validates retained history before exposing the session. */
+  /** @internal Restoration validates retained history before exposing the session. */
   static _fromWorkspace(data: unknown, history?: unknown): Document {
     const document = Document.fromJSON(data);
     if (history !== undefined) {

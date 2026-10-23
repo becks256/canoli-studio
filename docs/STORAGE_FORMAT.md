@@ -1,5 +1,11 @@
 # Project storage and local recovery
 
+## Explicit project history and calibrated RAW snapshots — in verification
+
+Native containers already support optional validated retained history. Trusted file opening now restores it through the same constructor as workspace restoration instead of discarding it after decoding. Accepted current, undo-only and redo-only image/original assets remain owned and need no native re-development. Malformed history rejects before publishing a session; failed construction releases prepared assets. Ordinary `saveProject()` still writes a clean current snapshot, while trusted serialization and REST `project?history=true` can explicitly include history. No container/schema version changes.
+
+RAW settings can retain a complete supported LensProfile calibration snapshot with explicit camera/exposure coordinates. An enabled profile requires separate `lensWasmSha256` provenance; disabled settings retain their definition without that identity or native loading. Project checksums and original/output hashes cover transport under the existing RAW v4 ownership rules. This is corruption/provenance validation, not physical-calibration authenticity. XML/catalog persistence, matching and broader photographic/roadmap gates remain unfinished. See SCRIPTING_API.md for exact versioned fields and the dated roadmap for executed acceptance checks.
+
 ## Schema 37 shared frequency radius
 
 The current document schema is 37. Group records may include frequencyRadius as a finite number 0–4096/3 or null. The field is rejected on other layer kinds and under older schema labels, including embedded masters. Null/omission inherits the nearest controller; without one, legacy per-filter sigma values apply. Native component boundaries reset the inherited scope. The property has no ID references to remap during duplication/copy and persists through existing source/history/project/workspace/recipe records. Render-derived sigma is never serialized back over filter fallbacks or protected child metadata. Project 3/workspace 2 and source Blob bytes remain unchanged.

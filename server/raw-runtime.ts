@@ -1,4 +1,6 @@
-import {hasLensCorrection,validateLensGeometry} from '../src/core/interchange/raw/lens';
+import {hasLensCorrection} from '../src/core/interchange/raw/lens';
+import {prepareRawLens} from '../src/core/interchange/raw/profile';
+import lensBuild from '../src/core/interchange/lens/codec/build.json';
 import {readFile} from 'node:fs/promises';
 import factory from '../src/core/interchange/raw/codec/canoli_raw_decoder.js';
 import {rawDecoder} from '../src/core/interchange/raw/codec';
@@ -16,11 +18,15 @@ export async function rawNativeJob(mode:unknown,blob:unknown,options:unknown,pro
   let last=0,lastPhase='';native.canoliRawProgress=stage=>{const phase=stage<=4?'inspecting':'developing',now=performance.now();if(lastPhase!==phase||now-last>=50){last=now;lastPhase=phase;progress({phase,fraction:null});}};
   const bytes=blob instanceof Blob?new Uint8Array(await blob.arrayBuffer()):blob;
   if(mode==='inspect')return{report:decoder.inspect(bytes,settings.development.image)};
-  if(hasLensCorrection(settings.development.lens)){const report=decoder.inspect(bytes,settings.development.image);validateLensGeometry(settings.development.lens!,report.displayWidth,report.displayHeight);}
-  const image=decoder.develop(bytes,settings.development),report=image.report,png=await encodeRawWorkingImage(image,fraction=>progress({phase:'encoding',fraction}),settings.development.lens);
+  const profile=hasLensCorrection(settings.development.lens)?await prepareRawLens(settings.development.lens,decoder.inspect(bytes,settings.development.image),async()=>{
+    const {default:createLens}=await import('../src/core/interchange/lens/codec/canoli_lens_correction.js');return createLens({wasmBinary:new Uint8Array(await readFile(new URL('../src/core/interchange/lens/codec/canoli_lens_correction.wasm',import.meta.url)))});
+  }):undefined;
+  try{
+  const image=decoder.develop(bytes,settings.development),report=image.report,png=await encodeRawWorkingImage(image,fraction=>progress({phase:'encoding',fraction}),settings.development.lens,profile);
   // Validate complete native PNG output off the request thread, not only its header.
   const rows=openPngRows(new Uint8Array(await png.arrayBuffer()));
   if(rows.width!==report.displayWidth||rows.height!==report.displayHeight)throw new Error('Invalid native RAW PNG geometry.');
   for await(const strip of rows.strips){if(!hasLensCorrection(settings.development.lens)&&strip.pixels.some((value,index)=>index%4===3&&value!==255))throw new Error('RAW output unexpectedly contains transparency.');}
-  return{report,png};
+  return{report,png,...(profile?{lensWasmSha256:lensBuild.artifacts['canoli_lens_correction.wasm'].sha256}:{})};
+  }finally{profile?.dispose();}
 }

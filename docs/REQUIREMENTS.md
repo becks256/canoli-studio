@@ -1,5 +1,11 @@
 # Canoli Studio editor requirements
 
+## Calibrated RAW profile execution — in implementation
+
+Opening a native project that explicitly includes validated retained history must preserve its undo/redo entries and all referenced accepted/original assets without native re-development. Ordinary history-free project files continue to open without history. Failed restoration must dispose prepared assets and preserve current artwork.
+
+Explicit immutable LensProfile definitions must retain their full calibration snapshot and camera crop/focal/exposure selection. Never infer calibrated crop from rounded equivalent focal length or lens maker from camera maker. Supported native models and actual Lensfun interpolation run before sRGB8 transfer; folded geometry/nonpositive attenuation and monochrome chromatic correction reject before sensor development. Active profiles carry a separate lens WASM identity and ordinary source/history/grant/revision checks; disabled profiles bypass native lens loading. Accepted profile settings remain reviewable/editable and original/accepted pixels reopen without a catalog or native decoder. No arbitrary original image cap is added. XML/catalog/camera matching, physical quality, broader model support, full F12/F10/F14 and every other unfinished roadmap gate remain required. See SCRIPTING_API.md for exact schemas and the dated roadmap for checks actually run.
+
 ## RAW development workflow in implementation
 
 Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.

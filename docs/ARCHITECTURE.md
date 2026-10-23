@@ -1,5 +1,11 @@
 # Architecture
 
+## Calibrated RAW profile execution — in implementation
+
+Trusted project opening now restores validated optional retained history through the same internal constructor as workspace restoration. Invalid restoration disposes prepared assets before publication. Ordinary files without history still open cleanly. This preserves explicitly supplied undo/redo artwork and accepted source assets rather than discarding the loader's verified history.
+
+The pure immutable `LensProfile` constructor and its `correction()` value retain complete supported Lensfun calibration tables and explicit camera/exposure parameters inside RAW settings. The public model stays object-oriented. Private `interchange/lens` owns a pinned checked WASM correction/interpolation boundary; disposable browser/Node RAW workers initialize it only for enabled profiles and validate native geometry before demosaicing. Bounded absolute coordinate requests and a source/gain tile cache sample native linear pixels without image-size cutoffs. An accepted source has separate lens/decoder WASM identities. Complete accepted settings/pixels travel through shared commands and source/project/history transport without catalog/decoder dependencies on reopen. UI edits accepted profiles separately from manual coefficients. XML/local catalog/matching remain unfinished; wider photographic, precision, merge and performance gates remain open. Exact contracts and executable examples are in SCRIPTING_API.md; test evidence is in the dated roadmap.
+
 ## RAW development workflow in implementation
 
 Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.

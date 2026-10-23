@@ -2815,6 +2815,48 @@ await image.developRaw(new RawDevelopment({
 }), {allowPrecisionLoss:true});
 ```
 
+### Calibrated LensProfile values — workflow in implementation
+
+Trusted `editor.openProject(file)` also restores a native file's optional validated retained history, using the same history admission as workspace restoration. Normal `saveProject()` still emits the current snapshot without history. Trusted `serializeProject(document, assets, history)` and the separate REST `project?history=true` can explicitly include it. Reopening those files retains accepted old/new pixels for ordinary undo/redo without loading a sensor or lens decoder; malformed retained history rejects before changing artwork.
+
+`new LensProfile(options: LensProfileOptions)` is a pure immutable calibration value, available from the public DOM and in isolated Scripts/plugins. `toJSON(): LensProfileData` returns an owned normalized copy. `profile.correction(options: LensProfileCorrectionOptions): LensCorrection` requires positive finite float32-representable `focalLength` (mm) and camera `cropFactor`; neither is inferred. `distortion` and `chromatic` default to whether a non-`none` calibration exists; `vignette` defaults false. Explicit false disables a family. `aperture` defaults null (unknown); vignetting requires a supplied positive aperture. `focusDistance` defaults null, explicitly selecting infinity; positive values use meters. `scale` defaults 1 (.1–10) and `enabled` defaults true. The complete definition and selected parameters serialize under optional `development.lens.profile`. Mixing a profile with non-neutral manual coefficients or a manually overridden center rejects, including disabled settings. Construction performs no parsing, file access or native work.
+
+The strict definition has `version:1`, `model` (required nonempty label), `maker:""`, `type:"rectilinear"`, `mounts:[]`, `aliases:[]`, `center:{x:0,y:0}` (each -1–1, Lensfun optical-center coordinates), `focalRange:{min:0,max:0}` (zero means unknown), and 1–128 `calibrations`. Each calibration has positive `cropFactor`, `aspectRatio` >=1 (default 1.5, landscape ratio), and optional `distortion:[]`, `chromatic:[]`, `vignette:[]`. There must be 1–50,000 total calibration metadata points. Duplicate float32 frame/family/focal/exposure coordinates and mixed non-neutral models within one frame/family reject. These are metadata/job budgets, independent of original image dimensions.
+
+| Family | Supported point records; all numerical terms must be finite float32-representable |
+| --- | --- |
+| Distortion | `{model:"poly3",focalLength,terms:[k1]}`, `poly5` with `[k1,k2]`, or `ptlens` with `[a,b,c]`; optional positive `realFocalLength` follows Lensfun. |
+| Chromatic | `{model:"linear",focalLength,terms:[kr,kb]}` or `poly3` with `[vr,vb,cr,cb,br,bb]`; the first two terms must be positive. |
+| Vignette | `{model:"pa",focalLength,aperture,focusDistance,terms:[k1,k2,k3]}`; all point coordinates are positive. |
+
+Distortion/chromatic may also retain `{model:"none",focalLength,terms:[]}` declarations, which do not supply an active calibration. Optional source provenance is `{name,sha256,index,notices?}` with a lowercase SHA-256 and a nonnegative integer profile index. Unsupported versions, fields, projection/fisheye/ACM models, non-finite/underflowed/overflowed native parameters and missing requested families reject. This is a self-contained calibration DTO, not an arbitrary XML or code execution interface.
+
+Private browser/Node workers use pinned Lensfun `b98997f7f1c020d0fac3136c2abbf06126385971` correction and interpolation through checked WASM. Actual library cohort selection, Hermite interpolation, native model rescaling and real-focal preservation apply; these coefficients must not be copied into the manual radial fields. Original orientation flips transform the optical center. Geometry/admission is checked before sensor demosaicing; unsupported crop/coverage, folded mappings and nonpositive attenuation reject without publishing assets/history. Monochrome RAW rejects requested chromatic correction. Native float32 coordinates and source-position vignette gains feed float32 corrected source samples, then float64 bilinear interpolation, one UInt16 clamp/round and the existing sRGB8 transfer. Absolute pixel evaluation makes region partitioning invariant; coordinate blocks and the 8 MB source/gain tile cache are separate from the decoder's full input/processing plane. Native dimensions remain unchanged; transparent coverage and browser partial-alpha rounding follow the manual contract above.
+
+Active profiles require a validated `raw.lensWasmSha256` alongside the independent `nativeWasmSha256`; disabled profiles retain their tables without loading the lens native module or adding that identity. Original/accepted hashes, permissions, revisions, locks and atomic commits remain authoritative. Project/history/workspace/source transports retain the complete definition so accepted pixels reopen without a database or native re-development. The existing RAW dialog exposes accepted profile parameters/family toggles and an explicit switch to manual correction; invalid drafts disable actions. It does not yet offer XML/database import, a persistent profile catalog or automatic camera/lens matching. Recipe preflight is provisional for native profile geometry; actual asynchronous preparation validates before commit. Separate REST `raw-develop` accepts up to 16,000,000 bytes of JSON metadata for complete profile tables. For tables larger than an HTTP header, first import the original normally, then send profile settings in that JSON request. This metadata budget does not limit the binary original. Scripts keep the existing five-second deadline/command/asset budgets, with no file/native handle/network privilege.
+
+The following synthetic calibration exercises the API; it is not a physical lens recommendation. Replace the definition and explicit geometry with measured calibration for real photographs. Vignetting is intentionally disabled by default.
+
+<!-- example: raw-profile-development -->
+```js
+const image = document.selectedLayer;
+if (!(image instanceof SmartObjectLayer)) throw new Error("Select a RAW smart object.");
+const current = await image.getRawDevelopment();
+if (!current) throw new Error("This image has no RAW original.");
+const profile = new LensProfile({
+  model: "Calibration example 35 mm",
+  calibrations: [{cropFactor:1.5, aspectRatio:1.5,
+    distortion:[{model:"poly3",focalLength:35,terms:[-0.02]}]}]
+});
+await image.developRaw(new RawDevelopment({
+  ...current.toJSON(),
+  lens: profile.correction({focalLength:43,cropFactor:1.5,scale:1.05})
+}), {allowPrecisionLoss:true});
+print("Calibrated correction accepted");
+```
+
+Physical lens/camera quality, broader models, XML/catalog/matching workflows, precision/merge/performance/device acceptance and the full roadmap remain open. See the dated implementation record for checks actually run. [Upstream model contracts](https://lensfun.github.io/manual/latest/group__Lens.html) and [pinned source](https://github.com/lensfun/lensfun/tree/b98997f7f1c020d0fac3136c2abbf06126385971) describe the native coordinate/interpolation implementation.
+
 ## RAW development recipes (trusted browser host)
 
 `editor.recipes.compilePlan(recipe, params = {})` validates a `raw.develop` action against the selected target's retained original and normalized native options without decoding or changing assets/history. Its `development` fields accept the RAW settings above and parameter expressions. Omitted fields use `RawDevelopment` defaults; this replaces settings rather than patching the previous accepted values. The action requires literal `allowPrecisionLoss: true`. Targets must resolve to attached RAW smart objects. Shared instances are developed once per master per step, with every dependent instance/ancestor lock checked. Dry-run geometry for another sensor image is provisional until native decoding validates that image.

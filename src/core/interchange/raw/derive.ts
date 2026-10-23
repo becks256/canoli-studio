@@ -9,6 +9,6 @@ export async function prepareRawDerivation(blob:Blob,name:string,options:RawDeco
   const settings=parseRawDevelopmentOptions(options),current=()=>{check();control.signal?.throwIfAborted();};current();
   const result=await validateRawDevelopmentResult(await develop(blob,settings,{signal:control.signal,onProgress:p=>{current();control.onProgress?.(p);current();}}),settings);current();
   const source=ownRawSource({version:1,original:{name,type:blob.type,byteLength:blob.size,sha256:await rawBlobHash(blob,current)},originalBlob:blob,settings,report:result.report,
-    nativeWasmSha256:build.artifacts['canoli_raw_decoder.wasm'].sha256,outputSha256:await rawBlobHash(result.png,current)});
+    nativeWasmSha256:build.artifacts['canoli_raw_decoder.wasm'].sha256,...(result.lensWasmSha256?{lensWasmSha256:result.lensWasmSha256}:{}),outputSha256:await rawBlobHash(result.png,current)});
   current();return{png:result.png,source};
 }

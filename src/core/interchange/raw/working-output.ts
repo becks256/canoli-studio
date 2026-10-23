@@ -1,6 +1,7 @@
 import {hasLensCorrection,type LensCorrectionData} from './lens';
 import {rawLensSampler} from './lens-sampler';
 import type {OwnedRawImage} from './codec';
+import type {OwnedLensCorrection} from '../lens/codec';
 import {PngRowEncoder} from '../../png-stream';
 
 // Apply the standard sRGB transfer once, after native linear RGB16 development.
@@ -19,10 +20,11 @@ export function rawLinearRowsToRgba8(samples:Uint16Array,channels:1|3):Uint8Arra
 }
 
 /** Convert bounded row copies; the native RGB16 plane stays owned until finally. */
-export async function encodeRawWorkingImage(image:OwnedRawImage,progress?:(fraction:number)=>void,lens?:LensCorrectionData){
+export async function encodeRawWorkingImage(image:OwnedRawImage,progress?:(fraction:number)=>void,lens?:LensCorrectionData,profile?:OwnedLensCorrection){
   let encoder:PngRowEncoder|undefined,sampler:ReturnType<typeof rawLensSampler>|undefined;
   try{
-    if(hasLensCorrection(lens))sampler=rawLensSampler(image,lens!);
+    if(hasLensCorrection(lens))sampler=rawLensSampler(image,lens!,profile);
+    else if(profile)throw new Error('Inactive lens settings cannot consume a native profile lease.');
     encoder=new PngRowEncoder(image.width,image.height);
     const rows=Math.max(1,Math.min(64,Math.floor(4_000_000/(image.width*(image.channels*2+8)+1))));
     progress?.(0);
@@ -35,5 +37,5 @@ export async function encodeRawWorkingImage(image:OwnedRawImage,progress?:(fract
     }
     return await encoder.finish();
   }catch(error){await encoder?.abort(error);throw error;}
-  finally{sampler?.dispose();image.dispose();}
+  finally{sampler?.dispose();try{image.dispose();}finally{profile?.dispose();}}
 }

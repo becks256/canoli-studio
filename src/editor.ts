@@ -1538,7 +1538,10 @@ export class EditorApplication {
         "The document changed while the project was opening. Try again.",
       );
     }
-    this.replace(Document.fromJSON(loaded.document), loaded.assets);
+    let document:Document;
+    try{document=Document._fromWorkspace(loaded.document,loaded.history);}
+    catch(error){loaded.assets.dispose();throw error;}
+    this.replace(document, loaded.assets);
     this.recentFiles?.remember(file,'project');
   }
 

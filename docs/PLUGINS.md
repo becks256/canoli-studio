@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Calibrated RAW value boundary — workflow in implementation
+
+LensProfile is a pure isolated constructor for complete strict calibration values. `profile.correction()` creates a LensCorrection inside RawDevelopment using explicit focal length/camera crop; no database, file, Blob, image, native handle or network access is exposed. Existing document/assets grants and private RAW preparation validate native geometry, original identities and final commands before atomic commit. Complete accepted settings and separate lens-native provenance survive ordinary history/project transport. Script deadline/command/asset budgets remain; installation stays inert. XML/catalog/matching remain trusted-host work in implementation. See SCRIPTING_API.md for supported models, defaults, limits, errors and the executable example.
+
 ## Recent-file privileges
 
 Recent files and open-document command-search entries are trusted browser UI resources. Packages gain no file bytes, browser history, recent-store/IndexedDB access, cross-tab channel, file opener or OS path privilege. Installation remains inert and execution stays within the existing isolated scripting boundary and document grants. The new trusted host recent service and raster-file opener are not globals in plugin/Script workers; REST sessions remain separate.

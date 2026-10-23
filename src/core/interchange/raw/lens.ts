@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {lensProfileSelectionSchema} from '../lens/schema';
 // Radial output-to-source coordinates; radius 1 is half the smaller image side.
 // https://docs.opencv.org/4.6.0/d9/d0c/group__calib3d.html
 // Vignetting attenuation uses diagonal-normalized source coordinates, before sampling.
@@ -11,11 +12,15 @@ export const lensCorrectionSchema=z.object({
   distortion:z.object({k1:coefficient,k2:coefficient,k3:coefficient}).strict().prefault({}),
   chromatic:z.object({red:z.number().finite().min(.5).max(2).default(1),blue:z.number().finite().min(.5).max(2).default(1)}).strict().prefault({}),
   vignette:z.object({k1:coefficient,k2:coefficient,k3:coefficient}).strict().prefault({}),
-}).strict();
+  profile:lensProfileSelectionSchema.optional(),
+}).strict().superRefine((value,context)=>{
+  if(value.profile&&(value.center.x!==.5||value.center.y!==.5||value.chromatic.red!==1||value.chromatic.blue!==1||Object.values(value.distortion).some(n=>n!==0)||Object.values(value.vignette).some(n=>n!==0)))
+    context.addIssue({code:'custom',message:'A calibrated profile cannot be combined with manual lens coefficients or an overridden optical center.'});
+});
 export type LensCorrectionOptions=z.input<typeof lensCorrectionSchema>;
 export type LensCorrectionData=z.output<typeof lensCorrectionSchema>;
 export function hasLensCorrection(value:LensCorrectionData|undefined){
-  return !!value?.enabled&&(value.scale!==1||value.chromatic.red!==1||value.chromatic.blue!==1||Object.values(value.distortion).some(n=>n!==0)||Object.values(value.vignette).some(n=>n!==0));
+  return !!value?.enabled&&(!!value.profile||value.scale!==1||value.chromatic.red!==1||value.chromatic.blue!==1||Object.values(value.distortion).some(n=>n!==0)||Object.values(value.vignette).some(n=>n!==0));
 }
 /** Exact extrema of a cubic on a finite interval; sampling cannot miss a fold between grid points. */
 function positiveCubic(a:number,b:number,c:number,max:number){
@@ -32,7 +37,7 @@ function positiveCubic(a:number,b:number,c:number,max:number){
   return points.filter(t=>t>=0&&t<=max).every(t=>Number.isFinite(t)&&1+t*(a+t*(b+t*c))>0);
 }
 export function validateLensGeometry(value:LensCorrectionData,width:number,height:number){
-  if(!value.enabled)return;
+  if(!value.enabled||value.profile)return; // Profile geometry is validated by the actual native model before sensor development.
   const radius2=Math.max(...[0,width].flatMap(x=>[0,height].map(y=>(x-width*value.center.x)**2+(y-height*value.center.y)**2)));
   const radialMax=radius2/(Math.min(width,height)*.5*value.scale)**2;
   const {k1,k2,k3}=value.distortion;

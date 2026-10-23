@@ -10,8 +10,10 @@ export const rawSourceMetadataSchema=z.object({
   settings:rawDecodeOptionsSchema.refine(value=>value.allowPrecisionLoss,'Accepted RAW working output requires precision-loss consent.'),
   report:rawImportReportSchema,
   nativeWasmSha256:sha256,
+  lensWasmSha256:sha256.optional(),
   outputSha256:sha256,
 }).strict().superRefine((value,context)=>{
+  if(!!(value.settings.development.lens?.enabled&&value.settings.development.lens.profile)!==(value.lensWasmSha256!==undefined))context.addIssue({code:'custom',message:'RAW profile settings require matching lens-native provenance.'});
   if(!value.report.canDevelop||value.report.image!==value.settings.development.image||value.settings.development.whiteBalance==='camera'&&value.report.channels>1&&!value.report.hasCameraWhiteBalance)
     context.addIssue({code:'custom',message:'RAW source settings do not match the accepted native report.'});
 });

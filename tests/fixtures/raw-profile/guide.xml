@@ -1,0 +1,1 @@
+<lensdatabase version="2"><lens><model>Calibration example 35 mm</model><mount>Example</mount><cropfactor>1.5</cropfactor><aspect-ratio>1.5</aspect-ratio><calibration cropfactor="1.5" aspect-ratio="1.5"><distortion model="poly3" focal="35" k1="-0.02"/></calibration></lens></lensdatabase>
