@@ -4,17 +4,16 @@ import {execute} from '../core/commands';
 import {id,referencedAssets} from '../core/model';
 import {ComponentRegistry} from '../core/smart/manager';
 import {developRawFile} from '../core/interchange/raw/client';
-import {rawDecodeOptionsSchema,type RawDecodeOptions,type RawImportControl} from '../core/interchange/raw/types';
-import {rawBlobHash,verifyRawSource} from '../core/interchange/raw/source';
-import build from '../core/interchange/raw/codec/build.json';
+import {parseRawDevelopmentOptions,type RawDecodeOptions,type RawImportControl} from '../core/interchange/raw/types';
+import {verifyRawSource} from '../core/interchange/raw/source';
+import {prepareRawDerivation} from '../core/interchange/raw/derive';
+import {rawComponentCommand} from '../core/interchange/raw/commands';
 
 /** Private native development. The original never becomes a browser bitmap. */
 async function prepareRawAsset(assets:AssetStore,blob:Blob,name:string,options:RawDecodeOptions,control:RawImportControl,check:()=>void){
-  const settings=rawDecodeOptionsSchema.parse(options),current=()=>{check();control.signal?.throwIfAborted();};current();
-  const result=await developRawFile(blob,settings,{signal:control.signal,onProgress:value=>{current();control.onProgress?.(value);current();}});current();
-  const source={version:1 as const,original:{name,type:blob.type,byteLength:blob.size,sha256:await rawBlobHash(blob,current)},originalBlob:blob,
-    settings,report:result.report,nativeWasmSha256:build.artifacts['canoli_raw_decoder.wasm'].sha256,outputSha256:await rawBlobHash(result.png,current)};
-  current();const asset=await assets.add(result.png,name,undefined,false,{raw:source,signal:control.signal});current();return asset;
+  const current=()=>{check();control.signal?.throwIfAborted();};
+  const {png,source}=await prepareRawDerivation(blob,name,options,control,current,developRawFile);
+  const asset=await assets.add(png,name,undefined,false,{raw:source,signal:control.signal});current();return asset;
 }
 export async function prepareRawImport(file:File,options:RawDecodeOptions={},control:RawImportControl={},check:()=>void=()=>{}){
   const assets=new AssetStore();
@@ -29,6 +28,7 @@ export async function prepareRawImport(file:File,options:RawDecodeOptions={},con
 
 /** One master replacement updates all instances and retains prior accepted pixels for undo. */
 export async function developRawComponent(document:Document,assets:AssetStore,layerId:string,options:RawDecodeOptions,control:RawImportControl,check:()=>void,beforeCommit:()=>void=()=>{}){
+  options=parseRawDevelopmentOptions(options);
   const layer=document.getLayer(layerId);if(!(layer instanceof SmartObjectLayer))throw new Error('Choose an attached RAW smart object.');
   const definition=new ComponentRegistry(document._read().components).get(layer.componentId),source=definition.source;
   if(source.kind!=='asset')throw new Error('This smart object has no retained RAW original.');
@@ -47,7 +47,7 @@ export async function developRawComponent(document:Document,assets:AssetStore,la
   try{
     await verifyRawSource(raw,blob,width,height,current);
     const asset=await prepareRawAsset(staging,raw.originalBlob,raw.original.name,options,control,current);current();
-    const command={type:'transaction' as const,label:'Develop RAW',commands:[{type:'component.set' as const,definition:{...definition,source:{kind:'asset' as const,assetId:asset.id,width:asset.width,height:asset.height}}}]};
+    const command=rawComponentCommand(document._read(),layerId,asset);
     execute(document._read(),command);current();
     beforeCommit();staging.shareTo(assets,asset.id,asset.id);installed=asset.id;
     try{document._dispatch(command);committed=true;}

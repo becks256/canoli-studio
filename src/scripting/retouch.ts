@@ -2,6 +2,10 @@ import { prepareSmartRaster } from "../engine/smart-raster";
 import {prepareMatting} from '../engine/prepare-matting';
 import {mattingRequestSchema} from '../core/matting';
 import { AssetStore } from "../core/assets";
+import {Document} from '../dom';
+import {ComponentRegistry} from '../core/smart/manager';
+import {rawDevelopmentRequestSchema,rawDevelopmentPlanSchema,rawComponentSource} from '../core/interchange/raw/commands';
+import {developRawComponent} from '../engine/raw-import';
 import { execute } from "../core/commands";
 import {
   createAdjustmentLayer,
@@ -28,11 +32,13 @@ export class ScriptRetouch {
   private readonly owned = new Set<string>();
   private readonly abort = new AbortController();
   private busy = false;
+  private rawOrigins=new Set<string>();
   constructor(
     private readonly snapshot: DocumentData,
     private readonly renderer: DocumentRenderer,
     assets: AssetStore,
     private readonly check: () => void,
+    private readonly checkRawOrigin:(assetId:string)=>void=()=>{},
   ) {
     try { for (const asset of assets.values()) assets.shareTo(this.view,asset.id,asset.id); }
     catch(error){this.view.dispose();throw error;}
@@ -40,7 +46,7 @@ export class ScriptRetouch {
   async prepare(
     commands: unknown,
     request: unknown,
-    method: "patch" | "heal" | "rasterize" | 'matting' = "patch",
+    method: "patch" | "heal" | "rasterize" | 'matting' | 'raw-develop' = "patch",
   ) {
     this.assertActive();
     if (this.busy)
@@ -63,6 +69,20 @@ export class ScriptRetouch {
     )
       throw new Error("Healing requires an attached unlocked layer.");
     this.busy = true;
+    if(method==='raw-develop'){
+      const previous=new Set(this.view.values().map(asset=>asset.id));
+      try{
+        const parsed=rawDevelopmentRequestSchema.parse(request),input=rawComponentSource(document,parsed.layerId,this.view);
+        if(!this.owned.has(input.source.assetId)){this.checkRawOrigin(input.source.assetId);this.rawOrigins.add(input.source.assetId);}
+        const current=()=>{this.assertActive();for(const key of this.rawOrigins)this.checkRawOrigin(key);};
+        const detached=Document.fromJSON(document);detached.assetStore=this.view;
+        const report=await developRawComponent(detached,this.view,parsed.layerId,parsed.options,{signal:this.abort.signal},current);current();
+        const definition=new ComponentRegistry(detached._read().components).get(input.layer.componentId);
+        for(const asset of this.view.values())if(!previous.has(asset.id))this.owned.add(asset.id);
+        return rawDevelopmentPlanSchema.parse({definition,report});
+      }catch(error){for(const asset of this.view.values())if(!previous.has(asset.id)){this.owned.delete(asset.id);this.view.remove(asset.id);}throw error;}
+      finally{this.busy=false;}
+    }
     if(method==='matting'){
       const previous=new Set(this.view.values().map(asset=>asset.id));
       let prepared:Awaited<ReturnType<typeof prepareMatting>>|undefined;
@@ -220,6 +240,15 @@ export class ScriptRetouch {
   private assertActive() {
     this.abort.signal.throwIfAborted();
     this.check();
+    for(const key of this.rawOrigins)this.checkRawOrigin(key);
+  }
+  rawSettings(document:DocumentData,layerId:string){
+    this.assertActive();const layer=findLayer(document,layerId);if(layer?.kind!=='smart-object')throw new Error('Choose an attached smart object.');
+    const source=new ComponentRegistry(document.components).get(layer.componentId).source;
+    if(source.kind!=='asset')return null;const asset=this.view.get(source.assetId);
+    if(!asset.raw)return null;
+    if(!this.owned.has(source.assetId)){this.checkRawOrigin(source.assetId);this.rawOrigins.add(source.assetId);}
+    return structuredClone(asset.raw.settings.development);
   }
   installReferenced(document: DocumentData, destination: AssetStore): string[] {
     this.assertActive();

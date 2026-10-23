@@ -385,6 +385,8 @@ export class Document {
   _rasterizeSmartObject?: (layerId: string) => Promise<RasterLayer>;
   /** @internal Native file development requires a configured application host. */
   _prepareRawDevelopment?:(layerId:string,settings:RawDevelopSettings,control:RawDevelopmentControl)=>Promise<Readonly<RawImportReport>>;
+  /** @internal Metadata-only bridge for isolated callers; never transfers source bytes. */
+  _readRawDevelopment?:(layerId:string)=>Promise<RawDevelopSettings|null>;
   async _developRaw(layerId:string,settings:RawDevelopSettings,control:RawDevelopmentControl):Promise<Readonly<RawImportReport>>{
     if(this.batch)throw new Error('RAW development cannot run inside a synchronous transaction.');
     if(!this._prepareRawDevelopment)throw new Error('RAW development requires a configured application host.');
@@ -1254,8 +1256,15 @@ export class SmartObjectLayer extends Layer {
   /** Accepted settings for this shared master; null for ordinary smart objects. */
   get rawDevelopment():RawDevelopment|null{
     const document=this.requireDocument(),source=new ComponentRegistry(document._read().components).get(this.componentId).source;
-    const raw=source.kind==='asset'?document.assetStore?.get(source.assetId).raw:undefined;
+    if(document._readRawDevelopment&&!document.assetStore)throw new Error('Use await layer.getRawDevelopment() in isolated scripts.');
+    const store=document.assetStore,raw=source.kind==='asset'&&store?.has(source.assetId)?store.get(source.assetId).raw:undefined;
     return raw?new RawDevelopment(raw.settings.development):null;
+  }
+  async getRawDevelopment():Promise<RawDevelopment|null>{
+    const document=this.requireDocument();if(!document._readRawDevelopment)return this.rawDevelopment;
+    const revision=document.getSnapshot().revision,settings=await document._readRawDevelopment(this.id);
+    if(document.getSnapshot().revision!==revision)throw new Error('The document changed while reading RAW development settings.');
+    return settings?new RawDevelopment(settings):null;
   }
   async developRaw(value:RawDevelopment,control:RawDevelopmentControl={}):Promise<Readonly<RawImportReport>>{
     if(!(value instanceof RawDevelopment))throw new Error('Use a RawDevelopment constructor.');

@@ -14,6 +14,9 @@ export type RawDevelopSettings=z.output<typeof rawDevelopOptionsSchema>;
 export const rawDecodeOptionsSchema=z.object({allowPrecisionLoss:z.boolean().default(false),development:rawDevelopOptionsSchema.prefault({})}).strict();
 export type RawDecodeOptions=z.input<typeof rawDecodeOptionsSchema>;
 export type RawDecodeSettings=z.output<typeof rawDecodeOptionsSchema>;
+export function parseRawDevelopmentOptions(input:RawDecodeOptions):RawDecodeSettings{
+  const settings=rawDecodeOptionsSchema.parse(input);if(!settings.allowPrecisionLoss)throw new Error('RAW working output requires explicit 8-bit precision-loss consent.');return settings;
+}
 
 const dimension=z.number().int().positive().max(0x7fffffff);
 export const rawImportReportSchema=z.object({

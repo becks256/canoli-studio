@@ -1,5 +1,14 @@
 # Implementation roadmap and planning record
 
+### 2026-10-22 — F12 RAW scripting and REST surfaces in implementation
+
+Owner: implementation agent; XL within T16/T17/F12. The preceding turn is progress: `359b81a` committed the native host workflow with 1,690 unit/API, 48 RAW application and 105 production checks, plus independent exact 50 MP output. The original full roadmap objective remains active.
+
+Current work connects pure RawDevelopment values and awaited metadata/development methods to isolated private preparation, existing v2 document/assets grants, source pins, validation and one final script transaction. It also connects actual private Node LibRaw/PNG workers to independent REST inspection/import/development, original retrieval and project/history exchange. Headless assets retain actual encoded pixels/dimensions and explicitly have no browser surface. Browser and REST use shared native result/provenance and master-command contracts; no browser/headless synchronization, plugin file privilege, paid call or arbitrary original MP/file-size limit is added. Existing metadata-only request budgets remain separate.
+
+Focused Node/codec/source checks and four real REST pilot checks pass, including a genuine >100 MB, 50 MP original and every working RGBA sample. Build/full unit, isolated plugin/runtime and browser/production acceptance remain pending. Semantic RAW recipes/direct-file batch, camera/profile/color/quality, lens/merge work, F10/F14 and all other unfinished original-roadmap requirements remain active; this is not a narrowed completion target.
+
+
 ### 2026-10-22 — F12 native RAW host workflow accepted; automation and camera-quality gates remain
 
 Owner: implementation agent; XL within T16/T17/F12. This turn is progress from `a38987a`: trusted `openRaw` now develops real sensor data into a clean native-resolution smart-object document. `RawDevelopment` and attached `developRaw` retain parameters, prepare pixels privately and commit one shared master command with ordinary locks/history. The custom import/development dialog supplies explicit sRGB8 consent, actual native previews, WB/custom multipliers, demosaicing and exposure/highlight controls, inspector/command-search access and recent-file review. Original RAW bytes and accepted PNGs have independent checksummed identities and frozen provenance/settings records. Project v4 deduplicates originals across history; ordinary projects stay v3, document/workspace schemas stay 41/2. Workspace redo, recovery, source-document closure/copy, recipe package v2 and brush preset/pack v6 retain source data and accepted pixels. Saved reopening and undo/redo need no RAW decoder.

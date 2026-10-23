@@ -1,3 +1,5 @@
+import {captureAssetSource} from "./core/assets";
+import {rawDevelopOptionsSchema} from "./core/interchange/raw/types";
 import {prepareRawImport,developRawComponent} from "./engine/raw-import";
 import {rawSourceMetadata} from "./core/interchange/raw/source";
 import {RecentFilesService} from './workspace/recent-service';
@@ -89,7 +91,7 @@ import type {
   ExportCapabilityReport,
 } from "./engine/export";
 import { execute } from "./core/commands";
-import { referencedAssets, allLayers, id } from "./core/model";
+import { referencedAssets, allLayers, id,findLayer } from "./core/model";
 import { layerTransform } from "./core/spatial";
 import {
   PluginRegistry,
@@ -1625,6 +1627,13 @@ export class EditorApplication {
     const assets = this.assets,
       generation = this.ioGeneration,
       snapshot = document.toJSON();
+    const rawOriginPins=new Map(assets.values().filter(asset=>asset.raw).map(asset=>[asset.id,captureAssetSource(assets,asset.id)]));
+    const usedRawOrigins=new Set<string>();let rawReadUsed=false;
+    const checkRawOrigin=(assetId:string)=>{
+      usedRawOrigins.add(assetId);const pin=rawOriginPins.get(assetId);if(!pin)throw new Error('RAW source was not present in the script snapshot.');
+      pin.check();
+    };
+    const checkRawOrigins=()=>{for(const key of usedRawOrigins){const pin=rawOriginPins.get(key);if(!pin)throw new Error('RAW source was not present in the script snapshot.');pin.check();}};
     let retouch: ScriptRetouch | undefined;
     const selectionAbort = new AbortController();
     const scriptCommitAbort = new AbortController(), scriptCommitDeadline = performance.now() + 5000;
@@ -1656,6 +1665,7 @@ export class EditorApplication {
           pluginContext.pluginId,
         );
         for (const permission of [
+          "document:read",
           "document:write",
           "assets:read",
           "assets:write",
@@ -1678,7 +1688,20 @@ export class EditorApplication {
     try {
       const pendingScript = this.scripts.run(document, code, {
         hostBridge: {
-          dispatch: (service, method, args) => {
+          dispatch: async (service, method, args) => {
+            if(service==='raw'&&method==='settings'){
+              selectionAbort.signal.throwIfAborted();
+              if(this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision)throw new Error('Document changed while reading RAW settings.');
+              if(pluginContext){const grants=this.plugins.getGrantedPermissions(pluginContext.pluginId);if(!grants.includes('document:read')||!grants.includes('assets:read'))throw new Error('Permission denied: document:read and assets:read are required for RAW settings.');}
+              rawReadUsed=true;
+              const request=args[1] as {layerId?:unknown};if(!request||typeof request.layerId!=='string'||Object.keys(request).some(key=>key!=='layerId'))throw new Error('Invalid RAW settings request.');
+              const data=execute(snapshot,{type:'transaction',label:'Read RAW settings',commands:parseCommands(args[0])});
+              if(retouch)return retouch.rawSettings(data,request.layerId);
+              const layer=findLayer(data,request.layerId);if(layer?.kind!=='smart-object')throw new Error('Choose an attached smart object.');
+              const source=new ComponentRegistry(data.components).get(layer.componentId).source;if(source.kind!=='asset')return null;
+              const asset=assets.get(source.assetId);if(rawOriginPins.has(source.assetId)||asset.raw)checkRawOrigin(source.assetId);
+              return asset.raw?rawDevelopOptionsSchema.parse(asset.raw.settings.development):null;
+            }
             if(service==='assets'&&pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('assets:read'))throw new Error('Permission denied: assets:read is required to inspect asset metadata.');
             if(service==='selection'&&method==='subject'){
               checkSelection();if(selectionBusy)throw new Error('Await each selection preparation before starting another.');
@@ -1746,7 +1769,7 @@ export class EditorApplication {
             if (
               method !== "patch" &&
               method !== "heal" &&
-              method !== "rasterize" && method!=='matting'
+              method !== "rasterize" && method!=='matting' && method!=='raw-develop'
             )
               return Promise.reject(new Error("Unknown retouch method."));
             retouch ??= new ScriptRetouch(
@@ -1754,6 +1777,7 @@ export class EditorApplication {
               this.renderer,
               assets,
               checkRetouch,
+              checkRawOrigin,
             );
             return retouch.prepare(args[0], args[1], method);
           },
@@ -1784,6 +1808,7 @@ export class EditorApplication {
       // before installing assets, dispatching staged commands or selecting layers.
       if (pluginContext) {
         const granted = this.plugins.getGrantedPermissions(pluginContext.pluginId);
+        if(rawReadUsed&&!granted.includes('assets:read'))throw new Error('Plugin no longer has assets:read permission. No script edits were applied.');
         if(imageSelectionPrepared&&!granted.includes('assets:read'))throw new Error('Plugin no longer has assets:read permission. No script edits were applied.');
         if (!granted.includes("document:read"))
           throw new Error("Plugin is no longer installed. No script edits were applied.");
@@ -1805,12 +1830,12 @@ export class EditorApplication {
         const pinned = [...referencedAssets(next)].map(id => { const source = sources.get(id); return { id, source, bitmap: source.bitmap, blob: source.blob, width: source.width, height: source.height }; });
         const needsWrite = result.commands.length > 0 || result.selectedId !== selectedId || JSON.stringify(result.selectedIds) !== JSON.stringify(selectedIds) || hostBridge.inBandRevisions > 0;
         const checkWetCommit = () => {
-          scriptCommitAbort.signal.throwIfAborted();
+          scriptCommitAbort.signal.throwIfAborted();checkRawOrigins();
           if (performance.now() > scriptCommitDeadline) throw new Error('Script exceeded its 5-second time limit. No script edits were applied.');
           if (this.ioGeneration !== generation || this.document !== document || this.assets !== assets || document.getSnapshot().revision !== revision + hostBridge.inBandRevisions) throw new Error('The document changed while the script ran. No script edits were applied.');
           if (pluginContext) {
             const grants = this.plugins.getGrantedPermissions(pluginContext.pluginId);
-            if (!grants.includes('document:read') || (needsWrite && !grants.includes('document:write')) || (imageSelectionPrepared && !grants.includes('assets:read'))) throw new Error('Plugin permissions changed. No script edits were applied.');
+            if (!grants.includes('document:read') || (needsWrite && !grants.includes('document:write')) || ((imageSelectionPrepared||rawReadUsed) && !grants.includes('assets:read'))) throw new Error('Plugin permissions changed. No script edits were applied.');
           }
           for (const entry of pinned) { const source = sources.get(entry.id); if (source !== entry.source || source.bitmap !== entry.bitmap || source.blob !== entry.blob || source.width !== entry.width || source.height !== entry.height || source.bitmap.width !== entry.width || source.bitmap.height !== entry.height) throw new Error('Script source assets changed. No script edits were applied.'); }
         };

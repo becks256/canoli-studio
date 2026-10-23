@@ -1,3 +1,10 @@
+import {validateServerProjectSources} from "./project";
+import {inspectServerRaw} from "./raw";
+import {importServerRaw,developServerRawComponent} from "./raw-document";
+import {RawDevelopment,SmartObjectLayer} from "../src/dom";
+import {rawDecodeOptionsSchema,type RawImportControl} from "../src/core/interchange/raw/types";
+import {rawSourceMetadata} from "../src/core/interchange/raw/source";
+import {serializeProject} from "../src/core/project";
 import { captureVectorBoolean, vectorBooleanSelectionSchema } from '../src/core/vector-boolean';
 import { prepareServerVectorBoolean } from './vector-boolean';
 import { z } from "zod";
@@ -143,25 +150,34 @@ export function createApiServer(options: ApiServerOptions = {}) {
     response.end(JSON.stringify(value));
   };
 
+  async function rawScope<T>(document:Document,assets:AssetStore,control:RawImportControl,work:(control:RawImportControl,check:()=>void,beforeCommit:()=>void)=>Promise<T>):Promise<T>{
+    control.signal?.throwIfAborted();const revision=document.getSnapshot().revision,alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+    control.signal?.addEventListener('abort',cancel,{once:true});selectionControllers.set(abort,document.id);
+    const check=()=>{abort.signal.throwIfAborted();alive();const session=sessions.get(document.id);if(!session||session.document!==document||session.assets!==assets||document.getSnapshot().revision!==revision)throw new Error('Document session changed during RAW preparation.');};
+    const stop=document.subscribe(()=>{try{check();}catch(error){abort.abort(error);}});
+    try{return await work({signal:abort.signal,onProgress:control.onProgress},check,()=>{check();stop();});}
+    finally{stop();control.signal?.removeEventListener('abort',cancel);selectionControllers.delete(abort);}
+  }
+
   const readRawBody = async (
     request: IncomingMessage,
-    maxBytes = 10_000_000,
+    maxBytes?: number,
   ): Promise<Buffer> => {
     const chunks: Buffer[] = [];
     let length = 0;
     for await (const chunk of request) {
       length += chunk.length;
-      if (length > maxBytes)
+      if (!Number.isSafeInteger(length)||maxBytes!==undefined&&length > maxBytes)
         throw new Error(`Request body exceeds ${maxBytes} bytes.`);
       chunks.push(chunk);
     }
     return Buffer.concat(chunks);
   };
 
-  const body = async (request: IncomingMessage) => {
+  const body = async (request: IncomingMessage,maxBytes:number|null=1_000_000) => {
     if (!request.headers["content-type"]?.startsWith("application/json"))
       throw new Error("Send application/json.");
-    const buf = await readRawBody(request, 1_000_000);
+    const buf = await readRawBody(request, maxBytes??undefined);
     return JSON.parse(buf.toString("utf8")) as unknown;
   };
 
@@ -290,7 +306,8 @@ export function createApiServer(options: ApiServerOptions = {}) {
               if(!sessions.has(document.id))throw new Error('Document was deleted.');return selection;
             }finally{unsubscribe();control.signal?.removeEventListener('abort',cancel);}
           };
-          const assets = new AssetStore();
+          const assets = new AssetStore();document.assetStore=assets;
+          document._prepareRawDevelopment=(layerId,development,control)=>rawScope(document,assets,control,(native,current,beforeCommit)=>developServerRawComponent(document,assets,layerId,{development,allowPrecisionLoss:control.allowPrecisionLoss??false},native,current,beforeCommit));
           document._preflight=async(options,control)=>{
             const snapshot=document.getSnapshot(),originals=assets.values(),alive=assets.captureLifetime();
             const report=await prepareServerPreflight(snapshot.document,snapshot.revision,options,originals.map(asset=>[asset.id,{width:asset.width,height:asset.height}]),control.signal??new AbortController().signal);
@@ -377,7 +394,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
 
       // Document scoped endpoints: /api/v1/documents/:id/...
       const docMatch = path.match(
-        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean))?(?:\/([^/]+))?$/,
+        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
         send(response, 404, { error: "Document or endpoint not found." });
@@ -388,6 +405,42 @@ export function createApiServer(options: ApiServerOptions = {}) {
       const document = session.document;
       const subresource = docMatch[2];
       const subresourceId = docMatch[3];
+      if((subresource==='raw-import'||subresource==='raw-inspect')&&!subresourceId&&method==='POST'){
+        const parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined}),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        const header=request.headers['x-raw-options'];if(header!==undefined&&typeof header!=='string')throw new Error('Invalid RAW options header.');
+        const options=rawDecodeOptionsSchema.parse(JSON.parse(header??'{}'));if(subresource==='raw-import'&&!options.allowPrecisionLoss)throw new Error('RAW working output requires explicit 8-bit precision-loss consent.');
+        const name=z.string().min(1).parse(url.searchParams.get('name')??request.headers['x-asset-name']??'Camera RAW'),mime=(request.headers['content-type']??'application/octet-stream').split(';')[0].trim();
+        if(mime==='application/json')throw new Error('Send binary RAW file bytes.');
+        const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('RAW request disconnected.'));};response.on('close',close);
+        try{
+          const result=await rawScope(document,session.assets,{signal:abort.signal},async(control,current,beforeCommit)=>{
+            const bytes=await readRawBody(request);current();const blob=new Blob([new Uint8Array(bytes)],{type:mime});
+            if(subresource==='raw-inspect'){const report=await inspectServerRaw(blob,options.development.image,control);current();return{report};}
+            return importServerRaw(document,session.assets,blob,name,options,control,current,beforeCommit);
+          });send(response,subresource==='raw-inspect'?200:201,{...snapshot(document),...result});
+        }catch(error){if(!sessions.has(document.id)){send(response,404,{error:'Document was deleted during RAW import.'});}else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during RAW import.',revision:document.getSnapshot().revision});else throw error;}
+        finally{response.off('close',close);}return;
+      }
+      if(subresource==='raw-develop'&&!subresourceId&&method==='POST'){
+        const parsed=z.object({...revisionSchema.shape,layerId:z.string().min(1).max(240),options:rawDecodeOptionsSchema}).strict().parse(await body(request)),revision=document.getSnapshot().revision;
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        const layer=document.getLayer(parsed.layerId);if(!(layer instanceof SmartObjectLayer))throw new Error('Choose an attached RAW smart object.');
+        const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('RAW request disconnected.'));};response.on('close',close);
+        try{const report=await layer.developRaw(new RawDevelopment(parsed.options.development),{signal:abort.signal,allowPrecisionLoss:parsed.options.allowPrecisionLoss});send(response,200,{...snapshot(document),report});}
+        catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during RAW development.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during RAW development.',revision:document.getSnapshot().revision});else throw error;}
+        finally{response.off('close',close);}return;
+      }
+      if(subresource==='project'&&!subresourceId&&method==='GET'){
+        const state=document.getSnapshot(),history=url.searchParams.get('history')==='true'?{version:1 as const,past:state.past,future:state.future}:undefined;
+        const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Project download disconnected.'));};response.on('close',close);selectionControllers.set(abort,document.id);
+        try{
+          await validateServerProjectSources(state.document,session.assets,history,abort.signal);
+          const file=await serializeProject(state.document,session.assets,history),bytes=await file.arrayBuffer();abort.signal.throwIfAborted();
+          if(sessions.get(document.id)!==session)throw new Error('Document was deleted during project encoding.');
+          response.writeHead(200,{'Content-Type':'application/x-luma','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store'});response.end(Buffer.from(bytes));
+        }finally{response.off('close',close);selectionControllers.delete(abort);}return;
+      }
       if(subresource==='preflight'&&!subresourceId&&method==='POST'){
         const parsed=z.object({...revisionSchema.shape,options:preflightOptionsSchema.optional()}).strict().parse(await body(request)),revision=document.getSnapshot().revision;
         if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
@@ -612,6 +665,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
               name: a.name,
               width: a.width,
               height: a.height,
+              ...(a.raw?{raw:rawSourceMetadata(a.raw)}:{}),
             })),
           });
           return;
@@ -623,6 +677,10 @@ export function createApiServer(options: ApiServerOptions = {}) {
             return;
           }
           const asset = session.assets.get(subresourceId);
+          if(url.searchParams.get('original')==='true'){
+            if(!asset.raw){send(response,404,{error:'No retained RAW original for this asset.'});return;}
+            const blob=asset.raw.originalBlob,bytes=await blob.arrayBuffer();response.writeHead(200,{'Content-Type':blob.type||'application/octet-stream','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store'});response.end(Buffer.from(bytes));return;
+          }
           const accept = request.headers.accept ?? "";
           const isRaw =
             accept.includes("image/") || url.searchParams.get("raw") === "true";
@@ -646,6 +704,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
               height: asset.height,
               mimeType: asset.blob.type || "image/png",
               byteLength: asset.blob.size,
+              ...(asset.raw?{raw:rawSourceMetadata(asset.raw)}:{}),
             },
           });
           return;
@@ -661,7 +720,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
           let buffer: Buffer;
 
           if (contentType.startsWith("application/json")) {
-            const jsonBody = (await body(request)) as {
+            const jsonBody = (await body(request,null)) as {
               name?: string;
               data?: string;
               width?: number;
@@ -684,7 +743,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
             );
           } else {
             mime = contentType.split(";")[0].trim() || "image/png";
-            buffer = await readRawBody(request, 10_000_000);
+            buffer = await readRawBody(request);
           }
 
           // Parse dimensions from PNG header if available (bytes 16..23)
@@ -1006,6 +1065,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
   server.on("close", () => {
     for (const controller of selectionControllers.keys()) controller.abort(new Error("Server closed"));
     selectionControllers.clear();
+    for(const session of sessions.values())session.assets.dispose();sessions.clear();
     for (const controller of controllers.values())
       controller.abort(new Error("Server closed"));
     controllers.clear();

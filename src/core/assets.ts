@@ -33,6 +33,18 @@ interface SharedBitmap {
   owners: number;
 }
 const sharedRecords = new WeakSet<ImageAsset>();
+const encodedRecords = new WeakSet<ImageAsset>();
+
+/** Pins immutable bytes and geometry, plus a real surface when this host has one. */
+export function captureAssetSource(assets:AssetStore,assetId:string){
+  const alive=assets.captureLifetime(),asset=assets.get(assetId),blob=asset.blob,raw=asset.raw,width=asset.width,height=asset.height;
+  const bitmap=encodedRecords.has(asset)?null:asset.bitmap;
+  const check=()=>{
+    alive();if(!assets.has(assetId)||assets.get(assetId)!==asset||asset.blob!==blob||asset.raw!==raw||asset.width!==width||asset.height!==height||
+      bitmap&&(asset.bitmap!==bitmap||bitmap.width!==width||bitmap.height!==height))throw new Error('Source image asset changed.');
+  };
+  check();return{asset,check};
+}
 
 export class AssetStore {
   readonly metadata = new MetadataService();
@@ -82,6 +94,14 @@ export class AssetStore {
       });
     }
     return asset;
+  }
+
+  /** Headless adapter only, after validating the complete encoded image.
+   * Pixel access must use that host's decoder. No ImageBitmap is fabricated. */
+  installEncoded(input:Omit<ImageAsset,'bitmap'|'thumbnail'>):ImageAsset{
+    if(input.blob.type!=='image/png'||!Number.isSafeInteger(input.width)||!Number.isSafeInteger(input.height)||input.width<=0||input.height<=0||!Number.isSafeInteger(input.width*input.height*4))throw new Error('Invalid encoded PNG asset geometry.');
+    const asset:ImageAsset=Object.freeze({...input,...(input.raw?{raw:ownRawSource(input.raw)}:{}),thumbnail:'',get bitmap():ImageBitmap{throw new Error('This encoded image has no browser bitmap. Use the headless pixel decoder.');}});
+    encodedRecords.add(asset);return this.install(asset,false);
   }
 
   /** Explicit shared ownership; returned records/bitmap are borrowed and immutable.
@@ -229,6 +249,7 @@ export class AssetStore {
   }
 
   private release(assetId: string, asset: ImageAsset) {
+    if(encodedRecords.has(asset))return;
     const lease = this.shared.get(assetId);
     this.shared.delete(assetId);
     if (!lease) asset.bitmap.close();

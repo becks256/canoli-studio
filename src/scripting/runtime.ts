@@ -4,6 +4,7 @@ import {
   Document,
   RasterLayer,
   SmartObjectLayer,
+  RawDevelopment,
   GaussianBlurFilter,
   MedianFilter,
   BilateralDenoiseFilter,
@@ -45,6 +46,10 @@ import {
 import type { EditorCommand } from "../core/commands";
 import type { AdjustmentLayerData } from "../core/model";
 import {inspectDesign,preflightAssetMetadataSchema} from '../core/preflight';
+import {ComponentRegistry} from '../core/smart/manager';
+import {findLayer} from '../core/model';
+import {rawDevelopOptionsSchema,parseRawDevelopmentOptions} from '../core/interchange/raw/types';
+import {rawDevelopmentPlanSchema} from '../core/interchange/raw/commands';
 
 // Bundled into an isolated worker created by an opaque-origin sandbox iframe.
 // No UI references, credentials, source image bytes, or host globals enter here.
@@ -117,6 +122,25 @@ self.onmessage = async (event) => {
       const result = document.getLayer(layer.id) as RasterLayer;
       document.selectedLayer = result;
       return result;
+    };
+    document._readRawDevelopment=async layerId=>{
+      const value=await callHost('raw','settings',[...commands],{layerId});
+      return value===null?null:rawDevelopOptionsSchema.parse(value);
+    };
+    document._prepareRawDevelopment=async(layerId,development,control)=>{
+      if(control.signal||control.onProgress)throw new Error('Use Scripts-panel cancellation; callbacks and AbortSignal are available to trusted host code only.');
+      const options=parseRawDevelopmentOptions({allowPrecisionLoss:control.allowPrecisionLoss??false,development});
+      const revision=document.getSnapshot().revision,layer=findLayer(document._read(),layerId);
+      if(layer?.kind!=='smart-object')throw new Error('Choose an attached RAW smart object.');
+      const before=new ComponentRegistry(document._read().components).get(layer.componentId);
+      if(before.source.kind!=='asset')throw new Error('This smart object has no retained RAW original.');
+      const plan=rawDevelopmentPlanSchema.parse(await callHost('retouch','raw-develop',[...commands],{layerId,options}));
+      if(document.getSnapshot().revision!==revision)throw new Error('Script document changed during RAW development.');
+      const source=plan.definition.source,report=plan.report;
+      if(plan.definition.id!==before.id||plan.definition.name!==before.name||source.kind!=='asset'||source.link||source.assetId===before.source.assetId||!report.canDevelop||report.image!==options.development.image||source.width!==report.displayWidth||source.height!==report.displayHeight)
+        throw new Error('RAW development result differs from its requested master or geometry.');
+      document._dispatch({type:'transaction',label:'Develop RAW',commands:[{type:'component.set',definition:{...plan.definition,source}}]});
+      return report;
     };
     document._preparePatch = (request) =>
       callHost(
@@ -202,6 +226,7 @@ self.onmessage = async (event) => {
       "Document",
       "RasterLayer",
       "SmartObjectLayer",
+      "RawDevelopment",
       "GaussianBlurFilter",
       "MedianFilter",
       "BilateralDenoiseFilter",
@@ -250,6 +275,7 @@ self.onmessage = async (event) => {
       Document,
       RasterLayer,
       SmartObjectLayer,
+      RawDevelopment,
       GaussianBlurFilter,
       MedianFilter,
       BilateralDenoiseFilter,
