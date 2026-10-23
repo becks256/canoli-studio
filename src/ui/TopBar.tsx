@@ -27,6 +27,7 @@ export interface TopBarProps {
   onOpen(): void;
   recentFilesControl?:ReactNode;
   chatGptControl?:ReactNode;
+  accountControl?:ReactNode;
   onSave(): void;
   onExport(): void;
   onExportDialog?(): void;
@@ -52,6 +53,7 @@ export function TopBar({
   onOpen,
   recentFilesControl,
   chatGptControl,
+  accountControl,
   onSave,
   onExport,
   onExportDialog,
@@ -123,6 +125,7 @@ export function TopBar({
         </Button>
         {recentFilesControl}
         {chatGptControl}
+        {accountControl}
         <Button variant="subtle" aria-label="Save project" title="Save project" onClick={onSave} disabled={busy}>
           <Save size={15} />
           <span>Save project</span>

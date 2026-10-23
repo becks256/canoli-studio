@@ -31,7 +31,8 @@
     "playwright.config.ts",
     "playwright.production.config.ts",
     "playwright.matting.config.ts",
-    "scripts/build-chatgpt-plugin.ts"
+    "scripts/build-chatgpt-plugin.ts",
+    "scripts/build-site.ts"
   ],
   "exclude": [
     "assembly"

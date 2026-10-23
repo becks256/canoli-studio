@@ -1,5 +1,9 @@
 # Scripting API
 
+## Website identity is outside the document API
+
+The custom Account dialog uses a separate same-origin identity service, not an EditorApplication/Document method or isolated Scripts global. Account data, cookies and provider tokens are not project/history data or MCP document results. Identity sign-in grants no document/asset/job/network permission and changes no constructor or command signature. Local editing and serialization remain useful without an account. See [Sign in with ChatGPT](SIGN_IN_WITH_CHATGPT.md) for the host-only contract and remaining real-provider acceptance.
+
 ## Local ChatGPT connection (trusted browser host, local workflow verified)
 
 `editor.chatGpt` is a separate opt-in host service for a local desktop MCP plugin. It is not a global in isolated Scripts/internal plugins, an inference provider or a REST synchronization layer. Its lazy constructor creates no connection/storage/network operation. `connect(code:string, sessionId:string, permissions:{read:true,write:boolean}, control?:{signal?:AbortSignal}):Promise<string>` requires a complete literal-loopback code, an open explicit session and chosen permissions. It returns the connection ID after validation/acknowledgement; failure, cancellation, closed target or editor disposal invalidates pending/half-acknowledged pairing. `disconnect(connectionId:string):void` immediately revokes local authority and best-effort closes the broker grant, preserving accepted artwork/history. `dispose():void` aborts pending/active work. Trusted UI uses `getSnapshot()`/`subscribe(listener)` for immutable connection status, and `setInteractionGuard(check)` only to protect current canvas gestures. No credential appears in snapshots. Configuration and methods are not serialized into projects.

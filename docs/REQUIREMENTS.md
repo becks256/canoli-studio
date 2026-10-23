@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## T24 identity-only sign-in — local signed-fixture workflow verified
+
+Optional website sign-in must use the actual registered OpenAI Authorization Code/PKCE/OIDC contract, server-side signature/issuer/client/nonce/time checks, one-time browser-bound state and application-owned sessions. Require explicit account creation/link confirmation; never merge by matching email or reassign an existing identity. Preserve local document/history/source data and isolated/plugin/REST boundaries. Cancel, sign-out, stale callbacks, cross-site requests, replay and expired authority must not publish a new session. Unconfigured sites retain useful local editing. Signed fixtures do not prove live OpenAI acceptance. See [Sign in with ChatGPT](SIGN_IN_WITH_CHATGPT.md).
+
 ## Local ChatGPT document connection — local workflow verified
 
 T23 must ship a complete installable local plugin with a focused skill and real MCP tools, explicit browser document/permission selection, strict shared commands and normal undo. Installation remains inert. Read-only is the default; owner credentials remain private and ephemeral. Wrong origins/hosts, malformed/locked/stale/source-changed requests, revoked/closed targets and pending canvas gestures cannot publish a partial edit. Exact retry keys cannot repeat accepted work; lost acknowledgements distinguish unknown outcomes from rejected edits. Cancellation of a half-acknowledged pairing must revoke it. Preserve original assets, native geometry, source bytes and editable history/project behavior, including the genuine 50 MP gate. A protocol test is not actual ChatGPT installation acceptance. Keep independent REST and isolated script contracts unchanged; see [the connection contract](CHATGPT_PLUGIN.md). The unassigned ChatGPT connection action is rebindable through the existing shortcut registry.

@@ -2,6 +2,8 @@
 
 An early browser image-editor foundation with a constructor-based document model, AssemblyScript/WASM adjustments, local JavaScript scripting, installable command plugins, and an optional REST document service. The product is named Canoli Studio (formerly Luma).
 
+Optional website accounts use `npm run start:site` after the normal build (Node.js 24+). The self-contained site host serves `dist` and an explicitly configured Sign in with ChatGPT identity flow; local editing remains available without sign-in. See [configuration, privacy and the still-pending live OpenAI acceptance](docs/SIGN_IN_WITH_CHATGPT.md). The existing loopback REST service remains independent.
+
 ## Run locally
 
 Use Node.js 24 (tested).

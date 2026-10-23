@@ -6319,3 +6319,6 @@ input[type="color"] {
 .raw-development-dialog .svg-import-body p, .raw-development-dialog figure { margin: 0; }
 .raw-development-dialog .dialog-footer { flex-wrap: wrap; }
 .raw-development-preview { display: block; max-width: 100%; max-height: 30vh; object-fit: contain; margin-inline: auto; }
+
+.account-dialog{width:min(580px,calc(100vw - 32px));display:flex;flex-direction:column;gap:18px;overflow:hidden}.account-dialog-body{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:12px;overflow-wrap:anywhere}.account-dialog-body p{margin:0;color:var(--color-text-secondary);line-height:1.6}.account-dialog-body h3{margin:0}.account-dialog-body section{border:1px solid var(--color-border);border-radius:var(--radius-control);padding:16px;display:flex;flex-direction:column;gap:12px}.account-dialog-body a{color:var(--color-accent)}.account-dialog-body [role=alert]{color:var(--color-danger)}
+.account-dialog-body > *{flex-shrink:0}

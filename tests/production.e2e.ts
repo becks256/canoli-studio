@@ -1,3 +1,4 @@
+import {accountProductionWorkflow} from './helpers/account-browser';
 import {checkAvif} from './helpers/avif';
 import { test, expect } from "@playwright/test";
 import { readFile, writeFile, readdir } from "node:fs/promises";
@@ -2018,3 +2019,5 @@ test('production desktop MCP plugin pairs explicitly and preserves native pixels
   await page.reload();await page.getByTestId('project-input').setInputFiles(path);await expect(page.locator('.layer-row')).toContainText('ChatGPT reviewed artwork');const restoredConnection=await connectChatGpt(page,mcp.client,false);expect((await readConnected(mcp.client,restoredConnection)).document).toEqual(edited.document);expect(await page.evaluate(()=>'luma'in window)).toBe(false);
  }finally{await mcp.close();}
 });
+
+test('production website account creation and sign-out preserve local artwork through the real identity host',async({page},info)=>accountProductionWorkflow(page,info));

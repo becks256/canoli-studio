@@ -24,6 +24,10 @@ Our differentiation hypotheses are the combination of:
 
 No source audit proves competitors lack this combination. Validate the advantage through task comparisons and customer behavior, not feature-name novelty.
 
+### Current T24 identity increment (2026-10-23, local signed-fixture workflow verified)
+
+The optional same-origin host now implements website identity-only OIDC/PKCE with verified tokens, durable browser-bound accounts/sessions, explicit creation/linking and cancellation/sign-out. Separate windows preserve local artwork/history; identity grants no document, plugin, REST or inference permission. Build, 1,866 unit/API, 104 affected browser and 113 production checks pass, with independent exact 50 MP output and a clean standalone compiled host. Live OpenAI registration/sign-in, T23 installed ChatGPT acceptance, broader commercial/enterprise operations and every other unfinished original portfolio requirement remain active. See the dated roadmap for exact evidence and limits.
+
 ### Current T23 extension increment (2026-10-23, local workflow verified)
 
 A complete local desktop ChatGPT plugin now connects explicitly selected live browser documents with read-only/default and separately granted edits. Real SDK tools share command validation, asset/revision/gesture checks and ordinary OO history, with private ownership, revocation, cancellation and retained retry receipts. Build, all 1,836 unit/API, 214 initial affected browser checks, 18 final plugin checks after the source-race correction and 112 final production checks pass; independently exact 50 MP output, clean standalone package and visible production controls are verified. Actual installation/model-driven evaluation in ChatGPT remains unverified, so T23 is not complete. T24 sign-in, broader W06 services and all other unfinished original portfolio gates remain active. See the dated roadmap and sealed evidence for exact scope and limits.

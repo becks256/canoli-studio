@@ -33,6 +33,7 @@ const generatedPages = [
   ["BRUSH_PRESETS", "Saved brush presets"],
   ["RECIPE_PARAGRAPH_STYLES", "Paragraph styles in recipes"],
   ["CHATGPT_PLUGIN", "ChatGPT plugin"],
+  ["SIGN_IN_WITH_CHATGPT", "Sign in with ChatGPT"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

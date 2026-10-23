@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Account and sign-in interaction
+
+Use the custom Account Dialog, neutral UserRound header icon, explicit status/confirmation/cancel/refresh controls and unassigned Account registry action. Start sign-in with Continue with ChatGPT in a separate named window so local artwork stays open. Show only verified display identity, require Create Canoli account or Link this ChatGPT sign-in before a new identity is attached, and keep matching-email/account distinction readable. Keep body scrolling independent of retained Done/close actions, use semantic tokens in both themes, and expose recoverable errors. Unconfigured installations explain availability without a false functional sign-in button. No invented OpenAI logo, inference claim or keyboard interception is introduced.
+
 ## ChatGPT connection interaction
 
 Use the custom Dialog, Select, TextInput, Button and native checkbox controls. The header uses a neutral Plug icon and connected-document count, with the rebindable unassigned action in command search. Require an explicit document choice and pasted local code; reading is disclosed and writing/undo starts unchecked. Explain that returned names/text/settings can enter the connected conversation while original files remain local. Keep connection errors, cancellation, status and per-document Disconnect visible. Closing a completed dialog retains the connection; cancelling a pending attempt revokes it. Existing canvas gestures finish before external commits. Match the independent body scroll and retained close/actions pattern; do not invent OpenAI branding or imply this is Sign in with ChatGPT. Setup/download links must deliver an actual complete local package, with installed-client acceptance described separately.

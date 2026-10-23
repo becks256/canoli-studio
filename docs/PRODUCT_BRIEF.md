@@ -80,6 +80,10 @@ This milestone has no model API calls, billing, or cloud upload. The optional RE
 
 The next requested slice adds paint brush, pencil, visible-composite clone brush, editable Bézier pen paths, rectangular/elliptical marquee, layer dragging/reparenting, fill opacity, color overlay, drop shadow and tonal/channel Blend If. These remain local operations with shared undo, source preservation and constructor-based automation. A Developer docs link exposes the maintained scripting guide in the app. See [TOOLS_MILESTONE.md](TOOLS_MILESTONE.md) for acceptance evidence and limitations.
 
+## Explicit optional identity scope (T24)
+
+The owner requested Sign in with ChatGPT in the implementation roadmap. Its optional identity-only account/session boundary is locally verified with signed fixtures; live OpenAI acceptance still needs an eligible registered client. It preserves local editing and artwork without accounts, and does not imply paid inference, plan access, document uploads, plugin permissions or cloud collaboration. See [identity contract and current acceptance limits](SIGN_IN_WITH_CHATGPT.md).
+
 ## Suggested evolution (subject to evidence)
 
 The phased feature portfolio and implementation gates are now maintained in [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md); the principles below remain applicable.

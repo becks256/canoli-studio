@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Website account routes are separate — local signed-fixture workflow verified
+
+The optional same-origin site/auth host supplies `/auth/session`, registered OpenAI sign-in/callback, explicit account confirmation, cancellation, browser sign-out and stale-session recovery. These routes do not authenticate or synchronize this independent `/api/v1` service; its existing Bearer/X-API-Key contract remains unchanged. Identity cookies do not authorize document commands, plugin grants or inference. See [website identity/session routes and errors](SIGN_IN_WITH_CHATGPT.md).
+
 ## Explicit local ChatGPT browser connection — local workflow verified
 
 The new desktop MCP package connects only explicitly paired live browser DocumentSessions through a separate private loopback broker. It does not redirect these REST routes, attach existing headless documents to the browser, or change REST authentication/origin/state semantics. Typed edits reuse shared validation/asset checks and normal OO history. Browser-owned grants, private ephemeral credentials, expected revisions and stable retry receipts protect that separate connection. No arbitrary script, original-file transfer or sign-in/inference API is introduced. See [the complete plugin and connection contract](CHATGPT_PLUGIN.md); actual ChatGPT installation testing remains required.

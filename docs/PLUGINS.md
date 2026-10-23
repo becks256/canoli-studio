@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Website identity grants no plugin permission
+
+T24 website sign-in is separate from internal package permissions and the explicitly paired T23 local document connection. Signed-in account cookies never enter isolated plugin code, project data or MCP document tools. Signing into/out of Canoli does not silently connect documents, change existing explicit grants or authorize provider inference. All existing isolated execution and host commit checks remain. See [identity-only account behavior](SIGN_IN_WITH_CHATGPT.md).
+
 ## Separate ChatGPT desktop plugin — local workflow verified
 
 The outer Canoli Studio ChatGPT plugin is a portable Agent Plugins package with a local stdio MCP server and focused skill; it is not an internal Canoli command-plugin package and must not be passed to the internal installer. A complete archive/runtime/notices/catalog is produced by `npm run build:chatgpt`. Installation executes no document command. Browser users explicitly pair a chosen document and grant reading, with writing separately opt-in. Tools send strict data through shared command validation/assets/revisions/undo, not third-party JavaScript. The existing isolated runtime remains the only execution boundary for internal third-party command code; no file/native/network/credential privilege is added there. Owner credentials are not exposed to tool results or projects. See [setup, tools, exact retry and revocation semantics](CHATGPT_PLUGIN.md). Actual installed ChatGPT testing and public-submission eligibility remain separate unfinished acceptance gates; T24 sign-in is not implemented by local pairing.
