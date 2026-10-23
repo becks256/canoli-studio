@@ -1,0 +1,10 @@
+{
+  "name": "canoli-studio-local",
+  "interface": {"displayName": "Canoli Studio"},
+  "plugins": [{
+    "name": "canoli-studio",
+    "source": {"source": "local", "path": "./plugins/canoli-studio"},
+    "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+    "category": "Productivity"
+  }]
+}

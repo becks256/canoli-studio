@@ -24,6 +24,10 @@ Our differentiation hypotheses are the combination of:
 
 No source audit proves competitors lack this combination. Validate the advantage through task comparisons and customer behavior, not feature-name novelty.
 
+### Current T23 extension increment (2026-10-23, local workflow verified)
+
+A complete local desktop ChatGPT plugin now connects explicitly selected live browser documents with read-only/default and separately granted edits. Real SDK tools share command validation, asset/revision/gesture checks and ordinary OO history, with private ownership, revocation, cancellation and retained retry receipts. Build, all 1,836 unit/API, 214 initial affected browser checks, 18 final plugin checks after the source-race correction and 112 final production checks pass; independently exact 50 MP output, clean standalone package and visible production controls are verified. Actual installation/model-driven evaluation in ChatGPT remains unverified, so T23 is not complete. T24 sign-in, broader W06 services and all other unfinished original portfolio gates remain active. See the dated roadmap and sealed evidence for exact scope and limits.
+
 ## Original planning baseline (2026-09-21)
 
 This table preserves the original planning snapshot; its limitations are not a current implementation inventory. Subsequent affine transforms, selections, masks, adjustments, persistence and other deliveries are recorded in the [roadmap work log](IMPLEMENTATION_ROADMAP.md). Use the current requirements, API contracts, source and verification entries for implemented behavior. This baseline is not a fresh performance benchmark.

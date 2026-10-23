@@ -93,6 +93,7 @@ export function formatShortcut(shortcut: string): string {
 
 // Binding definitions are shared by action registration and keyboard help.
 export const SHORTCUT_BINDINGS: Record<string, string[]> = {
+  'chatgpt-connection': [],
   "recent-files": [],
   "workspace-layout": [],
   "workspace-reset": [],

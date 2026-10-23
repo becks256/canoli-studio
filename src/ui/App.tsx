@@ -1,4 +1,5 @@
 import {RawDevelopmentDialog,isCameraRawFile,rawFileAccept} from "./RawDevelopmentDialog";
+import {ChatGptConnectionDialog,ChatGptConnectionButton} from './ChatGptConnectionDialog';
 import { FrequencySeparationDialog } from "./FrequencySeparationDialog";
 import {BrushSymmetryDialog} from './BrushSymmetryDialog';
 import {pointerPenTilt} from '../core/brush-tip';
@@ -235,6 +236,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [recentRequest,setRecentRequest]=useState<{id?:string}|null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showWorkspaceLayout,setShowWorkspaceLayout]=useState(false);
+  const [showChatGptConnection,setShowChatGptConnection]=useState(false);
   const [showPressureCurve,setShowPressureCurve]=useState(false);
   const [showBrushTip,setShowBrushTip]=useState(false);
   const [showBrushTexture,setShowBrushTexture]=useState(false);
@@ -354,6 +356,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         patch: LayerPatch;
       }
   >(null);
+  useEffect(()=>editor.chatGpt.setInteractionGuard(sessionId=>editor.recoverySessionId===sessionId&&(capturedPointer.current!==null||gesture.current!==null||editor.tools.getSnapshot().drawing)),[editor]);
   useEffect(() => {
     const drag = gesture.current;
     if (
@@ -694,6 +697,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
 
   const defaultShortcuts = new ShortcutRegistry([
+    {id:'chatgpt-connection',label:'ChatGPT connection',category:'Workspace',keys:SHORTCUT_BINDINGS['chatgpt-connection'],allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}},
     {id:"recent-files",label:"Recent files",keys:SHORTCUT_BINDINGS["recent-files"],run:()=>{cancelWorkspaceGesture();setRecentRequest({});}},
     {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
     {id:"workspace-reset",label:"Restore default workspace arrangement",keys:SHORTCUT_BINDINGS["workspace-reset"],run:()=>attempt(()=>{panelLayout.restore();cancelWorkspaceGesture();})},
@@ -1138,6 +1142,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       !!recentRequest ||
       showHelp ||
       showWorkspaceLayout ||
+      showChatGptConnection ||
       showPressureCurve ||
       showBrushTip ||
       showBrushTexture ||
@@ -1173,6 +1178,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       setRecentRequest(null);
       setShowHelp(false);
       setShowWorkspaceLayout(false);
+      setShowChatGptConnection(false);
       setShowScripts(false);
       setShowPlugins(false);
       setShowImageSizeDialog(false);
@@ -1858,6 +1864,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           }}
           onOpen={() => openInput.current?.click()}
           recentFilesControl={<RecentFilesButton library={editor.recentFiles} disabled={busy} onOpen={()=>{cancelWorkspaceGesture();setRecentRequest({});}}/>}
+          chatGptControl={<ChatGptConnectionButton editor={editor} disabled={false} onOpen={()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}}/>}
           onSave={save}
           onExport={exportPng}
           onExportDialog={() => setShowExportDialog(true)}
@@ -2582,6 +2589,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showBrushTexture&&<BrushTextureDialog editor={editor} onClose={()=>setShowBrushTexture(false)}/>}
         {showPressureCurve&&<PressureCurveDialog curve={toolState.settings.pressureCurve} onClose={()=>setShowPressureCurve(false)} onApply={curve=>{editor.tools.configure({pressureCurve:curve});setShowPressureCurve(false);}}/>}
         {showWorkspaceLayout&&<WorkspaceLayoutDialog preferences={panelLayout.preferences} loadError={panelLayout.error} onApply={layout=>{panelLayout.apply(layout);cancelWorkspaceGesture();}} onSave={(layout,name,id)=>{panelLayout.save(layout,name,id);cancelWorkspaceGesture();}} onRename={panelLayout.rename} onDelete={panelLayout.remove} onReload={panelLayout.reload} onClose={()=>setShowWorkspaceLayout(false)}/>}
+        {showChatGptConnection&&<ChatGptConnectionDialog editor={editor} onClose={()=>setShowChatGptConnection(false)}/>}
         {showHelp && (
           <ShortcutDialog
             shortcuts={shortcuts}

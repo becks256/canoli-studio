@@ -1,0 +1,51 @@
+# Canoli Studio ChatGPT plugin
+
+Status: local SDK/browser workflow verified (2026-10-23), within T18/T23/W06. Actual installation and evaluation in ChatGPT remains an acceptance requirement. SDK tests and an installable archive do not establish that client/account/workspace acceptance. The full implementation roadmap, including separate T24 Sign in with ChatGPT, remains active.
+
+## Connect an explicitly chosen live document
+
+Download the desktop plugin from **ChatGPT connection** in the editor header or command search. Unzip the archive, install Node.js 22 or later, and register its local marketplace using `codex plugin marketplace add /absolute/path/to/canoli-studio-chatgpt`. Restart ChatGPT desktop and install **Canoli Studio** from that local source. The package README includes the complete layout and setup. Workspace/client policies can restrict local plugins. No account registration, public listing, paid inference or outbound original-file upload occurs during installation.
+
+Ask the plugin to start a connection. In Canoli's **ChatGPT connection** dialog, select the intended document, paste the returned code and choose whether to allow edits. **Connect selected document** is the authorization action. Reading starts only after that explicit choice; editing and undo/redo default off. An unused code expires after two minutes and is accepted once. Cancelling or closing a pending connection invalidates the pairing request, including when its acknowledgement was lost. Closing a successfully connected dialog leaves the connection active. **Disconnect**, closing the chosen document, editor disposal or loss of the local process revokes access; accepted artwork and history remain.
+
+This is a separate opt-in connection to a live browser document. Existing headless REST sessions remain independent and do not synchronize browser state. Internal Canoli command plugins retain their different package format and isolated execution contract.
+
+## Data and authority
+
+The local MCP process uses stdio with ChatGPT and a dynamically allocated `127.0.0.1` HTTP listener with Canoli. Only literal loopback connection codes are accepted. The selected browser origin is pinned, Host is checked, and owner requests require a separate random credential which never appears in MCP tool results, persistent browser preferences, project data or package files. The pairing code alone cannot read or edit a real document. It must be presented by the browser's explicit authorization flow.
+
+Tools can return the chosen document's serialized layers, text, settings, selection and history labels. These may enter the ChatGPT conversation. They do not return original image/file bytes, asset Blobs, browser storage, native handles or host credentials. No arbitrary JavaScript, file/URL fetch or native image-preparation tool is exposed. Metadata requests/results have a 2,000,000-byte and 100,000-element/48-level transport budget, separate from original image geometry/file size. Shared commands retain their existing stricter 256-command/40,000-node/40-level admission rules. Oversized metadata rejects explicitly; source pixels are never resized or discarded to fit the transport.
+
+Only explicitly granted writing permits typed shared commands or normal undo/redo. The host validates strict command data, immutable candidate geometry/locks, every referenced existing source and prepared wet-paint coverage. Undo/redo validate the actual historical target as well. After asynchronous commit authorization returns, it rechecks pinned source/bitmap/blob identity and dimensions, document/session/revision/source lifetime, permission and active canvas interaction immediately before synchronous publication. The existing OO document dispatch and shared store create the ordinary atomic undo entry. A connected edit cannot target a silently substituted active tab. An active canvas gesture yields `BUSY`; a changed revision yields `REVISION_CONFLICT`, so the caller must inspect and revise its plan. Document text is data rather than instructions.
+
+## Tools and retry contract
+
+| Tool | Contract |
+| --- | --- |
+| `canoli_begin_connection` | No arguments; returns a one-use local connection code and expiry, without document data. |
+| `canoli_list_documents` | Only explicitly paired live documents, current last-acknowledged summary and read/write grants. Owner credentials are excluded. |
+| `canoli_read_document` | `{connectionId}`; returns `{ok:true,value:{document,revision,canUndo,canRedo,history:{past,future},selectedIds,interactionPending}}`. History arrays contain labels, not old document snapshots. |
+| `canoli_new_layer_template` | `{connectionId,layerKind:"paint"|"vector"|"text"|"group"}`; read-only preparation returns `{ok:true,value:{layer,revision,inserted:false}}` from actual detached OO constructors. Insert the complete template with `layer.add`, then update content/settings through ordinary commands in the same transaction. |
+| `canoli_apply_edits` | `{connectionId,expectedRevision,label,commands,idempotencyKey}`; one strict transaction, 1–256 commands, current revision, label 1–128 characters and retry key 1–128 characters. Returns the accepted revision/history availability. Existing assets must already be valid in that document. |
+| `canoli_undo`, `canoli_redo` | `{connectionId,expectedRevision,idempotencyKey}`; one normal history navigation. History can contain human edits, so the caller must follow the user's intent. |
+| `canoli_disconnect_document` | `{connectionId}`; revokes this process's chosen connection, preserving accepted artwork/history. |
+
+`canoli://commands` is a compact read-only index of actual command types and patch fields. `canoli://command-schema/{commandType}` supplies one command schema; `canoli://layer-update-field/{field}` supplies focused `layer.update` metadata. These are generated from the same actual shared definitions, not parallel handwritten validators. `canoli://all-command-schemas` retains the large complete reference; routine edits should request only needed schemas. Runtime validation, source constraints, native text measurement, metadata budgets and permissions remain authoritative. A schema is neither an executable script nor permission to fetch new assets.
+
+Document-operation failures use `isError:true` and `{ok:false,error:{code,message,revision?}}`. MCP protocol/input-schema failures and connection-creation errors may instead use standard SDK protocol/tool errors. Codes include `INVALID_REQUEST`, `PERMISSION_DENIED`, `REVISION_CONFLICT`, `BUSY`, `CANCELLED`, `DISCONNECTED`, `OUTCOME_UNKNOWN` and `FAILED`. Invalid/locked/stale requests publish no partial transaction. If an observer throws after the store records an edit, the result reports accepted state with a warning, rather than implying it is safe to resubmit a new edit.
+
+Each mutation requires a caller-stable idempotency key. Concurrent or completed exact retries return the retained result without repeating the edit; reusing a key for a different payload rejects. Keys are canonicalized independently of JSON object-member order. A connection retains 256 receipts and refuses new mutation keys when full; it never silently evicts old receipts and executes an old key twice. Reconnect explicitly to continue new work, without replaying previous requests. At most 16 requests can wait per connection; 512 total retained request records protect against an owner that never acknowledges cancelled reads.
+
+The host prepares privately before requesting commit authorization. Cancellation before authorization prevents the edit and retains a cancelled receipt. Once authorization is issued, a client cancellation cannot promise rollback: accepted work may finish. If the acknowledgement is lost after that point, `OUTCOME_UNKNOWN` tells the caller to inspect the document and retry the original key, never generate a new key for the same edit. A late acknowledgement updates the retained receipt. Local browser disconnection and source/revision/interaction checks still run immediately before synchronous dispatch. User-initiated disconnect never silently undoes an already accepted edit.
+
+Owner polls return within 10 seconds, requests have a 30-second acknowledgement deadline, and an absent owner expires after 45 seconds at the next hub operation. A late unknown commit is never automatically re-executed. A connection error is visible in the dialog and requires a fresh explicit pairing; owner credentials are not reused after restart.
+
+## Package and build
+
+`npm run build:chatgpt` bundles the pinned official MCP SDK and owned server, collects licenses for the dependency code actually included, and produces the complete marketplace archive at `/plugins/canoli-studio-chatgpt.zip`. `/plugins/canoli-studio-chatgpt.json` records its SHA-256, entry hashes, SDK/dependency versions and owned source/build-input identities. `npm run build` includes this step. `npm run start:chatgpt` runs the source server over stdio for development; stdout is reserved for MCP protocol messages.
+
+The archive contains `.agents/plugins/marketplace.json`, `plugins/canoli-studio/plugin.json`, `mcp.json`, the focused `skills/edit-canoli-document/SKILL.md`, a self-contained `server/index.mjs`, third-party notices and setup instructions. Installation executes no document command and makes no provider call. Do not replace the package with a manifest whose bundled runtime is missing.
+
+Public desktop-only submission requires OpenAI partner eligibility and review. This implementation does not claim submission, approval, public installation, Sign in with ChatGPT, inference billing, new isolated-script privileges, original-file sharing, cloud collaboration, broader W06 services or full roadmap completion. Current build/unit/browser/50 MP and installed-client evidence belong in the dated repository file `docs/IMPLEMENTATION_ROADMAP.md`.
+
+Official contracts: [plugin packaging](https://developers.openai.com/plugins/build/plugins), [MCP server tools](https://developers.openai.com/plugins/build/mcp-server), [client testing](https://developers.openai.com/plugins/deploy/connect-chatgpt), [desktop-only submissions](https://developers.openai.com/plugins/deploy/desktop-only).

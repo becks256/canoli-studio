@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Separate ChatGPT desktop plugin — local workflow verified
+
+The outer Canoli Studio ChatGPT plugin is a portable Agent Plugins package with a local stdio MCP server and focused skill; it is not an internal Canoli command-plugin package and must not be passed to the internal installer. A complete archive/runtime/notices/catalog is produced by `npm run build:chatgpt`. Installation executes no document command. Browser users explicitly pair a chosen document and grant reading, with writing separately opt-in. Tools send strict data through shared command validation/assets/revisions/undo, not third-party JavaScript. The existing isolated runtime remains the only execution boundary for internal third-party command code; no file/native/network/credential privilege is added there. Owner credentials are not exposed to tool results or projects. See [setup, tools, exact retry and revocation semantics](CHATGPT_PLUGIN.md). Actual installed ChatGPT testing and public-submission eligibility remain separate unfinished acceptance gates; T24 sign-in is not implemented by local pairing.
+
 ## Local lens database import boundary
 
 The trusted browser Lensfun library parses immutable local XML data in a private worker and persists originals. It never executes plugin commands or imported code, resolves external DTDs/entities, or adds file/Blob/database/native handles to isolated scripts. Scripts/plugins still use only pure LensProfile/LensCorrection values and existing RAW document/assets grants. The selected complete calibration snapshot stays in ordinary accepted source/history/project transport even if a library file is removed. Plugin installation remains inert. Host library signatures and the supported data/native boundary are in SCRIPTING_API.md.

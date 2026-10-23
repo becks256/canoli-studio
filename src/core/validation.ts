@@ -99,7 +99,7 @@ const layer = z.unknown().transform((value, context) => {
   }
 });
 
-const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
+const commandVariants = () =>
   z.discriminatedUnion("type", [
     z
       .object({
@@ -334,8 +334,13 @@ const commandSchema: z.ZodType<EditorCommand> = z.lazy(() =>
         commands: z.array(commandSchema).max(256),
       })
       .strict(),
-  ]),
-);
+  ]);
+const commandSchema: z.ZodType<EditorCommand> = z.lazy(commandVariants);
+
+/** Metadata for trusted adapters. parseCommands remains the admission boundary. */
+export const commandMetadataSchema=commandSchema;
+export const commandMetadataVariants=()=>commandVariants().options;
+export const layerPatchMetadataSchema=patch;
 
 /** Shared trust boundary for REST and sandbox results. Bound nesting before schema recursion. */
 export function parseCommands(input: unknown): EditorCommand[] {

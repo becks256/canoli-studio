@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Explicit local ChatGPT browser connection — local workflow verified
+
+The new desktop MCP package connects only explicitly paired live browser DocumentSessions through a separate private loopback broker. It does not redirect these REST routes, attach existing headless documents to the browser, or change REST authentication/origin/state semantics. Typed edits reuse shared validation/asset checks and normal OO history. Browser-owned grants, private ephemeral credentials, expected revisions and stable retry receipts protect that separate connection. No arbitrary script, original-file transfer or sign-in/inference API is introduced. See [the complete plugin and connection contract](CHATGPT_PLUGIN.md); actual ChatGPT installation testing remains required.
+
 ## RAW development workflow in implementation
 
 Trusted `editor.inspectRaw(file, image = 0, control = {})` performs read-only native sensor preflight. It returns the version-1 camera/decoder, sensor/visible/display geometry, selected-image/count, precision, calibration/white-balance, extra-sample and warning/capability report. It changes no document, assets or history. Controls accept AbortSignal and progress with phases inspecting/developing/encoding and a nullable fraction. Inspection needs the local native worker and full-input buffer; queued inspections/development share one application-context lease. Native failure, malformed results, cancellation and throwing callbacks reject and terminate private work.

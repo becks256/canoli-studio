@@ -1,4 +1,5 @@
 import {captureAssetSource} from "./core/assets";
+import {ChatGptConnections} from './integrations/chatgpt/host';
 import {rawDevelopOptionsSchema} from "./core/interchange/raw/types";
 import {prepareRawImport,developRawComponent} from "./engine/raw-import";
 import {rawSourceMetadata} from "./core/interchange/raw/source";
@@ -182,6 +183,7 @@ export class EditorApplication {
   readonly tools = new ToolController(this);
   readonly recentFiles = new RecentFilesService();
   readonly lensProfiles = new LensLibraryService();
+  readonly chatGpt = new ChatGptConnections(this);
   readonly brushPresets = new BrushPresetLibrary();
   readonly brushTextureSource = new BrushTextureSourceOwner();
   private presetApplyAbort:AbortController|null=null;
@@ -1884,6 +1886,7 @@ export class EditorApplication {
     this.presetApplyAbort?.abort(new DOMException('Editor disposed during preset preparation.','AbortError'));this.presetApplyAbort=null;
     this.recentFiles.dispose();
     this.lensProfiles.dispose();
+    this.chatGpt.dispose();
     this.brushPresets.dispose();
     this.brushTextureSource.dispose();
     this.scripts.cancel();

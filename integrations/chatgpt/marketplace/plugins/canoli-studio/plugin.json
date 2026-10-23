@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "canoli-studio",
+  "version": "0.1.0",
+  "description": "Inspect and edit explicitly connected Canoli Studio documents through shared validation and undo.",
+  "extensions": {"com.openai": {
+    "requires_local_executor": true,
+    "interface": {
+      "displayName": "Canoli Studio",
+      "shortDescription": "Work with a connected Canoli Studio document",
+      "longDescription": "Connect a chosen browser document, inspect its layers and settings, and apply reversible typed edits alongside the artist. Reading and editing permissions are granted in Canoli.",
+      "developerName": "Canoli Studio",
+      "category": "Productivity",
+      "capabilities": ["Read", "Write"],
+      "websiteURL": "https://canoli.studio"
+    }
+  }}
+}

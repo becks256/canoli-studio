@@ -9,3 +9,6 @@ playwright-report/
 !.env.example
 src/generated/
 public/developer/
+public/plugins/
+integrations/chatgpt/marketplace/plugins/canoli-studio/server/
+integrations/chatgpt/marketplace/plugins/canoli-studio/THIRD_PARTY_NOTICES.txt

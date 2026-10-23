@@ -32,6 +32,7 @@ const generatedPages = [
   ["TOOLS_MILESTONE", "Tools milestone"],
   ["BRUSH_PRESETS", "Saved brush presets"],
   ["RECIPE_PARAGRAPH_STYLES", "Paragraph styles in recipes"],
+  ["CHATGPT_PLUGIN", "ChatGPT plugin"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

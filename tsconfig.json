@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
@@ -12,7 +16,11 @@
     "allowImportingTsExtensions": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["vite/client", "node", "@webgpu/types"]
+    "types": [
+      "vite/client",
+      "node",
+      "@webgpu/types"
+    ]
   },
   "include": [
     "src",
@@ -22,7 +30,10 @@
     "vite.config.ts",
     "playwright.config.ts",
     "playwright.production.config.ts",
-    "playwright.matting.config.ts"
+    "playwright.matting.config.ts",
+    "scripts/build-chatgpt-plugin.ts"
   ],
-  "exclude": ["assembly"]
+  "exclude": [
+    "assembly"
+  ]
 }

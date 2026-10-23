@@ -1,6 +1,13 @@
 @import "@fontsource-variable/manrope";
 @import "@fontsource/dm-mono/400.css";
 @import "./tokens.css";
+
+.chatgpt-connection-dialog { width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 48px);display:flex;flex-direction:column;gap:16px; }
+.chatgpt-connection-body { overflow:auto;min-height:0;display:flex;flex-direction:column;gap:12px; }
+.chatgpt-connection-body p { margin:0;line-height:1.5; }
+.chatgpt-connection-list { list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px; }
+.chatgpt-connection-list li { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--color-border);border-radius:8px; }
+.chatgpt-connection-list li > div { min-width:0;overflow-wrap:anywhere; }
 @import "./AppearanceSelect.css";
 
 * {

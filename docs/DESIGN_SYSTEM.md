@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## ChatGPT connection interaction
+
+Use the custom Dialog, Select, TextInput, Button and native checkbox controls. The header uses a neutral Plug icon and connected-document count, with the rebindable unassigned action in command search. Require an explicit document choice and pasted local code; reading is disclosed and writing/undo starts unchecked. Explain that returned names/text/settings can enter the connected conversation while original files remain local. Keep connection errors, cancellation, status and per-document Disconnect visible. Closing a completed dialog retains the connection; cancelling a pending attempt revokes it. Existing canvas gestures finish before external commits. Match the independent body scroll and retained close/actions pattern; do not invent OpenAI branding or imply this is Sign in with ChatGPT. Setup/download links must deliver an actual complete local package, with installed-client acceptance described separately.
+
 ## Recovery footer error handling
 
 Keep the existing recovery text and title in the canvas footer, with errors overriding the project-download indicator. Save progress must not disturb a focused field, caret, selected tool or artwork. Bind the display to the active document's controller and retain background editing while saving. A local-copy notification failure does not become a storage-failure badge; an unavailable storage capability is disclosed through Recent files while ordinary editing remains usable.
