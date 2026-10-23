@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION} from "../src/core/model";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -78,7 +79,7 @@ test("gradient maps render masks, reverse, opacity and project round trips while
   expect(result.forward).toEqual([[127, 0, 128, 255], [128, 128, 128, 255]]);
   expect(result.reversed).toEqual([[128, 0, 127, 255], [128, 128, 128, 255]]);
   expect(result.undo).toEqual(result.forward); expect(result.faded[0]).toEqual([128, 64, 128, 255]);
-  expect(result.reopened).toEqual(result.faded); expect(result.original).toEqual(result.after); expect(result.schema).toBe(40);
+  expect(result.reopened).toEqual(result.faded); expect(result.original).toEqual(result.after); expect(result.schema).toBe(SCHEMA_VERSION);
 });
 
 test("context action fits and the worker owns its stop/pixel snapshot, including native tile seams", async ({ page }) => {

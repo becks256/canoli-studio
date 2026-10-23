@@ -1,5 +1,6 @@
 import {
   LibraryBig,
+  Palette,
   Search,
   PanelsTopLeft,
   Fingerprint,
@@ -51,6 +52,7 @@ export interface ToolRailProps {
   onOpenPreflight(): void;
   onOpenWorkspace(): void;
   onOpenArtworkLibrary(): void;
+  onOpenColorPalettes(): void;
   docsUrl?: string;
 }
 
@@ -69,6 +71,7 @@ export function ToolRail({
   onOpenPreflight,
   onOpenWorkspace,
   onOpenArtworkLibrary,
+  onOpenColorPalettes,
   docsUrl = `${import.meta.env.BASE_URL}developer/scripting-api.html`,
 }: ToolRailProps) {
   return (
@@ -154,6 +157,7 @@ export function ToolRail({
         >
           <FilePlus2 size={19} />
         </IconButton>
+        <IconButton shortcutId="color-palettes" label="Color palettes" className="tool-button" disabled={busy} onClick={onOpenColorPalettes}><Palette size={19}/></IconButton>
         <IconButton shortcutId="artwork-library" label="Artwork library" className="tool-button" disabled={busy} onClick={onOpenArtworkLibrary}><LibraryBig size={19}/></IconButton>
         <IconButton
           shortcutId="scripts"

@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Palette storage boundary
+
+Reusable palettes use a distinct lazy local IndexedDB repository with strict data-only pack validation and atomic writes. Durable per-entry revisions and catalog generations govern concurrent edits/imports; BroadcastChannel is advisory. App-owned picker requests pin the document/revision/selected layer and delegate a copied six-digit sRGB value to the original validated control callback. Palette management is outside document snapshots/history, accounts, independent headless REST and isolated plugin grants. Removing palette records leaves accepted colors intact. Complete schema, failure and supported-format boundaries: COLOR_PALETTES.md.
+
 ## Reusable artwork publication invariant
 
 An artwork library entry is metadata plus a checksummed native project, separate from any live document/account. Capture only selected roots/reachable dependencies, never unrelated document history. Preparation pins a durable library epoch. The final model transaction runs synchronously inside a database read guard that validates entry revision/content and epoch, ordering placement against cross-tab edit/remove/clear. Revalidate destination revision/session/lifetime and abort immediately before dispatch. Transfer source ownership before publication and roll back unpublished assets on failure; once dispatch advances the revision, retain accepted sources even if a listener/acknowledgement throws. Library cleanup must not collect placed/undo assets. Package installation remains inert, atomic and outside isolated capabilities.

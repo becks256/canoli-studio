@@ -1,3 +1,4 @@
+import {PaletteColorControl} from "./PaletteColorControl";
 import { useEffect, useRef, useState } from "react";
 
 /** Coalesce picker events within a task; the canvas owns frame pacing. */
@@ -38,7 +39,12 @@ export function ColorInput({ label, value, disabled = false, onPreview, onCommit
     element.addEventListener("change", commit);
     return () => { element.removeEventListener("change", commit); stopPreview(); };
   }, []);
-  return <input ref={input} type="color" aria-label={label} value={draft} disabled={disabled}
+  return <PaletteColorControl label={label} value={draft} disabled={disabled} onChoose={color=>{
+    stopPreview(); edit.current=null;
+    if(input.current) input.current.value=color;
+    setDraft(color); callbacks.current.onCancel();
+    if(color!==value) callbacks.current.onCommit(color);
+  }}><input ref={input} type="color" aria-label={label} value={draft} disabled={disabled}
     onChange={() => {}}
     onInput={event => {
       const next = event.currentTarget.value;
@@ -58,5 +64,5 @@ export function ColorInput({ label, value, disabled = false, onPreview, onCommit
       if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); finish(draft, true); }
       if (event.key === "Enter") finish(event.currentTarget.value);
     }}
-  />;
+  /></PaletteColorControl>;
 }

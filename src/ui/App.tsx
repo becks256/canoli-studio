@@ -1,3 +1,5 @@
+import {PaletteLibraryContext,type PalettePickerRequest} from './PaletteColorControl';
+import {PaletteLibraryDialog} from './PaletteLibraryDialog';
 import {ArtworkLibraryDialog} from './ArtworkLibraryDialog';
 import {AccountClient} from '../account/client';
 import {AccountButton,AccountDialog} from './AccountDialog';
@@ -243,6 +245,8 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [accountClient]=useState(()=>new AccountClient());
   const [showAccount,setShowAccount]=useState(false);
   const [showArtworkLibrary,setShowArtworkLibrary]=useState(false);
+  const [showColorPalettes,setShowColorPalettes]=useState(false);
+  const [colorPaletteRequest,setColorPaletteRequest]=useState<PalettePickerRequest|null>(null);
   const [showPressureCurve,setShowPressureCurve]=useState(false);
   const [showBrushTip,setShowBrushTip]=useState(false);
   const [showBrushTexture,setShowBrushTexture]=useState(false);
@@ -705,6 +709,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const defaultShortcuts = new ShortcutRegistry([
     {id:'account',label:'Account',category:'Workspace',keys:SHORTCUT_BINDINGS.account,allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowAccount(true);}},
     {id:'chatgpt-connection',label:'ChatGPT connection',category:'Workspace',keys:SHORTCUT_BINDINGS['chatgpt-connection'],allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}},
+    {id:"color-palettes",label:"Color palettes",keys:SHORTCUT_BINDINGS["color-palettes"],run:()=>{cancelWorkspaceGesture();setShowColorPalettes(true);}},
     {id:"artwork-library",label:"Artwork library",keys:SHORTCUT_BINDINGS["artwork-library"],run:()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}},
     {id:"recent-files",label:"Recent files",keys:SHORTCUT_BINDINGS["recent-files"],run:()=>{cancelWorkspaceGesture();setRecentRequest({});}},
     {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
@@ -1152,7 +1157,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       showWorkspaceLayout ||
       showChatGptConnection ||
       showAccount ||
-      showArtworkLibrary ||
+      showArtworkLibrary || showColorPalettes || !!colorPaletteRequest ||
       showPressureCurve ||
       showBrushTip ||
       showBrushTexture ||
@@ -1805,7 +1810,15 @@ export function App({ editor }: { editor: EditorApplication }) {
   };
 
   return (
-    <ShortcutHints.Provider value={activeOverrides}>
+    <PaletteLibraryContext.Provider value={request=>{
+      cancelWorkspaceGesture();setContextMenu(null);
+      const target=editor.document,revision=target.getSnapshot().revision,selection=JSON.stringify(target.selectedLayers.map(layer=>layer.id));
+      setColorPaletteRequest({...request,onChoose:color=>{
+        if(editor.document!==target||target.getSnapshot().revision!==revision||JSON.stringify(target.selectedLayers.map(layer=>layer.id))!==selection)
+          throw new Error("The document or selection changed. Close palettes and choose the color again.");
+        request.onChoose(color);
+      }});
+    }}><ShortcutHints.Provider value={activeOverrides}>
       <div className="app-shell">
         <input
           ref={importInput}
@@ -1909,6 +1922,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onOpenPlugins={() => setShowPlugins(true)}
             onOpenHelp={() => setShowHelp(true)}
             onOpenPreflight={()=>setShowPreflight(true)}
+            onOpenColorPalettes={()=>{cancelWorkspaceGesture();setShowColorPalettes(true);}}
             onOpenArtworkLibrary={()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}}
             onOpenWorkspace={openWorkspaceLayout}
             onOpenRecovery={() => setShowRecovery(true)}
@@ -2602,6 +2616,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showBrushTexture&&<BrushTextureDialog editor={editor} onClose={()=>setShowBrushTexture(false)}/>}
         {showPressureCurve&&<PressureCurveDialog curve={toolState.settings.pressureCurve} onClose={()=>setShowPressureCurve(false)} onApply={curve=>{editor.tools.configure({pressureCurve:curve});setShowPressureCurve(false);}}/>}
         {showWorkspaceLayout&&<WorkspaceLayoutDialog preferences={panelLayout.preferences} loadError={panelLayout.error} onApply={layout=>{panelLayout.apply(layout);cancelWorkspaceGesture();}} onSave={(layout,name,id)=>{panelLayout.save(layout,name,id);cancelWorkspaceGesture();}} onRename={panelLayout.rename} onDelete={panelLayout.remove} onReload={panelLayout.reload} onClose={()=>setShowWorkspaceLayout(false)}/>}
+        {(showColorPalettes||colorPaletteRequest)&&<PaletteLibraryDialog library={editor.palettes} color={colorPaletteRequest?.color??toolState.settings.color} onChoose={colorPaletteRequest?.onChoose} onClose={()=>{setShowColorPalettes(false);setColorPaletteRequest(null);}}/>}
         {showArtworkLibrary&&<ArtworkLibraryDialog editor={editor} onClose={()=>setShowArtworkLibrary(false)} onPlaced={()=>notify("Placed saved artwork")}/>}
         {showAccount&&<AccountDialog client={accountClient} onClose={()=>setShowAccount(false)}/>}
         {showChatGptConnection&&<ChatGptConnectionDialog editor={editor} onClose={()=>setShowChatGptConnection(false)}/>}
@@ -2753,6 +2768,6 @@ export function App({ editor }: { editor: EditorApplication }) {
           />
         )}
       </div>
-    </ShortcutHints.Provider>
+    </ShortcutHints.Provider></PaletteLibraryContext.Provider>
   );
 }

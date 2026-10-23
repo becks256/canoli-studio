@@ -1,3 +1,4 @@
+import {PaletteColorInput} from "./PaletteColorControl";
 import type {VectorGradientData} from '../core/vector-gradient';
 import {VectorGradientControls} from './VectorGradientControls';
 import {VectorStrokeControls} from './VectorStrokeControls';
@@ -228,12 +229,11 @@ export function ToolOptions({
         tool === "marquee" ||
         tool === "fill") && (
         <label className="tool-color">
-          <input
-            type="color"
-            aria-label="Foreground color"
+          <PaletteColorInput
+            label="Foreground color"
             value={settings.color}
             disabled={disabled}
-            onChange={(e) => controller.configure({ color: e.target.value })}
+            onChange={(color) => controller.configure({ color: color })}
           />
           <span>{settings.color.toUpperCase()}</span>
         </label>
@@ -761,14 +761,13 @@ export function PathProperties({
           />
           Fill
         </label>
-        <input
-          type="color"
-          aria-label="Path fill color"
+        <PaletteColorInput
+          label="Path fill color"
           value={path.fill ?? "#d5e79b"}
           disabled={disabled || !path.fill || !!path.fillGradient}
-          onChange={(e) =>
+          onChange={(color) =>
             onAction(() => {
-              path.fill = e.target.value;
+              path.fill = color;
             })
           }
         />
@@ -789,14 +788,13 @@ export function PathProperties({
           />
           Stroke
         </label>
-        <input
-          type="color"
-          aria-label="Path stroke color"
+        <PaletteColorInput
+          label="Path stroke color"
           value={path.stroke ?? "#d5e79b"}
           disabled={disabled || !path.stroke}
-          onChange={(e) =>
+          onChange={(color) =>
             onAction(() => {
-              path.stroke = e.target.value;
+              path.stroke = color;
             })
           }
         />

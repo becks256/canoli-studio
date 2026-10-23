@@ -1,3 +1,4 @@
+import {PaletteColorInput} from "./PaletteColorControl";
 import { useShortcutHint } from "./ShortcutHints";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
@@ -196,13 +197,12 @@ export function CanvasContextMenu({
             (tool === "pen" && settings.penEditTarget === "layer") ||
             tool === "fill") && (
             <label className="context-color-chip" title="Foreground color">
-              <input
-                type="color"
-                aria-label="Context foreground color"
+              <PaletteColorInput
+                label="Context foreground color"
                 value={settings.color}
                 disabled={disabled}
-                onChange={(e) =>
-                  controller.configure({ color: e.target.value })
+                onChange={(color) =>
+                  controller.configure({ color: color })
                 }
               />
               <span style={{ backgroundColor: settings.color }} />

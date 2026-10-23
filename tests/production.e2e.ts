@@ -2029,3 +2029,8 @@ test('production website account export and deletion preserve artwork and undo h
 test('production artwork library preserves native pixels through portable packs, placement and independent undo',async({page},info)=>{
  const {artworkLibraryProductionWorkflow}=await import('./helpers/artwork-library');await artworkLibraryProductionWorkflow(page,info,true);
 });
+
+
+test('production palettes persist, transfer and apply through actual UI without developer globals', async ({page}, info) => {
+ const {paletteProductionWorkflow}=await import('./helpers/palettes'); await paletteProductionWorkflow(page, info, true);
+});

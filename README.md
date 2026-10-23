@@ -19,6 +19,8 @@ For the separate local REST service, run `npm run dev:api` in another terminal. 
 
 The **Artwork library** saves selected editable layers and original sources locally, with names/tags/search, verified portable packs and one-step placement/undo. See [the library workflow, source retention and privacy](docs/ARTWORK_LIBRARY.md).
 
+**Color palettes** saves named/tagged local sRGB swatches with search, reordering, portable packs and corruption recovery. Palette buttons beside existing color controls apply copied values through normal validation and undo. [Palette workflow, storage and supported color formats](docs/COLOR_PALETTES.md).
+
 ## What works
 
 - Local metadata extraction in a worker, an Asset info inspector, and JSON sidecars with explicit privacy choices.

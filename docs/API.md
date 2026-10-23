@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Local color palette boundary
+
+The browser's local palette library is a trusted UI preference service, not a new REST resource or browser/headless synchronization mechanism. REST clients continue to apply validated literal color values through the existing document commands. Palette pack imports execute no command and change no document history. See COLOR_PALETTES.md.
+
 ## Artwork library remains a trusted browser service
 
 The optional local reusable-artwork library adds no independent REST route, account authority or synchronized browser session. Its native `.luma` downloads use existing explicit project transport; placed artwork uses the same shared command validators/history as ordinary browser copying. Isolated Scripts/plugins and MCP gain no file/storage capability. See ARTWORK_LIBRARY.md and the trusted scripting reference for current local methods and package boundaries.

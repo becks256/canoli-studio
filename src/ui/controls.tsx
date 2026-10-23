@@ -1,3 +1,4 @@
+import {PaletteColorInput} from "./PaletteColorControl";
 import { useShortcutLabel } from "./ShortcutHints";
 import { useEffect, useRef, useState } from "react";
 import type {
@@ -679,13 +680,7 @@ export function ColorField({
   return (
     <div className={`style-color-row ${className}`.trim()}>
       <span>{label}</span>
-      <input
-        type="color"
-        aria-label={ariaLabel ?? label}
-        value={value}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      <PaletteColorInput label={ariaLabel ?? label} value={value} disabled={disabled} onChange={onChange}/>
     </div>
   );
 }

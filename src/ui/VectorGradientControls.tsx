@@ -1,3 +1,4 @@
+import {PaletteColorInput} from "./PaletteColorControl";
 import type {VectorPath} from '../dom';
 import type {VectorGradientData,VectorGradientStop} from '../core/vector-gradient';
 import {gradientStopColor} from '../core/vector-gradient';
@@ -25,7 +26,7 @@ export function VectorGradientControls({path,disabled,onAction,onPreview,preview
     {gradient.kind==='radial'&&<NumberField layout="stacked" label={`Gradient ${end} radius`} value={gradient[end].radius} min={end==='end'?Number.MIN_VALUE:0} max={Number.MAX_SAFE_INTEGER} disabled={disabled} onCommit={radius=>commit({...gradient,[end]:{...gradient[end],radius}})}/>}
    </div>)}
    {gradient.stops.map((stop,index)=><div className="vector-gradient-stop" key={index}>
-    <label>Stop {index+1}<input type="color" aria-label={`Gradient stop ${index+1} color`} value={stop.color} disabled={disabled} onChange={event=>replace(index,{color:event.target.value})}/></label>
+    <label>Stop {index+1}<PaletteColorInput  label={`Gradient stop ${index+1} color`} value={stop.color} disabled={disabled} onChange={color=>replace(index,{color:color})}/></label>
     <NumberField label={`Gradient stop ${index+1} position`} value={stop.position*100} min={index?gradient.stops[index-1].position*100:0} max={index<gradient.stops.length-1?gradient.stops[index+1].position*100:100} suffix="%" disabled={disabled} onCommit={position=>replace(index,{position:position/100})}/>
     <Slider label={`Gradient stop ${index+1} opacity`} value={(stop.opacity??1)*100} min={0} max={100} suffix="%" disabled={disabled} onPreview={opacity=>onPreview({...gradient,stops:gradient.stops.map((entry,i)=>i===index?{...entry,opacity:opacity/100}:entry)})} onCommit={opacity=>replace(index,{opacity:opacity/100})}/>
     <Button variant="subtle" size="sm" aria-label={`Remove gradient stop ${index+1}`} disabled={disabled||gradient.stops.length<=2} onClick={()=>commit({...gradient,stops:gradient.stops.filter((_,i)=>i!==index)})}>Remove</Button>

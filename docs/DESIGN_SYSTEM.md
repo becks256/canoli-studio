@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Reusable palette interactions
+
+Use the custom Color palettes dialog from the rail, rebindable command search and a compact accessible palette button beside native color inputs. Keep native labels/disabled states and preview/commit boundaries. The app owns the modal, so a context menu may close without destroying the picker. Search includes named swatches and hex values. Palette selection opens a draft; explicit Save, Reload details and Save as copy distinguish local intent. Pair named swatches with visible hex values; color is not the only label. Reordering has labeled Earlier/Later buttons and native color inputs remain keyboard accessible. Paginate long catalogs/swatches without evicting data. Use a scrolling body and retained Done/Cancel footer, wrapped controls and names, both themes and short viewports. Never hide storage/corruption errors; explain that saved colors are copied values, local only and sRGB8. No default shortcut or component-library dependency is added.
+
 ## Artwork library interaction
 
 Use the custom modal, text fields, text area and buttons with independent body scrolling and retained Cancel/Done. The rail and unassigned rebindable command open one library. Names/descriptions/tags are explicit local catalog fields; show exact-content duplicate reuse without overwriting reviewed metadata. Search has stable selected IDs and 40 visible rows per page without evicting data. Keep edited metadata drafts until explicit save/reload; reject stale revisions. Offer on-demand preview, native download, inert pack import/export, place, removal and explicit clear confirmation. Distinguish corrupt-record recovery from verified export, disclose valid-only packs and preserve input shortcuts. Placing returns to the canvas with one undo entry; closing/canceling invalidates pending UI work.

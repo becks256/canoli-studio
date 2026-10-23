@@ -1,5 +1,9 @@
 # Scripting API
 
+## Local color palettes are outside isolated Scripts
+
+The trusted browser palette picker stores local named sRGB colors independently of documents. It exposes no constructor, global, file/database handle or new isolated permission. Existing attached color assignments still validate and record ordinary document commands/undo; palette management and removal do not recolor artwork. No script signature/default or execution budget changes. See COLOR_PALETTES.md for UI/storage/portable-pack behavior.
+
 ## Website identity is outside the document API
 
 The custom Account dialog uses a separate same-origin identity service, not an EditorApplication/Document method or isolated Scripts global. Account data, cookies and provider tokens are not project/history data or MCP document results. Identity sign-in grants no document/asset/job/network permission and changes no constructor or command signature. Local editing and serialization remain useful without an account. See [Sign in with ChatGPT](SIGN_IN_WITH_CHATGPT.md) for the host-only contract and remaining real-provider acceptance.

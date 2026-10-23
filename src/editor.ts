@@ -1,3 +1,4 @@
+import {PaletteLibrary} from './palettes/service';
 import {ArtworkLibrary} from './library/service';
 import type {ArtworkMetadata} from './library/model';
 import {CanvasRenderer} from './engine/renderer';
@@ -187,6 +188,7 @@ export class EditorApplication {
   readonly recentFiles = new RecentFilesService();
   readonly lensProfiles = new LensLibraryService();
   readonly artworkLibrary = new ArtworkLibrary();
+  readonly palettes = new PaletteLibrary();
   readonly chatGpt = new ChatGptConnections(this);
   readonly brushPresets = new BrushPresetLibrary();
   readonly brushTextureSource = new BrushTextureSourceOwner();
@@ -1916,6 +1918,7 @@ export class EditorApplication {
     this.presetApplyAbort?.abort(new DOMException('Editor disposed during preset preparation.','AbortError'));this.presetApplyAbort=null;
     this.recentFiles.dispose();
     this.artworkLibrary.dispose();
+    this.palettes.dispose();
     this.lensProfiles.dispose();
     this.chatGpt.dispose();
     this.brushPresets.dispose();

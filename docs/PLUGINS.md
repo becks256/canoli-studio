@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Palette library grants no extension access
+
+Local color palette packs are inert strict data, not command packages. Palette storage/pickers add no script global, local file/database/network grant or MCP tool; existing isolated document color commands retain validation and undo. Account deletion/sign-out leaves these independent browser preferences intact. Installation and the package/runtime contract are unchanged.
+
 ## Artwork library adds no extension grant
 
 Saving/importing a native artwork pack stores inert data only. It does not execute installed commands, extend isolated Scripts/plugins, connect desktop MCP documents or grant account/file/storage permissions. Explicit placement uses ordinary validated OO commands/history. Existing plugin installation, permissions, cancellation and asset/revision validation remain unchanged.
