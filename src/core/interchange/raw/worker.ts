@@ -1,3 +1,4 @@
+import {hasLensCorrection,validateLensGeometry} from './lens';
 import factory from './codec/canoli_raw_decoder.js';
 import wasmUrl from './codec/canoli_raw_decoder.wasm?url';
 import {rawDecoder} from './codec';
@@ -22,8 +23,9 @@ self.onmessage=async(event:MessageEvent)=>{
     const bytes=new Uint8Array(await request.blob.arrayBuffer());
     if(request.mode==='inspect')self.postMessage({report:decoder.inspect(bytes,settings.development.image)});
     else{
+      if(hasLensCorrection(settings.development.lens)){const report=decoder.inspect(bytes,settings.development.image);validateLensGeometry(settings.development.lens!,report.displayWidth,report.displayHeight);}
       const image=decoder.develop(bytes,settings.development),report=image.report;
-      const png=await encodeRawWorkingImage(image,fraction=>self.postMessage({progress:{phase:'encoding',fraction}}));
+      const png=await encodeRawWorkingImage(image,fraction=>self.postMessage({progress:{phase:'encoding',fraction}}),settings.development.lens);
       self.postMessage({report,png});
     }
   }catch(error){self.postMessage({error:error instanceof Error?error.message:String(error)});}

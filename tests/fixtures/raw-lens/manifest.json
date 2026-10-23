@@ -1,0 +1,107 @@
+{
+  "generator": "Independent NumPy equations over native dcraw_emu reference planes",
+  "numpy": "1.26.4",
+  "cases": [
+    {
+      "name": "barrel",
+      "options": {
+        "distortion": {
+          "k1": -0.08,
+          "k2": 0.01
+        },
+        "scale": 1.05
+      },
+      "width": 64,
+      "height": 48,
+      "rgbaSha256": "bf08113a9fbf2b0a2848f9ba8da56d1f3581a34f64777710ebeaea1aa167e336"
+    },
+    {
+      "name": "pincushion",
+      "options": {
+        "distortion": {
+          "k1": 0.04
+        }
+      },
+      "width": 64,
+      "height": 48,
+      "rgbaSha256": "ed796fca3a7ce9b097957491b2b0dd5c9d3bc50f3d8b122c21b7fec2d926df3e"
+    },
+    {
+      "name": "chromatic",
+      "options": {
+        "chromatic": {
+          "red": 0.995,
+          "blue": 1.005
+        },
+        "scale": 1.02
+      },
+      "width": 64,
+      "height": 48,
+      "rgbaSha256": "a4af54beff619a7d46a808a12f5c814ed6f5b075daa0f4a4293b4137f327508f"
+    },
+    {
+      "name": "vignette",
+      "options": {
+        "vignette": {
+          "k1": -0.2,
+          "k2": 0.02
+        }
+      },
+      "width": 64,
+      "height": 48,
+      "rgbaSha256": "b0f83d73653dd712bdccce0a02f09e736c87dc247521bbb77cebfc6130002a16"
+    },
+    {
+      "name": "combined",
+      "options": {
+        "center": {
+          "x": 0.48,
+          "y": 0.52
+        },
+        "scale": 1.1,
+        "distortion": {
+          "k1": -0.06,
+          "k2": 0.008,
+          "k3": 0.001
+        },
+        "chromatic": {
+          "red": 0.998,
+          "blue": 1.002
+        },
+        "vignette": {
+          "k1": -0.15,
+          "k2": 0.03
+        }
+      },
+      "width": 64,
+      "height": 48,
+      "rgbaSha256": "d3512509aa32ad4ec79d4da897f85af3067cd6e845ed39d31de107c2d5cd8abe"
+    },
+    {
+      "name": "native-50mp",
+      "options": {
+        "center": {
+          "x": 0.48,
+          "y": 0.52
+        },
+        "scale": 1.1,
+        "distortion": {
+          "k1": -0.06,
+          "k2": 0.008,
+          "k3": 0.001
+        },
+        "chromatic": {
+          "red": 0.998,
+          "blue": 1.002
+        },
+        "vignette": {
+          "k1": -0.15,
+          "k2": 0.03
+        }
+      },
+      "width": 10000,
+      "height": 5000,
+      "rgbaSha256": "1bf1b14096be174b83f1817019a55e6d147fa3f5f37c4d29089d1e6c802e210c"
+    }
+  ]
+}

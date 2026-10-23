@@ -1,3 +1,5 @@
+import {hasLensCorrection,type LensCorrectionData} from './lens';
+import {rawLensSampler} from './lens-sampler';
 import type {OwnedRawImage} from './codec';
 import {PngRowEncoder} from '../../png-stream';
 
@@ -17,17 +19,21 @@ export function rawLinearRowsToRgba8(samples:Uint16Array,channels:1|3):Uint8Arra
 }
 
 /** Convert bounded row copies; the native RGB16 plane stays owned until finally. */
-export async function encodeRawWorkingImage(image:OwnedRawImage,progress?:(fraction:number)=>void){
-  let encoder:PngRowEncoder|undefined;
+export async function encodeRawWorkingImage(image:OwnedRawImage,progress?:(fraction:number)=>void,lens?:LensCorrectionData){
+  let encoder:PngRowEncoder|undefined,sampler:ReturnType<typeof rawLensSampler>|undefined;
   try{
+    if(hasLensCorrection(lens))sampler=rawLensSampler(image,lens!);
     encoder=new PngRowEncoder(image.width,image.height);
     const rows=Math.max(1,Math.min(64,Math.floor(4_000_000/(image.width*(image.channels*2+8)+1))));
     progress?.(0);
     for(let top=0;top<image.height;top+=rows){
-      const count=Math.min(rows,image.height-top),samples=image.readRows(top,count);
-      await encoder.append(rawLinearRowsToRgba8(samples,image.channels),count);progress?.((top+count)/image.height);
+      const count=Math.min(rows,image.height-top);
+      let rgba:Uint8Array;
+      if(sampler){const corrected=sampler.rows(top,count);rgba=rawLinearRowsToRgba8(corrected.pixels,3);for(let i=0;i<corrected.alpha.length;i++)rgba[i*4+3]=corrected.alpha[i];}
+      else rgba=rawLinearRowsToRgba8(image.readRows(top,count),image.channels);
+      await encoder.append(rgba,count);progress?.((top+count)/image.height);
     }
     return await encoder.finish();
   }catch(error){await encoder?.abort(error);throw error;}
-  finally{image.dispose();}
+  finally{sampler?.dispose();image.dispose();}
 }

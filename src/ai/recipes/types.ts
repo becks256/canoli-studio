@@ -66,9 +66,17 @@ export interface StepCondition {
   target?: SemanticTarget;
 }
 
+export interface RecipeLensCorrection {
+  version?:1;enabled?:boolean|string;scale?:number|string;
+  center?:{x?:number|string;y?:number|string};
+  distortion?:{k1?:number|string;k2?:number|string;k3?:number|string};
+  chromatic?:{red?:number|string;blue?:number|string};
+  vignette?:{k1?:number|string;k2?:number|string;k3?:number|string};
+}
 export type RecipeRawDevelopment = {
   [K in keyof import('../../core/interchange/raw/types').RawDevelopOptions]?:
     K extends 'multipliers' ? {red?:number|string;green?:number|string;blue?:number|string}
+    : K extends 'lens' ? RecipeLensCorrection|string
     : import('../../core/interchange/raw/types').RawDevelopOptions[K]|string;
 };
 export interface PlannedRawDevelopment {

@@ -6,6 +6,7 @@ export interface OwnedRawImage {
   readonly width:number;readonly height:number;readonly channels:1|3;
   /** An owned copy of a full-width row interval; no borrowed WASM views escape. */
   readRows(top:number,rows:number):Uint16Array;
+  readRegion?(left:number,top:number,width:number,height:number):Uint16Array;
   dispose():void;
 }
 const qualities={linear:0,vng:1,ppg:2,ahd:3,dcb:4,dht:11,aahd:12};
@@ -57,6 +58,17 @@ export function rawDecoder(module:NativeRawModule){
           const current=module.HEAPU8,start=pixels+top*width*channels*2,count=rows*width*channels;
           if(start+count*2>current.length)throw new Error('RAW output lifetime changed.');
           return new Uint16Array(current.buffer,start,count).slice();
+        },
+        readRegion(left,top,w,h){
+          if(closed)throw new Error('The RAW image is disposed.');
+          if(![left,top,w,h].every(Number.isSafeInteger)||left<0||top<0||w<1||h<1||left+w>width||top+h>height)throw new Error('Invalid RAW region.');
+          const current=module.HEAPU8,result=new Uint16Array(w*h*channels);
+          for(let y=0;y<h;y++){
+            const start=pixels+((top+y)*width+left)*channels*2,count=w*channels;
+            if(start+count*2>current.length)throw new Error('RAW output lifetime changed.');
+            result.set(new Uint16Array(current.buffer,start,count),y*count);
+          }
+          return result;
         },
         dispose(){if(closed)return;closed=true;active=false;module._canoli_raw_release();},
       };

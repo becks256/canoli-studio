@@ -129,6 +129,7 @@ export const stepConditionSchema = z
 // Parameter expressions are resolved and then validated by the native options contract.
 const rawNumber=z.union([z.number().finite(),z.string().min(1)]);
 export const recipeRawDevelopmentSchema=z.object({
+  lens:z.union([z.record(z.string(),z.unknown()),z.string().min(1)]).optional(),
   image:rawNumber.optional(),whiteBalance:z.string().min(1).optional(),demosaic:z.string().min(1).optional(),
   exposure:rawNumber.optional(),highlightPreservation:rawNumber.optional(),highlights:rawNumber.optional(),
   multipliers:z.object({red:rawNumber.optional(),green:rawNumber.optional(),blue:rawNumber.optional()}).strict().optional(),

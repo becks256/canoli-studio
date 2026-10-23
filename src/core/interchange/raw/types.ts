@@ -1,6 +1,8 @@
+import {lensCorrectionSchema} from './lens';
 import {z} from 'zod';
 
 export const rawDevelopOptionsSchema=z.object({
+  lens:lensCorrectionSchema.optional(),
   image:z.number().int().nonnegative().max(0xffffffff).default(0),
   whiteBalance:z.enum(['camera','auto','daylight','custom']).default('camera'),
   demosaic:z.enum(['linear','vng','ppg','ahd','dcb','dht','aahd']).default('ahd'),

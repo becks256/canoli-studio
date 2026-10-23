@@ -1,3 +1,4 @@
+import {lensCorrectionSchema,hasLensCorrection,validateLensGeometry} from '../core/interchange/raw/lens';
 import {useEffect,useRef,useState} from 'react';
 import {X} from 'lucide-react';
 import {RawDevelopment,SmartObjectLayer} from '../dom';
@@ -46,7 +47,8 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
     }catch(cause){if(!abort.signal.aborted)setError(cause instanceof Error?cause.message:String(cause));}
     finally{applying.current=false;onBusyChange(false);if(!abort.signal.aborted)setRunning(false);}
   };
-  const disabled=running||stale,ready=report?.canDevelop&&precision&&!(settings.whiteBalance==='camera'&&!report.hasCameraWhiteBalance&&report.channels>1);
+  let lensIssue='';if(report&&hasLensCorrection(settings.lens)){try{validateLensGeometry(settings.lens!,report.displayWidth,report.displayHeight);}catch(error){lensIssue=String(error);}}
+  const disabled=running||stale,ready=report?.canDevelop&&precision&&!lensIssue&&!(settings.whiteBalance==='camera'&&!report.hasCameraWhiteBalance&&report.channels>1);
   return <Dialog localEscape titleId="raw-development-title" className="svg-import-dialog raw-development-dialog" onClose={close}>
     <div className="dialog-header"><h2 id="raw-development-title">{onQueued?'Queue camera RAW':file?'Import camera RAW':'Develop RAW'}</h2><IconButton label="Close RAW development" onClick={close}><X size={18}/></IconButton></div>
     <div className="svg-import-body"><p><strong>{file?.name??source?.original.name}</strong></p><p>Keep the complete sensor original and editable development settings. Accepted pixels use 8-bit sRGB editing precision. {onQueued?'Queue the original with these settings; develop it in the batch without changing the open editor. Cancel skips remaining unreviewed files.':file?'Open as a smart object in a new document; existing edited documents stay open.':'Apply updates every instance of this shared master in one undo step, preserving layer placement and effects.'}</p>
@@ -62,10 +64,21 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
         <NumberField layout="stacked" label="RAW exposure" value={settings.exposure} min={-2} max={3} suffix="EV" step="any" disabled={disabled} onCommit={exposure=>change({exposure})}/>
         <NumberField layout="stacked" label="RAW highlight preservation" value={settings.highlightPreservation} min={0} max={1} step="any" disabled={disabled} onCommit={highlightPreservation=>change({highlightPreservation})}/>
         <Select layout="stacked" label="RAW highlight mode" value={String(settings.highlights)} options={Array.from({length:10},(_,i)=>({value:String(i),label:i===0?'0 — Clip':i===1?'1 — Unclip':i===2?'2 — Blend':`${i} — Reconstruct`}))} disabled={disabled} onChange={value=>change({highlights:Number(value)})}/>
+        <details><summary>Lens correction</summary><p>Manual radial, color-fringe and vignette correction in linear RGB before 8-bit editing. Transparent borders retain missing coverage; increase Scale to crop them. Camera/profile matching requires separate calibration.</p>
+          <label className="check-field"><input type="checkbox" checked={settings.lens?.enabled??false} disabled={disabled} onChange={event=>change({lens:lensCorrectionSchema.parse({...settings.lens,enabled:event.target.checked})})}/>Enable lens correction</label>
+          {settings.lens?.enabled&&<>
+            <NumberField layout="stacked" label="Lens scale" value={settings.lens.scale} min={.1} max={10} step="any" disabled={disabled} onCommit={scale=>change({lens:{...settings.lens!,scale}})}/>
+            {(['k1','k2','k3']as const).map(key=><NumberField key={'d'+key} layout="stacked" label={`Lens radial ${key}`} value={settings.lens!.distortion[key]} min={-1} max={1} step="any" disabled={disabled} onCommit={value=>change({lens:{...settings.lens!,distortion:{...settings.lens!.distortion,[key]:value}}})}/>)}
+            {(['x','y']as const).map(key=><NumberField key={key} layout="stacked" label={`Lens center ${key}`} value={settings.lens!.center[key]} min={0} max={1} step="any" disabled={disabled} onCommit={value=>change({lens:{...settings.lens!,center:{...settings.lens!.center,[key]:value}}})}/>)}
+            {(['red','blue']as const).map(key=><NumberField key={key} layout="stacked" label={`Lens ${key} scale`} value={settings.lens!.chromatic[key]} min={.5} max={2} step="any" disabled={disabled} onCommit={value=>change({lens:{...settings.lens!,chromatic:{...settings.lens!.chromatic,[key]:value}}})}/>)}
+            {(['k1','k2','k3']as const).map(key=><NumberField key={'v'+key} layout="stacked" label={`Lens vignette ${key}`} value={settings.lens!.vignette[key]} min={-1} max={1} step="any" disabled={disabled} onCommit={value=>change({lens:{...settings.lens!,vignette:{...settings.lens!.vignette,[key]:value}}})}/>)}
+          </>}
+        </details>
         <label className="check-field"><input type="checkbox" checked={precision} disabled={disabled} onChange={event=>setPrecision(event.target.checked)}/>Convert RAW development to 8-bit editing precision</label>
       </>}
       {previewUrl&&<figure><img src={previewUrl} alt="RAW development preview" className="raw-development-preview"/><figcaption>Native development preview; original sensor resolution is retained.</figcaption></figure>}
       {running&&<div role="status"><p>{progress?.phase==='encoding'?'Preparing working image…':progress?.phase==='developing'?'Developing sensor pixels…':'Inspecting RAW…'}</p><progress aria-label="RAW development progress" max={1} value={progress?.fraction??undefined}/></div>}
+      {lensIssue&&<p role="alert">{lensIssue}</p>}
       {error&&<p role="alert">{error}</p>}
     </div>
     <div className="dialog-footer"><Button variant="subtle" onClick={close}>Cancel</Button><Button disabled={!ready||disabled} onClick={()=>void run(true)}>Preview development</Button><Button variant="primary" disabled={!ready||disabled} onClick={()=>void run(false)}>{onQueued?'Queue RAW image':file?'Import RAW image':'Apply RAW development'}</Button></div>

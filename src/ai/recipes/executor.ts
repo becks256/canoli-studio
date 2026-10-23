@@ -1,3 +1,4 @@
+import {hasLensCorrection,validateLensGeometry} from '../../core/interchange/raw/lens';
 import {parseRawDevelopmentOptions} from '../../core/interchange/raw/types';
 import {rawComponentCommand} from '../../core/interchange/raw/commands';
 import type {ImageAsset} from '../../core/assets';
@@ -328,6 +329,7 @@ export function compileEditPlan(
             const options=parseRawDevelopmentOptions({allowPrecisionLoss:step.action.allowPrecisionLoss,development:actionValue(step.action.development) as never});
             if(options.development.image>=source.raw.report.imageCount)throw new Error('RAW source image index is unavailable.');
             if(options.development.image===source.raw.report.image&&(!source.raw.report.canDevelop||options.development.whiteBalance==='camera'&&source.raw.report.channels>1&&!source.raw.report.hasCameraWhiteBalance))throw new Error('RAW source does not support the selected development settings.');
+            if(hasLensCorrection(options.development.lens)&&options.development.image===source.raw.report.image)validateLensGeometry(options.development.lens!,source.raw.report.displayWidth,source.raw.report.displayHeight);
             const assetId=id(),command=rawComponentCommand(simDoc,targetLayer.id,{id:assetId,width:source.width,height:source.height});
             simDoc=execute(simDoc,command);stepCommands.push(command);
             rawDevelopments.push({assetId,sourceAssetId:sourceId,options});plannedRawAssets.set(assetId,source);

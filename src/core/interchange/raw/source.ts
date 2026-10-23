@@ -1,3 +1,4 @@
+import {freeze} from '../../immutable';
 import {z} from 'zod';
 import {rawDecodeOptionsSchema,rawImportReportSchema} from './types';
 
@@ -32,7 +33,7 @@ export function ownRawSource(input:RawImageSource):Readonly<RawImageSource>{
   if(!input||!(input.originalBlob instanceof Blob))throw new Error('A retained RAW original Blob is required.');
   const metadata=rawSourceMetadata(input),blob=input.originalBlob;
   if(blob.size!==metadata.original.byteLength||blob.type!==metadata.original.type)throw new Error('RAW original extent or MIME type differs from its descriptor.');
-  Object.freeze(metadata.original);Object.freeze(metadata.settings.development.multipliers);Object.freeze(metadata.settings.development);Object.freeze(metadata.settings);
+  Object.freeze(metadata.original);freeze(metadata.settings.development);Object.freeze(metadata.settings);
   Object.freeze(metadata.report.unsupported);Object.freeze(metadata.report.warnings);Object.freeze(metadata.report);
   const result=Object.freeze({...metadata,originalBlob:blob});owned.add(result);return result;
 }

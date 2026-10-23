@@ -754,3 +754,7 @@ Brush/pencil/clone/eraser DTOs accept optional `texture: {assetId, channel: "alp
 ### Based-on paragraph styles
 
 Document schema 41 admits optional paragraph-style basedOn `{id, overrides}` (or null/omission for independent styles). Overrides are strict partial ParagraphFormat fields; format remains the complete resolved value. Existing paragraphStyle.set/remove commands share transitive inheritance, cycle/missing-base/coherence validation, follower locks, atomic history and revisions. A parent update derives child formats automatically; a supplied child record must agree with its base/overrides. Removal preserves formatting while detaching immediate child styles/direct text. Mislabeled pre-41 inheritance rejects. REST sessions remain separate from the browser and have existing headless font limits. See SCRIPTING_API.md for OO methods and the complete field contract.
+
+## RAW lens options
+
+RAW import/development options accept optional strict `development.lens` version-1 settings documented in SCRIPTING_API.md. Independent native workers perform geometric validation and linear RGB16 radial/chromatic/vignette correction before returning RGBA8 working pixels. Transparent correction borders are supported; original RAW extra-sample coverage remains unsupported. Existing expectedRevision, locks, original/accepted validation, project/history and cancellation contracts remain. Invalid correction publishes nothing; no browser synchronization or general REST renderer is introduced.
