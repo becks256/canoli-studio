@@ -6,3 +6,5 @@ export * from "./recorder";
 export * from "./presets";
 export * from "./storage";
 export * from "./service";
+
+export * from './async-executor';

@@ -1,10 +1,13 @@
 import { AssetStore } from "../../core/assets";
 import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
-import { id } from "../../core/model";
-import type { Document } from "../../dom";
+import { id,referencedAssets } from "../../core/model";
+import {Document} from "../../dom";
+import {captureAssetSource} from "../../core/assets";
+import type {RawImportControl} from "../../core/interchange/raw/types";
+import {commitRecipePlan} from "./executor";
 import type { Recipe } from "./types";
 import { readRecipePackage } from "./package";
-import { executeRecipe } from "./executor";
+import {executeRecipeAsync} from './async-executor';
 
 /** Remap only the artwork references represented in the package contract. */
 function remapSources(recipe: Recipe, ids: Map<string, string>): void {
@@ -35,6 +38,7 @@ export async function executeRecipePackage(
   document: Document,
   params: Record<string, unknown> = {},
   assertTargetAvailable: () => void = () => {},
+  control:RawImportControl={},
 ) {
   assertTargetAvailable();
   const assets = document.assetStore;
@@ -51,15 +55,20 @@ export async function executeRecipePackage(
   const supplied = structuredClone(params);
   const staging = new AssetStore();
   const promoted: string[] = [];
-  const transferred = new Set<string>();
-  let committed = false;
+  const lifetime=assets.captureLifetime(),pins=[...referencedAssets(document.toJSON())].map(id=>captureAssetSource(assets,id));
+  const current=()=>{
+    assertTargetAvailable();control.signal?.throwIfAborted();lifetime();
+    if(document.assetStore!==assets||document.getSnapshot().revision!==revision)throw new Error('Document changed while preparing the recipe package. Review the target and retry.');
+    if((document.selectedLayer?.id??null)!==selectedId)throw new Error('Layer selection changed while preparing the recipe package. Review the target and retry.');
+    for(const pin of pins)pin.check();
+  };
   try {
     const contents = await readRecipePackage(file);
-    assertTargetAvailable();
+    current();
     const ids = new Map<string, string>();
     for (const entry of contents.assets) {
-      const asset = await staging.add(entry.blob, entry.name, id(), false,{tiff:entry.tiff,avif:entry.avif,raw:entry.raw});
-      assertTargetAvailable();
+      const asset = await staging.add(entry.blob, entry.name, id(), false,{tiff:entry.tiff,avif:entry.avif,raw:entry.raw,signal:control.signal});
+      current();
       if (asset.width !== entry.width || asset.height !== entry.height)
         throw new Error(
           `Recipe image dimensions do not match the manifest: ${entry.id}`,
@@ -67,37 +76,23 @@ export async function executeRecipePackage(
       ids.set(entry.id, asset.id);
     }
     remapSources(contents.recipe, ids);
-    assertTargetAvailable();
-    if (
-      document.assetStore !== assets ||
-      document.getSnapshot().revision !== revision
-    ) {
-      throw new Error(
-        "Document changed while preparing the recipe package. Retry after reviewing the document.",
-      );
+    current();
+    // Borrow owner sources into a detached document. Package/native pixels stay private until commit.
+    for(const pin of pins)assets.shareTo(staging,pin.asset.id,pin.asset.id);
+    const detached=Document.fromJSON(document.toJSON());detached.assetStore=staging;
+    detached.selectedLayer=selectedId?detached.getLayer(selectedId):null;
+    const result=await executeRecipeAsync(contents.recipe,detached,supplied,control,current);
+    if(!result.success)throw new Error(result.error??'Recipe package execution failed.');
+    current();
+    for(const assetId of referencedAssets(detached.toJSON()))if(!assets.has(assetId)){
+      staging.shareTo(assets,assetId,assetId);promoted.push(assetId);
     }
-    if ((document.selectedLayer?.id ?? null) !== selectedId) {
-      throw new Error(
-        "Layer selection changed while preparing the recipe package. Review the target and retry.",
-      );
-    }
-    // Synchronous installation and command execution prevent intervening document edits.
-    for (const asset of staging.values()) {
-      assets.install(asset, false);
-      promoted.push(asset.id);
-      transferred.add(asset.id);
-    }
-    const result = executeRecipe(contents.recipe, document, supplied);
-    if (!result.success)
-      throw new Error(result.error ?? "Recipe package execution failed.");
-    committed = true;
-    return result;
+    const accepted=commitRecipePlan(contents.recipe,document,result.plan);
+    if(!accepted.success)throw new Error(accepted.error??'Recipe package commit failed.');
+    return accepted;
   } finally {
-    if (!committed) promoted.forEach((assetId) => assets.remove(assetId));
-    // Transferred bitmaps are owned by the document (or were closed by rollback).
-    // Dispose only untransferred bitmaps; dispose the staging services separately.
-    for (const asset of staging.values())
-      if (!transferred.has(asset.id)) asset.bitmap.close();
-    staging.metadata.dispose();
+    const state=document.getSnapshot(),retained=new Set([state.document,...state.past.map(entry=>entry.document),...state.future.map(entry=>entry.document)].flatMap(value=>[...referencedAssets(value)]));
+    promoted.forEach(assetId=>{if(!retained.has(assetId))assets.remove(assetId);});
+    staging.dispose();
   }
 }

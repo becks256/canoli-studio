@@ -1,3 +1,5 @@
+import {executeRecipeAsync} from './async-executor';
+import type {RawImportControl} from '../../core/interchange/raw/types';
 import {ownRawSource} from "../../core/interchange/raw/source";
 import { RecipePackageStorage } from "./package-storage";
 import { executeRecipePackage } from "./package-executor";
@@ -21,7 +23,7 @@ import {
 export class RecipeService {
   readonly storage = new RecipeStorage();
   readonly packages = new RecipePackageStorage();
-  readonly recorder = new RecipeRecorder();
+  readonly recorder = new RecipeRecorder((assetId)=>this.editor.assetStore.get(assetId));
   private unsavedRecording?: Recipe;
   private recordingSources = new Map<string, RecipeAsset>();
   lastSavedRecordingFormat: "json" | "package" = "json";
@@ -210,6 +212,7 @@ export class RecipeService {
   executeRecipePackage(
     file: Blob,
     params: Record<string, unknown> = {},
+    control:RawImportControl={},
   ): Promise<ExecuteRecipeResult> {
     const document = this.editor.document;
     return executeRecipePackage(
@@ -217,6 +220,7 @@ export class RecipeService {
       document,
       params,
       this.captureTargetGuard(document),
+      control,
     );
   }
 
@@ -236,6 +240,7 @@ export class RecipeService {
       doc.selectedLayer?.id ?? null,
       params,
       new Set(this.editor.assetStore.values().map((asset) => asset.id)),
+      this.editor.assetStore,
     );
   }
 
@@ -244,6 +249,11 @@ export class RecipeService {
     params: Record<string, unknown> = {},
   ): ExecuteRecipeResult {
     return executeRecipe(recipe, this.editor.document, params);
+  }
+
+  executeAsync(recipe:Recipe,params:Record<string,unknown>={},control:RawImportControl={}):Promise<ExecuteRecipeResult>{
+    const document=this.editor.document;
+    return executeRecipeAsync(recipe,document,params,control,this.captureTargetGuard(document));
   }
 
   startRecording(): void {

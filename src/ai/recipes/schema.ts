@@ -72,7 +72,7 @@ export const semanticTargetSchema: z.ZodTypeAny = z
     pattern: z.string().min(1).max(240).optional(),
     literal: z.boolean().optional(),
     kind: z
-      .enum(["raster", "group", "paint", "vector", "text", "adjustment"])
+      .enum(["raster", "group", "paint", "vector", "text", "adjustment", "smart-object"])
       .optional(),
     tag: z.string().min(1).max(80).optional(),
     stepId: z.string().min(1).max(120).optional(),
@@ -126,7 +126,16 @@ export const stepConditionSchema = z
     }
   });
 
+// Parameter expressions are resolved and then validated by the native options contract.
+const rawNumber=z.union([z.number().finite(),z.string().min(1)]);
+export const recipeRawDevelopmentSchema=z.object({
+  image:rawNumber.optional(),whiteBalance:z.string().min(1).optional(),demosaic:z.string().min(1).optional(),
+  exposure:rawNumber.optional(),highlightPreservation:rawNumber.optional(),highlights:rawNumber.optional(),
+  multipliers:z.object({red:rawNumber.optional(),green:rawNumber.optional(),blue:rawNumber.optional()}).strict().optional(),
+}).strict();
+
 export const recipeActionSchema = z.discriminatedUnion("type", [
+  z.object({type:z.literal("raw.develop"),development:recipeRawDevelopmentSchema,allowPrecisionLoss:z.literal(true)}).strict(),
   z.object({type:z.literal('paragraphStyle.ensure'),name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
   z.object({type:z.literal('paragraphStyle.update'),style:recipeParagraphStyleTargetSchema,name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
   z.object({type:z.literal('paragraphStyle.remove'),style:recipeParagraphStyleTargetSchema}).strict(),

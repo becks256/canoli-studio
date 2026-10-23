@@ -1,4 +1,7 @@
-import { recipeOutputBindingsUnique, stepConditionSchema } from "./schema";
+import {parseRawDevelopmentOptions} from '../../core/interchange/raw/types';
+import {rawComponentCommand} from '../../core/interchange/raw/commands';
+import type {ImageAsset} from '../../core/assets';
+import { recipeOutputBindingsUnique, stepConditionSchema, recipeActionSchema } from "./schema";
 import {recipeParagraphStyleTargetSchema} from './schema';
 import {paragraphStyleSchema,paragraphTextLayers,sameParagraphFormat,sameParagraphBase,type ParagraphStyleData} from '../../core/paragraph-styles';
 import type { DocumentData, LayerData } from "../../core/model";
@@ -22,6 +25,7 @@ import type {
   PreconditionCheck,
   Recipe,
   RecipeParameter,
+  PlannedRawDevelopment,
 } from "./types";
 import {
   checkTargetPreconditions,
@@ -125,6 +129,7 @@ export function compileEditPlan(
   selectedId: string | null = null,
   rawParams: Record<string, unknown> = {},
   availableAssetIds?: ReadonlySet<string>,
+  rawAssets?: {get(id:string):Pick<ImageAsset,'raw'|'width'|'height'>},
 ): EditPlan {
   const errors: string[] = [];
   if (!recipeOutputBindingsUnique(recipe))
@@ -135,6 +140,8 @@ export function compileEditPlan(
   const preconditions: PreconditionCheck[] = [];
   const plannedSteps: PlannedStepChange[] = [];
   const resolvedCommands: EditorCommand[] = [];
+  const rawDevelopments:PlannedRawDevelopment[]=[];
+  const plannedRawAssets=new Map<string,Pick<ImageAsset,'raw'|'width'|'height'>>();
 
   const { values: params, errors: paramErrors } = resolveParameterValues(
     recipe.parameters,
@@ -271,6 +278,12 @@ export function compileEditPlan(
         return true;
       });
     }
+    if(step.action.type==='raw.develop'){
+      const masters=new Set<string>();targets=targets.filter(layer=>{
+        if(layer.kind!=='smart-object')return true;
+        if(masters.has(layer.componentId))return false;masters.add(layer.componentId);return true;
+      });
+    }
     for (const targetId of step.target
       ? targets.map((layer) => layer.id)
       : [null]) {
@@ -305,6 +318,23 @@ export function compileEditPlan(
         const stepCommands: EditorCommand[] = [];
 
         switch (step.action.type) {
+          case 'raw.develop': {
+            recipeActionSchema.parse(step.action);
+            if(!targetLayer||targetLayer.kind!=='smart-object')throw new Error('RAW development requires a smart-object target with a retained original.');
+            const definition=simDoc.components?.find(value=>value.id===targetLayer.componentId);
+            if(!definition||definition.source.kind!=='asset')throw new Error('RAW target has no retained original.');
+            const sourceId=definition.source.assetId,source=plannedRawAssets.get(sourceId)??rawAssets?.get(sourceId);
+            if(!source?.raw)throw new Error('RAW recipe preflight requires the target document original and asset metadata.');
+            const options=parseRawDevelopmentOptions({allowPrecisionLoss:step.action.allowPrecisionLoss,development:actionValue(step.action.development) as never});
+            if(options.development.image>=source.raw.report.imageCount)throw new Error('RAW source image index is unavailable.');
+            if(options.development.image===source.raw.report.image&&(!source.raw.report.canDevelop||options.development.whiteBalance==='camera'&&source.raw.report.channels>1&&!source.raw.report.hasCameraWhiteBalance))throw new Error('RAW source does not support the selected development settings.');
+            const assetId=id(),command=rawComponentCommand(simDoc,targetLayer.id,{id:assetId,width:source.width,height:source.height});
+            simDoc=execute(simDoc,command);stepCommands.push(command);
+            rawDevelopments.push({assetId,sourceAssetId:sourceId,options});plannedRawAssets.set(assetId,source);
+            layersModified++;affectedLayerNames.add(targetLayer.name);
+            visualChange=`Develop retained RAW for '${targetLayer.name}' and its shared instances; native pixels are prepared before one atomic commit`;
+            break;
+          }
           case 'paragraphStyle.ensure':
           case 'paragraphStyle.update': {
             if(step.target)throw new Error('Paragraph style library actions do not accept layer targets.');
@@ -941,7 +971,7 @@ export function compileEditPlan(
 
   if (availableAssetIds) {
     const missing = [...referencedAssets(simDoc)].filter(
-      (assetId) => !availableAssetIds.has(assetId),
+      (assetId) => !availableAssetIds.has(assetId)&&!plannedRawAssets.has(assetId),
     );
     if (missing.length) {
       const error = `Recipe requires unavailable image assets: ${missing.join(", ")}. Import the source assets or use a recipe that references this document's artwork.`;
@@ -965,6 +995,7 @@ export function compileEditPlan(
     preconditions,
     steps: plannedSteps,
     resolvedCommands,
+    ...(rawDevelopments.length?{rawDevelopments}:{}),
     summary: {
       layersAdded,
       layersModified,
@@ -1003,8 +1034,15 @@ export function executeRecipe(
     document.assetStore
       ? new Set(document.assetStore.values().map((asset) => asset.id))
       : undefined,
+    document.assetStore??undefined,
   );
 
+  if(plan.rawDevelopments?.length)return {success:false,plan,error:"RAW recipes require awaited asynchronous execution. Use executeAsync()."};
+  return commitRecipePlan(recipe,document,plan);
+}
+
+/** Commit only a fully validated plan; asynchronous callers own private asset preparation. */
+export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan):ExecuteRecipeResult {
   if (!plan.valid || plan.errors.length > 0) {
     const errorMsg = `Recipe '${recipe.name}' validation failed: ${plan.errors.join("; ")}`;
     return {

@@ -15,7 +15,6 @@ import { readRecipePackage } from "../recipes/package";
  */
 
 import { AssetStore } from "../../core/assets";
-import { execute } from "../../core/commands";
 import {
   createDocument,
   createRaster,
@@ -29,7 +28,8 @@ import type { DocumentRenderer } from "../../engine/renderer";
 import { CanvasRenderer } from "../../engine/renderer";
 import type { BudgetLedger } from "../jobs/ledger";
 import { BudgetExceededError } from "../jobs/types";
-import { compileEditPlan } from "../recipes/executor";
+import { executeRecipeAsync } from '../recipes/async-executor';
+import {compileEditPlan} from '../recipes/executor';
 import type { RecipeService } from "../recipes/service";
 import type { Recipe } from "../recipes/types";
 import {
@@ -770,31 +770,19 @@ export class BatchRunner {
               file,
               stagingDocument,
               mergedParams,
+              ()=>signal.throwIfAborted(),
+              {signal},
             );
             if (signal.aborted) throw new Error("Batch execution aborted");
             doc = stagingDocument.toJSON();
             actualSpendCents += result.plan.summary.estimatedSpendCents;
           } else {
-            const plan = compileEditPlan(
-              recipe,
-              doc,
-              baseLayer.id,
-              mergedParams,
-              new Set(assets.values().map((asset) => asset.id)),
-            );
-            if (!plan.valid) {
-              throw new Error(
-                `Recipe '${recipe.name}' failed preflight: ${plan.errors.join("; ")}`,
-              );
-            }
-
-            // Execute commands against staging document
-            for (const cmd of plan.resolvedCommands) {
-              if (signal.aborted) throw new Error("Batch execution aborted");
-              doc = execute(doc, cmd);
-            }
-
-            actualSpendCents += plan.summary.estimatedSpendCents;
+            const stagingDocument=Document.fromJSON(doc);stagingDocument.assetStore=assets;
+            stagingDocument.selectedLayer=stagingDocument.getLayer(baseLayer.id)!;
+            const result=await executeRecipeAsync(recipe,stagingDocument,mergedParams,{signal});
+            if(!result.success)throw new Error(result.error??`Recipe '${recipe.name}' failed.`);
+            doc=stagingDocument.toJSON();
+            actualSpendCents += result.plan.summary.estimatedSpendCents;
           }
         }
       }

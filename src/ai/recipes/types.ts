@@ -66,7 +66,19 @@ export interface StepCondition {
   target?: SemanticTarget;
 }
 
+export type RecipeRawDevelopment = {
+  [K in keyof import('../../core/interchange/raw/types').RawDevelopOptions]?:
+    K extends 'multipliers' ? {red?:number|string;green?:number|string;blue?:number|string}
+    : import('../../core/interchange/raw/types').RawDevelopOptions[K]|string;
+};
+export interface PlannedRawDevelopment {
+  assetId:string;
+  sourceAssetId:string;
+  options:import('../../core/interchange/raw/types').RawDecodeSettings;
+}
+
 export type RecipeAction =
+  | {type:'raw.develop';development:RecipeRawDevelopment;allowPrecisionLoss:true}
   | {type:'paragraphStyle.ensure';name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
   | {type:'paragraphStyle.update';style:RecipeParagraphStyleTarget;name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
   | {type:'paragraphStyle.remove';style:RecipeParagraphStyleTarget}
@@ -219,6 +231,8 @@ export interface EditPlan {
   preconditions: PreconditionCheck[];
   steps: PlannedStepChange[];
   resolvedCommands: EditorCommand[];
+  /** Native outputs are private planning identities until asynchronous preparation succeeds. */
+  rawDevelopments?: PlannedRawDevelopment[];
   summary: EditPlanSummary;
   parameterValues: Record<string, unknown>;
   stepOutputs?: Map<string, string>;

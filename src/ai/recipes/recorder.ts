@@ -100,7 +100,7 @@ export class RecipeRecorder {
   private lastCommandTargetLayerId: string | null = null;
   private listeners = new Set<() => void>();
 
-  constructor() {}
+  constructor(private readonly assetSource?:(id:string)=>Pick<import('../../core/assets').ImageAsset,'raw'>) {}
 
   isRecording(): boolean {
     return this.active && !this.paused;
@@ -225,6 +225,23 @@ export class RecipeRecorder {
     };
 
     switch (command.type) {
+      case 'component.set': {
+        const previous=beforeDoc.components?.find(value=>value.id===command.definition.id),source=command.definition.source;
+        const layer=allLayers(beforeDoc.children).filter(value=>value.kind==='smart-object'&&value.componentId===command.definition.id)
+          .sort((a,b)=>Number(b.id===this.initialSelectedId)-Number(a.id===this.initialSelectedId))[0];
+        let recorded=false;
+        if(previous?.source.kind==='asset'&&source.kind==='asset'&&layer&&this.assetSource){
+          try{
+            const before=this.assetSource(previous.source.assetId).raw,after=this.assetSource(source.assetId).raw;
+            if(before&&after&&before.original.sha256===after.original.sha256&&before.original.byteLength===after.original.byteLength&&before.original.type===after.original.type&&
+              JSON.stringify({...previous,source:null})===JSON.stringify({...command.definition,source:null})){
+              this.steps.push({id:`step-${id()}`,name:`Develop RAW ${layer.name}`,target:targetFromLayer(layer),action:{type:'raw.develop',development:structuredClone(after.settings.development),allowPrecisionLoss:true}});recorded=true;
+            }
+          }catch{/* Unavailable provenance cannot become a semantic recording. */}
+        }
+        if(!recorded)this.unsupported.add(command.type);
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
       case 'paragraphStyle.set': {
         const previous=beforeDoc.paragraphStyles?.find(style=>style.id===command.style.id);
         const style=paragraphStyleSchema.parse(command.style);

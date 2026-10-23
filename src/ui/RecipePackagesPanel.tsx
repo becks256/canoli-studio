@@ -20,9 +20,12 @@ export function RecipePackagesPanel({
   const [selected, setSelected] = useState<{ recipe: Recipe; file: Blob }>();
   const [params, setParams] = useState<Record<string, unknown>>({});
   const [busy, setBusy] = useState(false);
+  const [progress,setProgress]=useState('');
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const input = useRef<HTMLInputElement>(null);
+  const execution=useRef<AbortController|null>(null);
+  useEffect(()=>()=>execution.current?.abort(),[]);
   const refresh = async () => setRecipes(await editor.recipes.packages.list());
   useEffect(() => {
     let active = true;
@@ -74,6 +77,7 @@ export function RecipePackagesPanel({
           ...assets.values().map((asset) => asset.id),
           ...recipeAssetIds(selected.recipe),
         ]),
+        assets,
       )
     : null;
   const download = (file: Blob, name: string) => {
@@ -220,10 +224,9 @@ export function RecipePackagesPanel({
               variant="primary"
               onClick={() =>
                 void attempt(async () => {
-                  await editor.recipes.executeRecipePackage(
-                    selected.file,
-                    params,
-                  );
+                  const controller=new AbortController();execution.current=controller;setProgress('Preparing package');
+                  try{await editor.recipes.executeRecipePackage(selected.file,params,{signal:controller.signal,onProgress:value=>setProgress(`${value.phase}${value.fraction===null?'':` ${Math.round(value.fraction*100)}%`}`)});}
+                  finally{if(execution.current===controller)execution.current=null;setProgress('');}
                   setMessage(
                     "Package executed. Undo restores the previous document.",
                   );
@@ -232,6 +235,7 @@ export function RecipePackagesPanel({
             >
               Run package
             </Button>
+            {busy&&progress&&<div role="status">{progress} <Button onClick={()=>execution.current?.abort()}>Cancel preparation</Button></div>}
             <Button
               disabled={busy}
               onClick={() => download(selected.file, selected.recipe.name)}

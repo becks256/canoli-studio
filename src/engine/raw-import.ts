@@ -10,10 +10,10 @@ import {prepareRawDerivation} from '../core/interchange/raw/derive';
 import {rawComponentCommand} from '../core/interchange/raw/commands';
 
 /** Private native development. The original never becomes a browser bitmap. */
-async function prepareRawAsset(assets:AssetStore,blob:Blob,name:string,options:RawDecodeOptions,control:RawImportControl,check:()=>void){
+export async function prepareRawAsset(assets:AssetStore,blob:Blob,name:string,options:RawDecodeOptions,control:RawImportControl,check:()=>void,assetId?:string){
   const current=()=>{check();control.signal?.throwIfAborted();};
   const {png,source}=await prepareRawDerivation(blob,name,options,control,current,developRawFile);
-  const asset=await assets.add(png,name,undefined,false,{raw:source,signal:control.signal});current();return asset;
+  const asset=await assets.add(png,name,assetId,false,{raw:source,signal:control.signal});current();return asset;
 }
 export async function prepareRawImport(file:File,options:RawDecodeOptions={},control:RawImportControl={},check:()=>void=()=>{}){
   const assets=new AssetStore();

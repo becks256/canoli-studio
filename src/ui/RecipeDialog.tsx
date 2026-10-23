@@ -1,5 +1,5 @@
 import { RecipePackagesPanel } from "./RecipePackagesPanel";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Dialog } from "./Dialog";
 import { Button, IconButton, NumberField, Slider } from "./controls";
 import {
@@ -133,18 +133,24 @@ export function RecipeDialog({
 
   // Execution state
   const [executing, setExecuting] = useState(false);
+  const execution=useRef<AbortController|null>(null);
+  const [rawProgress,setRawProgress]=useState('');
+  useEffect(()=>()=>execution.current?.abort(),[]);
+  const close=()=>{execution.current?.abort();onClose();};
   const [executeStatus, setExecuteStatus] = useState<{
     success?: boolean;
     message?: string;
   } | null>(null);
 
-  const handleRun = () => {
+  const handleRun = async () => {
     if (!selectedRecipe || !plan || !plan.valid) return;
-    setExecuting(true);
+    if(execution.current)return;
+    const controller=new AbortController();execution.current=controller;
+    setExecuting(true);setRawProgress('Preparing recipe');
     setExecuteStatus(null);
 
     try {
-      const result = editor.recipes.execute(selectedRecipe, paramValues);
+      const result = await editor.recipes.executeAsync(selectedRecipe, paramValues,{signal:controller.signal,onProgress:value=>setRawProgress(`${value.phase}${value.fraction===null?"":` ${Math.round(value.fraction*100)}%`}`)});
       if (result.success) {
         setExecuteStatus({
           success: true,
@@ -164,7 +170,8 @@ export function RecipeDialog({
         message: `Execution error: ${msg}`,
       });
     } finally {
-      setExecuting(false);
+      if(execution.current===controller)execution.current=null;
+      setExecuting(false);setRawProgress('');
     }
   };
 
@@ -273,7 +280,7 @@ export function RecipeDialog({
   };
 
   return (
-    <Dialog titleId={titleId} onClose={onClose} className="recipe-dialog">
+    <Dialog titleId={titleId} onClose={close} className="recipe-dialog">
       <div className="recipe-dialog-header">
         <div className="recipe-dialog-title-wrap">
           <Workflow size={20} className="recipe-dialog-title-icon" />
@@ -287,7 +294,7 @@ export function RecipeDialog({
             </p>
           </div>
         </div>
-        <IconButton label="Close" onClick={onClose}>
+        <IconButton label="Close" onClick={close}>
           <X size={16} />
         </IconButton>
       </div>
@@ -808,6 +815,8 @@ export function RecipeDialog({
                   )}
                 </div>
 
+                {executing&&<div role="status">{rawProgress} <Button onClick={()=>execution.current?.abort()}>Cancel preparation</Button></div>}
+                {plan?.rawDevelopments?.length? <p>Develops the target RAW original into 8-bit sRGB. Source sensor bytes are retained; shared instances update together.</p>:null}
                 {/* Status message */}
                 {executeStatus && (
                   <div
