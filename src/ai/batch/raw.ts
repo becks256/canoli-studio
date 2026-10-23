@@ -1,3 +1,4 @@
+import type {HistoryOrigin} from '../../core/history-provenance';
 import {hasLensCorrection,validateLensGeometry} from '../../core/interchange/raw/lens';
 import {z} from 'zod';
 import {id} from '../../core/model';
@@ -23,8 +24,8 @@ export async function prepareRawBatchSource(file:File,options:RawDecodeOptions={
   const sha256=await rawBlobHash(file,()=>control.signal?.throwIfAborted());
   return {id:`raw-${id()}`,name:file.name.slice(0,240),width:report.displayWidth,height:report.displayHeight,mimeType:file.type||'application/octet-stream',byteLength:file.size,sha256,blob:file,raw};
 }
-export function rawBatchDocument(name:string,width:number,height:number,assetId:string){
-  const document=new Document({name,width,height}),componentId=id();
+export function rawBatchDocument(name:string,width:number,height:number,assetId:string,origin?:HistoryOrigin){
+  const document=new Document({name,width,height}),componentId=id();if(origin)document._setDefaultHistoryOrigin(origin);
   document._dispatch({type:'component.set',definition:{id:componentId,name,source:{kind:'asset',assetId,width,height}}});
   const layer=document.layers.add(new SmartObjectLayer({name,componentId,width,height}));document.selectedLayer=layer;
   return {document,layer};

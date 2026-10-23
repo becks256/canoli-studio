@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Observed operation provenance (W05)
+
+Record host-assigned origins and local acceptance identity/time for changed command results, never infer old origins/authors/times from labels. Preserve point records through navigation, branches, comparisons, native/current-result saves and workspace recovery. Keep runtime observation separate from untrusted stored records. Strict history-4 admission checks point/model alignment and consistent repeated IDs; no authentication/signature claim is made. Script/plugin origins must be assigned at host commit and isolated overrides rejected. Async preparation must not leak origin scope to unrelated edits. Accepted observer failure must retain the operation/model/assets and notify remaining observers. Full authenticated audit and wider roadmap quality gates remain open. Contract: HISTORY.md.
+
 ## Saved comparison states and regions (W05)
 
 Support named saved comparisons between current/retained/branch-tip states with exact pinned source closure, editable integer document-pixel regions, bounded private before/after/difference previews and disclosed displayed-pixel statistics. Comparisons survive pruning, branch deletion, native saves and workspace recovery; continuing either side creates an exact new branch without replay. Show parent-ordered branch ancestry with active/selected and level/parent disclosures. Metadata operations remain separate from artwork Undo, revisioned, stale-safe and unavailable to isolated execution. History 3 must strictly admit complete graphs; older histories remain readable. Full provenance and remaining W05/roadmap quality gates stay open. Exact contract: [HISTORY.md](HISTORY.md#saved-comparison-regions-and-branch-ancestry).

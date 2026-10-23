@@ -1,3 +1,4 @@
+import type {HistoryOrigin} from '../../core/history-provenance';
 import {hasLensCorrection,validateLensGeometry} from '../../core/interchange/raw/lens';
 import {parseRawDevelopmentOptions} from '../../core/interchange/raw/types';
 import {rawComponentCommand} from '../../core/interchange/raw/commands';
@@ -1016,6 +1017,7 @@ export interface ExecuteRecipeResult {
   success: boolean;
   plan: EditPlan;
   error?: string;
+  warning?:string;
 }
 
 /**
@@ -1044,7 +1046,8 @@ export function executeRecipe(
 }
 
 /** Commit only a fully validated plan; asynchronous callers own private asset preparation. */
-export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan):ExecuteRecipeResult {
+export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan,origin:HistoryOrigin=document._getHistoryOrigin()):ExecuteRecipeResult {
+  const revision=document.getSnapshot().revision;
   if (!plan.valid || plan.errors.length > 0) {
     const errorMsg = `Recipe '${recipe.name}' validation failed: ${plan.errors.join("; ")}`;
     return {
@@ -1055,11 +1058,11 @@ export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan):
   }
 
   try {
-    document.transaction(`Execute Recipe: ${recipe.name}`, () => {
+    document._withHistoryOrigin({...origin,recipe:{id:recipe.id,version:recipe.version}},()=>document.transaction(`Execute Recipe: ${recipe.name}`, () => {
       for (const cmd of plan.resolvedCommands) {
         document._dispatch(cmd);
       }
-    });
+    }));
 
     if (plan.stepOutputs && plan.stepOutputs.size > 0) {
       const lastCreatedId = Array.from(plan.stepOutputs.values()).pop();
@@ -1077,6 +1080,7 @@ export function commitRecipePlan(recipe:Recipe,document:Document,plan:EditPlan):
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
+    if(document.getSnapshot().revision!==revision)return {success:true,plan,warning:'Recipe accepted, but an observer failed. Inspect the document before retrying.'};
     return {
       success: false,
       plan,

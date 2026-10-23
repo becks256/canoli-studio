@@ -198,6 +198,8 @@ self.onmessage = async (event) => {
     document.createHistoryBranch = document.checkoutHistoryBranch = document.renameHistoryBranch = document.deleteHistoryBranch = branchMutation;
     const comparisonMutation = () => {throw new Error('Use editor history comparisons after a script finishes.');};
     document.createHistoryComparison = document.updateHistoryComparison = document.deleteHistoryComparison = document.createHistoryBranchFromComparison = comparisonMutation;
+    const rejectHistoryOrigin = () => {throw new Error('History origins are assigned by the host.');};
+    document._setDefaultHistoryOrigin = document._withHistoryOrigin = rejectHistoryOrigin;
     const print = (...values: unknown[]) => {
       if (logs.length < 100)
         logs.push(

@@ -3,6 +3,7 @@ import {X} from 'lucide-react';
 import type {EditorApplication} from '../editor';
 import {historyTimeline, inspectHistoryChange, historyBranchTree} from '../core/history-inspection';
 import {HistoryComparisons} from './HistoryComparisons';
+import {HistoryOperationInfo} from './HistoryOperationInfo';
 import {Dialog} from './Dialog';
 import {Button, IconButton, Select, TextInput} from './controls';
 
@@ -47,7 +48,7 @@ export function HistoryInspectorDialog({editor, onClose}: {editor: EditorApplica
     <div className="dialog-heading"><div><span className="section-caption">RETAINED DOCUMENT STATES</span><h2 id={id}>Inspect history</h2></div><IconButton label="Close history inspector" onClick={onClose}><X size={18}/></IconButton></div>
     <div className="history-inspector-body">
       <p>Inspect a retained operation, then explicitly move to its result. Moving restores stored artwork without rerunning commands, decoders or generation. Editing before the latest state preserves the previous result as a separate branch.</p>
-      <p className="field-hint">This timeline is captured when opened; reload after other edits. Up to 60 transitions are retained. The oldest retained state may already contain earlier edits. History labels describe operations; they do not prove author, timestamp or AI provenance.</p>
+      <p className="field-hint">This timeline is captured when opened; reload after other edits. Up to 60 transitions are retained. The oldest retained state may already contain earlier edits. History labels alone do not prove authorship or execution time. Recorded operation origins are shown separately; stored records are not authenticated.</p>
       {error && <p role="alert">{error}</p>}
       <section aria-label="Document history branches"><h3>Document branches</h3>
         <p>Create a named branch from the current document state. Switching restores its latest accepted result and retained undo path. Save project and workspace recovery preserve branches and their sources.</p>
@@ -68,7 +69,7 @@ export function HistoryInspectorDialog({editor, onClose}: {editor: EditorApplica
       </section>
       <HistoryComparisons editor={editor} capture={capture} check={check} reload={reload}/>
       <ol className="history-inspector-timeline" aria-label="Retained history states">{timeline.map(item => <li key={item.position}><Button variant="subtle" disabled={busy} aria-pressed={position === item.position} onClick={() => {cancel(); clearImages(); setPosition(item.position); setError('');}} aria-label={`Inspect history state ${item.position}: ${item.label}`}><span>{item.position}. {item.label}</span>{item.position === capture.state.past.length && <strong>Current at capture</strong>}</Button></li>)}</ol>
-      <section aria-label="Selected history changes"><h3>{timeline[position].label}</h3>
+      <section aria-label="Selected history changes"><h3>{timeline[position].label}</h3><HistoryOperationInfo document={capture.document} operation={timeline[position].operation}/>
         {!position ? <p>No earlier state is retained for this baseline.</p> : <>
           <p>Document fields: {fieldNames(summary.documentFields) || 'No confirmed changes'}.</p>
           {!!summary.unexaminedDocumentFields.length && <p>Not fully compared: {fieldNames(summary.unexaminedDocumentFields)}.</p>}

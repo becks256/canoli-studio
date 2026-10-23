@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Operation-origin disclosure
+
+Use a native details disclosure under selected-state and saved-side history, showing a readable channel and runtime-observed versus stored-unverified status. Keep local clock, session/revision, submitted types/counts and workflow IDs in wrapped definition rows. Never infer authors or provider verification from labels, conflate billing with Undo or hide unknown legacy provenance. Saved-side labels say Captured before/after. Preserve the modal body scroll and fixed footer at both themes/short widths. No new rail icon, component library or default shortcut.
+
 ## Saved comparisons and ancestry
 
 Use a scrollable parent-ordered ancestry list of native buttons with actual parent/level, active and selected markers; cap visual indentation without losing depth metadata. Keep explicit Switch separate from inspection. Saved comparisons use the custom inspector section, independent name and state selectors, integer region fields, explicit Save/Preview/Delete/Continue actions and inline deletion confirmation. New comparison creation lives in a native details disclosure. Preserve typing, focus, stale errors, retained modal footer and both themes/short windows. Three labeled image panes disclose downscaling and measured displayed-pixel limits; never imply full-resolution, author or model provenance.

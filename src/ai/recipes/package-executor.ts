@@ -42,6 +42,7 @@ export async function executeRecipePackage(
   control:RawImportControl={},
 ) {
   assertTargetAvailable();
+  const origin=document._getHistoryOrigin();
   const assets = document.assetStore;
   if (!assets)
     throw new Error(
@@ -88,7 +89,7 @@ export async function executeRecipePackage(
     for(const assetId of referencedAssets(detached.toJSON()))if(!assets.has(assetId)){
       staging.shareTo(assets,assetId,assetId);promoted.push(assetId);
     }
-    const accepted=commitRecipePlan(contents.recipe,document,result.plan);
+    const accepted=commitRecipePlan(contents.recipe,document,result.plan,origin);
     if(!accepted.success)throw new Error(accepted.error??'Recipe package commit failed.');
     return accepted;
   } finally {

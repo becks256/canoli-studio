@@ -27,7 +27,7 @@ export async function historyComparisonsWorkflow(page:Page,info:TestInfo,product
  await dialog.getByLabel('Saved history branch',{exact:true}).selectOption({label:'Main'});await dialog.getByRole('button',{name:'Switch to branch tip',exact:true}).click();
  await dialog.getByLabel('Saved history branch',{exact:true}).selectOption({label:'Green alternative'});await dialog.getByRole('button',{name:'Delete branch',exact:true}).click();await dialog.getByRole('button',{name:'Confirm delete branch',exact:true}).click();
  await expect(dialog.getByRole('list',{name:'History branch ancestry',exact:true}).getByRole('button')).toHaveCount(1);await dialog.getByRole('button',{name:'Done',exact:true}).click();
- const saved=await historyProject(page,info,'comparisons-pinned.luma');expect(saved.value.history?.version).toBe(3);if(saved.value.history?.version!==3)throw Error('Saved comparison missing');
+ const saved=await historyProject(page,info,'comparisons-pinned.luma');expect(saved.value.history?.version).toBe(4);if(saved.value.history?.version!==4)throw Error('Saved comparison missing');
  expect(saved.value.history.branches).toHaveLength(1);expect(saved.value.history.comparisons[0]).toMatchObject({name:'Reviewed comparison',region:{x:30,y:20,width:120,height:90}});
  await page.getByTestId('project-input').setInputFiles(saved.path);dialog=await openHistoryInspector(page);await dialog.getByRole('button',{name:'Preview saved comparison',exact:true}).click();await expect(dialog.getByRole('img',{name:'Saved comparison difference',exact:true})).toBeVisible();
  expect(await comparisonImage(page,info,'Saved comparison after','comparison-reopened-after.png')).toEqual(initialAfter);
@@ -37,5 +37,5 @@ export async function historyComparisonsWorkflow(page:Page,info:TestInfo,product
  await dialog.getByRole('button',{name:'Delete saved comparison',exact:true}).click();await dialog.getByRole('button',{name:'Confirm delete comparison',exact:true}).click();await expect(dialog.getByLabel('Saved history comparison',{exact:true})).toHaveCount(0);
  await dialog.getByRole('button',{name:'Done',exact:true}).click();await expect(page.getByRole('button',{name:'Undo (Mod+Z)',exact:true})).toBeDisabled();
  expect((await historyPng(page,info,'comparison-restored-green-full.png')).bytes).toEqual(green.bytes);
- const afterDelete=await historyProject(page,info,'comparisons-after-delete.luma');expect(afterDelete.value.history?.version).toBe(2);
+ const afterDelete=await historyProject(page,info,'comparisons-after-delete.luma');expect(afterDelete.value.history?.version).toBe(4);if(afterDelete.value.history?.version!==4)throw Error('Missing retained provenance');expect(afterDelete.value.history.comparisons).toEqual([]);
 }

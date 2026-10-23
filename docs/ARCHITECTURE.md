@@ -1,5 +1,9 @@
 # Architecture
 
+## Result-point provenance and trusted ingress
+
+history-provenance owns strict origin/operation schemas and accepted submitted-command summaries. EditorStore records changed commits with private session/weak-observation ownership and parallel current/past/future point maps. History 4 carries full branch/comparison attribution closure; legacy entries stay unchanged and unknown. Document coordinates synchronous host origins and guards accepted publication/observers. Editor, REST, isolated script/plugin host commits, actual recipe/candidate workflows and connected clients supply context at trusted entry points. Async services capture context before preparation and apply it at final commit only. File admission validates record/model consistency but imports never acquire runtime observation or identity authentication. Ordinary unbranched browser files retain current attribution without adding Undo. See HISTORY.md.
+
 ## Saved comparison ownership and rendering
 
 EditorStore owns immutable pinned comparison pairs/labels/regions and guarded revisioned management; Document exposes constructor-based trusted host methods and exact continuation as a new branch. History 3 extends the existing strict history union; shared captureRetainedHistory/retainedDocuments include every comparison source in native/workspace transport, validation and stage cleanup. EditorApplication privately leases only captured sources for a cancellable regional Canvas reference render; history-comparison computes yielded sRGB8/premultiplied-RGBA differences on the displayed grid. The live renderer/document are untouched. Branch ancestry presentation uses iterative parent-order traversal. Existing document/native/workspace envelopes and isolated grants remain unchanged; see HISTORY.md for compatibility and bounds.

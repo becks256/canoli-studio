@@ -2046,3 +2046,7 @@ test('production persistent history branches preserve editable alternatives with
 test('production saved comparisons retain regions and continue exact alternatives without developer globals',async({page},info)=>{
  const {historyComparisonsWorkflow}=await import('./helpers/history-comparisons');await historyComparisonsWorkflow(page,info,true);
 });
+
+test('production operation provenance distinguishes observed and stored origins without developer globals', async ({page}, info) => {
+ const {historyProvenanceWorkflow}=await import('./helpers/history-provenance');await historyProvenanceWorkflow(page,info,true);
+});

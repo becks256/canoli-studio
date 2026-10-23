@@ -19,6 +19,7 @@ import { Document, LayerGroup, RasterLayer } from "../src/dom";
 import { AssetStore } from "../src/core/assets";
 import { EditorApplication } from "../src/editor";
 import { ProviderRegistry } from "../src/ai/providers/registry";
+import { HostBridge } from "../src/scripting/bridge";
 
 // Ensure Node test environment has Worker stub for EditorApplication's PixelProcessor
 if (typeof globalThis.Worker === "undefined") {
@@ -1073,6 +1074,71 @@ describe("T11: Revision Concurrency & Atomic Candidate Application", () => {
 
     return { document, assetStore, service, budgetLedger, staging };
   }
+
+  it("retains accepted generated assets, review state and real job provenance after a document observer fails",async()=>{
+    const {document,assetStore,service}=setupEditorEnv();
+    const job=await service.submit({prompt:'Observed source',modality:'text-to-image',targetWidth:16,targetHeight:16},{providerId:'test-flux',budgetId:'b-editor',baseRevision:0});
+    const candidate=await job.result(),off=document.subscribe(()=>{throw Error('Observer failure');});
+    try{
+      await expect(service.applyCandidate(candidate.id,{document,assetStore,expectedRevision:0},{surface:'script',executionId:'73573912-61ac-45cd-bd38-1c8c7f3d77c9'})).rejects.toThrow(/Generated layer accepted.*observer failed/);
+      const layer=document.layers.at(0) as RasterLayer,sourceId=layer.assetId;expect(assetStore.has(sourceId)).toBe(true);expect(candidate.reviewState).toBe('accepted');
+      const operation=document.getSnapshot().provenance.current!;expect(operation.origin).toMatchObject({surface:'script',candidate:{id:candidate.id,jobId:candidate.jobId,providerId:'test-flux'}});
+      expect(JSON.stringify(operation)).not.toContain('Observed source');expect(operation.origin.candidate).not.toHaveProperty('prompt');
+      off();document.undo();expect(assetStore.has(sourceId)).toBe(true);document.redo();expect(document.getSnapshot().provenance.current!.id).toBe(operation.id);
+    }finally{off();service.dispose();assetStore.dispose();}
+  });
+
+  for (const failure of ['intervening edit', 'revoked grant'] as const) {
+    it(`does not count a rejected host candidate or ${failure} as a script commit`, async () => {
+      const {document, assetStore, service, staging} = setupEditorEnv();
+      let allowed = true;
+      const bridge = new HostBridge({ai: service, assets: assetStore, document,
+        historyOrigin: {surface: 'script'}, assertCanCommit: () => {
+          if (!allowed) throw Error('Plugin permissions changed before host commit.');
+        }});
+      const job = await service.submit({prompt: 'Held promotion', modality: 'text-to-image', targetWidth: 16, targetHeight: 16},
+        {providerId: 'test-flux', budgetId: 'b-editor', baseRevision: 0});
+      const candidate = await job.result(), promote = staging.promote.bind(staging);
+      let resume!: () => void, entered!: () => void;
+      const hold = new Promise<void>(resolve => {resume = resolve;});
+      const ready = new Promise<void>(resolve => {entered = resolve;});
+      vi.spyOn(staging, 'promote').mockImplementation(async (...args) => {
+        entered(); await hold; return promote(...args);
+      });
+      try {
+        const pending = bridge.dispatch('jobs', 'applyCandidate', [candidate.id, {}]);
+        await ready;
+        if (failure === 'intervening edit') document.name = 'Human edit during promotion';
+        else allowed = false;
+        resume();
+        await expect(pending).rejects.toThrow(failure === 'intervening edit' ? /Document changed/ : /permissions changed/);
+        expect(document.layers.length).toBe(0);
+        expect(document.getSnapshot().revision).toBe(failure === 'intervening edit' ? 1 : 0);
+        expect(document.getSnapshot().provenance.current?.origin.surface ?? null).toBe(failure === 'intervening edit' ? 'host' : null);
+        expect(bridge.inBandRevisions).toBe(0);
+        expect(assetStore.values()).toHaveLength(0);
+        expect(candidate.reviewState).toBe('staged');
+      } finally {resume(); service.dispose(); assetStore.dispose();}
+    });
+  }
+
+  it('counts its own accepted host commit once even when an observer fails', async () => {
+    const {document, assetStore, service} = setupEditorEnv();
+    const bridge = new HostBridge({ai: service, assets: assetStore, document, historyOrigin: {surface: 'script'}});
+    const job = await service.submit({prompt: 'Accepted host result', modality: 'text-to-image', targetWidth: 16, targetHeight: 16},
+      {providerId: 'test-flux', budgetId: 'b-editor', baseRevision: 0});
+    const candidate = await job.result(), off = document.subscribe(() => {throw Error('Observer failed');});
+    try {
+      await expect(bridge.dispatch('jobs', 'applyCandidate', [candidate.id, {}])).rejects.toThrow(/Generated layer accepted/);
+      expect(bridge.inBandRevisions).toBe(1);
+      const operation = document.getSnapshot().provenance.current!;
+      expect(operation.origin).toMatchObject({surface: 'script', candidate: {id: candidate.id, jobId: candidate.jobId}});
+      expect(operation.origin.requestId).toMatch(/^[0-9a-f-]{36}$/);
+      expect(candidate.reviewState).toBe('accepted');
+      expect(assetStore.has((document.layers.at(0) as RasterLayer).assetId)).toBe(true);
+      off(); document.name = 'Later human edit'; expect(bridge.inBandRevisions).toBe(1);
+    } finally {off(); service.dispose(); assetStore.dispose();}
+  });
 
   it("rejects edits made during promotion and preserves the candidate for retry", async () => {
     const { document, assetStore, service } = setupEditorEnv();

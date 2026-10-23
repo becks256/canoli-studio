@@ -14,7 +14,7 @@ export async function executeRecipeAsync(
   recipe:Recipe,document:Document,params:Record<string,unknown>={},control:RawImportControl={},
   assertTargetAvailable:()=>void=()=>{},
 ):Promise<ExecuteRecipeResult>{
-  const captured=structuredClone(recipe),supplied=structuredClone(params),assets=document.assetStore;
+  const captured=structuredClone(recipe),supplied=structuredClone(params),assets=document.assetStore,origin=document._getHistoryOrigin();
   const revision=document.getSnapshot().revision,selectedId=document.selectedLayer?.id??null;
   const plan=compileEditPlan(captured,document.toJSON(),selectedId,supplied,
     assets?new Set(assets.values().map(asset=>asset.id)):undefined,assets??undefined);
@@ -57,7 +57,7 @@ export async function executeRecipeAsync(
     for(const assetId of referencedAssets(final))if(!assets?.has(assetId)&&!staging.has(assetId))throw new Error(`Recipe source asset is unavailable: ${assetId}`);
     current();
     for(const asset of staging.values()){staging.shareTo(assets!,asset.id,asset.id);promoted.push(asset.id);}
-    return commitRecipePlan(captured,document,plan);
+    return commitRecipePlan(captured,document,plan,origin);
   }catch(error){return {success:false,plan,error:error instanceof Error?error.message:String(error)};}
   finally{
     // Observers can throw after acceptance. Keep every asset the model/history actually owns.

@@ -59,7 +59,7 @@ test('50 MP RAW branch-only sources survive pruned history, workspace recovery a
   expect(before.linearHasRaster).toBe(false); expect(before.branches).toEqual(['Main','Empty alternative']);
   await page.reload(); await expect(page.getByRole('button', {name:'History', exact:true})).toBeVisible();
   const saved = await historyProject(page, info, 'branches-50mp.luma');
-  expect(saved.value.document.children).toHaveLength(0); expect(saved.value.history?.version).toBe(2);
+  expect(saved.value.document.children).toHaveLength(0); expect(saved.value.history?.version).toBe(4);
   const original = saved.value.entries.find(entry => entry.raw)!.raw!.originalBlob;
   expect(original.size).toBe(100000672); expect(createHash('sha256').update(Buffer.from(await original.arrayBuffer())).digest('hex')).toBe('cfe25bed379735dfea685695e956838b284106e6527e6aff77e3901ef6ef9d85');
   await page.getByTestId('project-input').setInputFiles(saved.path);

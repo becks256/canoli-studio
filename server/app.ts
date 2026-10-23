@@ -295,6 +295,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
           const document = new Document(
             createDocumentSchema.parse(await body(request)),
           );
+          document._setDefaultHistoryOrigin({surface:'rest'});
           document._prepareSelectionModification = async (settings,control) => {
             const selection = await prepareServerSelection({...settings,selection:document.getSnapshot().document.selection!,width:document.width,height:document.height},control.signal ?? new AbortController().signal);
             if (!sessions.has(document.id)) throw new Error("Document was deleted.");
@@ -637,11 +638,11 @@ export function createApiServer(options: ApiServerOptions = {}) {
           if (sessions.get(document.id) !== session) { send(response,404,{error:'Document not found.'}); return; }
           if (document.getSnapshot().revision !== parsed.expectedRevision) { send(response,409,{error:'Revision conflict. Read the document and retry.',revision:document.getSnapshot().revision}); return; }
         }
-        document.transaction(parsed.label ?? "REST transaction", () => {
+        const result=navigateHistory(document,()=>document.transaction(parsed.label ?? "REST transaction", () => {
           commands.forEach((command) => document._dispatch(command));
           validateTextureSources(document._read(),session.assets);
-        });
-        send(response, 200, snapshot(document));
+        }));
+        send(response, 200, result);
         return;
       }
 
@@ -702,9 +703,11 @@ export function createApiServer(options: ApiServerOptions = {}) {
       }
       if (subresource === 'history' && !docMatch[3] && method === 'GET') {
         const state=document.getSnapshot(),timeline=historyTimeline(state);
+        const provenance=(operation:import('../src/core/history-provenance').HistoryOperation|null)=>operation?{operation,observation:document._isHistoryOperationObserved(operation)?'observed-in-session':'stored-unverified'}:null;
         const position=url.searchParams.has('position')?z.coerce.number().int().min(0).max(timeline.length-1).parse(url.searchParams.get('position')):null;
         send(response,200,{revision:state.revision,position:state.past.length,length:timeline.length,
-          states:timeline.map(item=>({position:item.position,label:item.label,labelTruncated:item.labelTruncated})),
+          states:timeline.map(item=>({position:item.position,label:item.label,labelTruncated:item.labelTruncated,provenance:provenance(item.operation)})),
+          provenance:provenance(timeline[position??state.past.length].operation),
           ...(position===null?{}:{change:inspectHistoryChange(position?timeline[position-1].document:null,timeline[position].document)})});return;
       }
       if (subresource === 'history' && !docMatch[3] && method === 'POST') {
@@ -1076,13 +1079,13 @@ export function createApiServer(options: ApiServerOptions = {}) {
         }
 
         // Find candidate across jobs belonging to this document
-        let targetCandidate: ServerJob["candidate"] | undefined;
+        let targetCandidate: ServerJob["candidate"] | undefined;let targetJobId:string|undefined;
         for (const job of allJobs.values()) {
           if (
             job.documentId === document.id &&
             job.candidate?.id === input.candidateId
           ) {
-            targetCandidate = job.candidate;
+            targetCandidate = job.candidate;targetJobId=job.id;
             break;
           }
         }
@@ -1119,15 +1122,15 @@ export function createApiServer(options: ApiServerOptions = {}) {
           blendMode: input.blendMode ?? "normal",
         });
 
-        document.transaction("Apply generated candidate", () => {
+        const result=navigateHistory(document,()=>document._withHistoryOrigin({candidate:{id:targetCandidate!.id,jobId:targetJobId!}},()=>document.transaction("Apply generated candidate", () => {
           if (parent instanceof LayerGroup) parent.layers.add(layer);
           else document.layers.add(layer);
-        });
+        })));
 
         targetCandidate.reviewState = "accepted";
 
         send(response, 200, {
-          ...snapshot(document),
+          ...result,
           layerId: layer.id,
         });
         return;

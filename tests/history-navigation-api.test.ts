@@ -84,3 +84,16 @@ it('creates, inspects, updates and restores saved comparison states with indepen
  expect((await request(path+'/history-comparisons')).body.comparisons).toEqual([]);expect((await request(path+'/history-comparisons/'+id)).status).toBe(400);
  for(const payload of [{action:'create',name:'Bad',before:{kind:'current',extra:1},after:{kind:'current'}},{action:'update',comparisonId:id,changes:{extra:1}},{action:'branch',comparisonId:id,side:'constructor',name:'Bad'}])expect((await request(path+'/history-comparisons',{expectedRevision:removed.body.revision,...payload})).status).toBe(400);
 });
+
+it('assigns REST origins at the host and exposes observed point records without inferring an author from labels',async()=>{
+ const created=await request('/documents',{name:'Before'}),path='/documents/'+created.body.document.id;
+ const rejected=await request(path+'/commands',{expectedRevision:0,origin:{surface:'script'},commands:[{type:'document.rename',name:'Forged'}]});expect(rejected.status).toBe(400);expect((await request(path)).body.revision).toBe(0);
+ const changed=await request(path+'/commands',{expectedRevision:0,label:'Alice / human / 2000-01-01',commands:[{type:'document.rename',name:'After'}]});expect(changed.status).toBe(200);
+ const history=await request(path+'/history');expect(history.body.provenance).toMatchObject({observation:'observed-in-session',operation:{origin:{surface:'rest'},acceptedRevision:1,commandTypes:['document.rename'],commandCount:1}});expect(history.body.states[0].provenance).toBeNull();expect(history.body.provenance.operation).not.toHaveProperty('author');
+ const id=history.body.provenance.operation.id;await request(path+'/undo',{expectedRevision:changed.body.revision});const redone=await request(path+'/redo',{expectedRevision:changed.body.revision+1});expect(redone.status).toBe(200);expect((await request(path+'/history')).body.provenance.operation.id).toBe(id);
+});
+it('returns the accepted command snapshot and warning after an observer failure without losing provenance',async()=>{
+ const created=await request('/documents',{name:'Before'}),path='/documents/'+created.body.document.id;const original=Document.prototype._dispatch;
+ Document.prototype._dispatch=function(command){const off=this.subscribe(()=>{throw undefined;});try{original.call(this,command);}finally{off();}};
+ try{const result=await request(path+'/commands',{expectedRevision:0,commands:[{type:'document.rename',name:'Accepted'}]});expect(result.status).toBe(200);expect(result.body.document.name).toBe('Accepted');expect(result.body.warning).toMatch(/observer failed/);expect((await request(path+'/history')).body.provenance.operation.origin.surface).toBe('rest');expect((await request(path+'/commands',{expectedRevision:0,commands:[{type:'document.rename',name:'Retry'}]})).status).toBe(409);}finally{Document.prototype._dispatch=original;}
+});

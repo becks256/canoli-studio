@@ -11,7 +11,7 @@ it('preserves an abandoned redo result as Main and creates an independent branch
   expect(alternative.parentId).toBe(main.id); expect(alternative.forkDocument).toEqual(origin);
   doc.checkoutHistoryBranch(main.id); expect(doc.toJSON()).toEqual(original); doc.undo(); expect(doc.toJSON()).toEqual(origin); doc.redo();
   doc.checkoutHistoryBranch(alternative.id); expect(doc.name).toBe('Alternative'); doc.undo(); expect(doc.toJSON()).toEqual(origin);
-  expect(parseRetainedHistory(captureRetainedHistory(doc.getSnapshot()), doc.toJSON()).version).toBe(2);
+  expect(parseRetainedHistory(captureRetainedHistory(doc.getSnapshot()), doc.toJSON()).version).toBe(4);
 });
 it('forks explicitly at the current cursor and restores latest tips rather than abandoned undo cursors', () => {
   const doc = new Document(); doc.name = 'First'; doc.name = 'Latest'; doc.undo();
@@ -59,7 +59,7 @@ it('notifies every branch observer after accepted publication and prevents reent
 });
 it('rejects malformed branch graphs atomically and accepts reordered equivalent model keys', () => {
   const doc = new Document(); doc.name = 'Latest'; const id = doc.createHistoryBranch('Other'); doc.name = 'Other result';
-  const captured = captureRetainedHistory(doc.getSnapshot()); if (captured.version !== 2) throw Error('Expected branches');
+  const captured = captureRetainedHistory(doc.getSnapshot()); if (captured.version !== 4) throw Error('Expected branches');
   const corruptions = [
     (h: typeof captured) => {h.activeBranchId = crypto.randomUUID();},
     (h: typeof captured) => {h.branches[0].parentId = id;},
@@ -86,8 +86,8 @@ it('includes branch-only image sources in native files and rejects missing asset
   restored.checkoutHistoryBranch(main.id); expect(restored.toJSON()).toEqual(original);
   await expect(serializeProject(doc.toJSON(), {get:() => {throw Error('Missing branch source');}}, history)).rejects.toThrow(/Missing branch source/);
 });
-it('keeps history format 1 for documents without branching', () => {
-  const doc = new Document(); doc.name = 'Linear'; doc.undo();
-  expect(captureRetainedHistory(doc.getSnapshot()).version).toBe(1);
+it('retains legacy format 1 for unknown snapshots and records new unbranched operations in format 4', () => {
+  const doc = new Document(); expect(captureRetainedHistory(doc.getSnapshot()).version).toBe(1);doc.name = 'Linear'; doc.undo();
+  expect(captureRetainedHistory(doc.getSnapshot()).version).toBe(4);
   doc.redo(); expect(doc.getSnapshot().branches).toEqual([]);
 });

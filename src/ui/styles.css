@@ -6386,3 +6386,8 @@ input[type="color"] {
 .history-preview-pair img { max-width: 100%; max-height: 360px; object-fit: contain; background: var(--color-panel-raised); }
 .history-inspector-body > a { color: var(--color-text); text-underline-offset: 3px; }
 @media(max-width:600px) { .history-preview-pair { grid-template-columns: minmax(0,1fr); } }
+
+.history-operation-info { min-width:0; overflow-wrap:anywhere; }
+.history-operation-info dl { display:grid; grid-template-columns:minmax(100px,150px) minmax(0,1fr); gap:8px; margin:12px 0; }
+.history-operation-info dd { margin:0; min-width:0; }
+.history-operation-info dt { color:var(--color-text-secondary); }

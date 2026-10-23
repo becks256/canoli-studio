@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## REST operation observations
+
+The independent server assigns REST origin, and history GET includes point `provenance` as null or `{operation,observation}`. It never trusts command labels or request-supplied authors/origins. Accepted command observer failure returns the actual snapshot and warning; stale retries reject. Full native provenance requires `?history=true`. No browser synchronization, actor authentication, signed timestamp or replay privilege is introduced. Exact fields, limits and current-result/full-history persistence: HISTORY.md.
+
 ## Independent saved comparisons
 
 GET `/api/v1/documents/:id/history-comparisons` lists pinned-pair metadata; GET `.../:comparisonId` adds a bounded field-change report. Strict POST create/update/delete/branch actions use expectedRevision and the guarded OO boundary. Stale input returns 409, invalid input 400, accepted observer failure 200 with warning. Explicit `?history=true` native downloads include history-3 snapshots and all source bytes. There is no headless image preview or browser synchronization. Full signatures, metadata, defaults and examples: [HISTORY.md](HISTORY.md#independent-rest-comparisons).

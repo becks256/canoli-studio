@@ -1,8 +1,9 @@
 import type {DocumentData, LayerData} from './model';
 import type {EditorState} from './store';
 import {layerBounds, unionBounds} from './spatial';
+import {timelineProvenance} from './history';
 
-type TimelineState = Pick<EditorState, 'document' | 'past' | 'future'>;
+type TimelineState = Pick<EditorState, 'document' | 'past' | 'future'> & Partial<Pick<EditorState,'provenance'>>;
 let labelSegments: Intl.Segmenter | undefined;
 export function displayHistoryLabel(label: string) {
   if (label.length <= 240) return label;
@@ -18,9 +19,9 @@ export function displayHistoryLabel(label: string) {
   return label.slice(0, end) + '…';
 }
 export function historyTimeline(state: TimelineState) {
-  const redo = [...state.future].reverse();
-  return [{position: 0, label: 'Oldest retained state', labelTruncated: false, document: state.past[0]?.document ?? state.document},
-    ...[...state.past, ...redo].map((entry, index) => ({position: index + 1, label: displayHistoryLabel(entry.label), labelTruncated:entry.label.length>240,
+  const redo = [...state.future].reverse(),provenance=timelineProvenance(state);
+  return [{position: 0, label: 'Oldest retained state', labelTruncated: false, document: state.past[0]?.document ?? state.document, operation:provenance[0]},
+    ...[...state.past, ...redo].map((entry, index) => ({position: index + 1, label: displayHistoryLabel(entry.label), labelTruncated:entry.label.length>240, operation:provenance[index+1],
       document: index + 1 < state.past.length ? state.past[index + 1].document
         : index + 1 === state.past.length ? state.document : redo[index - state.past.length].document}))];
 }

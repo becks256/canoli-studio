@@ -47,6 +47,7 @@ import { AlphaChannelCollection } from './alpha-channels';
 import { channelLoadSchema, channelLoadOptionsSchema, type ChannelLoadSettings, type ChannelLoadOptions, type ChannelLoadControl } from '../core/alpha-channels';
 export { AlphaChannel, AlphaChannelCollection } from './alpha-channels';
 import type {HistoryTarget, HistoryRegion, HistoryComparisonChanges} from '../core/history';
+import {historyOriginSchema,type HistoryOrigin,type HistoryOperation} from '../core/history-provenance';
 export type {HistoryTarget, HistoryRegion, HistoryComparisonChanges} from '../core/history';
 export type { ChannelLoadOptions, ChannelLoadControl } from '../core/alpha-channels';
 export { LayerComp, LayerCompCollection } from "./layer-comps";
@@ -415,6 +416,9 @@ export class Document {
   private historyListeners = new Set<(direction: "undo" | "redo") => void>();
   private branchListeners = new Set<() => void>();
   private navigatingHistory = false;
+  private acceptingCommand = false;
+  private defaultHistoryOrigin:HistoryOrigin = {surface:'host'};
+  private scopedHistoryOrigin:HistoryOrigin|null = null;
   private _assetStore: AssetStore | null = null;
   /** @internal Read-only host inspection; no result can mutate document/history. */
   _preflight?: (options:PreflightSettings,control:PreflightControl)=>Promise<PreflightReport>;
@@ -846,6 +850,18 @@ export class Document {
       this.historyListeners.delete(listener);
     };
   }
+  /** @internal Trusted ingress only; isolated requests never supply this context. */
+  _setDefaultHistoryOrigin(origin:HistoryOrigin):void {this.defaultHistoryOrigin=freeze(historyOriginSchema.parse(origin));}
+  /** @internal Capture before async preparation; apply it only around a synchronous commit. */
+  _getHistoryOrigin():HistoryOrigin {return this.scopedHistoryOrigin??this.defaultHistoryOrigin;}
+  /** @internal Never hold an origin scope across an await. */
+  _withHistoryOrigin<T>(origin:Partial<HistoryOrigin>,run:()=>T):T {
+    const previous=this.scopedHistoryOrigin;
+    this.scopedHistoryOrigin=freeze(historyOriginSchema.parse({...this._getHistoryOrigin(),...origin}));
+    try {const result=run();if(result instanceof Promise)throw new Error('History origin scopes require synchronous commits.');return result;}finally{this.scopedHistoryOrigin=previous;}
+  }
+  /** @internal Observation is runtime-owned and is never trusted from a project file. */
+  _isHistoryOperationObserved(operation:HistoryOperation):boolean {return this.store.isHistoryOperationObserved(operation);}
   getSnapshot = () => this.store.getSnapshot();
   /** Trusted host observer; switching routes invalidates an active semantic recording. */
   onHistoryBranchSwitch(listener: () => void): () => void {
@@ -880,7 +896,7 @@ export class Document {
   }
   private mutateHistoryBranch<T>(run: () => T, switchBranch = false, noun: 'branch' | 'comparison' = 'branch'): T {
     if (this.batch) throw new Error('Finish the transaction first.');
-    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
+    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
     this.navigatingHistory = true;
     try {
       const before = this.store.getSnapshot().revision;
@@ -911,7 +927,7 @@ export class Document {
   /** Zero is the oldest retained state; past.length is the current position. */
   navigateHistory(position: number): void {
     if (this.batch) throw new Error("Finish the transaction first.");
-    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
+    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
     this.navigatingHistory = true;
     try {
       const before = this.store.getSnapshot(), count = Math.abs(position - before.past.length);
@@ -943,7 +959,7 @@ export class Document {
 
   /** Synchronous, atomic changes; one history entry. Failed batches roll back. */
   transaction(label: string, callback: () => void): void {
-    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
+    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
     if (this.batch) throw new Error("Nested transactions are not supported.");
     if (typeof label !== 'string') throw new Error('A transaction label must be a string.');
     this.batch = [];
@@ -969,23 +985,24 @@ export class Document {
   }
   /** @internal Automation adapters must validate external requests before dispatch. */
   _dispatch(command: EditorCommand) {
-    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
+    if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
     if (this.batch) {
       this.staged = freeze(execute(this._read(), command));
       this.batch.push(command);
     } else {
-      if (this.commandListeners.size > 0) {
-        const before = this.toJSON();
-        this.store.dispatch(command);
-        const after = this.toJSON();
-        this.commandListeners.forEach((listener) =>
-          listener(structuredClone(command), before, after),
-        );
-      } else {
-        this.store.dispatch(command);
-      }
+      this.acceptingCommand=true;
+      try {
+        const state=this.store.getSnapshot(),observing=this.commandListeners.size>0;
+        let failure:unknown,failed=false;
+        try {this.store.dispatch(command,this._getHistoryOrigin());}catch(cause){failure=cause;failed=true;}
+        if(this.store.getSnapshot().revision!==state.revision){
+          if(observing){const after=this.store.getSnapshot().document;for(const listener of [...this.commandListeners])try{listener(structuredClone(command),structuredClone(state.document),structuredClone(after));}catch(cause){if(!failed)failure=cause;failed=true;}}
+          if(failed)throw new Error('Command accepted, but an observer failed. Inspect the document before retrying.',{cause:failure});
+        }else if(failed)throw failure;
+      }finally{this.acceptingCommand=false;}
     }
   }
+
   /** @internal */
   _register(layer: Layer) {
     this.handles.set(layer.id, layer);

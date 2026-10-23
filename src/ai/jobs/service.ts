@@ -1,3 +1,4 @@
+import type {HistoryOrigin} from '../../core/history-provenance';
 import {
   validateGenerationRequest,
   validateProviderRequest,
@@ -967,6 +968,8 @@ export class GenerationJobService {
       document: Document;
       assetStore: AssetStore;
     },
+    historyOrigin?:HistoryOrigin,
+    assertCanCommit?:()=>void,
   ): Promise<RasterLayer> {
     return applyCandidateToDocument({
       candidateId,
@@ -975,6 +978,7 @@ export class GenerationJobService {
       staging: this.staging,
       records: this.records,
       options,
+      historyOrigin,assertCanCommit,
     });
   }
 

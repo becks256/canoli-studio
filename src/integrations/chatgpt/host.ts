@@ -91,7 +91,7 @@ export class ChatGptConnections {
   await validateWetPaintAssets(candidate,wetBrowserAssets(assets,checkSources));checkSources();
   z.object({authorized:z.literal(true)}).strict().parse(await this.request(owner,'/authorize/'+id,{method:'POST',signal}));checkSources();
   let warning:string|undefined;
-  try{if(operation.kind==='apply')document._dispatch(command!);else if(operation.kind==='undo')document.undo();else document.redo();}
+  try{if(operation.kind==='apply')document._withHistoryOrigin({surface:'connected-client',connectionId:owner.id,requestId:id},()=>document._dispatch(command!));else if(operation.kind==='undo')document.undo();else document.redo();}
   catch(cause){if(document.getSnapshot().revision===operation.expectedRevision)throw cause;warning='The edit was recorded, but a document observer failed. Inspect the current document before continuing.';}
   const state=document.getSnapshot();return{ok:true,value:{revision:state.revision,canUndo:document.canUndo,canRedo:document.canRedo,...(warning?{warning}:{})}};
  }

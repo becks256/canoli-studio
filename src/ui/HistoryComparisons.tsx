@@ -6,6 +6,7 @@ import {comparisonExtent, resolveHistoryTarget, type HistoryTarget, type History
 import {displayHistoryLabel, historyTimeline} from '../core/history-inspection';
 import type {HistoryDifferenceStatistics} from '../engine/history-comparison';
 import {Button, NumberField, Select, TextInput} from './controls';
+import {HistoryOperationInfo} from './HistoryOperationInfo';
 
 type Capture = {document: Document; state: EditorState};
 const current = JSON.stringify({kind:'current'});
@@ -55,7 +56,7 @@ export function HistoryComparisons({editor, capture, check, reload}: {editor: Ed
     {!!capture.state.comparisons.length && <>
       <Select label="Saved history comparison" value={selectedId} options={capture.state.comparisons.map(value=>({value:value.id,label:value.name}))} disabled={busy} onChange={id=>{cancel();clearPreview();setSelectedId(id);setConfirmDelete(false);setError('');const value=capture.state.comparisons.find(value=>value.id===id)!;setSavedName(value.name);setSavedRegion(value.region);}}/>
       {selected && <>
-        <p>Before: {displayHistoryLabel(selected.beforeLabel)}. After: {displayHistoryLabel(selected.afterLabel)}.</p>
+        <p>Captured before: {displayHistoryLabel(selected.beforeLabel)}. Captured after: {displayHistoryLabel(selected.afterLabel)}.</p><HistoryOperationInfo document={capture.document} operation={selected.beforeProvenance} label="Captured before provenance"/><HistoryOperationInfo document={capture.document} operation={selected.afterProvenance} label="Captured after provenance"/>
         <TextInput label="Saved comparison name" value={savedName} maxLength={120} onChange={setSavedName} disabled={busy}/>
         <RegionInputs label="Saved region" value={savedRegion} extent={comparisonExtent(selected.before,selected.after)} onChange={setSavedRegion}/>
         <div className="history-inspector-actions"><Button disabled={busy||!savedName.trim()} onClick={()=>mutate(()=>capture.document.updateHistoryComparison(selected.id,{name:savedName,region:savedRegion}))}>Save comparison details</Button><Button disabled={busy} onClick={()=>void render()}>Preview saved comparison</Button><Button variant="danger" disabled={busy} onClick={()=>setConfirmDelete(true)}>Delete saved comparison</Button></div>

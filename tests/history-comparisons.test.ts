@@ -12,7 +12,7 @@ it('pins nonadjacent accepted states without changing artwork, selection, undo o
  const id=doc.createHistoryComparison(' Candidate ',{kind:'timeline',position:0},current,{x:10,y:5,width:30,height:20});
  const after=doc.getSnapshot();expect(after.document).toBe(before.document);expect(after.past).toBe(before.past);expect(after.future).toBe(before.future);expect(after.selectedIds).toEqual(before.selectedIds);expect(after.canvasRevision).toBe(before.canvasRevision);expect(after.revision).toBe(before.revision+1);expect(notifications).toBe(1);
  const saved=after.comparisons.find(value=>value.id===id)!;expect(saved.before.children).toHaveLength(0);expect(saved.after).toBe(before.document);expect(saved.name).toBe('Candidate');expect(Reflect.set(saved.before,'name','Forbidden')).toBe(false);expect(Reflect.set(saved.region,'x',99)).toBe(false);
- expect(captureRetainedHistory(after)).toMatchObject({version:3,branches:[],activeBranchId:null});
+ expect(captureRetainedHistory(after)).toMatchObject({version:4,branches:[],activeBranchId:null});
 });
 it('preserves both states after pruning and branch deletion, and continues either side as an exact branch', () => {
  const doc=new Document();doc.name='Shared';const other=doc.createHistoryBranch('Alternative');doc.name='Alternative result';const original=doc.toJSON();
@@ -48,7 +48,7 @@ it('updates and deletes comparison metadata independently of artwork undo and re
  const doc=new Document();doc.name='Accepted';const id=doc.createHistoryComparison('First',current,current);const undo=doc.getSnapshot().past;
  doc.updateHistoryComparison(id,{name:'Reviewed',region:{x:1,y:2,width:20,height:30}});expect(doc.getSnapshot().past).toBe(undo);
  const off=doc.subscribe(()=>{throw undefined;});let notified=0;doc.subscribe(()=>{notified++;});expect(()=>doc.updateHistoryComparison(id,{name:'Accepted rename'})).toThrow(/comparison changed.*observer failed/);expect(doc.getSnapshot().comparisons[0].name).toBe('Accepted rename');expect(notified).toBe(1);off();
- doc.deleteHistoryComparison(id);expect(doc.getSnapshot().comparisons).toEqual([]);expect(captureRetainedHistory(doc.getSnapshot()).version).toBe(1);doc.undo();expect(doc.name).not.toBe('Accepted');expect(doc.getSnapshot().comparisons).toEqual([]);
+ doc.deleteHistoryComparison(id);expect(doc.getSnapshot().comparisons).toEqual([]);expect(captureRetainedHistory(doc.getSnapshot()).version).toBe(4);doc.undo();expect(doc.name).not.toBe('Accepted');expect(doc.getSnapshot().comparisons).toEqual([]);
 });
 it('notifies branch observers and rejects reentrant mutations when continuing a comparison', () => {
  const doc=new Document();doc.name='Named';const id=doc.createHistoryComparison('Previous',{kind:'timeline',position:0},current);let switches=0;
@@ -56,7 +56,7 @@ it('notifies branch observers and rejects reentrant mutations when continuing a 
  doc.createHistoryBranchFromComparison(id,'before','Previous artwork');expect(switches).toBe(1);
 });
 it('strictly admits comparison-bearing histories and migrates every pinned model', () => {
- const doc=new Document();doc.name='Latest';doc.createHistoryComparison('Pinned',{kind:'timeline',position:0},current);const captured=captureRetainedHistory(doc.getSnapshot());if(captured.version!==3)throw Error('Missing comparison');
+ const doc=new Document();doc.name='Latest';doc.createHistoryComparison('Pinned',{kind:'timeline',position:0},current);const captured=captureRetainedHistory(doc.getSnapshot());if(captured.version!==4)throw Error('Missing comparison');
  const corruptions=[
   (h:typeof captured)=>{h.activeBranchId=crypto.randomUUID();},
   (h:typeof captured)=>{h.comparisons[0].before.id=crypto.randomUUID();},
@@ -74,7 +74,7 @@ it('includes images retained only by saved comparisons in native source closure 
  const id=doc.createHistoryComparison('Original versus empty',{kind:'timeline',position:1},current);for(let i=0;i<65;i++)doc.name=`Prune ${i}`;
  const state=doc.getSnapshot();expect([state.document,...state.past.map(value=>value.document)].every(value=>!value.children.length)).toBe(true);expect(state.branches).toEqual([]);
  const asset={id:'comparison-only',name:'Original',width:10000,height:5000,blob:new Blob([new Uint8Array([137,80,78,71,1,2,3,4])],{type:'image/png'})};
- const result=await readProject(await serializeProject(doc.toJSON(),{get:()=>asset},captureRetainedHistory(state)));expect(result.history?.version).toBe(3);expect(result.entries).toHaveLength(1);
+ const result=await readProject(await serializeProject(doc.toJSON(),{get:()=>asset},captureRetainedHistory(state)));expect(result.history?.version).toBe(4);expect(result.entries).toHaveLength(1);
  const restored=Document._fromWorkspace(result.document,result.history);restored.createHistoryBranchFromComparison(id,'before','Original restored');expect(restored.toJSON()).toEqual(image);
 });
 it('compares displayed premultiplied color and alpha and creates exact opaque magenta differences', async () => {

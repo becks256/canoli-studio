@@ -1,3 +1,6 @@
+import type {HistoryOrigin} from '../../core/history-provenance';
+import {captureRetainedHistory,retainedDocuments} from '../../core/history';
+import {referencedAssets} from '../../core/model';
 import { rgbaThumbnail } from "./thumbnail";
 /**
  * Revision-Safe Candidate Application.
@@ -33,6 +36,8 @@ interface CandidatePlacementInput {
   records: Map<string, GenerationRecord>;
   options: ApplyCandidateOptions;
   renderer?: DocumentRenderer;
+  historyOrigin?:HistoryOrigin;
+  assertCanCommit?:()=>void;
 }
 
 export function applyCandidateToDocument(
@@ -58,6 +63,8 @@ async function placeCandidate({
   options,
   renderer,
   previewOnly = false,
+  historyOrigin = document._getHistoryOrigin(),
+  assertCanCommit,
 }: CandidatePlacementInput & { previewOnly?: boolean }): Promise<RasterLayer> {
   options = {
     ...options,
@@ -303,18 +310,20 @@ async function placeCandidate({
     }
     if (previewOnly) {
       assertCandidateAvailable();
+      assertCanCommit?.();
       if (document.getSnapshot().revision !== verificationRevision) {
         staging.verifyProtection(candidateId);
         throw new RevisionConflictError(
           "Document changed during placement preview. Check placement again.",
         );
       }
-      assetStore.remove(promotedAsset.id);
+      const state=document.getSnapshot();if(!retainedDocuments(state.document,captureRetainedHistory(state)).some(value=>referencedAssets(value).has(promotedAsset.id)))assetStore.remove(promotedAsset.id);
       candidate.reviewState = previousReviewState;
       return createdLayer!;
     }
-    document.transaction("Apply generated layer", () => {
+    document._withHistoryOrigin({...historyOrigin,candidate:{id:candidate.id,jobId:candidate.jobId,...(record?.providerId?{providerId:record.providerId}:{}),...(record?.modelVersion?{modelVersion:record.modelVersion}:{})}},()=>document.transaction("Apply generated layer", () => {
       assertCandidateAvailable();
+      assertCanCommit?.();
       if (
         (protection &&
           document.getSnapshot().revision !== verificationRevision) ||
@@ -327,7 +336,7 @@ async function placeCandidate({
         );
       }
       insert(document);
-    });
+    }));
 
     if (!createdLayer) {
       throw new Error(
@@ -335,11 +344,13 @@ async function placeCandidate({
       );
     }
   } catch (error) {
+    const state=document.getSnapshot(),retained=retainedDocuments(state.document,captureRetainedHistory(state)).some(value=>referencedAssets(value).has(promotedAsset.id)),accepted=state.revision!==currentRevision&&!!document.getLayer((createdLayer as RasterLayer|null)?.id??null);
+    if(accepted){candidate.reviewState='accepted';throw new Error('Generated layer accepted, but an observer failed. Inspect the document before retrying.',{cause:error});}
     // Revert candidate review state to staged and remove orphaned asset from AssetStore on rollback
     if (staging.getCandidate(candidateId) === candidate) {
-      candidate.reviewState = previewOnly ? previousReviewState : "staged";
+      candidate.reviewState = previousReviewState;
     }
-    assetStore.remove(promotedAsset.id);
+    if(!retained)assetStore.remove(promotedAsset.id);
     throw error;
   }
 

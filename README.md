@@ -23,6 +23,8 @@ The **Artwork library** saves selected editable layers and original sources loca
 
 **Inspect history** in the History panel or command search shows retained changes and private before/after references, then explicitly moves to a stored state in one publication. Undo/Redo and recipe recording stay aligned without rerunning old commands or generation. Edits after Undo preserve the previous tip as a branch. Create/rename alternatives and switch between accepted tips in the inspector; project downloads and recovery preserve their original sources. Switching to another branch explicitly invalidates active recipe recording. Saved comparisons pin accepted state pairs and document-pixel regions through pruning and branch deletion, with private displayed differences and explicit continuation as a new branch. [History navigation, branches, saved comparisons and current limits](docs/HISTORY.md).
 
+New accepted edits record their actual host entry path, operation/session IDs, submitted command summary and local clock time. The history inspector distinguishes records observed in the open session from unverified stored records; older states keep unknown origins. Undo, branches and comparisons preserve these identities. Provenance-bearing projects require a history-4 reader; ordinary unbranched Save project keeps current attribution without adding an Undo path. These records do not authenticate authors or model results.
+
 ## What works
 
 - Local metadata extraction in a worker, an Asset info inspector, and JSON sidecars with explicit privacy choices.

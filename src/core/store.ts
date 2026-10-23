@@ -1,9 +1,11 @@
 import { changesCanvasSpace, describe, execute } from "./commands";
 import type { EditorCommand } from "./commands";
-import { createDocument, findLayer, validateDocument, SCHEMA_VERSION } from "./model";
+import { createDocument, findLayer, validateDocument, SCHEMA_VERSION, id as newId } from "./model";
 import type { DocumentData } from "./model";
 import { parseRetainedHistory, retainedDocuments, historyTip, historyBranchName, historyNameKey, type HistoryEntry, type HistoryBranch } from "./history";
 import {comparisonExtent, validateHistoryRegion, resolveHistoryTarget, historyComparisonChangesSchema, type HistoryTarget, type HistoryRegion, type HistoryComparison, type HistoryComparisonChanges} from './history';
+import {unknownProvenance,knownTipProvenance,historyOriginSchema,recordHistoryOperation,type HistoryOrigin,type HistoryOperation,type HistoryProvenance} from "./history-provenance";
+import {timelineProvenance} from "./history";
 import { freeze, shareUnchanged, isImmutable } from "./immutable";
 export interface EditorState {
   document: DocumentData;
@@ -14,6 +16,7 @@ export interface EditorState {
   branches: HistoryBranch[];
   activeBranchId: string | null;
   comparisons: HistoryComparison[];
+  provenance: HistoryProvenance;
   revision: number;
   canvasRevision: number;
 }
@@ -21,6 +24,8 @@ export interface EditorState {
 export class EditorStore {
   private listeners = new Set<() => void>();
   private state: EditorState;
+  private sessionId = newId();
+  private observedOperations = new WeakSet<HistoryOperation>();
 
   constructor(
     document: unknown = createDocument(),
@@ -61,11 +66,12 @@ export class EditorStore {
       future: freeze(intern(retained.future)),
       branches: 'version' in retained && retained.version !== 1 ? retained.branches.map(branch => ({...branch,
         forkDocument: shareUnchanged(current, branch.forkDocument),
-        tip: {document: shareUnchanged(current, branch.tip.document), past: intern(branch.tip.past)},
+        tip: {document: shareUnchanged(current, branch.tip.document), past: intern(branch.tip.past),...(branch.tip.provenance?{provenance:branch.tip.provenance}:{})},
       })) : [],
       activeBranchId: 'version' in retained && retained.version !== 1 ? retained.activeBranchId : null,
-      comparisons: 'version' in retained && retained.version === 3 ? retained.comparisons.map(value => ({...value,
+      comparisons: 'version' in retained && (retained.version === 3 || retained.version === 4) ? retained.comparisons.map(value => ({...value,
         before: shareUnchanged(current, value.before), after: shareUnchanged(current, value.after)})) : [],
+      provenance: 'version' in retained && retained.version === 4 ? retained.provenance : unknownProvenance(retained.past.length,retained.future.length),
       revision: 0,
       canvasRevision: 0,
     });
@@ -112,22 +118,28 @@ export class EditorStore {
     };
   }
 
-  dispatch(command: EditorCommand) {
+  isHistoryOperationObserved(operation:HistoryOperation){return this.observedOperations.has(operation);}
+
+  dispatch(command: EditorCommand, context:HistoryOrigin={surface:'host'}) {
+    const origin=historyOriginSchema.parse(context);
     const label = describe(command);
     if (typeof label !== 'string') throw new Error('A history operation label must be a string.');
     const document = execute(this.state.document, command);
     if (document === this.state.document)
       return;
     const past = [...this.state.past, {document: this.state.document, label, canvasChanged: changesCanvasSpace(command)}].slice(-60);
+    const operation=freeze(recordHistoryOperation(command,document.id,this.sessionId,this.state.revision+1,label,origin));
+    const provenance:HistoryProvenance={current:operation,past:[...this.state.provenance.past,this.state.provenance.current].slice(-60),future:[]};
     let {branches, activeBranchId} = this.state;
     if (this.state.future.length) {
       ({branches, activeBranchId} = this.initialBranches());
-      const branch = this.newBranch(this.availableBranchName(branches), branches, activeBranchId, {document, past});
+      const branch = this.newBranch(this.availableBranchName(branches), branches, activeBranchId, {document, past, provenance:knownTipProvenance(provenance)});
       branches = [...branches, branch]; activeBranchId = branch.id;
-    } else if (activeBranchId) branches = branches.map(branch => branch.id === activeBranchId ? {...branch, tip: {document, past}} : branch);
+    } else if (activeBranchId) branches = branches.map(branch => branch.id === activeBranchId ? {...branch, tip: {document, past, provenance:knownTipProvenance(provenance)}} : branch);
+    this.observedOperations.add(operation);
     this.publish({
       ...this.state,
-      document,
+      document, provenance,
       branches, activeBranchId,
       ...this.selectionFor(document),
       past,
@@ -140,30 +152,31 @@ export class EditorStore {
 
   private initialBranches() {
     if (this.state.branches.length) return {branches: this.state.branches, activeBranchId: this.state.activeBranchId!};
-    const tip = historyTip(this.state), id = crypto.randomUUID();
-    return {branches: [{id, name: 'Main', parentId: null, forkDocument: this.state.past[0]?.document ?? this.state.document, tip}], activeBranchId: id};
+    const tip = historyTip(this.state), id = newId();
+    const forkProvenance=this.state.past.length?this.state.provenance.past[0]:this.state.provenance.current;
+    return {branches: [{id, name: 'Main', parentId: null, forkDocument: this.state.past[0]?.document ?? this.state.document, tip,...(forkProvenance?{forkProvenance}:{})}], activeBranchId: id};
   }
   private availableBranchName(branches: HistoryBranch[]) {
     const names = new Set(branches.map(branch => historyNameKey(branch.name)));
     let index = 1; while (names.has(historyNameKey(`Branch ${index}`))) index++;
     return `Branch ${index}`;
   }
-  private newBranch(name: string, branches: HistoryBranch[], parentId: string, tip = {document: this.state.document, past: this.state.past}): HistoryBranch {
+  private newBranch(name: string, branches: HistoryBranch[], parentId: string, tip:import('./history').HistoryTip = {document:this.state.document,past:this.state.past,...(knownTipProvenance(this.state.provenance)?{provenance:knownTipProvenance(this.state.provenance)}:{})}): HistoryBranch {
     name = historyBranchName(name);
     if (branches.some(branch => historyNameKey(branch.name) === historyNameKey(name))) throw new Error('A history branch with this name already exists.');
-    return {id: crypto.randomUUID(), name, parentId, forkDocument: this.state.document, tip};
+    return {id: newId(), name, parentId, forkDocument: this.state.document, tip,...(this.state.provenance.current?{forkProvenance:this.state.provenance.current}:{})};
   }
   createHistoryBranch(name: string): string {
     const {branches, activeBranchId} = this.initialBranches();
     const branch = this.newBranch(name, branches, activeBranchId);
-    this.publish({...this.state, branches: [...branches, branch], activeBranchId: branch.id, future: [], revision: this.state.revision + 1});
+    this.publish({...this.state, branches: [...branches, branch], activeBranchId: branch.id, future: [], provenance:{...this.state.provenance,future:[]}, revision: this.state.revision + 1});
     return branch.id;
   }
   checkoutHistoryBranch(id: string) {
     const branch = this.state.branches.find(branch => branch.id === id);
     if (!branch) throw new Error('History branch not found.');
     if (id === this.state.activeBranchId) {this.navigateHistory(this.state.past.length + this.state.future.length); return;}
-    this.publish({...this.state, ...branch.tip, ...this.selectionFor(branch.tip.document), future: [], activeBranchId: id,
+    this.publish({...this.state, ...branch.tip, provenance:{...(branch.tip.provenance??unknownProvenance(branch.tip.past.length)),future:[]}, ...this.selectionFor(branch.tip.document), future: [], activeBranchId: id,
       revision: this.state.revision + 1, canvasRevision: this.state.canvasRevision + 1});
   }
   renameHistoryBranch(id: string, name: string) {
@@ -185,8 +198,8 @@ export class EditorStore {
     name = historyBranchName(name);
     if (this.state.comparisons.some(value => historyNameKey(value.name) === historyNameKey(name))) throw new Error('A history comparison with this name already exists.');
     const before = resolveHistoryTarget(this.state, beforeTarget), after = resolveHistoryTarget(this.state, afterTarget);
-    const comparison: HistoryComparison = {id: crypto.randomUUID(), name, before: before.document, after: after.document,
-      beforeLabel: before.label, afterLabel: after.label, region: validateHistoryRegion(region === undefined ? comparisonExtent(before.document, after.document) : region, before.document, after.document)};
+    const comparison: HistoryComparison = {id: newId(), name, before: before.document, after: after.document,
+      beforeLabel: before.label, afterLabel: after.label,...(before.provenance?{beforeProvenance:before.provenance}:{}),...(after.provenance?{afterProvenance:after.provenance}:{}), region: validateHistoryRegion(region === undefined ? comparisonExtent(before.document, after.document) : region, before.document, after.document)};
     this.publish({...this.state, comparisons: [...this.state.comparisons, comparison], revision: this.state.revision + 1});
     return comparison.id;
   }
@@ -207,8 +220,8 @@ export class EditorStore {
     if (!comparison) throw new Error('History comparison not found.');
     if (side !== 'before' && side !== 'after') throw new Error('Choose the before or after comparison state.');
     const {branches, activeBranchId} = this.initialBranches(), document = comparison[side];
-    const branch = this.newBranch(name, branches, activeBranchId, {document, past: []});
-    this.publish({...this.state, document, past: [], future: [], ...this.selectionFor(document), branches: [...branches, branch], activeBranchId: branch.id,
+    const branch = this.newBranch(name, branches, activeBranchId, {document, past: [],...((side==='before'?comparison.beforeProvenance:comparison.afterProvenance)?{provenance:{current:(side==='before'?comparison.beforeProvenance:comparison.afterProvenance)!,past:[]}}:{})});
+    this.publish({...this.state, document, past: [], future: [], provenance:{current:side==='before'?comparison.beforeProvenance??null:comparison.afterProvenance??null,past:[],future:[]}, ...this.selectionFor(document), branches: [...branches, branch], activeBranchId: branch.id,
       revision: this.state.revision + 1, canvasRevision: this.state.canvasRevision + 1});
     return branch.id;
   }
@@ -230,10 +243,10 @@ export class EditorStore {
     const redo = [...state.future].reverse();
     const documents = [...state.past.map(entry => entry.document), state.document, ...redo.map(entry => entry.document)];
     const transitions = [...state.past, ...redo];
-    const document = documents[position];
+    const document = documents[position], points=timelineProvenance(state);
     const canvasChanged = transitions.slice(Math.min(current, position), Math.max(current, position)).some(entry => entry.canvasChanged);
     this.publish({
-      ...state, document,
+      ...state, document, provenance:{current:points[position],past:points.slice(0,position),future:points.slice(position+1).reverse()},
       past: transitions.slice(0, position).map((entry, index) => ({...entry, document: documents[index]})),
       future: transitions.slice(position).map((entry, index) => ({...entry, document: documents[position + index + 1]})).reverse(),
       ...this.selectionFor(document),
@@ -253,6 +266,7 @@ export class EditorStore {
       branches: [],
       activeBranchId: null,
       comparisons: [],
+      provenance:unknownProvenance(),
       revision: this.state.revision + 1,
       canvasRevision: this.state.canvasRevision + 1,
     });

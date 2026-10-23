@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Host-owned plugin provenance
+
+Accepted isolated plugin commands are stamped by the host with installed plugin ID/version/command and execution ID after existing grants/validation. Package manifests/sandbox results cannot set trusted origin or observation flags. Origin scopes do not remain active across awaits. Source records contain no executable code, credential or prompt; imported native records are unverified claims. The provided isolated document rejects internal origin overrides and rolls back earlier staged commands. Installation remains inert; package versions/grants are unchanged. See HISTORY.md.
+
 ## Saved comparison isolation
 
 Pinned host comparisons do not expand package permissions or installation behavior. All four comparison mutation/continuation methods reject in isolated execution, rolling back earlier commands; private preview is not an isolated global. Ordinary plugin edits continue through shared commands. History-3 source retention includes comparison-only accepted originals during staging cleanup, native/project delivery and workspace recovery. Package versions and inert installation remain unchanged. See HISTORY.md.

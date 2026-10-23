@@ -1,4 +1,4 @@
-import {captureRetainedHistory, retainedDocuments} from './core/history';
+import {captureRetainedHistory, captureProjectHistory, retainedDocuments} from './core/history';
 import {freeze} from './core/immutable';
 import {historyTimeline} from './core/history-inspection';
 import {renderHistoryComparison, type HistoryComparisonPreview} from './engine/history-comparison';
@@ -289,7 +289,7 @@ export class EditorApplication {
       cached?.state.document === state.document &&
       cached.state.past === state.past &&
       cached.state.future === state.future &&
-      cached.state.branches === state.branches && cached.state.activeBranchId === state.activeBranchId && cached.state.comparisons === state.comparisons
+      cached.state.branches === state.branches && cached.state.activeBranchId === state.activeBranchId && cached.state.comparisons === state.comparisons && cached.state.provenance === state.provenance
     )
       return cached.project;
     const entry = {
@@ -1259,6 +1259,7 @@ export class EditorApplication {
     finally{stopDocument();stopSession();stopPermissions();this.booleanControllers.delete(abort);control.signal?.removeEventListener('abort',cancel);}
   }
   private createSession(document: Document, assets: AssetStore) {
+    document._setDefaultHistoryOrigin({surface:'editor'});
     if (
       this.sessions.some(
         (session) => session.document === document || session.assets === assets,
@@ -1605,7 +1606,7 @@ export class EditorApplication {
     const blob = await serializeProject(
       state.document,
       session.assets,
-      state.branches.length || state.comparisons.length ? captureRetainedHistory(state) : undefined,
+      captureProjectHistory(state),
     );
     if (this.sessions.includes(session)) {
       session.savedRevision = revision;
@@ -1699,7 +1700,7 @@ export class EditorApplication {
       command.source,
       `${plugin.name}: ${command.title}`.slice(0, 240),
       !hasWritePermission,
-      { permissions: granted, pluginId },
+      { permissions: granted, pluginId, commandId, version:plugin.version },
     );
   }
 
@@ -1710,10 +1711,12 @@ export class EditorApplication {
     pluginContext?: {
       permissions: readonly PluginPermission[];
       pluginId: string;
+      commandId:string;version:string;
     },
   ) {
     const document = this.document;
     const revision = document.getSnapshot().revision;
+    const historyOrigin:import('./core/history-provenance').HistoryOrigin=pluginContext?{surface:'plugin',executionId:crypto.randomUUID(),plugin:{id:pluginContext.pluginId,commandId:pluginContext.commandId,version:pluginContext.version}}:{surface:'script',executionId:crypto.randomUUID()};
     const selectedId = document.selectedLayer?.id ?? null;
     const selectedIds = document.selectedLayers.map((layer) => layer.id);
     const assets = this.assets,
@@ -1776,6 +1779,13 @@ export class EditorApplication {
       permissions: pluginContext?.permissions,
       pluginId: pluginContext?.pluginId,
       isTrustedScript: !pluginContext,
+      historyOrigin,
+      assertCanCommit:()=>{
+        scriptCommitAbort.signal.throwIfAborted();
+        if(performance.now()>scriptCommitDeadline)throw new Error('Script exceeded its 5-second time limit.');
+        if(this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision+hostBridge.inBandRevisions)throw new Error('Document changed before the script host commit.');
+        if(pluginContext){const grants=this.plugins.getGrantedPermissions(pluginContext.pluginId);if(!grants.includes('document:read')||!grants.includes('document:write'))throw new Error('Plugin permissions changed before host commit.');}
+      },
     });
     try {
       const pendingScript = this.scripts.run(document, code, {
@@ -1935,7 +1945,7 @@ export class EditorApplication {
         checkWetCommit();
         installed = retouch ? retouch.installReferenced(next, assets) : [];
         for (const id of installed) installedRecords.set(id, assets.get(id));
-        document._dispatch(command);
+        document._withHistoryOrigin(historyOrigin,()=>document._dispatch(command));
       } catch (error) {
         const current = document.getSnapshot(), retained = new Set(retainedDocuments(current.document, captureRetainedHistory(current)).flatMap(state => [...referencedAssets(state)]));
         for (const assetId of installed) if (!retained.has(assetId) && assets.has(assetId) && assets.get(assetId) === installedRecords.get(assetId)) assets.remove(assetId);
@@ -1946,6 +1956,7 @@ export class EditorApplication {
       );
       return result.logs;
     } finally {
+      scriptCommitAbort.abort(new Error('Script execution finished. Pending host edits cannot commit.'));
       unsubscribeScriptCancellation();
       selectionAbort.abort();
       retouch?.dispose();

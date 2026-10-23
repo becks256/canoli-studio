@@ -1,3 +1,4 @@
+import {captureRetainedHistory,captureProjectHistory,type RetainedHistory} from '../../core/history';
 import {isCameraRawFile} from '../../core/interchange/raw/files';
 import {batchRawSourceSchema,rawBatchDocument} from './raw';
 import {readBatchPreparation,preparationInputs} from './preparation';
@@ -732,21 +733,21 @@ export class BatchRunner {
       }
       item.source.sha256 = digest;
       const progress:RawImportControl['onProgress']=value=>this.emit({type:'item_progress',runId,itemId:item.id,progress:value});
-      let doc:DocumentData,baseLayer:import('../../core/model').LayerData,initial:DocumentData|undefined;
+      let doc:DocumentData,baseLayer:import('../../core/model').LayerData,preparedHistory:RetainedHistory|undefined;
+      const historyOrigin={surface:'host' as const,batch:{runId,itemId:item.id}};
       if(item.preparation){
-        const accepted=await readBatchPreparation(this.storage,config,item,signal);assets.dispose();assets=accepted.assets;doc=accepted.document;baseLayer=doc.children[0];
+        const accepted=await readBatchPreparation(this.storage,config,item,signal);assets.dispose();assets=accepted.assets;doc=accepted.document;preparedHistory=accepted.history;baseLayer=doc.children[0];
       }else{
         if(item.source.raw){
           if(item.deliverables.length)throw new Error('RAW outputs have no accepted prepared scene. Restore the checkpoint or create a new batch.');
           const raw=batchRawSourceSchema.parse(item.source.raw);
           const source=await prepareRawAsset(assets,sourceBlob,raw.originalName,raw.options,{signal,onProgress:progress},()=>signal.throwIfAborted());
           if(source.width!==item.source.width||source.height!==item.source.height)throw new Error('RAW native dimensions changed. Review the original before creating a new batch.');
-          const prepared=rawBatchDocument(item.name,source.width,source.height,source.id);doc=prepared.document.toJSON();baseLayer=prepared.layer.toJSON();
+          const prepared=rawBatchDocument(item.name,source.width,source.height,source.id,historyOrigin);preparedHistory=captureProjectHistory(prepared.document.getSnapshot());doc=prepared.document.toJSON();baseLayer=prepared.layer.toJSON();
         }else{
           const assetId=item.source.assetId||id(),source=await assets.add(sourceBlob,item.name,assetId,false);
           doc=createDocument(item.name,source.width,source.height);baseLayer=createRaster(item.name,assetId,source.width,source.height);doc.children.push(baseLayer);
         }
-        initial=structuredClone(doc);
       }
 
       // 3. Apply Recipe if configured
@@ -779,7 +780,7 @@ export class BatchRunner {
               );
             }
             if (signal.aborted) throw new Error("Batch execution aborted");
-            const stagingDocument = Document.fromJSON(doc);
+            const stagingDocument = Document._fromWorkspace(doc,preparedHistory);stagingDocument._setDefaultHistoryOrigin(historyOrigin);
             stagingDocument.assetStore = assets;
             stagingDocument.selectedLayer = stagingDocument.getLayer(
               baseLayer.id,
@@ -792,14 +793,14 @@ export class BatchRunner {
               {signal,onProgress:progress},
             );
             if (signal.aborted) throw new Error("Batch execution aborted");
-            doc = stagingDocument.toJSON();
+            doc = stagingDocument.toJSON();preparedHistory=captureRetainedHistory(stagingDocument.getSnapshot());
             actualSpendCents += result.plan.summary.estimatedSpendCents;
           } else {
-            const stagingDocument=Document.fromJSON(doc);stagingDocument.assetStore=assets;
+            const stagingDocument=Document._fromWorkspace(doc,preparedHistory);stagingDocument._setDefaultHistoryOrigin(historyOrigin);stagingDocument.assetStore=assets;
             stagingDocument.selectedLayer=stagingDocument.getLayer(baseLayer.id)!;
             const result=await executeRecipeAsync(recipe,stagingDocument,mergedParams,{signal,onProgress:progress});
             if(!result.success)throw new Error(result.error??`Recipe '${recipe.name}' failed.`);
-            doc=stagingDocument.toJSON();
+            doc=stagingDocument.toJSON();preparedHistory=captureRetainedHistory(stagingDocument.getSnapshot());
             actualSpendCents += result.plan.summary.estimatedSpendCents;
           }
         }
@@ -807,7 +808,7 @@ export class BatchRunner {
 
       if(item.source.raw&&!item.preparation){
         signal.throwIfAborted();
-        const history=JSON.stringify(initial)!==JSON.stringify(doc)?{version:1 as const,past:[{document:initial!,label:'Before batch recipe',canvasChanged:true}],future:[]}:undefined;
+        const history=preparedHistory;
         const project=await serializeProject(doc,assets,history),inputsSha256=await preparationInputs(config,item);
         const metadata={version:1 as const,sha256:await rawBlobHash(project),byteLength:project.size,inputsSha256};signal.throwIfAborted();
         await this.storage.commitPreparation(runId,item.id,project,metadata);item.preparation=metadata;signal.throwIfAborted();

@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Operation observation invariants
+
+Provenance describes accepted result states, not replayable code or inferred authorship. Point maps move with snapshots and preserve current/fork/tip/comparison identity; missing records remain null. Only trusted ingress assigns source, IDs and local acceptance time. Weak runtime observation is never serialized, and imports are structurally checked stored claims. History 4 validates alignment/document ownership/repeated-ID result consistency before installing sources. Guard reentrant publication, exhaust observer delivery and preserve accepted generated assets/recipe success on observer failure. Authentication, signed/append-only audit, billing and inference remain separate. See HISTORY.md.
+
 ## Pinned comparison invariants
 
 A saved comparison resolves both selectors synchronously to immutable accepted snapshots. Names/region are revisioned metadata, never fake artwork transitions; pruning or branch deletion cannot retarget them. History-3 admission validates all models/IDs/names/regions and complete source closure before session installation. Private previews use one common regional grid, clip each original canvas and compare displayed premultiplied sRGB8/alpha with bounded allocation and yielded cancellation checks. Continuing a pinned side preserves the old route, creates a new branch with an empty path, filters selection and invalidates recording/pending work. No decoder/model replay or headless/browser synchronization is introduced. Full provenance and broader quality/performance gates remain open. Exact contract: HISTORY.md.

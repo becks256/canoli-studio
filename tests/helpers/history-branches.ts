@@ -33,8 +33,8 @@ export async function historyBranchesWorkflow(page: Page, info: TestInfo, produc
   await dialog.getByRole('button', {name:'Done', exact:true}).click();
   expect((await historyPng(page, info, 'branch-restored-green.png')).bytes).toEqual(green.bytes);
   const saved = await historyProject(page, info, 'branches-native.luma');
-  expect(saved.value.history?.version).toBe(2);
-  if (saved.value.history?.version !== 2) throw Error('Missing persistent branches');
+  expect(saved.value.history?.version).toBe(4);
+  if (saved.value.history?.version !== 4) throw Error('Missing persistent branches');
   expect(saved.value.history.branches.map(branch => branch.name)).toEqual(['Main', 'Green alternative', 'Named candidate']);
   await page.getByTestId('project-input').setInputFiles(saved.path);
   dialog = await openHistoryInspector(page);
