@@ -2,7 +2,7 @@
 
 Open **History → Inspect retained history**, or search for **Inspect history** in the command palette. The action has no default shortcut and can be rebound. Select a retained state to inspect the operation leading into it. Selection alone never changes the document. **Preview before and after** renders private reference images; **Move to selected history state** explicitly restores that state. **Reload history timeline** captures newer edits. The displayed current marker describes the captured timeline.
 
-Navigation publishes the destination once, preserves the complete retained redo path, and does not execute old commands, scripts, decoders or generation jobs. Normal Undo/Redo continue from the selected position. A subsequent edit replaces the redo path as before. This workflow provides inspection and navigation within linear retained history. Persistent candidate branches, a history tree, saved comparison regions, cryptographic provenance, authorship and generation billing remain separate unfinished roadmap work. Existing workspace checkpoints and named versions are separate recovery controls.
+Navigation publishes the destination once, preserves the complete retained redo path, and does not execute old commands, scripts, decoders or generation jobs. Normal Undo/Redo continue from the selected position. A subsequent edit from an earlier state creates a branch and preserves the previous result. Persistent branches now retain their own latest accepted result and linear undo path. Saved comparison regions, cryptographic provenance, authorship and generation billing remain separate unfinished roadmap work. Existing workspace checkpoints and named versions are separate recovery controls.
 
 ## Inspection and previews
 
@@ -37,4 +37,43 @@ The existing loopback REST host owns its own headless documents. These endpoints
 - `POST /api/v1/documents/:id/history` accepts strict `{expectedRevision:number,position:number}` and returns the normal document snapshot. Stale revisions return 409; malformed/noninteger/out-of-range positions return 400 without navigation. No-op navigation preserves the revision.
 - If navigation was accepted before an observer failed, history/undo/redo endpoints return 200 with the actual current snapshot and a `warning` asking the client to inspect before retrying. They do not report an accepted move as rejected. The revision still advances once.
 
-Retained history format 1, the document schema, native project formats and workspace format are unchanged. Workspace recovery and explicitly history-bearing native files preserve both directions. Ordinary project downloads may omit undo history; do not treat them as complete history backups. Accepted source assets must remain available for retained states and are preserved by the existing project/workspace asset validation. Browser eviction, current format/font/precision limits and the broader professional-editor/performance gates still apply.
+Unbranched documents retain history format 1. Branched history uses strict format 2 inside the existing checksummed native project 3/4 and workspace 2 containers; the document schema is unchanged. Older readers that only accept history 1 reject branched files. Workspace recovery and explicitly history-bearing native files preserve both directions and all branches. Normal browser Save project automatically includes history 2 when branches exist; unbranched downloads still omit linear history. Independent REST downloads require `?history=true` to include history and branches. Accepted source assets must remain available for retained states and are preserved by the existing project/workspace asset validation. Browser eviction, current format/font/precision limits and the broader professional-editor/performance gates still apply.
+
+
+## Persistent document branches
+
+The inspector's Document branches section creates a named alternative from the **current document state**, independently of the state selected only for inspection. Move to a selected historical state first if that is your intended fork. The first fork creates Main for the previous route; editing after Undo also creates an automatically named Branch N. Existing alternatives are never silently evicted. Each route retains the existing 60-transition window; a separate exact fork-origin snapshot survives window pruning. The graph records actual in-app parent branches, not authenticated authorship or an operation-time log. More branches require additional memory and project/recovery storage; no constant-memory or all-tool performance claim is made.
+
+Switch to branch tip restores its latest accepted result with its own undo path, filters layer selection, increments revision and canvas invalidation once, and reruns no commands, models or decoders. Switching away from an undo cursor does not overwrite that route's latest tip. Selecting the active branch's tip uses ordinary forward history navigation. Explicit creation, renaming and deletion are revisioned history-management operations, outside artwork Undo/Redo. Names are trimmed, 1–120 UTF-16 units, unique under NFKC plus lowercase comparison. Renaming to the exact current name is a no-op. Auto-generated names skip collisions. Active branches and parents with children cannot be deleted; switch away and delete leaf descendants first. The UI requires explicit deletion confirmation. Branches are local to one document; workspace named versions remain separate.
+
+Trusted OO API:
+
+```ts
+const candidate = document.createHistoryBranch('Warm alternative'); // string ID; activates the new branch
+// Edit with ordinary layer constructors, properties and transactions.
+const main = document.getSnapshot().branches.find(branch => branch.name === 'Main')!;
+document.checkoutHistoryBranch(main.id);
+document.renameHistoryBranch(candidate, 'Reviewed alternative');
+document.deleteHistoryBranch(candidate); // only an inactive leaf
+```
+
+`createHistoryBranch(name:string):string`, `checkoutHistoryBranch(id:string):void`, `renameHistoryBranch(id:string,name:string):void`, and `deleteHistoryBranch(id:string):void` have no implicit arguments. Invalid IDs/names, duplicate names, transaction calls and reentrant navigation reject before publication. The immutable snapshot exposes `branches` and `activeBranchId`; serialized records are data, not a mutation API. Unknown IDs reject. Store subscribers see one accepted publication. If an observer fails after a change, remaining branch-switch observers still run and the API throws **History branch changed, but an observer failed. Inspect the document before retrying.** The change remains accepted; reload before retrying.
+
+`onHistoryBranchSwitch(listener:()=>void):()=>void` observes accepted switches to a different branch and returns an unsubscribe function. It emits nothing for naming, creation, deletion or same-branch tip navigation. The semantic recorder explicitly invalidates active/paused recordings on an alternate-branch switch: start a new recording there. It cannot treat an alternate path as ordinary redo. Automatic forking after Undo continues the recorder's existing replacement-edit behavior.
+
+Isolated Scripts/internal plugins reject all four branch mutations with **Use editor history branches after a script finishes.** Prior commands in the failed script roll back. Installation remains inert; no permission or global file service is added.
+
+History 2 validates all current, past, future, branch-tip, branch-history and fork-origin models, document IDs, unique IDs/names, parent references, acyclic ancestry and active-tip/timeline consistency before installing a session. Project encoding/decoding, worker transport, source validation and stage cleanup include the entire branch graph. Accepted RAW/TIFF/AVIF source bytes and precision settings are retained even when no current or linear-history state references them. A missing/invalid source rejects loading; it is not silently dropped. Branch deletion releases graph references but does not promise immediate asset-store garbage collection.
+
+### Separate headless REST branches
+
+`GET /api/v1/documents/:id/history-branches` returns `{revision,activeBranchId,branches:[{id,name,parentId,retainedTransitions}]}`. `POST` accepts one strict tagged object:
+
+```json
+{"expectedRevision":3,"action":"create","name":"Candidate"}
+{"expectedRevision":4,"action":"checkout","branchId":"<branch UUID>"}
+{"expectedRevision":5,"action":"rename","branchId":"<branch UUID>","name":"Reviewed"}
+{"expectedRevision":6,"action":"delete","branchId":"<branch UUID>"}
+```
+
+Successful mutations return the ordinary document snapshot plus `activeBranchId` and branch metadata. Stale revisions return 409; unknown branches, malformed/extra fields and prohibited deletion return 400 without publication. Accepted observer failures return 200 with the actual current state and the existing inspect-before-retrying warning. These independent sessions do not synchronize with browser documents or gain image rendering. Use `GET .../project?history=true` for branch-bearing native delivery.

@@ -1,3 +1,4 @@
+import {retainedDocuments,captureRetainedHistory} from '../../core/history';
 import {AssetStore,captureAssetSource} from '../../core/assets';
 import {execute,type EditorCommand} from '../../core/commands';
 import {referencedAssets} from '../../core/model';
@@ -60,7 +61,7 @@ export async function executeRecipeAsync(
   }catch(error){return {success:false,plan,error:error instanceof Error?error.message:String(error)};}
   finally{
     // Observers can throw after acceptance. Keep every asset the model/history actually owns.
-    const state=document.getSnapshot(),retained=new Set([state.document,...state.past.map(entry=>entry.document),...state.future.map(entry=>entry.document)].flatMap(value=>[...referencedAssets(value)]));
+    const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));
     for(const assetId of promoted)if(!retained.has(assetId))assets!.remove(assetId);
     staging.dispose();
   }

@@ -1,3 +1,4 @@
+import {retainedDocuments,captureRetainedHistory} from '../../core/history';
 import { AssetStore } from "../../core/assets";
 import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
 import { id,referencedAssets } from "../../core/model";
@@ -91,7 +92,7 @@ export async function executeRecipePackage(
     if(!accepted.success)throw new Error(accepted.error??'Recipe package commit failed.');
     return accepted;
   } finally {
-    const state=document.getSnapshot(),retained=new Set([state.document,...state.past.map(entry=>entry.document),...state.future.map(entry=>entry.document)].flatMap(value=>[...referencedAssets(value)]));
+    const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));
     promoted.forEach(assetId=>{if(!retained.has(assetId))assets.remove(assetId);});
     staging.dispose();
   }

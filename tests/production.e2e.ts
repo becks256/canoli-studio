@@ -2038,3 +2038,7 @@ test('production palettes persist, transfer and apply through actual UI without 
 test('production history inspector renders and navigates retained artwork without developer globals', async ({page}, info) => {
  const {historyInspectorProductionWorkflow}=await import('./helpers/history-inspector'); await historyInspectorProductionWorkflow(page, info, true);
 });
+
+test('production persistent history branches preserve editable alternatives without developer globals', async ({page}, info) => {
+ const {historyBranchesWorkflow}=await import('./helpers/history-branches'); await historyBranchesWorkflow(page, info, true);
+});

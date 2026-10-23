@@ -194,6 +194,8 @@ self.onmessage = async (event) => {
     document.undo = document.redo = document.navigateHistory = () => {
       throw new Error("Use editor undo/redo after a script finishes.");
     };
+    const branchMutation = () => {throw new Error('Use editor history branches after a script finishes.');};
+    document.createHistoryBranch = document.checkoutHistoryBranch = document.renameHistoryBranch = document.deleteHistoryBranch = branchMutation;
     const print = (...values: unknown[]) => {
       if (logs.length < 100)
         logs.push(

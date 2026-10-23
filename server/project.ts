@@ -1,3 +1,4 @@
+import {retainedDocuments} from '../src/core/history';
 import {Worker} from 'node:worker_threads';
 import {referencedAssets,type DocumentData} from '../src/core/model';
 import type {AssetStore} from '../src/core/assets';
@@ -7,7 +8,7 @@ import {verifyRawSource} from '../src/core/interchange/raw/source';
 const verified=new WeakMap<Blob,{width:number;height:number}>();
 /** Deliver only actual supported encoded images, not legacy unverified metadata claims. */
 export async function validateServerProjectSources(document:DocumentData,assets:AssetStore,history?:RetainedHistory,signal?:AbortSignal){
-  const ids=new Set(referencedAssets(document));for(const entry of [...history?.past??[],...history?.future??[]])for(const id of referencedAssets(entry.document))ids.add(id);
+  const ids=new Set(retainedDocuments(document,history).flatMap(value=>[...referencedAssets(value)]));
   const sources=[...ids].map(id=>assets.get(id));
   for(const asset of sources){
     signal?.throwIfAborted();

@@ -1,3 +1,5 @@
+import {captureRetainedHistory, retainedDocuments} from './core/history';
+import {freeze} from './core/immutable';
 import {historyTimeline} from './core/history-inspection';
 import {PaletteLibrary} from './palettes/service';
 import {ArtworkLibrary} from './library/service';
@@ -285,16 +287,13 @@ export class EditorApplication {
     if (
       cached?.state.document === state.document &&
       cached.state.past === state.past &&
-      cached.state.future === state.future
+      cached.state.future === state.future &&
+      cached.state.branches === state.branches && cached.state.activeBranchId === state.activeBranchId
     )
       return cached.project;
     const entry = {
       state,
-      project: this.projectEncoder.encode(state.document, session.assets, {
-        version: 1,
-        past: state.past,
-        future: state.future,
-      }),
+      project: this.projectEncoder.encode(state.document, session.assets, freeze(captureRetainedHistory(state))),
     };
     this.workspaceProjects.set(session, entry);
     void entry.project.catch(() => {
@@ -1580,10 +1579,11 @@ export class EditorApplication {
 
   async saveProject(): Promise<Blob> {
     const session = this.activeSession;
-    const revision = session.document.getSnapshot().revision;
+    const state = session.document.getSnapshot(), revision = state.revision;
     const blob = await serializeProject(
-      session.document.toJSON(),
+      state.document,
       session.assets,
+      state.branches.length ? captureRetainedHistory(state) : undefined,
     );
     if (this.sessions.includes(session)) {
       session.savedRevision = revision;
@@ -1915,7 +1915,7 @@ export class EditorApplication {
         for (const id of installed) installedRecords.set(id, assets.get(id));
         document._dispatch(command);
       } catch (error) {
-        const current = document.getSnapshot(), retained = new Set([current.document, ...current.past.map(entry => entry.document), ...current.future.map(entry => entry.document)].flatMap(state => [...referencedAssets(state)]));
+        const current = document.getSnapshot(), retained = new Set(retainedDocuments(current.document, captureRetainedHistory(current)).flatMap(state => [...referencedAssets(state)]));
         for (const assetId of installed) if (!retained.has(assetId) && assets.has(assetId) && assets.get(assetId) === installedRecords.get(assetId)) assets.remove(assetId);
         throw error;
       }

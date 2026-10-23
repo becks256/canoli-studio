@@ -1,3 +1,4 @@
+import {retainedDocuments,captureRetainedHistory} from '../src/core/history';
 import {Document,SmartObjectLayer} from '../src/dom';
 import {AssetStore,captureAssetSource,type ImageAsset} from '../src/core/assets';
 import {execute} from '../src/core/commands';
@@ -16,7 +17,7 @@ function commit(document:Document,assets:AssetStore,asset:Omit<ImageAsset,'bitma
   execute(document._read(),command);check();beforeCommit();let installed=false;
   try{assets.installEncoded(asset);installed=true;document._dispatch(command);}
   catch(error){
-    const state=document.getSnapshot(),retained=[state.document,...state.past.map(entry=>entry.document),...state.future.map(entry=>entry.document)].some(data=>referencedAssets(data).has(asset.id));
+    const state=document.getSnapshot(),retained=retainedDocuments(state.document,captureRetainedHistory(state)).some(data=>referencedAssets(data).has(asset.id));
     if(installed&&!retained)assets.remove(asset.id);throw error;
   }
 }

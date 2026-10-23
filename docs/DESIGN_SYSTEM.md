@@ -1,8 +1,12 @@
 # Canoli Studio design system
 
+## Branch controls in history inspection
+
+Use the existing custom inspector section, labeled native branch selector and name input, explicit Create/Rename/Switch buttons, parent-name disclosure and active marker. Creating forks current artwork, not the row selected for inspection. Retain 60-transition and recorder-switch disclosures, stale-capture errors, wrapped controls and independent body scrolling. Disable active/parent deletion and ask for explicit inline confirmation for an inactive leaf. Explain that edits after Undo preserve alternatives rather than replacing the old result. No new shortcut or component library.
+
 ## History inspection controls
 
-History provides Inspect retained history; command search provides the same rebindable action without a default chord. Use the custom modal with a captured-current marker, scrollable chronological state buttons, explicit change-field/omission reports, before/after image panes, Reload and Move actions. Selecting a row only inspects; navigation is explicit. Retain footer/Cancel and normal focus/typing/shortcut containment in both themes and short windows. Label the oldest baseline honestly, clip excessive displayed operation labels without changing stored history, and distinguish geometry bounds/incomplete comparisons from pixel differences. Explain that a new edit replaces redo. Captured-state and accepted-observer errors remain visible. No new rail icon/component library.
+History provides Inspect retained history; command search provides the same rebindable action without a default chord. Use the custom modal with a captured-current marker, scrollable chronological state buttons, explicit change-field/omission reports, before/after image panes, Reload and Move actions. Selecting a row only inspects; navigation is explicit. Retain footer/Cancel and normal focus/typing/shortcut containment in both themes and short windows. Label the oldest baseline honestly, clip excessive displayed operation labels without changing stored history, and distinguish geometry bounds/incomplete comparisons from pixel differences. Explain that a new edit before the tip preserves the previous result as a branch. Captured-state and accepted-observer errors remain visible. No new rail icon/component library.
 
 ## Reusable palette interactions
 

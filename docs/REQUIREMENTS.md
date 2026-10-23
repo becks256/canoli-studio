@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Persistent document branches (W05)
+
+Editing from an earlier retained state preserves the abandoned result in a separate branch. Explicit named forks, rename, tip checkout, inactive-leaf deletion and parent relationships share validated immutable Store ownership and revision checks. Normal browser project downloads and workspace recovery retain complete branch/source closure, including native originals. Isolated execution cannot mutate branches; alternate-branch switching explicitly invalidates recipe recording. Each route retains 60 transitions; exact fork origins remain separately retained. Full provenance, saved comparison regions and remaining W05 scope stay open. See [HISTORY.md](HISTORY.md) for the exact contract.
+
 ## Inspectable retained history (W05)
 
 Inspect chronological retained states, document/layer change fields, disclosed conservative geometry bounds and private before/after previews without editing the live document. Explicit navigation must publish one destination, preserve redo/accepted assets, maintain canvas invalidation/selection and notify recipe history once per crossed transition without command/model replay. Pin UI captures and abort stale/cancelled/closed/disposed previews with private asset ownership. Bound reports and disclose omissions/unexamined fields; do not infer authors/times/AI provenance. Preserve the existing 60-transition retention, schemas, workspaces and default project behavior. Scripts/plugins cannot navigate inside their atomic execution; independent REST uses the same class path and expected revisions, distinguishing accepted observer failures. Candidate history branches and full W05 remain unfinished. Exact contract: HISTORY.md.

@@ -3,7 +3,7 @@ import { sendGraph, type GraphChunk } from "./graph-transfer";
 import { isImmutable } from "../core/immutable";
 import type { DocumentData } from "../core/model";
 import { referencedAssets } from "../core/model";
-import type { RetainedHistory } from "../core/history";
+import { retainedDocuments, type RetainedHistory } from "../core/history";
 import { serializeProject, type ProjectAssetSource } from "../core/project";
 
 export interface ProjectEncodingRequest {
@@ -38,18 +38,14 @@ export class ProjectEncoder {
       };
       this.worker.onerror = () => this.fail(new Error("Workspace encoding worker failed."));
     }
-    const ids = new Set(referencedAssets(document));
-    for (const entry of [...history.past, ...history.future])
-      for (const id of referencedAssets(entry.document)) ids.add(id);
+    const ids = new Set(retainedDocuments(document, history).flatMap(value => [...referencedAssets(value)]));
     const sources = [...ids].map(id => {
       const asset = assets.get(id);
       return { id: asset.id, name: asset.name, width: asset.width, height: asset.height, blob: asset.blob, ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{}) };
     });
     // Capture caller-owned inputs before the first asynchronous transport break.
-    const snapshot = isImmutable(document) && [...history.past, ...history.future].every(entry => isImmutable(entry.document))
-      ? { document, history: { version: history.version,
-          past: history.past.map(entry => ({ ...entry })),
-          future: history.future.map(entry => ({ ...entry })) } }
+    const snapshot = isImmutable(document) && isImmutable(history)
+      ? { document, history }
       : structuredClone({ document, history });
     const worker = this.worker;
     const id = ++this.nextId;

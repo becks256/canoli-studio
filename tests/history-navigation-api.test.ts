@@ -47,3 +47,26 @@ it('reports accepted navigation with a warning when an observer fails after publ
     expect(redone.status).toBe(200); expect(redone.body.warning).toMatch(/History moved/); expect(redone.body.document.name).toBe('After');
   } finally {Document.prototype.navigateHistory = original;}
 });
+
+it('creates, checks out, renames and deletes independent revision-checked history branches', async () => {
+  const created = await request('/documents', {name:'Main artwork'}), path = '/documents/' + created.body.document.id;
+  const fork = await request(path + '/history-branches', {expectedRevision:0, action:'create', name:'Candidate'});
+  expect(fork.status).toBe(200); expect(fork.body.branches).toHaveLength(2);
+  const candidate = fork.body.activeBranchId, main = fork.body.branches.find((branch:{name:string}) => branch.name === 'Main').id;
+  const changed = await request(path + '/commands', {expectedRevision:fork.body.revision, commands:[{type:'document.rename', name:'Candidate artwork'}]});
+  const stale = await request(path + '/history-branches', {expectedRevision:fork.body.revision, action:'checkout', branchId:main}); expect(stale.status).toBe(409);
+  const switched = await request(path + '/history-branches', {expectedRevision:changed.body.revision, action:'checkout', branchId:main});
+  expect(switched.body.document.name).toBe('Main artwork'); expect(switched.body.activeBranchId).toBe(main);
+  const renamed = await request(path + '/history-branches', {expectedRevision:switched.body.revision, action:'rename', branchId:candidate, name:'Approved'});
+  expect(renamed.body.branches.some((branch:{name:string}) => branch.name === 'Approved')).toBe(true);
+  const rejected = await request(path + '/history-branches', {expectedRevision:renamed.body.revision, action:'delete', branchId:main}); expect(rejected.status).toBe(400);
+  const restored = await request(path + '/history-branches', {expectedRevision:renamed.body.revision, action:'checkout', branchId:candidate}); expect(restored.body.document.name).toBe('Candidate artwork');
+  const undo = await request(path + '/undo', {expectedRevision:restored.body.revision}); expect(undo.body.document.name).toBe('Main artwork');
+  const latest = await request(path + '/history-branches', {expectedRevision:undo.body.revision, action:'checkout', branchId:candidate}); expect(latest.body.document.name).toBe('Candidate artwork');
+  const back = await request(path + '/history-branches', {expectedRevision:latest.body.revision, action:'checkout', branchId:main});
+  const removed = await request(path + '/history-branches', {expectedRevision:back.body.revision, action:'delete', branchId:candidate}); expect(removed.body.branches).toHaveLength(1);
+  expect((await request(path + '/history-branches')).body.branches).toHaveLength(1);
+  for (const payload of [
+    {action:'create', name:'Bad', extra:1}, {action:'rename', branchId:main, name:''}, {action:'checkout', branchId:'invalid'}, {action:'execute', branchId:main},
+  ]) expect((await request(path + '/history-branches', {expectedRevision:removed.body.revision, ...payload})).status).toBe(400);
+});

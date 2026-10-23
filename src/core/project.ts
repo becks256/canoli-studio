@@ -4,7 +4,7 @@ import { AssetStore } from "./assets";
 import type { SerializedAsset, ImageAsset } from "./assets";
 import { allLayers, referencedAssets, validateDocument, validateDocumentCooperatively } from "./model";
 import type { DocumentData } from "./model";
-import { parseRetainedHistory, type RetainedHistory } from "./history";
+import { parseRetainedHistory, retainedDocuments, type RetainedHistory } from "./history";
 import {avifDecodeOptionsSchema,type AvifDecodeSettings} from './interchange/avif/types';
 import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from './interchange/tiff/types';
 
@@ -85,8 +85,8 @@ export async function serializeProject(
       ? undefined
       : parseRetainedHistory(retainedHistory, document);
   const assetIds = new Set(referencedAssets(document));
-  for (const entry of [...(history?.past ?? []), ...(history?.future ?? [])]) {
-    for (const assetId of referencedAssets(entry.document))
+  for (const state of retainedDocuments(document, history)) {
+    for (const assetId of referencedAssets(state))
       assetIds.add(assetId);
   }
   const entries: BinaryAsset[] = [];
@@ -125,11 +125,7 @@ export async function serializeProject(
   for (let i = 0; i < entries.length; i++)
     entries[i].sha256 = await hashBlob(blobs[i]);
   verifyLinkedSnapshots(
-    [
-      document,
-      ...(history?.past ?? []).map((entry) => entry.document),
-      ...(history?.future ?? []).map((entry) => entry.document),
-    ],
+    retainedDocuments(document, history),
     entries,
   );
   for(const original of rawOriginals){original.offset=offset;offset+=original.size;if(!Number.isSafeInteger(offset))throw new Error("Project size exceeds safely representable offsets.");}
@@ -303,8 +299,8 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     throw new Error("Unexpected data after project assets.");
   for (const assetId of referencedAssets(manifest.document))
     if (!ids.has(assetId)) throw new Error(`Missing image asset: ${assetId}`);
-  for (const entry of [...(history?.past ?? []), ...(history?.future ?? [])]) {
-    for (const assetId of referencedAssets(entry.document))
+  for (const state of retainedDocuments(manifest.document, history)) {
+    for (const assetId of referencedAssets(state))
       if (!ids.has(assetId))
         throw new Error(`Missing history image asset: ${assetId}`);
   }
@@ -377,7 +373,7 @@ export async function loadProject(
   );
   const assets = new AssetStore();
   const rasterAssets = new Set(
-    allLayers(project.document.children)
+    retainedDocuments(project.document, project.history).flatMap(document => allLayers(document.children))
       .filter((layer) => layer.kind === "raster")
       .map((layer) => layer.assetId),
   );
@@ -393,11 +389,7 @@ export async function loadProject(
       if (asset.width !== entry.width || asset.height !== entry.height)
         throw new Error("Embedded image dimensions do not match the project.");
     }
-    const documents = [
-      project.document,
-      ...(project.history?.past ?? []).map((entry) => entry.document),
-      ...(project.history?.future ?? []).map((entry) => entry.document),
-    ];
+    const documents = retainedDocuments(project.document, project.history);
     const linkedIds = new Set(
       documents.flatMap((document) =>
         (document.components ?? []).flatMap((definition) =>

@@ -1,3 +1,4 @@
+import {retainedDocuments,captureRetainedHistory} from './core/history';
 import {brushSymmetrySchema,symmetryMatrices,type BrushSymmetryData} from './core/brush-symmetry';
 import {brushTipSchema,transformPenTilt,interpolatePenTilt,samePenTilt,type BrushTipData,type PenTiltData} from './core/brush-tip';
 import {paintStampGeometry} from './core/paint-stamps';
@@ -731,7 +732,7 @@ export class ToolController {
   private releaseTexture(gesture:BaseGesture){
     const lease=gesture.textureLease;if(!lease?.created||!lease.assets.has(lease.asset.id)||lease.assets.get(lease.asset.id)!==lease.asset)return;
     const state=gesture.document.getSnapshot();
-    if([state.document,...state.past.map(entry=>entry.document),...state.future.map(entry=>entry.document)]
+    if(retainedDocuments(state.document,captureRetainedHistory(state))
       .some(document=>referencedAssets(document).has(lease.asset.id)))return;
     lease.assets.remove(lease.asset.id);
   }

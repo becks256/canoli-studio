@@ -1,5 +1,9 @@
 # Scripting API
 
+## Trusted document branches
+
+`Document.createHistoryBranch(name:string):string`, `checkoutHistoryBranch(id:string):void`, `renameHistoryBranch(id:string,name:string):void`, and `deleteHistoryBranch(id:string):void` manage persistent history through guarded Store ownership. No arguments have defaults. Names trim to 1–120 units and are NFKC/lowercase-unique; IDs must identify an existing branch. Creation forks the current cursor, checkout restores the latest accepted tip, deletion requires an inactive leaf. Invalid input, transactions and reentrancy reject; accepted observer failures leave the published state intact and throw an inspect-before-retrying error. Immutable `getSnapshot()` includes branches/activeBranchId. `onHistoryBranchSwitch(listener:()=>void):()=>void` returns an unsubscribe handle and reports alternate-route switches only. Isolated Scripts/internal plugins reject every branch mutation with “Use editor history branches after a script finishes.” Earlier commands then roll back. Complete executable host example, source persistence, limits and failure semantics: [HISTORY.md](HISTORY.md#persistent-document-branches).
+
 ## Retained history navigation (trusted host)
 
 Returned `getSnapshot()` state/selection/history containers and models are immutable; use OO mutations or detached serialization clones. Non-string transaction labels reject before callbacks.

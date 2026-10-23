@@ -1,0 +1,53 @@
+import {expect, type Page, type TestInfo} from '@playwright/test';
+import {historyScript, openHistoryInspector, historyProject, historyPng} from './history-inspector';
+
+/** Complete normal UI workflow; also runs against release builds without globals. */
+export async function historyBranchesWorkflow(page: Page, info: TestInfo, production = false) {
+  await page.goto('/'); expect(await page.evaluate(() => 'luma' in window)).toBe(!production);
+  await historyScript(page, "document.resize(400,300);const layer=document.layers.add(new PaintLayer({name:'Branch target',x:30,y:20}));layer.strokes.add(new PaintFill({bounds:{x:0,y:0,width:120,height:90},color:'#ff0000'}));document.selectedLayer=layer", 'Branch red ready');
+  const red = await historyPng(page, info, 'branch-red.png');
+  await historyScript(page, "document.selectedLayer.strokes.add(new PaintFill({bounds:{x:0,y:0,width:120,height:90},color:'#0000ff'}))", 'Branch blue ready');
+  const blue = await historyPng(page, info, 'branch-blue.png');
+  await page.getByRole('button', {name:'Undo (Mod+Z)', exact:true}).click();
+  await historyScript(page, "document.selectedLayer.strokes.add(new PaintFill({bounds:{x:0,y:0,width:120,height:90},color:'#00ff00'}))", 'Branch green ready');
+  const green = await historyPng(page, info, 'branch-green.png');
+  let dialog = await openHistoryInspector(page);
+  await expect(dialog.getByLabel('Saved history branch', {exact:true})).toHaveValue(/.+/);
+  await dialog.getByLabel('Branch name', {exact:true}).fill('Green alternative');
+  await dialog.getByRole('button', {name:'Rename branch', exact:true}).click();
+  await expect(dialog.getByLabel('Saved history branch', {exact:true}).getByRole('option', {selected:true})).toHaveText('Green alternative (active)');
+  await dialog.getByLabel('Saved history branch', {exact:true}).selectOption({label:'Main'});
+  await dialog.getByRole('button', {name:'Switch to branch tip', exact:true}).click();
+  await expect(dialog.getByLabel('Saved history branch', {exact:true}).getByRole('option', {selected:true})).toHaveText('Main (active)');
+  await dialog.getByRole('button', {name:'Done', exact:true}).click();
+  expect((await historyPng(page, info, 'branch-restored-blue.png')).bytes).toEqual(blue.bytes);
+  await page.getByRole('button', {name:'Undo (Mod+Z)', exact:true}).click();
+  expect((await historyPng(page, info, 'branch-main-undo-red.png')).bytes).toEqual(red.bytes);
+  await page.getByRole('button', {name:'Redo (Mod+Shift+Z)', exact:true}).click();
+  dialog = await openHistoryInspector(page);
+  await dialog.getByLabel('Saved history branch', {exact:true}).selectOption({label:'Green alternative'});
+  await dialog.getByRole('button', {name:'Switch to branch tip', exact:true}).click();
+  await dialog.getByLabel('Branch name', {exact:true}).fill('Named candidate');
+  await dialog.getByRole('button', {name:'Create branch from current state', exact:true}).click();
+  await info.attach('history-branches.png', {body:await dialog.screenshot(), contentType:'image/png'});
+  await dialog.getByRole('button', {name:'Done', exact:true}).click();
+  expect((await historyPng(page, info, 'branch-restored-green.png')).bytes).toEqual(green.bytes);
+  const saved = await historyProject(page, info, 'branches-native.luma');
+  expect(saved.value.history?.version).toBe(2);
+  if (saved.value.history?.version !== 2) throw Error('Missing persistent branches');
+  expect(saved.value.history.branches.map(branch => branch.name)).toEqual(['Main', 'Green alternative', 'Named candidate']);
+  await page.getByTestId('project-input').setInputFiles(saved.path);
+  dialog = await openHistoryInspector(page);
+  await expect(dialog.getByLabel('Saved history branch', {exact:true}).getByRole('option', {selected:true})).toHaveText('Named candidate (active)');
+  await dialog.getByLabel('Saved history branch', {exact:true}).selectOption({label:'Main'});
+  await dialog.getByRole('button', {name:'Switch to branch tip', exact:true}).click();
+  await dialog.getByLabel('Saved history branch', {exact:true}).selectOption({label:'Named candidate'});
+  await dialog.getByRole('button', {name:'Delete branch', exact:true}).click();
+  await dialog.getByRole('button', {name:'Keep branch', exact:true}).click();
+  await expect(dialog.getByLabel('Saved history branch', {exact:true}).getByRole('option')).toHaveCount(3);
+  await dialog.getByRole('button', {name:'Delete branch', exact:true}).click();
+  await dialog.getByRole('button', {name:'Confirm delete branch', exact:true}).click();
+  await expect(dialog.getByLabel('Saved history branch', {exact:true}).getByRole('option')).toHaveCount(2);
+  await dialog.getByRole('button', {name:'Done', exact:true}).click();
+  expect((await historyPng(page, info, 'branch-reopened-blue.png')).bytes).toEqual(blue.bytes);
+}

@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## History branch isolation
+
+Persistent host document branches do not expand installed plugin permissions. All four branch mutation methods reject inside isolated execution, and preceding commands in a failed script do not commit. Host source retention includes branch-only snapshots. Ordinary plugin edits after host Undo may create a history branch through the existing shared command path. Package/runtime versions and inert installation remain unchanged. See [HISTORY.md](HISTORY.md).
+
 ## History inspection grants no extension authority
 
 History reference previews and timeline UI are trusted host controls. As with undo/redo, isolated Scripts/plugins reject document.navigateHistory during atomic execution; failed script commands do not commit. Host navigation still uses existing accepted snapshots, asset ownership, recipe observers and undo history. Installation/permissions stay unchanged. Independent REST navigation does not grant browser control or synchronize documents. See HISTORY.md.

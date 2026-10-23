@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Persistent branch invariants
+
+Branch tips represent the latest accepted result, independently of the undo cursor. Editing before that result forks and preserves both routes. Store-owned IDs, acyclic parents and exact fork snapshots survive per-route pruning. History-2 admission verifies every model and active-tip consistency before publication; native source closure includes all graph states. OO host/REST branch management is guarded and revisioned, while isolated branch mutation is forbidden. Alternate-route switches invalidate recorder state and pending previews/jobs; they never replay operations. Broader authenticated provenance and W05 work remain open. See [HISTORY.md](HISTORY.md).
+
 ## Atomic retained-history publication
 
 All published and initial state containers, history entries and selected-ID arrays are deeply immutable; non-string transaction labels reject before callbacks or history publication. A history move publishes one accepted snapshot and reorders existing past/future transitions, preserving source closure and offline replay. Revision/canvas invalidation are per publication, not model/job re-execution. Reentrant model writes reject during navigation; observer errors cannot reverse accepted state or skip remaining notifications. Recipe direction notifications account for every crossed transition after publication. Private bounded reference previews lease historical source assets and are invalidated by document/lifetime/revision changes. Metadata reports disclose clipping, omitted records and incomplete comparisons; geometry is not a pixel diff or provenance. Existing history/project/workspace schemas remain unchanged. REST stays headless and Scripts cannot navigate inside atomic execution. See HISTORY.md.

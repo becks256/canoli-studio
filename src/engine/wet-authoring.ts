@@ -1,3 +1,4 @@
+import {retainedDocuments,captureRetainedHistory} from '../core/history';
 import { AffineTransform } from '../core/affine';
 import { AssetStore } from '../core/assets';
 import { execute, type EditorCommand } from '../core/commands';
@@ -236,7 +237,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
             });
             document.selectLayers([layer]); return frame.operation;
           } catch (error) {
-            const state = document.getSnapshot(), retained = new Set([state.document, ...state.past.map(entry => entry.document), ...state.future.map(entry => entry.document)].flatMap(data => [...referencedAssets(data)]));
+            const state = document.getSnapshot(), retained = new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(data => [...referencedAssets(data)]));
             for (const [key, asset] of installed) if (!retained.has(key) && assets.has(key) && assets.get(key) === asset) assets.remove(key);
             throw error;
           } finally { frame.dispose(); }

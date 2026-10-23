@@ -1,3 +1,4 @@
+import {retainedDocuments,captureRetainedHistory} from '../core/history';
 import {AssetStore} from '../core/assets';
 import {Document,SmartObjectLayer} from '../dom';
 import {execute} from '../core/commands';
@@ -54,7 +55,7 @@ export async function developRawComponent(document:Document,assets:AssetStore,la
     finally{
       // A throwing observer may run after a shared command was already accepted.
       // Never remove an asset that the current model or its history now owns.
-      if(!committed){const state=document.getSnapshot();committed=[state.document,...state.past.map(entry=>entry.document),...state.future.map(entry=>entry.document)].some(data=>referencedAssets(data).has(asset.id));}
+      if(!committed){const state=document.getSnapshot();committed=retainedDocuments(state.document,captureRetainedHistory(state)).some(data=>referencedAssets(data).has(asset.id));}
     }
     return asset.raw!.report;
   }finally{

@@ -1,3 +1,4 @@
+import {captureRetainedHistory} from '../src/core/history';
 import {historyTimeline,inspectHistoryChange} from '../src/core/history-inspection';
 import {validateServerProjectSources} from "./project";
 import {inspectServerRaw} from "./raw";
@@ -404,7 +405,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
 
       // Document scoped endpoints: /api/v1/documents/:id/...
       const docMatch = path.match(
-        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|history|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
+        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|history|history-branches|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
         send(response, 404, { error: "Document or endpoint not found." });
@@ -442,7 +443,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
         finally{response.off('close',close);}return;
       }
       if(subresource==='project'&&!subresourceId&&method==='GET'){
-        const state=document.getSnapshot(),history=url.searchParams.get('history')==='true'?{version:1 as const,past:state.past,future:state.future}:undefined;
+        const state=document.getSnapshot(),history=url.searchParams.get('history')==='true'?captureRetainedHistory(state):undefined;
         const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Project download disconnected.'));};response.on('close',close);selectionControllers.set(abort,document.id);
         try{
           await validateServerProjectSources(state.document,session.assets,history,abort.signal);
@@ -644,6 +645,30 @@ export function createApiServer(options: ApiServerOptions = {}) {
       }
 
       // History navigation shares the ordinary retained-state/recipe boundary.
+      if (subresource === 'history-branches' && !docMatch[3]) {
+        const branches = () => {
+          const state = document.getSnapshot();
+          return {activeBranchId: state.activeBranchId, branches: state.branches.map(branch => ({id: branch.id, name: branch.name, parentId: branch.parentId, retainedTransitions: branch.tip.past.length}))};
+        };
+        if (method === 'GET') {send(response, 200, {revision: document.getSnapshot().revision, ...branches()}); return;}
+        if (method === 'POST') {
+          const common = {...revisionSchema.shape, branchId: z.uuid()};
+          const input = z.discriminatedUnion('action', [
+            z.object({...revisionSchema.shape, action: z.literal('create'), name: z.string().trim().min(1).max(120)}).strict(),
+            z.object({...common, action: z.literal('checkout')}).strict(),
+            z.object({...common, action: z.literal('rename'), name: z.string().trim().min(1).max(120)}).strict(),
+            z.object({...common, action: z.literal('delete')}).strict(),
+          ]).parse(await body(request));
+          if (input.expectedRevision !== document.getSnapshot().revision) {send(response, 409, {error: 'Revision conflict. Read the document and retry.', revision: document.getSnapshot().revision}); return;}
+          const result = navigateHistory(document, () => {
+            if (input.action === 'create') document.createHistoryBranch(input.name);
+            else if (input.action === 'checkout') document.checkoutHistoryBranch(input.branchId);
+            else if (input.action === 'rename') document.renameHistoryBranch(input.branchId, input.name);
+            else document.deleteHistoryBranch(input.branchId);
+          });
+          send(response, 200, {...result, ...branches()}); return;
+        }
+      }
       if (subresource === 'history' && !docMatch[3] && method === 'GET') {
         const state=document.getSnapshot(),timeline=historyTimeline(state);
         const position=url.searchParams.has('position')?z.coerce.number().int().min(0).max(timeline.length-1).parse(url.searchParams.get('position')):null;

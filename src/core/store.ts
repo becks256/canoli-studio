@@ -2,7 +2,7 @@ import { changesCanvasSpace, describe, execute } from "./commands";
 import type { EditorCommand } from "./commands";
 import { createDocument, findLayer, validateDocument, SCHEMA_VERSION } from "./model";
 import type { DocumentData } from "./model";
-import { parseRetainedHistory, type HistoryEntry } from "./history";
+import { parseRetainedHistory, retainedDocuments, historyTip, historyBranchName, historyNameKey, type HistoryEntry, type HistoryBranch } from "./history";
 import { freeze, shareUnchanged, isImmutable } from "./immutable";
 export interface EditorState {
   document: DocumentData;
@@ -10,6 +10,8 @@ export interface EditorState {
   selectedIds: readonly string[];
   past: HistoryEntry[];
   future: HistoryEntry[];
+  branches: HistoryBranch[];
+  activeBranchId: string | null;
   revision: number;
   canvasRevision: number;
 }
@@ -35,7 +37,11 @@ export class EditorStore {
       history === undefined
         ? { past: [], future: [] }
         : parseRetainedHistory(history, owned);
-    if (options.migrateSchema) owned.schemaVersion = SCHEMA_VERSION;
+    if (options.migrateSchema) {
+      owned.schemaVersion = SCHEMA_VERSION;
+      if ('version' in retained) for (const document of retainedDocuments(owned, retained))
+        if (document !== owned) document.schemaVersion = SCHEMA_VERSION;
+    }
     const current = freeze(owned);
     const intern = (entries: HistoryEntry[]) => {
       let previous = current;
@@ -51,6 +57,11 @@ export class EditorStore {
       selectedIds: Object.freeze([]),
       past: freeze(intern(retained.past)),
       future: freeze(intern(retained.future)),
+      branches: 'version' in retained && retained.version === 2 ? retained.branches.map(branch => ({...branch,
+        forkDocument: shareUnchanged(current, branch.forkDocument),
+        tip: {document: shareUnchanged(current, branch.tip.document), past: intern(branch.tip.past)},
+      })) : [],
+      activeBranchId: 'version' in retained && retained.version === 2 ? retained.activeBranchId : null,
       revision: 0,
       canvasRevision: 0,
     });
@@ -103,23 +114,67 @@ export class EditorStore {
     const document = execute(this.state.document, command);
     if (document === this.state.document)
       return;
+    const past = [...this.state.past, {document: this.state.document, label, canvasChanged: changesCanvasSpace(command)}].slice(-60);
+    let {branches, activeBranchId} = this.state;
+    if (this.state.future.length) {
+      ({branches, activeBranchId} = this.initialBranches());
+      const branch = this.newBranch(this.availableBranchName(branches), branches, activeBranchId, {document, past});
+      branches = [...branches, branch]; activeBranchId = branch.id;
+    } else if (activeBranchId) branches = branches.map(branch => branch.id === activeBranchId ? {...branch, tip: {document, past}} : branch);
     this.publish({
       ...this.state,
       document,
+      branches, activeBranchId,
       ...this.selectionFor(document),
-      past: [
-        ...this.state.past,
-        {
-          document: this.state.document,
-          label,
-          canvasChanged: changesCanvasSpace(command),
-        },
-      ].slice(-60),
+      past,
       future: [],
       revision: this.state.revision + 1,
       canvasRevision:
         this.state.canvasRevision + Number(changesCanvasSpace(command)),
     });
+  }
+
+  private initialBranches() {
+    if (this.state.branches.length) return {branches: this.state.branches, activeBranchId: this.state.activeBranchId!};
+    const tip = historyTip(this.state), id = crypto.randomUUID();
+    return {branches: [{id, name: 'Main', parentId: null, forkDocument: this.state.past[0]?.document ?? this.state.document, tip}], activeBranchId: id};
+  }
+  private availableBranchName(branches: HistoryBranch[]) {
+    const names = new Set(branches.map(branch => historyNameKey(branch.name)));
+    let index = 1; while (names.has(historyNameKey(`Branch ${index}`))) index++;
+    return `Branch ${index}`;
+  }
+  private newBranch(name: string, branches: HistoryBranch[], parentId: string, tip = {document: this.state.document, past: this.state.past}): HistoryBranch {
+    name = historyBranchName(name);
+    if (branches.some(branch => historyNameKey(branch.name) === historyNameKey(name))) throw new Error('A history branch with this name already exists.');
+    return {id: crypto.randomUUID(), name, parentId, forkDocument: this.state.document, tip};
+  }
+  createHistoryBranch(name: string): string {
+    const {branches, activeBranchId} = this.initialBranches();
+    const branch = this.newBranch(name, branches, activeBranchId);
+    this.publish({...this.state, branches: [...branches, branch], activeBranchId: branch.id, future: [], revision: this.state.revision + 1});
+    return branch.id;
+  }
+  checkoutHistoryBranch(id: string) {
+    const branch = this.state.branches.find(branch => branch.id === id);
+    if (!branch) throw new Error('History branch not found.');
+    if (id === this.state.activeBranchId) {this.navigateHistory(this.state.past.length + this.state.future.length); return;}
+    this.publish({...this.state, ...branch.tip, ...this.selectionFor(branch.tip.document), future: [], activeBranchId: id,
+      revision: this.state.revision + 1, canvasRevision: this.state.canvasRevision + 1});
+  }
+  renameHistoryBranch(id: string, name: string) {
+    name = historyBranchName(name);
+    const branch = this.state.branches.find(branch => branch.id === id);
+    if (!branch) throw new Error('History branch not found.');
+    if (branch.name === name) return;
+    if (this.state.branches.some(branch => branch.id !== id && historyNameKey(branch.name) === historyNameKey(name))) throw new Error('A history branch with this name already exists.');
+    this.publish({...this.state, branches: this.state.branches.map(branch => branch.id === id ? {...branch, name} : branch), revision: this.state.revision + 1});
+  }
+  deleteHistoryBranch(id: string) {
+    if (!this.state.branches.some(branch => branch.id === id)) throw new Error('History branch not found.');
+    if (id === this.state.activeBranchId) throw new Error('Switch to another branch before deleting the active branch.');
+    if (this.state.branches.some(branch => branch.parentId === id)) throw new Error('Delete child branches before their parent.');
+    this.publish({...this.state, branches: this.state.branches.filter(branch => branch.id !== id), revision: this.state.revision + 1});
   }
 
   undo() {
@@ -159,6 +214,8 @@ export class EditorStore {
       selectedIds: [],
       past: [],
       future: [],
+      branches: [],
+      activeBranchId: null,
       revision: this.state.revision + 1,
       canvasRevision: this.state.canvasRevision + 1,
     });

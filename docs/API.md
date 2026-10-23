@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Independent branch management
+
+GET/POST `/api/v1/documents/:id/history-branches` expose branch metadata and strict revision-checked create/checkout/rename/delete actions. They use the same guarded Document/Store path and accepted-observer semantics as UI history operations. Invalid input returns 400, stale revisions 409, accepted observer failures 200 plus warning. Native project delivery preserves branches only with `?history=true`. These headless sessions remain separate from the browser. Full request/response/error contracts: [HISTORY.md](HISTORY.md#separate-headless-rest-branches).
+
 ## Independent retained-history navigation
 
 `GET /api/v1/documents/:id/history` returns `{revision,position,length,states:[{position,label,labelTruncated}]}`. Optional `?position=N` adds bounded/disclosed `change` metadata; headless font/layout bounds may be unavailable, and no rendered preview is returned. Strict `POST .../history` body `{expectedRevision,position}` moves through the existing OO retained snapshots atomically. Positions are integers 0 through past+future; current is a no-op. Stale requests return 409 and invalid positions/bodies return 400 without navigation. History/undo/redo observer failure after accepted publication returns 200 with the actual snapshot plus `warning`, rather than pretending the accepted move failed. Token/origin policy and independent headless sessions remain unchanged. See HISTORY.md for exact report/retention and browser/isolated boundaries.

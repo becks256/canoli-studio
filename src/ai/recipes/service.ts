@@ -141,10 +141,12 @@ export class RecipeService {
     const unhookHistory = doc.onHistoryNavigation((direction) =>
       this.recorder.navigateHistory(direction),
     );
+    const unhookBranch = doc.onHistoryBranchSwitch(() => this.recorder.invalidateHistory('History branch switched; start a new recording.'));
     this.unhookRecorder = () => {
       unhookState();
       unhookCommands?.();
       unhookHistory();
+      unhookBranch();
     };
   }
 

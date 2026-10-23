@@ -48,7 +48,6 @@ import { channelLoadSchema, channelLoadOptionsSchema, type ChannelLoadSettings, 
 export { AlphaChannel, AlphaChannelCollection } from './alpha-channels';
 export type { ChannelLoadOptions, ChannelLoadControl } from '../core/alpha-channels';
 export { LayerComp, LayerCompCollection } from "./layer-comps";
-import { parseRetainedHistory } from "../core/history";
 import { SmartFilter } from "./smart-filters";
 export {
   SmartFilter,
@@ -412,6 +411,7 @@ export class Document {
     (command: EditorCommand, before: DocumentData, after: DocumentData) => void
   >();
   private historyListeners = new Set<(direction: "undo" | "redo") => void>();
+  private branchListeners = new Set<() => void>();
   private navigatingHistory = false;
   private _assetStore: AssetStore | null = null;
   /** @internal Read-only host inspection; no result can mutate document/history. */
@@ -494,13 +494,9 @@ export class Document {
   }
   /** @internal Restoration validates retained history before exposing the session. */
   static _fromWorkspace(data: unknown, history?: unknown): Document {
-    const document = Document.fromJSON(data);
-    if (history !== undefined) {
-      const retained = parseRetainedHistory(history, document._read());
-      for (const entry of [...retained.past, ...retained.future])
-        entry.document.schemaVersion = SCHEMA_VERSION;
-      document.store = new EditorStore(document._read(), retained);
-    }
+    const store = new EditorStore(data, history, {migrateSchema: true});
+    const document = new Document();
+    document.store = store;
     return document;
   }
 
@@ -849,6 +845,41 @@ export class Document {
     };
   }
   getSnapshot = () => this.store.getSnapshot();
+  /** Trusted host observer; switching routes invalidates an active semantic recording. */
+  onHistoryBranchSwitch(listener: () => void): () => void {
+    this.branchListeners.add(listener);
+    return () => {this.branchListeners.delete(listener);};
+  }
+  createHistoryBranch(name: string): string {
+    return this.mutateHistoryBranch(() => this.store.createHistoryBranch(name));
+  }
+  checkoutHistoryBranch(id: string): void {
+    const state = this.store.getSnapshot();
+    if (state.activeBranchId === id) {this.navigateHistory(state.past.length + state.future.length); return;}
+    this.mutateHistoryBranch(() => this.store.checkoutHistoryBranch(id), true);
+  }
+  renameHistoryBranch(id: string, name: string): void {
+    this.mutateHistoryBranch(() => this.store.renameHistoryBranch(id, name));
+  }
+  deleteHistoryBranch(id: string): void {
+    this.mutateHistoryBranch(() => this.store.deleteHistoryBranch(id));
+  }
+  private mutateHistoryBranch<T>(run: () => T, switchBranch = false): T {
+    if (this.batch) throw new Error('Finish the transaction first.');
+    if (this.navigatingHistory) throw new Error('Finish history navigation before editing or navigating again.');
+    this.navigatingHistory = true;
+    try {
+      const before = this.store.getSnapshot().revision;
+      let result!: T, failure: unknown, failed = false;
+      try {result = run();} catch (cause) {failure = cause; failed = true;}
+      if (this.store.getSnapshot().revision !== before) {
+        if (switchBranch) for (const listener of this.branchListeners)
+          try {listener();} catch (cause) {if (!failed) failure = cause; failed = true;}
+        if (failed) throw new Error('History branch changed, but an observer failed. Inspect the document before retrying.', {cause: failure});
+      } else if (failed) throw failure;
+      return result;
+    } finally {this.navigatingHistory = false;}
+  }
   toJSON(): DocumentData {
     return structuredClone(this._read());
   }

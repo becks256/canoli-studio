@@ -6,7 +6,7 @@ import {artworkMetadataSchema,artworkContentSchema,type PreparedArtwork} from '.
 const MAGIC=new TextEncoder().encode('CANOART1'),MANIFEST_BYTES=16*1024*1024;
 export async function hashArtworkBlob(blob:Blob){const hash=new Sha256();for(let offset=0;offset<blob.size;offset+=1024*1024)hash.update(new Uint8Array(await blob.slice(offset,offset+1024*1024).arrayBuffer()));return hash.digest();}
 export async function inspectArtwork(blob:Blob){
- const project=await readProject(blob);if(project.history&&(project.history.past.length||project.history.future.length))throw new Error('Library artwork must not include unrelated undo/redo history.');
+ const project=await readProject(blob);if(project.history&&(project.history.version===2||project.history.past.length||project.history.future.length))throw new Error('Library artwork must not include unrelated undo/redo history.');
  return artworkContentSchema.parse({sha256:await hashArtworkBlob(blob),bytes:blob.size,width:project.document.width,height:project.document.height,layers:allLayers(project.document.children).length});
 }
 const manifestSchema=z.object({format:z.literal('canoli-artwork-pack'),version:z.literal(1),entries:z.array(z.object({metadata:artworkMetadataSchema,content:artworkContentSchema,offset:z.number().int().nonnegative().safe()}).strict()).min(1)}).strict();
