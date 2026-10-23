@@ -1,9 +1,9 @@
 # Private Lensfun correction dependency
 
 This is a dependency of calibrated lens-profile development in implementation.
-Private browser/Node RAW workers consume complete immutable profile snapshots,
-and the editor can review/edit accepted profile parameters. XML import, a local
-catalog and matching remain unfinished; this component does not supply them.
+Private browser/Node RAW workers consume complete immutable profile snapshots.
+The host XML/catalog/library/review workflow is separate and in verification;
+this private component supplies its correction/interpolation dependency.
 
 The build uses Lensfun `b98997f7f1c020d0fac3136c2abbf06126385971`
 (0.3.99.0) and Emscripten 4.0.10 at the existing pinned toolchain revision.
@@ -23,13 +23,31 @@ compatibility header supplies only required C integer/character declarations;
 freeing uses the same allocator and warnings become checked native errors.
 There is no GLib runtime or XML, filesystem, network or locale service.
 
-The owned ABI creates one private lens, admits validated finite calibration
-points, initializes one correction and returns owned-copy-ready float32 scratch.
+The owned ABI creates a private profile and actual native lens per declared
+calibration frame, admits finite points, initializes one correction and returns
+owned-copy-ready float32 scratch.
 Rectilinear poly3/poly5/PTLens distortion, linear/poly3 TCA and PA vignetting are
 admitted. Upstream interpolation, coefficient rescaling, focal preservation and
 coordinate/gain callbacks perform the actual correction. ACM, projection and
 perspective admission remain outside this boundary. The full lens/profile and
 photographic roadmap remains active.
+
+Pinned upstream `GetCalibrationSetForAttributes` has a legacy compatibility path
+that always collapses points into its first set. Interpolation also rewrites that
+set from legacy lens crop/aspect. The host must not mistake this for multi-frame
+admission. The owned adapter isolates every declared crop/aspect cohort in an
+actual lfLens, routes each family using the upstream crop-ratio rule, and invokes
+unchanged upstream interpolation on the selected cohort. A separate native lens
+derives the global focal/aperture range from all declarations, including `none`
+points, to preserve vignetting distance normalization. The final modifier uses
+the distortion cohort's real focal geometry and explicit independently resolved
+distortion/TCA/vignette calibrations. Null calibration cohorts remain barriers,
+not a silent fallback to a different frame. Upstream translation units remain
+unmodified. Reference generation selects the physical cohort in independent XML
+before full native parsing; it retains a failing whole-file legacy-collapse
+diagnostic and uses different second-frame coefficients to expose wrong routing.
+Old accepted pixels retain their recorded WASM identity and are not redeveloped
+when reopened. Explicit new development uses the corrected native identity.
 
 Initialization rejects unsupported crop/exposure coverage, folded radial/TCA
 mappings and nonpositive attenuation using actual upstream-rescaled coefficients

@@ -4,7 +4,7 @@ No application WASM, parser, sampler or encoder is imported. The sensor planes
 were produced independently by full upstream LibRaw's dcraw_emu.
 """
 from pathlib import Path
-import argparse, gzip, hashlib, json, subprocess, tempfile
+import argparse, gzip, hashlib, json, re, subprocess, tempfile
 import numpy as np
 from PIL import Image
 
@@ -54,7 +54,7 @@ with tempfile.TemporaryDirectory()as temp:
         width=info['width'];height=info['height'];channels=info['channels']
         source_path=root/f'tests/fixtures/raw/{name}.rgb16le';source=np.frombuffer(source_path.read_bytes(),dtype='<u2').reshape(height,width,channels)
         mapping=Path(temp)/'mapping.bin';flags=(8 if dist else 0)|(1 if tca else 0)|(2 if vig else 0)
-        xml=guide_xml if model=='guide'else root/f'tests/fixtures/lens-core/{model}.xml'
+        xml=guide_xml if model=='guide'else root/f'tests/fixtures/lens-core/native-reference-{model}-1.5.xml'
         subprocess.run([str(args.oracle.resolve()),str(xml),str(mapping),str(width),str(height),'43','1.5','5.6','10','1.05',str(flags),str(flip),'0','0',str(width),str(height)],check=True)
         plane=np.frombuffer(mapping.read_bytes(),dtype='<f4');points=plane[:width*height*6].reshape(height,width,6);gains=plane[width*height*6:].reshape(height,width)
         pixels=reference(source,points,gains);file=f'{index:02d}-{model}-{name}.png';Image.fromarray(pixels,'RGBA').save(out/file)
@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory()as temp:
         mapping=Path(temp)/'mapping.bin'
         for top in range(0,height,8):
             rows=min(8,height-top)
-            subprocess.run([str(args.oracle.resolve()),str(root/'tests/fixtures/lens-core/ptlens.xml'),str(mapping),str(width),str(height),'43','1.5','5.6','10','1.15','11','0','0',str(top),str(width),str(rows)],check=True)
+            subprocess.run([str(args.oracle.resolve()),str(root/'tests/fixtures/lens-core/native-reference-ptlens-1.5.xml'),str(mapping),str(width),str(height),'43','1.5','5.6','10','1.15','11','0','0',str(top),str(width),str(rows)],check=True)
             plane=np.frombuffer(mapping.read_bytes(),dtype='<f4');coordinates[top:top+rows]=plane[:width*rows*6].reshape(rows,width,6);gains[top:top+rows]=plane[width*rows*6:].reshape(rows,width)
         for top in range(0,height,8):pixels[top:top+8]=reference(source,coordinates[top:top+8],gains)
         file='native-50mp.png';Image.fromarray(np.asarray(pixels),'RGBA').save(out/file)
@@ -81,5 +81,8 @@ with tempfile.TemporaryDirectory()as temp:
         record={'file':file,'source':'native-50mp.dng.gz','width':width,'height':height,'flip':0,'options':{'scale':1.15,'profile':{'definition':core['profiles']['ptlens'],'focalLength':43,'cropFactor':1.5,'aperture':5.6,'focusDistance':10,'distortion':True,'chromatic':True,'vignette':True}},'rgbaSha256':hashlib.sha256(pixels).hexdigest(),'sensorPlaneSha256':sensor_hash.hexdigest()}
         assert pixels[:,:,3].min()==255, 'Large application export fixture must have full source coverage.'
         records.append(record)
-(out/'manifest.json').write_text(json.dumps({'generator':'Complete pinned native Lensfun and real GLib, independent LibRaw RGB16 and NumPy/Pillow resampling','lensfunRevision':'b98997f7f1c020d0fac3136c2abbf06126385971','numpy':np.__version__,'cases':records},indent=2)+'\n')
+retained={record['file']for record in records}
+for path in out.glob('*.png'):
+ if path.name not in retained and re.fullmatch(r'\d{2}-(?:poly3|poly5|ptlens|guide)-(?:bayer-rggb|monochrome16|orientation-[2-8])\.png',path.name):path.unlink()
+(out/'manifest.json').write_text(json.dumps({'generator':'Complete pinned native Lensfun and real GLib using explicit physical cohort XML, independent LibRaw RGB16 and NumPy/Pillow resampling','lensfunRevision':'b98997f7f1c020d0fac3136c2abbf06126385971','numpy':np.__version__,'cases':records},indent=2)+'\n')
 print(json.dumps({'cases':len(records),'directory':str(out)}))

@@ -10,6 +10,7 @@ import {Button,IconButton,NumberField,Select} from './controls';
 import {Dialog} from './Dialog';
 import {RawProfileSettings} from './RawProfileSettings';
 import {validateRawLensProfile} from '../core/interchange/lens/client';
+import {RawLensLibrary} from './RawLensLibrary';
 
 export {isCameraRawFile,rawFileAccept} from '../core/interchange/raw/files';
 
@@ -17,6 +18,7 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
   const [source]=useState(()=>{if(file)return null;if(!layer?.document)throw new Error('Choose a RAW image.');const master=new ComponentRegistry(layer.document._read().components).get(layer.componentId).source;return master.kind==='asset'?layer.document.assetStore?.get(master.assetId).raw??null:null;});
   const [settings,setSettings]=useState<RawDevelopSettings>(()=>source?.settings.development??rawDevelopOptionsSchema.parse({}));
   const [settingsIssue,setSettingsIssue]=useState('');
+  const [libraryBusy,setLibraryBusy]=useState(false);
   const [profileValidation,setProfileValidation]=useState<{lens:RawDevelopSettings['lens'];report:Readonly<RawImportReport>;error:string}|null>(null);
   const [precision,setPrecision]=useState(source?.settings.allowPrecisionLoss??false),[report,setReport]=useState<Readonly<RawImportReport>|null>(source?.report??null),[error,setError]=useState(''),[running,setRunning]=useState(false),[stale,setStale]=useState(false);
   const [progress,setProgress]=useState<Parameters<NonNullable<RawImportControl['onProgress']>>[0]|null>(null),[preview,setPreview]=useState<Blob|null>(null),[previewUrl,setPreviewUrl]=useState('');
@@ -60,7 +62,7 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
   let lensIssue='';if(report&&hasLensCorrection(settings.lens)){try{validateLensGeometry(settings.lens!,report.displayWidth,report.displayHeight);}catch(error){lensIssue=String(error);}}
   const activeProfile=!!(settings.lens?.enabled&&settings.lens.profile),profileValidated=profileValidation?.lens===settings.lens&&profileValidation?.report===report;
   const profilePending=activeProfile&&!profileValidated,profileIssue=activeProfile&&profileValidated?profileValidation?.error??'':'';
-  const disabled=running||stale,ready=report?.canDevelop&&precision&&!lensIssue&&!settingsIssue&&!profilePending&&!profileIssue&&!(settings.whiteBalance==='camera'&&!report.hasCameraWhiteBalance&&report.channels>1);
+  const disabled=running||stale||libraryBusy,ready=report?.canDevelop&&precision&&!lensIssue&&!settingsIssue&&!profilePending&&!profileIssue&&!(settings.whiteBalance==='camera'&&!report.hasCameraWhiteBalance&&report.channels>1);
   return <Dialog localEscape titleId="raw-development-title" className="svg-import-dialog raw-development-dialog" onClose={close}>
     <div className="dialog-header"><h2 id="raw-development-title">{onQueued?'Queue camera RAW':file?'Import camera RAW':'Develop RAW'}</h2><IconButton label="Close RAW development" onClick={close}><X size={18}/></IconButton></div>
     <div className="svg-import-body"><p><strong>{file?.name??source?.original.name}</strong></p><p>Keep the complete sensor original and editable development settings. Accepted pixels use 8-bit sRGB editing precision. {onQueued?'Queue the original with these settings; develop it in the batch without changing the open editor. Cancel skips remaining unreviewed files.':file?'Open as a smart object in a new document; existing edited documents stay open.':'Apply updates every instance of this shared master in one undo step, preserving layer placement and effects.'}</p>
@@ -88,6 +90,7 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
         <NumberField layout="stacked" label="RAW highlight preservation" value={settings.highlightPreservation} min={0} max={1} step="any" disabled={disabled} onCommit={highlightPreservation=>change({highlightPreservation})}/>
         <Select layout="stacked" label="RAW highlight mode" value={String(settings.highlights)} options={Array.from({length:10},(_,i)=>({value:String(i),label:i===0?'0 — Clip':i===1?'1 — Unclip':i===2?'2 — Blend':`${i} — Reconstruct`}))} disabled={disabled} onChange={value=>change({highlights:Number(value)})}/>
         <details><summary>Lens correction</summary><p>Radial, color-fringe and vignette correction in linear RGB before 8-bit editing. Transparent borders retain missing coverage; increase Scale to crop them.</p>
+          <RawLensLibrary key={report.image} editor={editor} report={report} lens={settings.lens} disabled={disabled} onSelect={value=>change({lens:value.toJSON()})} onBusyChange={value=>{setLibraryBusy(value);onBusyChange(value);}}/>
           <label className="check-field"><input type="checkbox" checked={settings.lens?.enabled??false} disabled={disabled} onChange={event=>change({lens:lensCorrectionSchema.parse({...settings.lens,enabled:event.target.checked})})}/>Enable lens correction</label>
           {settings.lens?.enabled&&<>
             <NumberField layout="stacked" label="Lens scale" value={settings.lens.scale} min={.1} max={10} step="any" disabled={disabled} onCommit={scale=>change({lens:{...settings.lens!,scale}})}/>

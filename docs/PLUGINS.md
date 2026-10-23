@@ -1,8 +1,12 @@
 # Plugins and extensions
 
+## Local lens database import boundary
+
+The trusted browser Lensfun library parses immutable local XML data in a private worker and persists originals. It never executes plugin commands or imported code, resolves external DTDs/entities, or adds file/Blob/database/native handles to isolated scripts. Scripts/plugins still use only pure LensProfile/LensCorrection values and existing RAW document/assets grants. The selected complete calibration snapshot stays in ordinary accepted source/history/project transport even if a library file is removed. Plugin installation remains inert. Host library signatures and the supported data/native boundary are in SCRIPTING_API.md.
+
 ## Calibrated RAW value boundary — workflow in implementation
 
-LensProfile is a pure isolated constructor for complete strict calibration values. `profile.correction()` creates a LensCorrection inside RawDevelopment using explicit focal length/camera crop; no database, file, Blob, image, native handle or network access is exposed. Existing document/assets grants and private RAW preparation validate native geometry, original identities and final commands before atomic commit. Complete accepted settings and separate lens-native provenance survive ordinary history/project transport. Script deadline/command/asset budgets remain; installation stays inert. XML/catalog/matching remain trusted-host work in implementation. See SCRIPTING_API.md for supported models, defaults, limits, errors and the executable example.
+LensProfile is a pure isolated constructor for complete strict calibration values. `profile.correction()` creates a LensCorrection inside RawDevelopment using explicit focal length/camera crop; no database, file, Blob, image, native handle or network access is exposed. Existing document/assets grants and private RAW preparation validate native geometry, original identities and final commands before atomic commit. Complete accepted settings and separate lens-native provenance survive ordinary history/project transport. Script deadline/command/asset budgets remain; installation stays inert. XML/library and reviewed camera/lens selection remain trusted-host services; isolated code receives only complete selected values. See SCRIPTING_API.md for supported models, defaults, limits, errors and the executable example.
 
 ## Recent-file privileges
 

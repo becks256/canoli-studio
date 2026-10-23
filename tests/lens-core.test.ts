@@ -13,7 +13,7 @@ for(const fixture of manifest.cases)it(`native Lensfun ${fixture.file} coordinat
   const body=await readFile(base+fixture.file),reference=new DataView(body.buffer,body.byteOffset,body.byteLength),coordinates=lease.coordinates(fixture.left,fixture.top,64,48),gains=lease.gains(fixture.left,fixture.top,64,48);let maximum=0;
   for(let i=0;i<coordinates.length;i++)maximum=Math.max(maximum,Math.abs(coordinates[i]-reference.getFloat32(i*4,true)));
   for(let i=0;i<gains.length;i++)maximum=Math.max(maximum,Math.abs(gains[i]-reference.getFloat32((coordinates.length+i)*4,true)));
-  expect(maximum).toBe(0);expect(lease.report.applied).toBe(43);expect(Object.isFrozen(lease.report.coefficients)).toBe(true);
+  expect(maximum).toBe(0);expect(lease.report.applied).toBe(43);for(const index of [6,21,26])expect(lease.report.coefficients[index]).toBe(Math.fround(fixture.calibrationCropFactor));expect(Object.isFrozen(lease.report.coefficients)).toBe(true);
  }finally{lease.dispose();}
 });
 
@@ -52,4 +52,9 @@ it('refuses duplicate and mixed-model native calibration coordinates and unsuppo
  const definition=structuredClone(manifest.profiles.poly3);definition.calibrations[0].distortion.push({...definition.calibrations[0].distortion[0]});expect(()=>lensProfileSchema.parse(definition)).toThrow(/Duplicate/);
  definition.calibrations[0].distortion.pop();definition.calibrations[0].distortion[1]={model:'poly5',focalLength:35,terms:[0,0]};expect(()=>lensProfileSchema.parse(definition)).toThrow(/Mixed/);
  expect(()=>lensProfileSchema.parse({...manifest.profiles.poly3,type:'fisheye'})).toThrow();expect(()=>lensProfileSchema.parse({...manifest.profiles.poly3,code:'execute'}as LensProfileOptions)).toThrow();
+});
+it('retains unknown nearer calibration frames instead of silently falling back to another crop',async()=>{
+ const definition=structuredClone(manifest.profiles.poly3);definition.calibrations[1]={cropFactor:2,aspectRatio:1.5,distortion:[{model:'none',focalLength:43,terms:[]}],chromatic:[],vignette:[]};
+ const codec=lensCorrectionCodec(await module());expect(()=>codec.prepare({...options(definition),cropFactor:2.1},{width:64,height:48})).toThrow(/No distortion calibration/);
+ const retry=codec.prepare(options(definition),{width:64,height:48});retry.dispose();
 });

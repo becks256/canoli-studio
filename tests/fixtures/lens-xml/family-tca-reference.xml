@@ -1,0 +1,1 @@
+<lensdatabase version="2"><lens><maker>Canoli Optics</maker><model>Independent calibrated family frames</model><mount>Canoli Test Mount</mount><center x="0.015" y="-0.02"/><focal min="14" max="80"/><cropfactor>2</cropfactor><calibration><tca model="poly3" focal="35" vr="1.001" vb="0.999" cr="0.00005" cb="-0.00004"/></calibration></lens></lensdatabase>

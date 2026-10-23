@@ -3,6 +3,7 @@ import {rawDevelopOptionsSchema} from "./core/interchange/raw/types";
 import {prepareRawImport,developRawComponent} from "./engine/raw-import";
 import {rawSourceMetadata} from "./core/interchange/raw/source";
 import {RecentFilesService} from './workspace/recent-service';
+import {LensLibraryService} from './core/interchange/lens/library';
 import { separateFrequencies,prepareFrequencySeparation } from "./engine/frequency-separation";
 import type { FrequencySeparationOptions } from "./core/frequency-separation";
 import {captureFrequencyRadius} from './core/frequency-separation';
@@ -180,6 +181,7 @@ export class EditorApplication {
   readonly scripts = new ScriptRunner();
   readonly tools = new ToolController(this);
   readonly recentFiles = new RecentFilesService();
+  readonly lensProfiles = new LensLibraryService();
   readonly brushPresets = new BrushPresetLibrary();
   readonly brushTextureSource = new BrushTextureSourceOwner();
   private presetApplyAbort:AbortController|null=null;
@@ -1881,6 +1883,7 @@ export class EditorApplication {
     this.tools.cancel();
     this.presetApplyAbort?.abort(new DOMException('Editor disposed during preset preparation.','AbortError'));this.presetApplyAbort=null;
     this.recentFiles.dispose();
+    this.lensProfiles.dispose();
     this.brushPresets.dispose();
     this.brushTextureSource.dispose();
     this.scripts.cancel();

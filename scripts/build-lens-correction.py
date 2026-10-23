@@ -39,13 +39,15 @@ subprocess.run(command,check=True)
 destination=root/'src/core/interchange/lens/codec';destination.mkdir(parents=True,exist_ok=True)
 artifacts={}
 for name in ['canoli_lens_correction.js','canoli_lens_correction.wasm']:
-    body=(build/name).read_bytes();(destination/name).write_bytes(body);artifacts[name]={'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()}
+    body=(build/name).read_bytes()
+    if name.endswith('.js'):body=('\n'.join(line.rstrip()for line in body.decode().splitlines())+'\n').encode()
+    (destination/name).write_bytes(body);artifacts[name]={'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()}
 for name in ['COPYING','COPYING.LESSER']:
     shutil.copyfile(source/name,root/'public/licenses'/('lensfun-b98997f7-'+name+'.txt'))
 owned=[root/'scripts/build-lens-correction.py',*sorted((root/'scripts/lens-correction').glob('*'))]
 upstream=[source/'libs/lensfun'/name for name in [*units,'auxfun.cpp','lensfunprv.h']]+[source/'include/lensfun/lensfun.h.in']
 metadata={'protocolVersion':1,'lensfun':'0.3.99.0','emscripten':version,'sourceRevisions':pins,'sourceFiles':{str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()for p in owned if p.is_file()},'upstreamFiles':{str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest()for p in upstream},'generatedInterpolationSha256':hashlib.sha256(interpolate.encode()).hexdigest(),'artifacts':artifacts,
-    'included':['upstream scalar calibration interpolation','upstream distortion/TCA/vignette coordinate and gain models','owned checked C ABI, scratch budgets and output lifetime'],
+    'included':['upstream scalar calibration interpolation','upstream distortion/TCA/vignette coordinate and gain models','owned per-frame/family cohort routing around upstream legacy collapse','owned checked C ABI, scratch budgets and output lifetime'],
     'excluded':['GLib runtime, parser, locale and container services','database XML parsing/matching/loading','projection/perspective API','network and filesystem','SSE/SSE2'],
     'geometry':'Native original geometry is independent of bounded coordinate/gain scratch requests. Actual WASM representation and allocation failures remain.'}
 (destination/'build.json').write_text(json.dumps(metadata,indent=2)+'\n')

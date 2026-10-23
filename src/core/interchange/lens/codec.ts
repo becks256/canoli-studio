@@ -33,7 +33,6 @@ export function lensCorrectionCodec(module:NativeLensModule){
       let x=profile.center.x*(flip&1?-1:1),y=profile.center.y*(flip&2?-1:1);if(flip&4)[x,y]=[y,x];
       status(module._canoli_lens_create(allocation(maker),maker.length,allocation(model),model.length,first.cropFactor,first.aspectRatio,x,y,profile.focalRange.min,profile.focalRange.max));
       for(const set of profile.calibrations)for(const kind of ['distortion','chromatic','vignette']as const)for(const point of set[kind]){
-        if(point.model==='none')continue;
         const terms=Float32Array.from(point.terms),pointer=allocation(new Uint8Array(terms.buffer));
         try{status(module._canoli_lens_add(kind==='distortion'?1:kind==='chromatic'?2:3,kind==='distortion'?distortionModels[point.model as keyof typeof distortionModels]:kind==='chromatic'?chromaticModels[point.model as keyof typeof chromaticModels]:1,point.focalLength,'aperture'in point?point.aperture:0,'focusDistance'in point?point.focusDistance:0,'realFocalLength'in point?point.realFocalLength??0:0,set.cropFactor,set.aspectRatio,pointer,terms.length));}
         finally{module._free(pointer);pointers.pop();}

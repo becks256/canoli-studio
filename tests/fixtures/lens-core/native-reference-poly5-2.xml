@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lensdatabase version="2">
+  <mount>
+    <name>Canoli Test Mount</name>
+  </mount>
+  <camera>
+    <maker>Canoli synthetic</maker>
+    <model>Independent DNG fixture</model>
+    <mount>Canoli Test Mount</mount>
+    <cropfactor>1.5</cropfactor>
+  </camera>
+  <lens>
+    <maker>Canoli Optics</maker>
+    <model>Canoli Reference 24-70mm F2.8</model>
+    <mount>Canoli Test Mount</mount>
+    <cropfactor>2</cropfactor>
+    <aspect-ratio>1.5</aspect-ratio>
+    <center x="0.02" y="-0.01" />
+    <focal min="24" max="70" />
+    <calibration cropfactor="2" aspect-ratio="1.5">
+      <distortion model="poly5" focal="24" k1="-0.027999999999999997" k2="0.0021" />
+      <tca model="poly3" focal="24" vr="1.0006" vb="0.9994" cr="3e-05" cb="-2.4e-05" br="6e-06" bb="-1.2e-05" />
+      <vignetting model="pa" focal="24" aperture="4" distance="1" k1="-0.09" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="24" aperture="4" distance="1000" k1="-0.09" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="24" aperture="8" distance="1" k1="-0.08399999999999999" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="24" aperture="8" distance="1000" k1="-0.08399999999999999" k2="0.01" k3="0.0005" />
+      <distortion model="poly5" focal="35" k1="-0.0231" k2="0.0021" />
+      <tca model="poly3" focal="35" vr="1.000618" vb="0.9993879999999999" cr="3e-05" cb="-2.4e-05" br="6e-06" bb="-1.2e-05" />
+      <vignetting model="pa" focal="35" aperture="4" distance="1" k1="-0.08549999999999999" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="35" aperture="4" distance="1000" k1="-0.08549999999999999" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="35" aperture="8" distance="1" k1="-0.07949999999999999" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="35" aperture="8" distance="1000" k1="-0.07949999999999999" k2="0.01" k3="0.0005" />
+      <distortion model="poly5" focal="50" k1="-0.0182" k2="0.0021" />
+      <tca model="poly3" focal="50" vr="1.0006359999999999" vb="0.9993759999999999" cr="3e-05" cb="-2.4e-05" br="6e-06" bb="-1.2e-05" />
+      <vignetting model="pa" focal="50" aperture="4" distance="1" k1="-0.081" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="50" aperture="4" distance="1000" k1="-0.081" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="50" aperture="8" distance="1" k1="-0.075" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="50" aperture="8" distance="1000" k1="-0.075" k2="0.01" k3="0.0005" />
+      <distortion model="poly5" focal="70" k1="-0.0133" k2="0.0021" />
+      <tca model="poly3" focal="70" vr="1.000654" vb="0.999364" cr="3e-05" cb="-2.4e-05" br="6e-06" bb="-1.2e-05" />
+      <vignetting model="pa" focal="70" aperture="4" distance="1" k1="-0.0765" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="70" aperture="4" distance="1000" k1="-0.0765" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="70" aperture="8" distance="1" k1="-0.0705" k2="0.01" k3="0.0005" />
+      <vignetting model="pa" focal="70" aperture="8" distance="1000" k1="-0.0705" k2="0.01" k3="0.0005" />
+    </calibration>
+  </lens>
+</lensdatabase>

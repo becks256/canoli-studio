@@ -27,12 +27,12 @@ export const lensProfileSchema=z.object({
   calibrations:z.array(calibration).min(1).max(128),
   source:z.object({name:z.string().min(1),sha256:z.string().regex(/^[a-f0-9]{64}$/),index:z.number().int().nonnegative(),notices:z.string().optional()}).strict().optional(),
 }).strict().superRefine((profile,context)=>{
-  const pointKeys=new Set<string>();let count=0;
+  const pointKeys=new Set<string>(),frameModels=new Map<string,Set<string>>();let count=0;
   if(profile.focalRange.max>0&&profile.focalRange.min>0&&profile.focalRange.max<profile.focalRange.min)context.addIssue({code:'custom',message:'Invalid lens focal range.'});
   for(const set of profile.calibrations){
     const frame=`${Math.fround(set.cropFactor)}:${Math.fround(set.aspectRatio)}`;
     for(const kind of ['distortion','chromatic','vignette']as const){
-      const models=new Set<string>();
+      const modelKey=frame+':'+kind,models=frameModels.get(modelKey)??new Set<string>();frameModels.set(modelKey,models);
       for(const point of set[kind]){
         count++;if(point.model!=='none')models.add(point.model);
         const key=frame+':'+kind+':'+Math.fround(point.focalLength)+('aperture'in point?':'+Math.fround(point.aperture)+':'+Math.fround(point.focusDistance):'');

@@ -1,0 +1,33 @@
+{
+  "generator": "Complete unmodified native Lensfun XML database/modifier and real GLib; explicit selected physical cohort avoids upstream legacy AddCalib collapse; no application parser or owned WASM core",
+  "lensfunRevision": "b98997f7f1c020d0fac3136c2abbf06126385971",
+  "oracleSha256": "a6378eb32513d4bac1ff42a78a0c71aa619cd90476863fe8ac62059110b0af7b",
+  "width": 64,
+  "height": 48,
+  "focalLength": 43,
+  "cropFactor": 2.1,
+  "aperture": 5.6,
+  "focusDistance": null,
+  "scale": 1.05,
+  "sha256": "af4bd31eea0c0aff6304f304ac2228205f5be711c694979ea4c9792565e8bff5",
+  "xmlSha256": "7bb1d0cc5cd21b5019c051b9d161cee45ba1754f4c63f953d95c697d91404f30",
+  "selectedCohortReferenceSha256": "2ad18734dea63b7837804b94fea6331cd633090570dc50db371831b2e0a338da",
+  "legacyCollapsedDiagnosticSha256": "ff292581d8fe99b014b381229fb2c82df9a527a257265ddeaac2fd2586bfb4ee",
+  "families": {
+    "file": "family-frames.f32le",
+    "sourceXml": "family-frames.xml",
+    "sha256": "b52c0d43e7470436d3025aa3221c6fa27565119767c47c700226e0662d27a077",
+    "focalLength": 43,
+    "cropFactor": 2.1,
+    "aperture": 5.6,
+    "focusDistance": 10,
+    "scale": 1.05,
+    "distortionCrop": 1.5,
+    "tcaCrop": 2,
+    "vignetteCrop": 1.8,
+    "globalFocalRange": [
+      14,
+      80
+    ]
+  }
+}

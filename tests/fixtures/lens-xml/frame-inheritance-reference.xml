@@ -1,0 +1,8 @@
+<!DOCTYPE lensdatabase SYSTEM "lensfun-database.dtd">
+<lensdatabase version="2">
+<lens><maker>Canoli Optics</maker><model>Reference 35 mm</model><mount>Canoli Test Mount</mount>
+<focal min="35" max="50"/><cropfactor>2</cropfactor><aspect-ratio>1.5</aspect-ratio>
+<calibration cropfactor="2" aspect-ratio="1.5"><distortion model="poly3" focal="35" k1="-0.02"/></calibration>
+<calibration><tca model="linear" focal="35" kr="1.001"/></calibration>
+
+</lens></lensdatabase>

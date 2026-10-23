@@ -288,28 +288,28 @@
               "model": "poly3",
               "focalLength": 24,
               "terms": [
-                -0.05
+                -0.034999999999999996
               ]
             },
             {
               "model": "poly3",
               "focalLength": 35,
               "terms": [
-                -0.041
+                -0.0287
               ]
             },
             {
               "model": "poly3",
               "focalLength": 50,
               "terms": [
-                -0.032
+                -0.0224
               ]
             },
             {
               "model": "poly3",
               "focalLength": 70,
               "terms": [
-                -0.023000000000000007
+                -0.016100000000000003
               ]
             }
           ],
@@ -318,48 +318,48 @@
               "model": "poly3",
               "focalLength": 24,
               "terms": [
-                1.001,
-                0.999,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.0006,
+                0.9994,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 35,
               "terms": [
-                1.0010299999999999,
-                0.99898,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.000618,
+                0.9993879999999999,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 50,
               "terms": [
-                1.0010599999999998,
-                0.99896,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.0006359999999999,
+                0.9993759999999999,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 70,
               "terms": [
-                1.0010899999999998,
-                0.99894,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.000654,
+                0.999364,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             }
           ],
@@ -370,9 +370,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.18,
-                0.02,
-                0.001
+                -0.09,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -381,9 +381,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.18,
-                0.02,
-                0.001
+                -0.09,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -392,9 +392,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.16799999999999998,
-                0.02,
-                0.001
+                -0.08399999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -403,9 +403,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.16799999999999998,
-                0.02,
-                0.001
+                -0.08399999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -414,9 +414,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.17099999999999999,
-                0.02,
-                0.001
+                -0.08549999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -425,9 +425,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.17099999999999999,
-                0.02,
-                0.001
+                -0.08549999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -436,9 +436,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.15899999999999997,
-                0.02,
-                0.001
+                -0.07949999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -447,9 +447,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.15899999999999997,
-                0.02,
-                0.001
+                -0.07949999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -458,9 +458,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.162,
-                0.02,
-                0.001
+                -0.081,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -469,9 +469,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.162,
-                0.02,
-                0.001
+                -0.081,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -480,9 +480,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.15,
-                0.02,
-                0.001
+                -0.075,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -491,9 +491,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.15,
-                0.02,
-                0.001
+                -0.075,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -502,9 +502,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.153,
-                0.02,
-                0.001
+                -0.0765,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -513,9 +513,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.153,
-                0.02,
-                0.001
+                -0.0765,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -524,9 +524,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.141,
-                0.02,
-                0.001
+                -0.0705,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -535,9 +535,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.141,
-                0.02,
-                0.001
+                -0.0705,
+                0.01,
+                0.0005
               ]
             }
           ]
@@ -835,32 +835,32 @@
               "model": "poly5",
               "focalLength": 24,
               "terms": [
-                -0.04,
-                0.003
+                -0.027999999999999997,
+                0.0021
               ]
             },
             {
               "model": "poly5",
               "focalLength": 35,
               "terms": [
-                -0.033,
-                0.003
+                -0.0231,
+                0.0021
               ]
             },
             {
               "model": "poly5",
               "focalLength": 50,
               "terms": [
-                -0.026000000000000002,
-                0.003
+                -0.0182,
+                0.0021
               ]
             },
             {
               "model": "poly5",
               "focalLength": 70,
               "terms": [
-                -0.019,
-                0.003
+                -0.0133,
+                0.0021
               ]
             }
           ],
@@ -869,48 +869,48 @@
               "model": "poly3",
               "focalLength": 24,
               "terms": [
-                1.001,
-                0.999,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.0006,
+                0.9994,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 35,
               "terms": [
-                1.0010299999999999,
-                0.99898,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.000618,
+                0.9993879999999999,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 50,
               "terms": [
-                1.0010599999999998,
-                0.99896,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.0006359999999999,
+                0.9993759999999999,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 70,
               "terms": [
-                1.0010899999999998,
-                0.99894,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.000654,
+                0.999364,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             }
           ],
@@ -921,9 +921,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.18,
-                0.02,
-                0.001
+                -0.09,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -932,9 +932,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.18,
-                0.02,
-                0.001
+                -0.09,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -943,9 +943,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.16799999999999998,
-                0.02,
-                0.001
+                -0.08399999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -954,9 +954,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.16799999999999998,
-                0.02,
-                0.001
+                -0.08399999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -965,9 +965,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.17099999999999999,
-                0.02,
-                0.001
+                -0.08549999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -976,9 +976,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.17099999999999999,
-                0.02,
-                0.001
+                -0.08549999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -987,9 +987,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.15899999999999997,
-                0.02,
-                0.001
+                -0.07949999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -998,9 +998,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.15899999999999997,
-                0.02,
-                0.001
+                -0.07949999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1009,9 +1009,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.162,
-                0.02,
-                0.001
+                -0.081,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1020,9 +1020,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.162,
-                0.02,
-                0.001
+                -0.081,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1031,9 +1031,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.15,
-                0.02,
-                0.001
+                -0.075,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1042,9 +1042,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.15,
-                0.02,
-                0.001
+                -0.075,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1053,9 +1053,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.153,
-                0.02,
-                0.001
+                -0.0765,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1064,9 +1064,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.153,
-                0.02,
-                0.001
+                -0.0765,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1075,9 +1075,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.141,
-                0.02,
-                0.001
+                -0.0705,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1086,9 +1086,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.141,
-                0.02,
-                0.001
+                -0.0705,
+                0.01,
+                0.0005
               ]
             }
           ]
@@ -1390,36 +1390,36 @@
               "model": "ptlens",
               "focalLength": 24,
               "terms": [
-                0.012,
-                -0.045,
-                0.015
+                0.0084,
+                -0.0315,
+                0.010499999999999999
               ]
             },
             {
               "model": "ptlens",
               "focalLength": 35,
               "terms": [
-                0.01,
-                -0.037,
-                0.013
+                0.006999999999999999,
+                -0.025899999999999996,
+                0.009099999999999999
               ]
             },
             {
               "model": "ptlens",
               "focalLength": 50,
               "terms": [
-                0.008,
-                -0.028999999999999998,
-                0.011
+                0.0056,
+                -0.0203,
+                0.007699999999999999
               ]
             },
             {
               "model": "ptlens",
               "focalLength": 70,
               "terms": [
-                0.006,
-                -0.020999999999999998,
-                0.009
+                0.0042,
+                -0.014699999999999998,
+                0.006299999999999999
               ]
             }
           ],
@@ -1428,48 +1428,48 @@
               "model": "poly3",
               "focalLength": 24,
               "terms": [
-                1.001,
-                0.999,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.0006,
+                0.9994,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 35,
               "terms": [
-                1.0010299999999999,
-                0.99898,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.000618,
+                0.9993879999999999,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 50,
               "terms": [
-                1.0010599999999998,
-                0.99896,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.0006359999999999,
+                0.9993759999999999,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             },
             {
               "model": "poly3",
               "focalLength": 70,
               "terms": [
-                1.0010899999999998,
-                0.99894,
-                5e-05,
-                -4e-05,
-                1e-05,
-                -2e-05
+                1.000654,
+                0.999364,
+                3e-05,
+                -2.4e-05,
+                6e-06,
+                -1.2e-05
               ]
             }
           ],
@@ -1480,9 +1480,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.18,
-                0.02,
-                0.001
+                -0.09,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1491,9 +1491,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.18,
-                0.02,
-                0.001
+                -0.09,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1502,9 +1502,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.16799999999999998,
-                0.02,
-                0.001
+                -0.08399999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1513,9 +1513,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.16799999999999998,
-                0.02,
-                0.001
+                -0.08399999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1524,9 +1524,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.17099999999999999,
-                0.02,
-                0.001
+                -0.08549999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1535,9 +1535,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.17099999999999999,
-                0.02,
-                0.001
+                -0.08549999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1546,9 +1546,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.15899999999999997,
-                0.02,
-                0.001
+                -0.07949999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1557,9 +1557,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.15899999999999997,
-                0.02,
-                0.001
+                -0.07949999999999999,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1568,9 +1568,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.162,
-                0.02,
-                0.001
+                -0.081,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1579,9 +1579,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.162,
-                0.02,
-                0.001
+                -0.081,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1590,9 +1590,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.15,
-                0.02,
-                0.001
+                -0.075,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1601,9 +1601,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.15,
-                0.02,
-                0.001
+                -0.075,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1612,9 +1612,9 @@
               "aperture": 4,
               "focusDistance": 1,
               "terms": [
-                -0.153,
-                0.02,
-                0.001
+                -0.0765,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1623,9 +1623,9 @@
               "aperture": 4,
               "focusDistance": 1000,
               "terms": [
-                -0.153,
-                0.02,
-                0.001
+                -0.0765,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1634,9 +1634,9 @@
               "aperture": 8,
               "focusDistance": 1,
               "terms": [
-                -0.141,
-                0.02,
-                0.001
+                -0.0705,
+                0.01,
+                0.0005
               ]
             },
             {
@@ -1645,9 +1645,9 @@
               "aperture": 8,
               "focusDistance": 1000,
               "terms": [
-                -0.141,
-                0.02,
-                0.001
+                -0.0705,
+                0.01,
+                0.0005
               ]
             }
           ]
@@ -1669,6 +1669,8 @@
       "focusDistance": 1,
       "scale": 1.05,
       "flip": 0,
+      "referenceXml": "native-reference-poly3-1.5.xml",
+      "calibrationCropFactor": 1.5,
       "sha256": "db00efe7a18d8e026e56d6226695f702bc18d78e0def5d41ee9b0643c6e8cf1d"
     },
     {
@@ -1684,7 +1686,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "29c44ae57c45137f412eb3fd50b1f08d04908ad547e61b2da38a9c0e4c4c0c8a"
+      "referenceXml": "native-reference-poly3-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "e0e47b38b7d3978daf046dc324bdb2d305c4693ad1b2641d41e0a5b27886e089"
     },
     {
       "file": "poly3-crop.f32le",
@@ -1699,7 +1703,9 @@
       "focusDistance": null,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "c6e04983ef08c60c6a9437120efc1d42a361447bd2c9cc9931a0bd308a41afaa"
+      "referenceXml": "native-reference-poly3-2.xml",
+      "calibrationCropFactor": 2,
+      "sha256": "ec590bed73061b4ad9b881103f7d3eec76fff6448ab05e47df975eeb5108fa68"
     },
     {
       "file": "poly3-oriented.f32le",
@@ -1714,7 +1720,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 6,
-      "sha256": "1c1969172651ac12fb3b544fac45b65e5024fc6230353fb37721f199a1ab5547"
+      "referenceXml": "native-reference-poly3-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "8e9210c5b134da62575668746a6c69be0dd6f14b683b6b95d00f8e203974415a"
     },
     {
       "file": "poly3-native-50mp.f32le",
@@ -1729,7 +1737,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "ee6889add772de3d00314272d4c77d3bb35a89fd1848eacc0886fc84604ae0ba"
+      "referenceXml": "native-reference-poly3-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "48a711b6f0de14b38598f1860d3ee0c3907430a7d53b18dd857131b28791ed47"
     },
     {
       "file": "poly5-exact.f32le",
@@ -1744,6 +1754,8 @@
       "focusDistance": 1,
       "scale": 1.05,
       "flip": 0,
+      "referenceXml": "native-reference-poly5-1.5.xml",
+      "calibrationCropFactor": 1.5,
       "sha256": "8643fc13384fca757b2150627899281804b09d8961376de8925881c80d5ec214"
     },
     {
@@ -1759,7 +1771,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "03df8474d82a7b87ae9f0482674a8cd3b97fce24bf67093b7c32b024d427e443"
+      "referenceXml": "native-reference-poly5-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "bdc643791515538298d45190215db0580b38623e485fd86a8e908420855d1bc3"
     },
     {
       "file": "poly5-crop.f32le",
@@ -1774,7 +1788,9 @@
       "focusDistance": null,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "b43bb44abf6f32d0ee02e548a502fd73effa90f5ec9e1d5cf7f849636c29dce9"
+      "referenceXml": "native-reference-poly5-2.xml",
+      "calibrationCropFactor": 2,
+      "sha256": "17c5a478045a45830631f8d729acd048cf21661d633956c08255fe0f4e4f55fe"
     },
     {
       "file": "poly5-oriented.f32le",
@@ -1789,7 +1805,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 6,
-      "sha256": "ae8d3ef02401b9e51df9f0430f160589d42449da89144b8e51c64661f68c7499"
+      "referenceXml": "native-reference-poly5-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "d74faec5baefe71526046be3d506f2676071658ab00f544a1bb20bcf25330b3a"
     },
     {
       "file": "poly5-native-50mp.f32le",
@@ -1804,7 +1822,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "c8d205fe2a98ead414dfd03e82493920ad3d9b9cfecba8dceee97cb76e752a5c"
+      "referenceXml": "native-reference-poly5-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "c8b89bd8a3e6aa58d2b0f8df570fe864e38e1d6191b45bbdcb644eada432ea2d"
     },
     {
       "file": "ptlens-exact.f32le",
@@ -1819,6 +1839,8 @@
       "focusDistance": 1,
       "scale": 1.05,
       "flip": 0,
+      "referenceXml": "native-reference-ptlens-1.5.xml",
+      "calibrationCropFactor": 1.5,
       "sha256": "3950db47077ae274c2f8a69cb06adae829c28712f689c7207cdf5fa04bc9608f"
     },
     {
@@ -1834,7 +1856,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "100c37ec3818341bdda8c13ae062cf10dfd210ba6e69618517e388a53c0927a0"
+      "referenceXml": "native-reference-ptlens-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "638454cd00d03fb86292def93559a1e5b6f785d710022b47d00eb19dff629e83"
     },
     {
       "file": "ptlens-crop.f32le",
@@ -1849,7 +1873,9 @@
       "focusDistance": null,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "4f3d5454a62bf59812dad044b7f164c822063c04f817f8ae0b67e17675df5c65"
+      "referenceXml": "native-reference-ptlens-2.xml",
+      "calibrationCropFactor": 2,
+      "sha256": "cd66b11e5218387db4e455b56b90092ec2b5850250d1d11afce9937aba4fb60d"
     },
     {
       "file": "ptlens-oriented.f32le",
@@ -1864,7 +1890,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 6,
-      "sha256": "6368bc4df960ac365fbadb873c79673132b8bdb8843bcb7cbec8c62b7e8afdc7"
+      "referenceXml": "native-reference-ptlens-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "868ae1b6c9f09074a0b2181dbe42722410de45751cd20d1dab3cdfd531bdab31"
     },
     {
       "file": "ptlens-native-50mp.f32le",
@@ -1879,7 +1907,9 @@
       "focusDistance": 10,
       "scale": 1.05,
       "flip": 0,
-      "sha256": "0d42ad444391ca0b3bcafe535254d1bda7588061dad381a17d268c6d1abcf749"
+      "referenceXml": "native-reference-ptlens-1.5.xml",
+      "calibrationCropFactor": 1.5,
+      "sha256": "0f66d3e35cda0815dde61708263f507c0ffc07c737842acc462c605d3ff1449f"
     }
   ]
 }

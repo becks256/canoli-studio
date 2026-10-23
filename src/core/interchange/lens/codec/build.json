@@ -7,11 +7,11 @@
     "emsdk": "62a853cd3b3134398ce85cde8bb5cbb2ef0194cb"
   },
   "sourceFiles": {
-    "scripts/build-lens-correction.py": "3a4262df6130becbc204b309edd4f5a293fbda4156c3edc32857074f357f8d67",
-    "scripts/lens-correction/README.md": "e2d72b134944c241a29b412da39b373b6270bca7ae6838b6c33e86de35d98b51",
-    "scripts/lens-correction/core.cpp": "50d1b6c7405d6ee78c70dda8b860346b7feb56de8225f9f68bc089c926a81941",
+    "scripts/build-lens-correction.py": "c51558a193f608fe9a0205145a4a06d9df44a98b51b6254cfdf06bb72f38c289",
+    "scripts/lens-correction/README.md": "1de43b1ae00dee6eea476aaf11b625efa27202f644250acb1c868c7c30d8107e",
+    "scripts/lens-correction/core.cpp": "1f09d4c9f7438de12639db085fd2167d5b0b99e0f3241f59b7c2ba69faf024c4",
     "scripts/lens-correction/glib.h": "100041b5dbc97d12f78142bc53e4a7150c57c4553604317483e08e4d3466c497",
-    "scripts/lens-correction/oracle.cpp": "4683862520d32c8767141644cf9818b5028f8d47324c3e76e2c225c031cf88f2"
+    "scripts/lens-correction/oracle.cpp": "0e594ba38d6c9c1e47433f69be650f2d96708d4a77831bd6eb05d514c3458105"
   },
   "upstreamFiles": {
     "libs/lensfun/lens.cpp": "96981c7f1903435f4a4880eec628d1564f37cad7ba003fff8b6455b64916a2f5",
@@ -26,17 +26,18 @@
   "generatedInterpolationSha256": "8142a8fd1f22160678c666b82e2206050bb87823a9220b1639895e3829392f06",
   "artifacts": {
     "canoli_lens_correction.js": {
-      "bytes": 20369,
-      "sha256": "13306c0e32f77329ac2e288dc66229317a380acef7e64c95580932bc948d1689"
+      "bytes": 20545,
+      "sha256": "7bd4a2664b455aa211547c11297d7ed0fe83fae4fe4ebc077255e73d928cf8d0"
     },
     "canoli_lens_correction.wasm": {
-      "bytes": 272284,
-      "sha256": "b43f6f38948f66f624a24e22e6ac6df4f91d638171020e0045403d5a801828d4"
+      "bytes": 275038,
+      "sha256": "94982f3f18fd848bd3584655ef4dfd602a36266590a80ec0485a341d40e52e0e"
     }
   },
   "included": [
     "upstream scalar calibration interpolation",
     "upstream distortion/TCA/vignette coordinate and gain models",
+    "owned per-frame/family cohort routing around upstream legacy collapse",
     "owned checked C ABI, scratch budgets and output lifetime"
   ],
   "excluded": [
