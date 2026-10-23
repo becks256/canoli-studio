@@ -1,4 +1,5 @@
 import {
+  LibraryBig,
   Search,
   PanelsTopLeft,
   Fingerprint,
@@ -49,6 +50,7 @@ export interface ToolRailProps {
   onOpenRecovery(): void;
   onOpenPreflight(): void;
   onOpenWorkspace(): void;
+  onOpenArtworkLibrary(): void;
   docsUrl?: string;
 }
 
@@ -66,6 +68,7 @@ export function ToolRail({
   onOpenRecovery,
   onOpenPreflight,
   onOpenWorkspace,
+  onOpenArtworkLibrary,
   docsUrl = `${import.meta.env.BASE_URL}developer/scripting-api.html`,
 }: ToolRailProps) {
   return (
@@ -151,6 +154,7 @@ export function ToolRail({
         >
           <FilePlus2 size={19} />
         </IconButton>
+        <IconButton shortcutId="artwork-library" label="Artwork library" className="tool-button" disabled={busy} onClick={onOpenArtworkLibrary}><LibraryBig size={19}/></IconButton>
         <IconButton
           shortcutId="scripts"
           label="Scripts (Mod+Shift+K)"

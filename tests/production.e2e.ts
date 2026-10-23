@@ -2025,3 +2025,7 @@ test('production website account creation and sign-out preserve local artwork th
 test('production website account export and deletion preserve artwork and undo history',async({page},info)=>{
  const {accountLifecycleWorkflow}=await import('./helpers/account-lifecycle-browser');await accountLifecycleWorkflow(page,info);
 });
+
+test('production artwork library preserves native pixels through portable packs, placement and independent undo',async({page},info)=>{
+ const {artworkLibraryProductionWorkflow}=await import('./helpers/artwork-library');await artworkLibraryProductionWorkflow(page,info,true);
+});

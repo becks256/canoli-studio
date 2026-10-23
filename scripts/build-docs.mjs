@@ -34,6 +34,7 @@ const generatedPages = [
   ["RECIPE_PARAGRAPH_STYLES", "Paragraph styles in recipes"],
   ["CHATGPT_PLUGIN", "ChatGPT plugin"],
   ["SIGN_IN_WITH_CHATGPT", "Sign in with ChatGPT"],
+  ["ARTWORK_LIBRARY", "Reusable artwork library"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

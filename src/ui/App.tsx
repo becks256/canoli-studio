@@ -1,3 +1,4 @@
+import {ArtworkLibraryDialog} from './ArtworkLibraryDialog';
 import {AccountClient} from '../account/client';
 import {AccountButton,AccountDialog} from './AccountDialog';
 import {RawDevelopmentDialog,isCameraRawFile,rawFileAccept} from "./RawDevelopmentDialog";
@@ -241,6 +242,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [showChatGptConnection,setShowChatGptConnection]=useState(false);
   const [accountClient]=useState(()=>new AccountClient());
   const [showAccount,setShowAccount]=useState(false);
+  const [showArtworkLibrary,setShowArtworkLibrary]=useState(false);
   const [showPressureCurve,setShowPressureCurve]=useState(false);
   const [showBrushTip,setShowBrushTip]=useState(false);
   const [showBrushTexture,setShowBrushTexture]=useState(false);
@@ -703,6 +705,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const defaultShortcuts = new ShortcutRegistry([
     {id:'account',label:'Account',category:'Workspace',keys:SHORTCUT_BINDINGS.account,allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowAccount(true);}},
     {id:'chatgpt-connection',label:'ChatGPT connection',category:'Workspace',keys:SHORTCUT_BINDINGS['chatgpt-connection'],allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}},
+    {id:"artwork-library",label:"Artwork library",keys:SHORTCUT_BINDINGS["artwork-library"],run:()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}},
     {id:"recent-files",label:"Recent files",keys:SHORTCUT_BINDINGS["recent-files"],run:()=>{cancelWorkspaceGesture();setRecentRequest({});}},
     {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
     {id:"workspace-reset",label:"Restore default workspace arrangement",keys:SHORTCUT_BINDINGS["workspace-reset"],run:()=>attempt(()=>{panelLayout.restore();cancelWorkspaceGesture();})},
@@ -1149,6 +1152,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       showWorkspaceLayout ||
       showChatGptConnection ||
       showAccount ||
+      showArtworkLibrary ||
       showPressureCurve ||
       showBrushTip ||
       showBrushTexture ||
@@ -1905,6 +1909,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onOpenPlugins={() => setShowPlugins(true)}
             onOpenHelp={() => setShowHelp(true)}
             onOpenPreflight={()=>setShowPreflight(true)}
+            onOpenArtworkLibrary={()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}}
             onOpenWorkspace={openWorkspaceLayout}
             onOpenRecovery={() => setShowRecovery(true)}
           />
@@ -2597,6 +2602,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showBrushTexture&&<BrushTextureDialog editor={editor} onClose={()=>setShowBrushTexture(false)}/>}
         {showPressureCurve&&<PressureCurveDialog curve={toolState.settings.pressureCurve} onClose={()=>setShowPressureCurve(false)} onApply={curve=>{editor.tools.configure({pressureCurve:curve});setShowPressureCurve(false);}}/>}
         {showWorkspaceLayout&&<WorkspaceLayoutDialog preferences={panelLayout.preferences} loadError={panelLayout.error} onApply={layout=>{panelLayout.apply(layout);cancelWorkspaceGesture();}} onSave={(layout,name,id)=>{panelLayout.save(layout,name,id);cancelWorkspaceGesture();}} onRename={panelLayout.rename} onDelete={panelLayout.remove} onReload={panelLayout.reload} onClose={()=>setShowWorkspaceLayout(false)}/>}
+        {showArtworkLibrary&&<ArtworkLibraryDialog editor={editor} onClose={()=>setShowArtworkLibrary(false)} onPlaced={()=>notify("Placed saved artwork")}/>}
         {showAccount&&<AccountDialog client={accountClient} onClose={()=>setShowAccount(false)}/>}
         {showChatGptConnection&&<ChatGptConnectionDialog editor={editor} onClose={()=>setShowChatGptConnection(false)}/>}
         {showHelp && (

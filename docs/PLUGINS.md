@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Artwork library adds no extension grant
+
+Saving/importing a native artwork pack stores inert data only. It does not execute installed commands, extend isolated Scripts/plugins, connect desktop MCP documents or grant account/file/storage permissions. Explicit placement uses ordinary validated OO commands/history. Existing plugin installation, permissions, cancellation and asset/revision validation remain unchanged.
+
 ## Website identity grants no plugin permission
 
 Account export/deletion likewise grants no plugin or scripting capability and leaves independently paired local document connections under their existing explicit controls. Account deletion is not a Disconnect action and does not remove local artwork, recovery or saved projects. Credentials and account exports never enter isolated plugin results or document tool data.

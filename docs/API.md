@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Artwork library remains a trusted browser service
+
+The optional local reusable-artwork library adds no independent REST route, account authority or synchronized browser session. Its native `.luma` downloads use existing explicit project transport; placed artwork uses the same shared command validators/history as ordinary browser copying. Isolated Scripts/plugins and MCP gain no file/storage capability. See ARTWORK_LIBRARY.md and the trusted scripting reference for current local methods and package boundaries.
+
 ## Website account routes are separate — local signed-fixture workflow verified
 
 The same-origin host also provides authenticated POST `/auth/export` and `/auth/delete`, plus the `reauthenticate` sign-in intent. Account deletion requires exact confirmation and recent existing-identity verification and revokes every owned account session; it does not revoke independent REST keys or local plugin grants. Export is account metadata only. These are not `/api/v1` routes or public document constructors. See SIGN_IN_WITH_CHATGPT.md for the complete DTO, lease, migration, errors and deletion retention contract.

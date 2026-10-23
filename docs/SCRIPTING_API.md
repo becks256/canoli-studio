@@ -3758,3 +3758,32 @@ Trusted browser APIs: `new BrushPreset(data, source?)`, `captureBrushPreset(name
 The trusted recipe recorder now supports paragraph-style creation, base updates/renames, removal, text apply/detach and selective/all override reset. Recorded dependencies contain full formatting and recipe step references, never a required source-document style ID. This also applies to linked text in added groups. JSON and portable recipe packages retain the references; deterministic batch runs use their saved recipe snapshot. Constructor scripting signatures and isolated plugin capabilities are unchanged.
 
 See [paragraph-style recipe actions](RECIPE_PARAGRAPH_STYLES.md) for exact JSON signatures, dependency reuse/conflicts, parameters, conditions, template references and error behavior. Recipe v1/package v1 and document schema 40 remain unchanged. Older runtimes reject these unfamiliar action types. Existing unsupported commands still reject complete recordings; this does not make every editor command recordable.
+
+
+## Reusable artwork library (trusted browser application code)
+
+The optional `editor.artworkLibrary` is local browser storage outside Document commands/history. It is unavailable in isolated Scripts/plugins, desktop MCP tools and separate REST sessions. No account, network transfer, provider call or new permission is implied. Use public OO constructors for artwork and the shared command boundary for attached edits. [Full storage, package, privacy and cancellation contract](ARTWORK_LIBRARY.md).
+
+- `await editor.saveArtworkToLibrary(metadata, control = {}): Promise<{entry,added:boolean}>` captures selected root layers and only reachable source/master/style dependencies before asynchronous work. `metadata` is `{name:string,description:string,tags:string[]}` with the documented catalog bounds. `control.signal` cancels preparation/publication. No selection or unavailable storage rejects. Capture leaves document/history/save status unchanged; exact duplicate bytes keep existing local metadata.
+- `await editor.placeLibraryArtwork(entryId, control = {}): Promise<Layer[]>` validates/decodes private native sources and commits one **Place library artwork** transaction to the active destination. Keep saved world placement/native geometry and remap IDs/style conflicts through the existing cross-document rules. Reject abort, stale library authority and changed/switched/closed targets before publication. Library removal after a successful placement leaves document and undo/redo assets intact. A post-publication listener/acknowledgement error explicitly reports accepted artwork and preserves its sources; inspect before retrying.
+- `await editor.previewLibraryArtwork(entryId, control = {}): Promise<Blob>` returns a PNG from a separate reference renderer bounded to 256 per edge / 65,536 working pixels. It changes no artwork/history and rejects cancellation or stale library authority before delivery. Font files are not embedded.
+- `editor.artworkLibrary.getSnapshot()` returns `{entries,loading,pending,error,available}`; `subscribe(listener)` returns an unsubscribe function. Each healthy entry has `id`, `revision`, `createdAt`, `updatedAt`, `metadata` and `content:{sha256,bytes,width,height,layers}`. Unreadable summaries retain a removable ID where possible and an error rather than silently disappearing. `await refresh(signal?)` loads current durable rows; initialization is lazy.
+- `await read(entryId, signal?)` verifies the saved native container/content and current generation, returning `{entry,blob,generation}`. `await update(entry, metadata, signal?)` requires the captured entry revision; stale writes reject. `await remove(entryId)` and `await clear()` invalidate older preparations and remove only local library copies.
+- `await exportPack(entryIds, signal?): Promise<Blob>` validates the chosen entries and returns the strict version-1 original-bearing pack. `await importPack(blob, signal?): Promise<{added,reused}>` validates all entries in a private worker before one atomic install; duplicate bytes preserve existing metadata, entry IDs and metadata revisions while refreshing verified payload bytes (including repair of corrupted stored data). Restoring bytes invalidates older prepared authority. Neither method renders images, executes extension commands or edits the document.
+- `await recover(entryId, signal?): Promise<Blob>` retrieves unverified stored bytes for explicit recovery where the content reference remains readable. Do not label it a verified artwork export. `cancel()` aborts pending work; editor disposal closes the library and its active transactions/workers. Completed commits are not undone by later cancellation.
+
+Metadata limits are 1–120 trimmed name characters, 4,096 description characters and 64 normalized nonempty tags of at most 80 characters. Empty/invalid fields reject. Packs have a 16 MiB manifest metadata budget, separate from source geometry/encoded file size. There is no arbitrary original image cap. Quota, blocked/denied storage, corrupt manifests/payloads, decoding failures, cancellation and stale generations/revisions reject explicitly; original source/project/decoder memory requirements remain real. Failed list refresh after an acknowledged storage commit reports saved data plus a reload error rather than claiming rollback.
+
+This example runs only in trusted application code with the actual `EditorApplication` and DOM constructors. It cannot run in the isolated Scripts panel, which has no `editor` or storage capability. It creates native paint artwork, saves and exports it locally, places another independent editable copy and returns the entry identity.
+
+<!-- example: artwork-library-trusted -->
+```js
+const layer = editor.document.layers.add(new PaintLayer({name: 'Reusable artwork'}));
+layer.strokes.add(new PaintFill({bounds: {x: 20, y: 20, width: 80, height: 60}, color: '#c04b37'}));
+editor.document.selectedLayer = layer;
+const saved = await editor.saveArtworkToLibrary({name: 'Botanical base', description: 'Reviewed reusable paint', tags: ['botanical', 'base']});
+const pack = await editor.artworkLibrary.exportPack([saved.entry.id]);
+await editor.artworkLibrary.importPack(pack); // Exact content reuses the saved copy.
+const placed = await editor.placeLibraryArtwork(saved.entry.id);
+return {entryId: saved.entry.id, placedLayerId: placed[0].id, packBytes: pack.size};
+```

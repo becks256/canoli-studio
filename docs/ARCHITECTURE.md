@@ -1,5 +1,9 @@
 # Architecture
 
+## Reusable artwork library (W04, supported local workflow)
+
+`library` owns strict entry/package DTOs, private disposable validation/hash workers and a lazy independent IndexedDB entries/blobs/epoch repository. Native project Blobs remain the editable original-bearing truth; no second custom document schema is introduced. `EditorApplication` captures selected roots and dependencies through the existing OO snapshots, privately loads them and reuses the shared cross-document copy planner and command/undo transaction. The final synchronous publication is ordered against library writes in a readonly database guard. Already decoded private sources use explicit shared bitmap ownership, retaining independent destination lifetime without another full-resolution decode. Source selection capture, preview and library metadata do not mutate live history/save status. See ARTWORK_LIBRARY.md for metadata budgets, errors, cancellation, recovery and inert package boundaries.
+
 ## Optional website identity host — local signed-fixture workflow verified
 
 Account lifecycle uses private schema-2 SQL transactions and a monotonic authority sequence. Five-minute current-account verification gates linking/deletion; existing-identity reauthentication rotates the cookie, while new linking retains the original verification time. Strict shared account export DTOs whitelist owner metadata outside the editor DOM. Atomic account removal revokes every owner browser and matching proposal; ten-minute hashed identity markers reject anonymous callbacks that predate deletion. Migration retains old users/cookies with no recent-verification authority. Local editor/history/asset and independent plugin/REST boundaries remain unchanged.

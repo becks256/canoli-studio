@@ -1,8 +1,11 @@
+import {ArtworkLibrary} from './library/service';
+import type {ArtworkMetadata} from './library/model';
+import {CanvasRenderer} from './engine/renderer';
 import {captureAssetSource} from "./core/assets";
 import {ChatGptConnections} from './integrations/chatgpt/host';
 import {rawDevelopOptionsSchema} from "./core/interchange/raw/types";
 import {prepareRawImport,developRawComponent} from "./engine/raw-import";
-import {rawSourceMetadata} from "./core/interchange/raw/source";
+import {rawSourceMetadata,ownRawSource} from "./core/interchange/raw/source";
 import {RecentFilesService} from './workspace/recent-service';
 import {LensLibraryService} from './core/interchange/lens/library';
 import { separateFrequencies,prepareFrequencySeparation } from "./engine/frequency-separation";
@@ -183,6 +186,7 @@ export class EditorApplication {
   readonly tools = new ToolController(this);
   readonly recentFiles = new RecentFilesService();
   readonly lensProfiles = new LensLibraryService();
+  readonly artworkLibrary = new ArtworkLibrary();
   readonly chatGpt = new ChatGptConnections(this);
   readonly brushPresets = new BrushPresetLibrary();
   readonly brushTextureSource = new BrushTextureSourceOwner();
@@ -874,24 +878,45 @@ export class EditorApplication {
     }
   }
 
-  async copySelectedLayersTo(target: Document) {
-    const source = this.activeDocument;
-    const destination = this.sessions.find(
-      (session) => session.document === target,
-    );
-    if (!destination || source === target)
-      throw new Error("Choose another open document as the copy destination.");
-    const roots = source.layerSelection.rootLayers;
-    if (!roots.length) throw new Error("Select artwork to copy first.");
-    const snapshot = source.toJSON();
-    const copies = roots.map((layer) => {
-      const copy = structuredClone(captureFrequencyRadius(snapshot,layer.toJSON()));
-      const world = layerTransform(snapshot, layer.id)!.toJSON();
-      copy.x = world.e;
-      copy.y = world.f;
-      copy.transform = { ...world, e: 0, f: 0 };
-      return copy;
+  private captureSelectedArtwork() {
+    const source=this.activeDocument,roots=source.layerSelection.rootLayers;
+    if(!roots.length)throw new Error('Select artwork to save or copy first.');
+    const snapshot=source.toJSON(),copies=roots.map(layer=>{
+      const copy=structuredClone(captureFrequencyRadius(snapshot,layer.toJSON())),world=layerTransform(snapshot,layer.id)!.toJSON();
+      copy.x=world.e;copy.y=world.f;copy.transform={...world,e:0,f:0};return copy;
     });
+    return{snapshot,copies};
+  }
+
+  async saveArtworkToLibrary(metadata:ArtworkMetadata,control:{signal?:AbortSignal}={}) {
+    control.signal?.throwIfAborted();if(!this.artworkLibrary.getSnapshot().available)throw new Error('The local artwork library is unavailable.');
+    const {snapshot,copies}=this.captureSelectedArtwork(),base=new Document({name:'Saved artwork',width:snapshot.width,height:snapshot.height}).toJSON();
+    base.id=snapshot.id;base.children=copies;const registry=new ComponentRegistry(snapshot.components),roots=allLayers(copies).flatMap(node=>node.kind==='smart-object'?[node.componentId]:[]),reachable=new Set(roots.flatMap(key=>[...registry.reachableFrom(key)]));
+    base.components=[...reachable].map(key=>structuredClone(registry.get(key)));base.paragraphStyles=importParagraphStyles(snapshot,base,copies,id);
+    const captured=new Map([...referencedAssets(base)].map(key=>{const asset=this.assets.get(key);return[key,{id:asset.id,name:asset.name,width:asset.width,height:asset.height,blob:asset.blob,...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{})}] as const;}));
+    return this.artworkLibrary.save(()=>this.projectEncoder.encode(base,{get(key){const asset=captured.get(key);if(!asset)throw new Error('Missing captured artwork source.');return asset;}},{version:1,past:[],future:[]}),metadata,control.signal);
+  }
+
+  async placeLibraryArtwork(entryId:string,control:{signal?:AbortSignal}={}) {
+    const destination=this.activeSession,target=this.activeDocument,revision=target.getSnapshot().revision,lifetime=destination.assets.captureLifetime();
+    const check=()=>{control.signal?.throwIfAborted();lifetime();if(this.activeSession!==destination||!this.sessions.includes(destination)||target.getSnapshot().revision!==revision)throw new Error('The destination changed while artwork was preparing. Choose it again.');};
+    check();const value=await this.artworkLibrary.read(entryId,control.signal);check();const loaded=await loadProject(value.blob,{prepareImmutable:true});
+    try{check();return await this.copyArtworkTo(loaded.document,structuredClone(loaded.document.children),loaded.assets,target,{check,signal:control.signal,label:'Place library artwork',shareSources:true,commit:run=>this.artworkLibrary.commitPlacement(value,run,control.signal)});}finally{loaded.assets.dispose();}
+  }
+
+  async previewLibraryArtwork(entryId:string,control:{signal?:AbortSignal}={}):Promise<Blob> {
+    const value=await this.artworkLibrary.read(entryId,control.signal),loaded=await loadProject(value.blob,{prepareImmutable:true}),renderer=new CanvasRenderer();let canvas:HTMLCanvasElement|undefined;
+    try{control.signal?.throwIfAborted();canvas=await renderer.render(loaded.document,loaded.assets,{cache:false,scale:Math.min(1,256/loaded.document.width,256/loaded.document.height),maxPixels:65536,maxDimension:256,isCancelled:()=>!!control.signal?.aborted});control.signal?.throwIfAborted();const blob=await new Promise<Blob>((resolve,reject)=>canvas!.toBlob(blob=>{if(control.signal?.aborted)reject(control.signal.reason);else if(blob)resolve(blob);else reject(new Error('Artwork preview could not be encoded.'));},'image/png'));await this.artworkLibrary.commitPlacement(value,()=>{},control.signal);return blob;}
+    finally{if(canvas){canvas.width=0;canvas.height=0;}renderer.dispose();loaded.assets.dispose();}
+  }
+
+  async copySelectedLayersTo(target: Document) {
+    if(this.activeDocument===target)throw new Error('Choose another open document as the copy destination.');
+    const {snapshot,copies}=this.captureSelectedArtwork();return this.copyArtworkTo(snapshot,copies,this.assets,target);
+  }
+
+  private async copyArtworkTo(snapshot:import('./core/model').DocumentData,copies:import('./core/model').LayerData[],sourceAssets:AssetStore,target:Document,control:{check?():void;signal?:AbortSignal;label?:string;shareSources?:boolean;commit?(run:()=>void):Promise<void>}={}) {
+    const destination=this.sessions.find(session=>session.document===target);if(!destination)throw new Error('Choose an open document as the copy destination.');
     const registry = new ComponentRegistry(snapshot.components);
     const paragraphStyles=importParagraphStyles(snapshot,target._read(),copies,id);
     const componentRoots = allLayers(copies).flatMap((node) =>
@@ -910,12 +935,12 @@ export class EditorApplication {
       components: [...reachable].map((key) => registry.get(key)),
     });
     // Capture immutable original blobs before yielding; closing the source cannot revoke this snapshot.
-    const originals = [...assetIds].map((key) => this.assets.get(key));
+    const originals = [...assetIds].map((key) => sourceAssets.get(key));
     const replacements = new Map(originals.map((asset) => [asset.id, id()]));
     const revision = target.getSnapshot().revision;
     const assertLifetime = destination.assets.captureLifetime();
     const assertTarget = () => {
-      assertLifetime();
+      control.signal?.throwIfAborted();control.check?.();assertLifetime();
       if (
         !this.sessions.includes(destination) ||
         target.getSnapshot().revision !== revision
@@ -987,7 +1012,7 @@ export class EditorApplication {
     ];
     const command = {
       type: "transaction" as const,
-      label: "Copy artwork from document",
+      label: control.label??"Copy artwork from document",
       commands,
     };
     execute(target.toJSON(), command); // Validate the entire target before decoding or publishing images.
@@ -996,7 +1021,7 @@ export class EditorApplication {
     let committed = false;
     try {
       for (const asset of originals) {
-        const copy = await staging.add(
+        const copy = control.shareSources?sourceAssets.shareTo(staging,asset.id,replacements.get(asset.id)!):await staging.add(
           asset.blob,
           asset.name,
           replacements.get(asset.id)!,
@@ -1011,20 +1036,25 @@ export class EditorApplication {
       }
       assertTarget();
       for (const asset of staging.values()) {
-        destination.assets.install(asset, false);
+        if(control.shareSources)staging.shareTo(destination.assets,asset.id,asset.id);
+        else destination.assets.install(asset, false);
         installed.add(asset.id);
       }
-      target._dispatch(command);
-      committed = true;
-      const layers = copies.map((copy) => target.getLayer(copy.id)!);
-      target.selectLayers(layers);
-      return layers;
+      const publish=()=>{assertTarget();try{target._dispatch(command);}finally{committed=target.getSnapshot().revision!==revision;}};
+      try{
+        if(control.commit)await control.commit(publish);else publish();
+        const layers = copies.map((copy) => target.getLayer(copy.id)!);
+        target.selectLayers(layers);
+        return layers;
+      }catch(error){if(committed)throw new Error('Artwork was placed, but a listener or acknowledgement failed. Inspect the document before retrying.',{cause:error});throw error;}
     } finally {
       if (!committed)
         for (const key of installed) destination.assets.remove(key);
-      for (const asset of staging.values())
-        if (!installed.has(asset.id)) asset.bitmap.close();
-      staging.metadata.dispose();
+      if(control.shareSources)staging.dispose();
+      else{
+        for (const asset of staging.values())if (!installed.has(asset.id)) asset.bitmap.close();
+        staging.metadata.dispose();
+      }
     }
   }
 
@@ -1885,6 +1915,7 @@ export class EditorApplication {
     this.tools.cancel();
     this.presetApplyAbort?.abort(new DOMException('Editor disposed during preset preparation.','AbortError'));this.presetApplyAbort=null;
     this.recentFiles.dispose();
+    this.artworkLibrary.dispose();
     this.lensProfiles.dispose();
     this.chatGpt.dispose();
     this.brushPresets.dispose();

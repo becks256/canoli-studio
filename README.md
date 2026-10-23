@@ -17,6 +17,8 @@ Open http://127.0.0.1:5173. Import a PNG/JPEG/WebP or review a TIFF/BigTIFF page
 
 For the separate local REST service, run `npm run dev:api` in another terminal. Default: http://127.0.0.1:8787/api/v1/health.
 
+The **Artwork library** saves selected editable layers and original sources locally, with names/tags/search, verified portable packs and one-step placement/undo. See [the library workflow, source retention and privacy](docs/ARTWORK_LIBRARY.md).
+
 ## What works
 
 - Local metadata extraction in a worker, an Asset info inspector, and JSON sidecars with explicit privacy choices.

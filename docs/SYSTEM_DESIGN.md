@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Reusable artwork publication invariant
+
+An artwork library entry is metadata plus a checksummed native project, separate from any live document/account. Capture only selected roots/reachable dependencies, never unrelated document history. Preparation pins a durable library epoch. The final model transaction runs synchronously inside a database read guard that validates entry revision/content and epoch, ordering placement against cross-tab edit/remove/clear. Revalidate destination revision/session/lifetime and abort immediately before dispatch. Transfer source ownership before publication and roll back unpublished assets on failure; once dispatch advances the revision, retain accepted sources even if a listener/acknowledgement throws. Library cleanup must not collect placed/undo assets. Package installation remains inert, atomic and outside isolated capabilities.
+
 ## Website identity and document authority — local signed-fixture workflow verified
 
 Account export captures only owner metadata in one SQL snapshot. Deletion requires exact typed confirmation, current CSRF/origin and verification within five minutes by an already linked identity. One SQL commit removes the account and all sessions/links/proposals; short-lived identity hashes plus a database-ordered sequence reject old anonymous callbacks across instances/restarts, even within the same millisecond. Fresh later attempts may explicitly create a new account ID. Schema-1 migration is rollback-safe and grants old sessions no recent verification. Logical deletion does not erase SQLite pages/WAL/backups or local artwork. See SIGN_IN_WITH_CHATGPT.md for expiry and HTTP errors.

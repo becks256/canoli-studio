@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Reusable local artwork (W04, supported local workflow)
+
+Save only selected root artwork and reachable native source/master/style dependencies, with source resolution/settings intact and no live-document/history edits. Local names/tags/search, exact-content duplicate reuse, inert original-bearing packs and corruption recovery must remain useful without accounts. Placement must stage privately, preserve world geometry, remap sharing/styles, and commit through one ordinary undo transaction. Check destination lifetime/revision, cancellation and durable library entry/generation inside the final serialized commit; reject stale results without partial model/assets. Retain accepted sources if an observer fails. Atomic storage/quota and cross-tab remove/clear must not resurrect older preparations. Removing library entries leaves placed artwork and undo intact. No new isolated/plugin/REST storage capability or source image cap. See ARTWORK_LIBRARY.md for the complete current contract.
+
 ## T24 identity-only sign-in — local signed-fixture workflow verified
 
 Account metadata export must include only the authenticated owner and no credential/artwork fields. Explicit typed deletion requires recent verification by an existing current-account identity and atomically revokes all owned sessions, profiles, links and matching proposals. Reject anonymous/authenticated pre-deletion callbacks across processes/restarts without affecting other accounts. Legacy migration must be atomic, retain valid cookies/users and require fresh verification for sensitive operations; a newly linked identity cannot renew that authority. Preserve local artwork/history and independent grants. See the account lifecycle contract in SIGN_IN_WITH_CHATGPT.md.

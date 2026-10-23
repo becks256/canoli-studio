@@ -1,0 +1,4 @@
+import {inspectArtwork,encodeArtworkPack,readArtworkPack} from './pack';
+import type {PreparedArtwork} from './model';
+let started=false;
+self.onmessage=async(event:MessageEvent)=>{if(started)return;started=true;try{const data=event.data;if(data?.type==='inspect'&&data.blob instanceof Blob)self.postMessage({ok:true,value:await inspectArtwork(data.blob)});else if(data?.type==='import'&&data.blob instanceof Blob)self.postMessage({ok:true,value:await readArtworkPack(data.blob)});else if(data?.type==='export'&&Array.isArray(data.entries))self.postMessage({ok:true,value:await encodeArtworkPack(data.entries as PreparedArtwork[])});else throw new Error('Invalid artwork library worker request.');}catch(error){self.postMessage({ok:false,error:error instanceof Error?error.message:String(error)});}};

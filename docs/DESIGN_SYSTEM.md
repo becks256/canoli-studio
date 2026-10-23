@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Artwork library interaction
+
+Use the custom modal, text fields, text area and buttons with independent body scrolling and retained Cancel/Done. The rail and unassigned rebindable command open one library. Names/descriptions/tags are explicit local catalog fields; show exact-content duplicate reuse without overwriting reviewed metadata. Search has stable selected IDs and 40 visible rows per page without evicting data. Keep edited metadata drafts until explicit save/reload; reject stale revisions. Offer on-demand preview, native download, inert pack import/export, place, removal and explicit clear confirmation. Distinguish corrupt-record recovery from verified export, disclose valid-only packs and preserve input shortcuts. Placing returns to the canvas with one undo entry; closing/canceling invalidates pending UI work.
+
 ## Account and sign-in interaction
 
 Account data download is separate from Save project. Delete Canoli account opens a dedicated confirmation pane with retained Cancel/Done controls, explicit effects, current-identity verification when stale and a custom text input requiring exact DELETE before enabling the danger button. Keep controls at their normal height while the body scrolls. Treat typed editing shortcuts as input operations. Preserve the confirmation pane through same-account verification, clear it when account identity changes, and acknowledge deletion only after a valid server response.
