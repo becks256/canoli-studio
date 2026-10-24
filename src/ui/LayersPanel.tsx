@@ -1,3 +1,5 @@
+import {LayerAlignmentControls} from './LayerAlignmentControls';
+import type {AlignmentTarget,LayerAlignment} from '../core/layer-layout';
 import { LayerTreeRow } from "./LayerTreeRow";
 import type { RasterEditing } from "../raster-editing";
 import { LayerFilterBar } from "./LayerFilterBar";
@@ -56,6 +58,9 @@ export interface LayersPanelProps {
   onCancelTools(): void;
   onClearPreview(): void;
   onAttempt(action: () => void): void;
+  onAlign?(alignment:LayerAlignment,target:AlignmentTarget):void;
+  alignmentKeyId?:string;
+  onAlignmentKeyChange?(id:string):void;
   onSelectLayer(layer: Layer, additive?: boolean): void;
   onLoadTransparency?(id: string): void;
   onAddLayer(): void;
@@ -88,6 +93,9 @@ export function LayersPanel({
   onCancelTools,
   onClearPreview,
   onAttempt,
+  onAlign,
+  alignmentKeyId,
+  onAlignmentKeyChange,
   onSelectLayer,
   onLoadTransparency,
   onAddLayer,
@@ -325,42 +333,15 @@ export function LayersPanel({
           >
             Drop here to move to document
           </div>
+          <LayerAlignmentControls document={dom} viewDocument={viewDocument} busy={busy} keyLayerId={alignmentKeyId} onKeyChange={onAlignmentKeyChange} onAlign={(alignment,target)=>{
+            if(onAlign)onAlign(alignment,target);else{onCancelTools();onClearPreview();onAttempt(()=>dom.layerSelection.align(alignment,target.type==='layer'?dom.getLayer(target.id)!:target.type));}
+          }}/>
+          {dom.selectedLayers.length>0&&<div className="layer-extra-controls" role="region" aria-label="Additional layer controls" tabIndex={0} onKeyDown={event=>{
+            if(event.target===event.currentTarget&&['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key))event.stopPropagation();
+          }}>
           {dom.selectedLayers.length > 1 && (
             <div className="layer-filter-bar">
               <span>{dom.selectedLayers.length} layers selected</span>
-              <label>
-                Align layers{" "}
-                <select
-                  aria-label="Align selected layers"
-                  disabled={
-                    busy ||
-                    dom.layerSelection.rootLayers.some((layer) =>
-                      isLocked(viewDocument, layer.id),
-                    )
-                  }
-                  defaultValue=""
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    onAttempt(() =>
-                      dom.layerSelection.align(
-                        value as import("../dom/layer-selection").LayerAlignment,
-                      ),
-                    );
-                    event.target.value = "";
-                  }}
-                >
-                  <option value="" disabled>
-                    Choose alignment
-                  </option>
-                  {["left", "center", "right", "top", "middle", "bottom"].map(
-                    (value) => (
-                      <option value={value} key={value}>
-                        {value}
-                      </option>
-                    ),
-                  )}
-                </select>
-              </label>
               <label>
                 Distribute layers{" "}
                 <select
@@ -639,6 +620,7 @@ export function LayersPanel({
               New smart object via copy
             </Button>
           )}
+          </div>}
           <div className="layer-actions">
             <IconButton
               shortcutId="duplicate"

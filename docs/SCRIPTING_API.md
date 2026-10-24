@@ -1,5 +1,9 @@
 # Scripting API
 
+## Canvas and key-object layer alignment
+
+document.layerSelection.align(alignment, reference = "selection") accepts "selection", "canvas" or a real attached Layer handle from this document. The key remains stationary; all movement uses authored geometric bounds and one ordinary command. No new isolated capability or default keyboard shortcut is introduced. The guide includes executable scripting and semantic recipe examples. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.
+
 ## SVG embedded fonts and text
 
 Trusted `editor.inspectSvg(file,control={})` remains read-only structural preflight; `editor.openSvg(file,{mode:"editable"},control={})` privately parses embedded font originals and reconstructs supported horizontal text before new-tab publication. Mode defaults to editable and never silently flattens. Version-1 reports add fonts/texts counts. Exact methods/defaults, source and canonical-descriptor validation, cancellation/lifetime, native baseline preparation, unsupported character/CSS layouts and a trusted executable example are documented in [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md). These file services remain unavailable to ordinary isolated Scripts/plugins and headless REST.
@@ -2231,12 +2235,12 @@ print("Canvas", document.width, document.height);
 - `bounds`: union of selected-root document-space geometry, or `undefined` when no bounds exist.
 - `select(layers, mode = "replace")`, `clear()`: update layer selection.
 - `translate(x, y)`: move selected roots by a finite document-space delta; one transaction. A selected group and child move only once.
-- `align("left" | "center" | "right" | "top" | "middle" | "bottom")`: align selected-root geometric bounds to their union; one transaction. Layers without geometric bounds fail explicitly.
+- `align("left" | "center" | "right" | "top" | "middle" | "bottom", reference = "selection")`: align selected-root authored bounds to their union, the `"canvas"`, or an attached key `Layer` handle; one shared command. The key stays stationary and may be locked. Missing geometry, foreign/detached keys, moving hierarchy overlap and locked moving roots reject atomically. Text dimensions are preserved; no-op alignments add no history.
 - `scale(x, y = x)`: scale selected roots in canvas space around their shared geometric center; positive finite factors only. Preserves editable source geometry; one undo transaction. Empty selection and unit scale are no-ops.
 - `rotate(degrees)`: rotate selected roots clockwise in canvas space around their shared geometric center, preserving scale/shear through parent transforms; one transaction. Requires finite degrees and geometric bounds for every root. Empty selection and full turns are no-ops.
 - `remove()`: remove selected roots in one transaction.
 
-Mutations reject any locked selected root (including ancestor locks) without partial edits. Persisted affine transforms support multi-layer rotation and scaling. Bounds describe layer geometry, not shadow/effect extents. The inspector and individual tool settings still target the active layer.
+Mutations reject locked moving roots (including ancestor locks) without partial edits; alignment may use a stationary locked key. Persisted affine transforms support multi-layer rotation and scaling. Bounds describe layer geometry, not shadow/effect extents. The inspector and individual tool settings still target the active layer.
 
 ```js
 const first = document.layers.at(0);

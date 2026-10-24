@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Alignment uses existing editing authority
+
+The public alignment method emits the strict shared layer.align command. Existing document read/write grants, final revision/owner validation and ordinary Undo apply. A stationary key does not gain edit authority; installation remains inert, with no new file/network/asset-source capability or manifest version. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.
+
 ## SVG font import remains host-only
 
 Embedded SVG font data and native text reconstruction belong to trusted file admission. They add no source chooser, raw font store, network, native renderer or import capability to isolated plugin code. Installation stays inert; ordinary subsequent text/font metadata edits retain existing permissions, commands and Undo. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).

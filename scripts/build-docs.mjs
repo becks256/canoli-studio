@@ -44,6 +44,7 @@ const generatedPages = [
   ["FONT_FILES", "Embedded document font files"],
   ["FONT_RECIPES", "Portable font recipes"],
   ["SVG_FONT_IMPORT", "SVG fonts and editable text"],
+  ["LAYER_ALIGNMENT", "Align layers to canvas or key object"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

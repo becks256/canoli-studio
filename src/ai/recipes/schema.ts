@@ -3,6 +3,7 @@ import type { Recipe } from "./types";
 import { RECIPE_SCHEMA_VERSION } from "./types";
 import {paragraphOverrideKeysSchema} from '../../core/paragraph-styles';
 import {recipeFontFilesSchema} from './fonts';
+import {layerAlignmentSchema} from '../../core/layer-layout';
 
 export const recipeParagraphStyleTargetSchema=z.discriminatedUnion('by',[
   z.object({by:z.literal('name'),name:z.string().trim().min(1).max(80)}).strict(),
@@ -137,6 +138,9 @@ export const recipeRawDevelopmentSchema=z.object({
 }).strict();
 
 export const recipeActionSchema = z.discriminatedUnion("type", [
+  z.object({type:z.literal('layer.align'),targets:z.array(semanticTargetSchema).min(1),alignment:layerAlignmentSchema,reference:z.discriminatedUnion('type',[
+    z.object({type:z.literal('selection')}).strict(),z.object({type:z.literal('canvas')}).strict(),z.object({type:z.literal('layer'),layer:semanticTargetSchema}).strict(),
+  ]).optional()}).strict(),
   z.object({type:z.literal('font.file.add'),id:z.string().regex(/^[a-f0-9]{64}$/)}).strict(),
   z.object({type:z.literal('font.file.rename'),id:z.string().regex(/^[a-f0-9]{64}$/),name:z.string().min(1).max(240)}).strict(),
   z.object({type:z.literal('font.file.remove'),id:z.string().regex(/^[a-f0-9]{64}$/),replaceWith:z.string().min(1).max(240).optional()}).strict(),

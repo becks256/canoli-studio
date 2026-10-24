@@ -1,5 +1,9 @@
 # Canoli Studio — product brief
 
+## Local layout increment
+
+Canvas and key-object alignment extend precise local editing through shared OO commands, separate REST sessions and semantic recipes. Authored geometry and original sources remain preserved; this does not change the broad professional-editor objective or authorize accounts, inference or uploads. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md).
+
 ## Font-file binding (F08)
 
 Document schema 43 supports separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence. Selected native fonts preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. Portable recipe/package/batch transport is documented separately in [FONT_RECIPES.md](FONT_RECIPES.md); supported SVG font/text reimport is described in [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md). Broader font/viewer/device/mixed-source acceptance and professional typography remain open. See [the current font-file contract and limits](FONT_FILES.md). Earlier font-source sections below describe read-only inspection/preview; explicit embedding is a separate operation.

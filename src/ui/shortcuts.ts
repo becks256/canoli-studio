@@ -143,6 +143,10 @@ export const SHORTCUT_BINDINGS: Record<string, string[]> = {
   selectSubject: ["Mod+Alt+s"],
   help: ["?"],
 };
+// Alignment actions are available to command search and custom bindings; none
+// takes over a default typing shortcut.
+for(const reference of ['selection','canvas','layer'])for(const alignment of ['left','center','right','top','middle','bottom'])SHORTCUT_BINDINGS[`align-${alignment}-${reference}`]=[];
+
 export const TOOL_SHORTCUTS = [
   ["artboard", "Artboard editor", "a"],
   ["crop", "Crop canvas", "c"],

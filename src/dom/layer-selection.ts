@@ -1,6 +1,6 @@
-import type { DistributionAxis, DistributionMode } from "../core/layer-layout";
+import type { DistributionAxis, DistributionMode, LayerAlignment, AlignmentTarget } from "../core/layer-layout";
 import { AffineTransform } from "../core/affine";
-import type { Document, Layer } from "./index";
+import {Layer,type Document} from "./index";
 import { findParent, isLocked } from "../core/model";
 import {
   layerTransform,
@@ -8,8 +8,8 @@ import {
   unionBounds,
   parentSpaceDelta,
 } from "../core/spatial";
-export type LayerAlignment =
-  "left" | "center" | "right" | "top" | "middle" | "bottom";
+export type {LayerAlignment} from '../core/layer-layout';
+export type LayerAlignmentReference='selection'|'canvas'|Layer;
 /** Document-owned layer selection, independent of the pixel marquee. */
 export class LayerSelection {
   constructor(private readonly document: Document) {}
@@ -111,45 +111,14 @@ export class LayerSelection {
       for (const { layer, transform } of changes) layer.transform = transform;
     });
   }
-  align(alignment: LayerAlignment) {
-    if (
-      !["left", "center", "right", "top", "middle", "bottom"].includes(
-        alignment,
-      )
-    )
-      throw new Error("Unknown layer alignment.");
-    const layers = this.editableRoots(),
-      doc = this.document._read();
-    const items = layers.map((layer) => ({
-      layer,
-      bounds: layerBounds(doc, layer.id),
-    }));
-    if (items.some((item) => !item.bounds))
-      throw new Error("Every aligned layer must have geometric bounds.");
-    const bounds = unionBounds(items.map((item) => item.bounds!));
-    if (!bounds) return;
-    this.document.transaction("Align selected layers", () => {
-      for (const { layer, bounds: b } of items) {
-        const dx =
-          alignment === "left"
-            ? bounds.x - b!.x
-            : alignment === "right"
-              ? bounds.x + bounds.width - b!.x - b!.width
-              : alignment === "center"
-                ? bounds.x + bounds.width / 2 - b!.x - b!.width / 2
-                : 0;
-        const dy =
-          alignment === "top"
-            ? bounds.y - b!.y
-            : alignment === "bottom"
-              ? bounds.y + bounds.height - b!.y - b!.height
-              : alignment === "middle"
-                ? bounds.y + bounds.height / 2 - b!.y - b!.height / 2
-                : 0;
-        const delta = parentSpaceDelta(doc, layer.id, { x: dx, y: dy });
-        layer.update({ x: layer.x + delta.x, y: layer.y + delta.y });
-      }
-    });
+  align(alignment:LayerAlignment,reference:LayerAlignmentReference='selection') {
+    let target:AlignmentTarget;
+    if(typeof reference==='string')target={type:reference};
+    else{
+      if(!(reference instanceof Layer)||reference.document!==this.document||!reference.isAttached)throw new Error('The alignment key must be an attached layer from this document.');
+      target={type:'layer',id:reference.id};
+    }
+    this.document._dispatch({type:'layer.align',ids:this.layers.map(layer=>layer.id),alignment,target});
   }
   flip(axis: DistributionAxis) {
     this.document._dispatch({

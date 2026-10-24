@@ -87,6 +87,7 @@ export interface PlannedRawDevelopment {
 }
 
 export type RecipeAction =
+  | {type:'layer.align';targets:SemanticTarget[];alignment:import('../../core/layer-layout').LayerAlignment;reference?:{type:'selection'}|{type:'canvas'}|{type:'layer';layer:SemanticTarget}}
   | {type:'font.file.add';id:string}
   | {type:'font.file.rename';id:string;name:string}
   | {type:'font.file.remove';id:string;replaceWith?:string}

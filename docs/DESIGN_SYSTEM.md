@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Layer alignment reference controls
+
+Show Align relative to and the six-direction chooser for a nonempty layer selection. Default single-root selection to Canvas and multi-root selection to Selection. Key object reveals a numbered selected-root chooser and explains that the key stays stationary. Share the current key with command search/custom bindings; disable invalid moving locks/geometry with a useful reason. Use compact reference rows, retain usable layer-tree height and bound the additional controls in a keyboard-scrollable region instead of letting them push the action footer beyond the viewport. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.
+
 ## SVG font-source review
 
 Keep the custom SVG import dialog and explicit editable/flatten/cancel choices. Show the embedded-font declaration count and explain that editable projects retain supplied font files; structural inspection is followed by source validation during import. Decoding status covers images and fonts. Missing/malformed sources or unsupported canonical matching remain actionable errors without retargeting edited work. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).

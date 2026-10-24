@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Layer alignment command
+
+The existing independent command endpoint accepts layer.align with distinct ids, a six-value alignment and an optional strict selection/canvas/layer target. Omitted target uses the selection. Expected revisions, atomic validation and ordinary Undo remain authoritative; a key reference can be locked but cannot overlap a moving hierarchy. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.
+
 ## Trusted SVG font admission
 
 Existing trusted browser inspectSvg/openSvg services add horizontal text and embedded font-file reconstruction. Version-1 reports add fonts/texts counts; structural inspection does not certify native source decoding/layout. No SVG file/native-font service is added to independent REST or isolated scripts/plugins. Defaults, controls, failure behavior and limits: [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).

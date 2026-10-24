@@ -8,6 +8,47 @@ import {
   unionBounds,
 } from "./spatial";
 import type { EditorCommand } from "./commands";
+import {z} from 'zod';
+
+export const layerAlignmentSchema=z.enum(['left','center','right','top','middle','bottom']);
+export const alignmentTargetSchema=z.discriminatedUnion('type',[
+  z.object({type:z.literal('selection')}).strict(),
+  z.object({type:z.literal('canvas')}).strict(),
+  z.object({type:z.literal('layer'),id:z.string().min(1).max(240)}).strict(),
+]);
+export type LayerAlignment=z.infer<typeof layerAlignmentSchema>;
+export type AlignmentTarget=z.infer<typeof alignmentTargetSchema>;
+export interface AlignmentMovement {type:'layer.update';id:string;patch:{x:number;y:number}}
+
+/** Plan every movement from one canvas-space snapshot before publishing any edit. */
+export function alignmentCommands(document:DocumentData,ids:string[],alignment:LayerAlignment,target:AlignmentTarget={type:'selection'}):AlignmentMovement[]{
+  alignment=layerAlignmentSchema.parse(alignment);target=alignmentTargetSchema.parse(target);
+  z.array(z.string().min(1).max(240)).parse(ids);
+  const roots=independentLayoutRoots(document,ids);
+  if(!roots.length)return [];
+  const keyId=target.type==='layer'?target.id:undefined;
+  const key=keyId?allLayers(document.children).find(layer=>layer.id===keyId):undefined;
+  if(target.type==='layer'&&!key)throw new Error('The alignment key layer does not exist.');
+  const moving=roots.filter(layer=>layer.id!==key?.id);
+  if(moving.some(layer=>isLocked(document,layer.id)))throw new Error('Selection contains a locked layer.');
+  const contains=(ancestor:string,child:string)=>{let id=findParent(document.children,child);while(id){if(id===ancestor)return true;id=findParent(document.children,id);}return false;};
+  if(key&&moving.some(layer=>contains(layer.id,key.id)||contains(key.id,layer.id)))throw new Error('The alignment key layer must be independent of every moving layer.');
+  const items=moving.map(layer=>({layer,bounds:layerBounds(document,layer.id)}));
+  if(items.some(item=>!item.bounds))throw new Error('Every aligned layer must have geometric bounds.');
+  const bounds=target.type==='canvas'?{x:0,y:0,width:document.width,height:document.height}:key?layerBounds(document,key.id):unionBounds(items.map(item=>item.bounds!));
+  if(!bounds)throw new Error('The alignment reference must have geometric bounds.');
+  const changes:AlignmentMovement[]=[];
+  for(const{layer,bounds:b}of items){
+    const dx=alignment==='left'?bounds.x-b!.x:alignment==='right'?bounds.x+bounds.width-b!.x-b!.width:alignment==='center'?bounds.x+bounds.width/2-b!.x-b!.width/2:0;
+    const dy=alignment==='top'?bounds.y-b!.y:alignment==='bottom'?bounds.y+bounds.height-b!.y-b!.height:alignment==='middle'?bounds.y+bounds.height/2-b!.y-b!.height/2:0;
+    if(!Number.isFinite(dx)||!Number.isFinite(dy))throw new Error('Alignment exceeds representable coordinates.');
+    if(dx===0&&dy===0)continue;
+    const delta=parentSpaceDelta(document,layer.id,{x:dx,y:dy}),x=layer.x+delta.x,y=layer.y+delta.y;
+    if(!Number.isFinite(x)||!Number.isFinite(y))throw new Error('Alignment exceeds representable coordinates.');
+    changes.push({type:'layer.update',id:layer.id,patch:{x,y}});
+  }
+  return changes;
+}
 
 export type DistributionAxis = "horizontal" | "vertical";
 export type DistributionMode = "gaps" | "centers";
@@ -75,6 +116,12 @@ export function distributionCommands(
 }
 
 function editableLayoutRoots(document: DocumentData, ids: string[]) {
+  const roots=independentLayoutRoots(document,ids);
+  if (roots.some((layer) => isLocked(document, layer.id)))
+    throw new Error("Selection contains a locked layer.");
+  return roots;
+}
+function independentLayoutRoots(document: DocumentData, ids: string[]) {
   const selected = new Set(ids);
   const layers = allLayers(document.children);
   if (
@@ -91,8 +138,6 @@ function editableLayoutRoots(document: DocumentData, ids: string[]) {
     }
     return true;
   });
-  if (roots.some((layer) => isLocked(document, layer.id)))
-    throw new Error("Selection contains a locked layer.");
   return roots;
 }
 

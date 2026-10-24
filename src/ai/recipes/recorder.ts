@@ -237,6 +237,15 @@ export class RecipeRecorder {
     };
 
     switch (command.type) {
+      case 'layer.align': {
+        const reference=(layerId:string):SemanticTarget=>{
+          const layer=findLayer(beforeDoc,layerId);if(!layer)throw new Error('Missing recorded alignment layer.');
+          return this.createdLayerOutputs.has(layerId)?structuredClone(this.createdLayerOutputs.get(layerId)!):{by:'name',pattern:layer.name,literal:true,ambiguityStrategy:'fail'};
+        };
+        this.steps.push({id:`step-${id()}`,name:'Align layers',action:{type:'layer.align',targets:command.ids.map(reference),alignment:command.alignment,
+          reference:command.target?.type==='layer'?{type:'layer',layer:reference(command.target.id)}:command.target??{type:'selection'}}});
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
       case 'font.file.add':
       case 'font.file.rename':
       case 'font.file.remove': {

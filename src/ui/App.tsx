@@ -1,3 +1,4 @@
+import {alignmentCommands,layerAlignmentSchema,type LayerAlignment,type AlignmentTarget} from '../core/layer-layout';
 import {HistoryInspectorDialog} from './HistoryInspectorDialog';
 import {PaletteLibraryContext,type PalettePickerRequest} from './PaletteColorControl';
 import {PaletteLibraryDialog} from './PaletteLibraryDialog';
@@ -718,7 +719,19 @@ export function App({ editor }: { editor: EditorApplication }) {
   }
   function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
 
+  const[chosenAlignmentKey,setChosenAlignmentKey]=useState<{owner:EditorDocument;selection:string;id:string}|null>(null);
+  const alignmentSelection=dom.getSnapshot().selectedIds.join(':'),alignmentRoots=dom.layerSelection.rootLayers;
+  useEffect(()=>setChosenAlignmentKey(null),[dom,alignmentSelection]);
+  const requestedKey=chosenAlignmentKey?.owner===dom&&chosenAlignmentKey.selection===alignmentSelection?chosenAlignmentKey.id:dom.selectedLayer?.id;
+  const alignmentKey=alignmentRoots.find(layer=>layer.id===requestedKey)??alignmentRoots.find(layer=>layer.id===dom.selectedLayer?.id)??alignmentRoots[0]??null;
+  const alignLayers=(alignment:LayerAlignment,target:AlignmentTarget)=>{cancelWorkspaceGesture();attempt(()=>dom.layerSelection.align(alignment,target.type==='layer'?dom.getLayer(target.id)!:target.type));};
   const defaultShortcuts = new ShortcutRegistry([
+    ...(['selection','canvas','layer']as const).flatMap(type=>layerAlignmentSchema.options.map(alignment=>({
+      id:`align-${alignment}-${type}`,label:`Align ${alignment} to ${type==='layer'?'key object':type}`,category:'Layout',keys:SHORTCUT_BINDINGS[`align-${alignment}-${type}`],
+      description:type==='layer'?'Keep the active selected root stationary':'Align selected-root geometry in canvas space',
+      enabled:()=>{try{const roots=dom.layerSelection.rootLayers,key=alignmentKey;if(!roots.length||type==='layer'&&(!key||!roots.some(layer=>layer.id===key.id)||roots.length<2))return false;alignmentCommands(dom.toJSON(),dom.selectedLayers.map(layer=>layer.id),alignment,type==='layer'?{type,id:key!.id}:{type});return true;}catch{return false;}},
+      run:()=>{const key=alignmentKey;if(type==='layer'&&!key)return;alignLayers(alignment,type==='layer'?{type,id:key!.id}:{type});},
+    }))),
     {id:'account',label:'Account',category:'Workspace',keys:SHORTCUT_BINDINGS.account,allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowAccount(true);}},
     {id:'chatgpt-connection',label:'ChatGPT connection',category:'Workspace',keys:SHORTCUT_BINDINGS['chatgpt-connection'],allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowChatGptConnection(true);}},
     {id:"color-palettes",label:"Color palettes",keys:SHORTCUT_BINDINGS["color-palettes"],run:()=>{cancelWorkspaceGesture();setShowColorPalettes(true);}},
@@ -1988,6 +2001,9 @@ export function App({ editor }: { editor: EditorApplication }) {
             onCancelTools={() => editor.tools.cancel()}
             onClearPreview={clearPreview}
             onAttempt={attempt}
+            onAlign={alignLayers}
+            alignmentKeyId={alignmentKey?.id}
+            onAlignmentKeyChange={id=>setChosenAlignmentKey({owner:dom,selection:alignmentSelection,id})}
             onSelectLayer={(layer, additive) => {
               if (additive)
                 dom.selectLayers(

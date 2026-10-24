@@ -1626,3 +1626,15 @@ it('reflows based-on paragraph styles transitively through REST and rejects cycl
  expect((await request(path)).body.document).toEqual(locked.body.document);
  const renamed=await request(path+'/commands',{expectedRevision:locked.body.revision,commands:[{type:'paragraphStyle.set',style:{...changedBase,name:'Body renamed'}}]});expect(renamed.status,JSON.stringify(renamed.body)).toBe(200);
 });
+
+it('aligns a single layer to canvas through REST with revision checks and exact undo',async()=>{
+ const created=await request('/documents',{width:200,height:100}),path=`/documents/${created.body.document.id}`,layer={...new TextLayer({name:'Aligned',text:'A',x:10,y:15}).toJSON(),width:20,height:20};await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer}]});
+ const aligned=await request(path+'/commands',{expectedRevision:1,commands:[{type:'layer.align',ids:[layer.id],alignment:'center',target:{type:'canvas'}},{type:'layer.align',ids:[layer.id],alignment:'middle',target:{type:'canvas'}}]});expect(aligned.status).toBe(200);expect(aligned.body.document.children[0]).toMatchObject({x:90,y:40});
+ expect((await request(path+'/commands',{expectedRevision:1,commands:[{type:'layer.align',ids:[layer.id],alignment:'left',target:{type:'canvas'}}]})).status).toBe(409);
+ const undone=await request(path+'/undo',{expectedRevision:2});expect(undone.body.document.children[0]).toEqual(layer);
+ for(const command of [{type:'layer.align',ids:[layer.id],alignment:'diagonal'},{type:'layer.align',ids:[layer.id,layer.id],alignment:'left'},{type:'layer.align',ids:[layer.id],alignment:'left',target:{type:'canvas',id:layer.id}}])expect((await request(path+'/commands',{expectedRevision:3,commands:[command]})).status).toBe(400);
+});
+it('treats a locked selected key as a read-only REST alignment reference',async()=>{
+ const created=await request('/documents',{width:200,height:100}),path=`/documents/${created.body.document.id}`,moving={...new TextLayer({name:'Moving',text:'A',x:0,y:40}).toJSON(),width:20,height:20},key={...new TextLayer({name:'Key',text:'A',x:130,y:10,locked:true}).toJSON(),width:40,height:20};await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:moving},{type:'layer.add',layer:key}]});
+ const response=await request(path+'/commands',{expectedRevision:1,commands:[{type:'layer.align',ids:[moving.id,key.id],alignment:'right',target:{type:'layer',id:key.id}}]});expect(response.status).toBe(200);expect(response.body.document.children[0].x).toBe(150);expect(response.body.document.children[1]).toEqual(key);
+});

@@ -12,6 +12,7 @@ import { recipeOutputBindingsUnique, stepConditionSchema, recipeActionSchema } f
 import {recipeParagraphStyleTargetSchema} from './schema';
 import {paragraphStyleSchema,paragraphTextLayers,sameParagraphFormat,sameParagraphBase,type ParagraphStyleData} from '../../core/paragraph-styles';
 import type { DocumentData, LayerData } from "../../core/model";
+import {alignmentCommands,type AlignmentTarget} from '../../core/layer-layout';
 import {
   allLayers,
   findLayer,
@@ -259,6 +260,7 @@ export function compileEditPlan(
       }
     }
 
+    if(step.action.type==='layer.align'&&step.target){errors.push(`Step '${step.name}': Alignment actions use their own targets and reference.`);continue;}
     if((step.action.type.startsWith('paragraphStyle.')||step.action.type.startsWith('font.file.'))&&step.target){
       errors.push(`Step '${step.name}': Style and font library actions do not accept layer targets.`);
       continue;
@@ -927,6 +929,25 @@ export function compileEditPlan(
             stepCommands.push(cmd);simDoc = apply(cmd);
             visitFontScopes(simDoc,(scope,path)=>{for(const layer of allLayers(scope.children))if(layer.kind==='text'&&previous.get(JSON.stringify([...path,layer.id]))!==layer.fontFamily){layersModified++;affectedLayerNames.add(layer.name);}});
             visualChange=`Replace font request '${cmd.from}' with '${cmd.to}' across text, styles and embedded documents`;break;
+          }
+          case 'layer.align': {
+            const resolve=(reference:import('./types').SemanticTarget)=>{
+              const resolution=resolveTargets(reference,simDoc,selectedId,stepOutputs,params,outputGroups);
+              if(resolution.error||!resolution.layers.length)throw new Error(resolution.error??'No alignment layers match.');
+              return resolution.layers;
+            };
+            const ids=step.action.targets.flatMap(reference=>resolve(reference).map(layer=>layer.id));
+            if(new Set(ids).size!==ids.length)throw new Error('Alignment selectors resolve to duplicate layers.');
+            const reference=step.action.reference??{type:'selection'};
+            let target:AlignmentTarget;
+            if(reference.type==='layer'){
+              const layers=resolve(reference.layer);if(layers.length!==1)throw new Error('Choose exactly one alignment key layer.');
+              target={type:'layer',id:layers[0].id};
+            }else target=reference;
+            const changes=alignmentCommands(simDoc,ids,step.action.alignment,target),cmd:EditorCommand={type:'layer.align',ids,alignment:step.action.alignment,target};
+            stepCommands.push(cmd);simDoc=apply(cmd);layersModified+=changes.length;
+            for(const change of changes)if(change.type==='layer.update')affectedLayerNames.add(findLayer(simDoc,change.id)!.name);
+            visualChange=`Align layers ${step.action.alignment} relative to ${reference.type}`;break;
           }
           case "document.rename": {
             const name = String(actionValue(step.action.name));

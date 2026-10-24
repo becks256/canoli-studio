@@ -1,6 +1,7 @@
 import {fontVariantCapsSchema,fontStretchSchema} from './font-features';
 import {fontFamilyRequestSchema} from './font-management';
 import {fontFileSchema} from './font-files';
+import {layerAlignmentSchema,alignmentTargetSchema} from './layer-layout';
 import { layerCompSchema } from "./layer-comps";
 import {paragraphStyleSchema,paragraphOverrideKeysSchema} from './paragraph-styles';
 import { alphaChannelSchema } from './alpha-channels';
@@ -106,6 +107,7 @@ const layer = z.unknown().transform((value, context) => {
 
 const commandVariants = () =>
   z.discriminatedUnion("type", [
+    z.object({type:z.literal('layer.align'),ids:z.array(identifier).min(1),alignment:layerAlignmentSchema,target:alignmentTargetSchema.optional()}).strict(),
     z
       .object({
         type: z.literal("layer.flip"),

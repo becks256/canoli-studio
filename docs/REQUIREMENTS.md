@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Canvas and key-object alignment
+
+Single or multiple selected roots must align to their selection, canvas or an independent stationary key through one shared command. Preserve authored geometry, text dimensions, source bytes and parent bases; a locked key stays read-only, while locked moving roots reject atomically. Offer custom-system panel controls and matching command-palette actions, with no new default typing shortcuts. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.
+
 ## SVG font and horizontal text import
 
 Trusted SVG import must retain supplied complete embedded font files, remap selected native identities and reconstruct supported horizontal text with loaded-font bounds, alphabetic placement, whole-line typography and affine hierarchy. Keep structural inspection inert, final source/layout validation private, revision-zero publication and ordinary subsequent Undo. Unsupported character/CSS/descriptor graphs require explicit flattened import; cancellation, bad sources and stale owners publish nothing. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).

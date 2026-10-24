@@ -11,6 +11,9 @@ import { lassoSelection, polygonSelectionSchema } from "./lasso";
 import {
   flipCommands,
   distributionCommands,
+  alignmentCommands,
+  type LayerAlignment,
+  type AlignmentTarget,
   type DistributionAxis,
   type DistributionMode,
 } from "./layer-layout";
@@ -106,6 +109,7 @@ export type LayerPatch = Partial<
 // Serializable commands are the single mutation boundary for UI, automation,
 // and a future AI adapter. No renderer or UI code mutates document nodes.
 export type EditorCommand =
+  | {type:'layer.align';ids:string[];alignment:LayerAlignment;target?:AlignmentTarget}
   | {type:'font.file.add';file:FontFileData}
   | {type:'font.file.rename';id:string;name:string}
   | {type:'font.file.remove';id:string;replaceWith?:string}
@@ -391,6 +395,14 @@ function apply(document: DocumentData, command: EditorCommand): void {
   if (command.type === "layer.flip") {
     for (const change of flipCommands(document, command.ids, command.axis))
       apply(document, change);
+    return;
+  }
+  if(command.type==='layer.align'){
+    // Layout moves authored boxes; ordinary text updates may reflow against a
+    // different available font set, changing the very bounds being aligned.
+    for(const change of alignmentCommands(document,command.ids,command.alignment,command.target)){
+      const layer=findLayer(document,change.id)!;layer.x=change.patch.x;layer.y=change.patch.y;
+    }
     return;
   }
   if (command.type === "layer.distribute") {
@@ -871,6 +883,7 @@ export function execute(
 
 export function describe(command: EditorCommand): string {
   switch (command.type) {
+    case 'layer.align':return command.target?.type==='canvas'?'Align layers to canvas':command.target?.type==='layer'?'Align layers to key object':'Align selected layers';
     case 'font.file.add':return 'Embed font file';
     case 'font.file.rename':return 'Rename font file';
     case 'font.file.remove':return 'Remove font file';

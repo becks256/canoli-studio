@@ -1,5 +1,9 @@
 # Architecture
 
+## Shared alignment planner
+
+The read-only layer-layout planner resolves independent roots, stationary reference bounds and parent-space translations from one snapshot. The layer.align reducer changes only validated x/y fields, preserving authored text bounds rather than reflowing against another font environment. OO handles, REST DTOs, isolated commits and semantic recipe recording share this command. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.
+
 ## SVG font/text reconstruction
 
 The inert XML worker uses pinned CSSTree token/URL/declaration parsing and transports original font Blobs plus validated baseline placements. The host privately prepares native resources, resolves canonical family/style/stretch/weight choices, remaps source aliases and reconstructs TextLayer/FontFile values through OO commands. Temporary registration brackets synchronous layout after asynchronous source/image work; only the final accepted document adopts independently owned sources. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).
