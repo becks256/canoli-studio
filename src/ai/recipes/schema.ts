@@ -136,6 +136,7 @@ export const recipeRawDevelopmentSchema=z.object({
 }).strict();
 
 export const recipeActionSchema = z.discriminatedUnion("type", [
+  z.object({type:z.literal('document.font.replace'),from:z.string().min(1).max(240),to:z.string().min(1).max(240)}).strict(),
   z.object({type:z.literal("raw.develop"),development:recipeRawDevelopmentSchema,allowPrecisionLoss:z.literal(true)}).strict(),
   z.object({type:z.literal('paragraphStyle.ensure'),name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
   z.object({type:z.literal('paragraphStyle.update'),style:recipeParagraphStyleTargetSchema,name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),

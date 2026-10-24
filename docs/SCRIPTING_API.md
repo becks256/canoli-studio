@@ -1,5 +1,9 @@
 # Scripting API
 
+## Document font collection
+
+Document.fonts.items returns owned DocumentFontUsage[] across all stored text/style/embedded scopes. Document.fonts.replace(from:string,to:string):void requires exact 1–240-unit authored requests, preserves inheritance/overrides and uses shared validation, reflow, locks and one-step history. Equal/missing requests are no-ops; malformed or locked replacements reject atomically. No font files/embedding or availability API is exposed to isolated scripts. Full DTOs, defaults, executable example, REST/recipe counterparts and limits: [Document fonts](FONT_MANAGEMENT.md).
+
 ## Native capital variants and font stretch
 
 TextLayer options and attached fontVariantCaps/fontStretch setters accept exactly the native keyword enums; omitted fields render as normal and absent getters remain undefined. resetFontFeatures():void requests normal capitals/stretch in one command while preserving weight/source text; linked text receives explicit local overrides. Reset paragraph override keys to inherit instead. Existing fontWeight accepts CSS strings; UI numerical weight supports 1–1000. Nondefault unsupported native controls fail before drawing, not by rewriting characters. Full signatures, enums, executable isolated example, REST counterpart and errors/limits are in the guide. See [native font features](FONT_FEATURES.md).

@@ -100,6 +100,7 @@ export const SHORTCUT_BINDINGS: Record<string, string[]> = {
   "color-palettes": [],
   "recent-files": [],
   "workspace-layout": [],
+  "font-manager": [],
   "workspace-reset": [],
   "command-palette": ["Mod+k"],
   plugins: ["Mod+Shift+l"],

@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Document font management (F08 increment)
+
+Provide a searchable document-wide inventory and exact-request replacement across hidden/ordinary text, explicit overrides, based-on styles and all stored embedded scopes. Preserve inheritance, source text, selection, other typography, original assets and authored geometry; reflow affected text with shared commands, locks and one-step undo. Connect the custom modal, OO collection, isolated/plugin permissions, independent REST and semantic recipes. Guard stale/closed owners and asynchronous availability; fallback is explicit. Font embedding, character runs, arbitrary axes, path text and broader F08/F14 remain required. See [the contract](FONT_MANAGEMENT.md).
+
 ## Native capital variants and width selection (F08)
 
 Preserve original Unicode text and whole-line shaping while exposing validated capital variants, font-stretch requests and numerical weight input. Shared OO commands, locks/undo, paragraph-style inheritance/overrides, scripts, independent REST, native measurement/cache/rendering, resizing, recipes and persistence must agree. Explicit new fields require schema 42; legacy absent defaults stay normal and old labels cannot admit new fields. Unsupported nondefault Canvas requests fail before drawing and can be reset. Font tables, closest-face/synthesis and receiving-browser differences must remain explicit; font files and arbitrary axes are not implied. See [native font features](FONT_FEATURES.md).

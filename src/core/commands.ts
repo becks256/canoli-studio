@@ -1,4 +1,5 @@
 import { replaceVectorPaths, type VectorBooleanSelection } from './vector-boolean';
+import {replaceDocumentFont} from './font-management';
 import {paragraphStyleSchema,resolveParagraphStyleLibrary,paragraphOverrideKeysSchema,paragraphFormat,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS,resolveParagraphBinding,sameParagraphFormat,type ParagraphStyleData,type ParagraphFormat} from './paragraph-styles';
 import {vectorStrokeKeys} from './vector-stroke';
 import { isImmutable, shareUnchanged } from "./immutable";
@@ -103,6 +104,7 @@ export type LayerPatch = Partial<
 export type EditorCommand =
   | {type:'paragraphStyle.set';style:ParagraphStyleData}
   | {type:'paragraphStyle.remove';id:string}
+  | {type:'document.font.replace';from:string;to:string}
   | {type:'text.paragraphStyle';id:string;styleId:string|null;keepOverrides?:boolean}
   | {type:'text.paragraphOverrides.clear';id:string;keys?:(keyof ParagraphFormat)[]}
   | { type: "document.guides"; guides: GuideData[] }
@@ -206,6 +208,9 @@ function reflowText(layer:TextLayerData){
   layer.width=bounds.width;layer.height=bounds.height;
 }
 function apply(document: DocumentData, command: EditorCommand): void {
+  if(command.type==='document.font.replace'){
+    replaceDocumentFont(document,command.from,command.to,reflowText,(scope,definitions)=>apply(scope,{type:'component.replaceAll',definitions}));return;
+  }
   if (command.type === 'paths.replace') { replaceVectorPaths(document, command.operands, command.result); return; }
   if (command.type === "transaction") {
     for (const child of command.commands) apply(document, child);
@@ -838,6 +843,7 @@ export function execute(
 
 export function describe(command: EditorCommand): string {
   switch (command.type) {
+    case 'document.font.replace':return 'Replace document font';
     case 'paragraphStyle.set':return 'Edit paragraph style';
     case 'paragraphStyle.remove':return 'Remove paragraph style';
     case 'text.paragraphStyle':return command.styleId?'Apply paragraph style':'Detach paragraph style';

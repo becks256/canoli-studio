@@ -33,6 +33,7 @@ export const FONT_FAMILIES = [
 ];
 
 export interface TypographyPanelProps {
+  onManageFonts?():void;
   layer: TextLayer;
   disabled: boolean;
   onAction(action: () => void): void;
@@ -40,6 +41,7 @@ export interface TypographyPanelProps {
 }
 
 export function TypographyPanel({
+  onManageFonts,
   layer,
   disabled,
   onAction,
@@ -97,6 +99,7 @@ export function TypographyPanel({
 
   return (
     <InspectorSection title="Text" className="typography-panel">
+      {onManageFonts&&<Button variant="subtle" onClick={onManageFonts}>Manage document fonts…</Button>}
       <TextArea
         label="Content"
         ariaLabel="Text content"

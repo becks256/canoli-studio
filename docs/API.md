@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Document font requests
+
+GET /api/v1/documents/:id/fonts returns id/revision/fonts for the independent headless session. The strict document.font.replace command requires from/to strings and the current expectedRevision through the normal command endpoint, sharing atomic locks/history and estimated headless reflow. It does not inspect browser fonts or add rendering/synchronization. Complete DTOs, example, errors and limits: [Document fonts](FONT_MANAGEMENT.md).
+
 ## Native font requests through shared commands
 
 Independent REST accepts layer.update patches fontVariantCaps and fontStretch with strict native keywords, existing fontWeight strings, current expectedRevision, effective text/ancestor locks and atomic undo. Paragraph format/override commands carry the same requests. JSON resets use normal values or text.paragraphOverrides.clear; there is no undefined JSON or browser synchronization. Headless text metrics remain approximate. Current constructor defaults, complete enums, isolated example and failure/format boundaries are in the linked guide. See [native font features](FONT_FEATURES.md).

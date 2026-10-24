@@ -1,4 +1,5 @@
 import type {HistoryOrigin} from '../../core/history-provenance';
+import {visitFontScopes} from '../../core/font-management';
 import {hasLensCorrection,validateLensGeometry} from '../../core/interchange/raw/lens';
 import {parseRawDevelopmentOptions} from '../../core/interchange/raw/types';
 import {rawComponentCommand} from '../../core/interchange/raw/commands';
@@ -890,6 +891,14 @@ export function compileEditPlan(
             break;
           }
 
+          case 'document.font.replace': {
+            const cmd:EditorCommand={type:'document.font.replace',from:String(actionValue(step.action.from)),to:String(actionValue(step.action.to))};
+            const previous=new Map<string,string>();
+            visitFontScopes(simDoc,(scope,path)=>{for(const layer of allLayers(scope.children))if(layer.kind==='text')previous.set(JSON.stringify([...path,layer.id]),layer.fontFamily);});
+            stepCommands.push(cmd);simDoc=execute(simDoc,cmd);
+            visitFontScopes(simDoc,(scope,path)=>{for(const layer of allLayers(scope.children))if(layer.kind==='text'&&previous.get(JSON.stringify([...path,layer.id]))!==layer.fontFamily){layersModified++;affectedLayerNames.add(layer.name);}});
+            visualChange=`Replace font request '${cmd.from}' with '${cmd.to}' across text, styles and embedded documents`;break;
+          }
           case "document.rename": {
             const name = String(actionValue(step.action.name));
             const cmd: EditorCommand = {

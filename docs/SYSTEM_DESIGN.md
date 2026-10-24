@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Document font replacement invariant
+
+Match complete authored family requests exactly across all owned stored scopes. Recompute based-on cached formats without converting inheritance to overrides; update existing explicit font overrides and reflow only changed text. Resolve effective text locks per owning scope and changed component dependencies through existing registry checks. Validation/lock/reflow failure before publication discards the complete command draft, including earlier changes; accepted observer failures retain accepted state. UI owner/revision and request-keyed availability remain separate from native source/model persistence; no schema, font binary or isolated authority change occurs. See FONT_MANAGEMENT.md.
+
 ## Immutable query ownership
 
 Retained layer lookup and inherited-lock metadata require the existing internal recursive-immutability proof. Object.freeze(root) alone is insufficient. Key the private weak index by the complete root, preserving ancestry across shared children, undo/redo, independent documents and previews. Mutable drafts always traverse current data; command validation and publication remain authoritative. Weak keys permit collection with their snapshots and retain no source blobs or decoder handles. Index metadata still consumes memory while snapshots remain reachable; no process-memory bound or full F14 claim follows. Public constructors, command/history/schema and isolated/REST permissions remain unchanged.

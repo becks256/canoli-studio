@@ -81,6 +81,7 @@ export interface InspectorPanelProps {
   onSelectedAction(action: (layer: Layer) => void): void;
   onOpenHelp(): void;
   onCombinePaths(): void;
+  onManageFonts():void;
   onDevelopRaw(layer:SmartObjectLayer):void;
 }
 
@@ -102,6 +103,7 @@ export function InspectorPanel({
   onSelectedAction,
   onOpenHelp,
   onCombinePaths,
+  onManageFonts,
   onDevelopRaw,
 }: InspectorPanelProps) {
   const frequencyOwner=selected?frequencyRadiusOwner(viewDocument,selected.id):null;
@@ -479,6 +481,7 @@ export function InspectorPanel({
             <>
             <ParagraphStylesPanel layer={selectedObject} disabled={locked||busy} onAction={action=>onAttempt(()=>{onPreview(null);action();})}/>
             <TextProperties
+              onManageFonts={onManageFonts}
               layer={selectedObject}
               disabled={locked || busy}
               onAction={(action) =>

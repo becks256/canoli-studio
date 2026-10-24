@@ -93,6 +93,7 @@ export type RecipeAction =
   | {type:'paragraphStyle.remove';style:RecipeParagraphStyleTarget}
   | {type:'text.paragraphStyle';style:RecipeParagraphStyleTarget|null;keepOverrides?:boolean}
   | {type:'text.paragraphOverrides.clear';keys?:(keyof ParagraphFormat)[]}
+  | {type:'document.font.replace';from:string;to:string}
   | { type: "layer.translate"; dx: number | string; dy: number | string }
   | {
       type: "layer.update";

@@ -1,3 +1,4 @@
+import {fontManagementWorkflow} from './helpers/font-management';
 import {fontFeaturesWorkflow} from './helpers/font-features';
 import {accountProductionWorkflow} from './helpers/account-browser';
 import {checkAvif} from './helpers/avif';
@@ -2067,3 +2068,10 @@ test('production multipage TIFF preserves selected order, native page geometry a
 });
 
 test('production native font variants, stretch and numerical weights preserve literal editable typography without developer globals',async({page},info)=>{await fontFeaturesWorkflow(page,info,true);});
+
+test('production document fonts preserve native text, style inheritance, undo and project portability',async({page},info)=>{await fontManagementWorkflow(page,info);});
+
+test('production document-font guide renders without JavaScript at a narrow viewport',async({browser,baseURL},info)=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();
+ try{await page.goto(baseURL+'/developer/font-management.html');await expect(page.getByRole('heading',{name:'Document fonts',level:1,exact:true})).toBeVisible();await expect(page.locator('body')).toContainText('Document font replacement ready');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:info.outputPath('font-guide-mobile.png')});}finally{await context.close();}
+});

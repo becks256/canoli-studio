@@ -497,6 +497,10 @@ export class RecipeRecorder {
         break;
       }
 
+      case 'document.font.replace': {
+        this.steps.push({id:`step-${id()}`,name:'Replace document font',action:{type:command.type,from:command.from,to:command.to}});
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
       case "document.rename": {
         this.steps.push({
           id: `step-${id()}`,

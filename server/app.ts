@@ -407,7 +407,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
 
       // Document scoped endpoints: /api/v1/documents/:id/...
       const docMatch = path.match(
-        /^\/api\/v1\/documents\/([^/]+)(?:\/(commands|undo|redo|history|history-branches|history-comparisons|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
+        /^\/api\/v1\/documents\/([^/]+)(?:\/(fonts|commands|undo|redo|history|history-branches|history-comparisons|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
         send(response, 404, { error: "Document or endpoint not found." });
@@ -418,6 +418,8 @@ export function createApiServer(options: ApiServerOptions = {}) {
       const document = session.document;
       const subresource = docMatch[2];
       const subresourceId = docMatch[3];
+      if(subresource==='fonts'&&!subresourceId&&method==='GET'){send(response,200,{id:document.id,revision:document.getSnapshot().revision,fonts:document.fonts.items});return;}
+
       if((subresource==='raw-import'||subresource==='raw-inspect')&&!subresourceId&&method==='POST'){
         const parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined}),revision=document.getSnapshot().revision;
         if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}

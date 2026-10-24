@@ -40,6 +40,9 @@ export type { SelectionModificationOptions, SelectionModificationControl } from 
 import { EraserStroke, PaintFill } from "./values";
 import { LayerCompCollection } from "./layer-comps";
 import {ParagraphStyle,ParagraphStyleCollection} from './paragraph-styles';
+import {DocumentFonts} from './fonts';
+export {DocumentFonts} from './fonts';
+export type {DocumentFontUsage} from '../core/font-management';
 import {z} from 'zod';
 import {paragraphFormat,type ParagraphFormat} from '../core/paragraph-styles';
 export {ParagraphStyle,ParagraphStyleCollection} from './paragraph-styles';
@@ -471,6 +474,7 @@ export class Document {
   _prepareHeal?: (request: HealSpotRequest) => Promise<AdjustmentLayerData>;
   readonly layerComps: LayerCompCollection;
   readonly paragraphStyles:ParagraphStyleCollection;
+  readonly fonts:DocumentFonts;
   readonly alphaChannels: AlphaChannelCollection;
   /** @internal Hosts rasterize saved coverage without exposing source pixels. */
   _prepareChannelLoad?: (settings:ChannelLoadSettings,control:ChannelLoadControl)=>Promise<SelectionData>;
@@ -487,6 +491,7 @@ export class Document {
     }
     this.layerComps = new LayerCompCollection(this);
     this.paragraphStyles=new ParagraphStyleCollection(this);
+    this.fonts=new DocumentFonts(this);
     this.alphaChannels = new AlphaChannelCollection(this);
     this.guides = new GuideCollection(this);
     this.layers = new LayerCollection(this);

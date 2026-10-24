@@ -1,5 +1,9 @@
 # Architecture
 
+## Document font-management boundary
+
+core/font-management derives owned usage metadata and transforms a private command draft, resolving paragraph inheritance while retaining explicit overrides. document.font.replace uses shared reflow and component.replaceAll lock validation. DocumentFonts is an OO collection; the custom dialog pins owner/revision and shares permission-triggered installed-family discovery. Strict REST and semantic recipes use the same command. No font bytes, schema change, isolated grant or browser/headless synchronization is introduced. See FONT_MANAGEMENT.md.
+
 ## Layer-row presentation and event ownership
 
 LayerTreeRow contains presentation only. It retains a render only for registry-proven immutable node/thumbnail snapshots with complete shallow equality across all props. Unproven previews render afresh. LayersPanel delegates row click and drag events through contained data-layer IDs, resolves current OO handles at interaction time and uses the current committed callbacks, modifiers and disabled state. Raster/paint rows retain committed-document, pixel-service, fallback and pause dependencies for LayerThumbnail; ordinary thumbnails still derive their branch keys. Selection, locks, collapse and drop feedback remain explicit row inputs. No callback or document handle is hidden in a retained row.

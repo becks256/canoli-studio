@@ -39,6 +39,7 @@ const generatedPages = [
   ["HISTORY", "Inspectable retained history"],
   ["TIFF_PAGES", "Multipage TIFF export"],
   ["FONT_FEATURES", "Native font features"],
+  ["FONT_MANAGEMENT", "Document fonts"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

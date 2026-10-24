@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Document font-management interaction
+
+Open the custom Document fonts modal through command search or Typography. Use exact request labels, searchable 30-row pages, stable explicit selection and text/style/override/embedded-scope counts. Probe selected/replacement availability without enumeration; debounce typed replacement requests and ignore obsolete results; require explicit fallback consent when unavailable/unknown. Installed-font discovery stays user-activated and shares the Typography family list. Stale revisions require explicit refresh, closed/switched owners reject, cancellation stays read-only and modal typing cannot trigger canvas tools. Keep all-or-nothing lock errors visible and provide normal focus restoration. See FONT_MANAGEMENT.md.
+
 ## Retained layer-row behavior
 
 Keep all existing row dimensions, glyphs, nesting, labels, focus and hover controls. Retaining unchanged presentation must preserve current selection, inherited locks, drag eligibility/drop placement and filter/collapse state. Route keyboard/native clicks and pointer events through the current panel; disabled controls remain inert. Ctrl/Cmd-click on a rendered pixel thumbnail loads transparency through the current callback without selecting that layer; ordinary and Shift/Ctrl name clicks retain their selection semantics. Mutable previews and raster thumbnail dependencies must update normally. This adds no shortcut or visual component system.

@@ -6420,3 +6420,10 @@ input[type="color"] {
 .tiff-page-selection .checkbox-field { flex:1;min-width:150px;overflow-wrap:anywhere; }
 .tiff-page-selection small { display:block;color:var(--color-text-muted); }
 .tiff-page-actions { display:flex;gap:4px; }
+
+.font-manager-list { display: grid; gap: 6px; max-height: 28vh; overflow: auto; }
+.font-manager-list button { justify-content: flex-start; text-align: left; white-space: normal; overflow-wrap: anywhere; height: auto; min-height: 34px; padding-block: var(--space-2); }
+.font-manager-summary { overflow-wrap: anywhere; }
+.font-manager-dialog .dialog-actions { flex-wrap: wrap; }
+
+.font-manager-dialog p { overflow-wrap: anywhere; }

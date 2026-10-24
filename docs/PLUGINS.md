@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Document font commands
+
+Document.fonts.items uses existing document:read access; font replacement requires document:write and commits through the same isolated result validation, permission/revision, command and undo boundaries. It grants no font-file, asset, network or credential capability, and installation remains inert. See FONT_MANAGEMENT.md.
+
 ## Native font fields keep existing authority
 
 Isolated command plugins may author the same validated TextLayer font requests and paragraph styles through current document read/write grants and shared undo. These data fields add no font-file, host-font enumeration, network, credential, rendering or file-export privilege. Package permissions/lifecycle remain unchanged and installation remains inert. The bundled runtime uses the current schema-42 command validator. See [native font features](FONT_FEATURES.md).

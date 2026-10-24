@@ -28,6 +28,8 @@ import type { SelectionModificationProgress } from '../core/selection-modificati
 import type { SelectionModificationOptions } from "../core/selection-modification";
 import { PanelResizeHandle } from "./PanelResizeHandle";
 import { usePanelLayout } from "./hooks/usePanelLayout";
+import {FontManagerDialog} from './FontManagerDialog';
+import type {Document as EditorDocument} from '../dom';
 import { ShortcutHints } from "./ShortcutHints";
 import {
   readShortcutBindings,
@@ -242,6 +244,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [recentRequest,setRecentRequest]=useState<{id?:string}|null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showWorkspaceLayout,setShowWorkspaceLayout]=useState(false);
+  const [fontManagerOwner,setFontManagerOwner]=useState<EditorDocument|null>(null);
   const [showChatGptConnection,setShowChatGptConnection]=useState(false);
   const [accountClient]=useState(()=>new AccountClient());
   const [showAccount,setShowAccount]=useState(false);
@@ -723,6 +726,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     {id:"artwork-library",label:"Artwork library",keys:SHORTCUT_BINDINGS["artwork-library"],run:()=>{cancelWorkspaceGesture();setShowArtworkLibrary(true);}},
     {id:"recent-files",label:"Recent files",keys:SHORTCUT_BINDINGS["recent-files"],run:()=>{cancelWorkspaceGesture();setRecentRequest({});}},
     {id:"workspace-layout",label:"Workspace layout",keys:SHORTCUT_BINDINGS["workspace-layout"],run:openWorkspaceLayout},
+    {id:'font-manager',label:'Document fonts',category:'Text',keys:SHORTCUT_BINDINGS['font-manager'],run:()=>{cancelWorkspaceGesture();setFontManagerOwner(dom);}},
     {id:"workspace-reset",label:"Restore default workspace arrangement",keys:SHORTCUT_BINDINGS["workspace-reset"],run:()=>attempt(()=>{panelLayout.restore();cancelWorkspaceGesture();})},
     {
       id: "command-palette",
@@ -1165,6 +1169,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       !!recentRequest ||
       showHelp ||
       showWorkspaceLayout ||
+      !!fontManagerOwner ||
       showChatGptConnection ||
       showAccount ||
       showHistoryInspector || showArtworkLibrary || showColorPalettes || !!colorPaletteRequest ||
@@ -2544,6 +2549,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onSelectedAction={selectedAction}
             onOpenHelp={() => setShowHelp(true)}
             onDevelopRaw={layer=>setRawLayer(layer)}
+            onManageFonts={()=>{cancelWorkspaceGesture();setFontManagerOwner(dom);}}
             onCombinePaths={()=>{editor.tools.cancel();setShowVectorBoolean(true);}}
           />
           }
@@ -2566,6 +2572,10 @@ export function App({ editor }: { editor: EditorApplication }) {
             </IconButton>
           </div>
         )}
+        {fontManagerOwner&&<FontManagerDialog document={fontManagerOwner} onClose={()=>setFontManagerOwner(null)} onReplace={(from,to,revision)=>{
+          if(editor.document!==fontManagerOwner||!editor.documentSessions.some(session=>session.document===fontManagerOwner)||fontManagerOwner.getSnapshot().revision!==revision)throw new Error('The document changed or closed. Reopen Document fonts for the current document.');
+          fontManagerOwner.fonts.replace(from,to);
+        }}/>}
         {showPlugins && (
           <PluginPanel editor={editor} onClose={() => setShowPlugins(false)} />
         )}
