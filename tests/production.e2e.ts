@@ -2110,3 +2110,12 @@ test('production font recipe packages retain originals, native output, atomic un
 test('production portable font recipe contract is available without JavaScript',async({browser,baseURL})=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();try{await page.goto(baseURL+'/developer/font-recipes.html');await expect(page.getByRole('heading',{name:'Portable font recipes',level:1,exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);}finally{await context.close();}
 });
+
+
+test('production SVG fonts import through preflight with exact native pixels, isolated undo and project originals',async({page},info)=>{const{svgFontImportWorkflow}=await import('./helpers/svg-font-import');await svgFontImportWorkflow(page,info,true);});
+
+test('production escaped CSS geometry requires explicit flatten and preserves placement without developer globals',async({page},info)=>{const{svgCssGeometryWorkflow}=await import('./helpers/svg-font-import');await svgCssGeometryWorkflow(page,info,true);});
+
+test('production SVG font import contract is readable without JavaScript',async({browser,baseURL},info)=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();try{await page.goto(baseURL+'/developer/svg-font-import.html');await expect(page.getByRole('heading',{name:'SVG fonts and editable text',level:1,exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:info.outputPath('svg-font-guide-mobile.png')});const response=await page.request.get(baseURL+'/svg-parser-notices.txt');expect(response.ok()).toBe(true);expect(await response.text()).toContain('css-tree 3.2.1');}finally{await context.close();}
+});

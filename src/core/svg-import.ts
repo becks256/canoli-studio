@@ -1,7 +1,9 @@
 import {importSvgGradient} from './svg-gradient-import';
 import {bezierGeometryBounds} from './bezier-bounds';
 import {DOMParser,XMLSerializer,type Element as XmlElement,type Node as XmlNode} from '@xmldom/xmldom';
-import {Document,LayerGroup,VectorLayer,VectorPath,VectorContour,RasterLayer,AffineTransform} from '../dom';
+import {Document,LayerGroup,VectorLayer,VectorPath,VectorContour,RasterLayer,TextLayer,AffineTransform} from '../dom';
+import {svgStyleDeclarations,svgFontStylesheet,svgCheckCssValue,type SvgFontSource} from './svg-css-import';
+import {svgTextImportStyle,svgTextImportContent,svgTextLength,SVG_TEXT_ATTRIBUTES,type SvgTextImportStyle} from './svg-text-import';
 import type {DocumentData} from './model';
 import {parseSvgContours,svgNumbers,svgTransform,svgViewBox,type SvgContour} from './svg-path-import';
 export {svgTransform,svgViewBox} from './svg-path-import';
@@ -10,16 +12,17 @@ const SVG='http://www.w3.org/2000/svg';
 export interface SvgImportReport {
  version:1;width:number;height:number;canImportEditable:boolean;
  featuresPreserved:string[];featuresDegraded:string[];unsupportedFeatures:string[];additionalIssues:number;
- elements:number;layers:number;images:number;
+ elements:number;layers:number;images:number;fonts:number;texts:number;
 }
 export interface SvgImagePlacement {layerId:string;assetId:string;viewportWidth:number|null;viewportHeight:number|null;aspect:string}
+export interface SvgTextPlacement {layerId:string;x:number;y:number}
 /** Worker transport only; public document mutation still uses OO constructors. */
-export interface SvgInspection {report:SvgImportReport;document?:DocumentData;assets:{id:string;name:string;blob:Blob}[];images:SvgImagePlacement[];flat:Blob}
+export interface SvgInspection {report:SvgImportReport;document?:DocumentData;assets:{id:string;name:string;blob:Blob}[];images:SvgImagePlacement[];fonts:SvgFontSource[];texts:SvgTextPlacement[];flat:Blob}
 export interface SvgImportControl {signal?:AbortSignal;onProgress?:(progress:{phase:'reading'|'inspecting'|'decoding'|'rendering';fraction:number|null})=>void}
 export interface SvgImportOptions {mode?:'editable'|'flatten'}
 interface Paint {color:string;alpha:number}
 type Colors=(value:string)=>Paint|null;
-interface Style {fill:string;stroke:string;color:string;fillOpacity:number;strokeOpacity:number;strokeWidth:number;cap:string;join:string;miter:number;dash:number[];offset:number;rule:'evenodd'|'nonzero';visibility:boolean;opacity:number;display:boolean}
+interface Style {fill:string;stroke:string;color:string;fillOpacity:number;strokeOpacity:number;strokeWidth:number;cap:string;join:string;miter:number;dash:number[];offset:number;rule:'evenodd'|'nonzero';visibility:boolean;opacity:number;display:boolean;text:SvgTextImportStyle}
 const basic:Record<string,string>={black:'#000000',white:'#ffffff',red:'#ff0000',green:'#008000',blue:'#0000ff',yellow:'#ffff00',gray:'#808080',grey:'#808080',silver:'#c0c0c0',maroon:'#800000',purple:'#800080',fuchsia:'#ff00ff',lime:'#00ff00',olive:'#808000',navy:'#000080',teal:'#008080',aqua:'#00ffff',orange:'#ffa500',rebeccapurple:'#663399',transparent:'#00000000'};
 const hex=(n:number)=>Math.round(n).toString(16).padStart(2,'0');
 
@@ -70,13 +73,9 @@ function allowedReference(value:string){
  if(match[1].toLowerCase()==='webp')for(let at=12;at+8<=binary.length;){const tag=binary.slice(at,at+4),size=u32(at+4,true);if(tag==='ANIM'||tag==='ANMF'||tag==='VP8X'&&!!(binary.charCodeAt(at+8)&2))throw new Error('Animated embedded images are not admitted. Export a static frame first.');if(size>binary.length-at-8)break;at+=8+size+(size%2);}
  return true;
 }
-function checkCss(value:string){
- const css=unescapeCss(value);if(/@import\b|@(?:-[\w]+-)?keyframes\b|\b(?:animation|transition)(?:-[\w-]+)?\s*:/i.test(css))throw new Error('SVG imports do not run animations or external stylesheets.');
- for(const match of css.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/gi))if(!allowedReference(match[2].trim()))throw new Error('External SVG resources are not loaded. Embed static PNG/JPEG/WebP pixels first.');
-}
-function properties(element:XmlElement):Record<string,string>{
- const important=new Set<string>(),values:Record<string,string>=Object.create(null);for(let i=0;i<element.attributes.length;i++){const a=element.attributes.item(i)!;values[a.name]=a.value;}
- for(const declaration of (values.style??'').split(';')){const colon=declaration.indexOf(':');if(colon<0){if(declaration.trim())throw new Error('Invalid inline SVG style.');continue;}const name=declaration.slice(0,colon).trim().toLowerCase(),raw=declaration.slice(colon+1).trim(),priority=/!\s*important\s*$/i.test(raw),value=raw.replace(/\s*!\s*important\s*$/i,'');if(priority||!important.has(name)){values[name]=value;if(priority)important.add(name);}}
+function properties(element:XmlElement,inline=svgStyleDeclarations(element.getAttribute('style')??'',allowedReference)):Record<string,string>{
+ const values:Record<string,string>=Object.create(null);for(let i=0;i<element.attributes.length;i++){const a=element.attributes.item(i)!;values[a.name]=a.value;}
+ Object.assign(values,inline);
  return values;
 }
 
@@ -87,12 +86,12 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
  if(!root||root.localName!=='svg'||(root.namespaceURI&&root.namespaceURI!==SVG))throw new Error('Choose an SVG XML document.');
  const unsupported=new Set<string>(),preserved=new Set<string>(),degraded=new Set<string>(['Original SVG XML, identifiers, CSS rules and editor-specific metadata are not archived or round-tripped.','Native Canvas and SVG curve, clip-edge and image sampling can differ. Choose flattened import for the browser SVG image rendering.']),ids=new Map<string,XmlElement>();let elements=0,additionalIssues=0;
  const issue=(value:string)=>{value=value.slice(0,1000);if(unsupported.has(value))return;if(unsupported.size<256)unsupported.add(value);else additionalIssues++;};
- const stack:XmlNode[]=[xml];
+ const fonts:SvgFontSource[]=[],stack:XmlNode[]=[xml];
  while(stack.length){const node=stack.pop()!;if(node.nodeType===7&&node.nodeName!=='xml')throw new Error('SVG processing instructions are not admitted.');
   if(node.nodeType===1){const e=node as XmlElement;elements++;if(['script','foreignObject','animate','animateMotion','animateTransform','set','mpath','discard','handler','listener'].includes(e.localName??''))throw new Error('Executable, foreign HTML and animated SVG content are not admitted.');
    const key=e.getAttribute('id');if(key&&!ids.has(key))ids.set(key,e);
-   if(e.localName==='style')checkCss(e.textContent??'');
-   for(let i=0;i<e.attributes.length;i++){const a=e.attributes.item(i)!;if(/^on/i.test(a.localName??'')||a.name==='xml:base')throw new Error('SVG event handlers and xml:base are not admitted.');if(a.localName==='href'&&!allowedReference(a.value.trim()))throw new Error('External SVG resources are not loaded. Embed static PNG/JPEG/WebP pixels first.');if(a.name==='style'||/url\(/i.test(unescapeCss(a.value)))checkCss(a.value);}
+   if(e.localName==='style'){const sheet=svgFontStylesheet(e.textContent??'',allowedReference,issue);fonts.push(...sheet.fonts);if(sheet.otherRules)issue('Stylesheet selectors and conditional rules require flattened import.');}
+   for(let i=0;i<e.attributes.length;i++){const a=e.attributes.item(i)!;if(/^on/i.test(a.localName??'')||a.name==='xml:base')throw new Error('SVG event handlers and xml:base are not admitted.');if(a.localName==='href'&&!allowedReference(a.value.trim()))throw new Error('External SVG resources are not loaded. Embed static PNG/JPEG/WebP pixels first.');if(a.name==='style')svgStyleDeclarations(a.value,allowedReference);else if(/url\(/i.test(unescapeCss(a.value)))svgCheckCssValue(a.value,allowedReference);}
   }
   for(let child=node.lastChild;child;child=child.previousSibling)stack.push(child);
  }
@@ -104,11 +103,11 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
  const width=Math.ceil(w),height=Math.ceil(h);if(!Number.isSafeInteger(width)||!Number.isSafeInteger(height)||width<=0||height<=0)throw new Error('SVG viewport dimensions must resolve to positive safe integer pixels.');
  if(width!==w||height!==h)degraded.add('Fractional viewport dimensions are rounded up to native integer canvas pixels.');
  const document=new Document({name:name.slice(0,240)||'Imported SVG',width,height}),viewport=document.layers.add(new LayerGroup({name:'SVG viewport'}));
- const assets:SvgInspection['assets']=[],images:SvgImagePlacement[]=[],imageSources=new Map<string,string>();let layers=1;
- const initial:Style={fill:'#000000',stroke:'none',color:'#000000',fillOpacity:1,strokeOpacity:1,strokeWidth:1,cap:'butt',join:'miter',miter:4,dash:[],offset:0,rule:'nonzero',visibility:true,opacity:1,display:true};
- const known=new Set(['id','class','style','transform','fill','stroke','color','fill-opacity','stroke-opacity','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','stroke-dasharray','stroke-dashoffset','fill-rule','clip-rule','opacity','display','visibility','vector-effect','paint-order','isolation','mix-blend-mode','color-interpolation','overflow','version','xmlns','xmlns:xlink','viewBox','preserveAspectRatio','width','height','x','y','rx','ry','cx','cy','r','x1','y1','x2','y2','points','d','href','xlink:href','role','inkscape:label']);
+ const assets:SvgInspection['assets']=[],images:SvgImagePlacement[]=[],texts:SvgTextPlacement[]=[],imageSources=new Map<string,string>();let layers=1;
+ const initial:Style={fill:'#000000',stroke:'none',color:'#000000',fillOpacity:1,strokeOpacity:1,strokeWidth:1,cap:'butt',join:'miter',miter:4,dash:[],offset:0,rule:'nonzero',visibility:true,opacity:1,display:true,text:svgTextImportStyle({})};
+ const known=new Set([...SVG_TEXT_ATTRIBUTES,'dx','dy','id','class','style','transform','fill','stroke','color','fill-opacity','stroke-opacity','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','stroke-dasharray','stroke-dashoffset','fill-rule','clip-rule','opacity','display','visibility','vector-effect','paint-order','isolation','mix-blend-mode','color-interpolation','overflow','version','xmlns','xmlns:xlink','viewBox','preserveAspectRatio','width','height','x','y','rx','ry','cx','cy','r','x1','y1','x2','y2','points','d','href','xlink:href','role','inkscape:label']);
  function style(e:XmlElement,parent:Style):Style{
-  const p=properties(e);if(/(?:^|;)\s*(?:transform|x|y|width|height|rx|ry|cx|cy|r|x1|y1|x2|y2|d|points)\s*:/i.test(e.getAttribute('style')??''))issue('CSS transforms and geometry properties require flattened import.');for(const key of Object.keys(p))if(!known.has(key)&&!key.startsWith('xmlns:')&&!key.startsWith('data-')&&!key.startsWith('aria-'))issue(`Unsupported SVG attribute/style: ${key}.`);
+  const inline=svgStyleDeclarations(e.getAttribute('style')??'',allowedReference),p=properties(e,inline);if(Object.keys(inline).some(key=>['transform','x','y','dx','dy','width','height','rx','ry','cx','cy','r','x1','y1','x2','y2','d','points'].includes(key)))issue('CSS transforms and geometry properties require flattened import.');for(const key of Object.keys(p))if(!known.has(key)&&!key.startsWith('xmlns:')&&!key.startsWith('data-')&&!key.startsWith('aria-'))issue(`Unsupported SVG attribute/style: ${key}.`);
   const inherited=(key:string,fallback:string)=>p[key]===undefined||p[key]==='inherit'||p[key]==='unset'?fallback:p[key];
   const alpha=(key:string,fallback:number)=>{const raw=inherited(key,String(fallback));if(!raw.trim())throw new Error(`Invalid SVG ${key}.`);const n=raw.endsWith('%')?Number(raw.slice(0,-1))/100:Number(raw);if(!Number.isFinite(n))throw new Error(`Invalid SVG ${key}.`);return Math.max(0,Math.min(1,n));};
   if(p['mix-blend-mode']&&p['mix-blend-mode']!=='normal')issue('Non-normal SVG blending requires flattened import.');
@@ -123,7 +122,7 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
   if(length(inherited('stroke-width',String(parent.strokeWidth)))<0)throw new Error('Negative SVG stroke width.');
   if(!['visible','hidden','collapse'].includes(inherited('visibility',parent.visibility?'visible':'hidden')))issue('Unsupported SVG visibility value.');
   const color=inherited('color',parent.color);
-  return{fill:inherited('fill',parent.fill),stroke:inherited('stroke',parent.stroke),color:color.toLowerCase()==='currentcolor'?parent.color:color,fillOpacity:alpha('fill-opacity',parent.fillOpacity),strokeOpacity:alpha('stroke-opacity',parent.strokeOpacity),strokeWidth:length(inherited('stroke-width',String(parent.strokeWidth))),cap:inherited('stroke-linecap',parent.cap).trim().toLowerCase(),join:inherited('stroke-linejoin',parent.join).trim().toLowerCase(),miter:Number(inherited('stroke-miterlimit',String(parent.miter))),dash,offset:length(inherited('stroke-dashoffset',String(parent.offset))),rule:inherited('fill-rule',parent.rule) as Style['rule'],visibility:inherited('visibility',parent.visibility?'visible':'hidden')==='visible',opacity:alpha('opacity',p.opacity==='inherit'?parent.opacity:1),display:p.display!=='none'};
+  return{fill:inherited('fill',parent.fill),stroke:inherited('stroke',parent.stroke),color:color.toLowerCase()==='currentcolor'?parent.color:color,fillOpacity:alpha('fill-opacity',parent.fillOpacity),strokeOpacity:alpha('stroke-opacity',parent.strokeOpacity),strokeWidth:length(inherited('stroke-width',String(parent.strokeWidth))),cap:inherited('stroke-linecap',parent.cap).trim().toLowerCase(),join:inherited('stroke-linejoin',parent.join).trim().toLowerCase(),miter:Number(inherited('stroke-miterlimit',String(parent.miter))),dash,offset:length(inherited('stroke-dashoffset',String(parent.offset))),rule:inherited('fill-rule',parent.rule) as Style['rule'],visibility:inherited('visibility',parent.visibility?'visible':'hidden')==='visible',opacity:alpha('opacity',p.opacity==='inherit'?parent.opacity:1),display:p.display!=='none',text:svgTextImportStyle(p,parent.text)};
  }
  function paint(value:string,currentColor:string):Paint|null{value=value.trim();if(value.toLowerCase()==='none')return null;const color=resolveColor(value.toLowerCase()==='currentcolor'?currentColor:value);if(!color)throw new Error('Unsupported SVG paint/color; gradients and paint servers require flattened import.');return color;}
  function geometry(e:XmlElement):SvgContour[]{
@@ -135,7 +134,7 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
   else{const points=svgNumbers(e.getAttribute('points')??'');if(points.length%2)throw new Error('SVG points require coordinate pairs.');if(!points.length)return[];d=`M${points[0]} ${points[1]} `+points.slice(2).map((n,i)=>i%2===0?'L'+n:String(n)).join(' ')+(tag==='polygon'?'Z':'');}
   const parsed=parseSvgContours(d);if(parsed.approximatedArcs)degraded.add('Elliptical arcs/circles/rounded corners are converted to editable cubic Bézier approximations.');return parsed.contours.filter(c=>c.points.length);
  }
- function add<T extends LayerGroup|VectorLayer|RasterLayer>(parent:LayerGroup,layer:T):T{if(++layers>64)throw new Error('SVG exceeds the native 64-layer editing budget. Choose flattened import.');parent.layers.add(layer);return layer;}
+ function add<T extends LayerGroup|VectorLayer|RasterLayer|TextLayer>(parent:LayerGroup,layer:T):T{if(++layers>64)throw new Error('SVG exceeds the native 64-layer editing budget. Choose flattened import.');parent.layers.add(layer);return layer;}
  function drawing(e:XmlElement,parent:LayerGroup,s:Style,local:AffineTransform,_world:AffineTransform){
   const contours=geometry(e),usesGradient=/^url\(/.test(s.fill.trim()),fillGradient=usesGradient?importSvgGradient(s.fill,bezierGeometryBounds(contours),{ids,properties,color:resolveGradientColor,length,viewport:{width:box?.[2]??w,height:box?.[3]??h,offset:!!(box?.[0]||box?.[1])}}):null,fill=usesGradient?null:paint(s.fill,s.color),stroke=paint(s.stroke,s.color),hasFill=!!(fill||fillGradient)&&e.localName!=='line',hasStroke=!!stroke&&s.strokeWidth>0,fillAlpha=(fillGradient?1:fill?.alpha??0)*s.fillOpacity,strokeAlpha=(stroke?.alpha??0)*s.strokeOpacity;
   if(fillGradient)preserved.add('Editable encoded-sRGB linear/radial gradient fills, opacity stops and affine paint coordinates.');
@@ -167,15 +166,36 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
   const layer=add(parent,new RasterLayer({name:(e.getAttribute('id')||'SVG image').slice(0,240),assetId,width:w??1,height:h??1,opacity:s.opacity,visible:s.visibility&&s.display}));layer.transform=local.multiply(AffineTransform.translation(length(e.getAttribute('x')??''),length(e.getAttribute('y')??'')));
   images.push({layerId:layer.id,assetId,viewportWidth:w,viewportHeight:h,aspect:e.getAttribute('preserveAspectRatio')||'xMidYMid meet'});preserved.add('Embedded PNG/JPEG/WebP source bytes and native-resolution raster assets with editable placement.');
  }
+ function textDrawing(e:XmlElement,parent:LayerGroup,s:Style,local:AffineTransform){
+  const position=(value:string,base:number)=>{if(value.includes('%'))throw new Error('Percentage SVG text positions require flattened import.');return svgTextLength(value,base);};
+  const p=properties(e),x=position(p.x??'0',s.text.fontSize),y=position(p.y??'0',s.text.fontSize),dx=position(p.dx??'0',s.text.fontSize),dy=position(p.dy??'0',s.text.fontSize);
+  const line=(element:XmlElement,owner:LayerGroup,settings:Style,transform:AffineTransform,x:number,y:number)=>{
+   if(settings.stroke!=='none'&&settings.strokeWidth>0)throw new Error('Stroked SVG text requires flattened import.');
+   const fill=paint(settings.fill,settings.color),content=svgTextImportContent(element,settings.text),{anchor,xmlSpace:_xmlSpace,whiteSpace:_whiteSpace,...typography}=settings.text;
+   const align=anchor==='middle'?'center':(anchor==='start')===(typography.direction==='ltr')?'left':'right';
+   const layer=add(owner,new TextLayer({name:(element.getAttribute('id')||'SVG text').slice(0,240),text:content,...typography,align,color:fill?.color??'#000000',opacity:settings.opacity*(fill?.alpha??0)*settings.fillOpacity,visible:settings.visibility&&settings.display}));
+   layer.transform=transform;texts.push({layerId:layer.id,x,y});
+  };
+  const children:XmlElement[]=[];let literal='';for(let child=e.firstChild;child;child=child.nextSibling){if(child.nodeType===1)children.push(child as XmlElement);else if(child.nodeType===3||child.nodeType===4)literal+=child.nodeValue??'';}
+  if(children.some(child=>child.hasAttribute('x')||child.hasAttribute('y')||child.hasAttribute('dy'))){
+   if(literal.trim()||dx||dy||children.some(child=>child.localName!=='tspan'||!child.hasAttribute('x')||!child.hasAttribute('y')&&!child.hasAttribute('dy')))throw new Error('Inline SVG positioning and character runs require flattened import.');
+   const group=add(parent,new LayerGroup({name:(e.getAttribute('id')||'SVG text lines').slice(0,240),opacity:s.opacity,visible:s.display}));group.transform=local;let baseline=y;
+   for(const child of children){const settings=style(child,s),fields=properties(child);if(child.hasAttribute('transform'))throw new Error('Transformed SVG text runs require flattened import.');baseline=fields.y!==undefined?position(fields.y,settings.text.fontSize):baseline;baseline+=position(fields.dy??'0',settings.text.fontSize);line(child,group,settings,new AffineTransform(),position(fields.x,settings.text.fontSize)+position(fields.dx??'0',settings.text.fontSize),baseline);}
+   degraded.add('Independently positioned SVG text lines become independent native text layers; shared text/DOM identity is not retained.');
+  }else line(e,parent,s,local,x+dx,y+dy);
+  preserved.add('Editable horizontal text, whole-line typography, alphabetic baselines and full affine placement.');
+  degraded.add('SVG and Canvas font substitution, shaping, whitespace and hinting can differ; installed/system fonts remain external references.');
+ }
  function walk(e:XmlElement,parent:LayerGroup,inherited:Style,world:AffineTransform,refs:Set<string>,depth:number){
   if(depth>8){issue('SVG exceeds the native 8-level group editing budget. Choose flattened import.');return;}
   if(['defs','title','desc','metadata','linearGradient','radialGradient'].includes(e.localName??''))return;
-  if(e.localName==='style'){if((e.textContent??'').replace(/\/\*[\s\S]*?\*\//g,'').trim())issue('Stylesheet selectors require flattened import.');return;}
+  if(e.localName==='style')return;
   if(e.namespaceURI&&e.namespaceURI!==SVG){issue('Foreign XML drawing elements require flattened import.');return;}
   try{const s=style(e,inherited),local=svgTransform(e.getAttribute('transform')??''),next=world.multiply(local);
    if(e.localName==='g'||e.localName==='a'){const group=add(parent,new LayerGroup({name:(e.getAttribute('id')||e.localName||'SVG shape').slice(0,240),opacity:s.opacity,visible:s.display}));group.transform=local;for(let c=e.firstChild;c;c=c.nextSibling)if(c.nodeType===1)walk(c as XmlElement,group,s,next,refs,depth+1);}
    else if(e.localName==='use'){const key=(e.getAttribute('href')||e.getAttribute('xlink:href')||'').trim().slice(1),target=ids.get(key);if(!target||refs.has(key))throw new Error('Missing or cyclic SVG use reference.');const group=add(parent,new LayerGroup({name:(e.getAttribute('id')||'SVG use').slice(0,240),opacity:s.opacity,visible:s.display})),offset=local.multiply(AffineTransform.translation(length(e.getAttribute('x')??''),length(e.getAttribute('y')??'')));group.transform=offset;walk(target,group,s,world.multiply(offset),new Set([...refs,key]),depth+1);degraded.add('SVG use references expand independently; shared symbol/DOM identity is not retained.');}
    else if(e.localName==='image')image(e,parent,s,local);
+   else if(e.localName==='text')textDrawing(e,parent,s,local);
    else if(['path','rect','circle','ellipse','line','polyline','polygon'].includes(e.localName??''))drawing(e,parent,s,local,next);
    else issue(`SVG ${e.localName} elements require flattened import.`);
   }catch(error){issue(error instanceof Error?error.message:String(error));}
@@ -184,6 +204,7 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
  catch(error){issue(error instanceof Error?error.message:String(error));}
  root.setAttribute('xmlns',SVG);root.setAttribute('width',String(width));root.setAttribute('height',String(height));root.setAttribute('style',(root.getAttribute('style')??'')+`;width:${width}px!important;height:${height}px!important`);
  const flat=new Blob([new XMLSerializer().serializeToString(root)],{type:'image/svg+xml;charset=utf-8'});
- const report:SvgImportReport={version:1,width,height,canImportEditable:unsupported.size===0&&additionalIssues===0,featuresPreserved:[...preserved],featuresDegraded:[...degraded,'Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML.'],unsupportedFeatures:[...unsupported],additionalIssues,elements,layers,images:assets.length};
- return{report,document:report.canImportEditable?document.toJSON():undefined,assets:report.canImportEditable?assets:[],images:report.canImportEditable?images:[],flat};
+ if(fonts.length){preserved.add('Complete embedded font files are privately parsed and owned on import; no external font request is made.');degraded.add('SVG font-face CSS is converted to native face references; omitted original collections and external source files cannot be recovered from delivered face bytes.');}
+ const report:SvgImportReport={version:1,width,height,canImportEditable:unsupported.size===0&&additionalIssues===0,featuresPreserved:[...preserved],featuresDegraded:[...degraded,'Flattened import uses the browser SVG image decoder at the inspected viewport, discarding vector/text/effect editability and original XML.'],unsupportedFeatures:[...unsupported],additionalIssues,elements,layers,images:assets.length,fonts:fonts.length,texts:texts.length};
+ return{report,document:report.canImportEditable?document.toJSON():undefined,assets:report.canImportEditable?assets:[],images:report.canImportEditable?images:[],texts:report.canImportEditable?texts:[],fonts,flat};
 }

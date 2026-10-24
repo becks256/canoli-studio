@@ -1,5 +1,8 @@
 import {z} from 'zod';
-import {Document,LayerMask,RasterLayer,VectorPath,AffineTransform} from '../dom';
+import {Document,LayerMask,RasterLayer,TextLayer,VectorPath,AffineTransform} from '../dom';
+import {FontSourceStore} from '../fonts/store';
+import {documentFontFiles} from '../core/font-files';
+import {prepareSvgFontSources,reconstructSvgTexts} from './svg-import-text';
 import {AssetStore} from '../core/assets';
 import {allLayers,referencedAssets} from '../core/model';
 import type {SvgInspection,SvgImportControl,SvgImportOptions,SvgImportReport} from '../core/svg-import';
@@ -10,14 +13,15 @@ import {CanvasRenderer} from './renderer';
 const positive=z.number().int().positive().max(Number.MAX_SAFE_INTEGER);
 const count=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const messages=z.array(z.string().max(1000)).max(256);
-const reportSchema=z.object({version:z.literal(1),width:positive,height:positive,canImportEditable:z.boolean(),featuresPreserved:messages,featuresDegraded:messages,unsupportedFeatures:messages,additionalIssues:count,elements:count,layers:count,images:count}).strict();
-const inspectionSchema=z.object({report:reportSchema,document:z.unknown().optional(),flat:z.instanceof(Blob),assets:z.array(z.object({id:z.string().uuid(),name:z.string().max(240),blob:z.instanceof(Blob)}).strict()).max(64),images:z.array(z.object({layerId:z.string(),assetId:z.string(),viewportWidth:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),viewportHeight:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),aspect:z.string()}).strict()).max(64)}).strict();
+const reportSchema=z.object({version:z.literal(1),width:positive,height:positive,canImportEditable:z.boolean(),featuresPreserved:messages,featuresDegraded:messages,unsupportedFeatures:messages,additionalIssues:count,elements:count,layers:count,images:count,fonts:count.default(0),texts:count.default(0)}).strict();
+const fontSchema=z.object({family:z.string().min(1),sources:z.array(z.instanceof(Blob)).min(1),weight:z.string(),style:z.string(),stretch:z.string()}).strict();
+const inspectionSchema=z.object({report:reportSchema,document:z.unknown().optional(),flat:z.instanceof(Blob),fonts:z.array(fontSchema).default([]),texts:z.array(z.object({layerId:z.string(),x:z.number().finite(),y:z.number().finite()}).strict()).max(64).default([]),assets:z.array(z.object({id:z.string().uuid(),name:z.string().max(240),blob:z.instanceof(Blob)}).strict()).max(64),images:z.array(z.object({layerId:z.string(),assetId:z.string(),viewportWidth:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),viewportHeight:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),aspect:z.string()}).strict()).max(64)}).strict();
 export const svgImportOptionsSchema=z.object({mode:z.enum(['editable','flatten']).default('editable')}).strict();
 
 /** Validate worker transport before admitting any source assets or model. */
 export function validateSvgInspection(value:unknown):SvgInspection{
  const parsed=inspectionSchema.parse(value),r=parsed.report;
- if(parsed.flat.type!=='image/svg+xml;charset=utf-8'||r.canImportEditable!==(r.unsupportedFeatures.length===0&&r.additionalIssues===0))throw new Error('Invalid SVG capability result.');
+ if(parsed.flat.type!=='image/svg+xml;charset=utf-8'||r.fonts!==parsed.fonts.length||r.canImportEditable!==(r.unsupportedFeatures.length===0&&r.additionalIssues===0))throw new Error('Invalid SVG capability result.');
  if(r.canImportEditable){
   const doc=Document.fromJSON(parsed.document),layers=allLayers(doc.toJSON().children),ids=new Set(parsed.assets.map(a=>a.id)),placements=new Set(parsed.images.map(i=>i.layerId));
   if(doc.width!==r.width||doc.height!==r.height||ids.size!==parsed.assets.length||r.images!==parsed.assets.length||placements.size!==parsed.images.length||layers.length!==r.layers)throw new Error('Invalid SVG import model.');
@@ -25,7 +29,8 @@ export function validateSvgInspection(value:unknown):SvgInspection{
   for(const asset of parsed.assets)if(!['image/png','image/jpeg','image/webp'].includes(asset.blob.type))throw new Error('Invalid embedded SVG asset type.');
   for(const p of parsed.images){const layer=doc.getLayer(p.layerId);if(!(layer instanceof RasterLayer)||layer.assetId!==p.assetId||!ids.has(p.assetId))throw new Error('Invalid SVG image placement.');}
   if(layers.some(l=>l.kind==='raster'&&!placements.has(l.id)))throw new Error('Missing SVG image placement.');
- }else if(parsed.document!==undefined||parsed.assets.length||parsed.images.length)throw new Error('Unsupported SVG cannot publish partial editable content.');
+  const textIds=new Set(parsed.texts.map(p=>p.layerId));if(textIds.size!==parsed.texts.length||r.texts!==parsed.texts.length||layers.some(l=>l.kind==='text'&&!textIds.has(l.id))||parsed.texts.some(p=>!(doc.getLayer(p.layerId) instanceof TextLayer))||documentFontFiles(doc.toJSON()).length)throw new Error('Invalid SVG text/font preparation records.');
+ }else if(parsed.document!==undefined||parsed.assets.length||parsed.images.length||parsed.texts.length)throw new Error('Unsupported SVG cannot publish partial editable content.');
  return parsed as SvgInspection;
 }
 
@@ -61,11 +66,14 @@ async function decodeSvg(blob:Blob,control:SvgImportControl,check:()=>void):Prom
 
 /** Prepare an isolated OO document; caller alone publishes the complete tab. */
 export async function prepareSvgImport(file:File,options:SvgImportOptions={},control:SvgImportControl={},check:()=>void=()=>{}):Promise<{document:Document;assets:AssetStore;report:SvgImportReport}>{
- const {mode}=svgImportOptionsSchema.parse(options),inspection=await inspectSvgFile(file,control,check),assets=new AssetStore();
+ const {mode}=svgImportOptionsSchema.parse(options),inspection=await inspectSvgFile(file,control,check),assets=new AssetStore(),fonts=new FontSourceStore();
  const current=()=>{control.signal?.throwIfAborted();check();};
  const progress=(phase:'decoding'|'rendering',fraction:number|null)=>{current();control.onProgress?.({phase,fraction});current();};
  try{
   current();let doc:Document;
+  if(mode==='editable'&&!inspection.report.canImportEditable)throw new Error('This SVG has unsupported editable features. Review the report and explicitly choose flattened import.');
+  if(inspection.fonts.length)progress('decoding',null);
+  const preparedFonts=await prepareSvgFontSources(inspection.fonts,fonts,control,current,mode==='editable');current();
   if(mode==='editable'){
    if(!inspection.report.canImportEditable)throw new Error('This SVG has unsupported editable features. Review the report and explicitly choose flattened import.');
    doc=Document.fromJSON(inspection.document);
@@ -78,6 +86,8 @@ export async function prepareSvgImport(file:File,options:SvgImportOptions={},con
     layer.transform=layer.transform.multiply(AffineTransform.translation(view.e,view.f));
     if(/\bslice\s*$/.test(p.aspect))layer.mask=new LayerMask({paths:[VectorPath.rectangle({x:-view.e,y:-view.f,width:w,height:h})]});
    }
+   try{for(const source of fonts.values())fonts.activate(source.id);current();reconstructSvgTexts(doc,inspection.texts,preparedFonts,fonts,assets);current();}
+   finally{for(const source of fonts.values())fonts.deactivate(source.id);}
   }else{
    progress('decoding',null);const bitmap=await decodeSvg(inspection.flat,control,check),temporary=new AssetStore(),renderer=new CanvasRenderer();
    let png:Blob;
@@ -92,5 +102,5 @@ export async function prepareSvgImport(file:File,options:SvgImportOptions={},con
   }
   // Opening a file establishes a clean baseline, rather than exposing preparation history.
   doc=Document.fromJSON(doc.toJSON());current();return{document:doc,assets,report:inspection.report};
- }catch(error){assets.dispose();throw error;}
+ }catch(error){assets.dispose();throw error;}finally{fonts.dispose();}
 }

@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## SVG font-source review
+
+Keep the custom SVG import dialog and explicit editable/flatten/cancel choices. Show the embedded-font declaration count and explain that editable projects retain supplied font files; structural inspection is followed by source validation during import. Decoding status covers images and fonts. Missing/malformed sources or unsupported canonical matching remain actionable errors without retargeting edited work. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).
+
 ## Portable font package review
 
 Keep the existing custom Portable packages panel. Explain that packages retain image sources and complete embedded font originals; importing remains inert. Preflight asynchronously with a visible checking state, native source errors and a disabled Run action until the captured plan is valid. Recompute after parameter, selection or document changes and cancel stale/unmounted preflight. Keep explicit Run, cancellation/progress, source-sharing review, ordinary Undo and existing keyboard bindings. See [FONT_RECIPES.md](FONT_RECIPES.md).

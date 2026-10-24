@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## SVG font and horizontal text import
+
+Trusted SVG import must retain supplied complete embedded font files, remap selected native identities and reconstruct supported horizontal text with loaded-font bounds, alphabetic placement, whole-line typography and affine hierarchy. Keep structural inspection inert, final source/layout validation private, revision-zero publication and ordinary subsequent Undo. Unsupported character/CSS/descriptor graphs require explicit flattened import; cancellation, bad sources and stale owners publish nothing. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).
+
 ## Portable font recipes
 
 Font-bearing recipes must retain strict content-addressed declarations and complete original/selected bytes across recording, saved packages, per-item parameters, checkpoints and retries. Validate real native layout, preserve one-command Undo/locks/revision/source checks and collect failed staging. Read-only preflight must not change artwork, history or the owner source store; asynchronous preparation/callbacks must leave native registrations private. Reject missing sources instead of fallback output. Legacy font-free formats remain readable. Contract and current verification status: [FONT_RECIPES.md](FONT_RECIPES.md).

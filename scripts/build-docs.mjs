@@ -43,6 +43,7 @@ const generatedPages = [
   ["FONT_SOURCES", "Font-file inspection and private preview"],
   ["FONT_FILES", "Embedded document font files"],
   ["FONT_RECIPES", "Portable font recipes"],
+  ["SVG_FONT_IMPORT", "SVG fonts and editable text"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

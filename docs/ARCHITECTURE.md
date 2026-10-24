@@ -1,5 +1,9 @@
 # Architecture
 
+## SVG font/text reconstruction
+
+The inert XML worker uses pinned CSSTree token/URL/declaration parsing and transports original font Blobs plus validated baseline placements. The host privately prepares native resources, resolves canonical family/style/stretch/weight choices, remaps source aliases and reconstructs TextLayer/FontFile values through OO commands. Temporary registration brackets synchronous layout after asynchronous source/image work; only the final accepted document adopts independently owned sources. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).
+
 ## Portable font recipe boundary
 
 Recipe schema 2 holds strict face dependencies and existing font command actions; package container 3 reuses shared core font payload capture/encoding/decoding. Recorder history owns dependency metadata while RecipeService snapshots source Blobs. Private font preflight brackets synchronous native planning without holding registrations across awaits. Package execution borrows current sources, prepares a detached Document and stages destination font leases before one ordinary command commit. Batch inputs snapshot package bytes and use the same preflight/admission/persistence path. See [FONT_RECIPES.md](FONT_RECIPES.md).

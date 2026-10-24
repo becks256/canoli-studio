@@ -43,4 +43,4 @@ Batch creation captures the package bytes and recipe together. A selected font-b
 
 Internal plugins keep their existing permissions, inert installation and isolated command boundary. REST font admission/download/relink remains the independent surface documented in [API.md](API.md); this change adds no REST recipe-package endpoint, browser/headless synchronization or plugin source-import permission.
 
-Embedded-font SVG reimport, broader font/viewer/device/mixed-source acceptance, character runs, arbitrary axes, path text, language/shaping quality and sustained editor-wide performance remain open.
+Supported SVG font/text reimport has a separate [contract](SVG_FONT_IMPORT.md). Broader SVG/font/CSS/viewer/device/mixed-source acceptance, character runs, arbitrary axes, path text, language/shaping quality and sustained editor-wide performance remain open.

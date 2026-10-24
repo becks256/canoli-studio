@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## SVG font-source admission invariant
+
+Never use an embedded CSS alias as a substitute for source ownership. Parse inert CSS tokens, reject external/dynamic resources, validate whole originals and canonical face descriptors, remap chosen native identities and preserve full affine alphabetic placement. No newly registered face spans an await or progress callback. Failed/stale/cancelled work disposes provisional stores; only accepted revision-zero documents adopt sources. Report unrepresented character/CSS graphs before explicit flattening. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).
+
 ## Portable font source invariant
 
 A font-bearing recipe must never substitute a family string for missing source ownership. Version its dependencies and font actions, retain complete originals and selected native payloads, validate source/hash/descriptor agreement and acquire independent destination leases before publication. Private preflight may register prepared native faces only during synchronous planning; no registration spans an await or user progress callback. Conditional/parameterized replay publishes only required declarations in one shared command transaction. Batch snapshots and editable recovery scenes retain their own source bytes. See [FONT_RECIPES.md](FONT_RECIPES.md).

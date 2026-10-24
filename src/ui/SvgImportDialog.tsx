@@ -17,7 +17,7 @@ export function SvgImportDialog({file,editor,onClose,onBusyChange,onImported}:{f
  const close=()=>{pending.current?.abort(new Error('SVG import cancelled.'));onClose();};
  const run=async(mode:'editable'|'flatten')=>{
   const abort=new AbortController();pending.current?.abort();pending.current=abort;setRunning(true);setError('');onBusyChange(true);
-  const onProgress:SvgImportControl['onProgress']=p=>setPhase(p.phase==='reading'?'Reading SVG…':p.phase==='inspecting'?'Inspecting SVG…':p.phase==='decoding'?'Decoding image pixels…':'Rendering flattened SVG…');
+  const onProgress:SvgImportControl['onProgress']=p=>setPhase(p.phase==='reading'?'Reading SVG…':p.phase==='inspecting'?'Inspecting SVG…':p.phase==='decoding'?'Preparing images and fonts…':'Rendering flattened SVG…');
   try{await editor.openSvg(file,{mode},{signal:abort.signal,onProgress});if(!abort.signal.aborted){onImported();onClose();}}
   catch(cause){if(!abort.signal.aborted)setError(cause instanceof Error?cause.message:String(cause));}
   finally{onBusyChange(false);if(!abort.signal.aborted)setRunning(false);}
@@ -30,6 +30,7 @@ export function SvgImportDialog({file,editor,onClose,onBusyChange,onImported}:{f
    {!report&&!error&&<p role="status">Inspecting SVG…</p>}
    {report&&<>
     <p>{report.width} × {report.height} px · {report.elements} XML elements</p>
+    {report.fonts>0&&<p>{report.fonts} embedded font {report.fonts===1?'declaration':'declarations'}. Editable imports retain the supplied font files; source validation completes during import.</p>}
     <h3>Editable import</h3>
     <p>{report.canImportEditable?`${report.layers} native layers with editable placement and geometry.`:'Some artwork cannot be represented as editable native layers.'}</p>
     {!!report.featuresPreserved.length&&<ul>{report.featuresPreserved.map(text=><li key={text}>{text}</li>)}</ul>}

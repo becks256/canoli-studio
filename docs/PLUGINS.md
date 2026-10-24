@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## SVG font import remains host-only
+
+Embedded SVG font data and native text reconstruction belong to trusted file admission. They add no source chooser, raw font store, network, native renderer or import capability to isolated plugin code. Installation stays inert; ordinary subsequent text/font metadata edits retain existing permissions, commands and Undo. See [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).
+
 ## Font source packages remain a host surface
 
 Portable recipe font resources belong to the existing trusted host recipe/package path. Package storage/import is inert. Internal plugin manifests, permissions, installation and isolated execution are unchanged; no font chooser, source store or package-import capability is added to plugin code. Shared source validation, locks, revision and Undo still apply to accepted font metadata commands. See [FONT_RECIPES.md](FONT_RECIPES.md).

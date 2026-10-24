@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Trusted SVG font admission
+
+Existing trusted browser inspectSvg/openSvg services add horizontal text and embedded font-file reconstruction. Version-1 reports add fonts/texts counts; structural inspection does not certify native source decoding/layout. No SVG file/native-font service is added to independent REST or isolated scripts/plugins. Defaults, controls, failure behavior and limits: [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md).
+
 ## Portable font recipe host services
 
 Trusted browser-host package preflight/execution supports versioned font resources through shared validation/history. Independent REST font upload/download/relink remains unchanged; there is no new REST package endpoint and no browser-session synchronization. See [FONT_RECIPES.md](FONT_RECIPES.md).
