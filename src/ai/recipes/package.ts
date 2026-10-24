@@ -5,6 +5,7 @@ import {avifDecodeOptionsSchema,type AvifDecodeSettings} from "../../core/interc
 import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from "../../core/interchange/tiff/types";
 import type { Recipe } from "./types";
 import { recipeSchema } from "./schema";
+import {captureFontFileSources,encodeProjectFonts,decodeFontFileSources,projectFontsSchema,type ProjectFontSource} from '../../core/font-project';
 
 export interface RecipeAsset {
   id: string;
@@ -36,7 +37,8 @@ const assetSchema = z
 const manifestSchema = z
   .object({
     format: z.literal("luma-recipe"),
-    version: z.union([z.literal(1),z.literal(2)]),
+    version: z.union([z.literal(1),z.literal(2),z.literal(3)]),
+    fonts:projectFontsSchema.optional(),
     recipe: recipeSchema,
     assets: z.array(assetSchema),
   })
@@ -74,9 +76,10 @@ export function recipeAssetIds(recipe: Recipe): Set<string> {
 
 export async function serializeRecipePackage(
   input: Recipe,
-  source: { get(id: string): RecipeAsset },
+  source: { get(id: string): RecipeAsset;fonts?:ProjectFontSource },
 ): Promise<Blob> {
   const recipe = recipeSchema.parse(input) as Recipe;
+  const fontSources=captureFontFileSources(recipe.fontFiles??[],source.fonts);
   const assets: z.infer<typeof assetSchema>[] = [];
   const blobs: Blob[] = [];
   let offset = 0;
@@ -106,14 +109,15 @@ export async function serializeRecipePackage(
       throw new Error("Recipe package offsets exceed safe integer bounds.");
   }
   for(const original of originals.values()){for(const entry of original.entries)entry.raw!.originalOffset=offset;blobs.push(original.blob);offset+=original.blob.size;if(!Number.isSafeInteger(offset))throw new Error('Recipe size exceeds numeric addressing precision.');}
+  const fonts=await encodeProjectFonts(fontSources,offset),version=fonts.manifest?3:originals.size?2:1;
   const manifest = new Blob([
-    JSON.stringify({ format: "luma-recipe", version: originals.size?2:1, recipe, assets }),
+    JSON.stringify({ format: "luma-recipe", version, recipe, assets,...(fonts.manifest?{fonts:fonts.manifest}:{}) }),
   ]);
   const header = new Uint8Array(48);
-  header.set(magic);if(originals.size)header[5]=50;
+  header.set(magic);header[5]=48+version;
   new DataView(header.buffer).setBigUint64(8, BigInt(manifest.size), true);
   header.set(await hash(manifest), 16);
-  return new Blob([header, manifest, ...blobs], {
+  return new Blob([header, manifest, ...blobs,...fonts.blobs], {
     type: "application/x-luma-recipe",
   });
 }
@@ -121,11 +125,11 @@ export async function serializeRecipePackage(
 /** Validates bytes and references; image decoding and installation belong to the importing host. */
 export async function readRecipePackage(
   file: Blob,
-): Promise<{ recipe: Recipe; assets: RecipeAsset[] }> {
+): Promise<{ recipe: Recipe; assets: RecipeAsset[];fonts:import('../../fonts/resources').FontResourceInput[] }> {
   const header = new Uint8Array(await file.slice(0, 48).arrayBuffer());
   if (
     header.length !== 48 ||
-    !magic.every((byte, index) => index===5?(header[index]===49||header[index]===50):header[index] === byte)
+    !magic.every((byte, index) => index===5?(header[index]>=49&&header[index]<=51):header[index] === byte)
   )
     throw new Error("Invalid recipe package header.");
   const length = Number(new DataView(header.buffer).getBigUint64(8, true));
@@ -136,7 +140,8 @@ export async function readRecipePackage(
   if (hex(await hash(manifestBlob)) !== hex(header.slice(16)))
     throw new Error("Recipe manifest checksum mismatch.");
   const manifest = manifestSchema.parse(JSON.parse(await manifestBlob.text()));
-  if(manifest.version!==(header[5]===50?2:1)||manifest.version===1&&manifest.assets.some(entry=>entry.raw))throw new Error('RAW sources require recipe package version 2.');
+  if(manifest.version!==header[5]-48||manifest.version===1&&manifest.assets.some(entry=>entry.raw))throw new Error('RAW sources require recipe package version 2.');
+  if(manifest.version===3?manifest.fonts===undefined||manifest.recipe.schemaVersion!==2:manifest.fonts!==undefined||manifest.recipe.fontFiles!==undefined)throw new Error('Font sources require recipe package version 3 and recipe version 2.');
   const originalRanges=new Map<number,{blob:Blob;size:number;key:string}>();
   const required = recipeAssetIds(manifest.recipe as Recipe);
   const seen = new Set<string>();
@@ -178,7 +183,8 @@ export async function readRecipePackage(
   }
   if (seen.size !== required.size) throw new Error("Missing recipe assets.");
   for(const [originalOffset,original] of [...originalRanges].sort((a,b)=>a[0]-b[0])){if(originalOffset!==offset)throw new Error('Invalid recipe RAW original ranges.');offset+=original.size;}
+  const fonts=await decodeFontFileSources(manifest.fonts,manifest.recipe.fontFiles??[],file,start,offset);offset=fonts.endOffset;
   if (start + offset !== file.size)
     throw new Error("Unexpected trailing recipe package bytes.");
-  return { recipe: manifest.recipe as Recipe, assets };
+  return { recipe: manifest.recipe as Recipe, assets,fonts:fonts.fonts };
 }

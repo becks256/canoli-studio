@@ -1559,7 +1559,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                       key={item.id}
                       className={`review-card ${item.reviewState}`}
                     >
-                      {item.preparation&&<Button size="sm" onClick={()=>void handleDownloadPrepared(item.id,item.name)}>Download editable RAW project</Button>}
+                      {item.preparation&&<Button size="sm" onClick={()=>void handleDownloadPrepared(item.id,item.name)}>{item.source.raw?'Download editable RAW project':'Download editable font project'}</Button>}
                       {item.source.raw&&<p>RAW original: {item.source.raw.originalName} · {item.source.raw.options.development.whiteBalance} WB · {item.source.raw.options.development.exposure} EV</p>}
                       <div className="review-card-header">
                         <div className="review-card-title">

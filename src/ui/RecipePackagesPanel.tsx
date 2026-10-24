@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { EditorApplication } from "../editor";
 import type { Recipe } from "../ai/recipes/types";
-import { compileEditPlan } from "../ai/recipes/executor";
-import { readRecipePackage, recipeAssetIds } from "../ai/recipes/package";
+import type {EditPlan} from "../ai/recipes/types";
+import { readRecipePackage } from "../ai/recipes/package";
 import { Button, Select } from "./controls";
 
 export function RecipePackagesPanel({
@@ -12,7 +12,7 @@ export function RecipePackagesPanel({
   editor: EditorApplication;
   currentRecipe?: Recipe;
 }) {
-  const { document, state, assets } = useSyncExternalStore(
+  const { document, state } = useSyncExternalStore(
     editor.subscribe,
     editor.getSnapshot,
   );
@@ -67,19 +67,13 @@ export function RecipePackagesPanel({
       ),
     );
   };
-  const plan = selected
-    ? compileEditPlan(
-        selected.recipe,
-        state.document,
-        document.selectedLayer?.id ?? null,
-        params,
-        new Set([
-          ...assets.values().map((asset) => asset.id),
-          ...recipeAssetIds(selected.recipe),
-        ]),
-        assets,
-      )
-    : null;
+  const [planned,setPlanned]=useState<{selected:typeof selected;params:typeof params;data:typeof state.document;selectedId:typeof state.selectedId;plan:EditPlan}|null>(null),[planError,setPlanError]=useState('');
+  const plan=planned&&planned.selected===selected&&planned.params===params&&planned.data===state.document&&planned.selectedId===state.selectedId?planned.plan:null;
+  useEffect(()=>{
+    const abort=new AbortController();setPlanned(null);setPlanError('');
+    if(selected)void editor.recipes.compilePackagePlan(selected.file,params,{signal:abort.signal}).then(value=>{if(!abort.signal.aborted)setPlanned({selected,params,data:state.document,selectedId:state.selectedId,plan:value});},error=>{if(!abort.signal.aborted)setPlanError(String(error));});
+    return()=>abort.abort();
+  },[selected,params,state.document,state.selectedId,document,editor]);
   const download = (file: Blob, name: string) => {
     const url = URL.createObjectURL(file);
     const link = window.document.createElement("a");
@@ -96,8 +90,8 @@ export function RecipePackagesPanel({
       aria-labelledby="recipe-tab-packages"
     >
       <p>
-        Portable packages include recipe source images and remain available
-        after reloading.
+        Portable packages retain recipe source images and embedded font files,
+        including complete font originals. They remain available after reloading.
       </p>
       <div className="portable-package-actions">
         <Button
@@ -160,6 +154,7 @@ export function RecipePackagesPanel({
         <>
           <h3>{selected.recipe.name}</h3>
           <p>{selected.recipe.description}</p>
+          {selected.recipe.fontFiles?.length&&<section aria-label="Package font files"><h4>Embedded font files</h4><p>These packages retain complete original font files. Only dependencies needed by executed steps attach to the document.</p><ul>{selected.recipe.fontFiles.map(file=><li key={file.id}>{file.name} · {file.resource.report.faces[0].fullName??'Unnamed face'} · {file.resource.report.format.toUpperCase()}</li>)}</ul></section>}
           {selected.recipe.parameters.map((parameter) => (
             <label className="portable-package-parameter" key={parameter.name}>
               <span>{parameter.label}</span>
@@ -207,6 +202,8 @@ export function RecipePackagesPanel({
             </label>
           ))}
           <div aria-label="Package dry run">
+            {planError&&<p role="alert">{planError}</p>}
+            {!plan&&!planError&&<p role="status">Checking package sources and commands…</p>}
             {plan?.errors.map((error, index) => (
               <p key={index} role="alert">
                 {error}

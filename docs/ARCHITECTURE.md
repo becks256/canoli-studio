@@ -1,8 +1,12 @@
 # Architecture
 
-## Font-file binding development (F08)
+## Portable font recipe boundary
 
-Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+Recipe schema 2 holds strict face dependencies and existing font command actions; package container 3 reuses shared core font payload capture/encoding/decoding. Recorder history owns dependency metadata while RecipeService snapshots source Blobs. Private font preflight brackets synchronous native planning without holding registrations across awaits. Package execution borrows current sources, prepares a detached Document and stages destination font leases before one ordinary command commit. Batch inputs snapshot package bytes and use the same preflight/admission/persistence path. See [FONT_RECIPES.md](FONT_RECIPES.md).
+
+## Font-file binding (F08)
+
+Document schema 43 supports separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence. Selected native fonts preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. Portable recipe/package/batch transport is documented separately in [FONT_RECIPES.md](FONT_RECIPES.md). Broader font/viewer/device/mixed-source acceptance and professional typography remain open. See [the current font-file contract and limits](FONT_FILES.md). Earlier font-source sections below describe read-only inspection/preview; explicit embedding is a separate operation.
 
 ## Font resource ownership
 

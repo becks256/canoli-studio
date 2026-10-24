@@ -137,6 +137,7 @@ export class BatchRunnerService {
           `Recipe '${config.recipeId}' was not found. Batch was not created.`,
         );
       config.recipeSnapshot = structuredClone(recipe);
+      if(recipe.fontFiles?.length){config.recipePackageSnapshot=await this.recipes.exportRecipePackage(recipe);config.recipePackageId=recipe.id;}
     }
 
     const itemNames = batchItemNames(sourceImages);
@@ -349,18 +350,23 @@ export class BatchRunnerService {
       entries.push({ name: deliv.filePath, data: blob });
     }
 
-    const preparations=[];
-    for(const item of run.items.filter(item=>item.source.raw)){
+    const preparations=[],fontPreparations=[];
+    for(const item of run.items.filter(item=>item.source.raw||item.preparation)){
       options.signal?.throwIfAborted();
       if(item.deliverables.length&&!item.preparation)throw new Error('RAW deliverables have no accepted editable project. Restore the prepared checkpoint before packaging.');
       if(!item.preparation)continue;
       const blob=await this.getPreparedProject(runId,item.id),path=`projects/${item.id}.luma`;
       options.signal?.throwIfAborted();entries.push({name:path,data:blob});
-      preparations.push({itemId:item.id,sourceSha256:item.source.sha256,originalName:item.source.raw!.originalName,options:item.source.raw!.options,projectPath:path,projectSha256:item.preparation.sha256,projectByteLength:blob.size,inputsSha256:item.preparation.inputsSha256});
+      if(item.source.raw)preparations.push({itemId:item.id,sourceSha256:item.source.sha256,originalName:item.source.raw.originalName,options:item.source.raw.options,projectPath:path,projectSha256:item.preparation.sha256,projectByteLength:blob.size,inputsSha256:item.preparation.inputsSha256});
+      else fontPreparations.push({itemId:item.id,sourceSha256:item.source.sha256,originalName:item.source.name,projectPath:path,projectSha256:item.preparation.sha256,projectByteLength:blob.size,inputsSha256:item.preparation.inputsSha256});
     }
     if(preparations.length){
       const record={format:'canoli-raw-batch',version:1,batchId:run.id,preparations};
       entries.push({name:'raw-preparation.json',data:new Blob([JSON.stringify({...record,integrity:{sha256:await computeSha256(JSON.stringify(record))}},null,2)])});
+    }
+    if(fontPreparations.length){
+      const record={format:'canoli-font-batch',version:1,batchId:run.id,preparations:fontPreparations};
+      entries.push({name:'font-preparation.json',data:new Blob([JSON.stringify({...record,integrity:{sha256:await computeSha256(JSON.stringify(record))}},null,2)])});
     }
     return createZipArchiveAsync(entries, options);
   }

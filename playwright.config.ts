@@ -1,4 +1,21 @@
 import { defineConfig } from "@playwright/test";
+import { statfsSync } from "node:fs";
+import { tmpdir } from "node:os";
+
+// Chromium's redirected shared-memory files can exhaust a tight temporary disk
+// during source-module reloads. Prefer /dev/shm only when it has more room;
+// small Docker shared-memory mounts and other platforms retain the default.
+function chromiumSharedMemoryAvailable() {
+  if (process.platform !== "linux") return false;
+  try {
+    const shared = statfsSync("/dev/shm", { bigint: true });
+    const temporary = statfsSync(tmpdir(), { bigint: true });
+    return shared.bavail * shared.bsize > temporary.bavail * temporary.bsize;
+  } catch {
+    return false;
+  }
+}
+
 export default defineConfig({
   testDir: "./tests",
   testMatch: "**/*.e2e.ts",
@@ -12,6 +29,9 @@ export default defineConfig({
     viewport: { width: 1440, height: 1000 },
     launchOptions: {
       executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,
+      ignoreDefaultArgs: chromiumSharedMemoryAvailable()
+        ? ["--disable-dev-shm-usage"]
+        : undefined,
     },
     screenshot: "only-on-failure",
   },

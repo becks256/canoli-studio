@@ -1,13 +1,17 @@
 # Canoli Studio editor requirements
 
+## Portable font recipes
+
+Font-bearing recipes must retain strict content-addressed declarations and complete original/selected bytes across recording, saved packages, per-item parameters, checkpoints and retries. Validate real native layout, preserve one-command Undo/locks/revision/source checks and collect failed staging. Read-only preflight must not change artwork, history or the owner source store; asynchronous preparation/callbacks must leave native registrations private. Reject missing sources instead of fallback output. Legacy font-free formats remain readable. Contract and current verification status: [FONT_RECIPES.md](FONT_RECIPES.md).
+
 ## Font source collection and relinking
 
 Rejected/cancelled staged imports must release their own records without invalidating concurrent identical imports. Preserve sources referenced by every current/undo/redo/branch/comparison/stored-master state and every still-bound component view; release model-owned sources after the last reference and active operation lease ends. Active native exports must retain their captured fonts while live edits trim history, then release on success, cancellation or a throwing callback. Retained wet replay must release captured fonts at processing completion, failure, idle abort or disposal; finished output must stay readable independently. Explicit source loss must reject history navigation before publication. Relink an attached face from an explicitly selected local source through one shared transaction, preserving fallback lists, inheritance, locks, source text, labels and Undo/Redo; cancelled/stale/locked relinking leaves artwork intact and collects an unused replacement. Ordinary script/plugin contexts gain no file chooser or source-import capability. See [FONT_FILES.md](FONT_FILES.md).
 
 
-## Font-file binding development (F08)
+## Font-file binding (F08)
 
-Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+Document schema 43 supports separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence. Selected native fonts preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. Portable recipe/package/batch transport is documented separately in [FONT_RECIPES.md](FONT_RECIPES.md). Broader font/viewer/device/mixed-source acceptance and professional typography remain open. See [the current font-file contract and limits](FONT_FILES.md). Earlier font-source sections below describe read-only inspection/preview; explicit embedding is a separate operation.
 
 ## Font-source admission and private preview (F08 foundation)
 

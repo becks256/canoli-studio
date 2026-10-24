@@ -1,3 +1,7 @@
+import {recipeFontFiles,recipeFontIds} from './fonts';
+import {documentFontFiles} from '../../core/font-files';
+import {sameFontResource} from '../../fonts/resources';
+import type {FontSourceStore} from '../../fonts/store';
 import type {HistoryOrigin} from '../../core/history-provenance';
 import {visitFontScopes} from '../../core/font-management';
 import {hasLensCorrection,validateLensGeometry} from '../../core/interchange/raw/lens';
@@ -132,7 +136,7 @@ export function compileEditPlan(
   selectedId: string | null = null,
   rawParams: Record<string, unknown> = {},
   availableAssetIds?: ReadonlySet<string>,
-  rawAssets?: {get(id:string):{width:number;height:number;raw?:Pick<NonNullable<ImageAsset['raw']>,'report'>}},
+  rawAssets?: {get(id:string):{width:number;height:number;raw?:Pick<NonNullable<ImageAsset['raw']>,'report'>};fonts?:FontSourceStore},
 ): EditPlan {
   const errors: string[] = [];
   if (!recipeOutputBindingsUnique(recipe))
@@ -164,6 +168,21 @@ export function compileEditPlan(
 
   // Working copy of document for simulation
   let simDoc = structuredClone(document);
+  let dependencies:ReturnType<typeof recipeFontFiles>=[];
+  try{dependencies=recipeFontFiles(recipe);if(recipe.schemaVersion!==2&&recipe.steps.some(step=>step.action.type.startsWith('font.file.')))throw new Error('Font actions require recipe version 2.');}catch(error){errors.push(String(error));}
+  const fontFiles=new Map([...documentFontFiles(document),...dependencies].map(file=>[file.id,file]));
+  const apply=(command:EditorCommand):DocumentData=>{
+    for(const fontId of recipeFontIds(command)){
+      const file=fontFiles.get(fontId);if(!file)throw new Error(`Recipe requires an embedded font declaration: ${fontId}.`);
+      const sources=rawAssets?.fonts;if(!sources?.has(fontId))throw new Error(`Recipe font source is unavailable: ${file.name}. Use a portable package or embed the source first.`);
+      const resource=sources.get(fontId);if(!sameFontResource(file.resource,resource.descriptor))throw new Error('Recipe font declaration differs from its owned source.');
+      if(sources.nativeAvailable&&!sources.isActive(fontId))throw new Error('Recipe fonts require native preparation. Use awaited executeAsync() or a portable package.');
+      if(command.type!=='font.file.add'&&!documentFontFiles(simDoc).some(value=>value.id===fontId)){
+        const ensure:EditorCommand={type:'font.file.add',file};simDoc=execute(simDoc,ensure);resolvedCommands.push(ensure);
+      }
+    }
+    return execute(simDoc,command);
+  };
   const stepOutputs = new Map<string, string>();
   const outputGroups = new Map<string, string[]>();
   const effectIds = new Map<string, string>();
@@ -240,8 +259,8 @@ export function compileEditPlan(
       }
     }
 
-    if(step.action.type.startsWith('paragraphStyle.')&&step.target){
-      errors.push(`Step '${step.name}': Paragraph style library actions do not accept layer targets.`);
+    if((step.action.type.startsWith('paragraphStyle.')||step.action.type.startsWith('font.file.'))&&step.target){
+      errors.push(`Step '${step.name}': Style and font library actions do not accept layer targets.`);
       continue;
     }
     // Resolve the complete set once; earlier targets cannot change later matches.
@@ -321,6 +340,16 @@ export function compileEditPlan(
         const stepCommands: EditorCommand[] = [];
 
         switch (step.action.type) {
+          case 'font.file.add':
+          case 'font.file.rename':
+          case 'font.file.remove': {
+            const action=recipeActionSchema.parse(step.action);if(!action.type.startsWith('font.file.'))throw new Error('Invalid font action.');
+            const input=step.action,file=fontFiles.get(input.id);if(!file)throw new Error('Font action has no declared source dependency.');
+            const cmd:EditorCommand=input.type==='font.file.add'?{type:input.type,file}
+              :input.type==='font.file.rename'?{type:input.type,id:input.id,name:String(actionValue(input.name))}
+              :{type:input.type,id:input.id,...(input.replaceWith!==undefined?{replaceWith:String(actionValue(input.replaceWith))}:{})};
+            simDoc=apply(cmd);stepCommands.push(cmd);visualChange=`${input.type==='font.file.add'?'Embed':input.type==='font.file.rename'?'Rename':'Remove'} font file '${file.name}' through shared validation`;break;
+          }
           case 'raw.develop': {
             recipeActionSchema.parse(step.action);
             if(!targetLayer||targetLayer.kind!=='smart-object')throw new Error('RAW development requires a smart-object target with a retained original.');
@@ -333,7 +362,7 @@ export function compileEditPlan(
             if(options.development.image===source.raw.report.image&&(!source.raw.report.canDevelop||options.development.whiteBalance==='camera'&&source.raw.report.channels>1&&!source.raw.report.hasCameraWhiteBalance))throw new Error('RAW source does not support the selected development settings.');
             if(hasLensCorrection(options.development.lens)&&options.development.image===source.raw.report.image)validateLensGeometry(options.development.lens!,source.raw.report.displayWidth,source.raw.report.displayHeight);
             const assetId=id(),command=rawComponentCommand(simDoc,targetLayer.id,{id:assetId,width:source.width,height:source.height});
-            simDoc=execute(simDoc,command);stepCommands.push(command);
+            simDoc = apply(command);stepCommands.push(command);
             rawDevelopments.push({assetId,sourceAssetId:sourceId,options});plannedRawAssets.set(assetId,source);
             layersModified++;affectedLayerNames.add(targetLayer.name);
             visualChange=`Develop retained RAW for '${targetLayer.name}' and its shared instances; native pixels are prepared before one atomic commit`;
@@ -341,7 +370,7 @@ export function compileEditPlan(
           }
           case 'paragraphStyle.ensure':
           case 'paragraphStyle.update': {
-            if(step.target)throw new Error('Paragraph style library actions do not accept layer targets.');
+            if(step.target)throw new Error('Style and font library actions do not accept layer targets.');
             const action=step.action;
             const definition=paragraphStyleSchema.parse({id:id(),name:actionValue(action.name),format:actionValue(action.format),
               ...(action.basedOn?{basedOn:{id:resolveStyle(action.basedOn.style,actionValue).id,overrides:actionValue(action.basedOn.overrides)}}:{})});
@@ -363,7 +392,7 @@ export function compileEditPlan(
               visualChange=`Update paragraph style '${previous.name}' to '${definition.name}' and reflow linked text`;
             }
             const previousText=paragraphTextLayers(simDoc.children);
-            if(command){stepCommands.push(command);simDoc=execute(simDoc,command);}
+            if(command){stepCommands.push(command);simDoc = apply(command);}
             for(const layer of paragraphTextLayers(simDoc.children)){
               const previous=previousText.find(value=>value.id===layer.id);
               if(previous&&JSON.stringify(previous)!==JSON.stringify(layer)){layersModified++;affectedLayerNames.add(layer.name);}
@@ -373,11 +402,11 @@ export function compileEditPlan(
             break;
           }
           case 'paragraphStyle.remove': {
-            if(step.target)throw new Error('Paragraph style library actions do not accept layer targets.');
+            if(step.target)throw new Error('Style and font library actions do not accept layer targets.');
             const style=resolveStyle(step.action.style,actionValue);
             const followers=paragraphTextLayers(simDoc.children).filter(layer=>layer.paragraphStyle?.id===style.id);
             const command:EditorCommand={type:'paragraphStyle.remove',id:style.id};
-            stepCommands.push(command);simDoc=execute(simDoc,command);
+            stepCommands.push(command);simDoc = apply(command);
             for(const layer of followers){layersModified++;affectedLayerNames.add(layer.name);}
             visualChange=`Remove paragraph style '${style.name}' and detach ${followers.length} linked text layers, keeping their appearance`;
             break;
@@ -390,7 +419,7 @@ export function compileEditPlan(
             const command:EditorCommand=action.type==='text.paragraphStyle'
               ?{type:'text.paragraphStyle',id:targetLayer.id,styleId:style?.id??null,keepOverrides:action.keepOverrides}
               :{type:'text.paragraphOverrides.clear',id:targetLayer.id,keys:action.keys};
-            stepCommands.push(command);simDoc=execute(simDoc,command);layersModified++;affectedLayerNames.add(targetLayer.name);
+            stepCommands.push(command);simDoc = apply(command);layersModified++;affectedLayerNames.add(targetLayer.name);
             visualChange=action.type==='text.paragraphOverrides.clear'?`Reset paragraph overrides on '${targetLayer.name}'`
               :style?`Apply paragraph style '${style.name}' to '${targetLayer.name}'`:`Detach paragraph style from '${targetLayer.name}', keeping its appearance`;
             break;
@@ -416,7 +445,7 @@ export function compileEditPlan(
               patch: { x: targetLayer.x + dx, y: targetLayer.y + dy },
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersModified++;
             affectedLayerNames.add(targetLayer.name);
             visualChange = `Translate '${targetLayer.name}' by (${dx}, ${dy})`;
@@ -459,7 +488,7 @@ export function compileEditPlan(
                 patch: { locked: false },
               };
               stepCommands.push(unlockCmd);
-              simDoc = execute(simDoc, unlockCmd);
+              simDoc = apply(unlockCmd);
             }
 
             const cmd: EditorCommand = {
@@ -468,7 +497,7 @@ export function compileEditPlan(
               patch,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
 
             if (
               step.target?.ignoreLocked &&
@@ -481,7 +510,7 @@ export function compileEditPlan(
                 patch: { locked: true },
               };
               stepCommands.push(relockCmd);
-              simDoc = execute(simDoc, relockCmd);
+              simDoc = apply(relockCmd);
             }
 
             layersModified++;
@@ -519,7 +548,7 @@ export function compileEditPlan(
               newIds,
             };
             stepCommands.push(duplicateCmd);
-            simDoc = execute(simDoc, duplicateCmd);
+            simDoc = apply(duplicateCmd);
             const duplicated = allLayers(simDoc.children).find(
               (l) => l.id === newDuplicateId,
             );
@@ -532,7 +561,7 @@ export function compileEditPlan(
                   patch: { x: targetLayer.x, y: targetLayer.y },
                 };
                 stepCommands.push(position);
-                simDoc = execute(simDoc, position);
+                simDoc = apply(position);
               }
 
               layersAdded++;
@@ -549,7 +578,7 @@ export function compileEditPlan(
                   patch: { name: resolvedName },
                 };
                 stepCommands.push(renameCmd);
-                simDoc = execute(simDoc, renameCmd);
+                simDoc = apply(renameCmd);
                 duplicated.name = resolvedName;
               }
               visualChange = `Duplicate layer '${targetLayer.name}' -> '${duplicated.name}'`;
@@ -570,7 +599,7 @@ export function compileEditPlan(
               id: targetLayer.id,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersRemoved++;
             affectedLayerNames.add(targetLayer.name);
             visualChange = `Remove layer '${targetLayer.name}'`;
@@ -589,7 +618,7 @@ export function compileEditPlan(
               direction: step.action.direction,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersModified++;
             affectedLayerNames.add(targetLayer.name);
             visualChange = `Reorder layer '${targetLayer.name}' ${step.action.direction}`;
@@ -706,7 +735,7 @@ export function compileEditPlan(
               parentId,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersAdded++;
             affectedLayerNames.add(newLayerData.name);
             bindOutput(step.id, newLayerData);
@@ -748,7 +777,7 @@ export function compileEditPlan(
               values: parsedValues,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersModified++;
             affectedLayerNames.add(targetLayer.name);
             visualChange = `Adjust tone on '${targetLayer.name}' (exp: ${parsedValues.exposure ?? 0}, con: ${parsedValues.contrast ?? 0}, sat: ${parsedValues.saturation ?? 0})`;
@@ -775,7 +804,7 @@ export function compileEditPlan(
               effect: { ...step.action.effect, id: addedEffectId },
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersModified++;
             affectedLayerNames.add(targetLayer.name);
             visualChange = `Add effect '${step.action.effect.kind}' to '${targetLayer.name}'`;
@@ -821,7 +850,7 @@ export function compileEditPlan(
                   }
                 : { type: "effect.remove", id: targetLayer.id, effectId };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersModified++;
             affectedLayerNames.add(targetLayer.name);
             visualChange = `${step.action.type === "effect.update" ? "Update" : "Remove"} effect on '${targetLayer.name}'`;
@@ -836,7 +865,7 @@ export function compileEditPlan(
               id: targetLayer.id,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             layersModified++;
             affectedLayerNames.add(targetLayer.name);
             visualChange = `Reset effects on '${targetLayer.name}'`;
@@ -863,7 +892,7 @@ export function compileEditPlan(
               height: h,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             canvasResized = true;
             visualChange = `Resize artboard from ${document.width}×${document.height} to ${w}×${h} px`;
             break;
@@ -885,7 +914,7 @@ export function compileEditPlan(
               bounds,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             canvasResized = true;
             visualChange = `Crop canvas to ${bounds.width}×${bounds.height} at (${bounds.x}, ${bounds.y})`;
             break;
@@ -895,7 +924,7 @@ export function compileEditPlan(
             const cmd:EditorCommand={type:'document.font.replace',from:String(actionValue(step.action.from)),to:String(actionValue(step.action.to))};
             const previous=new Map<string,string>();
             visitFontScopes(simDoc,(scope,path)=>{for(const layer of allLayers(scope.children))if(layer.kind==='text')previous.set(JSON.stringify([...path,layer.id]),layer.fontFamily);});
-            stepCommands.push(cmd);simDoc=execute(simDoc,cmd);
+            stepCommands.push(cmd);simDoc = apply(cmd);
             visitFontScopes(simDoc,(scope,path)=>{for(const layer of allLayers(scope.children))if(layer.kind==='text'&&previous.get(JSON.stringify([...path,layer.id]))!==layer.fontFamily){layersModified++;affectedLayerNames.add(layer.name);}});
             visualChange=`Replace font request '${cmd.from}' with '${cmd.to}' across text, styles and embedded documents`;break;
           }
@@ -906,7 +935,7 @@ export function compileEditPlan(
               name,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             visualChange = `Rename document to '${name}'`;
             break;
           }
@@ -917,7 +946,7 @@ export function compileEditPlan(
               selection: (step.action.selection as any) ?? null,
             };
             stepCommands.push(cmd);
-            simDoc = execute(simDoc, cmd);
+            simDoc = apply(cmd);
             visualChange = step.action.selection
               ? "Set canvas selection"
               : "Clear selection";

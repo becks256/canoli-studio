@@ -87,6 +87,9 @@ export interface PlannedRawDevelopment {
 }
 
 export type RecipeAction =
+  | {type:'font.file.add';id:string}
+  | {type:'font.file.rename';id:string;name:string}
+  | {type:'font.file.remove';id:string;replaceWith?:string}
   | {type:'raw.develop';development:RecipeRawDevelopment;allowPrecisionLoss:true}
   | {type:'paragraphStyle.ensure';name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
   | {type:'paragraphStyle.update';style:RecipeParagraphStyleTarget;name:string;format:RecipeParagraphFormat;basedOn?:RecipeParagraphBase|null}
@@ -189,7 +192,9 @@ export interface RecipeStep {
 }
 
 export interface Recipe {
-  schemaVersion: 1;
+  schemaVersion: 1|2;
+  /** Version 2 only. Exact source/face metadata; bytes belong to a package/store. */
+  fontFiles?:import('../../core/font-files').FontFileData[];
   id: string;
   name: string;
   description: string;

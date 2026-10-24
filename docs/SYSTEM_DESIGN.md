@@ -1,13 +1,17 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Portable font source invariant
+
+A font-bearing recipe must never substitute a family string for missing source ownership. Version its dependencies and font actions, retain complete originals and selected native payloads, validate source/hash/descriptor agreement and acquire independent destination leases before publication. Private preflight may register prepared native faces only during synchronous planning; no registration spans an await or user progress callback. Conditional/parameterized replay publishes only required declarations in one shared command transaction. Batch snapshots and editable recovery scenes retain their own source bytes. See [FONT_RECIPES.md](FONT_RECIPES.md).
+
 ## Font source lifetime
 
 Use temporary source leases acquired before async publication, weak Document ownership bindings over complete retained history, and operation leases for native exports/wet sessions. Adopted records collect only after every live model/history/view reference and operation pin ends; explicit host preparation remains caller-owned until adopted. Cancelling one identical importer must not evict another. Source identity includes the store entry generation, so removal/reinstallation invalidates old captures. Prepare relinks outside transactions and atomically publish shared add/replace/remove commands with normal locks and history. Source loss rejects navigation before publication. Current schema/transport and isolation boundaries remain unchanged. See [FONT_FILES.md](FONT_FILES.md).
 
 
-## Font-file binding development (F08)
+## Font-file binding (F08)
 
-Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+Document schema 43 supports separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence. Selected native fonts preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. Portable recipe/package/batch transport is documented separately in [FONT_RECIPES.md](FONT_RECIPES.md). Broader font/viewer/device/mixed-source acceptance and professional typography remain open. See [the current font-file contract and limits](FONT_FILES.md). Earlier font-source sections below describe read-only inspection/preview; explicit embedding is a separate operation.
 
 ## Font-source ownership invariant
 

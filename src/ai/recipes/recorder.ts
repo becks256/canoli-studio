@@ -12,6 +12,8 @@ import type {
   SemanticTarget,
 } from "./types";
 import { RECIPE_SCHEMA_VERSION } from "./types";
+import {documentFontFiles,type FontFileData} from '../../core/font-files';
+import {recipeFontIds} from './fonts';
 
 export interface RecorderOptions {
   name?: string;
@@ -24,6 +26,7 @@ interface RecordingState {
   unsupported: Set<string>;
   outputs: Map<string, SemanticTarget>;
   styles:Map<string,RecipeParagraphStyleTarget>;
+  fonts:Map<string,FontFileData>;
   lastTarget: string | null;
 }
 
@@ -50,6 +53,7 @@ export class RecipeRecorder {
       unsupported: this.unsupported,
       outputs: this.createdLayerOutputs,
       styles:this.styleOutputs,
+      fonts:this.fontFiles,
       lastTarget: this.lastCommandTargetLayerId,
     });
   }
@@ -58,7 +62,7 @@ export class RecipeRecorder {
     this.steps = state.steps;
     this.unsupported = state.unsupported;
     this.createdLayerOutputs = state.outputs;
-    this.styleOutputs=state.styles;
+    this.styleOutputs=state.styles;this.fontFiles=state.fonts;
     this.lastCommandTargetLayerId = state.lastTarget;
     this.notify();
   }
@@ -85,12 +89,18 @@ export class RecipeRecorder {
   }
   private createdLayerOutputs = new Map<string, SemanticTarget>(); // creation-time identity for roots and descendants
   private styleOutputs=new Map<string,RecipeParagraphStyleTarget>();
+  private fontFiles=new Map<string,FontFileData>();
 
+  private captureFonts(value:unknown,before:DocumentData,after?:DocumentData):void{
+    const ids=recipeFontIds(value);if(!ids.size)return;
+    const available=[...documentFontFiles(before),...(after?documentFontFiles(after):[])];
+    for(const id of ids)if(!this.fontFiles.has(id)){const file=available.find(file=>file.id===id);if(file)this.fontFiles.set(id,structuredClone(file));}
+  }
   private captureStyle(styleId:string,document:DocumentData):RecipeParagraphStyleTarget {
     const existing=this.styleOutputs.get(styleId);if(existing)return structuredClone(existing);
     const style=document.paragraphStyles?.find(value=>value.id===styleId);
     if(!style)throw new Error('Recorded paragraph style is missing from its document.');
-    const parsed=paragraphStyleSchema.parse(style),stepId=`step-${id()}`;
+    const parsed=paragraphStyleSchema.parse(style),stepId=`step-${id()}`;this.captureFonts(parsed.format,document);
     const basedOn=parsed.basedOn?{style:this.captureStyle(parsed.basedOn.id,document),overrides:structuredClone(parsed.basedOn.overrides)}:undefined;
     this.steps.push({id:stepId,name:`Use paragraph style ${parsed.name}`,action:{type:'paragraphStyle.ensure',name:parsed.name,format:parsed.format,...(basedOn?{basedOn}:{})}});
     const reference:RecipeParagraphStyleTarget={by:'stepResult',stepId};
@@ -138,7 +148,7 @@ export class RecipeRecorder {
     this.historyError = undefined;
     this.unsupported.clear();
     this.createdLayerOutputs.clear();
-    this.styleOutputs.clear();
+    this.styleOutputs.clear();this.fontFiles.clear();
     this.initialSelectedId = selectedId;
     this.lastCommandTargetLayerId = null;
     this.notify();
@@ -213,6 +223,8 @@ export class RecipeRecorder {
       return;
     }
 
+    this.captureFonts(command,beforeDoc,afterDoc);
+
     const targetFromLayer = (layer: LayerData): SemanticTarget => {
       const priorStepResult = this.createdLayerOutputs.get(layer.id);
       if (priorStepResult) {
@@ -225,6 +237,12 @@ export class RecipeRecorder {
     };
 
     switch (command.type) {
+      case 'font.file.add':
+      case 'font.file.rename':
+      case 'font.file.remove': {
+        const action=command.type==='font.file.add'?{type:command.type,id:command.file.id}:structuredClone(command);
+        this.steps.push({id:`step-${id()}`,name:'Update embedded font file',action});this.lastCommandTargetLayerId=null;this.notify();break;
+      }
       case 'component.set': {
         const previous=beforeDoc.components?.find(value=>value.id===command.definition.id),source=command.definition.source;
         const layer=allLayers(beforeDoc.children).filter(value=>value.kind==='smart-object'&&value.componentId===command.definition.id)
@@ -655,8 +673,12 @@ export class RecipeRecorder {
       }
     }
 
+    const fonts=[...recipeFontIds(steps.map(step=>step.action))].map(id=>{
+      const file=this.fontFiles.get(id);if(!file)throw new Error(`Recorded embedded font declaration is unavailable: ${id}. Embed the source before recording.`);return structuredClone(file);
+    });
     const recipe: Recipe = {
-      schemaVersion: RECIPE_SCHEMA_VERSION,
+      schemaVersion: fonts.length?2:RECIPE_SCHEMA_VERSION,
+      ...(fonts.length?{fontFiles:fonts}:{}),
       id: `recipe-${id()}`,
       name: options.name?.trim() || "Recorded Action",
       description:
@@ -673,7 +695,7 @@ export class RecipeRecorder {
     this.steps = [];
     this.unsupported.clear();
     this.createdLayerOutputs.clear();
-    this.styleOutputs.clear();
+    this.styleOutputs.clear();this.fontFiles.clear();
     this.notify();
     return recipe;
   }

@@ -23,7 +23,10 @@ export function retainedFontFiles(documents:readonly DocumentData[]):FontFileDat
 
 /** Snapshot every source synchronously before any encoding/transport await. */
 export function captureProjectFonts(documents:readonly DocumentData[],source?:ProjectFontSource):FontResourceInput[]{
-  return retainedFontFiles(documents).map(file=>{
+  return captureFontFileSources(retainedFontFiles(documents),source);
+}
+export function captureFontFileSources(files:readonly FontFileData[],source?:ProjectFontSource):FontResourceInput[]{
+  return files.map(file=>{
     if(!source)throw new Error(`Missing project font source: ${file.name}`);
     const resource=source.get(file.id);
     if(!sameFontResource(resource.descriptor,file.resource))throw new Error(`Project font declaration differs from its source: ${file.name}`);
@@ -48,7 +51,9 @@ export async function encodeProjectFonts(inputs:readonly FontResourceInput[],sta
 }
 
 export async function decodeProjectFonts(input:unknown,documents:readonly DocumentData[],file:Blob,payloadStart:number,startOffset:number):Promise<{fonts:FontResourceInput[];endOffset:number}>{
-  const declarations=retainedFontFiles(documents);
+  return decodeFontFileSources(input,retainedFontFiles(documents),file,payloadStart,startOffset);
+}
+export async function decodeFontFileSources(input:unknown,declarations:readonly FontFileData[],file:Blob,payloadStart:number,startOffset:number):Promise<{fonts:FontResourceInput[];endOffset:number}>{
   if(input===undefined){if(declarations.length)throw new Error('Missing embedded font records.');return{fonts:[],endOffset:startOffset};}
   const manifest=projectFontsSchema.parse(input),blobs:Blob[]=[],used=new Set<number>(),keys=new Set<string>();
   let offset=startOffset;

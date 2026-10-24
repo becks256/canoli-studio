@@ -9,6 +9,9 @@ import {commitRecipePlan} from "./executor";
 import type { Recipe } from "./types";
 import { readRecipePackage } from "./package";
 import {executeRecipeAsync} from './async-executor';
+import {documentFontFiles} from '../../core/font-files';
+import {recipeFontIds} from './fonts';
+import type {FontSourceLease} from '../../fonts/store';
 
 /** Remap only the artwork references represented in the package contract. */
 function remapSources(recipe: Recipe, ids: Map<string, string>): void {
@@ -57,16 +60,23 @@ export async function executeRecipePackage(
   const supplied = structuredClone(params);
   const staging = new AssetStore();
   const promoted: string[] = [];
+  const fontPins:FontSourceLease[]=[],fontPromotions:FontSourceLease[]=[];
   const lifetime=assets.captureLifetime(),pins=[...referencedAssets(document.toJSON())].map(id=>captureAssetSource(assets,id));
   const current=()=>{
     assertTargetAvailable();control.signal?.throwIfAborted();lifetime();
     if(document.assetStore!==assets||document.getSnapshot().revision!==revision)throw new Error('Document changed while preparing the recipe package. Review the target and retry.');
     if((document.selectedLayer?.id??null)!==selectedId)throw new Error('Layer selection changed while preparing the recipe package. Review the target and retry.');
     for(const pin of pins)pin.check();
+    for(const pin of fontPins)pin.check();
   };
   try {
+    for(const file of documentFontFiles(document.toJSON())){fontPins.push(assets.fonts.retain(file.id));assets.fonts.shareTo(staging.fonts,file.id);}
     const contents = await readRecipePackage(file);
     current();
+    for(let index=0;index<contents.fonts.length;index++){
+      control.onProgress?.({phase:'inspecting',fraction:index/contents.fonts.length});current();
+      await staging.fonts.restore(contents.fonts[index],{signal:control.signal});current();
+    }
     const ids = new Map<string, string>();
     for (const entry of contents.assets) {
       const asset = await staging.add(entry.blob, entry.name, id(), false,{tiff:entry.tiff,avif:entry.avif,raw:entry.raw,signal:control.signal});
@@ -89,12 +99,15 @@ export async function executeRecipePackage(
     for(const assetId of referencedAssets(detached.toJSON()))if(!assets.has(assetId)){
       staging.shareTo(assets,assetId,assetId);promoted.push(assetId);
     }
+    for(const fontId of new Set([...recipeFontIds(result.plan.resolvedCommands),...documentFontFiles(detached.toJSON()).map(file=>file.id)]))fontPromotions.push(staging.fonts.stageTo(assets.fonts,fontId));
+    current();for(const pin of fontPromotions)pin.check();
     const accepted=commitRecipePlan(contents.recipe,document,result.plan,origin);
     if(!accepted.success)throw new Error(accepted.error??'Recipe package commit failed.');
     return accepted;
   } finally {
     const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));
     promoted.forEach(assetId=>{if(!retained.has(assetId))assets.remove(assetId);});
+    for(const pin of fontPromotions)pin.release();for(const pin of fontPins)pin.release();
     staging.dispose();
   }
 }

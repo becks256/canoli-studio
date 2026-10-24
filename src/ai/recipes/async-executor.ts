@@ -1,3 +1,6 @@
+import {recipeFontFiles} from './fonts';
+import {documentFontFiles} from '../../core/font-files';
+import type {FontSourceLease} from '../../fonts/store';
 import {retainedDocuments,captureRetainedHistory} from '../../core/history';
 import {AssetStore,captureAssetSource} from '../../core/assets';
 import {execute,type EditorCommand} from '../../core/commands';
@@ -16,19 +19,26 @@ export async function executeRecipeAsync(
 ):Promise<ExecuteRecipeResult>{
   const captured=structuredClone(recipe),supplied=structuredClone(params),assets=document.assetStore,origin=document._getHistoryOrigin();
   const revision=document.getSnapshot().revision,selectedId=document.selectedLayer?.id??null;
-  const plan=compileEditPlan(captured,document.toJSON(),selectedId,supplied,
+  let plan=compileEditPlan(captured,document.toJSON(),selectedId,supplied,
     assets?new Set(assets.values().map(asset=>asset.id)):undefined,assets??undefined);
-  if(!plan.valid)return {success:false,plan,error:`Recipe '${captured.name}' validation failed: ${plan.errors.join('; ')}`};
+  const fontPins:FontSourceLease[]=[];
   const alive=assets?.captureLifetime(),pins=new Map<string,ReturnType<typeof captureAssetSource>>();
   const current=()=>{
     assertTargetAvailable();control.signal?.throwIfAborted();alive?.();
     if(document.assetStore!==assets||document.getSnapshot().revision!==revision)throw new Error('Document changed during recipe preparation. Review the target and retry.');
     if((document.selectedLayer?.id??null)!==selectedId)throw new Error('Layer selection changed during recipe preparation. Review the target and retry.');
-    for(const pin of pins.values())pin.check();
+    for(const pin of pins.values())pin.check();for(const pin of fontPins)pin.check();
   };
   const staging=new AssetStore(),promoted:string[]=[];
   try{
     current();
+    const files=[...documentFontFiles(document.toJSON()),...recipeFontFiles(captured)];
+    if(assets&&files.length){
+      for(const id of new Set(files.map(file=>file.id)))if(assets.fonts.has(id)){fontPins.push(assets.fonts.retain(id));assets.fonts.shareTo(staging.fonts,id);staging.fonts.activate(id);}
+      try{plan=compileEditPlan(captured,document.toJSON(),selectedId,supplied,new Set(assets.values().map(asset=>asset.id)),{get:id=>assets.get(id),fonts:staging.fonts});}
+      finally{for(const resource of staging.fonts.values())staging.fonts.deactivate(resource.id);}
+    }
+    if(!plan.valid)return {success:false,plan,error:`Recipe '${captured.name}' validation failed: ${plan.errors.join('; ')}`};
     if(assets){
       const outputs=new Set(plan.rawDevelopments?.map(value=>value.assetId)??[]);
       const sources=new Set([...referencedAssets(document.toJSON()),...(plan.rawDevelopments??[]).map(value=>value.sourceAssetId).filter(value=>!outputs.has(value))]);
@@ -53,6 +63,9 @@ export async function executeRecipeAsync(
     };
     plan.resolvedCommands=plan.resolvedCommands.map(repair);
     plan.steps=plan.steps.map(step=>step.resolvedCommand?{...step,resolvedCommand:repair(step.resolvedCommand)}:step);
+    // Native faces are registered only for synchronous simulation/publication,
+    // never across asynchronous RAW work or user progress callbacks.
+    for(const resource of staging.fonts.values())staging.fonts.activate(resource.id);
     let final=document.toJSON();for(const command of plan.resolvedCommands)final=execute(final,command);
     for(const assetId of referencedAssets(final))if(!assets?.has(assetId)&&!staging.has(assetId))throw new Error(`Recipe source asset is unavailable: ${assetId}`);
     current();
@@ -63,6 +76,6 @@ export async function executeRecipeAsync(
     // Observers can throw after acceptance. Keep every asset the model/history actually owns.
     const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));
     for(const assetId of promoted)if(!retained.has(assetId))assets!.remove(assetId);
-    staging.dispose();
+    staging.dispose();for(const pin of fontPins)pin.release();
   }
 }

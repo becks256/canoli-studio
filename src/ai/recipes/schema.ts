@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { Recipe } from "./types";
 import { RECIPE_SCHEMA_VERSION } from "./types";
 import {paragraphOverrideKeysSchema} from '../../core/paragraph-styles';
+import {recipeFontFilesSchema} from './fonts';
 
 export const recipeParagraphStyleTargetSchema=z.discriminatedUnion('by',[
   z.object({by:z.literal('name'),name:z.string().trim().min(1).max(80)}).strict(),
@@ -136,6 +137,9 @@ export const recipeRawDevelopmentSchema=z.object({
 }).strict();
 
 export const recipeActionSchema = z.discriminatedUnion("type", [
+  z.object({type:z.literal('font.file.add'),id:z.string().regex(/^[a-f0-9]{64}$/)}).strict(),
+  z.object({type:z.literal('font.file.rename'),id:z.string().regex(/^[a-f0-9]{64}$/),name:z.string().min(1).max(240)}).strict(),
+  z.object({type:z.literal('font.file.remove'),id:z.string().regex(/^[a-f0-9]{64}$/),replaceWith:z.string().min(1).max(240).optional()}).strict(),
   z.object({type:z.literal('document.font.replace'),from:z.string().min(1).max(240),to:z.string().min(1).max(240)}).strict(),
   z.object({type:z.literal("raw.develop"),development:recipeRawDevelopmentSchema,allowPrecisionLoss:z.literal(true)}).strict(),
   z.object({type:z.literal('paragraphStyle.ensure'),name:z.string().min(1).max(80),format:recipeParagraphFormatSchema,basedOn:recipeParagraphBaseSchema}).strict(),
@@ -268,7 +272,8 @@ export const recipeStepSchema = z.object({
 
 export const recipeSchema = z
   .object({
-    schemaVersion: z.literal(RECIPE_SCHEMA_VERSION),
+    schemaVersion: z.union([z.literal(RECIPE_SCHEMA_VERSION),z.literal(2)]),
+    fontFiles:recipeFontFilesSchema.optional(),
     id: z.string().min(1).max(120),
     name: z.string().min(1).max(240),
     description: z.string().max(4000),
@@ -282,6 +287,7 @@ export const recipeSchema = z
     created: z.string().optional(),
     modified: z.string().optional(),
   })
+  .refine(data=>data.schemaVersion===2?data.fontFiles!==undefined:data.fontFiles===undefined&&!data.steps.some(step=>step.action.type.startsWith('font.file.')),{message:'Font dependencies and actions require recipe version 2 with fontFiles.'})
   .refine(
     (data) => {
       // Check that step IDs are unique

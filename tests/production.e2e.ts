@@ -2103,3 +2103,10 @@ test('production font-source guide and dependency notices are available without 
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();
  try{await page.goto(baseURL+'/developer/font-sources.html');await expect(page.getByRole('heading',{name:'Font-file inspection and private preview',level:1,exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:info.outputPath('font-source-guide-mobile.png')});const response=await page.request.get(baseURL+'/font-parser-notices.txt');expect(response.ok()).toBe(true);expect(await response.text()).toContain('fontkit');}finally{await context.close();}
 });
+
+
+test('production font recipe packages retain originals, native output, atomic undo and reopening',async({page},info)=>{const{fontRecipeWorkflow}=await import('./helpers/font-recipes');await fontRecipeWorkflow(page,info,true);});
+
+test('production portable font recipe contract is available without JavaScript',async({browser,baseURL})=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();try{await page.goto(baseURL+'/developer/font-recipes.html');await expect(page.getByRole('heading',{name:'Portable font recipes',level:1,exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);}finally{await context.close();}
+});

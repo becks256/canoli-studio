@@ -1,13 +1,17 @@
 # Canoli Studio design system
 
+## Portable font package review
+
+Keep the existing custom Portable packages panel. Explain that packages retain image sources and complete embedded font originals; importing remains inert. Preflight asynchronously with a visible checking state, native source errors and a disabled Run action until the captured plan is valid. Recompute after parameter, selection or document changes and cancel stale/unmounted preflight. Keep explicit Run, cancellation/progress, source-sharing review, ordinary Undo and existing keyboard bindings. See [FONT_RECIPES.md](FONT_RECIPES.md).
+
 ## Font relinking interaction
 
 In each Embedded font files row, offer **Choose replacement for [name]**. Open the existing inspector in a named relink context, require collection-face selection and an explicit **Relink selected face** action, retain read-only preview and expose **Cancel font relinking**. Preserve the friendly label while showing actual source metadata. Explain that prior bytes remain for Undo; capture the current owner/revision and reject stale, closed or locked targets. Wrap long row/action labels within the modal and retain its scrolling body/footer. No new shortcut, rail icon or component library is introduced.
 
 
-## Font-file binding development (F08)
+## Font-file binding (F08)
 
-Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+Document schema 43 supports separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence. Selected native fonts preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. Portable recipe/package/batch transport is documented separately in [FONT_RECIPES.md](FONT_RECIPES.md). Broader font/viewer/device/mixed-source acceptance and professional typography remain open. See [the current font-file contract and limits](FONT_FILES.md). Earlier font-source sections below describe read-only inspection/preview; explicit embedding is a separate operation.
 
 ## Font-file inspection interaction
 

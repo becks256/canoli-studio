@@ -1,8 +1,12 @@
 # Scripting API
 
-## Font-file binding development (F08)
+## Trusted portable font recipes
 
-Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+Trusted `editor.recipes.compilePackagePlan(file:Blob,params:Record<string,unknown>={},control:RawImportControl={}):Promise<EditPlan>` loads/validates package sources privately and performs read-only native preflight. `executeRecipePackage(file,params={},control={})` commits one transaction after source/owner/revision/selection/lock checks. `RawImportControl` supports signal and inspecting/developing/encoding progress; active font parsing retains the default 60000ms deadline excluding queue wait. Font-bearing recipe schema 2/package 3, actions, dependencies, JSON source errors, recording, cancellation, batch behavior and the executable trusted example are documented in [FONT_RECIPES.md](FONT_RECIPES.md). These methods remain outside ordinary isolated Scripts/plugins.
+
+## Font-file binding (F08)
+
+Document schema 43 supports separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence. Selected native fonts preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. Portable recipe/package/batch transport is documented separately in [FONT_RECIPES.md](FONT_RECIPES.md). Broader font/viewer/device/mixed-source acceptance and professional typography remain open. See [the current font-file contract and limits](FONT_FILES.md). Earlier font-source sections below describe read-only inspection/preview; explicit embedding is a separate operation.
 
 ## FontFile and Document.fonts.files
 

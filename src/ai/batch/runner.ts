@@ -1,3 +1,6 @@
+import {documentFontFiles} from '../../core/font-files';
+import {withRecipeFonts} from '../recipes/font-preparation';
+import type {FontSourceStore} from '../../fonts/store';
 import {captureRetainedHistory,captureProjectHistory,type RetainedHistory} from '../../core/history';
 import {isCameraRawFile} from '../../core/interchange/raw/files';
 import {batchRawSourceSchema,rawBatchDocument} from './raw';
@@ -154,15 +157,17 @@ export class BatchRunner {
   /**
    * Estimates cost and checks budget limits for a batch configuration.
    */
-  async estimateBatch(
-    config: BatchConfig,
-    items: BatchItem[],
-  ): Promise<{
-    totalEstimatedCostCents: number;
-    perItemEstimates: Record<string, number>;
-    approved: boolean;
-    error?: string;
-  }> {
+  async estimateBatch(config:BatchConfig,items:BatchItem[]){
+    const recipe=config.recipeSnapshot;
+    if(recipe?.fontFiles?.length&&items.some(item=>!item.preparation)){
+      const file=config.recipePackageSnapshot;if(!file)throw new Error('Font batch recipes require captured portable font sources.');
+      const contents=await readRecipePackage(file);
+      if(contents.recipe.id!==config.recipeId||JSON.stringify(contents.recipe)!==JSON.stringify(recipe))throw new Error('Batch recipe package does not match its captured recipe.');
+      return withRecipeFonts(contents.fonts,undefined,[],{},()=>{},fonts=>this.estimateBatchCommands(config,items,fonts));
+    }
+    return this.estimateBatchCommands(config,items);
+  }
+  private estimateBatchCommands(config:BatchConfig,items:BatchItem[],fonts?:FontSourceStore):{totalEstimatedCostCents:number;perItemEstimates:Record<string,number>;approved:boolean;error?:string}{
     let recipe: Recipe | undefined;
 
     if (config.recipeId) {
@@ -182,7 +187,7 @@ export class BatchRunner {
       if(item.source.raw){const raw=batchRawSourceSchema.parse(item.source.raw);if(raw.report.displayWidth!==item.source.width||raw.report.displayHeight!==item.source.height)throw new Error('RAW batch source dimensions differ from its native report.');}
       if(!Number.isFinite(item.estimatedCostCents)||item.estimatedCostCents<0)throw new Error('Batch item cost must be finite and nonnegative.');
       let recipeUnitCostCents = 0;
-      if (recipe) {
+      if (recipe&&!item.preparation) {
         // Match the initial item document and merged parameters used by executeItem.
         const assetId=item.source.assetId||'estimate-source';
         let sampleDoc=createDocument(item.name,item.source.width,item.source.height),sampleLayer=createRaster(item.name,assetId,item.source.width,item.source.height) as import('../../core/model').LayerData;
@@ -192,7 +197,7 @@ export class BatchRunner {
           const staged=rawBatchDocument(item.name,item.source.width,item.source.height,assetId);sampleDoc=staged.document.toJSON();sampleLayer=staged.layer.toJSON();
         }else sampleDoc.children.push(sampleLayer);
         const plan = compileEditPlan(recipe,sampleDoc,sampleLayer.id,{...config.recipeParams,...item.parameters},undefined,
-          item.source.raw?{get(key:string){if(key!==assetId)throw new Error('Recipe source metadata is unavailable.');return{width:item.source.width,height:item.source.height,raw:{report:item.source.raw!.report}};}}:undefined);
+          item.source.raw||fonts?{fonts,get(key:string){if(key!==assetId)throw new Error('Recipe source metadata is unavailable.');return{width:item.source.width,height:item.source.height,...(item.source.raw?{raw:{report:item.source.raw.report}}:{})};}}:undefined);
         if (!plan.valid)
           return {
             totalEstimatedCostCents: 0,
@@ -806,7 +811,7 @@ export class BatchRunner {
         }
       }
 
-      if(item.source.raw&&!item.preparation){
+      if((item.source.raw||documentFontFiles(doc).length)&&!item.preparation){
         signal.throwIfAborted();
         const history=preparedHistory;
         const project=await serializeProject(doc,assets,history),inputsSha256=await preparationInputs(config,item);

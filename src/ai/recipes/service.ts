@@ -1,4 +1,6 @@
+import type {FontResourceInput} from '../../fonts/resources';
 import {executeRecipeAsync} from './async-executor';
+import {compileRecipePackagePlan} from './package-plan';
 import type {RawImportControl} from '../../core/interchange/raw/types';
 import {ownRawSource} from "../../core/interchange/raw/source";
 import { RecipePackageStorage } from "./package-storage";
@@ -26,15 +28,17 @@ export class RecipeService {
   readonly recorder = new RecipeRecorder((assetId)=>this.editor.assetStore.get(assetId));
   private unsavedRecording?: Recipe;
   private recordingSources = new Map<string, RecipeAsset>();
+  private recordingFonts=new Map<string,FontResourceInput>();
   lastSavedRecordingFormat: "json" | "package" = "json";
 
   get pendingRecordingHasAssets(): boolean {
     return (
-      !!this.unsavedRecording && recipeAssetIds(this.unsavedRecording).size > 0
+      !!this.unsavedRecording && (recipeAssetIds(this.unsavedRecording).size > 0||!!this.unsavedRecording.fontFiles?.length)
     );
   }
 
   private captureRecordingSources(document: Document): void {
+    for(const resource of document.assetStore?.fonts.values()??[])this.recordingFonts.set(resource.id,{descriptor:resource.descriptor,original:resource.original,renderBlob:resource.renderBlob});
     for (const asset of document.assetStore?.values() ?? []) {
       this.recordingSources.set(asset.id, {
         id: asset.id,
@@ -51,6 +55,7 @@ export class RecipeService {
     if (!this.unsavedRecording)
       throw new Error("No unsaved recording is available.");
     return serializeRecipePackage(this.unsavedRecording, {
+      fonts:{get:id=>{const source=this.recordingFonts.get(id);if(!source)throw new Error(`Recorded font source is unavailable: ${id}`);return source;}},
       get: (id) => {
         const asset = this.recordingSources.get(id);
         if (!asset)
@@ -77,7 +82,7 @@ export class RecipeService {
       await this.storage.save(recipe);
       this.lastSavedRecordingFormat = "json";
     }
-    this.recordingSources.clear();
+    this.recordingSources.clear();this.recordingFonts.clear();
     this.unsavedRecording = undefined;
     return recipe;
   }
@@ -246,6 +251,10 @@ export class RecipeService {
     );
   }
 
+  compilePackagePlan(file:Blob,params:Record<string,unknown>={},control:RawImportControl={}):Promise<EditPlan>{
+    const document=this.editor.document;return compileRecipePackagePlan(file,document,params,control,this.captureTargetGuard(document));
+  }
+
   execute(
     recipe: Recipe,
     params: Record<string, unknown> = {},
@@ -263,7 +272,7 @@ export class RecipeService {
       throw new Error(
         "Save the pending recording before starting another recording.",
       );
-    this.recordingSources.clear();
+    this.recordingSources.clear();this.recordingFonts.clear();
     this.captureRecordingSources(this.editor.document);
     this.recorder.start(this.editor.document.selectedLayer?.id ?? null);
   }
@@ -284,7 +293,7 @@ export class RecipeService {
   dispose(): void {
     this.disposed = true;
     this.targetGeneration++;
-    this.recordingSources.clear();
+    this.recordingSources.clear();this.recordingFonts.clear();
     if (this.unhookRecorder) {
       this.unhookRecorder();
       this.unhookRecorder = null;
