@@ -1,5 +1,22 @@
 # Implementation roadmap and planning record
 
+### 2026-10-24 — F14 font-swap phases measured; scheduling experiments rejected
+
+Owner: implementation agent; investigation following `33e935c`. The retained benchmark now records click-to-prepare wait, preparation, and post-preparation canvas-copy time on the same matching-state frame. It verifies nonnegative phases and their exact partition of total latency. The separate command marker is included in click-to-prepare wait, not an additional stage. Measurements still end at canvas copy behind the open dialog, not physical display.
+
+Final unchanged-scheduler results, 12 real swaps per case and nearest-rank p95 without filtering:
+
+| Text layers | Total median / p95 | Click-to-prepare median / p95 | Preparation median / p95 | Copy median / p95 | Long tasks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 16 | 57.10 / 64.30 ms | 53.60 / 62.30 ms | 2.20 / 13.40 ms | 0.10 / 0.20 ms | 1 |
+| 64 | 56.35 / 66.20 ms | 50.70 / 61.80 ms | 4.55 / 43.60 ms | 0.40 / 0.70 ms | 2 |
+
+Every captured font frame uses Canvas2D. A CPU profile and separate timeline show short warm preparation but a substantial earlier wait; this is not evidence of its root cause. A task-boundary experiment passed deterministic coalescing/Undo/supersession checks but did not improve real clicks and made typing controls slower. Its trace also records delayed MessageChannel delivery. A feature-detected prioritized-task experiment likewise did not improve font clicks. Both were fully reverted, including their proposed requirements and experimental tests. Their exact source preimages, bundles, raw reports and traces remain in the evidence. No scheduling optimization or new browser requirement is shipped.
+
+The final normal build and all **2,018 unit/API tests across 228 files** pass (138.39 s). The retained phase checks pass both browser cases (15.52 s), and all **8 native font-management workflows** pass (41.28 s), without skips, flakes or retries. Six newly decoded native PNGs match the corresponding six previously accepted production images and direct-reference/Undo/script/reopen groups. All **97 served resources** match the build and are byte-identical to the prior accepted release, including five WASMs and the plugin archive; plugin source/entry digests verify. The prior 126-case production acceptance is historical evidence for those identical release bytes, **not a production rerun this turn**.
+
+[Sealed raw measurements, rejected experiments, phase assertions, release identities and independent checks](benchmarks/font-replacement-phases-2026-10-24.json) preserve the earlier records. The next performance investigation must distinguish command/UI/browser waiting from actual renderer work and validate an improvement before changing scheduling. F14 remains open, as does the complete original roadmap, including broader typography/fonts/shaping, photographic/color/precision/interchange, AI/provider/evaluation/production, catalog/workflow/collaboration/commercial/enterprise/specialist/motion, installed/model-driven T23 and eligible registered live-provider T24. No product runtime/API/schema, source-resolution, permission, account, upload or paid-operation change is introduced.
+
 ### 2026-10-24 — F14 cold plain-text working area verified; font-swap latency remains open
 
 Owner: implementation agent; estimate M within F14. Starting from `7038b21`, eligible normal-blend plain text now uses the existing native-ink bounded compositor before allocating its content surface. Previously only shadowed text used that path; compact cache retention happened after full-viewport cold drawing. Fresh native bounds preserve whole-line shaping, overhangs and the exact output grid. Missing metrics and the existing processing/benefit guards retain the full path. No document geometry, source resolution, public API or stored format changes.

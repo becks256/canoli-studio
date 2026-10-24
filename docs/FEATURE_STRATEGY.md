@@ -24,6 +24,10 @@ Our differentiation hypotheses are the combination of:
 
 No source audit proves competitors lack this combination. Validate the advantage through task comparisons and customer behavior, not feature-name novelty.
 
+### Current F14 phase investigation (2026-10-24)
+
+Font-replacement instrumentation now separates click-to-prepare wait, preparation and canvas copy on a matching-state frame. The 64-layer final medians are 50.70/4.55/0.40 ms, with total p95 still 66.20 ms. Task-based scheduling experiments did not improve the real workflow and were reverted; the production release remains byte-identical. Final build, all 2,018 unit/API, two phase checks and eight native font-management workflows pass. This is diagnostic progress, not a shipped scheduling optimization or closed F14 gate. All original roadmap requirements remain active. See the dated roadmap and [sealed evidence](benchmarks/font-replacement-phases-2026-10-24.json).
+
 ### Current F14 cold-text increment (2026-10-24, local verification)
 
 Plain text can use fresh native-ink bounds before allocating cold viewport content, preserving whole-line shaping and exact output pixels; unavailable metrics retain the full path. The 64-layer stress fixture uses about 98% less drawing area. Real font-replacement median improves from 150.55 to 58.40 ms, with observed long tasks reduced from 25 to 3, while p95 remains above target. Typing/vector control differences are mixed. Build, all 2,018 unit/API, 133 distinct native and 126 normal-production checks pass; independent decoding verifies the 50 MP native export and font-workflow PNGs. This does not close sustained/editor-wide/device/GPU/process-memory F14 or any other original roadmap gate. See the dated roadmap and [sealed evidence](benchmarks/bounded-plain-text-2026-10-24.json).
