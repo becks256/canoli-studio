@@ -729,7 +729,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     ...(['selection','canvas','layer']as const).flatMap(type=>layerAlignmentSchema.options.map(alignment=>({
       id:`align-${alignment}-${type}`,label:`Align ${alignment} to ${type==='layer'?'key object':type}`,category:'Layout',keys:SHORTCUT_BINDINGS[`align-${alignment}-${type}`],
       description:type==='layer'?'Keep the active selected root stationary':'Align selected-root geometry in canvas space',
-      enabled:()=>{try{const roots=dom.layerSelection.rootLayers,key=alignmentKey;if(!roots.length||type==='layer'&&(!key||!roots.some(layer=>layer.id===key.id)||roots.length<2))return false;alignmentCommands(dom.toJSON(),dom.selectedLayers.map(layer=>layer.id),alignment,type==='layer'?{type,id:key!.id}:{type});return true;}catch{return false;}},
+      enabled:()=>{try{const roots=dom.layerSelection.rootLayers,key=alignmentKey;if(!roots.length||type==='layer'&&(!key||!roots.some(layer=>layer.id===key.id)||roots.length<2))return false;alignmentCommands(dom._read(),dom.selectedLayers.map(layer=>layer.id),alignment,type==='layer'?{type,id:key!.id}:{type});return true;}catch{return false;}},
       run:()=>{const key=alignmentKey;if(type==='layer'&&!key)return;alignLayers(alignment,type==='layer'?{type,id:key!.id}:{type});},
     }))),
     {id:'account',label:'Account',category:'Workspace',keys:SHORTCUT_BINDINGS.account,allowWhileBusy:true,run:()=>{cancelWorkspaceGesture();setShowAccount(true);}},

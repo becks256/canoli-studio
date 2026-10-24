@@ -1,5 +1,9 @@
 # Architecture
 
+## Immutable geometry queries and palette availability
+
+`layerBounds` privately retains successful canvas-space bounds only for complete roots proven immutable by `core/immutable`. Keys include the exact document root and layer ID, so shared children, repeated IDs, parent edits and Undo remain scoped correctly. Mutable DTOs, command drafts and caller-only freezing retain fresh traversal. Cached records never escape: each returned bounds object is independently owned, and missing/empty results do not populate arbitrary keys. Palette alignment availability reads the current internal readonly model through the existing pure planner instead of serializing an owned document for each action. Public `toJSON()` ownership, validation, commands, history and extension contracts are unchanged.
+
 ## Text update measurement boundary
 
 The shared `layer.update` reducer preserves cached authored dimensions unless the request includes text, metric/layout fields or legacy explicit width/height normalization. Presence rather than value difference preserves intentional same-text reflow. Linked paragraph bindings resolve only for requested format changes; unrelated edits retain sparse legacy cached fields. Style-library/application/reset commands keep their existing explicit reflow behavior. No model/schema, renderer or extension boundary changes are required.

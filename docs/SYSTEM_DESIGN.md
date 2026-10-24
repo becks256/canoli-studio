@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Retained world-geometry invariant
+
+Cache successful layer geometry only behind the model's recursive immutable registry, keyed by complete root identity and layer ID. Never infer safety from persisted IDs, shared child references or caller freezing. Return owned rectangles on every request, preserve fresh mutable-draft traversal and avoid negative-ID retention. Root replacement naturally invalidates parent/path/position results and history navigation reuses only the matching root. Action availability must inspect the current readonly root without a whole-document serialization; accepted edits still pass the authoritative shared command validator.
+
 ## Authored text measurement invariant
 
 A non-layout `layer.update` must not replace retained text bounds with measurements from another font environment. The reducer tests explicit metric/content/layout property presence before reflow and resolves linked paragraph overrides only for format edits. Same-value explicit reflow remains supported; history navigation restores saved results without remeasurement. Independent REST, isolated commits, semantic replay and UI actions consume this shared behavior.

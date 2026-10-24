@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Command-search responsiveness verification
+
+Measure opening and query input against matching DOM results and a matching animation frame separately, alongside main-thread long tasks. Include blank, moderate and dense valid documents and report development versus normal production evidence. Palette inspection must preserve artwork, selection and history; source geometry and public serialization ownership stay intact. Repeated action eligibility must not serialize complete artwork unnecessarily. The complete editor-wide F14 objective and its existing ≤33 ms live-input p95 / <50 ms routine-task targets remain open until the broader runtime/device evidence satisfies them.
+
 ## Authored text geometry during ordinary edits
 
 Position, transforms, appearance, naming and visibility/locking changes through `layer.update` must preserve imported text width/height. This includes distribution/flip and color/alignment property edits. Resolve linked format overrides only when format properties are requested. Explicit content, metric or paragraph-layout requests still reflow, including same-text `TextLayer.reflow()`. Shared UI, isolated/plugin, REST, recipe and ordinary Undo behavior must agree; saved projects retain the resulting authored dimensions.

@@ -1,4 +1,5 @@
 import { isActiveWetPaint } from './wet-operation';
+import { isImmutable } from './immutable';
 import type { DocumentData, LayerData } from "./model";
 import { AffineTransform } from "./affine";
 import { pathBounds, strokeBounds } from "./drawing";
@@ -76,7 +77,24 @@ export function layerOrigin(
 ): Point | undefined {
   return layerTransform(document, targetId)?.point({ x: 0, y: 0 });
 }
+// Cache only complete roots proven immutable by the model registry. Geometry
+// depends on ancestry, so shared child identity or persisted IDs are not keys.
+const immutableLayerBounds = new WeakMap<object, Map<string, Readonly<Bounds>>>();
 export function layerBounds(
+  document: DocumentData,
+  targetId: string,
+): Bounds | undefined {
+  if (!isImmutable(document)) return computeLayerBounds(document, targetId);
+  let cache = immutableLayerBounds.get(document);
+  if (!cache) { cache = new Map(); immutableLayerBounds.set(document, cache); }
+  const saved = cache.get(targetId);
+  if (saved) return {...saved};
+  const result = computeLayerBounds(document, targetId);
+  // Missing IDs/empty geometry do not add arbitrary keys to a retained root.
+  if (result) cache.set(targetId, Object.freeze({...result}));
+  return result;
+}
+function computeLayerBounds(
   document: DocumentData,
   targetId: string,
 ): Bounds | undefined {
