@@ -1,5 +1,29 @@
 # Implementation roadmap and planning record
 
+### 2026-10-23 — F14 retained layer glyphs verified; sustained responsiveness remains open
+
+Owner: implementation agent; estimate M within F14. Starting from `3ae5034`, CPU profiles identify repeated decorative layer-icon construction during unrelated text updates. LayersPanel now retains its 21 fixed glyph elements. Row names, selection, visibility, own/ancestor locks, drag state, collapse controls, handlers and history indicators continue to update from current state. Original glyph sizes, styling and editing behavior remain intact. No document/schema, source asset, renderer equation, command/history, public API, isolated permission or REST boundary changes.
+
+The unchanged seven matching-text presentation fixtures run against frozen production bundles using the existing benchmark API exposure; its only source-code branch exposes the same editor/constructors on window. Three alternating baseline/candidate pairs, one worker and 20 edits per fixture produce **840 actual matching-frame samples**. Median per-run p95 for the 64-layer fixtures improves:
+
+| Fixture | Baseline p95 | Candidate p95 |
+| --- | ---: | ---: |
+| Plain text | 19.0 ms | 16.2 ms |
+| Color overlay | 21.7 ms | 16.7 ms |
+| Drop shadow | 23.1 ms | 17.6 ms |
+
+No long tasks are observed in those paired runs. One-layer results remain mixed; candidate per-run p95 ranges from 13.7 to 18.1 ms. A separate profiled source-browser pair reduces 64-layer p95 from 142.1–151.9 to 90.8–96.4 ms; sampled time under icon code falls from approximately 389–410 to 129–141 ms across 20 edits. Development typing still misses the 33 ms target and retains long tasks. These short local headless-Chromium canvas-presentation proxies do not establish sustained editor-wide, physical-display/device/GPU, process-memory or universal 60fps acceptance.
+
+Verification:
+
+- `npm run build` passes actual WASM/runtime/plugin/site/docs generation, TypeScript and normal production bundling. All **2,000 unit/API tests across 225 files** pass (121.24 s). Product/runtime source inputs match the final browser matrices; only the disclosed browser-test fixture corrections occur after the unit run.
+- All **52 final native browser cases** pass (275.55 s), including layer selection/filtering/flip/distribution/comps, tools, workspace docking, 48 cache comparisons, text/vector latency and seven contextual guide examples. All **123 normal-production workflows** pass (441.59 s), with the benchmark global absent. Accepted runs have no skipped/flaky/unexpected cases or automatic retries. Each final run retains identical before/after input maps. Benchmark-to-normal release differences are confined to the app bundle and its HTML reference; all five native WASM binaries remain byte-identical.
+- The shared UI workflow types text, hides/restores another layer, locks/unlocks its ancestor, checks drag/disabled state, collapses/expands the group, changes selection and verifies exact editable-document/PNG restoration. Independent Pillow decoding finds all six pilot/native/production PNGs identical at 400×300, RGBA SHA-256 `b551df4be5b4231f0a6b6790e4dc9bee4a388401407d7caf93971ac33d3e2bae`. The real 50 MP RAW batch guide independently checks every native delivery sample and retains the complete original; current production large-image workflows also pass.
+
+The first broad native run passes 43/45. The new UI fixture omitted the hover that reveals a lock button; the general guide runner also lacked the documented selected-frequency-layer prerequisite. The corrected runner prepares that actual workflow and verifies exact undo/source preservation. It identifies seven RAW/trusted-host snippets with dedicated executable suites; all seven run in the final matrix, while the general isolated runner executes the other 62 JavaScript examples. The corrected two-case pilot passes before the final matrix. Initial mechanical conditional syntax and sandbox server-start failures remain recorded separately. During production verification, four old temporary RAW copies are removed only after complete size/hash comparison with the tracked compressed original, freeing **400,002,688 bytes**; every copy is reproducible from that unchanged fixture.
+
+[Sealed raw reports, CPU profiles, source preimages, release/input identities, PNGs and cleanup proof](benchmarks/layer-icon-retention-2026-10-23.json) preserve the **277 earlier benchmark records unchanged**. The complete original roadmap remains active: broader typography/fonts/shaping, photographic/color/precision/interchange/merge quality, real AI/providers/evaluation/production, catalog/library, authenticated audit, workflow/collaboration/commercial/enterprise/specialist/motion, actual installed/model-driven T23 and eligible registered live-provider T24, and sustained all-tool/device/GPU/process-memory F14. No paid call, account, upload, dependency, new isolated grant or arbitrary image/import limit is introduced.
+
 ### 2026-10-23 — F08 native capital variants, stretch, continuous weight and guarded PNG verified
 
 Owner: implementation agent; T16/F08, estimate M–L. The preceding turn made progress with `e45bfb1`, verified ordered multipage TIFF. This increment provides native capital-variant/font-stretch requests and numerical weight input through the existing Typography Inspector, OO constructors/setters/reset, shared commands/locks/history, paragraph-style inheritance/overrides, isolated Scripts and independent REST. Whole-line measurement, wrapping/justification, ink/cache/rendering, resizing and editable SVG preserve the requests and original Unicode text. These are font/browser-dependent requests, with explicit closest-face/synthesis limitations; they do not supply font files, arbitrary variable axes or general character runs. [Complete contract and executable example](FONT_FEATURES.md).

@@ -36,6 +36,33 @@ import type { DocumentData, LayerData } from "../core/model";
 import { allLayers, isLocked } from "../core/model";
 import { Button, IconButton, Slider } from "./controls";
 
+// These glyphs have no row state or handlers. Retain their elements so a text
+// edit does not rebuild every unchanged icon in the layer list. State-dependent
+// controls still choose the appropriate glyph on every render.
+const layerIcons = {
+  collapsed: <ChevronRight size={12} />,
+  expanded: <ChevronDown size={12} />,
+  group: <Folder size={17} />,
+  paint: <Paintbrush size={15} />,
+  vector: <PenTool size={15} />,
+  text: <Type size={15} />,
+  smartObject: <Component size={15} />,
+  adjustment: <SlidersHorizontal size={15} />,
+  layer: <Layers size={15} />,
+  locked: <LockKeyhole size={12} />,
+  unlocked: <UnlockKeyhole size={12} />,
+  visible: <Eye size={13} />,
+  hidden: <EyeOff size={13} />,
+  addLayer: <SquarePlus size={15} />,
+  addGroup: <FolderPlus size={15} />,
+  layerComps: <Layers size={14} />,
+  copy: <Copy size={15} />,
+  forward: <ArrowUp size={15} />,
+  backward: <ArrowDown size={15} />,
+  delete: <Trash2 size={15} />,
+  currentHistory: <Check size={12} />,
+};
+
 export interface LayersPanelProps {
   document: Document;
   viewDocument: DocumentData;
@@ -208,11 +235,7 @@ export function LayersPanel({
                     })
                   }
                 >
-                  {isCollapsed(node.id) ? (
-                    <ChevronRight size={12} />
-                  ) : (
-                    <ChevronDown size={12} />
-                  )}
+                  {isCollapsed(node.id) ? layerIcons.collapsed : layerIcons.expanded}
                 </button>
               ) : (
                 <span className="tree-spacer" />
@@ -232,7 +255,7 @@ export function LayersPanel({
               >
                 {node.kind === "group" ? (
                   <span className="layer-thumb group-thumb">
-                    <Folder size={17} />
+                    {layerIcons.group}
                   </span>
                 ) : (node.kind === "raster" || node.kind === "paint") && pixels ? (
                   <LayerThumbnail
@@ -251,29 +274,29 @@ export function LayersPanel({
                 ) : node.kind === "raster" ? (
                   <img className="layer-thumb" src={getThumbnail(node.assetId)} alt="" />
                 ) : node.kind === "paint" ? (
-                  <span className="layer-thumb group-thumb"><Paintbrush size={15} /></span>
+                  <span className="layer-thumb group-thumb">{layerIcons.paint}</span>
                 ) : node.kind === "vector" ? (
                   <span className="layer-thumb group-thumb">
-                    <PenTool size={15} />
+                    {layerIcons.vector}
                   </span>
                 ) : node.kind === "text" ? (
                   <span className="layer-thumb group-thumb">
-                    <Type size={15} />
+                    {layerIcons.text}
                   </span>
                 ) : node.kind === "smart-object" ? (
                   <span
                     className="layer-thumb group-thumb"
                     title="Smart object"
                   >
-                    <Component size={15} />
+                    {layerIcons.smartObject}
                   </span>
                 ) : node.kind === "adjustment" ? (
                   <span className="layer-thumb group-thumb">
-                    <SlidersHorizontal size={15} />
+                    {layerIcons.adjustment}
                   </span>
                 ) : (
                   <span className="layer-thumb group-thumb">
-                    <Layers size={15} />
+                    {layerIcons.layer}
                   </span>
                 )}
                 <span className="layer-name">{node.name}</span>
@@ -287,11 +310,7 @@ export function LayersPanel({
                   })
                 }
               >
-                {node.locked ? (
-                  <LockKeyhole size={12} />
-                ) : (
-                  <UnlockKeyhole size={12} />
-                )}
+                {node.locked ? layerIcons.locked : layerIcons.unlocked}
               </button>
               <button
                 className="layer-control always"
@@ -303,7 +322,7 @@ export function LayersPanel({
                   })
                 }
               >
-                {node.visible ? <Eye size={13} /> : <EyeOff size={13} />}
+                {node.visible ? layerIcons.visible : layerIcons.hidden}
               </button>
             </div>
             {node.kind === "group" &&
@@ -336,7 +355,7 @@ export function LayersPanel({
             disabled={busy}
             onClick={onAddLayer}
           >
-            <SquarePlus size={15} />
+            {layerIcons.addLayer}
           </IconButton>
           <IconButton
             shortcutId="group"
@@ -344,7 +363,7 @@ export function LayersPanel({
             disabled={busy || locked}
             onClick={onAddGroup}
           >
-            <FolderPlus size={15} />
+            {layerIcons.addGroup}
           </IconButton>
           {onAddAdjustmentLayer && (
             <IconButton
@@ -352,7 +371,7 @@ export function LayersPanel({
               disabled={busy || locked}
               onClick={onAddAdjustmentLayer}
             >
-              <SlidersHorizontal size={15} />
+              {layerIcons.adjustment}
             </IconButton>
           )}
         </div>
@@ -360,7 +379,7 @@ export function LayersPanel({
       {!showHistory ? (
         <>
           <div className="document-summary">
-            <Layers size={14} />
+            {layerIcons.layerComps}
             <span>
               {viewDocument.width} × {viewDocument.height}
             </span>
@@ -749,7 +768,7 @@ export function LayersPanel({
               disabled={!selected || locked || busy}
               onClick={onDuplicateLayer}
             >
-              <Copy size={15} />
+              {layerIcons.copy}
             </IconButton>
             <IconButton
               shortcutId="up"
@@ -757,7 +776,7 @@ export function LayersPanel({
               disabled={!selected || locked || busy}
               onClick={onMoveLayerForward}
             >
-              <ArrowUp size={15} />
+              {layerIcons.forward}
             </IconButton>
             <IconButton
               shortcutId="down"
@@ -765,7 +784,7 @@ export function LayersPanel({
               disabled={!selected || locked || busy}
               onClick={onMoveLayerBackward}
             >
-              <ArrowDown size={15} />
+              {layerIcons.backward}
             </IconButton>
             <span className="grow" />
             <IconButton
@@ -773,7 +792,7 @@ export function LayersPanel({
               disabled={!selected || locked || busy}
               onClick={onDeleteLayer}
             >
-              <Trash2 size={15} />
+              {layerIcons.delete}
             </IconButton>
           </div>
         </>
@@ -789,7 +808,7 @@ export function LayersPanel({
             <div className="history-entry" key={index}>
               <span className="history-dot" />
               {entry.label}
-              {index === historyPast.length - 1 && <Check size={12} />}
+              {index === historyPast.length - 1 && layerIcons.currentHistory}
             </div>
           ))}
           {historyFuture.length > 0 && (

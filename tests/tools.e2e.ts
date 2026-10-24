@@ -624,8 +624,25 @@ test("developer docs link, anchors and documented scripts work in the actual san
   const examples = [
     ...markdown.matchAll(/<!-- example: ([\w-]+) -->\s*```js\n([\s\S]*?)```/g),
   ];
+  // These snippets require a retained RAW original or a trusted host, rather
+  // than the generic sample/isolated context. Their dedicated suites execute
+  // the exact guide snippets with those prerequisites and verify real output.
+  const contextualExamples:Record<string,string> = {
+    'raw-shooting-metadata':'tests/raw-shooting.e2e.ts',
+    'raw-lens-development':'tests/raw-lens.e2e.ts',
+    'raw-profile-development':'tests/raw-profile.e2e.ts',
+    'raw-isolated-development':'tests/raw-scripting.e2e.ts',
+    'raw-development-recipe':'tests/raw-recipes.e2e.ts',
+    'raw-native-batch':'tests/raw-batch.e2e.ts',
+    'artwork-library-trusted':'tests/artwork-library.e2e.ts',
+  };
   expect(examples.length).toBeGreaterThanOrEqual(8);
+  for (const [name,suite] of Object.entries(contextualExamples)) {
+    expect(examples.some(example=>example[1]===name),name).toBe(true);
+    expect(await readFile(suite,'utf8'),suite).toContain(`example: ${name}`);
+  }
   for (const [, name, code] of examples) {
+    if (contextualExamples[name]) continue;
     const fixture = ({
       "tiff-import-edit": "tests/fixtures/tiff/rgba-1.tif",
       "photoshop-import-edit": "tests/fixtures/psd/masks/black-raw.psd",
@@ -633,7 +650,7 @@ test("developer docs link, anchors and documented scripts work in the actual san
       "photoshop-group-edit": "tests/fixtures/psd/groups/normal.psd",
     } as Record<string, string>)[name];
     const bytes = fixture ? [...await readFile(fixture)] : null;
-    const needsFixture = Boolean(fixture) || ['wet-prepared','wet-mask-prepared'].includes(name);
+    const needsFixture = Boolean(fixture) || ['wet-prepared','wet-mask-prepared','frequency-shared-radius'].includes(name);
     const result = await page.evaluate(async ({ code, fixture, bytes, name, needsFixture }) => {
       const e = window.luma.editor;
       if (['wet-prepared','wet-mask-prepared'].includes(name)) {
@@ -648,6 +665,13 @@ test("developer docs link, anchors and documented scripts work in the actual san
       else if (bytes)
         await e.openPsd(new Uint8Array(bytes), {mode:"layered"});
       else await e.openSample();
+      if (name === 'frequency-shared-radius') {
+        await e.separateFrequencies(e.document.selectedLayer!.id, {sigma:2});
+        await e.editSmartObject(e.document.selectedLayer as import('../src/dom').SmartObjectLayer);
+        const group = e.document.layers.at(0);
+        if (!(group instanceof window.luma.LayerGroup)) throw new Error('Missing frequency fixture group.');
+        e.document.selectedLayer = group.layers.at(2)!;
+      }
       const before = JSON.stringify(e.document.toJSON());
       const sources = async () => Promise.all(e.assetStore.values().map(async asset =>
         [asset.id, [...new Uint8Array(await crypto.subtle.digest("SHA-256", await asset.blob.arrayBuffer()))]]));

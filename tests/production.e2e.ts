@@ -2,6 +2,11 @@ import {fontFeaturesWorkflow} from './helpers/font-features';
 import {accountProductionWorkflow} from './helpers/account-browser';
 import {checkAvif} from './helpers/avif';
 import { test, expect } from "@playwright/test";
+import {layerControlsWorkflow} from './helpers/layer-controls';
+
+test('production layer glyphs and controls stay current through typing, history and group changes', async ({page},info) => {
+  await layerControlsWorkflow(page,info);
+});
 import { readFile, writeFile, readdir } from "node:fs/promises";
 import {encodeRgbaPng} from "../src/engine/png";
 import {spawnSync} from 'node:child_process';
