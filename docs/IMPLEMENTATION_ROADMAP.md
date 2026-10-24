@@ -1,5 +1,32 @@
 # Implementation roadmap and planning record
 
+### 2026-10-24 — F14 retained layer rows verified; sustained responsiveness remains open
+
+Owner: implementation agent; estimate M–L within F14. Starting from `37e4eb6`, unchanged layer-row presentation can retain its render only with registry-proven recursive immutability and complete shallow prop equality. Mutable and shallow-frozen previews render afresh. The panel delegates events through contained row IDs, resolves current OO document handles and uses current callbacks; raster/paint thumbnails retain their committed snapshot, pixel-service, pause and fallback dependencies. Selection, collapse, visibility, inherited locks, drag feedback and shared command/history behavior remain live.
+
+Real-browser regressions cover changed callback versions and transparency eligibility, keyboard selection, nested SVG controls, native drag data, same-reference rows switching document owners and mutable preview labels. Removing the recursive-immutability guard deliberately fails the stale-label case; restoring the exact source passes. A normal UI workflow checks thumbnail modifiers, active-layer preservation, text undo and exact native project/PNG restoration in both development and production.
+
+Three final alternating production pairs use frozen baseline/final releases, the unchanged matching-text/vector, document-operation and routine-interaction fixtures, one worker and identical per-run inputs: **72 cases**, including **840 matching-text presentation samples with zero observed long tasks**. Median per-run p95:
+
+| 64-layer fixture | Baseline | Retained rows |
+| --- | ---: | ---: |
+| Plain text | 17.5 ms | 15.8 ms |
+| Color overlay | 18.8 ms | 18.4 ms |
+| Drop shadow | 18.2 ms | 17.7 ms |
+
+Broader results remain mixed: 64-layer resize/script median presentation moves from 26.5/170.0 to 25.9/159.9 ms, crop stays at 22.5 ms, and routine redo p95 rises from 16.2 to 19.9 ms. Source-build plain/overlay/shadow p95 worsens from 92.5/97.6/98.3 to 99.6/111.2/108.8 ms, with 5/3/4 versus 12/8/8 long tasks. In the plain 64-layer CPU profile, inclusive LayersPanel/renderLayers sampling falls from 140.81/125.46 to 83.54/61.50 ms across 20 edits. Less panel work does not establish editor-wide latency acceptance; source typing still exceeds 33 ms. Earlier preliminary production pairs and source measurements are preserved separately, not pooled with the final comparisons.
+
+The first broad native run passes **103/104**: successful background workspace recovery clears an unrelated corrupt-layout warning. A new regression waits for actual recovery completion and reproduces that failure against the previous App. Startup success now preserves existing warnings; explicit dismissal and the layout dialog's explicit repair still work. Both focused recovery tests pass. The complete final-source checks then pass:
+
+- Actual `npm run build` including WASM/runtime/plugin/site/docs generation, TypeScript and normal production bundling; **2,005 unit/API tests across 226 files** (139.84 s).
+- **105 native cases across 15 files** (482.93 s) and **124 normal-production workflows** (439.39 s), with no accepted skips/flakes/unexpected cases or automatic retries. The production benchmark API is absent. Actual 50 MP import/edit/save/reopen/export and independent production Photoshop pixel checks remain covered.
+- Final unit/native/production runtime, public-resource and test inputs agree; each accepted run has identical before/after maps. 96 served release resources match exact bytes, all five WASM binaries remain unchanged, and every plugin archive entry/source-input digest verifies.
+- Independent Pillow decoding finds six baseline/native/production layer-control PNGs identical at 400×300, RGBA SHA-256 `b551df4be5b4231f0a6b6790e4dc9bee4a388401407d7caf93971ac33d3e2bae`. Thumbnail-event before/restored PNGs also match independently in native and production runs.
+
+The initial pilot regenerates exactly two edited developer guides, so its before/after input maps differ there; final canonical runs are unchanged. Initial/final releases, source preimages, failed/control/final reports, profiles, PNGs, hashes and verification scripts are retained in the [sealed evidence](benchmarks/retained-layer-rows-2026-10-24.json), with all **279 preceding benchmark records unchanged**.
+
+The complete original roadmap remains active: broader typography/fonts/shaping; photographic/color/precision/interchange/merge quality; real AI/provider/evaluation/production; catalog/library, authenticated audit, workflow/collaboration/commercial/enterprise/specialist/motion; installed/model-driven T23, eligible registered live-provider T24; and sustained all-tool/device/GPU/process-memory F14. These short local headless-Chromium measurements are not physical-display, peak-memory or universal 60fps acceptance. No public schema/API, source-resolution, command/history, isolated grant or independent REST boundary changes, paid operation, new account, upload or arbitrary original-image/import limit is introduced.
+
 ### 2026-10-23 — F14 immutable layer-query index verified; broader latency remains mixed
 
 Owner: implementation agent; estimate M within F14. Starting from `908bc26`, repeated layer-tree flattening and ancestor walks identified in actual profiles now share a private WeakMap index in core/model. Only the existing registry proof of recursive immutability permits indexing. Each exact root receives depth-first layer references and inherited-lock metadata; mutable drafts and shallow-frozen caller roots retain their original fresh traversal. Root identity preserves ancestry across shared subtrees, independent documents, previews and retained undo/redo states. Public constructors, query results, commands/history, schema 42, original source resolution and isolated/REST permissions remain unchanged. No new layer/image cap or source-asset cache is introduced.

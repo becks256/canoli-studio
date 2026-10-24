@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Retained layer-row behavior
+
+Keep all existing row dimensions, glyphs, nesting, labels, focus and hover controls. Retaining unchanged presentation must preserve current selection, inherited locks, drag eligibility/drop placement and filter/collapse state. Route keyboard/native clicks and pointer events through the current panel; disabled controls remain inert. Ctrl/Cmd-click on a rendered pixel thumbnail loads transparency through the current callback without selecting that layer; ordinary and Shift/Ctrl name clicks retain their selection semantics. Mutable previews and raster thumbnail dependencies must update normally. This adds no shortcut or visual component system.
+
 ## Native font feature controls
 
 Use existing Typography Select controls labeled Capitals and Font stretch, and a NumberField labeled Weight value with preview/cancel/commit and 1–1000 requests. Retain preset/custom weight visibility and an explicit numeric conversion for relative/custom weights. Explain closest-face/synthesized glyph dependence and that stretch is not artwork scaling. Unsupported selectors are disabled with a readable status; Reset font features stays available when unlocked. Keep typing, Inspector scrolling, both themes and normal lock/error handling; no new shortcut, rail icon or component library. See [native font features](FONT_FEATURES.md).
@@ -53,6 +57,8 @@ Add a compact Recent files control beside Open, with a local-copy status indicat
 Command search groups actual open sessions and recent copies under Open documents and Recent files, with useful details. Keep selection by stable resource ID when async results change. If the chosen item disappears, show that fact and require deliberate navigation before Enter; do not silently choose another file. Existing focus restoration, native modal controls, typing suppression and shortcut capture apply. The new static Recent files action has no default chord.
 
 ## Workspace layout interaction
+
+Successful background workspace recovery preserves unrelated startup warnings. A corrupt-layout notification remains available until dismissed or a subsequent explicit action succeeds; dismissal leaves the invalid saved value intact and the layout dialog still requires explicit repair.
 
 Use the custom Workspace layout modal from the rail and command search. Draft changes apply only through Apply layout or save/update. Give Layers/history and Properties independent Show, left/right dock and precise width controls; support responsive defaults and explicit same-side ordering. Saved layouts have a named selector plus save-as-new, update, rename and delete actions. Explain that save/update also applies and deletion leaves the current arrangement intact. Restore default arrangement selects a draft until Apply; command search also offers direct recovery. The rail remains visible when both docks are hidden. Keep errors within the modal, preserve the draft on rejected writes, and provide explicit Reload saved layouts for detected external changes. Restore focus on dismissal and use actual DOM order matching visual order. Retain native splitter pointer/Escape/keyboard behavior with direction appropriate to each dock side.
 

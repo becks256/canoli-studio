@@ -1,5 +1,9 @@
 # Architecture
 
+## Layer-row presentation and event ownership
+
+LayerTreeRow contains presentation only. It retains a render only for registry-proven immutable node/thumbnail snapshots with complete shallow equality across all props. Unproven previews render afresh. LayersPanel delegates row click and drag events through contained data-layer IDs, resolves current OO handles at interaction time and uses the current committed callbacks, modifiers and disabled state. Raster/paint rows retain committed-document, pixel-service, fallback and pause dependencies for LayerThumbnail; ordinary thumbnails still derive their branch keys. Selection, locks, collapse and drop feedback remain explicit row inputs. No callback or document handle is hidden in a retained row.
+
 ## Immutable layer queries
 
 core/model shares a private WeakMap index for findLayer and inherited isLocked queries, keyed by the exact document root only when core/immutable proves recursive immutability. The first query walks that root once; subsequent queries reuse layer references and effective locks. Keys do not use persisted IDs or child identity, so shared subtrees, independent documents and undo/redo states retain separate ancestry. Mutable command drafts and shallow-frozen caller roots retain fresh traversal. The index exposes no mutation API or serialized data and adds no source-resolution or layer cap. Runtime correctness, release and performance acceptance are recorded in the dated roadmap.

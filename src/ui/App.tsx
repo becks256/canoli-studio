@@ -492,13 +492,16 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
   }
   const pendingCopy = useRef<{ pastes: number; cancelled: boolean } | null>(null);
-  async function task(action: () => Promise<void>) {
+  async function task(
+    action: () => Promise<void>,
+    { preserveError = false }: { preserveError?: boolean } = {},
+  ) {
     if (busy) return;
     setBusy(true);
     setPreview(null);
     try {
       await action();
-      setError(null);
+      if (!preserveError) setError(null);
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "The operation failed.",
@@ -511,10 +514,14 @@ export function App({ editor }: { editor: EditorApplication }) {
   useEffect(() => {
     if (startupRestore.current) return;
     startupRestore.current = true;
-    void task(async () => {
-      if (await editor.initializeWorkspaceRecovery())
-        notify("Saved workspace restored.");
-    });
+    void task(
+      async () => {
+        if (await editor.initializeWorkspaceRecovery())
+          notify("Saved workspace restored.");
+      },
+      // Background startup success must not dismiss unrelated load warnings.
+      { preserveError: true },
+    );
   }, [editor]);
 
   function fit() {

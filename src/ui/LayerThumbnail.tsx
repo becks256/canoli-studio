@@ -34,7 +34,7 @@ export function LayerThumbnail({ document, layerId, name, pixels, fallback, paus
   pixels: RasterEditing;
   fallback?: string;
   paused?: boolean;
-  onClick: MouseEventHandler<HTMLImageElement>;
+  onClick?: MouseEventHandler<HTMLImageElement>;
 }) {
   // Ignore selection changes and edits to other branches of the document.
   const key = useMemo(() => branchKey(document, layerId), [document, layerId]);

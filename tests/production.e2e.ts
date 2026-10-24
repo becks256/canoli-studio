@@ -3,6 +3,11 @@ import {accountProductionWorkflow} from './helpers/account-browser';
 import {checkAvif} from './helpers/avif';
 import { test, expect } from "@playwright/test";
 import {layerControlsWorkflow} from './helpers/layer-controls';
+import {layerRowEventsWorkflow} from './helpers/layer-row-events';
+
+test('production thumbnail modifiers, SVG controls and text undo preserve native output',async({page},info)=>{
+  await layerRowEventsWorkflow(page,info);
+});
 
 test('production layer glyphs and controls stay current through typing, history and group changes', async ({page},info) => {
   await layerControlsWorkflow(page,info);

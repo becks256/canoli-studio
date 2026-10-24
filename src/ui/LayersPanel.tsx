@@ -1,30 +1,19 @@
-import { LayerThumbnail } from "./LayerThumbnail";
+import { LayerTreeRow } from "./LayerTreeRow";
 import type { RasterEditing } from "../raster-editing";
 import { LayerFilterBar } from "./LayerFilterBar";
 import { emptyLayerFilter, filterLayers } from "./layer-filter";
 import { useEffect, useRef, useState } from "react";
-import type { DragEvent } from "react";
+import type { DragEvent, MouseEvent, SyntheticEvent } from "react";
 import {
   ArrowDown,
   ArrowUp,
   Check,
-  ChevronDown,
-  ChevronRight,
   Copy,
-  Component,
-  Eye,
-  EyeOff,
-  Folder,
   FolderPlus,
   Layers,
-  LockKeyhole,
-  Paintbrush,
-  PenTool,
   SquarePlus,
   SlidersHorizontal,
   Trash2,
-  Type,
-  UnlockKeyhole,
 } from "lucide-react";
 import {
   SmartObjectLayer,
@@ -33,26 +22,14 @@ import {
   type LayerGroup,
 } from "../dom";
 import type { DocumentData, LayerData } from "../core/model";
-import { allLayers, isLocked } from "../core/model";
+import { allLayers, findLayer, isLocked } from "../core/model";
 import { Button, IconButton, Slider } from "./controls";
 
 // These glyphs have no row state or handlers. Retain their elements so a text
 // edit does not rebuild every unchanged icon in the layer list. State-dependent
 // controls still choose the appropriate glyph on every render.
 const layerIcons = {
-  collapsed: <ChevronRight size={12} />,
-  expanded: <ChevronDown size={12} />,
-  group: <Folder size={17} />,
-  paint: <Paintbrush size={15} />,
-  vector: <PenTool size={15} />,
-  text: <Type size={15} />,
-  smartObject: <Component size={15} />,
   adjustment: <SlidersHorizontal size={15} />,
-  layer: <Layers size={15} />,
-  locked: <LockKeyhole size={12} />,
-  unlocked: <UnlockKeyhole size={12} />,
-  visible: <Eye size={13} />,
-  hidden: <EyeOff size={13} />,
   addLayer: <SquarePlus size={15} />,
   addGroup: <FolderPlus size={15} />,
   layerComps: <Layers size={14} />,
@@ -175,162 +152,63 @@ export function LayersPanel({
     });
   }
 
-  function renderLayers(nodes: LayerData[], depth = 0) {
-    return [...nodes]
-      .reverse()
-      .filter((node) => filtered.included.has(node.id))
-      .map((node) => {
-        const object = dom.getLayer(node.id)!;
-        return (
-          <div key={node.id}>
-            <div
-              className={`layer-row ${filtered.active && !filtered.matches.has(node.id) ? "filter-context" : ""} ${dom.getSnapshot().selectedIds.includes(node.id) ? "selected" : ""} ${!node.visible ? "muted" : ""} ${dropTarget?.id === node.id ? `drop-${dropTarget.placement}` : ""}`}
-              style={{ paddingLeft: 8 + depth * 16 }}
-              draggable={!busy && !isLocked(viewDocument, node.id)}
-              onDragStart={(event) => {
-                onCancelTools();
-                event.dataTransfer.setData("application/x-luma-layer", node.id);
-                event.dataTransfer.effectAllowed = "move";
-                setDraggedLayer(node.id);
-              }}
-              onDragEnd={() => {
-                setDraggedLayer(null);
-                setDropTarget(null);
-              }}
-              onDragOver={(event) => {
-                if (!draggedLayer || draggedLayer === node.id) return;
-                event.preventDefault();
-                event.stopPropagation();
-                const box = event.currentTarget.getBoundingClientRect();
-                const y = (event.clientY - box.top) / box.height;
-                setDropTarget({
-                  id: node.id,
-                  placement:
-                    node.kind === "group" && y > 0.25 && y < 0.75
-                      ? "inside"
-                      : y < 0.5
-                        ? "after"
-                        : "before",
-                });
-              }}
-              onDrop={(event) =>
-                dropLayer(
-                  event,
-                  node.id,
-                  dropTarget?.id === node.id ? dropTarget.placement : "after",
-                )
-              }
-            >
-              {node.kind === "group" ? (
-                <button
-                  className="tree-toggle"
-                  aria-label={`Toggle ${node.name}`}
-                  disabled={filtered.active}
-                  onClick={() =>
-                    setCollapsed((old) => {
-                      const next = new Set(old);
-                      if (next.has(node.id)) next.delete(node.id);
-                      else next.add(node.id);
-                      return next;
-                    })
-                  }
-                >
-                  {isCollapsed(node.id) ? layerIcons.collapsed : layerIcons.expanded}
-                </button>
-              ) : (
-                <span className="tree-spacer" />
-              )}
-              <button
-                className="layer-select"
-                aria-pressed={dom.getSnapshot().selectedIds.includes(node.id)}
-                aria-label={`Select ${node.name}`}
-                onClick={(event) => {
-                  onCancelTools();
-                  onClearPreview();
-                  onSelectLayer(
-                    object,
-                    event.ctrlKey || event.metaKey || event.shiftKey,
-                  );
-                }}
-              >
-                {node.kind === "group" ? (
-                  <span className="layer-thumb group-thumb">
-                    {layerIcons.group}
-                  </span>
-                ) : (node.kind === "raster" || node.kind === "paint") && pixels ? (
-                  <LayerThumbnail
-                    document={dom.getSnapshot().document}
-                    layerId={node.id}
-                    name={node.name}
-                    pixels={pixels}
-                    paused={deferThumbnails}
-                    fallback={node.kind === "raster" ? getThumbnail(node.assetId) : undefined}
-                    onClick={event => {
-                      if (!(event.ctrlKey || event.metaKey) || busy || !onLoadTransparency) return;
-                      event.preventDefault(); event.stopPropagation();
-                      onLoadTransparency(node.id);
-                    }}
-                  />
-                ) : node.kind === "raster" ? (
-                  <img className="layer-thumb" src={getThumbnail(node.assetId)} alt="" />
-                ) : node.kind === "paint" ? (
-                  <span className="layer-thumb group-thumb">{layerIcons.paint}</span>
-                ) : node.kind === "vector" ? (
-                  <span className="layer-thumb group-thumb">
-                    {layerIcons.vector}
-                  </span>
-                ) : node.kind === "text" ? (
-                  <span className="layer-thumb group-thumb">
-                    {layerIcons.text}
-                  </span>
-                ) : node.kind === "smart-object" ? (
-                  <span
-                    className="layer-thumb group-thumb"
-                    title="Smart object"
-                  >
-                    {layerIcons.smartObject}
-                  </span>
-                ) : node.kind === "adjustment" ? (
-                  <span className="layer-thumb group-thumb">
-                    {layerIcons.adjustment}
-                  </span>
-                ) : (
-                  <span className="layer-thumb group-thumb">
-                    {layerIcons.layer}
-                  </span>
-                )}
-                <span className="layer-name">{node.name}</span>
-              </button>
-              <button
-                className={`layer-control ${node.locked ? "always" : ""}`}
-                aria-label={`${node.locked ? "Unlock" : "Lock"} ${node.name}`}
-                onClick={() =>
-                  onAttempt(() => {
-                    object.locked = !node.locked;
-                  })
-                }
-              >
-                {node.locked ? layerIcons.locked : layerIcons.unlocked}
-              </button>
-              <button
-                className="layer-control always"
-                aria-label={`${node.visible ? "Hide" : "Show"} ${node.name}`}
-                disabled={isLocked(viewDocument, node.id)}
-                onClick={() =>
-                  onAttempt(() => {
-                    object.visible = !node.visible;
-                  })
-                }
-              >
-                {node.visible ? layerIcons.visible : layerIcons.hidden}
-              </button>
-            </div>
-            {node.kind === "group" &&
-              !isCollapsed(node.id) &&
-              renderLayers(node.children, depth + 1)}
-          </div>
-        );
+  function eventRow(event:SyntheticEvent<HTMLDivElement>) {
+    const target=event.target instanceof Element?event.target:event.target instanceof Node?event.target.parentElement:null;
+    const row=target?.closest<HTMLDivElement>('.layer-row[data-layer-id]');
+    return row&&event.currentTarget.contains(row)?{row,target,id:row.dataset.layerId!}:null;
+  }
+
+  function clickRow(event:MouseEvent<HTMLDivElement>) {
+    const hit=eventRow(event);if(!hit)return;
+    const node=findLayer(viewDocument,hit.id);if(!node)return;
+    if(hit.target?.closest('img.pixel-thumb')&&(event.ctrlKey||event.metaKey)&&!busy&&onLoadTransparency){
+      event.preventDefault();event.stopPropagation();onLoadTransparency(hit.id);return;
+    }
+    const button=hit.target?.closest<HTMLButtonElement>('button[data-layer-action]');
+    if(!button||!hit.row.contains(button)||button.disabled)return;
+    const action=button.dataset.layerAction;
+    if(action==='toggle'){
+      setCollapsed(old=>{const next=new Set(old);if(next.has(hit.id))next.delete(hit.id);else next.add(hit.id);return next;});
+    }else if(action==='select'){
+      onCancelTools();onClearPreview();
+      const object=dom.getLayer(hit.id);
+      if(object)onSelectLayer(object,event.ctrlKey||event.metaKey||event.shiftKey);
+    }else if(action==='lock'||action==='visibility'){
+      onAttempt(()=>{
+        const object=dom.getLayer(hit.id);if(!object)return;
+        if(action==='lock')object.locked=!node.locked;else object.visible=!node.visible;
       });
+    }
+  }
+
+  function startRowDrag(event:DragEvent<HTMLDivElement>) {
+    const hit=eventRow(event);if(!hit||!hit.row.draggable)return;
+    onCancelTools();event.dataTransfer.setData('application/x-luma-layer',hit.id);
+    event.dataTransfer.effectAllowed='move';setDraggedLayer(hit.id);
+  }
+  function overRowDrag(event:DragEvent<HTMLDivElement>) {
+    const hit=eventRow(event);if(!hit||!draggedLayer||draggedLayer===hit.id)return;
+    const node=findLayer(viewDocument,hit.id);if(!node)return;
+    event.preventDefault();event.stopPropagation();
+    const box=hit.row.getBoundingClientRect(),y=(event.clientY-box.top)/box.height;
+    setDropTarget({id:hit.id,placement:node.kind==='group'&&y>0.25&&y<0.75?'inside':y<0.5?'after':'before'});
+  }
+  function dropRow(event:DragEvent<HTMLDivElement>) {
+    const hit=eventRow(event);if(hit)dropLayer(event,hit.id,dropTarget?.id===hit.id?dropTarget.placement:'after');
+  }
+
+  function renderLayers(nodes:LayerData[],depth=0) {
+    return [...nodes].reverse().filter(node=>filtered.included.has(node.id)).map(node=>{
+      const thumbnailPixels=node.kind==='raster'||node.kind==='paint'?pixels:undefined;
+      return <div key={node.id}>
+        <LayerTreeRow node={node} depth={depth} selected={dom.getSnapshot().selectedIds.includes(node.id)}
+          locked={isLocked(viewDocument,node.id)} busy={busy} filterContext={filtered.active&&!filtered.matches.has(node.id)}
+          filtered={filtered.active} collapsed={isCollapsed(node.id)} dropPlacement={dropTarget?.id===node.id?dropTarget.placement:undefined}
+          pixels={thumbnailPixels} thumbnailDocument={thumbnailPixels?dom.getSnapshot().document:undefined}
+          paused={!!thumbnailPixels&&deferThumbnails} fallback={node.kind==='raster'?getThumbnail(node.assetId):undefined}/>
+        {node.kind==='group'&&!isCollapsed(node.id)&&renderLayers(node.children,depth+1)}
+      </div>;
+    });
   }
 
   return (
@@ -425,7 +303,7 @@ export function LayersPanel({
                 Selected layer: {selected?.name}. Outside current filter.
               </p>
             )}
-          <div className="layer-list">
+          <div className="layer-list" onClick={clickRow} onDragStart={startRowDrag} onDragOver={overRowDrag} onDrop={dropRow} onDragEnd={()=>{setDraggedLayer(null);setDropTarget(null);}}>
             {filtered.active && !filtered.matches.size && (
               <p className="panel-empty">No matching layers.</p>
             )}

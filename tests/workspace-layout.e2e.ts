@@ -34,6 +34,21 @@ test('hidden docks reclaim canvas space and moved resize handles obey the correc
  await page.getByRole('button',{name:'Find a command (Mod+K)',exact:true}).click();await page.getByRole('combobox',{name:'Search commands',exact:true}).fill('Restore default workspace arrangement');await page.keyboard.press('Enter');await expect(page.locator('.layers-panel')).toBeVisible();await expect(page.locator('.inspector')).toBeVisible();expect(await arrangement(page)).toEqual(['layers','canvas','inspector']);
 });
 
+test('startup recovery preserves corrupt-layout warnings until explicit dismissal or repair',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('luma.workspace-layout.v1','corrupt'));
+ await page.goto('/');
+ await page.evaluate(()=>window.luma.editor.initializeWorkspaceRecovery());
+ await expect(page.getByRole('button',{name:'Move tool (V)',exact:true})).toBeEnabled();
+ await expect(page.getByRole('alert')).toContainText('Default layout is in use');
+ await page.getByRole('button',{name:'Dismiss notification',exact:true}).click();
+ await expect(page.getByRole('alert')).toHaveCount(0);
+ expect(await page.evaluate(()=>localStorage.getItem('luma.workspace-layout.v1'))).toBe('corrupt');
+ const dialog=await open(page);
+ await expect(dialog.getByRole('alert')).toContainText('Applying a layout replaces');
+ await dialog.getByRole('button',{name:'Apply layout',exact:true}).click();
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('luma.workspace-layout.v1')!).version)).toBe(1);
+});
+
 test('legacy widths migrate read-only and invalid preferences require explicit recovery',async({page})=>{
  await page.addInitScript(()=>{localStorage.setItem('luma.panel-widths.v1',JSON.stringify({version:1,layers:310,inspector:340}));});await page.goto('/');await expect(page.getByRole('separator',{name:'Resize layers panel',exact:true})).toHaveAttribute('aria-valuenow','310');expect(await page.evaluate(()=>localStorage.getItem('luma.workspace-layout.v1'))).toBeNull();
  let dialog=await open(page);await dialog.getByRole('button',{name:'Restore default arrangement',exact:true}).click();await dialog.getByRole('button',{name:'Apply layout',exact:true}).click();await page.reload();await expect(page.getByRole('separator',{name:'Resize layers panel',exact:true})).toHaveAttribute('aria-valuenow','230');

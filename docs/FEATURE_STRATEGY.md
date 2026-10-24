@@ -24,6 +24,10 @@ Our differentiation hypotheses are the combination of:
 
 No source audit proves competitors lack this combination. Validate the advantage through task comparisons and customer behavior, not feature-name novelty.
 
+### Current F14 retained-row increment (2026-10-24, local verification)
+
+Unchanged immutable layer rows retain presentation while delegated events use current document ownership and callbacks; mutable previews and native thumbnail dependencies remain live. Startup recovery also preserves unrelated corrupt-layout warnings. Build, all 2,005 unit/API, 105 native and 124 normal-production checks pass, with exact resources/package digests and independently matching workflow PNGs. Three final production pairs show modestly lower dense-text p95, but broader timings are mixed and source-build dense typing worsens despite less sampled panel work. This does not complete the 33 ms, sustained editor-wide/device/GPU/process-memory F14 gates or any other unfinished original requirement, including actual installed/model-driven T23 and eligible registered live-provider T24. See the dated roadmap and [sealed evidence](benchmarks/retained-layer-rows-2026-10-24.json).
+
 ### Current F14 immutable-query increment (2026-10-23, local verification)
 
 A private weak index reuses layer/inherited-lock queries only for registry-proven immutable roots; mutable and shallow-frozen drafts remain fresh. Unit invariants, a rejected unsafe-freeze control and actual discarded-document collection verify ownership/lifetime. Build, final 2,005 unit/API, 120 native and 123 production checks pass with matching final runtime inputs, exact PNGs and real 50 MP workflows. Three production pairs improve dense typing p95 by 6–15%, while broader results include slower script/vector cases. Fresh source profiles remove most lookup CPU work but retain higher 102.4–111.3 ms typing tails and long tasks. This does not close sustained editor-wide/device/GPU/process-memory F14 or any other unfinished original roadmap gate. See the dated roadmap and [sealed evidence](benchmarks/immutable-layer-queries-2026-10-23.json).
