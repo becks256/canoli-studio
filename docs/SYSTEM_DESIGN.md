@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Font-file binding development (F08)
+
+Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+
 ## Font-source ownership invariant
 
 Font admission retains the exact immutable original Blob and derives a selected whole native face without subsetting. Validate source/derived digests, actual signatures, selected index and strict DTOs before returning unregistered native FontFaces. Serialized host jobs use fresh disposable parser workers; cancellation/timeout/disposal revokes publication and terminates parsing. Native loads cannot be forcibly stopped, and late results acquire no registration or document authority. Private preview registrations belong solely to the child FontFaceSet and are removed on replacement/unmount. This source-only foundation has no persistent font asset, model/history/schema mutation or isolated/plugin/REST capability. Full source binding/persistence remains required F08 work. See [FONT_SOURCES.md](FONT_SOURCES.md).

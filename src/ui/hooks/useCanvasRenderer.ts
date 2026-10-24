@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {subscribeNativeFontChanges} from '../../fonts/native-events';
 import type { RefObject } from "react";
 import type { EditorApplication } from "../../editor";
 import type { DocumentData } from "../../core/model";
@@ -49,7 +50,9 @@ export function useCanvasRenderer({
     const changed = () => setFontRevision((value) => value + 1);
     fonts?.addEventListener("loadingdone", changed);
     fonts?.addEventListener("loadingerror", changed);
+    const stopOwned=subscribeNativeFontChanges(fonts,changed);
     return () => {
+      stopOwned();
       fonts?.removeEventListener("loadingdone", changed);
       fonts?.removeEventListener("loadingerror", changed);
     };

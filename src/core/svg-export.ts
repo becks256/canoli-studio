@@ -14,11 +14,12 @@ import {planSvgPaint,svgPaintDefinitions,svgPaintElements} from './svg-paint';
  * Every layer boundary isolates its content, like the native compositor's surfaces.
  * Native mask coverage is supplied by the host; other losses are reported there.
  */
-export function* svgDocumentChunks(document: SvgDocument, rasterMasks?:SvgRasterMasks, images?:SvgImages,texts?:SvgTextLayouts): Generator<string> {
+export function* svgDocumentChunks(document: SvgDocument, rasterMasks?:SvgRasterMasks, images?:SvgImages,texts?:SvgTextLayouts,fontDefinitions=''): Generator<string> {
   const { width, height } = document;
   if (!Number.isSafeInteger(width) || width <= 0 || !Number.isSafeInteger(height) || height <= 0)
     throw new Error('SVG dimensions must be positive safe integers.');
   yield `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" overflow="hidden">\n`;
+  if(fontDefinitions)yield fontDefinitions;
   yield* svgImageDefinitions(images);
   const plans=planSvgMasks(document),maskIds=new Map(plans.map(plan=>[plan.layerId,plan.id]));
   yield* svgMaskDefinitions(document,plans,rasterMasks);
@@ -78,14 +79,14 @@ export function exportVectorLayerSvg(layer: VectorLayerData, width: number, heig
 export async function exportSvgBlob(document: SvgDocument, control?: {
   signal?: AbortSignal;
   onProgress?: (progress: {phase: 'encoding'; fraction: null}) => void;
-}, rasterMasks?:SvgRasterMasks, images?:SvgImages,texts?:SvgTextLayouts): Promise<Blob> {
+}, rasterMasks?:SvgRasterMasks, images?:SvgImages,texts?:SvgTextLayouts,fontDefinitions=''): Promise<Blob> {
   control?.signal?.throwIfAborted();
   control?.onProgress?.({phase: 'encoding', fraction: null});
   const parts: string[] = [];
   let deadline = performance.now() + 8, fragments = 0;
   // Give queued cancellation a boundary before reading any geometry.
   await yieldTask();
-  for (const part of svgDocumentChunks(document,rasterMasks,images,texts)) {
+  for (const part of svgDocumentChunks(document,rasterMasks,images,texts,fontDefinitions)) {
     control?.signal?.throwIfAborted();
     parts.push(part);
     if (++fragments % 16 === 0 || performance.now() >= deadline) {

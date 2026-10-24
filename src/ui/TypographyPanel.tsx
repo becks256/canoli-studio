@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { systemFonts, subscribeSystemFonts, getSystemFonts } from "./system-fonts";
+import {subscribeNativeFontChanges} from '../fonts/native-events';
 import { fontAvailability, type FontAvailability } from "./font-availability";
 import { AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import type { TextLayer } from "../dom";
@@ -48,6 +49,7 @@ export function TypographyPanel({
   onPreview,
 }: TypographyPanelProps) {
   const family = layer.fontFamily;
+  const embeddedFonts=layer.document?.fonts.files.items??[],embeddedFont=embeddedFonts.find(file=>file.family===family);
   const capitalsSupported=typeof CanvasRenderingContext2D!=='undefined'&&'fontVariantCaps'in CanvasRenderingContext2D.prototype;
   const stretchSupported=typeof CanvasRenderingContext2D!=='undefined'&&'fontStretch'in CanvasRenderingContext2D.prototype;
   const weight=layer.fontWeight??'normal',numericWeight=weight==='normal'?400:weight==='bold'?700:Number(weight);
@@ -90,7 +92,9 @@ export function TypographyPanel({
     refresh();
     document.fonts?.addEventListener("loadingdone", refresh);
     document.fonts?.addEventListener("loadingerror", refresh);
+    const stopOwned=subscribeNativeFontChanges(document.fonts,refresh);
     return () => {
+      stopOwned();
       disposed = true;
       document.fonts?.removeEventListener("loadingdone", refresh);
       document.fonts?.removeEventListener("loadingerror", refresh);
@@ -139,7 +143,7 @@ export function TypographyPanel({
         layout="stacked"
         value={layer.fontFamily}
         disabled={disabled}
-        options={families}
+        options={[...embeddedFonts.map(file=>({value:file.family,label:`${file.name} (embedded)`})),...families.filter(value=>!embeddedFonts.some(file=>file.family===value)).map(value=>({value,label:value}))]}
         onChange={(val) => {
           onAction(() => {
             layer.fontFamily = val;
@@ -154,7 +158,7 @@ export function TypographyPanel({
         <p>This browser cannot list installed fonts. Enter a font family name below.</p>
       )}
       {fontMessage && <p role="status">{fontMessage}</p>}
-      <TextInput
+      {embeddedFont?<p>Embedded font: {embeddedFont.name}</p>:<TextInput
         label="Font family"
         layout="stacked"
         value={layer.fontFamily}
@@ -165,7 +169,7 @@ export function TypographyPanel({
             layer.fontFamily = value;
           })
         }
-      />
+      />}
       {availability === "unavailable" && (
         <div className="font-fallback-warning" role="alert">
           Font &ldquo;{layer.fontFamily}&rdquo; could not be loaded locally. A

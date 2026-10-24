@@ -1,4 +1,5 @@
 import { MetadataService } from "../intelligence/metadata/service";
+import {FontSourceStore} from '../fonts/store';
 import { AnalysisService } from "../intelligence/candidates/service";
 import { id } from "./model";
 import {decodeTiffFile} from './interchange/tiff/client';
@@ -47,6 +48,8 @@ export function captureAssetSource(assets:AssetStore,assetId:string){
 }
 
 export class AssetStore {
+  readonly fonts:FontSourceStore;
+  constructor(options:{fontSources?:ConstructorParameters<typeof FontSourceStore>[0]}={}){this.fonts=new FontSourceStore(options.fontSources);}
   readonly metadata = new MetadataService();
   readonly analysis = new AnalysisService();
   private assets = new Map<string, ImageAsset>();
@@ -278,6 +281,7 @@ export class AssetStore {
       try { this.release(assetId, asset); } catch (error) { failure ??= error; }
     }
     this.assets.clear();
+    try{this.fonts.dispose();}catch(error){failure??=error;}
     if (failure) throw failure;
   }
 }

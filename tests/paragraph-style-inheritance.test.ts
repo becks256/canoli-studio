@@ -67,10 +67,10 @@ it('removes a base by detaching immediate child styles and direct text, preservi
  expect([first.paragraphFormat,second.paragraphFormat,direct.paragraphFormat]).toEqual(formats);child.update({lineHeight:2});expect(second.lineHeight).toBe(2);document.undo();document.undo();expect(document.toJSON()).toEqual(before);
 });
 it('gates hierarchy schema 41 in roots and embedded masters, and rejects corrupt graphs without repairing snapshots',()=>{
- const {document,base,first}=scene(),saved=document.toJSON();expect(saved.schemaVersion).toBe(42);expect(()=>validateDocument({...withoutNativeFontFeatures(saved),schemaVersion:40})).toThrow(/schema version 41/);
+ const {document,base,first}=scene(),saved=document.toJSON();expect(saved.schemaVersion).toBe(43);expect(()=>validateDocument({...withoutNativeFontFeatures(saved),schemaVersion:40})).toThrow(/schema version 41/);
  const corrupt=structuredClone(saved);corrupt.paragraphStyles![1].format.color='#000000';expect(()=>Document.fromJSON(corrupt)).toThrow(/disagrees/);
  const cyclic=structuredClone(saved);cyclic.paragraphStyles![0].basedOn={id:cyclic.paragraphStyles![2].id,overrides:{}};expect(()=>Document.fromJSON(cyclic)).toThrow(/cycle/);
- const legacy=new Document();legacy.paragraphStyles.add(new ParagraphStyle());expect(Document.fromJSON({...withoutNativeFontFeatures(legacy.toJSON()),schemaVersion:40}).toJSON().schemaVersion).toBe(42);
+ const legacy=new Document();legacy.paragraphStyles.add(new ParagraphStyle());expect(Document.fromJSON({...withoutNativeFontFeatures(legacy.toJSON()),schemaVersion:40}).toJSON().schemaVersion).toBe(43);
  const object=document.createSmartObject([first]),snapshot=document.toJSON(),definition=snapshot.components!.find(value=>value.id===object.componentId)!;if(definition.source.kind!=='document')throw new Error('fixture');definition.source.document.schemaVersion=40;expect(()=>Document.fromJSON(withoutNativeFontFeatures(snapshot))).toThrow(/schema version 41/);expect(base.format.fontSize).toBe(24);
 });
 it('imports the complete ancestor closure before children and remaps hierarchy conflicts without changing source data',()=>{

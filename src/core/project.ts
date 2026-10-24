@@ -7,6 +7,8 @@ import type { DocumentData } from "./model";
 import { parseRetainedHistory, retainedDocuments, type RetainedHistory } from "./history";
 import {avifDecodeOptionsSchema,type AvifDecodeSettings} from './interchange/avif/types';
 import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from './interchange/tiff/types';
+import {captureProjectFonts,encodeProjectFonts,decodeProjectFonts,retainedFontFiles,type ProjectFonts,type ProjectFontSource} from './font-project';
+import type {FontResourceInput} from '../fonts/resources';
 
 interface ProjectFile {
   format: "luma";
@@ -15,8 +17,8 @@ interface ProjectFile {
   assets: SerializedAsset[];
 }
 
-// v3 adds manifest/asset checksums; v4 retains deduplicated RAW originals.
-// Source-free projects stay v3; v1/v2 remain readable. Document schemas are independent.
+// v3 adds checksums; v4 retains RAW originals; v5 retains selected font sources.
+// Font-free projects stay v3/v4; v1/v2 remain readable. Document schemas are independent.
 const MAGIC = new Uint8Array([76, 85, 77, 65, 50, 13, 10, 0]);
 interface BinaryAsset {
   id: string;
@@ -33,11 +35,12 @@ interface BinaryAsset {
 }
 interface BinaryManifest {
   format: "luma";
-  version: 2 | 3 | 4;
+  version: 2 | 3 | 4 | 5;
   document: DocumentData;
   assets: BinaryAsset[];
   history?: RetainedHistory;
   rawOriginals?: {type:string;size:number;offset:number;sha256:string}[];
+  fonts?:ProjectFonts;
 }
 const hex = (bytes: ArrayBuffer) =>
   Array.from(new Uint8Array(bytes), (byte) =>
@@ -69,6 +72,7 @@ function verifyLinkedSnapshots(
     }
 }
 export interface ProjectAssetSource {
+  fonts?:ProjectFontSource;
   get(
     id: string,
   ): Pick<ImageAsset, "id" | "name" | "width" | "height" | "blob" | "tiff" | "avif" | "raw">;
@@ -84,6 +88,7 @@ export async function serializeProject(
     retainedHistory === undefined
       ? undefined
       : parseRetainedHistory(retainedHistory, document);
+  const fontSources=captureProjectFonts(retainedDocuments(document,history),assets.fonts);
   const assetIds = new Set(referencedAssets(document));
   for (const state of retainedDocuments(document, history)) {
     for (const assetId of referencedAssets(state))
@@ -129,9 +134,11 @@ export async function serializeProject(
     entries,
   );
   for(const original of rawOriginals){original.offset=offset;offset+=original.size;if(!Number.isSafeInteger(offset))throw new Error("Project size exceeds safely representable offsets.");}
+  const encodedFonts=await encodeProjectFonts(fontSources,offset);
   const manifest: BinaryManifest = {
     format: "luma",
-    version: rawOriginals.length?4:3,
+    version: encodedFonts.manifest?5:rawOriginals.length?4:3,
+    ...(encodedFonts.manifest?{fonts:encodedFonts.manifest}:{}),
     ...(rawOriginals.length?{rawOriginals}:{}),
     document,
     assets: entries,
@@ -140,17 +147,18 @@ export async function serializeProject(
   const json = new TextEncoder().encode(JSON.stringify(manifest));
   const header = new Uint8Array(48);
   header.set(MAGIC);
-  header[4] = manifest.version===4?52:51;
+  header[4] = 48+manifest.version;
   header.set(new Uint8Array(await crypto.subtle.digest("SHA-256", json)), 16);
   new DataView(header.buffer).setBigUint64(8, BigInt(json.byteLength), true);
   // Blob parts avoid full-source base64 strings and document-sized byte arrays.
-  return new Blob([header, json, ...blobs,...originalBlobs], { type: "application/x-luma" });
+  return new Blob([header, json, ...blobs,...originalBlobs,...encodedFonts.blobs], { type: "application/x-luma" });
 }
 
 /** Internal editing preparation is opt-in; ordinary readers retain mutable owned data. */
 export async function readProject(file: Blob, options: { prepareImmutable?: boolean } = {}): Promise<{
   document: DocumentData;
   history?: RetainedHistory;
+  fonts:FontResourceInput[];
   entries: {
     id: string;
     name: string;
@@ -163,9 +171,10 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
   }[];
 }> {
   const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+  const version5 = header[4] === 53 && MAGIC.every((value,index)=>index===4||header[index]===value);
   const version4 = header[4] === 52 && MAGIC.every((value,index)=>index===4||header[index]===value);
   const version3 =
-    (header[4] === 51 || version4) &&
+    (header[4] === 51 || version4 || version5) &&
     MAGIC.every((value, index) => index === 4 || header[index] === value);
   const headerSize = version3 ? 48 : 16;
   if (!version3 && !MAGIC.every((value, index) => header[index] === value)) {
@@ -183,7 +192,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
       await freezeOwnedData(legacy.document);
       await validateDocumentCooperatively(legacy.document);
     }
-    return { document: legacy.document, entries };
+    return { document: legacy.document, entries,fonts:[] };
   }
   if (header.byteLength !== 16)
     throw new Error("Truncated Canoli Studio project header.");
@@ -209,7 +218,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
   if (
     !manifest ||
     manifest.format !== "luma" ||
-    manifest.version !== (version4 ? 4 : version3 ? 3 : 2) ||
+    manifest.version !== (version5 ? 5 : version4 ? 4 : version3 ? 3 : 2) ||
     !Array.isArray(manifest.assets)
   )
     throw new Error("Unsupported project manifest.");
@@ -225,7 +234,10 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     manifest.history === undefined
       ? undefined
       : parseRetainedHistory(manifest.history, manifest.document);
-  if(!version4&&(manifest.rawOriginals!==undefined||manifest.assets.some(entry=>entry?.raw!==undefined)))throw new Error('RAW source records require a version-4 project container.');
+  if(!version5&&manifest.fonts!==undefined)throw new Error('Font source records require a version-5 project container.');
+  if(version5&&manifest.fonts===undefined)throw new Error('Missing version-5 font records.');
+  if(!version5&&!version4&&(manifest.rawOriginals!==undefined||manifest.assets.some(entry=>entry?.raw!==undefined)))throw new Error('RAW source records require a version-4 project container.');
+  if(version5&&manifest.rawOriginals!==undefined&&(!Array.isArray(manifest.rawOriginals)||!manifest.rawOriginals.length))throw new Error('Invalid RAW original records.');
   if(version4&&(!Array.isArray(manifest.rawOriginals)||!manifest.rawOriginals.length))throw new Error('Missing RAW original records.');
   let offset = 0;
   const rawReferences=new Set<number>();
@@ -295,6 +307,8 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
     if(!rawReferences.has(index)||typeof original.type!=='string'||!Number.isSafeInteger(original.size)||original.size<=0||original.offset!==offset||!Number.isSafeInteger(offset+original.size)||offset+original.size>file.size-headerSize-length||typeof original.sha256!=='string'||!/^[a-f0-9]{64}$/.test(original.sha256))throw new Error('Invalid, unused or truncated RAW original.');
     offset+=original.size;
   }
+  const decodedFonts=await decodeProjectFonts(manifest.fonts,retainedDocuments(manifest.document,history),file,headerSize+length,offset);
+  offset=decodedFonts.endOffset;
   if (offset !== file.size - headerSize - length)
     throw new Error("Unexpected data after project assets.");
   for (const assetId of referencedAssets(manifest.document))
@@ -313,6 +327,7 @@ export async function readProject(file: Blob, options: { prepareImmutable?: bool
   return {
     document: manifest.document,
     entries,
+    fonts:decodedFonts.fonts,
     ...(history ? { history } : {}),
   };
 }
@@ -330,6 +345,7 @@ export function parseProject(text: string): ProjectFile {
     );
   }
   validateDocument(project.document);
+  if(retainedFontFiles([project.document]).length)throw new Error('Embedded fonts require a version-5 project container.');
   const ids = new Set<string>();
   for (const asset of project.assets) {
     if (
@@ -361,7 +377,7 @@ export function parseProject(text: string): ProjectFile {
 
 export async function loadProject(
   input: string | Blob,
-  options: { prepareImmutable?: boolean } = {},
+  options: { prepareImmutable?: boolean;fontSources?:NonNullable<ConstructorParameters<typeof AssetStore>[0]>['fontSources'] } = {},
 ): Promise<{
   document: DocumentData;
   assets: AssetStore;
@@ -371,13 +387,14 @@ export async function loadProject(
     typeof input === "string" ? new Blob([input]) : input,
     options,
   );
-  const assets = new AssetStore();
+  const assets = new AssetStore({fontSources:options.fontSources});
   const rasterAssets = new Set(
     retainedDocuments(project.document, project.history).flatMap(document => allLayers(document.children))
       .filter((layer) => layer.kind === "raster")
       .map((layer) => layer.assetId),
   );
   try {
+    for(const source of project.fonts)await assets.fonts.restore(source);
     for (const entry of project.entries) {
       const asset = await assets.add(
         entry.blob,

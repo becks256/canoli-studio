@@ -1,15 +1,18 @@
-function familyNames(value:string):string[]{
-  const parts:string[]=[];let part='',quote='';
-  for(let i=0;i<value.length;i++){
-    const c=value[i];
-    if(c==='\\'){part+=c;if(i+1<value.length)part+=value[++i];}
-    else if(quote){part+=c;if(c===quote)quote='';}
-    else if(c==='"'||c==="'"){quote=c;part+=c;}
-    else if(c===','){parts.push(part);part='';}
-    else part+=c;
+import {fontFamilyNames as familyNames} from '../core/font-families';
+import {documentFontFiles} from '../core/font-files';
+import type {DocumentData} from '../core/model';
+import type {AssetStore} from '../core/assets';
+import {sameFontResource} from '../fonts/resources';
+
+/** Shared native handles can outlive a source store. Pin owned bytes as well. */
+export function captureOwnedExportFonts(documents:readonly DocumentData[],families:readonly string[],assets:AssetStore):()=>void{
+  const names=new Set(families.flatMap(familyNames)),checks:(()=>void)[]=[],seen=new Set<string>();
+  for(const document of documents)for(const file of documentFontFiles(document)){
+    if(seen.has(file.id)||!names.has(file.resource.report.faces[0].cssFamily.toLowerCase()))continue;seen.add(file.id);
+    const source=assets.fonts.get(file.id);if(!sameFontResource(file.resource,source.descriptor))throw new Error('An export font declaration differs from its owned source.');
+    checks.push(assets.fonts.capture(file.id));
   }
-  parts.push(part);
-  return parts.map(p=>p.trim().replace(/^(['"])(.*)\1$/,'$2').replace(/\\([a-fA-F0-9]{1,6})\s?|\\(.)/g,(_all,hex:string,char:string)=>hex?String.fromCodePoint(Math.min(0x10ffff,parseInt(hex,16))):char).toLowerCase());
+  const check=()=>{for(const value of checks)value();};check();return check;
 }
 
 /** Pin only referenced families: unrelated UI web-font loads cannot invalidate output. */

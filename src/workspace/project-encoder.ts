@@ -5,17 +5,20 @@ import type { DocumentData } from "../core/model";
 import { referencedAssets } from "../core/model";
 import { retainedDocuments, type RetainedHistory } from "../core/history";
 import { serializeProject, type ProjectAssetSource } from "../core/project";
+import {captureProjectFonts} from '../core/font-project';
+import type {FontResourceInput} from '../fonts/resources';
 
 export interface ProjectEncodingRequest {
   id: number;
   document: DocumentData;
   history: RetainedHistory;
   assets: ReturnType<ProjectAssetSource["get"]>[];
+  fonts:FontResourceInput[];
 }
 
 export type ProjectEncodingMessage =
   | { id: number; type: "chunk"; chunk: GraphChunk }
-  | { id: number; type: "finish"; assets: ProjectEncodingRequest["assets"] }
+  | { id: number; type: "finish"; assets: ProjectEncodingRequest["assets"];fonts:FontResourceInput[] }
   | { id: number; type: "abort" };
 
 /** Autosave validation and JSON encoding must not monopolize the UI thread. */
@@ -43,6 +46,7 @@ export class ProjectEncoder {
       const asset = assets.get(id);
       return { id: asset.id, name: asset.name, width: asset.width, height: asset.height, blob: asset.blob, ...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{}) };
     });
+    const fonts=captureProjectFonts(retainedDocuments(document,history),assets.fonts);
     // Capture caller-owned inputs before the first asynchronous transport break.
     const snapshot = isImmutable(document) && isImmutable(history)
       ? { document, history }
@@ -56,7 +60,7 @@ export class ProjectEncoder {
         worker.postMessage({ id, type: "chunk", chunk } satisfies ProjectEncodingMessage);
       }).then(() => {
         if (this.worker !== worker || !this.pending.has(id)) return;
-        worker.postMessage({ id, type: "finish", assets: sources } satisfies ProjectEncodingMessage);
+        worker.postMessage({ id, type: "finish", assets: sources,fonts } satisfies ProjectEncodingMessage);
       }).catch(error => {
         if (this.worker === worker) {
           try { worker.postMessage({ id, type: "abort" } satisfies ProjectEncodingMessage); } catch { /* The original send failure is authoritative. */ }

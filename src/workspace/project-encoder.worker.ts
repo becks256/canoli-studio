@@ -14,13 +14,14 @@ self.onmessage = ({ data: message }: MessageEvent<ProjectEncodingMessage>) => {
   }
   const receiver = receiving.get(message.id);
   receiving.delete(message.id);
-  const data = { ...receiver!.finish<Pick<ProjectEncodingRequest, "document" | "history">>(), id: message.id, assets: message.assets };
+  const data = { ...receiver!.finish<Pick<ProjectEncodingRequest, "document" | "history">>(), id: message.id, assets: message.assets,fonts:message.fonts };
   queue = queue.then(async () => {
     try {
       freeze(data.document);
       freeze(data.history);
       const assets = new Map(data.assets.map(asset => [asset.id, asset]));
-      const blob = await serializeProject(data.document, { get(id) {
+      const fonts = new Map(data.fonts.map(font=>[font.descriptor.report.faces[0].id,font]));
+      const blob = await serializeProject(data.document, { fonts:{get(id){const font=fonts.get(id);if(!font)throw new Error(`Missing project font: ${id}`);return font;}},get(id) {
         const asset = assets.get(id);
         if (!asset) throw new Error(`Missing project asset: ${id}`);
         return asset;

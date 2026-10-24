@@ -61,7 +61,7 @@ describe("authored layer metadata", () => {
     const legacy = document.toJSON();
     legacy.schemaVersion = 1;
     const reopened = Document.fromJSON(legacy);
-    expect(reopened.toJSON().schemaVersion).toBe(42);
+    expect(reopened.toJSON().schemaVersion).toBe(43);
     layer.metadata = new LayerMetadata({ copyright: "Author supplied" });
     const saved = document.toJSON();
     expect(

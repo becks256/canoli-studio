@@ -80,11 +80,11 @@ it("migrates validated legacy undo and redo states with the current workspace do
     future: [{ document: future, label: "After", canvasChanged: false }],
   });
   restored.undo();
-  expect(restored.toJSON().schemaVersion).toBe(42);
+  expect(restored.toJSON().schemaVersion).toBe(43);
   expect(restored.name).toBe("Before");
   restored.redo();
   restored.redo();
-  expect(restored.toJSON().schemaVersion).toBe(42);
+  expect(restored.toJSON().schemaVersion).toBe(43);
   expect(restored.name).toBe("After");
 });
 

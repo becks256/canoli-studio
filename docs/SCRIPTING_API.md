@@ -1,12 +1,37 @@
 # Scripting API
 
+## Font-file binding development (F08)
+
+Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+
+## FontFile and Document.fonts.files
+
+Trusted host signature: `Document.fonts.embed(source:Blob,options:{faceIndex?:number;name?:string;replace?:string}={},control:FontEmbedControl={}):Promise<FontFile>`. Prepare outside transactions; a single-face file defaults to index 0, while collections require an explicit index. Name defaults to source full name/family; `replace` optionally reflows one exact family request in the same undoable attachment. Active timeout defaults to 60000ms. Cancellation, missing/disposed source store, stale document, malformed input, native rejection and locked affected artwork reject. Accepted observer failures retain sources/history. FontEmbedControl additionally accepts synchronous `beforeCommit():void`; throwing, cancelling or changing the revision there prevents attachment. This method is unavailable for isolated source admission because no host store is attached there.
+
+`document.fonts.files.items:FontFile[]`, `.length:number`, `.getById(id:string):FontFile|null` and iteration expose current owned metadata handles. `FontFile` getters are `id`, `isAttached`, `document`, `name`, `family` and owned `resource`; `toJSON()` returns owned declaration data. Setting `name` and `.remove(options:{replaceWith?:string}={})` use shared commands. A used face requires an explicit replacement, which cannot reference that face. Locked edits reject atomically; removed-handle reads reject until Undo restores attachment. Source bytes/native handles are not metadata members. Trusted hosts construct `new FontFile({id,name,resource})` and `.files.add(file)` only after preparing or transferring the matching source. Names are 1–240 units and not whitespace-only. The isolated constructor globals remain unchanged; scripts can rename/remove currently declared handles but cannot import new font files. Full descriptor schema, errors, retained-history behavior, worker/native constraints and remaining gates: [FONT_FILES.md](FONT_FILES.md).
+
+The following example runs in the isolated Scripts panel after explicitly embedding a font. It constructs text against the private worker's loaded native face and returns only commands/metadata:
+
+<!-- example: embedded-font-script -->
+```js
+const prior = document.layers.at(0);
+const file = document.fonts.files.items[0];
+if (!prior || !file) throw new Error('Embed a font and create text first.');
+const copy = document.layers.add(new TextLayer({
+  name: 'Script native metrics', text: prior.text,
+  fontFamily: file.family, fontSize: 40, fontWeight: prior.fontWeight,
+  visible: false,
+}));
+print('native width ' + copy.width);
+```
+
 ## Font sources — trusted browser host only
 
-`editor.inspectFont(file:Blob,options:{offset?:number;limit?:number}={},control:FontSourceControl={}):Promise<FontInspection>` and `editor.prepareFontSource(file:Blob,options:{faceIndex?:number}={},control:FontSourceControl={}):Promise<PreparedFontSource>` are trusted EditorApplication methods, unavailable inside isolated Scripts/internal plugins. Inspection defaults to offset0/limit32; limit is1–128. Preparation defaults to index0 only for single-face sources; multi-face sources require a selected index. Control supports signal, active timeout60000ms by default, and phase progress. Returned FontFaces are loaded but unregistered; originals remain unchanged and no document command occurs. Invalid data/options, native rejection, cancellation, timeout and disposal reject. There is no font file/FontFace global, embedding method, new permission or REST counterpart. Full signatures, DTOs, trusted example, cancellation/native limitations and ownership: [FONT_SOURCES.md](FONT_SOURCES.md).
+`editor.inspectFont(file:Blob,options:{offset?:number;limit?:number}={},control:FontSourceControl={}):Promise<FontInspection>` and `editor.prepareFontSource(file:Blob,options:{faceIndex?:number}={},control:FontSourceControl={}):Promise<PreparedFontSource>` are trusted EditorApplication methods, unavailable inside isolated Scripts/internal plugins. Inspection defaults to offset0/limit32; limit is1–128. Preparation defaults to index0 only for single-face sources; multi-face sources require a selected index. Control supports signal, active timeout60000ms by default, and phase progress. Returned FontFaces are loaded but unregistered; originals remain unchanged and no document command occurs. Invalid data/options, native rejection, cancellation, timeout and disposal reject. These inspection services expose no font-file/FontFace global, new permission or REST counterpart. Trusted `Document.fonts.embed` is a separate operation described in [FONT_FILES.md](FONT_FILES.md). Full signatures, DTOs, trusted example, cancellation/native limitations and ownership: [FONT_SOURCES.md](FONT_SOURCES.md).
 
 ## Document font collection
 
-Document.fonts.items returns owned DocumentFontUsage[] across all stored text/style/embedded scopes. Document.fonts.replace(from:string,to:string):void requires exact 1–240-unit authored requests, preserves inheritance/overrides and uses shared validation, reflow, locks and one-step history. Equal/missing requests are no-ops; malformed or locked replacements reject atomically. No font files/embedding or availability API is exposed to isolated scripts. Full DTOs, defaults, executable example, REST/recipe counterparts and limits: [Document fonts](FONT_MANAGEMENT.md).
+Document.fonts.items returns owned DocumentFontUsage[] across all stored text/style/embedded scopes. Document.fonts.replace(from:string,to:string):void requires exact 1–240-unit authored requests, preserves inheritance/overrides and uses shared validation, reflow, locks and one-step history. Equal/missing requests are no-ops; malformed or locked replacements reject atomically. The trusted embedding operation requires a source store and rejects inside isolated scripts; existing embedded metadata is available through `document.fonts.files`. No font chooser or host availability service is exposed. Full DTOs, defaults, executable example, REST/recipe counterparts and limits: [Document fonts](FONT_MANAGEMENT.md).
 
 ## Native capital variants and font stretch
 

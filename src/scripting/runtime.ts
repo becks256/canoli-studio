@@ -98,6 +98,16 @@ self.onmessage = async (event) => {
   const commands: EditorCommand[] = [];
   const logs: string[] = [];
   try {
+    const fonts=event.data.fonts??[];
+    // Remove the private payload from the event before invoking untrusted code.
+    delete event.data.fonts;
+    for(const source of fonts){
+      const set=(self as typeof self&{fonts?:FontFaceSet}).fonts;
+      if(!set||typeof FontFace==='undefined')throw new Error('This browser cannot measure embedded fonts in isolated scripts.');
+      const bytes=await source.blob.arrayBuffer();
+      for(const descriptor of source.descriptors){const face=new FontFace(source.family,bytes,descriptor);await face.load();set.add(face);}
+    }
+    fonts.length=0;
     const document = Document.fromJSON(event.data.document);
     document.selectLayers(
       (event.data.selectedIds ?? [])

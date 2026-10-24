@@ -41,7 +41,15 @@ import { EraserStroke, PaintFill } from "./values";
 import { LayerCompCollection } from "./layer-comps";
 import {ParagraphStyle,ParagraphStyleCollection} from './paragraph-styles';
 import {DocumentFonts} from './fonts';
+export {FontFile,FontFileCollection} from './font-file';
+export type {FontFileRemoveOptions} from './font-file';
+import {fontFileSchema,documentFontFiles,fontFilesForArtwork,type FontFileData} from '../core/font-files';
+import {sameFontResource} from '../fonts/resources';
+import type {FontSourceStore} from '../fonts/store';
+import type {SmartComponentDefinition} from '../core/smart/types';
+import {captureRetainedHistory,retainedDocuments} from '../core/history';
 export {DocumentFonts} from './fonts';
+export type {FontEmbedOptions,FontEmbedControl} from './fonts';
 export type {DocumentFontUsage} from '../core/font-management';
 import {z} from 'zod';
 import {paragraphFormat,type ParagraphFormat} from '../core/paragraph-styles';
@@ -305,6 +313,8 @@ export class Document {
     if (!(source instanceof Document))
       throw new Error("A component source must be a Document.");
     const { components: _nestedDefinitions, ...data } = source.toJSON();
+    const files=fontFilesForArtwork(source._read(),data);
+    if(files.length){data.fontFiles=files;if(this.assetStore){if(!source.assetStore)throw new Error('The component is missing its font source store.');for(const file of files)source.assetStore.fonts.shareTo(this.assetStore.fonts,file.id);}}
     const componentId = options.id ?? id();
     this._dispatch({
       type: "component.set",
@@ -335,10 +345,12 @@ export class Document {
               ),
             ],
           };
+    const components=structuredClone(this._read().components??[]),fonts=fontFilesForArtwork(this._read(),{...data,components});
     const document = Document.fromJSON({
       ...data,
       schemaVersion: SCHEMA_VERSION,
-      components: structuredClone(this._read().components ?? []),
+      components,
+      ...(fonts.length?{fontFiles:fonts}:{}),
     });
     document.assetStore = this.assetStore;
     return document;
@@ -414,6 +426,8 @@ export class Document {
   private handles = new Map<string, Layer>();
   private staged: DocumentData | null = null;
   private batch: EditorCommand[] | null = null;
+  private fontTransactionActivations:{store:FontSourceStore;id:string}[]|null=null;
+  private checkedFontDeclarations=new WeakMap<object,object>();
   private commandListeners = new Set<
     (command: EditorCommand, before: DocumentData, after: DocumentData) => void
   >();
@@ -557,8 +571,37 @@ export class Document {
   get assetStore(): AssetStore | null {
     return this._assetStore;
   }
+  /** @internal Async font preparation must precede synchronous model edits. */
+  _assertFontImportReady():void{
+    if(this.batch||this.navigatingHistory||this.acceptingCommand)throw new Error('Prepare a font outside synchronous transactions and history navigation.');
+  }
   set assetStore(store: AssetStore | null) {
+    if(store){const files=this.fontDeclarations(),activated=this.activateFontSources(store.fonts,files);try{this._assetStore=store;}catch(error){for(const entry of activated)entry.store.deactivate(entry.id);throw error;}return;}
     this._assetStore = store;
+  }
+  private fontDeclarations():FontFileData[]{
+    const state=this.getSnapshot(),documents=retainedDocuments(state.document,captureRetainedHistory(state));
+    if(this.staged)documents.push(this.staged);
+    return documents.flatMap(documentFontFiles);
+  }
+  private activateFontSources(store:FontSourceStore,files:readonly FontFileData[]){
+    const values=new Map<string,FontFileData>();
+    for(const file of files){const previous=values.get(file.id);if(previous){if(previous.resource!==file.resource&&!sameFontResource(previous.resource,file.resource))throw new Error('Conflicting retained font source declarations.');continue;}const resource=store.get(file.id);if(this.checkedFontDeclarations.get(file.resource)!==resource){if(!sameFontResource(resource.descriptor,file.resource))throw new Error('Document font declarations differ from their owned source.');if(isImmutable(file.resource))this.checkedFontDeclarations.set(file.resource,resource);}values.set(file.id,file);}
+    const activated:{store:FontSourceStore;id:string}[]=[];
+    try{for(const id of values.keys()){const active=store.isActive(id);store.activate(id);if(!active)activated.push({store,id});}return activated;}
+    catch(error){for(const entry of activated)entry.store.deactivate(entry.id);throw error;}
+  }
+  private prepareFontCommands(command:EditorCommand){
+    if(!this._assetStore)return[];
+    const incoming:FontFileData[]=[],definition=(value:SmartComponentDefinition)=>{if(value.source.kind==='document')incoming.push(...documentFontFiles(value.source.document));},visit=(value:EditorCommand)=>{if(value.type==='transaction')for(const child of value.commands)visit(child);else if(value.type==='font.file.add')incoming.push(fontFileSchema.parse(value.file));else if(value.type==='component.set')definition(value.definition);else if(value.type==='component.replaceAll')for(const entry of value.definitions)definition(entry);};visit(command);
+    if(!incoming.length&&!this._assetStore.fonts.size&&!documentFontFiles(this._read()).length)return[];
+    const files=[...this.fontDeclarations(),...incoming];
+    return this.activateFontSources(this._assetStore.fonts,files);
+  }
+  private releaseUnacceptedFonts(entries:readonly {store:FontSourceStore;id:string}[]){
+    if(!entries.length)return;
+    const required=new Set(this.fontDeclarations().map(value=>value.id));
+    for(const entry of entries)if(entry.store!==this._assetStore?.fonts||!required.has(entry.id))entry.store.deactivate(entry.id);
   }
   get selectedLayer() {
     return this.getLayer(this.store.getSnapshot().selectedId);
@@ -969,6 +1012,7 @@ export class Document {
     if (this.batch) throw new Error("Nested transactions are not supported.");
     if (typeof label !== 'string') throw new Error('A transaction label must be a string.');
     this.batch = [];
+    this.fontTransactionActivations=[];
     this.staged = this.store.getSnapshot().document;
     try {
       const result: unknown = callback();
@@ -982,6 +1026,7 @@ export class Document {
     } finally {
       this.batch = null;
       this.staged = null;
+      const activations=this.fontTransactionActivations;this.fontTransactionActivations=null;if(activations)this.releaseUnacceptedFonts(activations);
     }
   }
 
@@ -992,6 +1037,8 @@ export class Document {
   /** @internal Automation adapters must validate external requests before dispatch. */
   _dispatch(command: EditorCommand) {
     if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
+    const activations=this.prepareFontCommands(command);this.fontTransactionActivations?.push(...activations);
+    try{
     if (this.batch) {
       this.staged = freeze(execute(this._read(), command));
       this.batch.push(command);
@@ -1007,6 +1054,7 @@ export class Document {
         }else if(failed)throw failure;
       }finally{this.acceptingCommand=false;}
     }
+    }finally{this.releaseUnacceptedFonts(activations);}
   }
 
   /** @internal */

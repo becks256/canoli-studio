@@ -55,7 +55,7 @@ it("white balance persists in the current schema, migrates v18 and shares valida
   const options = defaultWhiteBalanceAdjustment(), layer = doc.layers.add(new AdjustmentLayer({ adjustment: options })); options.temperature = 25000;
   expect(layer.adjustment).toEqual(defaultWhiteBalanceAdjustment());
   layer.mask = new LayerMask({ selection: new MarqueeSelection({ shape: "rectangle", x: 0, y: 0, width: 10, height: 10 }) });
-  const stored = doc.toJSON(); expect(stored.schemaVersion).toBe(42); expect(Document.fromJSON(stored).toJSON()).toEqual(stored);
+  const stored = doc.toJSON(); expect(stored.schemaVersion).toBe(43); expect(Document.fromJSON(stored).toJSON()).toEqual(stored);
   expect(() => validateDocument({ ...stored, schemaVersion: 18 })).toThrow(/schema version 19/);
   expect(Document.fromJSON({ ...empty, schemaVersion: 18 }).toJSON()).toEqual(empty);
   const before = doc.getSnapshot();

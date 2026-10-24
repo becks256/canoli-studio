@@ -1,4 +1,5 @@
 import {nativeToneSamplingGrid} from './smart-filter-grid';
+import {subscribeNativeFontChanges} from '../fonts/native-events';
 import {canonicalCellOffset} from './canvas';
 import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
 import {NativeCanvasGrid} from './native-canvas-grid';
@@ -183,6 +184,7 @@ export class CanvasRenderer implements DocumentRenderer {
       ? undefined
       : globalThis.document.fonts;
   private readonly fontsChanged = () => this.clearCache();
+  private readonly stopOwnedFonts=subscribeNativeFontChanges(this.fonts,this.fontsChanged);
   constructor() {
     this.fonts?.addEventListener("loadingdone", this.fontsChanged);
     this.fonts?.addEventListener("loadingerror", this.fontsChanged);
@@ -1454,6 +1456,7 @@ export class CanvasRenderer implements DocumentRenderer {
     this.patchPrefixes.clear();
   }
   dispose() {
+    this.stopOwnedFonts();
     this.fonts?.removeEventListener("loadingdone", this.fontsChanged);
     this.fonts?.removeEventListener("loadingerror", this.fontsChanged);
     this.clearCache();

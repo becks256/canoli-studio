@@ -41,6 +41,7 @@ const generatedPages = [
   ["FONT_FEATURES", "Native font features"],
   ["FONT_MANAGEMENT", "Document fonts"],
   ["FONT_SOURCES", "Font-file inspection and private preview"],
+  ["FONT_FILES", "Embedded document font files"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

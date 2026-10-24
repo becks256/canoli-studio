@@ -1,8 +1,12 @@
 # Plugins and extensions
 
+## Font-file binding development (F08)
+
+Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+
 ## Font-source inspection grants no extension access
 
-The trusted font inspector reads local font Blobs and previews loaded faces in a private child font set. EditorApplication.inspectFont/prepareFontSource are not isolated globals, plugin capabilities or document-font mutations. Existing document:read/document:write grants cover family inventory/replacement only; installation stays inert. Font source files, native handles and their private lifetime are not exposed through plugin storage, network or independent REST. No package/runtime contract changes. See [FONT_SOURCES.md](FONT_SOURCES.md).
+The trusted font inspector reads local font Blobs and previews loaded faces in a private child font set. EditorApplication.inspectFont/prepareFontSource are not isolated globals, plugin capabilities or document-font mutations. Existing document:read/document:write grants cover family inventory/replacement and existing font-file metadata commands; installation stays inert. Font source files, native handles and their private lifetime are not exposed through plugin storage or network. Selected render faces preload privately into the disposable script worker before text constructors run; explicit independent REST admission is a separate authenticated host surface. No package/runtime contract changes. See [FONT_SOURCES.md](FONT_SOURCES.md).
 
 ## Document font commands
 

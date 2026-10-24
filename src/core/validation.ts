@@ -1,5 +1,6 @@
 import {fontVariantCapsSchema,fontStretchSchema} from './font-features';
 import {fontFamilyRequestSchema} from './font-management';
+import {fontFileSchema} from './font-files';
 import { layerCompSchema } from "./layer-comps";
 import {paragraphStyleSchema,paragraphOverrideKeysSchema} from './paragraph-styles';
 import { alphaChannelSchema } from './alpha-channels';
@@ -124,6 +125,9 @@ const commandVariants = () =>
       .object({ type: z.literal("layerComp.set"), comp: layerCompSchema })
       .strict(),
     z.object({type:z.literal('document.font.replace'),from:fontFamilyRequestSchema,to:fontFamilyRequestSchema}).strict(),
+    z.object({type:z.literal('font.file.add'),file:fontFileSchema}).strict(),
+    z.object({type:z.literal('font.file.rename'),id:identifier,name:fontFileSchema.shape.name}).strict(),
+    z.object({type:z.literal('font.file.remove'),id:identifier,replaceWith:fontFamilyRequestSchema.optional()}).strict(),
     z.object({type:z.literal('paragraphStyle.set'),style:paragraphStyleSchema}).strict(),
     z.object({type:z.literal('paragraphStyle.remove'),id:identifier}).strict(),
     z.object({type:z.literal('text.paragraphStyle'),id:identifier,styleId:identifier.nullable(),keepOverrides:z.boolean().optional()}).strict(),

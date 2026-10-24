@@ -1,5 +1,9 @@
 import { replaceVectorPaths, type VectorBooleanSelection } from './vector-boolean';
 import {replaceDocumentFont} from './font-management';
+import {documentFontUsage,fontFamilyRequestSchema} from './font-management';
+import {fontFileSchema,documentFontFiles,visitFontFileScopes,type FontFileData} from './font-files';
+import {sameFontResource} from '../fonts/resources';
+import {fontFamilyNames,replaceFontFamilyToken} from './font-families';
 import {paragraphStyleSchema,resolveParagraphStyleLibrary,paragraphOverrideKeysSchema,paragraphFormat,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS,resolveParagraphBinding,sameParagraphFormat,type ParagraphStyleData,type ParagraphFormat} from './paragraph-styles';
 import {vectorStrokeKeys} from './vector-stroke';
 import { isImmutable, shareUnchanged } from "./immutable";
@@ -102,6 +106,9 @@ export type LayerPatch = Partial<
 // Serializable commands are the single mutation boundary for UI, automation,
 // and a future AI adapter. No renderer or UI code mutates document nodes.
 export type EditorCommand =
+  | {type:'font.file.add';file:FontFileData}
+  | {type:'font.file.rename';id:string;name:string}
+  | {type:'font.file.remove';id:string;replaceWith?:string}
   | {type:'paragraphStyle.set';style:ParagraphStyleData}
   | {type:'paragraphStyle.remove';id:string}
   | {type:'document.font.replace';from:string;to:string}
@@ -208,6 +215,27 @@ function reflowText(layer:TextLayerData){
   layer.width=bounds.width;layer.height=bounds.height;
 }
 function apply(document: DocumentData, command: EditorCommand): void {
+  if(command.type==='font.file.add'){
+    const file=fontFileSchema.parse(command.file),existing=documentFontFiles(document).find(value=>value.id===file.id);
+    if(existing){if(!sameFontResource(existing.resource,file.resource))throw new Error('Font resource identity collision.');return;}
+    const family=file.resource.report.faces[0].cssFamily.toLowerCase();
+    for(const request of documentFontUsage(document))if(fontFamilyNames(request.family).includes(family))replaceDocumentFont(document,request.family,request.family,reflowText,(scope,definitions)=>apply(scope,{type:'component.replaceAll',definitions}),true);
+    document.fontFiles=[...(document.fontFiles??[]),file];return;
+  }
+  if(command.type==='font.file.rename'){
+    const name=fontFileSchema.shape.name.parse(command.name);let found=false;
+    visitFontFileScopes(document,scope=>{for(const file of scope.fontFiles??[])if(file.id===command.id){file.name=name;found=true;}});
+    if(!found)throw new Error('Font file not found.');return;
+  }
+  if(command.type==='font.file.remove'){
+    const file=documentFontFiles(document).find(value=>value.id===command.id);if(!file)throw new Error('Font file not found.');
+    const family=file.resource.report.faces[0].cssFamily,requests=documentFontUsage(document).filter(request=>fontFamilyNames(request.family).includes(family.toLowerCase()));
+    if(requests.length&&command.replaceWith===undefined)throw new Error('This font file is in use. Choose a replacement before removing it.');
+    if(command.replaceWith!==undefined){fontFamilyRequestSchema.parse(command.replaceWith);if(fontFamilyNames(command.replaceWith).includes(family.toLowerCase()))throw new Error('The replacement still references the font being removed.');}
+    const replacements=requests.map(request=>({from:request.family,to:fontFamilyRequestSchema.parse(replaceFontFamilyToken(request.family,family,command.replaceWith!))}));
+    for(const replacement of replacements)replaceDocumentFont(document,replacement.from,replacement.to,reflowText,(scope,definitions)=>apply(scope,{type:'component.replaceAll',definitions}));
+    visitFontFileScopes(document,scope=>{if(scope.fontFiles)scope.fontFiles=scope.fontFiles.filter(value=>value.id!==file.id);});return;
+  }
   if(command.type==='document.font.replace'){
     replaceDocumentFont(document,command.from,command.to,reflowText,(scope,definitions)=>apply(scope,{type:'component.replaceAll',definitions}));return;
   }
@@ -843,6 +871,9 @@ export function execute(
 
 export function describe(command: EditorCommand): string {
   switch (command.type) {
+    case 'font.file.add':return 'Embed font file';
+    case 'font.file.rename':return 'Rename font file';
+    case 'font.file.remove':return 'Remove font file';
     case 'document.font.replace':return 'Replace document font';
     case 'paragraphStyle.set':return 'Edit paragraph style';
     case 'paragraphStyle.remove':return 'Remove paragraph style';

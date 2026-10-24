@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Font-file binding development (F08)
+
+Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+
 ## Font-source admission and private preview (F08 foundation)
 
 Inspect actual local TTF/OTF/WOFF/WOFF2/TTC/SFNT-datafork sources in disposable workers without a font-file size cutoff. Return paged strict metadata, original/derived hashes and explicit selected-face transformations; preserve complete originals and copy whole collection faces without glyph subsetting. Multi-face preparation requires explicit selection. Native validation returns loaded unregistered FontFaces. The custom inspector previews only in a private font set, supports cancellation/retry and retains modal controls at short widths without changing artwork, font requests, revision or history. Verify original-face native pixels and queue/error/late-result/disposal behavior. This trusted service grants no isolated/plugin/REST file capability. Font embedding and project/workspace/history/source-library persistence remain required, unfinished F08 work. See [FONT_SOURCES.md](FONT_SOURCES.md).

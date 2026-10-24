@@ -1,5 +1,9 @@
 # Canoli Studio — product brief
 
+## Font-file binding development (F08)
+
+Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+
 Canoli Studio is the chosen product name (formerly Luma). This brief is the source of truth for product intent. Read it before planning or implementing features. See [REQUIREMENTS.md](./REQUIREMENTS.md) for acceptance criteria and [ARCHITECTURE.md](./ARCHITECTURE.md) for implementation boundaries.
 
 The rebrand changes product-facing names and credits. Existing `.luma` projects, plugin/recipe formats, browser storage keys, development `window.luma` access and `LUMA_API_*` configuration remain compatible. The repository directory and existing deployment URLs remain unchanged until a new destination is configured.

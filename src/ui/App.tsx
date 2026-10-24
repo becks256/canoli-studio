@@ -2572,7 +2572,9 @@ export function App({ editor }: { editor: EditorApplication }) {
             </IconButton>
           </div>
         )}
-        {fontManagerOwner&&<FontManagerDialog document={fontManagerOwner} fontSources={editor} onClose={()=>setFontManagerOwner(null)} onReplace={(from,to,revision)=>{
+        {fontManagerOwner&&<FontManagerDialog document={fontManagerOwner} fontSources={editor} assertOwner={()=>{
+          if(editor.document!==fontManagerOwner||!editor.documentSessions.some(session=>session.document===fontManagerOwner))throw new Error('The document changed or closed. Reopen Document fonts for the current document.');
+        }} onClose={()=>setFontManagerOwner(null)} onReplace={(from,to,revision)=>{
           if(editor.document!==fontManagerOwner||!editor.documentSessions.some(session=>session.document===fontManagerOwner)||fontManagerOwner.getSnapshot().revision!==revision)throw new Error('The document changed or closed. Reopen Document fonts for the current document.');
           fontManagerOwner.fonts.replace(from,to);
         }}/>}

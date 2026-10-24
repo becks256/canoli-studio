@@ -3,6 +3,7 @@ import runtimeSource from "../generated/script-runtime.js?raw";
 import type { Document } from "../dom";
 import type { EditorCommand } from "../core/commands";
 import { parseCommands } from "../core/validation";
+import {documentFontFiles} from '../core/font-files';
 
 export interface ScriptResult {
   commands: EditorCommand[];
@@ -45,6 +46,17 @@ export class ScriptRunner {
     // until the worker is ready instead of cloning that same revision twice.
     const current = document._read();
     const snapshot = isImmutable(current) ? current : document.toJSON();
+    // Only current declared faces enter this disposable native font set. Raw
+    // font payloads are consumed before user code starts, never put in the DOM.
+    let fonts:{family:string;descriptors:import('../fonts/types').FontDescriptors[];blob:Blob}[],fontChecks:(()=>void)[];
+    try{
+      fontChecks=[];
+      fonts=documentFontFiles(snapshot).map(file=>{
+        const store=document.assetStore?.fonts;if(!store)throw new Error('The script document is missing an embedded font source.');
+        const check=store.capture(file.id);check();fontChecks.push(check);
+        const resource=store.get(file.id);return{family:resource.cssFamily,descriptors:resource.descriptor.report.faces[0].descriptors,blob:resource.renderBlob};
+      });
+    }catch(error){return Promise.reject(error);}
     const selectedId = document.selectedLayer?.id ?? null;
     const selectedIds = document.selectedLayers.map((layer) => layer.id);
     const iframe = window.document.createElement("iframe");
@@ -97,8 +109,10 @@ export class ScriptRunner {
         if (finished) return;
         const data = event.data;
         if (data?.type === "ready") {
+          try{for(const check of fontChecks)check();}catch(error){fail(error instanceof Error?error:new Error(String(error)));return;}
           channel.port1.postMessage({
             document: snapshot,
+            fonts,
             selectedId,
             selectedIds,
             code,
@@ -168,6 +182,7 @@ export class ScriptRunner {
           )
             throw new Error("Invalid selected layer IDs.");
           const selectedIds = [...new Set<string>(data.selectedIds)];
+          for(const check of fontChecks)check();
           if ((selectedIds.at(-1) ?? null) !== selectedId)
             throw new Error("Inconsistent active layer.");
           finished = true;

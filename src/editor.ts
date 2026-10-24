@@ -69,6 +69,8 @@ import { BrushPresetLibrary } from './brushes/library';
 import {BrushPreset,type BrushTool} from './brushes/presets';
 import {verifyPresetSource} from './brushes/sources';
 import { AssetStore } from "./core/assets";
+import {fontFilesForArtwork,documentFontFiles} from './core/font-files';
+import {captureProjectFonts} from './core/font-project';
 import { loadProject, serializeProject } from "./core/project";
 import {
   Document,
@@ -902,8 +904,10 @@ export class EditorApplication {
     const {snapshot,copies}=this.captureSelectedArtwork(),base=new Document({name:'Saved artwork',width:snapshot.width,height:snapshot.height}).toJSON();
     base.id=snapshot.id;base.children=copies;const registry=new ComponentRegistry(snapshot.components),roots=allLayers(copies).flatMap(node=>node.kind==='smart-object'?[node.componentId]:[]),reachable=new Set(roots.flatMap(key=>[...registry.reachableFrom(key)]));
     base.components=[...reachable].map(key=>structuredClone(registry.get(key)));base.paragraphStyles=importParagraphStyles(snapshot,base,copies,id);
+    const fontFiles=fontFilesForArtwork(snapshot,base);if(fontFiles.length)base.fontFiles=fontFiles;
+    const capturedFonts=new Map(captureProjectFonts([base],this.assets.fonts).map(value=>[value.descriptor.report.faces[0].id,value]));
     const captured=new Map([...referencedAssets(base)].map(key=>{const asset=this.assets.get(key);return[key,{id:asset.id,name:asset.name,width:asset.width,height:asset.height,blob:asset.blob,...(asset.tiff?{tiff:{...asset.tiff}}:{}),...(asset.avif?{avif:{...asset.avif}}:{}),...(asset.raw?{raw:ownRawSource(asset.raw)}:{})}] as const;}));
-    return this.artworkLibrary.save(()=>this.projectEncoder.encode(base,{get(key){const asset=captured.get(key);if(!asset)throw new Error('Missing captured artwork source.');return asset;}},{version:1,past:[],future:[]}),metadata,control.signal);
+    return this.artworkLibrary.save(()=>this.projectEncoder.encode(base,{fonts:{get(key){const font=capturedFonts.get(key);if(!font)throw new Error('Missing captured artwork font.');return font;}},get(key){const asset=captured.get(key);if(!asset)throw new Error('Missing captured artwork source.');return asset;}},{version:1,past:[],future:[]}),metadata,control.signal);
   }
 
   async placeLibraryArtwork(entryId:string,control:{signal?:AbortSignal}={}) {
@@ -929,6 +933,7 @@ export class EditorApplication {
     control.signal?.addEventListener('abort',cancel,{once:true});abort.signal.addEventListener('abort',disposeRenderer,{once:true});this.historyPreviews.add(abort);
     try {
       check();const sourceIds=new Set([...referencedAssets(timeline[position].document),...(position?referencedAssets(timeline[position-1].document):[])]);for(const assetId of sourceIds)this.assetStore.shareTo(assets,assetId,assetId);
+      for(const state of [timeline[position].document,...(position?[timeline[position-1].document]:[])])for(const font of documentFontFiles(state)){this.assetStore.fonts.shareTo(assets.fonts,font.id);assets.fonts.activate(font.id);}
       const render=async(document:import('./core/model').DocumentData)=>{
         let canvas:HTMLCanvasElement|undefined;
         try {
@@ -957,6 +962,7 @@ export class EditorApplication {
     try {
       check(); const ids = new Set([...referencedAssets(comparison.before), ...referencedAssets(comparison.after)]);
       for (const assetId of ids) this.assetStore.shareTo(assets, assetId, assetId);
+      for(const state of [comparison.before,comparison.after])for(const font of documentFontFiles(state)){this.assetStore.fonts.shareTo(assets.fonts,font.id);assets.fonts.activate(font.id);}
       const value = await renderHistoryComparison(comparison, assets, renderer, check, () => abort.signal.aborted); check(); return value;
     } catch (cause) {if (abort.signal.aborted) throw abort.signal.reason; throw cause;}
     finally {stopDocument(); stopEditor(); control.signal?.removeEventListener('abort', cancel); abort.signal.removeEventListener('abort', disposeRenderer); this.historyPreviews.delete(abort); renderer.dispose(); assets.dispose();}
@@ -987,6 +993,7 @@ export class EditorApplication {
       [...reachable].map((key) => [key, id()]),
     );
     const definitions = registry.copyDefinitions(componentRoots, componentIds);
+    const fontFiles=fontFilesForArtwork(snapshot,{...snapshot,fontFiles:undefined,children:copies,components:definitions,paragraphStyles});
     const assetIds = referencedAssets({
       ...snapshot,
       children: copies,
@@ -1054,6 +1061,7 @@ export class EditorApplication {
       } // Master references were already remapped by the registry.
     }
     const commands: import("./core/commands").EditorCommand[] = [
+      ...fontFiles.map(file=>({type:'font.file.add' as const,file})),
       ...paragraphStyles.map(style=>({type:'paragraphStyle.set' as const,style})),
       ...(definitions.length
         ? [
@@ -1078,6 +1086,9 @@ export class EditorApplication {
       installed = new Set<string>();
     let committed = false;
     try {
+      // Independent leases are acquired before image decoding yields, so closing
+      // the source cannot change the captured artwork's native font identity.
+      for(const file of fontFiles)sourceAssets.fonts.shareTo(destination.assets.fonts,file.id);
       for (const asset of originals) {
         const copy = control.shareSources?sourceAssets.shareTo(staging,asset.id,replacements.get(asset.id)!):await staging.add(
           asset.blob,

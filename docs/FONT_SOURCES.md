@@ -1,6 +1,6 @@
 # Font-file inspection and private preview
 
-Open **Document fonts** from command search or **Manage document fonts…** in the Typography Inspector. Expand **Inspect font files** and choose a local TTF, OTF, WOFF, WOFF2, TTC or SFNT datafork (`.dfont`). The source is read locally in a disposable worker. Choosing a font does not install it, change document text or add an Undo entry.
+Open **Document fonts** from command search or **Manage document fonts…** in the Typography Inspector. Expand **Inspect font files** and choose a local TTF, OTF, WOFF, WOFF2, TTC or SFNT datafork (`.dfont`). The source is read locally in a disposable worker. Choosing a font does not install it, change document text or add an Undo entry. Explicit **Embed selected face** is a separate, undoable operation; its ownership, native persistence and remaining acceptance work are documented in [Embedded font files](FONT_FILES.md).
 
 The inspector shows source size/container, face count, declared family/style/PostScript names, glyph count, units per em, OS/2 weight/width classes, raw embedding flags, declared copyright and variable-axis ranges. Names and flags are file declarations, not verification of authorship, licensing rights, glyph coverage or native rendering quality. Missing values stay unknown. Unsupported or malformed sources reject with a recoverable error.
 

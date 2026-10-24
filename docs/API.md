@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Font-file binding development (F08)
+
+Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+
 ## Trusted font-file services
 
 Browser `editor.inspectFont(file:Blob,options:{offset?:number;limit?:number}={},control:FontSourceControl={}):Promise<FontInspection>` and `editor.prepareFontSource(file:Blob,options:{faceIndex?:number}={},control:FontSourceControl={}):Promise<PreparedFontSource>` inspect local sources and prepare loaded unregistered native faces without document edits. Defaults are offset0/limit32 (limit1–128), single-face index0 and active timeout60000ms. Multi-face preparation requires explicit selection. Cancellation/disposal, malformed data/results and native failures reject. These methods are host-only; no REST endpoint, isolated file capability or browser/headless synchronization is added. Complete DTOs, ownership, examples, errors and limits: [FONT_SOURCES.md](FONT_SOURCES.md).
@@ -7,6 +11,8 @@ Browser `editor.inspectFont(file:Blob,options:{offset?:number;limit?:number}={},
 ## Document font requests
 
 GET /api/v1/documents/:id/fonts returns id/revision/fonts for the independent headless session. The strict document.font.replace command requires from/to strings and the current expectedRevision through the normal command endpoint, sharing atomic locks/history and estimated headless reflow. It does not inspect browser fonts or add rendering/synchronization. Complete DTOs, example, errors and limits: [Document fonts](FONT_MANAGEMENT.md).
+
+Font admission adds `files` to that inventory. `POST /api/v1/documents/:id/fonts?expectedRevision=N` accepts binary bytes plus optional strict JSON `X-Font-Options` (`faceIndex`, `name`, `replace`), with one shared attachment/replacement transaction. It returns HTTP 201, snapshot/file and explicit `metrics:"estimated"`; bad input/locks return 400, stale revisions 409 and deleted sessions 404. `GET .../fonts/:fontId` returns metadata; `?source=original|render` downloads exact authenticated source bytes. A separate FIFO Node parser has cancellation/deadlines and no native browser font handles. Native project 5 delivery retains the source. Full defaults, schemas and isolation: [FONT_FILES.md](FONT_FILES.md).
 
 ## Native font requests through shared commands
 

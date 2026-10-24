@@ -1,4 +1,5 @@
 import {assertFontFeaturesVersion,fontVariantCapsSchema,fontStretchSchema,type FontFeatures} from './font-features';
+import {fontFileSchema,documentFontFiles} from './font-files';
 import {vectorStrokeKeys} from './vector-stroke';
 import {visitLayerAssets} from './asset-references';
 import {assertBrushVersion} from './drawing';
@@ -40,7 +41,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 42;
+export const SCHEMA_VERSION = 43;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -194,6 +195,7 @@ export interface DocumentData {
     | 39
     | 40
     | 41
+    | 42
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -205,6 +207,7 @@ export interface DocumentData {
   components?: SmartComponentDefinition[];
   layerComps?: LayerCompData[];
   paragraphStyles?:ParagraphStyleData[];
+  fontFiles?:import('./font-files').FontFileData[];
   alphaChannels?: AlphaChannelData[];
   children: LayerData[];
 }
@@ -586,7 +589,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -594,7 +597,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–41), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–43), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -611,6 +614,12 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
         "Affine selection regions require document schema version 5 or later.",
       );
   };
+  if(value.fontFiles!==undefined){
+    if(Number(value.schemaVersion)<43)throw new Error('Embedded font files require document schema version 43.');
+    if(!Array.isArray(value.fontFiles))throw new Error('Invalid document font files.');
+    const fontIds=new Set<string>();
+    for(const entry of value.fontFiles){const font=fontFileSchema.parse(entry);if(fontIds.has(font.id))throw new Error('Duplicate document font identity.');fontIds.add(font.id);yield;}
+  }
   if (value.guides !== undefined) {
     if (Number(value.schemaVersion) < 7)
       throw new Error("Document guides require schema version 7.");
@@ -899,6 +908,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       throw new Error("Linked image files require schema version 13.");
     for (const layer of allLayers(value.children as LayerData[]))
       if (layer.kind === "smart-object") registry.get(layer.componentId);
+    if(value.fontFiles!==undefined||value.components!==undefined)documentFontFiles(value as unknown as DocumentData);
   }
 }
 

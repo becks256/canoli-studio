@@ -53,15 +53,17 @@ export function replaceDocumentFont(
   document:DocumentData,from:string,to:string,
   reflow:(layer:TextLayerData)=>void,
   replaceComponents:(scope:DocumentData,definitions:SmartComponentDefinition[])=>void,
+  forceReflow=false,
 ):void{
   fontFamilyRequestSchema.parse(from);fontFamilyRequestSchema.parse(to);
-  if(from===to)return;
-  const visit=(scope:DocumentData)=>{
+  if(from===to&&!forceReflow)return;
+  const visit=(scope:DocumentData):boolean=>{
+    let touched=false;
     let changedStyles=false;
     const definitions=(scope.paragraphStyles??[]).map(style=>{
       const value=structuredClone(style);
-      if(value.format.fontFamily===from){value.format.fontFamily=to;changedStyles=true;}
-      if(value.basedOn?.overrides.fontFamily===from){value.basedOn.overrides.fontFamily=to;changedStyles=true;}
+      if(from!==to&&value.format.fontFamily===from){value.format.fontFamily=to;changedStyles=true;}
+      if(from!==to&&value.basedOn?.overrides.fontFamily===from){value.basedOn.overrides.fontFamily=to;changedStyles=true;}
       return value;
     });
     const styles=changedStyles?resolveParagraphStyleLibrary(definitions):scope.paragraphStyles??[];
@@ -74,19 +76,21 @@ export function replaceDocumentFont(
         if(layer.paragraphStyle.overrides.fontFamily===from)layer.paragraphStyle.overrides.fontFamily=to;
         family=layer.paragraphStyle.overrides.fontFamily??style.format.fontFamily;
       }else if(family===from)family=to;
-      if(family!==layer.fontFamily){
+      if(family!==layer.fontFamily||forceReflow&&family===from){
         if(isLocked(scope,layer.id))throw new Error('Unlock affected text and its parent groups before replacing a font.');
-        layer.fontFamily=family;reflow(layer);
+        layer.fontFamily=family;reflow(layer);touched=true;
       }
     }
     if(changedStyles)scope.paragraphStyles=styles;
     if(scope.components?.length){
       const next=structuredClone(scope.components);
-      for(const definition of next)if(definition.source.kind==='document')visit(definition.source.document);
+      const rebound=new Set<string>();
+      for(const definition of next)if(definition.source.kind==='document'&&visit(definition.source.document))rebound.add(definition.id);
       const changed=next.filter((definition,index)=>JSON.stringify(definition)!==JSON.stringify(scope.components![index]));
-      if(changed.length){
+      if(changed.length||forceReflow&&rebound.size){
         const registry=new ComponentRegistry(scope.components),affected=new Set<string>();
         for(const definition of changed)for(const id of registry.affectedBy(definition.id))affected.add(id);
+        if(forceReflow)for(const definitionId of rebound)for(const id of registry.affectedBy(definitionId))affected.add(id);
         // Definitions use the owning registry. Check dependent instances in every
         // master too, including unchanged parents that reference an edited leaf.
         visitFontScopes({...scope,components:next},(owned,path)=>{
@@ -95,9 +99,11 @@ export function replaceDocumentFont(
             throw new Error(`A locked instance "${layer.name}" in "${name}" prevents replacing this font.`);
           }
         });
-        replaceComponents(scope,next);
+        if(changed.length)replaceComponents(scope,next);
       }
+      touched||=rebound.size>0;
     }
+    return touched;
   };
   visit(document);
 }

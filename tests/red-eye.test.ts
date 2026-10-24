@@ -71,14 +71,14 @@ it('selection masks inverse-map into transformed parents, commit with creation o
   const before=doc.toJSON(),past=doc.getSnapshot().past.length,layer=new AdjustmentLayer({adjustment:new RedEyeAdjustment()});
   doc.transaction('Correct pupils',()=>{group.layers.add(layer);layer.maskFromSelection(new MarqueeSelection({shape:'rectangle',x:14,y:24,width:8,height:8}));});
   expect(doc.getSnapshot().past).toHaveLength(past+1);
-  const saved=doc.toJSON();expect(saved.schemaVersion).toBe(42);expect(Document.fromJSON(saved).toJSON()).toEqual(saved);
+  const saved=doc.toJSON();expect(saved.schemaVersion).toBe(43);expect(Document.fromJSON(saved).toJSON()).toEqual(saved);
   const mask=layer.mask!.toJSON();if(mask.kind!=='selection')throw new Error('Expected selection mask');
   const region=mask.selection.regions[0],basis=selectionRegionTransform(region);
   expect(basis.point({x:region.x,y:region.y})).toEqual({x:2,y:2});
   expect(basis.point({x:region.x+region.width,y:region.y+region.height})).toEqual({x:6,y:6});
   for(let schemaVersion=1;schemaVersion<=34;schemaVersion++)expect(()=>validateDocument({...saved,schemaVersion})).toThrow();
   doc.undo();expect(doc.toJSON()).toEqual(before);doc.redo();expect(doc.toJSON()).toEqual(saved);
-  expect(Document.fromJSON({...before,schemaVersion:34}).toJSON().schemaVersion).toBe(42);
+  expect(Document.fromJSON({...before,schemaVersion:34}).toJSON().schemaVersion).toBe(43);
 });
 
 it('rejects old-labelled red-eye records inside embedded masters, including immutable cached definitions', () => {

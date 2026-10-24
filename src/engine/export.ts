@@ -13,6 +13,11 @@ import {planSvgImages} from '../core/svg-images';
 import {svgArtwork} from '../core/svg-styles';
 import {captureSvgSources,prepareSvgImages} from './svg-images';
 import {prepareSvgTexts} from './svg-text';
+import {captureSvgFonts} from './svg-fonts';
+import {captureRasterExportSources} from './raster-export-source';
+import {captureExportFonts,captureOwnedExportFonts} from './export-fonts';
+import {fontFamilyNames} from '../core/font-families';
+import {documentFontFiles} from '../core/font-files';
 import {planSvgTexts} from '../core/svg-text';
 import {planSvgSmart,type SvgSmartPlan} from '../core/svg-smart';
 import {planSvgPaint} from '../core/svg-paint';
@@ -77,6 +82,7 @@ export function getExportCapabilityReport(
   return describeExport(document,options,smart,smart?planSvgComposition(smart.document):undefined);
 }
 function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSmartPlan,composition?:SvgCompositionPlan):ExportCapabilityReport{
+  const authored=document;
   const hasParagraphStyleMetadata=!!document.paragraphStyles?.length||!!document.components?.some(definition=>definition.source.kind==='document'&&definition.source.document.paragraphStyles?.length);
   if(composition)document=composition.document;else if(smart)document=smart.document;
   const format = options.format;
@@ -84,6 +90,8 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
   const hasVectors = layers.some((l) => l.kind === "vector");
   const hasAdjustments = layers.some((l) => l.kind === "adjustment");
   const hasText = layers.some((l) => l.kind === "text");
+  const svgFontNames=options.format==='svg'?new Set(planSvgTexts(document).flatMap(text=>fontFamilyNames(text.fontFamily))):new Set<string>();
+  const embeddedSvgFonts=options.format==='svg'&&documentFontFiles(authored).some(file=>svgFontNames.has(file.resource.report.faces[0].cssFamily.toLowerCase()));
 
   const warnings: string[] = [];
   const featuresPreserved: string[] = [];
@@ -236,13 +244,14 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
         if (planSvgTexts(document).some(layer => layer.wrapWidth != null || layer.paragraphSpacing || layer.firstLineIndent || layer.paragraphJustify==='inter-word'))
           warnings.push('Paragraph text is exported as editable positioned lines. Original paragraph reflow settings and soft-break source spacing are retained in the native project, not portable SVG layout.');
         if(planSvgTexts(document).some(layer=>layer.paragraphJustify==='inter-word'))featuresPreserved.push('Editable per-line native inter-word justification spacing');
-        warnings.push('SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model.');
+        if(embeddedSvgFonts){featuresPreserved.push('Complete selected embedded font faces as inline SVG font resources');warnings.push('SVG includes selected embedded font bytes referenced by visible editable text. Hidden/unused faces and system font files are excluded; viewer support and shaping can differ. Save a project to retain complete original font collections.');}
+        else warnings.push('SVG text references font families without embedding font files. Other viewers may substitute fonts or shape text differently, changing appearance. Choose PNG for rendered text appearance; save a project for the original text model.');
         if (planSvgTexts(document).some(layer => layer.paragraphJustify==='inter-word' || (layer.wordSpacing && /(?:^|\n)[ \t\r\f\u00a0]|[ \t\r\f\u00a0](?:\n|$)/u.test(layer.text)))) {
           warnings.push('Native Canvas and SVG text can space glyphs differently at whitespace boundaries, even with the same local font. Choose PNG for the editor’s rendered glyph appearance.');
           featuresDegradedOrOmitted.push('Guaranteed Canvas/SVG boundary-space glyph placement');
           if(planSvgTexts(document).some(layer=>layer.paragraphJustify==='inter-word'))warnings.push('Fractional text positions, tracking and nonbreaking spaces can produce additional Canvas/SVG glyph-placement differences. Save a native project for the complete text model; use PNG for the rendered appearance.');
         }
-        featuresDegradedOrOmitted.push('Embedded font files and guaranteed cross-viewer text appearance');
+        featuresDegradedOrOmitted.push(embeddedSvgFonts?'Guaranteed cross-viewer text appearance and unembedded system font files':'Embedded font files and guaranteed cross-viewer text appearance');
       }
       if(rasterPlans.length){
         if(rasterPlans.some(plan=>!plan.rendered)){
@@ -396,14 +405,22 @@ export async function exportDocument(
   const smart=options.format==='svg'?planSvgSmart(document):undefined;
   const composition=smart?planSvgComposition(smart.document):undefined;
   const authored=document;if(composition)document=composition.document;
-  const currentSources=options.format==='svg'?captureSvgSources(document,assets,control,[...smart!.filteredAssets,...composition!.nativeAssets]):()=>checkExport(control);
+  const editableTextFamilies=options.format==='svg'?planSvgTexts(document).map(text=>text.fontFamily):[];
+  const renderedTextFamilies=options.format==='svg'?[...editableTextFamilies,...smart!.filteredTexts.map(text=>text.fontFamily),...composition!.nativeTexts.map(text=>text.fontFamily)]:[];
+  const fonts=options.format==='svg'?captureSvgFonts(authored,assets,editableTextFamilies):undefined;
+  const ownedFonts=options.format==='svg'?captureOwnedExportFonts([authored],renderedTextFamilies,assets):()=>{};
+  const sourceCheck=options.format==='svg'?captureSvgSources(document,assets,control,[...smart!.filteredAssets,...composition!.nativeAssets]):captureRasterExportSources(document,assets,control,`${options.format.toUpperCase()} export`);
+  const fontSet=options.format==='svg'?captureExportFonts(renderedTextFamilies):()=>{};
+  const currentSources=()=>{sourceCheck();fonts?.check();fontSet();ownedFonts();};
   control?.onProgress?.({phase:"rendering",fraction:null});
+  currentSources();
   const report = describeExport(authored, options,smart,composition);
 
   if (options.format === "svg") {
     currentSources();
     const texts=await prepareSvgTexts(document,control,currentSources,[...smart!.filteredTexts,...composition!.nativeTexts]);
-    const currentSvg=()=>{currentSources();texts.check();};
+    const currentSvg=()=>{currentSources();texts.check();fonts?.check();};
+    const fontDefinitions=await fonts!.definitions(currentSvg);
     const hasImages=planSvgImages(document).length>0,hasNativeMasks=planSvgMasks(document).some(plan=>!plan.vector);
     const imageShare=hasImages?(hasNativeMasks?0.5:1):0;
     const stage=(start:number,share:number):ExportControl=>({signal:control?.signal,onProgress:p=>{
@@ -416,7 +433,7 @@ export async function exportDocument(
     currentSvg();
     const blob = await exportSvgBlob(document,{signal:control?.signal,onProgress:p=>{
       currentSvg();control?.onProgress?.(p);currentSvg();
-    }},masks,images,texts.layouts);
+    }},masks,images,texts.layouts,fontDefinitions);
     currentSvg();
     return {
       blob,
@@ -454,7 +471,7 @@ export async function exportDocument(
       Math.min(1024, Math.floor(4_000_000 / Math.max(1, rowBytes))),
     );
     for (let y = 0; y < height; y += rowsPerStrip) {
-      checkExport(control);
+      currentSources();
       const rows = Math.min(rowsPerStrip, height - y);
       for (let x = 0; x < width; x += 2048) {
         const tileWidth = Math.min(2048, width - x);
@@ -464,18 +481,20 @@ export async function exportDocument(
           readback: true,
         });
         try {
-          checkExport(control);
+          currentSources();
           ctx.drawImage(tile, x, y);
         } finally {
           release(tile);
         }
       }
       control?.onProgress?.({phase:"rendering",fraction:(y+rows)/height});
+      currentSources();
       await new Promise<void>(resolve=>setTimeout(resolve,0));
     }
 
-    checkExport(control);
+    currentSources();
     control?.onProgress?.({phase:"encoding",fraction:null});
+    currentSources();
     const mimeType = options.format === "jpeg" ? "image/jpeg" : "image/webp";
     const quality = options.quality ?? (options.format === "jpeg" ? 0.92 : 0.9);
     const extension = options.format === "jpeg" ? "jpg" : "webp";
@@ -505,7 +524,7 @@ export async function exportDocument(
       blob = await encodeRgbaPng(bytes, width, height);
     }
 
-    checkExport(control);
+    currentSources();
     return {
       blob,
       mimeType,

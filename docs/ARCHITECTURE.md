@@ -1,5 +1,9 @@
 # Architecture
 
+## Font-file binding development (F08)
+
+Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.
+
 ## Font-file source boundary
 
 `src/fonts/{parser,sfnt,types}` indexes actual containers, validates paged metadata, extracts whole TTC/datafork faces and preserves source identity. Pinned Fontkit executes in a disposable module worker; `client` owns FIFO scheduling, strict response/digest checks, timeout/cancellation and unregistered native validation. EditorApplication tracks/disposes its font jobs independently of document mutation. The lazy FontSourceInspector registers preview faces only in a same-origin, script-disabled child document and cleans them on replacement/unmount; the visible parent canvas receives only copied pixels, and resizing redraws the sample. No image AssetStore/model/history/schema change or isolated/plugin/REST privilege is introduced. Binary font persistence and document binding remain unfinished. Build-time parser notices and the complete API/lifecycle contract are in [FONT_SOURCES.md](FONT_SOURCES.md).

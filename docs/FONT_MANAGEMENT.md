@@ -1,6 +1,6 @@
 # Document fonts
 
-**Inspect font files** now offers local source metadata, explicit collection-face selection and private native preview within this dialog. It preserves complete originals but does not install, attach or embed fonts. Closing discards pending/preview work. Source signatures, host APIs, scheduling, native validation and current limits: [FONT_SOURCES.md](FONT_SOURCES.md).
+**Inspect font files** now offers local source metadata, explicit collection-face selection and private native preview within this dialog. Inspection and private preview preserve complete originals without attaching fonts or changing artwork. **Embed selected face** is a separate explicit, undoable operation; [FONT_FILES.md](FONT_FILES.md) describes its source ownership, native persistence, APIs and remaining acceptance work. Closing cancels pending inspection/embedding work. Source signatures, host APIs, scheduling, native validation and current limits: [FONT_SOURCES.md](FONT_SOURCES.md).
 
 Open **Document fonts** from command search (`Mod+K`) or **Manage document fonts…** in the Typography Inspector. There is no default shortcut. The dialog lists exact authored family requests, including complete fallback lists, across all ordinary and hidden text, paragraph styles and every stored embedded document, including unused definitions. Search and 30-row pages retain the complete inventory.
 
@@ -8,7 +8,7 @@ Select a request to inspect text/style/override counts and a local availability 
 
 **Replace font** changes the selected exact request throughout the captured document. Text content, position, transformations, authored paragraph width, all other typography, selections and original image assets remain unchanged. Point/paragraph bounds reflow. Inherited styles retain their links, inherited values stay inherited, and explicit font overrides remain explicit. Hidden layers and unused styles/masters are included. Changed locked text/ancestors or affected locked component instances reject the complete operation. A locked follower shielded by a different font override need not change. Close the dialog to use ordinary one-step Undo/Redo.
 
-A changed document revision disables replacement until an explicit refresh. A closed/switched document rejects; reopen the manager for the current document. Search and availability results never retarget a pending replacement. Closing/canceling does not edit the document. No font files are imported or embedded; projects retain requests and styles, and another environment may use different installed fonts or fallback. Font-file management/embedding, arbitrary axes, character runs and path text remain unfinished F08 requirements.
+A changed document revision disables replacement until an explicit refresh. A closed/switched document rejects; reopen the manager for the current document. Search and availability results never retarget a pending replacement. Closing/canceling does not edit the document. Installed fonts are not embedded automatically; another environment may use different installed fonts or fallback. Explicit embedded faces retain selected native bytes and complete original sources in native project 5. Complete font-file transport/removal acceptance, arbitrary axes, character runs and path text remain unfinished F08 requirements.
 
 ## OO API
 
