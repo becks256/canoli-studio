@@ -1646,7 +1646,7 @@ export class EditorApplication {
     const result = await exportDocument(
       // Native read-only exporters pin the immutable model before yielding instead
       // of cloning all paths and unrelated raster/effect data on the UI thread.
-      ['svg','tiff','pdf','psd','psb','avif'].includes(options.format) ? this.document._read() : this.document.toJSON(),
+      ['png','svg','tiff','pdf','psd','psb','avif'].includes(options.format) ? this.document._read() : this.document.toJSON(),
       this.assets,
       this.renderer,
       options,
@@ -1688,7 +1688,7 @@ export class EditorApplication {
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {
     return getExportCapabilityReport(
-      ['svg','tiff','pdf','psd','psb','avif'].includes(options.format) ? this.document._read() : this.document.toJSON(), options,
+      ['png','svg','tiff','pdf','psd','psb','avif'].includes(options.format) ? this.document._read() : this.document.toJSON(), options,
     );
   }
 

@@ -1,3 +1,4 @@
+import {withoutNativeFontFeatures} from './helpers/legacy-typography';
 import {expect,it} from 'vitest';
 import {Document,TextLayer,ParagraphStyle,LayerGroup} from '../src/dom';
 import {validateDocument} from '../src/core/model';
@@ -81,8 +82,8 @@ it('captures current text as the base without dropping existing explicit overrid
   expect(document.paragraphStyles.getById(style.id)!.format).toEqual(first.paragraphFormat);
 });
 it('checks schema age, missing definitions, wrong layer types and inconsistent resolved formats',()=>{
-  const {document,first,style}=scene();first.paragraphStyle=style;const saved=document.toJSON();expect(saved.schemaVersion).toBe(41);
-  expect(()=>validateDocument({...saved,schemaVersion:39})).toThrow(/schema version 40/);
+  const {document,first,style}=scene();first.paragraphStyle=style;const saved=document.toJSON();expect(saved.schemaVersion).toBe(42);
+  expect(()=>validateDocument({...withoutNativeFontFeatures(saved),schemaVersion:39})).toThrow(/schema version 40/);
   const missing=structuredClone(saved);delete missing.paragraphStyles;expect(()=>Document.fromJSON(missing)).toThrow(/missing paragraph style/);
   const inconsistent=structuredClone(saved);(inconsistent.children[0]as {fontSize:number}).fontSize=200;expect(()=>Document.fromJSON(inconsistent)).toThrow(/disagrees/);
   const wrong=structuredClone(saved);wrong.children.push({...new LayerGroup().toJSON(),paragraphStyle:{id:style.id,overrides:{}}}as never);expect(()=>Document.fromJSON(wrong)).toThrow(/text layer/);
@@ -97,7 +98,7 @@ it('preserves independent style scopes when converting text into an embedded mas
   style.update({fontSize:44});expect(second.fontSize).toBe(44);expect(inside.fontSize).toBe(20);
   const view=planSvgSmart(document.toJSON()).document;expect(()=>validateDocument(view)).not.toThrow();
   const invalid=document.toJSON(),definition=invalid.components!.find(d=>d.id===object.componentId)!;if(definition.source.kind!=='document')throw new Error('fixture');definition.source.document.schemaVersion=39;
-  expect(()=>Document.fromJSON(invalid)).toThrow(/schema version 40/);
+  expect(()=>Document.fromJSON(withoutNativeFontFeatures(invalid))).toThrow(/schema version 40/);
 });
 it('copies only needed root definitions, resolves ID/name conflicts and retains local overrides',()=>{
   const {document,first,style}=scene();first.paragraphStyle=style;first.fontSize=27;
@@ -125,5 +126,5 @@ it('keeps resolved SVG typography while reporting that style links are native-pr
   const {document,first,style}=scene();first.paragraphStyle=style;
   const report=getExportCapabilityReport(document.toJSON(),{format:'svg'});expect(report.warnings.some(w=>w.includes('linked paragraph-style'))).toBe(true);
   expect(report.featuresDegradedOrOmitted).toContain('Linked paragraph styles and override relationships');
-  const legacy={...new Document().toJSON(),schemaVersion:39 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:41});
+  const legacy={...new Document().toJSON(),schemaVersion:39 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:42});
 });

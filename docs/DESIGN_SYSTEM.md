@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Native font feature controls
+
+Use existing Typography Select controls labeled Capitals and Font stretch, and a NumberField labeled Weight value with preview/cancel/commit and 1–1000 requests. Retain preset/custom weight visibility and an explicit numeric conversion for relative/custom weights. Explain closest-face/synthesized glyph dependence and that stretch is not artwork scaling. Unsupported selectors are disabled with a readable status; Reset font features stays available when unlocked. Keep typing, Inspector scrolling, both themes and normal lock/error handling; no new shortcut, rail icon or component library. See [native font features](FONT_FEATURES.md).
+
 ## TIFF page selection
 
 Within the existing Export dialog, keep Current document as the TIFF default and offer Selected open documents. Use labeled native checkboxes and an ordered list with Page N, document name and native dimensions, plus explicit Up/Down/Remove buttons. Closed selected entries stay visible and block export until removal; empty selection has an inline alert. Use stable session keys, preserve the scrollable body/fixed footer, both themes and keyboard focus, and show font/capability warnings for all chosen pages. No new shortcut or component library. See [multipage TIFF](TIFF_PAGES.md).

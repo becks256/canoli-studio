@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Native font fields keep existing authority
+
+Isolated command plugins may author the same validated TextLayer font requests and paragraph styles through current document read/write grants and shared undo. These data fields add no font-file, host-font enumeration, network, credential, rendering or file-export privilege. Package permissions/lifecycle remain unchanged and installation remains inert. The bundled runtime uses the current schema-42 command validator. See [native font features](FONT_FEATURES.md).
+
 ## Multipage TIFF stays a host capability
 
 The cross-document TIFF exporter accepts owned host Document handles only. No plugin manifest, permission, lifecycle or package changes are introduced. Isolated plugins still receive their current document and validated editing/host services, without editor/export/file access. Plugin installation remains inert and existing commit grants/history validation remain required. See [multipage TIFF](TIFF_PAGES.md).

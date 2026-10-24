@@ -1,3 +1,4 @@
+import {assertFontFeaturesVersion,fontVariantCapsSchema,fontStretchSchema,type FontFeatures} from './font-features';
 import {vectorStrokeKeys} from './vector-stroke';
 import {visitLayerAssets} from './asset-references';
 import {assertBrushVersion} from './drawing';
@@ -39,7 +40,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 41;
+export const SCHEMA_VERSION = 42;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -117,7 +118,7 @@ export interface VectorLayerData extends LayerBaseData {
   kind: "vector";
   paths: VectorPathData[];
 }
-export interface TextLayerData extends LayerBaseData, ParagraphStyle {
+export interface TextLayerData extends LayerBaseData, ParagraphStyle, FontFeatures {
   paragraphStyle?:ParagraphStyleBinding|null;
   kind: "text";
   text: string;
@@ -192,6 +193,7 @@ export interface DocumentData {
     | 38
     | 39
     | 40
+    | 41
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -270,7 +272,7 @@ export function measureTextBounds(
   fontSize: number,
   fontFamily: string,
   lineHeight: number,
-  options: ParagraphStyle & {
+  options: ParagraphStyle & FontFeatures & {
     letterSpacing?: number;
     wordSpacing?: number;
     fontKerning?: 'auto' | 'normal' | 'none';
@@ -324,7 +326,7 @@ export function measureTextBounds(
 export function createText(
   name: string,
   text = "Text",
-  options: ParagraphStyle & {
+  options: ParagraphStyle & FontFeatures & {
     fontSize?: number;
     fontFamily?: string;
     color?: string;
@@ -356,6 +358,8 @@ export function createText(
     direction,
     fontWeight,
     fontStyle,
+    ...(options.fontVariantCaps===undefined?{}:{fontVariantCaps:options.fontVariantCaps}),
+    ...(options.fontStretch===undefined?{}:{fontStretch:options.fontStretch}),
     ...(options.wrapWidth === undefined ? {} : {wrapWidth: options.wrapWidth}),
     ...(options.paragraphSpacing === undefined ? {} : {paragraphSpacing: options.paragraphSpacing}),
     ...(options.firstLineIndent === undefined ? {} : {firstLineIndent: options.firstLineIndent}),
@@ -373,6 +377,8 @@ export function createText(
     letterSpacing,
     ...(wordSpacing === undefined ? {} : {wordSpacing}),
     ...(fontKerning === undefined ? {} : {fontKerning}),
+    ...(options.fontVariantCaps===undefined?{}:{fontVariantCaps:options.fontVariantCaps}),
+    ...(options.fontStretch===undefined?{}:{fontStretch:options.fontStretch}),
     ...(options.wrapWidth === undefined ? {} : {wrapWidth: options.wrapWidth}),
     ...(options.paragraphSpacing === undefined ? {} : {paragraphSpacing: options.paragraphSpacing}),
     ...(options.firstLineIndent === undefined ? {} : {firstLineIndent: options.firstLineIndent}),
@@ -550,7 +556,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -630,6 +636,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
+      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node))throw new Error('Native font features require a text layer.');
       if (node.blendMode === 'pass-through') {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 28)
           throw new Error('Pass-through blending requires a group and document schema 28.');
@@ -777,6 +784,9 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           yield;
         }
       } else if (node.kind === "text") {
+        assertFontFeaturesVersion(node,Number(value.schemaVersion));
+        if(node.fontVariantCaps!==undefined)fontVariantCapsSchema.parse(node.fontVariantCaps);
+        if(node.fontStretch!==undefined)fontStretchSchema.parse(node.fontStretch);
         if (Number(value.schemaVersion) < 27 && 'paragraphJustify' in node) throw new Error('Paragraph justification requires schema version 27.');
         if (Number(value.schemaVersion) < 26 && ('wrapWidth' in node || 'paragraphSpacing' in node || 'firstLineIndent' in node))
           throw new Error('Paragraph layout requires schema version 26.');

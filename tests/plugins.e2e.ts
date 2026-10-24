@@ -65,6 +65,7 @@ test("plugins install inertly, execute named commands, undo, persist, update and
     page.getByRole("button", { name: "Run Add guide frame", exact: true }),
   ).toHaveCount(0);
   await page.reload();
+  await expect(page.getByRole("button", {name:"History",exact:true})).toBeVisible();
   expect(
     await page.evaluate(
       () => window.luma.editor.plugins.getSnapshot().plugins.length,

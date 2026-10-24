@@ -1,3 +1,4 @@
+import {withoutNativeFontFeatures} from './helpers/legacy-typography';
 import {expect,it} from 'vitest';
 import {Document,ParagraphStyle,TextLayer,LayerGroup} from '../src/dom';
 import {validateDocument} from '../src/core/model';
@@ -56,9 +57,9 @@ it('rejects changed locked descendants atomically, while shielded fields and ren
 it('supports switching bases with explicit retention, detaching without appearance changes and capture/reset',()=>{
  const {document,base,child,leaf,first}=scene(),other=document.paragraphStyles.add(new ParagraphStyle({name:'Other',format:{fontSize:50,color:'#888888'}}));
  child.setBase(other,{keepOverrides:true});expect(child.format).toMatchObject({fontSize:36,color:'#888888'});expect(first.fontSize).toBe(36);child.basedOn=base;expect(child.overrides).toEqual({});expect(first.fontSize).toBe(24);
- first.fontSize=31;child.captureFrom(first);expect(Object.keys(child.overrides)).toHaveLength(14);base.update({fontSize:40,color:'#000000'});expect(child.format.fontSize).toBe(31);child.resetOverrides();expect(child.format.fontSize).toBe(40);
+ first.fontSize=31;child.captureFrom(first);expect(Object.keys(child.overrides)).toHaveLength(16);base.update({fontSize:40,color:'#000000'});expect(child.format.fontSize).toBe(31);child.resetOverrides();expect(child.format.fontSize).toBe(40);
  const format=child.format;child.basedOn=null;expect(child.basedOn).toBeNull();expect(child.format).toEqual(format);base.update({lineHeight:2});expect(child.format.lineHeight).toBe(format.lineHeight);expect(leaf.basedOn!.id).toBe(child.id);
- const independent=new ParagraphStyle({name:'Detached',format:{fontSize:30}});independent.setBase(other,{keepOverrides:true});expect(independent.format.fontSize).toBe(30);expect(Object.keys(independent.overrides)).toHaveLength(14);
+ const independent=new ParagraphStyle({name:'Detached',format:{fontSize:30}});independent.setBase(other,{keepOverrides:true});expect(independent.format.fontSize).toBe(30);expect(Object.keys(independent.overrides)).toHaveLength(16);
 });
 it('removes a base by detaching immediate child styles and direct text, preserving descendants and appearance',()=>{
  const {document,base,child,leaf,first,second}=scene(),direct=document.layers.add(new TextLayer({name:'Direct'}));direct.paragraphStyle=base;
@@ -66,11 +67,11 @@ it('removes a base by detaching immediate child styles and direct text, preservi
  expect([first.paragraphFormat,second.paragraphFormat,direct.paragraphFormat]).toEqual(formats);child.update({lineHeight:2});expect(second.lineHeight).toBe(2);document.undo();document.undo();expect(document.toJSON()).toEqual(before);
 });
 it('gates hierarchy schema 41 in roots and embedded masters, and rejects corrupt graphs without repairing snapshots',()=>{
- const {document,base,first}=scene(),saved=document.toJSON();expect(saved.schemaVersion).toBe(41);expect(()=>validateDocument({...saved,schemaVersion:40})).toThrow(/schema version 41/);
+ const {document,base,first}=scene(),saved=document.toJSON();expect(saved.schemaVersion).toBe(42);expect(()=>validateDocument({...withoutNativeFontFeatures(saved),schemaVersion:40})).toThrow(/schema version 41/);
  const corrupt=structuredClone(saved);corrupt.paragraphStyles![1].format.color='#000000';expect(()=>Document.fromJSON(corrupt)).toThrow(/disagrees/);
  const cyclic=structuredClone(saved);cyclic.paragraphStyles![0].basedOn={id:cyclic.paragraphStyles![2].id,overrides:{}};expect(()=>Document.fromJSON(cyclic)).toThrow(/cycle/);
- const legacy=new Document();legacy.paragraphStyles.add(new ParagraphStyle());expect(Document.fromJSON({...legacy.toJSON(),schemaVersion:40}).toJSON().schemaVersion).toBe(41);
- const object=document.createSmartObject([first]),snapshot=document.toJSON(),definition=snapshot.components!.find(value=>value.id===object.componentId)!;if(definition.source.kind!=='document')throw new Error('fixture');definition.source.document.schemaVersion=40;expect(()=>Document.fromJSON(snapshot)).toThrow(/schema version 41/);expect(base.format.fontSize).toBe(24);
+ const legacy=new Document();legacy.paragraphStyles.add(new ParagraphStyle());expect(Document.fromJSON({...withoutNativeFontFeatures(legacy.toJSON()),schemaVersion:40}).toJSON().schemaVersion).toBe(42);
+ const object=document.createSmartObject([first]),snapshot=document.toJSON(),definition=snapshot.components!.find(value=>value.id===object.componentId)!;if(definition.source.kind!=='document')throw new Error('fixture');definition.source.document.schemaVersion=40;expect(()=>Document.fromJSON(withoutNativeFontFeatures(snapshot))).toThrow(/schema version 41/);expect(base.format.fontSize).toBe(24);
 });
 it('imports the complete ancestor closure before children and remaps hierarchy conflicts without changing source data',()=>{
  const {document,base,child,leaf,second}=scene(),target=new Document(),before=document.toJSON();target._dispatch({type:'paragraphStyle.set',style:{...base.toJSON(),format:{...base.format,color:'#000000'}}});

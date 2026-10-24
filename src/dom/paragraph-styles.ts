@@ -26,7 +26,7 @@ export class ParagraphStyle {
   get document():Document|undefined{return this.owner;}
   get name(){return this.data().name;}
   set name(value:string){this.replace({...this.toJSON(),name:value});}
-  get format():ParagraphFormat{return structuredClone(this.data().format);}
+  get format():ParagraphFormat{return {...DEFAULT_PARAGRAPH_FORMAT,...paragraphFormatSchema.parse(structuredClone(this.data().format))};}
   get basedOn():ParagraphStyle|null{
     const binding=this.data().basedOn;if(!binding)return null;
     const base=this.owner?this.owner.paragraphStyles.getById(binding.id):this.initialBase;
@@ -38,7 +38,7 @@ export class ParagraphStyle {
     const settings=z.object({keepOverrides:z.boolean().optional()}).strict().parse(options),value=this.toJSON();
     if(base===null){delete value.basedOn;this.replace(value);this.initialBase=undefined;return;}
     if(!(base instanceof ParagraphStyle)||!base.document||this.owner&&base.document!==this.owner)throw new Error('Use a base paragraph style attached to this document.');
-    const overrides=settings.keepOverrides?(value.basedOn?.overrides??value.format):{};
+    const overrides=settings.keepOverrides?(value.basedOn?.overrides??this.format):{};
     value.basedOn={id:base.id,overrides};value.format=paragraphFormatSchema.parse({...base.format,...overrides});
     this.replace(value);this.initialBase=base;
   }

@@ -1,6 +1,7 @@
 /** Shared native text state. Keep whole-line shaping in the browser engine. */
 import type {ParagraphStyle} from './text-layout';
-export interface TextStyle extends ParagraphStyle {
+import type {FontFeatures} from './font-features';
+export interface TextStyle extends ParagraphStyle,FontFeatures {
   fontSize: number;
   fontFamily: string;
   fontWeight?: string;
@@ -11,7 +12,16 @@ export interface TextStyle extends ParagraphStyle {
   direction?: 'ltr' | 'rtl';
 }
 export class UnsupportedTextStyleError extends Error {}
+/** Include stretch in matching and readiness checks, not only final drawing. */
+export function nativeTextFont(style:TextStyle):string {
+  const stretch=style.fontStretch&&style.fontStretch!=='normal'?` ${style.fontStretch}`:'';
+  return `${style.fontStyle??'normal'} ${style.fontWeight??'normal'}${stretch} ${style.fontSize}px ${style.fontFamily}`;
+}
 export function assertTextStyleSupport(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, style: TextStyle) {
+  if ((style.fontVariantCaps??'normal')!=='normal'&&!('fontVariantCaps'in context))
+    throw new UnsupportedTextStyleError('This browser cannot render native capital variants. Choose Capitals Normal or Reset font features.');
+  if ((style.fontStretch??'normal')!=='normal'&&!('fontStretch'in context))
+    throw new UnsupportedTextStyleError('This browser cannot select native font stretch. Choose Stretch Normal or Reset font features.');
   if (style.paragraphJustify === 'inter-word' && !('wordSpacing' in context))
     throw new UnsupportedTextStyleError('This browser cannot render native paragraph justification. Use a supporting browser or Reset paragraph.');
   if ((style.wordSpacing ?? 0) !== 0 && !('wordSpacing' in context))
@@ -26,7 +36,9 @@ export function measureStyledText(context: CanvasRenderingContext2D | OffscreenC
 }
 export function applyTextStyle(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, style: TextStyle) {
   assertTextStyleSupport(context, style);
-  context.font = `${style.fontStyle ?? 'normal'} ${style.fontWeight ?? 'normal'} ${style.fontSize}px ${style.fontFamily}`;
+  context.font = nativeTextFont(style);
+  if ('fontVariantCaps'in context) context.fontVariantCaps=style.fontVariantCaps??'normal';
+  if ('fontStretch'in context) context.fontStretch=style.fontStretch??'normal';
   // Reset absent values too: measurement and export contexts are reused.
   if ('letterSpacing' in context) context.letterSpacing = `${style.letterSpacing ?? 0}px`;
   if ('wordSpacing' in context) context.wordSpacing = `${style.wordSpacing ?? 0}px`;

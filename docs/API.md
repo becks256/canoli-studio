@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Native font requests through shared commands
+
+Independent REST accepts layer.update patches fontVariantCaps and fontStretch with strict native keywords, existing fontWeight strings, current expectedRevision, effective text/ancestor locks and atomic undo. Paragraph format/override commands carry the same requests. JSON resets use normal values or text.paragraphOverrides.clear; there is no undefined JSON or browser synchronization. Headless text metrics remain approximate. Current constructor defaults, complete enums, isolated example and failure/format boundaries are in the linked guide. See [native font features](FONT_FEATURES.md).
+
 ## Trusted multipage TIFF export
 
 Browser-host editor.exportTiffPages(documents,{variant?}={},control?) returns one TIFF ExportResult; editor.getTiffPagesCapabilityReport(documents,{variant?}={}) inspects the same ordered open-handle selection without rendering. Nonempty unique owned Document handles are required; distinct sessions with the same persisted ID remain valid. Invalid options/ownership and stale source/font/session/cancellation fail without a partial file. This adds no headless REST endpoint, isolated script binding or browser/REST synchronization. Complete signatures/defaults/examples/limits: [multipage TIFF](TIFF_PAGES.md).

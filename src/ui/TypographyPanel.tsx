@@ -4,6 +4,7 @@ import { fontAvailability, type FontAvailability } from "./font-availability";
 import { AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import type { TextLayer } from "../dom";
 import type { EditorCommand } from "../core/commands";
+import {FONT_STRETCHES,type FontVariantCaps,type FontStretch} from '../core/font-features';
 import {
   Button,
   ColorField,
@@ -45,6 +46,10 @@ export function TypographyPanel({
   onPreview,
 }: TypographyPanelProps) {
   const family = layer.fontFamily;
+  const capitalsSupported=typeof CanvasRenderingContext2D!=='undefined'&&'fontVariantCaps'in CanvasRenderingContext2D.prototype;
+  const stretchSupported=typeof CanvasRenderingContext2D!=='undefined'&&'fontStretch'in CanvasRenderingContext2D.prototype;
+  const weight=layer.fontWeight??'normal',numericWeight=weight==='normal'?400:weight==='bold'?700:Number(weight);
+  const hasNumericWeight=Number.isFinite(numericWeight)&&numericWeight>=1&&numericWeight<=1000;
   const wordSpacingSupported = typeof CanvasRenderingContext2D !== 'undefined' && 'wordSpacing' in CanvasRenderingContext2D.prototype;
   const kerningSupported = typeof CanvasRenderingContext2D !== 'undefined' && 'fontKerning' in CanvasRenderingContext2D.prototype;
   const paragraphSupported = typeof Intl.Segmenter === 'function';
@@ -245,6 +250,7 @@ export function TypographyPanel({
           { value: "600", label: "Semi Bold (600)" },
           { value: "800", label: "Extra Bold (800)" },
           { value: "900", label: "Black (900)" },
+          ...(['normal','bold','100','200','300','500','600','800','900'].includes(weight)?[]:[{value:weight,label:`Custom (${weight})`}]),
         ]}
         onChange={(val) => {
           onAction(() => {
@@ -252,6 +258,18 @@ export function TypographyPanel({
           });
         }}
       />
+      {hasNumericWeight?<NumberField label="Weight value" layout="stacked" value={numericWeight} min={1} max={1000} step={1} disabled={disabled}
+        onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{fontWeight:String(value)}})}
+        onCommit={value=>onAction(()=>{layer.fontWeight=String(value);})}/>:<Button disabled={disabled} onClick={()=>onAction(()=>{layer.fontWeight='400';})}>Use numeric weight</Button>}
+      <Select label="Capitals" layout="stacked" value={layer.fontVariantCaps??'normal'} disabled={disabled||!capitalsSupported}
+        options={[{value:'normal',label:'Normal'},{value:'small-caps',label:'Small capitals'},{value:'all-small-caps',label:'All small capitals'},{value:'petite-caps',label:'Petite capitals'},{value:'all-petite-caps',label:'All petite capitals'},{value:'unicase',label:'Unicase'},{value:'titling-caps',label:'Titling capitals'}]}
+        onChange={value=>onAction(()=>{layer.fontVariantCaps=value as FontVariantCaps;})}/>
+      <Select label="Font stretch" layout="stacked" value={layer.fontStretch??'normal'} disabled={disabled||!stretchSupported}
+        options={FONT_STRETCHES.map(value=>({value,label:value.charAt(0).toUpperCase()+value.slice(1).replaceAll('-',' ')}))}
+        onChange={value=>onAction(()=>{layer.fontStretch=value as FontStretch;})}/>
+      <p>These settings select glyphs and font faces without changing the text. Available capitals, widths and intermediate weights depend on the font and browser; a closest face or synthesized capitals may be used. Font stretch does not scale artwork.</p>
+      {(!capitalsSupported||!stretchSupported)&&<p role="status">This browser cannot control every native font feature. Reset font features restores normal capitals and stretch.</p>}
+      <Button disabled={disabled} onClick={()=>onAction(()=>layer.resetFontFeatures())}>Reset font features</Button>
       <SegmentedControl
         label="Style"
         value={layer.fontStyle ?? "normal"}

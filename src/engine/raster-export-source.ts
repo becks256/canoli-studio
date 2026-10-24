@@ -1,3 +1,4 @@
+import {nativeTextFont} from '../core/text-style';
 import type {DocumentData,LayerData,TextLayerData} from '../core/model';
 import {isActiveSmartFilter} from '../core/smart/filters';
 import type {LayerMaskData} from '../core/masks';
@@ -35,7 +36,7 @@ export function captureRasterExportDocuments(documents:readonly DocumentData[],a
  }
  const lifetime=assets.captureLifetime(),pinned=[...ids].map(id=>{const source=assets.get(id);return{source,bitmap:source.bitmap,blob:source.blob,width:source.width,height:source.height};});
  const fonts=captureExportFonts(texts.map(text=>text.fontFamily),operation);
- for(const text of texts){const requested=`${text.fontStyle??'normal'} ${text.fontWeight??'normal'} ${text.fontSize}px ${text.fontFamily}`;
+ for(const text of texts){const requested=nativeTextFont(text);
   if(typeof globalThis.document!=='undefined'&&globalThis.document.fonts&&!globalThis.document.fonts.check(requested,text.text))throw new Error(`A referenced text font is not loaded. Retry ${operation} after fonts are ready.`);
  }
  const current=()=>{

@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Whole-line native font invariant
+
+Capital variants and stretch are immutable authored font requests, never character replacement or layer scaling. Measurement/ink/layout/cache/render/export and resize capture use the same native state. Apply normal defaults to reused contexts, reject unsupported nondefault states before drawing, and include stretch in exact face-readiness matching. Normalize complete paragraph formats independently of sparse patch/override admission so absent values cannot create hidden overrides. Reject explicit new fields under old schema labels before normalization, including masters/history and style graphs. See [native font features](FONT_FEATURES.md).
+
 ## Multipage TIFF snapshot invariant
 
 Capture the complete ordered page selection and all visible dependencies synchronously before user callbacks. Native rendering uses independent immutable page geometry and stores compressed bounded tiles; no page can silently substitute newer source/font generations. Selected owner closure/cancellation/callback failure invalidates the whole private result. Main-IFD offsets and metadata use the complete file budget, with exact 64-bit BigTIFF addressing where Classic overflows. Page selection is host/session identity, not persisted document-ID identity. Document/history and original bytes remain unchanged. See [multipage TIFF](TIFF_PAGES.md).

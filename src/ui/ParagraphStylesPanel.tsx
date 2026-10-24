@@ -5,7 +5,7 @@ import {InspectorSection} from './InspectorSection';
 
 const formatLabels:Record<keyof ParagraphFormat,string>={
   fontSize:'Font size',fontFamily:'Font family',color:'Color',align:'Alignment',lineHeight:'Line height',
-  letterSpacing:'Letter spacing',wordSpacing:'Word spacing',fontKerning:'Kerning',fontWeight:'Weight',fontStyle:'Style',
+  letterSpacing:'Letter spacing',wordSpacing:'Word spacing',fontKerning:'Kerning',fontWeight:'Weight',fontStyle:'Style',fontVariantCaps:'Capitals',fontStretch:'Font stretch',
   direction:'Direction',paragraphJustify:'Justification',paragraphSpacing:'Paragraph spacing',firstLineIndent:'First-line indent',
 };
 

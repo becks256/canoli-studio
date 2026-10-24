@@ -1,3 +1,4 @@
+import {fontVariantCapsSchema,fontStretchSchema} from './font-features';
 import { layerCompSchema } from "./layer-comps";
 import {paragraphStyleSchema,paragraphOverrideKeysSchema} from './paragraph-styles';
 import { alphaChannelSchema } from './alpha-channels';
@@ -78,6 +79,8 @@ const patch = z
     letterSpacing: z.number().min(-50).max(500).optional(),
     wordSpacing: z.number().min(-50).max(500).optional(),
     fontKerning: z.enum(['auto', 'normal', 'none']).optional(),
+    fontVariantCaps:fontVariantCapsSchema.optional(),
+    fontStretch:fontStretchSchema.optional(),
     paragraphJustify: z.enum(["none","inter-word"]).optional(),
     wrapWidth: dimension.nullable().optional(),
     paragraphSpacing: z.number().min(0).max(10000).optional(),

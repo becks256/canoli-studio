@@ -1,5 +1,9 @@
 # Architecture
 
+## Native font feature state
+
+core/font-features owns strict capital/stretch enums and pre-normalization schema-42 admission. core/text-style shares native shorthand/readiness matching and Canvas state across bounds/layout/ink/rendering. TextLayer constructors and attached setters feed the existing command reflow/history boundary. Full paragraph formats normalize missing legacy defaults, while patch/override schemas retain absence; public format access resolves defaults without rewriting stored old data. Native style fields reach resize captures, SVG measurement probes and literal editable output. No new font asset, worker authority or network service is introduced. See [native font features](FONT_FEATURES.md).
+
 ## Multipage TIFF ownership
 
 core/tiff plans a complete main-IFD chain with page-local tile inputs, exact global offsets and whole-file Classic/BigTIFF selection. engine/tiff captures all immutable page snapshots/dependencies, renders native tiles sequentially and assembles compressed private page payloads before directories. EditorApplication resolves actual owned Document handles, validates options and guards selected-session lifetime. ExportDialog uses session keys, including for duplicate persisted IDs, and offers explicit order/inclusion. No model/project/workspace schema or isolated/REST surface changes. See [multipage TIFF](TIFF_PAGES.md).

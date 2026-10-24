@@ -105,7 +105,7 @@ it("persists attached comps, supports recapture and rejects legacy or corrupt ow
     }),
   );
   const reopened = Document.fromJSON(saved.document);
-  expect(reopened.toJSON().schemaVersion).toBe(41);
+  expect(reopened.toJSON().schemaVersion).toBe(42);
   const restored = reopened.layerComps.at(0)!;
   expect(restored.name).toBe("Updated");
   restored.apply();

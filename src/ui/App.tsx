@@ -1410,6 +1410,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           layerTextStyle: selected.kind === 'text' ? {
             fontSize:selected.fontSize, fontFamily:selected.fontFamily,
             fontWeight:selected.fontWeight, fontStyle:selected.fontStyle,
+            fontVariantCaps:selected.fontVariantCaps,fontStretch:selected.fontStretch,
             letterSpacing:selected.letterSpacing, wordSpacing:selected.wordSpacing,
             fontKerning:selected.fontKerning, direction:selected.direction,
             wrapWidth:selected.wrapWidth, paragraphSpacing:selected.paragraphSpacing, paragraphJustify:selected.paragraphJustify,

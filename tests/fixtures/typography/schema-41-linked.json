@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 41,
+  "id": "2cd06d80-d08e-4fbb-a1b6-8bc40e90682d",
+  "name": "Actual schema 41 font study",
+  "width": 640,
+  "height": 240,
+  "colorSpace": "srgb",
+  "children": [
+    {
+      "id": "d64aab0a-7c01-41fa-9360-69c65ef76438",
+      "name": "Text",
+      "visible": true,
+      "locked": false,
+      "opacity": 1,
+      "blendMode": "normal",
+      "x": 24,
+      "y": 24,
+      "kind": "text",
+      "text": "Original ß é العربية",
+      "fontSize": 32,
+      "fontFamily": "serif",
+      "color": "#205080",
+      "align": "left",
+      "lineHeight": 1.2,
+      "letterSpacing": 0,
+      "wrapWidth": 400,
+      "fontWeight": "553.25",
+      "fontStyle": "normal",
+      "direction": "ltr",
+      "width": 400,
+      "height": 77,
+      "paragraphStyle": {
+        "id": "6ce7e6c7-8d50-42e4-9bd8-ff766b2ec33f",
+        "overrides": {
+          "color": "#205080"
+        }
+      },
+      "wordSpacing": 0,
+      "fontKerning": "auto",
+      "paragraphJustify": "none",
+      "paragraphSpacing": 0,
+      "firstLineIndent": 0
+    }
+  ],
+  "paragraphStyles": [
+    {
+      "id": "d91a98e6-04eb-47b2-b69d-1cb924fc3560",
+      "name": "Body",
+      "format": {
+        "fontSize": 24,
+        "fontFamily": "serif",
+        "color": "#315b2a",
+        "align": "left",
+        "lineHeight": 1.2,
+        "letterSpacing": 0,
+        "wordSpacing": 0,
+        "fontKerning": "auto",
+        "fontWeight": "553.25",
+        "fontStyle": "normal",
+        "direction": "ltr",
+        "paragraphJustify": "none",
+        "paragraphSpacing": 0,
+        "firstLineIndent": 0
+      }
+    },
+    {
+      "id": "6ce7e6c7-8d50-42e4-9bd8-ff766b2ec33f",
+      "name": "Caption",
+      "format": {
+        "fontSize": 32,
+        "fontFamily": "serif",
+        "color": "#315b2a",
+        "align": "left",
+        "lineHeight": 1.2,
+        "letterSpacing": 0,
+        "wordSpacing": 0,
+        "fontKerning": "auto",
+        "fontWeight": "553.25",
+        "fontStyle": "normal",
+        "direction": "ltr",
+        "paragraphJustify": "none",
+        "paragraphSpacing": 0,
+        "firstLineIndent": 0
+      },
+      "basedOn": {
+        "id": "d91a98e6-04eb-47b2-b69d-1cb924fc3560",
+        "overrides": {
+          "fontSize": 32
+        }
+      }
+    }
+  ]
+}

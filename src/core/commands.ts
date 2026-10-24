@@ -85,6 +85,8 @@ export type LayerPatch = Partial<
       | "letterSpacing"
       | "wordSpacing"
       | "fontKerning"
+      | "fontVariantCaps"
+      | "fontStretch"
       | "wrapWidth"
       | "paragraphSpacing"
       | "firstLineIndent"
@@ -198,6 +200,7 @@ function reflowText(layer:TextLayerData){
   const bounds=measureTextBounds(layer.text,layer.fontSize,layer.fontFamily,layer.lineHeight,{
     letterSpacing:layer.letterSpacing,wordSpacing:layer.wordSpacing,fontKerning:layer.fontKerning,
     direction:layer.direction,fontWeight:layer.fontWeight,fontStyle:layer.fontStyle,wrapWidth:layer.wrapWidth,
+    fontVariantCaps:layer.fontVariantCaps,fontStretch:layer.fontStretch,
     paragraphSpacing:layer.paragraphSpacing,firstLineIndent:layer.firstLineIndent,paragraphJustify:layer.paragraphJustify,
   });
   layer.width=bounds.width;layer.height=bounds.height;
@@ -523,7 +526,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
     case "layer.update":
       if ("frequencyRadius" in command.patch && layer.kind !== "group") throw new Error("A shared frequency radius requires a group.");
       if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
-      if (layer.kind !== 'text' && ['text','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
+      if (layer.kind !== 'text' && ['text','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
         throw new Error('Typography properties require a text layer.');
       if (
         Object.keys(command.patch).some(
@@ -553,6 +556,8 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "letterSpacing",
               "wordSpacing",
               "fontKerning",
+              "fontVariantCaps",
+              "fontStretch",
               "wrapWidth",
               "paragraphSpacing",
               "firstLineIndent",

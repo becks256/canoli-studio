@@ -9,13 +9,13 @@ test("compact text retention preserves ink overhangs, alignment and transformed 
     const renderer = new CanvasRenderer();
     const differences: number[] = [], retained: { effect: string; bytes: number }[] = [];
     try {
-      for (const effect of ["plain", "overlay", "shadow", "masked-shadow"] as const) for (const align of ["left", "center", "right"] as const) {
+      for (const features of [{}, {fontVariantCaps:"all-small-caps",fontStretch:"condensed"}] as const) for (const effect of ["plain", "overlay", "shadow", "masked-shadow"] as const) for (const align of ["left", "center", "right"] as const) {
         for (const direction of ["ltr", "rtl"] as const) {
           renderer.clearCache();
           const doc = new Document({ width: 500, height: 300 });
           const layer = doc.layers.add(new TextLayer({
             text: "  fj Ág j\u0301\nمرحبا שלום 🙂", fontFamily: "serif",
-            fontSize: 27, fontStyle: "italic", fontWeight: "bold",
+            ...features, fontSize: 27, fontStyle: "italic", fontWeight: "bold",
             lineHeight: 1.4, letterSpacing: -0.6, align, direction,
             x: 130, y: 70, opacity: 0.63, color: "#e7814b",
           }));
@@ -54,7 +54,7 @@ test("compact text retention preserves ink overhangs, alignment and transformed 
       if (!pixels.some((value, i) => i % 4 === 3 && value > 0)) throw Error("Expected visible text ink");
     }
   });
-  expect(result.differences).toEqual(Array(24).fill(0));
+  expect(result.differences).toEqual(Array(48).fill(0));
   for (const { effect, bytes } of result.retained) {
     expect(bytes).toBeGreaterThan(0);
     // Shadow fixtures retain the earlier unpadded raw entry too; masks

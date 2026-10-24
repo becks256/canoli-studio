@@ -1,5 +1,11 @@
 # Scripting API
 
+## Native capital variants and font stretch
+
+TextLayer options and attached fontVariantCaps/fontStretch setters accept exactly the native keyword enums; omitted fields render as normal and absent getters remain undefined. resetFontFeatures():void requests normal capitals/stretch in one command while preserving weight/source text; linked text receives explicit local overrides. Reset paragraph override keys to inherit instead. Existing fontWeight accepts CSS strings; UI numerical weight supports 1–1000. Nondefault unsupported native controls fail before drawing, not by rewriting characters. Full signatures, enums, executable isolated example, REST counterpart and errors/limits are in the guide. See [native font features](FONT_FEATURES.md).
+
+Trusted `editor.exportPng(control?: ExportControl): Promise<Blob>` also captures immutable page data and visible source/font generations before its first progress callback. Pending required faces, source/font replacement/removal, store disposal, cancellation and throwing callbacks reject without a file; returned native surfaces are released. Later live model edits retain captured output. Existing rendering/encoding progress phases and native RGBA8 geometry remain unchanged. This does not expose export inside isolated Scripts/plugins or independent REST sessions.
+
 ## Multipage TIFF export — trusted host only
 
 Trusted editor.exportTiffPages(documents:readonly Document[],options:{variant?:"auto"|"classic"|"big"}={},control?:ExportControl):Promise<ExportResult> and editor.getTiffPagesCapabilityReport(documents,options={}):ExportCapabilityReport accept actual owned open handles in explicit order. Empty, repeated/closed/detached handles, unsupported variants and unknown option fields reject. Default variant is auto. Each page retains its own native RGBA8 sRGB dimensions; the whole file selects its container. Source/font/cancel/session guards cover every captured page before callbacks and through assembly. Later model edits preserve snapshot output. These are not isolated globals or REST rendering methods. Full executable host example, failure behavior, UI and resource/format limits: [multipage TIFF](TIFF_PAGES.md).

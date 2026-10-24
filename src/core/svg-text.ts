@@ -1,3 +1,4 @@
+import {fontVariantCapsSchema,fontStretchSchema} from './font-features';
 import type {LayerData,TextLayerData} from './model';
 import type {SvgDocument} from './svg-masks';
 import {svgAttribute,svgNumber} from './svg-path';
@@ -84,13 +85,15 @@ export function* svgTextElements(layer:TextLayerData,layout?:SvgTextLayout):Gene
   if(!/^(?:#[a-fA-F0-9]{3,8}|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([a-zA-Z0-9.,%+\-/\s]+\))$/.test(layout.color))throw new Error('SVG text requires a prepared literal color.');
   const direction=layer.direction??'ltr',align=layer.align;
   const fontKerning=layer.fontKerning??'auto';
+  const caps=fontVariantCapsSchema.parse(layer.fontVariantCaps??'normal'),stretch=fontStretchSchema.parse(layer.fontStretch??'normal');
+  const features=(caps==='normal'?'':`;font-variant-caps:${caps}`)+(stretch==='normal'?'':`;font-stretch:${stretch}`);
   if(!['auto','normal','none'].includes(fontKerning))throw new Error('Invalid SVG font kerning.');
   if(direction!=='ltr'&&direction!=='rtl')throw new Error('Invalid SVG text direction.');
   const anchor=align==='center'?'middle':(align==='left')===(direction==='ltr')?'start':'end';
   const origin=align==='center'?layer.width/2:align==='right'?layer.width:0;
   for(let i=0;i<lines.length;i++){
     const x=(layout.xPositions?.[i]??origin)+(layout.xOffsets?.[i]??0);
-    yield `<text x="${svgNumber(x)}" y="${svgNumber(layout.baselines[i])}" font-family="${svgAttribute(layer.fontFamily)}" font-size="${svgNumber(layer.fontSize)}" font-weight="${svgAttribute(layer.fontWeight??'normal')}" font-style="${svgAttribute(layer.fontStyle??'normal')}" letter-spacing="${svgNumber(layout.letterSpacing)}" word-spacing="${svgNumber(layout.wordSpacings?.[i]??layer.wordSpacing??0)}" direction="${direction}" text-anchor="${anchor}" dominant-baseline="alphabetic" fill="${svgAttribute(layout.color)}" xml:space="preserve" style="white-space:pre;font-kerning:${fontKerning}">`;
+    yield `<text x="${svgNumber(x)}" y="${svgNumber(layout.baselines[i])}" font-family="${svgAttribute(layer.fontFamily)}" font-size="${svgNumber(layer.fontSize)}" font-weight="${svgAttribute(layer.fontWeight??'normal')}" font-style="${svgAttribute(layer.fontStyle??'normal')}" letter-spacing="${svgNumber(layout.letterSpacing)}" word-spacing="${svgNumber(layout.wordSpacings?.[i]??layer.wordSpacing??0)}" direction="${direction}" text-anchor="${anchor}" dominant-baseline="alphabetic" fill="${svgAttribute(layout.color)}" xml:space="preserve" style="white-space:pre;font-kerning:${fontKerning}${features}">`;
     // Canvas fillText normalizes ASCII whitespace to individual spaces. Newline
     // layout is already explicit; tabs/CR/form feed must not become SVG tab stops.
     yield* svgTextContent(lines[i],layout.spacingRuns?.[i]);

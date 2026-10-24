@@ -103,7 +103,7 @@ it('shares strict immutable values, commands, locks, history and schema-age chec
   for(const options of [{radius:null},{enabled:null},{amount:null},{extra:1},{kind:'bilateral-denoise'}])expect(()=>new BilateralDenoiseFilter(options as never)).toThrow();
   expect(smartFilterHalo([filter.toJSON(),new MedianFilter({radius:3}).toJSON()])).toBe(5);
   const document=new Document(),key=document.defineComponent(new Document({width:8,height:8})),instance=document.placeSmartObject(key),before=document.toJSON(),history=document.getSnapshot().past.length;
-  instance.addFilter(filter);const after=document.toJSON();expect(after.schemaVersion).toBe(41);expect(document.getSnapshot().past).toHaveLength(history+1);
+  instance.addFilter(filter);const after=document.toJSON();expect(after.schemaVersion).toBe(42);expect(document.getSnapshot().past).toHaveLength(history+1);
   expect(after.components).toEqual(before.components);expect(Document.fromJSON(after).toJSON()).toEqual(after);
   document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);
   expect(()=>validateDocument({...after,schemaVersion:38})).toThrow(/Bilateral denoise filters require schema version 39/);
@@ -111,7 +111,7 @@ it('shares strict immutable values, commands, locks, history and schema-age chec
   if(definition.source.kind!=='document')throw new Error('fixture');definition.source.document.schemaVersion=38;expect(()=>Document.fromJSON(saved)).toThrow(/schema version 39/);
   instance.locked=true;const locked=document.toJSON();expect(()=>instance.setFilters([])).toThrow(/Unlock/);expect(document.toJSON()).toEqual(locked);
   expect(()=>parseCommands([{type:'smartObject.filters',id:instance.id,filters:[{...filter.toJSON(),amount:null}]}])).toThrow();
-  const legacy={...new Document().toJSON(),schemaVersion:38 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:41});
+  const legacy={...new Document().toJSON(),schemaVersion:38 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:42});
 });
 
 it('preserves editable SVG and native support for every explicitly inert bilateral setting',()=>{

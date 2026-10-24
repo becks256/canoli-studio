@@ -1,3 +1,6 @@
+import {captureRasterExportSources} from './raster-export-source';
+import {freeze,isImmutable} from '../core/immutable';
+import {validateDocument} from '../core/model';
 import {RASTER_EXPORT_COLUMNS,rasterExportRows} from './raster-export-grid';
 import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
@@ -36,7 +39,9 @@ export async function exportPng(
   control?: ExportControl,
 ): Promise<Blob> {
   checkExport(control);
-  control?.onProgress?.({phase:"rendering",fraction:0});
+  document=isImmutable(document)?document:freeze(structuredClone(document));validateDocument(document);
+  const current=captureRasterExportSources(document,assets,control,'PNG export');
+  current();control?.onProgress?.({phase:"rendering",fraction:0});current();
   const { width, height } = document;
   // This is the PNG format's dimension boundary, not an image import restriction.
   if (width > 0x7fffffff || height > 0x7fffffff)
@@ -68,19 +73,21 @@ export async function exportPng(
     const rowBytes = width * 4 + 1;
     const rowsPerStrip = rasterExportRows(width);
     for (let y = 0; y < height; y += rowsPerStrip) {
-      checkExport(control);
+      current();
       const rows = Math.min(rowsPerStrip, height - y);
       const strip = new Uint8Array(rowBytes * rows); // filter byte 0 for each row
       let deadline=performance.now()+8;
       for (let x = 0; x < width; x += RASTER_EXPORT_COLUMNS) {
+        current();
         const tileWidth = Math.min(RASTER_EXPORT_COLUMNS, width - x);
         const tile = await renderer.render(document, assets, {
           region: { x, y, width: tileWidth, height: rows },
           cache: false,
           readback: true,
+          isCancelled:()=>!!control?.signal?.aborted,
         });
         try {
-          checkExport(control);
+          current();
           const pixels = tile
             .getContext("2d")!
             .getImageData(0, 0, tileWidth, rows).data;
@@ -94,27 +101,27 @@ export async function exportPng(
         }
         if(performance.now()>=deadline){
           await yieldTask();
-          checkExport(control);
+          current();
           deadline=performance.now()+8;
         }
       }
-      await writer.write(strip);
-      control?.onProgress?.({phase:"rendering",fraction:(y+rows)/height});
+      current();await writer.write(strip);current();
+      control?.onProgress?.({phase:"rendering",fraction:(y+rows)/height});current();
       // Let input, status messages, and cancellation by navigation proceed.
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
     }
-    checkExport(control);
-    control?.onProgress?.({phase:"encoding",fraction:null});
+    current();
+    control?.onProgress?.({phase:"encoding",fraction:null});current();
     await writer.close();
     await collect;
-    checkExport(control);
+    current();
   } catch (error) {
     await writer.abort(error).catch(() => {});
     await reader.cancel().catch(() => {});
     throw error;
   }
   parts.push(chunk("IEND", new Uint8Array()));
-  return new Blob(parts, { type: "image/png" });
+  current();return new Blob(parts, { type: "image/png" });
 }
 
 /**

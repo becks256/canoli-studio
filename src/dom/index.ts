@@ -1,3 +1,4 @@
+import type {FontFeatures,FontVariantCaps,FontStretch} from '../core/font-features';
 import { createFrequencySeparation } from "./frequency-separation";
 import {RawDevelopment,type RawDevelopmentControl} from './raw';
 import type {RawDevelopSettings,RawImportReport} from '../core/interchange/raw/types';
@@ -259,7 +260,7 @@ export interface RasterLayerOptions extends LayerOptions {
   width: number;
   height: number;
 }
-export interface TextLayerOptions extends LayerOptions {
+export interface TextLayerOptions extends LayerOptions,FontFeatures {
   paragraphJustify?: 'none' | 'inter-word';
   wrapWidth?: number | null;
   paragraphSpacing?: number;
@@ -2315,6 +2316,8 @@ export class TextLayer extends Layer {
       letterSpacing,
       wordSpacing,
       fontKerning,
+      fontVariantCaps,
+      fontStretch,
       wrapWidth,
       paragraphSpacing,
       firstLineIndent,
@@ -2334,6 +2337,8 @@ export class TextLayer extends Layer {
         letterSpacing,
         wordSpacing,
         fontKerning,
+        fontVariantCaps,
+        fontStretch,
         wrapWidth,
         paragraphSpacing,
         firstLineIndent,
@@ -2428,6 +2433,12 @@ export class TextLayer extends Layer {
   set fontKerning(value: 'auto' | 'normal' | 'none' | undefined) {
     this.update({fontKerning: value});
   }
+  /** Restore native default glyph requests without changing authored text. */
+  resetFontFeatures():void { this.update({fontVariantCaps:'normal',fontStretch:'normal'}); }
+  get fontVariantCaps():FontVariantCaps|undefined{return(this._read() as TextLayerData).fontVariantCaps;}
+  set fontVariantCaps(value:FontVariantCaps|undefined){this.update({fontVariantCaps:value});}
+  get fontStretch():FontStretch|undefined{return(this._read() as TextLayerData).fontStretch;}
+  set fontStretch(value:FontStretch|undefined){this.update({fontStretch:value});}
   get fontWeight(): string | undefined {
     return (this._read() as TextLayerData).fontWeight;
   }

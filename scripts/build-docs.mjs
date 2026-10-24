@@ -38,6 +38,7 @@ const generatedPages = [
   ["COLOR_PALETTES", "Reusable color palettes"],
   ["HISTORY", "Inspectable retained history"],
   ["TIFF_PAGES", "Multipage TIFF export"],
+  ["FONT_FEATURES", "Native font features"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

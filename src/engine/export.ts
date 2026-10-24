@@ -229,6 +229,10 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       }
       if(planSvgTexts(document).length){
         featuresPreserved.push('Editable SVG text with measured line baselines, typography, alignment and direction');
+        if(planSvgTexts(document).some(layer=>(layer.fontVariantCaps??'normal')!=='normal'||(layer.fontStretch??'normal')!=='normal')){
+          featuresPreserved.push('Native capital-variant and font-stretch requests as editable SVG typography');
+          warnings.push('Capital variants and font stretch request font features and matching faces. Actual glyphs, synthesis and widths depend on the receiving font and browser.');
+        }
         if (planSvgTexts(document).some(layer => layer.wrapWidth != null || layer.paragraphSpacing || layer.firstLineIndent || layer.paragraphJustify==='inter-word'))
           warnings.push('Paragraph text is exported as editable positioned lines. Original paragraph reflow settings and soft-break source spacing are retained in the native project, not portable SVG layout.');
         if(planSvgTexts(document).some(layer=>layer.paragraphJustify==='inter-word'))featuresPreserved.push('Editable per-line native inter-word justification spacing');

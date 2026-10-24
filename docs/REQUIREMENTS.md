@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Native capital variants and width selection (F08)
+
+Preserve original Unicode text and whole-line shaping while exposing validated capital variants, font-stretch requests and numerical weight input. Shared OO commands, locks/undo, paragraph-style inheritance/overrides, scripts, independent REST, native measurement/cache/rendering, resizing, recipes and persistence must agree. Explicit new fields require schema 42; legacy absent defaults stay normal and old labels cannot admit new fields. Unsupported nondefault Canvas requests fail before drawing and can be reset. Font tables, closest-face/synthesis and receiving-browser differences must remain explicit; font files and arbitrary axes are not implied. See [native font features](FONT_FEATURES.md).
+
 ## Ordered multipage TIFF delivery
 
 Export an explicitly ordered, nonempty selection of owned open documents as independent native RGBA8 sRGB TIFF pages. Current-document export stays the default. Preserve each page geometry, source bytes, active tab, selection/history and later-edit snapshot independence. Validate owner handles/options, pin all referenced sources/fonts before callbacks, reject selected-owner/source changes or cancellation without a partial file, and select Classic/BigTIFF from the entire output. UI supports inclusion, removal and ordering without silently dropping closed pages. See [multipage TIFF](TIFF_PAGES.md); full F11/color/precision/reader/device acceptance remains open.

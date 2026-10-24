@@ -1,3 +1,4 @@
+import {nativeTextFont} from '../core/text-style';
 import {captureExportFonts} from './export-fonts';
 import type {SvgDocument} from '../core/svg-masks';
 import {planSvgTexts,svgWhitespaceRuns,type SvgWhitespaceRun,type SvgTextLayouts,type SvgTextLayout} from '../core/svg-text';
@@ -31,7 +32,7 @@ export async function prepareSvgTexts(document:SvgDocument,control?:ExportContro
         const direction=layer.direction??'ltr',align=layer.align;
         const attributes={'x':'0','y':'0','font-family':layer.fontFamily,'font-size':String(layer.fontSize),'font-weight':layer.fontWeight??'normal','font-style':layer.fontStyle??'normal','direction':direction,'text-anchor':align==='center'?'middle':(align==='left')===(direction==='ltr')?'start':'end'};
         for(const[key,value]of Object.entries(attributes))text.setAttribute(key,value);
-        text.style.whiteSpace='pre';text.style.fontKerning=layer.fontKerning??'auto';text.style.wordSpacing=`${wordSpacing}px`;text.style.letterSpacing=`${spacingSupported?(layer.letterSpacing??0):0}px`;
+        text.style.whiteSpace='pre';text.style.fontKerning=layer.fontKerning??'auto';text.style.fontVariantCaps=layer.fontVariantCaps??'normal';text.style.fontStretch=layer.fontStretch??'normal';text.style.wordSpacing=`${wordSpacing}px`;text.style.letterSpacing=`${spacingSupported?(layer.letterSpacing??0):0}px`;
       }
       probeLayer=layer;probeWordSpacing=wordSpacing;
     }
@@ -112,7 +113,7 @@ export async function prepareSvgTexts(document:SvgDocument,control?:ExportContro
   try{
     for(const layer of layers){
       current();
-      const requested=`${layer.fontStyle??'normal'} ${layer.fontWeight??'normal'} ${layer.fontSize}px ${layer.fontFamily}`;
+      const requested=nativeTextFont(layer);
       // Invalid CSS assignments retain the preceding value. Two sentinels
       // distinguish invalid input from a valid font/color equal to a sentinel.
       context.font='10px serif';context.font=requested;

@@ -67,7 +67,7 @@ it('strictly admits comparison-bearing histories and migrates every pinned model
  ];
  for(const corrupt of corruptions){const h=structuredClone(captured);corrupt(h);expect(()=>parseRetainedHistory(h,doc.toJSON())).toThrow();}
  const h=structuredClone(captured), data=doc.toJSON();data.schemaVersion=12;for(const value of retainedDocuments(data,h))value.schemaVersion=12;
- const restored=Document._fromWorkspace(data,h);expect(restored.getSnapshot().comparisons.every(value=>value.before.schemaVersion===41&&value.after.schemaVersion===41)).toBe(true);
+ const restored=Document._fromWorkspace(data,h);expect(restored.getSnapshot().comparisons.every(value=>value.before.schemaVersion===42&&value.after.schemaVersion===42)).toBe(true);
 });
 it('includes images retained only by saved comparisons in native source closure and round trips', async () => {
  const doc=new Document({width:10000,height:5000});doc.layers.add(new RasterLayer({assetId:'comparison-only',width:10000,height:5000}));const image=doc.toJSON();doc.layers.at(0)!.remove();
