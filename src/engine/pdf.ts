@@ -42,6 +42,7 @@ export async function exportPdf(document: DocumentData, assets: AssetStore, rend
   checkExport(control);
   const geometry = pdfPageGeometry(document.width,document.height,dpi), writer = new PdfWriter();
   const current = captureRasterExportSources(document,assets,control,'PDF export');
+  try{
   const catalog=writer.reserve(),pages=writer.reserve(),page=writer.reserve(),profile=writer.reserve(),content=writer.reserve(),info=writer.reserve();
   const colors=new DeflateRows(control),coverage=new DeflateRows(control);
   const rows=rasterExportRows(document.width),total=Math.ceil(document.width/RASTER_EXPORT_COLUMNS)*Math.ceil(document.height/rows); let completed=0;
@@ -78,4 +79,5 @@ export async function exportPdf(document: DocumentData, assets: AssetStore, rend
     writer.object(info,'<< /Producer (Canoli Studio) /Creator (Canoli Studio) >>');
     current();const blob=writer.finish(catalog,info);current();return blob;
   } catch(error) {writer.abort();await Promise.allSettled([colors.abort(error),coverage.abort(error)]);throw error;}
+  }finally{current.release();}
 }

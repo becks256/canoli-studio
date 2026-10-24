@@ -2,6 +2,7 @@ import type {Document} from './index';
 import {fontFileSchema,documentFontFiles,type FontFileData} from '../core/font-files';
 import {fontFamilyRequestSchema} from '../core/font-management';
 import {z} from 'zod';
+import type {FontRelinkOptions,FontEmbedControl} from './fonts';
 
 export const fontFileRemoveOptionsSchema=z.object({replaceWith:fontFamilyRequestSchema.optional()}).strict();
 export type FontFileRemoveOptions=z.input<typeof fontFileRemoveOptionsSchema>;
@@ -22,6 +23,10 @@ export class FontFile {
   get resource(){return structuredClone(this.read().resource);}
   toJSON():FontFileData{return structuredClone(this.read());}
   remove(options:FontFileRemoveOptions={}):void{if(!this.owner||!this.isAttached)throw new Error('Removing a font requires an attached font file.');this.owner.fonts.files.remove(this,options);}
+  relink(source:Blob,options:FontRelinkOptions={},control:FontEmbedControl={}):Promise<FontFile>{
+    if(!this.owner||!this.isAttached)return Promise.reject(new Error('Relinking requires an attached font file.'));
+    return this.owner.fonts.relink(this,source,options,control);
+  }
   /** @internal */ _attach(document:Document){this.owner=document;}
 }
 

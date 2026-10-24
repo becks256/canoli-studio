@@ -72,7 +72,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
     this.failed = true; this.failure = this.config?.signal?.reason ?? new DOMException('Wet-paint session aborted.', 'AbortError');
     void this.dispose().catch(() => { /* Explicit disposal retains the cleanup rejection for its caller. */ });
   };
-  constructor(config: Configuration, private readonly store: WetTileStore) {
+  constructor(config: Configuration, private readonly store: WetTileStore, private releaseSources?: () => void) {
     this.config = config; this.strokeData = config.stroke; this.reservedPoints = config.stroke.points.length;
     this.cache = createWetWorkingCache(store, config.cacheBudget,this.check); this.issued.add(store);
     this.textures = config.stroke.texture ? new BrushTextureSampler(config.processor) : undefined;
@@ -275,7 +275,10 @@ class RetainedWetStrokeSession implements WetStrokeSession {
   }
   private releaseProcessing() {
     this.config?.signal?.removeEventListener('abort', this.abort);
-    try { this.textures?.dispose(); } finally { this.textures = undefined; this.cache.discard(); this.current.clear(); this.originals.clear(); this.fields.clear(); this.projected.clear(); this.config = undefined; }
+    try { this.textures?.dispose(); } finally {
+      this.textures = undefined; this.cache.discard(); this.current.clear(); this.originals.clear(); this.fields.clear(); this.projected.clear(); this.config = undefined;
+      const release = this.releaseSources; this.releaseSources = undefined; release?.();
+    }
   }
   private cleanup(): Promise<void> {
     return this.cleanupPromise ??= (async () => { try { this.releaseProcessing(); } finally { if (!this.transferred) await this.store.dispose(); } })();
@@ -292,10 +295,12 @@ class RetainedWetStrokeSession implements WetStrokeSession {
   }
 }
 
-export async function createWetStrokeSession(input: BrushStrokeData, readSource: (region: Rect) => Promise<Uint8ClampedArray>, processor: WetProcessor, options: WetStrokeOptions = {}): Promise<WetStrokeSession> {
+/** The internal source owner releases at processing completion, failure or
+ * disposal; immutable output tiles no longer depend on the captured source. */
+export async function createWetStrokeSession(input: BrushStrokeData, readSource: (region: Rect) => Promise<Uint8ClampedArray>, processor: WetProcessor, options: WetStrokeOptions = {}, releaseSources?: () => void): Promise<WetStrokeSession> {
   const config = capture(input, readSource, processor, options), store = await config.storage();
   let session: RetainedWetStrokeSession | undefined;
-  try { config.check(); session = new RetainedWetStrokeSession(config, store); await session.initialize(); return session; }
+  try { config.check(); session = new RetainedWetStrokeSession(config, store, releaseSources); await session.initialize(); return session; }
   catch (error) {
     if (!session) { try { await store.dispose(); } catch (cleanup) { throw new AggregateError([error, cleanup], 'Wet-paint initialization and private storage cleanup failed.'); } }
     throw error;

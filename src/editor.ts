@@ -1085,10 +1085,11 @@ export class EditorApplication {
     const staging = new AssetStore(),
       installed = new Set<string>();
     let committed = false;
+    const fontLeases:import('./fonts/store').FontSourceLease[]=[];
     try {
       // Independent leases are acquired before image decoding yields, so closing
       // the source cannot change the captured artwork's native font identity.
-      for(const file of fontFiles)sourceAssets.fonts.shareTo(destination.assets.fonts,file.id);
+      for(const file of fontFiles)fontLeases.push(sourceAssets.fonts.stageTo(destination.assets.fonts,file.id));
       for (const asset of originals) {
         const copy = control.shareSources?sourceAssets.shareTo(staging,asset.id,replacements.get(asset.id)!):await staging.add(
           asset.blob,
@@ -1117,6 +1118,7 @@ export class EditorApplication {
         return layers;
       }catch(error){if(committed)throw new Error('Artwork was placed, but a listener or acknowledgement failed. Inspect the document before retrying.',{cause:error});throw error;}
     } finally {
+      for(const lease of fontLeases)lease.release();
       if (!committed)
         for (const key of installed) destination.assets.remove(key);
       if(control.shareSources)staging.dispose();

@@ -1,5 +1,10 @@
 # Plugins and extensions
 
+## Font lifetime and relinking boundaries
+
+The host collects staged sources and retains model/history/view/operation ownership independently of plugin package lifecycle. Existing metadata rename/remove commands retain their document permissions and shared undo checks. FontFile.relink and Document.fonts.relink are trusted asynchronous source-admission operations requiring a configured source store; the ordinary isolated context has no such store or source chooser. Private native preloading for script text remains unchanged. No manifest version, permission or installation execution behavior changes.
+
+
 ## Font-file binding development (F08)
 
 Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.

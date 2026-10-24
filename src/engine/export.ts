@@ -408,10 +408,12 @@ export async function exportDocument(
   const editableTextFamilies=options.format==='svg'?planSvgTexts(document).map(text=>text.fontFamily):[];
   const renderedTextFamilies=options.format==='svg'?[...editableTextFamilies,...smart!.filteredTexts.map(text=>text.fontFamily),...composition!.nativeTexts.map(text=>text.fontFamily)]:[];
   const fonts=options.format==='svg'?captureSvgFonts(authored,assets,editableTextFamilies):undefined;
-  const ownedFonts=options.format==='svg'?captureOwnedExportFonts([authored],renderedTextFamilies,assets):()=>{};
-  const sourceCheck=options.format==='svg'?captureSvgSources(document,assets,control,[...smart!.filteredAssets,...composition!.nativeAssets]):captureRasterExportSources(document,assets,control,`${options.format.toUpperCase()} export`);
+  const ownedFonts=options.format==='svg'?captureOwnedExportFonts([authored],renderedTextFamilies,assets):undefined;
+  let sourceCheck:((()=>void)&{release?:()=>void})|undefined;
+  try{
+  sourceCheck=options.format==='svg'?captureSvgSources(document,assets,control,[...smart!.filteredAssets,...composition!.nativeAssets]):captureRasterExportSources(document,assets,control,`${options.format.toUpperCase()} export`);
   const fontSet=options.format==='svg'?captureExportFonts(renderedTextFamilies):()=>{};
-  const currentSources=()=>{sourceCheck();fonts?.check();fontSet();ownedFonts();};
+  const currentSources=()=>{sourceCheck!();fonts?.check();fontSet();ownedFonts?.();};
   control?.onProgress?.({phase:"rendering",fraction:null});
   currentSources();
   const report = describeExport(authored, options,smart,composition);
@@ -534,4 +536,5 @@ export async function exportDocument(
   } finally {
     release(canvas);
   }
+  }finally{sourceCheck?.release?.();ownedFonts?.release();}
 }

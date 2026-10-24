@@ -49,11 +49,12 @@ export interface TiffExportPage {document:DocumentData;assets:AssetStore;rendere
 export async function exportTiffPages(input:readonly TiffExportPage[],variant:TiffVariant='auto',control?:ExportControl):Promise<Blob>{
  checkExport(control);variant=validateTiffVariant(variant);
  if(!Array.isArray(input)||!input.length)throw new Error('Choose at least one TIFF page.');
- const pages=input.map(page=>{
+ const pages:{document:DocumentData;assets:AssetStore;renderer:DocumentRenderer;encoder:TiffTileEncoder;check:import('./export-fonts').FontSourceCapture}[]=[];
+ try{for(const page of input){
   const document=isImmutable(page.document)?page.document:freeze(structuredClone(page.document));validateDocument(document);
   const encoder=new TiffTileEncoder(document.width,document.height,variant);
-  return{document,assets:page.assets,renderer:page.renderer,encoder,check:captureRasterExportSources(document,page.assets,control,'multipage TIFF export')};
- });
+  pages.push({document,assets:page.assets,renderer:page.renderer,encoder,check:captureRasterExportSources(document,page.assets,control,'multipage TIFF export')});
+ }
  const current=()=>{checkExport(control);for(const page of pages)page.check();};
  const encoded:{input:TiffPageDirectoryInput;payload:Blob}[]=[];
  const total=pages.reduce((sum,page)=>sum+page.encoder.totalTiles,0);
@@ -81,6 +82,7 @@ export async function exportTiffPages(input:readonly TiffExportPage[],variant:Ti
   if(blob.size!==plan.fileBytes)throw new Error('TIFF output size does not match its directories.');current();return blob;
  }catch(error){for(const page of pages)page.encoder.abort();throw error;}
  finally{encoded.length=0;}
+ }finally{for(const page of pages)page.check.release();}
 }
 export async function exportTiff(document:DocumentData,assets:AssetStore,renderer:DocumentRenderer,variant:TiffVariant='auto',control?:ExportControl):Promise<Blob>{
  return exportTiffPages([{document,assets,renderer}],variant,control);

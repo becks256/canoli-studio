@@ -41,6 +41,7 @@ export async function exportPng(
   checkExport(control);
   document=isImmutable(document)?document:freeze(structuredClone(document));validateDocument(document);
   const current=captureRasterExportSources(document,assets,control,'PNG export');
+  try{
   current();control?.onProgress?.({phase:"rendering",fraction:0});current();
   const { width, height } = document;
   // This is the PNG format's dimension boundary, not an image import restriction.
@@ -122,6 +123,7 @@ export async function exportPng(
   }
   parts.push(chunk("IEND", new Uint8Array()));
   current();return new Blob(parts, { type: "image/png" });
+  }finally{current.release();}
 }
 
 /**

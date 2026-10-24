@@ -2092,6 +2092,8 @@ test('production font files inspect and preview privately without changing docum
 
 test('production explicit font embedding preserves original sources, native metrics, projects and history',async({page},info)=>{const{fontFilesWorkflow}=await import('./helpers/font-files');await fontFilesWorkflow(page,info,true);});
 
+test('production font relinking retains source bytes, native pixels, shared undo and project reopening',async({page},info)=>{const{fontRelinkWorkflow}=await import('./helpers/font-relink');await fontRelinkWorkflow(page,info,true);});
+
 test('production embedded-font contract is available without JavaScript',async({browser,baseURL})=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();
  try{await page.goto(baseURL+'/developer/font-files.html');await expect(page.getByRole('heading',{name:'Embedded document font files',level:1,exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);}finally{await context.close();}

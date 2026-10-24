@@ -15,14 +15,14 @@ import { createWetStrokeSession, type WetStrokeSession } from './wet-session';
  * and must commit the returned replacement through the shared command boundary. */
 export function prepareDocumentWetStroke(document: DocumentData, assets: AssetStore, renderer: DocumentRenderer, processor: PixelProcessor, stroke: BrushStrokeData, sampling: RetouchSamplingOptions, options: Omit<WetStrokeOptions, 'assets'> = {}): Promise<WetStrokeResult> {
   const captured = capturedSource(document, assets, renderer, sampling, options);
-  return prepareWetStroke(stroke, captured.read, processor, captured.options);
+  try{return prepareWetStroke(stroke, captured.read, processor, captured.options).finally(captured.release);}catch(error){captured.release();throw error;}
 }
 
 /** Read-only retained replay over captured rendered pixels; authoring still
  * requires a neutral target adapter and current revision/ownership validation. */
 export function createDocumentWetStrokeSession(document: DocumentData, assets: AssetStore, renderer: DocumentRenderer, processor: PixelProcessor, stroke: BrushStrokeData, sampling: RetouchSamplingOptions, options: Omit<WetStrokeOptions, 'assets'> = {}): Promise<WetStrokeSession> {
   const captured = capturedSource(document, assets, renderer, sampling, options);
-  return createWetStrokeSession(stroke, captured.read, processor, captured.options);
+  try{return createWetStrokeSession(stroke, captured.read, processor, captured.options,captured.release).catch(error=>{captured.release();throw error;});}catch(error){captured.release();throw error;}
 }
 
 function capturedSource(document: DocumentData, assets: AssetStore, renderer: DocumentRenderer, sampling: RetouchSamplingOptions, options: Omit<WetStrokeOptions, 'assets'>) {
@@ -31,9 +31,9 @@ function capturedSource(document: DocumentData, assets: AssetStore, renderer: Do
   const checkSources = captureRasterExportSources(snapshot, assets, { signal }, 'wet-paint preparation');
   const external = options.check;
   const check = () => { external?.(); checkSources(); };
-  check();
+  try{check();}catch(error){checkSources.release();throw error;}
   const read = async (region: import('../core/drawing').Rect) => {
     check(); const pixels = await sampleRetouchRegion(snapshot, assets, renderer, region, signal); check(); return pixels;
   };
-  return { read, options: { ...options, assets, signal, check } };
+  return { read, options: { ...options, assets, signal, check },release:()=>checkSources.release() };
 }

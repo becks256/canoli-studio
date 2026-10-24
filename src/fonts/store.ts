@@ -6,7 +6,9 @@ import {nativeFontsChanged} from './native-events';
  * faces; headless adapters return bytes only and never fabricate native faces. */
 export type FontResourcePreparer=(source:Blob,options:FontPrepareOptions,control:FontSourceControl)=>Promise<FontPreparedBytes&{readonly fontFaces?:readonly FontFace[]}>;
 interface NativeSet {add(face:FontFace):void;delete(face:FontFace):boolean;has(face:FontFace):boolean}
-interface Entry {resource:Readonly<FontResource>;faces:readonly FontFace[];state:readonly string[];active:boolean}
+interface Entry {resource:Readonly<FontResource>;faces:readonly FontFace[];state:readonly string[];active:boolean;managed:boolean;pins:number}
+export interface FontSourceLease {readonly resource:Readonly<FontResource>;check():void;release():void}
+export interface FontSourceOwner {_fontSourceIds():ReadonlySet<string>}
 interface Registration {descriptor:FontResource['descriptor'];faces:readonly FontFace[];state:readonly string[];owners:number}
 const registrations=new WeakMap<object,Map<string,Registration>>();
 const nativeState=(face:FontFace)=>JSON.stringify(['family','style','weight','stretch','unicodeRange','status','featureSettings','variationSettings','ascentOverride','descentOverride','lineGapOverride','display','sizeAdjust'].map(key=>(face as unknown as Record<string,unknown>)[key]));
@@ -24,6 +26,7 @@ export class FontSourceStore {
   private entries=new Map<string,Entry>();
   private jobs=new Set<AbortController>();
   private originals=new Map<string,{blob:Blob;owners:number}>();
+  private owners=new Map<symbol,WeakRef<FontSourceOwner>>();
   private disposed=false;
   private generation=0;
   private readonly nativeSet:NativeSet|null;
@@ -38,16 +41,39 @@ export class FontSourceStore {
   values(){this.captureLifetime();return[...this.entries.values()].map(entry=>entry.resource);}
   get nativeAvailable(){return this.nativeSet!==null;}
   isActive(id:string){return this.entries.get(id)?.active??false;}
-  capture(id:string){const alive=this.captureLifetime(),resource=this.get(id);return()=>{alive();if(this.entries.get(id)?.resource!==resource)throw new Error('An owned font source changed.');const entry=this.entries.get(id)!;if(entry.active&&this.nativeSet){const registration=registrations.get(this.nativeSet)?.get(id);if(!registration)throw new Error('An owned font registration is missing.');checkRegistration(this.nativeSet,registration);}};}
+  capture(id:string){const alive=this.captureLifetime();this.get(id);const entry=this.entries.get(id)!;return()=>{alive();if(this.entries.get(id)!==entry)throw new Error('An owned font source changed.');if(entry.active&&this.nativeSet){const registration=registrations.get(this.nativeSet)?.get(id);if(!registration)throw new Error('An owned font registration is missing.');checkRegistration(this.nativeSet,registration);}};}
+  /** Bind a model view without keeping an otherwise unreachable Document alive. */
+  bind(owner:FontSourceOwner):()=>void{
+    this.captureLifetime();const token=Symbol(),reference=new WeakRef(owner);this.owners.set(token,reference);this.collect();
+    return()=>{this.owners.delete(token);this.collect();};
+  }
+  /** Complete current/history closures from every live view share this store. */
+  collect():void{
+    if(this.disposed||!this.entries.size)return;
+    const required=new Set<string>();
+    for(const[token,reference]of this.owners){const owner=reference.deref();if(!owner){this.owners.delete(token);continue;}for(const id of owner._fontSourceIds())required.add(id);}
+    for(const id of required){const entry=this.entries.get(id);if(entry)entry.managed=true;}
+    for(const[id,entry]of this.entries)if(entry.managed&&!entry.pins&&!required.has(id))this.remove(id);
+  }
+  /** Explicit host preparation remains caller-owned until adopted by a model. */
+  retain(id:string):FontSourceLease{
+    const resource=this.get(id),entry=this.entries.get(id)!,check=this.capture(id);entry.pins++;let released=false;
+    return Object.freeze({resource,check,release:()=>{if(released)return;released=true;if(this.entries.get(id)===entry){entry.pins--;this.collect();}}});
+  }
 
   prepare(source:Blob,options:FontPrepareOptions={},control:FontSourceControl={}):Promise<Readonly<FontResource>>{
-    return this.operation(control,checked=>this.prepareOwned(source,options,checked));
+    return this.operation(control,checked=>this.prepareOwned(source,options,checked,false,value=>value));
   }
-  private async prepareOwned(source:Blob,options:FontPrepareOptions,control:FontSourceControl):Promise<Readonly<FontResource>>{
+  /** Pin before publishing an async result; cancellation also releases an
+   * unadopted late lease, including the promise-resolution microtask race. */
+  stage(source:Blob,options:FontPrepareOptions={},control:FontSourceControl={}):Promise<FontSourceLease>{
+    return this.operation(control,checked=>this.prepareOwned(source,options,checked,true,value=>this.retain(value.id)),value=>value.release());
+  }
+  private async prepareOwned<T>(source:Blob,options:FontPrepareOptions,control:FontSourceControl,managed:boolean,adopt:(resource:Readonly<FontResource>)=>T):Promise<T>{
     const settings=fontPrepareOptionsSchema.parse(options),alive=this.captureLifetime(),check=()=>{alive();control.signal?.throwIfAborted();};check();
     const prepared=await this.prepareSource(source,settings,control);check();
     const resource=await ownFontResource({descriptor:describePreparedFont(prepared),original:source,renderBlob:prepared.renderBlob},check);check();
-    return this.install(resource,prepared.fontFaces??[],check);
+    return adopt(this.install(resource,prepared.fontFaces??[],check,managed));
   }
   restore(input:FontResourceInput,control:FontSourceControl={}):Promise<Readonly<FontResource>>{
     return this.operation(control,checked=>this.restoreOwned(input,checked));
@@ -59,7 +85,7 @@ export class FontSourceStore {
     if(!sameFontResource(describePreparedFont(prepared),source.descriptor))throw new Error('Stored font declarations or native bytes differ from their original selected face.');
     return this.install(source,prepared.fontFaces??[],check);
   }
-  private install(resource:Readonly<FontResource>,faces:readonly FontFace[],check:()=>void){
+  private install(resource:Readonly<FontResource>,faces:readonly FontFace[],check:()=>void,managed=false){
     check();const existing=this.entries.get(resource.id);
     if(existing){if(!sameFontResource(existing.resource.descriptor,resource.descriptor))throw new Error('Font resource identity collision.');this.capture(resource.id)();return existing.resource;}
     if(this.nativeSet&&(faces.length!==resource.descriptor.report.faces[0].descriptors.length||faces.some(face=>face.status!=='loaded'||face.family!==resource.cssFamily)))throw new Error('Font resources require loaded native faces on this host.');
@@ -68,7 +94,7 @@ export class FontSourceStore {
     if(original&&original.blob.size!==resource.original.size)throw new Error('Original font identity collision.');
     const owned=original?Object.freeze({...resource,original:original.blob}):resource;
     if(original)original.owners++;else this.originals.set(hash,{blob:resource.original,owners:1});
-    this.entries.set(resource.id,{resource:owned,faces:Object.freeze([...faces]),state:faces.map(nativeState),active:false});return owned;
+    this.entries.set(resource.id,{resource:owned,faces:Object.freeze([...faces]),state:faces.map(nativeState),active:false,managed,pins:0});return owned;
   }
   activate(id:string):void{
     this.captureLifetime();const entry=this.entries.get(id);if(!entry)throw new Error(`Missing font source: ${id}`);if(entry.active){this.capture(id)();return;}
@@ -96,17 +122,23 @@ export class FontSourceStore {
     if(this.nativeSet!==destination.nativeSet)throw new Error('Font sources require reparsing when transferred to a different native host.');
     const entry=this.entries.get(id)!,resource=destination.install(entry.resource,entry.faces,()=>{check();alive();});return resource;
   }
+  stageTo(destination:FontSourceStore,id:string):FontSourceLease{
+    const check=this.capture(id);check();destination.captureLifetime();
+    if(this.nativeSet!==destination.nativeSet)throw new Error('Font sources require reparsing when transferred to a different native host.');
+    const entry=this.entries.get(id)!;destination.install(entry.resource,entry.faces,check,true);return destination.retain(id);
+  }
   remove(id:string):void{
     const entry=this.entries.get(id);if(!entry)return;this.deactivate(id);this.entries.delete(id);
     const hash=entry.resource.descriptor.report.sha256,original=this.originals.get(hash);if(original&&--original.owners===0)this.originals.delete(hash);
   }
-  private async operation<T>(control:FontSourceControl,run:(control:FontSourceControl)=>Promise<T>):Promise<T>{
+  private async operation<T>(control:FontSourceControl,run:(control:FontSourceControl)=>Promise<T>,abandon?:(value:T)=>void):Promise<T>{
     this.captureLifetime();control.signal?.throwIfAborted();const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);this.jobs.add(abort);control.signal?.addEventListener('abort',cancel,{once:true});
-    let onAbort:()=>void=()=>{};
+    let onAbort:()=>void=()=>{},produced=false,adopted=false,value:T;
     try{
       const cancelled=new Promise<never>((_resolve,reject)=>{onAbort=()=>reject(abort.signal.reason);abort.signal.addEventListener('abort',onAbort,{once:true});});
-      return await Promise.race([run({...control,signal:abort.signal}),cancelled]);
-    }finally{abort.signal.removeEventListener('abort',onAbort);control.signal?.removeEventListener('abort',cancel);this.jobs.delete(abort);}
+      const work=run({...control,signal:abort.signal}).then(result=>{value=result;produced=true;if(abort.signal.aborted){abandon?.(result);throw abort.signal.reason;}return result;});
+      const result=await Promise.race([work,cancelled]);abort.signal.throwIfAborted();adopted=true;return result;
+    }finally{if(produced&&!adopted)abandon?.(value!);abort.signal.removeEventListener('abort',onAbort);control.signal?.removeEventListener('abort',cancel);this.jobs.delete(abort);}
   }
-  dispose():void{if(this.disposed)return;this.disposed=true;this.generation++;for(const job of this.jobs)job.abort(new Error('The font source store was disposed during preparation.'));this.jobs.clear();for(const id of this.entries.keys())this.remove(id);this.originals.clear();}
+  dispose():void{if(this.disposed)return;this.disposed=true;this.generation++;for(const job of this.jobs)job.abort(new Error('The font source store was disposed during preparation.'));this.jobs.clear();for(const id of this.entries.keys())this.remove(id);this.originals.clear();this.owners.clear();}
 }

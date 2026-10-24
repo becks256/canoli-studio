@@ -1,5 +1,10 @@
 # Canoli Studio design system
 
+## Font relinking interaction
+
+In each Embedded font files row, offer **Choose replacement for [name]**. Open the existing inspector in a named relink context, require collection-face selection and an explicit **Relink selected face** action, retain read-only preview and expose **Cancel font relinking**. Preserve the friendly label while showing actual source metadata. Explain that prior bytes remain for Undo; capture the current owner/revision and reject stale, closed or locked targets. Wrap long row/action labels within the modal and retain its scrolling body/footer. No new shortcut, rail icon or component library is introduced.
+
+
 ## Font-file binding development (F08)
 
 Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.

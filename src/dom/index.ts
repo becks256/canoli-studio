@@ -49,7 +49,7 @@ import type {FontSourceStore} from '../fonts/store';
 import type {SmartComponentDefinition} from '../core/smart/types';
 import {captureRetainedHistory,retainedDocuments} from '../core/history';
 export {DocumentFonts} from './fonts';
-export type {FontEmbedOptions,FontEmbedControl} from './fonts';
+export type {FontEmbedOptions,FontRelinkOptions,FontEmbedControl} from './fonts';
 export type {DocumentFontUsage} from '../core/font-management';
 import {z} from 'zod';
 import {paragraphFormat,type ParagraphFormat} from '../core/paragraph-styles';
@@ -428,6 +428,9 @@ export class Document {
   private batch: EditorCommand[] | null = null;
   private fontTransactionActivations:{store:FontSourceStore;id:string}[]|null=null;
   private checkedFontDeclarations=new WeakMap<object,object>();
+  private stopFontHistory?:()=>void;
+  private unbindFontSources?:()=>void;
+  private hasFontHistory=false;
   private commandListeners = new Set<
     (command: EditorCommand, before: DocumentData, after: DocumentData) => void
   >();
@@ -500,9 +503,6 @@ export class Document {
     this.store = new EditorStore(
       createDocument(options.name, options.width, options.height),
     );
-    if (options.assets) {
-      this._assetStore = options.assets;
-    }
     this.layerComps = new LayerCompCollection(this);
     this.paragraphStyles=new ParagraphStyleCollection(this);
     this.fonts=new DocumentFonts(this);
@@ -510,12 +510,15 @@ export class Document {
     this.guides = new GuideCollection(this);
     this.layers = new LayerCollection(this);
     this.layerSelection = new LayerSelection(this);
+    this.watchFontHistory();
+    if(options.assets)this.assetStore=options.assets;
   }
 
   static fromJSON(data: unknown): Document {
     const store = new EditorStore(data, undefined, { migrateSchema: true });
     const document = new Document();
     document.store = store;
+    document.watchFontHistory();
     return document;
   }
   /** @internal Restoration validates retained history before exposing the session. */
@@ -523,6 +526,7 @@ export class Document {
     const store = new EditorStore(data, history, {migrateSchema: true});
     const document = new Document();
     document.store = store;
+    document.watchFontHistory();
     return document;
   }
 
@@ -576,13 +580,22 @@ export class Document {
     if(this.batch||this.navigatingHistory||this.acceptingCommand)throw new Error('Prepare a font outside synchronous transactions and history navigation.');
   }
   set assetStore(store: AssetStore | null) {
-    if(store){const files=this.fontDeclarations(),activated=this.activateFontSources(store.fonts,files);try{this._assetStore=store;}catch(error){for(const entry of activated)entry.store.deactivate(entry.id);throw error;}return;}
-    this._assetStore = store;
+    if(store){const files=this.fontDeclarations();this.activateFontSources(store.fonts,files);}
+    if(store===this._assetStore){store?.fonts.collect();return;}
+    const unbind=this.unbindFontSources;this.unbindFontSources=undefined;this._assetStore=store;
+    if(store)this.unbindFontSources=store.fonts.bind(this);
+    unbind?.();
   }
+  private watchFontHistory():void{
+    this.stopFontHistory?.();
+    this.stopFontHistory=this.store.subscribe(()=>this._assetStore?.fonts.collect());
+  }
+  /** @internal Complete model closure for shared source-store collection. */
+  _fontSourceIds():ReadonlySet<string>{return new Set(this.fontDeclarations().map(file=>file.id));}
   private fontDeclarations():FontFileData[]{
     const state=this.getSnapshot(),documents=retainedDocuments(state.document,captureRetainedHistory(state));
     if(this.staged)documents.push(this.staged);
-    return documents.flatMap(documentFontFiles);
+    const files=documents.flatMap(documentFontFiles);if(files.length)this.hasFontHistory=true;return files;
   }
   private activateFontSources(store:FontSourceStore,files:readonly FontFileData[]){
     const values=new Map<string,FontFileData>();
@@ -946,6 +959,7 @@ export class Document {
   private mutateHistoryBranch<T>(run: () => T, switchBranch = false, noun: 'branch' | 'comparison' = 'branch'): T {
     if (this.batch) throw new Error('Finish the transaction first.');
     if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
+    if(this._assetStore&&(this._assetStore.fonts.size||this.hasFontHistory))this.activateFontSources(this._assetStore.fonts,this.fontDeclarations());
     this.navigatingHistory = true;
     try {
       const before = this.store.getSnapshot().revision;
@@ -977,6 +991,7 @@ export class Document {
   navigateHistory(position: number): void {
     if (this.batch) throw new Error("Finish the transaction first.");
     if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
+    if(this._assetStore&&(this._assetStore.fonts.size||this.hasFontHistory))this.activateFontSources(this._assetStore.fonts,this.fontDeclarations());
     this.navigatingHistory = true;
     try {
       const before = this.store.getSnapshot(), count = Math.abs(position - before.past.length);
@@ -1027,6 +1042,7 @@ export class Document {
       this.batch = null;
       this.staged = null;
       const activations=this.fontTransactionActivations;this.fontTransactionActivations=null;if(activations)this.releaseUnacceptedFonts(activations);
+      this._assetStore?.fonts.collect();
     }
   }
 

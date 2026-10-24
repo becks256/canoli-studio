@@ -80,10 +80,11 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
   let cachedTiles: ReadonlyMap<string, PreparedTile> = new Map(), cachedAssets: AssetStore | undefined;
   let maskTextures:BrushTextureSampler|undefined;
   let session: WetStrokeSession | undefined, accepting = true, released = false, serial: Promise<unknown> = Promise.resolve(), cleanup: Promise<void> | undefined, disposal: Promise<void> | undefined, version = 0;
+  let releaseSources=()=>{};
   const clean = () => cleanup ??= (async () => {
     try { await session?.dispose(); }
     finally {
-      released = true; unsubscribe(); signal?.removeEventListener('abort', relay);
+      released = true;releaseSources(); unsubscribe(); signal?.removeEventListener('abort', relay);
       const retained = cachedAssets; cachedAssets = undefined; cachedTiles = new Map();
       try { maskTextures?.dispose(); }
       finally { try { retained?.dispose(); } finally { base.dispose(); } }
@@ -121,6 +122,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
     const neutralMask=maskData?{...maskData,x:0,y:0,basis:undefined,linked:true,enabled:true,inverted:false,density:1,feather:0}:undefined;
     const neutral = maskData?{...new PaintLayer().toJSON(),mask:neutralMask}:{ ...source, x: 0, y: 0, transform: undefined, visible: true, opacity: 1, fillOpacity: 1, mask: null, styles: undefined, blendMode: 'normal' as const, ...(source.kind === 'raster' ? { width: native!.width, height: native!.height, effects: [] } : {}) };
     const sourceDocument = freeze({ ...snapshot.document, children: [neutral], layerComps: undefined,...(maskData?{components:undefined}: {}) } as DocumentData), checkSources = captureRasterExportSources(sourceDocument, base, { signal: abort.signal }, 'wet-paint target preparation');
+    releaseSources=()=>checkSources.release();
     if(maskData)maskTextures=new BrushTextureSampler(editor.renderer.processor);
     const current = () => { check(); checkSources(); session?.assertStorageCurrent(); };
     const read = async (region: Rect) => {

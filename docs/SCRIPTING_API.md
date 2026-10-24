@@ -25,6 +25,25 @@ const copy = document.layers.add(new TextLayer({
 print('native width ' + copy.width);
 ```
 
+## Trusted font relinking
+
+`document.fonts.relink(file:FontFile,source:Blob,options:{faceIndex?:number;name?:string}={},control:FontEmbedControl={}):Promise<FontFile>` and `file.relink(source,options={},control={}):Promise<FontFile>` replace an attached face throughout stored scopes in one Undo entry. A multi-face collection requires explicit `faceIndex`; the default active parser timeout remains 60000ms. A fresh replacement preserves the original label; an existing target retains its label unless `name` is explicit. The old different-ID handle detaches until Undo, and the returned handle is attached. Identical relinking is a no-op apart from explicit renaming. Invalid/detached/foreign files, unsupported sources/options, locks, stale owner/revision, cancellation and source loss reject atomically. Old/new bytes remain for all retained histories and live views; rejected staged bytes are released. These async source-admission methods require a trusted attached store and reject in the ordinary isolated Scripts/plugin context. Complete lifecycle and export-lease behavior: [FONT_FILES.md](FONT_FILES.md).
+
+The trusted example below receives a caller-selected single-face Blob as `fontSource`; it does not choose a file or initiate a network request. The label is preserved while the source and every reference change in one Undo entry.
+
+<!-- example: font-relink-trusted -->
+```js
+const original = editor.document.fonts.files.items[0];
+if (!original) throw new Error('Embed a font before relinking.');
+const replacement = await original.relink(fontSource, { faceIndex: 0 });
+return {
+  id: replacement.id,
+  name: replacement.name,
+  fullName: replacement.resource.report.faces[0].fullName,
+  oldAttached: original.isAttached,
+};
+```
+
 ## Font sources — trusted browser host only
 
 `editor.inspectFont(file:Blob,options:{offset?:number;limit?:number}={},control:FontSourceControl={}):Promise<FontInspection>` and `editor.prepareFontSource(file:Blob,options:{faceIndex?:number}={},control:FontSourceControl={}):Promise<PreparedFontSource>` are trusted EditorApplication methods, unavailable inside isolated Scripts/internal plugins. Inspection defaults to offset0/limit32; limit is1–128. Preparation defaults to index0 only for single-face sources; multi-face sources require a selected index. Control supports signal, active timeout60000ms by default, and phase progress. Returned FontFaces are loaded but unregistered; originals remain unchanged and no document command occurs. Invalid data/options, native rejection, cancellation, timeout and disposal reject. These inspection services expose no font-file/FontFace global, new permission or REST counterpart. Trusted `Document.fonts.embed` is a separate operation described in [FONT_FILES.md](FONT_FILES.md). Full signatures, DTOs, trusted example, cancellation/native limitations and ownership: [FONT_SOURCES.md](FONT_SOURCES.md).

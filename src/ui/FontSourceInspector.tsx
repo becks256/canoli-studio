@@ -37,7 +37,7 @@ function FontPreview({prepared,sample}:{prepared:PreparedFontSource|null;sample:
   return prepared?<><iframe hidden aria-hidden="true" ref={frame} title="Selected font preview" sandbox="allow-same-origin" tabIndex={-1} srcDoc={previewHtml} onLoad={()=>setLoaded(value=>value+1)}/><canvas ref={visible} className="font-source-preview" role="img" aria-label="Selected font preview">Selected font sample</canvas>{error&&<p role="alert">Font preview failed: {error}</p>}</>:null;
 }
 
-function InspectorBody({host,onEmbed}:{host:FontSourceHost;onEmbed?:EmbedFace}){
+function InspectorBody({host,onEmbed,relinkName}:{host:FontSourceHost;onEmbed?:EmbedFace;relinkName?:string}){
   const input=useRef<HTMLInputElement>(null),job=useRef<AbortController|null>(null),generation=useRef(0);
   const [file,setFile]=useState<File|null>(null),[report,setReport]=useState<FontInspection|null>(null),[selected,setSelected]=useState<number|null>(null);
   const [prepared,setPrepared]=useState<PreparedFontSource|null>(null),[sample,setSample]=useState('Canoli Studio — Aa 0123');
@@ -69,7 +69,7 @@ function InspectorBody({host,onEmbed}:{host:FontSourceHost;onEmbed?:EmbedFace}){
   const face=report?.faces.find(value=>value.index===selected),axes=face?.axes??[];
   return <div className="font-source-body">
     <p>Inspect TTF, OTF, WOFF, WOFF2, TTC or SFNT datafork files. Previews stay separate from your document.{onEmbed?' Embed a selected face explicitly to use and save it with this document.':' Inspection does not install or embed fonts.'}</p>
-    {embedded&&<p role="status">Font embedded. Choose it in the replacement presets or Typography controls.</p>}
+    {embedded&&<p role="status">{relinkName?'Font relinked. Existing references now use the selected face.':'Font embedded. Choose it in the replacement presets or Typography controls.'}</p>}
     <input ref={input} type="file" hidden data-testid="font-source-input" aria-label="Font file source" accept=".ttf,.otf,.woff,.woff2,.ttc,.dfont" onChange={event=>{
       const source=event.target.files?.[0];event.target.value='';if(!source)return;
       setFile(source);setReport(null);setSelected(null);void run(source,'inspect');
@@ -92,7 +92,7 @@ function InspectorBody({host,onEmbed}:{host:FontSourceHost;onEmbed?:EmbedFace}){
       {face.copyright&&<details><summary>Declared copyright</summary><p dir="auto">{label(face.copyright,4096)}</p></details>}
       {axes.length>0&&<><p>Variation axes: {axes.length}</p><ul>{axes.slice(axisPage*16,axisPage*16+16).map(axis=><li key={axis.tag}>{axis.tag} · {label(axis.name,100)} · {axis.min} / {axis.default} / {axis.max} (min / default / max)</li>)}</ul>{axes.length>16&&<div className="dialog-actions"><Button variant="subtle" disabled={axisPage===0} onClick={()=>setAxisPage(axisPage-1)}>Previous font axes</Button><Button variant="subtle" disabled={(axisPage+1)*16>=axes.length} onClick={()=>setAxisPage(axisPage+1)}>Next font axes</Button></div>}</>}
       <Button variant="subtle" disabled={loading} onClick={()=>{if(file)void run(file,'prepare');}}>Preview selected face</Button>
-      {onEmbed&&<><p>Embedding retains the complete original file in saved projects. Review its declared embedding flags and your font license before sharing.</p><Button variant="secondary" disabled={loading} onClick={()=>{if(file)void run(file,'embed');}}>Embed selected face</Button></>}
+      {onEmbed&&<><p>Embedding retains the complete original file in saved projects. Review its declared embedding flags and your font license before sharing.</p>{relinkName&&<p>Replace {relinkName} throughout this document. The previous source remains available to Undo.</p>}<Button variant="secondary" disabled={loading} onClick={()=>{if(file)void run(file,'embed');}}>{relinkName?'Relink selected face':'Embed selected face'}</Button></>}
     </>}
     {prepared&&<>
       <p role="status">Selected face is ready for preview.</p>
@@ -104,7 +104,7 @@ function InspectorBody({host,onEmbed}:{host:FontSourceHost;onEmbed?:EmbedFace}){
   </div>;
 }
 
-export function FontSourceInspector({host,onEmbed}:{host:FontSourceHost;onEmbed?:EmbedFace}){
-  const [open,setOpen]=useState(false);
-  return <details className="font-source-inspector" onToggle={event=>setOpen(event.currentTarget.open)}><summary>Inspect font files</summary>{open&&<InspectorBody host={host} onEmbed={onEmbed}/>}</details>;
+export function FontSourceInspector({host,onEmbed,relinkName}:{host:FontSourceHost;onEmbed?:EmbedFace;relinkName?:string}){
+  const [open,setOpen]=useState(!!relinkName);
+  return <details open={open} className="font-source-inspector" onToggle={event=>setOpen(event.currentTarget.open)}><summary>Inspect font files</summary>{open&&<InspectorBody host={host} onEmbed={onEmbed} relinkName={relinkName}/>}</details>;
 }

@@ -60,3 +60,14 @@ it('downloads original bytes as binary attachments without reflecting an uploade
   const created=await request('/documents',{}),path='/documents/'+created.body.document.id,embedded=await upload(path,0,{},'Regular.ttf','text/html');expect(embedded.status).toBe(201);
   const original=await fetch(base+path+'/fonts/'+embedded.body.file.id+'?source=original',{headers});expect(original.headers.get('content-type')).toBe('application/octet-stream');expect(original.headers.get('content-disposition')).toBe('attachment; filename="font-original.ttf"');expect(original.headers.get('x-content-type-options')).toBe('nosniff');expect(Buffer.from(await original.arrayBuffer())).toEqual(await readFile('tests/fixtures/fonts/Regular.ttf'));
 });
+
+it('relinks a selected file through revisioned shared history while retaining the old source for undo',async()=>{
+  const created=await request('/documents',{}),path='/documents/'+created.body.document.id,embedded=await upload(path,0,{name:'REST campaign'},'Regular.ttf'),old=embedded.body.file;
+  const text=new TextLayer({text:'ABC',fontFamily:old.resource.report.faces[0].cssFamily}),added=await request(path+'/commands',{expectedRevision:embedded.body.revision,commands:[{type:'layer.add',layer:text.toJSON()}]});
+  const endpoint=path+'/fonts/'+old.id;
+  const sendFont=async(revision:number,options:unknown={})=>{const response=await fetch(base+endpoint+'?expectedRevision='+revision,{method:'POST',headers:{...headers,'Content-Type':'application/octet-stream','X-Font-Options':JSON.stringify(options)},body:new Uint8Array(await readFile('tests/fixtures/fonts/Bold.ttf'))});return{status:response.status,body:await response.json()};};
+  expect((await sendFont(0)).status).toBe(409);expect((await sendFont(added.body.revision,{replace:'serif'})).status).toBe(400);
+  const changed=await sendFont(added.body.revision);expect(changed.status,JSON.stringify(changed.body)).toBe(200);expect(changed.body.metrics).toBe('estimated');expect(changed.body.revision).toBe(added.body.revision+1);expect(changed.body.file.id).not.toBe(old.id);expect(changed.body.file.name).toBe('REST campaign');expect((await request(endpoint)).status).toBe(404);
+  const undo=await request(path+'/undo',{expectedRevision:changed.body.revision});expect(undo.body.document).toEqual(added.body.document);const original=await fetch(base+endpoint+'?source=original',{headers});expect(Buffer.from(await original.arrayBuffer())).toEqual(await readFile('tests/fixtures/fonts/Regular.ttf'));
+  const redo=await request(path+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(changed.body.document);
+});

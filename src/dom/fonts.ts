@@ -2,13 +2,13 @@ import type {Document} from './index';
 import {documentFontUsage,fontFamilyRequestSchema} from '../core/font-management';
 import {FontFile,FontFileCollection} from './font-file';
 import {fontFileSchema} from '../core/font-files';
-import {captureRetainedHistory,retainedDocuments} from '../core/history';
-import {referencedFontFiles} from '../core/font-files';
 import {fontPrepareOptionsSchema,type FontSourceControl} from '../fonts/types';
 import {z} from 'zod';
 
 export const embedOptionsSchema=fontPrepareOptionsSchema.extend({name:fontFileSchema.shape.name.optional(),replace:fontFamilyRequestSchema.optional()}).strict();
+export const relinkOptionsSchema=fontPrepareOptionsSchema.extend({name:fontFileSchema.shape.name.optional()}).strict();
 export type FontEmbedOptions=z.input<typeof embedOptionsSchema>;
+export type FontRelinkOptions=z.input<typeof relinkOptionsSchema>;
 export interface FontEmbedControl extends FontSourceControl {beforeCommit?():void}
 
 /** Font requests used by this document and all of its stored embedded scopes. */
@@ -21,31 +21,35 @@ export class DocumentFonts {
   }
   /** Trusted host operation: parse privately, then bind in one ordinary edit. */
   async embed(source:Blob,options:FontEmbedOptions={},control:FontEmbedControl={}):Promise<FontFile>{
+    return this.importSource(source,embedOptionsSchema.parse(options),control);
+  }
+  /** Replace every reference to an owned face and its declaration atomically. */
+  async relink(file:FontFile,source:Blob,options:FontRelinkOptions={},control:FontEmbedControl={}):Promise<FontFile>{
+    if(!(file instanceof FontFile)||file.document!==this.document)throw new Error('Relinking requires an attached font file from this document.');
+    return this.importSource(source,relinkOptionsSchema.parse(options),control,file);
+  }
+  private async importSource(source:Blob,settings:FontEmbedOptions,control:FontEmbedControl,replacing?:FontFile):Promise<FontFile>{
     this.document._assertFontImportReady();
-    const settings=embedOptionsSchema.parse(options),assets=this.document.assetStore;
+    const assets=this.document.assetStore,previous=replacing?.toJSON();
     if(!assets)throw new Error('Embedding a font requires an attached source store.');
     const revision=this.document.getSnapshot().revision,alive=assets.fonts.captureLifetime();
     control.signal?.throwIfAborted();
-    const resource=await assets.fonts.prepare(source,{faceIndex:settings.faceIndex},control);
+    const lease=await assets.fonts.stage(source,{faceIndex:settings.faceIndex},control),resource=lease.resource;
     try{
       control.beforeCommit?.();
       alive();control.signal?.throwIfAborted();
+      lease.check();
       this.document._assertFontImportReady();
       if(this.document.assetStore!==assets)throw new Error('The document source store changed during font preparation.');
       if(this.document.getSnapshot().revision!==revision)throw new Error('The document changed during font preparation. Try again.');
-      const face=resource.descriptor.report.faces[0],name=settings.name??(face.fullName||face.family||'Embedded font').slice(0,240);
-      this.document.transaction('Embed font file',()=>{
+      const face=resource.descriptor.report.faces[0],existing=this.files.getById(resource.id),name=settings.name??existing?.name??previous?.name??([face.fullName,face.family].find(value=>value?.trim())?.trim()||'Embedded font').slice(0,240);
+      this.document.transaction(previous?'Relink font file':'Embed font file',()=>{
         const file=this.files.add(new FontFile({id:resource.id,name,resource:resource.descriptor}));
-        if(settings.replace!==undefined)this.replace(settings.replace,file.family);
+        if(previous&&settings.name!==undefined&&file.name!==settings.name)file.name=settings.name;
+        if(previous&&previous.id!==resource.id)this.files.getById(previous.id)!.remove({replaceWith:file.family});
+        else if(settings.replace!==undefined)this.replace(settings.replace,file.family);
       });
       return this.files.getById(resource.id)!;
-    }catch(error){
-      // Accepted observer failures retain the source for current and historical
-      // states. Unaccepted imports remain inert in the store until disposal,
-      // avoiding invalidation of another concurrent importer of the same face.
-      const state=this.document.getSnapshot(),required=retainedDocuments(state.document,captureRetainedHistory(state)).some(value=>referencedFontFiles(value).has(resource.id));
-      if(!required)assets.fonts.deactivate(resource.id);
-      throw error;
-    }
+    }finally{lease.release();}
   }
 }

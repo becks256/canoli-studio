@@ -18,6 +18,7 @@ export function FontManagerDialog({document:owner,fontSources,assertOwner,onRepl
   const [sourceAvailability,setSourceAvailability]=useState<{request:string;value:FontAvailability|'checking'}>({request:'',value:'checking'});
   const localFonts=useSyncExternalStore(subscribeSystemFonts,getSystemFonts);
   const [loadingFonts,setLoadingFonts]=useState(false);
+  const [relinkId,setRelinkId]=useState<string|null>(null),relinkFile=relinkId?owner.fonts.files.getById(relinkId):null;
   const embeddedFonts=owner.fonts.files.items,label=(request:string)=>embeddedFonts.reduce((value,file)=>value.replaceAll(file.family,file.name),request);
   const changed=(message:string)=>{setCaptured({revision:owner.getSnapshot().revision,items:owner.fonts.items});setFrom('');setPage(0);setError('');setMessage(message);};
   const changeFile=(action:()=>void)=>{try{assertOwner?.();if(stale)throw new Error('The document changed. Refresh before changing embedded fonts.');action();changed('Embedded fonts updated. Close this dialog to use Undo.');}catch(cause){setError(cause instanceof Error?cause.message:String(cause));}};
@@ -73,16 +74,19 @@ export function FontManagerDialog({document:owner,fontSources,assertOwner,onRepl
         setLoadingFonts(true);setError('');void systemFonts().catch(cause=>setError(`Installed fonts could not be listed: ${String(cause)}`)).finally(()=>setLoadingFonts(false));
       }}>{loadingFonts?'Listing installed fonts…':'List installed fonts'}</Button>
     </div>
-    {embeddedFonts.length>0&&<section aria-label="Embedded font files"><h3>Embedded font files</h3>{embeddedFonts.map(file=><div key={file.id}>
+    {embeddedFonts.length>0&&<section aria-label="Embedded font files"><h3>Embedded font files</h3>{embeddedFonts.map(file=><div className="font-file-row" key={file.id}>
       <TextInput label={`Font file name: ${file.name}`} layout="stacked" value={file.name} maxLength={240} onCommit={name=>changeFile(()=>{file.name=name;})}/>
       <p>{file.resource.report.faces[0].fullName??'Unnamed face'} · {file.resource.report.format.toUpperCase()}</p>
+      {fontSources&&<Button variant="subtle" disabled={stale} onClick={()=>{try{assertOwner?.();setRelinkId(file.id);setError('');setMessage('Choose and inspect a replacement file below. Relinking uses one Undo entry.');}catch(cause){setError(String(cause));}}}>Choose replacement for {file.name}</Button>}
       <Button variant="subtle" disabled={stale} onClick={()=>changeFile(()=>file.remove())}>Remove {file.name} if unused</Button>
       <Button variant="subtle" disabled={stale||checking||fallback&&!allowFallback||!to.trim()||to===file.family} onClick={()=>changeFile(()=>file.remove({replaceWith:to}))}>Replace uses and remove {file.name}</Button>
     </div>)}</section>}
-    {fontSources&&<Suspense fallback={<p role="status">Loading font-file inspector…</p>}><FontSourceInspector host={fontSources} onEmbed={async(file,faceIndex,control)=>{
+    {relinkId&&<div className="dialog-actions"><p>{relinkFile?`Replacing ${relinkFile.name}`:'The selected font is no longer attached. Cancel and choose another font.'}</p><Button variant="subtle" onClick={()=>setRelinkId(null)}>Cancel font relinking</Button></div>}
+    {fontSources&&<Suspense fallback={<p role="status">Loading font-file inspector…</p>}><FontSourceInspector key={relinkId??'embed'} host={fontSources} relinkName={relinkFile?.name} onEmbed={async(file,faceIndex,control)=>{
       assertOwner?.();if(owner.getSnapshot().revision!==captured.revision)throw new Error('The document changed. Refresh before embedding a font.');
-      await owner.fonts.embed(file,{faceIndex},{...control,beforeCommit:()=>assertOwner?.(),onProgress:progress=>{assertOwner?.();control.onProgress?.(progress);}});
-      changed('Font embedded. Choose it in the replacement presets or Typography controls.');
+      const controls={...control,beforeCommit:()=>assertOwner?.(),onProgress:(progress:Parameters<NonNullable<typeof control.onProgress>>[0])=>{assertOwner?.();control.onProgress?.(progress);}};
+      if(relinkId){if(!relinkFile)throw new Error('The font to replace is no longer attached.');await relinkFile.relink(file,{faceIndex},controls);setRelinkId(null);changed('Font relinked. Close this dialog to use Undo.');}
+      else{await owner.fonts.embed(file,{faceIndex},controls);changed('Font embedded. Choose it in the replacement presets or Typography controls.');}
     }}/></Suspense>}
     </div>
     <div className="dialog-actions font-manager-footer"><Button variant="subtle" onClick={onClose}>Done</Button><Button variant="primary" disabled={!selected||!to.trim()||from===to||stale||checking||fallback&&!allowFallback} onClick={replace}>Replace font</Button></div>

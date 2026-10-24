@@ -4,8 +4,7 @@ import {historyTimeline,inspectHistoryChange} from '../src/core/history-inspecti
 import {validateServerProjectSources} from "./project";
 import {inspectServerRaw} from "./raw";
 import {prepareServerFont} from './fonts';
-import {embedOptionsSchema} from '../src/dom/fonts';
-import {FontFile} from '../src/dom/font-file';
+import {embedOptionsSchema,relinkOptionsSchema} from '../src/dom/fonts';
 import {importServerRaw,developServerRawComponent} from "./raw-document";
 import {RawDevelopment,SmartObjectLayer} from "../src/dom";
 import {rawDecodeOptionsSchema,type RawImportControl} from "../src/core/interchange/raw/types";
@@ -431,20 +430,20 @@ export function createApiServer(options: ApiServerOptions = {}) {
         const extension=source==='original'?resource.descriptor.report.format:resource.descriptor.render.format;
         response.writeHead(200,{'Content-Type':source==='original'?'application/octet-stream':blob.type,'Content-Disposition':`attachment; filename="font-${source}.${extension}"`,'X-Content-Type-Options':'nosniff','Content-Length':bytes.length,'Cache-Control':'no-store'});response.end(bytes);return;
       }
-      if(subresource==='fonts'&&!subresourceId&&method==='POST'){
+      if(subresource==='fonts'&&method==='POST'){
         const revision=document.getSnapshot().revision,parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined});
         if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
         const header=request.headers['x-font-options'];if(header!==undefined&&typeof header!=='string')throw new Error('Invalid font options header.');
-        const options=embedOptionsSchema.parse(JSON.parse(header??'{}')),mime=(request.headers['content-type']??'application/octet-stream').split(';')[0].trim();
+        const options=(subresourceId?relinkOptionsSchema:embedOptionsSchema).parse(JSON.parse(header??'{}')),mime=(request.headers['content-type']??'application/octet-stream').split(';')[0].trim();
+        const relink=subresourceId?document.fonts.files.getById(subresourceId):null;
+        if(subresourceId&&!relink){send(response,404,{error:'Font file not found.'});return;}
         if(mime==='application/json')throw new Error('Send binary font source bytes.');
         const abort=new AbortController(),closed=()=>{if(!response.writableEnded)abort.abort(new Error('Font request disconnected.'));};response.on('close',closed);
         try{
           const file=await rawScope(document,session.assets,{signal:abort.signal},async(control,current,beforeCommit)=>{
-            const bytes=await readRawBody(request);current();const resource=await session.assets.fonts.prepare(new Blob([new Uint8Array(bytes)],{type:mime}),{faceIndex:options.faceIndex},{signal:control.signal});current();
-            const face=resource.descriptor.report.faces[0],name=options.name??(face.fullName||face.family||'Embedded font').slice(0,240);
-            beforeCommit();document.transaction('Embed font file',()=>{document.fonts.files.add(new FontFile({id:resource.id,name,resource:resource.descriptor}));if(options.replace!==undefined)document.fonts.replace(options.replace,resource.cssFamily);});
-            return document.fonts.files.getById(resource.id)!.toJSON();
-          });send(response,201,{...snapshot(document),file,metrics:'estimated'});
+            const bytes=await readRawBody(request);current();const source=new Blob([new Uint8Array(bytes)],{type:mime}),controls={signal:control.signal,beforeCommit};
+            const file=relink?await relink.relink(source,options,controls):await document.fonts.embed(source,options,controls);return file.toJSON();
+          });send(response,relink?200:201,{...snapshot(document),file,metrics:'estimated'});
         }catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during font preparation.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during font preparation.',revision:document.getSnapshot().revision});else throw error;}
         finally{response.off('close',closed);}return;
       }

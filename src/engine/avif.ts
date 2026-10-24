@@ -54,5 +54,5 @@ export async function exportAvif(document:DocumentData,assets:AssetStore,rendere
     }
     check();inner.onProgress?.({phase:'encoding',fraction:null});check();
     const blob=await encodeAvifFrame(pixels.buffer,geometry.width,geometry.height,settings,requiresAlpha,inner,check);check();return blob;
-  }finally{clearInterval(watch);control?.signal?.removeEventListener('abort',abort);relinquish?.();}
+  }finally{clearInterval(watch);control?.signal?.removeEventListener('abort',abort);relinquish?.();current.release();}
 }

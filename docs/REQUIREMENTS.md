@@ -1,5 +1,10 @@
 # Canoli Studio editor requirements
 
+## Font source collection and relinking
+
+Rejected/cancelled staged imports must release their own records without invalidating concurrent identical imports. Preserve sources referenced by every current/undo/redo/branch/comparison/stored-master state and every still-bound component view; release model-owned sources after the last reference and active operation lease ends. Active native exports must retain their captured fonts while live edits trim history, then release on success, cancellation or a throwing callback. Retained wet replay must release captured fonts at processing completion, failure, idle abort or disposal; finished output must stay readable independently. Explicit source loss must reject history navigation before publication. Relink an attached face from an explicitly selected local source through one shared transaction, preserving fallback lists, inheritance, locks, source text, labels and Undo/Redo; cancelled/stale/locked relinking leaves artwork intact and collects an unused replacement. Ordinary script/plugin contexts gain no file chooser or source-import capability. See [FONT_FILES.md](FONT_FILES.md).
+
+
 ## Font-file binding development (F08)
 
 Document schema 43, separately owned font resources, shared FontFile commands, explicit trusted embedding and native-project 5/workspace persistence are being connected and verified. Selected native fonts also preload into isolated script workers before text construction; no font chooser, host store, credentials or network grant is exposed there. The full font-file/transport/browser release gate is still open. See [the current contract and limits](FONT_FILES.md). Earlier font-source sections below describe the read-only inspection/preview service; explicit embedding is a separate operation.

@@ -138,6 +138,7 @@ export async function exportPsd(
   const plan = planPsdExport(document, mode,format);
   if (plan.records.length > 32767) throw new Error("Photoshop output cannot represent more than 32,767 layer records.");
   const current=captureRasterExportDocuments([document,...plan.layers.map(layer=>layer.document),...plan.masks.map(mask=>mask.document)],assets,control,format.toUpperCase()+' export');
+  try{
   const encoder=new PhotoshopEncoder();
   try{
   const totalRows = plan.layers.reduce((total, layer) => total + layer.height, 0)+plan.masks.reduce((total,mask)=>total+mask.height,0) + (plan.reuseComposite ? 0 : document.height);
@@ -177,4 +178,5 @@ export async function exportPsd(
   current();
   return blob;
   }finally{encoder.dispose();}
+  }finally{current.release();}
 }

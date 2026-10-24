@@ -4,16 +4,17 @@ import {isActiveSmartFilter} from '../core/smart/filters';
 import type {LayerMaskData} from '../core/masks';
 import type {AssetStore} from '../core/assets';
 import {captureExportFonts,captureOwnedExportFonts} from './export-fonts';
+import type {FontSourceCapture} from './export-fonts';
 import {checkExport,type ExportControl} from './export-control';
 import {visitMaskAssets,visitBrushAssets,visitAdjustmentAssets} from '../core/asset-references';
 
 /** Pin visible native dependencies before callbacks, including reachable masters. */
-export function captureRasterExportSources(document:DocumentData,assets:AssetStore,control?:ExportControl,operation='TIFF export'):()=>void{
+export function captureRasterExportSources(document:DocumentData,assets:AssetStore,control?:ExportControl,operation='TIFF export'):FontSourceCapture{
  return captureRasterExportDocuments([document],assets,control,operation);
 }
 
 /** Independent Photoshop planes may render otherwise hidden top-level artwork. */
-export function captureRasterExportDocuments(documents:readonly DocumentData[],assets:AssetStore,control?:ExportControl,operation='raster export'):()=>void{
+export function captureRasterExportDocuments(documents:readonly DocumentData[],assets:AssetStore,control?:ExportControl,operation='raster export'):FontSourceCapture{
  const ids=new Set<string>(),texts:TextLayerData[]=[];
  const mask=(value?:LayerMaskData|null)=>{if(value?.enabled&&value.density>0)visitMaskAssets(value,reference=>ids.add(reference.assetId));};
  for(const document of documents){
@@ -37,11 +38,12 @@ export function captureRasterExportDocuments(documents:readonly DocumentData[],a
  const lifetime=assets.captureLifetime(),pinned=[...ids].map(id=>{const source=assets.get(id);return{source,bitmap:source.bitmap,blob:source.blob,width:source.width,height:source.height};});
  const fonts=captureExportFonts(texts.map(text=>text.fontFamily),operation);
  const ownedFonts=captureOwnedExportFonts(documents,texts.map(text=>text.fontFamily),assets);
+ try{
  for(const text of texts){const requested=nativeTextFont(text);
   if(typeof globalThis.document!=='undefined'&&globalThis.document.fonts&&!globalThis.document.fonts.check(requested,text.text))throw new Error(`A referenced text font is not loaded. Retry ${operation} after fonts are ready.`);
  }
  const current=()=>{
   checkExport(control);lifetime();fonts();ownedFonts();
   for(const entry of pinned){const s=entry.source;if(!assets.has(s.id)||assets.get(s.id)!==s||s.bitmap!==entry.bitmap||s.blob!==entry.blob||s.width!==entry.width||s.height!==entry.height||s.bitmap.width!==entry.width||s.bitmap.height!==entry.height)throw new Error(`An image source changed during ${operation}. Retry with the current assets.`);}
- };current();return current;
+ };current();return Object.assign(current,{release:()=>ownedFonts.release()});}catch(error){ownedFonts.release();throw error;}
 }
