@@ -1,5 +1,9 @@
 # Architecture
 
+## Cold plain-text working geometry
+
+The Canvas viewport bounds eligible normal-blend text to fresh native glyph ink before allocating its content surface, using the existing bounded shadow/raster path. Whole-line shaping, ink overhangs and the exact output-pixel origin remain unchanged. Missing ink metrics, backdrop-dependent processing, live affected layers and non-beneficial bounds retain the full path. Export/reference renders with `cache:false` remain the independent full-surface comparison. Compact retention alone does not bound cold drawing work; see the dated F14 roadmap evidence.
+
 ## Document font-management boundary
 
 core/font-management derives owned usage metadata and transforms a private command draft, resolving paragraph inheritance while retaining explicit overrides. document.font.replace uses shared reflow and component.replaceAll lock validation. DocumentFonts is an OO collection; the custom dialog pins owner/revision and shares permission-triggered installed-family discovery. Strict REST and semantic recipes use the same command. No font bytes, schema change, isolated grant or browser/headless synchronization is introduced. See FONT_MANAGEMENT.md.

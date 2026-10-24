@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Cold text allocation invariant
+
+Eligible text uses fresh native ink bounds and the existing exact-grid bounded compositor before drawing, including plain text without shadows. Logical text dimensions cannot bound italic, RTL, combining or overlapping glyph ink. Invalid/unavailable native ink metrics preserve the full reference path. Allocation geometry is temporary viewport work; no authored/source dimensions or stored formats change. Cold, retained, replacement and Undo output must match `cache:false` pixels exactly. Working-area reduction does not establish latency or physical-device performance.
+
 ## Document font replacement invariant
 
 Match complete authored family requests exactly across all owned stored scopes. Recompute based-on cached formats without converting inheritance to overrides; update existing explicit font overrides and reflow only changed text. Resolve effective text locks per owning scope and changed component dependencies through existing registry checks. Validation/lock/reflow failure before publication discards the complete command draft, including earlier changes; accepted observer failures retain accepted state. UI owner/revision and request-keyed availability remain separate from native source/model persistence; no schema, font binary or isolated authority change occurs. See FONT_MANAGEMENT.md.

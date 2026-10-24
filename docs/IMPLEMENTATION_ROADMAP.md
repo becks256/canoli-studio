@@ -1,5 +1,31 @@
 # Implementation roadmap and planning record
 
+### 2026-10-24 — F14 cold plain-text working area verified; font-swap latency remains open
+
+Owner: implementation agent; estimate M within F14. Starting from `7038b21`, eligible normal-blend plain text now uses the existing native-ink bounded compositor before allocating its content surface. Previously only shadowed text used that path; compact cache retention happened after full-viewport cold drawing. Fresh native bounds preserve whole-line shaping, overhangs and the exact output grid. Missing metrics and the existing processing/benefit guards retain the full path. No document geometry, source resolution, public API or stored format changes.
+
+A fresh diagnostic selects Canvas2D for both blank and dense documents in this environment. Removing Canvas `save()` simply shifts its cost into the next drawing call without improving the isolated total; skipping state preservation was rejected. The new regression fails against the old renderer's **30,720,000 working pixels** for 64 cold text layers. The candidate uses **622,937** pixels for serif text and **592,204** after monospace replacement, with exact uncached-reference pixels on cold/warm frames, replacement and Undo. Unavailable native ink metrics independently preserve full-surface, byte-identical output.
+
+The same real Replace-font workflow measures 12 swaps per case, approximately 1,000 characters per layer, from click through a prepared matching-state frame to its canvas copy. Availability preparation is excluded; long-task observation includes surrounding UI work. Nearest-rank p95 and all samples are retained without filtering or pooling:
+
+| Text layers | Frozen baseline median / p95 | Candidate median / p95 | Baseline control after candidate median / p95 | Long tasks: baseline / candidate / later control |
+| --- | ---: | ---: | ---: | ---: |
+| 16 | 77.80 / 94.80 ms | 57.30 / 64.90 ms | 75.60 / 92.10 ms | 1 / 1 / 1 |
+| 64 | 150.55 / 175.10 ms | 58.40 / 110.00 ms | 145.15 / 158.40 ms | 25 / 3 / 21 |
+
+Every captured font-swap frame uses Canvas2D. Typing and vector controls pass in both releases, with mixed small differences: candidate 64-layer plain/overlay/shadow typing p95 is 16.1/17.4/19.5 ms versus 17.1/15.7/16.1 ms in the later frozen control. This establishes a cold-font replacement improvement, not a blanket speedup. Font-swap p95 still exceeds 33 ms and retains long tasks; physical display, sustained editor-wide latency, hardware GPU/tablet and process-peak memory gates remain open.
+
+Final verification:
+
+- Benchmark and normal `npm run build` pass actual WASM/runtime/plugin/site/docs generation, TypeScript and production bundling. All **2,018 unit/API tests across 228 files** pass (138.29 s).
+- All **133 distinct native browser cases** pass in separately managed typography (81; 306.02 s) and composition (52; 199.00 s) batches, including unavailable metrics, native font loading, cache/history/masks, real software-WebGPU and genuine 50 MP workflows. All **126 normal-production workflows** pass (440.32 s). Accepted runs have no skips, flakes, unexpected cases or automatic retries.
+- Independent Pillow decoding verifies every pixel of the **50 MP native export** against the original fixture plus separately drawn typography, and all **12 native/production font-workflow PNGs** against direct construction, Undo, scripts and reopening.
+- Final matrix input maps agree and remain unchanged throughout each run. Measured benchmark runtime/test inputs match final verification; expected normal-bundle/HTML and generated-guide differences are disclosed. All **97 served resources** match release bytes, five WASMs and the plugin archive remain byte-identical to the baseline, and plugin source/entry digests verify.
+
+An initial benchmark build caught missing explicit pixel-return types in the new test; these were corrected before accepted build/timing. Raw diagnostics, failing old-renderer regression, accepted reports, source/release identities, independent checks and artifact hashes are retained in [sealed evidence](benchmarks/bounded-plain-text-2026-10-24.json). Existing benchmark records remain unchanged.
+
+The complete original roadmap remains active: broader typography/fonts/shaping; color/precision/interchange/photographic quality; AI/provider/evaluation/production; catalog/workflow/collaboration/commercial/enterprise/specialist/motion; installed/model-driven T23; eligible registered live-provider T24; and sustained all-tool/device/GPU/process-memory F14. No paid operation, account, upload, new isolated permission or arbitrary image/import limit is introduced.
+
 ### 2026-10-24 — F08 document font requests verified; font binaries and broader typography remain open
 
 Owner: implementation agent; estimate L within T16/F08. Starting from `dfec8b5`, **Document fonts** now inventories exact authored family/fallback requests and replaces one request throughout ordinary/hidden text, paragraph styles and all stored embedded scopes, including unused definitions. The OO `Document.fonts` collection, strict `document.font.replace` command, custom dialog, independent REST inventory/commands, isolated Scripts/internal plugins and semantic recipe/package/batch paths share validation, native/estimated reflow, component dependency locks and one-step history. Inheritance stays inherited; explicit overrides stay explicit. Source Unicode, placement/transforms/authored paragraph width, other typography, selection and original image sources are preserved. Equal/missing requests remain no-ops. [Complete API, executable example and limits](FONT_MANAGEMENT.md).

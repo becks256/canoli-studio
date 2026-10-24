@@ -718,7 +718,7 @@ export class CanvasRenderer implements DocumentRenderer {
           ? Math.ceil((shadow.blur * 3 + Math.abs(shadow.y)) * current.sy) + 2
           : 0;
         if (cache && isolated !== layer && !affected.has(layer.id) &&
-            (layer.kind === "raster" || (layer.kind === "text" && shadow.enabled) ||
+            (layer.kind === "raster" || layer.kind === "text" ||
               (layer.kind === "paint" && layer.strokes.every(stroke => stroke.kind === "fill" && !stroke.clip))) &&
             layer.blendMode === "normal" && (layer.fillOpacity ?? 1) === 1 &&
             !style.blendIf.enabled) {
@@ -728,6 +728,8 @@ export class CanvasRenderer implements DocumentRenderer {
             ? [localBounds(layer)!]
             : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
             : ink ? [ink] : undefined;
+          // Cold plain text needs the same bounded working area as shadows;
+          // retaining compact pixels after full-surface drawing is too late.
           // Unsupported glyph metrics take the full reference path. Logical
           // text width alone cannot bound italic, RTL or overlapping glyph ink.
           if (bounds) {

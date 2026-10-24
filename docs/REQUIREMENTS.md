@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Cold text working-area acceptance (F14 increment)
+
+Eligible plain-text viewport work must follow visible glyph ink before allocation, without clipping overhangs, changing whole-line shaping, authored geometry or native output pixels. Verify cold frames, font replacement, Undo and retained frames against the uncached reference; unavailable native ink metrics must preserve the full path. Record real matching-frame latency and long tasks separately from working-area reduction. This increment does not close the sustained editor-wide/device/GPU/process-memory gates.
+
 ## Document font management (F08 increment)
 
 Provide a searchable document-wide inventory and exact-request replacement across hidden/ordinary text, explicit overrides, based-on styles and all stored embedded scopes. Preserve inheritance, source text, selection, other typography, original assets and authored geometry; reflow affected text with shared commands, locks and one-step undo. Connect the custom modal, OO collection, isolated/plugin permissions, independent REST and semantic recipes. Guard stale/closed owners and asynchronous availability; fallback is explicit. Font embedding, character runs, arbitrary axes, path text and broader F08/F14 remain required. See [the contract](FONT_MANAGEMENT.md).
