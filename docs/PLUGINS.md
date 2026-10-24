@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Text property edits preserve authored frames
+
+Existing isolated command code uses the same `layer.update` measurement boundary: ordinary placement/appearance changes preserve imported text dimensions, while explicit metric/layout requests and `TextLayer.reflow()` recalculate them. Manifest/grant, isolation, revision/source checks, inert installation and one accepted Undo transaction remain unchanged. No font chooser, source loader or new permission is exposed.
+
 ## Alignment uses existing editing authority
 
 The public alignment method emits the strict shared layer.align command. Existing document read/write grants, final revision/owner validation and ordinary Undo apply. A stationary key does not gain edit authority; installation remains inert, with no new file/network/asset-source capability or manifest version. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.

@@ -601,7 +601,12 @@ test("docs highlight examples without JavaScript and keep long code keyboard-scr
     }
     await page.goto(`${baseURL}/developer/scripting-api.html`);
     // Native focusable pre retains text selection/copy and horizontal keyboard scrolling.
-    const pre = page.locator(".syntax-highlighter pre").first();
+    const examples = page.locator(".syntax-highlighter pre");
+    const overflowing = await examples.evaluateAll((nodes) =>
+      nodes.findIndex((node) => node.scrollWidth > node.clientWidth),
+    );
+    expect(overflowing).toBeGreaterThanOrEqual(0);
+    const pre = examples.nth(overflowing);
     await pre.focus();
     await expect(pre).toBeFocused();
     await expect(pre).toHaveAttribute("aria-label", "JavaScript code example");
@@ -2125,3 +2130,4 @@ test('production key-object alignment preserves the chosen key, transformed pare
 test('production alignment guide remains readable without JavaScript at a narrow viewport',async({browser,baseURL},info)=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();try{await page.goto(baseURL+'/developer/layer-alignment.html');await expect(page.getByRole('heading',{name:'Align layers to the canvas or a key object',level:1,exact:true})).toBeVisible();await expect(page.locator('body')).toContainText('Centered on canvas');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:info.outputPath('alignment-guide-mobile.png')});}finally{await context.close();}
 });
+test('production ordinary text edits preserve imported geometry, exact pixels and undo while explicit reflow remains available',async({page},info)=>{const{textGeometryWorkflow}=await import('./helpers/text-edit-geometry');await textGeometryWorkflow(page,info,true);});

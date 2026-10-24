@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Authored text geometry during ordinary edits
+
+Position, transforms, appearance, naming and visibility/locking changes through `layer.update` must preserve imported text width/height. This includes distribution/flip and color/alignment property edits. Resolve linked format overrides only when format properties are requested. Explicit content, metric or paragraph-layout requests still reflow, including same-text `TextLayer.reflow()`. Shared UI, isolated/plugin, REST, recipe and ordinary Undo behavior must agree; saved projects retain the resulting authored dimensions.
+
 ## Canvas and key-object alignment
 
 Single or multiple selected roots must align to their selection, canvas or an independent stationary key through one shared command. Preserve authored geometry, text dimensions, source bytes and parent bases; a locked key stays read-only, while locked moving roots reject atomically. Offer custom-system panel controls and matching command-palette actions, with no new default typing shortcuts. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.

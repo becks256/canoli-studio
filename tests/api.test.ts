@@ -1638,3 +1638,16 @@ it('treats a locked selected key as a read-only REST alignment reference',async(
  const created=await request('/documents',{width:200,height:100}),path=`/documents/${created.body.document.id}`,moving={...new TextLayer({name:'Moving',text:'A',x:0,y:40}).toJSON(),width:20,height:20},key={...new TextLayer({name:'Key',text:'A',x:130,y:10,locked:true}).toJSON(),width:40,height:20};await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:moving},{type:'layer.add',layer:key}]});
  const response=await request(path+'/commands',{expectedRevision:1,commands:[{type:'layer.align',ids:[moving.id,key.id],alignment:'right',target:{type:'layer',id:key.id}}]});expect(response.status).toBe(200);expect(response.body.document.children[0].x).toBe(150);expect(response.body.document.children[1]).toEqual(key);
 });
+it('preserves authored text geometry through REST appearance/layout commands while explicit typography still reflows',async()=>{
+ const created=await request('/documents',{width:300,height:200}),path=`/documents/${created.body.document.id}`,layers=[0,40,150].map((x,index)=>({...new TextLayer({name:'Imported '+index,text:'A',x,y:20}).toJSON(),width:20,height:20}));
+ let state=await request(path+'/commands',{expectedRevision:0,commands:layers.map(layer=>({type:'layer.add',layer}))});expect(state.status).toBe(200);const before=state.body.document;
+ state=await request(path+'/commands',{expectedRevision:state.body.revision,commands:[{type:'layer.update',id:layers[1].id,patch:{x:75,opacity:.5,color:'#2050a0',align:'right'}}]});expect(state.status).toBe(200);expect(state.body.document.children[1]).toEqual({...layers[1],x:75,opacity:.5,color:'#2050a0',align:'right'});
+ expect((await request(path+'/commands',{expectedRevision:1,commands:[{type:'layer.update',id:layers[1].id,patch:{x:1}}]})).status).toBe(409);
+ state=await request(path+'/undo',{expectedRevision:state.body.revision});expect(state.body.document).toEqual(before);
+ for(const command of [{type:'layer.distribute',ids:layers.map(layer=>layer.id),axis:'horizontal',mode:'gaps'},{type:'layer.flip',ids:layers.map(layer=>layer.id),axis:'horizontal'}]){
+  state=await request(path+'/commands',{expectedRevision:state.body.revision,commands:[command]});expect(state.status).toBe(200);for(const layer of state.body.document.children)expect(layer).toMatchObject({width:20,height:20,text:'A'});
+  state=await request(path+'/undo',{expectedRevision:state.body.revision});expect(state.body.document).toEqual(before);
+ }
+ const invalid=await request(path+'/commands',{expectedRevision:state.body.revision,commands:[{type:'layer.update',id:layers[1].id,patch:{opacity:.5}},{type:'layer.update',id:layers[1].id,patch:{fontSize:0}}]});expect(invalid.status).toBe(400);expect((await request(path)).body.document).toEqual(before);
+ state=await request(path+'/commands',{expectedRevision:state.body.revision,commands:[{type:'layer.update',id:layers[1].id,patch:{text:'A'}}]});expect(state.status).toBe(200);expect([state.body.document.children[1].width,state.body.document.children[1].height]).not.toEqual([20,20]);
+});

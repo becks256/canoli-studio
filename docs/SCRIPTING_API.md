@@ -1,5 +1,20 @@
 # Scripting API
 
+## Text property edits and explicit reflow
+
+Ordinary attached or detached `TextLayer.update(patch)` operations preserve authored width/height when changing position, transform, name, opacity/fill/blend, color, alignment, visibility, lock, masks or styles. This also applies to movement, distribution and flipping through `document.layerSelection`. Color/alignment property edits still update linked paragraph overrides without measuring the text. Unrelated edits retain sparse legacy cached fields.
+
+Explicit requests containing `text`, `fontSize`, `fontFamily`, `lineHeight`, `letterSpacing`, `wordSpacing`, `fontKerning`, `fontVariantCaps`, `fontStretch`, `fontWeight`, `fontStyle`, `direction`, `wrapWidth`, `paragraphSpacing`, `firstLineIndent` or `paragraphJustify` recalculate bounds with the fonts available in that execution environment. Legacy raw `width`/`height` patches retain their existing normalization to measured text bounds; use font size and `wrapWidth` for authored layout. Request presence matters even when its value is unchanged or a supported optional override is cleared.
+
+`TextLayer.reflow(): void` explicitly recalculates current bounds by submitting the current text again. It loads no font or external resource. With a text layer selected, run:
+
+<!-- example: text-explicit-reflow -->
+```js
+document.selectedLayer.reflow();
+```
+
+Select a real TextLayer before this example; missing/non-text selections do not offer this method. Attached changes retain existing validation, locks and ordinary Undo. An isolated script accepts one host transaction after revision/permission/source checks. Applying/resetting paragraph styles and editing reusable style definitions retain their separate documented reflow behavior. No signature, schema, execution limit, permission or default shortcut changes.
+
 ## Canvas and key-object layer alignment
 
 document.layerSelection.align(alignment, reference = "selection") accepts "selection", "canvas" or a real attached Layer handle from this document. The key remains stationary; all movement uses authored geometric bounds and one ordinary command. No new isolated capability or default keyboard shortcut is introduced. The guide includes executable scripting and semantic recipe examples. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.

@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION} from '../src/core/model';
 import {expect,test} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 
@@ -20,7 +21,7 @@ test('isolated based-on style guide matches independent native text and preserve
    packageExact,packageOneUndo,packageFresh,packageUndo,cycleRejected,cycleAtomic,failedAtomic,undo,reopenedEqual:actual.every((v,i)=>v===reopened[i]),modelEqual,embeddedSize:inside.fontSize,embeddedBaseSize:inside.paragraphStyle!.basedOn!.format.fontSize,rootSize:second.fontSize,rootBaseSize:second.paragraphStyle!.basedOn!.basedOn!.format.fontSize,
    svgWarning:editor.getExportCapabilityReport({format:'svg'}).warnings.some((value:string)=>value.includes('linked paragraph-style'))};return values;
  },code);
- expect(result).toEqual({schema:42,oneUndo:true,visible:true,referenceEqual:true,cacheEqual:true,cropDifferences:0,packageExact:true,packageOneUndo:true,packageFresh:true,packageUndo:true,cycleRejected:true,cycleAtomic:true,failedAtomic:true,undo:true,reopenedEqual:true,modelEqual:true,embeddedSize:28,embeddedBaseSize:28,rootSize:30,rootBaseSize:40,svgWarning:true});
+ expect(result).toEqual({schema:SCHEMA_VERSION,oneUndo:true,visible:true,referenceEqual:true,cacheEqual:true,cropDifferences:0,packageExact:true,packageOneUndo:true,packageFresh:true,packageUndo:true,cycleRejected:true,cycleAtomic:true,failedAtomic:true,undo:true,reopenedEqual:true,modelEqual:true,embeddedSize:28,embeddedBaseSize:28,rootSize:30,rootBaseSize:40,svgWarning:true});
  await info.attach('paragraph-inheritance-native',{body:JSON.stringify(result),contentType:'application/json'});
 });
 

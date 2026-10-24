@@ -1,5 +1,9 @@
 # Architecture
 
+## Text update measurement boundary
+
+The shared `layer.update` reducer preserves cached authored dimensions unless the request includes text, metric/layout fields or legacy explicit width/height normalization. Presence rather than value difference preserves intentional same-text reflow. Linked paragraph bindings resolve only for requested format changes; unrelated edits retain sparse legacy cached fields. Style-library/application/reset commands keep their existing explicit reflow behavior. No model/schema, renderer or extension boundary changes are required.
+
 ## Shared alignment planner
 
 The read-only layer-layout planner resolves independent roots, stationary reference bounds and parent-space translations from one snapshot. The layer.align reducer changes only validated x/y fields, preserving authored text bounds rather than reflowing against another font environment. OO handles, REST DTOs, isolated commits and semantic recipe recording share this command. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.

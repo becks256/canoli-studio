@@ -218,6 +218,14 @@ function reflowText(layer:TextLayerData){
   });
   layer.width=bounds.width;layer.height=bounds.height;
 }
+// Presence matters: reflow() deliberately submits the current text again.
+// Explicit legacy width/height requests still normalize to measured bounds.
+const TEXT_REFLOW_KEYS: readonly (keyof LayerPatch)[] = [
+  'text','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
+  'fontKerning','fontVariantCaps','fontStretch','fontWeight','fontStyle',
+  'direction','wrapWidth','paragraphSpacing','firstLineIndent','paragraphJustify',
+  'width','height',
+];
 function apply(document: DocumentData, command: EditorCommand): void {
   if(command.type==='font.file.add'){
     const file=fontFileSchema.parse(command.file),existing=documentFontFiles(document).find(value=>value.id===file.id);
@@ -631,7 +639,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
       }
       Object.assign(layer, command.patch);
       if (layer.kind === "text") {
-        if(layer.paragraphStyle){
+        if(layer.paragraphStyle&&PARAGRAPH_FORMAT_KEYS.some(key=>Object.hasOwn(command.patch,key))){
           const style=document.paragraphStyles?.find(value=>value.id===layer.paragraphStyle!.id);if(!style)throw new Error('Paragraph style not found.');
           const overrides={...layer.paragraphStyle.overrides};
           for(const key of PARAGRAPH_FORMAT_KEYS)if(key in command.patch){
@@ -639,7 +647,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
           }
           layer.paragraphStyle={id:style.id,overrides};resolveParagraphBinding(layer,style);
         }
-        reflowText(layer);
+        if(TEXT_REFLOW_KEYS.some(key=>Object.hasOwn(command.patch,key)))reflowText(layer);
       }
       break;
     case "mask.setFromMatting":

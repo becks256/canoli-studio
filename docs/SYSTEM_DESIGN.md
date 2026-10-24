@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Authored text measurement invariant
+
+A non-layout `layer.update` must not replace retained text bounds with measurements from another font environment. The reducer tests explicit metric/content/layout property presence before reflow and resolves linked paragraph overrides only for format edits. Same-value explicit reflow remains supported; history navigation restores saved results without remeasurement. Independent REST, isolated commits, semantic replay and UI actions consume this shared behavior.
+
 ## Alignment invariant
 
 Plan all selected-root translations from one immutable canvas-space snapshot, excluding duplicate descendants and the explicit stationary key. Validate moving locks, geometry, hierarchy independence and finite coordinates before mutation. Commit only positions through one shared command; never reflow text, modify source contents or move the key. Semantic recipes preserve reference intent across fresh document identities. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.

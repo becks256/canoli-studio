@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Stable text frames during ordinary edits
+
+Moving/flipping/distributing text and changing its name, appearance, color, alignment, visibility or lock must keep the authored frame dimensions. Typography/layout controls and explicit reflow still recalculate them. Continue using existing controls and shortcuts; no new binding or input interception is introduced.
+
 ## Layer alignment reference controls
 
 Show Align relative to and the six-direction chooser for a nonempty layer selection. Default single-root selection to Canvas and multi-root selection to Selection. Key object reveals a numbered selected-root chooser and explains that the key stays stationary. Share the current key with command search/custom bindings; disable invalid moving locks/geometry with a useful reason. Use compact reference rows, retain usable layer-tree height and bound the additional controls in a keyboard-scrollable region instead of letting them push the action footer beyond the viewport. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.
