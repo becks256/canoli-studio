@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Font-file inspection interaction
+
+Use a lazy native details disclosure within Document fonts, the existing custom controls, source filename/size disclosure and a labeled native face selector. A multi-face collection starts unselected. Paginate faces and axes independently without dropping source data; declared names are text. Keep explicit Choose/Inspect again/Preview/Cancel, recoverable inline errors, a scrolling body and retained modal footer. Shape in a private script-disabled iframe and display only copied pixels in the visible canvas; resize redraws and missing glyph fallback is disclosed. Explain that inspection does not install/embed or change artwork. No new shortcut, rail icon or component library. See [FONT_SOURCES.md](FONT_SOURCES.md).
+
 ## Document font-management interaction
 
 Open the custom Document fonts modal through command search or Typography. Use exact request labels, searchable 30-row pages, stable explicit selection and text/style/override/embedded-scope counts. Probe selected/replacement availability without enumeration; debounce typed replacement requests and ignore obsolete results; require explicit fallback consent when unavailable/unknown. Installed-font discovery stays user-activated and shares the Typography family list. Stale revisions require explicit refresh, closed/switched owners reject, cancellation stays read-only and modal typing cannot trigger canvas tools. Keep all-or-nothing lock errors visible and provide normal focus restoration. See FONT_MANAGEMENT.md.

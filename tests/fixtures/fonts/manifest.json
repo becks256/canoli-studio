@@ -1,0 +1,34 @@
+{
+  "Bold.ttf": {
+    "bytes": 884,
+    "sha256": "f767deea32eed70b0b0622950cebac591ea93cdad29e992cdf907522f96502e8"
+  },
+  "CFF.otf": {
+    "bytes": 1008,
+    "sha256": "4123512ca0b62cd3ea2bf75032a7295f0e2096f0b4a812ef633f49c72a12f03f"
+  },
+  "Collection.dfont": {
+    "bytes": 2118,
+    "sha256": "4060294f9cbf1e365f2e04bdd9c0a8f0af8652f46179e01d0eafa7f63e380870"
+  },
+  "Collection.ttc": {
+    "bytes": 1672,
+    "sha256": "9f44e1933b9f42be02e623e053aa59b59b8deccac81c853c61466d7db52bcdad"
+  },
+  "DsigCollection.ttc": {
+    "bytes": 1696,
+    "sha256": "f1c5921da37dcc1c8fd87f1ddb1e48b5520fca98eaedebd8037c3712f36dd332"
+  },
+  "Regular.ttf": {
+    "bytes": 908,
+    "sha256": "4c6dfa9ea4d098de1f4b85e7c02671b05f5bfff822e2d7b3dc93c7ed5569b0c5"
+  },
+  "Regular.woff": {
+    "bytes": 700,
+    "sha256": "f844c3abf4d15c8c35c350f8fae926b4c26aba7f3fa95047542db607064aec9d"
+  },
+  "Regular.woff2": {
+    "bytes": 392,
+    "sha256": "060cde669f46ded10aa94d9dd5273c5c1244a03aa62f2795da7b6c79515b4387"
+  }
+}

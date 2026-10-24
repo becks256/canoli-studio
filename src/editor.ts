@@ -1,4 +1,5 @@
 import {exportTiffPages as encodeTiffPages} from './engine/tiff';
+import type {FontInspection,FontInspectOptions,FontPrepareOptions,FontSourceControl,PreparedFontSource} from './fonts/types';
 import {validateTiffVariant,type TiffPagesExportOptions} from './core/tiff';
 import {captureRetainedHistory, captureProjectHistory, retainedDocuments} from './core/history';
 import {freeze} from './core/immutable';
@@ -184,6 +185,7 @@ export class EditorApplication {
   private photoshopJobs=new Set<AbortController>();
   private rawJobs=new Set<AbortController>();
   private avifJobs=new Set<AbortController>();
+  private fontJobs=new Set<AbortController>();
   private photoshopCommits=new Set<AbortController>();
   private idleRetouchProcessor: PixelProcessor | null = null;
   private retouchProcessors = new Set<PixelProcessor>();
@@ -1417,6 +1419,21 @@ export class EditorApplication {
     return (await inspectSvgFile(file,control)).report;
   }
 
+  /** Read-only font source preparation; no font is installed or embedded. */
+  inspectFont(file:Blob,options:FontInspectOptions={},control:FontSourceControl={}):Promise<FontInspection>{
+    return this.withFontSource(control,async checked=>(await import('./fonts/client')).inspectFontFile(file,options,checked));
+  }
+  prepareFontSource(file:Blob,options:FontPrepareOptions={},control:FontSourceControl={}):Promise<PreparedFontSource>{
+    return this.withFontSource(control,async checked=>(await import('./fonts/client')).prepareFontFile(file,options,checked));
+  }
+  private async withFontSource<T>(control:FontSourceControl,action:(checked:FontSourceControl)=>Promise<T>):Promise<T>{
+    if(this.retouchDisposed)throw new Error('The editor is disposed.');
+    control.signal?.throwIfAborted();const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
+    this.fontJobs.add(abort);control.signal?.addEventListener('abort',cancel,{once:true});
+    try{const result=await action({...control,signal:abort.signal});abort.signal.throwIfAborted();return result;}
+    finally{this.fontJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+  }
+
   async inspectTiff(file:File,control:TiffImportControl={}):Promise<TiffImportReport>{return inspectTiffFile(file,control);}
 
   /** Trusted local preflight; opening uses the separate guarded import transaction below. */
@@ -1997,6 +2014,7 @@ export class EditorApplication {
   dispose() {
     this.ioGeneration++;
     this.retouchDisposed = true;
+    for(const job of this.fontJobs)job.abort(new Error('Editor disposed during font source preparation.'));this.fontJobs.clear();
     for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
     for(const job of this.rawJobs)job.abort(new Error('Editor disposed during RAW preparation.'));this.rawJobs.clear();
     for(const job of this.avifJobs)job.abort(new Error('Editor disposed during AVIF import.'));this.avifJobs.clear();

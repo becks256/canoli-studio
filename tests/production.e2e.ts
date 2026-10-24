@@ -668,6 +668,16 @@ test("production docs, fragment links and installed plugin commands work without
   expect((await exported).suggestedFilename()).toMatch(/\.png$/);
   await page.keyboard.press("Control+z");
   await expect(page.locator(".layer-row")).toHaveCount(0);
+  // Exercise durable plugin state across the same repeated reloads as the
+  // development workflow, using the actual release without editor globals.
+  await page.reload();await expect(page.getByRole('button',{name:'Move tool (V)',exact:true})).toBeVisible();
+  expect(await page.evaluate(()=> 'luma' in window)).toBe(false);
+  await page.getByRole('button',{name:'Plugins (Mod+Shift+L)',exact:true}).click();await expect(page.getByRole('button',{name:'Run Add guide frame',exact:true})).toBeVisible();
+  const {examplePlugin}=await import('../src/plugins');await page.getByTestId('plugin-input').setInputFiles({name:'update.luma-plugin.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...examplePlugin,version:'1.1.0'}))});
+  await expect(page.getByLabel('Review plugin')).toContainText('replaces installed version 1.0.0');await page.getByRole('button',{name:'Replace installed plugin',exact:true}).click();
+  const pluginDownload=page.waitForEvent('download');await page.getByRole('button',{name:'Export Studio utilities',exact:true}).click();expect((await pluginDownload).suggestedFilename()).toBe('studio.utilities.luma-plugin.json');
+  await page.getByRole('button',{name:'Remove Studio utilities',exact:true}).click();await expect(page.getByRole('button',{name:'Run Add guide frame',exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Close plugins',exact:true}).click();
+  await page.reload();await expect(page.getByRole('button',{name:'Move tool (V)',exact:true})).toBeVisible();await page.getByRole('button',{name:'Plugins (Mod+Shift+L)',exact:true}).click();await expect(page.getByRole('button',{name:'Run Add guide frame',exact:true})).toHaveCount(0);await page.getByRole('button',{name:'Close plugins',exact:true}).click();
   expect(errors).toEqual([]);
 });
 
@@ -2074,4 +2084,13 @@ test('production document fonts preserve native text, style inheritance, undo an
 test('production document-font guide renders without JavaScript at a narrow viewport',async({browser,baseURL},info)=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();
  try{await page.goto(baseURL+'/developer/font-management.html');await expect(page.getByRole('heading',{name:'Document fonts',level:1,exact:true})).toBeVisible();await expect(page.locator('body')).toContainText('Document font replacement ready');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:info.outputPath('font-guide-mobile.png')});}finally{await context.close();}
+});
+
+test('production font files inspect and preview privately without changing document pixels or history',async({page},info)=>{
+ const {fontSourceWorkflow}=await import('./helpers/font-sources');await fontSourceWorkflow(page,info,true);
+});
+
+test('production font-source guide and dependency notices are available without JavaScript',async({browser,baseURL},info)=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();
+ try{await page.goto(baseURL+'/developer/font-sources.html');await expect(page.getByRole('heading',{name:'Font-file inspection and private preview',level:1,exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);await page.screenshot({path:info.outputPath('font-source-guide-mobile.png')});const response=await page.request.get(baseURL+'/font-parser-notices.txt');expect(response.ok()).toBe(true);expect(await response.text()).toContain('fontkit');}finally{await context.close();}
 });

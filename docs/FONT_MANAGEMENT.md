@@ -1,5 +1,7 @@
 # Document fonts
 
+**Inspect font files** now offers local source metadata, explicit collection-face selection and private native preview within this dialog. It preserves complete originals but does not install, attach or embed fonts. Closing discards pending/preview work. Source signatures, host APIs, scheduling, native validation and current limits: [FONT_SOURCES.md](FONT_SOURCES.md).
+
 Open **Document fonts** from command search (`Mod+K`) or **Manage document fonts…** in the Typography Inspector. There is no default shortcut. The dialog lists exact authored family requests, including complete fallback lists, across all ordinary and hidden text, paragraph styles and every stored embedded document, including unused definitions. Search and 30-row pages retain the complete inventory.
 
 Select a request to inspect text/style/override counts and a local availability probe. Choose a replacement preset or type a family/fallback list. Installed-font discovery is an explicit permission-controlled action shared with the Typography picker; denial is recoverable and manual entry remains available. Unavailable or unknown replacement requests require **Allow browser fallback for this replacement**. Availability is a family probe at the time of inspection; it does not prove glyph coverage, weight/width support or cross-device fidelity. Refresh to check again after fonts change.

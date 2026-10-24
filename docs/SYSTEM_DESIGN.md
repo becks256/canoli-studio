@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Font-source ownership invariant
+
+Font admission retains the exact immutable original Blob and derives a selected whole native face without subsetting. Validate source/derived digests, actual signatures, selected index and strict DTOs before returning unregistered native FontFaces. Serialized host jobs use fresh disposable parser workers; cancellation/timeout/disposal revokes publication and terminates parsing. Native loads cannot be forcibly stopped, and late results acquire no registration or document authority. Private preview registrations belong solely to the child FontFaceSet and are removed on replacement/unmount. This source-only foundation has no persistent font asset, model/history/schema mutation or isolated/plugin/REST capability. Full source binding/persistence remains required F08 work. See [FONT_SOURCES.md](FONT_SOURCES.md).
+
 ## Cold text allocation invariant
 
 Eligible text uses fresh native ink bounds and the existing exact-grid bounded compositor before drawing, including plain text without shadows. Logical text dimensions cannot bound italic, RTL, combining or overlapping glyph ink. Invalid/unavailable native ink metrics preserve the full reference path. Allocation geometry is temporary viewport work; no authored/source dimensions or stored formats change. Cold, retained, replacement and Undo output must match `cache:false` pixels exactly. Working-area reduction does not establish latency or physical-device performance.

@@ -1,4 +1,4 @@
-import {useEffect,useId,useState,useSyncExternalStore} from 'react';
+import {lazy,Suspense,useEffect,useId,useState,useSyncExternalStore} from 'react';
 import {X} from 'lucide-react';
 import type {Document} from '../dom';
 import {Dialog} from './Dialog';
@@ -6,8 +6,10 @@ import {Button,IconButton,Select,TextInput} from './controls';
 import {fontAvailability,type FontAvailability} from './font-availability';
 import {FONT_FAMILIES} from './TypographyPanel';
 import {getSystemFonts,subscribeSystemFonts,systemFonts} from './system-fonts';
+import type {FontSourceHost} from './FontSourceInspector';
+const FontSourceInspector=lazy(()=>import('./FontSourceInspector').then(module=>({default:module.FontSourceInspector})));
 
-export function FontManagerDialog({document:owner,onReplace,onClose}:{document:Document;onReplace(from:string,to:string,revision:number):void;onClose():void}){
+export function FontManagerDialog({document:owner,fontSources,onReplace,onClose}:{document:Document;fontSources?:FontSourceHost;onReplace(from:string,to:string,revision:number):void;onClose():void}){
   const title=useId(),live=useSyncExternalStore(owner.subscribe,owner.getSnapshot);
   const [captured,setCaptured]=useState(()=>({revision:live.revision,items:owner.fonts.items}));
   const [from,setFrom]=useState(''),[to,setTo]=useState('sans-serif'),[search,setSearch]=useState(''),[page,setPage]=useState(0);
@@ -44,6 +46,7 @@ export function FontManagerDialog({document:owner,onReplace,onClose}:{document:D
   };
   return <Dialog titleId={title} onClose={onClose} className="font-manager-dialog" localEscape>
     <div className="dialog-heading"><h2 id={title}>Document fonts</h2><IconButton label="Close document fonts" autoFocus onClick={onClose}><X size={19}/></IconButton></div>
+    <div className="font-manager-body">
     <p>Review exact font family requests, including fallback lists. Replacement includes hidden text, paragraph styles and every stored embedded document.</p>
     {error&&<p role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
     {stale&&<p role="alert">The document changed. Refresh the font list before replacing.</p>}
@@ -67,6 +70,8 @@ export function FontManagerDialog({document:owner,onReplace,onClose}:{document:D
         setLoadingFonts(true);setError('');void systemFonts().catch(cause=>setError(`Installed fonts could not be listed: ${String(cause)}`)).finally(()=>setLoadingFonts(false));
       }}>{loadingFonts?'Listing installed fonts…':'List installed fonts'}</Button>
     </div>
-    <div className="dialog-actions"><Button variant="subtle" onClick={onClose}>Done</Button><Button variant="primary" disabled={!selected||!to.trim()||from===to||stale||checking||fallback&&!allowFallback} onClick={replace}>Replace font</Button></div>
+    {fontSources&&<Suspense fallback={<p role="status">Loading font-file inspector…</p>}><FontSourceInspector host={fontSources}/></Suspense>}
+    </div>
+    <div className="dialog-actions font-manager-footer"><Button variant="subtle" onClick={onClose}>Done</Button><Button variant="primary" disabled={!selected||!to.trim()||from===to||stale||checking||fallback&&!allowFallback} onClick={replace}>Replace font</Button></div>
   </Dialog>;
 }

@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Font-source inspection grants no extension access
+
+The trusted font inspector reads local font Blobs and previews loaded faces in a private child font set. EditorApplication.inspectFont/prepareFontSource are not isolated globals, plugin capabilities or document-font mutations. Existing document:read/document:write grants cover family inventory/replacement only; installation stays inert. Font source files, native handles and their private lifetime are not exposed through plugin storage, network or independent REST. No package/runtime contract changes. See [FONT_SOURCES.md](FONT_SOURCES.md).
+
 ## Document font commands
 
 Document.fonts.items uses existing document:read access; font replacement requires document:write and commits through the same isolated result validation, permission/revision, command and undo boundaries. It grants no font-file, asset, network or credential capability, and installation remains inert. See FONT_MANAGEMENT.md.

@@ -40,6 +40,7 @@ const generatedPages = [
   ["TIFF_PAGES", "Multipage TIFF export"],
   ["FONT_FEATURES", "Native font features"],
   ["FONT_MANAGEMENT", "Document fonts"],
+  ["FONT_SOURCES", "Font-file inspection and private preview"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

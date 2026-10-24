@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+### Current F08 increment: font-source inspection and private preview (2026-10-24)
+
+Local source inspection, explicit collection selection, complete original retention and loaded unregistered native faces now support a private preview within Document fonts. The independently built parser worker, FIFO cancellation/validation and visible pixel-copy preview preserve document artwork/history and existing extension boundaries. Build and all 2,036 unit/API checks pass; all 128 production workflows are verified across the full run and dedicated-reader corrections. A development plugin third-reload case still exhausts Chromium resources and remains open. Font binding/embedding, project/workspace/history source persistence and the entire remaining typography/performance and original roadmap scope remain required. See [the source contract](FONT_SOURCES.md), dated roadmap and [sealed evidence](benchmarks/font-source-admission-2026-10-24.json).
+
 Planning baseline: 2026-09-21. Status: proposed product plan, not shipped features or a release promise. Owner: founder/product owner. Implementation handoff: [roadmap](IMPLEMENTATION_ROADMAP.md), [AI specifications](AI_FEATURE_SPECS.md), [competitive evidence](COMPETITIVE_RESEARCH.md). Current behavior remains defined by [requirements](REQUIREMENTS.md), code, and tests.
 
 ## Objective and definition of “Photoshop, but better”

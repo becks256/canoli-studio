@@ -1219,7 +1219,7 @@ kbd {
   color: var(--color-accent);
   white-space: nowrap;
 }
-.shortcut-dialog > p {
+.shortcut-dialog > p, .font-manager-body > p {
   color: var(--color-text-muted);
   font-size: 10px;
   margin: 21px 0 0;
@@ -6427,3 +6427,13 @@ input[type="color"] {
 .font-manager-dialog .dialog-actions { flex-wrap: wrap; }
 
 .font-manager-dialog p { overflow-wrap: anywhere; }
+.font-manager-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
+.font-manager-body { flex: 1; min-height: 0; overflow: auto; }
+.font-manager-dialog > .dialog-heading, .font-manager-footer { flex-shrink: 0; }
+.font-source-inspector { margin-block: var(--space-3); border-top: 1px solid var(--color-border); padding-top: var(--space-3); }
+.font-source-inspector summary { cursor: pointer; }
+.font-source-body { display: grid; gap: var(--space-2); min-width: 0; }
+.font-source-body p, .font-source-body dd, .font-source-body li { overflow-wrap: anywhere; }
+.font-source-preview { display: block; width: 100%; height: 150px; border: 1px solid var(--color-border); border-radius: var(--radius-control); color: var(--color-text); }
+.font-source-metadata { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--space-2); }
+.font-source-metadata dd { margin: 0; min-width: 0; }

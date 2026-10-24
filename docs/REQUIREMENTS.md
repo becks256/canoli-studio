@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Font-source admission and private preview (F08 foundation)
+
+Inspect actual local TTF/OTF/WOFF/WOFF2/TTC/SFNT-datafork sources in disposable workers without a font-file size cutoff. Return paged strict metadata, original/derived hashes and explicit selected-face transformations; preserve complete originals and copy whole collection faces without glyph subsetting. Multi-face preparation requires explicit selection. Native validation returns loaded unregistered FontFaces. The custom inspector previews only in a private font set, supports cancellation/retry and retains modal controls at short widths without changing artwork, font requests, revision or history. Verify original-face native pixels and queue/error/late-result/disposal behavior. This trusted service grants no isolated/plugin/REST file capability. Font embedding and project/workspace/history/source-library persistence remain required, unfinished F08 work. See [FONT_SOURCES.md](FONT_SOURCES.md).
+
 ## Cold text working-area acceptance (F14 increment)
 
 Eligible plain-text viewport work must follow visible glyph ink before allocation, without clipping overhangs, changing whole-line shaping, authored geometry or native output pixels. Verify cold frames, font replacement, Undo and retained frames against the uncached reference; unavailable native ink metrics must preserve the full path. Record real matching-frame latency and long tasks separately from working-area reduction. This increment does not close the sustained editor-wide/device/GPU/process-memory gates.

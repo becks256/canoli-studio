@@ -1,5 +1,9 @@
 # Architecture
 
+## Font-file source boundary
+
+`src/fonts/{parser,sfnt,types}` indexes actual containers, validates paged metadata, extracts whole TTC/datafork faces and preserves source identity. Pinned Fontkit executes in a disposable module worker; `client` owns FIFO scheduling, strict response/digest checks, timeout/cancellation and unregistered native validation. EditorApplication tracks/disposes its font jobs independently of document mutation. The lazy FontSourceInspector registers preview faces only in a same-origin, script-disabled child document and cleans them on replacement/unmount; the visible parent canvas receives only copied pixels, and resizing redraws the sample. No image AssetStore/model/history/schema change or isolated/plugin/REST privilege is introduced. Binary font persistence and document binding remain unfinished. Build-time parser notices and the complete API/lifecycle contract are in [FONT_SOURCES.md](FONT_SOURCES.md).
+
 ## Cold plain-text working geometry
 
 The Canvas viewport bounds eligible normal-blend text to fresh native glyph ink before allocating its content surface, using the existing bounded shadow/raster path. Whole-line shaping, ink overhangs and the exact output-pixel origin remain unchanged. Missing ink metrics, backdrop-dependent processing, live affected layers and non-beneficial bounds retain the full path. Export/reference renders with `cache:false` remain the independent full-surface comparison. Compact retention alone does not bound cold drawing work; see the dated F14 roadmap evidence.

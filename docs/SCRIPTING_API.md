@@ -1,5 +1,9 @@
 # Scripting API
 
+## Font sources — trusted browser host only
+
+`editor.inspectFont(file:Blob,options:{offset?:number;limit?:number}={},control:FontSourceControl={}):Promise<FontInspection>` and `editor.prepareFontSource(file:Blob,options:{faceIndex?:number}={},control:FontSourceControl={}):Promise<PreparedFontSource>` are trusted EditorApplication methods, unavailable inside isolated Scripts/internal plugins. Inspection defaults to offset0/limit32; limit is1–128. Preparation defaults to index0 only for single-face sources; multi-face sources require a selected index. Control supports signal, active timeout60000ms by default, and phase progress. Returned FontFaces are loaded but unregistered; originals remain unchanged and no document command occurs. Invalid data/options, native rejection, cancellation, timeout and disposal reject. There is no font file/FontFace global, embedding method, new permission or REST counterpart. Full signatures, DTOs, trusted example, cancellation/native limitations and ownership: [FONT_SOURCES.md](FONT_SOURCES.md).
+
 ## Document font collection
 
 Document.fonts.items returns owned DocumentFontUsage[] across all stored text/style/embedded scopes. Document.fonts.replace(from:string,to:string):void requires exact 1–240-unit authored requests, preserves inheritance/overrides and uses shared validation, reflow, locks and one-step history. Equal/missing requests are no-ops; malformed or locked replacements reject atomically. No font files/embedding or availability API is exposed to isolated scripts. Full DTOs, defaults, executable example, REST/recipe counterparts and limits: [Document fonts](FONT_MANAGEMENT.md).

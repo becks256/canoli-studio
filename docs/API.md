@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Trusted font-file services
+
+Browser `editor.inspectFont(file:Blob,options:{offset?:number;limit?:number}={},control:FontSourceControl={}):Promise<FontInspection>` and `editor.prepareFontSource(file:Blob,options:{faceIndex?:number}={},control:FontSourceControl={}):Promise<PreparedFontSource>` inspect local sources and prepare loaded unregistered native faces without document edits. Defaults are offset0/limit32 (limit1–128), single-face index0 and active timeout60000ms. Multi-face preparation requires explicit selection. Cancellation/disposal, malformed data/results and native failures reject. These methods are host-only; no REST endpoint, isolated file capability or browser/headless synchronization is added. Complete DTOs, ownership, examples, errors and limits: [FONT_SOURCES.md](FONT_SOURCES.md).
+
 ## Document font requests
 
 GET /api/v1/documents/:id/fonts returns id/revision/fonts for the independent headless session. The strict document.font.replace command requires from/to strings and the current expectedRevision through the normal command endpoint, sharing atomic locks/history and estimated headless reflow. It does not inspect browser fonts or add rendering/synchronization. Complete DTOs, example, errors and limits: [Document fonts](FONT_MANAGEMENT.md).
