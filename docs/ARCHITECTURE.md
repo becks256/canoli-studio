@@ -1,5 +1,9 @@
 # Architecture
 
+## Multipage TIFF ownership
+
+core/tiff plans a complete main-IFD chain with page-local tile inputs, exact global offsets and whole-file Classic/BigTIFF selection. engine/tiff captures all immutable page snapshots/dependencies, renders native tiles sequentially and assembles compressed private page payloads before directories. EditorApplication resolves actual owned Document handles, validates options and guards selected-session lifetime. ExportDialog uses session keys, including for duplicate persisted IDs, and offers explicit order/inclusion. No model/project/workspace schema or isolated/REST surface changes. See [multipage TIFF](TIFF_PAGES.md).
+
 ## Result-point provenance and trusted ingress
 
 history-provenance owns strict origin/operation schemas and accepted submitted-command summaries. EditorStore records changed commits with private session/weak-observation ownership and parallel current/past/future point maps. History 4 carries full branch/comparison attribution closure; legacy entries stay unchanged and unknown. Document coordinates synchronous host origins and guards accepted publication/observers. Editor, REST, isolated script/plugin host commits, actual recipe/candidate workflows and connected clients supply context at trusted entry points. Async services capture context before preparation and apply it at final commit only. File admission validates record/model consistency but imports never acquire runtime observation or identity authentication. Ordinary unbranched browser files retain current attribution without adding Undo. See HISTORY.md.

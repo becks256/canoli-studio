@@ -37,6 +37,7 @@ const generatedPages = [
   ["ARTWORK_LIBRARY", "Reusable artwork library"],
   ["COLOR_PALETTES", "Reusable color palettes"],
   ["HISTORY", "Inspectable retained history"],
+  ["TIFF_PAGES", "Multipage TIFF export"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

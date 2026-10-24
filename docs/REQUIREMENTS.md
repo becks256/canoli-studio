@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Ordered multipage TIFF delivery
+
+Export an explicitly ordered, nonempty selection of owned open documents as independent native RGBA8 sRGB TIFF pages. Current-document export stays the default. Preserve each page geometry, source bytes, active tab, selection/history and later-edit snapshot independence. Validate owner handles/options, pin all referenced sources/fonts before callbacks, reject selected-owner/source changes or cancellation without a partial file, and select Classic/BigTIFF from the entire output. UI supports inclusion, removal and ordering without silently dropping closed pages. See [multipage TIFF](TIFF_PAGES.md); full F11/color/precision/reader/device acceptance remains open.
+
 ## Observed operation provenance (W05)
 
 Record host-assigned origins and local acceptance identity/time for changed command results, never infer old origins/authors/times from labels. Preserve point records through navigation, branches, comparisons, native/current-result saves and workspace recovery. Keep runtime observation separate from untrusted stored records. Strict history-4 admission checks point/model alignment and consistent repeated IDs; no authentication/signature claim is made. Script/plugin origins must be assigned at host commit and isolated overrides rejected. Async preparation must not leak origin scope to unrelated edits. Accepted observer failure must retain the operation/model/assets and notify remaining observers. Full authenticated audit and wider roadmap quality gates remain open. Contract: HISTORY.md.

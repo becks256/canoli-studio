@@ -1,3 +1,5 @@
+import {exportTiffPages as encodeTiffPages} from './engine/tiff';
+import {validateTiffVariant,type TiffPagesExportOptions} from './core/tiff';
 import {captureRetainedHistory, captureProjectHistory, retainedDocuments} from './core/history';
 import {freeze} from './core/immutable';
 import {historyTimeline} from './core/history-inspection';
@@ -85,7 +87,7 @@ import type {
 import type { SelectionData } from "./core/drawing";
 import { AdaptiveRenderer } from "./engine/adaptive";
 import { ScriptRunner } from "./scripting/runner";
-import { exportDocument, getExportCapabilityReport } from "./engine/export";
+import { exportDocument, getExportCapabilityReport, getTiffPagesCapabilityReport } from "./engine/export";
 import {prepareTiffImport} from './engine/tiff-import';
 import {prepareAvifImport} from './engine/avif-import';
 import {importParagraphStyles} from './core/paragraph-styles';
@@ -1653,6 +1655,35 @@ export class EditorApplication {
     if (control?.signal) await new Promise<void>(resolve=>setTimeout(resolve,0));
     checkExport(control);
     return result;
+  }
+
+  private captureTiffPages(documents:readonly Document[],options:TiffPagesExportOptions) {
+    if(!Array.isArray(documents)||!documents.length)throw new Error('Choose at least one open document as a TIFF page.');
+    if(new Set(documents).size!==documents.length)throw new Error('Choose each open document once.');
+    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='variant'))throw new Error('TIFF page export options accept only variant.');
+    const variant=validateTiffVariant(options.variant);
+    const pages=documents.map(document=>{
+      const session=this.sessions.find(session=>session.document===document);
+      if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');
+      return{session,document:document._read(),assets:session.assets,renderer:this.renderer};
+    });
+    const check=()=>{for(const page of pages)if(this.retouchDisposed||!this.sessions.includes(page.session)||page.session.assets!==page.assets)throw new Error('A TIFF page document closed during export. Choose its pages again.');};
+    check();return{pages,variant,check};
+  }
+
+  /** Trusted browser host; each open Document becomes one flattened native-size page. */
+  async exportTiffPages(documents:readonly Document[],options:TiffPagesExportOptions={},control?:ExportControl):Promise<ExportResult> {
+    checkExport(control);const{pages,variant,check}=this.captureTiffPages(documents,options);
+    const report=getTiffPagesCapabilityReport(pages.map(page=>page.document),variant);
+    const current=()=>{checkExport(control);check();};
+    const blob=await encodeTiffPages(pages,variant,{signal:control?.signal,onProgress:progress=>{current();control?.onProgress?.(progress);current();}});
+    if(control?.signal)await new Promise<void>(resolve=>setTimeout(resolve,0));current();
+    return{blob,mimeType:'image/tiff',extension:'tif',report};
+  }
+
+  getTiffPagesCapabilityReport(documents:readonly Document[],options:TiffPagesExportOptions={}):ExportCapabilityReport {
+    const{pages,variant}=this.captureTiffPages(documents,options);
+    return getTiffPagesCapabilityReport(pages.map(page=>page.document),variant);
   }
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {

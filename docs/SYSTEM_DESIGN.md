@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Multipage TIFF snapshot invariant
+
+Capture the complete ordered page selection and all visible dependencies synchronously before user callbacks. Native rendering uses independent immutable page geometry and stores compressed bounded tiles; no page can silently substitute newer source/font generations. Selected owner closure/cancellation/callback failure invalidates the whole private result. Main-IFD offsets and metadata use the complete file budget, with exact 64-bit BigTIFF addressing where Classic overflows. Page selection is host/session identity, not persisted document-ID identity. Document/history and original bytes remain unchanged. See [multipage TIFF](TIFF_PAGES.md).
+
 ## Operation observation invariants
 
 Provenance describes accepted result states, not replayable code or inferred authorship. Point maps move with snapshots and preserve current/fork/tip/comparison identity; missing records remain null. Only trusted ingress assigns source, IDs and local acceptance time. Weak runtime observation is never serialized, and imports are structurally checked stored claims. History 4 validates alignment/document ownership/repeated-ID result consistency before installing sources. Guard reentrant publication, exhaust observer delivery and preserve accepted generated assets/recipe success on observer failure. Authentication, signed/append-only audit, billing and inference remain separate. See HISTORY.md.

@@ -1,5 +1,9 @@
 # Scripting API
 
+## Multipage TIFF export — trusted host only
+
+Trusted editor.exportTiffPages(documents:readonly Document[],options:{variant?:"auto"|"classic"|"big"}={},control?:ExportControl):Promise<ExportResult> and editor.getTiffPagesCapabilityReport(documents,options={}):ExportCapabilityReport accept actual owned open handles in explicit order. Empty, repeated/closed/detached handles, unsupported variants and unknown option fields reject. Default variant is auto. Each page retains its own native RGBA8 sRGB dimensions; the whole file selects its container. Source/font/cancel/session guards cover every captured page before callbacks and through assembly. Later model edits preserve snapshot output. These are not isolated globals or REST rendering methods. Full executable host example, failure behavior, UI and resource/format limits: [multipage TIFF](TIFF_PAGES.md).
+
 ## Operation provenance and command observers
 
 Await `host.jobs.applyCandidate(...)` while the script is active. Candidate placement rechecks the current document, cancellation/deadline and live plugin read/write grants immediately before its synchronous commit. Returning or throwing revokes pending host edit authority; unawaited placement cannot publish afterward. Submitting a background job remains separate and does not auto-attach its result.
@@ -3150,7 +3154,7 @@ document.layers.add(new TextLayer({
 print("TIFF composition ready");
 ```
 
-Multipage output, higher precision, editable TIFF layers and general independent-reader/device acceptance remain open F11 work. This host method adds no REST export endpoint or isolated script/plugin export capability. TIFF input has the separately bounded contract above.
+Ordered open-document multipage output is described in [multipage TIFF](TIFF_PAGES.md). Higher precision, editable TIFF layers and broader independent-reader/device acceptance remain open F11 work. This host method adds no REST export endpoint or isolated script/plugin export capability. TIFF input has the separately bounded contract above.
 
 ## Rendered PSD export (trusted application code)
 

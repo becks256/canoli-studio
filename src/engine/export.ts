@@ -58,6 +58,17 @@ export interface ExportResult {
  * what document features are preserved or degraded/omitted when exporting
  * to the requested target format.
  */
+/** Pure page report; cross-document ownership is checked by EditorApplication. */
+export function getTiffPagesCapabilityReport(documents:readonly DocumentData[],variant:TiffVariant='auto'):ExportCapabilityReport {
+  validateTiffVariant(variant);
+  if(!documents.length)throw new Error('Choose at least one TIFF page.');
+  const reports=documents.map(document=>getExportCapabilityReport(document,{format:'tiff',tiffVariant:variant}));
+  const unique=(values:string[])=>[...new Set(values)];
+  return {format:'tiff',warnings:unique([`Exports ${documents.length} TIFF page${documents.length===1?'':'s'} in the selected order. Some viewers display only the first page.`,...reports.flatMap(report=>report.warnings.map(warning=>warning.replace('TIFF is one flattened image.','Each TIFF page is a flattened image.')))]),
+    featuresPreserved:unique(['Independent native page dimensions and page order',...reports.flatMap(report=>report.featuresPreserved)]),
+    featuresDegradedOrOmitted:unique(reports.flatMap(report=>report.featuresDegradedOrOmitted))};
+}
+
 export function getExportCapabilityReport(
   document: DocumentData,
   options: ExportOptions,
@@ -109,7 +120,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       if(variant==='big')warnings.push('BigTIFF requires a compatible viewer. Some TIFF applications support only classic TIFF.');
       else if(variant==='auto')warnings.push('Automatic selects classic TIFF when its actual output fits; larger files use BigTIFF and require a compatible viewer.');
       else warnings.push('Classic TIFF uses 32-bit file addresses. If the output exceeds that format, choose Automatic or BigTIFF.');
-      featuresDegradedOrOmitted.push('Editable layers, masks, typography, effects and component links','Higher-bit-depth, CMYK/HDR and multipage output','Source-file and authored metadata');
+      featuresDegradedOrOmitted.push('Editable layers, masks, typography, effects and component links','Higher-bit-depth and CMYK/HDR output','Source-file and authored metadata');
       if(document.alphaChannels?.length)featuresDegradedOrOmitted.push('Saved alpha channels');
       break;
     case "png":

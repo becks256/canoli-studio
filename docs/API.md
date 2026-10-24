@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Trusted multipage TIFF export
+
+Browser-host editor.exportTiffPages(documents,{variant?}={},control?) returns one TIFF ExportResult; editor.getTiffPagesCapabilityReport(documents,{variant?}={}) inspects the same ordered open-handle selection without rendering. Nonempty unique owned Document handles are required; distinct sessions with the same persisted ID remain valid. Invalid options/ownership and stale source/font/session/cancellation fail without a partial file. This adds no headless REST endpoint, isolated script binding or browser/REST synchronization. Complete signatures/defaults/examples/limits: [multipage TIFF](TIFF_PAGES.md).
+
 ## REST operation observations
 
 The independent server assigns REST origin, and history GET includes point `provenance` as null or `{operation,observation}`. It never trusts command labels or request-supplied authors/origins. Accepted command observer failure returns the actual snapshot and warning; stale retries reject. Full native provenance requires `?history=true`. No browser synchronization, actor authentication, signed timestamp or replay privilege is introduced. Exact fields, limits and current-result/full-history persistence: HISTORY.md.
@@ -745,7 +749,7 @@ Trusted host SVG export may add whitespace-only inline spans after full-line nat
 
 ## TIFF export remains a browser-host operation
 
-Trusted `editor.export({format: "tiff", tiffVariant?: "auto" | "classic" | "big"}, control?)` returns a native-resolution, flattened lossless RGBA8 sRGB `.tif`, with alpha and an output ICC profile. Automatic selects classic TIFF or BigTIFF from actual file addressing. The existing Export dialog exposes compatibility, progress and cancellation. See [SCRIPTING_API.md](SCRIPTING_API.md#native-tiff-export-trusted-application-code) for defaults, limits, errors and lifetime behavior. This adds no REST rendering route, sandbox file method, cloud transfer or synchronization between headless and browser sessions. TIFF import and higher-precision/multipage/editable output remain planned.
+Trusted `editor.export({format: "tiff", tiffVariant?: "auto" | "classic" | "big"}, control?)` returns a native-resolution, flattened lossless RGBA8 sRGB `.tif`, with alpha and an output ICC profile. Automatic selects classic TIFF or BigTIFF from actual file addressing. The existing Export dialog exposes compatibility, progress and cancellation. See [SCRIPTING_API.md](SCRIPTING_API.md#native-tiff-export-trusted-application-code) for defaults, limits, errors and lifetime behavior. This adds no REST rendering route, sandbox file method, cloud transfer or synchronization between headless and browser sessions. TIFF input and ordered open-document multipage output have separate contracts; higher-precision/editable TIFF output remains open.
 
 
 ### Trusted browser PSB delivery and Photoshop import

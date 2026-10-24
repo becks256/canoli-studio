@@ -2050,3 +2050,7 @@ test('production saved comparisons retain regions and continue exact alternative
 test('production operation provenance distinguishes observed and stored origins without developer globals', async ({page}, info) => {
  const {historyProvenanceWorkflow}=await import('./helpers/history-provenance');await historyProvenanceWorkflow(page,info,true);
 });
+
+test('production multipage TIFF preserves selected order, native page geometry and exact pixels without globals',async({page},info)=>{
+ const {tiffPagesWorkflow}=await import('./helpers/tiff-pages');await tiffPagesWorkflow(page,info,true);
+});

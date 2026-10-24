@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Multipage TIFF stays a host capability
+
+The cross-document TIFF exporter accepts owned host Document handles only. No plugin manifest, permission, lifecycle or package changes are introduced. Isolated plugins still receive their current document and validated editing/host services, without editor/export/file access. Plugin installation remains inert and existing commit grants/history validation remain required. See [multipage TIFF](TIFF_PAGES.md).
+
 ## Host-owned plugin provenance
 
 Accepted isolated plugin commands are stamped by the host with installed plugin ID/version/command and execution ID after existing grants/validation. Package manifests/sandbox results cannot set trusted origin or observation flags. Origin scopes do not remain active across awaits. Source records contain no executable code, credential or prompt; imported native records are unverified claims. The provided isolated document rejects internal origin overrides and rolls back earlier staged commands. Installation remains inert; package versions/grants are unchanged. See HISTORY.md.

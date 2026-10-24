@@ -6,17 +6,20 @@ import { Button, IconButton, Select, Slider, ColorField, NumberField } from "./c
 import { AlertTriangle, CheckCircle, Info, X } from "lucide-react";
 import type { DocumentData } from "../core/model";
 import type { ExportFormat, ExportOptions } from "../engine/export";
-import { getExportCapabilityReport } from "../engine/export";
+import { getExportCapabilityReport, getTiffPagesCapabilityReport } from "../engine/export";
 
+export interface ExportPage {key:string;document:DocumentData}
 export interface ExportDialogProps {
+  pages?:readonly ExportPage[];
   document: DocumentData;
-  onExport(options: ExportOptions, control?: ExportControl): Promise<void>;
+  onExport(options: ExportOptions, control?: ExportControl, pages?:readonly string[]): Promise<void>;
   onClose(): void;
   busy?: boolean;
 }
 
 export function ExportDialog({
   document,
+  pages: suppliedPages,
   onExport,
   onClose,
   busy = false,
@@ -24,6 +27,14 @@ export function ExportDialog({
   const [format, setFormat] = useState<ExportFormat>("png");
   const [psdMode, setPsdMode] = useState<"layers" | "flatten">("layers");
   const [tiffVariant,setTiffVariant]=useState<"auto"|"classic"|"big">("auto");
+  const pages=suppliedPages??[{key:document.id,document}];
+  const [tiffScope,setTiffScope]=useState('current');
+  const [pageKeys,setPageKeys]=useState(()=>pages.map(page=>page.key));
+  const pageMap=new Map(pages.map(page=>[page.key,page]));
+  const multiPage=format==='tiff'&&tiffScope==='pages';
+  const selectedPages=pageKeys.map(key=>pageMap.get(key));
+  const invalidPages=multiPage&&(!pageKeys.length||selectedPages.some(page=>!page));
+  const movePage=(index:number,delta:number)=>setPageKeys(keys=>{const result=[...keys];[result[index],result[index+delta]]=[result[index+delta],result[index]];return result;});
   const [pdfDpi,setPdfDpi]=useState(72);
   const [quality, setQuality] = useState(90);
   const [avifQuality,setAvifQuality]=useState(80),[avifLossless,setAvifLossless]=useState(false),[avifSpeed,setAvifSpeed]=useState(8);
@@ -33,7 +44,7 @@ export function ExportDialog({
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
   const dismiss = () => { controller.current?.abort(); onClose(); };
-  const fontKey = JSON.stringify(exportFontFamilies(document));
+  const fontKey = JSON.stringify([...new Set((multiPage?selectedPages.filter((page):page is ExportPage=>!!page).map(page=>page.document):[document]).flatMap(page=>exportFontFamilies(page)))]);
   const [fontReport, setFontReport] = useState<{
     key: string;
     warnings: string[];
@@ -77,6 +88,7 @@ export function ExportDialog({
   }, [fontKey, reportKey]);
 
   const report = useMemo(() => {
+    if(multiPage&&selectedPages.length&&!selectedPages.some(page=>!page))return getTiffPagesCapabilityReport(selectedPages.map(page=>page!.document),tiffVariant);
     return getExportCapabilityReport(document, {
       format,
       quality: (format==='avif'?avifQuality:quality) / 100,
@@ -86,7 +98,7 @@ export function ExportDialog({
       tiffVariant,
       pdfDpi,
     });
-  }, [document, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi,avifQuality,avifLossless,avifSpeed]);
+  }, [document, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi,avifQuality,avifLossless,avifSpeed,multiPage,pages,pageKeys]);
 
   const handleExport = async () => {
     const run = new AbortController();
@@ -102,7 +114,7 @@ export function ExportDialog({
         psdMode,
         tiffVariant,
         pdfDpi,
-      }, {signal:run.signal,onProgress:setProgress});
+      }, {signal:run.signal,onProgress:setProgress},multiPage?[...pageKeys]:undefined);
       if (!run.signal.aborted) onClose();
     } finally {
       controller.current = null;
@@ -164,6 +176,28 @@ export function ExportDialog({
           options={[{value:'auto',label:'Automatic — TIFF or BigTIFF as needed'},{value:'classic',label:'Classic TIFF — widest compatibility'},{value:'big',label:'BigTIFF — requires a compatible viewer'}]}
           onChange={value=>setTiffVariant(value as 'auto'|'classic'|'big')} />}
 
+        {format==='tiff'&&<>
+          <Select label="TIFF pages" layout="stacked" value={tiffScope} disabled={busy||exporting}
+            options={[{value:'current',label:'Current document'},{value:'pages',label:'Selected open documents'}]} onChange={setTiffScope}/>
+          {multiPage&&<section className="tiff-page-selection" aria-label="TIFF page order">
+            <p>Choose documents and arrange their page order. Each page keeps its own native dimensions. Pages are flattened; save projects or a workspace to keep editable artwork.</p>
+            <ol>{[...pageKeys,...pages.filter(page=>!pageKeys.includes(page.key)).map(page=>page.key)].map(key=>{
+              const page=pageMap.get(key),index=pageKeys.indexOf(key),included=index>=0,openIndex=pages.findIndex(page=>page.key===key);
+              return <li key={key}>
+                <label className="checkbox-field"><input type="checkbox" checked={included} disabled={busy||exporting||!page} aria-label={`Include ${page?.document.name??'closed document'} (open document ${openIndex+1}) as TIFF page`}
+                  onChange={event=>{const checked=event.target.checked;setPageKeys(keys=>checked?[...keys,key]:keys.filter(value=>value!==key));}}/>
+                  <span>{included?`Page ${index+1}: `:''}{page?.document.name??'Closed document — remove this page'}{page&&<small>{page.document.width} × {page.document.height} px</small>}</span></label>
+                {included&&<div className="tiff-page-actions">
+                  <Button variant="subtle" aria-label={`Move TIFF page ${index+1} up`} disabled={busy||exporting||index===0} onClick={()=>movePage(index,-1)}>Up</Button>
+                  <Button variant="subtle" aria-label={`Move TIFF page ${index+1} down`} disabled={busy||exporting||index===pageKeys.length-1} onClick={()=>movePage(index,1)}>Down</Button>
+                  <Button variant="subtle" aria-label={`Remove TIFF page ${index+1}`} disabled={busy||exporting} onClick={()=>setPageKeys(keys=>keys.filter(value=>value!==key))}>Remove</Button>
+                </div>}
+              </li>;
+            })}</ol>
+            {invalidPages&&<p role="alert">Choose at least one page and remove any closed documents before exporting.</p>}
+          </section>}
+        </>}
+
         {format==='pdf'&&<div>
           <NumberField label="PDF resolution" value={pdfDpi} min={1} max={1000000} suffix="DPI" disabled={busy||exporting} onChange={setPdfDpi}/>
           <p>Physical page size: {(document.width/pdfDpi).toFixed(3)} × {(document.height/pdfDpi).toFixed(3)} inches. Native pixels stay unchanged.</p>
@@ -178,7 +212,7 @@ export function ExportDialog({
 
         <div className="export-dimension-info">
           <span>
-            Resolution: {document.width} × {document.height} px
+            {multiPage?`Pages: ${pageKeys.length} · independent native dimensions`:`Resolution: ${document.width} × ${document.height} px`}
           </span>
           <span>Target: .{extension}</span>
         </div>
@@ -283,7 +317,7 @@ export function ExportDialog({
         <Button
           variant="primary"
           onClick={handleExport}
-          disabled={busy || exporting || checkingFonts}
+          disabled={busy || exporting || checkingFonts || invalidPages}
         >
           {exporting ? "Exporting..." : `Export .${extension}`}
         </Button>

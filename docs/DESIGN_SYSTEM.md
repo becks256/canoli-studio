@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## TIFF page selection
+
+Within the existing Export dialog, keep Current document as the TIFF default and offer Selected open documents. Use labeled native checkboxes and an ordered list with Page N, document name and native dimensions, plus explicit Up/Down/Remove buttons. Closed selected entries stay visible and block export until removal; empty selection has an inline alert. Use stable session keys, preserve the scrollable body/fixed footer, both themes and keyboard focus, and show font/capability warnings for all chosen pages. No new shortcut or component library. See [multipage TIFF](TIFF_PAGES.md).
+
 ## Operation-origin disclosure
 
 Use a native details disclosure under selected-state and saved-side history, showing a readable channel and runtime-observed versus stored-unverified status. Keep local clock, session/revision, submitted types/counts and workflow IDs in wrapped definition rows. Never infer authors or provider verification from labels, conflate billing with Undo or hide unknown legacy provenance. Saved-side labels say Captured before/after. Preserve the modal body scroll and fixed footer at both themes/short widths. No new rail icon, component library or default shortcut.

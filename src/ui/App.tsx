@@ -2666,12 +2666,19 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showExportDialog && (
           <ExportDialog
             document={dom.toJSON()}
+            pages={editor.documentSessions.map(session=>({key:session.id,document:session.document._read()}))}
             busy={busy}
             onClose={() => setShowExportDialog(false)}
-            onExport={async (options, control) => {
+            onExport={async (options, control, pageKeys) => {
               await task(async () => {
                 let result;
-                try { result = await editor.export(options, control); }
+                try {
+                  if(pageKeys){
+                    const sessions=editor.documentSessions;
+                    const pages=pageKeys.map(key=>{const session=sessions.find(session=>session.id===key);if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');return session.document;});
+                    result=await editor.exportTiffPages(pages,{variant:options.tiffVariant},control);
+                  }else result = await editor.export(options, control);
+                }
                 catch (error) { if (control?.signal?.aborted) return; throw error; }
                 if (control?.signal?.aborted) return;
                 download(
