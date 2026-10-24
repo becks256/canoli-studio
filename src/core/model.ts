@@ -408,10 +408,38 @@ export function allLayers(children: LayerData[]): LayerData[] {
   );
 }
 
+type LayerLookup = { layer: LayerData; locked: boolean };
+const immutableLayerLookups = new WeakMap<DocumentData, Map<string, LayerLookup>>();
+
+/** Only the internal deep-immutability proof permits retaining query results.
+ * Shallow-frozen caller roots and mutable command drafts still traverse afresh.
+ * Root identity also keeps inherited locks separate across shared subtrees,
+ * independent documents, previews and retained undo/redo states.
+ */
+function immutableLayerLookup(document: DocumentData) {
+  if (!isImmutable(document)) return undefined;
+  const cached = immutableLayerLookups.get(document);
+  if (cached) return cached;
+  const lookup = new Map<string, LayerLookup>();
+  const visit = (nodes: LayerData[], parentLocked: boolean) => {
+    for (const layer of nodes) {
+      const locked = parentLocked || layer.locked;
+      // Match the existing depth-first, first-occurrence query order.
+      if (!lookup.has(layer.id)) lookup.set(layer.id, {layer, locked});
+      if (layer.kind === 'group') visit(layer.children, locked);
+    }
+  };
+  visit(document.children, false);
+  immutableLayerLookups.set(document, lookup);
+  return lookup;
+}
+
 export function findLayer(
   document: DocumentData,
   layerId: string | null,
 ): LayerData | undefined {
+  const lookup = immutableLayerLookup(document);
+  if (lookup) return layerId === null ? undefined : lookup.get(layerId)?.layer;
   return allLayers(document.children).find((node) => node.id === layerId);
 }
 
@@ -443,6 +471,8 @@ export function findParent(
 }
 
 export function isLocked(document: DocumentData, layerId: string): boolean {
+  const lookup = immutableLayerLookup(document);
+  if (lookup) return lookup.get(layerId)?.locked ?? false;
   const walk = (
     nodes: LayerData[],
     parentLocked: boolean,

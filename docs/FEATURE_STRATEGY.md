@@ -24,6 +24,10 @@ Our differentiation hypotheses are the combination of:
 
 No source audit proves competitors lack this combination. Validate the advantage through task comparisons and customer behavior, not feature-name novelty.
 
+### Current F14 immutable-query increment (2026-10-23, local verification)
+
+A private weak index reuses layer/inherited-lock queries only for registry-proven immutable roots; mutable and shallow-frozen drafts remain fresh. Unit invariants, a rejected unsafe-freeze control and actual discarded-document collection verify ownership/lifetime. Build, final 2,005 unit/API, 120 native and 123 production checks pass with matching final runtime inputs, exact PNGs and real 50 MP workflows. Three production pairs improve dense typing p95 by 6–15%, while broader results include slower script/vector cases. Fresh source profiles remove most lookup CPU work but retain higher 102.4–111.3 ms typing tails and long tasks. This does not close sustained editor-wide/device/GPU/process-memory F14 or any other unfinished original roadmap gate. See the dated roadmap and [sealed evidence](benchmarks/immutable-layer-queries-2026-10-23.json).
+
 ### Current F14 layer-glyph increment (2026-10-23, local verification)
 
 Retaining fixed layer-panel glyph elements removes repeated icon work while row controls keep current editing state. Three alternating production pairs lower median per-run 64-layer typing p95 from 19.0/21.7/23.1 to 16.2/16.7/17.6 ms for plain/overlay/shadow text, with no observed long tasks in 840 matched-frame samples. Build, 2,000 unit/API, 52 final native and 123 normal-production checks pass; independent PNGs and the genuine 50 MP RAW guide retain exact output. Development p95 remains 90.8–96.4 ms with long tasks, and one-layer production results are mixed. Sustained editor-wide/device/GPU/process-memory acceptance and every other unfinished original roadmap requirement remain open. See the dated roadmap and [sealed evidence](benchmarks/layer-icon-retention-2026-10-23.json).

@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Immutable query ownership
+
+Retained layer lookup and inherited-lock metadata require the existing internal recursive-immutability proof. Object.freeze(root) alone is insufficient. Key the private weak index by the complete root, preserving ancestry across shared children, undo/redo, independent documents and previews. Mutable drafts always traverse current data; command validation and publication remain authoritative. Weak keys permit collection with their snapshots and retain no source blobs or decoder handles. Index metadata still consumes memory while snapshots remain reachable; no process-memory bound or full F14 claim follows. Public constructors, command/history/schema and isolated/REST permissions remain unchanged.
+
 ## Whole-line native font invariant
 
 Capital variants and stretch are immutable authored font requests, never character replacement or layer scaling. Measurement/ink/layout/cache/render/export and resize capture use the same native state. Apply normal defaults to reused contexts, reject unsupported nondefault states before drawing, and include stretch in exact face-readiness matching. Normalize complete paragraph formats independently of sparse patch/override admission so absent values cannot create hidden overrides. Reject explicit new fields under old schema labels before normalization, including masters/history and style graphs. See [native font features](FONT_FEATURES.md).
