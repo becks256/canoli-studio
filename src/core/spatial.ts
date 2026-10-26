@@ -1,6 +1,6 @@
 import { isActiveWetPaint } from './wet-operation';
 import { isImmutable } from './immutable';
-import type { DocumentData, LayerData } from "./model";
+import type { DocumentData, LayerData, RasterLayerData, TextLayerData, PaintLayerData, VectorLayerData } from "./model";
 import { AffineTransform } from "./affine";
 import { pathBounds, strokeBounds } from "./drawing";
 import type { Point } from "./drawing";
@@ -24,7 +24,19 @@ export function unionBounds(rects: Bounds[]): Bounds | undefined {
   }
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
-export function localBounds(node: LayerData): Bounds | undefined {
+/** Read-only authored geometry shared by the editor and compact inspection workers. */
+export type LayerGeometry =
+  Pick<RasterLayerData,'kind'|'width'|'height'|'erasures'>|
+  Pick<TextLayerData,'kind'|'width'|'height'|'textPathOrigin'|'textFrameOrigin'>|
+  Pick<PaintLayerData,'kind'|'strokes'>|
+  Pick<VectorLayerData,'kind'|'paths'>|
+  {kind:'smart-object';width:number;height:number}|
+  {kind:'adjustment'}|
+  {kind:'group';children:readonly (LayerGeometry&Pick<LayerData,'x'|'y'|'transform'>)[]};
+export function groupLocalBounds<T extends Pick<LayerData,'x'|'y'|'transform'>>(children:readonly T[],measure:(child:T)=>Bounds|undefined):Bounds|undefined{
+  return unionBounds(children.flatMap(child=>{const bounds=measure(child);return bounds?[localTransform(child).bounds(bounds)]:[];}));
+}
+export function localBounds(node: LayerGeometry): Bounds | undefined {
   if(node.kind==='text'&&(node.textPathOrigin||node.textFrameOrigin)){const origin=node.textPathOrigin??node.textFrameOrigin!;return{x:origin.x,y:origin.y,width:node.width,height:node.height};}
   if (node.kind === 'raster' && node.erasures?.some(entry => isActiveWetPaint(entry.stroke))) return unionBounds([{ x: 0, y: 0, width: node.width, height: node.height }, ...node.erasures.filter(entry => isActiveWetPaint(entry.stroke)).map(entry => AffineTransform.scale(node.width / entry.width, node.height / entry.height).bounds(strokeBounds(entry.stroke)))]);
   if (
@@ -36,17 +48,12 @@ export function localBounds(node: LayerData): Bounds | undefined {
   if (node.kind === "paint") return unionBounds(node.strokes.filter(stroke => stroke.kind !== 'wet' || isActiveWetPaint(stroke)).map(strokeBounds));
   if (node.kind === "vector") return unionBounds(node.paths.map(pathBounds));
   if (node.kind === "group") {
-    return unionBounds(
-      node.children.flatMap((child) => {
-        const b = localBounds(child);
-        return b ? [localTransform(child).bounds(b)] : [];
-      }),
-    );
+    return groupLocalBounds(node.children,localBounds);
   }
   return undefined;
 }
 /** x/y remain translation aliases; schema 6 adds an optional invertible linear basis. */
-export function localTransform(node: LayerData): AffineTransform {
+export function localTransform(node: Pick<LayerData,'x'|'y'|'transform'>): AffineTransform {
   return AffineTransform.translation(node.x, node.y).multiply(
     node.transform
       ? AffineTransform.fromJSON(node.transform)

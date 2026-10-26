@@ -1,3 +1,4 @@
+import {preflightAlignmentGeometryIds} from '../core/preflight-alignment';
 import {preflightDocumentView} from '../core/preflight-view';
 import type {DocumentData} from '../core/model';
 import type {AssetStore} from '../core/assets';
@@ -48,6 +49,6 @@ export async function preparePreflight(document:DocumentData,revision:number,ass
     worker.onmessage=event=>event.data.error?finish(new Error(event.data.error)):finish(undefined,event.data.report);
     worker.onerror=()=>finish(new Error('Design-check worker failed.'));
     worker.onmessageerror=()=>finish(new Error('Invalid design-check worker message.'));
-    try{current();worker.postMessage({document:preflightDocumentView(document,settings.checkBounds),revision,options:settings,assets:originals.map(asset=>[asset.id,{width:asset.width,height:asset.height}]),fonts});}catch(error){finish(error);}
+    try{current();worker.postMessage({document:preflightDocumentView(document,settings.checkBounds,preflightAlignmentGeometryIds(settings.alignments)),revision,options:settings,assets:originals.map(asset=>[asset.id,{width:asset.width,height:asset.height}]),fonts});}catch(error){finish(error);}
   });
 }

@@ -31,7 +31,7 @@ import {vectorStrokeData,vectorStrokeValues,type VectorStrokeOptions} from '../c
 export type {VectorStrokeOptions} from '../core/vector-stroke';
 import { parseCubeLut, lutOptionsSchema, type LutInterpolation } from "../core/lut";
 import {inspectDesign,preflightOptionsSchema,preflightReportSchema,type PreflightOptions,type PreflightSettings,type PreflightReport,type PreflightControl} from '../core/preflight';
-export type {PreflightOptions,PreflightReport,PreflightFinding,PreflightControl} from '../core/preflight';
+export type {PreflightOptions,PreflightReport,PreflightFinding,PreflightControl,PreflightAlignmentRule,PreflightAlignmentInput,PreflightAlignmentSummary} from '../core/preflight';
 import { selectSubjectOptionsSchema, type SelectSubjectSettings, type SelectSubjectControl } from '../core/subject-selection';
 import {refineEdgeOptionsSchema,mattingPlanSchema,type MattingRequest,type PreparedMatting,type RefineEdgeControl} from '../core/matting';
 import {parentId} from '../core/spatial';

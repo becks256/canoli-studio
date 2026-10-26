@@ -1,5 +1,24 @@
 # Implementation roadmap and planning record
 
+### 2026-10-26 — A12 declared alignment inspection connected and verified
+
+Explicit canvas/key alignment policies now use shared authored geometry, version-2 report evidence/coverage, the custom Design checks dialog, isolated Scripts/plugins and independent REST. Omitted policies retain strict version 1. Compact payloads preserve active wet replacement extents and scope geometry to requested targets/keys when canvas bounds are disabled; geometry is cached per report. Actual document-instance binding clears stale policies/results even for identical persistent IDs and revision. [Exact signatures, defaults, errors, executable example and limits](DESIGN_CHECKS.md).
+
+Verified on unchanged captured inputs with Chromium 153.0.8010.12, Node 24.0.1 and Linux x64:
+
+- Full `npm run build` passed, including 31 developer guides. All five WASM outputs remain byte-identical to the previous verified build.
+- Full `npm test -- --maxWorkers=2`: 2,323 unit/API tests across 255 files passed with local API loopback access.
+- One complete affected native run passed 69 browser cases across eight files; one complete production run passed all 150 workflows. Both have zero retries, skips or flaky cases. This is the affected geometry/inspection/text/wet-paint matrix, not a new complete typography run.
+- The new actual 50 MP inspection preserves the complete 496,965-byte original PNG and unchanged document data. Its worker receives 647 bytes of metadata and no binary source buffers. That observed fixture size is not a source/import limit or a peak-memory/performance guarantee.
+- Independent saved-container and Pillow readers confirm unchanged document data and every PNG sample before/after the new native and production UI inspections. The documented example executes through the real isolated host; current plugin grants, rollback, cancellation, immutable policy capture, affine/native text geometry, hidden/unknown precision, wet extents, report tampering/truncation and same-ID document replacement are exercised.
+- Independent regression readers retain exact native/production alignment and text outputs. Both existing 50 MP alignment exports match all 200,000,000 RGBA samples each, and the saved complete 100,000,672-byte RAW original verifies exactly.
+- All 1,986 captured source/configuration, test/fixture, public, guide and release identities remain unchanged through final verification. All 115 served release resources match their hashes; the linked guide works at 390px without JavaScript, and production starts without the development global.
+
+Raw pilots retain corrected harness/validator assertions. The final build caught a missing version narrowing in a new browser assertion; the corrected build and full runs pass. An independent auditor initially assumed a fill-only rectangle; saved points and its authored 2px stroke establish the correct 42×22 frame without changing source, reports or tolerances. [Sealed source reconstruction, complete raw reports, pilots, original-bearing artifacts and independent validators](benchmarks/declared-alignment-checks-2026-10-26.zip).
+
+This delivers explicit declared alignment inspection, not full A12 or the original roadmap. Inferred intent, bleed, rendered visibility, contrast/legibility and broader delivery/quality/device/performance/provider/installed ChatGPT/live identity/commercial gates remain required. Headless REST frames are estimated and do not synchronize with browser sessions. Document schema 47, existing project/workspace formats and plugin permissions are unchanged. No paid call, account, upload or arbitrary original-resolution limit is introduced.
+
+
 ### 2026-10-26 — F08 public vertical authoring connected and verified
 
 Schema 47 connects writing direction/orientation to TextLayer OO/shared commands, inherited paragraph styles, owned native metric handoffs, native rendering and separate logical-inline/physical-frame caches. The custom Inspector exposes writing/orientation, paragraph height and vertical alignment; point/paragraph corner resizing preserves the opposite frame corner under affine parents. Supported editable SVG, recipes, independent REST, native projects and workspace recovery preserve source/geometry and complete original payloads. Legacy horizontal defaults retain their renderer; text entering native writing retains its character-layout marker when returned to horizontal. SCRIPTING_API.md and VERTICAL_TEXT.md document exact signatures, defaults, errors, examples and limits.

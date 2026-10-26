@@ -1,41 +1,69 @@
+import {preflightAlignmentRulesSchema,preflightAlignmentEvidenceSchema,preflightAlignmentSummarySchema,preflightBoundsSchema,preflightAlignmentAnchor,preflightAlignmentRoundoff,inspectPreflightAlignments} from './preflight-alignment';
+export type {PreflightAlignmentRule,PreflightAlignmentInput,PreflightAlignmentSummary} from './preflight-alignment';
 import {z} from 'zod';
 import {characterFontFamilies} from './character-layout';
 import type {PreflightDocumentView,PreflightLayerView,PreflightComponentView} from './preflight-view';
 import {AffineTransform} from './affine';
-import {unionBounds} from './spatial';
-import {strokeBounds,pathBounds} from './drawing';
+import {localBounds} from './spatial';
 import {yieldTask} from './task-yield';
 
-export const preflightOptionsSchema=z.object({
+const legacyPreflightOptionsSchema=z.object({
   outputDpi:z.number().finite().positive().default(72),
   minimumPpi:z.number().finite().positive().default(72),
   checkBounds:z.boolean().default(true),
   checkFonts:z.boolean().default(true),
   includeHidden:z.boolean().default(false),
 }).strict();
+const preflightOptionsInputSchema=legacyPreflightOptionsSchema.extend({alignments:preflightAlignmentRulesSchema.optional()}).strict();
+export const preflightOptionsSchema=preflightOptionsInputSchema.transform(options=>{if(options.alignments===undefined)delete options.alignments;return options;});
 export type PreflightOptions=z.input<typeof preflightOptionsSchema>;
 export type PreflightSettings=z.output<typeof preflightOptionsSchema>;
 export interface PreflightControl {signal?:AbortSignal}
 export const fontStatusSchema=z.enum(['available','unavailable','unknown']);
 export type PreflightFontStatus=z.infer<typeof fontStatusSchema>;
 export const preflightAssetMetadataSchema=z.array(z.object({id:z.string().min(1),name:z.string().optional(),width:z.number().int().positive().safe(),height:z.number().int().positive().safe()}).strict());
-const codes=['bounds-outside','low-resolution','asset-missing','asset-unchecked','font-unavailable','font-unchecked','measurement-unavailable'] as const;
-const findingSchema=z.object({
-  code:z.enum(codes),severity:z.enum(['error','warning','info']),
+const legacyCodes=['bounds-outside','low-resolution','asset-missing','asset-unchecked','font-unavailable','font-unchecked','measurement-unavailable'] as const;
+const legacyFindingSchema=z.object({
+  code:z.enum(legacyCodes),severity:z.enum(['error','warning','info']),
   layerId:z.string().min(1),layerName:z.string(),path:z.array(z.string()).min(1).max(64),
   message:z.string(),assetId:z.string().optional(),family:z.string().optional(),
-  bounds:z.object({x:z.number().finite(),y:z.number().finite(),width:z.number().finite().nonnegative(),height:z.number().finite().nonnegative()}).strict().optional(),
+  bounds:preflightBoundsSchema.optional(),
   effectivePpi:z.number().finite().nonnegative().optional(),
 }).strict();
-export const preflightReportSchema=z.object({
-  version:z.literal(1),documentId:z.string().min(1),revision:z.number().int().nonnegative(),
-  options:preflightOptionsSchema,findings:z.array(findingSchema).max(512),
+const findingSchema=legacyFindingSchema.extend({code:z.enum([...legacyCodes,'alignment-mismatch','alignment-unchecked']),alignment:preflightAlignmentEvidenceSchema.optional()}).strict();
+const reportShape={documentId:z.string().min(1),revision:z.number().int().nonnegative(),
+  findings:z.array(legacyFindingSchema).max(512),
   totalFindings:z.number().int().nonnegative(),truncated:z.boolean(),layersChecked:z.number().int().nonnegative().max(4096),
   counts:z.object({error:z.number().int().nonnegative(),warning:z.number().int().nonnegative(),info:z.number().int().nonnegative()}).strict(),
-  fonts:z.array(z.object({family:z.string(),status:fontStatusSchema}).strict()).max(4096),
-  limitations:z.array(z.string()),
-}).strict().superRefine((report,context)=>{
-  if(report.counts.error+report.counts.warning+report.counts.info!==report.totalFindings||report.findings.length!==Math.min(512,report.totalFindings)||report.truncated!==(report.totalFindings>512))context.addIssue({code:'custom',message:'Inconsistent design-check counts.'});
+  fonts:z.array(z.object({family:z.string(),status:fontStatusSchema}).strict()).max(4096),limitations:z.array(z.string()),
+};
+const legacyReportSchema=z.object({...reportShape,version:z.literal(1),options:legacyPreflightOptionsSchema}).strict();
+const alignmentReportSchema=z.object({...reportShape,version:z.literal(2),options:preflightOptionsInputSchema.extend({alignments:preflightAlignmentRulesSchema}),findings:z.array(findingSchema).max(512),alignment:preflightAlignmentSummarySchema}).strict();
+export const preflightReportSchema=z.discriminatedUnion('version',[legacyReportSchema,alignmentReportSchema]).superRefine((report,context)=>{
+  const invalid=(message:string)=>context.addIssue({code:'custom',message});
+  if(report.counts.error+report.counts.warning+report.counts.info!==report.totalFindings||report.findings.length!==Math.min(512,report.totalFindings)||report.truncated!==(report.totalFindings>512))invalid('Inconsistent design-check counts.');
+  for(const severity of ['error','warning','info']as const){const retained=report.findings.filter(finding=>finding.severity===severity).length;if(retained>report.counts[severity]||!report.truncated&&retained!==report.counts[severity])invalid('Finding severities disagree with summary counts.');}
+  if(report.version!==2)return;
+  const summary=report.alignment,rules=report.options.alignments,requested=rules.reduce((n,rule)=>n+rule.layerIds.length,0);
+  if(summary.rules!==rules.length||summary.requested!==requested||summary.matched+summary.mismatched+summary.unavailable+summary.excluded!==requested)invalid('Inconsistent alignment-check coverage.');
+  let mismatch=0,unchecked=0,excluded=0,unavailable=0;const seen=new Set<string>();
+  for(const finding of report.findings){
+    if(!['alignment-mismatch','alignment-unchecked'].includes(finding.code)){if(finding.alignment)invalid('Alignment evidence requires an alignment finding.');continue;}
+    const evidence=finding.alignment,rule=evidence&&rules[evidence.ruleIndex];
+    if(!evidence||!rule){invalid('Alignment findings require a declared rule.');continue;}
+    const key=`${evidence.ruleIndex}:${finding.layerId}`;if(seen.has(key))invalid('Duplicate alignment finding.');seen.add(key);
+    if(!rule.layerIds.includes(finding.layerId)||finding.path.at(-1)!==finding.layerId||evidence.alignment!==rule.alignment||JSON.stringify(evidence.target)!==JSON.stringify(rule.target)||evidence.tolerance!==rule.tolerance)invalid('Alignment evidence does not match its rule and target.');
+    if(finding.code==='alignment-mismatch'){
+      mismatch++;
+      if(finding.severity!=='warning'||evidence.reason!==undefined||!finding.bounds||!evidence.referenceBounds||evidence.actual===undefined||evidence.expected===undefined||evidence.delta===undefined||evidence.numericalTolerance===undefined||evidence.delta!==evidence.expected-evidence.actual||evidence.actual!==preflightAlignmentAnchor(finding.bounds,evidence.alignment)||evidence.expected!==preflightAlignmentAnchor(evidence.referenceBounds,evidence.alignment)||evidence.numericalTolerance!==preflightAlignmentRoundoff(finding.bounds,evidence.referenceBounds)||Math.abs(evidence.delta)<=evidence.tolerance+evidence.numericalTolerance)invalid('Invalid measured alignment evidence.');
+    }else{
+      unchecked++;if(evidence.reason==='hidden'){excluded++;if(report.options.includeHidden)invalid('Included layers cannot be excluded by visibility.');}else unavailable++;
+      if(finding.severity!=='info'||!evidence.reason||evidence.actual!==undefined||evidence.expected!==undefined||evidence.delta!==undefined||evidence.referenceBounds!==undefined||evidence.numericalTolerance!==undefined)invalid('Unmeasured alignment must not fabricate measurements.');
+    }
+  }
+  if(excluded>summary.excluded||unavailable>summary.unavailable||!report.truncated&&(excluded!==summary.excluded||unavailable!==summary.unavailable))invalid('Unverified alignment reasons disagree with coverage counts.');
+  if(summary.mismatched>report.counts.warning||summary.unavailable+summary.excluded>report.counts.info)invalid('Alignment coverage exceeds severity counts.');
+  if(mismatch>summary.mismatched||unchecked>summary.unavailable+summary.excluded||!report.truncated&&(mismatch!==summary.mismatched||unchecked!==summary.unavailable+summary.excluded))invalid('Alignment findings disagree with coverage counts.');
 });
 export type PreflightReport=z.infer<typeof preflightReportSchema>;
 export type PreflightFinding=z.infer<typeof findingSchema>;
@@ -80,7 +108,7 @@ export async function inspectDesign(document:PreflightDocumentView,revision:numb
       catch{add({...target,code:'measurement-unavailable',severity:'info',message:'Layer placement exceeds numerical measurement precision.'});continue;}
       if(settings.checkBounds&&!inMaster&&node.kind!=='group'){
         try{
-          const local=node.kind==='paint'?unionBounds(node.strokes.map(strokeBounds)):node.kind==='vector'?unionBounds(node.paths.map(pathBounds)):node.kind==='adjustment'?undefined:{x:node.kind==='text'?(node.textPathOrigin??node.textFrameOrigin)?.x??0:0,y:node.kind==='text'?(node.textPathOrigin??node.textFrameOrigin)?.y??0:0,width:node.width,height:node.height},bounds=local?world.bounds(local):undefined;
+          const local=localBounds(node),bounds=local?world.bounds(local):undefined;
           if(bounds&&(bounds.x<-1e-7||bounds.y<-1e-7||bounds.x+bounds.width>document.width+1e-7||bounds.y+bounds.height>document.height+1e-7))add({...target,code:'bounds-outside',severity:'warning',bounds,message:'Authored bounds extend beyond the canvas. Review intentional bleed and clipping; masks, effects and occlusion are not evaluated.'});
         }catch{add({...target,code:'measurement-unavailable',severity:'info',message:'Authored bounds exceed numerical measurement precision.'});}
       }
@@ -105,12 +133,13 @@ export async function inspectDesign(document:PreflightDocumentView,revision:numb
     }
   };
   alive();await walk(document.children,new AffineTransform(),new Map((document.components??[]).map(definition=>[definition.id,definition])),[]);alive();
-  return preflightReportSchema.parse({version:1,documentId:document.id,revision,options:settings,findings,totalFindings,truncated:totalFindings>512,layersChecked,counts,fonts:[...fonts.values()].sort((a,b)=>a.family.localeCompare(b.family)),limitations:[
+  const alignment=settings.alignments===undefined?undefined:await inspectPreflightAlignments(document,settings.alignments,settings.includeHidden,add,environment.signal);alive();
+  return preflightReportSchema.parse({version:alignment?2:1,...(alignment?{alignment}:{}),documentId:document.id,revision,options:settings,findings,totalFindings,truncated:totalFindings>512,layersChecked,counts,fonts:[...fonts.values()].sort((a,b)=>a.family.localeCompare(b.family)),limitations:[
     'Bounds describe authored geometry, not rendered pixels. Masks, effects, clipping stacks, occlusion and intentional bleed require review.',
     'Embedded-master bounds are clipped by their artboards and are not classified against the root canvas. Reachable font/source references are checked conservatively.',
     'Inspection policy applies to native document dimensions, not separately resized exports.',
     'Resolution measures original source sampling under affine placement, including shear. It does not assess focus, compression, detail or generated quality.',
     'Font checks cover family resolution in the inspection environment, not exact face/weight fidelity, licensing or availability on another device.',
-    'Bleed conformance, alignment, text legibility, contrast, print readiness and inferred design judgments are not evaluated.',
+    ...(alignment?['Alignment checks compare only declared root-document targets against canvas or independent key-layer authored frames. Masks, effects and visible pixels are not measured. Group bounds include hidden child geometry, matching the editor alignment tools; hidden key references remain usable.', 'Alignment uses a 1e-7 document-pixel numerical floor plus floating-point roundoff. Unresolved precision is reported as unverified instead of passing the rule.', 'Bleed conformance, inferred alignment intent, text legibility, contrast and print readiness are not evaluated.']:['Bleed conformance, alignment, text legibility, contrast, print readiness and inferred design judgments are not evaluated.']),
   ]});
 }

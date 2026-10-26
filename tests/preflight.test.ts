@@ -71,7 +71,7 @@ it('strict policy/metadata validation rejects malformed external inputs',async()
 });
 
 it('OO reports bind the exact document/revision/policy and reject late or mismatched results',async()=>{
-  const document=new Document(),base=await document.preflight();
+  const document=new Document(),base=await document.preflight();if(base.version!==1)throw new Error("Expected a legacy report");
   document._preflight=async()=>({...base,documentId:'another'});await expect(document.preflight()).rejects.toThrow('do not match');
   document._preflight=async()=>({...base,options:preflightOptionsSchema.parse({minimumPpi:300})});await expect(document.preflight()).rejects.toThrow('do not match');
   document._preflight=async()=>{document.name='Changed';return base;};await expect(document.preflight()).rejects.toThrow('document changed');
