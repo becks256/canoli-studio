@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Styled SVG review and editing
+
+Use the existing Import SVG dialog to disclose editable inline characters, embedded source counts and remaining flattening boundaries. Inspection stays inert. Preserve explicit Editable/Flattened/Cancel actions, preparation status and existing modal scrolling. After import, the existing Text content selection and Character formatting disclosure edit the native ranges; Undo and source-retaining project reopening remain ordinary workflows. No new shortcut, tool icon or UI framework. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).
+
 ## Character-range controls
 
 Use a Character formatting disclosure below Text content. Retain its selection while using family/size/color/weight/slant/spacing controls; explain range scope and first-character values for mixed selections. Provide Clear selected character formatting, preparation status and errors. Cancel stale/unmounted preparation and retain ordinary Undo/typing shortcuts and the existing Inspector scroll region. Existing typography controls change paragraph defaults. No new shortcut, rail icon or component framework. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.

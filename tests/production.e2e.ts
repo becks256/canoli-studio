@@ -1,4 +1,6 @@
 import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
+import {svgCharacterImportWorkflow} from './helpers/svg-character-import';
+test('production styled SVG preflight and native character editing retain originals, prior work, Undo and reopening',async({page},info)=>{await svgCharacterImportWorkflow(page,info,true);});
 import {characterTextWorkflow} from './helpers/character-text';
 test('production character formatting preserves selected ranges, native output, undo and portable reopening',async({page},info)=>{await characterTextWorkflow(page,info,true);});
 import {fontManagementWorkflow} from './helpers/font-management';

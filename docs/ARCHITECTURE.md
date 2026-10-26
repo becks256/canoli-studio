@@ -1,5 +1,9 @@
 # Architecture
 
+## Styled SVG preparation records
+
+SVG inspection keeps unresolved character ranges in optional private text-placement records, outside its uniform placeholder document. The host validates ranges/ownership and rejects already formatted placeholders, privately matches each effective style to canonical font resources, declares selected sources, then applies one shared character update per line. Native whole-line geometry establishes the alphabetic anchor under the original affine hierarchy. Complete clean documents alone are published; public OO/command/plugin boundaries are unchanged. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).
+
 ## Character formatting integration
 
 Optional schema-45 TextLayerData.characterRanges stores sparse source-indexed overrides. Public constructors/TextLayer methods mutate through existing layer.update validation/history. core/character-layout shares native SVG measurement between synchronous commands and cooperative async preparation, with explicit estimates without a DOM. engine/styled-text-layout retains font leases around metrics/bitmap work. Canvas/SVG output consumes matching native lines. The private scripting broker returns finite bounds only; final host commands independently remeasure and recheck revision, grants and sources. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.

@@ -1,8 +1,12 @@
 # Canoli Studio editor requirements
 
+## Editable SVG character import
+
+Reconstruct supported nested inline styles into source-indexed character ranges only after private source preparation and per-range native face matching. Validate inert preparation records separately from uniform placeholder layers; use native whole-line baseline/anchor geometry and retain complete supplied image/font bytes. Preserve prior tabs and a clean revision-zero import, then ordinary shared Undo/Inspector/script behavior. Cancellation, stale owners/revisions and preparation failures publish nothing. Report unsupported inline positioning, opacity/visibility/paint graphs and richer CSS instead of dropping them. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).
+
 ## Character formatting (F08)
 
-Retain literal text and sparse UTF-16 character overrides through shared commands, exact selection replacement, Undo/Redo and portable projects/recipes. Gaps inherit paragraph defaults. Reject invalid/overlapping/surrogate-splitting ranges, unsupported native scalars, undeclared embedded sources, stale/cancelled preparation and locked edits atomically. Browser scripts await native metrics without source bytes or bypassing final host validation. Schema 45 gates even empty ranges; legacy omission stays readable. Raster/SVG output preserves effective formatting and owned sources. Styled-SVG editable reimport and wider typography/device/performance gates remain unfinished. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
+Retain literal text and sparse UTF-16 character overrides through shared commands, exact selection replacement, Undo/Redo and portable projects/recipes. Gaps inherit paragraph defaults. Reject invalid/overlapping/surrogate-splitting ranges, unsupported native scalars, undeclared embedded sources, stale/cancelled preparation and locked edits atomically. Browser scripts await native metrics without source bytes or bypassing final host validation. Schema 45 gates even empty ranges; legacy omission stays readable. Raster/SVG output preserves effective formatting and owned sources. Broader SVG graphs and typography/device/performance gates remain unfinished. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
 
 ## Variable font axes
 

@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Styled SVG remains a trusted file service
+
+Inline SVG font/source reconstruction does not expose file admission or a native rendering host to isolated code. Installation remains inert and no permission/manifest change is added. After trusted import, existing TextLayer range methods and shared commands retain their usual grants, native script measurement, revision/lock/source validation and Undo; REST sessions remain separate. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).
+
 ## Character formatting and native metrics
 
 Character ranges use existing layer.update authority, schema-45 validation and Undo. Awaited TextLayer formatting/reflow may request private native host measurement with existing document read/write grants. Return finite bounds only; final accepted commands independently remeasure and validate revision, sources and grants. Keep the five-second deadline, 32 native preparations and 256-command bound. Scripts use panel cancellation. No source chooser/bytes, rendering host, network grant or manifest permission is exposed; installation stays inert. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.

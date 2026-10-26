@@ -9,6 +9,8 @@ import type {AssetStore} from '../core/assets';
 import type {SvgImportControl} from '../core/svg-import';
 import {createCanvas,release} from './canvas';
 import type {TextLayerData} from '../core/model';
+import {characterInputForLayer,measureCharacterText} from '../core/character-layout';
+import {normalizeCharacterRanges} from '../core/text-ranges';
 
 interface PreparedSvgFont extends SvgFontSource {resource:Readonly<FontResource>}
 const widths:Record<string,number>={'ultra-condensed':50,'extra-condensed':62.5,condensed:75,'semi-condensed':87.5,normal:100,'semi-expanded':112.5,expanded:125,'extra-expanded':150,'ultra-expanded':200};
@@ -59,17 +61,30 @@ export function reconstructSvgTexts(doc:Document,placements:readonly SvgTextPlac
  try{
   for(const placement of placements){
    const layer=doc.getLayer(placement.layerId);if(!(layer instanceof TextLayer))throw new Error('Invalid SVG text placement.');
-   const source=layer.toJSON() as TextLayerData,weight=source.fontWeight==='bold'?700:source.fontWeight==='normal'||!source.fontWeight?400:Number(source.fontWeight),stretch=widths[source.fontStretch??'normal'];
-   const family=fontFamilyParts(source.fontFamily).map(part=>{
+   const source=layer.toJSON() as TextLayerData,selected=new Map<string,Readonly<FontResource>>();
+   const remap=(format:Pick<TextLayerData,'fontFamily'|'fontWeight'|'fontStyle'|'fontStretch'>)=>{
+    const weight=format.fontWeight==='bold'?700:format.fontWeight==='normal'||!format.fontWeight?400:Number(format.fontWeight),stretch=widths[format.fontStretch??'normal'];
+    return fontFamilyParts(format.fontFamily).map(part=>{
     const choices=mappings.map((font,index)=>({font,index})).filter(({font})=>font.family===part.name);
     if(!choices.length){if(/^canolifont_[a-f0-9]{64}$/i.test(part.name))throw new Error('SVG refers to missing embedded font bytes.');return part.raw;}
-    choices.sort((a,b)=>compare([...widthRank(range(a.font.stretch,true),stretch),a.font.style===(source.fontStyle??'normal')?0:1,...weightRank(range(a.font.weight),weight),-a.index],[...widthRank(range(b.font.stretch,true),stretch),b.font.style===(source.fontStyle??'normal')?0:1,...weightRank(range(b.font.weight),weight),-b.index]));
+    choices.sort((a,b)=>compare([...widthRank(range(a.font.stretch,true),stretch),a.font.style===(format.fontStyle??'normal')?0:1,...weightRank(range(a.font.weight),weight),-a.index],[...widthRank(range(b.font.stretch,true),stretch),b.font.style===(format.fontStyle??'normal')?0:1,...weightRank(range(b.font.weight),weight),-b.index]));
     const resource=choices[0].font.resource;
-    if(!assets.fonts.has(resource.id))store.shareTo(assets.fonts,resource.id);
-    doc.fonts.files.add(new FontFile({id:resource.id,name:(resource.descriptor.report.faces[0].fullName??part.name).slice(0,240),resource:resource.descriptor}));
+    selected.set(resource.id,resource);
     return resource.descriptor.report.faces[0].cssFamily;
-   }).join(',');
-   layer.fontFamily=family;layer.reflow();const text=layer.toJSON() as TextLayerData;applyTextStyle(context,text);context.textAlign=text.align;
+   }).join(',');};
+   const family=remap(source),ranges=placement.characterRanges===undefined?undefined:normalizeCharacterRanges(source.text,placement.characterRanges).map(range=>({...range,format:{...range.format,fontFamily:remap({...source,...range.format})}}));
+   for(const resource of selected.values()){
+    if(!assets.fonts.has(resource.id))store.shareTo(assets.fonts,resource.id);
+    doc.fonts.files.add(new FontFile({id:resource.id,name:(resource.descriptor.report.faces[0].fullName??resource.cssFamily).slice(0,240),resource:resource.descriptor}));
+   }
+   layer.update({fontFamily:family,...(ranges===undefined?{}:{characterRanges:ranges})});
+   const text=layer.toJSON() as TextLayerData;
+   if(ranges!==undefined){
+    const layout=measureCharacterText(characterInputForLayer(text)),first=layout.lines[0];if(layout.accuracy!=='native'||!first||layout.lines.length!==1)throw new Error('SVG inline character reconstruction requires one native logical line.');
+    const shiftX=placement.x-first.x,shiftY=placement.y-first.y;
+    layer.transform=layer.transform.multiply(AffineTransform.translation(shiftX,shiftY));continue;
+   }
+   layer.reflow();applyTextStyle(context,text);context.textAlign=text.align;
    if(globalThis.document?.fonts&&!globalThis.document.fonts.check(nativeTextFont(text),text.text||'M'))throw new Error('A referenced SVG font is still loading. Retry after fonts are ready.');
    // Undo the exact top-to-alphabetic relation used by native SVG export.
    context.textBaseline='alphabetic';const alphabetic=context.measureText(text.text||'M').actualBoundingBoxAscent;

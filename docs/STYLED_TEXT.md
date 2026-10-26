@@ -1,6 +1,6 @@
 # Native styled-text surface foundation
 
-Status: internal F08 rendering/layout boundary now connected to schema-45 character ranges, OO commands, Inspector selections, isolated native measurement, REST/recipe data, native persistence and visual SVG output. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the public contract. Editable styled-SVG reimport, richer typography/shaping and sustained editor-wide performance remain unfinished. No new plugin permission, account or network operation is introduced.
+Status: internal F08 rendering/layout boundary now connected to schema-45 character ranges, OO commands, Inspector selections, isolated native measurement, REST/recipe data, native persistence and visual SVG output. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the public contract. Supported inline styles now reimport through the private native reconstruction boundary described in [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md). Richer SVG graphs, typography/shaping and sustained editor-wide performance remain unfinished. No new plugin permission, account or network operation is introduced.
 
 `src/engine/styled-text.ts` prepares an immutable, owned `ImageBitmap` from explicitly positioned visual lines. Each line has an alphabetic baseline, physical alignment, paragraph direction and logical-order spans. Spans inherit a base character format and can override font family, size, color, weight/style, caps, stretch, kerning, spacing and declared variable axes. The input is an internal render DTO, not a public document mutation API.
 

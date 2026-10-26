@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Styled SVG admission invariant
+
+Inert inspection cannot publish unresolved character-family aliases into the public model or install native faces. Validate private range metadata against its exact placeholder text and owner. Resolve every effective face and declare it before applying character commands; use native common baselines/anchors rather than estimates. Keep temporary native registration inside synchronous reconstruction with no callbacks/awaits, and dispose provisional stores after any failure. Publish only a complete revision-zero document; retain complete source bytes and report unrepresented graphs explicitly. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).
+
 ## Character-range invariant
 
 Store literal text with ordered nonoverlapping sparse UTF-16 overrides. Normalize into mutable command drafts before immutable store reconciliation. Gaps inherit paragraph defaults; source edits retain unaffected ranges and explicit affinity. Inspector edits use actual beforeinput intervals for repeated text. Schema 45 gates even explicit empty arrays, which keep native paragraph layout. Capture typography/source/revision before awaits, retain owned fonts, validate throughout and release probes/leases/URLs. Scoped prepared bounds never enter serialized commands or bypass final host remeasurement/grants. Distinguish headless estimates from native host metrics. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.

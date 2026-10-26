@@ -2,6 +2,8 @@ import type {Element as XmlElement} from '@xmldom/xmldom';
 import type {TextStyle} from './text-style';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {svgTextFontFamily} from './svg-css-import';
+import {characterFormatSchema,DEFAULT_CHARACTER_FORMAT,type CharacterFormat} from './character-format';
+import {normalizeCharacterRanges,type CharacterRangeData} from './text-ranges';
 
 export interface SvgTextImportStyle extends TextStyle {
   anchor:'start'|'middle'|'end';
@@ -37,8 +39,8 @@ export function svgTextImportStyle(p:Record<string,string>,parent?:SvgTextImport
  return{fontSize,fontFamily,fontWeight,fontStyle:fontStyle as 'normal'|'italic',direction:direction as 'ltr'|'rtl',anchor:anchor as SvgTextImportStyle['anchor'],xmlSpace:xmlSpace as SvgTextImportStyle['xmlSpace'],...(whiteSpace!==undefined?{whiteSpace:whiteSpace as 'normal'|'pre'}:{}),letterSpacing:spacing('letter-spacing',previous.letterSpacing??0),wordSpacing:spacing('word-spacing',previous.wordSpacing??0),fontKerning:fontKerning as TextStyle['fontKerning'],fontVariantCaps:fontVariantCapsSchema.parse(get('font-variant-caps',previous.fontVariantCaps??'normal')),fontStretch:fontStretchSchema.parse(get('font-stretch',previous.fontStretch??'normal')),fontVariationSettings:fontVariationSettingsSchema.parse(get('font-variation-settings',previous.fontVariationSettings??'normal'))};
 }
 
-/** Uniform tspans retain a whole shaped line; character styling/position lists
- * need a richer public text model and are reported rather than discarded. */
+/** Preserve the existing uniform-text path. Styled sources use the inert
+ * character projection below and acquire native geometry only in the host. */
 export function svgTextImportContent(element:XmlElement,style:SvgTextImportStyle):string{
  const collect=(element:XmlElement):string=>{let value='';for(let node=element.firstChild;node;node=node.nextSibling){
   if(node.nodeType===3||node.nodeType===4)value+=node.nodeValue??'';
@@ -48,10 +50,50 @@ export function svgTextImportContent(element:XmlElement,style:SvgTextImportStyle
    value+=collect(span);
   }
  }return value;};const value=collect(element);
- if(style.whiteSpace==='pre'||style.whiteSpace===undefined&&style.xmlSpace==='preserve'){
+ if(style.whiteSpace==='pre'){
   if(/[\n\r]/.test(value))throw new Error('Preserved SVG line breaks require explicitly positioned text lines.');
   if(/\t/.test(value))throw new Error('SVG preformatted tabs require flattened import.');
   return value;
  }
+ if(style.whiteSpace===undefined&&style.xmlSpace==='preserve')return value.replace(/[\t\n\r]/g,' ');
  return value.replace(/[\t\n\r ]+/g,' ').trim();
+}
+
+/** Inert source projection. Font declarations remain outside the public model
+ * until the trusted host resolves and owns every selected native face. */
+export function svgTextImportRuns<T extends {text:SvgTextImportStyle}>(element:XmlElement,root:T,resolve:(span:XmlElement,parent:T)=>T,format:(value:T)=>CharacterFormat):{text:string;ranges:readonly CharacterRangeData[];styled:boolean}{
+ const base=characterFormatSchema.parse(format(root)),ranges:CharacterRangeData[]=[];let text='',pending:CharacterFormat|undefined,styled=false;
+ const mode=(value:T)=>value.text.whiteSpace??(value.text.xmlSpace==='preserve'?'preserve-spaces':'normal');
+ const append=(value:string,style:CharacterFormat)=>{
+  if(text.length+value.length>10000)throw new Error('SVG text exceeds the 10,000 UTF-16-unit text budget.');
+  const start=text.length;text+=value;
+  const patch=Object.fromEntries(Object.keys(characterFormatSchema.shape).filter(key=>style[key as keyof CharacterFormat]!==base[key as keyof CharacterFormat]).map(key=>[key,style[key as keyof CharacterFormat]]));
+  if(Object.keys(patch).length)ranges.push({start,end:text.length,format:patch});
+ };
+ const literal=(value:string,current:T)=>{
+  const style=characterFormatSchema.parse(format(current)),space=mode(current);
+  for(let point of value){
+   if(space==='pre'&&/[\n\r\t]/u.test(point))throw new Error('SVG preformatted tabs or unpositioned line breaks require flattened import.');
+   if(/[\u2028\u2029]/u.test(point))throw new Error('SVG forced text lines require explicit positioned line reconstruction.');
+   if(space==='preserve-spaces'&&/[\n\r\t]/u.test(point))point=' ';
+   const collapsible=space!=='pre'&&space!=='preserve-spaces';
+   if(collapsible&&/[\t\r\n\f ]/u.test(point)){if(text&&!pending)pending=style;continue;}
+   if(pending){append(' ',pending);pending=undefined;}append(point,style);
+  }
+ };
+ const collect=(node:XmlElement,current:T)=>{for(let child=node.firstChild;child;child=child.nextSibling){
+  if(child.nodeType===3||child.nodeType===4)literal(child.nodeValue??'',current);
+  else if(child.nodeType===1){
+   const span=child as XmlElement;if(span.localName!=='tspan')throw new Error('SVG text paths and foreign text require flattened import.');
+   for(const key of ['x','y','dx','dy','rotate','textLength','lengthAdjust','transform'])if(span.hasAttribute(key))throw new Error('Individually positioned SVG text runs require flattened import.');
+   for(let i=0;i<span.attributes.length;i++){const key=span.attributes.item(i)!.name;if(key!=='id'&&!key.startsWith('data-')&&!key.startsWith('aria-'))styled=true;}
+   const next=resolve(span,current);if(next.text.direction!==root.text.direction||next.text.anchor!==root.text.anchor)throw new Error('Inline SVG direction or anchor changes require flattened import.');
+   collect(span,next);
+  }
+ }};collect(element,root);
+ return{text,ranges:normalizeCharacterRanges(text,ranges),styled};
+}
+
+export function svgCharacterFormat(style:SvgTextImportStyle,color:string):CharacterFormat{
+ return characterFormatSchema.parse({...DEFAULT_CHARACTER_FORMAT,...Object.fromEntries(Object.keys(characterFormatSchema.shape).filter(key=>key!=='color'&&(style as unknown as Record<string,unknown>)[key]!==undefined).map(key=>[key,(style as unknown as Record<string,unknown>)[key]])),color});
 }

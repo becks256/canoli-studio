@@ -5,6 +5,7 @@ import {documentFontFiles} from '../core/font-files';
 import {prepareSvgFontSources,reconstructSvgTexts} from './svg-import-text';
 import {AssetStore} from '../core/assets';
 import {allLayers,referencedAssets} from '../core/model';
+import {characterRangeSchema,normalizeCharacterRanges} from '../core/text-ranges';
 import type {SvgInspection,SvgImportControl,SvgImportOptions,SvgImportReport} from '../core/svg-import';
 import {svgViewBox} from '../core/svg-path-import';
 import {exportPng} from './png';
@@ -15,7 +16,7 @@ const count=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const messages=z.array(z.string().max(1000)).max(256);
 const reportSchema=z.object({version:z.literal(1),width:positive,height:positive,canImportEditable:z.boolean(),featuresPreserved:messages,featuresDegraded:messages,unsupportedFeatures:messages,additionalIssues:count,elements:count,layers:count,images:count,fonts:count.default(0),texts:count.default(0)}).strict();
 const fontSchema=z.object({family:z.string().min(1),sources:z.array(z.instanceof(Blob)).min(1),weight:z.string(),style:z.string(),stretch:z.string()}).strict();
-const inspectionSchema=z.object({report:reportSchema,document:z.unknown().optional(),flat:z.instanceof(Blob),fonts:z.array(fontSchema).default([]),texts:z.array(z.object({layerId:z.string(),x:z.number().finite(),y:z.number().finite()}).strict()).max(64).default([]),assets:z.array(z.object({id:z.string().uuid(),name:z.string().max(240),blob:z.instanceof(Blob)}).strict()).max(64),images:z.array(z.object({layerId:z.string(),assetId:z.string(),viewportWidth:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),viewportHeight:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),aspect:z.string()}).strict()).max(64)}).strict();
+const inspectionSchema=z.object({report:reportSchema,document:z.unknown().optional(),flat:z.instanceof(Blob),fonts:z.array(fontSchema).default([]),texts:z.array(z.object({layerId:z.string(),x:z.number().finite(),y:z.number().finite(),characterRanges:z.array(characterRangeSchema).max(10000).optional()}).strict()).max(64).default([]),assets:z.array(z.object({id:z.string().uuid(),name:z.string().max(240),blob:z.instanceof(Blob)}).strict()).max(64),images:z.array(z.object({layerId:z.string(),assetId:z.string(),viewportWidth:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),viewportHeight:z.number().positive().max(Number.MAX_SAFE_INTEGER).nullable(),aspect:z.string()}).strict()).max(64)}).strict();
 export const svgImportOptionsSchema=z.object({mode:z.enum(['editable','flatten']).default('editable')}).strict();
 
 /** Validate worker transport before admitting any source assets or model. */
@@ -30,6 +31,7 @@ export function validateSvgInspection(value:unknown):SvgInspection{
   for(const p of parsed.images){const layer=doc.getLayer(p.layerId);if(!(layer instanceof RasterLayer)||layer.assetId!==p.assetId||!ids.has(p.assetId))throw new Error('Invalid SVG image placement.');}
   if(layers.some(l=>l.kind==='raster'&&!placements.has(l.id)))throw new Error('Missing SVG image placement.');
   const textIds=new Set(parsed.texts.map(p=>p.layerId));if(textIds.size!==parsed.texts.length||r.texts!==parsed.texts.length||layers.some(l=>l.kind==='text'&&!textIds.has(l.id))||parsed.texts.some(p=>!(doc.getLayer(p.layerId) instanceof TextLayer))||documentFontFiles(doc.toJSON()).length)throw new Error('Invalid SVG text/font preparation records.');
+  for(const placement of parsed.texts){const layer=doc.getLayer(placement.layerId)as TextLayer,data=layer.toJSON();if(data.kind!=='text'||data.characterRanges!==undefined)throw new Error('SVG character formatting must remain in inert preparation records.');if(placement.characterRanges!==undefined)normalizeCharacterRanges(layer.text,placement.characterRanges);}
  }else if(parsed.document!==undefined||parsed.assets.length||parsed.images.length||parsed.texts.length)throw new Error('Unsupported SVG cannot publish partial editable content.');
  return parsed as SvgInspection;
 }

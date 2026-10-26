@@ -3,7 +3,8 @@ import {bezierGeometryBounds} from './bezier-bounds';
 import {DOMParser,XMLSerializer,type Element as XmlElement,type Node as XmlNode} from '@xmldom/xmldom';
 import {Document,LayerGroup,VectorLayer,VectorPath,VectorContour,RasterLayer,TextLayer,Layer,AffineTransform} from '../dom';
 import {svgStyleDeclarations,svgFontStylesheet,svgCheckCssValue,type SvgFontSource} from './svg-css-import';
-import {svgTextImportStyle,svgTextImportContent,svgTextLength,SVG_TEXT_ATTRIBUTES,type SvgTextImportStyle} from './svg-text-import';
+import {svgTextImportStyle,svgTextImportContent,svgTextImportRuns,svgCharacterFormat,svgTextLength,SVG_TEXT_ATTRIBUTES,type SvgTextImportStyle} from './svg-text-import';
+import type {CharacterRangeData} from './text-ranges';
 import type {DocumentData} from './model';
 import {parseSvgContours,svgNumbers,svgTransform,svgViewBox,type SvgContour} from './svg-path-import';
 export {svgTransform,svgViewBox} from './svg-path-import';
@@ -15,7 +16,7 @@ export interface SvgImportReport {
  elements:number;layers:number;images:number;fonts:number;texts:number;
 }
 export interface SvgImagePlacement {layerId:string;assetId:string;viewportWidth:number|null;viewportHeight:number|null;aspect:string}
-export interface SvgTextPlacement {layerId:string;x:number;y:number}
+export interface SvgTextPlacement {layerId:string;x:number;y:number;characterRanges?:readonly CharacterRangeData[]}
 /** Worker transport only; public document mutation still uses OO constructors. */
 export interface SvgInspection {report:SvgImportReport;document?:DocumentData;assets:{id:string;name:string;blob:Blob}[];images:SvgImagePlacement[];fonts:SvgFontSource[];texts:SvgTextPlacement[];flat:Blob}
 export interface SvgImportControl {signal?:AbortSignal;onProgress?:(progress:{phase:'reading'|'inspecting'|'decoding'|'rendering';fraction:number|null})=>void}
@@ -171,14 +172,17 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
   const p=properties(e),x=position(p.x??'0',s.text.fontSize),y=position(p.y??'0',s.text.fontSize),dx=position(p.dx??'0',s.text.fontSize),dy=position(p.dy??'0',s.text.fontSize);
   const line=(element:XmlElement,owner:LayerGroup,settings:Style,transform:AffineTransform,x:number,y:number)=>{
    if(settings.stroke!=='none'&&settings.strokeWidth>0)throw new Error('Stroked SVG text requires flattened import.');
-   const fill=paint(settings.fill,settings.color),content=svgTextImportContent(element,settings.text),{anchor,xmlSpace:_xmlSpace,whiteSpace:_whiteSpace,...typography}=settings.text;
+   const color=(value:Style)=>{const fill=paint(value.fill,value.color),alpha=(fill?.alpha??0)*value.fillOpacity;if(!fill||alpha===0)return'#00000000';return alpha===1?fill.color:`rgba(${parseInt(fill.color.slice(1,3),16)},${parseInt(fill.color.slice(3,5),16)},${parseInt(fill.color.slice(5,7),16)},${alpha})`;};
+   const runs=svgTextImportRuns(element,settings,(span,parent)=>{const value=style(span,parent);if(value.stroke!=='none'&&value.strokeWidth>0||value.opacity!==1||!value.display||value.visibility!==settings.visibility)throw new Error('SVG inline stroke, group opacity or visibility changes require flattened import.');return value;},value=>svgCharacterFormat(value.text,color(value)));
+   const fill=paint(settings.fill,settings.color),content=runs.styled?runs.text:svgTextImportContent(element,settings.text),{anchor,xmlSpace:_xmlSpace,whiteSpace:_whiteSpace,...typography}=settings.text;
    const align=anchor==='middle'?'center':(anchor==='start')===(typography.direction==='ltr')?'left':'right';
-   const prepared=new TextLayer({name:(element.getAttribute('id')||'SVG text').slice(0,240),text:content,...typography,fontVariationSettings:undefined,align,color:fill?.color??'#000000',opacity:settings.opacity*(fill?.alpha??0)*settings.fillOpacity,visible:settings.visibility&&settings.display});
+   const prepared=new TextLayer({name:(element.getAttribute('id')||'SVG text').slice(0,240),text:content,...typography,fontVariationSettings:undefined,align,color:runs.styled?color(settings):fill?.color??'#000000',opacity:settings.opacity*(runs.styled?1:(fill?.alpha??0)*settings.fillOpacity),visible:settings.visibility&&settings.display});
    // Structural inspection retains authored axes but cannot load their source.
    // Native placement/reflow occurs only after private font preparation.
    const data=prepared.toJSON();if(data.kind!=='text')throw new Error('Expected SVG text');if(typography.fontVariationSettings!==undefined)data.fontVariationSettings=typography.fontVariationSettings;
    const layer=add(owner,Layer._fromData(data)as TextLayer);
-   layer.transform=transform;texts.push({layerId:layer.id,x,y});
+   layer.transform=transform;texts.push({layerId:layer.id,x,y,...(runs.styled?{characterRanges:runs.ranges}:{})});
+   if(runs.styled)preserved.add('Editable inline character fonts, sizes, colors, native spacing and inherited source-indexed formatting.');
   };
   const children:XmlElement[]=[];let literal='';for(let child=e.firstChild;child;child=child.nextSibling){if(child.nodeType===1)children.push(child as XmlElement);else if(child.nodeType===3||child.nodeType===4)literal+=child.nodeValue??'';}
   if(children.some(child=>child.hasAttribute('x')||child.hasAttribute('y')||child.hasAttribute('dy'))){
