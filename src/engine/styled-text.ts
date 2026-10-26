@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {paragraphFormatSchema,DEFAULT_PARAGRAPH_FORMAT} from '../core/paragraph-styles';
+import {characterFormatSchema,characterFormatPatchSchema as formatPatchSchema,DEFAULT_CHARACTER_FORMAT,definedCharacterFormat,type CharacterFormat} from '../core/character-format';
 import {fontFamilyNames} from '../core/font-families';
 import {parseFontVariations,assertFontVariationRanges} from '../core/font-variations';
 import {documentFontFiles} from '../core/font-files';
@@ -11,17 +11,13 @@ import {captureOwnedExportFonts,captureExportFonts,type FontSourceCapture} from 
 import {captureSvgFonts} from './svg-fonts';
 import {yieldTask} from './task-yield';
 
-const characterFormatSchema=paragraphFormatSchema.pick({fontSize:true,fontFamily:true,color:true,
-  fontWeight:true,fontStyle:true,letterSpacing:true,wordSpacing:true,fontKerning:true,
-  fontVariantCaps:true,fontStretch:true,fontVariationSettings:true});
-const formatPatchSchema=characterFormatSchema.partial().strict();
 const SVG_NS='http://www.w3.org/2000/svg';
 const coordinate=z.number().finite().min(-Number.MAX_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER);
 const sceneSchema=z.object({
   width:z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
   transform:z.tuple([coordinate,coordinate,coordinate,coordinate,coordinate,coordinate]).optional(),
   style:formatPatchSchema.optional(),
-  lines:z.array(z.object({x:coordinate.default(0),y:coordinate.default(0),
+  lines:z.array(z.object({x:coordinate.default(0),y:coordinate.default(0),wordSpacingDelta:coordinate.default(0),
     align:z.enum(['left','center','right']).default('left'),direction:z.enum(['ltr','rtl']).default('ltr'),
     spans:z.array(z.object({text:z.string().max(10000),style:formatPatchSchema.optional()}).strict()).max(10000),
   }).strict()).max(10000),
@@ -42,9 +38,8 @@ const sceneSchema=z.object({
 
 /** Internal render DTOs; these are not a second public document mutation API. */
 export type StyledTextSceneInput=z.input<typeof sceneSchema>;
-type CharacterFormat=z.infer<typeof characterFormatSchema>;
 export interface StyledTextSpan {readonly text:string;readonly style:Readonly<CharacterFormat>}
-export interface StyledTextLine {readonly x:number;readonly y:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly spans:readonly StyledTextSpan[]}
+export interface StyledTextLine {readonly x:number;readonly y:number;readonly wordSpacingDelta:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly spans:readonly StyledTextSpan[]}
 export interface StyledTextScene {readonly width:number;readonly height:number;readonly transform:readonly number[];readonly lines:readonly StyledTextLine[]}
 export interface StyledTextLineMetrics {readonly advance:number;readonly ink:Readonly<Rect>}
 export interface StyledTextControl {signal?:AbortSignal;isCancelled?:()=>boolean}
@@ -58,14 +53,12 @@ export interface StyledTextSurface {
 /** Snapshot before any await; parser budgets apply to text metadata, not fonts
  * or document geometry. Width/height describe a caller-selected work window. */
 export function normalizeStyledTextScene(input:StyledTextSceneInput):StyledTextScene{
-  const value=sceneSchema.parse(input),defaults=characterFormatSchema.parse(Object.fromEntries(Object.keys(characterFormatSchema.shape).map(key=>[key,DEFAULT_PARAGRAPH_FORMAT[key as keyof typeof DEFAULT_PARAGRAPH_FORMAT]])));
-  const defined=(style:z.infer<typeof formatPatchSchema>|undefined)=>Object.fromEntries(Object.entries(style??{}).filter(([,value])=>value!==undefined));
-  const base={...defaults,...defined(value.style)};
+  const value=sceneSchema.parse(input),base={...DEFAULT_CHARACTER_FORMAT,...definedCharacterFormat(value.style)};
   const lines=value.lines.map(line=>{
     const spans:{text:string;style:Readonly<CharacterFormat>}[]=[];
     for(const span of line.spans){
       if(!span.text)continue;
-      const style=Object.freeze(characterFormatSchema.parse({...base,...defined(span.style)})),text=span.text.replace(/[\t\r\f]/g,' '),previous=spans.at(-1);
+      const style=Object.freeze(characterFormatSchema.parse({...base,...definedCharacterFormat(span.style)})),text=span.text.replace(/[\t\r\f]/g,' '),previous=spans.at(-1);
       if(previous&&Object.keys(characterFormatSchema.shape).every(key=>previous.style[key as keyof CharacterFormat]===style[key as keyof CharacterFormat]))previous.text+=text;
       else spans.push({text,style});
     }
@@ -76,14 +69,10 @@ export function normalizeStyledTextScene(input:StyledTextSceneInput):StyledTextS
   });
 }
 
-/** Prepare native whole-line SVG text in one pixel work window. Model ranges,
- * wrapping, OO commands and the Inspector are separate integration work. */
-export async function prepareStyledTextSurface(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}):Promise<StyledTextSurface>{
-  const alive=assets.captureLifetime();
-  const cancelled=()=>{control.signal?.throwIfAborted();if(control.isCancelled?.())throw new DOMException('Styled text preparation superseded.','AbortError');alive();};cancelled();
-  const scene=normalizeStyledTextScene(input);cancelled();
-  if(typeof globalThis.document==='undefined'||typeof Image==='undefined'||typeof createImageBitmap!=='function')throw new Error('Native styled text preparation requires a browser SVG host.');
-  const spans=scene.lines.flatMap(line=>line.spans),families=[...new Set(spans.map(span=>span.style.fontFamily))],requested=new Set(families.flatMap(fontFamilyNames));
+/** Private shared ownership for native measurement and raster preparation. */
+export function captureStyledTextFonts(styles:readonly Readonly<CharacterFormat>[],document:DocumentData,assets:AssetStore){
+  if(typeof globalThis.document==='undefined')throw new Error('Native styled text preparation requires a browser SVG host.');
+  const families=[...new Set(styles.map(style=>style.fontFamily))],requested=new Set(families.flatMap(fontFamilyNames));
   const files=documentFontFiles(document).filter(file=>requested.has(file.resource.report.faces[0].cssFamily.toLowerCase())).map(file=>structuredClone(file));
   const fontDocument={...document,children:[],components:[],fontFiles:files};
   const ownedFamilies=new Set(files.map(file=>file.resource.report.faces[0].cssFamily.toLowerCase()));
@@ -91,21 +80,42 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
   // not let its SVG-image copy silently select a different platform fallback.
   for(const face of globalThis.document.fonts)if(fontFamilyNames(face.family).some(name=>requested.has(name)&&!ownedFamilies.has(name)))throw new Error('Styled text requires an owned source for installed web fonts. Embed the requested font first.');
   for(const file of files)if(!assets.fonts.nativeAvailable||!assets.fonts.isActive(file.id))throw new Error('An owned styled-text font is not active on this native host.');
-  for(const span of spans){
-    const settings=span.style.fontVariationSettings??'normal';
+  for(const style of styles){
+    const settings=style.fontVariationSettings??'normal';
     if(parseFontVariations(settings).length){
       if(typeof FontFace==='undefined'||!('variationSettings'in FontFace.prototype))throw new Error('This browser cannot render native font variations.');
-      const primary=fontFamilyNames(span.style.fontFamily).map(name=>files.find(file=>file.resource.report.faces[0].cssFamily.toLowerCase()===name)).find(Boolean);
+      const primary=fontFamilyNames(style.fontFamily).map(name=>files.find(file=>file.resource.report.faces[0].cssFamily.toLowerCase()===name)).find(Boolean);
       if(!primary)throw new Error('Styled font variations require an owned embedded source.');
       assertFontVariationRanges(settings,primary.resource.report.faces[0].axes);
     }
   }
-  let lease:FontSourceCapture|undefined,native=()=>{},fonts:ReturnType<typeof captureSvgFonts>|undefined;
-  let host:HTMLDivElement|undefined,image:HTMLImageElement|undefined,url:string|undefined,bitmap:ImageBitmap|undefined,released=false,handedOff=false;
-  const release=()=>{if(released)return;released=true;bitmap?.close();lease?.release();};
-  const check=()=>{if(released)throw new Error('The styled text surface was released.');cancelled();lease?.();native();fonts?.check();if(bitmap&&(bitmap.width!==scene.width||bitmap.height!==scene.height))throw new Error('The styled text bitmap was closed or changed.');};
+  let lease:FontSourceCapture|undefined;
   try{
-    lease=captureOwnedExportFonts([fontDocument],families,assets);native=captureExportFonts(families,'styled text preparation');fonts=captureSvgFonts(fontDocument,assets,families);
+    lease=captureOwnedExportFonts([fontDocument],families,assets);const native=captureExportFonts(families,'styled text preparation'),fonts=captureSvgFonts(fontDocument,assets,families);let released=false;
+    const check=()=>{if(released)throw new Error('The styled text font capture was released.');lease!();native();fonts.check();};check();
+    return{check,document:fontDocument,definitions:fonts.definitions,release:()=>{if(released)return;released=true;lease!.release();}};
+  }catch(error){lease?.release();throw error;}
+}
+
+export function applyStyledSpanStyle(node:SVGTSpanElement,style:Readonly<CharacterFormat>,wordSpacingDelta=0){
+  Object.assign(node.style,{fontFamily:style.fontFamily,fontSize:`${style.fontSize}px`,fontWeight:style.fontWeight,fontStyle:style.fontStyle,
+    fontKerning:style.fontKerning,letterSpacing:`${style.letterSpacing}px`,wordSpacing:`${style.wordSpacing+wordSpacingDelta}px`,fontVariantCaps:style.fontVariantCaps??'normal',fontStretch:style.fontStretch??'normal',fontVariationSettings:style.fontVariationSettings??'normal'});
+}
+
+/** Prepare native whole-line SVG text in one pixel work window. Public model
+ * ranges, OO commands and the Inspector remain separate integration work. */
+export async function prepareStyledTextSurface(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}):Promise<StyledTextSurface>{
+  control={...control};
+  const alive=assets.captureLifetime();
+  const cancelled=()=>{control.signal?.throwIfAborted();if(control.isCancelled?.())throw new DOMException('Styled text preparation superseded.','AbortError');alive();};cancelled();
+  const scene=normalizeStyledTextScene(input);cancelled();
+  if(typeof globalThis.document==='undefined'||typeof Image==='undefined'||typeof createImageBitmap!=='function')throw new Error('Native styled text preparation requires a browser SVG host.');
+  let fonts:ReturnType<typeof captureStyledTextFonts>|undefined;
+  let host:HTMLDivElement|undefined,image:HTMLImageElement|undefined,url:string|undefined,bitmap:ImageBitmap|undefined,released=false,handedOff=false;
+  const release=()=>{if(released)return;released=true;bitmap?.close();fonts?.release();};
+  const check=()=>{if(released)throw new Error('The styled text surface was released.');cancelled();fonts?.check();if(host&&!host.isConnected)throw new Error('The styled text measurement host was removed.');if(bitmap&&(bitmap.width!==scene.width||bitmap.height!==scene.height))throw new Error('The styled text bitmap was closed or changed.');};
+  try{
+    fonts=captureStyledTextFonts(scene.lines.flatMap(line=>line.spans.map(span=>span.style)),document,assets);
     check();const context=globalThis.document.createElement('canvas').getContext('2d')!;
     host=globalThis.document.createElement('div');host.setAttribute('data-canoli-styled-text-probe','');host.setAttribute('aria-hidden','true');host.setAttribute('inert','');host.style.cssText='position:fixed;left:-100000px;top:0;width:1px;height:1px;visibility:hidden;pointer-events:none;contain:strict';
     const shadow=host.attachShadow({mode:'closed'}),svg=globalThis.document.createElementNS(SVG_NS,'svg');
@@ -122,8 +132,7 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
         context.fillStyle='#010203';context.fillStyle=style.color;
         if(context.fillStyle==='#010203'){context.fillStyle='#040506';context.fillStyle=style.color;if(context.fillStyle==='#040506')throw new Error('Cannot prepare an invalid styled-text color.');}
         const node=globalThis.document.createElementNS(SVG_NS,'tspan');node.textContent=span.text;node.setAttribute('fill',String(context.fillStyle));
-        Object.assign(node.style,{fontFamily:style.fontFamily,fontSize:`${style.fontSize}px`,fontWeight:style.fontWeight,fontStyle:style.fontStyle,
-          fontKerning:style.fontKerning,letterSpacing:`${style.letterSpacing}px`,wordSpacing:`${style.wordSpacing}px`,fontVariantCaps:style.fontVariantCaps??'normal',fontStretch:style.fontStretch??'normal',fontVariationSettings:style.fontVariationSettings??'normal'});
+        applyStyledSpanStyle(node,style,line.wordSpacingDelta);
         text.append(node);
         if(++visited%32===0||performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}
       }
@@ -144,5 +153,5 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
     });
     check();await image.decode();check();bitmap=await createImageBitmap(image);check();
     handedOff=true;return Object.freeze({bitmap,metrics,check,release});
-  }finally{host?.remove();if(image)image.src='';if(url)URL.revokeObjectURL(url);if(!handedOff)release();}
+  }finally{host?.remove();host=undefined;if(image)image.src='';if(url)URL.revokeObjectURL(url);if(!handedOff)release();}
 }

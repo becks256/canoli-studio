@@ -1,4 +1,5 @@
 import {expect,test} from '@playwright/test';
+import {SCHEMA_VERSION} from '../src/core/model';
 import {readFile} from 'node:fs/promises';
 
 test('isolated paragraph-style guide updates native pixels, preserves overrides and round-trips one script undo/project',async({page},info)=>{
@@ -29,7 +30,7 @@ test('isolated paragraph-style guide updates native pixels, preserves overrides 
       svgWarning:report.warnings.some((w:string)=>w.includes('linked paragraph-style')),schema:restored.schemaVersion};
   },code);
   expect(result).toMatchObject({oneUndo:true,cropDifferences:0,referenceEqual:true,cacheEqual:true,visible:true,failedAtomic:true,undo:true,reopenedEqual:true,modelEqual:true,
-    styleName:'Body',firstSize:28,secondSize:28,overrides:{color:'#a43e29'},updated:true,reset:true,svgWarning:true,schema:42});
+    styleName:'Body',firstSize:28,secondSize:28,overrides:{color:'#a43e29'},updated:true,reset:true,svgWarning:true,schema:SCHEMA_VERSION});
   await info.attach('paragraph-style-native',{body:JSON.stringify(result),contentType:'application/json'});
 });
 

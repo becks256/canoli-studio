@@ -1,8 +1,8 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
-### Current F08 styled-text preparation groundwork (2026-10-26)
+### Current F08 source-indexed paragraph groundwork (2026-10-26)
 
-An internal native SVG preparer snapshots visual lines and per-span formats, retains complete owned fonts and returns checked bitmap/metric surfaces with cancellation and source-lifetime cleanup. The first-capture fallback-font readiness bug is corrected by waiting for actual image loading. This does not connect mixed character ranges to TextLayer/model/commands, Inspector, paragraph/worker layout or transport. Those complete vertical workflows and all other unfinished original gates remain required. See [STYLED_TEXT.md](STYLED_TEXT.md) and the dated roadmap for actual verification and remaining scope.
+Internal format/edit projections and a shared sync/async line breaker now retain original character offsets through native SVG wrapping, mixed baselines and derived justification. Font leases and checked raster windows survive asynchronous preparation and source-model removal. Build, 2,193 unit/API checks, 202 distinct native cases across the disclosed full/corrected-file runs, and one complete 144-case production run are verified. Independent focused pixels, original fonts and two complete 50 MP outputs remain exact; schema/readers/forced-line failures and corrections are retained. Public character ranges, OO/history/Inspector/caret editing, native worker services and renderer/font/transport integration remain required. Observed typing tails/long tasks do not meet sustained F14 goals. See [STYLED_TEXT.md](STYLED_TEXT.md), the dated roadmap and [sealed evidence](benchmarks/character-layout-2026-10-26.zip).
 
 ### Current F08 owned variable-font axes increment (2026-10-25)
 
