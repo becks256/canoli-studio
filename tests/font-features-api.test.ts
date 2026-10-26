@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {beforeAll,afterAll,expect,it} from 'vitest';
 import type {AddressInfo} from 'node:net';
 import {createApiServer} from '../server/app';
@@ -11,7 +12,7 @@ it('REST applies native font requests through strict revisioned commands, atomic
  const created=await request('/documents',{width:640,height:320}),path=`/documents/${created.body.document.id}`,group=new LayerGroup(),text=group.layers.add(new TextLayer({text:'Original ß العربية',fontWeight:'553.25'})),vector=group.layers.add(new VectorLayer());
  const added=await request(path+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:group.toJSON()}]});expect(added.status).toBe(200);
  const patch={fontVariantCaps:'all-small-caps',fontStretch:'condensed'},changed=await request(path+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:text.id,patch}]});
- expect(changed.status,JSON.stringify(changed.body)).toBe(200);expect(changed.body.document.schemaVersion).toBe(43);expect(changed.body.document.children[0].children[0]).toMatchObject({...patch,text:text.text,fontWeight:'553.25'});
+ expect(changed.status,JSON.stringify(changed.body)).toBe(200);expect(changed.body.document.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);expect(changed.body.document.children[0].children[0]).toMatchObject({...patch,text:text.text,fontWeight:'553.25'});
  for(const invalid of [{fontVariantCaps:'uppercase'},{fontVariantCaps:null},{fontStretch:'75%'},{fontStretch:75}]){
   expect((await request(path+'/commands',{expectedRevision:changed.body.revision,commands:[{type:'document.rename',name:'No partial change'},{type:'layer.update',id:text.id,patch:invalid}]})).status).toBe(400);expect((await request(path)).body.document).toEqual(changed.body.document);
  }

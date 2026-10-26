@@ -1,6 +1,6 @@
 import type {Element as XmlElement} from '@xmldom/xmldom';
 import type {TextStyle} from './text-style';
-import {fontVariantCapsSchema,fontStretchSchema} from './font-features';
+import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {svgTextFontFamily} from './svg-css-import';
 
 export interface SvgTextImportStyle extends TextStyle {
@@ -8,7 +8,7 @@ export interface SvgTextImportStyle extends TextStyle {
   xmlSpace:'default'|'preserve';
   whiteSpace?:'normal'|'pre';
 }
-export const SVG_TEXT_ATTRIBUTES=['font-family','font-size','font-weight','font-style','font-stretch','font-variant-caps','font-kerning','letter-spacing','word-spacing','direction','text-anchor','dominant-baseline','alignment-baseline','baseline-shift','white-space','xml:space','unicode-bidi','writing-mode','text-decoration'];
+export const SVG_TEXT_ATTRIBUTES=['font-family','font-size','font-weight','font-style','font-stretch','font-variation-settings','font-variant-caps','font-kerning','letter-spacing','word-spacing','direction','text-anchor','dominant-baseline','alignment-baseline','baseline-shift','white-space','xml:space','unicode-bidi','writing-mode','text-decoration'];
 
 export function svgTextLength(value:string,base:number):number{
  const match=/^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)\s*(px|in|cm|mm|q|pt|pc|em|%)?$/i.exec(value.trim());
@@ -34,7 +34,7 @@ export function svgTextImportStyle(p:Record<string,string>,parent?:SvgTextImport
  for(const[key,allowed]of Object.entries({'dominant-baseline':['auto','alphabetic'],'alignment-baseline':['auto','baseline','alphabetic'],'baseline-shift':['baseline','0','0px'],'unicode-bidi':['normal'],'writing-mode':['horizontal-tb','lr','lr-tb'],'text-decoration':['none']}))if(p[key]!==undefined&&!['inherit','unset',...allowed].includes(p[key]))throw new Error(`SVG text ${key} requires flattened import.`);
  const spacing=(key:string,fallback:number)=>{const value=get(key,String(fallback));if(value.includes('%'))throw new Error('Percentage SVG text spacing requires flattened import.');return value==='normal'?0:svgTextLength(value,fontSize);};
  const fontKerning=get('font-kerning',previous.fontKerning??'auto');if(!['auto','normal','none'].includes(fontKerning))throw new Error('Unsupported SVG font kerning.');
- return{fontSize,fontFamily,fontWeight,fontStyle:fontStyle as 'normal'|'italic',direction:direction as 'ltr'|'rtl',anchor:anchor as SvgTextImportStyle['anchor'],xmlSpace:xmlSpace as SvgTextImportStyle['xmlSpace'],...(whiteSpace!==undefined?{whiteSpace:whiteSpace as 'normal'|'pre'}:{}),letterSpacing:spacing('letter-spacing',previous.letterSpacing??0),wordSpacing:spacing('word-spacing',previous.wordSpacing??0),fontKerning:fontKerning as TextStyle['fontKerning'],fontVariantCaps:fontVariantCapsSchema.parse(get('font-variant-caps',previous.fontVariantCaps??'normal')),fontStretch:fontStretchSchema.parse(get('font-stretch',previous.fontStretch??'normal'))};
+ return{fontSize,fontFamily,fontWeight,fontStyle:fontStyle as 'normal'|'italic',direction:direction as 'ltr'|'rtl',anchor:anchor as SvgTextImportStyle['anchor'],xmlSpace:xmlSpace as SvgTextImportStyle['xmlSpace'],...(whiteSpace!==undefined?{whiteSpace:whiteSpace as 'normal'|'pre'}:{}),letterSpacing:spacing('letter-spacing',previous.letterSpacing??0),wordSpacing:spacing('word-spacing',previous.wordSpacing??0),fontKerning:fontKerning as TextStyle['fontKerning'],fontVariantCaps:fontVariantCapsSchema.parse(get('font-variant-caps',previous.fontVariantCaps??'normal')),fontStretch:fontStretchSchema.parse(get('font-stretch',previous.fontStretch??'normal')),fontVariationSettings:fontVariationSettingsSchema.parse(get('font-variation-settings',previous.fontVariationSettings??'normal'))};
 }
 
 /** Uniform tspans retain a whole shaped line; character styling/position lists

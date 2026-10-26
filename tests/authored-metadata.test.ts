@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { describe, it, expect } from "vitest";
 import { Document, RasterLayer, LayerMetadata } from "../src/dom";
 import { parseCommands } from "../src/core/validation";
@@ -61,7 +62,7 @@ describe("authored layer metadata", () => {
     const legacy = document.toJSON();
     legacy.schemaVersion = 1;
     const reopened = Document.fromJSON(legacy);
-    expect(reopened.toJSON().schemaVersion).toBe(43);
+    expect(reopened.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
     layer.metadata = new LayerMetadata({ copyright: "Author supplied" });
     const saved = document.toJSON();
     expect(

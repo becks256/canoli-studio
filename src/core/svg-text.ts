@@ -1,4 +1,4 @@
-import {fontVariantCapsSchema,fontStretchSchema} from './font-features';
+import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import type {LayerData,TextLayerData} from './model';
 import type {SvgDocument} from './svg-masks';
 import {svgAttribute,svgNumber} from './svg-path';
@@ -86,7 +86,7 @@ export function* svgTextElements(layer:TextLayerData,layout?:SvgTextLayout):Gene
   const direction=layer.direction??'ltr',align=layer.align;
   const fontKerning=layer.fontKerning??'auto';
   const caps=fontVariantCapsSchema.parse(layer.fontVariantCaps??'normal'),stretch=fontStretchSchema.parse(layer.fontStretch??'normal');
-  const features=(caps==='normal'?'':`;font-variant-caps:${caps}`)+(stretch==='normal'?'':`;font-stretch:${stretch}`);
+  const features=(caps==='normal'?'':`;font-variant-caps:${caps}`)+(stretch==='normal'?'':`;font-stretch:${stretch}`)+((layer.fontVariationSettings??'normal')==='normal'?'':`;font-variation-settings:${svgAttribute(fontVariationSettingsSchema.parse(layer.fontVariationSettings))}`);
   if(!['auto','normal','none'].includes(fontKerning))throw new Error('Invalid SVG font kerning.');
   if(direction!=='ltr'&&direction!=='rtl')throw new Error('Invalid SVG text direction.');
   const anchor=align==='center'?'middle':(align==='left')===(direction==='ltr')?'start':'end';

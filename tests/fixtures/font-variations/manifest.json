@@ -1,0 +1,49 @@
+{
+  "license": "CC0-1.0; original geometric test artwork",
+  "axes": {
+    "TEST": [
+      0,
+      0,
+      100
+    ],
+    "wght": [
+      400,
+      400,
+      800
+    ]
+  },
+  "reference": {
+    "TEST": 50,
+    "wght": 600
+  },
+  "fallback": {
+    "unicode": 66,
+    "TESTRange": [
+      0,
+      0,
+      25
+    ],
+    "reference": {
+      "TEST": 25,
+      "wght": 600
+    }
+  },
+  "files": {
+    "Axes-fallback-mid.ttf": {
+      "bytes": 1044,
+      "sha256": "72a250253d4cf3ef931be42716710f758dc04691759af013d738c6f9729aba57"
+    },
+    "Axes-fallback.ttf": {
+      "bytes": 1352,
+      "sha256": "85a2c43fca4bfc7fcc2a7f22a749d02a410a7d4b7eb1e9fce9fa318bce2c9bcf"
+    },
+    "Axes-mid.ttf": {
+      "bytes": 988,
+      "sha256": "0ae1d8ae6efd56e15e48052ce81fd951ef13238dd54252b4cf6439dcd11309c3"
+    },
+    "Axes.ttf": {
+      "bytes": 1296,
+      "sha256": "d02d9039782d362160439f17607f8ecfce3f0d763fc2eeeec40a05a29c2f20fa"
+    }
+  }
+}

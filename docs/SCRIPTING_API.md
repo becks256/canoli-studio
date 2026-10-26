@@ -1,5 +1,23 @@
 # Scripting API
 
+## Variable font axes
+
+`new TextLayer({fontVariationSettings?: string})`, `text.fontVariationSettings: string | undefined` and `text.resetVariableAxes(): void` add authored CSS axis tuples through the shared command/history boundary. Omitted/`normal` selects existing matching defaults. Explicit native requests require a current owned embedded font, supported variation descriptors and declared in-range tags; strict syntax/limits, linked-style overrides, schema-44 admission and headless limitations are described in [FONT_VARIATIONS.md](FONT_VARIATIONS.md). The dated roadmap records acceptance evidence and remaining coverage.
+
+<!-- example: embedded-font-axes -->
+```js
+const font = document.fonts.files.items[0];
+if (!font) throw new Error('Embed the variable font first.');
+const text = document.layers.add(new TextLayer({
+  name: 'Variable study', text: 'AAAA', fontFamily: font.family,
+  fontSize: 40, fontVariationSettings: '"TEST" 50, "wght" 600',
+}));
+document.selectedLayer = text;
+print('Variable study ready');
+```
+
+This example requires the declared TEST 0–100 and wght 400–800 axes of the geometric acceptance font; choose actual declared tags/ranges for other fonts. No font source loader, network, credential or export capability is exposed to scripts.
+
 ## Text property edits and explicit reflow
 
 Ordinary attached or detached `TextLayer.update(patch)` operations preserve authored width/height when changing position, transform, name, opacity/fill/blend, color, alignment, visibility, lock, masks or styles. This also applies to movement, distribution and flipping through `document.layerSelection`. Color/alignment property edits still update linked paragraph overrides without measuring the text. Unrelated edits retain sparse legacy cached fields.
@@ -906,6 +924,7 @@ Inherits common layer options (`name`, `opacity`, `fillOpacity`, `visible`, `loc
 | `letterSpacing` | number                          | `0`            | Letter tracking in pixels between -50 and 500.    |
 | `wordSpacing`   | number                          | absent, effective `0` | Extra native separator spacing, finite pixels between -50 and 500. |
 | `fontKerning`   | `"auto" \| "normal" \| "none"` | absent, effective `"auto"` | Native font pair kerning: browser choice, enabled, or disabled. |
+| `fontVariationSettings` | string | absent, effective `"normal"` | Strict CSS tuples with unique four-character tags and finite values, at most 65,536 characters; primary owned-font tags/ranges and native support must validate. |
 | `fontWeight`    | string                          | `"normal"`     | Font weight (e.g. `"normal"`, `"bold"`, `"700"`). |
 | `fontStyle`     | `"normal" \| "italic"`          | `"normal"`     | Font style posture.                               |
 | `direction`     | `"ltr" \| "rtl"`                | `"ltr"`        | Directionality for text laying out.               |
@@ -923,6 +942,7 @@ Members:
 | `letterSpacing` | number                          | Read/write; letter tracking in pixels.                                                   |
 | `wordSpacing`   | `number \| undefined`            | Read/write; extra native word spacing. Undefined restores the effective zero default. |
 | `fontKerning`   | `"auto" \| "normal" \| "none" \| undefined` | Read/write; native pair kerning. Undefined restores Auto. |
+| `fontVariationSettings` | `string \| undefined` | Read/write; authored CSS axis tuples, omission/`normal` uses matching defaults. Undefined clears a linked local override; native requests need an owned embedded source. |
 | `fontWeight`    | string                          | Read/write; font weight descriptor.                                                      |
 | `fontStyle`     | `"normal" \| "italic"`          | Read/write; font posture.                                                                |
 | `direction`     | `"ltr" \| "rtl"`                | Read/write; text flow direction.                                                         |
@@ -931,8 +951,9 @@ Members:
 | `update()`      | method                          | Update multiple text and layer properties in a single command.                           |
 | `reflow(): void` | method                         | Explicitly refresh stored bounds with fonts available in this execution environment. |
 | `resetSpacing(): void` | method                   | Reset tracking and word spacing to `0`, kerning to `"auto"`, in one validated command. |
+| `resetVariableAxes(): void` | method | Request `"normal"` in one command; clear the linked paragraph override to resume inheritance instead. |
 
-Kerning and word spacing retain whole-line browser shaping, including direction, ligatures and script joining; the editor does not split glyphs or words to fake these controls. They are independent of tracking. Measurement, reference rendering, native GPU textures and SVG baseline preparation use the same complete text state, resetting absent defaults on reused contexts. Valid zero/negative advances retain native measurements instead of invoking estimates; stored intrinsic advance width has a minimum of one pixel and is not the glyph ink rectangle. Corner resizing measures the resized font with its current weight/style/tracking/word spacing/kerning/direction; stored spacing stays in document pixels rather than scaling with font size. Point text keeps authored newline-separated lines; optional paragraph wrapping, gaps and first-line indent are described below. Full paragraph styles, pair-specific manual kerning, variable-font axes and font embedding remain unsupported.
+Kerning and word spacing retain whole-line browser shaping, including direction, ligatures and script joining; the editor does not split glyphs or words to fake these controls. They are independent of tracking. Measurement, reference rendering, native GPU textures and SVG baseline preparation use the same complete text state, resetting absent defaults on reused contexts. Valid zero/negative advances retain native measurements instead of invoking estimates; stored intrinsic advance width has a minimum of one pixel and is not the glyph ink rectangle. Corner resizing measures the resized font with its current weight/style/tracking/word spacing/kerning/direction; stored spacing stays in document pixels rather than scaling with font size. Point text keeps authored newline-separated lines; optional paragraph wrapping, gaps and first-line indent are described below. Named/based-on paragraph styles, owned embedded fonts and declared variable-font axes follow their own contracts in this guide and [FONT_VARIATIONS.md](FONT_VARIATIONS.md). Pair-specific manual kerning and broader shaping/device fidelity remain open.
 
 Attached changes obey ancestor locks, validate finite values and enum members, recalculate bounds and share UI/REST/script history. Typography patches on other layer kinds reject atomically. Invalid constructors, unsupported native settings or malformed commands leave no partial edit. If the current native Canvas lacks word-spacing or kerning control, requesting a nonzero/non-Auto value rejects measurement/rendering rather than silently substituting segmented text. The inspector disables unavailable controls and retains **Reset spacing**, which can reset both unsupported settings together in one command. Existing projects with unsupported authored values require reset or a supporting browser. This is feature detection, not a cross-browser acceptance claim.
 

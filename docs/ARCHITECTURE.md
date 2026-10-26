@@ -1,5 +1,9 @@
 # Architecture
 
+## Native font variation instances
+
+`core/font-variations` validates authored CSS tuples; `fonts/variations` resolves immutable requests to separate private binary FontFace instances owned by the source registration. Base registrations remain shared between active stores. Preparation, restoration, immediate sharing and staged promotion retain complete selected native bytes before installing a native entry; a destination can activate them independently after the source closes. Captures pin exact instances before raster work, retain original bytes, validate native state and release leases on success/failure. Unpinned instances use a 64-tuple cache budget; original font/document geometry is unchanged. Source activation and public-font notifications remain distinct from private alias creation. Shared schema-44 commands, OOP members, style inheritance, isolated preloads and independent headless REST use the same field. Acceptance evidence and remaining coverage are recorded in the dated roadmap; see [FONT_VARIATIONS.md](FONT_VARIATIONS.md).
+
 ## Immutable geometry queries and palette availability
 
 `layerBounds` privately retains successful canvas-space bounds only for complete roots proven immutable by `core/immutable`. Keys include the exact document root and layer ID, so shared children, repeated IDs, parent edits and Undo remain scoped correctly. Mutable DTOs, command drafts and caller-only freezing retain fresh traversal. Cached records never escape: each returned bounds object is independently owned, and missing/empty results do not populate arbitrary keys. Palette alignment availability reads the current internal readonly model through the existing pure planner instead of serializing an owned document for each action. Public `toJSON()` ownership, validation, commands, history and extension contracts are unchanged.

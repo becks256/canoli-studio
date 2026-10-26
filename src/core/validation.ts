@@ -1,4 +1,4 @@
-import {fontVariantCapsSchema,fontStretchSchema} from './font-features';
+import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {fontFamilyRequestSchema} from './font-management';
 import {fontFileSchema} from './font-files';
 import {layerAlignmentSchema,alignmentTargetSchema} from './layer-layout';
@@ -84,6 +84,7 @@ const patch = z
     fontKerning: z.enum(['auto', 'normal', 'none']).optional(),
     fontVariantCaps:fontVariantCapsSchema.optional(),
     fontStretch:fontStretchSchema.optional(),
+    fontVariationSettings:fontVariationSettingsSchema.optional(),
     paragraphJustify: z.enum(["none","inter-word"]).optional(),
     wrapWidth: dimension.nullable().optional(),
     paragraphSpacing: z.number().min(0).max(10000).optional(),

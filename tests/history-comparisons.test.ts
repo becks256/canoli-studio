@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {it, expect} from 'vitest';
 import {Document, PaintLayer, RasterLayer} from '../src/dom';
 import {captureRetainedHistory, parseRetainedHistory, retainedDocuments} from '../src/core/history';
@@ -67,7 +68,7 @@ it('strictly admits comparison-bearing histories and migrates every pinned model
  ];
  for(const corrupt of corruptions){const h=structuredClone(captured);corrupt(h);expect(()=>parseRetainedHistory(h,doc.toJSON())).toThrow();}
  const h=structuredClone(captured), data=doc.toJSON();data.schemaVersion=12;for(const value of retainedDocuments(data,h))value.schemaVersion=12;
- const restored=Document._fromWorkspace(data,h);expect(restored.getSnapshot().comparisons.every(value=>value.before.schemaVersion===43&&value.after.schemaVersion===43)).toBe(true);
+ const restored=Document._fromWorkspace(data,h);expect(restored.getSnapshot().comparisons.every(value=>value.before.schemaVersion===CURRENT_DOCUMENT_SCHEMA&&value.after.schemaVersion===CURRENT_DOCUMENT_SCHEMA)).toBe(true);
 });
 it('includes images retained only by saved comparisons in native source closure and round trips', async () => {
  const doc=new Document({width:10000,height:5000});doc.layers.add(new RasterLayer({assetId:'comparison-only',width:10000,height:5000}));const image=doc.toJSON();doc.layers.at(0)!.remove();

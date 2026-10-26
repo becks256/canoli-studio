@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { expect, it } from "vitest";
 import {
   AffineTransform,
@@ -95,7 +96,7 @@ it("migrates old documents and round-trips transformed selection, clips and mask
     ...new Document().toJSON(),
     schemaVersion: 4,
   });
-  expect(doc.toJSON().schemaVersion).toBe(43);
+  expect(doc.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   const selection = new MarqueeSelection({
     shape: "ellipse",
     x: 2,

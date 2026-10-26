@@ -39,6 +39,7 @@ const generatedPages = [
   ["HISTORY", "Inspectable retained history"],
   ["TIFF_PAGES", "Multipage TIFF export"],
   ["FONT_FEATURES", "Native font features"],
+  ["FONT_VARIATIONS", "Variable font axes"],
   ["FONT_MANAGEMENT", "Document fonts"],
   ["FONT_SOURCES", "Font-file inspection and private preview"],
   ["FONT_FILES", "Embedded document font files"],

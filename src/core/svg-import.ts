@@ -1,7 +1,7 @@
 import {importSvgGradient} from './svg-gradient-import';
 import {bezierGeometryBounds} from './bezier-bounds';
 import {DOMParser,XMLSerializer,type Element as XmlElement,type Node as XmlNode} from '@xmldom/xmldom';
-import {Document,LayerGroup,VectorLayer,VectorPath,VectorContour,RasterLayer,TextLayer,AffineTransform} from '../dom';
+import {Document,LayerGroup,VectorLayer,VectorPath,VectorContour,RasterLayer,TextLayer,Layer,AffineTransform} from '../dom';
 import {svgStyleDeclarations,svgFontStylesheet,svgCheckCssValue,type SvgFontSource} from './svg-css-import';
 import {svgTextImportStyle,svgTextImportContent,svgTextLength,SVG_TEXT_ATTRIBUTES,type SvgTextImportStyle} from './svg-text-import';
 import type {DocumentData} from './model';
@@ -173,7 +173,11 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
    if(settings.stroke!=='none'&&settings.strokeWidth>0)throw new Error('Stroked SVG text requires flattened import.');
    const fill=paint(settings.fill,settings.color),content=svgTextImportContent(element,settings.text),{anchor,xmlSpace:_xmlSpace,whiteSpace:_whiteSpace,...typography}=settings.text;
    const align=anchor==='middle'?'center':(anchor==='start')===(typography.direction==='ltr')?'left':'right';
-   const layer=add(owner,new TextLayer({name:(element.getAttribute('id')||'SVG text').slice(0,240),text:content,...typography,align,color:fill?.color??'#000000',opacity:settings.opacity*(fill?.alpha??0)*settings.fillOpacity,visible:settings.visibility&&settings.display}));
+   const prepared=new TextLayer({name:(element.getAttribute('id')||'SVG text').slice(0,240),text:content,...typography,fontVariationSettings:undefined,align,color:fill?.color??'#000000',opacity:settings.opacity*(fill?.alpha??0)*settings.fillOpacity,visible:settings.visibility&&settings.display});
+   // Structural inspection retains authored axes but cannot load their source.
+   // Native placement/reflow occurs only after private font preparation.
+   const data=prepared.toJSON();if(data.kind!=='text')throw new Error('Expected SVG text');if(typography.fontVariationSettings!==undefined)data.fontVariationSettings=typography.fontVariationSettings;
+   const layer=add(owner,Layer._fromData(data)as TextLayer);
    layer.transform=transform;texts.push({layerId:layer.id,x,y});
   };
   const children:XmlElement[]=[];let literal='';for(let child=e.firstChild;child;child=child.nextSibling){if(child.nodeType===1)children.push(child as XmlElement);else if(child.nodeType===3||child.nodeType===4)literal+=child.nodeValue??'';}

@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { expect, it } from 'vitest';
 import { AffineTransform, BrushStroke, BrushTexture, Document, EraserStroke, LayerGroup, PaintLayer, RasterLayer, WetPaintStroke } from '../src/dom';
 import { paintOperationSchema, rasterErasureSchema, strokeBounds } from '../src/core/drawing';
@@ -57,7 +58,7 @@ for (const context of ['paint', 'raster', 'embedded-master'] as const) it(`retai
   if (context === 'paint') document.layers.add(new PaintLayer()).strokes.add(wet());
   else if (context === 'raster') document.layers.add(new RasterLayer({ assetId: 'original', width: 12, height: 8 })).applyWetPaint(wet());
   else { const master = new Document(); master.layers.add(new PaintLayer()).strokes.add(wet()); document.placeSmartObject(document.defineComponent(master)); }
-  const saved = document.toJSON(); expect(saved.schemaVersion).toBe(43); expect(Document.fromJSON(saved).toJSON()).toEqual(saved);
+  const saved = document.toJSON(); expect(saved.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA); expect(Document.fromJSON(saved).toJSON()).toEqual(saved);
   expect(referencedAssets(saved)).toEqual(new Set(context === 'raster' ? ['original', 'tip', 'result', 'coverage'] : ['tip', 'result', 'coverage']));
   const old = structuredClone(saved); old.schemaVersion = 32;
   if (context === 'embedded-master') for (const definition of old.components ?? []) if (definition.source.kind === 'document') definition.source.document.schemaVersion = 32;

@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { expect, it } from "vitest";
 import { Document } from "../src/dom";
 import { EditorStore } from "../src/core/store";
@@ -80,11 +81,11 @@ it("migrates validated legacy undo and redo states with the current workspace do
     future: [{ document: future, label: "After", canvasChanged: false }],
   });
   restored.undo();
-  expect(restored.toJSON().schemaVersion).toBe(43);
+  expect(restored.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   expect(restored.name).toBe("Before");
   restored.redo();
   restored.redo();
-  expect(restored.toJSON().schemaVersion).toBe(43);
+  expect(restored.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   expect(restored.name).toBe("After");
 });
 

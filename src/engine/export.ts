@@ -1,3 +1,4 @@
+import {parseFontVariations} from '../core/font-variations';
 import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
@@ -241,6 +242,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
           featuresPreserved.push('Native capital-variant and font-stretch requests as editable SVG typography');
           warnings.push('Capital variants and font stretch request font features and matching faces. Actual glyphs, synthesis and widths depend on the receiving font and browser.');
         }
+        if(planSvgTexts(document).some(layer=>parseFontVariations(layer.fontVariationSettings??'normal').length>0)){featuresPreserved.push('Declared variable-font axis requests as editable SVG typography');warnings.push('Variable axes require the embedded font and a supporting SVG viewer; font substitution or variation support can change appearance.');}
         if (planSvgTexts(document).some(layer => layer.wrapWidth != null || layer.paragraphSpacing || layer.firstLineIndent || layer.paragraphJustify==='inter-word'))
           warnings.push('Paragraph text is exported as editable positioned lines. Original paragraph reflow settings and soft-break source spacing are retained in the native project, not portable SVG layout.');
         if(planSvgTexts(document).some(layer=>layer.paragraphJustify==='inter-word'))featuresPreserved.push('Editable per-line native inter-word justification spacing');

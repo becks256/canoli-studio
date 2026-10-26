@@ -1,5 +1,6 @@
 /** Shared native text state. Keep whole-line shaping in the browser engine. */
 import type {ParagraphStyle} from './text-layout';
+import {nativeVariationFamily} from '../fonts/variations';
 import type {FontFeatures} from './font-features';
 export interface TextStyle extends ParagraphStyle,FontFeatures {
   fontSize: number;
@@ -12,10 +13,14 @@ export interface TextStyle extends ParagraphStyle,FontFeatures {
   direction?: 'ltr' | 'rtl';
 }
 export class UnsupportedTextStyleError extends Error {}
+export function nativeTextFamily(style:TextStyle):string {
+  try{return nativeVariationFamily(style.fontFamily,style.fontVariationSettings);}
+  catch(error){throw new UnsupportedTextStyleError(error instanceof Error?error.message:'Native font variations are unavailable.');}
+}
 /** Include stretch in matching and readiness checks, not only final drawing. */
 export function nativeTextFont(style:TextStyle):string {
   const stretch=style.fontStretch&&style.fontStretch!=='normal'?` ${style.fontStretch}`:'';
-  return `${style.fontStyle??'normal'} ${style.fontWeight??'normal'}${stretch} ${style.fontSize}px ${style.fontFamily}`;
+  return `${style.fontStyle??'normal'} ${style.fontWeight??'normal'}${stretch} ${style.fontSize}px ${nativeTextFamily(style)}`;
 }
 export function assertTextStyleSupport(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, style: TextStyle) {
   if ((style.fontVariantCaps??'normal')!=='normal'&&!('fontVariantCaps'in context))

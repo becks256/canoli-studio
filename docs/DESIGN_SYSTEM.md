@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Variable font-axis controls
+
+Use the custom Typography Inspector and a Variable font axes disclosure. Show declared tags/names and source ranges through existing precision NumberField preview/commit/cancel behavior, eight axes per page and explicit Reset variable axes. Keep inherited/default versus explicitly authored values clear and disclose unsupported fonts/browsers. Retain ordinary focus/typing shortcuts and a bounded scrolling disclosure. No new rail icon, shortcut or component library. See [FONT_VARIATIONS.md](FONT_VARIATIONS.md).
+
 ## Stable text frames during ordinary edits
 
 Moving/flipping/distributing text and changing its name, appearance, color, alignment, visibility or lock must keep the authored frame dimensions. Typography/layout controls and explicit reflow still recalculate them. Continue using existing controls and shortcuts; no new binding or input interception is introduced.

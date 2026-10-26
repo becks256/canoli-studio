@@ -32,7 +32,7 @@ export async function prepareSvgTexts(document:SvgDocument,control?:ExportContro
         const direction=layer.direction??'ltr',align=layer.align;
         const attributes={'x':'0','y':'0','font-family':layer.fontFamily,'font-size':String(layer.fontSize),'font-weight':layer.fontWeight??'normal','font-style':layer.fontStyle??'normal','direction':direction,'text-anchor':align==='center'?'middle':(align==='left')===(direction==='ltr')?'start':'end'};
         for(const[key,value]of Object.entries(attributes))text.setAttribute(key,value);
-        text.style.whiteSpace='pre';text.style.fontKerning=layer.fontKerning??'auto';text.style.fontVariantCaps=layer.fontVariantCaps??'normal';text.style.fontStretch=layer.fontStretch??'normal';text.style.wordSpacing=`${wordSpacing}px`;text.style.letterSpacing=`${spacingSupported?(layer.letterSpacing??0):0}px`;
+        text.style.whiteSpace='pre';text.style.fontKerning=layer.fontKerning??'auto';text.style.fontVariantCaps=layer.fontVariantCaps??'normal';text.style.fontStretch=layer.fontStretch??'normal';text.style.fontVariationSettings=layer.fontVariationSettings??'normal';text.style.wordSpacing=`${wordSpacing}px`;text.style.letterSpacing=`${spacingSupported?(layer.letterSpacing??0):0}px`;
       }
       probeLayer=layer;probeWordSpacing=wordSpacing;
     }

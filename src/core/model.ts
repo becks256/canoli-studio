@@ -1,4 +1,5 @@
-import {assertFontFeaturesVersion,fontVariantCapsSchema,fontStretchSchema,type FontFeatures} from './font-features';
+import {validateDeclaredFontVariations} from './font-variations';
+import {assertFontFeaturesVersion,fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema,type FontFeatures} from './font-features';
 import {fontFileSchema,documentFontFiles} from './font-files';
 import {vectorStrokeKeys} from './vector-stroke';
 import {visitLayerAssets} from './asset-references';
@@ -41,7 +42,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 43;
+export const SCHEMA_VERSION = 44;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -196,6 +197,7 @@ export interface DocumentData {
     | 40
     | 41
     | 42
+    | 43
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -363,6 +365,7 @@ export function createText(
     fontStyle,
     ...(options.fontVariantCaps===undefined?{}:{fontVariantCaps:options.fontVariantCaps}),
     ...(options.fontStretch===undefined?{}:{fontStretch:options.fontStretch}),
+    ...(options.fontVariationSettings===undefined?{}:{fontVariationSettings:options.fontVariationSettings}),
     ...(options.wrapWidth === undefined ? {} : {wrapWidth: options.wrapWidth}),
     ...(options.paragraphSpacing === undefined ? {} : {paragraphSpacing: options.paragraphSpacing}),
     ...(options.firstLineIndent === undefined ? {} : {firstLineIndent: options.firstLineIndent}),
@@ -382,6 +385,7 @@ export function createText(
     ...(fontKerning === undefined ? {} : {fontKerning}),
     ...(options.fontVariantCaps===undefined?{}:{fontVariantCaps:options.fontVariantCaps}),
     ...(options.fontStretch===undefined?{}:{fontStretch:options.fontStretch}),
+    ...(options.fontVariationSettings===undefined?{}:{fontVariationSettings:options.fontVariationSettings}),
     ...(options.wrapWidth === undefined ? {} : {wrapWidth: options.wrapWidth}),
     ...(options.paragraphSpacing === undefined ? {} : {paragraphSpacing: options.paragraphSpacing}),
     ...(options.firstLineIndent === undefined ? {} : {firstLineIndent: options.firstLineIndent}),
@@ -589,7 +593,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -597,7 +601,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–43), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–44), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -675,7 +679,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
-      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node))throw new Error('Native font features require a text layer.');
+      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node))throw new Error('Native font features require a text layer.');
       if (node.blendMode === 'pass-through') {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 28)
           throw new Error('Pass-through blending requires a group and document schema 28.');
@@ -826,6 +830,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
         assertFontFeaturesVersion(node,Number(value.schemaVersion));
         if(node.fontVariantCaps!==undefined)fontVariantCapsSchema.parse(node.fontVariantCaps);
         if(node.fontStretch!==undefined)fontStretchSchema.parse(node.fontStretch);
+        if(node.fontVariationSettings!==undefined)fontVariationSettingsSchema.parse(node.fontVariationSettings);
         if (Number(value.schemaVersion) < 27 && 'paragraphJustify' in node) throw new Error('Paragraph justification requires schema version 27.');
         if (Number(value.schemaVersion) < 26 && ('wrapWidth' in node || 'paragraphSpacing' in node || 'firstLineIndent' in node))
           throw new Error('Paragraph layout requires schema version 26.');
@@ -888,6 +893,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
   };
   yield* walk(value.children, 0);
   if(value.paragraphStyles!==undefined||hasParagraphStyle)validateParagraphStyles(value as unknown as DocumentData);
+  if(value.fontFiles!==undefined)validateDeclaredFontVariations(value as unknown as DocumentData);
   if (value.components !== undefined && Number(value.schemaVersion) < 10)
     throw new Error("Component definitions require schema version 10.");
   if (checkComponents) {

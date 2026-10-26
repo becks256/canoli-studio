@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {describe,it,expect} from 'vitest';
 import {readFileSync} from 'node:fs';
 import {Document,LayerGroup,RasterLayer,LayerStyle} from '../src/dom';
@@ -14,10 +15,10 @@ const root='tests/fixtures/psd/groups/';
 describe('native pass-through group contracts',()=>{
  it('uses shared commands, atomic undo and schema-28 compatibility guards',()=>{
   const doc=new Document(),group=doc.layers.add(new LayerGroup({blendMode:'pass-through'}));
-  expect(group.blendMode).toBe('pass-through');expect(doc.toJSON().schemaVersion).toBe(43);
+  expect(group.blendMode).toBe('pass-through');expect(doc.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   doc.transaction('Change group',()=>{group.opacity=.5;group.blendMode='normal';});doc.undo();expect(group.blendMode).toBe('pass-through');expect(group.opacity).toBe(1);
   expect(()=>Document.fromJSON({...doc.toJSON(),schemaVersion:27})).toThrow(/schema 28/);
-  const legacy=new Document();legacy.layers.add(new LayerGroup());const restored=Document.fromJSON({...legacy.toJSON(),schemaVersion:27});expect(restored.toJSON().schemaVersion).toBe(43);expect(restored.layers.at(0)!.blendMode).toBe('normal');
+  const legacy=new Document();legacy.layers.add(new LayerGroup());const restored=Document.fromJSON({...legacy.toJSON(),schemaVersion:27});expect(restored.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);expect(restored.layers.at(0)!.blendMode).toBe('normal');
   const raster=doc.layers.add(new RasterLayer({assetId:'source',width:3,height:2}));expect(()=>{raster.blendMode='pass-through';}).toThrow(/requires a group/);
   expect(parseCommands([{type:'layer.update',id:group.id,patch:{blendMode:'pass-through'}}])).toHaveLength(1);
  });

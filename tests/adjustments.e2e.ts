@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { test, expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 
@@ -495,7 +496,7 @@ test("Adjustment layer project serialization and load round-trip", async ({
     };
   });
 
-  expect(result.schemaVersion).toBe(43);
+  expect(result.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   expect(result.layerCount).toBe(2);
   expect(result.kind).toBe("adjustment");
   expect(result.opacity).toBe(0.85);

@@ -33,6 +33,16 @@ describe('owned font resources and independent native leases',()=>{
     const copied=a.shareTo(b,resource.id),check=b.capture(resource.id);expect(copied.original).toBe(resource.original);b.activate(resource.id);b.activate(resource.id);expect(set.size).toBe(1);
     a.dispose();check();expect(set.size).toBe(1);expect(b.get(resource.id).id).toBe(resource.id);b.dispose();expect(set.size).toBe(0);
   });
+  it('stages native sources independently before activation and releases them after the final destination lease',async()=>{
+    const set=new Set<FontFace>(),source=new FontSourceStore({nativeSet:set,prepare:native}),target=new FontSourceStore({nativeSet:set,prepare:native});
+    try{
+      const resource=await source.prepare(fixture()),lease=source.stageTo(target,resource.id);source.dispose();
+      expect(set.size).toBe(0);expect(new Uint8Array(await lease.resource.original.arrayBuffer())).toEqual(new Uint8Array(await fixture().arrayBuffer()));
+      target.activate(resource.id);lease.check();expect(set.size).toBe(1);
+      target.deactivate(resource.id);expect(set.size).toBe(0);target.activate(resource.id);lease.check();expect(set.size).toBe(1);
+      lease.release();expect(target.has(resource.id)).toBe(false);expect(set.size).toBe(0);
+    }finally{source.dispose();target.dispose();}
+  });
   it('detects native replacement/removal and descriptor mutation without changing resource bytes',async()=>{
     const set=new Set<FontFace>(),store=new FontSourceStore({nativeSet:set,prepare:native}),value=await store.prepare(fixture());store.activate(value.id);const check=store.capture(value.id),face=[...set][0];
     face.weight='700';expect(check).toThrow('registration changed');face.weight='400';check();set.delete(face);expect(check).toThrow('registration changed');set.add(face);store.deactivate(value.id);

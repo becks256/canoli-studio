@@ -1,7 +1,7 @@
 import {withoutNativeFontFeatures} from './helpers/legacy-typography';
 import {expect,it} from 'vitest';
 import {Document,TextLayer,ParagraphStyle,LayerGroup} from '../src/dom';
-import {validateDocument} from '../src/core/model';
+import {validateDocument,SCHEMA_VERSION} from '../src/core/model';
 import {parseCommands} from '../src/core/validation';
 import {importParagraphStyles,paragraphStyleLibrarySchema} from '../src/core/paragraph-styles';
 import {getExportCapabilityReport} from '../src/engine/export';
@@ -82,7 +82,7 @@ it('captures current text as the base without dropping existing explicit overrid
   expect(document.paragraphStyles.getById(style.id)!.format).toEqual(first.paragraphFormat);
 });
 it('checks schema age, missing definitions, wrong layer types and inconsistent resolved formats',()=>{
-  const {document,first,style}=scene();first.paragraphStyle=style;const saved=document.toJSON();expect(saved.schemaVersion).toBe(43);
+  const {document,first,style}=scene();first.paragraphStyle=style;const saved=document.toJSON();expect(saved.schemaVersion).toBe(SCHEMA_VERSION);
   expect(()=>validateDocument({...withoutNativeFontFeatures(saved),schemaVersion:39})).toThrow(/schema version 40/);
   const missing=structuredClone(saved);delete missing.paragraphStyles;expect(()=>Document.fromJSON(missing)).toThrow(/missing paragraph style/);
   const inconsistent=structuredClone(saved);(inconsistent.children[0]as {fontSize:number}).fontSize=200;expect(()=>Document.fromJSON(inconsistent)).toThrow(/disagrees/);
@@ -126,5 +126,5 @@ it('keeps resolved SVG typography while reporting that style links are native-pr
   const {document,first,style}=scene();first.paragraphStyle=style;
   const report=getExportCapabilityReport(document.toJSON(),{format:'svg'});expect(report.warnings.some(w=>w.includes('linked paragraph-style'))).toBe(true);
   expect(report.featuresDegradedOrOmitted).toContain('Linked paragraph styles and override relationships');
-  const legacy={...new Document().toJSON(),schemaVersion:39 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:43});
+  const legacy={...new Document().toJSON(),schemaVersion:39 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:SCHEMA_VERSION});
 });

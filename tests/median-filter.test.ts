@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { readFile } from 'node:fs/promises';
 import { beforeAll, expect, it } from 'vitest';
 import { applyMedianFilter, instantiateKernel, type PixelKernel } from '../src/engine/wasm';
@@ -109,7 +110,7 @@ it('shares commands, locks, one-step history and schema-age checks, including ne
   const document=new Document(),key=document.defineComponent(new Document({width:8,height:8})),instance=document.placeSmartObject(key);
   const before=document.toJSON(),history=document.getSnapshot().past.length;
   instance.setFilters([new MedianFilter({radius:2}),new SmartToneFilter({contrast:5})]);
-  const after=document.toJSON();expect(after.schemaVersion).toBe(43);expect(document.getSnapshot().past).toHaveLength(history+1);
+  const after=document.toJSON();expect(after.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);expect(document.getSnapshot().past).toHaveLength(history+1);
   expect(after.components).toEqual(before.components);expect(Document.fromJSON(after).toJSON()).toEqual(after);
   document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);
   expect(()=>validateDocument({...after,schemaVersion:37})).toThrow(/Median filters require schema version 38/);
@@ -121,7 +122,7 @@ it('shares commands, locks, one-step history and schema-age checks, including ne
   instance.locked=true;const locked=document.toJSON();expect(()=>instance.setFilters([new MedianFilter()])).toThrow(/Unlock/);expect(document.toJSON()).toEqual(locked);
   expect(()=>parseCommands([{type:'smartObject.filters',id:instance.id,filters:[{...new MedianFilter().toJSON(),radius:1.5}]}])).toThrow();
   const old=new Document(),group=old.layers.add(new LayerGroup());group.name='Legacy';
-  const legacy={...old.toJSON(),schemaVersion:37 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:43});
+  const legacy={...old.toJSON(),schemaVersion:37 as const};expect(Document.fromJSON(legacy).toJSON()).toEqual({...legacy,schemaVersion:CURRENT_DOCUMENT_SCHEMA});
   const state=old.getSnapshot(),restored=Document._fromWorkspace(legacy,{version:1,past:state.past,future:state.future});
-  restored.undo();expect(restored.toJSON().schemaVersion).toBe(43);restored.redo();expect(restored.toJSON()).toEqual({...legacy,schemaVersion:43});
+  restored.undo();expect(restored.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);restored.redo();expect(restored.toJSON()).toEqual({...legacy,schemaVersion:CURRENT_DOCUMENT_SCHEMA});
 });

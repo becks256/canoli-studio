@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { expect, it } from "vitest";
 import { Document, TextLayer, LayerGroup } from "../src/dom";
 import {
@@ -105,7 +106,7 @@ it("persists attached comps, supports recapture and rejects legacy or corrupt ow
     }),
   );
   const reopened = Document.fromJSON(saved.document);
-  expect(reopened.toJSON().schemaVersion).toBe(43);
+  expect(reopened.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   const restored = reopened.layerComps.at(0)!;
   expect(restored.name).toBe("Updated");
   restored.apply();

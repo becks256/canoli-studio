@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {beforeAll,expect,it} from 'vitest';
 import {readFile} from 'node:fs/promises';
 import {Document,AdjustmentLayer,defaultColorBalanceAdjustment,defaultVibranceAdjustment,LayerMask,MarqueeSelection} from '../src/dom';
@@ -57,11 +58,11 @@ it('chromatic layers persist in the current schema, upgrade v17 and reject misla
   const original=doc.getSnapshot();
   const layer=doc.layers.add(new AdjustmentLayer({adjustment:defaultColorBalanceAdjustment()}));
   layer.mask=new LayerMask({selection:new MarqueeSelection({shape:'rectangle',x:0,y:0,width:10,height:20})});
-  const before=doc.toJSON();expect(before.schemaVersion).toBe(43);
+  const before=doc.toJSON();expect(before.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   expect(()=>validateDocument({...before,schemaVersion:16})).toThrow(/schema version 17/);
   expect(Document.fromJSON(before).toJSON()).toEqual(before);
   expect(Document.fromJSON({...before,schemaVersion:17}).toJSON()).toEqual(before);
-  const legacy={...original.document,schemaVersion:16};expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(43);
+  const legacy={...original.document,schemaVersion:16};expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   layer.adjustment={kind:'vibrance',vibrance:63,saturation:-10};doc.undo();expect(layer.adjustment.kind).toBe('color-balance');doc.redo();expect(layer.adjustment.kind).toBe('vibrance');
   const checkpoint=doc.getSnapshot();
   for(const value of [{kind:'vibrance',vibrance:101,saturation:0},{...defaultColorBalanceAdjustment(),midtones:{red:0,green:0,blue:NaN}},{...defaultColorBalanceAdjustment(),extra:1}]){

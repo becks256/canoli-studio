@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {expect,it} from 'vitest';
 import {BrushTip,BrushStroke,PencilStroke,Document,PaintLayer,PressureCurve} from '../src/dom';
 import {brushTipPose,pointerPenTilt,interpolatePenTilt,transformPenTilt} from '../src/core/brush-tip';
@@ -10,7 +11,7 @@ it('owns complete authored tip geometry and rejects invalid values before attach
  const doc=new Document(),layer=doc.layers.add(new PaintLayer()),before=doc.toJSON();expect(()=>layer.strokes.add(new BrushStroke({points:[{x:1,y:1}],tip:{roundness:0,angle:0}}))).toThrow();expect(doc.toJSON()).toEqual(before);expect(()=>new BrushTip({angle:181})).toThrow();
 });
 it('retains tip and spherical tilt through OO commands, undo and schema migration while rejecting false age labels',()=>{
- const doc=new Document(),layer=doc.layers.add(new PaintLayer()),before=doc.toJSON();layer.strokes.add(new BrushStroke({points:[{x:10,y:10,pressure:.5,tilt:{altitude:Math.PI/4,azimuth:Math.PI/2}}],tip:new BrushTip({roundness:.5,tiltAngle:true})}));const saved=doc.toJSON();expect(saved.schemaVersion).toBe(43);expect(Document.fromJSON(saved).toJSON()).toEqual(saved);expect(()=>Document.fromJSON({...saved,schemaVersion:29})).toThrow(/schema version 30/);doc.undo();expect(doc.toJSON()).toEqual(before);doc.redo();expect(doc.toJSON()).toEqual(saved);expect(Document.fromJSON({...before,schemaVersion:29}).toJSON().schemaVersion).toBe(43);
+ const doc=new Document(),layer=doc.layers.add(new PaintLayer()),before=doc.toJSON();layer.strokes.add(new BrushStroke({points:[{x:10,y:10,pressure:.5,tilt:{altitude:Math.PI/4,azimuth:Math.PI/2}}],tip:new BrushTip({roundness:.5,tiltAngle:true})}));const saved=doc.toJSON();expect(saved.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);expect(Document.fromJSON(saved).toJSON()).toEqual(saved);expect(()=>Document.fromJSON({...saved,schemaVersion:29})).toThrow(/schema version 30/);doc.undo();expect(doc.toJSON()).toEqual(before);doc.redo();expect(doc.toJSON()).toEqual(saved);expect(Document.fromJSON({...before,schemaVersion:29}).toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
  const raw=new BrushStroke({points:[{x:10,y:10,tilt:{altitude:0,azimuth:0}}]}).toJSON();layer.strokes.add(new BrushStroke(raw));expect(()=>Document.fromJSON({...doc.toJSON(),schemaVersion:29})).toThrow(/schema version 30/);
 });
 it('uses pen orientation conventions including upright, axis-aligned and ambiguous horizontal boundaries',()=>{
@@ -38,7 +39,7 @@ it(`retains ${context} tip/orientation and rejects a falsely old schema`,async()
 });
 
 it('retains redo-only tip records through workspace migration and rejects invalid restored histories',()=>{
- const doc=new Document(),layer=doc.layers.add(new PaintLayer());layer.strokes.add(new BrushStroke({points:[{x:10,y:10,tilt:{altitude:.4,azimuth:.8}}],tip:new BrushTip({roundness:.5})}));const saved=doc.toJSON();doc.undo();const state=doc.getSnapshot(),history={version:1,past:state.past,future:state.future};const restored=Document._fromWorkspace({...state.document,schemaVersion:29},history);expect(restored.toJSON().schemaVersion).toBe(43);restored.redo();expect(restored.toJSON()).toEqual(saved);
+ const doc=new Document(),layer=doc.layers.add(new PaintLayer());layer.strokes.add(new BrushStroke({points:[{x:10,y:10,tilt:{altitude:.4,azimuth:.8}}],tip:new BrushTip({roundness:.5})}));const saved=doc.toJSON();doc.undo();const state=doc.getSnapshot(),history={version:1,past:state.past,future:state.future};const restored=Document._fromWorkspace({...state.document,schemaVersion:29},history);expect(restored.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);restored.redo();expect(restored.toJSON()).toEqual(saved);
  const invalid=structuredClone(history);invalid.future[0].document.schemaVersion=29;expect(()=>Document._fromWorkspace(state.document,invalid)).toThrow(/schema version 30/);
 });
 

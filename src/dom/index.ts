@@ -2387,6 +2387,7 @@ export class TextLayer extends Layer {
       fontKerning,
       fontVariantCaps,
       fontStretch,
+      fontVariationSettings,
       wrapWidth,
       paragraphSpacing,
       firstLineIndent,
@@ -2408,6 +2409,7 @@ export class TextLayer extends Layer {
         fontKerning,
         fontVariantCaps,
         fontStretch,
+        fontVariationSettings,
         wrapWidth,
         paragraphSpacing,
         firstLineIndent,
@@ -2506,6 +2508,9 @@ export class TextLayer extends Layer {
   resetFontFeatures():void { this.update({fontVariantCaps:'normal',fontStretch:'normal'}); }
   get fontVariantCaps():FontVariantCaps|undefined{return(this._read() as TextLayerData).fontVariantCaps;}
   set fontVariantCaps(value:FontVariantCaps|undefined){this.update({fontVariantCaps:value});}
+  get fontVariationSettings():string|undefined{return(this._read() as TextLayerData).fontVariationSettings;}
+  set fontVariationSettings(value:string|undefined){this.update({fontVariationSettings:value});}
+  resetVariableAxes():void{this.update({fontVariationSettings:'normal'});}
   get fontStretch():FontStretch|undefined{return(this._read() as TextLayerData).fontStretch;}
   set fontStretch(value:FontStretch|undefined){this.update({fontStretch:value});}
   get fontWeight(): string | undefined {

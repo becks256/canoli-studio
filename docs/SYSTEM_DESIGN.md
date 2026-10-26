@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Variable-font ownership invariant
+
+An authored axis tuple selects its own native binary faces; no edit mutates another layer's FontFace. Cache private instances separately from public source registrations. Every native installation path, including staged recipe/component promotion, must carry selected native bytes matching the render payload size before publishing its entry. Retain exact operation instances before capture, protect original source ownership and validate unchanged native descriptors/registration. Evict only unpinned instances and remove all variants on last-owner deactivation. Do not expose binary buffers through the public model or isolated APIs. Explicit fields require schema 44 before normalization; actual native/static-reference, source/Undo/persistence and production acceptance remains required. See [FONT_VARIATIONS.md](FONT_VARIATIONS.md).
+
 ## Retained world-geometry invariant
 
 Cache successful layer geometry only behind the model's recursive immutable registry, keyed by complete root identity and layer ID. Never infer safety from persisted IDs, shared child references or caller freezing. Return owned rectangles on every request, preserve fresh mutable-draft traversal and avoid negative-ID retention. Root replacement naturally invalidates parent/path/position results and history navigation reuses only the matching root. Action availability must inspect the current readonly root without a whole-document serialization; accepted edits still pass the authoritative shared command validator.

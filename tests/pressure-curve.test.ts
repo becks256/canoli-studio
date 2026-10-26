@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {describe,it,expect} from 'vitest';
 import {PRESSURE_CURVE_PRESETS,pressureCurveSchema,pressureResponse} from '../src/core/pressure-curve';
 
@@ -26,10 +27,10 @@ import {strokeBounds} from '../src/core/drawing';
 it('retains authored curves and recorded samples through shared commands, undo and native document reload',()=>{
  const curve=PressureCurve.soft(),stroke=new BrushStroke({points:[{x:5,y:10,pressure:.25},{x:25,y:10,pressure:.5}],size:20,flow:.5,pressureOpacity:true,pressureCurve:curve});
  const doc=new Document(),layer=doc.layers.add(new PaintLayer());layer.strokes.add(stroke);const snapshot=doc.toJSON();
- expect(snapshot.schemaVersion).toBe(43);expect(stroke.points.map(p=>p.pressure)).toEqual([.25,.5]);expect(stroke.pressureCurve!.points).toEqual(curve.points);
+ expect(snapshot.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);expect(stroke.points.map(p=>p.pressure)).toEqual([.25,.5]);expect(stroke.pressureCurve!.points).toEqual(curve.points);
  const restored=Document.fromJSON(snapshot);expect(restored.toJSON()).toEqual(snapshot);doc.undo();expect((doc.layers.at(0) as PaintLayer).strokes.length).toBe(0);doc.redo();expect(doc.toJSON()).toEqual(snapshot);
  expect(()=>Document.fromJSON({...snapshot,schemaVersion:28})).toThrow(/pressure curves require schema version 29/);
- const legacy=new Document();legacy.layers.add(new PaintLayer());expect(Document.fromJSON({...legacy.toJSON(),schemaVersion:28}).toJSON().schemaVersion).toBe(43);
+ const legacy=new Document();legacy.layers.add(new PaintLayer());expect(Document.fromJSON({...legacy.toJSON(),schemaVersion:28}).toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
  const data=stroke.toJSON();expect(paintStampSize(data,data.points[0])).toBe(10);expect(paintStampAlpha(data,data.points[0])).toBe(.25);expect(strokeBounds(data).height).toBe(17);
  expect([...strokeStamps(data,{x:0,y:0,width:100,height:100})].some(p=>p.pressure>.25&&p.pressure<.5)).toBe(true);
 });
@@ -66,7 +67,7 @@ it(`retains ${context} curves while rejecting a falsely labeled legacy brush`,()
 
 it('retains redo-only curve records and migrates valid legacy workspace states before further edits',()=>{
  const doc=new Document(),layer=doc.layers.add(new PaintLayer());layer.strokes.add(new BrushStroke({points:[{x:10,y:10,pressure:.25}],pressureCurve:PressureCurve.firm()}));const final=doc.toJSON();doc.undo();const state=doc.getSnapshot(),history={version:1,past:state.past,future:state.future};
- const restored=Document._fromWorkspace({...state.document,schemaVersion:28},history);expect(restored.toJSON().schemaVersion).toBe(43);restored.redo();expect(restored.toJSON()).toEqual(final);
+ const restored=Document._fromWorkspace({...state.document,schemaVersion:28},history);expect(restored.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);restored.redo();expect(restored.toJSON()).toEqual(final);
  const bad=structuredClone(history);bad.future[0].document.schemaVersion=28;expect(()=>Document._fromWorkspace(state.document,bad)).toThrow(/pressure curves require schema version 29/);
 });
 

@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Font-axis commands
+
+The optional schema-44 fontVariationSettings field and reset use existing text/paragraph commands and ordinary manifest grants, source/revision validation and Undo. Current owned fonts preload privately before isolated code starts. No source chooser, binary font store, host native face, network or export capability is added; installation remains inert. The dated roadmap records isolated/production acceptance and remaining coverage; see [FONT_VARIATIONS.md](FONT_VARIATIONS.md).
+
 ## Text property edits preserve authored frames
 
 Existing isolated command code uses the same `layer.update` measurement boundary: ordinary placement/appearance changes preserve imported text dimensions, while explicit metric/layout requests and `TextLayer.reflow()` recalculate them. Manifest/grant, isolation, revision/source checks, inert installation and one accepted Undo transaction remain unchanged. No font chooser, source loader or new permission is exposed.
@@ -35,7 +39,7 @@ Document.fonts.items uses existing document:read access; font replacement requir
 
 ## Native font fields keep existing authority
 
-Isolated command plugins may author the same validated TextLayer font requests and paragraph styles through current document read/write grants and shared undo. These data fields add no font-file, host-font enumeration, network, credential, rendering or file-export privilege. Package permissions/lifecycle remain unchanged and installation remains inert. The bundled runtime uses the current schema-42 command validator. See [native font features](FONT_FEATURES.md).
+Isolated command plugins may author the same validated TextLayer font requests and paragraph styles through current document read/write grants and shared undo. These data fields add no font-file, host-font enumeration, network, credential, rendering or file-export privilege. Package permissions/lifecycle remain unchanged and installation remains inert. The bundled runtime uses the shared current command validator; capital/stretch fields retain their schema-42 introduction gate. See [native font features](FONT_FEATURES.md).
 
 ## Multipage TIFF stays a host capability
 

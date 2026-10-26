@@ -855,6 +855,19 @@ select {
 .typography-panel .field-label:first-of-type {
   margin-top: 0;
 }
+.variable-font-axes {
+  margin-top: 14px;
+  overflow-wrap: anywhere;
+}
+.variable-font-axes[open] {
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.variable-font-axes summary {
+  cursor: pointer;
+  padding: 4px 0;
+}
 .inspector h2 {
   font-size: 11px;
   margin: 0 0 14px;

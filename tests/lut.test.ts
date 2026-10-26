@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { beforeAll, expect, it } from "vitest";
 import { readFile } from "node:fs/promises";
 import { Document, AdjustmentLayer, LayerMask, MarqueeSelection } from "../src/dom";
@@ -71,7 +72,7 @@ it("schema 20 preserves tables, masks and history through strict commands, OOP s
   const doc = new Document(), empty = doc.toJSON(), layer = doc.layers.add(new AdjustmentLayer());
   layer.setLut(cube, { amount: 35, interpolation: 'trilinear' });
   layer.mask = new LayerMask({ selection: new MarqueeSelection({ shape: 'rectangle', x: 0, y: 0, width: 10, height: 10 }) });
-  const before = doc.getSnapshot(), saved = doc.toJSON();expect(saved.schemaVersion).toBe(43);
+  const before = doc.getSnapshot(), saved = doc.toJSON();expect(saved.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
   expect(Document.fromJSON(saved).toJSON()).toEqual(saved);
   expect(() => validateDocument({ ...saved, schemaVersion: 19 })).toThrow(/version 20/);
   expect(Document.fromJSON({ ...empty, schemaVersion: 19 }).toJSON()).toEqual(empty);

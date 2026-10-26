@@ -11,7 +11,7 @@ import legacyFixture from './fixtures/typography/schema-41-linked.json';
 
 it('opens a genuine prior-runtime linked-style fixture without rewriting its text, formats or sparse overrides',()=>{
  const source=structuredClone(legacyFixture),document=Document.fromJSON(source),saved=document.toJSON(),text=document.layers.at(0)as TextLayer;
- expect(source.schemaVersion).toBe(41);expect(saved).toEqual({...source,schemaVersion:43});expect(text.text).toBe('Original ß é العربية');expect(text.paragraphOverrides).toEqual({color:'#205080'});
+ expect(source.schemaVersion).toBe(41);expect(saved).toEqual({...source,schemaVersion:SCHEMA_VERSION});expect(text.text).toBe('Original ß é العربية');expect(text.paragraphOverrides).toEqual({color:'#205080'});
  expect(text.paragraphStyle!.format).toMatchObject({fontVariantCaps:'normal',fontStretch:'normal',fontWeight:'553.25'});
  text.paragraphStyle!.basedOn!.update({fontVariantCaps:'small-caps',fontStretch:'condensed'});expect(text.fontVariantCaps).toBe('small-caps');expect(text.fontStretch).toBe('condensed');expect(text.paragraphOverrides).toEqual({color:'#205080'});
  document.undo();expect(document.toJSON()).toEqual(saved);expect(legacyFixture).toEqual(source);
@@ -54,7 +54,7 @@ it('keeps legacy missing defaults and rejects new fields in old style formats or
  }
  expect(paragraphFormatPatchSchema.parse({})).toEqual({});
  const style=document.paragraphStyles.add(new ParagraphStyle({name:'Normal'}));text.paragraphStyle=style;
- const old=JSON.parse(JSON.stringify(document.toJSON(),(key,value)=>key==='fontVariantCaps'||key==='fontStretch'?undefined:value));old.schemaVersion=41;
+ const old=JSON.parse(JSON.stringify(document.toJSON(),(key,value)=>key==='fontVariantCaps'||key==='fontStretch'||key==='fontVariationSettings'?undefined:value));old.schemaVersion=41;
  validateDocument(old);const restored=Document.fromJSON(old),linked=restored.layers.at(0)as TextLayer;
  expect(linked.paragraphStyle!.format).toMatchObject({fontVariantCaps:'normal',fontStretch:'normal'});expect(linked.paragraphOverrides).toEqual({});
  const legacyText=old.children[0];if(legacyText.kind!=='text'||!legacyText.paragraphStyle)throw new Error('Expected linked legacy text');

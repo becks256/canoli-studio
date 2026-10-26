@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Font variations
+
+The shared optional text/paragraph `fontVariationSettings` field carries validated CSS axis tuples and uses existing revision/lock/atomic-history commands. `normal` restores matching defaults; JSON clients clear inherited overrides through the existing command. REST remains a separate headless session with estimated metrics and no browser synchronization or new font-source capability. Schema-44, syntax/range/native support and remaining acceptance are documented in [FONT_VARIATIONS.md](FONT_VARIATIONS.md).
+
 ## Text geometry in property updates
 
 Independent REST `layer.update` commands preserve authored text dimensions for position, transform, name, opacity/fill/blend, color, alignment, visibility, lock and other non-layout changes. Explicit content, font metrics, paragraph layout or legacy width/height requests recalculate text bounds; supplying the same text remains an explicit reflow request. Shared strict validation, expected revisions, atomic rollback and Undo apply. REST documents remain independent of the browser. See the [scripting measurement contract](SCRIPTING_API.md#text-property-edits-and-explicit-reflow).

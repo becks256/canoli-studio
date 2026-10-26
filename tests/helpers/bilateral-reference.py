@@ -8,14 +8,15 @@ import sys
 from pathlib import Path
 from PIL import Image
 
-project, first_png, reopened_png = map(Path, sys.argv[1:])
+project, first_png, reopened_png = map(Path, sys.argv[1:4])
+expected_schema = int(sys.argv[4])
 container = project.read_bytes()
 assert container[:8] == b'LUMA3\r\n\0'
 length = struct.unpack('<Q', container[8:16])[0]
 manifest_bytes = container[48:48 + length]
 assert hashlib.sha256(manifest_bytes).digest() == container[16:48]
 manifest = json.loads(manifest_bytes)
-assert manifest['document']['schemaVersion'] == 43
+assert manifest['document']['schemaVersion'] == expected_schema
 filter_value = manifest['document']['children'][0]['smartFilters'][0]
 assert filter_value['kind'] == 'bilateral-denoise'
 assert (filter_value['radius'], filter_value['colorSigma'], filter_value['amount']) == (3, 20, .75)

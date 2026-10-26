@@ -1,3 +1,4 @@
+import {registerFontVariationSource} from '../fonts/variations';
 import {
   LayerMask,
   LayerMetadata,
@@ -105,7 +106,8 @@ self.onmessage = async (event) => {
       const set=(self as typeof self&{fonts?:FontFaceSet}).fonts;
       if(!set||typeof FontFace==='undefined')throw new Error('This browser cannot measure embedded fonts in isolated scripts.');
       const bytes=await source.blob.arrayBuffer();
-      for(const descriptor of source.descriptors){const face=new FontFace(source.family,bytes,descriptor);await face.load();set.add(face);}
+      const faces:FontFace[]=[];for(const descriptor of source.descriptors){const face=new FontFace(source.family,bytes,descriptor);await face.load();set.add(face);faces.push(face);}
+      registerFontVariationSource(set,bytes,source.info,()=>{if(faces.some(face=>face.status!=='loaded'||!set.has(face)))throw new Error('An isolated native font changed.');});
     }
     fonts.length=0;
     const document = Document.fromJSON(event.data.document);

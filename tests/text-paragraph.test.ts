@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {describe, it, expect} from 'vitest';
 import {Document, TextLayer, LayerGroup, VectorLayer} from '../src/dom';
 import {layoutText} from '../src/core/text-layout';
@@ -68,7 +69,7 @@ describe('paragraph layout and shared mutation contracts', () => {
   it('upgrades every valid earlier root/history without injecting paragraph properties', () => {
     const doc=new Document();doc.layers.add(new TextLayer({text:'Legacy'}));doc.name='Later';
     for(let schemaVersion=1;schemaVersion<SCHEMA_VERSION;schemaVersion++){
-      const restored=Document.fromJSON({...doc.toJSON(),schemaVersion});expect(restored.toJSON().schemaVersion).toBe(43);
+      const restored=Document.fromJSON({...doc.toJSON(),schemaVersion});expect(restored.toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
       for(const key of ['wrapWidth','paragraphSpacing','firstLineIndent'])expect(restored.toJSON().children[0]).not.toHaveProperty(key);
     }
     const state=doc.getSnapshot(),old=(value:ReturnType<Document['toJSON']>)=>({...value,schemaVersion:25 as const});

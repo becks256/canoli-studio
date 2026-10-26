@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { describe, it, expect } from "vitest";
 import {
   BrushStroke,
@@ -66,7 +67,7 @@ describe("layer mask contract", () => {
     for (const version of [1, 2, 3] as const) {
       const legacy = new Document().toJSON();
       legacy.schemaVersion = version;
-      expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(43);
+      expect(Document.fromJSON(legacy).toJSON().schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
     }
     const invalid = doc.toJSON();
     invalid.schemaVersion = 2;

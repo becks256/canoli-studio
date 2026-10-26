@@ -16,6 +16,7 @@ import {
   TextArea,
   TextInput,
 } from "./controls";
+import {VariableFontAxes} from './VariableFontAxes';
 import { InspectorSection } from "./InspectorSection";
 
 export const FONT_FAMILIES = [
@@ -268,6 +269,7 @@ export function TypographyPanel({
       {hasNumericWeight?<NumberField label="Weight value" layout="stacked" value={numericWeight} min={1} max={1000} step={1} disabled={disabled}
         onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{fontWeight:String(value)}})}
         onCommit={value=>onAction(()=>{layer.fontWeight=String(value);})}/>:<Button disabled={disabled} onClick={()=>onAction(()=>{layer.fontWeight='400';})}>Use numeric weight</Button>}
+      <VariableFontAxes layer={layer} disabled={disabled} onAction={onAction} onPreview={onPreview}/>
       <Select label="Capitals" layout="stacked" value={layer.fontVariantCaps??'normal'} disabled={disabled||!capitalsSupported}
         options={[{value:'normal',label:'Normal'},{value:'small-caps',label:'Small capitals'},{value:'all-small-caps',label:'All small capitals'},{value:'petite-caps',label:'Petite capitals'},{value:'all-petite-caps',label:'All petite capitals'},{value:'unicase',label:'Unicase'},{value:'titling-caps',label:'Titling capitals'}]}
         onChange={value=>onAction(()=>{layer.fontVariantCaps=value as FontVariantCaps;})}/>

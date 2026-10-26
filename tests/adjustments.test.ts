@@ -1,3 +1,4 @@
+import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import { describe, expect, it } from "vitest";
 import {
   evaluateMonotoneCubicSpline,
@@ -192,7 +193,7 @@ describe("adjustment math and schemas", () => {
 
     const json = doc.toJSON();
     expect(json.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(json.schemaVersion).toBe(43);
+    expect(json.schemaVersion).toBe(CURRENT_DOCUMENT_SCHEMA);
 
     // Validating under schema version 3 should throw
     const v3 = { ...json, schemaVersion: 3 };

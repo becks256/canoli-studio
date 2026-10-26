@@ -1,3 +1,4 @@
+import {DEFAULT_PARAGRAPH_FORMAT} from '../src/core/paragraph-styles';
 import {SCHEMA_VERSION} from '../src/core/model';
 import {expect,test} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
@@ -28,7 +29,7 @@ test('isolated based-on style guide matches independent native text and preserve
 test('Inspector creates a child style, resets its overrides, excludes cycles and detaches a base without changing text',async({page},info)=>{
  await page.goto('/');await page.evaluate(()=>{const {editor,ParagraphStyle,TextLayer}=window.luma,document=editor.newDocument({width:600,height:300}),body=document.paragraphStyles.add(new ParagraphStyle({name:'Body',format:{fontSize:24,color:'#315b2a'}})),first=document.layers.add(new TextLayer({name:'First',text:'Hierarchy in the Inspector',x:24,y:24}));first.paragraphStyle=body;document.selectedLayer=first;});
  const section=page.getByRole('region',{name:'Paragraph styles',exact:true});await section.getByRole('textbox',{name:'New paragraph style name',exact:true}).fill('Heading');await section.getByRole('button',{name:'Create style based on selected',exact:true}).click();await expect(section.getByText(/Based on Body\./)).toBeVisible();
- const size=page.getByRole('spinbutton',{name:'Font size',exact:true});await size.fill('36');await size.press('Enter');await section.getByRole('button',{name:'Update style from text',exact:true}).click();await expect(section.getByText(/16 style overrides/)).toBeVisible();
+ const size=page.getByRole('spinbutton',{name:'Font size',exact:true});await size.fill('36');await size.press('Enter');await section.getByRole('button',{name:'Update style from text',exact:true}).click();await expect(section.getByText(`${Object.keys(DEFAULT_PARAGRAPH_FORMAT).length} style overrides.`,{exact:false})).toBeVisible();
  await section.getByRole('button',{name:'Reset inherited style overrides',exact:true}).click();await expect(size).toHaveValue('36');await section.getByRole('button',{name:'Reset style overrides',exact:true}).click();await expect(size).toHaveValue('24');
  const ids=await page.evaluate(()=>window.luma.editor.document.paragraphStyles.items.map(style=>({id:style.id,name:style.name}))),body=ids.find(style=>style.name==='Body')!,heading=ids.find(style=>style.name==='Heading')!;
  await section.getByRole('combobox',{name:'Paragraph style',exact:true}).selectOption(body.id);await expect(section.getByRole('combobox',{name:'Base paragraph style',exact:true}).locator(`option[value="${heading.id}"]`)).toHaveCount(0);

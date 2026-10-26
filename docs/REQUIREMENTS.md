@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Variable font axes
+
+Provide explicit arbitrary declared font-axis values on embedded fonts through precision Inspector controls, shared TextLayer/paragraph fields, strict commands, Undo, isolated/plugin execution, independent REST, recipes and native persistence. Preserve Unicode and native whole-line shaping; never substitute glyph-by-glyph placement or layer scaling. Require actual source metadata, in-range settings, recoverable unsupported-source/browser errors and reset. Capture/lease native instances and complete originals through export/source lifetimes. Verify independent static-instance pixels, concurrent different tuples, SVG/native/workspace/recipe round trips, browser UI cancellation, actual isolated examples, 50 MP source/output and production workflows before declaring the increment complete. See [FONT_VARIATIONS.md](FONT_VARIATIONS.md).
+
 ## Command-search responsiveness verification
 
 Measure opening and query input against matching DOM results and a matching animation frame separately, alongside main-thread long tasks. Include blank, moderate and dense valid documents and report development versus normal production evidence. Palette inspection must preserve artwork, selection and history; source geometry and public serialization ownership stay intact. Repeated action eligibility must not serialize complete artwork unnecessarily. The complete editor-wide F14 objective and its existing ≤33 ms live-input p95 / <50 ms routine-task targets remain open until the broader runtime/device evidence satisfies them.
