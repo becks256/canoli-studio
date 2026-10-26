@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Character-range controls
+
+Use a Character formatting disclosure below Text content. Retain its selection while using family/size/color/weight/slant/spacing controls; explain range scope and first-character values for mixed selections. Provide Clear selected character formatting, preparation status and errors. Cancel stale/unmounted preparation and retain ordinary Undo/typing shortcuts and the existing Inspector scroll region. Existing typography controls change paragraph defaults. No new shortcut, rail icon or component framework. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
+
 ## Variable font-axis controls
 
 Use the custom Typography Inspector and a Variable font axes disclosure. Show declared tags/names and source ranges through existing precision NumberField preview/commit/cancel behavior, eight axes per page and explicit Reset variable axes. Keep inherited/default versus explicitly authored values clear and disclose unsupported fonts/browsers. Retain ordinary focus/typing shortcuts and a bounded scrolling disclosure. No new rail icon, shortcut or component library. See [FONT_VARIATIONS.md](FONT_VARIATIONS.md).

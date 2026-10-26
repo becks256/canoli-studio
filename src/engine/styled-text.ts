@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {characterFormatSchema,characterFormatPatchSchema as formatPatchSchema,DEFAULT_CHARACTER_FORMAT,definedCharacterFormat,type CharacterFormat} from '../core/character-format';
+import {applyNativeCharacterStyle} from '../core/character-layout';
 import {fontFamilyNames} from '../core/font-families';
 import {parseFontVariations,assertFontVariationRanges} from '../core/font-variations';
 import {documentFontFiles} from '../core/font-files';
@@ -98,8 +99,7 @@ export function captureStyledTextFonts(styles:readonly Readonly<CharacterFormat>
 }
 
 export function applyStyledSpanStyle(node:SVGTSpanElement,style:Readonly<CharacterFormat>,wordSpacingDelta=0){
-  Object.assign(node.style,{fontFamily:style.fontFamily,fontSize:`${style.fontSize}px`,fontWeight:style.fontWeight,fontStyle:style.fontStyle,
-    fontKerning:style.fontKerning,letterSpacing:`${style.letterSpacing}px`,wordSpacing:`${style.wordSpacing+wordSpacingDelta}px`,fontVariantCaps:style.fontVariantCaps??'normal',fontStretch:style.fontStretch??'normal',fontVariationSettings:style.fontVariationSettings??'normal'});
+  applyNativeCharacterStyle(node,style,wordSpacingDelta);
 }
 
 /** Prepare native whole-line SVG text in one pixel work window. Public model

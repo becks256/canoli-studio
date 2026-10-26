@@ -12,3 +12,7 @@ it("collects unique visible families from groups while excluding hidden ancestor
   doc.layers.add(new TextLayer({ fontFamily: "Invisible", opacity: 0 }));
   expect(exportFontFamilies(doc.toJSON())).toEqual(["Custom", "serif"]);
 });
+it('collects effective character families through visible and explicitly included hidden text',()=>{
+ const doc=new Document(),layer=doc.layers.add(new TextLayer({text:'ab',fontFamily:'serif',characterRanges:[{start:1,end:2,format:{fontFamily:'monospace'}}]}));
+ expect(exportFontFamilies(doc.toJSON())).toEqual(['monospace','serif']);layer.visible=false;expect(exportFontFamilies(doc.toJSON())).toEqual([]);expect(exportFontFamilies(doc.toJSON(),true)).toEqual(['monospace','serif']);
+});

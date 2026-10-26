@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Character ranges
+
+Schema-45 text accepts characterRanges: [{start, end, format}] through strict layer.update commands. Intervals are ordered, nonempty UTF-16 ranges that cannot split surrogate pairs. Empty arrays clear overrides while retaining the native paragraph path in browser hosts. Invalid, locked or stale edits reject atomically through existing revision/Undo contracts. Text-only replacement retains unchanged prefix/suffix formatting; OO replaceText supplies exact positions. REST remains an independent headless session with estimated metrics, separate from browser artwork and the isolated native typography broker. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
+
 ## Font variations
 
 The shared optional text/paragraph `fontVariationSettings` field carries validated CSS axis tuples and uses existing revision/lock/atomic-history commands. `normal` restores matching defaults; JSON clients clear inherited overrides through the existing command. REST remains a separate headless session with estimated metrics and no browser synchronization or new font-source capability. Schema-44, syntax/range/native support and remaining acceptance are documented in [FONT_VARIATIONS.md](FONT_VARIATIONS.md).

@@ -4,6 +4,8 @@ import type {DocumentData} from './model';
 import {isImmutable} from './immutable';
 import {documentFontUsage} from './font-management';
 import {fontFamilyNames} from './font-families';
+import {normalizeCharacterText,characterInputForLayer} from './character-layout';
+import {assertFontVariationRanges} from './font-variations';
 
 /** Serialized declaration; public mutation uses FontFile and DocumentFonts. */
 export const fontFileSchema=z.object({id:z.string().regex(/^[a-f0-9]{64}$/),name:z.string().min(1).max(240).refine(value=>value.trim().length>0,'A font file needs a name.'),resource:fontResourceDescriptorSchema}).strict().refine(value=>value.id===value.resource.report.faces[0].id,'Font file identity differs from its resource.');
@@ -23,6 +25,28 @@ export function documentFontFiles(document:DocumentData):FontFileData[]{
   const result=[...values.values()];if(isImmutable(document))cachedFiles.set(document,Object.freeze(result));return[...result];
 }
 export const referencedFontFiles=(document:DocumentData)=>new Set(documentFontFiles(document).map(value=>value.id));
+
+/** Rich text may refer to declared source identities, never private aliases. */
+export function validateCharacterFontDeclarations(document:DocumentData):void{
+  const files=new Map(documentFontFiles(document).map(file=>[file.resource.report.faces[0].cssFamily.toLowerCase(),file]));
+  visitFontFileScopes(document,scope=>{
+    const walk=(nodes:readonly import('./model').LayerData[])=>{for(const layer of nodes){
+      if(layer.kind==='group')walk(layer.children);
+      else if(layer.kind==='text'&&layer.characterRanges!==undefined){
+       const snapshot=normalizeCharacterText(characterInputForLayer(layer));
+       for(const style of [snapshot.style,...snapshot.styles]){
+        const names=fontFamilyNames(style.fontFamily);
+        for(const family of names){
+          if(/^canolivariation_/i.test(family))throw new Error('Private native font aliases cannot be stored in character formatting.');
+          if(/^canolifont_/i.test(family)&&!files.has(family))throw new Error('A character font requires its declared embedded source.');
+        }
+        const file=names.map(name=>files.get(name)).find(Boolean);
+        if(file&&style.fontVariationSettings!==undefined)assertFontVariationRanges(style.fontVariationSettings,file.resource.report.faces[0].axes);
+       }
+      }
+    }};walk(scope.children);
+  });
+}
 
 /** Bind inherited source families when artwork leaves its owning document. */
 export function fontFilesForArtwork(source:DocumentData,artwork:DocumentData):FontFileData[]{

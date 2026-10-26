@@ -366,7 +366,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         layerText?: string;
         layerFontFamily?: string;
         layerLineHeight?: number;
-        layerTextStyle?: import('../core/text-style').TextStyle;
+        layerTextStyle?: import('./utils').ResizeDragState['layerTextStyle'];
         id: string;
         layerKind: "raster" | "text";
         patch: LayerPatch;
@@ -1433,6 +1433,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           layerLineHeight:
             selected.kind === "text" ? selected.lineHeight : undefined,
           layerTextStyle: selected.kind === 'text' ? {
+            characterRanges:selected.characterRanges,color:selected.color,align:selected.align,
             fontSize:selected.fontSize, fontFamily:selected.fontFamily,
             fontWeight:selected.fontWeight, fontStyle:selected.fontStyle,
             fontVariantCaps:selected.fontVariantCaps,fontStretch:selected.fontStretch,fontVariationSettings:selected.fontVariationSettings,

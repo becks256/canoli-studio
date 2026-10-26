@@ -1,5 +1,32 @@
 # Scripting API
 
+## Character ranges
+
+`TextLayerOptions.characterRanges?: readonly CharacterRangeData[]` initializes ordered, nonoverlapping UTF-16 intervals `{start, end, format}`. `TextLayer.characterRanges` returns an owned snapshot; public mutations use the methods below and shared commands/history. Explicit ranges require schema 45. Gaps inherit paragraph defaults; an empty array retains the native paragraph path.
+
+| Member | Signature and behavior |
+| --- | --- |
+| Format | `formatRange(start: number, end: number, format: CharacterFormatPatch | null, control?: TypographyControl): Promise<void>`; nonempty interval, overlay properties or clear with `null`. |
+| Clear | `clearCharacterFormatting(start = 0, end = text.length, control?: TypographyControl): Promise<void>`; empty whole text is a no-op. |
+| Replace | `replaceText(start: number, end: number, replacement: string, options?: {affinity?: 'before' | 'after'}): void`; exact source positions, default preceding-character inheritance for insertions and first-selected-character inheritance for replacements. |
+| Native reflow | `reflowNative(control?: TypographyControl): Promise<void>`; prepare current native bounds before one ordinary update. |
+
+`CharacterFormatPatch` supports family, size, color, weight, slant, letter/word spacing, kerning, capitals, stretch and variable axes using the existing field names and authoring limits. Paragraph geometry stays on the layer. Offsets must be integers within the current text and cannot split surrogate pairs; text remains limited to 10,000 UTF-16 units. Rich text rejects unpaired surrogates and XML control characters unsupported by native SVG. Ranges and format inputs are captured before asynchronous work; malformed, stale, cancelled, locked or missing-source operations leave artwork/history untouched.
+
+Await formatting/reflow outside synchronous `Document.transaction`. Trusted code accepts `{signal?: AbortSignal}`; isolated scripts use panel cancellation, existing grants, five-second execution and 32 native-preparation limits. The broker returns native bounds only and final host commit independently validates/recomputes commands. Synchronous content/metric edits in a worker and independent Node REST sessions use estimated metrics; await `reflowNative()` in a browser script before querying native rich-text dimensions. Whole-string `text = value` retains formatting through unchanged prefix/suffix; use `replaceText` for ambiguous repeated text. Full behavior and output limits: [CHARACTER_TEXT.md](CHARACTER_TEXT.md).
+
+<!-- example: character-ranges -->
+```js
+const title = document.layers.add(new TextLayer({
+  name: "Character study", text: "Canoli Studio", fontSize: 32,
+  fontFamily: "serif", color: "#123456"
+}));
+await title.formatRange(0, 6, {fontSize: 48, color: "#a43e29"});
+title.replaceText(7, 13, "Design");
+await title.reflowNative();
+console.log("Character study ready", title.width, title.height);
+```
+
 ## Variable font axes
 
 `new TextLayer({fontVariationSettings?: string})`, `text.fontVariationSettings: string | undefined` and `text.resetVariableAxes(): void` add authored CSS axis tuples through the shared command/history boundary. Omitted/`normal` selects existing matching defaults. Explicit native requests require a current owned embedded font, supported variation descriptors and declared in-range tags; strict syntax/limits, linked-style overrides, schema-44 admission and headless limitations are described in [FONT_VARIATIONS.md](FONT_VARIATIONS.md). The dated roadmap records acceptance evidence and remaining coverage.

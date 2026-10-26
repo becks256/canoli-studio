@@ -1,10 +1,13 @@
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
+import {characterFormatSchema} from './character-format';
+import type {CharacterLayoutLine} from './character-layout';
 import type {LayerData,TextLayerData} from './model';
 import type {SvgDocument} from './svg-masks';
 import {svgAttribute,svgNumber} from './svg-path';
 
 /** Private measured export data; original text/typography remains in the model. */
 export interface SvgTextLayout {
+  styledLines?:readonly CharacterLayoutLine[];
   baselines:readonly number[];
   color:string;
   letterSpacing:number;
@@ -62,6 +65,20 @@ export function planSvgTexts(document:SvgDocument):TextLayerData[]{
 export function* svgTextElements(layer:TextLayerData,layout?:SvgTextLayout):Generator<string>{
   if(!layer.text)return;
   if(!layout)throw new Error('Text layers require host font measurement for SVG export.');
+  if(layer.characterRanges!==undefined){
+    if(!layout.styledLines)throw new Error('Character formatting requires prepared native SVG lines.');
+    for(const line of layout.styledLines){
+      const anchor=line.align==='center'?'middle':(line.align==='left')===(line.direction==='ltr')?'start':'end';
+      yield `<text x="${svgNumber(line.x)}" y="${svgNumber(line.y)}" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="alphabetic" xml:space="preserve" style="white-space:pre">`;
+      for(const span of line.spans){
+        const s=characterFormatSchema.parse(span.style);
+        if(!/^(?:#[a-fA-F0-9]{3,8}|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([a-zA-Z0-9.,%+\-/\s]+\))$/.test(s.color))throw new Error('SVG text requires a prepared literal color.');
+        yield `<tspan font-family="${svgAttribute(s.fontFamily)}" font-size="${svgNumber(s.fontSize)}" font-weight="${svgAttribute(s.fontWeight??'normal')}" font-style="${s.fontStyle??'normal'}" letter-spacing="${svgNumber(s.letterSpacing)}" word-spacing="${svgNumber(s.wordSpacing+line.wordSpacingDelta)}" fill="${svgAttribute(s.color)}" style="font-kerning:${s.fontKerning??'auto'};font-variant-caps:${s.fontVariantCaps??'normal'};font-stretch:${s.fontStretch??'normal'};font-variation-settings:${svgAttribute(s.fontVariationSettings??'normal')}">${svgAttribute(span.text)}</tspan>`;
+      }
+      yield '</text>\n';
+    }
+    return;
+  }
   const lines=layout.lines??layer.text.split('\n');
   if(lines.some(line=>typeof line!=='string'))throw new Error('Invalid SVG text lines.');
   if(layout.baselines.length!==lines.length)throw new Error('SVG text measurements do not match the line count.');

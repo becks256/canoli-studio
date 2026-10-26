@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Character formatting (F08)
+
+Retain literal text and sparse UTF-16 character overrides through shared commands, exact selection replacement, Undo/Redo and portable projects/recipes. Gaps inherit paragraph defaults. Reject invalid/overlapping/surrogate-splitting ranges, unsupported native scalars, undeclared embedded sources, stale/cancelled preparation and locked edits atomically. Browser scripts await native metrics without source bytes or bypassing final host validation. Schema 45 gates even empty ranges; legacy omission stays readable. Raster/SVG output preserves effective formatting and owned sources. Styled-SVG editable reimport and wider typography/device/performance gates remain unfinished. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
+
 ## Variable font axes
 
 Provide explicit arbitrary declared font-axis values on embedded fonts through precision Inspector controls, shared TextLayer/paragraph fields, strict commands, Undo, isolated/plugin execution, independent REST, recipes and native persistence. Preserve Unicode and native whole-line shaping; never substitute glyph-by-glyph placement or layer scaling. Require actual source metadata, in-range settings, recoverable unsupported-source/browser errors and reset. Capture/lease native instances and complete originals through export/source lifetimes. Verify independent static-instance pixels, concurrent different tuples, SVG/native/workspace/recipe round trips, browser UI cancellation, actual isolated examples, 50 MP source/output and production workflows before declaring the increment complete. See [FONT_VARIATIONS.md](FONT_VARIATIONS.md).

@@ -1,0 +1,18 @@
+import {test,expect} from '@playwright/test';
+import {readFile,writeFile} from 'node:fs/promises';
+import {gunzipSync} from 'node:zlib';
+
+test('50 MP RAW keeps every original sample beneath mixed characters across tile boundaries and native reopening',async({page},info)=>{
+ test.setTimeout(480000);const path=info.outputPath('characters-50mp.dng');await writeFile(path,gunzipSync(await readFile('tests/fixtures/raw/native-50mp.dng.gz')));const font=await readFile('tests/fixtures/fonts/Regular.ttf');
+ await page.goto('/');await page.getByTestId('import-input').setInputFiles(path);const review=page.getByRole('dialog',{name:'Import camera RAW',exact:true});await review.getByRole('checkbox',{name:'Convert RAW development to 8-bit editing precision',exact:true}).check();await review.getByRole('button',{name:'Import RAW image',exact:true}).click();await expect(review).toHaveCount(0,{timeout:180000});
+ const result=await page.evaluate(async source=>{
+  const{editor,TextLayer,PaintLayer,PaintFill}=window.luma,originalDocument=editor.document,font=await editor.document.fonts.embed(new Blob([new Uint8Array(source)]));
+  editor.document.layers.add(new PaintLayer({name:'Opaque reference region'})).strokes.add(new PaintFill({bounds:{x:2016,y:2024,width:600,height:200},color:'#ffffff'}));
+  const layer=editor.document.layers.add(new TextLayer({name:'Mixed characters',text:'AAAA',fontFamily:font.family,fontSize:40,color:'#2468ac',x:2032,y:2040}));await layer.formatRange(2,4,{fontSize:80,color:'#cc4422'});const authored=JSON.stringify(editor.document.toJSON()),project=await editor.saveProject();
+  await editor.openProject(new File([project],'Characters 50MP.luma'));await editor.closeDocument(originalDocument,{discardChanges:true});const original=editor.assetStore.values().find(asset=>asset.raw)!.raw!.originalBlob,originalSha256=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await original.arrayBuffer())),v=>v.toString(16).padStart(2,'0')).join('');
+  const canvas=document.createElement('canvas');canvas.width=600;canvas.height=200;const c=canvas.getContext('2d')!;c.fillStyle='#ffffff';c.fillRect(0,0,600,200);c.font=`80px ${font.family}`;c.textBaseline='alphabetic';const a=c.measureText('AA').actualBoundingBoxAscent;c.textBaseline='top';const baseline=a-c.measureText('AA').actualBoundingBoxAscent;c.textBaseline='alphabetic';c.font=`40px ${font.family}`;c.fillStyle='#2468ac';c.fillText('AA',16,16+baseline);const advance=c.measureText('AA').width;c.font=`80px ${font.family}`;c.fillStyle='#cc4422';c.fillText('AA',16+advance,16+baseline);const reference=await new Promise<Blob>(resolve=>canvas.toBlob(value=>resolve(value!)));canvas.width=canvas.height=0;
+  const png=await editor.exportPng();(window as any).characterLarge={png,reference,project};return{originalBytes:original.size,originalSha256,modelUnchanged:JSON.stringify(editor.document.toJSON())===authored,fontOriginalBytes:editor.assetStore.fonts.get(font.id).original.size};
+ },[...font]);expect(result).toMatchObject({originalBytes:100000672,originalSha256:'cfe25bed379735dfea685695e956838b284106e6527e6aff77e3901ef6ef9d85',modelUnchanged:true});
+ for(const name of ['png','reference','project']){const pending=page.waitForEvent('download');await page.evaluate(name=>{const blob=(window as any).characterLarge[name],anchor=document.createElement('a');anchor.href=URL.createObjectURL(blob);anchor.download=name+(name==='project'?'.luma':'.png');anchor.click();setTimeout(()=>URL.revokeObjectURL(anchor.href),1000);},name);await(await pending).saveAs(info.outputPath('characters-50mp-'+name+(name==='project'?'.luma':'.png')));}
+ await writeFile(info.outputPath('characters-50mp.json'),JSON.stringify(result,null,2));
+});

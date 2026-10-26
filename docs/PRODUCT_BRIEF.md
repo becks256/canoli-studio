@@ -1,5 +1,9 @@
 # Canoli Studio — product brief
 
+## Character formatting increment
+
+Source-indexed character formatting extends local professional typography through shared OO commands/undo, Inspector selections, native browser script metrics and portable document data. The broad professional-editor objective remains; path/vertical text, richer flow, wider shaping/interchange and sustained performance are still required. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
+
 ## Local layout increment
 
 Canvas and key-object alignment extend precise local editing through shared OO commands, separate REST sessions and semantic recipes. Authored geometry and original sources remain preserved; this does not change the broad professional-editor objective or authorize accounts, inference or uploads. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md).

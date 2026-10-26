@@ -35,8 +35,8 @@ export function documentFontUsage(document:DocumentData):DocumentFontUsage[]{
       return value;
     };
     for(const layer of allLayers(scope.children))if(layer.kind==='text'){
-      const value=entry(layer.fontFamily);value.textLayers++;
-      if(isLocked(scope,layer.id))value.lockedTextLayers++;
+      for(const family of new Set([layer.fontFamily,...(layer.characterRanges??[]).flatMap(range=>range.format.fontFamily===undefined?[]:[range.format.fontFamily])])){const value=entry(family);value.textLayers++;if(isLocked(scope,layer.id))value.lockedTextLayers++;}
+      for(const range of layer.characterRanges??[])if(range.format.fontFamily!==undefined)entry(range.format.fontFamily).overrides++;
       if(layer.paragraphStyle?.overrides.fontFamily!==undefined)entry(layer.paragraphStyle.overrides.fontFamily).overrides++;
     }
     for(const style of scope.paragraphStyles??[]){
@@ -76,8 +76,10 @@ export function replaceDocumentFont(
         if(layer.paragraphStyle.overrides.fontFamily===from)layer.paragraphStyle.overrides.fontFamily=to;
         family=layer.paragraphStyle.overrides.fontFamily??style.format.fontFamily;
       }else if(family===from)family=to;
-      if(family!==layer.fontFamily||forceReflow&&family===from){
+      const changedRanges=layer.characterRanges?.some(range=>range.format.fontFamily===from);
+      if(family!==layer.fontFamily||changedRanges||forceReflow&&(family===from||changedRanges)){
         if(isLocked(scope,layer.id))throw new Error('Unlock affected text and its parent groups before replacing a font.');
+        if(changedRanges)layer.characterRanges=layer.characterRanges!.map(range=>range.format.fontFamily===from?{...range,format:{...range.format,fontFamily:to}}:range);
         layer.fontFamily=family;reflow(layer);touched=true;
       }
     }

@@ -1,3 +1,4 @@
+import {characterFontFamilies} from './character-layout';
 /** Visible text in groups and reachable embedded masters; unused masters do not affect export. */
 export function exportFontFamilies(
   document: import("./model").DocumentData,
@@ -16,7 +17,7 @@ export function exportFontFamilies(
   ) => {
     for (const layer of layers) {
       if (!includeHidden && (!layer.visible || layer.opacity === 0)) continue;
-      if (layer.kind === "text") families.add(layer.fontFamily);
+      if (layer.kind === "text") for(const family of characterFontFamilies(layer))families.add(family);
       else if (layer.kind === "group") walk(layer.children, definitions);
       else if (layer.kind === "smart-object") {
         const definition = definitions.get(layer.componentId);

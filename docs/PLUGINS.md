@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Character formatting and native metrics
+
+Character ranges use existing layer.update authority, schema-45 validation and Undo. Awaited TextLayer formatting/reflow may request private native host measurement with existing document read/write grants. Return finite bounds only; final accepted commands independently remeasure and validate revision, sources and grants. Keep the five-second deadline, 32 native preparations and 256-command bound. Scripts use panel cancellation. No source chooser/bytes, rendering host, network grant or manifest permission is exposed; installation stays inert. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
+
 ## Font-axis commands
 
 The optional schema-44 fontVariationSettings field and reset use existing text/paragraph commands and ordinary manifest grants, source/revision validation and Undo. Current owned fonts preload privately before isolated code starts. No source chooser, binary font store, host native face, network or export capability is added; installation remains inert. The dated roadmap records isolated/production acceptance and remaining coverage; see [FONT_VARIATIONS.md](FONT_VARIATIONS.md).

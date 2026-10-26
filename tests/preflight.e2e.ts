@@ -2,6 +2,7 @@ import {test,expect,type Page} from '@playwright/test';
 import {writeFile,readFile} from 'node:fs/promises';
 async function setup(page:Page){
  await page.goto('/');await page.getByTestId('import-input').setInputFiles('tests/fixtures/matting/color-line.png');
+ await expect(page.getByRole('button',{name:'Select color-line.png',exact:true})).toBeVisible();
  return page.evaluate(()=>{
   const {editor,TextLayer,RasterLayer}=window.luma,document=editor.document;document.resize(600,400);const source=document.layers.at(0)! as InstanceType<typeof RasterLayer>;source.width=18;source.height=10;source.x=10;source.y=10;
   const text=document.layers.add(new TextLayer({name:'Headline',text:'Review this font',fontFamily:'Canoli Preflight Missing Font 517892',x:-20,y:20}));document.selectedLayer=source;

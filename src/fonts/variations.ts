@@ -8,6 +8,16 @@ interface Source {bytes:ArrayBuffer;info:FontFaceInfo;check:()=>void;variants:Ma
 const sources=new WeakMap<object,Map<string,Source>>();let serial=0;
 const state=(face:FontFace)=>JSON.stringify(['family','style','weight','stretch','unicodeRange','status','variationSettings','featureSettings','ascentOverride','descentOverride','lineGapOverride','display','sizeAdjust'].map(key=>(face as unknown as Record<string,unknown>)[key]));
 const currentSet=():NativeVariationSet|null=>globalThis.document?.fonts??(globalThis as typeof globalThis&{fonts?:FontFaceSet}).fonts??null;
+/** Read-only native ownership/validation for shared typography measurement. */
+export function isOwnedNativeFontFamily(family:string):boolean{
+ const set=currentSet(),source=set?sources.get(set)?.get(family.toLowerCase()):undefined;if(source)source.check();return !!source;
+}
+export function assertNativeFontVariations(family:string,settings='normal'):void{
+ if(!parseFontVariations(settings).length)return;
+ const set=currentSet();if(!set||typeof FontFace==='undefined'||!('variationSettings'in FontFace.prototype))throw new Error('This browser cannot render native font variations.');
+ const source=fontFamilyNames(family).map(name=>sources.get(set)?.get(name)).find(Boolean);
+ if(!source)throw new Error('Styled font variations require an owned embedded source.');source.check();assertFontVariationRanges(settings,source.info.axes);
+}
 // A native-face cache budget, independent of source/font/document admission.
 // Captured operations may retain additional instances until their lease ends.
 function trim(set:NativeVariationSet,source:Source){

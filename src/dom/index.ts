@@ -1,4 +1,10 @@
 import type {FontFeatures,FontVariantCaps,FontStretch} from '../core/font-features';
+import {formatCharacterRange,editCharacterRanges,type CharacterRangeData} from '../core/text-ranges';
+import type {CharacterFormatPatch} from '../core/character-format';
+import {characterInputForLayer,measureCharacterTextAsync,withPreparedCharacterBounds} from '../core/character-layout';
+export type {CharacterRangeData} from '../core/text-ranges';
+export type {CharacterFormat,CharacterFormatPatch} from '../core/character-format';
+export interface TypographyControl {signal?:AbortSignal}
 import { createFrequencySeparation } from "./frequency-separation";
 import {RawDevelopment,type RawDevelopmentControl} from './raw';
 import type {RawDevelopSettings,RawImportReport} from '../core/interchange/raw/types';
@@ -272,6 +278,7 @@ export interface RasterLayerOptions extends LayerOptions {
   height: number;
 }
 export interface TextLayerOptions extends LayerOptions,FontFeatures {
+  characterRanges?:readonly CharacterRangeData[];
   paragraphJustify?: 'none' | 'inter-word';
   wrapWidth?: number | null;
   paragraphSpacing?: number;
@@ -441,6 +448,10 @@ export class Document {
   private defaultHistoryOrigin:HistoryOrigin = {surface:'host'};
   private scopedHistoryOrigin:HistoryOrigin|null = null;
   private _assetStore: AssetStore | null = null;
+  /** @internal Native geometry broker; final host commands remeasure independently. */
+  _prepareTextLayout?:(layerId:string,patch:Pick<TextLayerData,'text'|'characterRanges'>,control:TypographyControl)=>Promise<{width:number;height:number}>;
+  /** @internal Async typography must not outlive a synchronous transaction. */
+  _assertTypographyPreparation(){if(this.batch)throw new Error('Prepare typography outside synchronous transactions.');}
   /** @internal Read-only host inspection; no result can mutate document/history. */
   _preflight?: (options:PreflightSettings,control:PreflightControl)=>Promise<PreflightReport>;
   async preflight(options:PreflightOptions={},control:PreflightControl={}):Promise<PreflightReport>{
@@ -2377,6 +2388,7 @@ export class TextLayer extends Layer {
   constructor(options: TextLayerOptions = {}) {
     const {
       text = "Text",
+      characterRanges,
       fontSize = 32,
       fontFamily = "sans-serif",
       color = "#ffffff",
@@ -2400,6 +2412,7 @@ export class TextLayer extends Layer {
     super({
       ...createText(options.name ?? "Text", text, {
         fontSize,
+        characterRanges,
         fontFamily,
         color,
         align,
@@ -2420,12 +2433,55 @@ export class TextLayer extends Layer {
       }),
       ...baseOpts,
     });
-    validateDocument({ ...createDocument(), children: [this.data] });
+    validateDocument({ ...createDocument(), children: [this.data] },false);
   }
 
   /** Recalculate bounds with fonts available to this execution environment. */
   reflow(): void {
     this.update({ text: this.text });
+  }
+  /** Owned source-indexed overrides. Gaps inherit the layer's paragraph format. */
+  get characterRanges():readonly CharacterRangeData[]{
+    return structuredClone((this._read() as TextLayerData).characterRanges??[]);
+  }
+  /** Format a nonempty UTF-16 interval; null restores inherited formatting. */
+  async formatRange(start:number,end:number,format:CharacterFormatPatch|null,control:TypographyControl={}):Promise<void>{
+    const before=this._read() as TextLayerData;
+    const ranges=formatCharacterRange(before.text,before.characterRanges??[],start,end,format);
+    await this.applyCharacterFormatting({text:before.text,characterRanges:ranges},control);
+  }
+  async clearCharacterFormatting(start=0,end=this.text.length,control:TypographyControl={}):Promise<void>{
+    if(start===0&&end===0&&this.text===''){control.signal?.throwIfAborted();return;}
+    await this.formatRange(start,end,null,control);
+  }
+  /** Exact source replacement; insertion defaults to the preceding character. */
+  replaceText(start:number,end:number,replacement:string,options:{affinity?:'before'|'after'}={}):void{
+    const settings=z.object({affinity:z.enum(['before','after']).optional()}).strict().parse(options),before=this._read() as TextLayerData;
+    const result=editCharacterRanges(before.text,before.characterRanges??[],start,end,replacement,settings.affinity);
+    this.update({text:result.text,...(before.characterRanges===undefined?{}:{characterRanges:result.ranges})});
+  }
+  /** Refresh native rich-text bounds, including inside an isolated script. */
+  async reflowNative(control:TypographyControl={}):Promise<void>{
+    const before=this._read() as TextLayerData;
+    await this.applyCharacterFormatting({text:before.text,characterRanges:before.characterRanges??[]},control);
+  }
+  private async applyCharacterFormatting(patch:Pick<TextLayerData,'text'|'characterRanges'>,control:TypographyControl):Promise<void>{
+    control={...control};control.signal?.throwIfAborted();
+    const owner=this.document;owner?._assertTypographyPreparation();
+    const before=this._read() as TextLayerData,revision=owner?.getSnapshot().revision,assets=owner?.assetStore,detached=owner?undefined:JSON.stringify(before);
+    const unchanged=()=>{control.signal?.throwIfAborted();if(this.document!==owner||owner&&(owner.getSnapshot().revision!==revision||owner.assetStore!==assets)||!owner&&JSON.stringify(this._read())!==detached)throw new Error('Text or document changed during typography preparation.');};
+    const input=characterInputForLayer({...before,...patch});let release=()=>{},check=unchanged;
+    try{
+      let bounds:{width:number;height:number};
+      if(owner?._prepareTextLayout)bounds=await owner._prepareTextLayout(this.id,patch,control);
+      else if(typeof globalThis.document!=='undefined'&&assets&&owner){
+        const {prepareCharacterTextMetrics}=await import('../engine/styled-text-layout');unchanged();
+        const prepared=await prepareCharacterTextMetrics(input,owner._read(),assets,{...control,isCancelled:()=>{unchanged();return false;}});
+        release=prepared.release;check=()=>{unchanged();prepared.check();};bounds=prepared.bounds;
+      }else{const layout=await measureCharacterTextAsync(input,{...control,check:unchanged});bounds={width:layout.width,height:layout.height};}
+      bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER)}).strict().parse(bounds);
+      check();withPreparedCharacterBounds(input,bounds,()=>this.update(patch),check);
+    }finally{release();}
   }
   /** Restore point text and default paragraph spacing in one undoable command. */
   resetParagraph(): void {

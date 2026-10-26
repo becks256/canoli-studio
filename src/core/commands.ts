@@ -5,6 +5,7 @@ import {fontFileSchema,documentFontFiles,visitFontFileScopes,type FontFileData} 
 import {sameFontResource} from '../fonts/resources';
 import {fontFamilyNames,replaceFontFamilyToken} from './font-families';
 import {paragraphStyleSchema,resolveParagraphStyleLibrary,paragraphOverrideKeysSchema,paragraphFormat,paragraphTextLayers,PARAGRAPH_FORMAT_KEYS,resolveParagraphBinding,sameParagraphFormat,type ParagraphStyleData,type ParagraphFormat} from './paragraph-styles';
+import {normalizeCharacterRanges,replaceCharacterText} from './text-ranges';
 import {vectorStrokeKeys} from './vector-stroke';
 import { isImmutable, shareUnchanged } from "./immutable";
 import { lassoSelection, polygonSelectionSchema } from "./lasso";
@@ -85,6 +86,7 @@ export type LayerPatch = Partial<
     Pick<
       TextLayerData,
       | "text"
+      | "characterRanges"
       | "fontSize"
       | "fontFamily"
       | "color"
@@ -212,6 +214,7 @@ export type EditorCommand =
 
 function reflowText(layer:TextLayerData){
   const bounds=measureTextBounds(layer.text,layer.fontSize,layer.fontFamily,layer.lineHeight,{
+    characterRanges:layer.characterRanges,color:layer.color,align:layer.align,
     letterSpacing:layer.letterSpacing,wordSpacing:layer.wordSpacing,fontKerning:layer.fontKerning,
     direction:layer.direction,fontWeight:layer.fontWeight,fontStyle:layer.fontStyle,wrapWidth:layer.wrapWidth,
     fontVariantCaps:layer.fontVariantCaps,fontStretch:layer.fontStretch,fontVariationSettings:layer.fontVariationSettings,
@@ -222,7 +225,7 @@ function reflowText(layer:TextLayerData){
 // Presence matters: reflow() deliberately submits the current text again.
 // Explicit legacy width/height requests still normalize to measured bounds.
 const TEXT_REFLOW_KEYS: readonly (keyof LayerPatch)[] = [
-  'text','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
+  'text','characterRanges','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
   'fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle',
   'direction','wrapWidth','paragraphSpacing','firstLineIndent','paragraphJustify',
   'width','height',
@@ -580,7 +583,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
     case "layer.update":
       if ("frequencyRadius" in command.patch && layer.kind !== "group") throw new Error("A shared frequency radius requires a group.");
       if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
-      if (layer.kind !== 'text' && ['text','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
+      if (layer.kind !== 'text' && ['text','characterRanges','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
         throw new Error('Typography properties require a text layer.');
       if (
         Object.keys(command.patch).some(
@@ -602,6 +605,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "width",
               "height",
               "text",
+              "characterRanges",
               "fontSize",
               "fontFamily",
               "color",
@@ -639,8 +643,10 @@ function apply(document: DocumentData, command: EditorCommand): void {
       if (layer.kind !== "adjustment" && "adjustment" in command.patch) {
         throw new Error("Only adjustment layers have adjustment settings.");
       }
+      if(layer.kind==='text'&&command.patch.text!==undefined&&command.patch.characterRanges===undefined&&layer.characterRanges!==undefined)layer.characterRanges=replaceCharacterText(layer.text,layer.characterRanges,command.patch.text);
       Object.assign(layer, command.patch);
       if (layer.kind === "text") {
+        if(layer.characterRanges!==undefined)layer.characterRanges=structuredClone(normalizeCharacterRanges(layer.text,layer.characterRanges));
         if(layer.paragraphStyle&&PARAGRAPH_FORMAT_KEYS.some(key=>Object.hasOwn(command.patch,key))){
           const style=document.paragraphStyles?.find(value=>value.id===layer.paragraphStyle!.id);if(!style)throw new Error('Paragraph style not found.');
           const overrides={...layer.paragraphStyle.overrides};
@@ -978,7 +984,7 @@ export function describe(command: EditorCommand): string {
               ? "Add text layer"
               : "Import image";
     case "layer.update":
-      return "Edit layer";
+      return 'characterRanges'in command.patch?('text'in command.patch?'Edit formatted text':'Format characters'):"Edit layer";
     case "layer.remove":
       return "Delete layer";
     case "layer.duplicate":

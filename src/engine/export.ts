@@ -15,6 +15,7 @@ import {svgArtwork} from '../core/svg-styles';
 import {captureSvgSources,prepareSvgImages} from './svg-images';
 import {prepareSvgTexts} from './svg-text';
 import {captureSvgFonts} from './svg-fonts';
+import {characterFontFamilies} from '../core/character-layout';
 import {captureRasterExportSources} from './raster-export-source';
 import {captureExportFonts,captureOwnedExportFonts} from './export-fonts';
 import {fontFamilyNames} from '../core/font-families';
@@ -91,7 +92,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
   const hasVectors = layers.some((l) => l.kind === "vector");
   const hasAdjustments = layers.some((l) => l.kind === "adjustment");
   const hasText = layers.some((l) => l.kind === "text");
-  const svgFontNames=options.format==='svg'?new Set(planSvgTexts(document).flatMap(text=>fontFamilyNames(text.fontFamily))):new Set<string>();
+  const svgFontNames=options.format==='svg'?new Set(planSvgTexts(document).flatMap(text=>characterFontFamilies(text).flatMap(fontFamilyNames))):new Set<string>();
   const embeddedSvgFonts=options.format==='svg'&&documentFontFiles(authored).some(file=>svgFontNames.has(file.resource.report.faces[0].cssFamily.toLowerCase()));
 
   const warnings: string[] = [];
@@ -407,8 +408,8 @@ export async function exportDocument(
   const smart=options.format==='svg'?planSvgSmart(document):undefined;
   const composition=smart?planSvgComposition(smart.document):undefined;
   const authored=document;if(composition)document=composition.document;
-  const editableTextFamilies=options.format==='svg'?planSvgTexts(document).map(text=>text.fontFamily):[];
-  const renderedTextFamilies=options.format==='svg'?[...editableTextFamilies,...smart!.filteredTexts.map(text=>text.fontFamily),...composition!.nativeTexts.map(text=>text.fontFamily)]:[];
+  const editableTextFamilies=options.format==='svg'?planSvgTexts(document).flatMap(characterFontFamilies):[];
+  const renderedTextFamilies=options.format==='svg'?[...editableTextFamilies,...smart!.filteredTexts.flatMap(characterFontFamilies),...composition!.nativeTexts.flatMap(characterFontFamilies)]:[];
   const fonts=options.format==='svg'?captureSvgFonts(authored,assets,editableTextFamilies):undefined;
   const ownedFonts=options.format==='svg'?captureOwnedExportFonts([authored],renderedTextFamilies,assets):undefined;
   let sourceCheck:((()=>void)&{release?:()=>void})|undefined;

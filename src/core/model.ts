@@ -1,6 +1,8 @@
 import {validateDeclaredFontVariations} from './font-variations';
+import {normalizeCharacterRanges,type CharacterRangeData} from './text-ranges';
+import {characterInputForLayer,characterTextBounds,assertCharacterTextScalars} from './character-layout';
 import {assertFontFeaturesVersion,fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema,type FontFeatures} from './font-features';
-import {fontFileSchema,documentFontFiles} from './font-files';
+import {fontFileSchema,documentFontFiles,validateCharacterFontDeclarations} from './font-files';
 import {vectorStrokeKeys} from './vector-stroke';
 import {visitLayerAssets} from './asset-references';
 import {assertBrushVersion} from './drawing';
@@ -42,7 +44,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 44;
+export const SCHEMA_VERSION = 45;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -121,6 +123,7 @@ export interface VectorLayerData extends LayerBaseData {
   paths: VectorPathData[];
 }
 export interface TextLayerData extends LayerBaseData, ParagraphStyle, FontFeatures {
+  characterRanges?:readonly CharacterRangeData[];
   paragraphStyle?:ParagraphStyleBinding|null;
   kind: "text";
   text: string;
@@ -198,6 +201,7 @@ export interface DocumentData {
     | 41
     | 42
     | 43
+    | 44
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -278,6 +282,9 @@ export function measureTextBounds(
   fontFamily: string,
   lineHeight: number,
   options: ParagraphStyle & FontFeatures & {
+    characterRanges?:readonly CharacterRangeData[];
+    color?:string;
+    align?:'left'|'center'|'right';
     letterSpacing?: number;
     wordSpacing?: number;
     fontKerning?: 'auto' | 'normal' | 'none';
@@ -287,6 +294,7 @@ export function measureTextBounds(
   } = {},
 ): { width: number; height: number } {
   assertParagraphStyle(options);
+  if(options.characterRanges!==undefined)return characterTextBounds(characterInputForLayer({...options,text,fontSize,fontFamily,lineHeight,color:options.color??'#ffffff'}));
 
   if (!measureCtx) {
     if (typeof OffscreenCanvas !== "undefined") {
@@ -332,6 +340,7 @@ export function createText(
   name: string,
   text = "Text",
   options: ParagraphStyle & FontFeatures & {
+    characterRanges?:readonly CharacterRangeData[];
     fontSize?: number;
     fontFamily?: string;
     color?: string;
@@ -357,6 +366,7 @@ export function createText(
   const fontStyle = options.fontStyle;
   const direction = options.direction;
   const bounds = measureTextBounds(text, fontSize, fontFamily, lineHeight, {
+    characterRanges:options.characterRanges,color,align,
     letterSpacing,
     wordSpacing,
     fontKerning,
@@ -374,6 +384,7 @@ export function createText(
   return {
     ...base(name),
     kind: "text",
+    ...(options.characterRanges===undefined?{}:{characterRanges:normalizeCharacterRanges(text,options.characterRanges)}),
     text,
     fontSize,
     fontFamily,
@@ -593,7 +604,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -601,7 +612,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–44), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–45), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -679,7 +690,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
-      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node))throw new Error('Native font features require a text layer.');
+      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node||'characterRanges'in node))throw new Error('Native font features require a text layer.');
       if (node.blendMode === 'pass-through') {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 28)
           throw new Error('Pass-through blending requires a group and document schema 28.');
@@ -861,6 +872,10 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
         ) {
           throw new Error("Invalid text layer.");
         }
+        if('characterRanges'in node){
+          if(Number(value.schemaVersion)<45)throw new Error('Character ranges require document schema version 45.');
+          if(node.characterRanges!==undefined){normalizeCharacterRanges(node.text,node.characterRanges as readonly CharacterRangeData[]);assertCharacterTextScalars(node.text);}
+        }
       } else if (node.kind === "adjustment") {
         if ((value as any).schemaVersion < 4)
           throw new Error(
@@ -897,6 +912,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
   if (value.components !== undefined && Number(value.schemaVersion) < 10)
     throw new Error("Component definitions require schema version 10.");
   if (checkComponents) {
+    validateCharacterFontDeclarations(value as unknown as DocumentData);
     if (value.components !== undefined && !Array.isArray(value.components))
       throw new Error("Invalid component definitions.");
     const registry = new ComponentRegistry(

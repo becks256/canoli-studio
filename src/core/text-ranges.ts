@@ -50,6 +50,16 @@ export function editCharacterRanges(text:string,input:readonly CharacterRangeDat
   return{text:next,ranges:normalizeCharacterRanges(next,result)};
 }
 
+/** Whole-string setters keep the longest unchanged prefix/suffix. Explicit
+ * replaceText retains the user's selected interval and affinity instead. */
+export function replaceCharacterText(text:string,ranges:readonly CharacterRangeData[],replacement:string):readonly CharacterRangeData[]{
+ if(text===replacement)return normalizeCharacterRanges(text,ranges);let start=0;while(start<text.length&&start<replacement.length&&text[start]===replacement[start])start++;
+ if(start>0&&/[\ud800-\udbff]/.test(text[start-1])&&(/[\udc00-\udfff]/.test(text[start]??'')||/[\udc00-\udfff]/.test(replacement[start]??'')))start--;
+ let oldEnd=text.length,newEnd=replacement.length;while(oldEnd>start&&newEnd>start&&text[oldEnd-1]===replacement[newEnd-1]){oldEnd--;newEnd--;}
+ if(oldEnd>start&&/[\ud800-\udbff]/.test(text[oldEnd-1])&&/[\udc00-\udfff]/.test(text[oldEnd]??'')){oldEnd++;newEnd++;}
+ return editCharacterRanges(text,ranges,start,oldEnd,replacement.slice(start,newEnd)).ranges;
+}
+
 /** Project an original source range into one native visual line. Consumed
  * whitespace and discretionary hyphens retain their original style identity. */
 export function characterLineSpans(text:string,ranges:readonly CharacterRangeData[],base:Readonly<CharacterFormat>,range:Readonly<TextMeasurementRange>,wrapped:boolean):{text:string;style:Readonly<CharacterFormat>}[]{

@@ -1,4 +1,6 @@
 import {nativeToneSamplingGrid} from './smart-filter-grid';
+import {prepareStyledTextParagraph} from './styled-text-layout';
+import {characterInputForLayer} from '../core/character-layout';
 import {subscribeNativeFontChanges} from '../fonts/native-events';
 import {canonicalCellOffset} from './canvas';
 import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
@@ -725,7 +727,7 @@ export class CanvasRenderer implements DocumentRenderer {
             layer.blendMode === "normal" && (layer.fillOpacity ?? 1) === 1 &&
             !style.blendIf.enabled) {
           const placement = renderTransform(current, world);
-          const ink = layer.kind === "text" ? measureTextInk(layer) : undefined;
+          const ink = layer.kind === "text" && layer.characterRanges===undefined ? measureTextInk(layer) : undefined;
           const bounds = layer.kind === "raster"
             ? [localBounds(layer)!]
             : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
@@ -946,9 +948,12 @@ export class CanvasRenderer implements DocumentRenderer {
             }
             else if (layer.kind === "vector")
               drawVectors(layer, content, padded, world);
-            else if (layer.kind === "text")
-              textInk = drawText(layer, content, padded, world,
-                !!cache && cacheable && isImmutable(layer));
+            else if (layer.kind === "text") {
+              if(layer.characterRanges!==undefined){
+                const t=renderTransform(padded,world),surface=await prepareStyledTextParagraph({...characterInputForLayer(layer),width:content.width,height:content.height,alignmentWidth:layer.width,transform:[t.a,t.b,t.c,t.d,t.e,t.f]},document,assets,{isCancelled:options.isCancelled});
+                try{surface.check();content.getContext('2d')!.drawImage(surface.bitmap,0,0);textInk=surface.layout.ink;}finally{surface.release();}
+              }else textInk = drawText(layer, content, padded, world,!!cache && cacheable && isImmutable(layer));
+            }
             else if (layer.kind === "adjustment") {
               const c = content.getContext("2d")!;
               c.drawImage(target, haloX, haloY);

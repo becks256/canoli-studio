@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {characterFontFamilies} from './character-layout';
 import type {PreflightDocumentView,PreflightLayerView,PreflightComponentView} from './preflight-view';
 import {AffineTransform} from './affine';
 import {unionBounds} from './spatial';
@@ -85,8 +86,10 @@ export async function inspectDesign(document:PreflightDocumentView,revision:numb
       }
       if(node.kind==='group')await walk(node.children,world,definitions,next,rootId,inMaster,nextNames);
       else if(node.kind==='text'&&node.text.trim()&&settings.checkFonts){
-        const family=node.fontFamily,key=family.trim().toLowerCase(),status=environment.fonts?.get(key)??'unknown';fonts.set(key,{family,status});
-        if(status!=='available')add({...target,family,code:status==='unavailable'?'font-unavailable':'font-unchecked',severity:status==='unavailable'?'warning':'info',message:status==='unavailable'?'The browser could not resolve this font family; fallback may be used.':'Font availability is unverified in this inspection environment.'});
+        for(const family of node.fontFamilies??characterFontFamilies(node)){
+          const key=family.trim().toLowerCase(),status=environment.fonts?.get(key)??'unknown';fonts.set(key,{family,status});
+          if(status!=='available')add({...target,family,code:status==='unavailable'?'font-unavailable':'font-unchecked',severity:status==='unavailable'?'warning':'info',message:status==='unavailable'?'The browser could not resolve this font family; fallback may be used.':'Font availability is unverified in this inspection environment.'});
+        }
       }else if(node.kind==='raster')raster(node.assetId,node.width,node.height,world,target);
       else if(node.kind==='smart-object'){
         const master=definitions.get(node.componentId);

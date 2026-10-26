@@ -39,6 +39,6 @@ export function validateDeclaredFontVariations(document:DocumentData):void{
   if(format.fontVariationSettings===undefined)return;const names=fontFamilyNames(format.fontFamily),file=names.map(name=>files.find(value=>value.resource.report.faces[0].cssFamily.toLowerCase()===name)).find(Boolean);
   if(file)assertFontVariationRanges(format.fontVariationSettings,file.resource.report.faces[0].axes);
  };
- const walk=(nodes:readonly LayerData[])=>{for(const node of nodes)if(node.kind==='text')check(node);else if(node.kind==='group')walk(node.children);};walk(document.children);
+ const walk=(nodes:readonly LayerData[])=>{for(const node of nodes)if(node.kind==='text'){check(node);for(const range of node.characterRanges??[])check({...node,...range.format});}else if(node.kind==='group')walk(node.children);};walk(document.children);
  for(const style of document.paragraphStyles??[])check(style.format);
 }

@@ -1,4 +1,5 @@
 import {PaletteColorInput} from "./PaletteColorControl";
+import {textEditRange,type TextEditStart} from './text-edit-range';
 import { useShortcutLabel } from "./ShortcutHints";
 import { useEffect, useRef, useState } from "react";
 import type {
@@ -548,6 +549,8 @@ export function TextArea({
   className = "",
   placeholder = "",
   ariaLabel,
+  onEdit,
+  onSelection,
 }: {
   label: string;
   value: string;
@@ -560,8 +563,12 @@ export function TextArea({
   className?: string;
   placeholder?: string;
   ariaLabel?: string;
+  onEdit?(previous:string,start:number,end:number,replacement:string):void;
+  onSelection?(start:number,end:number):void;
 }) {
   const [draft, setDraft] = useState(value);
+  const input=useRef<HTMLTextAreaElement>(null),before=useRef<TextEditStart|undefined>(undefined);
+  useEffect(()=>{const node=input.current;if(!node)return;const capture=(event:InputEvent)=>{before.current={value:node.value,start:node.selectionStart,end:node.selectionEnd,inputType:event.inputType};};node.addEventListener('beforeinput',capture);return()=>node.removeEventListener('beforeinput',capture);},[]);
   const dirty = useRef(false);
   useEffect(() => {
     dirty.current = false;
@@ -580,6 +587,7 @@ export function TextArea({
     <label className={`field-label ${className}`.trim()}>
       {!hideLabel && label}
       <textarea
+        ref={input}
         className="text-content-area"
         aria-label={ariaLabel ?? label}
         value={draft}
@@ -590,10 +598,12 @@ export function TextArea({
           dirty.current = true;
           const val = e.target.value;
           setDraft(val);
+          if(onEdit){const edit=textEditRange(draft,val,before.current);onEdit(draft,edit.start,edit.end,edit.replacement);}before.current=undefined;
           onChange?.(val);
           onPreview?.(val);
         }}
         onBlur={commit}
+        onSelect={event=>onSelection?.(event.currentTarget.selectionStart,event.currentTarget.selectionEnd)}
       />
     </label>
   );

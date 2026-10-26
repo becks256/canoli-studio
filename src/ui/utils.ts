@@ -4,6 +4,7 @@ import type { LayerPatch } from "../core/commands";
 import type { Point, Rect } from "../core/drawing";
 import { measureTextBounds } from "../core/model";
 import type {TextStyle} from '../core/text-style';
+import type {CharacterRangeData} from '../core/text-ranges';
 
 /**
  * Triggers a browser file download using an ephemeral object URL anchor.
@@ -34,7 +35,7 @@ export interface ResizeDragState {
   layerText?: string;
   layerFontFamily?: string;
   layerLineHeight?: number;
-  layerTextStyle?: TextStyle;
+  layerTextStyle?: TextStyle&{characterRanges?:readonly CharacterRangeData[];color?:string;align?:'left'|'center'|'right'};
   layerKind: "raster" | "text";
   /** Expanded ink bounds; logical image geometry still addresses its source. */
   layerContentBounds?: Rect;
@@ -167,12 +168,13 @@ export function computeResizePatch(
         Math.round(layerFontSize * clampedScale),
       ),
     );
+    const characterRanges=drag.layerTextStyle?.characterRanges?.map(range=>({...range,format:{...range.format,...(range.format.fontSize===undefined?{}:{fontSize:Math.max(1,Math.min(Number.MAX_SAFE_INTEGER,range.format.fontSize*newFontSize/layerFontSize))})}}));
     const newBounds = measureTextBounds(
       layerText??'',
       newFontSize,
       layerFontFamily ?? "sans-serif",
       layerLineHeight ?? 1.2,
-      drag.layerTextStyle,
+      {...drag.layerTextStyle,...(characterRanges===undefined?{}:{characterRanges})},
     );
     let textX = layerX;
     let textY = layerY;
@@ -192,6 +194,7 @@ export function computeResizePatch(
         Math.min(Number.MAX_SAFE_INTEGER, Math.round(textY)),
       ),
       fontSize: newFontSize,
+      ...(characterRanges===undefined?{}:{characterRanges}),
     };
   }
 

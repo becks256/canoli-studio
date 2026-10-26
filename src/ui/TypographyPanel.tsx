@@ -17,6 +17,7 @@ import {
   TextInput,
 } from "./controls";
 import {VariableFontAxes} from './VariableFontAxes';
+import {CharacterFormattingPanel} from './CharacterFormattingPanel';
 import { InspectorSection } from "./InspectorSection";
 
 export const FONT_FAMILIES = [
@@ -50,6 +51,8 @@ export function TypographyPanel({
   onPreview,
 }: TypographyPanelProps) {
   const family = layer.fontFamily;
+  const [characterSelection,setCharacterSelection]=useState({id:layer.id,text:layer.text,start:0,end:0});
+  const selection=characterSelection.id===layer.id&&characterSelection.text===layer.text?characterSelection:{start:0,end:0};
   const embeddedFonts=layer.document?.fonts.files.items??[],embeddedFont=embeddedFonts.find(file=>file.family===family);
   const capitalsSupported=typeof CanvasRenderingContext2D!=='undefined'&&'fontVariantCaps'in CanvasRenderingContext2D.prototype;
   const stretchSupported=typeof CanvasRenderingContext2D!=='undefined'&&'fontStretch'in CanvasRenderingContext2D.prototype;
@@ -111,12 +114,11 @@ export function TypographyPanel({
         value={layer.text}
         disabled={disabled}
         rows={3}
-        onChange={(val) => {
-          onAction(() => {
-            layer.text = val;
-          });
-        }}
+        key={layer.id}
+        onEdit={(previous,start,end,replacement)=>onAction(()=>{if(layer.text!==previous)throw new Error('Text changed while editing. Select the current text and retry.');layer.replaceText(start,end,replacement);})}
+        onSelection={(start,end)=>setCharacterSelection({id:layer.id,text:layer.text,start,end})}
       />
+      <CharacterFormattingPanel layer={layer} start={selection.start} end={selection.end} disabled={disabled}/>
       <Select label="Text layout" value={layer.wrapWidth === undefined ? 'point' : 'paragraph'} disabled={disabled || (!paragraphSupported && layer.wrapWidth === undefined)}
         options={[{value:'point',label:'Point text'},{value:'paragraph',label:'Paragraph text'}]}
         onChange={value=>onAction(()=>{layer.wrapWidth=value==='paragraph'?layer.width:undefined;})} />

@@ -1,10 +1,14 @@
 # Architecture
 
+## Character formatting integration
+
+Optional schema-45 TextLayerData.characterRanges stores sparse source-indexed overrides. Public constructors/TextLayer methods mutate through existing layer.update validation/history. core/character-layout shares native SVG measurement between synchronous commands and cooperative async preparation, with explicit estimates without a DOM. engine/styled-text-layout retains font leases around metrics/bitmap work. Canvas/SVG output consumes matching native lines. The private scripting broker returns finite bounds only; final host commands independently remeasure and recheck revision, grants and sources. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.
+
 ## Native styled-text preparation groundwork
 
-`engine/styled-text` snapshots explicit visual lines and per-span character formats, measures native SVG geometry and returns a checked, owned bitmap for one pixel work window. Whole-line shaping, complete selected font bytes, independent source leases, cancellation/failure cleanup and physical alignment remain explicit. It is an internal rendering boundary; character-range commands, model/schema, paragraph/worker metrics, Inspector and transport integration are still required. Existing TextLayer rendering is unchanged. See [STYLED_TEXT.md](STYLED_TEXT.md).
+`engine/styled-text` snapshots explicit visual lines and per-span character formats, measures native SVG geometry and returns a checked, owned bitmap for one pixel work window. Whole-line shaping, complete selected font bytes, independent source leases, cancellation/failure cleanup and physical alignment remain explicit. This internal boundary now supplies explicit character-range text; omitted-range legacy text retains its Canvas path. See [STYLED_TEXT.md](STYLED_TEXT.md).
 
-`core/character-format` and `core/text-ranges` define private source-indexed format/edit projections. The shared line breaker supplies identical request sequences to synchronous and cooperative asynchronous measurers, with source-aware cache keys only when requested. `engine/styled-text-layout` consumes native whole-line SVG advances for wrapping/justification and per-font baseline offsets, then prepares the same checked surface. It retains source leases before awaits and snapshots font declarations for later raster work. Public model/OO/UI/worker-broker/transport integration remains required; these internal DTOs publish no document mutations.
+`core/character-format` and `core/text-ranges` define private source-indexed format/edit projections. The shared line breaker supplies identical request sequences to synchronous and cooperative asynchronous measurers, with source-aware cache keys only when requested. `engine/styled-text-layout` consumes native whole-line SVG advances for wrapping/justification and per-font baseline offsets, then prepares the same checked surface. It retains source leases before awaits and snapshots font declarations for later raster work. Public integration uses shared OO commands; these internal DTOs publish no document mutations.
 
 ## Native font variation instances
 

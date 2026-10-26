@@ -855,18 +855,26 @@ select {
 .typography-panel .field-label:first-of-type {
   margin-top: 0;
 }
-.variable-font-axes {
+.variable-font-axes,
+.character-formatting-panel {
   margin-top: 14px;
   overflow-wrap: anywhere;
 }
-.variable-font-axes[open] {
+.variable-font-axes[open],
+.character-formatting-panel[open] {
   max-height: 340px;
   overflow-y: auto;
   padding-right: 4px;
 }
-.variable-font-axes summary {
+.variable-font-axes summary,
+.character-formatting-panel summary {
   cursor: pointer;
   padding: 4px 0;
+}
+.character-formatting-panel p {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
 }
 .inspector h2 {
   font-size: 11px;
