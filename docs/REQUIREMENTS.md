@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## F08 path preparation and remaining integration
+
+The internal native renderer now prepares cubic baseline text using complete owned fonts, logical character order, start/baseline offsets, reversal and independent pixel windows. This does not deliver public path text: TextLayer authoring, selection/curve handles, native reflow/interaction bounds, shared OO/UI/script/REST commands, undo/persistence/recipes and editable SVG import/export still require connected implementation and acceptance. Keep those gates open. See [STYLED_TEXT.md](STYLED_TEXT.md#native-curve-preparation-internal-f08-dependency).
+
 ## Editable SVG character import
 
 Reconstruct supported nested inline styles into source-indexed character ranges only after private source preparation and per-range native face matching. Validate inert preparation records separately from uniform placeholder layers; use native whole-line baseline/anchor geometry and retain complete supplied image/font bytes. Preserve prior tabs and a clean revision-zero import, then ordinary shared Undo/Inspector/script behavior. Cancellation, stale owners/revisions and preparation failures publish nothing. Report unsupported inline positioning, opacity/visibility/paint graphs and richer CSS instead of dropping them. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).

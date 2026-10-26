@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native curve ownership
+
+Path preparation must preserve cubic geometry, logical Unicode ordering, whole-span shaping and font ownership independently. Accept numeric vector anchors rather than arbitrary SVG/URLs; snapshot before awaits, keep private fragment identities, validate native finite nonzero path length and clean up on cancellation/source/probe/image/bitmap failure. Reverse geometry and handles while keeping the closed seam. Allocation windows stay separate from document/source dimensions. This is an internal renderer dependency; connected public path authoring and transport remain unfinished. See [STYLED_TEXT.md](STYLED_TEXT.md#native-curve-preparation-internal-f08-dependency).
+
 ## Styled SVG admission invariant
 
 Inert inspection cannot publish unresolved character-family aliases into the public model or install native faces. Validate private range metadata against its exact placeholder text and owner. Resolve every effective face and declare it before applying character commands; use native common baselines/anchors rather than estimates. Keep temporary native registration inside synchronous reconstruction with no callbacks/awaits, and dispose provisional stores after any failure. Publish only a complete revision-zero document; retain complete source bytes and report unrepresented graphs explicitly. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).

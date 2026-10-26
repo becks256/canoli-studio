@@ -1,4 +1,6 @@
 import {z} from 'zod';
+import {PATH_POINT_LIMIT} from '../core/drawing';
+import {textPathSchema,normalizeTextPath,textPathData,type TextPathGeometry} from '../core/text-path';
 import {characterFormatSchema,characterFormatPatchSchema as formatPatchSchema,DEFAULT_CHARACTER_FORMAT,definedCharacterFormat,type CharacterFormat} from '../core/character-format';
 import {applyNativeCharacterStyle} from '../core/character-layout';
 import {fontFamilyNames} from '../core/font-families';
@@ -20,9 +22,12 @@ const sceneSchema=z.object({
   style:formatPatchSchema.optional(),
   lines:z.array(z.object({x:coordinate.default(0),y:coordinate.default(0),wordSpacingDelta:coordinate.default(0),
     align:z.enum(['left','center','right']).default('left'),direction:z.enum(['ltr','rtl']).default('ltr'),
+    path:textPathSchema.optional(),
     spans:z.array(z.object({text:z.string().max(10000),style:formatPatchSchema.optional()}).strict()).max(10000),
   }).strict()).max(10000),
 }).strict().superRefine((scene,context)=>{
+  const anchors=scene.lines.reduce((count,line)=>count+(line.path?.points.length??0),0);
+  if(anchors>PATH_POINT_LIMIT)context.addIssue({code:'custom',message:'Styled text baselines exceed the existing 20000-anchor vector budget.'});
   const characters=scene.lines.reduce((count,line)=>count+line.spans.reduce((size,span)=>size+span.text.length,0),Math.max(0,scene.lines.length-1));
   if(characters>10000)context.addIssue({code:'custom',message:'Styled text exceeds the existing 10000-character text budget.'});
   for(const line of scene.lines){
@@ -40,9 +45,9 @@ const sceneSchema=z.object({
 /** Internal render DTOs; these are not a second public document mutation API. */
 export type StyledTextSceneInput=z.input<typeof sceneSchema>;
 export interface StyledTextSpan {readonly text:string;readonly style:Readonly<CharacterFormat>}
-export interface StyledTextLine {readonly x:number;readonly y:number;readonly wordSpacingDelta:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly spans:readonly StyledTextSpan[]}
+export interface StyledTextLine {readonly x:number;readonly y:number;readonly wordSpacingDelta:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly path?:TextPathGeometry;readonly spans:readonly StyledTextSpan[]}
 export interface StyledTextScene {readonly width:number;readonly height:number;readonly transform:readonly number[];readonly lines:readonly StyledTextLine[]}
-export interface StyledTextLineMetrics {readonly advance:number;readonly ink:Readonly<Rect>}
+export interface StyledTextLineMetrics {readonly advance:number;readonly ink:Readonly<Rect>;readonly pathLength?:number}
 export interface StyledTextControl {signal?:AbortSignal;isCancelled?:()=>boolean}
 export interface StyledTextSurface {
   readonly bitmap:ImageBitmap;
@@ -63,7 +68,7 @@ export function normalizeStyledTextScene(input:StyledTextSceneInput):StyledTextS
       if(previous&&Object.keys(characterFormatSchema.shape).every(key=>previous.style[key as keyof CharacterFormat]===style[key as keyof CharacterFormat]))previous.text+=text;
       else spans.push({text,style});
     }
-    return Object.freeze({...line,spans:Object.freeze(spans.map(span=>Object.freeze(span)))});
+    return Object.freeze({...line,...(line.path?{path:normalizeTextPath(line.path)}:{}),spans:Object.freeze(spans.map(span=>Object.freeze(span)))});
   });
   return Object.freeze({width:value.width,height:value.height,transform:Object.freeze(value.transform??[1,0,0,1,0,0]),
     lines:Object.freeze(lines),
@@ -102,8 +107,8 @@ export function applyStyledSpanStyle(node:SVGTSpanElement,style:Readonly<Charact
   applyNativeCharacterStyle(node,style,wordSpacingDelta);
 }
 
-/** Prepare native whole-line SVG text in one pixel work window. Public model
- * ranges, OO commands and the Inspector remain separate integration work. */
+/** Prepare native whole-line SVG text in one pixel work window.
+ * Path baselines are private render geometry; public path editing is separate. */
 export async function prepareStyledTextSurface(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}):Promise<StyledTextSurface>{
   control={...control};
   const alive=assets.captureLifetime();
@@ -121,9 +126,17 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
     const shadow=host.attachShadow({mode:'closed'}),svg=globalThis.document.createElementNS(SVG_NS,'svg');
     svg.setAttribute('width',String(scene.width));svg.setAttribute('height',String(scene.height));svg.style.fontWeight='normal';svg.style.fontStyle='normal';
     const group=globalThis.document.createElementNS(SVG_NS,'g');group.setAttribute('transform',`matrix(${scene.transform.join(' ')})`);svg.append(group);shadow.append(svg);globalThis.document.body.append(host);
-    const elements:SVGTextElement[]=[];let visited=0,deadline=performance.now()+8;
+    const elements:{text:SVGTextElement;line:StyledTextLine;path?:SVGPathElement}[]=[];let visited=0,deadline=performance.now()+8;
     for(const line of scene.lines){
       const text=globalThis.document.createElementNS(SVG_NS,'text');text.setAttribute('x',String(line.x));text.setAttribute('y',String(line.y));text.setAttribute('direction',line.direction);text.setAttribute('text-anchor',line.align==='center'?'middle':(line.align==='left')===(line.direction==='ltr')?'start':'end');text.style.whiteSpace='pre';
+      let parent:SVGTextElement|SVGTextPathElement=text,path:SVGPathElement|undefined;
+      if(line.path){
+        const defs=globalThis.document.createElementNS(SVG_NS,'defs');path=globalThis.document.createElementNS(SVG_NS,'path');
+        // Local fragments never accept author-supplied IDs, URLs or SVG markup.
+        const id='canoli-text-baseline-'+elements.length;path.setAttribute('id',id);path.setAttribute('d',textPathData(line.path));defs.append(path);svg.prepend(defs);
+        parent=globalThis.document.createElementNS(SVG_NS,'textPath');if(typeof SVGTextPathElement==='undefined'||!(parent instanceof SVGTextPathElement)||typeof path.getTotalLength!=='function')throw new Error('Native text on a path is unavailable.');parent.setAttribute('href','#'+id);parent.setAttribute('startOffset',String(line.path.startOffset));parent.setAttribute('method','align');parent.setAttribute('spacing','exact');
+        text.setAttribute('x','0');text.setAttribute('y','0');text.setAttribute('dy',String(line.path.baselineOffset));text.setAttribute('transform',`translate(${line.x} ${line.y})`);text.append(parent);
+      }
       for(const span of line.spans){
         const style=span.style,ordinary={...style,fontVariationSettings:'normal'};
         applyTextStyle(context,ordinary);const request=nativeTextFont(ordinary);context.font='10px serif';context.font=request;
@@ -133,12 +146,12 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
         if(context.fillStyle==='#010203'){context.fillStyle='#040506';context.fillStyle=style.color;if(context.fillStyle==='#040506')throw new Error('Cannot prepare an invalid styled-text color.');}
         const node=globalThis.document.createElementNS(SVG_NS,'tspan');node.textContent=span.text;node.setAttribute('fill',String(context.fillStyle));
         applyStyledSpanStyle(node,style,line.wordSpacingDelta);
-        text.append(node);
+        parent.append(node);
         if(++visited%32===0||performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}
       }
-      group.append(text);elements.push(text);
+      group.append(text);elements.push({text,line,...(path?{path}:{})});
     }
-    const metrics=Object.freeze(elements.map(text=>{const box=text.getBBox(),advance=text.getComputedTextLength();if(![box.x,box.y,box.width,box.height,advance].every(Number.isFinite))throw new Error('The native styled-text geometry is not finite.');return Object.freeze({advance,ink:Object.freeze({x:box.x,y:box.y,width:box.width,height:box.height})});}));
+    const metrics=Object.freeze(elements.map(({text,line,path})=>{const box=text.getBBox(),advance=text.getComputedTextLength(),pathLength=path?.getTotalLength();if(![box.x,box.y,box.width,box.height,advance].every(Number.isFinite))throw new Error('The native styled-text geometry is not finite.');if(pathLength!==undefined&&(!Number.isFinite(pathLength)||pathLength<=0))throw new Error('Native text requires a finite, positive baseline length.');return Object.freeze({advance,ink:Object.freeze({x:box.x+(path?line.x:0),y:box.y+(path?line.y:0),width:box.width,height:box.height}),...(pathLength===undefined?{}:{pathLength})});}));
     const definitions=await fonts.definitions(check);check();
     const markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);
     url=URL.createObjectURL(new Blob([markup],{type:'image/svg+xml'}));image=new Image();

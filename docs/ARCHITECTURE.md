@@ -1,5 +1,9 @@
 # Architecture
 
+## Native curve preparation
+
+core/text-path snapshots existing cubic anchors and projects reversed/open/closed baselines with a stable closed seam. engine/styled-text uses private SVG textPath fragments, shared owned fonts and the existing checked bitmap lifecycle. Geometry metrics stay in local user coordinates while the caller chooses the pixel work window. This internal dependency does not add a public TextLayer path model, command, UI or transport; those remain required. See [STYLED_TEXT.md](STYLED_TEXT.md#native-curve-preparation-internal-f08-dependency).
+
 ## Styled SVG preparation records
 
 SVG inspection keeps unresolved character ranges in optional private text-placement records, outside its uniform placeholder document. The host validates ranges/ownership and rejects already formatted placeholders, privately matches each effective style to canonical font resources, declares selected sources, then applies one shared character update per line. Native whole-line geometry establishes the alphabetic anchor under the original affine hierarchy. Complete clean documents alone are published; public OO/command/plugin boundaries are unchanged. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).
