@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Styled text preparation boundary
+
+Snapshot render DTOs before yielding; shape complete logical lines in the native SVG engine. Retain complete owned render fonts and source lifetimes, reject nontransferable web-font dependencies, and validate default native registrations throughout preparation. Native SVG metrics belong to SVG layout, not an assumed exact Canvas advance. Return only checked owned bitmaps; remove probes, revoke URLs and release sources on every failure, and close successful bitmaps on explicit release. This foundation does not yet add character-range model/UI/worker/transport behavior. See [STYLED_TEXT.md](STYLED_TEXT.md).
+
 ## Variable-font ownership invariant
 
 An authored axis tuple selects its own native binary faces; no edit mutates another layer's FontFace. Cache private instances separately from public source registrations. Every native installation path, including staged recipe/component promotion, must carry selected native bytes matching the render payload size before publishing its entry. Retain exact operation instances before capture, protect original source ownership and validate unchanged native descriptors/registration. Evict only unpinned instances and remove all variants on last-owner deactivation. Do not expose binary buffers through the public model or isolated APIs. Explicit fields require schema 44 before normalization; actual native/static-reference, source/Undo/persistence and production acceptance remains required. See [FONT_VARIATIONS.md](FONT_VARIATIONS.md).

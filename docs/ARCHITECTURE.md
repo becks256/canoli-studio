@@ -1,5 +1,9 @@
 # Architecture
 
+## Native styled-text preparation groundwork
+
+`engine/styled-text` snapshots explicit visual lines and per-span character formats, measures native SVG geometry and returns a checked, owned bitmap for one pixel work window. Whole-line shaping, complete selected font bytes, independent source leases, cancellation/failure cleanup and physical alignment remain explicit. It is an internal rendering boundary; character-range commands, model/schema, paragraph/worker metrics, Inspector and transport integration are still required. Existing TextLayer rendering is unchanged. See [STYLED_TEXT.md](STYLED_TEXT.md).
+
 ## Native font variation instances
 
 `core/font-variations` validates authored CSS tuples; `fonts/variations` resolves immutable requests to separate private binary FontFace instances owned by the source registration. Base registrations remain shared between active stores. Preparation, restoration, immediate sharing and staged promotion retain complete selected native bytes before installing a native entry; a destination can activate them independently after the source closes. Captures pin exact instances before raster work, retain original bytes, validate native state and release leases on success/failure. Unpinned instances use a 64-tuple cache budget; original font/document geometry is unchanged. Source activation and public-font notifications remain distinct from private alias creation. Shared schema-44 commands, OOP members, style inheritance, isolated preloads and independent headless REST use the same field. Acceptance evidence and remaining coverage are recorded in the dated roadmap; see [FONT_VARIATIONS.md](FONT_VARIATIONS.md).
