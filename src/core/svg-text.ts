@@ -1,4 +1,5 @@
 import {textPathData} from './text-path';
+import {verticalWriting} from './text-writing';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {characterFormatSchema} from './character-format';
 import type {CharacterLayoutLine} from './character-layout';
@@ -67,6 +68,7 @@ export function planSvgTexts(document:SvgDocument):TextLayerData[]{
 export function* svgTextElements(layer:TextLayerData,layout?:SvgTextLayout,pathId='canoli-text-baseline'):Generator<string>{
   if(!layer.text&&!layer.textPath)return;
   if(!layout)throw new Error('Text layers require host font measurement for SVG export.');
+  if(layout.styledLines?.some(line=>verticalWriting(line.writing)))throw new Error('Vertical SVG text export requires public model integration.');
   if(layer.characterRanges!==undefined||layer.textPath!==undefined){
     if(!layout.styledLines)throw new Error('Character formatting requires prepared native SVG lines.');
     for(const line of layout.styledLines){

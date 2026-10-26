@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Vertical renderer is private
+
+Current document schema 46 and strict REST/scripting patches do not expose vertical writing fields. Native vertical layout is internal preparation, not another mutation API or permission. Public model/native metrics/command/transport integration remains required. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+
 ## Path-text commands
 
 Schema 46 accepts textPath geometry or null through the existing strict layer.update surface. Set wrapWidth to null and paragraph spacing/indent/justification to their defaults when attaching to paragraph text. Commands derive textPathOrigin and frame dimensions; a client-written origin patch rejects. Native files retain authored geometry, fonts and cached frames. Separate Node sessions use conservative estimated metrics and existing expected-revision/atomic Undo checks. Browser-native metrics are not REST synchronization. See [TEXT_PATHS.md](TEXT_PATHS.md).

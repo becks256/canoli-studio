@@ -1,3 +1,4 @@
+import {textWritingSchema,verticalWriting,applyNativeTextWriting,type TextWriting} from '../core/text-writing';
 import {z} from 'zod';
 import {PATH_POINT_LIMIT} from '../core/drawing';
 import {textPathSchema,normalizeTextPath,textPathData,type TextPathGeometry} from '../core/text-path';
@@ -22,7 +23,7 @@ const sceneSchema=z.object({
   style:formatPatchSchema.optional(),
   lines:z.array(z.object({x:coordinate.default(0),y:coordinate.default(0),wordSpacingDelta:coordinate.default(0),
     align:z.enum(['left','center','right']).default('left'),direction:z.enum(['ltr','rtl']).default('ltr'),
-    path:textPathSchema.optional(),
+    path:textPathSchema.optional(),writing:textWritingSchema.optional(),
     spans:z.array(z.object({text:z.string().max(10000),style:formatPatchSchema.optional()}).strict()).max(10000),
   }).strict()).max(10000),
 }).strict().superRefine((scene,context)=>{
@@ -45,7 +46,7 @@ const sceneSchema=z.object({
 /** Internal render DTOs; these are not a second public document mutation API. */
 export type StyledTextSceneInput=z.input<typeof sceneSchema>;
 export interface StyledTextSpan {readonly text:string;readonly style:Readonly<CharacterFormat>}
-export interface StyledTextLine {readonly x:number;readonly y:number;readonly wordSpacingDelta:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly path?:TextPathGeometry;readonly spans:readonly StyledTextSpan[]}
+export interface StyledTextLine {readonly x:number;readonly y:number;readonly wordSpacingDelta:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly path?:TextPathGeometry;readonly writing?:Readonly<TextWriting>;readonly spans:readonly StyledTextSpan[]}
 export interface StyledTextScene {readonly width:number;readonly height:number;readonly transform:readonly number[];readonly lines:readonly StyledTextLine[]}
 export interface StyledTextLineMetrics {readonly advance:number;readonly ink:Readonly<Rect>;readonly pathLength?:number}
 export interface StyledTextControl {signal?:AbortSignal;isCancelled?:()=>boolean}
@@ -68,7 +69,7 @@ export function normalizeStyledTextScene(input:StyledTextSceneInput):StyledTextS
       if(previous&&Object.keys(characterFormatSchema.shape).every(key=>previous.style[key as keyof CharacterFormat]===style[key as keyof CharacterFormat]))previous.text+=text;
       else spans.push({text,style});
     }
-    return Object.freeze({...line,...(line.path?{path:normalizeTextPath(line.path)}:{}),spans:Object.freeze(spans.map(span=>Object.freeze(span)))});
+    return Object.freeze({...line,...(line.path?{path:normalizeTextPath(line.path)}:{}),...(line.writing?{writing:Object.freeze(line.writing)}:{}),spans:Object.freeze(spans.map(span=>Object.freeze(span)))});
   });
   return Object.freeze({width:value.width,height:value.height,transform:Object.freeze(value.transform??[1,0,0,1,0,0]),
     lines:Object.freeze(lines),
@@ -128,14 +129,14 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
     const group=globalThis.document.createElementNS(SVG_NS,'g');group.setAttribute('transform',`matrix(${scene.transform.join(' ')})`);svg.append(group);shadow.append(svg);globalThis.document.body.append(host);
     const elements:{text:SVGTextElement;line:StyledTextLine;path?:SVGPathElement}[]=[];let visited=0,deadline=performance.now()+8;
     for(const line of scene.lines){
-      const text=globalThis.document.createElementNS(SVG_NS,'text');text.setAttribute('x',String(line.x));text.setAttribute('y',String(line.y));text.setAttribute('direction',line.direction);text.setAttribute('text-anchor',line.align==='center'?'middle':(line.align==='left')===(line.direction==='ltr')?'start':'end');text.style.whiteSpace='pre';
+      const text=globalThis.document.createElementNS(SVG_NS,'text');text.setAttribute('x',String(line.x));text.setAttribute('y',String(line.y));text.setAttribute('direction',line.direction);text.setAttribute('text-anchor',line.align==='center'?'middle':(line.align==='left')===(line.direction==='ltr')?'start':'end');text.style.whiteSpace='pre';applyNativeTextWriting(text,line.writing);
       let parent:SVGTextElement|SVGTextPathElement=text,path:SVGPathElement|undefined;
       if(line.path){
         const defs=globalThis.document.createElementNS(SVG_NS,'defs');path=globalThis.document.createElementNS(SVG_NS,'path');
         // Local fragments never accept author-supplied IDs, URLs or SVG markup.
         const id='canoli-text-baseline-'+elements.length;path.setAttribute('id',id);path.setAttribute('d',textPathData(line.path));defs.append(path);svg.prepend(defs);
         parent=globalThis.document.createElementNS(SVG_NS,'textPath');if(typeof SVGTextPathElement==='undefined'||!(parent instanceof SVGTextPathElement)||typeof path.getTotalLength!=='function')throw new Error('Native text on a path is unavailable.');parent.setAttribute('href','#'+id);parent.setAttribute('startOffset',String(line.path.startOffset));parent.setAttribute('method','align');parent.setAttribute('spacing','exact');
-        text.setAttribute('x','0');text.setAttribute('y','0');text.setAttribute('dy',String(line.path.baselineOffset));text.setAttribute('transform',`translate(${line.x} ${line.y})`);text.append(parent);
+        text.setAttribute('x','0');text.setAttribute('y','0');text.setAttribute(verticalWriting(line.writing)?'dx':'dy',String(line.path.baselineOffset));text.setAttribute('transform',`translate(${line.x} ${line.y})`);text.append(parent);
       }
       for(const span of line.spans){
         const style=span.style,ordinary={...style,fontVariationSettings:'normal'};

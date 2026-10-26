@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Native vertical dependency (F08; public integration open)
+
+Prepare real native vertical-rl/vertical-lr columns with mixed/upright/sideways glyph orientation, whole-line shaping, owned font vertical metrics/substitutions, source-aware wrapping/indentation/paragraph spacing/justification and independent work windows. Retain logical Unicode, derived frame origin, cancellation/source authority and exact native references. Public fields/styles/commands/Inspector/script metrics/resize/transport/editable SVG remain required. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+
 ## Connected path text (F08)
 
 Retain authored local cubic baselines through OO/TextLayer commands, character/font edits, shared Undo, native project/workspace/recipe data and supported editable SVG output/reimport. Keep measured frame origin independent of geometry/placement. Enforce logical-line/paragraph compatibility, locks, source ownership, stale/cancelled preparation and strict transport. Provide copied vector sources, signed offsets, orientation and precision anchor/handle controls. Canvas Pen anchors/handles use shared staged previews and one-command Undo; richer path/paragraph/vertical flow and broad viewer/device/performance acceptance remain unfinished. See [TEXT_PATHS.md](TEXT_PATHS.md).

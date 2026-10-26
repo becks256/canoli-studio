@@ -1,5 +1,9 @@
 # Architecture
 
+## Native vertical preparation boundary
+
+Private character-layout/styled-text DTOs accept normalized writing mode and orientation. Native SVG supplies whole-line vertical advances, ink and font substitutions; the shared logical line breaker maps inline coordinates to physical columns. Derived physical origin/extent stays separate from source and caller window transforms. Existing font/source leases and checked bitmap cancellation/release apply. This does not add schema-46 fields, OO/Inspector/REST properties or isolated capabilities; those integrations remain required. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+
 ## Public baseline ownership and frames
 
 Schema-46 TextLayerData stores authored textPath and derived textPathOrigin beside width/height. OO TextPath values own geometry; attached setters/awaited native preparation submit shared layer.update commands. core/character-layout measures the actual native path and returns a local frame origin without rewriting anchors or layer translation. spatial/preflight/resize consumers include that origin. The existing owned-font surface renders matching baselines; native projects/recipes and measured SVG output retain geometry. The typography broker returns finite bounds/origin and host commit independently validates/recomputes. See [TEXT_PATHS.md](TEXT_PATHS.md).

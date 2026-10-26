@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Vertical preparation grants no capability
+
+Private native vertical preparation introduces no plugin grant, source access or script import surface. Installation stays inert, current strict layer fields remain authoritative, and public vertical scripting/commands/host metrics are still pending. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+
 ## Path text uses existing authority
 
 TextPath values and TextLayer baseline commands use existing document read/write grants, shared schema-46 validation, native finite frame preparation and final host revalidation. Installation stays inert. No source bytes, chooser, renderer, network, import service or new permission is exposed. Keep existing cancellation, deadline/native-operation/command limits and atomic rollback. See [TEXT_PATHS.md](TEXT_PATHS.md).

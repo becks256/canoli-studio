@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+### Current F08 native vertical dependency (2026-10-26)
+
+Native writing modes/orientation, whole-line vertical metrics/substitutions and logical-to-physical column layout now prepare caller-selected windows internally. The dated roadmap records verification; [VERTICAL_TEXT.md](VERTICAL_TEXT.md) separates this dependency from required public layer/style/command/Inspector/native-script/resize/transport/SVG work. This does not complete vertical authoring, broad typography quality, sustained F14 or the original roadmap.
+
 ### Current F08 editable text-baseline integration (2026-10-26)
 
 Schema-46 paths now retain authored cubic geometry separately from native frame origin through shared OO/UI/script commands, separate REST, Undo, recipes, original-bearing native files and supported SVG interchange. Canvas Pen anchor/handle editing extends the precision Inspector through affine pointer previews, Alt-independent handles, curve insertion, keyboard nudge/removal and cancellation. Current verification and remaining gates are recorded in the dated roadmap and [TEXT_PATHS.md](TEXT_PATHS.md). Earlier dated foundation entries below retain their original verification boundaries. Richer flow, broad viewer/device/font/language/interchange quality, sustained F14 and the complete original professional/AI/workflow scope remain active.

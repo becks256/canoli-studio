@@ -1,0 +1,33 @@
+{
+  "purpose": "Original geometric fixtures: native vmtx and vert/vrt2 substitution; negative control retains original cmap/outlines/metrics and omits GSUB.",
+  "horizontalAdvances": {
+    ".notdef": 600,
+    "space": 300,
+    "A": 600,
+    "B": 700,
+    "han": 1000,
+    "character": 1000,
+    "comma": 1000,
+    "comma.vert": 1000
+  },
+  "verticalAdvances": {
+    ".notdef": 1000,
+    "space": 1000,
+    "A": 1200,
+    "B": 1100,
+    "han": 900,
+    "character": 1000,
+    "comma": 1000,
+    "comma.vert": 1000
+  },
+  "files": {
+    "Vertical.ttf": {
+      "bytes": 1444,
+      "sha256": "15b9a89a90012d99bf89850240432b1190fe2ee47a6b241fe0bb53f992ffa944"
+    },
+    "NoSubstitution.ttf": {
+      "bytes": 1412,
+      "sha256": "3218464935d543427c334f840f800999fa749cdfffd6d40d7123121dc469ef74"
+    }
+  }
+}

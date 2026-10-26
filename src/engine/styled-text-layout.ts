@@ -28,7 +28,7 @@ export async function prepareStyledTextParagraph(input:StyledTextParagraphInput,
  try{
   fonts=captureStyledTextFonts(snapshot.styles,document,assets);const check=()=>{current();fonts!.check();};check();
   const layout=await measureCharacterTextAsync(source,{...control,alignmentWidth,check});check();if(layout.accuracy!=='native')throw new Error('Native styled paragraph preparation requires a browser SVG host.');
-  const scene:StyledTextSceneInput={width:window.width,height:window.height,transform:[...window.transform]as[number,number,number,number,number,number],lines:layout.lines.map(line=>({x:line.x,y:line.y,align:line.align,direction:line.direction,wordSpacingDelta:line.wordSpacingDelta,...(line.path?{path:textPathSchema.parse(line.path)}:{}),spans:line.spans.map(span=>({text:span.text,style:span.style}))}))};
+  const scene:StyledTextSceneInput={width:window.width,height:window.height,transform:[...window.transform]as[number,number,number,number,number,number],lines:layout.lines.map(line=>({x:line.x,y:line.y,align:line.align,direction:line.direction,wordSpacingDelta:line.wordSpacingDelta,...(line.path?{path:textPathSchema.parse(line.path)}:{}),...(line.writing?{writing:line.writing}:{}),spans:line.spans.map(span=>({text:span.text,style:span.style}))}))};
   surface=await prepareStyledTextSurface(scene,fonts.document,assets,control);check();handedOff=true;return Object.freeze({...surface,layout});
  }finally{fonts?.release();if(!handedOff)surface?.release();}
 }

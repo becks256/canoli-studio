@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Vertical native-layout invariant
+
+Native glyph advances and substitutions precede physical column placement and affine raster windows. Writing settings and logical spans are owned snapshots; no glyph-by-glyph rotation substitutes for shaping. Keep physical frame origin, source order, paragraph breaks and complete font originals independent. Unsupported native capability and cancelled/stale work publish no document/history mutation. This is a private dependency; public vertical authority is not exposed. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+
 ## Editable baseline invariant
 
 Authored curve coordinates must not drift when text/font metrics change. Retain native frame origin separately, derive it through shared commands, and apply it to interaction geometry rather than translating the baseline. Measure the actual native textPath, preserve logical source order and pin owned fonts through bitmap/export work. Worker/native/REST surfaces share structural validation and history while headless metrics remain explicit estimates. Inert SVG inspection keeps curves outside placeholder text until private source preparation. See [TEXT_PATHS.md](TEXT_PATHS.md).
