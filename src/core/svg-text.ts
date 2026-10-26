@@ -1,3 +1,4 @@
+import {textPathData} from './text-path';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {characterFormatSchema} from './character-format';
 import type {CharacterLayoutLine} from './character-layout';
@@ -8,6 +9,7 @@ import {svgAttribute,svgNumber} from './svg-path';
 /** Private measured export data; original text/typography remains in the model. */
 export interface SvgTextLayout {
   styledLines?:readonly CharacterLayoutLine[];
+  rootStyle?:import('./character-format').CharacterFormat;
   baselines:readonly number[];
   color:string;
   letterSpacing:number;
@@ -56,26 +58,29 @@ export function planSvgTexts(document:SvgDocument):TextLayerData[]{
   const result:TextLayerData[]=[];
   function walk(nodes:LayerData[]){for(const layer of nodes){
     if(!layer.visible||layer.opacity===0)continue;
-    if(layer.kind==='text'&&layer.text)result.push(layer);
+    if(layer.kind==='text'&&(layer.text||layer.textPath))result.push(layer);
     else if(layer.kind==='group')walk(layer.children);
   }}
   walk(document.children);return result;
 }
 
-export function* svgTextElements(layer:TextLayerData,layout?:SvgTextLayout):Generator<string>{
-  if(!layer.text)return;
+export function* svgTextElements(layer:TextLayerData,layout?:SvgTextLayout,pathId='canoli-text-baseline'):Generator<string>{
+  if(!layer.text&&!layer.textPath)return;
   if(!layout)throw new Error('Text layers require host font measurement for SVG export.');
-  if(layer.characterRanges!==undefined){
+  if(layer.characterRanges!==undefined||layer.textPath!==undefined){
     if(!layout.styledLines)throw new Error('Character formatting requires prepared native SVG lines.');
     for(const line of layout.styledLines){
       const anchor=line.align==='center'?'middle':(line.align==='left')===(line.direction==='ltr')?'start':'end';
-      yield `<text x="${svgNumber(line.x)}" y="${svgNumber(line.y)}" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="alphabetic" xml:space="preserve" style="white-space:pre">`;
+      const root=layout.rootStyle,rootAttributes=root?` font-family="${svgAttribute(root.fontFamily)}" font-size="${svgNumber(root.fontSize)}" font-weight="${svgAttribute(root.fontWeight)}" font-style="${root.fontStyle}" fill="${svgAttribute(root.color)}" letter-spacing="${svgNumber(root.letterSpacing)}" word-spacing="${svgNumber(root.wordSpacing)}" style="white-space:pre;font-kerning:${root.fontKerning};font-variant-caps:${root.fontVariantCaps??'normal'};font-stretch:${root.fontStretch??'normal'};font-variation-settings:${svgAttribute(root.fontVariationSettings??'normal')}"`:' style="white-space:pre"';
+      if(root&&!/^(?:#[a-fA-F0-9]{3,8}|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([a-zA-Z0-9.,%+\-/\s]+\))$/.test(root.color))throw new Error('SVG text requires a prepared literal color.');
+      if(line.path)yield `<defs><path id="${svgAttribute(pathId)}" d="${textPathData(line.path)}"/></defs>`;
+      yield line.path?`<text x="0" y="0" dy="${svgNumber(line.path.baselineOffset)}" transform="translate(${svgNumber(line.x)} ${svgNumber(line.y)})" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="alphabetic" xml:space="preserve"${rootAttributes}><textPath href="#${svgAttribute(pathId)}" startOffset="${svgNumber(line.path.startOffset)}" method="align" spacing="exact">`:`<text x="${svgNumber(line.x)}" y="${svgNumber(line.y)}" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="alphabetic" xml:space="preserve"${rootAttributes}>`;
       for(const span of line.spans){
         const s=characterFormatSchema.parse(span.style);
         if(!/^(?:#[a-fA-F0-9]{3,8}|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([a-zA-Z0-9.,%+\-/\s]+\))$/.test(s.color))throw new Error('SVG text requires a prepared literal color.');
         yield `<tspan font-family="${svgAttribute(s.fontFamily)}" font-size="${svgNumber(s.fontSize)}" font-weight="${svgAttribute(s.fontWeight??'normal')}" font-style="${s.fontStyle??'normal'}" letter-spacing="${svgNumber(s.letterSpacing)}" word-spacing="${svgNumber(s.wordSpacing+line.wordSpacingDelta)}" fill="${svgAttribute(s.color)}" style="font-kerning:${s.fontKerning??'auto'};font-variant-caps:${s.fontVariantCaps??'normal'};font-stretch:${s.fontStretch??'normal'};font-variation-settings:${svgAttribute(s.fontVariationSettings??'normal')}">${svgAttribute(span.text)}</tspan>`;
       }
-      yield '</text>\n';
+      yield line.path?'</textPath></text>\n':'</text>\n';
     }
     return;
   }

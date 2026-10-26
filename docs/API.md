@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Path-text commands
+
+Schema 46 accepts textPath geometry or null through the existing strict layer.update surface. Set wrapWidth to null and paragraph spacing/indent/justification to their defaults when attaching to paragraph text. Commands derive textPathOrigin and frame dimensions; a client-written origin patch rejects. Native files retain authored geometry, fonts and cached frames. Separate Node sessions use conservative estimated metrics and existing expected-revision/atomic Undo checks. Browser-native metrics are not REST synchronization. See [TEXT_PATHS.md](TEXT_PATHS.md).
+
 ## Character ranges
 
 Schema-45 text accepts characterRanges: [{start, end, format}] through strict layer.update commands. Intervals are ordered, nonempty UTF-16 ranges that cannot split surrogate pairs. Empty arrays clear overrides while retaining the native paragraph path in browser hosts. Invalid, locked or stale edits reject atomically through existing revision/Undo contracts. Text-only replacement retains unchanged prefix/suffix formatting; OO replaceText supplies exact positions. REST remains an independent headless session with estimated metrics, separate from browser artwork and the isolated native typography broker. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.

@@ -1,3 +1,4 @@
+import {textPathSchema} from './core/text-path';
 import {exportTiffPages as encodeTiffPages} from './engine/tiff';
 import {z} from 'zod';
 import {prepareCharacterTextMetrics} from './engine/styled-text-layout';
@@ -1925,7 +1926,7 @@ export class EditorApplication {
               const check=()=>{checkSelection();if(pluginContext&&!this.plugins.getGrantedPermissions(pluginContext.pluginId).includes('document:read'))throw new Error('Permission denied: document:read is required for typography preparation.');};
               check();if(selectionBusy)throw new Error('Await each native preparation before starting another.');
               if(++selectionCount>32)throw new Error('A script can prepare at most 32 native operations.');
-              const request=z.object({layerId:z.string(),patch:z.object({text:z.string().max(10000),characterRanges:z.array(characterRangeSchema).max(10000).optional()}).strict()}).strict().parse(args[1]);
+              const request=z.object({layerId:z.string(),patch:z.object({text:z.string().max(10000).optional(),characterRanges:z.array(characterRangeSchema).max(10000).optional(),textPath:textPathSchema.nullable().optional(),wrapWidth:z.number().finite().positive().nullable().optional(),paragraphSpacing:z.number().finite().min(0).max(10000).optional(),firstLineIndent:z.number().finite().min(-10000).max(10000).optional(),paragraphJustify:z.enum(['none','inter-word']).optional()}).strict()}).strict().parse(args[1]);
               const source=execute(snapshot,{type:'transaction',label:'Prepare typography',commands:parseCommands(args[0])});
               const candidate=execute(source,{type:'layer.update',id:request.layerId,patch:request.patch}),layer=findLayer(candidate,request.layerId);
               if(layer?.kind!=='text')throw new Error('Typography preparation requires an attached text layer.');

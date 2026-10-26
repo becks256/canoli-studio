@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Path text uses existing authority
+
+TextPath values and TextLayer baseline commands use existing document read/write grants, shared schema-46 validation, native finite frame preparation and final host revalidation. Installation stays inert. No source bytes, chooser, renderer, network, import service or new permission is exposed. Keep existing cancellation, deadline/native-operation/command limits and atomic rollback. See [TEXT_PATHS.md](TEXT_PATHS.md).
+
 ## Styled SVG remains a trusted file service
 
 Inline SVG font/source reconstruction does not expose file admission or a native rendering host to isolated code. Installation remains inert and no permission/manifest change is added. After trusted import, existing TextLayer range methods and shared commands retain their usual grants, native script measurement, revision/lock/source validation and Undo; REST sessions remain separate. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).

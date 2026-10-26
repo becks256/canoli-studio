@@ -35,7 +35,7 @@ export interface ResizeDragState {
   layerText?: string;
   layerFontFamily?: string;
   layerLineHeight?: number;
-  layerTextStyle?: TextStyle&{characterRanges?:readonly CharacterRangeData[];color?:string;align?:'left'|'center'|'right'};
+  layerTextStyle?: TextStyle&{textPath?:import('../core/text-path').TextPathData|null;textPathOrigin?:{x:number;y:number};characterRanges?:readonly CharacterRangeData[];color?:string;align?:'left'|'center'|'right'};
   layerKind: "raster" | "text";
   /** Expanded ink bounds; logical image geometry still addresses its source. */
   layerContentBounds?: Rect;
@@ -148,7 +148,7 @@ export function computeResizePatch(
   newWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newWidth));
   newHeight = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newHeight));
 
-  if (layerKind === "text" && layerFontSize && (layerText || drag.layerTextStyle?.wrapWidth != null)) {
+  if (layerKind === "text" && layerFontSize && (layerText || drag.layerTextStyle?.wrapWidth != null||drag.layerTextStyle?.textPath)) {
     if (drag.layerTextStyle?.wrapWidth != null) {
       const wrapWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, layerWidth+effectiveDx));
       const bounds = measureTextBounds(layerText??'', layerFontSize, layerFontFamily??'sans-serif', layerLineHeight??1.2, {...drag.layerTextStyle, wrapWidth});
@@ -169,12 +169,13 @@ export function computeResizePatch(
       ),
     );
     const characterRanges=drag.layerTextStyle?.characterRanges?.map(range=>({...range,format:{...range.format,...(range.format.fontSize===undefined?{}:{fontSize:Math.max(1,Math.min(Number.MAX_SAFE_INTEGER,range.format.fontSize*newFontSize/layerFontSize))})}}));
+    const originalPath=drag.layerTextStyle?.textPath,ratio=newFontSize/layerFontSize,textPath=originalPath?{...originalPath,startOffset:originalPath.startOffset*ratio,baselineOffset:originalPath.baselineOffset*ratio,points:originalPath.points.map(p=>({x:p.x*ratio,y:p.y*ratio,in:{x:p.in.x*ratio,y:p.in.y*ratio},out:{x:p.out.x*ratio,y:p.out.y*ratio}}))}:undefined;
     const newBounds = measureTextBounds(
       layerText??'',
       newFontSize,
       layerFontFamily ?? "sans-serif",
       layerLineHeight ?? 1.2,
-      {...drag.layerTextStyle,...(characterRanges===undefined?{}:{characterRanges})},
+      {...drag.layerTextStyle,...(textPath?{textPath}:{}),...(characterRanges===undefined?{}:{characterRanges})},
     );
     let textX = layerX;
     let textY = layerY;
@@ -184,14 +185,16 @@ export function computeResizePatch(
     if (handle === "nw" || handle === "ne") {
       textY = layerY + layerHeight - newBounds.height;
     }
+    if(textPath){const before=drag.layerTextStyle?.textPathOrigin??{x:0,y:0},after=newBounds.origin??{x:0,y:0};textX+=before.x-after.x;textY+=before.y-after.y;}
     return {
+      ...(textPath?{textPath}:{}),
       x: Math.max(
         -Number.MAX_SAFE_INTEGER,
-        Math.min(Number.MAX_SAFE_INTEGER, Math.round(textX)),
+        Math.min(Number.MAX_SAFE_INTEGER, (textPath?textX:Math.round(textX))),
       ),
       y: Math.max(
         -Number.MAX_SAFE_INTEGER,
-        Math.min(Number.MAX_SAFE_INTEGER, Math.round(textY)),
+        Math.min(Number.MAX_SAFE_INTEGER, (textPath?textY:Math.round(textY))),
       ),
       fontSize: newFontSize,
       ...(characterRanges===undefined?{}:{characterRanges}),

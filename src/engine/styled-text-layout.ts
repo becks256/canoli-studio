@@ -1,3 +1,4 @@
+import {textPathSchema} from '../core/text-path';
 import {z} from 'zod';
 import {characterTextSchema,normalizeCharacterText,measureCharacterTextAsync,type CharacterLayoutLine,type CharacterLayout} from '../core/character-layout';
 import type {DocumentData} from '../core/model';
@@ -15,7 +16,7 @@ export interface StyledParagraphSurface extends StyledTextSurface {readonly layo
 export async function prepareCharacterTextMetrics(input:import('../core/character-layout').CharacterTextInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}){
  control={...control};const alive=assets.captureLifetime(),snapshot=normalizeCharacterText(input);let fonts:ReturnType<typeof captureStyledTextFonts>|undefined,released=false,handedOff=false;
  const check=()=>{if(released)throw new Error('Typography preparation was released.');control.signal?.throwIfAborted();if(control.isCancelled?.())throw new DOMException('Typography preparation superseded.','AbortError');alive();fonts?.check();};check();
- try{fonts=captureStyledTextFonts(snapshot.styles,document,assets);check();const layout=await measureCharacterTextAsync(input,{...control,check});check();if(layout.accuracy!=='native')throw new Error('Native typography measurement requires a browser SVG host.');const bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER)}).parse(layout);handedOff=true;return{bounds,check,release:()=>{if(released)return;released=true;fonts?.release();}};}finally{if(!handedOff){released=true;fonts?.release();}}
+ try{fonts=captureStyledTextFonts(snapshot.styles,document,assets);check();const layout=await measureCharacterTextAsync(input,{...control,check});check();if(layout.accuracy!=='native')throw new Error('Native typography measurement requires a browser SVG host.');const bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),origin:z.object({x:z.number().finite(),y:z.number().finite()}).strict().optional()}).parse(layout);handedOff=true;return{bounds,check,release:()=>{if(released)return;released=true;fonts?.release();}};}finally{if(!handedOff){released=true;fonts?.release();}}
 }
 
 /** Native paragraph rasterization owns fonts independently of model lifetime.
@@ -27,7 +28,7 @@ export async function prepareStyledTextParagraph(input:StyledTextParagraphInput,
  try{
   fonts=captureStyledTextFonts(snapshot.styles,document,assets);const check=()=>{current();fonts!.check();};check();
   const layout=await measureCharacterTextAsync(source,{...control,alignmentWidth,check});check();if(layout.accuracy!=='native')throw new Error('Native styled paragraph preparation requires a browser SVG host.');
-  const scene:StyledTextSceneInput={width:window.width,height:window.height,transform:[...window.transform]as[number,number,number,number,number,number],lines:layout.lines.map(line=>({x:line.x,y:line.y,align:line.align,direction:line.direction,wordSpacingDelta:line.wordSpacingDelta,spans:line.spans.map(span=>({text:span.text,style:span.style}))}))};
+  const scene:StyledTextSceneInput={width:window.width,height:window.height,transform:[...window.transform]as[number,number,number,number,number,number],lines:layout.lines.map(line=>({x:line.x,y:line.y,align:line.align,direction:line.direction,wordSpacingDelta:line.wordSpacingDelta,...(line.path?{path:textPathSchema.parse(line.path)}:{}),spans:line.spans.map(span=>({text:span.text,style:span.style}))}))};
   surface=await prepareStyledTextSurface(scene,fonts.document,assets,control);check();handedOff=true;return Object.freeze({...surface,layout});
  }finally{fonts?.release();if(!handedOff)surface?.release();}
 }

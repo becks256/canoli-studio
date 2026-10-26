@@ -1,5 +1,9 @@
 # Scripting API
 
+## Text on a path (schema 46)
+
+`TextPath` is an immutable cubic baseline value; `new TextLayer({textPath?: TextPath | null})`, `text.textPath: TextPath | null` and `await text.setTextPath(value, control = {}): Promise<void>` connect it to shared commands/history. Points and returned values are owned copies. Signed start/baseline offsets default to zero; closed/reverse default to false. Awaited attachment clears incompatible paragraph layout, requires one logical source line and rejects locks, invalid geometry, cancellation or stale owners/revisions atomically. Trusted `control` permits AbortSignal; scripts use panel cancellation and existing grants/native preparation limits. Native host bounds include a measured frame origin; headless/synchronous worker metrics remain estimates. Full signatures/defaults/errors/limits and the executable example: [TEXT_PATHS.md](TEXT_PATHS.md). No source/file/network/renderer capability is added.
+
 ## Character ranges
 
 `TextLayerOptions.characterRanges?: readonly CharacterRangeData[]` initializes ordered, nonoverlapping UTF-16 intervals `{start, end, format}`. `TextLayer.characterRanges` returns an owned snapshot; public mutations use the methods below and shared commands/history. Explicit ranges require schema 45. Gaps inherit paragraph defaults; an empty array retains the native paragraph path.
@@ -440,6 +444,7 @@ The **Developer docs** link in the tool rail and Scripts panel opens this guide 
 - [Prepared wet paint](#prepared-wet-paint-schema-33)
 - [Image-backed brush textures](#image-backed-brush-textures-schema-32)
 - [VectorLayer and paths](#vectorlayer-and-paths)
+- [TextPath](#textpath)
 - [TextLayer](#textlayer)
 - [Shared radius and native preview](#shared-frequency-radius-and-native-preview-schema-37)
 - [Frequency separation](#frequency-separation-and-native-composition-schema-36)
@@ -500,6 +505,7 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 | `VectorLayer`                                                | Constructor for a vector layer containing Bézier vector paths.                                                                                               |
 | `VectorPath`                                                 | Constructor for editable vector paths with anchors, control handles, fill, and stroke.                                                                       |
 | `TextLayer`                                                  | Constructor for text layers with font, size, color, alignment, and line height.                                                                              |
+| `TextPath` | Immutable authored cubic baseline with owned points, signed offsets and traversal; attach through TextLayer commands. |
 | `ParagraphStyle` | Named reusable typography, linked frames and per-field overrides through Document.paragraphStyles. |
 | `AdjustmentLayer`                                            | Constructor for non-destructive adjustment layers modifying preceding backdrop pixels; see AdjustmentLayer for current families.                                 |
 | `RedEyeAdjustment` | Immutable threshold/strength correction value; isolate pupils with an editable mask. See [Red-eye correction](#redeyeadjustment-schema-35). |
@@ -934,6 +940,22 @@ Static Factory Methods:
 
 Path handles remain attached to their owner and read the current revision across undo/redo. Access while absent throws. A path cannot be added to a second owner. Duplicating its layer gives each path a new ID.
 
+## TextPath
+
+Signature: `new TextPath(options: TextPathInput)`.
+
+| Option/member | Type | Default/behavior |
+| --- | --- | --- |
+| `points` | `PathAnchor[]` | Required; 1–20,000 anchors, each `{x,y,in:{x,y},out:{x,y}}`; finite safe-coordinate range and a nonzero curve. Read returns an owned copy. |
+| `closed` | boolean | `false`; close the final cubic to the first anchor. Read-only on the value. |
+| `reverse` | boolean | `false`; reverse cubic handles/order while retaining the closed seam and Unicode source. Read-only. |
+| `startOffset` | number | `0`; signed finite local-pixel path distance. Read-only. |
+| `baselineOffset` | number | `0`; signed finite local-pixel native baseline shift. Read-only. |
+| `with(changes)` | `(Partial<TextPathInput>) => TextPath` | Validated immutable replacement; does not mutate attached text. |
+| `toJSON()` | `() => TextPathData` | Owned complete serialized baseline; data is for snapshots/transport. |
+
+Use `text.textPath = path` for synchronous shared mutation or `await text.setTextPath(path)` for browser-native prepared bounds. `null` detaches; an explicit null field retains native straight-text rendering, while old omitted data retains legacy Canvas rendering. Single-logical-line/paragraph compatibility, trusted cancellation, worker estimates, examples and errors: [TEXT_PATHS.md](TEXT_PATHS.md).
+
 ## TextLayer
 
 Signature: `new TextLayer(options = {})`.
@@ -942,6 +964,7 @@ Inherits common layer options (`name`, `opacity`, `fillOpacity`, `visible`, `loc
 | Option          | Type                            | Default        | Validation                                        |
 | --------------- | ------------------------------- | -------------- | ------------------------------------------------- |
 | `name`          | string                          | `"Text"`       | Nonempty, at most 240 characters.                 |
+| `textPath` | `TextPath \| null` | absent | Immutable baseline value; one logical line and compatible paragraph layout. |
 | `text`          | string                          | `"Text"`       | String up to 10,000 characters.                   |
 | `fontSize`      | number                          | `32`           | Finite positive number in pixels (>= 1).          |
 | `fontFamily`    | string                          | `"sans-serif"` | Nonempty string up to 240 characters.             |
@@ -960,6 +983,8 @@ Members:
 
 | Member          | Type                            | Behavior                                                                                 |
 | --------------- | ------------------------------- | ---------------------------------------------------------------------------------------- |
+| `textPath` | `TextPath \| null` | Read owned value; write through shared validation/Undo, clearing incompatible paragraph layout. |
+| `setTextPath(value, control?)` | `(TextPath \| null, TypographyControl?) => Promise<void>` | Captured native preparation outside synchronous transactions; preserves text/ranges, rejects stale/locked/cancelled work, one accepted update. |
 | `text`          | string                          | Read/write; updates intrinsic dimensions via text measurement.                           |
 | `fontSize`      | number                          | Read/write; font size in document pixels.                                                |
 | `fontFamily`    | string                          | Read/write; font family name.                                                            |

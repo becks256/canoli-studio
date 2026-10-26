@@ -17,6 +17,7 @@ import {
   UnsharpMaskFilter,
   SmartToneFilter,
   TextLayer,
+  TextPath,
   ParagraphStyle,
   AdjustmentLayer,
   LayerGroup,
@@ -125,7 +126,7 @@ self.onmessage = async (event) => {
     document._prepareTextLayout=async(layerId,patch,control)=>{
       if(control.signal)throw new Error('Use Scripts-panel cancellation; AbortSignal is available to trusted host code only.');
       const revision=document.getSnapshot().revision;
-      const bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER)}).strict().parse(await callHost('typography','measure',[...commands],{layerId,patch}));
+      const bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),origin:z.object({x:z.number().finite(),y:z.number().finite()}).strict().optional()}).strict().parse(await callHost('typography','measure',[...commands],{layerId,patch}));
       if(document.getSnapshot().revision!==revision)throw new Error('Script document changed during typography preparation.');
       return bounds;
     };
@@ -266,6 +267,7 @@ self.onmessage = async (event) => {
       "UnsharpMaskFilter",
       "SmartToneFilter",
       "TextLayer",
+      "TextPath",
       "ParagraphStyle",
       "AdjustmentLayer",
       "LayerGroup",
@@ -317,6 +319,7 @@ self.onmessage = async (event) => {
       UnsharpMaskFilter,
       SmartToneFilter,
       TextLayer,
+      TextPath,
       ParagraphStyle,
       AdjustmentLayer,
       LayerGroup,

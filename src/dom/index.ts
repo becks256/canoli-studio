@@ -1,3 +1,7 @@
+import {TextPath} from './text-path';
+export {TextPath} from './text-path';
+export type {TextPathInput,TextPathData} from '../core/text-path';
+import type {CharacterBounds} from '../core/character-layout';
 import type {FontFeatures,FontVariantCaps,FontStretch} from '../core/font-features';
 import {formatCharacterRange,editCharacterRanges,type CharacterRangeData} from '../core/text-ranges';
 import type {CharacterFormatPatch} from '../core/character-format';
@@ -278,6 +282,7 @@ export interface RasterLayerOptions extends LayerOptions {
   height: number;
 }
 export interface TextLayerOptions extends LayerOptions,FontFeatures {
+  textPath?:TextPath|null;
   characterRanges?:readonly CharacterRangeData[];
   paragraphJustify?: 'none' | 'inter-word';
   wrapWidth?: number | null;
@@ -449,7 +454,7 @@ export class Document {
   private scopedHistoryOrigin:HistoryOrigin|null = null;
   private _assetStore: AssetStore | null = null;
   /** @internal Native geometry broker; final host commands remeasure independently. */
-  _prepareTextLayout?:(layerId:string,patch:Pick<TextLayerData,'text'|'characterRanges'>,control:TypographyControl)=>Promise<{width:number;height:number}>;
+  _prepareTextLayout?:(layerId:string,patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl)=>Promise<CharacterBounds>;
   /** @internal Async typography must not outlive a synchronous transaction. */
   _assertTypographyPreparation(){if(this.batch)throw new Error('Prepare typography outside synchronous transactions.');}
   /** @internal Read-only host inspection; no result can mutate document/history. */
@@ -2389,6 +2394,7 @@ export class TextLayer extends Layer {
     const {
       text = "Text",
       characterRanges,
+      textPath,
       fontSize = 32,
       fontFamily = "sans-serif",
       color = "#ffffff",
@@ -2413,6 +2419,7 @@ export class TextLayer extends Layer {
       ...createText(options.name ?? "Text", text, {
         fontSize,
         characterRanges,
+        ...(textPath===undefined?{}:{textPath:textPath instanceof TextPath?textPath.toJSON():textPath===null?null:(()=>{throw new Error('Use a TextPath value or null.');})()}),
         fontFamily,
         color,
         align,
@@ -2436,6 +2443,17 @@ export class TextLayer extends Layer {
     validateDocument({ ...createDocument(), children: [this.data] },false);
   }
 
+  get textPath():TextPath|null{const value=(this._read()as TextLayerData).textPath;return value?new TextPath(value):null;}
+  set textPath(value:TextPath|null){this.update(this.pathPatch(value));}
+  private pathPatch(value:TextPath|null){
+    if(value!==null&&!(value instanceof TextPath))throw new Error('Use a TextPath value or null.');
+    return{textPath:value?.toJSON()??null,...(value?{wrapWidth:null,paragraphSpacing:0,firstLineIndent:0,paragraphJustify:'none'as const}:{})};
+  }
+  /** Native preparation keeps the baseline and current revision owned through one Undo. */
+  async setTextPath(value:TextPath|null,control:TypographyControl={}):Promise<void>{
+    const patch=this.pathPatch(value);
+    await this.applyCharacterFormatting(patch,control);
+  }
   /** Recalculate bounds with fonts available to this execution environment. */
   reflow(): void {
     this.update({ text: this.text });
@@ -2465,21 +2483,21 @@ export class TextLayer extends Layer {
     const before=this._read() as TextLayerData;
     await this.applyCharacterFormatting({text:before.text,characterRanges:before.characterRanges??[]},control);
   }
-  private async applyCharacterFormatting(patch:Pick<TextLayerData,'text'|'characterRanges'>,control:TypographyControl):Promise<void>{
+  private async applyCharacterFormatting(patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl):Promise<void>{
     control={...control};control.signal?.throwIfAborted();
     const owner=this.document;owner?._assertTypographyPreparation();
     const before=this._read() as TextLayerData,revision=owner?.getSnapshot().revision,assets=owner?.assetStore,detached=owner?undefined:JSON.stringify(before);
     const unchanged=()=>{control.signal?.throwIfAborted();if(this.document!==owner||owner&&(owner.getSnapshot().revision!==revision||owner.assetStore!==assets)||!owner&&JSON.stringify(this._read())!==detached)throw new Error('Text or document changed during typography preparation.');};
     const input=characterInputForLayer({...before,...patch});let release=()=>{},check=unchanged;
     try{
-      let bounds:{width:number;height:number};
+      let bounds:CharacterBounds;
       if(owner?._prepareTextLayout)bounds=await owner._prepareTextLayout(this.id,patch,control);
       else if(typeof globalThis.document!=='undefined'&&assets&&owner){
         const {prepareCharacterTextMetrics}=await import('../engine/styled-text-layout');unchanged();
         const prepared=await prepareCharacterTextMetrics(input,owner._read(),assets,{...control,isCancelled:()=>{unchanged();return false;}});
         release=prepared.release;check=()=>{unchanged();prepared.check();};bounds=prepared.bounds;
-      }else{const layout=await measureCharacterTextAsync(input,{...control,check:unchanged});bounds={width:layout.width,height:layout.height};}
-      bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER)}).strict().parse(bounds);
+      }else{const layout=await measureCharacterTextAsync(input,{...control,check:unchanged});bounds={width:layout.width,height:layout.height,...(layout.origin?{origin:{...layout.origin}}:{})};}
+      bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),origin:z.object({x:z.number().finite(),y:z.number().finite()}).strict().optional()}).strict().parse(bounds);
       check();withPreparedCharacterBounds(input,bounds,()=>this.update(patch),check);
     }finally{release();}
   }

@@ -87,6 +87,7 @@ export type LayerPatch = Partial<
       TextLayerData,
       | "text"
       | "characterRanges"
+      | "textPath"
       | "fontSize"
       | "fontFamily"
       | "color"
@@ -214,18 +215,18 @@ export type EditorCommand =
 
 function reflowText(layer:TextLayerData){
   const bounds=measureTextBounds(layer.text,layer.fontSize,layer.fontFamily,layer.lineHeight,{
-    characterRanges:layer.characterRanges,color:layer.color,align:layer.align,
+    textPath:layer.textPath,characterRanges:layer.characterRanges,color:layer.color,align:layer.align,
     letterSpacing:layer.letterSpacing,wordSpacing:layer.wordSpacing,fontKerning:layer.fontKerning,
     direction:layer.direction,fontWeight:layer.fontWeight,fontStyle:layer.fontStyle,wrapWidth:layer.wrapWidth,
     fontVariantCaps:layer.fontVariantCaps,fontStretch:layer.fontStretch,fontVariationSettings:layer.fontVariationSettings,
     paragraphSpacing:layer.paragraphSpacing,firstLineIndent:layer.firstLineIndent,paragraphJustify:layer.paragraphJustify,
   });
-  layer.width=bounds.width;layer.height=bounds.height;
+  layer.width=bounds.width;layer.height=bounds.height;if(bounds.origin)layer.textPathOrigin={...bounds.origin};else delete layer.textPathOrigin;
 }
 // Presence matters: reflow() deliberately submits the current text again.
 // Explicit legacy width/height requests still normalize to measured bounds.
 const TEXT_REFLOW_KEYS: readonly (keyof LayerPatch)[] = [
-  'text','characterRanges','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
+  'text','textPath','characterRanges','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
   'fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle',
   'direction','wrapWidth','paragraphSpacing','firstLineIndent','paragraphJustify',
   'width','height',
@@ -583,7 +584,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
     case "layer.update":
       if ("frequencyRadius" in command.patch && layer.kind !== "group") throw new Error("A shared frequency radius requires a group.");
       if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
-      if (layer.kind !== 'text' && ['text','characterRanges','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
+      if (layer.kind !== 'text' && ['text','textPath','characterRanges','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
         throw new Error('Typography properties require a text layer.');
       if (
         Object.keys(command.patch).some(
@@ -606,6 +607,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "height",
               "text",
               "characterRanges",
+              "textPath",
               "fontSize",
               "fontFamily",
               "color",
@@ -655,7 +657,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
           }
           layer.paragraphStyle={id:style.id,overrides};resolveParagraphBinding(layer,style);
         }
-        if(TEXT_REFLOW_KEYS.some(key=>Object.hasOwn(command.patch,key)))reflowText(layer);
+        if(TEXT_REFLOW_KEYS.some(key=>Object.hasOwn(command.patch,key))||layer.textPath&&Object.hasOwn(command.patch,'align'))reflowText(layer);
       }
       break;
     case "mask.setFromMatting":

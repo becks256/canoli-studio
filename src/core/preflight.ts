@@ -80,7 +80,7 @@ export async function inspectDesign(document:PreflightDocumentView,revision:numb
       catch{add({...target,code:'measurement-unavailable',severity:'info',message:'Layer placement exceeds numerical measurement precision.'});continue;}
       if(settings.checkBounds&&!inMaster&&node.kind!=='group'){
         try{
-          const local=node.kind==='paint'?unionBounds(node.strokes.map(strokeBounds)):node.kind==='vector'?unionBounds(node.paths.map(pathBounds)):node.kind==='adjustment'?undefined:{x:0,y:0,width:node.width,height:node.height},bounds=local?world.bounds(local):undefined;
+          const local=node.kind==='paint'?unionBounds(node.strokes.map(strokeBounds)):node.kind==='vector'?unionBounds(node.paths.map(pathBounds)):node.kind==='adjustment'?undefined:{x:node.kind==='text'?node.textPathOrigin?.x??0:0,y:node.kind==='text'?node.textPathOrigin?.y??0:0,width:node.width,height:node.height},bounds=local?world.bounds(local):undefined;
           if(bounds&&(bounds.x<-1e-7||bounds.y<-1e-7||bounds.x+bounds.width>document.width+1e-7||bounds.y+bounds.height>document.height+1e-7))add({...target,code:'bounds-outside',severity:'warning',bounds,message:'Authored bounds extend beyond the canvas. Review intentional bleed and clipping; masks, effects and occlusion are not evaluated.'});
         }catch{add({...target,code:'measurement-unavailable',severity:'info',message:'Authored bounds exceed numerical measurement precision.'});}
       }

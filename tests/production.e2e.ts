@@ -1,3 +1,5 @@
+import {publicTextPathWorkflow} from './helpers/public-text-path';
+test('production path typography keeps curve authoring, isolated commands, Undo and native reopening without developer globals',async({page},info)=>{await publicTextPathWorkflow(page,info,true);});
 import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
 import {svgCharacterImportWorkflow} from './helpers/svg-character-import';
 test('production styled SVG preflight and native character editing retain originals, prior work, Undo and reopening',async({page},info)=>{await svgCharacterImportWorkflow(page,info,true);});

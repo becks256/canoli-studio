@@ -1,3 +1,4 @@
+import {textPathSchema} from './text-path';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {characterRangeSchema} from './text-ranges';
 import {fontFamilyRequestSchema} from './font-management';
@@ -75,6 +76,7 @@ const patch = z
     styles: styleSchema.optional(),
     blendMode: z.enum(GROUP_BLEND_MODES).optional(),
     text: z.string().max(10000).optional(),
+    textPath:textPathSchema.nullable().optional(),
     characterRanges:z.array(characterRangeSchema).max(10000).optional(),
     fontSize: z.number().min(1).max(Number.MAX_SAFE_INTEGER).optional(),
     fontFamily: identifier.optional(),

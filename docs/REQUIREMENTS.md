@@ -1,8 +1,12 @@
 # Canoli Studio editor requirements
 
+## Connected path text (F08)
+
+Retain authored local cubic baselines through OO/TextLayer commands, character/font edits, shared Undo, native project/workspace/recipe data and supported editable SVG output/reimport. Keep measured frame origin independent of geometry/placement. Enforce logical-line/paragraph compatibility, locks, source ownership, stale/cancelled preparation and strict transport. Provide copied vector sources, signed offsets, orientation and precision anchor/handle controls. Interactive canvas handles, richer path/paragraph/vertical flow and broad viewer/device/performance acceptance remain unfinished. See [TEXT_PATHS.md](TEXT_PATHS.md).
+
 ## F08 path preparation and remaining integration
 
-The internal native renderer now prepares cubic baseline text using complete owned fonts, logical character order, start/baseline offsets, reversal and independent pixel windows. This does not deliver public path text: TextLayer authoring, selection/curve handles, native reflow/interaction bounds, shared OO/UI/script/REST commands, undo/persistence/recipes and editable SVG import/export still require connected implementation and acceptance. Keep those gates open. See [STYLED_TEXT.md](STYLED_TEXT.md#native-curve-preparation-internal-f08-dependency).
+The internal native renderer now prepares cubic baseline text using complete owned fonts, logical character order, start/baseline offsets, reversal and independent pixel windows. This section describes the renderer dependency; current public TextLayer/command/frame/precision-control/persistence/SVG integration is documented in [TEXT_PATHS.md](TEXT_PATHS.md). Interactive canvas handles, richer flow and broader acceptance remain open. See [STYLED_TEXT.md](STYLED_TEXT.md#native-curve-preparation-internal-f08-dependency).
 
 ## Editable SVG character import
 

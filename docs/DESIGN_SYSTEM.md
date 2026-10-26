@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Path typography controls
+
+Use the existing custom Typography disclosure with paginated vector-source choices, explicit Use vector path/Remove text path, named offset NumberFields with preview/cancel/commit, traversal and contour selectors. Explain that copied geometry is independent and path text has one logical line. Baseline anchors uses an indexed anchor and labeled incoming/outgoing coordinates plus explicit split/remove. Keep paragraph controls visibly in path mode, preserve scrolling/typing/focus, and surface stale/cancelled/source errors. Do not add shortcuts, rail icons or a component library. Native canvas handles remain future work. See [TEXT_PATHS.md](TEXT_PATHS.md).
+
 ## Styled SVG review and editing
 
 Use the existing Import SVG dialog to disclose editable inline characters, embedded source counts and remaining flattening boundaries. Inspection stays inert. Preserve explicit Editable/Flattened/Cancel actions, preparation status and existing modal scrolling. After import, the existing Text content selection and Character formatting disclosure edit the native ranges; Undo and source-retaining project reopening remain ordinary workflows. No new shortcut, tool icon or UI framework. See [SVG_CHARACTER_IMPORT.md](SVG_CHARACTER_IMPORT.md).

@@ -1,3 +1,4 @@
+import {TextPathPanel} from './TextPathPanel';
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { systemFonts, subscribeSystemFonts, getSystemFonts } from "./system-fonts";
 import {subscribeNativeFontChanges} from '../fonts/native-events';
@@ -119,8 +120,9 @@ export function TypographyPanel({
         onSelection={(start,end)=>setCharacterSelection({id:layer.id,text:layer.text,start,end})}
       />
       <CharacterFormattingPanel layer={layer} start={selection.start} end={selection.end} disabled={disabled}/>
-      <Select label="Text layout" value={layer.wrapWidth === undefined ? 'point' : 'paragraph'} disabled={disabled || (!paragraphSupported && layer.wrapWidth === undefined)}
-        options={[{value:'point',label:'Point text'},{value:'paragraph',label:'Paragraph text'}]}
+      <TextPathPanel layer={layer} disabled={disabled} onAction={onAction} onPreview={onPreview}/>
+      <Select label="Text layout" value={layer.textPath?'path':layer.wrapWidth === undefined ? 'point' : 'paragraph'} disabled={disabled || !!layer.textPath || (!paragraphSupported && layer.wrapWidth === undefined)}
+        options={[{value:'point',label:'Point text'},{value:'paragraph',label:'Paragraph text'},...(layer.textPath?[{value:'path',label:'Path text'}]:[])]}
         onChange={value=>onAction(()=>{layer.wrapWidth=value==='paragraph'?layer.width:undefined;})} />
       {layer.wrapWidth !== undefined && <>
         <NumberField label="Paragraph width" layout="stacked" value={layer.wrapWidth} min={1} max={Number.MAX_SAFE_INTEGER} step={1} suffix="px" disabled={disabled || !paragraphSupported}
@@ -134,13 +136,13 @@ export function TypographyPanel({
         onChange={value=>onAction(()=>{layer.paragraphJustify=value as 'none'|'inter-word';})} />
       {layer.paragraphJustify==='inter-word' && <p>Wrapped lines expand native word spacing to the available width. Final lines, forced breaks and unbreakable text keep their spacing. Paragraph text mode is required. If native spacing cannot fit a line, choose Kerning Normal or Reset paragraph.</p>}
       {!wordSpacingSupported && <p>Paragraph justification requires native word spacing. Reset paragraph clears unsupported justification.</p>}
-      <Slider label="Paragraph spacing" value={layer.paragraphSpacing??0} min={0} max={10000} step={1} suffix="px" disabled={disabled}
+      <Slider label="Paragraph spacing" value={layer.paragraphSpacing??0} min={0} max={10000} step={1} suffix="px" disabled={disabled||!!layer.textPath}
         onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{paragraphSpacing:value}})}
         onCommit={value=>onAction(()=>{layer.paragraphSpacing=value;})} />
-      <Slider label="First-line indent" value={layer.firstLineIndent??0} min={-10000} max={10000} step={1} suffix="px" disabled={disabled}
+      <Slider label="First-line indent" value={layer.firstLineIndent??0} min={-10000} max={10000} step={1} suffix="px" disabled={disabled||!!layer.textPath}
         onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{firstLineIndent:value}})}
         onCommit={value=>onAction(()=>{layer.firstLineIndent=value;})} />
-      <Button disabled={disabled} onClick={()=>onAction(()=>layer.resetParagraph())}>Reset paragraph</Button>
+      <Button disabled={disabled||!!layer.textPath} onClick={()=>onAction(()=>layer.resetParagraph())}>Reset paragraph</Button>
       <Select
         label="Font"
         layout="stacked"
@@ -302,7 +304,7 @@ export function TypographyPanel({
         max={3}
         step={0.05}
         suffix="x"
-        disabled={disabled}
+        disabled={disabled||!!layer.textPath}
         onPreview={(value) =>
           onPreview({
             type: "layer.update",

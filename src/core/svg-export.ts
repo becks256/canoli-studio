@@ -53,7 +53,7 @@ export function* svgDocumentChunks(document: SvgDocument, rasterMasks?:SvgRaster
       if (fill !== 1&&!effect) yield `<g opacity="${svgNumber(fill)}" style="isolation:isolate">\n`;
       if (layer.kind === 'group') yield* layers(layer.children,world);
       else if(layer.kind==='vector')for (const path of layer.paths) { yield* svgPathElements(path,`canoli-vector-gradient-${++gradientOrdinal}`); yield '\n'; }
-      else if(layer.kind==='text')yield* svgTextElements(layer,texts?.get(layer.id));
+      else if(layer.kind==='text')yield* svgTextElements(layer,texts?.get(layer.id),`canoli-text-baseline-${ordinal}`);
       else if(layer.kind==='paint'){const plan=paintPlans.get(layer.id);if(plan)yield* svgPaintElements(plan,maskIds,images);}
       else{
         const image=images?.get(layer.id);

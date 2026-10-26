@@ -19,6 +19,7 @@ export const textPathSchema=z.object({
  }
  if(!useful)context.addIssue({code:'custom',message:'Text requires a nonzero baseline path.'});
 });
+export type TextPathData=z.output<typeof textPathSchema>;
 export type TextPathInput=z.input<typeof textPathSchema>;
 export interface TextPathGeometry {
  readonly points:readonly Readonly<{x:number;y:number;in:Readonly<{x:number;y:number}>;out:Readonly<{x:number;y:number}>}>[];

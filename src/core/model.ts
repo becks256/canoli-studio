@@ -1,3 +1,4 @@
+import {textPathSchema,type TextPathData} from './text-path';
 import {validateDeclaredFontVariations} from './font-variations';
 import {normalizeCharacterRanges,type CharacterRangeData} from './text-ranges';
 import {characterInputForLayer,characterTextBounds,assertCharacterTextScalars} from './character-layout';
@@ -44,7 +45,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 45;
+export const SCHEMA_VERSION = 46;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -123,6 +124,8 @@ export interface VectorLayerData extends LayerBaseData {
   paths: VectorPathData[];
 }
 export interface TextLayerData extends LayerBaseData, ParagraphStyle, FontFeatures {
+  textPath?:TextPathData|null;
+  textPathOrigin?:{x:number;y:number};
   characterRanges?:readonly CharacterRangeData[];
   paragraphStyle?:ParagraphStyleBinding|null;
   kind: "text";
@@ -202,6 +205,7 @@ export interface DocumentData {
     | 42
     | 43
     | 44
+    | 45
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -282,6 +286,7 @@ export function measureTextBounds(
   fontFamily: string,
   lineHeight: number,
   options: ParagraphStyle & FontFeatures & {
+    textPath?:TextPathData|null;
     characterRanges?:readonly CharacterRangeData[];
     color?:string;
     align?:'left'|'center'|'right';
@@ -292,9 +297,9 @@ export function measureTextBounds(
     fontWeight?: string;
     fontStyle?: "normal" | "italic";
   } = {},
-): { width: number; height: number } {
+): import('./character-layout').CharacterBounds {
   assertParagraphStyle(options);
-  if(options.characterRanges!==undefined)return characterTextBounds(characterInputForLayer({...options,text,fontSize,fontFamily,lineHeight,color:options.color??'#ffffff'}));
+  if(options.characterRanges!==undefined||options.textPath!==undefined)return characterTextBounds(characterInputForLayer({...options,text,fontSize,fontFamily,lineHeight,color:options.color??'#ffffff'}));
 
   if (!measureCtx) {
     if (typeof OffscreenCanvas !== "undefined") {
@@ -340,6 +345,7 @@ export function createText(
   name: string,
   text = "Text",
   options: ParagraphStyle & FontFeatures & {
+    textPath?:TextPathData|null;
     characterRanges?:readonly CharacterRangeData[];
     fontSize?: number;
     fontFamily?: string;
@@ -366,7 +372,7 @@ export function createText(
   const fontStyle = options.fontStyle;
   const direction = options.direction;
   const bounds = measureTextBounds(text, fontSize, fontFamily, lineHeight, {
-    characterRanges:options.characterRanges,color,align,
+    textPath:options.textPath,characterRanges:options.characterRanges,color,align,
     letterSpacing,
     wordSpacing,
     fontKerning,
@@ -384,6 +390,8 @@ export function createText(
   return {
     ...base(name),
     kind: "text",
+    ...(options.textPath===undefined?{}:{textPath:options.textPath?textPathSchema.parse(options.textPath):null}),
+    ...(bounds.origin?{textPathOrigin:{...bounds.origin}}:{}),
     ...(options.characterRanges===undefined?{}:{characterRanges:normalizeCharacterRanges(text,options.characterRanges)}),
     text,
     fontSize,
@@ -604,7 +612,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -690,7 +698,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
-      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node||'characterRanges'in node))throw new Error('Native font features require a text layer.');
+      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node||'characterRanges'in node||'textPath'in node||'textPathOrigin'in node))throw new Error('Native font features require a text layer.');
       if (node.blendMode === 'pass-through') {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 28)
           throw new Error('Pass-through blending requires a group and document schema 28.');
@@ -871,6 +879,16 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
             !["ltr", "rtl"].includes(node.direction as string))
         ) {
           throw new Error("Invalid text layer.");
+        }
+        if('textPath'in node||'textPathOrigin'in node){
+          if(Number(value.schemaVersion)<46)throw new Error('Text paths require document schema version 46.');
+          if(node.textPath!==undefined)assertCharacterTextScalars(node.text as string);
+          if(node.textPath!=null){
+            const path=textPathSchema.parse(node.textPath);characterInputForLayer({...node,text:node.text as string,textPath:path}as unknown as TextLayerData);
+            if(!record(node.textPathOrigin)||Object.keys(node.textPathOrigin).some(key=>!['x','y'].includes(key))||!number(node.textPathOrigin.x,-MAX_COORDINATE,MAX_COORDINATE)||!number(node.textPathOrigin.y,-MAX_COORDINATE,MAX_COORDINATE))throw new Error('A text path requires its measured frame origin.');
+            // Validation stays structural; source-owned native geometry belongs to commands.
+            if(node.wrapWidth!=null||node.paragraphSpacing!=null&&node.paragraphSpacing!==0||node.firstLineIndent!=null&&node.firstLineIndent!==0||node.paragraphJustify!=null&&node.paragraphJustify!=='none'||/[\n\u2028\u2029]/u.test(node.text as string))throw new Error('Path text requires one logical line without paragraph layout.');
+          }else if(node.textPathOrigin!==undefined)throw new Error('A text frame origin requires a baseline path.');
         }
         if('characterRanges'in node){
           if(Number(value.schemaVersion)<45)throw new Error('Character ranges require document schema version 45.');

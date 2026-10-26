@@ -1,5 +1,5 @@
 import {nativeTextFont} from '../core/text-style';
-import {characterFontFamilies,characterInputForLayer,measureCharacterTextAsync} from '../core/character-layout';
+import {characterFontFamilies,characterInputForLayer,measureCharacterTextAsync,normalizeCharacterText} from '../core/character-layout';
 import {captureExportFonts} from './export-fonts';
 import type {SvgDocument} from '../core/svg-masks';
 import {planSvgTexts,svgWhitespaceRuns,type SvgWhitespaceRun,type SvgTextLayouts,type SvgTextLayout} from '../core/svg-text';
@@ -114,14 +114,15 @@ export async function prepareSvgTexts(document:SvgDocument,control?:ExportContro
   try{
     for(const layer of layers){
       current();
-      if(layer.characterRanges!==undefined){
+      if(layer.characterRanges!==undefined||layer.textPath!==undefined){
         const layout=await measureCharacterTextAsync(characterInputForLayer(layer),{signal:control?.signal,check:current,alignmentWidth:layer.width});
         const styledLines=layout.lines.map(line=>({...line,spans:line.spans.map(span=>{
           context.fillStyle='#010203';context.fillStyle=span.style.color;
           if(context.fillStyle==='#010203'){context.fillStyle='#040506';context.fillStyle=span.style.color;if(context.fillStyle==='#040506')throw new Error('Cannot export an invalid text color to SVG.');}
           return{...span,style:{...span.style,color:String(context.fillStyle)}};
         })}));
-        if(measuredLayers.has(layer))layouts.set(layer.id,{baselines:styledLines.map(line=>line.y),color:'#000000',letterSpacing:0,styledLines});
+        const rootStyle={...normalizeCharacterText(characterInputForLayer(layer)).style};context.fillStyle='#010203';context.fillStyle=rootStyle.color;if(context.fillStyle==='#010203'){context.fillStyle='#040506';context.fillStyle=rootStyle.color;if(context.fillStyle==='#040506')throw new Error('Cannot export an invalid text color to SVG.');}rootStyle.color=String(context.fillStyle);
+        if(measuredLayers.has(layer))layouts.set(layer.id,{rootStyle,baselines:styledLines.map(line=>line.y),color:'#000000',letterSpacing:0,styledLines});
         current();continue;
       }
       const requested=nativeTextFont(layer);
