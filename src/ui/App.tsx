@@ -693,6 +693,10 @@ export function App({ editor }: { editor: EditorApplication }) {
       attempt(() => editor.tools.nudgeMaskPoint(x, y));
       return;
     }
+    if(tool==='pen'&&selected?.kind==='text'&&selected.textPath){
+      attempt(()=>editor.tools.nudgeTextPathPoint(x,y));
+      return;
+    }
     selectedAction((layer) => {
       if (movingMask && layer.mask) {
         layer.update(
@@ -2153,6 +2157,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                 selected?.kind === "smart-object" && !!selected.filterMask
               }
               hasVectorMask={selected?.mask?.kind === "vector"}
+              hasTextPath={selected?.kind === 'text' && !!selected.textPath}
               onMoveTarget={setMoveTarget}
               snapEnabled={snapEnabled}
               onSnapEnabled={setSnapEnabled}

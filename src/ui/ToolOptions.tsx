@@ -15,6 +15,7 @@ export function ToolOptions({
   hasPaintMask,
   hasFilterMask = false,
   hasVectorMask,
+  hasTextPath = false,
   onMoveTarget,
   snapEnabled = false,
   onSnapEnabled,
@@ -43,6 +44,7 @@ export function ToolOptions({
   hasPaintMask: boolean;
   hasFilterMask?: boolean;
   hasVectorMask: boolean;
+  hasTextPath?: boolean;
   snapArtwork?: boolean;
   onSnapArtwork?(enabled: boolean): void;
   snapEnabled?: boolean;
@@ -225,7 +227,7 @@ export function ToolOptions({
         </>
       )}
       {((brush && !tonal && tool !== "eraser" && tool !== "heal" && (!wet || settings.paintTarget==='layer')) ||
-        (tool === "pen" && settings.penEditTarget === "layer") ||
+        (tool === "pen" && settings.penEditTarget === "layer" && !hasTextPath) ||
         tool === "marquee" ||
         tool === "fill") && (
         <label className="tool-color">
@@ -442,7 +444,7 @@ export function ToolOptions({
           value={settings.penEditTarget}
           disabled={disabled}
           options={[
-            { value: "layer", label: "Layer paths" },
+            { value: "layer", label: hasTextPath ? 'Text baseline' : "Layer paths" },
             { value: "mask", label: "Mask paths" },
           ]}
           onChange={(value) =>
@@ -488,7 +490,11 @@ export function ToolOptions({
           )}
         </div>
       )}
-      {tool === "pen" && settings.penEditTarget === "layer" && (
+      {tool === 'pen' && settings.penEditTarget === 'layer' && hasTextPath && <div className="text-baseline-actions">
+        <Button disabled={disabled || !controller.selectedTextPathAnchor?.canSplit} onClick={()=>onAction(()=>controller.insertTextPathAnchor())}>Insert baseline midpoint</Button>
+        <Button disabled={disabled || !controller.selectedTextPathAnchor?.canRemove} onClick={()=>onAction(()=>{controller.removeLastAnchor();})}>Remove baseline anchor</Button>
+      </div>}
+      {tool === "pen" && settings.penEditTarget === "layer" && !hasTextPath && (
         <>
           <Slider
             label="Pen width"
@@ -683,6 +689,7 @@ export function ToolOptions({
                         ? controller.drawingMaskContour
                           ? "Click/drag anchors · Enter or first anchor closes · Esc cancels"
                           : "Click curve to add · Alt frees handles · Arrows nudge"
+                        : hasTextPath ? 'Drag anchors/handles · Click curve to split · Alt frees handles · Arrows nudge · Esc cancels'
                         : "Click anchors · Drag curves · Click start to close"
                       : tool === "marquee"
                         ? "Shift adds · Alt subtracts"

@@ -4,6 +4,10 @@
 
 Authored curve coordinates must not drift when text/font metrics change. Retain native frame origin separately, derive it through shared commands, and apply it to interaction geometry rather than translating the baseline. Measure the actual native textPath, preserve logical source order and pin owned fonts through bitmap/export work. Worker/native/REST surfaces share structural validation and history while headless metrics remain explicit estimates. Inert SVG inspection keeps curves outside placeholder text until private source preparation. See [TEXT_PATHS.md](TEXT_PATHS.md).
 
+## Baseline pointer authority
+
+A text-baseline pointer gesture owns a detached curve draft, captured document/revision/selection and affine inverse. Preview commands must not mutate authored state or history. Recheck authority before queued publication and final shared OO commit; do not retarget an edit after selection, revision or owner changes. A click/no displacement retains asymmetric handles. Closed seams, text/fonts/offsets and layer placement survive anchor edits; explicit removal preserves valid minimum geometry. Screen-sized controls and hit testing follow the complete parent basis, including reflection/shear. See [TEXT_PATHS.md](TEXT_PATHS.md).
+
 ## Native curve ownership
 
 Path preparation must preserve cubic geometry, logical Unicode ordering, whole-span shaping and font ownership independently. Accept numeric vector anchors rather than arbitrary SVG/URLs; snapshot before awaits, keep private fragment identities, validate native finite nonzero path length and clean up on cancellation/source/probe/image/bitmap failure. Reverse geometry and handles while keeping the closed seam. Allocation windows stay separate from document/source dimensions. The preparation DTO stays internal; current public authoring/transport and remaining gates are documented in [TEXT_PATHS.md](TEXT_PATHS.md). See [STYLED_TEXT.md](STYLED_TEXT.md#native-curve-preparation-internal-f08-dependency).

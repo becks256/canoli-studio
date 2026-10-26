@@ -2194,6 +2194,12 @@ input[type="color"] {
 .mask-contour-actions > button {
   flex: 1;
 }
+.text-baseline-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
 .crop-actions {
   display: flex;

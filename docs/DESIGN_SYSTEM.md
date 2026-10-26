@@ -2,7 +2,7 @@
 
 ## Path typography controls
 
-Use the existing custom Typography disclosure with paginated vector-source choices, explicit Use vector path/Remove text path, named offset NumberFields with preview/cancel/commit, traversal and contour selectors. Explain that copied geometry is independent and path text has one logical line. Baseline anchors uses an indexed anchor and labeled incoming/outgoing coordinates plus explicit split/remove. Keep paragraph controls visibly in path mode, preserve scrolling/typing/focus, and surface stale/cancelled/source errors. Do not add shortcuts, rail icons or a component library. Native canvas handles remain future work. See [TEXT_PATHS.md](TEXT_PATHS.md).
+Use the existing custom Typography disclosure with paginated vector-source choices, explicit Use vector path/Remove text path, named offset NumberFields with preview/cancel/commit, traversal and contour selectors. Explain that copied geometry is independent and path text has one logical line. Baseline anchors uses an indexed anchor and labeled incoming/outgoing coordinates plus explicit split/remove. Keep paragraph controls visibly in path mode, preserve scrolling/typing/focus, and surface stale/cancelled/source errors. Do not add shortcuts, rail icons or a component library. The existing Pen overlay also edits selected text baselines in layer-path mode. Keep screen-sized complete affine anchors/handles and a correct open/closed outline. Use the existing Alt independence, keyboard nudge/Delete/Escape, explicit midpoint/remove controls and separate mask target. Clicking empty canvas clears anchor selection without creating artwork; editable fields retain typing behavior. See [TEXT_PATHS.md](TEXT_PATHS.md).
 
 ## Styled SVG review and editing
 

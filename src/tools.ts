@@ -36,7 +36,11 @@ import {
   PencilStroke,
   VectorLayer,
   VectorPath,
+  TextLayer,
+  TextPath,
 } from "./dom";
+import type {TextPathData} from './core/text-path';
+import {PATH_POINT_LIMIT} from './core/drawing';
 import type { Document, Layer, ShapeOptions } from "./dom";
 import type { EditorCommand } from "./core/commands";
 import { isLocked, findLayer } from "./core/model";
@@ -226,6 +230,18 @@ interface PenGesture extends BaseGesture {
   start: Point;
   origin: Point;
 }
+interface TextPathGesture extends BaseGesture {
+  kind: 'text-path';
+  layer: TextLayer;
+  selection: readonly string[];
+  inputTransform: AffineTransform;
+  data: TextPathData;
+  original: PathAnchor;
+  index: number;
+  mode: 'anchor' | 'in' | 'out' | 'insert';
+  start: Point;
+  changed: boolean;
+}
 interface FillGesture extends BaseGesture {
   kind: "fill";
   layer: PaintLayer;
@@ -286,6 +302,7 @@ interface PatchGesture extends BaseGesture {
   settings: ToolSettings;
 }
 type Gesture =
+  | TextPathGesture
   | WetGesture
   | QuickSelectionGesture
   | HealGesture
@@ -369,6 +386,7 @@ export class ToolController {
     pathIndex: number;
     index: number;
   } | null = null;
+  private textPathPoint: {document: Document; layerId: string; index: number} | null = null;
   private paintFrame: number | null = null;
   private cancelFrame() {
     if (this.paintFrame !== null) cancelAnimationFrame(this.paintFrame);
@@ -467,6 +485,13 @@ export class ToolController {
         index: gesture.index,
       };
     return this.maskPoint ? { ...this.maskPoint } : null;
+  }
+  get selectedTextPathAnchor() {
+    const point=this.textPathPoint,doc=this.editor.document;
+    if(!point||this.state.settings.penEditTarget!=='layer'||point.document!==doc||doc.selectedLayer?.id!==point.layerId)return null;
+    const layer=findLayer(doc._read(),point.layerId);
+    const path=layer?.kind==='text'?layer.textPath:null;
+    return path?.points[point.index]?{layerId:point.layerId,index:point.index,canSplit:path.points.length<PATH_POINT_LIMIT&&(path.closed||point.index<path.points.length-1),canRemove:path.points.length>(path.closed?1:2)}:null;
   }
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -573,6 +598,7 @@ export class ToolController {
     });
   }
   reset() {
+    this.textPathPoint = null;
     if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
     this.state.wetPreview?.dispose();
     this.quickAbort?.abort();this.quickAbort=null;
@@ -602,6 +628,7 @@ export class ToolController {
     });
   }
   finishPath() {
+    if(this.selectedTextPathAnchor){this.textPathPoint=null;this.cancel();return;}
     if (this.polygonLasso) {
       this.finishPolygonLasso();
       return;
@@ -644,6 +671,14 @@ export class ToolController {
       });
       return true;
     }
+    const text=this.editor.document.selectedLayer;
+    if(text instanceof TextLayer&&text.textPath){
+      this.editTextPathPoint((path,index)=>{
+        if(path.points.length<=(path.closed?1:2))throw new Error('Keep at least one closed or two open baseline anchors.');
+        return path.with({points:path.points.filter((_,i)=>i!==index)});
+      });
+      return true;
+    }
     const target = this.state.penTarget;
     if (!target) return false;
     const layer = this.editor.document.getLayer(target.layerId);
@@ -672,6 +707,26 @@ export class ToolController {
     else paths.splice(target.pathIndex, 1);
     selected.mask = mask.with({ paths });
     if (!points.length || target.index >= points.length) this.maskPoint = null;
+  }
+  private editTextPathPoint(edit:(path:TextPath,index:number)=>TextPath){
+    const target=this.selectedTextPathAnchor,doc=this.editor.document,layer=doc.selectedLayer;
+    if(!target||!(layer instanceof TextLayer)||!layer.textPath)return;
+    this.cancel();
+    const next=edit(layer.textPath,target.index);
+    doc.transaction('Edit text baseline',()=>{layer.textPath=next;});
+    this.textPathPoint={document:doc,layerId:layer.id,index:Math.min(target.index,next.points.length-1)};
+    this.publish({});
+  }
+  insertTextPathAnchor(){
+    const index=this.selectedTextPathAnchor?.index;
+    this.editTextPathPoint((path,i)=>path.with({points:splitPathSegment(path.points,path.closed,i)}));
+    if(index!==undefined&&this.textPathPoint){this.textPathPoint.index=index+1;this.publish({});}
+  }
+  nudgeTextPathPoint(x:number,y:number){
+    const doc=this.editor.document,target=this.selectedTextPathAnchor;
+    if(!target)return;
+    const inverse=layerTransform(doc._read(),target.layerId)!.inverse(),dx=inverse.a*x+inverse.c*y,dy=inverse.b*x+inverse.d*y;
+    this.editTextPathPoint((path,index)=>{const points=path.points,p=points[index];p.x+=dx;p.y+=dy;p.in.x+=dx;p.in.y+=dy;p.out.x+=dx;p.out.y+=dy;return path.with({points});});
   }
   insertMaskAnchor() {
     if (this.maskContour) return;
@@ -1034,6 +1089,7 @@ export class ToolController {
       return;
     }
     if (tool === "pen") {
+      if(selected instanceof TextLayer&&this.beginTextPathPen(base,selected,point,zoom))return;
       this.beginPen(base, selected, point, zoom);
       this.publish({ drawing: true });
       return;
@@ -1404,6 +1460,36 @@ export class ToolController {
       },
     });
   }
+  private assertTextPathGesture(gesture:TextPathGesture){
+    this.assertCurrent(gesture);
+    const state=gesture.document.getSnapshot();
+    if(state.selectedId!==gesture.layer.id||state.selectedIds.length!==gesture.selection.length||state.selectedIds.some((id,i)=>id!==gesture.selection[i]))throw new Error('The baseline selection changed during this gesture. Try again.');
+    this.unlocked();
+  }
+  private textPathPreview(gesture:TextPathGesture):EditorCommand{
+    return{type:'layer.update',id:gesture.layer.id,patch:{textPath:{...gesture.data,points:gesture.data.points.map((p,i)=>i===gesture.index?structuredClone(p):p)}}};
+  }
+  private beginTextPathPen(base:BaseGesture,layer:TextLayer,point:Point,zoom:number):boolean{
+    const record=layer._read();if(record.kind!=='text'||!record.textPath)return false;
+    const path=record.textPath,world=layerTransform(base.document._read(),layer.id)!,inputTransform=world.inverse(),local=inputTransform.point(point);
+    this.textPathPoint=null;
+    const start=(data:TextPathData,index:number,mode:TextPathGesture['mode'])=>{
+      const gesture:TextPathGesture={...base,kind:'text-path',layer,selection:base.document.getSnapshot().selectedIds,inputTransform,data,original:structuredClone(data.points[index]),index,mode,start:local,changed:mode==='insert'};
+      this.gesture=gesture;this.textPathPoint={document:base.document,layerId:layer.id,index};
+      this.publish({drawing:true,penTarget:null,selectedPath:null,...(gesture.changed?{preview:this.textPathPreview(gesture)}:{})});
+    };
+    for(let index=0;index<path.points.length;index++)for(const mode of ['in','out','anchor']as const){
+      const anchor=path.points[index],p=mode==='anchor'?anchor:anchor[mode];
+      if(mode!=='anchor'&&p.x===anchor.x&&p.y===anchor.y)continue;
+      const canvas=world.point(p);
+      if(Math.hypot(canvas.x-point.x,canvas.y-point.y)<=7/zoom){start({...path,points:[...path.points]},index,mode);return true;}
+    }
+    const hit=hitTestPath(path.points.map(p=>({...world.point(p),in:world.point(p.in),out:world.point(p.out)})),path.closed,point,zoom);
+    if(!hit){this.publish({});return true;}
+    if(path.points.length>=PATH_POINT_LIMIT)throw new Error('This baseline has reached its 20,000-anchor limit.');
+    start({...path,points:splitPathSegment(path.points,path.closed,hit.index,hit.t)},hit.index+1,'insert');
+    return true;
+  }
   private beginPen(
     base: BaseGesture,
     selected: Layer | null,
@@ -1527,6 +1613,25 @@ export class ToolController {
     }
     const gesture = this.gesture;
     if (!gesture || gesture.kind === "fill") return;
+    if(gesture.kind==='text-path'){
+      try{this.assertTextPathGesture(gesture);}catch(error){this.cancel();throw error;}
+      if(gesture.mode==='insert')return;
+      const local=gesture.inputTransform.point(point),dx=local.x-gesture.start.x,dy=local.y-gesture.start.y,p=gesture.original,anchor=structuredClone(p);
+      if(gesture.mode==='anchor'){
+        anchor.x+=dx;anchor.y+=dy;anchor.in.x+=dx;anchor.in.y+=dy;anchor.out.x+=dx;anchor.out.y+=dy;
+      }else if(dx||dy){
+        const handle={x:p[gesture.mode].x+dx,y:p[gesture.mode].y+dy};anchor[gesture.mode]=handle;
+        if(!modifiers.alt)anchor[gesture.mode==='in'?'out':'in']={x:anchor.x*2-handle.x,y:anchor.y*2-handle.y};
+      }
+      gesture.data.points[gesture.index]=anchor;
+      gesture.changed=JSON.stringify(anchor)!==JSON.stringify(p);
+      if(this.paintFrame===null)this.paintFrame=requestAnimationFrame(()=>{
+        this.paintFrame=null;if(this.gesture!==gesture)return;
+        try{this.assertTextPathGesture(gesture);}catch{this.cancel();return;}
+        this.publish({preview:gesture.changed?this.textPathPreview(gesture):null});
+      });
+      return;
+    }
     if(!this.textureCurrent(gesture)){this.cancel();throw new Error('The brush texture source changed during this gesture. Try again.');}
     if(gesture.kind==='wet'){
       if(gesture.finishing)return;
@@ -1954,6 +2059,11 @@ export class ToolController {
     try {
       this.assertCurrent(gesture);
       const doc = gesture.document;
+      if(gesture.kind==='text-path'){
+        this.assertTextPathGesture(gesture);
+        if(gesture.changed)doc.transaction('Edit text baseline',()=>{gesture.layer.textPath=new TextPath(gesture.data);});
+        return;
+      }
       if(gesture.kind==='quick-selection'){
         const abort=new AbortController();this.quickAbort=abort;this.publish({quickSelectionProgress:{completed:0,total:1}});
         try{await doc.selectQuickSelection({...gesture.options,points:gesture.points},{signal:abort.signal,onProgress:progress=>this.publish({quickSelectionProgress:progress})});committed=true;}

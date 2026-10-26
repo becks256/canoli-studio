@@ -4,6 +4,10 @@
 
 Schema-46 TextLayerData stores authored textPath and derived textPathOrigin beside width/height. OO TextPath values own geometry; attached setters/awaited native preparation submit shared layer.update commands. core/character-layout measures the actual native path and returns a local frame origin without rewriting anchors or layer translation. spatial/preflight/resize consumers include that origin. The existing owned-font surface renders matching baselines; native projects/recipes and measured SVG output retain geometry. The typography broker returns finite bounds/origin and host commit independently validates/recomputes. See [TEXT_PATHS.md](TEXT_PATHS.md).
 
+## Canvas text-baseline gestures
+
+ToolController stages authored TextPath geometry independently of the document. It captures the owner/revision/selection and inverse complete layer transform, performs screen-space anchor/handle/curve hit testing, translates both handles with anchors and supports Alt-independent handle movement. Frame-coalesced previews contain owned changed anchors and shared immutable remaining geometry. Pointer release rechecks authority and uses the existing OO setter/shared validation in one history transaction; cancellation, selection/revision changes and locks publish no stale edits. CanvasOverlays reuses complete Pen controls, affine translation precision fallback and memoized blocks, drawing open baselines without a closing segment. Nudge uses document-space deltas; masks retain their separate target. This adds no document schema, scripting capability or shortcut binding. See [TEXT_PATHS.md](TEXT_PATHS.md).
+
 ## Native curve preparation
 
 core/text-path snapshots existing cubic anchors and projects reversed/open/closed baselines with a stable closed seam. engine/styled-text uses private SVG textPath fragments, shared owned fonts and the existing checked bitmap lifecycle. Geometry metrics stay in local user coordinates while the caller chooses the pixel work window. The render DTO stays private; current public integration is documented in [TEXT_PATHS.md](TEXT_PATHS.md). See [STYLED_TEXT.md](STYLED_TEXT.md#native-curve-preparation-internal-f08-dependency).

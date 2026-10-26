@@ -628,6 +628,7 @@ test("developer docs link, anchors and documented scripts work in the actual san
   // than the generic sample/isolated context. Their dedicated suites execute
   // the exact guide snippets with those prerequisites and verify real output.
   const contextualExamples:Record<string,string> = {
+    'font-relink-trusted':'tests/font-lifetime.e2e.ts',
     'raw-shooting-metadata':'tests/raw-shooting.e2e.ts',
     'raw-lens-development':'tests/raw-lens.e2e.ts',
     'raw-profile-development':'tests/raw-profile.e2e.ts',
@@ -648,6 +649,8 @@ test("developer docs link, anchors and documented scripts work in the actual san
       "photoshop-import-edit": "tests/fixtures/psd/masks/black-raw.psd",
       "photoshop-mask-edit": "tests/fixtures/psd/masks/black-raw.psd",
       "photoshop-group-edit": "tests/fixtures/psd/groups/normal.psd",
+      "embedded-font-axes": "tests/fixtures/font-variations/Axes.ttf",
+      "embedded-font-script": "tests/fixtures/fonts/Regular.ttf",
     } as Record<string, string>)[name];
     const bytes = fixture ? [...await readFile(fixture)] : null;
     const needsFixture = Boolean(fixture) || ['wet-prepared','wet-mask-prepared','frequency-shared-radius'].includes(name);
@@ -660,6 +663,13 @@ test("developer docs link, anchors and documented scripts work in the actual san
           const asset = await e.assetStore.add(await encodeRgbaPng(Uint8Array.from(rgba), 1, 1), title, undefined, false);
           e.document.layers.add(new window.luma.RasterLayer({ name: title, assetId: asset.id, width: 1, height: 1, visible: false }));
         }
+      } else if(name==='text-explicit-reflow') {
+        e.newDocument({width:480,height:320});
+        e.document.selectedLayer=e.document.layers.add(new window.luma.TextLayer({text:'Reflow fixture',fontFamily:'serif',fontSize:32}));
+      } else if (bytes && fixture?.endsWith('.ttf')) {
+        e.newDocument({width:480,height:320});
+        const font=await e.document.fonts.embed(new File([new Uint8Array(bytes)],fixture));
+        e.document.selectedLayer=e.document.layers.add(new window.luma.TextLayer({text:'AAAA',fontFamily:font.family,fontSize:40}));
       } else if (bytes && fixture?.endsWith(".tif"))
         await e.openTiff(new File([new Uint8Array(bytes)], fixture, {type:"image/tiff"}));
       else if (bytes)
@@ -688,7 +698,7 @@ test("developer docs link, anchors and documented scripts work in the actual san
       } catch (error) {
         return { error: (error as Error).message };
       }
-    }, {code, fixture, bytes, name, needsFixture});
+    }, {code, fixture, bytes, name, needsFixture}).catch(error=>{throw new Error(`Documented example ${name}: ${error.message}`);});
     expect(result.error, name).toBeUndefined();
     if (needsFixture) {
       expect(result.edited, name).toBe(true);

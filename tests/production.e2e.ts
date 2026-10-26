@@ -2142,3 +2142,6 @@ test('production ordinary text edits preserve imported geometry, exact pixels an
 for(const count of [0,16,64])test(`production palette readonly presentation and search on ${count} vector layers`,async({page},info)=>{test.setTimeout(240000);const{paletteLatencyWorkflow}=await import('./helpers/palette-latency');await paletteLatencyWorkflow(page,info,count,true);});
 
 test('production variable axes preserve native glyphs, precision controls, source bytes, undo and project reopening',async({page},info)=>{test.setTimeout(240000);const{fontVariationsWorkflow}=await import('./helpers/font-variations');await fontVariationsWorkflow(page,info,true);});
+
+import {textPathPenWorkflow} from './helpers/text-path-pen';
+test('production Pen baseline editing retains exact pixels, cancellation, shared Undo and native project reopening without globals',async({page},info)=>{test.setTimeout(180000);await textPathPenWorkflow(page,info,true);});

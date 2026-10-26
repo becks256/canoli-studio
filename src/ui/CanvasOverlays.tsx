@@ -34,6 +34,7 @@ export function CanvasOverlays({
   const world = selected ? layerTransform(document, selected.id) : null;
   const pending = controller.pendingStroke;
   const editingMask = state.settings.penEditTarget === "mask";
+  const editingTextPath = !editingMask && selected?.kind === 'text' && !!selected.textPath;
   const mask = selected?.mask;
   const pathTransform =
     editingMask && mask && world ? maskTransform(mask, world) : world;
@@ -45,12 +46,15 @@ export function CanvasOverlays({
     Math.max(Math.abs(pathTransform.e), Math.abs(pathTransform.f)) * zoom * 2 ** -23 <= 1 / 1024;
   const localPaths = editingMask
     ? mask?.kind === "vector"
-      ? mask.paths.map((path, index) => ({ ...path, id: `mask-${index}` }))
+      ? mask.paths.map((path, index) => ({ ...path, closed:true, id: `mask-${index}` }))
       : []
     : selected?.kind === "vector"
       ? selected.paths.flatMap(path => [path, ...(path.subpaths ?? []).map(contour => ({ ...contour, id: `${path.id}/${contour.id}` }))])
+      : selected?.kind === 'text' && selected.textPath
+        ? [{...selected.textPath,id:'text-baseline'}]
       : [];
   const selectedAnchor = controller.selectedMaskAnchor;
+  const selectedTextAnchor = controller.selectedTextPathAnchor;
   return (
     <svg
       className="drawing-overlay"
@@ -206,10 +210,10 @@ export function CanvasOverlays({
             <PenPathControls key={path.id} points={path.points}
               a={pathTransform.a} b={pathTransform.b} c={pathTransform.c}
               d={pathTransform.d} e={sharePenTranslation ? 0 : pathTransform.e} f={sharePenTranslation ? 0 : pathTransform.f}
-              zoom={zoom} outline={editingMask}
+              zoom={zoom} outline={editingMask || editingTextPath} closed={path.closed}
               contour={pathIndex === controller.maskContourIndex}
               active={editingMask ? (selectedAnchor?.layerId === selected?.id &&
-                selectedAnchor?.pathIndex === pathIndex ? selectedAnchor.index : -1) : 0}
+                selectedAnchor?.pathIndex === pathIndex ? selectedAnchor.index : -1) : editingTextPath ? selectedTextAnchor?.index ?? -1 : 0}
             />
           ))}
         </g>
@@ -293,7 +297,7 @@ const PenAnchor = memo(function PenAnchor({
 type PenPathProps = {
   points: readonly { x: number; y: number; in: Point; out: Point }[];
   a: number; b: number; c: number; d: number; e: number; f: number;
-  zoom: number; outline: boolean; contour: boolean; active: number;
+  zoom: number; outline: boolean; contour: boolean; active: number; closed?: boolean;
 };
 // Keep handles in the document plane so scaling/shearing artwork does not
 // change their screen size. Translation alone belongs on the shared group:
@@ -306,9 +310,10 @@ const PenPathControls = memo(function PenPathControls(props: PenPathProps) {
     {outline && points.length > 0 && <path fill="none" stroke="#d5e79b"
       strokeWidth={1/zoom} strokeDasharray={contour ? `${4/zoom} ${3/zoom}` : undefined}
       d={`M ${coordinate(points[0])} ` + points.map((p,i) => {
+        if(props.closed === false && i === points.length-1)return '';
         const next = points[(i+1)%points.length];
         return `C ${coordinate(p.out)} ${coordinate(next.in)} ${coordinate(next)}`;
-      }).join(" ") + " Z"} />}
+      }).join(" ") + (props.closed === false ? '' : ' Z')} />}
     {points.length <= PEN_CONTROL_BLOCK ? penAnchors(props, 0) :
       Array.from({length: Math.ceil(points.length / PEN_CONTROL_BLOCK)}, (_, block) =>
         <PenControlBlock key={block} {...props} start={block * PEN_CONTROL_BLOCK}
@@ -352,7 +357,7 @@ function samePenGeometry(previous: PenPathProps, next: PenPathProps) {
   if (previous.a!==next.a || previous.b!==next.b || previous.c!==next.c ||
       previous.d!==next.d || previous.e!==next.e || previous.f!==next.f ||
       previous.zoom!==next.zoom || previous.outline!==next.outline ||
-      previous.contour!==next.contour || previous.active!==next.active) return false;
+      previous.contour!==next.contour || previous.active!==next.active || previous.closed!==next.closed) return false;
   if (previous.points===next.points) return true;
   return previous.points.length===next.points.length && previous.points.every((p,i) => {
     const q=next.points[i];

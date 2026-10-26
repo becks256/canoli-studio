@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+### Current F08 editable text-baseline integration (2026-10-26)
+
+Schema-46 paths now retain authored cubic geometry separately from native frame origin through shared OO/UI/script commands, separate REST, Undo, recipes, original-bearing native files and supported SVG interchange. Canvas Pen anchor/handle editing extends the precision Inspector through affine pointer previews, Alt-independent handles, curve insertion, keyboard nudge/removal and cancellation. Current verification and remaining gates are recorded in the dated roadmap and [TEXT_PATHS.md](TEXT_PATHS.md). Earlier dated foundation entries below retain their original verification boundaries. Richer flow, broad viewer/device/font/language/interchange quality, sustained F14 and the complete original professional/AI/workflow scope remain active.
+
 ### Current F08 source-indexed paragraph groundwork (2026-10-26)
 
 Internal format/edit projections and a shared sync/async line breaker now retain original character offsets through native SVG wrapping, mixed baselines and derived justification. Font leases and checked raster windows survive asynchronous preparation and source-model removal. Build, 2,193 unit/API checks, 202 distinct native cases across the disclosed full/corrected-file runs, and one complete 144-case production run are verified. Independent focused pixels, original fonts and two complete 50 MP outputs remain exact; schema/readers/forced-line failures and corrections are retained. Public character ranges, OO/history/Inspector/caret editing, native worker services and renderer/font/transport integration remain required. Observed typing tails/long tasks do not meet sustained F14 goals. See [STYLED_TEXT.md](STYLED_TEXT.md), the dated roadmap and [sealed evidence](benchmarks/character-layout-2026-10-26.zip).
