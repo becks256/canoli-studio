@@ -1,5 +1,7 @@
 # Editable SVG character formatting
 
+Schema-47 vertical columns and supported native vertical textPath placement now reconstruct through the same inert/private font boundary; see [VERTICAL_TEXT.md](VERTICAL_TEXT.md). Writing remains in private placement records until native reconstruction. Incompatible explicit or inherited vertical baselines and inline writing changes require flattened import.
+
 Trusted SVG import reconstructs supported inline character formatting as native `TextLayer.characterRanges`. It retains logical text, resolved UTF-16 ranges, effective font faces/sizes, solid colors/alpha, weight/slant, kerning, tracking/word spacing, capitals/stretch and declared variable axes. Nested inline presentation attributes and parsed inline CSS inherit through their parent styles. This uses document schema 45; no new document/project or plugin format is introduced.
 
 ## Inspection and publication
@@ -22,7 +24,7 @@ SVG can supply only delivered face bytes, not a discarded source collection. Nat
 
 ## Explicit flattening boundaries
 
-Supported single-baseline textPath graphs are described in [TEXT_PATHS.md](TEXT_PATHS.md). Individual inline x/y/dx/dy/rotate/textLength/transform graphs, arbitrary baseline shifts, vertical text/unsupported path graphs, independent inline opacity groups, inline visibility changes/strokes, paint servers and unsupported CSS flow/selectors still require explicit flattened import. Preserved unpositioned line breaks/tab stops that need layout absent from the model are reported. Unsupported authoring values, including SVG spacing outside the current character field contract, are never silently clamped. Source validation can reject font matching/axis settings during import even when structural inspection was initially editable.
+Supported single-baseline textPath graphs are described in [TEXT_PATHS.md](TEXT_PATHS.md). Individual inline x/y/dx/dy/rotate/textLength/transform graphs, arbitrary baseline shifts, unsupported vertical/path graphs, independent inline opacity groups, inline visibility changes/strokes, paint servers and unsupported CSS flow/selectors still require explicit flattened import. Preserved unpositioned line breaks/tab stops that need layout absent from the model are reported. Unsupported authoring values, including SVG spacing outside the current character field contract, are never silently clamped. Source validation can reject font matching/axis settings during import even when structural inspection was initially editable.
 
 Flattening remains an explicit user choice and discards text editability. Supported native character import is not a promise of arbitrary SVG/CSS/font/viewer/device equivalence. Native SVG and Canvas can differ in transformed glyph edge coverage; visual import acceptance compares against the source SVG renderer and retains independent font-byte/metric/Canvas references separately.
 

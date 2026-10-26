@@ -42,7 +42,7 @@ const generatedPages = [
   ["FONT_VARIATIONS", "Variable font axes"],
   ["STYLED_TEXT", "Native styled-text preparation"],
   ["TEXT_PATHS", "Editable text on a path"],
-  ["VERTICAL_TEXT", "Native vertical text preparation"],
+  ["VERTICAL_TEXT", "Vertical text"],
   ["CHARACTER_TEXT", "Character formatting"],
   ["FONT_MANAGEMENT", "Document fonts"],
   ["FONT_SOURCES", "Font-file inspection and private preview"],

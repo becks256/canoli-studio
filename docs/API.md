@@ -1,8 +1,15 @@
 # REST and scripting APIs
 
+## Public vertical text (F08)
+
+Schema 47 adds optional TextLayer `writingMode` (`horizontal-tb`, `vertical-rl`, `vertical-lr`) and `textOrientation` (`mixed`, `upright`, `sideways`). Shared OO setters/commands, reusable paragraph formats and awaited native preparation retain logical Unicode and character/font ownership. Vertical wrapping uses the existing logical `wrapWidth` as physical height. Derived `textFrameOrigin` and `textInlineExtent` separate the physical frame from its logical alignment extent; client patches cannot author these caches. Native paths retain their separate `textPathOrigin`. Defaults preserve legacy horizontal rendering; text that has entered native writing retains its native character-layout marker when switched back to horizontal.
+
+The custom Inspector exposes writing direction, glyph orientation, paragraph height and vertical alignment. Corner resizing follows the inline axis and keeps the opposite frame corner under affine parents. Native projects/workspace/recipes preserve source text, geometry and complete original font/image payloads. Supported native SVG output/reimport retains writing/orientation and whole-line placement; unsupported inline writing/baseline graphs require explicit flattening. Independent REST sessions preserve the fields with estimated headless bounds; they do not synchronize with the browser. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md) for the precise contract, limitations and dated verification status. Broader typography/interchange/device/performance and the original roadmap remain open.
+
+
 ## Vertical renderer is private
 
-Current document schema 46 and strict REST/scripting patches do not expose vertical writing fields. Native vertical layout is internal preparation, not another mutation API or permission. Public model/native metrics/command/transport integration remains required. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+Schema 47 exposes writingMode/textOrientation through strict shared patches and OO/native preparation as described above. The private writing DTO is internal preparation, not another mutation API or permission. Independent Node metrics remain estimated. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
 
 ## Path-text commands
 

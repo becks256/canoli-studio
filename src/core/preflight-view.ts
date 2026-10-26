@@ -6,7 +6,7 @@ type Placement=Pick<LayerBaseData,'id'|'name'|'visible'|'opacity'|'x'|'y'|'trans
 export type PreflightLayerView=Placement&(
   {kind:'group';children:PreflightLayerView[]}|
   Pick<RasterLayerData,'kind'|'assetId'|'width'|'height'>|
-  (Pick<TextLayerData,'kind'|'text'|'fontFamily'|'characterRanges'|'textPathOrigin'|'width'|'height'>&{fontFamilies?:readonly string[]})|
+  (Pick<TextLayerData,'kind'|'text'|'fontFamily'|'characterRanges'|'textPathOrigin'|'textFrameOrigin'|'width'|'height'>&{fontFamilies?:readonly string[]})|
   Pick<PaintLayerData,'kind'|'strokes'>|
   Pick<VectorLayerData,'kind'|'paths'>|
   Pick<SmartObjectInstanceData,'kind'|'componentId'|'width'|'height'>|
@@ -28,7 +28,7 @@ export function preflightDocumentView(document:DocumentData,checkBounds=true):Pr
     switch(node.kind){
       case 'group':return{...placement,kind:node.kind,children:node.children.map(layer)};
       case 'raster':return{...placement,kind:node.kind,assetId:node.assetId,width:node.width,height:node.height};
-      case 'text':return{...placement,kind:node.kind,text:node.text,fontFamily:node.fontFamily,...(node.textPathOrigin?{textPathOrigin:{...node.textPathOrigin}}:{}),width:node.width,height:node.height,...(node.characterRanges===undefined?{}:{fontFamilies:characterFontFamilies(node)})};
+      case 'text':return{...placement,kind:node.kind,text:node.text,fontFamily:node.fontFamily,...(node.textPathOrigin?{textPathOrigin:{...node.textPathOrigin}}:{}),...(node.textFrameOrigin?{textFrameOrigin:{...node.textFrameOrigin}}:{}),width:node.width,height:node.height,...(node.characterRanges===undefined?{}:{fontFamilies:characterFontFamilies(node)})};
       case 'paint':return{...placement,kind:node.kind,strokes:checkBounds?node.strokes.map(stroke=>stroke.kind==='fill'?{...stroke,clip:null}:{...stroke,clip:null,tiles:[]}):[]};
       case 'vector':return{...placement,kind:node.kind,paths:checkBounds?node.paths:[]};
       case 'smart-object':return{...placement,kind:node.kind,componentId:node.componentId,width:node.width,height:node.height};

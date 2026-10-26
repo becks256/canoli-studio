@@ -1437,7 +1437,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           layerLineHeight:
             selected.kind === "text" ? selected.lineHeight : undefined,
           layerTextStyle: selected.kind === 'text' ? {
-            textPath:selected.textPath,textPathOrigin:selected.textPathOrigin,characterRanges:selected.characterRanges,color:selected.color,align:selected.align,
+            textPath:selected.textPath,textPathOrigin:selected.textPathOrigin,textFrameOrigin:selected.textFrameOrigin,writingMode:selected.writingMode,textOrientation:selected.textOrientation,characterRanges:selected.characterRanges,color:selected.color,align:selected.align,
             fontSize:selected.fontSize, fontFamily:selected.fontFamily,
             fontWeight:selected.fontWeight, fontStyle:selected.fontStyle,
             fontVariantCaps:selected.fontVariantCaps,fontStretch:selected.fontStretch,fontVariationSettings:selected.fontVariationSettings,

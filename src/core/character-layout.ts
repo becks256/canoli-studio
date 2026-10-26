@@ -1,4 +1,4 @@
-import {textWritingSchema,verticalWriting,applyNativeTextWriting,type TextWriting} from './text-writing';
+import {textWritingSchema,verticalWriting,applyNativeTextWriting,hasTextWriting,type TextWriting,type TextWritingProperties} from './text-writing';
 import {z} from 'zod';
 import {textPathSchema,normalizeTextPath,textPathData,type TextPathGeometry} from './text-path';
 import {bezierGeometryBounds} from './bezier-bounds';
@@ -18,26 +18,28 @@ export const characterTextSchema=z.object({text:z.string().max(10000),ranges:z.a
 export type CharacterTextInput=z.input<typeof characterTextSchema>;
 export interface CharacterSpan {readonly text:string;readonly style:Readonly<CharacterFormat>}
 export interface CharacterLayoutLine {readonly source:Readonly<TextMeasurementRange>;readonly x:number;readonly y:number;readonly top:number;readonly height:number;readonly wordSpacingDelta:number;readonly align:'left'|'center'|'right';readonly direction:'ltr'|'rtl';readonly advance:number;readonly spans:readonly CharacterSpan[];readonly path?:TextPathGeometry;readonly pathLength?:number;readonly writing?:Readonly<TextWriting>}
-export interface CharacterBounds {width:number;height:number;origin?:{x:number;y:number}}
-export interface CharacterLayout {readonly origin?:Readonly<{x:number;y:number}>;readonly width:number;readonly height:number;readonly lines:readonly CharacterLayoutLine[];readonly ink:Readonly<Rect>;readonly accuracy:'native'|'estimated'}
+export const characterBoundsSchema=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),origin:z.object({x:z.number().finite(),y:z.number().finite()}).strict().optional(),inlineExtent:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER).optional()}).strict();
+export type CharacterBounds=z.infer<typeof characterBoundsSchema>;
+export interface CharacterLayout {readonly inlineExtent?:number;readonly origin?:Readonly<{x:number;y:number}>;readonly width:number;readonly height:number;readonly lines:readonly CharacterLayoutLine[];readonly ink:Readonly<Rect>;readonly accuracy:'native'|'estimated'}
 export interface CharacterLayoutControl {signal?:AbortSignal;isCancelled?:()=>boolean;check?:()=>void;alignmentWidth?:number}
 type Paragraph=Required<Omit<z.infer<typeof characterParagraphSchema>,'wrapWidth'>>&Pick<z.infer<typeof characterParagraphSchema>,'wrapWidth'>;
 export interface CharacterTextSnapshot {readonly text:string;readonly ranges:readonly CharacterRangeData[];readonly style:Readonly<CharacterFormat>;readonly paragraph:Readonly<Paragraph>;readonly styles:readonly Readonly<CharacterFormat>[];readonly path?:TextPathGeometry;readonly writing?:Readonly<TextWriting>}
 /** Structural read adapter; public callers mutate TextLayer, never this DTO. */
-export function characterInputForLayer(layer:{text:string;characterRanges?:readonly CharacterRangeData[];textPath?:TextPathGeometry|null}&Partial<CharacterFormat>&z.input<typeof characterParagraphSchema>):CharacterTextInput{
+export function characterInputForLayer(layer:{text:string;characterRanges?:readonly CharacterRangeData[];textPath?:TextPathGeometry|null}&TextWritingProperties&Partial<CharacterFormat>&z.input<typeof characterParagraphSchema>):CharacterTextInput{
  const attributes=layer as unknown as Record<string,unknown>;
- return{...(layer.textPath?{path:{...layer.textPath,points:layer.textPath.points.map(p=>({...p,in:{...p.in},out:{...p.out}}))}}:{}),text:layer.text,ranges:layer.characterRanges?[...layer.characterRanges]:[],style:characterFormatPatchSchema.parse(Object.fromEntries(Object.keys(characterFormatSchema.shape).filter(key=>attributes[key]!==undefined).map(key=>[key,attributes[key]]))),paragraph:characterParagraphSchema.parse(Object.fromEntries(Object.keys(characterParagraphSchema.shape).filter(key=>attributes[key]!==undefined).map(key=>[key,attributes[key]])))};
+ return{...(hasTextWriting(layer)?{writing:textWritingSchema.parse({mode:layer.writingMode,orientation:layer.textOrientation})}:{}),...(layer.textPath?{path:{...layer.textPath,points:layer.textPath.points.map(p=>({...p,in:{...p.in},out:{...p.out}}))}}:{}),text:layer.text,ranges:layer.characterRanges?[...layer.characterRanges]:[],style:characterFormatPatchSchema.parse(Object.fromEntries(Object.keys(characterFormatSchema.shape).filter(key=>attributes[key]!==undefined).map(key=>[key,attributes[key]]))),paragraph:characterParagraphSchema.parse(Object.fromEntries(Object.keys(characterParagraphSchema.shape).filter(key=>attributes[key]!==undefined).map(key=>[key,attributes[key]])))};
 }
 export function characterFontFamilies(layer:Parameters<typeof characterInputForLayer>[0]):string[]{return layer.characterRanges!==undefined?[...new Set(normalizeCharacterText(characterInputForLayer(layer)).styles.map(style=>style.fontFamily))]:[layer.fontFamily??DEFAULT_CHARACTER_FORMAT.fontFamily];}
 let preparedBounds:{key:string;bounds:CharacterBounds;check?:()=>void}|undefined;
 const boundsKey=(input:CharacterTextInput)=>{const s=normalizeCharacterText(input);return JSON.stringify([s.text,s.ranges,s.style,s.paragraph,s.path,s.writing]);};
 /** Worker-local geometry only. The native host always remeasures commands. */
 export function withPreparedCharacterBounds<T>(input:CharacterTextInput,bounds:CharacterBounds,operation:()=>T,check?:()=>void):T{
- const before=preparedBounds;preparedBounds={key:boundsKey(input),bounds,check};try{check?.();return operation();}finally{preparedBounds=before;}
+ const before=preparedBounds;preparedBounds={key:boundsKey(input),bounds:characterBoundsSchema.parse(bounds),check};try{check?.();return operation();}finally{preparedBounds=before;}
 }
 export function characterTextBounds(input:CharacterTextInput):CharacterBounds{
- if(preparedBounds?.key===boundsKey(input)){preparedBounds.check?.();return{...preparedBounds.bounds};}const layout=measureCharacterText(input);return{width:layout.width,height:layout.height,...(layout.origin?{origin:{...layout.origin}}:{})};
+ if(preparedBounds?.key===boundsKey(input)){preparedBounds.check?.();return characterBoundsSchema.parse(preparedBounds.bounds);}return characterBoundsForLayout(measureCharacterText(input));
 }
+export function characterBoundsForLayout(layout:CharacterLayout):CharacterBounds{return characterBoundsSchema.parse({width:layout.width,height:layout.height,...(layout.origin?{origin:layout.origin}:{}),...(layout.inlineExtent===undefined?{}:{inlineExtent:layout.inlineExtent})});}
 
 export function assertCharacterTextScalars(text:string):void{
  for(const character of text){const point=character.codePointAt(0)!;if(point<32&&![9,10,12,13].includes(point)||point>=0xd800&&point<=0xdfff||point===0xfffe||point===0xffff)throw new Error('Native styled text cannot represent XML controls or unpaired surrogates.');}
@@ -113,7 +115,7 @@ function session(snapshot:CharacterTextSnapshot,control:CharacterLayoutControl){
    if(box.width>0&&box.height>0){left=Math.min(left,box.x);upper=Math.min(upper,box.y);right=Math.max(right,box.x+box.width);bottom=Math.max(bottom,box.y+box.height);}lines.push(line);top+=height;yield line;
   }
   current();const ink=Object.freeze(left===Infinity?{x:0,y:0,width:0,height:0}:{x:left,y:upper,width:right-left,height:bottom-upper});
-  if(verticalWriting(snapshot.writing)){const frameLeft=snapshot.writing!.mode==='vertical-rl'?-top:0,frameRight=snapshot.writing!.mode==='vertical-rl'?0:top,x=Math.min(frameLeft,left===Infinity?frameLeft:left),y=Math.min(0,upper===Infinity?0:upper),width=Math.max(1,Math.ceil(Math.max(frameRight,right===-Infinity?frameRight:right)-x)),height=Math.max(1,Math.ceil(Math.max(layout.width,bottom===-Infinity?0:bottom)-y));return Object.freeze({width,height,origin:Object.freeze({x,y}),accuracy:measurer.accuracy,lines:Object.freeze(lines),ink});}
+  if(verticalWriting(snapshot.writing)){const frameLeft=snapshot.writing!.mode==='vertical-rl'?-top:0,frameRight=snapshot.writing!.mode==='vertical-rl'?0:top,x=Math.min(frameLeft,left===Infinity?frameLeft:left),y=Math.min(0,upper===Infinity?0:upper),width=Math.max(1,Math.ceil(Math.max(frameRight,right===-Infinity?frameRight:right)-x)),height=Math.max(1,Math.ceil(Math.max(layout.width,bottom===-Infinity?0:bottom)-y));return Object.freeze({width,height,inlineExtent:layout.width,origin:Object.freeze({x,y}),accuracy:measurer.accuracy,lines:Object.freeze(lines),ink});}
   return Object.freeze({width:layout.width,height:Math.max(1,Math.round(top)),accuracy:measurer.accuracy,lines:Object.freeze(lines),ink});
  }
  return{measurer,current,measure,complete,input:{...snapshot.paragraph,text:snapshot.text,fontSize:snapshot.style.fontSize,letterSpacing:snapshot.style.letterSpacing,wordSpacing:snapshot.style.wordSpacing},options:{sourceRanges:true,pointLineBreaks:true,estimateTokens:snapshot.styles.every(s=>s.letterSpacing>=0&&s.wordSpacing>=0)}};

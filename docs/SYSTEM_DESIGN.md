@@ -1,8 +1,15 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Public vertical text (F08)
+
+Schema 47 adds optional TextLayer `writingMode` (`horizontal-tb`, `vertical-rl`, `vertical-lr`) and `textOrientation` (`mixed`, `upright`, `sideways`). Shared OO setters/commands, reusable paragraph formats and awaited native preparation retain logical Unicode and character/font ownership. Vertical wrapping uses the existing logical `wrapWidth` as physical height. Derived `textFrameOrigin` and `textInlineExtent` separate the physical frame from its logical alignment extent; client patches cannot author these caches. Native paths retain their separate `textPathOrigin`. Defaults preserve legacy horizontal rendering; text that has entered native writing retains its native character-layout marker when switched back to horizontal.
+
+The custom Inspector exposes writing direction, glyph orientation, paragraph height and vertical alignment. Corner resizing follows the inline axis and keeps the opposite frame corner under affine parents. Native projects/workspace/recipes preserve source text, geometry and complete original font/image payloads. Supported native SVG output/reimport retains writing/orientation and whole-line placement; unsupported inline writing/baseline graphs require explicit flattening. Independent REST sessions preserve the fields with estimated headless bounds; they do not synchronize with the browser. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md) for the precise contract, limitations and dated verification status. Broader typography/interchange/device/performance and the original roadmap remain open.
+
+
 ## Vertical native-layout invariant
 
-Native glyph advances and substitutions precede physical column placement and affine raster windows. Writing settings and logical spans are owned snapshots; no glyph-by-glyph rotation substitutes for shaping. Keep physical frame origin, source order, paragraph breaks and complete font originals independent. Unsupported native capability and cancelled/stale work publish no document/history mutation. This is a private dependency; public vertical authority is not exposed. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+Native glyph advances and substitutions precede physical column placement and affine raster windows. Writing settings and logical spans are owned snapshots; no glyph-by-glyph rotation substitutes for shaping. Keep physical frame origin, source order, paragraph breaks and complete font originals independent. Unsupported native capability and cancelled/stale work publish no document/history mutation. The private dependency serves public schema-47 OO/command authoring without becoming an alternative mutation or plugin privilege. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
 
 ## Editable baseline invariant
 

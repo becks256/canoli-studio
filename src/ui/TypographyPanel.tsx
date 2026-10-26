@@ -52,6 +52,7 @@ export function TypographyPanel({
   onPreview,
 }: TypographyPanelProps) {
   const family = layer.fontFamily;
+  const vertical=layer.writingMode!=='horizontal-tb',writingSupported=typeof CSS!=='undefined'&&CSS.supports('writing-mode','vertical-rl')&&CSS.supports('text-orientation','upright');
   const [characterSelection,setCharacterSelection]=useState({id:layer.id,text:layer.text,start:0,end:0});
   const selection=characterSelection.id===layer.id&&characterSelection.text===layer.text?characterSelection:{start:0,end:0};
   const embeddedFonts=layer.document?.fonts.files.items??[],embeddedFont=embeddedFonts.find(file=>file.family===family);
@@ -120,15 +121,22 @@ export function TypographyPanel({
         onSelection={(start,end)=>setCharacterSelection({id:layer.id,text:layer.text,start,end})}
       />
       <CharacterFormattingPanel layer={layer} start={selection.start} end={selection.end} disabled={disabled}/>
+      <Select label="Writing direction" layout="stacked" value={layer.writingMode} disabled={disabled}
+        options={[{value:'horizontal-tb',label:'Horizontal'},...(['vertical-rl','vertical-lr']as const).map(value=>({value,label:value==='vertical-rl'?'Vertical, right to left':'Vertical, left to right',disabled:!writingSupported}))]}
+        onChange={value=>onAction(()=>{layer.writingMode=value as typeof layer.writingMode;})}/>
+      <Select label="Glyph orientation" layout="stacked" value={layer.textOrientation} disabled={disabled||!vertical||!writingSupported}
+        options={[{value:'mixed',label:'Mixed'},{value:'upright',label:'Upright'},{value:'sideways',label:'Sideways'}]}
+        onChange={value=>onAction(()=>{layer.textOrientation=value as typeof layer.textOrientation;})}/>
+      {!writingSupported&&<p role="status">This browser cannot prepare native vertical text. Choose Horizontal or use a supporting browser.</p>}
       <TextPathPanel layer={layer} disabled={disabled} onAction={onAction} onPreview={onPreview}/>
       <Select label="Text layout" value={layer.textPath?'path':layer.wrapWidth === undefined ? 'point' : 'paragraph'} disabled={disabled || !!layer.textPath || (!paragraphSupported && layer.wrapWidth === undefined)}
         options={[{value:'point',label:'Point text'},{value:'paragraph',label:'Paragraph text'},...(layer.textPath?[{value:'path',label:'Path text'}]:[])]}
-        onChange={value=>onAction(()=>{layer.wrapWidth=value==='paragraph'?layer.width:undefined;})} />
+        onChange={value=>onAction(()=>{layer.wrapWidth=value==='paragraph'?(vertical?layer.height:layer.width):undefined;})} />
       {layer.wrapWidth !== undefined && <>
-        <NumberField label="Paragraph width" layout="stacked" value={layer.wrapWidth} min={1} max={Number.MAX_SAFE_INTEGER} step={1} suffix="px" disabled={disabled || !paragraphSupported}
+        <NumberField label={vertical?"Paragraph height":"Paragraph width"} layout="stacked" value={layer.wrapWidth} min={1} max={Number.MAX_SAFE_INTEGER} step={1} suffix="px" disabled={disabled || !paragraphSupported}
           onPreview={value=>onPreview({type:'layer.update',id:layer.id,patch:{wrapWidth:value}})}
           onCommit={value=>onAction(()=>{layer.wrapWidth=value;})} />
-        <p>Text wraps to the paragraph width. Long unbreakable text can extend beyond it. Corner handles adjust width and keep font size; height grows with the lines.</p>
+        <p>{vertical?"Text wraps to the paragraph height. Corner handles adjust height and keep font size; width grows with the columns.":"Text wraps to the paragraph width. Corner handles adjust width and keep font size; height grows with the lines."} Long unbreakable text can extend beyond the frame.</p>
       </>}
       {!paragraphSupported && <p role="status">This browser cannot wrap paragraph text. Use Point text or Reset paragraph, or open the project in a supporting browser.</p>}
       <Select label="Justification" layout="stacked" value={layer.paragraphJustify??'none'} disabled={disabled || !wordSpacingSupported || layer.wrapWidth===undefined}
@@ -227,18 +235,18 @@ export function TypographyPanel({
         options={[
           {
             value: "left",
-            label: "Align left",
-            icon: <AlignLeft size={16} />,
+            label: vertical?"Align top":"Align left",
+            icon: <AlignLeft size={16} style={vertical?{transform:"rotate(90deg)"}:undefined} />,
           },
           {
             value: "center",
             label: "Align center",
-            icon: <AlignCenter size={16} />,
+            icon: <AlignCenter size={16} style={vertical?{transform:"rotate(90deg)"}:undefined} />,
           },
           {
             value: "right",
-            label: "Align right",
-            icon: <AlignRight size={16} />,
+            label: vertical?"Align bottom":"Align right",
+            icon: <AlignRight size={16} style={vertical?{transform:"rotate(90deg)"}:undefined} />,
           },
         ]}
         onChange={(val) => {

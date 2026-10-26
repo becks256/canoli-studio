@@ -1,6 +1,6 @@
 import {textPathSchema} from '../core/text-path';
 import {z} from 'zod';
-import {characterTextSchema,normalizeCharacterText,measureCharacterTextAsync,type CharacterLayoutLine,type CharacterLayout} from '../core/character-layout';
+import {characterTextSchema,normalizeCharacterText,measureCharacterTextAsync,characterBoundsForLayout,type CharacterLayoutLine,type CharacterLayout} from '../core/character-layout';
 import type {DocumentData} from '../core/model';
 import type {AssetStore} from '../core/assets';
 import {normalizeStyledTextScene,prepareStyledTextSurface,captureStyledTextFonts,type StyledTextSceneInput,type StyledTextControl,type StyledTextSurface} from './styled-text';
@@ -16,7 +16,7 @@ export interface StyledParagraphSurface extends StyledTextSurface {readonly layo
 export async function prepareCharacterTextMetrics(input:import('../core/character-layout').CharacterTextInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}){
  control={...control};const alive=assets.captureLifetime(),snapshot=normalizeCharacterText(input);let fonts:ReturnType<typeof captureStyledTextFonts>|undefined,released=false,handedOff=false;
  const check=()=>{if(released)throw new Error('Typography preparation was released.');control.signal?.throwIfAborted();if(control.isCancelled?.())throw new DOMException('Typography preparation superseded.','AbortError');alive();fonts?.check();};check();
- try{fonts=captureStyledTextFonts(snapshot.styles,document,assets);check();const layout=await measureCharacterTextAsync(input,{...control,check});check();if(layout.accuracy!=='native')throw new Error('Native typography measurement requires a browser SVG host.');const bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),origin:z.object({x:z.number().finite(),y:z.number().finite()}).strict().optional()}).parse(layout);handedOff=true;return{bounds,check,release:()=>{if(released)return;released=true;fonts?.release();}};}finally{if(!handedOff){released=true;fonts?.release();}}
+ try{fonts=captureStyledTextFonts(snapshot.styles,document,assets);check();const layout=await measureCharacterTextAsync(input,{...control,check});check();if(layout.accuracy!=='native')throw new Error('Native typography measurement requires a browser SVG host.');const bounds=characterBoundsForLayout(layout);handedOff=true;return{bounds,check,release:()=>{if(released)return;released=true;fonts?.release();}};}finally{if(!handedOff){released=true;fonts?.release();}}
 }
 
 /** Native paragraph rasterization owns fonts independently of model lifetime.

@@ -54,7 +54,7 @@ it('keeps legacy missing defaults and rejects new fields in old style formats or
  }
  expect(paragraphFormatPatchSchema.parse({})).toEqual({});
  const style=document.paragraphStyles.add(new ParagraphStyle({name:'Normal'}));text.paragraphStyle=style;
- const old=JSON.parse(JSON.stringify(document.toJSON(),(key,value)=>key==='fontVariantCaps'||key==='fontStretch'||key==='fontVariationSettings'?undefined:value));old.schemaVersion=41;
+ const old=JSON.parse(JSON.stringify(document.toJSON(),(key,value)=>key==='fontVariantCaps'||key==='fontStretch'||key==='fontVariationSettings'||key==='writingMode'||key==='textOrientation'?undefined:value));old.schemaVersion=41;
  validateDocument(old);const restored=Document.fromJSON(old),linked=restored.layers.at(0)as TextLayer;
  expect(linked.paragraphStyle!.format).toMatchObject({fontVariantCaps:'normal',fontStretch:'normal'});expect(linked.paragraphOverrides).toEqual({});
  const legacyText=old.children[0];if(legacyText.kind!=='text'||!legacyText.paragraphStyle)throw new Error('Expected linked legacy text');

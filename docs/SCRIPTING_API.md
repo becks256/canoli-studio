@@ -1,5 +1,28 @@
 # Scripting API
 
+## Vertical text
+
+`TextLayerOptions.writingMode?: WritingMode` and `textOrientation?: TextOrientation` use strict enum values. Effective defaults are `horizontal-tb` and `mixed`; omission retains legacy horizontal behavior. The corresponding read/write properties expose these effective defaults. Setting either optional property to `undefined` on linked text removes its override and restores paragraph-style inheritance. `ParagraphFormat` supports the same fields, including based-on styles, capture and selective resets.
+
+`await text.setWriting(writing: {mode?: WritingMode, orientation?: TextOrientation}, control: TypographyControl = {}): Promise<void>` captures a strict owned value before async work. Omitted members default to horizontal/mixed, so this method sets both properties. `WritingMode` is `horizontal-tb | vertical-rl | vertical-lr`; `TextOrientation` is `mixed | upright | sideways`. Unknown keys/values reject. Writing-only commands/recipes preserve the receiving text, ranges and font choices. Existing native text stays on the source-aware native pipeline when returned to horizontal.
+
+Browser scripts await `setWriting()` or `reflowNative()` before querying native geometry. Synchronous construction/setters in workers and independent Node REST use estimated geometry; trusted browser calls use available native fonts. Async preparation runs outside synchronous transactions, returns only checked finite metrics and commits through ordinary commands/Undo. Trusted controls accept `signal?: AbortSignal`; isolated scripts use panel cancellation, the existing five-second deadline, 256 commands and 32 native preparations. Missing/unavailable fonts or native vertical capability, locks, invalid source scalars, stale revisions and cancellation reject without partial edits. Plugins need current document read/write grants; installation remains inert. No source bytes, font imports, DOM, network or new plugin privilege are exposed.
+
+In vertical flow, `wrapWidth` remains the logical inline extent (physical height); `align` left/center/right maps to top/center/bottom. `lineHeight`, paragraph spacing and indentation retain document-pixel semantics across columns. Authored x/y and Unicode remain unchanged. Physical width/height can include ink overhang; derived schema-47 `textFrameOrigin` and `textInlineExtent` are read-only serialization caches, never mutable public properties/patches. Paths retain their separate derived origin and compatibility restrictions. Native project/workspace/recipe transport and supported SVG columns preserve these values/owned sources. SVG columns import as independent text layers; shared flow/style identity is not reconstructed. Full contract and remaining quality gates: [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+
+<!-- example: vertical-text -->
+```js
+const title = document.layers.add(new TextLayer({
+  name: "Vertical study", text: "Canoli Studio\nColumn two",
+  fontFamily: "serif", fontSize: 28, lineHeight: 1.3,
+  color: "#2468ac", x: 240, y: 24
+}));
+await title.setWriting({mode: "vertical-rl", orientation: "mixed"});
+document.selectedLayer = title;
+print("Vertical study ready", title.width, title.height);
+```
+
+
 ## Text on a path (schema 46)
 
 `TextPath` is an immutable cubic baseline value; `new TextLayer({textPath?: TextPath | null})`, `text.textPath: TextPath | null` and `await text.setTextPath(value, control = {}): Promise<void>` connect it to shared commands/history. Points and returned values are owned copies. Signed start/baseline offsets default to zero; closed/reverse default to false. Awaited attachment clears incompatible paragraph layout, requires one logical source line and rejects locks, invalid geometry, cancellation or stale owners/revisions atomically. Trusted `control` permits AbortSignal; scripts use panel cancellation and existing grants/native preparation limits. Native host bounds include a measured frame origin; headless/synchronous worker metrics remain estimates. Full signatures/defaults/errors/limits and the executable example: [TEXT_PATHS.md](TEXT_PATHS.md). No source/file/network/renderer capability is added.
@@ -964,6 +987,8 @@ Inherits common layer options (`name`, `opacity`, `fillOpacity`, `visible`, `loc
 | Option          | Type                            | Default        | Validation                                        |
 | --------------- | ------------------------------- | -------------- | ------------------------------------------------- |
 | `name`          | string                          | `"Text"`       | Nonempty, at most 240 characters.                 |
+| `writingMode` | `WritingMode` | absent, effective `horizontal-tb` | Schema 47; native vertical columns and unchanged logical Unicode. |
+| `textOrientation` | `TextOrientation` | absent, effective `mixed` | Schema 47; native mixed/upright/sideways glyph orientation. |
 | `textPath` | `TextPath \| null` | absent | Immutable baseline value; one logical line and compatible paragraph layout. |
 | `text`          | string                          | `"Text"`       | String up to 10,000 characters.                   |
 | `fontSize`      | number                          | `32`           | Finite positive number in pixels (>= 1).          |

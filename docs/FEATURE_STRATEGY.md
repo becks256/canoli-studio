@@ -1,5 +1,7 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+Public vertical writing is connected under F08; see [the current contract](VERTICAL_TEXT.md). Broader typography/flow/interchange and the full original portfolio remain required.
+
 ### Current F08 native vertical dependency (2026-10-26)
 
 Native writing modes/orientation, whole-line vertical metrics/substitutions and logical-to-physical column layout now prepare caller-selected windows internally. The dated roadmap records verification; [VERTICAL_TEXT.md](VERTICAL_TEXT.md) separates this dependency from required public layer/style/command/Inspector/native-script/resize/transport/SVG work. This does not complete vertical authoring, broad typography quality, sustained F14 or the original roadmap.

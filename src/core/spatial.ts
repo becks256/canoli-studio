@@ -25,7 +25,7 @@ export function unionBounds(rects: Bounds[]): Bounds | undefined {
   return { x: left, y: top, width: right - left, height: bottom - top };
 }
 export function localBounds(node: LayerData): Bounds | undefined {
-  if(node.kind==='text'&&node.textPathOrigin)return{x:node.textPathOrigin.x,y:node.textPathOrigin.y,width:node.width,height:node.height};
+  if(node.kind==='text'&&(node.textPathOrigin||node.textFrameOrigin)){const origin=node.textPathOrigin??node.textFrameOrigin!;return{x:origin.x,y:origin.y,width:node.width,height:node.height};}
   if (node.kind === 'raster' && node.erasures?.some(entry => isActiveWetPaint(entry.stroke))) return unionBounds([{ x: 0, y: 0, width: node.width, height: node.height }, ...node.erasures.filter(entry => isActiveWetPaint(entry.stroke)).map(entry => AffineTransform.scale(node.width / entry.width, node.height / entry.height).bounds(strokeBounds(entry.stroke)))]);
   if (
     node.kind === "raster" ||

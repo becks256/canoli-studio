@@ -1,8 +1,15 @@
 # Canoli Studio design system
 
+## Public vertical text (F08)
+
+Schema 47 adds optional TextLayer `writingMode` (`horizontal-tb`, `vertical-rl`, `vertical-lr`) and `textOrientation` (`mixed`, `upright`, `sideways`). Shared OO setters/commands, reusable paragraph formats and awaited native preparation retain logical Unicode and character/font ownership. Vertical wrapping uses the existing logical `wrapWidth` as physical height. Derived `textFrameOrigin` and `textInlineExtent` separate the physical frame from its logical alignment extent; client patches cannot author these caches. Native paths retain their separate `textPathOrigin`. Defaults preserve legacy horizontal rendering; text that has entered native writing retains its native character-layout marker when switched back to horizontal.
+
+The custom Inspector exposes writing direction, glyph orientation, paragraph height and vertical alignment. Corner resizing follows the inline axis and keeps the opposite frame corner under affine parents. Native projects/workspace/recipes preserve source text, geometry and complete original font/image payloads. Supported native SVG output/reimport retains writing/orientation and whole-line placement; unsupported inline writing/baseline graphs require explicit flattening. Independent REST sessions preserve the fields with estimated headless bounds; they do not synchronize with the browser. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md) for the precise contract, limitations and dated verification status. Broader typography/interchange/device/performance and the original roadmap remain open.
+
+
 ## Vertical preparation and pending controls
 
-Native vertical rendering is currently an internal dependency and adds no rail icon, shortcut or Inspector control. Public vertical mode/orientation, logical paragraph-height controls and geometry-aware resize still require implementation through the custom Typography system and shared commands. Do not imply that private rendering input is an available user-facing property. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+Native vertical authoring uses Typography writing direction/glyph orientation controls, Paragraph height, rotated top/center/bottom alignment icons and geometry-aware corner resize through shared commands. It adds no rail icon or shortcut. The private renderer DTO remains internal. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
 
 ## Path typography controls
 

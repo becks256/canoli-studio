@@ -1,3 +1,4 @@
+import {usesNativeTextWriting,textWritingSchema} from './text-writing';
 import {textPathData} from './text-path';
 import {verticalWriting} from './text-writing';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
@@ -68,15 +69,16 @@ export function planSvgTexts(document:SvgDocument):TextLayerData[]{
 export function* svgTextElements(layer:TextLayerData,layout?:SvgTextLayout,pathId='canoli-text-baseline'):Generator<string>{
   if(!layer.text&&!layer.textPath)return;
   if(!layout)throw new Error('Text layers require host font measurement for SVG export.');
-  if(layout.styledLines?.some(line=>verticalWriting(line.writing)))throw new Error('Vertical SVG text export requires public model integration.');
-  if(layer.characterRanges!==undefined||layer.textPath!==undefined){
+  if(layout.styledLines?.some(line=>(line.writing?.mode??'horizontal-tb')!==(layer.writingMode??'horizontal-tb')||(line.writing?.orientation??'mixed')!==(layer.textOrientation??'mixed')))throw new Error('Prepared SVG writing does not match its text layer.');
+  if(layer.characterRanges!==undefined||layer.textPath!==undefined||usesNativeTextWriting(layer)){
     if(!layout.styledLines)throw new Error('Character formatting requires prepared native SVG lines.');
     for(const line of layout.styledLines){
+      const writing=line.writing?textWritingSchema.parse(line.writing):undefined,vertical=verticalWriting(writing),writingStyle=writing?`writing-mode:${writing.mode};text-orientation:${writing.orientation};`:'';
       const anchor=line.align==='center'?'middle':(line.align==='left')===(line.direction==='ltr')?'start':'end';
-      const root=layout.rootStyle,rootAttributes=root?` font-family="${svgAttribute(root.fontFamily)}" font-size="${svgNumber(root.fontSize)}" font-weight="${svgAttribute(root.fontWeight)}" font-style="${root.fontStyle}" fill="${svgAttribute(root.color)}" letter-spacing="${svgNumber(root.letterSpacing)}" word-spacing="${svgNumber(root.wordSpacing)}" style="white-space:pre;font-kerning:${root.fontKerning};font-variant-caps:${root.fontVariantCaps??'normal'};font-stretch:${root.fontStretch??'normal'};font-variation-settings:${svgAttribute(root.fontVariationSettings??'normal')}"`:' style="white-space:pre"';
+      const root=layout.rootStyle,rootAttributes=root?` font-family="${svgAttribute(root.fontFamily)}" font-size="${svgNumber(root.fontSize)}" font-weight="${svgAttribute(root.fontWeight)}" font-style="${root.fontStyle}" fill="${svgAttribute(root.color)}" letter-spacing="${svgNumber(root.letterSpacing)}" word-spacing="${svgNumber(root.wordSpacing)}" style="white-space:pre;${writingStyle}font-kerning:${root.fontKerning};font-variant-caps:${root.fontVariantCaps??'normal'};font-stretch:${root.fontStretch??'normal'};font-variation-settings:${svgAttribute(root.fontVariationSettings??'normal')}"`:` style="white-space:pre;${writingStyle}"`;
       if(root&&!/^(?:#[a-fA-F0-9]{3,8}|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([a-zA-Z0-9.,%+\-/\s]+\))$/.test(root.color))throw new Error('SVG text requires a prepared literal color.');
       if(line.path)yield `<defs><path id="${svgAttribute(pathId)}" d="${textPathData(line.path)}"/></defs>`;
-      yield line.path?`<text x="0" y="0" dy="${svgNumber(line.path.baselineOffset)}" transform="translate(${svgNumber(line.x)} ${svgNumber(line.y)})" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="alphabetic" xml:space="preserve"${rootAttributes}><textPath href="#${svgAttribute(pathId)}" startOffset="${svgNumber(line.path.startOffset)}" method="align" spacing="exact">`:`<text x="${svgNumber(line.x)}" y="${svgNumber(line.y)}" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="alphabetic" xml:space="preserve"${rootAttributes}>`;
+      yield line.path?`<text x="0" y="0" ${vertical?'dx':'dy'}="${svgNumber(line.path.baselineOffset)}" transform="translate(${svgNumber(line.x)} ${svgNumber(line.y)})" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="${vertical?'auto':'alphabetic'}" xml:space="preserve"${rootAttributes}><textPath href="#${svgAttribute(pathId)}" startOffset="${svgNumber(line.path.startOffset)}" method="align" spacing="exact">`:`<text x="${svgNumber(line.x)}" y="${svgNumber(line.y)}" text-anchor="${anchor}" direction="${line.direction}" dominant-baseline="${vertical?'auto':'alphabetic'}" xml:space="preserve"${rootAttributes}>`;
       for(const span of line.spans){
         const s=characterFormatSchema.parse(span.style);
         if(!/^(?:#[a-fA-F0-9]{3,8}|(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\([a-zA-Z0-9.,%+\-/\s]+\))$/.test(s.color))throw new Error('SVG text requires a prepared literal color.');

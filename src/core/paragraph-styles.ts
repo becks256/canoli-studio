@@ -1,9 +1,11 @@
+import {writingModeSchema,textOrientationSchema,assertTextWritingVersion} from './text-writing';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema,assertFontFeaturesVersion} from './font-features';
 import {z} from 'zod';
 import type {DocumentData,LayerData,TextLayerData} from './model';
 
 /** Geometry/text/width belong to each frame; this format is reusable across frames. */
 const paragraphFormatInputSchema=z.object({
+  writingMode:writingModeSchema.optional(),textOrientation:textOrientationSchema.optional(),
   fontSize:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),
   fontFamily:z.string().min(1).max(240),color:z.string().min(1).max(240),
   align:z.enum(['left','center','right']),lineHeight:z.number().finite().min(.5).max(10),
@@ -19,6 +21,7 @@ export const paragraphFormatPatchSchema=paragraphFormatInputSchema.partial().str
 export const paragraphOverrideKeysSchema=z.array(paragraphFormatInputSchema.keyof()).max(Object.keys(paragraphFormatInputSchema.shape).length).refine(keys=>new Set(keys).size===keys.length,'Override keys must be unique.');
 export const PARAGRAPH_FORMAT_KEYS=Object.keys(paragraphFormatInputSchema.shape) as (keyof ParagraphFormat)[];
 export const DEFAULT_PARAGRAPH_FORMAT:Readonly<ParagraphFormat>=Object.freeze({
+  writingMode:'horizontal-tb',textOrientation:'mixed',
   fontSize:32,fontFamily:'sans-serif',color:'#ffffff',align:'left',lineHeight:1.2,letterSpacing:0,wordSpacing:0,
   fontVariantCaps:'normal',fontStretch:'normal',fontVariationSettings:'normal',fontKerning:'auto',fontWeight:'normal',fontStyle:'normal',direction:'ltr',paragraphJustify:'none',paragraphSpacing:0,firstLineIndent:0,
 });
@@ -35,7 +38,7 @@ export function paragraphFormat(layer:TextLayerData):ParagraphFormat {
   for(const key of PARAGRAPH_FORMAT_KEYS)if(layer[key]!==undefined)(value as Record<string,unknown>)[key]=layer[key];
   return paragraphFormatSchema.parse(value);
 }
-export function sameParagraphFormat(a:ParagraphFormat,b:ParagraphFormat){return PARAGRAPH_FORMAT_KEYS.every(key=>(key==='fontVariantCaps'||key==='fontStretch'||key==='fontVariationSettings')?(a[key]??'normal')===(b[key]??'normal'):a[key]===b[key]);}
+export function sameParagraphFormat(a:ParagraphFormat,b:ParagraphFormat){return PARAGRAPH_FORMAT_KEYS.every(key=>(key==='fontVariantCaps'||key==='fontStretch'||key==='fontVariationSettings')?(a[key]??'normal')===(b[key]??'normal'):(key==='writingMode'||key==='textOrientation')?(a[key]??DEFAULT_PARAGRAPH_FORMAT[key])===(b[key]??DEFAULT_PARAGRAPH_FORMAT[key]):a[key]===b[key]);}
 export function sameParagraphBase(a:ParagraphStyleData['basedOn'],b:ParagraphStyleData['basedOn']){
   return !a&&!b||!!a&&!!b&&a.id===b.id&&PARAGRAPH_FORMAT_KEYS.every(key=>Object.hasOwn(a.overrides,key)===Object.hasOwn(b.overrides,key)&&a.overrides[key]===b.overrides[key]);
 }
@@ -71,8 +74,10 @@ export function validateParagraphStyles(document:DocumentData){
   for(const style of document.paragraphStyles??[]){
     assertFontFeaturesVersion(style.format,Number(document.schemaVersion));
     if(style.basedOn)assertFontFeaturesVersion(style.basedOn.overrides,Number(document.schemaVersion));
+    assertTextWritingVersion(style.format,Number(document.schemaVersion));
+    if(style.basedOn)assertTextWritingVersion(style.basedOn.overrides,Number(document.schemaVersion));
   }
-  for(const layer of text)if(layer.paragraphStyle)assertFontFeaturesVersion(layer.paragraphStyle.overrides,Number(document.schemaVersion));
+  for(const layer of text)if(layer.paragraphStyle){assertTextWritingVersion(layer.paragraphStyle.overrides,Number(document.schemaVersion));assertFontFeaturesVersion(layer.paragraphStyle.overrides,Number(document.schemaVersion));}
   const original=paragraphStyleLibrarySchema.parse(document.paragraphStyles??[]),styles=resolveParagraphStyleLibrary(original),byId=new Map(styles.map(style=>[style.id,style]));
   if(document.paragraphStyles!==undefined&&Number(document.schemaVersion)<40)throw new Error('Paragraph styles require schema version 40.');
   for(const [index,style]of original.entries()){

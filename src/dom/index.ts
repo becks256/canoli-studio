@@ -1,3 +1,6 @@
+import {textWritingSchema} from '../core/text-writing';
+export type {WritingMode,TextOrientation,TextWritingInput} from '../core/text-writing';
+import {characterBoundsSchema,characterBoundsForLayout} from '../core/character-layout';
 import {TextPath} from './text-path';
 export {TextPath} from './text-path';
 export type {TextPathInput,TextPathData} from '../core/text-path';
@@ -282,6 +285,8 @@ export interface RasterLayerOptions extends LayerOptions {
   height: number;
 }
 export interface TextLayerOptions extends LayerOptions,FontFeatures {
+  writingMode?:import('../core/text-writing').WritingMode;
+  textOrientation?:import('../core/text-writing').TextOrientation;
   textPath?:TextPath|null;
   characterRanges?:readonly CharacterRangeData[];
   paragraphJustify?: 'none' | 'inter-word';
@@ -454,7 +459,7 @@ export class Document {
   private scopedHistoryOrigin:HistoryOrigin|null = null;
   private _assetStore: AssetStore | null = null;
   /** @internal Native geometry broker; final host commands remeasure independently. */
-  _prepareTextLayout?:(layerId:string,patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl)=>Promise<CharacterBounds>;
+  _prepareTextLayout?:(layerId:string,patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'writingMode'|'textOrientation'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl)=>Promise<CharacterBounds>;
   /** @internal Async typography must not outlive a synchronous transaction. */
   _assertTypographyPreparation(){if(this.batch)throw new Error('Prepare typography outside synchronous transactions.');}
   /** @internal Read-only host inspection; no result can mutate document/history. */
@@ -1288,7 +1293,10 @@ export abstract class Layer {
         { type: "layer.update", id: this.id, patch },
         false,
       );
-      Object.assign(this.data, updated.children[0]);
+      // Detached groups share the child's record. Preserve that identity while
+      // clearing fields removed by reflow (for example a vertical frame cache).
+      for(const key of Object.keys(this.data))if(!Object.hasOwn(updated.children[0],key))delete(this.data as unknown as Record<string,unknown>)[key];
+      Object.assign(this.data,updated.children[0]);
     }
   }
   remove() {
@@ -2395,6 +2403,8 @@ export class TextLayer extends Layer {
       text = "Text",
       characterRanges,
       textPath,
+      writingMode,
+      textOrientation,
       fontSize = 32,
       fontFamily = "sans-serif",
       color = "#ffffff",
@@ -2419,6 +2429,8 @@ export class TextLayer extends Layer {
       ...createText(options.name ?? "Text", text, {
         fontSize,
         characterRanges,
+        writingMode,
+        textOrientation,
         ...(textPath===undefined?{}:{textPath:textPath instanceof TextPath?textPath.toJSON():textPath===null?null:(()=>{throw new Error('Use a TextPath value or null.');})()}),
         fontFamily,
         color,
@@ -2443,6 +2455,15 @@ export class TextLayer extends Layer {
     validateDocument({ ...createDocument(), children: [this.data] },false);
   }
 
+  get writingMode():import('../core/text-writing').WritingMode{return (this._read()as TextLayerData).writingMode??'horizontal-tb';}
+  set writingMode(value:import('../core/text-writing').WritingMode|undefined){this.update({writingMode:value});}
+  get textOrientation():import('../core/text-writing').TextOrientation{return (this._read()as TextLayerData).textOrientation??'mixed';}
+  set textOrientation(value:import('../core/text-writing').TextOrientation|undefined){this.update({textOrientation:value});}
+  /** Native bounds for the current logical source; one ordinary undoable edit. */
+  async setWriting(writing:import('../core/text-writing').TextWritingInput,control:TypographyControl={}):Promise<void>{
+    const value=textWritingSchema.parse(writing);
+    await this.applyCharacterFormatting({writingMode:value.mode,textOrientation:value.orientation},control);
+  }
   get textPath():TextPath|null{const value=(this._read()as TextLayerData).textPath;return value?new TextPath(value):null;}
   set textPath(value:TextPath|null){this.update(this.pathPatch(value));}
   private pathPatch(value:TextPath|null){
@@ -2483,7 +2504,7 @@ export class TextLayer extends Layer {
     const before=this._read() as TextLayerData;
     await this.applyCharacterFormatting({text:before.text,characterRanges:before.characterRanges??[]},control);
   }
-  private async applyCharacterFormatting(patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl):Promise<void>{
+  private async applyCharacterFormatting(patch:Partial<Pick<TextLayerData,'text'|'characterRanges'|'textPath'|'writingMode'|'textOrientation'|'wrapWidth'|'paragraphSpacing'|'firstLineIndent'|'paragraphJustify'>>,control:TypographyControl):Promise<void>{
     control={...control};control.signal?.throwIfAborted();
     const owner=this.document;owner?._assertTypographyPreparation();
     const before=this._read() as TextLayerData,revision=owner?.getSnapshot().revision,assets=owner?.assetStore,detached=owner?undefined:JSON.stringify(before);
@@ -2496,8 +2517,8 @@ export class TextLayer extends Layer {
         const {prepareCharacterTextMetrics}=await import('../engine/styled-text-layout');unchanged();
         const prepared=await prepareCharacterTextMetrics(input,owner._read(),assets,{...control,isCancelled:()=>{unchanged();return false;}});
         release=prepared.release;check=()=>{unchanged();prepared.check();};bounds=prepared.bounds;
-      }else{const layout=await measureCharacterTextAsync(input,{...control,check:unchanged});bounds={width:layout.width,height:layout.height,...(layout.origin?{origin:{...layout.origin}}:{})};}
-      bounds=z.object({width:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),height:z.number().finite().min(1).max(Number.MAX_SAFE_INTEGER),origin:z.object({x:z.number().finite(),y:z.number().finite()}).strict().optional()}).strict().parse(bounds);
+      }else{const layout=await measureCharacterTextAsync(input,{...control,check:unchanged});bounds=characterBoundsForLayout(layout);}
+      bounds=characterBoundsSchema.parse(bounds);
       check();withPreparedCharacterBounds(input,bounds,()=>this.update(patch),check);
     }finally{release();}
   }

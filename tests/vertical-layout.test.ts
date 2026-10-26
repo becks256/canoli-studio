@@ -24,6 +24,6 @@ it('prepared native bounds cannot be reused for a different writing mode or orie
 });
 it('private writing settings do not become unversioned public mutation fields',()=>{
  const document=new Document(),layer=document.layers.add(new TextLayer({text:'Authoring stays explicit'})),before=document.getSnapshot();
- expect(()=>layer.update({writing:{mode:'vertical-rl'}}as never)).toThrow();expect(()=>layer.update({writingMode:'vertical-rl'}as never)).toThrow();expect(document.getSnapshot()).toBe(before);
- const data=layer.toJSON(),layout=measureCharacterText({text:'Vertical',writing:{mode:'vertical-rl'}});if(data.kind!=='text')throw new Error('Expected text');expect(()=>[...svgTextElements(data,{styledLines:layout.lines,baselines:[],color:'#ffffff',letterSpacing:0})]).toThrow('Vertical SVG text export requires public model integration.');expect(document.getSnapshot()).toBe(before);
+ expect(()=>layer.update({writing:{mode:'vertical-rl'}}as never)).toThrow();expect(document.getSnapshot()).toBe(before);
+ const data=layer.toJSON(),layout=measureCharacterText({text:'Vertical',writing:{mode:'vertical-rl'}});if(data.kind!=='text')throw new Error('Expected text');expect(()=>[...svgTextElements(data,{styledLines:layout.lines,baselines:[],color:'#ffffff',letterSpacing:0})]).toThrow('Prepared SVG writing does not match its text layer.');expect(document.getSnapshot()).toBe(before);
 });

@@ -1,3 +1,4 @@
+import {usesNativeTextWriting} from './text-writing';
 import { replaceVectorPaths, type VectorBooleanSelection } from './vector-boolean';
 import {replaceDocumentFont} from './font-management';
 import {documentFontUsage,fontFamilyRequestSchema} from './font-management';
@@ -88,6 +89,8 @@ export type LayerPatch = Partial<
       | "text"
       | "characterRanges"
       | "textPath"
+      | "writingMode"
+      | "textOrientation"
       | "fontSize"
       | "fontFamily"
       | "color"
@@ -214,19 +217,20 @@ export type EditorCommand =
   | { type: "transaction"; label: string; commands: EditorCommand[] };
 
 function reflowText(layer:TextLayerData){
+  if(usesNativeTextWriting(layer)&&layer.characterRanges===undefined)layer.characterRanges=[];
   const bounds=measureTextBounds(layer.text,layer.fontSize,layer.fontFamily,layer.lineHeight,{
-    textPath:layer.textPath,characterRanges:layer.characterRanges,color:layer.color,align:layer.align,
+    textPath:layer.textPath,characterRanges:layer.characterRanges,writingMode:layer.writingMode,textOrientation:layer.textOrientation,color:layer.color,align:layer.align,
     letterSpacing:layer.letterSpacing,wordSpacing:layer.wordSpacing,fontKerning:layer.fontKerning,
     direction:layer.direction,fontWeight:layer.fontWeight,fontStyle:layer.fontStyle,wrapWidth:layer.wrapWidth,
     fontVariantCaps:layer.fontVariantCaps,fontStretch:layer.fontStretch,fontVariationSettings:layer.fontVariationSettings,
     paragraphSpacing:layer.paragraphSpacing,firstLineIndent:layer.firstLineIndent,paragraphJustify:layer.paragraphJustify,
   });
-  layer.width=bounds.width;layer.height=bounds.height;if(bounds.origin)layer.textPathOrigin={...bounds.origin};else delete layer.textPathOrigin;
+  layer.width=bounds.width;layer.height=bounds.height;delete layer.textPathOrigin;delete layer.textFrameOrigin;delete layer.textInlineExtent;if(bounds.origin){if(layer.textPath)layer.textPathOrigin={...bounds.origin};else layer.textFrameOrigin={...bounds.origin};}if(bounds.inlineExtent!==undefined)layer.textInlineExtent=bounds.inlineExtent;
 }
 // Presence matters: reflow() deliberately submits the current text again.
 // Explicit legacy width/height requests still normalize to measured bounds.
 const TEXT_REFLOW_KEYS: readonly (keyof LayerPatch)[] = [
-  'text','textPath','characterRanges','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
+  'text','textPath','writingMode','textOrientation','characterRanges','fontSize','fontFamily','lineHeight','letterSpacing','wordSpacing',
   'fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle',
   'direction','wrapWidth','paragraphSpacing','firstLineIndent','paragraphJustify',
   'width','height',
@@ -584,7 +588,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
     case "layer.update":
       if ("frequencyRadius" in command.patch && layer.kind !== "group") throw new Error("A shared frequency radius requires a group.");
       if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
-      if (layer.kind !== 'text' && ['text','textPath','characterRanges','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
+      if (layer.kind !== 'text' && ['text','textPath','writingMode','textOrientation','characterRanges','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
         throw new Error('Typography properties require a text layer.');
       if (
         Object.keys(command.patch).some(
@@ -608,6 +612,8 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "text",
               "characterRanges",
               "textPath",
+              "writingMode",
+              "textOrientation",
               "fontSize",
               "fontFamily",
               "color",
@@ -657,7 +663,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
           }
           layer.paragraphStyle={id:style.id,overrides};resolveParagraphBinding(layer,style);
         }
-        if(TEXT_REFLOW_KEYS.some(key=>Object.hasOwn(command.patch,key))||layer.textPath&&Object.hasOwn(command.patch,'align'))reflowText(layer);
+        if(TEXT_REFLOW_KEYS.some(key=>Object.hasOwn(command.patch,key))||(layer.textPath||usesNativeTextWriting(layer))&&Object.hasOwn(command.patch,'align'))reflowText(layer);
       }
       break;
     case "mask.setFromMatting":

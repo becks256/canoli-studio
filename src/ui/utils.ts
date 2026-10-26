@@ -1,3 +1,4 @@
+import {isVerticalText,type TextWritingProperties} from '../core/text-writing';
 import {pointerPenTilt,type PenTiltData} from '../core/brush-tip';
 import type { AffineTransform } from "../core/affine";
 import type { LayerPatch } from "../core/commands";
@@ -35,7 +36,7 @@ export interface ResizeDragState {
   layerText?: string;
   layerFontFamily?: string;
   layerLineHeight?: number;
-  layerTextStyle?: TextStyle&{textPath?:import('../core/text-path').TextPathData|null;textPathOrigin?:{x:number;y:number};characterRanges?:readonly CharacterRangeData[];color?:string;align?:'left'|'center'|'right'};
+  layerTextStyle?: TextStyle&TextWritingProperties&{textFrameOrigin?:{x:number;y:number};textPath?:import('../core/text-path').TextPathData|null;textPathOrigin?:{x:number;y:number};characterRanges?:readonly CharacterRangeData[];color?:string;align?:'left'|'center'|'right'};
   layerKind: "raster" | "text";
   /** Expanded ink bounds; logical image geometry still addresses its source. */
   layerContentBounds?: Rect;
@@ -148,13 +149,14 @@ export function computeResizePatch(
   newWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newWidth));
   newHeight = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, newHeight));
 
-  if (layerKind === "text" && layerFontSize && (layerText || drag.layerTextStyle?.wrapWidth != null||drag.layerTextStyle?.textPath)) {
+  if (layerKind === "text" && layerFontSize && (layerText || drag.layerTextStyle?.wrapWidth != null||drag.layerTextStyle?.textPath||isVerticalText(drag.layerTextStyle??{}))) {
     if (drag.layerTextStyle?.wrapWidth != null) {
-      const wrapWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, layerWidth+effectiveDx));
+      const vertical=isVerticalText(drag.layerTextStyle),wrapWidth = Math.max(1, Math.min(Number.MAX_SAFE_INTEGER, vertical?drag.layerTextStyle.wrapWidth+effectiveDy:layerWidth+effectiveDx));
       const bounds = measureTextBounds(layerText??'', layerFontSize, layerFontFamily??'sans-serif', layerLineHeight??1.2, {...drag.layerTextStyle, wrapWidth});
+      const before=drag.layerTextStyle.textFrameOrigin??{x:0,y:0},after=bounds.origin??{x:0,y:0};
       return {wrapWidth,
-        x: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='sw'?layerX+layerWidth-bounds.width:layerX)),
-        y: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='ne'?layerY+layerHeight-bounds.height:layerY))};
+        x: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='sw'?layerX+layerWidth-bounds.width+before.x-after.x:layerX+before.x-after.x)),
+        y: Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, handle==='nw'||handle==='ne'?layerY+layerHeight-bounds.height+before.y-after.y:layerY+before.y-after.y))};
     }
     const scale =
       Math.abs(effectiveDx) > Math.abs(effectiveDy)
@@ -185,16 +187,16 @@ export function computeResizePatch(
     if (handle === "nw" || handle === "ne") {
       textY = layerY + layerHeight - newBounds.height;
     }
-    if(textPath){const before=drag.layerTextStyle?.textPathOrigin??{x:0,y:0},after=newBounds.origin??{x:0,y:0};textX+=before.x-after.x;textY+=before.y-after.y;}
+    if(textPath||isVerticalText(drag.layerTextStyle??{})){const before=drag.layerTextStyle?.textPathOrigin??drag.layerTextStyle?.textFrameOrigin??{x:0,y:0},after=newBounds.origin??{x:0,y:0};textX+=before.x-after.x;textY+=before.y-after.y;}
     return {
       ...(textPath?{textPath}:{}),
       x: Math.max(
         -Number.MAX_SAFE_INTEGER,
-        Math.min(Number.MAX_SAFE_INTEGER, (textPath?textX:Math.round(textX))),
+        Math.min(Number.MAX_SAFE_INTEGER, (textPath||isVerticalText(drag.layerTextStyle??{})?textX:Math.round(textX))),
       ),
       y: Math.max(
         -Number.MAX_SAFE_INTEGER,
-        Math.min(Number.MAX_SAFE_INTEGER, (textPath?textY:Math.round(textY))),
+        Math.min(Number.MAX_SAFE_INTEGER, (textPath||isVerticalText(drag.layerTextStyle??{})?textY:Math.round(textY))),
       ),
       fontSize: newFontSize,
       ...(characterRanges===undefined?{}:{characterRanges}),

@@ -1,3 +1,4 @@
+import {writingModeSchema,textOrientationSchema} from './text-writing';
 import {textPathSchema} from './text-path';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {characterRangeSchema} from './text-ranges';
@@ -76,6 +77,7 @@ const patch = z
     styles: styleSchema.optional(),
     blendMode: z.enum(GROUP_BLEND_MODES).optional(),
     text: z.string().max(10000).optional(),
+    writingMode:writingModeSchema.optional(),textOrientation:textOrientationSchema.optional(),
     textPath:textPathSchema.nullable().optional(),
     characterRanges:z.array(characterRangeSchema).max(10000).optional(),
     fontSize: z.number().min(1).max(Number.MAX_SAFE_INTEGER).optional(),

@@ -1,5 +1,7 @@
 # Editable text on a path
 
+Schema-47 writing mode/orientation also applies to native baselines. Vertical normal offsets use SVG dx, while authored geometry, Unicode and path origins remain separate. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+
 Schema 46 adds an authored cubic baseline and a measured frame origin to native text. Geometry stays in the text layer's local plane. Changing text or fonts changes its measured frame without translating the baseline anchors or moving the layer. Existing document commands, locks, revision checks and Undo apply. Verification status and remaining work are recorded in the dated implementation roadmap.
 
 ## Object-oriented authoring
@@ -49,4 +51,4 @@ Arrow keys nudge the selected baseline anchor by one document pixel; Shift uses 
 
 SVG output emits real local baseline definitions and native textPath/tspan content with embedded selected font bytes. Supported editable reimport privately resolves a local single cubic path and character sources before publishing a clean document. Shared SVG path references become independent native baselines; reverse traversal is represented by the resulting anchors, not the original flag. DOM/CSS identity is not retained.
 
-Percentage/calibrated path lengths, multiple contours, repositioned/mixed text chunks, text stretching/automatic spacing, alternate side, unsupported baseline-reference ancestry, vertical/path paragraph flow and wider SVG/CSS/layout graphs require explicit flattened import or further implementation. Imported elliptical arc baselines may require cubic approximation and are reported. Broader viewer/language/device quality and sustained editor-wide performance remain open. This is not arbitrary SVG equivalence or completion of the professional typography roadmap.
+Percentage/calibrated path lengths, multiple contours, repositioned/mixed text chunks, text stretching/automatic spacing, alternate side, unsupported baseline-reference ancestry, path paragraph flow and wider SVG/CSS/layout graphs require explicit flattened import or further implementation. Imported elliptical arc baselines may require cubic approximation and are reported. Broader viewer/language/device quality and sustained editor-wide performance remain open. This is not arbitrary SVG equivalence or completion of the professional typography roadmap.

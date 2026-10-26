@@ -1,3 +1,4 @@
+import {verticalTextWorkflow} from './helpers/vertical-text';
 import {publicTextPathWorkflow} from './helpers/public-text-path';
 test('production path typography keeps curve authoring, isolated commands, Undo and native reopening without developer globals',async({page},info)=>{await publicTextPathWorkflow(page,info,true);});
 import {SCHEMA_VERSION as CURRENT_DOCUMENT_SCHEMA} from '../src/core/model';
@@ -2145,3 +2146,5 @@ test('production variable axes preserve native glyphs, precision controls, sourc
 
 import {textPathPenWorkflow} from './helpers/text-path-pen';
 test('production Pen baseline editing retains exact pixels, cancellation, shared Undo and native project reopening without globals',async({page},info)=>{test.setTimeout(180000);await textPathPenWorkflow(page,info,true);});
+
+test('production vertical Inspector, native script example and project reopening',async({page},info)=>{await verticalTextWorkflow(page,info,true);});

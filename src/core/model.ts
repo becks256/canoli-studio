@@ -1,3 +1,4 @@
+import {usesNativeTextWriting,isVerticalText,writingModeSchema,textOrientationSchema,assertTextWritingVersion,type TextWritingProperties} from './text-writing';
 import {textPathSchema,type TextPathData} from './text-path';
 import {validateDeclaredFontVariations} from './font-variations';
 import {normalizeCharacterRanges,type CharacterRangeData} from './text-ranges';
@@ -45,7 +46,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 46;
+export const SCHEMA_VERSION = 47;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -123,9 +124,11 @@ export interface VectorLayerData extends LayerBaseData {
   kind: "vector";
   paths: VectorPathData[];
 }
-export interface TextLayerData extends LayerBaseData, ParagraphStyle, FontFeatures {
+export interface TextLayerData extends LayerBaseData, ParagraphStyle, FontFeatures, TextWritingProperties {
   textPath?:TextPathData|null;
   textPathOrigin?:{x:number;y:number};
+  textFrameOrigin?:{x:number;y:number};
+  textInlineExtent?:number;
   characterRanges?:readonly CharacterRangeData[];
   paragraphStyle?:ParagraphStyleBinding|null;
   kind: "text";
@@ -206,6 +209,7 @@ export interface DocumentData {
     | 43
     | 44
     | 45
+    | 46
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -285,7 +289,7 @@ export function measureTextBounds(
   fontSize: number,
   fontFamily: string,
   lineHeight: number,
-  options: ParagraphStyle & FontFeatures & {
+  options: ParagraphStyle & FontFeatures & TextWritingProperties & {
     textPath?:TextPathData|null;
     characterRanges?:readonly CharacterRangeData[];
     color?:string;
@@ -299,7 +303,7 @@ export function measureTextBounds(
   } = {},
 ): import('./character-layout').CharacterBounds {
   assertParagraphStyle(options);
-  if(options.characterRanges!==undefined||options.textPath!==undefined)return characterTextBounds(characterInputForLayer({...options,text,fontSize,fontFamily,lineHeight,color:options.color??'#ffffff'}));
+  if(options.characterRanges!==undefined||options.textPath!==undefined||usesNativeTextWriting(options))return characterTextBounds(characterInputForLayer({...options,text,fontSize,fontFamily,lineHeight,color:options.color??'#ffffff'}));
 
   if (!measureCtx) {
     if (typeof OffscreenCanvas !== "undefined") {
@@ -344,7 +348,7 @@ export function measureTextBounds(
 export function createText(
   name: string,
   text = "Text",
-  options: ParagraphStyle & FontFeatures & {
+  options: ParagraphStyle & FontFeatures & TextWritingProperties & {
     textPath?:TextPathData|null;
     characterRanges?:readonly CharacterRangeData[];
     fontSize?: number;
@@ -372,7 +376,7 @@ export function createText(
   const fontStyle = options.fontStyle;
   const direction = options.direction;
   const bounds = measureTextBounds(text, fontSize, fontFamily, lineHeight, {
-    textPath:options.textPath,characterRanges:options.characterRanges,color,align,
+    textPath:options.textPath,characterRanges:options.characterRanges,writingMode:options.writingMode,textOrientation:options.textOrientation,color,align,
     letterSpacing,
     wordSpacing,
     fontKerning,
@@ -391,8 +395,11 @@ export function createText(
     ...base(name),
     kind: "text",
     ...(options.textPath===undefined?{}:{textPath:options.textPath?textPathSchema.parse(options.textPath):null}),
-    ...(bounds.origin?{textPathOrigin:{...bounds.origin}}:{}),
-    ...(options.characterRanges===undefined?{}:{characterRanges:normalizeCharacterRanges(text,options.characterRanges)}),
+    ...(bounds.origin?(options.textPath?{textPathOrigin:{...bounds.origin}}:{textFrameOrigin:{...bounds.origin}}):{}),
+    ...(bounds.inlineExtent===undefined?{}:{textInlineExtent:bounds.inlineExtent}),
+    ...(options.writingMode===undefined?{}:{writingMode:writingModeSchema.parse(options.writingMode)}),
+    ...(options.textOrientation===undefined?{}:{textOrientation:textOrientationSchema.parse(options.textOrientation)}),
+    ...(options.characterRanges===undefined&&!usesNativeTextWriting(options)?{}:{characterRanges:normalizeCharacterRanges(text,options.characterRanges??[])}),
     text,
     fontSize,
     fontFamily,
@@ -612,7 +619,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -698,7 +705,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
-      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node||'characterRanges'in node||'textPath'in node||'textPathOrigin'in node))throw new Error('Native font features require a text layer.');
+      if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node||'characterRanges'in node||'textPath'in node||'textPathOrigin'in node||'writingMode'in node||'textOrientation'in node||'textFrameOrigin'in node||'textInlineExtent'in node))throw new Error('Native font features require a text layer.');
       if (node.blendMode === 'pass-through') {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 28)
           throw new Error('Pass-through blending requires a group and document schema 28.');
@@ -854,7 +861,9 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
         if (Number(value.schemaVersion) < 26 && ('wrapWidth' in node || 'paragraphSpacing' in node || 'firstLineIndent' in node))
           throw new Error('Paragraph layout requires schema version 26.');
         assertParagraphStyle(node);
-        if (node.wrapWidth != null && node.width !== node.wrapWidth)
+        if (node.wrapWidth != null && (isVerticalText(node as unknown as TextLayerData)
+          ?node.textInlineExtent!==node.wrapWidth||!number(node.height,node.wrapWidth as number,MAX_COORDINATE)
+          :node.width!==node.wrapWidth))
           throw new Error('Paragraph bounds must retain their authored wrap width.');
         if (Number(value.schemaVersion) < 25 && ('wordSpacing' in node || 'fontKerning' in node))
           throw new Error('Word spacing and font kerning require schema version 25.');
@@ -880,6 +889,15 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
         ) {
           throw new Error("Invalid text layer.");
         }
+        assertTextWritingVersion(node,Number(value.schemaVersion));
+        if(node.writingMode!==undefined)writingModeSchema.parse(node.writingMode);
+        if(node.textOrientation!==undefined)textOrientationSchema.parse(node.textOrientation);
+        if('textFrameOrigin'in node||'textInlineExtent'in node){
+          if(Number(value.schemaVersion)<47)throw new Error('Vertical text frames require document schema version 47.');
+          if(!isVerticalText(node as unknown as TextLayerData)||node.textPath)throw new Error('A vertical text frame requires vertical writing without a path.');
+          if(!record(node.textFrameOrigin)||Object.keys(node.textFrameOrigin).some(key=>!['x','y'].includes(key))||!number(node.textFrameOrigin.x,-MAX_COORDINATE,MAX_COORDINATE)||!number(node.textFrameOrigin.y,-MAX_COORDINATE,MAX_COORDINATE)||!number(node.textInlineExtent,1,MAX_COORDINATE))throw new Error('Vertical text requires a measured frame origin and logical inline extent.');
+        }else if(isVerticalText(node as unknown as TextLayerData)&&!node.textPath)throw new Error('Vertical text requires its measured frame.');
+        if(usesNativeTextWriting(node as unknown as TextLayerData))assertCharacterTextScalars(node.text as string);
         if('textPath'in node||'textPathOrigin'in node){
           if(Number(value.schemaVersion)<46)throw new Error('Text paths require document schema version 46.');
           if(node.textPath!==undefined)assertCharacterTextScalars(node.text as string);

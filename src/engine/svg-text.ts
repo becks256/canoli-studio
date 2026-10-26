@@ -1,3 +1,4 @@
+import {usesNativeTextWriting,isVerticalText} from '../core/text-writing';
 import {nativeTextFont} from '../core/text-style';
 import {characterFontFamilies,characterInputForLayer,measureCharacterTextAsync,normalizeCharacterText} from '../core/character-layout';
 import {captureExportFonts} from './export-fonts';
@@ -114,8 +115,8 @@ export async function prepareSvgTexts(document:SvgDocument,control?:ExportContro
   try{
     for(const layer of layers){
       current();
-      if(layer.characterRanges!==undefined||layer.textPath!==undefined){
-        const layout=await measureCharacterTextAsync(characterInputForLayer(layer),{signal:control?.signal,check:current,alignmentWidth:layer.width});
+      if(layer.characterRanges!==undefined||layer.textPath!==undefined||usesNativeTextWriting(layer)){
+        const layout=await measureCharacterTextAsync(characterInputForLayer(layer),{signal:control?.signal,check:current,alignmentWidth:isVerticalText(layer)&&!layer.textPath?layer.textInlineExtent:layer.width});
         const styledLines=layout.lines.map(line=>({...line,spans:line.spans.map(span=>{
           context.fillStyle='#010203';context.fillStyle=span.style.color;
           if(context.fillStyle==='#010203'){context.fillStyle='#040506';context.fillStyle=span.style.color;if(context.fillStyle==='#040506')throw new Error('Cannot export an invalid text color to SVG.');}

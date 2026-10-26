@@ -77,10 +77,10 @@ export function reconstructSvgTexts(doc:Document,placements:readonly SvgTextPlac
     if(!assets.fonts.has(resource.id))store.shareTo(assets.fonts,resource.id);
     doc.fonts.files.add(new FontFile({id:resource.id,name:(resource.descriptor.report.faces[0].fullName??resource.cssFamily).slice(0,240),resource:resource.descriptor}));
    }
-   layer.update({fontFamily:family,...(ranges===undefined?{}:{characterRanges:ranges}),...(placement.path?{textPath:placement.path}:{})});
+   layer.update({fontFamily:family,...(placement.writing?{writingMode:placement.writing.mode,textOrientation:placement.writing.orientation}:{}),...(ranges===undefined?{}:{characterRanges:ranges}),...(placement.path?{textPath:placement.path}:{})});
    if(placement.path)continue;
    const text=layer.toJSON() as TextLayerData;
-   if(ranges!==undefined){
+   if(ranges!==undefined||placement.writing){
     const layout=measureCharacterText(characterInputForLayer(text)),first=layout.lines[0];if(layout.accuracy!=='native'||!first||layout.lines.length!==1)throw new Error('SVG inline character reconstruction requires one native logical line.');
     const shiftX=placement.x-first.x,shiftY=placement.y-first.y;
     layer.transform=layer.transform.multiply(AffineTransform.translation(shiftX,shiftY));continue;

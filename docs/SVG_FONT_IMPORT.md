@@ -1,5 +1,7 @@
 # SVG fonts and editable text
 
+Supported schema-47 vertical columns and native vertical baselines share this original-font reconstruction boundary; see [VERTICAL_TEXT.md](VERTICAL_TEXT.md). Broader CSS/layout and language/viewer/device acceptance remains open.
+
 Status: scoped F08/F11 font-source and horizontal-text implementation. See the implementation roadmap for accepted evidence and remaining gates. This extends trusted SVG file import; it does not claim general SVG or professional typography parity.
 
 ## Choosing an import

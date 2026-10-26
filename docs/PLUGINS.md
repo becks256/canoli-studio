@@ -1,8 +1,15 @@
 # Plugins and extensions
 
+## Public vertical text (F08)
+
+Schema 47 adds optional TextLayer `writingMode` (`horizontal-tb`, `vertical-rl`, `vertical-lr`) and `textOrientation` (`mixed`, `upright`, `sideways`). Shared OO setters/commands, reusable paragraph formats and awaited native preparation retain logical Unicode and character/font ownership. Vertical wrapping uses the existing logical `wrapWidth` as physical height. Derived `textFrameOrigin` and `textInlineExtent` separate the physical frame from its logical alignment extent; client patches cannot author these caches. Native paths retain their separate `textPathOrigin`. Defaults preserve legacy horizontal rendering; text that has entered native writing retains its native character-layout marker when switched back to horizontal.
+
+The custom Inspector exposes writing direction, glyph orientation, paragraph height and vertical alignment. Corner resizing follows the inline axis and keeps the opposite frame corner under affine parents. Native projects/workspace/recipes preserve source text, geometry and complete original font/image payloads. Supported native SVG output/reimport retains writing/orientation and whole-line placement; unsupported inline writing/baseline graphs require explicit flattening. Independent REST sessions preserve the fields with estimated headless bounds; they do not synchronize with the browser. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md) for the precise contract, limitations and dated verification status. Broader typography/interchange/device/performance and the original roadmap remain open.
+
+
 ## Vertical preparation grants no capability
 
-Private native vertical preparation introduces no plugin grant, source access or script import surface. Installation stays inert, current strict layer fields remain authoritative, and public vertical scripting/commands/host metrics are still pending. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
+Private native vertical preparation introduces no plugin grant, source access or script import surface. Installation stays inert; current document read/write grants, strict schema-47 layer fields, native typography broker checks and final host revalidation govern public vertical operations. See [VERTICAL_TEXT.md](VERTICAL_TEXT.md).
 
 ## Path text uses existing authority
 
