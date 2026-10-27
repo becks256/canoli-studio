@@ -1,9 +1,10 @@
 import {hasTextWriting,isVerticalText,type TextWriting} from './text-writing';
 import {textPathSchema,type TextPathData} from './text-path';
 import {importSvgGradient} from './svg-gradient-import';
+import {importSvgClip,svgClipProperty,type SvgClipGeometry}from './svg-clip-import';
 import {bezierGeometryBounds} from './bezier-bounds';
 import {DOMParser,XMLSerializer,type Element as XmlElement,type Node as XmlNode} from '@xmldom/xmldom';
-import {Document,LayerGroup,VectorLayer,VectorPath,VectorContour,RasterLayer,TextLayer,Layer,AffineTransform} from '../dom';
+import {Document,LayerGroup,VectorLayer,VectorPath,VectorContour,RasterLayer,TextLayer,Layer,LayerMask,AffineTransform} from '../dom';
 import {svgStyleDeclarations,svgFontStylesheet,svgCheckCssValue,type SvgFontSource} from './svg-css-import';
 import {svgTextImportStyle,svgTextImportContent,svgTextImportRuns,svgCharacterFormat,svgTextLength,SVG_TEXT_ATTRIBUTES,type SvgTextImportStyle} from './svg-text-import';
 import type {CharacterRangeData} from './text-ranges';
@@ -25,7 +26,7 @@ export interface SvgImportControl {signal?:AbortSignal;onProgress?:(progress:{ph
 export interface SvgImportOptions {mode?:'editable'|'flatten'}
 interface Paint {color:string;alpha:number}
 type Colors=(value:string)=>Paint|null;
-interface Style {fill:string;stroke:string;color:string;fillOpacity:number;strokeOpacity:number;strokeWidth:number;cap:string;join:string;miter:number;dash:number[];offset:number;rule:'evenodd'|'nonzero';visibility:boolean;opacity:number;display:boolean;text:SvgTextImportStyle}
+interface Style {fill:string;stroke:string;color:string;fillOpacity:number;strokeOpacity:number;strokeWidth:number;cap:string;join:string;miter:number;dash:number[];offset:number;rule:'evenodd'|'nonzero';visibility:boolean;opacity:number;display:boolean;clipPath:string;text:SvgTextImportStyle}
 const basic:Record<string,string>={black:'#000000',white:'#ffffff',red:'#ff0000',green:'#008000',blue:'#0000ff',yellow:'#ffff00',gray:'#808080',grey:'#808080',silver:'#c0c0c0',maroon:'#800000',purple:'#800080',fuchsia:'#ff00ff',lime:'#00ff00',olive:'#808000',navy:'#000080',teal:'#008080',aqua:'#00ffff',orange:'#ffa500',rebeccapurple:'#663399',transparent:'#00000000'};
 const hex=(n:number)=>Math.round(n).toString(16).padStart(2,'0');
 
@@ -107,8 +108,8 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
  if(width!==w||height!==h)degraded.add('Fractional viewport dimensions are rounded up to native integer canvas pixels.');
  const document=new Document({name:name.slice(0,240)||'Imported SVG',width,height}),viewport=document.layers.add(new LayerGroup({name:'SVG viewport'}));
  const assets:SvgInspection['assets']=[],images:SvgImagePlacement[]=[],texts:SvgTextPlacement[]=[],imageSources=new Map<string,string>();let layers=1;
- const initial:Style={fill:'#000000',stroke:'none',color:'#000000',fillOpacity:1,strokeOpacity:1,strokeWidth:1,cap:'butt',join:'miter',miter:4,dash:[],offset:0,rule:'nonzero',visibility:true,opacity:1,display:true,text:svgTextImportStyle({})};
- const known=new Set([...SVG_TEXT_ATTRIBUTES,'dx','dy','id','class','style','transform','fill','stroke','color','fill-opacity','stroke-opacity','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','stroke-dasharray','stroke-dashoffset','fill-rule','clip-rule','opacity','display','visibility','vector-effect','paint-order','isolation','mix-blend-mode','color-interpolation','overflow','version','xmlns','xmlns:xlink','viewBox','preserveAspectRatio','width','height','x','y','rx','ry','cx','cy','r','x1','y1','x2','y2','points','d','href','xlink:href','role','inkscape:label']);
+ const initial:Style={fill:'#000000',stroke:'none',color:'#000000',fillOpacity:1,strokeOpacity:1,strokeWidth:1,cap:'butt',join:'miter',miter:4,dash:[],offset:0,rule:'nonzero',visibility:true,opacity:1,display:true,clipPath:'none',text:svgTextImportStyle({})};
+ const known=new Set([...SVG_TEXT_ATTRIBUTES,'dx','dy','id','class','style','transform','fill','stroke','color','fill-opacity','stroke-opacity','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','stroke-dasharray','stroke-dashoffset','fill-rule','clip-rule','clip-path','opacity','display','visibility','vector-effect','paint-order','isolation','mix-blend-mode','color-interpolation','overflow','version','xmlns','xmlns:xlink','viewBox','preserveAspectRatio','width','height','x','y','rx','ry','cx','cy','r','x1','y1','x2','y2','points','d','href','xlink:href','role','inkscape:label']);
  function style(e:XmlElement,parent:Style):Style{
   const inline=svgStyleDeclarations(e.getAttribute('style')??'',allowedReference),p=properties(e,inline);if(Object.keys(inline).some(key=>['transform','x','y','dx','dy','width','height','rx','ry','cx','cy','r','x1','y1','x2','y2','d','points'].includes(key)))issue('CSS transforms and geometry properties require flattened import.');for(const key of Object.keys(p))if(!known.has(key)&&!(e.localName==='textPath'&&['startOffset','method','spacing','side'].includes(key))&&!key.startsWith('xmlns:')&&!key.startsWith('data-')&&!key.startsWith('aria-'))issue(`Unsupported SVG attribute/style: ${key}.`);
   const inherited=(key:string,fallback:string)=>p[key]===undefined||p[key]==='inherit'||p[key]==='unset'?fallback:p[key];
@@ -125,11 +126,17 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
   if(length(inherited('stroke-width',String(parent.strokeWidth)))<0)throw new Error('Negative SVG stroke width.');
   if(!['visible','hidden','collapse'].includes(inherited('visibility',parent.visibility?'visible':'hidden')))issue('Unsupported SVG visibility value.');
   const color=inherited('color',parent.color);
-  return{fill:inherited('fill',parent.fill),stroke:inherited('stroke',parent.stroke),color:color.toLowerCase()==='currentcolor'?parent.color:color,fillOpacity:alpha('fill-opacity',parent.fillOpacity),strokeOpacity:alpha('stroke-opacity',parent.strokeOpacity),strokeWidth:length(inherited('stroke-width',String(parent.strokeWidth))),cap:inherited('stroke-linecap',parent.cap).trim().toLowerCase(),join:inherited('stroke-linejoin',parent.join).trim().toLowerCase(),miter:Number(inherited('stroke-miterlimit',String(parent.miter))),dash,offset:length(inherited('stroke-dashoffset',String(parent.offset))),rule:inherited('fill-rule',parent.rule) as Style['rule'],visibility:inherited('visibility',parent.visibility?'visible':'hidden')==='visible',opacity:alpha('opacity',p.opacity==='inherit'?parent.opacity:1),display:p.display!=='none',text:svgTextImportStyle(p,parent.text)};
+  return{fill:inherited('fill',parent.fill),stroke:inherited('stroke',parent.stroke),color:color.toLowerCase()==='currentcolor'?parent.color:color,fillOpacity:alpha('fill-opacity',parent.fillOpacity),strokeOpacity:alpha('stroke-opacity',parent.strokeOpacity),strokeWidth:length(inherited('stroke-width',String(parent.strokeWidth))),cap:inherited('stroke-linecap',parent.cap).trim().toLowerCase(),join:inherited('stroke-linejoin',parent.join).trim().toLowerCase(),miter:Number(inherited('stroke-miterlimit',String(parent.miter))),dash,offset:length(inherited('stroke-dashoffset',String(parent.offset))),rule:inherited('fill-rule',parent.rule) as Style['rule'],visibility:inherited('visibility',parent.visibility?'visible':'hidden')==='visible',opacity:alpha('opacity',p.opacity==='inherit'?parent.opacity:1),display:p.display!=='none',clipPath:svgClipProperty(p['clip-path'],parent.clipPath),text:svgTextImportStyle(p,parent.text)};
  }
  function paint(value:string,currentColor:string):Paint|null{value=value.trim();if(value.toLowerCase()==='none')return null;const color=resolveColor(value.toLowerCase()==='currentcolor'?currentColor:value);if(!color)throw new Error('Unsupported SVG paint/color; gradients and paint servers require flattened import.');return color;}
- function geometry(e:XmlElement):SvgContour[]{
-  const get=(key:string,fallback=0)=>length(e.getAttribute(key)??'',fallback),tag=e.localName??'';let d='';
+ function geometry(e:XmlElement,percentageViewport?:{width:number;height:number}):SvgContour[]{
+  const get=(key:string,fallback=0)=>{
+   const raw=e.getAttribute(key)??'';
+   if(percentageViewport&&raw.trim().endsWith('%')){
+    const factor=length(raw.trim().slice(0,-1)),base=key==='r'?Math.hypot(percentageViewport.width,percentageViewport.height)/Math.SQRT2:['y','y1','y2','cy','ry','height'].includes(key)?percentageViewport.height:percentageViewport.width;return factor*base/100;
+   }
+   return length(raw,fallback);
+  },tag=e.localName??'';let d='';
   if(tag==='path')d=e.getAttribute('d')??'';
   else if(tag==='rect'){const x=get('x'),y=get('y'),w=get('width'),h=get('height'),rx=Math.min(w/2,get('rx',get('ry'))),ry=Math.min(h/2,get('ry',get('rx')));if(w<0||h<0||rx<0||ry<0)throw new Error('Negative SVG shape dimensions.');if(!w||!h)return[];d=rx&&ry?`M${x+rx} ${y}H${x+w-rx}A${rx} ${ry} 0 0 1 ${x+w} ${y+ry}V${y+h-ry}A${rx} ${ry} 0 0 1 ${x+w-rx} ${y+h}H${x+rx}A${rx} ${ry} 0 0 1 ${x} ${y+h-ry}V${y+ry}A${rx} ${ry} 0 0 1 ${x+rx} ${y}Z`:`M${x} ${y}H${x+w}V${y+h}H${x}Z`;}
   else if(tag==='circle'||tag==='ellipse'){const x=get('cx'),y=get('cy'),rx=get(tag==='circle'?'r':'rx'),ry=tag==='circle'?rx:get('ry');if(rx<0||ry<0)throw new Error('Negative SVG radii.');if(!rx||!ry)return[];d=`M${x+rx} ${y}A${rx} ${ry} 0 1 1 ${x-rx} ${y}A${rx} ${ry} 0 1 1 ${x+rx} ${y}Z`;}
@@ -175,7 +182,7 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
   const line=(element:XmlElement,owner:LayerGroup,settings:Style,transform:AffineTransform,x:number,y:number,path?:TextPathData)=>{
    if(settings.stroke!=='none'&&settings.strokeWidth>0)throw new Error('Stroked SVG text requires flattened import.');
    const color=(value:Style)=>{const fill=paint(value.fill,value.color),alpha=(fill?.alpha??0)*value.fillOpacity;if(!fill||alpha===0)return'#00000000';return alpha===1?fill.color:`rgba(${parseInt(fill.color.slice(1,3),16)},${parseInt(fill.color.slice(3,5),16)},${parseInt(fill.color.slice(5,7),16)},${alpha})`;};
-   const runs=svgTextImportRuns(element,settings,(span,parent)=>{const value=style(span,parent);if(value.stroke!=='none'&&value.strokeWidth>0||value.opacity!==1||!value.display||value.visibility!==settings.visibility)throw new Error('SVG inline stroke, group opacity or visibility changes require flattened import.');return value;},value=>svgCharacterFormat(value.text,color(value)));
+   const runs=svgTextImportRuns(element,settings,(span,parent)=>{const value=style(span,parent);if(value.clipPath!=='none')throw new Error('Inline SVG text clipping requires flattened import.');if(value.stroke!=='none'&&value.strokeWidth>0||value.opacity!==1||!value.display||value.visibility!==settings.visibility)throw new Error('SVG inline stroke, group opacity or visibility changes require flattened import.');return value;},value=>svgCharacterFormat(value.text,color(value)));
    const native=!!path||runs.styled||hasTextWriting(settings.text),fill=paint(settings.fill,settings.color),content=native?runs.text:svgTextImportContent(element,settings.text),{anchor,xmlSpace:_xmlSpace,whiteSpace:_whiteSpace,dominantBaseline:_dominantBaseline,alignmentBaseline:_alignmentBaseline,writingMode,textOrientation,...typography}=settings.text;
    const align=anchor==='middle'?'center':(anchor==='start')===(typography.direction==='ltr')?'left':'right';
    const prepared=new TextLayer({name:(element.getAttribute('id')||'SVG text').slice(0,240),text:content,...typography,fontVariationSettings:undefined,align,color:native?color(settings):fill?.color??'#000000',opacity:settings.opacity*(native?1:(fill?.alpha??0)*settings.fillOpacity),visible:settings.visibility&&settings.display});
@@ -198,7 +205,7 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
    const geometry=parseSvgContours(target.getAttribute('d')??'');if(geometry.contours.length!==1)throw new Error('Compound SVG text baselines require flattened import.');
    if(geometry.approximatedArcs)degraded.add('Elliptical text baselines are approximated by editable cubic curves.');
    const contour=geometry.contours[0],matrix=svgTransform(target.getAttribute('transform')??''),settings=style(child,s);
-   if(settings.opacity!==1||!settings.display||settings.visibility!==s.visibility||settings.text.direction!==s.text.direction||settings.text.anchor!==s.text.anchor||settings.text.writingMode!==s.text.writingMode||settings.text.textOrientation!==s.text.textOrientation)throw new Error('SVG path text group styling requires flattened import.');
+   if(settings.clipPath!=='none'||settings.opacity!==1||!settings.display||settings.visibility!==s.visibility||settings.text.direction!==s.text.direction||settings.text.anchor!==s.text.anchor||settings.text.writingMode!==s.text.writingMode||settings.text.textOrientation!==s.text.textOrientation)throw new Error('SVG path text group styling requires flattened import.');
    const path=textPathSchema.parse({points:contour.points.map(point=>({...matrix.point(point),in:matrix.point(point.in),out:matrix.point(point.out)})),closed:contour.closed,startOffset:position(fields.startOffset??'0',settings.text.fontSize),baselineOffset:isVerticalText(settings.text)?dx:dy});
    line(child,parent,{...settings,opacity:s.opacity},local,0,0,path);preserved.add('Editable native text on a copied single cubic baseline with source-owned character formatting.');
    degraded.add('SVG path references become independent editable text baselines; shared path/DOM identity and authored traversal flags are not retained.');
@@ -211,21 +218,56 @@ export function inspectSvgSource(source:string,name='Imported SVG',resolveColor:
   preserved.add(isVerticalText(s.text)?'Editable native vertical columns, whole-line typography and full affine placement.':'Editable horizontal text, whole-line typography, alphabetic baselines and full affine placement.');
   degraded.add('SVG and Canvas font substitution, shaping, whitespace and hinting can differ; installed/system fonts remain external references.');
  }
+ const clipContext={ids,properties,inline:(element:XmlElement)=>svgStyleDeclarations(element.getAttribute('style')??'',allowedReference),geometry,length,viewport:{width:box?.[2]??w,height:box?.[3]??h}};
+ const moveContours=(contours:SvgContour[],matrix:AffineTransform)=>contours.map(c=>({...c,points:c.points.map(p=>({...matrix.point(p),in:matrix.point(p.in),out:matrix.point(p.out)}))}));
+ function clipTargetContours(element:XmlElement,seen=new Set<string>(),depth=0):SvgContour[]{
+  if(depth>8)throw new Error('SVG clipping bounds exceed native nesting depth.');
+  const tag=element.localName??'',p=properties(element);
+  if(p.display==='none')return[];
+  if(['defs','title','desc','metadata','style','clipPath','mask','linearGradient','radialGradient'].includes(tag))return[];
+  if(['svg','g','a'].includes(tag)){
+   const contours:SvgContour[]=[];
+   for(let child=element.firstChild;child;child=child.nextSibling)if(child.nodeType===1){const e=child as XmlElement;contours.push(...moveContours(clipTargetContours(e,seen,depth+1),svgTransform(e.getAttribute('transform')??'')));}
+   return contours;
+  }
+  if(tag==='use'){
+   const key=decodeURIComponent((p.href??p['xlink:href']??'').trim().slice(1)),target=ids.get(key);if(!target||seen.has(key))throw new Error('Missing or cyclic SVG clipping bounds reference.');
+   const matrix=AffineTransform.translation(length(p.x??''),length(p.y??'')).multiply(svgTransform(target.getAttribute('transform')??''));
+   return moveContours(clipTargetContours(target,new Set([...seen,key]),depth+1),matrix);
+  }
+  if(['path','rect','circle','ellipse','line','polyline','polygon'].includes(tag))return geometry(element);
+  if(tag==='image'){
+   if(!element.hasAttribute('width')||!element.hasAttribute('height'))throw new Error('SVG object-bounds clipping requires explicit image dimensions.');
+   const x=length(p.x??''),y=length(p.y??''),w=length(p.width),h=length(p.height);
+   return[{closed:true,points:[{x,y},{x:x+w,y},{x:x+w,y:y+h},{x,y:y+h}].map(p=>({...p,in:{...p},out:{...p}}))}];
+  }
+  throw new Error('SVG object-bounds clipping for text or unknown geometry requires flattened import.');
+ }
+ function clipping(element:XmlElement,reference:string,boundsTransform=new AffineTransform()):LayerMask|null{
+  const value:SvgClipGeometry|null=importSvgClip(reference,()=>bezierGeometryBounds(moveContours(clipTargetContours(element),boundsTransform)),clipContext);
+  if(value===null)return null;
+  preserved.add('Editable geometric clipping silhouettes, union/intersection, local references and affine/bounds-based coordinates.');
+  degraded.add('Clipping references expand into independent native vector masks; shared definition and original Boolean operand identity are not retained.');
+  return new LayerMask({paths:value.contours.map(points=>new VectorPath({points,closed:true})),fillRule:value.fillRule});
+ }
  function walk(e:XmlElement,parent:LayerGroup,inherited:Style,world:AffineTransform,refs:Set<string>,depth:number){
   if(depth>8){issue('SVG exceeds the native 8-level group editing budget. Choose flattened import.');return;}
-  if(['defs','title','desc','metadata','linearGradient','radialGradient'].includes(e.localName??''))return;
+  if(['defs','title','desc','metadata','linearGradient','radialGradient','clipPath','mask'].includes(e.localName??''))return;
   if(e.localName==='style')return;
   if(e.namespaceURI&&e.namespaceURI!==SVG){issue('Foreign XML drawing elements require flattened import.');return;}
-  try{const s=style(e,inherited),local=svgTransform(e.getAttribute('transform')??''),next=world.multiply(local);
-   if(e.localName==='g'||e.localName==='a'){const group=add(parent,new LayerGroup({name:(e.getAttribute('id')||e.localName||'SVG shape').slice(0,240),opacity:s.opacity,visible:s.display}));group.transform=local;for(let c=e.firstChild;c;c=c.nextSibling)if(c.nodeType===1)walk(c as XmlElement,group,s,next,refs,depth+1);}
-   else if(e.localName==='use'){const key=(e.getAttribute('href')||e.getAttribute('xlink:href')||'').trim().slice(1),target=ids.get(key);if(!target||refs.has(key))throw new Error('Missing or cyclic SVG use reference.');const group=add(parent,new LayerGroup({name:(e.getAttribute('id')||'SVG use').slice(0,240),opacity:s.opacity,visible:s.display})),offset=local.multiply(AffineTransform.translation(length(e.getAttribute('x')??''),length(e.getAttribute('y')??'')));group.transform=offset;walk(target,group,s,world.multiply(offset),new Set([...refs,key]),depth+1);degraded.add('SVG use references expand independently; shared symbol/DOM identity is not retained.');}
+  try{const s=style(e,inherited);let local=svgTransform(e.getAttribute('transform')??'');const next=world.multiply(local),useOffset=e.localName==='use'?AffineTransform.translation(length(e.getAttribute('x')??''),length(e.getAttribute('y')??'')):new AffineTransform(),mask=s.clipPath==='none'?null:clipping(e,s.clipPath,useOffset.inverse());
+   if(mask&&!['g','a','use'].includes(e.localName??'')){
+    const wrapper=add(parent,new LayerGroup({name:((e.getAttribute('id')||e.localName||'SVG')+' clipping').slice(0,240)}));wrapper.transform=local;wrapper.mask=mask;parent=wrapper;local=new AffineTransform();world=next;if(++depth>8)throw new Error('SVG clipping exceeds native group nesting depth.');
+   }
+   if(e.localName==='g'||e.localName==='a'){const group=add(parent,new LayerGroup({name:(e.getAttribute('id')||e.localName||'SVG shape').slice(0,240),opacity:s.opacity,visible:s.display}));group.transform=local;if(mask)group.mask=mask;for(let c=e.firstChild;c;c=c.nextSibling)if(c.nodeType===1)walk(c as XmlElement,group,s,next,refs,depth+1);}
+   else if(e.localName==='use'){const key=(e.getAttribute('href')||e.getAttribute('xlink:href')||'').trim().slice(1),target=ids.get(key);if(!target||refs.has(key))throw new Error('Missing or cyclic SVG use reference.');const group=add(parent,new LayerGroup({name:(e.getAttribute('id')||'SVG use').slice(0,240),opacity:s.opacity,visible:s.display})),offset=local.multiply(useOffset);group.transform=offset;if(mask)group.mask=mask;walk(target,group,s,world.multiply(offset),new Set([...refs,key]),depth+1);degraded.add('SVG use references expand independently; shared symbol/DOM identity is not retained.');}
    else if(e.localName==='image')image(e,parent,s,local);
    else if(e.localName==='text')textDrawing(e,parent,s,local);
    else if(['path','rect','circle','ellipse','line','polyline','polygon'].includes(e.localName??''))drawing(e,parent,s,local,next);
    else issue(`SVG ${e.localName} elements require flattened import.`);
   }catch(error){issue(error instanceof Error?error.message:String(error));}
  }
- try{const s=style(root,initial);viewport.opacity=s.opacity;viewport.visible=s.display;const view=box?svgViewBox(width,height,box,root.getAttribute('preserveAspectRatio')||'xMidYMid meet'):new AffineTransform();viewport.transform=svgTransform(root.getAttribute('transform')??'').multiply(view);for(let child=root.firstChild;child;child=child.nextSibling)if(child.nodeType===1)walk(child as XmlElement,viewport,s,viewport.transform,new Set(),1);}
+ try{const s=style(root,initial);viewport.opacity=s.opacity;viewport.visible=s.display;const view=box?svgViewBox(width,height,box,root.getAttribute('preserveAspectRatio')||'xMidYMid meet'):new AffineTransform();viewport.transform=svgTransform(root.getAttribute('transform')??'').multiply(view);if(s.clipPath!=='none'){const mask=clipping(root,s.clipPath,view);if(mask){const inverse=view.inverse();viewport.mask=mask.with({basis:new AffineTransform(inverse.a,inverse.b,inverse.c,inverse.d,0,0),x:inverse.e,y:inverse.f});}}for(let child=root.firstChild;child;child=child.nextSibling)if(child.nodeType===1)walk(child as XmlElement,viewport,s,viewport.transform,new Set(),1);}
  catch(error){issue(error instanceof Error?error.message:String(error));}
  root.setAttribute('xmlns',SVG);root.setAttribute('width',String(width));root.setAttribute('height',String(height));root.setAttribute('style',(root.getAttribute('style')??'')+`;width:${width}px!important;height:${height}px!important`);
  const flat=new Blob([new XMLSerializer().serializeToString(root)],{type:'image/svg+xml;charset=utf-8'});

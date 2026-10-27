@@ -3,9 +3,10 @@ import {ComponentRegistry} from './smart/manager';
 import {resolveSmartDocument} from './smart/resolve';
 import {isActiveSmartFilter} from './smart/filters';
 import type {LayerMaskData} from './masks';
+import type {SvgDocument}from './svg-masks';
 
 export interface SvgSmartPlan {
-  document:DocumentData;
+  document:DocumentData&SvgDocument;
   expanded:number;
   filtered:number;
   filteredAssets:ReadonlySet<string>;
@@ -19,7 +20,8 @@ export function planSvgSmart(document:DocumentData):SvgSmartPlan{
     return{document,expanded:0,filtered:0,filteredAssets,filteredTexts};
   }
   const registry=new ComponentRegistry(document.components);
-  const view=resolveSmartDocument(document,registry,{preserveFiltered:true,retainImmutable:true,vectorCanvasClips:true});
+  const canvasClips=new Set<string>();
+  const view=resolveSmartDocument(document,registry,{preserveFiltered:true,retainImmutable:true,vectorCanvasClips:true,onVectorCanvasClip:id=>canvasClips.add(id)});
   const definitions=new Map(document.components.map(value=>[value.id,value]));
   let expanded=0,filtered=0;
   function mask(value?:LayerMaskData|null){if(value?.enabled&&value.density>0&&value.kind==='bitmap')filteredAssets.add(value.assetId);}
@@ -46,5 +48,5 @@ export function planSvgSmart(document:DocumentData):SvgSmartPlan{
   // resolveSmartDocument already enforces the logical 4096-node/64-depth budget,
   // including descendants of retained filtered instances, before this traversal.
   walk(document.children);
-  return{document:{...view,components:document.components},expanded,filtered,filteredAssets,filteredTexts};
+  return{document:{...view,components:document.components,svgAlphaMasks:canvasClips},expanded,filtered,filteredAssets,filteredTexts};
 }

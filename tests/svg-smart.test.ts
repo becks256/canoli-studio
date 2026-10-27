@@ -8,6 +8,11 @@ import {getExportCapabilityReport} from '../src/engine/export';
 
 function scene(){const doc=new Document({width:240,height:160}),master=new Document({width:64,height:48}),vector=master.layers.add(new VectorLayer());vector.paths.add(VectorPath.rectangle({x:-8,y:-4,width:40,height:32},0,{fill:'#ff0000',stroke:null}));const key=doc.defineComponent(master),instance=doc.placeSmartObject(key,{x:12,y:16,width:128,height:48});return{doc,master,key,instance};}
 describe('SVG smart-object export view',()=>{
+ it('keeps generated viewport alpha sampling while same-named authored masks retain geometric SVG clipping',()=>{
+  const{doc,master,key,instance}=scene();master.layers.at(0)!.mask=new LayerMask({paths:[VectorPath.rectangle({x:0,y:0,width:32,height:24})]});doc.defineComponent(master,{id:key});instance.name='Component contents';
+  const authored=doc.layers.add(new VectorLayer({name:'Component contents'}));authored.paths.add(VectorPath.rectangle({x:0,y:0,width:40,height:32}));authored.mask=new LayerMask({paths:[VectorPath.rectangle({x:4,y:4,width:24,height:24})]});
+  const before=doc.toJSON(),svg=[...svgDocumentChunks(planSvgSmart(before).document)].join('');expect(svg.match(/<mask /g)).toHaveLength(1);expect(svg.match(/<clipPath /g)).toHaveLength(2);expect(doc.toJSON()).toEqual(before);expect(JSON.stringify(before)).not.toContain('svgAlphaMasks');
+ });
  it('expands shared vector instances with independent geometry and editable master clips without model mutation',()=>{
   const{doc,instance}=scene();instance.duplicate().x=150;const before=doc.toJSON(),plan=planSvgSmart(before),nodes=allLayers(plan.document.children),svg=[...svgDocumentChunks(plan.document)].join('');
   expect(plan.expanded).toBe(2);expect(plan.filtered).toBe(0);expect(nodes.some(node=>node.kind==='smart-object')).toBe(false);expect(new Set(nodes.map(node=>node.id)).size).toBe(nodes.length);expect(planSvgMasks(plan.document).every(mask=>mask.vector)).toBe(true);expect(svg).not.toContain('<image ');expect(svg.match(/<path /g)).toHaveLength(4);expect(svg).toContain('matrix(2 0 0 1 0 0)');expect(doc.toJSON()).toEqual(before);

@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Editable SVG geometric clipping (F02/F11)
+
+Support local geometric clipPath graphs through actual editable import, native mask controls/isolated edits, one Undo, native project persistence and supported SVG export/reimport. Preserve per-child union rules, nested intersections, independent references, root/use/affine/bbox/percentage coordinates and complete source assets. Unsupported graphs must disclose explicit flattening without partial publication. Verify independent reference pixels, raster/text preparation, stale/cancel/locks and a genuine 50 MP source. Native/SVG edge sampling remains disclosed; broader F02/F11 and the complete original roadmap remain required. See [SVG_CLIPPING.md](SVG_CLIPPING.md).
+
 ## Editable Photoshop pixel clipping (F02/F11)
 
 Retain supported consecutive pixel clipping, including nested folder scopes, through actual PSD/PSB import/export, shared edits/Undo and original-bearing native reopening. Validate grouped blending, intrinsic alpha, masks, opacity and hidden membership against independent files and forced recomposition. Unsupported group/orphan/Fill/advanced settings must disclose baking or actual merged fallback; renderer-free exports must reject. Keep source resolution and existing isolation/permission/schema contracts. See [the exact subset](CLIPPING_MASKS.md#editable-photoshop-clipping-subset).

@@ -18,6 +18,8 @@ export interface ComponentExpansionBudget {
   retainImmutable?: boolean;
   /** @internal SVG export keeps generated master-canvas clips as editable geometry. */
   vectorCanvasClips?: boolean;
+  /** @internal Identify generated SVG boundaries without relying on names/IDs. */
+  onVectorCanvasClip?: (layerId: string) => void;
 }
 /** Ephemeral render tree only. Never replace authored definitions with this expansion. */
 export function resolveSmartDocument(
@@ -244,6 +246,7 @@ export function resolveSmartDocument(
         expand(child, new AffineTransform(), true, scope, depth + 2),
       ),
     };
+    if (budget.vectorCanvasClips) budget.onVectorCanvasClip?.(content.id);
     return { ...instance, kind: "group", children: [content] };
   }
   const { components: _definitions, ...ordinary } = document;

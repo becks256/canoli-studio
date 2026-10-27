@@ -12,6 +12,14 @@ export interface SvgFontSource {
   style: string;
   stretch: string;
 }
+/** Decoded, complete CSS URL tokens; escaped url() names retain their tokens. */
+export function svgCssUrl(node:CssNode):string|undefined{
+ if(node.type==='Url')return node.value;
+ if(node.type==='Function'&&ident.decode(node.name).toLowerCase()==='url'&&node.children.size===1){
+  const child=node.children.first!;if(child.type==='String')return child.value;if(child.type==='Hash')return '#'+ident.decode(child.value);
+ }
+ return;
+}
 
 /** No URL is fetched. Original decoded font payloads cross the worker boundary. */
 export function svgFontDataUrl(value: string): Blob | null {
@@ -63,9 +71,7 @@ function inspectCss(node: CssNode, allowedReference: (url: string) => boolean) {
     let url: string | undefined;
     if (current.type === 'Url') url = current.value;
     else if (current.type === 'Function' && ident.decode(current.name).toLowerCase() === 'url') {
-      const children = current.children.toArray();
-      if (children.length !== 1 || children[0].type !== 'String') throw new Error('Invalid SVG CSS URL.');
-      url = children[0].value;
+      url=svgCssUrl(current);if(url===undefined)throw new Error('Invalid SVG CSS URL.');
     }
     if (url !== undefined && !allowedReference(url) && !svgFontDataUrl(url)) throw new Error('External SVG resources are not loaded. Embed static images or complete font files first.');
   });

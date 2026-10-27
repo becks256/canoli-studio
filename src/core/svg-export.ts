@@ -21,7 +21,7 @@ export function* svgDocumentChunks(document: SvgDocument, rasterMasks?:SvgRaster
   yield `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" overflow="hidden">\n`;
   if(fontDefinitions)yield fontDefinitions;
   yield* svgImageDefinitions(images);
-  const plans=planSvgMasks(document),maskIds=new Map(plans.map(plan=>[plan.layerId,plan.id]));
+  const plans=planSvgMasks(document),maskIds=new Map(plans.map(plan=>[plan.layerId,plan.id])),clipIds=new Set(plans.filter(plan=>plan.clipPath).map(plan=>plan.id));
   yield* svgMaskDefinitions(document,plans,rasterMasks);
   const paints=planSvgPaint(document),paintPlans=new Map(paints.map(plan=>[plan.layer.id,plan]));
   yield* svgPaintDefinitions(paints,maskIds,images);
@@ -47,7 +47,7 @@ export function* svgDocumentChunks(document: SvgDocument, rasterMasks?:SvgRaster
       // restores the original content plane without flattening the layer tree.
       if(effect)yield `<g transform="matrix(${svgMatrix(effect.world.inverse())})" filter="url(#${effect.id})"><rect x="${svgNumber(support.x)}" y="${svgNumber(support.y)}" width="${svgNumber(support.width)}" height="${svgNumber(support.height)}" fill="#000000" fill-opacity="0" pointer-events="none" /><g transform="matrix(${svgMatrix(effect.world)})">\n`;
       const maskId=maskIds.get(layer.id);
-      if(maskId)yield `<g mask="url(#${maskId})">\n`;
+      if(maskId)yield `<g ${clipIds.has(maskId)?'clip-path':'mask'}="url(#${maskId})">\n`;
       // Fill opacity applies after all paths/children composite, before layer opacity.
       const fill = layer.fillOpacity ?? 1;
       if (fill !== 1&&!effect) yield `<g opacity="${svgNumber(fill)}" style="isolation:isolate">\n`;

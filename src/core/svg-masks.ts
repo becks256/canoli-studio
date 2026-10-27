@@ -12,6 +12,8 @@ import {selectionRegionTransform,type Rect,type SelectionData} from './drawing';
 export type SvgDocument = Pick<DocumentData,'width'|'height'|'children'> & {
   svgNativePrefixes?:ReadonlyMap<string,readonly LayerData[]>;
   svgSupport?:Rect;
+  /** Generated smart viewport boundaries retain established alpha sampling. */
+  svgAlphaMasks?:ReadonlySet<string>;
 };
 export interface SvgMaskPlan {
   layerId:string;
@@ -19,6 +21,8 @@ export interface SvgMaskPlan {
   world:AffineTransform;
   mask:LayerMaskData;
   vector:boolean;
+  /** Hard vector coverage retains a native geometric clipping graph. */
+  clipPath?:boolean;
   /** Only zero-outside stroke selection coverage may use smaller native support. */
   region?:Rect;
 }
@@ -47,8 +51,8 @@ export function planSvgMasks(document:SvgDocument):SvgMaskPlan[]{
     for(const layer of nodes){
       if(!svgArtwork(layer))continue;
       const world=parent.multiply(localTransform(layer)),mask=layer.mask;
-      if(mask?.enabled&&mask.density>0)plans.push({layerId:layer.id,id:`canoli-mask-${plans.length+1}`,world,mask,
-        vector:mask.kind==='vector'&&!hasMaskRefinements(mask)&&!(mask.feather??0)});
+      if(mask?.enabled&&mask.density>0){const vector=mask.kind==='vector'&&!hasMaskRefinements(mask)&&!(mask.feather??0);plans.push({layerId:layer.id,id:`canoli-mask-${plans.length+1}`,world,mask,
+        vector,clipPath:vector&&!mask.inverted&&mask.density===1&&!document.svgAlphaMasks?.has(layer.id)});}
       if(layer.kind==='paint')for(let i=0;i<layer.strokes.length;i++){
         const stroke=layer.strokes[i];if(!stroke.clip)continue;
         plans.push({layerId:svgPaintClipKey(layer.id,i),id:`canoli-mask-${plans.length+1}`,world,vector:false,region:strokeClipRegion(stroke.clip,world,support),mask:{kind:'selection',enabled:true,inverted:false,density:1,linked:true,selection:stroke.clip}});
@@ -68,6 +72,12 @@ export function* svgMaskDefinitions(document:SvgDocument,plans:SvgMaskPlan[],ras
     const inverse=plan.world.inverse(),b=inverse.bounds(svgEffectRegion(document));
     const bounds=`x="${svgNumber(b.x)}" y="${svgNumber(b.y)}" width="${svgNumber(b.width)}" height="${svgNumber(b.height)}"`;
     const {mask}=plan;
+    if(plan.vector&&mask.kind==='vector'&&mask.fillRule!=='evenodd'&&mask.fillRule!=='nonzero')throw new Error('Unsupported SVG mask fill rule.');
+    if(plan.clipPath&&mask.kind==='vector'){
+      yield `<clipPath id="${plan.id}" clipPathUnits="userSpaceOnUse"><path transform="matrix(${matrix(inverse.multiply(maskTransform(mask,plan.world)))})" clip-rule="${mask.fillRule}" d="`;
+      for(const path of mask.paths){yield* svgPathCommands({points:path.points,closed:true});yield ' ';}
+      yield '" /></clipPath>\n';continue;
+    }
     // Alpha transfer inverts coverage independently of RGB/luminance/color space.
     if(plan.vector&&mask.inverted)yield `<filter id="${plan.id}-coverage" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" ${bounds}><feComponentTransfer ${bounds}><feFuncA type="linear" slope="${svgNumber(-mask.density)}" intercept="1" /></feComponentTransfer></filter>\n`;
     yield `<mask id="${plan.id}" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" ${bounds} style="mask-type:alpha">\n`;

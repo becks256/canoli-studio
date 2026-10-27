@@ -1,4 +1,6 @@
 import {spacingWorkflow} from './helpers/spacing';
+import {svgClippingWorkflow}from './helpers/svg-clipping';
+test('production SVG geometric clipping preserves native controls, isolated edits, Undo, editable SVG and project reopening',async({page},info)=>{await svgClippingWorkflow(page,info,true);});
 import {clippingWorkflow} from './helpers/clipping';
 import {photoshopClippingWorkflow}from './helpers/photoshop-clipping';
 for(const fixture of ['normal','ungrouped']as const)test(`production Photoshop ${fixture} clipping retains the actual editable or fallback boundary`,async({page},info)=>{await photoshopClippingWorkflow(page,info,fixture);});
@@ -1565,14 +1567,14 @@ test('production SVG masks preserve vector holes and native coverage through the
   document.resize(160,96);const group=document.layers.add(new LayerGroup({x:12,y:8}));group.mask=new LayerMask({base:0.5,density:0.5});
   const layer=group.layers.add(new VectorLayer({x:4,y:4}));layer.paths.add(VectorPath.rectangle({x:-500,y:-500,width:2000,height:2000},0,{fill:'#ff0000',stroke:null}));
   layer.mask=new LayerMask({paths:[VectorPath.rectangle({x:8,y:8,width:64,height:48}),VectorPath.rectangle({x:24,y:20,width:24,height:20})]});
-  if(!layer.toSvg(160,96).includes('<mask'))throw new Error('Standalone vector mask missing');
+  if(!layer.toSvg(160,96).includes('<clipPath'))throw new Error('Standalone geometric mask missing');
   let rejected=false;try{new VectorLayer().toSvg(0,96);}catch(error){rejected=true;}if(!rejected)throw new Error('Invalid SVG accepted');print('Masked SVG ready');
  `);await page.getByRole('button',{name:'Run script',exact:true}).click();await expect(page.getByLabel('Script output')).toContainText('Masked SVG ready');await page.getByRole('button',{name:'Close scripts',exact:true}).click();
  await page.getByRole('button',{name:'Export…',exact:true}).click();const dialog=page.locator('.export-dialog');await dialog.getByLabel('Format',{exact:true}).selectOption('svg');await expect(dialog).toContainText('Editable unfeathered vector');await expect(dialog).toContainText('native-resolution PNG coverage tiles');
  const pending=page.waitForEvent('download');await dialog.getByRole('button',{name:'Export .svg',exact:true}).click();const stream=await(await pending).createReadStream(),chunks:Buffer[]=[];for await(const chunk of stream!)chunks.push(Buffer.from(chunk));
  const result=await page.evaluate(async text=>{
   const xml=new DOMParser().parseFromString(text,'image/svg+xml'),image=new Image(),url=URL.createObjectURL(new Blob([text],{type:'image/svg+xml'}));image.src=url;await image.decode();URL.revokeObjectURL(url);const canvas=document.createElement('canvas');canvas.width=160;canvas.height=96;const c=canvas.getContext('2d')!;c.drawImage(image,0,0);
-  return{masks:xml.querySelectorAll('mask').length,tiles:xml.querySelectorAll('mask image').length,samples:[[10,10],[30,25],[48,40],[80,60]].map(([x,y])=>Array.from(c.getImageData(x,y,1,1).data))};
+  return{masks:xml.querySelectorAll('mask, clipPath').length,tiles:xml.querySelectorAll('mask image').length,samples:[[10,10],[30,25],[48,40],[80,60]].map(([x,y])=>Array.from(c.getImageData(x,y,1,1).data))};
  },Buffer.concat(chunks).toString());expect(result).toEqual({masks:2,tiles:1,samples:[[0,0,0,0],[255,0,0,192],[0,0,0,0],[255,0,0,192]]});await page.keyboard.press('Control+z');await expect(page.locator('.layer-row')).toHaveCount(0);
 });
 
@@ -1626,7 +1628,7 @@ test('production documented smart SVG keeps editable vectors and native filtered
  const svg=await download(()=>dialog.getByRole('button',{name:'Export .svg',exact:true}).click()),png=await download(()=>page.getByRole('button',{name:'Export PNG',exact:true}).click());const result=await page.evaluate(async({svg,png})=>{
   const xml=new DOMParser().parseFromString(svg,'image/svg+xml');async function pixels(blob:Blob){const image=new Image(),url=URL.createObjectURL(blob);image.src=url;await image.decode();URL.revokeObjectURL(url);const canvas=document.createElement('canvas');canvas.width=240;canvas.height=140;const c=canvas.getContext('2d')!;c.drawImage(image,0,0);return c.getImageData(0,0,240,140).data;}
   const a=await pixels(new Blob([svg],{type:'image/svg+xml'})),b=await pixels(new Blob([new Uint8Array(png)],{type:'image/png'}));let alpha=0,premult=0;for(let i=0;i<a.length;i+=4){alpha=Math.max(alpha,Math.abs(a[i+3]-b[i+3]));for(let c=0;c<3;c++)premult=Math.max(premult,Math.abs(a[i+c]*a[i+3]/255-b[i+c]*b[i+3]/255));}
-  return{alpha,premult,paths:xml.querySelectorAll('svg > g path').length,vectorClips:xml.querySelectorAll('mask path').length,images:xml.querySelectorAll('defs > image').length,original:Array.from(a.slice((20*240+20)*4,(20*240+20)*4+4)),filtered:Array.from(a.slice((20*240+124)*4,(20*240+124)*4+4))};
+  return{alpha,premult,paths:xml.querySelectorAll('svg > g path').length,vectorClips:xml.querySelectorAll('mask path, clipPath path').length,images:xml.querySelectorAll('defs > image').length,original:Array.from(a.slice((20*240+20)*4,(20*240+20)*4+4)),filtered:Array.from(a.slice((20*240+124)*4,(20*240+124)*4+4))};
  },{svg:svg.toString(),png:[...png]});expect(result.paths).toBe(1);expect(result.vectorClips).toBe(1);expect(result.images).toBe(1);expect(result.original).toEqual([128,64,32,255]);expect(result.filtered[3]).toBe(255);expect(result.filtered).not.toEqual(result.original);expect(result.alpha).toBe(0);expect(result.premult).toBe(0);await writeFile('/tmp/canoli-svg-smart-production.json',JSON.stringify(result,null,2)+'\n');await page.keyboard.press('Control+z');await expect(page.locator('.layer-row')).toHaveCount(0);
 });
 

@@ -270,6 +270,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       const vectorTree = layers.filter(layer => layer.kind === "vector" || layer.kind === "group"||layer.kind==='raster'||layer.kind==='text'||layer.kind==='smart-object'||layer.kind==='paint');
       const svgMasks=planSvgMasks(document);
       if(svgMasks.some(plan=>plan.vector))featuresPreserved.push('Editable unfeathered vector layer/group masks, density and inversion');
+      if(svgMasks.some(plan=>plan.clipPath))featuresPreserved.push('Hard vector masks as editable SVG clipping paths');
       if(svgMasks.some(plan=>!plan.vector)){
         featuresPreserved.push('Native-resolution layer/group/stroke mask coverage in embedded PNG tiles');
         warnings.push('Painted, sampled, bitmap and feathered masks are embedded as native-resolution PNG coverage tiles. Artwork paths remain vectors; these masks are rasterized and may soften when enlarged.');

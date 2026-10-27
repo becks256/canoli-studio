@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Current F02/F11 geometric SVG clipping increment (2026-10-27)
+
+Local geometric clipping compiles into editable native masks with independent source ownership and the existing shared commands/history. Hard vector masks retain standard SVG clipping-path output for supported editable reimport; richer masks, CSS/DOM/text silhouettes and broader SVG/viewer fidelity remain open. See [SVG_CLIPPING.md](SVG_CLIPPING.md) and the dated roadmap for observed verification. The complete professional-editor and performance objectives remain active.
+
 ### Current F02 sibling clipping increment (2026-10-26)
 
 Schema 48 connects editable clipping membership to shared OO/history, Inspector/palette, isolated scripts/plugins, independent REST, recipes and original-bearing native persistence. The dated roadmap records source-isolation, native-alpha, styles/cache and large-image verification. SVG prefixes remain baked. Supported Photoshop pixel stacks retain editable clipping on import/export; group relationships, advanced settings and other unsupported appearance retain explicit bake/merged fallback. [Contract and remaining F02 scope](CLIPPING_MASKS.md). The full professional-editor, all-tool performance and original roadmap remain required.

@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## SVG clipping invariant
+
+Compile inert XML references without altering the source tree. Child silhouettes union independently of paint opacity/strokes; nested geometric clipping intersects. Bbox coordinates cannot replace the definition viewport used for percentage lengths. Preserve root viewport and use-instance coordinate planes, and retain independent native mask ownership rather than shared XML references. Host image/text preparation cannot overwrite outer clipping. Existing mask validation/history/cache and source leases remain authoritative. Hard vector masks retain geometric SVG output; richer alpha graphs remain explicit. See [SVG_CLIPPING.md](SVG_CLIPPING.md).
+
 ## Clipping invariant
 
 Sibling clipping derives from current order, not ID links or mutated pixels. Resolve it independently in each group; orphan members contribute no pixels. Keep intrinsic base alpha separate from fill/color and apply it once after member composition. Base masks/styles and common opacity/blending stay on the completed stack. Cache keys cannot treat completed clipping as raw base-only content. Source-isolated preparation clears only its private outer flag, retaining the public relationship on replacement output. No new command authority, external capability or source-size cap is introduced. See [CLIPPING_MASKS.md](CLIPPING_MASKS.md).
