@@ -1,8 +1,8 @@
 # Canoli Studio System Design & Architecture Specification
 
-## ICC dependency invariant
+## Connected ICC invariants
 
-Separate original ICC bytes, checked native metadata, prepared settings and owned RGBA windows. Native intent fallback must be explicit. A failed/aborted owner cannot expose an earlier transform or commit late pixels. Validate worker identity, settings and output shape, release native contexts/slots and keep alpha unchanged. Profiles are not document geometry, image-resolution limits or new plugin grants. The sRGB8 scene and existing public mutation model remain authoritative until application color integration is completed. See [ICC_ENGINE.md](ICC_ENGINE.md).
+Separate immutable complete ICC sources, native metadata, output/proof preferences, prepared workers and owned pixel windows. Apply preferences atomically after native preflight; validate complete workspace v3 sources before publishing any restored tab. Stale or failed proof must not present partial pixels or report applied. Viewport proof never enters native caches or export. Convert straight-alpha readback directly into PNG/TIFF/PDF encoding and embed the exact target profile. Keep scene editing sRGB8 and preserve all document/command/isolation boundaries. [Contracts and remaining gates](ICC_ENGINE.md).
 
 ## SVG clipping invariant
 

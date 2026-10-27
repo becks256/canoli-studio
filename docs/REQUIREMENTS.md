@@ -1,8 +1,8 @@
 # Canoli Studio editor requirements
 
-## Native ICC dependency and application gates (F10/F11)
+## ICC browser proof and RGB delivery (F10/F11)
 
-Use actual native ICC transforms, explicit intent/black-point behavior, four-channel device proofing, exact alpha and complete original profile bytes. Reject stale/malformed worker results and failed targets without retaining a prior transform. Verify real WASM, independent native/reader references and browser cancellation/resource recovery. This private dependency does not complete application assignment/conversion, soft-proof pixels, color-managed delivery or profile transport; those integrations and the full professional color/precision objective remain required. See [ICC_ENGINE.md](ICC_ENGINE.md).
+Support inspected complete RGB/device ICC profiles, native intent/BPC, staged atomic Color settings, actual current-frame proof/gamut alarms and explicit pending/applied/failed status. Convert RGB8 PNG/TIFF/PDF delivery with exact alpha and original embedded target profiles; exclude proof. Persist complete sources/settings per tab in workspace v3, validate before restore publication and visibly disable legacy unclipped proof. Verify actual WASM, independent decoded files, cancellation/stale ownership, real browser workflow and genuine 50 MP behavior. Working-space assignment/conversion, high precision, CMYK delivery, HDR, portable job dependencies, other-format profile fidelity and physical device/performance acceptance remain required. [Exact implemented boundary](ICC_ENGINE.md).
 
 ## Editable SVG geometric clipping (F02/F11)
 

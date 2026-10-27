@@ -96,6 +96,8 @@ export function previewMask(
     : mask;
 }
 export interface RenderOptions {
+  /** Viewport-only. Native render/export caches remain in sRGB8. */
+  colorProof?: import('../core/color/color-settings').ColorProof | null;
   /** Internal transient cancellation predicate; never serialized. */
   isCancelled?: () => boolean;
   /** Trusted transient tool data; never committed to document history. */

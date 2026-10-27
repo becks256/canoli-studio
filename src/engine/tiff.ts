@@ -1,3 +1,5 @@
+import {prepareIccOutput,type IccOutput} from './icc-output';
+import {normalizeColorOutput,type ColorOutput} from '../core/color/color-settings';
 import {RASTER_EXPORT_COLUMNS,rasterExportRows} from './raster-export-grid';
 import {captureRasterExportSources} from './raster-export-source';
 import {validateDocument,type DocumentData} from '../core/model';
@@ -23,9 +25,9 @@ async function deflateTile(pixels:Uint8Array,control?:ExportControl):Promise<Blo
 export class TiffTileEncoder {
  readonly tileWidth:number;readonly tileHeight:number;readonly totalTiles:number;
  private parts:BlobPart[]=[];private offsets:number[]=[];private counts:number[]=[];private payloadBytes=0;private state:'open'|'busy'|'closed'|'failed'='open';private profile:Uint8Array;
- constructor(readonly width:number,readonly height:number,readonly variant:TiffVariant='auto'){
+ constructor(readonly width:number,readonly height:number,readonly variant:TiffVariant='auto',profile?:Uint8Array){
   validateTiffGeometry(width,height);validateTiffVariant(variant);this.tileWidth=Math.min(RASTER_EXPORT_COLUMNS,Math.ceil(width/16)*16);this.tileHeight=Math.min(64,Math.ceil(height/16)*16);this.totalTiles=Math.ceil(width/this.tileWidth)*Math.ceil(height/this.tileHeight);if(!Number.isSafeInteger(this.totalTiles))throw new Error('TIFF tile count exceeds exact file addressing.');
-  this.profile=new Uint8Array(STANDARD_PROFILES.srgb.iccBytes!);
+  this.profile=new Uint8Array(profile??STANDARD_PROFILES.srgb.iccBytes!);
  }
  async append(pixels:Uint8Array,control?:ExportControl){
   if(this.state!=='open'||this.counts.length>=this.totalTiles)throw new Error('TIFF encoder is not accepting tiles.');
@@ -46,8 +48,8 @@ export class TiffTileEncoder {
 }
 export interface TiffExportPage {document:DocumentData;assets:AssetStore;renderer:DocumentRenderer}
 /** All page snapshots and dependencies are captured before the first callback. */
-export async function exportTiffPages(input:readonly TiffExportPage[],variant:TiffVariant='auto',control?:ExportControl):Promise<Blob>{
- checkExport(control);variant=validateTiffVariant(variant);
+export async function exportTiffPages(input:readonly TiffExportPage[],variant:TiffVariant='auto',control?:ExportControl,color?:ColorOutput):Promise<Blob>{
+ checkExport(control);variant=validateTiffVariant(variant);color=color?normalizeColorOutput(color):undefined;let output:IccOutput|null=null;
  if(!Array.isArray(input)||!input.length)throw new Error('Choose at least one TIFF page.');
  const pages:{document:DocumentData;assets:AssetStore;renderer:DocumentRenderer;encoder:TiffTileEncoder;check:import('./export-fonts').FontSourceCapture}[]=[];
  try{for(const page of input){
@@ -56,6 +58,8 @@ export async function exportTiffPages(input:readonly TiffExportPage[],variant:Ti
   pages.push({document,assets:page.assets,renderer:page.renderer,encoder,check:captureRasterExportSources(document,page.assets,control,'multipage TIFF export')});
  }
  const current=()=>{checkExport(control);for(const page of pages)page.check();};
+ output=await prepareIccOutput(color,control);current();
+ if(output)for(const page of pages){page.encoder=new TiffTileEncoder(page.document.width,page.document.height,variant,output.profile);}
  const encoded:{input:TiffPageDirectoryInput;payload:Blob}[]=[];
  const total=pages.reduce((sum,page)=>sum+page.encoder.totalTiles,0);
  if(!Number.isSafeInteger(total))throw new Error('TIFF tile count exceeds exact file addressing.');
@@ -68,7 +72,8 @@ export async function exportTiffPages(input:readonly TiffExportPage[],variant:Ti
     // Match the canonical PNG render grid before cropping into TIFF storage tiles.
     for(let sourceY=Math.floor(y/rows)*rows;sourceY<y+height;sourceY+=rows){
      current();const nativeRows=Math.min(rows,document.height-sourceY),tile=await renderer.render(document,assets,{region:{x,y:sourceY,width,height:nativeRows},cache:false,readback:true,isCancelled:()=>!!control?.signal?.aborted});
-     try{current();if(tile.width!==width||tile.height!==nativeRows)throw new Error('TIFF rendering did not return native-resolution pixels.');const pixels=tile.getContext('2d')!.getImageData(0,0,width,nativeRows).data;
+     try{current();if(tile.width!==width||tile.height!==nativeRows)throw new Error('TIFF rendering did not return native-resolution pixels.');let pixels=tile.getContext('2d')!.getImageData(0,0,width,nativeRows).data;
+      if(output){pixels=await output.apply(pixels);current();}
       for(let row=Math.max(y,sourceY);row<Math.min(y+height,sourceY+nativeRows);row++)padded.set(pixels.subarray((row-sourceY)*width*4,(row-sourceY+1)*width*4),(row-y)*encoder.tileWidth*4);
      }finally{release(tile);}
     }
@@ -82,8 +87,8 @@ export async function exportTiffPages(input:readonly TiffExportPage[],variant:Ti
   if(blob.size!==plan.fileBytes)throw new Error('TIFF output size does not match its directories.');current();return blob;
  }catch(error){for(const page of pages)page.encoder.abort();throw error;}
  finally{encoded.length=0;}
- }finally{for(const page of pages)page.check.release();}
+ }finally{output?.dispose();for(const page of pages)page.check.release();}
 }
-export async function exportTiff(document:DocumentData,assets:AssetStore,renderer:DocumentRenderer,variant:TiffVariant='auto',control?:ExportControl):Promise<Blob>{
- return exportTiffPages([{document,assets,renderer}],variant,control);
+export async function exportTiff(document:DocumentData,assets:AssetStore,renderer:DocumentRenderer,variant:TiffVariant='auto',control?:ExportControl,color?:ColorOutput):Promise<Blob>{
+ return exportTiffPages([{document,assets,renderer}],variant,control,color);
 }

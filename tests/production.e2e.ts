@@ -2164,3 +2164,6 @@ test('production measured spacing and equal-gap attraction preserve cancellation
 
 import {vectorWorkingWorkflow} from './helpers/vector-working-cache';
 test('production dense vector movement preserves complete paths, exact native pixels, one Undo and reopened projects',async({page},info)=>{await vectorWorkingWorkflow(page,info,true);});
+
+import {iccApplicationWorkflow}from './helpers/icc-application';
+test('production ICC canvas proof, independent converted files and complete workspace reopening without developer globals',async({page},info)=>{test.setTimeout(240000);await iccApplicationWorkflow(page,info,true);});

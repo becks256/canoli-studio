@@ -1,3 +1,5 @@
+import {prepareIccOutput,type IccOutput} from './icc-output';
+import {normalizeColorOutput,type ColorOutput} from '../core/color/color-settings';
 import type {DocumentData} from '../core/model';
 import type {AssetStore} from '../core/assets';
 import type {DocumentRenderer} from './renderer';
@@ -38,17 +40,19 @@ class DeflateRows {
 }
 
 /** One native-resolution raster page; source pixels are never resampled to set DPI. */
-export async function exportPdf(document: DocumentData, assets: AssetStore, renderer: DocumentRenderer, dpi: unknown = 72, control?: ExportControl): Promise<Blob> {
+export async function exportPdf(document: DocumentData, assets: AssetStore, renderer: DocumentRenderer, dpi: unknown = 72, control?: ExportControl, color?:ColorOutput): Promise<Blob> {
   checkExport(control);
   const geometry = pdfPageGeometry(document.width,document.height,dpi), writer = new PdfWriter();
+  color=color?normalizeColorOutput(color):undefined;let output:IccOutput|null=null;
   const current = captureRasterExportSources(document,assets,control,'PDF export');
   try{
+  output=await prepareIccOutput(color,control);current();
   const catalog=writer.reserve(),pages=writer.reserve(),page=writer.reserve(),profile=writer.reserve(),content=writer.reserve(),info=writer.reserve();
   const colors=new DeflateRows(control),coverage=new DeflateRows(control);
   const rows=rasterExportRows(document.width),total=Math.ceil(document.width/RASTER_EXPORT_COLUMNS)*Math.ceil(document.height/rows); let completed=0;
   let opaque=true;
   try {
-    writer.stream(profile,'/N 3 /Alternate /DeviceRGB',new Blob([new Uint8Array(STANDARD_PROFILES.srgb.iccBytes!)]));
+    writer.stream(profile,'/N 3 /Alternate /DeviceRGB',new Blob([output?.profile??new Uint8Array(STANDARD_PROFILES.srgb.iccBytes!)]));
     control?.onProgress?.({phase:'rendering',fraction:0}); current();
     for(let y=0;y<document.height;y+=rows) {
       current();const height=Math.min(rows,document.height-y),rgb=new Uint8Array(document.width*height*3),alpha=new Uint8Array(document.width*height);
@@ -57,7 +61,8 @@ export async function exportPdf(document: DocumentData, assets: AssetStore, rend
         const tile=await renderer.render(document,assets,{region:{x,y,width,height},cache:false,readback:true,isCancelled:()=>!!control?.signal?.aborted});
         try {
           current();if(tile.width!==width||tile.height!==height)throw new Error('PDF rendering did not return native-resolution pixels.');
-          const rgba=tile.getContext('2d')!.getImageData(0,0,width,height).data;
+          let rgba=tile.getContext('2d')!.getImageData(0,0,width,height).data;
+          if(output){rgba=await output.apply(rgba);current();}
           for(let row=0;row<height;row++)for(let col=0;col<width;col++) {
             const i=(row*width+col)*4,p=row*document.width+x+col,j=p*3;
             rgb[j]=rgba[i];rgb[j+1]=rgba[i+1];rgb[j+2]=rgba[i+2];alpha[p]=rgba[i+3];if(alpha[p]!==255)opaque=false;
@@ -79,5 +84,5 @@ export async function exportPdf(document: DocumentData, assets: AssetStore, rend
     writer.object(info,'<< /Producer (Canoli Studio) /Creator (Canoli Studio) >>');
     current();const blob=writer.finish(catalog,info);current();return blob;
   } catch(error) {writer.abort();await Promise.allSettled([colors.abort(error),coverage.abort(error)]);throw error;}
-  }finally{current.release();}
+  }finally{output?.dispose();current.release();}
 }

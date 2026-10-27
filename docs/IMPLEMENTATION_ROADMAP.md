@@ -1524,7 +1524,7 @@ Owner: implementation agent; T16 complete across contracts F06, F07, F08, and F1
 
 ### 2026-09-28 — T17: Color management and interchange feasibility & prototype
 
-Owner: implementation agent; T17 complete across contracts F10 (Color Management & Precision) and F11 (Interchange & High-Fidelity Export). Resolves roadmap decision **D10**.
+Historical prototype entry; its completion, assign/convert, real-time proof and dependency claims below were superseded by the native ICC foundation and connected browser workflow recorded on 2026-10-27. Full F10/F11 acceptance remains open.
 
 - **F10 (Mathematical Color Management & Precision Engine)**:
   - Implemented mathematical color pipeline in `src/core/color/` supporting standard RGB spaces (`sRGB`, `Display P3`, `Adobe RGB 1998`, `Linear sRGB`), `CIEXYZ` (illuminants D65 and D50), `CIELAB`, and `DeviceCMYK`.
@@ -6014,3 +6014,18 @@ Verification on the fixed final source/release:
 - [Sealed AVIF foundation evidence](benchmarks/avif-input-foundation-2026-10-22.json) retains source/release identities, native build provenance/logs, independent fixtures/checkers, failed/excluded diagnostic runs and accepted reports/output artifacts. All **257 earlier benchmark JSON files remain byte-identical**; payload/source/release and independent pixel audits complete before commit.
 
 The required next work is transactional AVIF app opening and exact original-source/decode-choice retention through AssetStore, native projects/workspaces/history/recovery, portable recipes/brush sources and cross-document copying, with picker/drop/recent-file preflight and full app 50 MP import/save/reopen/export acceptance. The foundation's source-Blob hash checks do not substitute for those persistence tests. HDR/tone-map/sample-transform/sequence/color/photographic breadth, real device/display/process-memory and sustained editor-wide F14 gates remain open, together with every other unfinished original professional, AI/provider/evaluation/production, workflow/collaboration/commercial/specialist roadmap requirement. No paid operation, account, upload, new isolated permission or complete-roadmap claim is introduced.
+
+
+### 2026-10-27 — F10 connected ICC proof, RGB delivery and workspace ownership
+
+Owner: implementation agent. Continues the active objective to finish the complete roadmap; this increment does not close F10/F11 or reduce professional-editor scope.
+
+Connected the native dependency to immutable inspected host profiles, atomic preflighted Color settings, actual Canvas2D proof/gamut pixels and honest pending/applied/failed presentation. Fingerprint/settings identity invalidates stale gesture/wet/stroke frames; exports keep unproofed sources. PNG/TIFF/PDF convert final straight-alpha RGB8 readback and embed the exact original target profile; TIFF pages share the captured output preset. Unsupported explicit format/color combinations reject. Default host output remains sRGB and the scene remains sRGB8. Workspace v3 owns full profile Blobs/hash/name/settings and restores only after all sources, transforms and projects validate; versions 1/2 migrate, with a visible notice disabling unsupported unclipped proof. Removed misleading working-space assignment/conversion controls. [Contract](ICC_ENGINE.md).
+
+Validation: final `npm run build` and all **2,467 unit/API tests across 263 files** pass. The source-browser regression matrix passed **87 cases** before final profile-picker/proof-status review; **6 final source-browser cases** then verified actual CMYK device proof against the independent red reference, RGB-only output admission, profile deduplication after complete workspace restore, captured output conversion on every TIFF page, source/history invariants, stale/malformed restore rejection and failed proof removal with same-setting retry. All **157 final production browser cases** pass, including the connected workflow without developer globals. The built ICC guide also passes its JavaScript-disabled 390 px check.
+
+The genuine **10,000 × 5,000 (50 MP)** fixture preserves original project sources/model across reopening. All stored PNG/TIFF/PDF RGBA samples match independent Pillow/Little CMS and MuPDF conversion with maximum error **0**, including alpha and exact embedded target profiles. Native/reference provenance remains in the preceding dependency entry; synthetic device checks do not establish physical print quality. Final review fixed duplicate profile choices by fingerprint and retained an honest failed-proof badge plus retry scheduling when removal cannot render. Long profile names are bounded in the footer.
+
+Evidence: [ICC application verification](benchmarks/icc-application-2026-10-27.zip) retains exact source/build identities, a reconstructable patch, independent decoder results, raw failed/interrupted/accepted reports and actual browser/file artifacts. The initial production attempt was deliberately interrupted for the proof failure/retry correction; it is not counted as acceptance. The complete final production run uses the corrected frozen build.
+
+Still required: working-space assignment/conversion and rendering architecture, genuine high precision and CMYK/HDR delivery, complete portable recipe/batch/delivery-job profile dependencies, remaining format color fidelity, measured physical devices, broader browser/device/performance/resource gates, and every other unfinished roadmap family. No live ChatGPT/provider/commercial acceptance is inferred.

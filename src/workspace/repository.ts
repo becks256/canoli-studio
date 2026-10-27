@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import {colorSettingsRecordSchema} from '../core/color/color-settings-record';
+export const WORKSPACE_VERSION=3 as const;
 const rgbSpace = z.enum(["srgb", "display-p3", "adobe-rgb", "linear-srgb"]);
 const channel = z.number().finite().min(0).max(255);
 const proofSchema = z.object({
@@ -16,7 +18,7 @@ const proofSchema = z.object({
 });
 export const workspaceSchema = z
   .object({
-    version: z.union([z.literal(1), z.literal(2)]),
+    version: z.union([z.literal(1), z.literal(2), z.literal(3)]),
     savedAt: z.number().finite(),
     activeIndex: z.number().int().nonnegative(),
     documents: z
@@ -34,6 +36,7 @@ export const workspaceSchema = z
             .strict()
             .optional(),
           selectedIds: z.array(z.string()),
+          colorSettings:colorSettingsRecordSchema.optional(),
           colorProfile: rgbSpace.default("srgb"),
           softProof: proofSchema.nullable().default(null),
           view: z.object({
@@ -52,7 +55,9 @@ export const workspaceSchema = z
   .superRefine((workspace, context) => {
     const links = new Set<string>();
     for (let index = 0; index < workspace.documents.length; index++) {
-      const link = workspace.documents[index].componentEdit;
+      const entry=workspace.documents[index];
+      if((workspace.version===3)!==!!entry.colorSettings)context.addIssue({code:'custom',path:['documents',index,'colorSettings'],message:'Complete color settings are required for workspace version 3 only.'});
+      const link = entry.componentEdit;
       if (!link) continue;
       const issue = (message: string) =>
         context.addIssue({
@@ -60,8 +65,8 @@ export const workspaceSchema = z
           path: ["documents", index, "componentEdit"],
           message,
         });
-      if (workspace.version !== 2)
-        issue("Component editing links require workspace version 2.");
+      if (workspace.version < 2)
+        issue("Component editing links require workspace version 2 or later.");
       if (
         link.ownerIndex >= workspace.documents.length ||
         link.ownerIndex === index

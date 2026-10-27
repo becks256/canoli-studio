@@ -1,8 +1,8 @@
 # Plugins and extensions
 
-## Native ICC is not a new plugin capability
+## ICC browser integration adds no plugin grant
 
-The private ICC dependency adds no file chooser, profile store, native module or worker service to isolated plugin commands. Installation remains inert and existing host grants/undo validation remain authoritative. Application color integration remains in progress; see [ICC_ENGINE.md](ICC_ENGINE.md).
+Native ICC inspection, color preferences, viewport proof and file delivery belong to the trusted browser host. They add no file chooser, profile/native store or worker service to isolated plugin commands. Installation remains inert; manifest grants, host validation, shared Undo/revision and source ownership remain authoritative. [Exact host boundary](ICC_ENGINE.md).
 
 ## SVG geometric clipping grants no file capability
 

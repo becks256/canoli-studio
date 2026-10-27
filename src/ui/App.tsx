@@ -114,7 +114,7 @@ import { BatchRunnerDialog } from "./BatchRunnerDialog";
 import { ColorProfileDialog } from "./ColorProfileDialog";
 import {PhotoshopImportDialog} from "./PhotoshopImportDialog";
 import { RefineEdgeDialog } from "./RefineEdgeDialog";
-import { STANDARD_PROFILES } from "../core/color/icc";
+import {iccTarget} from '../core/color/profile-source';
 import type { GenerationCandidate } from "../ai/jobs/types";
 import { ScriptPanel } from "./ScriptPanel";
 import { PluginPanel } from "./PluginPanel";
@@ -580,7 +580,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   }
   function exportPng() {
     void task(async () => {
-      download(await editor.exportPng(), `${fileName(dom.name)}.png`);
+      download((await editor.export({format:"png",color:editor.colorSettings.output.profile==='srgb'&&editor.colorSettings.output.intent==='relative-colorimetric'&&!editor.colorSettings.output.blackPointCompensation?undefined:editor.colorSettings.output})).blob, `${fileName(dom.name)}.png`);
       notify("PNG exported");
     });
   }
@@ -1284,7 +1284,8 @@ export function App({ editor }: { editor: EditorApplication }) {
     },
   }), [editor, dom, state.document, state.selectedIds, toolState.settings, toolState.drawing, zoom, pan, viewportSize, panelLayout.widths.layers, panelLayout.widths.inspector, viewDocument.width, viewDocument.height]);
 
-  const { rendering, renderBackend, paintedRegion } = useCanvasRenderer({
+  const { rendering, renderBackend, paintedRegion, proofStatus } = useCanvasRenderer({
+    colorProof:editor.colorSettings.proof,
     editor,
     viewDocument,
     assets:wetPreview?.assets??assets,
@@ -2521,7 +2522,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                   type="button"
                   className="status-profile-btn"
                   onClick={() => setShowColorDialog(true)}
-                  title="Click to change color working space or configure soft proofing"
+                  title={["sRGB8 editing. Click for output profile and canvas proof settings.",...editor.colorWarnings].join(" ")}
                   style={{
                     background: "none",
                     border: "none",
@@ -2530,29 +2531,18 @@ export function App({ editor }: { editor: EditorApplication }) {
                     cursor: "pointer",
                     padding: 0,
                     textDecoration: "underline dotted",
+                    display: "inline-block",
+                    maxWidth: "min(20vw, 200px)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    verticalAlign: "middle",
                   }}
                 >
-                  {STANDARD_PROFILES[editor.colorProfile]?.name ?? "sRGB"}
+                  sRGB8 · Output: {iccTarget(editor.colorSettings.output.profile).name}
                 </button>
-                {editor.softProof && (
-                  <>
-                    <span className="footer-divider">/</span>
-                    <span
-                      style={{
-                        color: "#eab308",
-                        fontWeight: 600,
-                      }}
-                      title={`Proofing: ${STANDARD_PROFILES[editor.softProof.proofSpace]?.name} (${editor.softProof.intent})${editor.softProof.gamutWarning ? " [Gamut Warning ON]" : ""}`}
-                    >
-                      Proof:{" "}
-                      {
-                        STANDARD_PROFILES[
-                          editor.softProof.proofSpace
-                        ]?.name.split(" ")[0]
-                      }
-                    </span>
-                  </>
-                )}
+                {(editor.colorSettings.proof||proofStatus==='pending'||proofStatus==='failed')&&<><span className="footer-divider">/</span><span data-testid="proof-status" style={{display:"inline-block",maxWidth:"min(25vw, 260px)",overflow:"hidden",textOverflow:"ellipsis",verticalAlign:"middle"}} title={proofStatus==='failed'?'Proof update failed; the previous frame is retained.':editor.colorSettings.proof?iccTarget(editor.colorSettings.proof.profile).name:'Removing proof'}>Proof: {proofStatus}{editor.colorSettings.proof?` · ${iccTarget(editor.colorSettings.proof.profile).name}`:''}</span></>}
+                {!!editor.colorWarnings.length&&<span title={editor.colorWarnings.join(' ')}> · Color notice</span>}
               </span>
               <span title={recoveryState.message}>
                 {recoveryState.status === "error"
@@ -2738,6 +2728,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         {showExportDialog && (
           <ExportDialog
             document={dom.toJSON()}
+            color={editor.colorSettings.output.profile==='srgb'&&editor.colorSettings.output.intent==='relative-colorimetric'&&!editor.colorSettings.output.blackPointCompensation?undefined:editor.colorSettings.output}
             pages={editor.documentSessions.map(session=>({key:session.id,document:session.document._read()}))}
             busy={busy}
             onClose={() => setShowExportDialog(false)}
@@ -2748,7 +2739,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                   if(pageKeys){
                     const sessions=editor.documentSessions;
                     const pages=pageKeys.map(key=>{const session=sessions.find(session=>session.id===key);if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');return session.document;});
-                    result=await editor.exportTiffPages(pages,{variant:options.tiffVariant},control);
+                    result=await editor.exportTiffPages(pages,{variant:options.tiffVariant,color:options.color},control);
                   }else result = await editor.export(options, control);
                 }
                 catch (error) { if (control?.signal?.aborted) return; throw error; }
@@ -2764,23 +2755,11 @@ export function App({ editor }: { editor: EditorApplication }) {
         )}
         {showColorDialog && (
           <ColorProfileDialog
-            currentProfileId={editor.colorProfile}
-            onApplyProfile={(profileId, mode, _intent) => {
-              editor.setColorProfile(profileId);
-              notify(
-                `Color profile set to ${STANDARD_PROFILES[profileId]?.name ?? profileId} (${mode})`,
-              );
-            }}
-            onUpdateSoftProof={(options) => {
-              editor.setSoftProof(options);
-              if (options) {
-                notify(
-                  `Soft proofing: ${STANDARD_PROFILES[options.proofSpace]?.name ?? options.proofSpace}`,
-                );
-              } else {
-                notify("Soft proofing disabled");
-              }
-            }}
+            key={editor.recoverySessionId}
+            settings={editor.colorSettings}
+            warnings={editor.colorWarnings}
+            inspect={(file,name,signal)=>editor.inspectColorProfile(file,name,{signal})}
+            onApply={async(settings,signal)=>{const warnings=await editor.setColorSettings(settings,{signal});notify(warnings.length?warnings.join(' '):'Color output and proof settings applied');}}
             onClose={() => setShowColorDialog(false)}
           />
         )}

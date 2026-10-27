@@ -1,8 +1,8 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
-## Current F10 native ICC dependency (2026-10-27)
+## Current F10 connected ICC browser increment (2026-10-27)
 
-A pinned memory-only CMM now supplies actual RGB output conversion and device proofing internally, with explicit intent fallback, exact alpha and private worker ownership. This is a dependency, not application color-feature acceptance: Color dialog integration, preview/delivery, profile persistence and the full working-space/precision/CMYK/HDR/device/performance scope remain required. See [ICC_ENGINE.md](ICC_ENGINE.md) and the dated roadmap.
+A pinned memory-only CMM now supplies actual RGB output conversion and device proofing internally, with explicit intent fallback, exact alpha and private worker ownership. Atomic Color settings now drive actual viewport proof/gamut pixels, RGB8 PNG/TIFF/PDF delivery and complete workspace v3 profile ownership. The scene remains sRGB8. Portable job dependencies and the full working-space/precision/CMYK/HDR/device/performance scope remain required. See [ICC_ENGINE.md](ICC_ENGINE.md) and the dated roadmap.
 
 ## Current F02/F11 geometric SVG clipping increment (2026-10-27)
 

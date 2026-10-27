@@ -13,6 +13,7 @@ export interface UseCanvasRendererOptions {
   renderRegion: RenderRegion;
   zoom: number;
   paintPreview: RenderOptions["paintPreview"];
+  colorProof?: RenderOptions["colorProof"];
   wetPreview?: WetPaintPreview | null;
   previewGesture?: object | null;
   gestureRef?: RefObject<object | null>;
@@ -26,6 +27,7 @@ export interface UseCanvasRendererResult {
   rendering: boolean;
   renderBackend: "webgpu" | "canvas2d" | null;
   paintedRegion: RenderRegion;
+  proofStatus: "pending" | "applied" | "failed" | "off";
 }
 
 export function useCanvasRenderer({
@@ -35,6 +37,7 @@ export function useCanvasRenderer({
   renderRegion,
   zoom,
   paintPreview,
+  colorProof = editor.colorSettings?.proof ?? null,
   wetPreview,
   previewGesture,
   gestureRef,
@@ -43,7 +46,9 @@ export function useCanvasRenderer({
   onCleanupCursor,
   onError,
 }: UseCanvasRendererOptions): UseCanvasRendererResult {
+  const colorState=editor.colorSettings;
   const [rendering, setRendering] = useState(false);
+  const [proofFrame,setProofFrame]=useState<{proof:typeof colorProof;failed:boolean;colorState:typeof colorState}|null>(null);
   const [fontRevision, setFontRevision] = useState(0);
   useEffect(() => {
     const fonts = document.fonts;
@@ -75,6 +80,7 @@ export function useCanvasRenderer({
 
   const latestRender = useRef<{
     document: DocumentData;
+    colorState:typeof colorState;
     assets: typeof assets;
     key: number;
     options: RenderOptions;
@@ -98,7 +104,7 @@ export function useCanvasRenderer({
     // An older prefix of the SAME live stroke may be displayed while
     // its next frame waits. Never show an old revision/view/gesture.
     const sameStroke =
-      target &&
+      target && target.options.colorProof === job.options.colorProof && target.colorState === job.colorState &&
       job.options.paintPreview &&
       target.options.paintPreview?.stroke.id ===
         job.options.paintPreview.stroke.id &&
@@ -113,7 +119,7 @@ export function useCanvasRenderer({
       target.backendState === job.backendState &&
       target.options.scale === job.options.scale;
 
-    const sameGesture = target && job.gesture &&
+    const sameGesture = target && target.options.colorProof === job.options.colorProof && target.colorState === job.colorState && job.gesture &&
       target.gesture === job.gesture && gestureRef?.current === job.gesture &&
       target.sourceDocument === job.sourceDocument &&
       editor.document.getSnapshot().document === job.sourceDocument &&
@@ -122,7 +128,7 @@ export function useCanvasRenderer({
       target.fontRevision === job.fontRevision &&
       target.backendState === job.backendState;
 
-    const sameWet=target&&job.wetPreview&&target.wetPreview?.owner===job.wetPreview.owner&&
+    const sameWet=target&&target.options.colorProof===job.options.colorProof&&target.colorState===job.colorState&&job.wetPreview&&target.wetPreview?.owner===job.wetPreview.owner&&
       job.wetPreview.isCurrent()&&target.sourceDocument===job.sourceDocument&&
       target.hostAssets===job.hostAssets&&target.region===job.region&&target.zoom===job.zoom&&
       target.fontRevision===job.fontRevision&&target.backendState===job.backendState;
@@ -130,6 +136,8 @@ export function useCanvasRenderer({
     return !!(
       editor.document.getSnapshot().document !== job.sourceDocument ||
       editor.assetStore !== job.hostAssets ||
+      editor.colorSettings !== job.colorState ||
+      (editor.colorSettings?.proof??null) !== (job.options.colorProof??null) ||
       (job.wetPreview&&!job.wetPreview.isCurrent()) ||
       job.options.paintPreview?.cloneSource?.isDisposed ||
       (job.gesture && (gestureRef?.current !== job.gesture ||
@@ -145,6 +153,7 @@ export function useCanvasRenderer({
     latestRender.current?.release?.();
     latestRender.current = {
       document: viewDocument,
+      colorState,
       gesture: previewGesture,
       sourceDocument: editor.document.getSnapshot().document,
       zoom, fontRevision, backendState,
@@ -158,6 +167,7 @@ export function useCanvasRenderer({
         region: renderRegion,
         scale: Math.min(1, zoom * window.devicePixelRatio),
         paintPreview,
+        colorProof,
       },
     };
     renderTarget.current = latestRender.current;
@@ -237,9 +247,11 @@ export function useCanvasRenderer({
               result.dispose();
             }
 
+            setProofFrame({proof:job.options.colorProof??null,failed:false,colorState:job.colorState});
             setRenderBackend(result.backend);
             setPaintedRegion(job.region);
           } catch (cause) {
+            if (!isObsolete(job))setProofFrame(previous=>({proof:job.options.colorProof??null,failed:!!job.options.colorProof||!!previous?.proof||!!previous?.failed,colorState:job.colorState}));
             if (!isObsolete(job) && onErrorRef.current) {
               onErrorRef.current(
                 cause instanceof Error ? cause.message : "Rendering failed.",
@@ -271,10 +283,10 @@ export function useCanvasRenderer({
       const key = ++renderVersion.current;
       latestRender.current?.release?.();
       latestRender.current = {
-        document: viewDocument, assets, key, region: renderRegion,
+        document: viewDocument, colorState, assets, key, region: renderRegion,
         hostAssets:assets,
         gesture: previewGesture, sourceDocument, zoom, fontRevision, backendState,
-        options: { region: renderRegion, scale: Math.min(1, zoom * window.devicePixelRatio), paintPreview: next },
+        options: { region: renderRegion, scale: Math.min(1, zoom * window.devicePixelRatio), paintPreview: next, colorProof },
       };
       renderTarget.current = latestRender.current;
       void drain();
@@ -286,6 +298,8 @@ export function useCanvasRenderer({
     renderRegion,
     zoom,
     paintPreview,
+    colorProof,
+    colorState,
     wetPreview,
     previewGesture,
     gestureRef,
@@ -310,5 +324,6 @@ export function useCanvasRenderer({
     rendering,
     renderBackend,
     paintedRegion,
+    proofStatus:(proofFrame?.proof!==colorProof||proofFrame?.colorState!==colorState)&&(colorProof||proofFrame?.proof||proofFrame?.failed)?"pending":proofFrame?.failed?"failed":colorProof?"applied":"off",
   };
 }

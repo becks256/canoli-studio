@@ -1,8 +1,8 @@
 # REST and scripting APIs
 
-## ICC dependency remains private
+## ICC color services are trusted browser host APIs
 
-The new native ICC worker is not an independent REST rendering route, browser synchronization or isolated scripting service. Existing document commands and sRGB8 composition remain unchanged. Actual application color delivery, proofing and profile ownership/transport remain in progress; see [ICC_ENGINE.md](ICC_ENGINE.md).
+The browser host exposes inspectColorProfile, guarded setColorSettings, immutable colorSettings/colorWarnings and explicit ExportOptions.color for PNG/TIFF/PDF and TIFF pages. Complete custom profile bytes persist in workspace v3. This adds no independent REST rendering route, browser synchronization or isolated scripting service. Existing document commands and sRGB8 composition remain authoritative. [Signatures, defaults, errors and ownership](ICC_ENGINE.md).
 
 ## SVG geometric clipping remains a host file boundary
 

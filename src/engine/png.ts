@@ -1,3 +1,5 @@
+import {prepareIccOutput,type IccOutput} from './icc-output';
+import {normalizeColorOutput,type ColorOutput} from '../core/color/color-settings';
 import {captureRasterExportSources} from './raster-export-source';
 import {freeze,isImmutable} from '../core/immutable';
 import {validateDocument} from '../core/model';
@@ -37,11 +39,15 @@ export async function exportPng(
   assets: AssetStore,
   renderer: DocumentRenderer,
   control?: ExportControl,
+  color?: ColorOutput,
 ): Promise<Blob> {
   checkExport(control);
   document=isImmutable(document)?document:freeze(structuredClone(document));validateDocument(document);
+  color=color?normalizeColorOutput(color):undefined;
+  let output:IccOutput|null=null;
   const current=captureRasterExportSources(document,assets,control,'PNG export');
   try{
+  output=await prepareIccOutput(color,control);current();
   current();control?.onProgress?.({phase:"rendering",fraction:0});current();
   const { width, height } = document;
   // This is the PNG format's dimension boundary, not an image import restriction.
@@ -56,8 +62,12 @@ export async function exportPng(
   const parts: BlobPart[] = [
     new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
     chunk("IHDR", header),
-    chunk("sRGB", new Uint8Array([0])),
+    ...(output?[]:[chunk("sRGB", new Uint8Array([0]))]),
   ];
+  if(output){
+    const compressed=await new Response(new Blob([output.profile]).stream().pipeThrough(new CompressionStream("deflate"))).arrayBuffer();current();
+    const name=new TextEncoder().encode("Canoli output\0\0"),data=new Uint8Array(name.length+compressed.byteLength);data.set(name);data.set(new Uint8Array(compressed),name.length);parts.push(chunk("iCCP",data));
+  }
   const compression = new CompressionStream("deflate");
   const writer = compression.writable.getWriter();
   const reader = compression.readable.getReader();
@@ -89,9 +99,10 @@ export async function exportPng(
         });
         try {
           current();
-          const pixels = tile
+          let pixels = tile
             .getContext("2d")!
             .getImageData(0, 0, tileWidth, rows).data;
+          if(output){pixels=await output.apply(pixels);current();}
           for (let row = 0; row < rows; row++)
             strip.set(
               pixels.subarray(row * tileWidth * 4, (row + 1) * tileWidth * 4),
@@ -123,7 +134,7 @@ export async function exportPng(
   }
   parts.push(chunk("IEND", new Uint8Array()));
   current();return new Blob(parts, { type: "image/png" });
-  }finally{current.release();}
+  }finally{output?.dispose();current.release();}
 }
 
 /**

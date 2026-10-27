@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Color settings and honest proof status
+
+Use the existing custom dialog, selects and check fields. Lead with the actual sRGB8 editing plane, then output RGB profile/intent/BPC and separately staged canvas-proof controls. File import shows inspected profile identity/class/space; CMYK is a proof target, never an RGB output choice. Apply preflights the whole draft; Cancel stays available during native work. Surface failures and intent fallback. Footer labels output preset separately from actual pending/applied/failed proof presentation. Export describes the selected RGB profile or explicit sRGB limitation; avoid working-space assignment or physical-print claims. [Workflow](ICC_ENGINE.md).
+
 ## Clipping controls
 
 Use the existing Appearance check-field and command palette for clipping. Disable creation without an eligible preceding base or under existing busy/lock rules; allow release of an orphan. Show the current base name in the Inspector and an indented arrow in clipped layer rows. Do not expose renderer/cache implementation details in the control. [Behavior and limitations](CLIPPING_MASKS.md).

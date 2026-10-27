@@ -135,6 +135,9 @@ import {
   type PsdImportOptions,
   type PsdImportResult,
 } from "./core/interchange/psd";
+import {IccProfile} from './core/color/profile-source';
+import {type IccControl} from './core/color/icc-client';
+import {normalizeColorSettings,normalizeColorOutput,serializeColorSettings,restoreColorSettings,preflightColorSettings,type ColorSettings} from './core/color/color-settings';
 import type { StandardRgbSpaceId, SoftProofOptions } from "./core/color/types";
 import {inspectPhotoshop,decodePhotoshop} from './engine/photoshop-import';
 import { validateWetPaintAssets } from './core/wet-assets';
@@ -281,6 +284,7 @@ export class EditorApplication {
       })(),
       selectedIds: [...session.document.getSnapshot().selectedIds],
       view: structuredClone(session.view),
+      colorSettings:serializeColorSettings(session.colorSettings),
       colorProfile: session.colorProfile,
       softProof: structuredClone(session.softProof),
       project: this.captureWorkspaceProject(session),
@@ -292,7 +296,7 @@ export class EditorApplication {
         project: await entry.project,
       })),
     );
-    return { version: 2, savedAt, activeIndex, documents: await encoded };
+    return { version: 3, savedAt, activeIndex, documents: await encoded };
   }
   private captureWorkspaceProject(session: DocumentSession): Promise<Blob> {
     const state = session.document.getSnapshot();
@@ -383,8 +387,14 @@ export class EditorApplication {
   ): Promise<Document[]> {
     workspace = workspaceSchema.parse(workspace);
     const decoded: { document: Document; assets: AssetStore }[] = [];
+    const colorSettings:ColorSettings[]=[],colorWarnings:string[][]=[];
     try {
       for (const entry of workspace.documents) {
+        const warnings:string[]=[];
+        colorSettings.push(entry.colorSettings?await restoreColorSettings(entry.colorSettings):this.legacyColorSettings(entry.colorProfile,entry.softProof,warnings));
+        const settings=colorSettings[colorSettings.length-1];
+        if(typeof settings.output.profile!=='string'||settings.proof)warnings.push(...await preflightColorSettings(settings));
+        colorWarnings.push(warnings);
         const loaded = await loadProject(entry.project);
         try {
           decoded.push({
@@ -421,8 +431,10 @@ export class EditorApplication {
     const restored = decoded.map((entry, index) => {
       const session = this.createSession(entry.document, entry.assets);
       session.view = structuredClone(workspace.documents[index].view);
-      session.colorProfile = workspace.documents[index].colorProfile;
-      session.softProof = structuredClone(workspace.documents[index].softProof);
+      session.colorSettings=colorSettings[index];
+      session.colorWarnings=colorWarnings[index];
+      session.colorProfile=typeof session.colorSettings.output.profile==='string'?session.colorSettings.output.profile:'srgb';
+      session.softProof=this.legacyProofMirror(session.colorSettings.proof);
       entry.document.selectLayers(
         workspace.documents[index].selectedIds.flatMap((id) => {
           const layer = entry.document.getLayer(id);
@@ -779,6 +791,8 @@ export class EditorApplication {
       const document = Document.fromJSON(loaded.document);
       const session = this.createSession(document, loaded.assets);
       session.colorProfile = owner.colorProfile;
+      session.colorSettings = owner.colorSettings;
+      session.colorWarnings = owner.colorWarnings;
       this.componentEdits.set(session, {
         owner,
         componentId,
@@ -1179,16 +1193,45 @@ export class EditorApplication {
     return this.currentSoftProof;
   }
 
-  setColorProfile(profileId: StandardRgbSpaceId): void {
-    this.currentProfileId = profileId;
-    this.activeSession.colorProfile = profileId;
-    this.publish();
+  get colorSettings():ColorSettings { return this.activeSession.colorSettings; }
+  get colorWarnings():readonly string[] { return this.activeSession.colorWarnings; }
+  inspectColorProfile(source:Blob,name?:string,control:IccControl={}) { return IccProfile.inspect(source,name,control); }
+  private colorRequest=0;
+  /** Trusted host preferences; preflight both transforms before publishing anything. */
+  async setColorSettings(value:ColorSettings,control:IccControl={}):Promise<readonly string[]> {
+    const settings=normalizeColorSettings(value),session=this.activeSession,before=session.colorSettings,request=++this.colorRequest,generation=this.ioGeneration;
+    const warnings:string[]=[];
+    const current=()=>{control.signal?.throwIfAborted();if(this.retouchDisposed||this.activeSession!==session||session.colorSettings!==before||this.ioGeneration!==generation||request!==this.colorRequest)throw new Error('The active document or color settings changed. Apply again from the current tab.');};
+    current();
+    warnings.push(...await preflightColorSettings(settings,control,current));
+    current();this.commitColorSettings(settings,[...new Set(warnings)]);return this.colorWarnings;
   }
-
-  setSoftProof(options: SoftProofOptions | null): void {
-    this.currentSoftProof = options;
-    this.activeSession.softProof = options;
-    this.publish();
+  private commitColorSettings(settings:ColorSettings,warnings:readonly string[]=[]){
+    this.activeSession.colorSettings=settings;this.activeSession.colorWarnings=Object.freeze([...warnings]);
+    this.currentProfileId=typeof settings.output.profile==='string'?settings.output.profile:'srgb';this.activeSession.colorProfile=this.currentProfileId;
+    const proof=settings.proof;
+    this.currentSoftProof=this.legacyProofMirror(proof);
+    this.activeSession.softProof=this.currentSoftProof;
+    this.renderer.resetView();this.publish();
+  }
+  private legacyProofMirror(proof:ColorSettings['proof']):SoftProofOptions|null{
+    if(!proof||typeof proof.profile!=='string')return null;
+    const warningColor=proof.warningColor.slice(1).match(/../g)!.map(value=>parseInt(value,16));
+    return {proofSpace:proof.profile,intent:proof.proofIntent,gamutWarning:proof.gamutWarning,...(proof.warningColor!=='#00ffff'?{warningColor:[...warningColor,255] as [number,number,number,number]}:{})};
+  }
+  private legacyColorSettings(profile:StandardRgbSpaceId,proof:SoftProofOptions|null,warnings:string[]=[]):ColorSettings{
+    if(proof?.intent==='unclipped'){warnings.push('Legacy soft proof was disabled: “unclipped” is not an ICC rendering intent. Choose a proof intent in Color Settings.');proof=null;}
+    const warningColor=proof?.warningColor?'#'+proof.warningColor.slice(0,3).map(v=>Math.round(v).toString(16).padStart(2,'0')).join(''):'#00ffff';
+    return normalizeColorSettings({output:{profile,intent:'relative-colorimetric',blackPointCompensation:false},proof:proof?{profile:proof.proofSpace,intent:'relative-colorimetric',proofIntent:proof.intent as import('./core/color/icc-types').IccIntent,blackPointCompensation:false,gamutWarning:proof.gamutWarning,warningColor}:null});
+  }
+  /** Compatibility alias: chooses an output preset; does not assign a working space. */
+  setColorProfile(profileId:StandardRgbSpaceId):void{
+    this.commitColorSettings(normalizeColorSettings({...this.colorSettings,output:{...this.colorSettings.output,profile:profileId}}));
+  }
+  setSoftProof(options:SoftProofOptions|null):void{
+    if(options?.intent==='unclipped')throw new Error('“unclipped” is not an ICC rendering intent. Choose a supported proof intent.');
+    const legacy=this.legacyColorSettings(this.currentProfileId,options);
+    this.commitColorSettings(normalizeColorSettings({...this.colorSettings,proof:legacy.proof}));
   }
 
   async selectSubject(options?: SelectSubjectOptions,control?:SelectSubjectControl): Promise<SelectionData> {
@@ -1223,6 +1266,8 @@ export class EditorApplication {
       document: this.activeDocument,
       assets: this.assets,
       state: this.activeDocument.getSnapshot(),
+      colorSettings:this.activeSession?.colorSettings,
+      colorWarnings:this.activeSession?.colorWarnings,
       colorProfile: this.currentProfileId,
       softProof: this.currentSoftProof,
       sessions: this.sessions?.map((session) => ({
@@ -1696,30 +1741,30 @@ export class EditorApplication {
   private captureTiffPages(documents:readonly Document[],options:TiffPagesExportOptions) {
     if(!Array.isArray(documents)||!documents.length)throw new Error('Choose at least one open document as a TIFF page.');
     if(new Set(documents).size!==documents.length)throw new Error('Choose each open document once.');
-    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='variant'))throw new Error('TIFF page export options accept only variant.');
-    const variant=validateTiffVariant(options.variant);
+    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='variant'&&key!=='color'))throw new Error('TIFF page export options accept only variant and color.');
+    const variant=validateTiffVariant(options.variant),color=options.color?normalizeColorOutput(options.color):undefined;
     const pages=documents.map(document=>{
       const session=this.sessions.find(session=>session.document===document);
       if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');
       return{session,document:document._read(),assets:session.assets,renderer:this.renderer};
     });
     const check=()=>{for(const page of pages)if(this.retouchDisposed||!this.sessions.includes(page.session)||page.session.assets!==page.assets)throw new Error('A TIFF page document closed during export. Choose its pages again.');};
-    check();return{pages,variant,check};
+    check();return{pages,variant,color,check};
   }
 
   /** Trusted browser host; each open Document becomes one flattened native-size page. */
   async exportTiffPages(documents:readonly Document[],options:TiffPagesExportOptions={},control?:ExportControl):Promise<ExportResult> {
-    checkExport(control);const{pages,variant,check}=this.captureTiffPages(documents,options);
-    const report=getTiffPagesCapabilityReport(pages.map(page=>page.document),variant);
+    checkExport(control);const{pages,variant,color,check}=this.captureTiffPages(documents,options);
+    const report=getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color);
     const current=()=>{checkExport(control);check();};
-    const blob=await encodeTiffPages(pages,variant,{signal:control?.signal,onProgress:progress=>{current();control?.onProgress?.(progress);current();}});
+    const blob=await encodeTiffPages(pages,variant,{signal:control?.signal,onProgress:progress=>{current();control?.onProgress?.(progress);current();}},color);
     if(control?.signal)await new Promise<void>(resolve=>setTimeout(resolve,0));current();
     return{blob,mimeType:'image/tiff',extension:'tif',report};
   }
 
   getTiffPagesCapabilityReport(documents:readonly Document[],options:TiffPagesExportOptions={}):ExportCapabilityReport {
-    const{pages,variant}=this.captureTiffPages(documents,options);
-    return getTiffPagesCapabilityReport(pages.map(page=>page.document),variant);
+    const{pages,variant,color}=this.captureTiffPages(documents,options);
+    return getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color);
   }
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {

@@ -35,7 +35,12 @@ import {avifSettings} from '../core/avif';
 
 export type ExportFormat = "png" | "jpeg" | "webp" | "avif" | "svg" | "psd" | "psb" | "tiff" | "pdf";
 
+import type {ColorOutput} from '../core/color/color-settings';
+import {colorOutputForFormat} from './icc-output';
+import {iccTarget} from '../core/color/profile-source';
+
 export interface ExportOptions {
+  color?: ColorOutput;
   format: ExportFormat;
   psdMode?: PsdExportMode;
   tiffVariant?: TiffVariant;
@@ -66,10 +71,10 @@ export interface ExportResult {
  * to the requested target format.
  */
 /** Pure page report; cross-document ownership is checked by EditorApplication. */
-export function getTiffPagesCapabilityReport(documents:readonly DocumentData[],variant:TiffVariant='auto'):ExportCapabilityReport {
+export function getTiffPagesCapabilityReport(documents:readonly DocumentData[],variant:TiffVariant='auto',color?:ColorOutput):ExportCapabilityReport {
   validateTiffVariant(variant);
   if(!documents.length)throw new Error('Choose at least one TIFF page.');
-  const reports=documents.map(document=>getExportCapabilityReport(document,{format:'tiff',tiffVariant:variant}));
+  const reports=documents.map(document=>getExportCapabilityReport(document,{format:'tiff',tiffVariant:variant,color}));
   const unique=(values:string[])=>[...new Set(values)];
   return {format:'tiff',warnings:unique([`Exports ${documents.length} TIFF page${documents.length===1?'':'s'} in the selected order. Some viewers display only the first page.`,...reports.flatMap(report=>report.warnings.map(warning=>warning.replace('TIFF is one flattened image.','Each TIFF page is a flattened image.')))]),
     featuresPreserved:unique(['Independent native page dimensions and page order',...reports.flatMap(report=>report.featuresPreserved)]),
@@ -80,6 +85,7 @@ export function getExportCapabilityReport(
   document: DocumentData,
   options: ExportOptions,
 ): ExportCapabilityReport {
+  options={...options,color:colorOutputForFormat(options.format,options.color)};
   const smart=options.format==='svg'?planSvgSmart(document):undefined;
   return describeExport(document,options,smart,smart?planSvgComposition(smart.document):undefined);
 }
@@ -95,7 +101,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
   const svgFontNames=options.format==='svg'?new Set(planSvgTexts(document).flatMap(text=>characterFontFamilies(text).flatMap(fontFamilyNames))):new Set<string>();
   const embeddedSvgFonts=options.format==='svg'&&documentFontFiles(authored).some(file=>svgFontNames.has(file.resource.report.faces[0].cssFamily.toLowerCase()));
 
-  const warnings: string[] = [];
+  const warnings: string[] = options.color ? [`RGB samples are converted from sRGB8 to ${iccTarget(options.color.profile).name}; its original ICC profile is embedded. Soft proofing does not affect delivery. Intent availability depends on the profile; matrix profiles may use intent fallback.`] : [];
   const featuresPreserved: string[] = [];
   const featuresDegradedOrOmitted: string[] = [];
 
@@ -113,7 +119,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
     case "pdf": {
       let geometry:ReturnType<typeof pdfPageGeometry>|undefined;
       try{geometry=pdfPageGeometry(document.width,document.height,options.pdfDpi);}catch(error){warnings.push(error instanceof Error?error.message:String(error));}
-      featuresPreserved.push('Native-resolution visible composition on one PDF page','Lossless 8-bit RGB image with a transparency soft mask','Embedded output sRGB ICC profile');
+      featuresPreserved.push('Native-resolution visible composition on one PDF page','Lossless 8-bit RGB image with a transparency soft mask',options.color?'Embedded original output ICC profile':'Embedded output sRGB ICC profile');
       if(geometry)featuresPreserved.push(`Physical page sizing at ${geometry.dpi} DPI without resampling`);
       warnings.push('PDF artwork is rasterized at document resolution. Text is not searchable or selectable, and vectors, layers, masks, effects and component links are not independently editable. Save a Canoli Studio project for full editability.');
       warnings.push('Only the canvas is exported. Hidden/off-canvas content, saved alpha channels, source EXIF/GPS, authored metadata and font files are excluded. Viewer color conversion, transparency and scaling can affect appearance.');
@@ -124,7 +130,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
     }
     case "tiff":
       const variant=validateTiffVariant(options.tiffVariant);
-      featuresPreserved.push('Native document resolution and visible composition','Lossless Deflate-compressed 8-bit sRGB pixels','Unassociated RGBA transparency','Embedded output sRGB ICC profile');
+      featuresPreserved.push('Native document resolution and visible composition',options.color?'Lossless Deflate-compressed 8-bit output RGB pixels':'Lossless Deflate-compressed 8-bit sRGB pixels','Unassociated RGBA transparency',options.color?'Embedded original output ICC profile':'Embedded output sRGB ICC profile');
       warnings.push('TIFF is one flattened image. Save a Canoli Studio project for editable layers, masks, text, effects and original sources.');
       warnings.push('Resolution metadata is 72 DPI; pixel dimensions are unchanged. Source EXIF/GPS and authored metadata are not copied.');
       if(variant==='big')warnings.push('BigTIFF requires a compatible viewer. Some TIFF applications support only classic TIFF.');
@@ -136,7 +142,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
     case "png":
       featuresPreserved.push(
         "Full alpha channel (transparency)",
-        "Lossless pixel accuracy",
+        options.color?"Lossless encoding of converted RGB8 samples":"Lossless pixel accuracy",
         "All layer types composited",
       );
       if (hasVectors) {
@@ -390,6 +396,7 @@ export async function exportDocument(
   control?: ExportControl,
 ): Promise<ExportResult> {
   checkExport(control);
+  options={...options,color:colorOutputForFormat(options.format,options.color)};
   if(options.format==='avif'){
     const report=getExportCapabilityReport(document,options),blob=await exportAvif(document,assets,renderer,{quality:options.quality,lossless:options.avifLossless,speed:options.avifSpeed},control);
     return{blob,mimeType:'image/avif',extension:'avif',report};
@@ -400,13 +407,13 @@ export async function exportDocument(
   }
   if(options.format==='pdf'){
     const report=getExportCapabilityReport(document,options);
-    const blob=await exportPdf(document,assets,renderer,options.pdfDpi,control);
+    const blob=await exportPdf(document,assets,renderer,options.pdfDpi,control,options.color);
     return{blob,mimeType:'application/pdf',extension:'pdf',report};
   }
   // TIFF captures sources/fonts before the first user progress callback.
   if(options.format==='tiff'){
     const report=getExportCapabilityReport(document,options);
-    const blob=await exportTiff(document,assets,renderer,validateTiffVariant(options.tiffVariant),control);
+    const blob=await exportTiff(document,assets,renderer,validateTiffVariant(options.tiffVariant),control,options.color);
     return{blob,mimeType:'image/tiff',extension:'tif',report};
   }
   const smart=options.format==='svg'?planSvgSmart(document):undefined;
@@ -453,7 +460,7 @@ export async function exportDocument(
   }
 
   if (options.format === "png") {
-    const blob = await exportPng(document, assets, renderer, control);
+    const blob = await exportPng(document, assets, renderer, control,options.color);
     return {
       blob,
       mimeType: "image/png",

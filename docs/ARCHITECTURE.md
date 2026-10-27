@@ -1,8 +1,8 @@
 # Architecture
 
-## Native ICC dependency (F10)
+## Connected ICC browser workflow (F10/F11)
 
-core/color/icc-native owns a pinned memory-only Little CMS module; icc.worker keeps profiles and compiled transforms isolated, and icc-client enforces two owner slots, normalized request/reply identity, cancellation and owned windows. RGB conversion and device proofing copy alpha, disclose native intent fallback and reject unusable targets. This is a private dependency; application settings, viewport, export and persistence integration remain in progress. The document still composites sRGB8; no model, command authority or plugin grant changes. See [ICC_ENGINE.md](ICC_ENGINE.md).
+core/color/profile-source owns immutable inspected ICC resources; color-settings normalizes guarded host preferences; workspace v3 retains complete profile sources. engine/icc-proof applies a fingerprint/settings-keyed transform only to the final private viewport frame, bypassing GPU presentation while proofing. engine/icc-output converts raw native RGBA8 readback directly before PNG/TIFF/PDF encoding; alpha and original target bytes remain independent. UI settings preflight atomically, and stale gesture/proof frames cannot present. The scene stays sRGB8; file services remain outside document mutation, isolated scripts and independent REST. See [ICC_ENGINE.md](ICC_ENGINE.md) for contracts, migration and remaining precision/device gates.
 
 ## Editable SVG geometric clipping (F02/F11)
 

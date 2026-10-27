@@ -1,3 +1,4 @@
+import {iccTarget} from '../core/color/profile-source';
 import type { ExportControl, ExportProgress } from "../engine/export-control";
 import { exportFontFamilies, fontAvailability } from "./font-availability";
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -10,6 +11,7 @@ import { getExportCapabilityReport, getTiffPagesCapabilityReport } from "../engi
 
 export interface ExportPage {key:string;document:DocumentData}
 export interface ExportDialogProps {
+  color?:import('../core/color/color-settings').ColorOutput;
   pages?:readonly ExportPage[];
   document: DocumentData;
   onExport(options: ExportOptions, control?: ExportControl, pages?:readonly string[]): Promise<void>;
@@ -19,6 +21,7 @@ export interface ExportDialogProps {
 
 export function ExportDialog({
   document,
+  color,
   pages: suppliedPages,
   onExport,
   onClose,
@@ -87,10 +90,12 @@ export function ExportDialog({
     };
   }, [fontKey, reportKey]);
 
+  const deliveryColor=['png','tiff','pdf'].includes(format)?color:undefined;
   const report = useMemo(() => {
-    if(multiPage&&selectedPages.length&&!selectedPages.some(page=>!page))return getTiffPagesCapabilityReport(selectedPages.map(page=>page!.document),tiffVariant);
+    if(multiPage&&selectedPages.length&&!selectedPages.some(page=>!page))return getTiffPagesCapabilityReport(selectedPages.map(page=>page!.document),tiffVariant,deliveryColor);
     return getExportCapabilityReport(document, {
       format,
+      color:deliveryColor,
       quality: (format==='avif'?avifQuality:quality) / 100,
       avifLossless,avifSpeed,
       backgroundColor,
@@ -98,7 +103,7 @@ export function ExportDialog({
       tiffVariant,
       pdfDpi,
     });
-  }, [document, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi,avifQuality,avifLossless,avifSpeed,multiPage,pages,pageKeys]);
+  }, [document, deliveryColor, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi,avifQuality,avifLossless,avifSpeed,multiPage,pages,pageKeys]);
 
   const handleExport = async () => {
     const run = new AbortController();
@@ -108,6 +113,7 @@ export function ExportDialog({
     try {
       await onExport({
         format,
+        color:deliveryColor,
         quality: (format==='avif'?avifQuality:quality) / 100,
         avifLossless,avifSpeed,
         backgroundColor,
@@ -167,6 +173,8 @@ export function ExportDialog({
           ]}
           onChange={(val) => setFormat(val as ExportFormat)}
         />
+
+        <p>{deliveryColor?`RGB output: ${iccTarget(deliveryColor.profile).name}. Pixel conversion and original ICC profile embedding; canvas proofing is excluded.`:'Output uses sRGB. Custom ICC delivery currently supports PNG, TIFF and PDF.'}</p>
 
         {(format === "psd"||format==='psb') && <Select label={format==='psb'?'PSB layers':'PSD layers'} layout="stacked" value={psdMode} disabled={busy || exporting}
           options={[{ value: "layers", label: "Keep independent layers; merge dependent effects" }, { value: "flatten", label: "Flatten visible composition into one layer" }]}

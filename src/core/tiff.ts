@@ -1,6 +1,6 @@
 /** TIFF 6 tiled RGBA8 / BigTIFF directories. Pixel payloads stay separate. */
 export type TiffVariant = 'auto' | 'classic' | 'big';
-export interface TiffPagesExportOptions {variant?: TiffVariant}
+export interface TiffPagesExportOptions {color?:import('./color/color-settings').ColorOutput;variant?: TiffVariant}
 export interface TiffDirectoryInput {
   width: number; height: number; tileWidth: number; tileHeight: number;
   /** Page-local offsets relative to its first pixel payload, eight-byte aligned. */

@@ -651,6 +651,26 @@ describe("UI Custom Hooks", () => {
       } finally { hook.unmount(); frame.mockRestore(); }
     });
 
+    it('discards an older live stroke frame when proof settings change, even before React queues its next frame', async () => {
+      const frame=vi.spyOn(globalThis,'requestAnimationFrame').mockImplementation(()=>1);
+      let ready!:(value:unknown)=>void;
+      const prepared={backend:'canvas2d',present:vi.fn(),dispose:vi.fn()},prepareViewport=vi.fn(()=>new Promise(resolve=>{ready=resolve;}));
+      const doc=new Document(),assets={},listeners=new Set<()=>void>();
+      let toolState={preview:null,paintPreview:{layerId:'paint',stroke:{id:'stroke',points:[]}}};
+      const editor={assetStore:assets,document:doc,colorSettings:{proof:{profile:'srgb'}},renderer:{prepareViewport},tools:{cancel:vi.fn(),getSnapshot:()=>toolState,subscribe:(listener:()=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener);};}}};
+      const options={editor,viewDocument:doc._read(),assets,renderRegion:{x:0,y:0,width:100,height:100},zoom:1,paintPreview:toolState.paintPreview,backendState:null,displayHost:{current:{querySelector:()=>({dataset:{renderer:'canvas2d'}})}}}as unknown as Parameters<typeof useCanvasRenderer>[0];
+      const hook=renderHook(()=>useCanvasRenderer(options));
+      try{
+        expect(prepareViewport).toHaveBeenCalledTimes(1);
+        const job=prepareViewport.mock.calls[0] as unknown as [unknown,unknown,{isCancelled():boolean}];
+        expect(job[2].isCancelled()).toBe(false);
+        editor.colorSettings={proof:{profile:'display-p3'}};
+        toolState={...toolState,paintPreview:{...toolState.paintPreview,stroke:{...toolState.paintPreview.stroke}}};
+        await act(async()=>{listeners.forEach(listener=>listener());ready(prepared);await Promise.resolve();});
+        expect(job[2].isCancelled()).toBe(true);expect(prepared.present).not.toHaveBeenCalled();expect(prepared.dispose).toHaveBeenCalledTimes(1);
+      }finally{hook.unmount();frame.mockRestore();}
+    });
+
     it("cleans up editor tools on unmount", () => {
       const cancelMock = vi.fn();
       const cleanupCursorMock = vi.fn();

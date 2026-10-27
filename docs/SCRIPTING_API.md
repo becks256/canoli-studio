@@ -1,5 +1,9 @@
 # Scripting API
 
+## ICC profiles remain outside isolated scripts
+
+The trusted browser host can inspect immutable ICC resources, preflight color preferences, proof the displayed canvas and convert PNG/TIFF/PDF delivery. These are view/output services; no constructor, profile/file/native import, document mutation command or isolated script signature is added. Scripts/plugins continue shared OO commands and sRGB8 scene behavior. Headless REST does not render or synchronize the browser. [Host signatures, persistence and exact limits](ICC_ENGINE.md).
+
 ## Editable SVG clipping
 
 Trusted SVG import compiles supported local geometric clipPath graphs into ordinary immutable LayerMask vector values. Existing layer.mask assignment, mask.with controls, geometry editing, shared Undo, plugin permissions and native persistence apply. Hard vector masks export as editable SVG clipping paths; advanced controls retain their existing alpha-mask/native-coverage boundary. No file/DOM/network service is added to isolated scripts or independent REST. [Exact coordinate rules, executable edit example, errors and limits](SVG_CLIPPING.md).
