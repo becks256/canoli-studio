@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Current F10 native ICC dependency (2026-10-27)
+
+A pinned memory-only CMM now supplies actual RGB output conversion and device proofing internally, with explicit intent fallback, exact alpha and private worker ownership. This is a dependency, not application color-feature acceptance: Color dialog integration, preview/delivery, profile persistence and the full working-space/precision/CMYK/HDR/device/performance scope remain required. See [ICC_ENGINE.md](ICC_ENGINE.md) and the dated roadmap.
+
 ## Current F02/F11 geometric SVG clipping increment (2026-10-27)
 
 Local geometric clipping compiles into editable native masks with independent source ownership and the existing shared commands/history. Hard vector masks retain standard SVG clipping-path output for supported editable reimport; richer masks, CSS/DOM/text silhouettes and broader SVG/viewer fidelity remain open. See [SVG_CLIPPING.md](SVG_CLIPPING.md) and the dated roadmap for observed verification. The complete professional-editor and performance objectives remain active.

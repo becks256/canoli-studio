@@ -54,6 +54,7 @@ const generatedPages = [
   ["LAYER_ALIGNMENT", "Align layers to canvas or key object"],
   ["CLIPPING_MASKS", "Editable clipping masks"],
   ["SVG_CLIPPING", "Editable SVG clipping"],
+  ["ICC_ENGINE", "Native ICC engine dependency"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

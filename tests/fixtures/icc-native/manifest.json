@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "pillow": "10.3.0",
+  "littleCms": "2.16",
+  "nativeLittleCms": {
+    "macroVersion": 2190,
+    "librarySha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6"
+  },
+  "pixels": 729,
+  "source": "source.rgba",
+  "cases": [
+    {
+      "profile": "srgb.icc",
+      "mode": "convert",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "srgb-convert-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "srgb.icc",
+      "mode": "proof",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "srgb-proof-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "srgb.icc",
+      "mode": "proof",
+      "intent": 0,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "pixels": "srgb-proof-0-0-1.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "srgb.icc",
+      "mode": "proof",
+      "intent": 3,
+      "proofIntent": 3,
+      "blackPointCompensation": false,
+      "pixels": "srgb-proof-3-3-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "display-p3.icc",
+      "mode": "convert",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "display-p3-convert-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "display-p3.icc",
+      "mode": "proof",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "display-p3-proof-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "display-p3.icc",
+      "mode": "proof",
+      "intent": 0,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "pixels": "display-p3-proof-0-0-1.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "display-p3.icc",
+      "mode": "proof",
+      "intent": 3,
+      "proofIntent": 3,
+      "blackPointCompensation": false,
+      "pixels": "display-p3-proof-3-3-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "adobe-rgb.icc",
+      "mode": "convert",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "adobe-rgb-convert-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "adobe-rgb.icc",
+      "mode": "proof",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "adobe-rgb-proof-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "adobe-rgb.icc",
+      "mode": "proof",
+      "intent": 0,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "pixels": "adobe-rgb-proof-0-0-1.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "adobe-rgb.icc",
+      "mode": "proof",
+      "intent": 3,
+      "proofIntent": 3,
+      "blackPointCompensation": false,
+      "pixels": "adobe-rgb-proof-3-3-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "linear-srgb.icc",
+      "mode": "convert",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "linear-srgb-convert-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "linear-srgb.icc",
+      "mode": "proof",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "linear-srgb-proof-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "linear-srgb.icc",
+      "mode": "proof",
+      "intent": 0,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "pixels": "linear-srgb-proof-0-0-1.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "linear-srgb.icc",
+      "mode": "proof",
+      "intent": 3,
+      "proofIntent": 3,
+      "blackPointCompensation": false,
+      "pixels": "linear-srgb-proof-3-3-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "narrow-rgb.icc",
+      "mode": "convert",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "narrow-rgb-convert-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "narrow-rgb.icc",
+      "mode": "proof",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "narrow-rgb-proof-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "narrow-rgb.icc",
+      "mode": "proof",
+      "intent": 0,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "pixels": "narrow-rgb-proof-0-0-1.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "narrow-rgb.icc",
+      "mode": "proof",
+      "intent": 3,
+      "proofIntent": 3,
+      "blackPointCompensation": false,
+      "pixels": "narrow-rgb-proof-3-3-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "synthetic-cmyk.icc",
+      "mode": "proof",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "pixels": "synthetic-cmyk-proof-1-1-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    },
+    {
+      "profile": "synthetic-cmyk.icc",
+      "mode": "proof",
+      "intent": 0,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "pixels": "synthetic-cmyk-proof-0-0-1-native-2191.rgba",
+      "reference": "Independent native Little CMS 2.19.1",
+      "previousReference": "synthetic-cmyk-proof-0-0-1.rgba",
+      "crossVersionMaximumColorError": 180
+    },
+    {
+      "profile": "synthetic-cmyk.icc",
+      "mode": "proof",
+      "intent": 3,
+      "proofIntent": 3,
+      "blackPointCompensation": false,
+      "pixels": "synthetic-cmyk-proof-3-3-0.rgba",
+      "reference": "Pillow 10.3.0 / Little CMS 2.16"
+    }
+  ],
+  "files": {
+    "adobe-rgb-convert-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "08f8f7544d5300dac50738c94010b980cdf8ac3e0a7ad82346ec3a392f9656b2"
+    },
+    "adobe-rgb-proof-0-0-1.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "adobe-rgb-proof-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "adobe-rgb-proof-3-3-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "adobe-rgb.icc": {
+      "bytes": 442,
+      "sha256": "1446f498b1e3d3e31ce7a53ff42ef1b93ba249ab1f4947f56e36c5772a595e5a"
+    },
+    "display-p3-convert-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "876ab8c30dc2961c395f2c6a2b143530940cb6d1a9146f5752944116954828ea"
+    },
+    "display-p3-proof-0-0-1.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "display-p3-proof-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "display-p3-proof-3-3-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "display-p3.icc": {
+      "bytes": 25004,
+      "sha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    "linear-srgb-convert-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "4b4c99c69077166ed76015bc719f0e786621aadaacedae95fa177ab3b69ae675"
+    },
+    "linear-srgb-proof-0-0-1.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "linear-srgb-proof-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "linear-srgb-proof-3-3-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "linear-srgb.icc": {
+      "bytes": 438,
+      "sha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae"
+    },
+    "narrow-rgb-convert-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "9a2cd4418ede0b6acaecfdbd490a6c1c5395a16595eb91ff835a8b8f957d2926"
+    },
+    "narrow-rgb-proof-0-0-1.rgba": {
+      "bytes": 2916,
+      "sha256": "2749cc3046f47203893a0565890628da3c82d55972bd98c897d7c47e5889c5ce"
+    },
+    "narrow-rgb-proof-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "2749cc3046f47203893a0565890628da3c82d55972bd98c897d7c47e5889c5ce"
+    },
+    "narrow-rgb-proof-3-3-0.rgba": {
+      "bytes": 2916,
+      "sha256": "2749cc3046f47203893a0565890628da3c82d55972bd98c897d7c47e5889c5ce"
+    },
+    "narrow-rgb.icc": {
+      "bytes": 720,
+      "sha256": "07e0193bda4335a2cc0849ec6d211f7a1cdee310e1fb72adf0fb65adfc72965c"
+    },
+    "source.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "srgb-convert-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "dd7e113c94872a35026725773bd396a4e9c6b573d344a4e773c374b503e452de"
+    },
+    "srgb-proof-0-0-1.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "srgb-proof-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "srgb-proof-3-3-0.rgba": {
+      "bytes": 2916,
+      "sha256": "329f8fae6028bc2f7d400372fdb963469fc94032b620dc24e94f5a6eb3d0d16c"
+    },
+    "srgb.icc": {
+      "bytes": 25012,
+      "sha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37"
+    },
+    "synthetic-cmyk-proof-0-0-1-native-2191.rgba": {
+      "bytes": 2916,
+      "sha256": "21e4341721c4d777ae0365da1f15086affcd27d6d620ba92b63a53286f04a177"
+    },
+    "synthetic-cmyk-proof-0-0-1.rgba": {
+      "bytes": 2916,
+      "sha256": "33dfa9f511fb8fa9475af9b1fb5290ae866e1504774fc24ef6dde776b146e797"
+    },
+    "synthetic-cmyk-proof-1-1-0.rgba": {
+      "bytes": 2916,
+      "sha256": "33dfa9f511fb8fa9475af9b1fb5290ae866e1504774fc24ef6dde776b146e797"
+    },
+    "synthetic-cmyk-proof-3-3-0.rgba": {
+      "bytes": 2916,
+      "sha256": "0daaa64b703db40210e27144dd776f2d3c8fd8175bce0b15979c0d01c08d7b61"
+    },
+    "synthetic-cmyk.icc": {
+      "bytes": 45848,
+      "sha256": "fe284480a22fd078e47f7728404ad4a8fee03dd8a7b7fabe681bab4cde9c87b9"
+    }
+  },
+  "limits": "Synthetic unmeasured devices and finite color cube; not physical color/printer fidelity. Matrix/RGB cross-version samples and the pinned-version native reference require exact bytes; remaining CMYK cross-version proof color permits one code value, with exact alpha. The version-sensitive v2 CMYK perceptual/BPC reference retains the older result separately."
+}

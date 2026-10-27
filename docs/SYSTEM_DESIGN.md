@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## ICC dependency invariant
+
+Separate original ICC bytes, checked native metadata, prepared settings and owned RGBA windows. Native intent fallback must be explicit. A failed/aborted owner cannot expose an earlier transform or commit late pixels. Validate worker identity, settings and output shape, release native contexts/slots and keep alpha unchanged. Profiles are not document geometry, image-resolution limits or new plugin grants. The sRGB8 scene and existing public mutation model remain authoritative until application color integration is completed. See [ICC_ENGINE.md](ICC_ENGINE.md).
+
 ## SVG clipping invariant
 
 Compile inert XML references without altering the source tree. Child silhouettes union independently of paint opacity/strokes; nested geometric clipping intersects. Bbox coordinates cannot replace the definition viewport used for percentage lengths. Preserve root viewport and use-instance coordinate planes, and retain independent native mask ownership rather than shared XML references. Host image/text preparation cannot overwrite outer clipping. Existing mask validation/history/cache and source leases remain authoritative. Hard vector masks retain geometric SVG output; richer alpha graphs remain explicit. See [SVG_CLIPPING.md](SVG_CLIPPING.md).

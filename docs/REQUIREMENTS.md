@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Native ICC dependency and application gates (F10/F11)
+
+Use actual native ICC transforms, explicit intent/black-point behavior, four-channel device proofing, exact alpha and complete original profile bytes. Reject stale/malformed worker results and failed targets without retaining a prior transform. Verify real WASM, independent native/reader references and browser cancellation/resource recovery. This private dependency does not complete application assignment/conversion, soft-proof pixels, color-managed delivery or profile transport; those integrations and the full professional color/precision objective remain required. See [ICC_ENGINE.md](ICC_ENGINE.md).
+
 ## Editable SVG geometric clipping (F02/F11)
 
 Support local geometric clipPath graphs through actual editable import, native mask controls/isolated edits, one Undo, native project persistence and supported SVG export/reimport. Preserve per-child union rules, nested intersections, independent references, root/use/affine/bbox/percentage coordinates and complete source assets. Unsupported graphs must disclose explicit flattening without partial publication. Verify independent reference pixels, raster/text preparation, stale/cancel/locks and a genuine 50 MP source. Native/SVG edge sampling remains disclosed; broader F02/F11 and the complete original roadmap remain required. See [SVG_CLIPPING.md](SVG_CLIPPING.md).

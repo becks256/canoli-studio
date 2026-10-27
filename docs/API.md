@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## ICC dependency remains private
+
+The new native ICC worker is not an independent REST rendering route, browser synchronization or isolated scripting service. Existing document commands and sRGB8 composition remain unchanged. Actual application color delivery, proofing and profile ownership/transport remain in progress; see [ICC_ENGINE.md](ICC_ENGINE.md).
+
 ## SVG geometric clipping remains a host file boundary
 
 Supported trusted SVG import produces ordinary native vector LayerMask data; shared layer commands, strict locks/revisions and independent REST behavior are unchanged. No file service or browser synchronization is added. Isolated scripts edit imported mask values through the existing OO API and host validation. [Exact supported graph, error/fallback and ownership contract](SVG_CLIPPING.md).

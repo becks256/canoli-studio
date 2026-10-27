@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Native ICC is not a new plugin capability
+
+The private ICC dependency adds no file chooser, profile store, native module or worker service to isolated plugin commands. Installation remains inert and existing host grants/undo validation remain authoritative. Application color integration remains in progress; see [ICC_ENGINE.md](ICC_ENGINE.md).
+
 ## SVG geometric clipping grants no file capability
 
 The trusted importer compiles supported clipping into ordinary vector LayerMask values. Plugins can edit them only through current document grants and existing isolated command validation. Installation remains inert; no SVG parser, file chooser, DOM, network or source-byte service is exposed. Native command/schema/manifest permissions are unchanged. See [SVG_CLIPPING.md](SVG_CLIPPING.md).

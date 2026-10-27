@@ -1,5 +1,9 @@
 # Architecture
 
+## Native ICC dependency (F10)
+
+core/color/icc-native owns a pinned memory-only Little CMS module; icc.worker keeps profiles and compiled transforms isolated, and icc-client enforces two owner slots, normalized request/reply identity, cancellation and owned windows. RGB conversion and device proofing copy alpha, disclose native intent fallback and reject unusable targets. This is a private dependency; application settings, viewport, export and persistence integration remain in progress. The document still composites sRGB8; no model, command authority or plugin grant changes. See [ICC_ENGINE.md](ICC_ENGINE.md).
+
 ## Editable SVG geometric clipping (F02/F11)
 
 core/svg-clip-import compiles readonly local definition graphs into owned cubic silhouettes. It shares the bounded pure core/vector-boolean-kernel with the existing isolated worker entrypoint. Union preserves separate child fill rules; nested clips intersect. Definition styles, source geometry bounds, viewport percentages, bbox content transforms, root viewBox compensation and use placement remain separate. core/svg-import attaches OO LayerMask values, reusing existing group/use owners and wrapping graphics whose host image/text preparation can change their local origin. Authored hard vector masks serialize as clipPath definitions; generated smart viewport boundaries keep private identity-based alpha-mask sampling, while advanced mask controls keep alpha/native coverage. Host admission still validates the entire private document before publication. No schema, command authority, source-resolution or isolation boundary changes. See [SVG_CLIPPING.md](SVG_CLIPPING.md).
