@@ -16,7 +16,7 @@ export function floatSceneIssue(document:DocumentData):string|null {
         if(layer.frequencyRadius!=null)return 'Frequency separation requires its float document integration.';
         const issue=visit(layer.children);if(issue)return issue;
       }else if(layer.kind==='raster'){
-        if(layer.erasures?.length)return 'Raster erasures require their float document integration.';
+        if(layer.erasures?.some(entry=>entry.stroke.kind==='wet'))return 'Prepared wet raster replacements require their float document integration.';
       }else if(layer.kind==='adjustment'){
         if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support tone adjustments only.';
       }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and tone adjustments. Other layer types require their float integration.';

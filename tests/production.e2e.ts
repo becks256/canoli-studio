@@ -2191,3 +2191,5 @@ test('production unsigned 16-bit originals retain low-order samples through UI e
 test('production full float tone preserves native low-order samples through actual controls, cancelled preview, isolated edits and exact delivery',async({page},info)=>{const{floatToneWorkflow}=await import('./helpers/float-tone');await floatToneWorkflow(page,info,true);});
 
 test('production float clipping retains exact original samples through Inspector, palette, isolated script, Undo and precision delivery',async({page},info)=>{const{floatClippingWorkflow}=await import('./helpers/float-clipping');await floatClippingWorkflow(page,info,true);});
+
+test('production float erasure preserves original samples through pointer cancellation, shared Undo, native files and reopening',async({page},info)=>{const{floatErasureWorkflow}=await import('./helpers/float-erasure');await floatErasureWorkflow(page,info,true);});

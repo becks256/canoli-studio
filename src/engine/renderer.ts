@@ -203,7 +203,16 @@ export class CanvasRenderer implements DocumentRenderer {
   }
 
   private floatPreview(document:DocumentData,preview?:PaintPreview|null):DocumentData{
-    if(!preview?.maskMode)return document;
+    if(!preview)return document;
+    if(!preview.maskMode){
+      if(preview.stroke.kind!=='eraser')throw new Error('Color painting requires its float document integration.');
+      let found=false;
+      const visit=(layers:LayerData[]):LayerData[]=>layers.map(layer=>{
+        if(layer.id===preview.layerId){if(layer.kind!=='raster')throw new Error('Float eraser preview requires an original raster layer.');found=true;return{...layer,erasures:[...(layer.erasures??[]),{width:layer.width,height:layer.height,stroke:preview.stroke}]};}
+        return layer.kind==='group'?{...layer,children:visit(layer.children)}:layer;
+      });
+      const children=visit(document.children);if(!found)throw new Error('Float eraser preview target is unavailable.');return{...document,children};
+    }
     const visit=(layers:LayerData[]):LayerData[]=>layers.map(layer=>layer.kind==='group'?{...layer,mask:previewMask(layer,preview),children:visit(layer.children)}:{...layer,mask:previewMask(layer,preview)});
     return{...document,children:visit(document.children)};
   }
@@ -612,7 +621,6 @@ export class CanvasRenderer implements DocumentRenderer {
   ): Promise<HTMLCanvasElement> {
     checkRenderCurrent(options.isCancelled);
     if(isFloatDocument(document)){
-      if(options.paintPreview&&!options.paintPreview.maskMode)throw new Error('Color painting requires its float document integration.');
       const sizeRegion=options.region??{x:0,y:0,width:document.width,height:document.height},size=workingSize(options.outputSize?.width??sizeRegion.width,options.outputSize?.height??sizeRegion.height,options.outputSize?1:options.scale,options.maxPixels,options.maxDimension);
       return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback);
     }

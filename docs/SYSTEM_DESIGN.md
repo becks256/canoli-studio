@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-The explicit float document pipeline preserves original native samples separately from display-only thumbnails, derived IndexedDB tiles, captured float composition and final SDR/output conversions. Source preparation completes before an output/display ICC owner is acquired. Schema 49 and shared OO/history validation gate the initial supported scene; default byte documents keep their existing path. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+The explicit float document pipeline preserves original native samples separately from display-only thumbnails, derived IndexedDB tiles, captured float composition and final SDR/output conversions. Source preparation completes before an output/display ICC owner is acquired. Erasure coverage is captured in its authored resize plane; each operation changes float alpha before clipping and layer appearance, without passing RGB through a coverage canvas. Schema 49 and shared OO/history validation gate the initial supported scene; default byte documents keep their existing path. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Owned float source storage dependency
 

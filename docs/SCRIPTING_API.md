@@ -2856,7 +2856,7 @@ Automation recipe steps accept optional `literalValues: boolean` (default `false
 
 ### Raster erasure and pixel selections (schema 16)
 
-`RasterLayer.erase(stroke: EraserStroke): void` appends an undoable erasure. `RasterLayer.clear(selection: MarqueeSelection | null = null): void` clears the supplied selection, or the entire image when omitted. Coordinates and clips are layer-local. These methods do not implicitly read `document.selection`; UI tools translate the document selection for you. They preserve original asset bytes and respect layer locks. Invalid constructors throw. Each layer accepts at most 2,048 erasure records. Captured layer dimensions make erasures scale with subsequent image resizing.
+`RasterLayer.erase(stroke: EraserStroke): void` appends an undoable erasure. `RasterLayer.clear(selection: MarqueeSelection | null = null): void` clears the supplied selection, or the entire image when omitted. In float32/linear-sRGB documents these operations preserve original RGB and apply existing byte coverage to float alpha once per operation, before clipping and layer appearance; prepared wet replacements remain unsupported. [Float erasure contract and executable example](FLOAT_DOCUMENTS.md#original-preserving-raster-erasure). Coordinates and clips are layer-local. These methods do not implicitly read `document.selection`; UI tools translate the document selection for you. They preserve original asset bytes and respect layer locks. Invalid constructors throw. Each layer accepts at most 2,048 erasure records. Captured layer dimensions make erasures scale with subsequent image resizing.
 
 ```js
 const image = document.selectedLayer;

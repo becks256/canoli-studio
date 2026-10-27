@@ -6498,3 +6498,110 @@ all-tool performance, plus every other unfinished original gate, remain required
 No arbitrary original-resolution cap, paid call, account, upload, new isolated
 privilege, public mutation API, schema change or browser/REST synchronization
 was introduced. The complete original implementation-roadmap goal remains active.
+
+### 2026-10-27 — F06/F10 original-preserving float erasure verified
+
+Owner: implementation agent; estimate L within T16/T17. The preceding goal turn
+made progress at e6a5ce0 with verified float sibling clipping. Original raster
+Eraser/clear now connect existing authored coverage, captured resize geometry and
+shared commands/history to float alpha, retaining every original RGB word.
+Each operation applies coverage independently before clipping intrinsic shape;
+prepared wet color replacement remains gated. Detached pointer preview and
+ordinary tool eligibility use the same path. Initial eight focused checks pass.
+Actual normal UI, independent native files, source/texture lifetime, partition,
+large native originals, isolated/REST/recipe/persistence and complete build/unit/
+production acceptance remain required. Full F10/F14 and the original roadmap
+remain active; this is not general float painting or physical/device acceptance.
+
+Corrected real-browser acceptance passes the normal Eraser pointer/cancel/Undo/
+Redo workflow, the published isolated clear example and direct float32/uint16
+TIFF, PNG and PDF samples against an independent original/native-CMM/NumPy oracle.
+A numerical scene check passes exact preview/commit equivalence, unchanged preview
+history, native read partition identity, resized erasure placement, clipped-base
+alpha and original-bearing reopening. The initial UI pilot exposed an example
+selection assumption; the example now selects its original explicitly. Two
+portable recorded-erasure recipe cases pass original/full tone, prepared-project
+operation retention, accepted-file retention and missing-file-only partial retry.
+A textured erasure check preserves every visible RGB word, retains complete PNG
+coverage bytes after reopening and rejects a closed captured coverage bitmap.
+Initial TypeScript checks found only two unused test bindings; corrected checks
+pass. Final full unit/build/source/50 MP/production acceptance follows.
+
+The complete actual WASM/unit/API suite passes all 2,690 tests in 279 files;
+`npm run build` passes TypeScript and publishes 40 developer guides. The final
+focused source selection is 82 cases across 23 files, retaining existing float,
+clipping, byte eraser, committed paint and cursor regressions. Final normal UI
+coverage also checks Delete-key selection clearing and exact Undo. Both genuine
+50 MP original source types and the complete 168-case production suite follow
+on frozen inputs, without changing native binaries or test tolerances/timeouts.
+
+The final focused browser matrix passes all 82 cases across 23 files with no
+skips, retries, flaky or unexpected results. This includes the new Delete-key
+clear/Undo check and independently exact four-format UI delivery alongside
+existing float, clipping, byte erasure/clipboard, committed paint and cursor
+regressions. Both genuine 50 MP erasure source workflows and the complete
+production suite remain in progress against the same frozen inputs.
+
+The genuine 50 MP float-original erasure workflow passes native geometry,
+original byte identity, workspace restoration and one Undo/Redo. Both output
+files independently match all 200,000,000 channel values with zero error and
+zero differing words. The float32 file retains 75,270,986 extended RGB samples;
+raw SHA-256 `ede89260c98cbc9b81fba5273a479974f30f2df28f6b383f1a3e4a0aa1194d2c`,
+file SHA-256 `45de657a82d8a441c1d4c095cb90b9b945d2788ee9ad6d50e6e80cd76ed40776`
+(2,529,000 bytes). The uint16 file raw SHA-256 is
+`865cf8f724192a4523a7a97958210b6225018945e5cfaf367652abbd37b02c2a`,
+file SHA-256 `31a2ed099466cc2691116451a9945fa6c15eb4bd7a56eeb28840c84575a4d4a5`
+(788,592 bytes). The uint16-original and production gates remain in progress.
+
+The genuine 50 MP uint16-original erasure workflow also passes full geometry,
+original byte identity, workspace restoration and Undo/Redo. Each precision file
+matches all 200,000,000 channel values independently with zero error and zero
+differing words. The float32 file retains 60,373,530 extended RGB samples; raw
+SHA-256 `fa4e637dace122ab5d4a68fec80c45ebad2e687e4f2b53e5b6ba563dfc9ef6ba`,
+file SHA-256 `612e1759d668c17f73642edb10cd2d1ccd2ab1805454a9bb1642f578053e6e07`
+(82,383,712 bytes). The uint16 file raw SHA-256 is
+`6ddcb0df108d3ed80e4509b04997a0b2246ae15ad83f111bb57201738bc1123a`,
+file SHA-256 `ef48ff5fb7c9cd2f269b5248c6bf76a880a105a36642b8c062a60e7c39f44b32`
+(36,460,240 bytes). The two-case run has no skips, retries, flaky or unexpected
+results within the existing 600-second per-case limit. Combined source acceptance
+is 84 distinct cases. Complete production acceptance is now running. These
+comparisons do not establish physical/device quality, peak process memory or
+sustained all-tool performance; the complete original roadmap remains active.
+
+
+Complete production acceptance passes all 168 cases without developer globals,
+including original-bearing import, the actual isolated erasure example, pointer
+preview cancellation, one Undo/Redo, Delete-key clear/Undo and reopened projects.
+Source and production UI float32 TIFF, uint16 TIFF, PNG and PDF outputs match
+all 262,144 channel values each against the independent native-CMM/NumPy reference
+with zero error and complete ICC identity. The 82-case focused source matrix
+plus both genuine 50 MP workflows are 84 distinct accepted source cases. Accepted
+final runs have no skips, retries, flaky or unexpected results; earlier example
+and test-binding corrections remain separate diagnostic evidence.
+
+The final audit checks all 2,211 frozen source-input identities and 142 release
+resources, with no post-freeze runtime, test, guide, oracle or release correction.
+All five native binaries remain unchanged from e6a5ce0, including pixels WASM
+SHA-256 `8bcb47b4b65ede3e20f11f0cc24c309728386eeb3d3edbb677c9d26d37af1d51`.
+Only the separately recorded roadmap observations change after the freeze.
+
+[Sealed float erasure evidence](benchmarks/float-erasure-2026-10-27.zip) contains
+the complete changed-source overlay against e6a5ce0, all release resources,
+independent native source/oracle/checker inputs, all four complete 50 MP TIFF
+files, original-bearing projects/workspaces, portable recipe partial retries,
+normal UI outputs, successful and failed reports, screenshots and verification
+tools. The version-2 content-addressed manifest preserves every full file while
+sharing repeated TIFF blocks. Every payload/reconstructed file and source/release
+identity is checked before staging; staged and committed bytes are checked
+against the sealed source/archive identities.
+
+This completes the supported original-preserving float Eraser/clear workflow.
+Existing byte brush coverage remains explicit, and prepared wet/color painting,
+other layers/adjustments/blends/styles, broader working spaces, HDR, proof, CMYK,
+interchange, physical/device quality, peak process memory, sustained all-tool
+performance and every other unfinished original-roadmap gate remain required.
+The shared OO/commands/history and current plugin grants remain authoritative;
+PNG-only independent headless REST source admission does not provide native
+float TIFF rendering or browser synchronization. No new schema, public mutation
+API, isolated privilege, paid call, account, upload or arbitrary original image
+resolution cap was introduced. The complete original roadmap goal remains active.

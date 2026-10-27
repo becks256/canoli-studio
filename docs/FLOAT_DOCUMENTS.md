@@ -145,15 +145,48 @@ changes the accumulated backdrop; pass-through group opacity interpolates
 premultiplied before/after backdrops rather than source-over compositing a second
 copy. Masks use the existing byte coverage rasterizer; color stays float32.
 
-Other layer types, artistic blends, styles, raster erasures,
+Other layer types, artistic blends, styles, prepared wet raster replacements,
 frequency separation and other adjustment types reject
 atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
 palette and context controls disable unsupported creation/color tools. Move,
 Hand, selections, Crop, Artboard and mask drawing retain their existing commands;
-mask brush/pencil/eraser and mask Pen require their corresponding mask target.
+Layer Eraser requires an original raster target. Mask brush/pencil/eraser and mask Pen require their corresponding mask target.
 Device soft proofing is unavailable. Selecting float mode disables it; isolated
 precision conversion clears existing proof state with a visible notice. Saved
 float workspaces with proof enabled reject before publication.
+
+## Original-preserving raster erasure
+
+`RasterLayer.erase(EraserStroke)` and `RasterLayer.clear(selection = null)` use
+existing shared commands, locks, captured layer dimensions and Undo in float
+mode. Clear selects layer-local coordinates; omission clears the whole image.
+The Eraser tool works on selected original raster layers. Pointer preview uses a
+detached scene and leaves history unchanged until commit; cancellation discards it.
+
+Each authored erasure uses the existing brush/selection/texture coverage renderer
+in its captured coordinate plane. Its byte coverage is normalized to float32;
+only native float alpha is multiplied, once per operation, and rounded to float32.
+RGB never passes through that canvas. Coverage is applied after original tone and
+projection, before clipping-stack intrinsic shape, layer mask, fill and opacity.
+Multiple erasures accumulate float alpha rather than a combined byte alpha mask.
+Selection clips, pressure, tips, symmetry and textures retain existing coverage
+semantics. These coverage semantics do not imply a float-color paint engine.
+Prepared wet replacements and other color painting remain unsupported.
+
+<!-- example: float-erasure -->
+```js
+document.convertToFloat();
+const image = document.layers.at(0);
+if (!(image instanceof RasterLayer)) throw new Error('Select an original raster');
+document.selectedLayer = image;
+for (let i = 0; i < 2; i++) image.clear(new MarqueeSelection({
+  shape: 'pixels', x: 15, y: 10, width: 90, height: 55,
+  coverage: {width: 1, height: 1, runs: [1, 128]},
+}));
+image.clear(new MarqueeSelection({
+  shape: 'rectangle', x: 140, y: 80, width: 60, height: 100,
+}));
+```
 
 ## Sibling clipping in float documents
 

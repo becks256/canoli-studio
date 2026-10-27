@@ -1,9 +1,10 @@
 import{clippingStacks}from'../core/clipping';
 import{prepareFloatClipping,restoreFloatClipping}from'./float-clipping';
+import{applyFloatCoverage}from'./float-coverage';
 import type{DocumentData,LayerData}from'../core/model';
 import{validateDocument}from'../core/model';
 import{floatSceneIssue,assertFloatSources}from'../core/float-document';
-import{visitMaskAssets}from'../core/asset-references';
+import{visitLayerAssets}from'../core/asset-references';
 import type{AssetStore,ImageAsset}from'../core/assets';
 import{freeze,isImmutable}from'../core/immutable';
 import{FloatRasterSource}from'../core/float-source/source';
@@ -74,7 +75,7 @@ export class FloatSceneRenderer {
   };
   const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
-   visitMaskAssets(layer.mask,reference=>{if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
+   visitLayerAssets(layer,reference=>{if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
    if(layer.kind==='group')visit(layer.children);else if(layer.kind==='raster'&&!sources.has(layer.assetId)){const asset=assets.get(layer.assetId);sources.set(asset.id,{asset,source:this.source(assets,asset),tiff:asset.tiff,color:asset.tiffColor});}
   }};
   try{
@@ -96,7 +97,14 @@ export class FloatSceneRenderer {
     const raster=async(layer:Extract<LayerData,{kind:'raster'}>,world:AffineTransform)=>{
      const source=sources.get(layer.assetId)!,placement=renderTransform(full,world).multiply(AffineTransform.scale(layer.width/source.source.width,layer.height/source.source.height));
      const effects=layer.effects.filter(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0)),adjusted:FloatWindowSource=effects.length?{width:source.source.width,height:source.source.height,readWindow:async(region,control)=>{let pixels:Float32Array=await source.source.readWindow(region,control);for(const effect of effects)pixels=await tone(pixels,effect);return pixels;}}:source.source;
-     return projectFloatWindow(adjusted,placement,bounds,{signal:control.signal,isCancelled:()=>{check();return false;}});
+     let pixels=await projectFloatWindow(adjusted,placement,bounds,{signal:control.signal,isCancelled:()=>{check();return false;}});
+     // Capture dimensions belong to each authored stroke; later raster resizing
+     // changes coverage placement without changing the original source geometry.
+     for(const entry of layer.erasures??[]){
+      check();const coverage=await maskService({kind:'raster-erasures',width:layer.width,height:layer.height,erasures:[entry],enabled:true,inverted:false,density:1},space,world,check);check();
+      pixels=await applyFloatCoverage(pixels,coverage,check);
+     }
+     return pixels;
     };
     const paint=async(layers:LayerData[],initial:Float32Array,parent:AffineTransform,clippingMembers=false):Promise<Float32Array>=>{
      let backdrop=initial;
