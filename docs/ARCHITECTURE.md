@@ -1,12 +1,16 @@
 # Architecture
 
+## Initial float document workflow (F10)
+
+core/float-document gates scene structure and asset roles. engine/float-asset admits originals with bounded display-only thumbnails; float-scene captures original leases, uses float-projection and native float operations, and converts only final display/output samples. float-delivery/float-tiff own profile-aware file sessions. Model/OO/shared command schema 49, independent source caches and existing host/isolated boundaries remain separate. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Owned float source storage dependency
 
-Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. Public documents/rendering/history remain sRGB8. This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
+Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
 
 ## Float processing dependency
 
-Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Default byte documents remain sRGB8; the connected float subset is documented above; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
 
 ## Normalized float TIFF input increment
 
@@ -26,7 +30,7 @@ core/color/output-record defines cloned source/receipt DTOs; output-source perfo
 
 ## Connected ICC browser workflow (F10/F11)
 
-core/color/profile-source owns immutable inspected ICC resources; color-settings normalizes guarded host preferences; workspace v3 retains complete profile sources. engine/icc-proof applies a fingerprint/settings-keyed transform only to the final private viewport frame, bypassing GPU presentation while proofing. engine/icc-output converts raw native RGBA8 readback directly before PNG/TIFF/PDF encoding; alpha and original target bytes remain independent. UI settings preflight atomically, and stale gesture/proof frames cannot present. The scene stays sRGB8; file services remain outside document mutation, isolated scripts and independent REST. See [ICC_ENGINE.md](ICC_ENGINE.md) for contracts, migration and remaining precision/device gates.
+core/color/profile-source owns immutable inspected ICC resources; color-settings normalizes guarded host preferences; workspace v3 retains complete profile sources. engine/icc-proof applies a fingerprint/settings-keyed transform only to the final private viewport frame, bypassing GPU presentation while proofing. engine/icc-output converts raw native RGBA8 readback directly before PNG/TIFF/PDF encoding; alpha and original target bytes remain independent. UI settings preflight atomically, and stale gesture/proof frames cannot present. That byte workflow stays sRGB8; the initial float mode is documented above; file services remain outside document mutation, isolated scripts and independent REST. See [ICC_ENGINE.md](ICC_ENGINE.md) for contracts, migration and remaining precision/device gates.
 
 ## Editable SVG geometric clipping (F02/F11)
 

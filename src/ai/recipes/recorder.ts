@@ -528,6 +528,9 @@ export class RecipeRecorder {
         this.steps.push({id:`step-${id()}`,name:'Replace document font',action:{type:command.type,from:command.from,to:command.to}});
         this.lastCommandTargetLayerId=null;this.notify();break;
       }
+      case 'document.precision.float':{
+        this.steps.push({id:`step-${id()}`,name:'Use 32-bit linear editing',action:{type:'document.precision.float'}});this.notify();break;
+      }
       case "document.rename": {
         this.steps.push({
           id: `step-${id()}`,

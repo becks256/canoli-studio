@@ -1,3 +1,4 @@
+import{isFloatDocument,assertFloatSources}from'../core/float-document';
 import {textWritingSchema} from '../core/text-writing';
 export type {WritingMode,TextOrientation,TextWritingInput} from '../core/text-writing';
 import {characterBoundsSchema,characterBoundsForLayout} from '../core/character-layout';
@@ -264,6 +265,7 @@ import type {
 import { EditorStore } from "../core/store";
 
 export interface DocumentOptions {
+  precision?:'uint8'|'float32';
   name?: string;
   width?: number;
   height?: number;
@@ -330,6 +332,7 @@ export class Document {
   ): string {
     if (!(source instanceof Document))
       throw new Error("A component source must be a Document.");
+    if(isFloatDocument(source._read()))throw new Error('Smart-object embedding requires its float document integration.');
     const { components: _nestedDefinitions, ...data } = source.toJSON();
     const files=fontFilesForArtwork(source._read(),data);
     if(files.length){data.fontFiles=files;if(this.assetStore){if(!source.assetStore)throw new Error('The component is missing its font source store.');for(const file of files)source.assetStore.fonts.shareTo(this.assetStore.fonts,file.id);}}
@@ -522,9 +525,9 @@ export class Document {
   readonly layerSelection: LayerSelection;
 
   constructor(options: DocumentOptions = {}) {
-    this.store = new EditorStore(
-      createDocument(options.name, options.width, options.height),
-    );
+    if(options.precision!==undefined&&options.precision!=='uint8'&&options.precision!=='float32')throw new Error('Use uint8 or float32 document precision.');
+    const data=createDocument(options.name, options.width, options.height);if(options.precision==='float32'){data.precision='float32';data.colorSpace='linear-srgb';}
+    this.store = new EditorStore(data);
     this.layerComps = new LayerCompCollection(this);
     this.paragraphStyles=new ParagraphStyleCollection(this);
     this.fonts=new DocumentFonts(this);
@@ -576,6 +579,9 @@ export class Document {
   get width() {
     return this._read().width;
   }
+  get precision():'uint8'|'float32'{return this._read().precision??'uint8';}
+  get workingSpace(){return this._read().colorSpace;}
+  convertToFloat(){this._dispatch({type:'document.precision.float'});}
   set width(value: number) {
     this.resize(value, this.height);
   }
@@ -602,6 +608,7 @@ export class Document {
     if(this.batch||this.navigatingHistory||this.acceptingCommand)throw new Error('Prepare a font outside synchronous transactions and history navigation.');
   }
   set assetStore(store: AssetStore | null) {
+    if(store&&(isFloatDocument(this._read())||store.hasFloatAssets))assertFloatSources(this._read(),store);
     if(store){const files=this.fontDeclarations();this.activateFontSources(store.fonts,files);}
     if(store===this._assetStore){store?.fonts.collect();return;}
     const unbind=this.unbindFontSources;this.unbindFontSources=undefined;this._assetStore=store;
@@ -1077,6 +1084,8 @@ export class Document {
     if (this.navigatingHistory || this.acceptingCommand) throw new Error('Finish history navigation before editing or navigating again.');
     const activations=this.prepareFontCommands(command);this.fontTransactionActivations?.push(...activations);
     try{
+    const changesPrecision=(value:EditorCommand):boolean=>value.type==='document.precision.float'||value.type==='transaction'&&value.commands.some(changesPrecision);
+    if(this._assetStore&&(isFloatDocument(this._read())||this._assetStore.hasFloatAssets||changesPrecision(command)))assertFloatSources(execute(this._read(),command),this._assetStore);
     if (this.batch) {
       this.staged = freeze(execute(this._read(), command));
       this.batch.push(command);

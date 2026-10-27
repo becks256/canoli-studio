@@ -107,6 +107,7 @@ export function InspectorPanel({
   onManageFonts,
   onDevelopRaw,
 }: InspectorPanelProps) {
+  const float=dom.precision==='float32';
   const frequencyOwner=selected?frequencyRadiusOwner(viewDocument,selected.id):null;
   const frequencyGroup=frequencyOwner?dom.getLayer(frequencyOwner.id) as LayerGroup:null;
   const tone = selected?.kind === "raster" ? toneOf(selected) : null;
@@ -349,7 +350,7 @@ export function InspectorPanel({
           {frequencyGroup&&frequencyOwner?.frequencyRadius!=null&&<FrequencyRadiusControls key={`${dom.id}:${frequencyGroup.id}`} document={dom} group={frequencyGroup} value={frequencyOwner.frequencyRadius} busy={busy} onPreview={onPreview} onAttempt={onAttempt}/>}
           <InspectorSection title="Appearance">
             <label className="check-field"><input type="checkbox" checked={selected.clipped??false}
-              disabled={locked||busy||(!selected.clipped&&!clippingBaseFor(dom._read().children,selected.id))}
+              disabled={float||locked||busy||(!selected.clipped&&!clippingBaseFor(dom._read().children,selected.id))}
               onChange={event=>{onPreview(null);const value=event.target.checked;onSelectedAction(layer=>{layer.clipped=value;});}}/>Clip to base layer</label>
             {selected.clipped&&<p className="panel-description">{clippingBaseFor(dom._read().children,selected.id)?.name??'No base layer'} controls this layer’s visible area.</p>}
             {selected.blendMode==='pass-through'&&<p className="panel-description">Pass-through blends with surrounding layers unless this group is a clipping base. Choose Normal to use group styles or fill opacity.</p>}
@@ -359,7 +360,7 @@ export function InspectorPanel({
               className="wide-select"
               value={selected.blendMode}
               disabled={locked || busy}
-              options={(selected.kind==='group'?GROUP_BLEND_MODES:BLEND_MODES).map((mode) => ({
+              options={(selected.kind==='group'?GROUP_BLEND_MODES:BLEND_MODES).filter(mode=>!float||mode==='normal'||mode==='pass-through').map((mode) => ({
                 value: mode,
                 label:
                   mode[0].toUpperCase() + mode.slice(1).replaceAll("-", " "),
@@ -511,7 +512,7 @@ export function InspectorPanel({
             key={selected.id}
             onCancel={() => onPreview(null)}
             value={selected.styles ?? defaultStyle()}
-            disabled={locked || busy || selected.blendMode==='pass-through'}
+            disabled={float || locked || busy || selected.blendMode==='pass-through'}
             onPreview={(styles) =>
               onPreview({
                 type: "layer.update",
@@ -578,16 +579,16 @@ export function InspectorPanel({
                   options={[
                     { value: "tonal", label: "Tonal strokes", disabled: true },
                     { value: "patch", label: "Retouch patch", disabled: true },
-                    { value: "hsl", label: "Hue / Saturation / Lightness" },
-                    { value: "color-balance", label: "Color Balance" },
-                    { value: "vibrance", label: "Vibrance" },
-                    { value: "gradient-map", label: "Gradient Map" },
-                    { value: "red-eye", label: "Red Eye" },
-                    { value: "white-balance", label: "White Balance" },
-                    { value: "lut", label: "Color Lookup (LUT)" },
-                    { value: "curves", label: "Curves" },
-                    { value: "levels", label: "Levels" },
-                    { value: "tone", label: "Tone (Exposure / Contrast)" },
+                    { value: "hsl", label: "Hue / Saturation / Lightness",disabled:float },
+                    { value: "color-balance", label: "Color Balance",disabled:float },
+                    { value: "vibrance", label: "Vibrance",disabled:float },
+                    { value: "gradient-map", label: "Gradient Map",disabled:float },
+                    { value: "red-eye", label: "Red Eye",disabled:float },
+                    { value: "white-balance", label: "White Balance",disabled:float },
+                    { value: "lut", label: "Color Lookup (LUT)",disabled:float },
+                    { value: "curves", label: "Curves",disabled:float },
+                    { value: "levels", label: "Levels",disabled:float },
+                    { value: "tone", label: float?'Linear exposure':"Tone (Exposure / Contrast)" },
                   ]}
                   onChange={(kind) => {
                     onSelectedAction((layer) => {
@@ -744,7 +745,7 @@ export function InspectorPanel({
                             max={key === "exposure" ? 3 : 100}
                             step={key === "exposure" ? 0.05 : 1}
                             suffix={key === "exposure" ? " EV" : ""}
-                            disabled={locked || busy}
+                            disabled={locked || busy || float&&key!=='exposure'}
                             onPreview={(val) =>
                               onPreview({
                                 type: "layer.update",
@@ -816,7 +817,7 @@ export function InspectorPanel({
                   max={key === "exposure" ? 3 : 100}
                   step={key === "exposure" ? 0.05 : 1}
                   suffix={key === "exposure" ? " EV" : ""}
-                  disabled={locked || busy || !wasmReady}
+                  disabled={locked || busy || !wasmReady || float&&key!=='exposure'}
                   onPreview={(value) =>
                     onPreview({
                       type: "effect.tone",

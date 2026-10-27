@@ -1,12 +1,16 @@
 # REST and scripting APIs
 
+## Initial float document workflow (F10)
+
+The shared strict command {type: "document.precision.float"} and schema-49 state also apply to independent REST documents. REST original admission remains PNG-only; it supplies no original float TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Owned float source storage dependency
 
-Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. Public documents/rendering/history remain sRGB8. This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
+Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
 
 ## Float processing dependency
 
-Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Default byte documents remain sRGB8; the connected float subset is documented above; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
 
 ## Normalized float TIFF input increment
 

@@ -1,12 +1,16 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Initial float document workflow (F10)
+
+An initial connected float32/linear-sRGB workflow extends original float TIFF raster edits through shared precision/exposure commands, direct file delivery and original-bearing persistence. Byte editing remains the default. This staged subset leaves broad tools, working profiles, HDR, physical/device and performance acceptance required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Profile-aware PNG/TIFF/PDF batch variants now retain complete ICC sources and native conversion receipts. Portable delivery presets and recipe packages preserve those dependencies across reload/library removal; canonical settings guard retry and package integrity. This advances repeatable professional delivery while full color/precision/device, independent REST jobs and the rest of the broad editor objective remain open. [Contract and current verification](COLOR_DELIVERY.md).
 
 ## Current F10 connected ICC browser increment (2026-10-27)
 
-A pinned memory-only CMM now supplies actual RGB output conversion and device proofing internally, with explicit intent fallback, exact alpha and private worker ownership. Atomic Color settings now drive actual viewport proof/gamut pixels, RGB8 PNG/TIFF/PDF delivery and complete workspace v3 profile ownership. The scene remains sRGB8. Portable job dependencies and the full working-space/precision/CMYK/HDR/device/performance scope remain required. See [ICC_ENGINE.md](ICC_ENGINE.md) and the dated roadmap.
+A pinned memory-only CMM now supplies actual RGB output conversion and device proofing internally, with explicit intent fallback, exact alpha and private worker ownership. Atomic Color settings now drive actual viewport proof/gamut pixels, RGB8 PNG/TIFF/PDF delivery and complete workspace v3 profile ownership. That byte workflow remains sRGB8; the initial float mode is documented above. Portable job dependencies and the full working-space/precision/CMYK/HDR/device/performance scope remain required. See [ICC_ENGINE.md](ICC_ENGINE.md) and the dated roadmap.
 
 ## Current F02/F11 geometric SVG clipping increment (2026-10-27)
 

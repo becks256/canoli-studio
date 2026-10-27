@@ -27,6 +27,7 @@ export interface CanvasContextMenuProps {
   settings: ToolSettings;
   controller: ToolController;
   disabled: boolean;
+  floatEditing?:boolean;
   hasSelection: boolean;
   hasMask: boolean;
   hasVectorMask: boolean;
@@ -78,6 +79,7 @@ export function CanvasContextMenu({
   settings,
   controller,
   disabled,
+  floatEditing=false,
   hasSelection,
   hasMask,
   hasVectorMask,
@@ -179,6 +181,7 @@ export function CanvasContextMenu({
             title={`${name} (${key})`}
             aria-label={`${name} (${key})`}
             aria-pressed={tool === id}
+            disabled={disabled||!controller.canUseTool(id)}
             onClick={() => onChooseTool(id)}
           >
             <Icon size={16} />
@@ -578,7 +581,7 @@ export function CanvasContextMenu({
           type="button"
           className="context-action-btn"
           role="menuitem"
-          disabled={disabled}
+          disabled={disabled||floatEditing}
           onClick={() => {
             onAddLayer();
             onClose();
@@ -601,6 +604,7 @@ export function CanvasContextMenu({
           <button
             type="button"
             className="button subtle button-sm"
+            disabled={disabled||floatEditing}
             onClick={() => {
               onAddAdjustmentLayer("curves");
               onClose();
@@ -611,6 +615,7 @@ export function CanvasContextMenu({
           <button
             type="button"
             className="button subtle button-sm"
+            disabled={disabled||floatEditing}
             onClick={() => {
               onAddAdjustmentLayer("levels");
               onClose();
@@ -621,6 +626,7 @@ export function CanvasContextMenu({
           <button
             type="button"
             className="button subtle button-sm"
+            disabled={disabled}
             onClick={() => {
               onAddAdjustmentLayer("tone");
               onClose();
@@ -631,7 +637,7 @@ export function CanvasContextMenu({
           <button
             type="button"
             className="button subtle button-sm"
-            disabled={disabled}
+            disabled={disabled||floatEditing}
             onClick={() => {
               onAddAdjustmentLayer("hsl");
               onClose();
@@ -639,7 +645,7 @@ export function CanvasContextMenu({
           >
             HSL
           </button>
-          {(["color-balance","vibrance","gradient-map","white-balance","lut","red-eye"] as const).map(kind=><button key={kind} type="button" className="button subtle button-sm" disabled={disabled}
+          {(["color-balance","vibrance","gradient-map","white-balance","lut","red-eye"] as const).map(kind=><button key={kind} type="button" className="button subtle button-sm" disabled={disabled||floatEditing}
             onClick={()=>{onAddAdjustmentLayer(kind);onClose();}}>{kind==="color-balance"?"Color Balance":kind==="gradient-map"?"Gradient Map":kind==="white-balance"?"White Balance":kind==="lut"?"Color Lookup (LUT)":kind==="red-eye"?"Red Eye":"Vibrance"}</button>)}
         </div>
         {onGenerateLayer && (

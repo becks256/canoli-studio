@@ -949,6 +949,9 @@ export function compileEditPlan(
             for(const change of changes)if(change.type==='layer.update')affectedLayerNames.add(findLayer(simDoc,change.id)!.name);
             visualChange=`Align layers ${step.action.alignment} relative to ${reference.type}`;break;
           }
+          case 'document.precision.float':{
+            const cmd:EditorCommand={type:'document.precision.float'};stepCommands.push(cmd);simDoc=apply(cmd);visualChange='Use 32-bit linear editing from retained original float sources';break;
+          }
           case "document.rename": {
             const name = String(actionValue(step.action.name));
             const cmd: EditorCommand = {

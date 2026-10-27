@@ -6,7 +6,9 @@ import {prepareCharacterTextMetrics} from './engine/styled-text-layout';
 import {characterInputForLayer} from './core/character-layout';
 import {characterRangeSchema} from './core/text-ranges';
 import type {FontInspection,FontInspectOptions,FontPrepareOptions,FontSourceControl,PreparedFontSource} from './fonts/types';
-import {validateTiffVariant,type TiffPagesExportOptions} from './core/tiff';
+import {validateTiffVariant,validateTiffPrecision,type TiffPagesExportOptions} from './core/tiff';
+import{isFloatDocument,floatSceneIssue}from'./core/float-document';
+import type{FloatSourceControl}from'./core/float-source/types';
 import {captureRetainedHistory, captureProjectHistory, retainedDocuments} from './core/history';
 import {freeze} from './core/immutable';
 import {historyTimeline} from './core/history-inspection';
@@ -15,7 +17,7 @@ import {PaletteLibrary} from './palettes/service';
 import {ArtworkLibrary} from './library/service';
 import type {ArtworkMetadata} from './library/model';
 import {CanvasRenderer} from './engine/renderer';
-import {captureAssetSource} from "./core/assets";
+import {captureAssetSource,assetBitmapMatches} from "./core/assets";
 import {ChatGptConnections} from './integrations/chatgpt/host';
 import {rawDevelopOptionsSchema} from "./core/interchange/raw/types";
 import {prepareRawImport,developRawComponent} from "./engine/raw-import";
@@ -398,10 +400,11 @@ export class EditorApplication {
         const warnings:string[]=[];
         colorSettings.push(entry.colorSettings?await restoreColorSettings(entry.colorSettings):this.legacyColorSettings(entry.colorProfile,entry.softProof,warnings));
         const settings=colorSettings[colorSettings.length-1];
-        if(typeof settings.output.profile!=='string'||settings.proof)warnings.push(...await preflightColorSettings(settings));
         colorWarnings.push(warnings);
         const loaded = await loadProject(entry.project);
         try {
+          if(isFloatDocument(loaded.document)&&settings.proof)throw new Error('Saved float documents cannot use device proofing. Restore a workspace with proofing disabled.');
+          if(typeof settings.output.profile!=='string'||settings.proof||isFloatDocument(loaded.document))warnings.push(...await preflightColorSettings(settings,{},()=>{},isFloatDocument(loaded.document)));
           decoded.push({
             document: Document._fromWorkspace(loaded.document, loaded.history),
             assets: loaded.assets,
@@ -1195,23 +1198,44 @@ export class EditorApplication {
     return this.currentProfileId;
   }
   get softProof(): SoftProofOptions | null {
-    return this.currentSoftProof;
+    return this.activeSession.softProof;
   }
 
   get colorSettings():ColorSettings { return this.activeSession.colorSettings; }
+  private precisionJob:AbortController|null=null;
+  get floatConversionIssue():string|null{
+    const document=this.document._read();if(isFloatDocument(document))return'This document already uses 32-bit linear editing.';const issue=floatSceneIssue(document);if(issue)return issue;
+    const rasters=allLayers(document.children).filter(layer=>layer.kind==='raster');if(!rasters.length)return'Open an original float32 TIFF raster before changing to float editing.';
+    for(const raster of rasters){const asset=this.assets.get(raster.assetId);if(!asset.tiff||!asset.tiffColor)return'Float editing requires retained original float32 TIFF raster sources.';}return null;
+  }
+  async convertDocumentToFloat(control:FloatSourceControl={},value?:ColorSettings):Promise<void>{
+    const beforeSettings=this.colorSettings,settings=normalizeColorSettings(value??{...beforeSettings,proof:null});
+    if(settings.proof)throw new Error('Disable device proofing before choosing float32 editing.');
+    const issue=this.floatConversionIssue;if(issue)throw new Error(issue);control.signal?.throwIfAborted();this.precisionJob?.abort(new Error('Precision preparation was replaced.'));
+    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason),document=this.document,assets=this.assets,revision=document.getSnapshot().revision,generation=this.ioGeneration,alive=assets.captureLifetime();this.precisionJob=abort;control.signal?.addEventListener('abort',cancel,{once:true});
+    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||this.precisionJob!==abort||this.document!==document||this.assets!==assets||this.ioGeneration!==generation||document.getSnapshot().revision!==revision||this.colorSettings!==beforeSettings)throw new Error('The document or color settings changed during float preparation. Try again.');};
+    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);
+    try{
+      check();const candidate=execute(document._read(),{type:'document.precision.float'}),scene=await this.renderer.captureFloatScene(candidate,assets,{signal:abort.signal,onProgress:progress=>{check();control.onProgress?.(progress);check();}});scene.dispose();check();
+      const warnings=await preflightColorSettings(settings,{signal:abort.signal,onProgress:check},check,true);check();
+      stopDocument();stopEditor();this.precisionJob=null;document.convertToFloat();this.commitColorSettings(settings,warnings);
+    }finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);if(this.precisionJob===abort)this.precisionJob=null;}
+  }
   get colorWarnings():readonly string[] { return this.activeSession.colorWarnings; }
   inspectColorProfile(source:Blob,name?:string,control:IccControl={}) { return IccProfile.inspect(source,name,control); }
   private colorRequest=0;
   /** Trusted host preferences; preflight both transforms before publishing anything. */
   async setColorSettings(value:ColorSettings,control:IccControl={}):Promise<readonly string[]> {
     const settings=normalizeColorSettings(value),session=this.activeSession,before=session.colorSettings,request=++this.colorRequest,generation=this.ioGeneration;
+    if(this.document.precision==='float32'&&settings.proof)throw new Error('Device proofing requires its float document integration. Disable proofing for float32 editing.');
     const warnings:string[]=[];
     const current=()=>{control.signal?.throwIfAborted();if(this.retouchDisposed||this.activeSession!==session||session.colorSettings!==before||this.ioGeneration!==generation||request!==this.colorRequest)throw new Error('The active document or color settings changed. Apply again from the current tab.');};
     current();
-    warnings.push(...await preflightColorSettings(settings,control,current));
+    warnings.push(...await preflightColorSettings(settings,control,current,this.document.precision==='float32'));
     current();this.commitColorSettings(settings,[...new Set(warnings)]);return this.colorWarnings;
   }
   private commitColorSettings(settings:ColorSettings,warnings:readonly string[]=[]){
+    if(this.document.precision==='float32'&&settings.proof)throw new Error('Device proofing requires its float document integration.');
     this.activeSession.colorSettings=settings;this.activeSession.colorWarnings=Object.freeze([...warnings]);
     this.currentProfileId=typeof settings.output.profile==='string'?settings.output.profile:'srgb';this.activeSession.colorProfile=this.currentProfileId;
     const proof=settings.proof;
@@ -1274,7 +1298,7 @@ export class EditorApplication {
       colorSettings:this.activeSession?.colorSettings,
       colorWarnings:this.activeSession?.colorWarnings,
       colorProfile: this.currentProfileId,
-      softProof: this.currentSoftProof,
+      softProof: this.activeSession?this.activeSession.softProof:this.currentSoftProof,
       sessions: this.sessions?.map((session) => ({
         id: session.id,
         document: session.document,
@@ -1774,30 +1798,30 @@ export class EditorApplication {
   private captureTiffPages(documents:readonly Document[],options:TiffPagesExportOptions) {
     if(!Array.isArray(documents)||!documents.length)throw new Error('Choose at least one open document as a TIFF page.');
     if(new Set(documents).size!==documents.length)throw new Error('Choose each open document once.');
-    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='variant'&&key!=='color'))throw new Error('TIFF page export options accept only variant and color.');
-    const variant=validateTiffVariant(options.variant),color=options.color?normalizeColorOutput(options.color):undefined;
+    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='variant'&&key!=='color'&&key!=='precision'))throw new Error('TIFF page export options accept only variant, precision and color.');
+    const variant=validateTiffVariant(options.variant),precision=validateTiffPrecision(options.precision),color=options.color?normalizeColorOutput(options.color):undefined;
     const pages=documents.map(document=>{
       const session=this.sessions.find(session=>session.document===document);
       if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');
       return{session,document:document._read(),assets:session.assets,renderer:this.renderer};
     });
     const check=()=>{for(const page of pages)if(this.retouchDisposed||!this.sessions.includes(page.session)||page.session.assets!==page.assets)throw new Error('A TIFF page document closed during export. Choose its pages again.');};
-    check();return{pages,variant,color,check};
+    check();return{pages,variant,precision,color,check};
   }
 
   /** Trusted browser host; each open Document becomes one flattened native-size page. */
   async exportTiffPages(documents:readonly Document[],options:TiffPagesExportOptions={},control?:ExportControl):Promise<ExportResult> {
-    checkExport(control);const{pages,variant,color,check}=this.captureTiffPages(documents,options);
-    const report=getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color);
+    checkExport(control);const{pages,variant,precision,color,check}=this.captureTiffPages(documents,options);
+    const report=getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color,precision);if(report.unavailableReason)throw new Error(report.unavailableReason);
     const current=()=>{checkExport(control);check();};
-    const blob=await encodeTiffPages(pages,variant,{signal:control?.signal,onProgress:progress=>{current();control?.onProgress?.(progress);current();}},color);
+    const blob=await encodeTiffPages(pages,variant,{signal:control?.signal,onProgress:progress=>{current();control?.onProgress?.(progress);current();}},color,precision);
     if(control?.signal)await new Promise<void>(resolve=>setTimeout(resolve,0));current();
     return{blob,mimeType:'image/tiff',extension:'tif',report};
   }
 
   getTiffPagesCapabilityReport(documents:readonly Document[],options:TiffPagesExportOptions={}):ExportCapabilityReport {
-    const{pages,variant,color}=this.captureTiffPages(documents,options);
-    return getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color);
+    const{pages,variant,precision,color}=this.captureTiffPages(documents,options);
+    return getTiffPagesCapabilityReport(pages.map(page=>page.document),variant,color,precision);
   }
 
   getExportCapabilityReport(options: ExportOptions): ExportCapabilityReport {
@@ -2095,7 +2119,7 @@ export class EditorApplication {
             const grants = this.plugins.getGrantedPermissions(pluginContext.pluginId);
             if (!grants.includes('document:read') || (needsWrite && !grants.includes('document:write')) || ((imageSelectionPrepared||rawReadUsed) && !grants.includes('assets:read'))) throw new Error('Plugin permissions changed. No script edits were applied.');
           }
-          for (const entry of pinned) { const source = sources.get(entry.id); if (source !== entry.source || source.bitmap !== entry.bitmap || source.blob !== entry.blob || source.width !== entry.width || source.height !== entry.height || source.bitmap.width !== entry.width || source.bitmap.height !== entry.height) throw new Error('Script source assets changed. No script edits were applied.'); }
+          for (const entry of pinned) { const source = sources.get(entry.id); if (source !== entry.source || source.bitmap !== entry.bitmap || source.blob !== entry.blob || source.width !== entry.width || source.height !== entry.height || !assetBitmapMatches(source)) throw new Error('Script source assets changed. No script edits were applied.'); }
         };
         await validateWetPaintAssets(next, wetBrowserAssets(sources, checkWetCommit));
         checkWetCommit();
@@ -2122,6 +2146,7 @@ export class EditorApplication {
   dispose() {
     this.ioGeneration++;
     this.retouchDisposed = true;
+    this.precisionJob?.abort(new Error('Editor disposed during precision preparation.'));this.precisionJob=null;
     for(const job of this.fontJobs)job.abort(new Error('Editor disposed during font source preparation.'));this.fontJobs.clear();
     for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
     for(const job of this.rawJobs)job.abort(new Error('Editor disposed during RAW preparation.'));this.rawJobs.clear();

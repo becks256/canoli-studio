@@ -1,11 +1,13 @@
 # Native float pixel processing dependency
 
+The initial connected schema-49 float document workflow is now specified in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). The dependency/legacy byte-mode sections below retain their individual boundaries; they do not describe the new mode as byte editing. Broader F10 and full-roadmap acceptance remain required.
+
 The private native engine now processes straight RGBA float32 windows without
-8-bit staging. This is a dependency of F10 precision editing. The current public
-Document renderer, tools, caches, accepted assets and editing history still use
-sRGB8. It does not add working-space assignment/conversion, float documents,
-precision selection, float brush/effect stacks, scene export or HDR tone mapping.
-These integrations and the original professional-editor roadmap remain required.
+8-bit staging. This is a dependency of F10 precision editing. The initial public
+float scene integration is described above; default byte documents retain sRGB8.
+This dependency alone does not implement general working-space assignment,
+float brush/effect stacks or HDR tone mapping. The broader integrations and the
+original professional-editor roadmap remain required.
 
 ## Numeric and ownership contract
 

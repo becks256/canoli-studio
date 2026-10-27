@@ -405,6 +405,12 @@ export class ToolController {
     );
   }
   getSnapshot = () => this.state;
+  canUseTool(tool:Tool):boolean{
+    if(this.editor.document.precision!=='float32')return true;
+    if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
+    if(tool==='pen')return this.state.settings.penEditTarget==='mask';
+    return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');
+  }
   /** Current gestures may begin before React flushes a selection preference reset. */
   get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&(gesture.document.selectedLayer?.id??null)===gesture.selectionId;}
 
@@ -879,6 +885,7 @@ export class ToolController {
     zoom: number,
     cropHandle?: CropHandle,
   ) {
+    if(!this.canUseTool(tool))throw new Error('This tool requires its float document integration. Use Move, selections, masks, crop or linear exposure in this mode.');
     if (tool === "lasso" && this.state.settings.lassoMode === "polygon") {
       this.beginPolygonLasso(point, modifiers, zoom);
       return;

@@ -1,10 +1,13 @@
 # Owned float originals and derived tiles
 
+The initial connected schema-49 float document workflow is now specified in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). The dependency/legacy byte-mode sections below retain their individual boundaries; they do not describe the new mode as byte editing. Broader F10 and full-roadmap acceptance remain required.
+
 The trusted browser host can retain independent leases over original float32 TIFF
 files and prepare persistent, losslessly compressed RGBA float32 tiles. This is
-an internal F10 source-storage dependency. The public Document, renderer, tools,
-history and scene output still use sRGB8. Float document authoring, working-space
-commands and authored float persistence remain required by the original roadmap.
+an internal F10 source-storage dependency, now used by the initial connected
+float Document workflow described above. Default byte documents retain sRGB8.
+Broader float authoring, working profiles, tools and performance remain required
+by the original roadmap.
 
 ## Admission and ownership
 

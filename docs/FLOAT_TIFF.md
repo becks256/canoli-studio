@@ -1,11 +1,13 @@
 # Float TIFF input and retained precision
 
+The initial connected schema-49 float document workflow is now specified in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). The dependency/legacy byte-mode sections below retain their individual boundaries; they do not describe the new mode as byte editing. Broader F10 and full-roadmap acceptance remain required.
+
 Canoli can inspect and open normalized SDR float32 TIFF/BigTIFF pages, retaining
-all original bytes and explicit decode choices. The scene still edits sRGB8:
+all original bytes and explicit decode choices. In the default byte mode,
 import requires precision-loss consent and converts original float samples
 through the actual source ICC profile before quantizing the editing proxy.
-This does not add a float canvas, document working spaces, HDR tone mapping,
-signed/half/double TIFF input or physical color calibration.
+Explicit float document admission is described above. HDR tone mapping,
+half/double TIFF input and physical color calibration remain required.
 
 ## Input and color contract
 

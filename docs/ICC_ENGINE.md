@@ -1,5 +1,7 @@
 # Native ICC engine dependency
 
+The initial connected schema-49 float document workflow is now specified in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). The dependency/legacy byte-mode sections below retain their individual boundaries; they do not describe the new mode as byte editing. Broader F10 and full-roadmap acceptance remain required.
+
 The native Little CMS engine now connects to trusted browser color settings,
 viewport proofing and RGB8 PNG/TIFF/PDF output. Original ICC sources and per-tab
 preferences survive workspace checkpoints. The scene still composites sRGB8;

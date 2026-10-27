@@ -1,5 +1,7 @@
 # Profile-aware batch delivery and portable recipes
 
+The initial connected schema-49 float document workflow is now specified in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). The dependency/legacy byte-mode sections below retain their individual boundaries; they do not describe the new mode as byte editing. Broader F10 and full-roadmap acceptance remain required.
+
 Batch variants now support PNG, JPEG, WebP, AVIF, TIFF and raster PDF. PNG/TIFF/PDF
 can use complete owned RGB ICC sources, with actual Little CMS conversion after
 fitted native RGBA8 readback. The scene remains sRGB8. JPEG/WebP/AVIF are sRGB;

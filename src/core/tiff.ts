@@ -1,7 +1,9 @@
 /** TIFF 6 tiled RGBA8/16/float32 / BigTIFF directories. Pixel payloads stay separate. */
 export type TiffSampleFormat='rgba8'|'rgba16'|'rgba-float32';
 export type TiffVariant = 'auto' | 'classic' | 'big';
-export interface TiffPagesExportOptions {color?:import('./color/color-settings').ColorOutput;variant?: TiffVariant}
+export type TiffPrecision='uint8'|'uint16'|'float32';
+export function validateTiffPrecision(value:unknown):TiffPrecision{if(value===undefined)return'uint8';if(value!=='uint8'&&value!=='uint16'&&value!=='float32')throw new Error('TIFF precision must be uint8, uint16 or float32.');return value;}
+export interface TiffPagesExportOptions {color?:import('./color/color-settings').ColorOutput;variant?: TiffVariant;precision?:TiffPrecision}
 export interface TiffDirectoryInput {
   width: number; height: number; tileWidth: number; tileHeight: number;
   /** Page-local offsets relative to its first pixel payload, eight-byte aligned. */

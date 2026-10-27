@@ -1,3 +1,4 @@
+import{isFloatDocument}from'../../core/float-document';
 import {hasMaskRefinements} from '../../core/masks';
 import {symmetryMatrices} from '../../core/brush-symmetry';
 import {paintStampSize,paintStampAlpha,paintStampGeometry,sameStrokePoint} from '../../core/paint-stamps';
@@ -856,6 +857,7 @@ export class WebGpuRenderer {
     options: RenderOptions,
   ): Promise<ViewportFrame | null> {
     checkRenderCurrent(options.isCancelled);
+    if(isFloatDocument(document))return null;
     if (!(await this.ready) || !this.device || this.disposed) return null;
     checkRenderCurrent(options.isCancelled);
     if (this.namespace !== document.id || this.assets !== assets) {

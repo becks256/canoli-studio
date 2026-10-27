@@ -17,6 +17,20 @@ import type{Recipe}from'../src/ai/recipes/types';
 let cleanup:()=>void;beforeEach(async()=>{cleanup=await nativeIccHost();});afterEach(()=>cleanup());
 const variant:DeliveryVariantSpec={id:'png',name:'Review',format:'png',targetWidth:32,targetHeight:16,fit:'contain'};
 const recipe:Recipe={schemaVersion:1,id:'color-recipe',name:'Color recipe',description:'',version:1,parameters:[],steps:[{id:'size',name:'Resize',action:{type:'document.resize',width:32,height:16}}]};
+it('float delivery receipts bind the actual native input and output precision through presets and reuse checks',async()=>{
+ const color=await captureColorOutput({profile:'linear-srgb'});
+ for(const precision of['uint8','uint16','float32']as const){
+  const format=precision==='float32'?'rgba-float32':precision==='uint16'?'rgba16':'rgba8',value:DeliveryVariantSpec={...variant,format:'tiff',tiffPrecision:precision,color},prepared=await prepareColorOutputSource(color,{},format);
+  expect(prepared.receipt).toMatchObject({version:2,sourceSpace:'linear-srgb-float32',outputFormat:format});
+  const file=await encodeDeliveryPreset({name:'Precision outputs',variants:[value]}),restored=await readDeliveryPreset(file);expect(restored.variants[0].tiffPrecision).toBe(precision);
+  const delivery={format:'tiff' as const,width:32,height:16,settingsSha256:await deliverySettingsHash(value),color:prepared.receipt};
+  await verifyDeliveryContract(value,delivery,prepared.receipt,'linear-srgb-float32');
+  await expect(verifyDeliveryContract(value,delivery,undefined,'srgb8')).rejects.toThrow('working precision');
+  if(prepared.receipt.version!==2)throw new Error('Expected float receipt');
+  await expect(verifyDeliveryContract(value,{...delivery,color:{...prepared.receipt,outputFormat:format==='rgba8'?'rgba16':'rgba8'}})).rejects.toThrow('sample precision');
+ }
+ expect(deliveryVariantSpecSchema.safeParse({...variant,tiffPrecision:'float32'}).success).toBe(false);
+});
 it('captures complete built-in bytes and real native settings, rejects substituted files, CMYK output and aborted preparation',async()=>{
  const color=await captureColorOutput({profile:'display-p3',intent:'perceptual',blackPointCompensation:true});expect(color.profile.source.size).toBeGreaterThan(128);
  const prepared=await prepareColorOutputSource(color);expect(prepared.receipt).toMatchObject({sourceSpace:'srgb8',profileSha256:color.profile.sha256,engine:'Little CMS 2.19.1',intent:'perceptual',blackPointCompensation:true});

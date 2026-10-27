@@ -1,4 +1,5 @@
 import {prepareDeliveryVariants} from './delivery-preparation';
+import{isFloatDocument}from'../../core/float-document';
 import {captureRasterExportSources} from '../../engine/raster-export-source';
 import {exportTiff} from '../../engine/tiff';
 import {exportPdf} from '../../engine/pdf';
@@ -353,16 +354,21 @@ export class BatchRunner {
 
     const capturedSettings=JSON.stringify(run.config.variants.map(deliverySettingsKey));
     const capturedStatus=run.status;
+    const workingCheckpoints=(value:BatchRun)=>JSON.stringify(value.items.map(item=>[item.id,item.checkpoint,item.deliverables]));
+    const capturedCheckpoints=workingCheckpoints(run);
     const colors=await prepareDeliveryVariants(run.config.variants);
     for(const item of run.items)for(const delivery of item.deliverables){
       const variant=run.config.variants.find(v=>v.id===delivery.variantId);if(!variant)throw new Error('An accepted variant was removed from batch settings. Create a new batch.');
-      await verifyDeliveryContract(variant,delivery,colors.get(await deliverySettingsHash(variant))?.receipt);
+      const float=!!item.checkpoint&&isFloatDocument(item.checkpoint);if(delivery.color?.version===2&&!float)throw new Error('An accepted float delivery requires its float working checkpoint.');
+      const format=variant.format==='tiff'&&variant.tiffPrecision==='float32'?'rgba-float32':variant.format==='tiff'&&variant.tiffPrecision==='uint16'?'rgba16':'rgba8',key=await deliverySettingsHash(variant)+(float?':float:'+format:'');
+      if(float&&variant.color&&!colors.has(key))colors.set(key,await prepareColorOutputSource(variant.color,{},format));
+      await verifyDeliveryContract(variant,delivery,colors.get(key)?.receipt,float?'linear-srgb-float32':'srgb8');
     }
 
     const fresh=await this.storage.getRun(runId);
-    if(!fresh||fresh.status!==capturedStatus||JSON.stringify(fresh.config.variants.map(deliverySettingsKey))!==capturedSettings)throw new Error('Batch state or delivery settings changed during profile preflight. Start again explicitly.');
+    if(!fresh||fresh.status!==capturedStatus||workingCheckpoints(fresh)!==capturedCheckpoints||JSON.stringify(fresh.config.variants.map(deliverySettingsKey))!==capturedSettings)throw new Error('Batch state or delivery settings changed during profile preflight. Start again explicitly.');
     run = await this.storage.updateRun(runId, (current) => {
-      if(current.status!==capturedStatus||JSON.stringify(current.config.variants.map(deliverySettingsKey))!==capturedSettings)throw new Error('Batch state changed during delivery preflight.');
+      if(current.status!==capturedStatus||workingCheckpoints(current)!==capturedCheckpoints||JSON.stringify(current.config.variants.map(deliverySettingsKey))!==capturedSettings)throw new Error('Batch state changed during delivery preflight.');
       for (const item of current.items) {
         if (item.status === "running") item.status = "pending";
         if (retryFailed && item.status === "failed") {
@@ -607,6 +613,7 @@ export class BatchRunner {
                 await updateItemState(item.id, {
                   deliverables: item.deliverables,
                   source: item.source,
+                  ...(item.checkpoint?{checkpoint:item.checkpoint}:{}),
                 });
               },
             );
@@ -828,7 +835,7 @@ export class BatchRunner {
         }
       }
 
-      if((item.source.raw||documentFontFiles(doc).length)&&!item.preparation){
+      if((item.source.raw||isFloatDocument(doc)||documentFontFiles(doc).length)&&!item.preparation){
         signal.throwIfAborted();
         const history=preparedHistory;
         const project=await serializeProject(doc,assets,history),inputsSha256=await preparationInputs(config,item);
@@ -837,6 +844,8 @@ export class BatchRunner {
       }
 
       // 4. Generate Delivery Variants
+      // Bind partial precision outputs to their accepted working scene too.
+      if(isFloatDocument(doc)){item.checkpoint=doc;await checkpoint();signal.throwIfAborted();}
       const previousDeliverables = [...item.deliverables];
       const deliverables: DeliveryDeliverable[] = [];
 
@@ -846,7 +855,7 @@ export class BatchRunner {
         const existing = previousDeliverables.find(
           (d) => d.variantId === variant.id,
         );
-        if(existing)await verifyDeliveryContract(variant,existing);
+        if(existing)await verifyDeliveryContract(variant,existing,undefined,isFloatDocument(doc)?'linear-srgb-float32':'srgb8');
         const existingBlob = existing
           ? await this.storage.getDeliverableBlob(existing.id)
           : null;
@@ -904,7 +913,8 @@ export class BatchRunner {
     const sourceCheck=captureRasterExportSources(doc,assets,{signal},'batch delivery');
     try{
     const settingsSha256=await deliverySettingsHash(variant);sourceCheck();
-    const preparedColor=variant.color?await prepareColorOutputSource(variant.color,{signal}):undefined;sourceCheck();
+    const floatFormat=variant.format==='tiff'&&variant.tiffPrecision==='float32'?'rgba-float32':variant.format==='tiff'&&variant.tiffPrecision==='uint16'?'rgba16':'rgba8';
+    const preparedColor=variant.color?await prepareColorOutputSource(variant.color,{signal},isFloatDocument(doc)?floatFormat:undefined):undefined;sourceCheck();
 
     // Scale and fit layers into variant geometry
     const variantDoc = createDocument(
@@ -912,6 +922,7 @@ export class BatchRunner {
       variant.targetWidth,
       variant.targetHeight,
     );
+    if(isFloatDocument(doc)){variantDoc.colorSpace=doc.colorSpace;variantDoc.precision=doc.precision;}
 
     const deliveryRenderer = fittedRenderer(
       this.renderer,
@@ -927,7 +938,7 @@ export class BatchRunner {
       if (variant.format === "png") {
         blob = await exportPng(variantDoc, assets, deliveryRenderer,{signal},preparedColor?.output);
       } else if(variant.format==='tiff'){
-        blob=await exportTiff(variantDoc,assets,deliveryRenderer,variant.tiffVariant,{signal},preparedColor?.output);
+        blob=await exportTiff(variantDoc,assets,deliveryRenderer,variant.tiffVariant,{signal},preparedColor?.output,variant.tiffPrecision);
       } else if(variant.format==='pdf'){
         blob=await exportPdf(variantDoc,assets,deliveryRenderer,variant.pdfDpi,{signal},preparedColor?.output);
       } else if(variant.format==='avif'){

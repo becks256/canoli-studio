@@ -146,6 +146,7 @@ export type RecipeAction =
     }
   | { type: "effect.remove"; effectId?: string; effectIndex?: number }
   | { type: "effect.reset" }
+  | {type:'document.precision.float'}
   | {
       type: "document.resize" | "document.resizeImage";
       width: number | string;

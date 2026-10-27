@@ -30,8 +30,13 @@ export async function restoreColorSettings(value:ColorSettingsRecord,control:Icc
  const output={...record.output,profile:await target(record.output.profile)},proof=record.proof?{...record.proof,profile:await target(record.proof.profile)}:null;control.signal?.throwIfAborted();return normalizeColorSettings({output,proof});
 }
 
-export async function preflightColorSettings(value:ColorSettings,control:IccControl={},check:()=>void=()=>{}):Promise<readonly string[]>{
+export async function preflightColorSettings(value:ColorSettings,control:IccControl={},check:()=>void=()=>{},float=false):Promise<readonly string[]>{
  const settings=normalizeColorSettings(value),warnings:string[]=[];
+ if(float){
+  if(settings.proof)throw new Error('Device proofing requires its float document integration.');
+  check();control.signal?.throwIfAborted();const prepared=await IccSession.prepareRgb(iccTarget('linear-srgb').source,iccTarget(settings.output.profile).source,{inputFormat:'rgba-float32',outputFormat:'rgba8',intent:settings.output.intent,blackPointCompensation:settings.output.blackPointCompensation},control);
+  try{check();control.signal?.throwIfAborted();return Object.freeze([...prepared.prepared.warnings]);}finally{prepared.session.dispose();}
+ }
  const targets=[[settings.output.profile,{mode:'convert' as const,intent:settings.output.intent,blackPointCompensation:settings.output.blackPointCompensation}],...(settings.proof?[[settings.proof.profile,proofTransformSettings(settings.proof)]as const]:[])] as const;
  for(const[profile,options]of targets){
   check();control.signal?.throwIfAborted();const prepared=await IccSession.prepare(iccTarget(profile).source,options,control);

@@ -12,12 +12,14 @@ export function deliverySettingsKey(input:DeliveryVariantSpec):string{
  return JSON.stringify(canonical({...variant,...(color?{color:{...color,profile:{name:color.profile.name,sha256:color.profile.sha256,byteLength:color.profile.source.size}}}:{})}));
 }
 export async function deliverySettingsHash(input:DeliveryVariantSpec){return computeSha256(deliverySettingsKey(input));}
-export async function verifyDeliveryContract(variant:DeliveryVariantSpec,delivery:Pick<DeliveryDeliverable,'settingsSha256'|'color'|'format'|'width'|'height'>,receipt?:ColorOutputReceipt){
+export async function verifyDeliveryContract(variant:DeliveryVariantSpec,delivery:Pick<DeliveryDeliverable,'settingsSha256'|'color'|'format'|'width'|'height'>,receipt?:ColorOutputReceipt,sourceSpace?:'srgb8'|'linear-srgb-float32'){
  if(!delivery.settingsSha256){if(variant.color||['tiff','pdf'].includes(variant.format)||delivery.color)throw new Error('This delivery has no accepted output contract. Create a new batch instead of relabeling old files.');return;}
  if(delivery.settingsSha256!==await deliverySettingsHash(variant)||delivery.format!==variant.format||delivery.width!==variant.targetWidth||delivery.height!==variant.targetHeight)throw new Error('Delivery settings differ from accepted output. Create a new batch.');
  const color=variant.color;
  if(color){
   const actual=delivery.color;
   if(!actual||actual.profileSha256!==color.profile.sha256||actual.profileByteLength!==color.profile.source.size||actual.profileName!==color.profile.name||actual.intent!==color.intent||actual.blackPointCompensation!==color.blackPointCompensation||receipt&&JSON.stringify(canonical(actual))!==JSON.stringify(canonical(receipt)))throw new Error('ICC delivery contract differs from the accepted file. Create a new batch.');
+  if(sourceSpace&&actual.sourceSpace!==sourceSpace)throw new Error('Accepted delivery working precision differs from its checkpoint. Create a new batch.');
+  if(actual.version===2&&actual.outputFormat!==(variant.format==='tiff'&&variant.tiffPrecision==='float32'?'rgba-float32':variant.format==='tiff'&&variant.tiffPrecision==='uint16'?'rgba16':'rgba8'))throw new Error('Accepted float delivery sample precision differs from its settings.');
  }else if(delivery.color)throw new Error('An accepted ICC delivery cannot be relabeled as sRGB. Create a new batch.');
 }

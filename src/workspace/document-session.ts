@@ -27,6 +27,10 @@ export class DocumentSession {
       const current = document.getSnapshot().document;
       if (current !== observed) {
         observed = current;
+        if(current.precision==='float32'&&this.colorSettings.proof){
+          this.colorSettings=Object.freeze({...this.colorSettings,proof:null});this.softProof=null;
+          this.colorWarnings=Object.freeze([...this.colorWarnings,'Soft proofing is disabled for float editing until its precision integration is available.']);
+        }
         this.recovery.schedule(this.id, current, assets);
       }
       changed();

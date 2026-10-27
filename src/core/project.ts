@@ -1,3 +1,4 @@
+import{assertFloatSources,isFloatDocument}from'./float-document';
 import {rawSourceMetadataSchema,rawSourceMetadata,ownRawSource,verifyRawSource,type RawImageSource,type RawSourceMetadata} from "./interchange/raw/source";
 import { freezeOwnedData } from "./immutable";
 import { AssetStore } from "./assets";
@@ -407,6 +408,7 @@ export async function loadProject(
         throw new Error("Embedded image dimensions do not match the project.");
     }
     const documents = retainedDocuments(project.document, project.history);
+    for(const document of documents)if(isFloatDocument(document)||assets.hasFloatAssets)assertFloatSources(document,assets);
     const linkedIds = new Set(
       documents.flatMap((document) =>
         (document.components ?? []).flatMap((definition) =>

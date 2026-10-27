@@ -1,4 +1,6 @@
 import {parseFontVariations} from '../core/font-variations';
+import{isFloatDocument}from'../core/float-document';
+import{validateTiffPrecision,type TiffPrecision}from'../core/tiff';
 import { checkExport, type ExportControl } from "./export-control";
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
@@ -44,6 +46,7 @@ export interface ExportOptions {
   format: ExportFormat;
   psdMode?: PsdExportMode;
   tiffVariant?: TiffVariant;
+  tiffPrecision?:TiffPrecision;
   pdfDpi?: number; // Physical page sizing only; native pixels are not resampled.
   quality?: number; // 0.01 to 1.0 (JPEG, WebP and AVIF)
   avifLossless?:boolean;
@@ -52,6 +55,7 @@ export interface ExportOptions {
 }
 
 export interface ExportCapabilityReport {
+  unavailableReason?:string;
   format: ExportFormat;
   warnings: string[];
   featuresPreserved: string[];
@@ -71,12 +75,13 @@ export interface ExportResult {
  * to the requested target format.
  */
 /** Pure page report; cross-document ownership is checked by EditorApplication. */
-export function getTiffPagesCapabilityReport(documents:readonly DocumentData[],variant:TiffVariant='auto',color?:ColorOutput):ExportCapabilityReport {
+export function getTiffPagesCapabilityReport(documents:readonly DocumentData[],variant:TiffVariant='auto',color?:ColorOutput,precision:TiffPrecision='uint8'):ExportCapabilityReport {
   validateTiffVariant(variant);
   if(!documents.length)throw new Error('Choose at least one TIFF page.');
-  const reports=documents.map(document=>getExportCapabilityReport(document,{format:'tiff',tiffVariant:variant,color}));
+  const reports=documents.map(document=>getExportCapabilityReport(document,{format:'tiff',tiffVariant:variant,color,tiffPrecision:precision}));
   const unique=(values:string[])=>[...new Set(values)];
-  return {format:'tiff',warnings:unique([`Exports ${documents.length} TIFF page${documents.length===1?'':'s'} in the selected order. Some viewers display only the first page.`,...reports.flatMap(report=>report.warnings.map(warning=>warning.replace('TIFF is one flattened image.','Each TIFF page is a flattened image.')))]),
+  const unavailable=reports.find(report=>report.unavailableReason)?.unavailableReason;
+  return {format:'tiff',...(unavailable?{unavailableReason:unavailable}:{}),warnings:unique([`Exports ${documents.length} TIFF page${documents.length===1?'':'s'} in the selected order. Some viewers display only the first page.`,...reports.flatMap(report=>report.warnings.map(warning=>warning.replace('TIFF is one flattened image.','Each TIFF page is a flattened image.')))]),
     featuresPreserved:unique(['Independent native page dimensions and page order',...reports.flatMap(report=>report.featuresPreserved)]),
     featuresDegradedOrOmitted:unique(reports.flatMap(report=>report.featuresDegradedOrOmitted))};
 }
@@ -85,6 +90,8 @@ export function getExportCapabilityReport(
   document: DocumentData,
   options: ExportOptions,
 ): ExportCapabilityReport {
+  const precision=validateTiffPrecision(options.tiffPrecision),float=isFloatDocument(document),reason=float&&['svg','psd','psb'].includes(options.format)?'This interchange format requires its float document integration. Use TIFF for precision pixels or save a native project for editable artwork.':options.format==='tiff'&&precision!=='uint8'&&!float?'High-precision TIFF delivery requires a float32 document.':options.tiffPrecision!==undefined&&options.format!=='tiff'?'TIFF precision applies only to TIFF delivery.':null;
+  if(reason)return{format:options.format,unavailableReason:reason,warnings:[reason],featuresPreserved:[],featuresDegradedOrOmitted:['No file is produced for this unsupported precision/format combination.']};
   options={...options,color:colorOutputForFormat(options.format,options.color)};
   const smart=options.format==='svg'?planSvgSmart(document):undefined;
   return describeExport(document,options,smart,smart?planSvgComposition(smart.document):undefined);
@@ -101,9 +108,14 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
   const svgFontNames=options.format==='svg'?new Set(planSvgTexts(document).flatMap(text=>characterFontFamilies(text).flatMap(fontFamilyNames))):new Set<string>();
   const embeddedSvgFonts=options.format==='svg'&&documentFontFiles(authored).some(file=>svgFontNames.has(file.resource.report.faces[0].cssFamily.toLowerCase()));
 
-  const warnings: string[] = options.color ? [`RGB samples are converted from sRGB8 to ${iccTarget(options.color.profile).name}; its original ICC profile is embedded. Soft proofing does not affect delivery. Intent availability depends on the profile; matrix profiles may use intent fallback.`] : [];
+  const float=isFloatDocument(document),precision=validateTiffPrecision(options.tiffPrecision);
+  const warnings: string[] = options.color ? [`RGB samples are converted from ${float?'linear-sRGB float32':'sRGB8'} to ${iccTarget(options.color.profile).name}; its original ICC profile is embedded. Soft proofing does not affect delivery. Intent availability depends on the profile; matrix profiles may use intent fallback.`] : [];
   const featuresPreserved: string[] = [];
   const featuresDegradedOrOmitted: string[] = [];
+  if(float&&format!=='tiff'){
+    warnings.push('This format converts the float working scene to 8-bit SDR delivery. Extended values are clipped; HDR tone mapping is not applied. Use float32 TIFF to retain precision.');
+    featuresDegradedOrOmitted.push('Float sample precision and extended RGB range');
+  }
 
   switch (format) {
     case 'avif': {
@@ -130,19 +142,20 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
     }
     case "tiff":
       const variant=validateTiffVariant(options.tiffVariant);
-      featuresPreserved.push('Native document resolution and visible composition',options.color?'Lossless Deflate-compressed 8-bit output RGB pixels':'Lossless Deflate-compressed 8-bit sRGB pixels','Unassociated RGBA transparency',options.color?'Embedded original output ICC profile':'Embedded output sRGB ICC profile');
+      featuresPreserved.push('Native document resolution and visible composition',precision==='float32'?'Lossless Deflate-compressed 32-bit floating-point RGB samples':precision==='uint16'?'Lossless Deflate-compressed 16-bit integer RGB samples':options.color?'Lossless Deflate-compressed 8-bit output RGB pixels':'Lossless Deflate-compressed 8-bit sRGB pixels','Unassociated RGBA transparency',options.color?'Embedded original output ICC profile':precision==='uint8'?'Embedded output sRGB ICC profile':'Embedded linear-sRGB output ICC profile');
+      if(float){featuresPreserved.push('Direct conversion from the float working scene without an intermediate byte display surface');if(precision!=='float32')warnings.push('Integer TIFF quantizes samples and clips values outside its representable range. HDR tone mapping is not applied.');}
       warnings.push('TIFF is one flattened image. Save a Canoli Studio project for editable layers, masks, text, effects and original sources.');
       warnings.push('Resolution metadata is 72 DPI; pixel dimensions are unchanged. Source EXIF/GPS and authored metadata are not copied.');
       if(variant==='big')warnings.push('BigTIFF requires a compatible viewer. Some TIFF applications support only classic TIFF.');
       else if(variant==='auto')warnings.push('Automatic selects classic TIFF when its actual output fits; larger files use BigTIFF and require a compatible viewer.');
       else warnings.push('Classic TIFF uses 32-bit file addresses. If the output exceeds that format, choose Automatic or BigTIFF.');
-      featuresDegradedOrOmitted.push('Editable layers, masks, typography, effects and component links','Higher-bit-depth and CMYK/HDR output','Source-file and authored metadata');
+      featuresDegradedOrOmitted.push('Editable layers, masks, typography, effects and component links',precision==='uint8'?'Higher-bit-depth and CMYK/HDR output':'CMYK, HDR transfer encoding and tone mapping','Source-file and authored metadata');
       if(document.alphaChannels?.length)featuresDegradedOrOmitted.push('Saved alpha channels');
       break;
     case "png":
       featuresPreserved.push(
         "Full alpha channel (transparency)",
-        options.color?"Lossless encoding of converted RGB8 samples":"Lossless pixel accuracy",
+        options.color||float?"Lossless encoding of converted RGB8 samples":"Lossless pixel accuracy",
         "All layer types composited",
       );
       if (hasVectors) {
@@ -396,6 +409,7 @@ export async function exportDocument(
   control?: ExportControl,
 ): Promise<ExportResult> {
   checkExport(control);
+  if(isFloatDocument(document)||options.tiffPrecision!==undefined){const capability=getExportCapabilityReport(document,options);if(capability.unavailableReason)throw new Error(capability.unavailableReason);}
   options={...options,color:colorOutputForFormat(options.format,options.color)};
   if(options.format==='avif'){
     const report=getExportCapabilityReport(document,options),blob=await exportAvif(document,assets,renderer,{quality:options.quality,lossless:options.avifLossless,speed:options.avifSpeed},control);
@@ -413,7 +427,7 @@ export async function exportDocument(
   // TIFF captures sources/fonts before the first user progress callback.
   if(options.format==='tiff'){
     const report=getExportCapabilityReport(document,options);
-    const blob=await exportTiff(document,assets,renderer,validateTiffVariant(options.tiffVariant),control,options.color);
+    const blob=await exportTiff(document,assets,renderer,validateTiffVariant(options.tiffVariant),control,options.color,validateTiffPrecision(options.tiffPrecision));
     return{blob,mimeType:'image/tiff',extension:'tif',report};
   }
   const smart=options.format==='svg'?planSvgSmart(document):undefined;

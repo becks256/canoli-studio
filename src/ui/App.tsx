@@ -207,6 +207,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     editor.tools.getUiSnapshot,
   );
   useEffect(()=>{if(toolState.error)setError(toolState.error);},[toolState.error]);
+  useEffect(()=>{if(!editor.tools.canUseTool(tool)){editor.tools.cancel();setTool('move');setPreview(null);}},[editor,dom,state.revision,tool,toolState]);
   const [customCursors, setCustomCursors] = useState(() => {
     try { return localStorage.getItem("luma.custom-cursors.v1") !== "false"; } catch { return true; }
   });
@@ -468,6 +469,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   }, [viewDocument.width, viewDocument.height, viewportSize, zoom, pan]);
 
   function chooseTool(next: Tool) {
+    if(!editor.tools.canUseTool(next)){notify('This tool requires its float document integration.');return;}
     editor.tools.cancel();
     setPreview(null);
     updateCursor(null);
@@ -627,6 +629,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" | "red-eye" = "curves",
   ) {
     attempt(() => {
+      if(dom.precision==='float32'&&kind!=='tone')throw new Error('Float editing currently supports linear exposure adjustments only.');
       const pupilSelection = kind === "red-eye" ? dom.selection : null;
       if (kind === "red-eye" && (!pupilSelection || !pupilSelection.toJSON().regions.length))
         throw new Error("Select the red pupils first, then add a Red Eye adjustment.");
@@ -783,11 +786,12 @@ export function App({ editor }: { editor: EditorApplication }) {
       keys: SHORTCUT_BINDINGS["hand"],
       run: () => chooseTool("hand"),
     },
-    ...(["smudge","mixer"] as const).map(key=>({id:key,label:key==="smudge"?"Smudge tool":"Mixer brush",keys:[],run:()=>chooseTool(key)})),
+    ...(["smudge","mixer"] as const).map(key=>({id:key,label:key==="smudge"?"Smudge tool":"Mixer brush",keys:[],enabled:()=>editor.tools.canUseTool(key),run:()=>chooseTool(key)})),
     ...TOOL_SHORTCUTS.map(([key, label, binding]) => ({
       id: key,
       label,
       keys: [binding],
+      enabled:()=>editor.tools.canUseTool(key),
       run: () => chooseTool(key),
     })),
     {
@@ -924,8 +928,8 @@ export function App({ editor }: { editor: EditorApplication }) {
     {id:'design-checks',label:'Design checks',keys:[],run:()=>setShowPreflight(true),enabled:()=>!busy},
     {id:'clipping-mask',label:selected?.clipped?'Release clipping mask':'Create clipping mask',keys:[],
       run:()=>selectedAction(layer=>{layer.clipped=!layer.clipped;}),
-      enabled:()=>!busy&&!locked&&!!selected&&(!!selected.clipped||!!clippingBaseFor(state.document.children,selected.id))},
-    {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>!busy},
+      enabled:()=>dom.precision!=='float32'&&!busy&&!locked&&!!selected&&(!!selected.clipped||!!clippingBaseFor(state.document.children,selected.id))},
+    {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>dom.precision!=='float32'&&!busy},
     {
       id: "undo",
       label: "Undo",
@@ -975,20 +979,21 @@ export function App({ editor }: { editor: EditorApplication }) {
       enabled: () => tool === "crop" || editor.tools.drawingPolygonLasso || (!!selected && !locked),
     },
     {id:"develop-raw",label:"Develop RAW…",keys:[],enabled:()=>!busy&&!locked&&selectedObject instanceof SmartObjectLayer&&!!selectedObject.rawDevelopment,run:()=>{if(selectedObject instanceof SmartObjectLayer)setRawLayer(selectedObject);}},
-    {id:"frequency-separation",label:"Frequency separation…",keys:[],enabled:()=>!busy&&!locked&&selectedObject instanceof RasterLayer,
+    {id:"frequency-separation",label:"Frequency separation…",keys:[],enabled:()=>dom.precision!=='float32'&&!busy&&!locked&&selectedObject instanceof RasterLayer,
       run:()=>{if(selectedObject instanceof RasterLayer){editor.tools.cancel();setFrequencySource(selectedObject.id);}}},
     ...(["curves", "levels", "tone", "hsl", "color-balance", "vibrance", "gradient-map", "white-balance", "lut", "red-eye"] as const).map((kind) => ({
       id: `new-${kind}-adjustment`,
       label: `New ${kind === "hsl" ? "HSL (Hue / Saturation / Lightness)" : kind === "color-balance" ? "Color Balance" : kind === "gradient-map" ? "Gradient Map" : kind === "white-balance" ? "White Balance" : kind === "lut" ? "Color Lookup (LUT)" : kind === "red-eye" ? "Red Eye" : kind[0].toUpperCase() + kind.slice(1)} adjustment layer`,
       keys: [],
       run: () => addAdjustmentLayer(kind),
-      enabled: () => !busy && !locked,
+      enabled: () => !busy && !locked && (dom.precision!=='float32'||kind==='tone'),
     })),
     {
       id: "new-layer",
       label: "New layer",
       keys: SHORTCUT_BINDINGS["new-layer"],
       run: addLayer,
+      enabled:()=>dom.precision!=='float32'&&!busy,
     },
     {
       id: "group",
@@ -1975,6 +1980,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             tool={tool}
             spacePan={spacePan}
             busy={busy}
+            canUseTool={value=>editor.tools.canUseTool(value)}
             onChooseTool={chooseTool}
             onImport={() => importInput.current?.click()}
             onNewDocument={() => editor.newDocument()}
@@ -2047,7 +2053,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             }}
             onAddLayer={addLayer}
             onAddGroup={addGroup}
-            onAddAdjustmentLayer={() => addAdjustmentLayer("curves")}
+            onAddAdjustmentLayer={() => addAdjustmentLayer(dom.precision==='float32'?"tone":"curves")}
             onDuplicateLayer={() =>
               selectedAction((layer) => {
                 dom.selectedLayer = layer.duplicate();
@@ -2522,7 +2528,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                   type="button"
                   className="status-profile-btn"
                   onClick={() => setShowColorDialog(true)}
-                  title={["sRGB8 editing. Click for output profile and canvas proof settings.",...editor.colorWarnings].join(" ")}
+                  title={[dom.precision==='float32'?'32-bit linear sRGB editing; SDR canvas preview. Click for output settings.':"sRGB8 editing. Click for output profile and canvas proof settings.",...editor.colorWarnings].join(" ")}
                   style={{
                     background: "none",
                     border: "none",
@@ -2539,7 +2545,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                     verticalAlign: "middle",
                   }}
                 >
-                  sRGB8 · Output: {iccTarget(editor.colorSettings.output.profile).name}
+                  {dom.precision==='float32'?'Linear RGB32':'sRGB8'} · Output: {iccTarget(editor.colorSettings.output.profile).name}
                 </button>
                 {(editor.colorSettings.proof||proofStatus==='pending'||proofStatus==='failed')&&<><span className="footer-divider">/</span><span data-testid="proof-status" style={{display:"inline-block",maxWidth:"min(25vw, 260px)",overflow:"hidden",textOverflow:"ellipsis",verticalAlign:"middle"}} title={proofStatus==='failed'?'Proof update failed; the previous frame is retained.':editor.colorSettings.proof?iccTarget(editor.colorSettings.proof.profile).name:'Removing proof'}>Proof: {proofStatus}{editor.colorSettings.proof?` · ${iccTarget(editor.colorSettings.proof.profile).name}`:''}</span></>}
                 {!!editor.colorWarnings.length&&<span title={editor.colorWarnings.join(' ')}> · Color notice</span>}
@@ -2739,7 +2745,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                   if(pageKeys){
                     const sessions=editor.documentSessions;
                     const pages=pageKeys.map(key=>{const session=sessions.find(session=>session.id===key);if(!session)throw new Error('A TIFF page document is no longer open. Choose its pages again.');return session.document;});
-                    result=await editor.exportTiffPages(pages,{variant:options.tiffVariant,color:options.color},control);
+                    result=await editor.exportTiffPages(pages,{variant:options.tiffVariant,precision:options.tiffPrecision,color:options.color},control);
                   }else result = await editor.export(options, control);
                 }
                 catch (error) { if (control?.signal?.aborted) return; throw error; }
@@ -2757,6 +2763,9 @@ export function App({ editor }: { editor: EditorApplication }) {
           <ColorProfileDialog
             key={editor.recoverySessionId}
             settings={editor.colorSettings}
+            precision={dom.precision}
+            conversionIssue={editor.floatConversionIssue}
+            onConvert={async(settings,signal)=>{await editor.convertDocumentToFloat({signal},settings);notify('32-bit linear editing and color output settings applied');}}
             warnings={editor.colorWarnings}
             inspect={(file,name,signal)=>editor.inspectColorProfile(file,name,{signal})}
             onApply={async(settings,signal)=>{const warnings=await editor.setColorSettings(settings,{signal});notify(warnings.length?warnings.join(' '):'Color output and proof settings applied');}}
@@ -2786,6 +2795,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             tool={tool}
             settings={toolState.settings}
             controller={editor.tools}
+            floatEditing={dom.precision==='float32'}
             disabled={busy || locked}
             hasSelection={!!state.document.selection}
             hasMask={!!selected?.mask}
@@ -2797,7 +2807,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             onChooseTool={chooseTool}
             onAddLayer={addLayer}
             onAddAdjustmentLayer={addAdjustmentLayer}
-            onFrequencySeparation={selectedObject instanceof RasterLayer ? () => setFrequencySource(selectedObject.id) : undefined}
+            onFrequencySeparation={dom.precision!=='float32'&&selectedObject instanceof RasterLayer ? () => setFrequencySource(selectedObject.id) : undefined}
             onSelectSubject={handleSelectSubject}
             onRemoveBackground={handleRemoveBackground}
             onRefineEdge={() => setShowRefineEdgeDialog(true)}

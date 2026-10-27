@@ -238,7 +238,7 @@ export function LayersPanel({
           <IconButton
             shortcutId="new-layer"
             label="New layer (Mod+Shift+N)"
-            disabled={busy}
+            disabled={busy||dom.precision==='float32'}
             onClick={onAddLayer}
           >
             {layerIcons.addLayer}

@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Initial float document workflow (F10)
+
+Use the custom TIFF precision selector and staged Working precision choice in Color Settings. Keep Cancel active during preparation, apply output settings only after successful native preparation, display SDR preview status, disable unsupported tools and proofing, and explain quantization in export reports. Actual float documents use ordinary Undo for working precision; output preferences remain outside history. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Normalized float TIFF input increment
 
 TIFF review names float32 source precision and requires a separate explicit checkbox for the sRGB8 editing conversion. Untagged float sources also require a color interpretation with no preselected assumption. Source/HDR failures stay in review and retain the existing artwork. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.

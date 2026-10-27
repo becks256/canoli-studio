@@ -3,6 +3,7 @@ import {IccProfile,iccTarget} from './profile-source';
 import {IccSession,type IccControl} from './icc-client';
 import {normalizeColorOutput,type ColorOutput} from './color-settings';
 import {colorOutputSourceSchema,type ColorOutputSource,type ColorOutputReceipt} from './output-record';
+import type{IccSampleFormat}from'./icc-types';
 
 export async function captureColorOutput(value:ColorOutput,control:IccControl={}):Promise<ColorOutputSource>{
  const settings=normalizeColorOutput(value),target=iccTarget(settings.profile);
@@ -12,14 +13,18 @@ export async function captureColorOutput(value:ColorOutput,control:IccControl={}
  return Object.freeze({...record,profile:Object.freeze(record.profile)});
 }
 /** Verify all bytes and compile the real transform before a batch can publish/run. */
-export async function prepareColorOutputSource(input:ColorOutputSource,control:IccControl={}){
+export async function prepareColorOutputSource(input:ColorOutputSource,control:IccControl={},floatOutput?:IccSampleFormat){
  const record=colorOutputSourceSchema.parse(input),profile=await IccProfile.inspect(record.profile.source,record.profile.name,control);
  if(profile.sha256!==record.profile.sha256)throw new Error('Delivery ICC source does not match its fingerprint. Restore the original profile.');
- return prepareOwnedProfile(profile,record,control);
+ return prepareOwnedProfile(profile,record,control,floatOutput);
 }
 const wasmSha256=build.artifacts['canoli_icc.wasm'].sha256;
-async function prepareOwnedProfile(profile:IccProfile,record:ColorOutputSource,control:IccControl){
+async function prepareOwnedProfile(profile:IccProfile,record:ColorOutputSource,control:IccControl,floatOutput?:IccSampleFormat){
  const output=normalizeColorOutput({profile,intent:record.intent,blackPointCompensation:record.blackPointCompensation});
+ if(floatOutput){
+  const{session,prepared}=await IccSession.prepareRgb(iccTarget('linear-srgb').source,profile.source,{inputFormat:'rgba-float32',outputFormat:floatOutput,intent:output.intent,blackPointCompensation:output.blackPointCompensation},control);
+  try{control.signal?.throwIfAborted();const receipt:ColorOutputReceipt={version:2,engine:prepared.destination.engine,wasmSha256,sourceSpace:'linear-srgb-float32',outputFormat:floatOutput,profileName:profile.name,profileSha256:profile.sha256,profileByteLength:profile.source.size,intent:output.intent,blackPointCompensation:output.blackPointCompensation,usesIntentFallback:prepared.usesIntentFallback,warnings:[...prepared.warnings]};return{output,receipt};}finally{session.dispose();}
+ }
  const {session,prepared}=await IccSession.prepare(profile.source,{mode:'convert',intent:output.intent,blackPointCompensation:output.blackPointCompensation},control);
  try{
   control.signal?.throwIfAborted();

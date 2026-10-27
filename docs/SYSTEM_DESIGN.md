@@ -1,12 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Initial float document workflow (F10)
+
+The explicit float document pipeline preserves original native samples separately from display-only thumbnails, derived IndexedDB tiles, captured float composition and final SDR/output conversions. Source preparation completes before an output/display ICC owner is acquired. Schema 49 and shared OO/history validation gate the initial supported scene; default byte documents keep their existing path. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Owned float source storage dependency
 
-Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. Public documents/rendering/history remain sRGB8. This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
+Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
 
 ## Float processing dependency
 
-Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Default byte documents remain sRGB8; the connected float subset is documented above; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
 
 ## Normalized float TIFF input increment
 

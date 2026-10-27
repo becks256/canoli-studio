@@ -91,6 +91,7 @@ export class FloatRasterSource{
  }
  private owner(){if(!this.context)throw new Error('Float source lease is closed.');return this.context;}
  get original(){return this.owner().input.original;}
+ get sourceColor(){return this.owner().input.expectedSource;}
  get width(){return this.owner().input.width;}
  get height(){return this.owner().input.height;}
  share(){return new FloatRasterSource(this.owner());}

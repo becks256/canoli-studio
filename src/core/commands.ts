@@ -54,6 +54,7 @@ import {
   measureTextBounds,
   toneOf,
   validateDocument,
+  SCHEMA_VERSION,
 } from "./model";
 import type {
   DocumentData,
@@ -117,6 +118,7 @@ export type LayerPatch = Partial<
 // Serializable commands are the single mutation boundary for UI, automation,
 // and a future AI adapter. No renderer or UI code mutates document nodes.
 export type EditorCommand =
+  | {type:'document.precision.float'}
   | {type:'layer.align';ids:string[];alignment:LayerAlignment;target?:AlignmentTarget}
   | {type:'font.file.add';file:FontFileData}
   | {type:'font.file.rename';id:string;name:string}
@@ -237,6 +239,7 @@ const TEXT_REFLOW_KEYS: readonly (keyof LayerPatch)[] = [
   'width','height',
 ];
 function apply(document: DocumentData, command: EditorCommand): void {
+  if(command.type==='document.precision.float'){document.schemaVersion=SCHEMA_VERSION;document.colorSpace='linear-srgb';document.precision='float32';return;}
   if(command.type==='font.file.add'){
     const file=fontFileSchema.parse(command.file),existing=documentFontFiles(document).find(value=>value.id===file.id);
     if(existing){if(!sameFontResource(existing.resource,file.resource))throw new Error('Font resource identity collision.');return;}
@@ -864,7 +867,7 @@ export function execute(
   // need a new root and the path to their target, never copies of pixel coverage.
   while (command.type === "transaction" && command.commands.length === 1) command = command.commands[0];
   let next: DocumentData;
-  const rootOnly = ["document.rename", "document.resize", "document.guides", "selection.set", "selection.polygon"].includes(command.type);
+  const rootOnly = ["document.precision.float", "document.rename", "document.resize", "document.guides", "selection.set", "selection.polygon"].includes(command.type);
   const targeted = command.type === "layer.update" || command.type === "paint.add" || command.type === "paint.remove" || command.type === "path.update" || command.type === "path.add" || command.type === "path.remove";
   if (isImmutable(document) && rootOnly) next = { ...document };
   else if (isImmutable(document) && command.type === 'paths.replace') {
@@ -909,6 +912,7 @@ export function execute(
 
 export function describe(command: EditorCommand): string {
   switch (command.type) {
+    case 'document.precision.float':return 'Use 32-bit linear editing';
     case 'layer.align':return command.target?.type==='canvas'?'Align layers to canvas':command.target?.type==='layer'?'Align layers to key object':'Align selected layers';
     case 'font.file.add':return 'Embed font file';
     case 'font.file.rename':return 'Rename font file';
@@ -1023,6 +1027,7 @@ export function describe(command: EditorCommand): string {
 /** Session tool coordinates must be discarded after these operations, including undo/redo. */
 export function changesCanvasSpace(command: EditorCommand): boolean {
   return (
+    command.type === 'document.precision.float' ||
     command.type === "document.resizeImage" ||
     command.type === "document.crop" ||
     command.type === "document.resize" ||

@@ -1,12 +1,16 @@
 # Scripting API
 
+## Initial float document workflow (F10)
+
+DocumentOptions.precision defaults to uint8 and also accepts float32. Readonly document.precision and document.workingSpace expose effective state; document.convertToFloat() dispatches the shared idempotent command. Existing retained float TIFF originals are required at host commit. Plugins/scripts gain no file/native/network privilege. Recipes record the zero-argument precision action. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Owned float source storage dependency
 
-Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. Public documents/rendering/history remain sRGB8. This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
+Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
 
 ## Float processing dependency
 
-Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Default byte documents remain sRGB8; the connected float subset is documented above; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
 
 ## Normalized float TIFF input increment
 
@@ -22,7 +26,7 @@ Recipe schema 3/package 4 can retain a complete delivery preset and existing fon
 
 ## ICC profiles remain outside isolated scripts
 
-The trusted browser host can inspect immutable ICC resources, preflight color preferences, proof the displayed canvas and convert PNG/TIFF/PDF delivery. These are view/output services; no constructor, profile/file/native import, document mutation command or isolated script signature is added. Scripts/plugins continue shared OO commands and sRGB8 scene behavior. Headless REST does not render or synchronize the browser. [Host signatures, persistence and exact limits](ICC_ENGINE.md).
+The trusted browser host can inspect immutable ICC resources, preflight color preferences, proof the displayed canvas and convert PNG/TIFF/PDF delivery. These are view/output services; no constructor, profile/file/native import, document mutation command or isolated script signature is added. Scripts/plugins continue shared OO commands; byte scenes and the initial float scene subset use their respective validated working modes. Headless REST does not render or synchronize the browser. [Host signatures, persistence and exact limits](ICC_ENGINE.md).
 
 ## Editable SVG clipping
 

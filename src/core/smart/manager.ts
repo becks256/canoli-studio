@@ -65,6 +65,7 @@ function inspectDocument(input: unknown, retainImmutable = false): {
     !Array.isArray(input.children)
   )
     throw new Error("Invalid component document.");
+  if('precision'in input&&input.precision==='float32')throw new Error('Smart-object embedding requires its float document integration.');
   const references: string[] = [];
   const filterAssets = new Set<string>();
   const ancestors = new Set<object>();

@@ -16,6 +16,7 @@ export const deliveryVariantSpecSchema = z.object({
   format: z.enum(["png", "jpeg", "webp", "avif", "tiff", "pdf"]),
   color:colorOutputSourceSchema.optional(),
   tiffVariant:z.enum(['auto','classic','big']).optional(),
+  tiffPrecision:z.enum(['uint8','uint16','float32']).optional(),
   pdfDpi:z.number().finite().positive().optional(),
   quality:z.number().finite().min(.01).max(1).optional(),
   avifLossless:z.boolean().optional(),
@@ -25,6 +26,7 @@ export const deliveryVariantSpecSchema = z.object({
 }).strict().superRefine((variant,context)=>{
   if(variant.color&&!['png','tiff','pdf'].includes(variant.format))context.addIssue({code:'custom',message:'ICC conversion requires PNG, TIFF or PDF delivery.'});
   if(variant.tiffVariant!==undefined&&variant.format!=='tiff')context.addIssue({code:'custom',message:'TIFF compatibility requires a TIFF variant.'});
+  if(variant.tiffPrecision!==undefined&&variant.format!=='tiff')context.addIssue({code:'custom',message:'TIFF precision requires a TIFF variant.'});
   if(variant.pdfDpi!==undefined&&variant.format!=='pdf')context.addIssue({code:'custom',message:'PDF page sizing requires a PDF variant.'});
   if(variant.format!=='avif'&&(variant.avifLossless!==undefined||variant.avifSpeed!==undefined))context.addIssue({code:'custom',message:'AVIF settings require an AVIF delivery variant.'});
   if(['png','tiff','pdf'].includes(variant.format)&&variant.quality!==undefined)context.addIssue({code:'custom',message:'Quality settings require JPEG, WebP or AVIF.'});

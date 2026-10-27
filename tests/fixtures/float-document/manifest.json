@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "reference": "Independent native libtiff float sample readback, native Linux Little CMS float32 original ICC -> linear-sRGB; no 8-bit intermediate.",
+  "libtiff": "LIBTIFF, Version 4.3.0",
+  "nativeCmmSha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6",
+  "generatorSha256": "e3905228f13d3e6f2742905807c7d067174fbe4eaec3f2be41f5f781ffcf79fd",
+  "targetProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+  "cases": [
+    {
+      "file": "hdr-high.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "hdr-high-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "97a1e257d5094e279f34ab316af6d5e715c90fca1c345da03389e18a8f15e03f",
+      "sourceSha256": "da9e6934d429af2f8137deb764ef4a50cc02f8be678d50cbde4c36042937dd9e",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    }
+  ],
+  "files": {
+    "hdr-high-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "ca2becc365b11ca3d2fc70d2c51665e946f7333d895e3b3d8862edba50099674"
+    }
+  }
+}

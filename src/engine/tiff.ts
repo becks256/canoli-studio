@@ -1,4 +1,7 @@
 import {prepareIccOutput,type IccOutput} from './icc-output';
+import{isFloatDocument}from'../core/float-document';
+import{exportFloatTiffPages}from'./float-tiff';
+import{validateTiffPrecision,type TiffPrecision}from'../core/tiff';
 import {normalizeColorOutput,type ColorOutput} from '../core/color/color-settings';
 import {rasterExportRows} from './raster-export-grid';
 import {captureRasterExportSources} from './raster-export-source';
@@ -15,9 +18,10 @@ import {TiffTileEncoder} from '../core/tiff-encoder';
 export {TiffTileEncoder} from '../core/tiff-encoder';
 export interface TiffExportPage {document:DocumentData;assets:AssetStore;renderer:DocumentRenderer}
 /** All page snapshots and dependencies are captured before the first callback. */
-export async function exportTiffPages(input:readonly TiffExportPage[],variant:TiffVariant='auto',control?:ExportControl,color?:ColorOutput):Promise<Blob>{
+export async function exportTiffPages(input:readonly TiffExportPage[],variant:TiffVariant='auto',control?:ExportControl,color?:ColorOutput,precision:TiffPrecision='uint8'):Promise<Blob>{
  checkExport(control);variant=validateTiffVariant(variant);color=color?normalizeColorOutput(color):undefined;let output:IccOutput|null=null;
  if(!Array.isArray(input)||!input.length)throw new Error('Choose at least one TIFF page.');
+ precision=validateTiffPrecision(precision);if(precision!=='uint8'||input.some(page=>isFloatDocument(page.document)))return exportFloatTiffPages(input,variant,precision,control,color);
  const pages:{document:DocumentData;assets:AssetStore;renderer:DocumentRenderer;encoder:TiffTileEncoder;check:import('./export-fonts').FontSourceCapture}[]=[];
  try{for(const page of input){
   const document=isImmutable(page.document)?page.document:freeze(structuredClone(page.document));validateDocument(document);
@@ -56,6 +60,6 @@ export async function exportTiffPages(input:readonly TiffExportPage[],variant:Ti
  finally{encoded.length=0;}
  }finally{output?.dispose();for(const page of pages)page.check.release();}
 }
-export async function exportTiff(document:DocumentData,assets:AssetStore,renderer:DocumentRenderer,variant:TiffVariant='auto',control?:ExportControl,color?:ColorOutput):Promise<Blob>{
- return exportTiffPages([{document,assets,renderer}],variant,control,color);
+export async function exportTiff(document:DocumentData,assets:AssetStore,renderer:DocumentRenderer,variant:TiffVariant='auto',control?:ExportControl,color?:ColorOutput,precision:TiffPrecision='uint8'):Promise<Blob>{
+ return exportTiffPages([{document,assets,renderer}],variant,control,color,precision);
 }

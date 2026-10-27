@@ -1,4 +1,5 @@
 import { checkRenderCurrent } from "./render-control";
+import{isFloatDocument}from'../core/float-document';
 import type { AssetStore } from "../core/assets";
 import type { DocumentData } from "../core/model";
 import { CanvasRenderer } from "./renderer";
@@ -33,6 +34,10 @@ export class AdaptiveRenderer extends CanvasRenderer {
     options: RenderOptions = {},
   ): Promise<ViewportFrame> {
     checkRenderCurrent(options.isCancelled);
+    if(isFloatDocument(document)){
+      if(options.colorProof)throw new Error('Device proofing requires its float document integration. Disable proofing to view this float document.');
+      this.proof.reset();return this.prepareFallback(document,assets,options);
+    }
     if(options.colorProof)return this.prepareFallback(document,assets,options);
     this.proof.reset();
     try {

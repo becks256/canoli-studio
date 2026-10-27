@@ -41,6 +41,7 @@ export interface ToolRailProps {
   tool: Tool;
   spacePan: boolean;
   busy: boolean;
+  canUseTool?(tool:Tool):boolean;
   onChooseTool(tool: Tool): void;
   onImport(): void;
   onNewDocument(): void;
@@ -60,6 +61,7 @@ export function ToolRail({
   tool,
   spacePan,
   busy,
+  canUseTool=()=>true,
   onChooseTool,
   onImport,
   onNewDocument,
@@ -133,7 +135,7 @@ export function ToolRail({
             label={label}
             aria-pressed={tool === key}
             className={`tool-button ${tool === key ? "active" : ""}`}
-            disabled={busy}
+            disabled={busy||!canUseTool(key)}
             onClick={() => onChooseTool(key)}
           >
             <Icon size={19} />

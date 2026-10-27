@@ -1,4 +1,6 @@
 import {prepareIccOutput,type IccOutput} from './icc-output';
+import{isFloatDocument}from'../core/float-document';
+import{exportFloatPng}from'./float-delivery';
 import {normalizeColorOutput,type ColorOutput} from '../core/color/color-settings';
 import {captureRasterExportSources} from './raster-export-source';
 import {freeze,isImmutable} from '../core/immutable';
@@ -42,6 +44,7 @@ export async function exportPng(
   color?: ColorOutput,
 ): Promise<Blob> {
   checkExport(control);
+  if(isFloatDocument(document))return exportFloatPng(document,assets,renderer,control,color);
   document=isImmutable(document)?document:freeze(structuredClone(document));validateDocument(document);
   color=color?normalizeColorOutput(color):undefined;
   let output:IccOutput|null=null;

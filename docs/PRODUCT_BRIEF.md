@@ -1,5 +1,9 @@
 # Canoli Studio — product brief
 
+## Initial float document workflow (F10)
+
+The local professional-editor objective now includes an explicit initial float32/linear-sRGB workflow for original float TIFF raster artwork, masks, groups and exposure. Display remains SDR; unsupported tools and interchange reject. No paid operation, account or upload is added. Full color/tool/device/performance acceptance remains required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Character formatting increment
 
 Source-indexed character formatting extends local professional typography through shared OO commands/undo, Inspector selections, native browser script metrics and portable document data. The broad professional-editor objective remains; path/vertical text, richer flow, wider shaping/interchange and sustained performance are still required. See [CHARACTER_TEXT.md](CHARACTER_TEXT.md) for the contract, limits and dated verification status.

@@ -92,6 +92,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
     DeliveryVariantSpec["format"]
   >("png");
   const [customVarColor,setCustomVarColor]=useState(false),[deliveryBusy,setDeliveryBusy]=useState(false);
+  const[customTiffPrecision,setCustomTiffPrecision]=useState<'uint8'|'uint16'|'float32'>('uint8');
   const deliveryController=useRef<AbortController|null>(null);
   useEffect(()=>()=>deliveryController.current?.abort(),[]);
   async function deliveryTask(action:(signal:AbortSignal)=>Promise<void>){
@@ -431,6 +432,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
       targetWidth: Math.max(16, customVarWidth),
       targetHeight: Math.max(16, customVarHeight),
       format: customVarFormat,
+      ...(customVarFormat==='tiff'?{tiffPrecision:customTiffPrecision}:{}),
       ...(customVarColor&&['png','tiff','pdf'].includes(customVarFormat)?{color:await editor.batch.captureColorOutput(capturedOutput,{signal})}:{}),
       ...(customVarFormat==='avif'?{quality:customVarQuality/100,avifLossless:customVarLossless,avifSpeed:customVarSpeed}:{}),
       fit: "cover",
@@ -1011,6 +1013,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                         </select>
                       </div>
                       {['png','tiff','pdf'].includes(customVarFormat)&&<label className="checkbox-field"><input type="checkbox" disabled={deliveryBusy} checked={customVarColor} onChange={event=>setCustomVarColor(event.target.checked)}/>Use current output profile: {iccTarget(editor.colorSettings.output.profile).name}</label>}
+                      {customVarFormat==='tiff'&&<><label>TIFF precision<select aria-label="Batch TIFF precision" className="batch-select" disabled={deliveryBusy} value={customTiffPrecision} onChange={event=>setCustomTiffPrecision(event.target.value as typeof customTiffPrecision)}><option value="uint8">8-bit integer</option><option value="uint16">16-bit integer</option><option value="float32">32-bit float</option></select></label><p>High-precision TIFF requires a recipe that produces a float document with retained original float TIFF rasters. Ordinary byte sources remain 8-bit. Omitted output profiles use linear sRGB for high-precision TIFF.</p></>}
                       {!['png','tiff','pdf'].includes(customVarFormat)&&<p>This format uses sRGB delivery.</p>}
                       {customVarFormat==='avif'&&<>
                         <label className="checkbox-field"><input type="checkbox" checked={customVarLossless} onChange={event=>setCustomVarLossless(event.target.checked)}/>Lossless AVIF variant</label>

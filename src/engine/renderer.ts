@@ -1,4 +1,6 @@
 import {nativeVectorFootprint} from './native-vector-footprint';
+import{isFloatDocument}from'../core/float-document';
+import{FloatSceneRenderer,type CapturedFloatScene,type FloatSceneControl}from'./float-scene';
 import {clippingStacks} from '../core/clipping';
 import {composeClippingStack} from './clipping';
 import {usesNativeTextWriting,isVerticalText} from '../core/text-writing';
@@ -124,6 +126,7 @@ interface CanvasRenderOptions extends RenderOptions {
   documentTransform?: AffineTransform;
 }
 export interface DocumentRenderer {
+  captureFloatScene?(document:DocumentData,assets:AssetStore,control?:FloatSceneControl):Promise<CapturedFloatScene>;
   render(
     document: DocumentData,
     assets: AssetStore,
@@ -166,6 +169,7 @@ export function workingSize(
  * independent of bounded buffers, stroke tiles and effect halos. */
 export class CanvasRenderer implements DocumentRenderer {
   readonly processor = new PixelProcessor();
+  private readonly floatScene=new FloatSceneRenderer(this.processor);
   private readonly brushTextures=new BrushTextureSampler(this.processor);
   private cache = new CanvasCache();
   private filterTiles = new FilterTileCache();
@@ -196,6 +200,22 @@ export class CanvasRenderer implements DocumentRenderer {
   constructor() {
     this.fonts?.addEventListener("loadingdone", this.fontsChanged);
     this.fonts?.addEventListener("loadingerror", this.fontsChanged);
+  }
+
+  private floatPreview(document:DocumentData,preview?:PaintPreview|null):DocumentData{
+    if(!preview?.maskMode)return document;
+    const visit=(layers:LayerData[]):LayerData[]=>layers.map(layer=>layer.kind==='group'?{...layer,mask:previewMask(layer,preview),children:visit(layer.children)}:{...layer,mask:previewMask(layer,preview)});
+    return{...document,children:visit(document.children)};
+  }
+  private floatMasks(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatMaskService{
+    return async(mask,space,world,check)=>{
+      check();const origin=world.point({x:0,y:0}),canvas=await this.renderMaskCoverage(mask,space,origin.x,origin.y,'float-mask',false,world,assets,()=>{check();return!!isCancelled?.();});
+      try{check();applyMaskSettings(canvas,mask);const bytes=canvas.getContext('2d')!.getImageData(0,0,space.width,space.height).data,coverage=new Float32Array(space.width*space.height);for(let i=0;i<coverage.length;i++)coverage[i]=bytes[i*4+3]/255;check();return coverage;}finally{release(canvas);}
+    };
+  }
+  async captureFloatScene(document:DocumentData,assets:AssetStore,control:FloatSceneControl={}):Promise<CapturedFloatScene>{
+    if(!isFloatDocument(document))throw new Error('Native float scene output requires a float32 linear-sRGB document.');
+    return this.floatScene.capture(document,assets,this.floatMasks(assets,control.isCancelled),control);
   }
 
   private signature(layer: LayerData): string {
@@ -591,6 +611,11 @@ export class CanvasRenderer implements DocumentRenderer {
     options: CanvasRenderOptions = {},
   ): Promise<HTMLCanvasElement> {
     checkRenderCurrent(options.isCancelled);
+    if(isFloatDocument(document)){
+      if(options.paintPreview&&!options.paintPreview.maskMode)throw new Error('Color painting requires its float document integration.');
+      const sizeRegion=options.region??{x:0,y:0,width:document.width,height:document.height},size=workingSize(options.outputSize?.width??sizeRegion.width,options.outputSize?.height??sizeRegion.height,options.outputSize?1:options.scale,options.maxPixels,options.maxDimension);
+      return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback);
+    }
     if(!options.taskBudget)options={...options,taskBudget:{deadline:performance.now()+8}};
     const ownedFrequencyScratch=options.frequencyScratch?undefined:new FilterTileCache(8*1024*1024);
     if(ownedFrequencyScratch)options={...options,frequencyScratch:ownedFrequencyScratch};
@@ -1473,6 +1498,7 @@ export class CanvasRenderer implements DocumentRenderer {
     this.brushTextures.retireCache();
   }
   clearCache() {
+    this.floatScene.clear();
     this.resetView();
     this.cache.clear();
     this.signatures = new WeakMap();
@@ -1483,6 +1509,7 @@ export class CanvasRenderer implements DocumentRenderer {
     this.patchPrefixes.clear();
   }
   dispose() {
+    this.floatScene.dispose();
     this.stopOwnedFonts();
     this.fonts?.removeEventListener("loadingdone", this.fontsChanged);
     this.fonts?.removeEventListener("loadingerror", this.fontsChanged);

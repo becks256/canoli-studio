@@ -1,3 +1,4 @@
+import{floatSceneIssue}from'./float-document';
 import {usesNativeTextWriting,isVerticalText,writingModeSchema,textOrientationSchema,assertTextWritingVersion,type TextWritingProperties} from './text-writing';
 import {textPathSchema,type TextPathData} from './text-path';
 import {validateDeclaredFontVariations} from './font-variations';
@@ -46,7 +47,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 48;
+export const SCHEMA_VERSION = 49;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -213,12 +214,14 @@ export interface DocumentData {
     | 45
     | 46
     | 47
+    | 48
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
   width: number;
   height: number;
-  colorSpace: "srgb";
+  colorSpace: "srgb" | "linear-srgb";
+  precision?:"uint8"|"float32";
   selection?: SelectionData | null;
   guides?: GuideData[];
   components?: SmartComponentDefinition[];
@@ -622,17 +625,18 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48 && value.schemaVersion !== 49) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
     !dimension(value.height) ||
-    value.colorSpace !== "srgb"
+    !(value.colorSpace === "srgb" && (value.precision === undefined || value.precision === "uint8") || value.colorSpace === "linear-srgb" && value.precision === "float32")
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–48), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–49), a supported precision/working-space pair, and positive, safely representable integer dimensions.",
     );
   }
+  if(value.precision!==undefined&&Number(value.schemaVersion)<49)throw new Error('Document precision requires schema version 49.');
   const checkSelection = (selection: unknown) => {
     if (selection == null) return;
     const cached = isImmutable(selection) && validatedSelections.has(selection);
@@ -948,6 +952,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     }
   };
   yield* walk(value.children, 0);
+  if(value.precision==='float32'){const issue=floatSceneIssue(value as unknown as DocumentData);if(issue)throw new Error(issue);}
   if(value.paragraphStyles!==undefined||hasParagraphStyle)validateParagraphStyles(value as unknown as DocumentData);
   if(value.fontFiles!==undefined)validateDeclaredFontVariations(value as unknown as DocumentData);
   if (value.components !== undefined && Number(value.schemaVersion) < 10)

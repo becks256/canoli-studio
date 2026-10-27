@@ -29,6 +29,7 @@ export interface DeliveryVariantSpec {
   format: "png" | "jpeg" | "webp" | "avif" | "tiff" | "pdf";
   color?:import('../../core/color/output-record').ColorOutputSource;
   tiffVariant?:import('../../core/tiff').TiffVariant;
+  tiffPrecision?:import('../../core/tiff').TiffPrecision;
   pdfDpi?:number;
   quality?:number;
   avifLossless?:boolean;

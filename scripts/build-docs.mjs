@@ -60,6 +60,7 @@ const generatedPages = [
   ["FLOAT_TIFF", "Float TIFF input and retained precision"],
   ["FLOAT_PROCESSING", "Native float pixel processing dependency"],
   ["FLOAT_SOURCES", "Owned float originals and derived tiles"],
+  ["FLOAT_DOCUMENTS", "Float document editing"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

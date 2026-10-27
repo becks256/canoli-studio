@@ -63,6 +63,16 @@ async function request(
   });
   return { status: response.status, body: await response.json() };
 }
+it('independent REST sessions share precision commands and Undo while refusing PNG pixels as original float rasters',async()=>{
+ const{PngRowEncoder}=await import('../src/core/png-stream'),{RasterLayer}=await import('../src/dom');
+ const created=await request('/documents',{width:2,height:1}),endpoint=`/documents/${created.body.document.id}`;
+ const changed=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'document.precision.float'}]});expect(changed.status,JSON.stringify(changed.body)).toBe(200);expect(changed.body.document).toMatchObject({schemaVersion:CURRENT_DOCUMENT_SCHEMA,colorSpace:'linear-srgb',precision:'float32'});
+ const png=new PngRowEncoder(2,1);await png.append(new Uint8Array([255,0,0,255,0,255,0,255]),1);const blob=await png.finish(),upload=await request(endpoint+'/assets',{name:'Byte original',width:2,height:1,contentType:'image/png',data:Buffer.from(await blob.arrayBuffer()).toString('base64')});expect(upload.status).toBe(201);
+ const layer=new RasterLayer({assetId:upload.body.asset.id,width:2,height:1}),denied=await request(endpoint+'/commands',{expectedRevision:changed.body.revision,commands:[{type:'document.rename',name:'Uncommitted float'},{type:'layer.add',layer:layer.toJSON()}]});expect(denied.status).toBe(400);expect((await request(endpoint)).body.document).toEqual(changed.body.document);
+ const undone=await request(endpoint+'/undo',{expectedRevision:changed.body.revision});expect(undone.body.document).toEqual(created.body.document);
+ const added=await request(endpoint+'/commands',{expectedRevision:undone.body.revision,commands:[{type:'layer.add',layer:layer.toJSON()}]});expect(added.status).toBe(200);
+ const rejected=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'document.precision.float'}]});expect(rejected.status).toBe(400);expect((await request(endpoint)).body.document).toEqual(added.body.document);
+});
 it('validates serialized pressure curves atomically with revisions, locks and undo',async()=>{
  const created=await request('/documents',{width:64,height:64}),endpoint=`/documents/${created.body.document.id}`,paint=new PaintLayer(),curve=PressureCurve.firm().toJSON(),stroke=new BrushStroke({points:[{x:20,y:20,pressure:.25}],pressureOpacity:true,pressureCurve:curve}).toJSON();
  const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:paint.toJSON()}]});expect(added.status).toBe(200);

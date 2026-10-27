@@ -1,16 +1,20 @@
 # Canoli Studio editor requirements
 
+## Initial float document workflow (F10)
+
+Support schema-49 float32/linear-sRGB state, original-bearing float TIFF admission, shared OO conversion/Undo, guarded source roles, original-native raster composition and direct precision delivery. Stage output settings with precision, disable unsupported UI operations and retain exact originals through persistence. Complete all actual verification before acceptance; broader F10/F11/F14 and the original roadmap remain open. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+
 ## Owned float source storage dependency
 
-Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. Public documents/rendering/history remain sRGB8. This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
+Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.
 
 ## Float processing dependency
 
-Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Default byte documents remain sRGB8; the connected float subset is documented above; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
 
 ## Normalized float TIFF input increment
 
-Normalized SDR float32 TIFF/BigTIFF input now retains original samples/profile and explicit precision/color choices while preparing an sRGB8 editing proxy through native ICC. HDR tone mapping, float editing/compositing and full color/precision acceptance remain required. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+Normalized SDR float32 TIFF/BigTIFF input now retains original samples/profile and explicit precision/color choices while preparing an sRGB8 editing proxy through native ICC. HDR tone mapping, broader float editing/compositing and full color/precision acceptance remain required. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
 
 ## Native RAW master TIFF (F10/F11/F12)
 

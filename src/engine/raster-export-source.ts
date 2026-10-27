@@ -5,6 +5,7 @@ import type {DocumentData,LayerData,TextLayerData} from '../core/model';
 import {isActiveSmartFilter} from '../core/smart/filters';
 import type {LayerMaskData} from '../core/masks';
 import type {AssetStore} from '../core/assets';
+import{assetBitmapMatches}from'../core/assets';
 import {captureExportFonts,captureOwnedExportFonts} from './export-fonts';
 import type {FontSourceCapture} from './export-fonts';
 import {checkExport,type ExportControl} from './export-control';
@@ -48,6 +49,6 @@ export function captureRasterExportDocuments(documents:readonly DocumentData[],a
  }
  const current=()=>{
   checkExport(control);lifetime();fonts();ownedFonts!();variations.check();
-  for(const entry of pinned){const s=entry.source;if(!assets.has(s.id)||assets.get(s.id)!==s||s.bitmap!==entry.bitmap||s.blob!==entry.blob||s.width!==entry.width||s.height!==entry.height||s.bitmap.width!==entry.width||s.bitmap.height!==entry.height)throw new Error(`An image source changed during ${operation}. Retry with the current assets.`);}
+  for(const entry of pinned){const s=entry.source;if(!assets.has(s.id)||assets.get(s.id)!==s||s.bitmap!==entry.bitmap||s.blob!==entry.blob||s.width!==entry.width||s.height!==entry.height||!assetBitmapMatches(s))throw new Error(`An image source changed during ${operation}. Retry with the current assets.`);}
  };current();return Object.assign(current,{release:()=>{ownedFonts?.release();variations.release();}});}catch(error){ownedFonts?.release();variations.release();throw error;}
 }

@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const tiffDecodeOptionsSchema=z.object({page:z.number().int().nonnegative().safe().default(0),allowPrecisionLoss:z.boolean().default(false),floatColorSpace:z.enum(['srgb','linear-srgb']).optional()}).strict();
+export const tiffDecodeOptionsSchema=z.object({page:z.number().int().nonnegative().safe().default(0),allowPrecisionLoss:z.boolean().default(false),floatColorSpace:z.enum(['srgb','linear-srgb']).optional(),editingPrecision:z.literal('float32').optional()}).strict();
 export type TiffDecodeOptions=z.input<typeof tiffDecodeOptionsSchema>;
 export type TiffDecodeSettings=z.output<typeof tiffDecodeOptionsSchema>;
 export interface TiffImportProgress {phase:'inspecting'|'decoding';fraction:number|null}

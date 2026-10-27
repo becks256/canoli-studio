@@ -30,6 +30,7 @@ export function ExportDialog({
   const [format, setFormat] = useState<ExportFormat>("png");
   const [psdMode, setPsdMode] = useState<"layers" | "flatten">("layers");
   const [tiffVariant,setTiffVariant]=useState<"auto"|"classic"|"big">("auto");
+  const[tiffPrecision,setTiffPrecision]=useState<'uint8'|'uint16'|'float32'>('uint8');
   const pages=suppliedPages??[{key:document.id,document}];
   const [tiffScope,setTiffScope]=useState('current');
   const [pageKeys,setPageKeys]=useState(()=>pages.map(page=>page.key));
@@ -92,7 +93,7 @@ export function ExportDialog({
 
   const deliveryColor=['png','tiff','pdf'].includes(format)?color:undefined;
   const report = useMemo(() => {
-    if(multiPage&&selectedPages.length&&!selectedPages.some(page=>!page))return getTiffPagesCapabilityReport(selectedPages.map(page=>page!.document),tiffVariant,deliveryColor);
+    if(multiPage&&selectedPages.length&&!selectedPages.some(page=>!page))return getTiffPagesCapabilityReport(selectedPages.map(page=>page!.document),tiffVariant,deliveryColor,tiffPrecision);
     return getExportCapabilityReport(document, {
       format,
       color:deliveryColor,
@@ -101,9 +102,10 @@ export function ExportDialog({
       backgroundColor,
       psdMode,
       tiffVariant,
+      tiffPrecision:format==='tiff'?tiffPrecision:undefined,
       pdfDpi,
     });
-  }, [document, deliveryColor, format, quality, backgroundColor, psdMode,tiffVariant,pdfDpi,avifQuality,avifLossless,avifSpeed,multiPage,pages,pageKeys]);
+  }, [document, deliveryColor, format, quality, backgroundColor, psdMode,tiffVariant,tiffPrecision,pdfDpi,avifQuality,avifLossless,avifSpeed,multiPage,pages,pageKeys]);
 
   const handleExport = async () => {
     const run = new AbortController();
@@ -119,6 +121,7 @@ export function ExportDialog({
         backgroundColor,
         psdMode,
         tiffVariant,
+        tiffPrecision:format==='tiff'?tiffPrecision:undefined,
         pdfDpi,
       }, {signal:run.signal,onProgress:setProgress},multiPage?[...pageKeys]:undefined);
       if (!run.signal.aborted) onClose();
@@ -183,6 +186,7 @@ export function ExportDialog({
         {format==='tiff'&&<Select label="TIFF compatibility" layout="stacked" value={tiffVariant} disabled={busy||exporting}
           options={[{value:'auto',label:'Automatic — TIFF or BigTIFF as needed'},{value:'classic',label:'Classic TIFF — widest compatibility'},{value:'big',label:'BigTIFF — requires a compatible viewer'}]}
           onChange={value=>setTiffVariant(value as 'auto'|'classic'|'big')} />}
+        {format==='tiff'&&<Select label="TIFF precision" layout="stacked" value={tiffPrecision} disabled={busy||exporting} options={[{value:'uint8',label:'8-bit integer'},{value:'uint16',label:'16-bit integer — requires a float document'},{value:'float32',label:'32-bit float — requires a float document'}]} onChange={value=>setTiffPrecision(value as typeof tiffPrecision)}/>}
 
         {format==='tiff'&&<>
           <Select label="TIFF pages" layout="stacked" value={tiffScope} disabled={busy||exporting}
@@ -325,7 +329,7 @@ export function ExportDialog({
         <Button
           variant="primary"
           onClick={handleExport}
-          disabled={busy || exporting || checkingFonts || invalidPages}
+          disabled={busy || exporting || checkingFonts || invalidPages || !!report.unavailableReason}
         >
           {exporting ? "Exporting..." : `Export .${extension}`}
         </Button>

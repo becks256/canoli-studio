@@ -1,0 +1,213 @@
+# Float document editing
+
+Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
+default sRGB8 document. Original float TIFF samples, raster transformations,
+Normal composition, groups, masks and linear exposure use this mode. Display
+conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
+reads the float scene directly, without reading colors from the display canvas.
+
+This is an initial connected precision workflow. It does not complete F10,
+professional color/precision editing, all-tool performance or the full roadmap.
+
+## Opening and changing precision
+
+The custom TIFF import dialog offers 8-bit sRGB or 32-bit linear sRGB editing for
+supported float32 pages. The default remains 8-bit, requiring explicit precision
+loss consent. Float editing does not require that consent. Both choices retain
+the complete original TIFF, selected page, orientation and color interpretation.
+An unprofiled file requires an explicit sRGB or linear-sRGB assumption; an
+embedded supported RGB ICC profile remains authoritative.
+
+Trusted browser host:
+
+```ts
+await editor.openTiff(file, {
+  page: 0,
+  editingPrecision: 'float32',
+  // Required only when the original page has no ICC profile:
+  floatColorSpace: 'linear-srgb',
+}, {signal, onProgress});
+```
+
+`editingPrecision?: 'float32'` is optional. Omission retains the old byte import.
+Page defaults to zero; `allowPrecisionLoss` defaults to false. The float choice
+currently requires original float32 samples. Unsigned 16-bit TIFF, RAW and
+ordinary byte image admission do not acquire float precision through this flag.
+Nonfinite color, alpha outside [0,1], unsupported pages/profiles and known PQ/HLG
+ICC transfer declarations reject. Finite negative and above-one RGB values are
+retained with supported source profiles; no HDR transfer decoding, tone mapping
+or HDR display is implied.
+
+An existing eligible byte document can switch using Color Settings → Working
+precision. Apply stages the output profile together with the precision choice;
+Cancel changes neither. All original sources and the actual float-to-output
+transform prepare before publication. Unsupported current layers block this
+conversion. A missing original float TIFF cannot be reconstructed from byte
+pixels. Trusted host signature:
+
+```ts
+await editor.convertDocumentToFloat(
+  {signal, onProgress},
+  {output: {profile: 'display-p3', intent: 'relative-colorimetric',
+            blackPointCompensation: false}, proof: null},
+);
+```
+
+`control: FloatSourceControl = {}` accepts an optional abort signal and source
+preparation progress callback. `settings?: ColorSettings` defaults to the current
+output settings with proof disabled. `editor.floatConversionIssue: string | null`
+provides the current eligibility reason. Already-float conversion through this
+host preparation service rejects. Replacement preparation, document edit, tab
+change, asset disposal, changed preferences, cancellation or preparation failure
+reject without applying precision or staged preferences. Output preferences are
+workspace settings outside document history; ordinary Undo restores precision.
+
+## Object model, commands and isolation
+
+`DocumentOptions.precision?: 'uint8' | 'float32'` defaults to `uint8`.
+`new Document({precision: 'float32'})` creates an empty linear-sRGB document.
+Readonly `document.precision` and `document.workingSpace` expose effective state.
+`document.convertToFloat(): void` dispatches the shared strict zero-argument
+`{type: 'document.precision.float'}` command. It is idempotent in an existing
+float document; it does not expose decoding, files, workers or preference changes.
+Source validation at host commit requires retained original float TIFF raster
+assets. Synchronous structural construction without an attached asset store
+still requires final source admission before rendering or host publication.
+
+For an already-open original float TIFF, an ordinary isolated script can use:
+
+<!-- example: float-exposure -->
+```js
+document.convertToFloat();
+const original = document.layers.at(0);
+if (!(original instanceof RasterLayer)) throw new Error('Select a raster original');
+original.adjustments.add(new ToneAdjustment({exposure: 1}));
+```
+
+The existing isolated execution transaction, expected revision, command limit,
+locks, permission checks and Undo boundary remain authoritative. Plugins require
+their existing document read/write grants; installation remains inert. No new
+file, native or network grant is added. REST accepts the shared structural state
+and strict command in its own independent sessions. Its PNG-only original asset
+admission does not provide original float TIFF sources, render the browser scene
+or synchronize with a browser document.
+
+The semantic recipe action `{type: 'document.precision.float'}` records/replays
+the same command against recipient content. Recipe execution does not import
+files or change preferences; unsuitable receiving originals reject at host
+commit. Existing source-bearing project/recipe transport retains original TIFF
+choices independently of this zero-argument action.
+
+## Supported scene and controls
+
+The initial mode supports original float TIFF raster layers, Normal isolated
+groups, pass-through groups, transforms, visibility, opacity, Normal fill
+opacity, existing masks and linear exposure in raster tone effects or Tone
+adjustment layers. Exposure multiplies native linear RGB by `2 ** exposure`,
+leaving alpha unchanged. Raster exposure precedes projection. Adjustment exposure
+changes the accumulated backdrop; pass-through group opacity interpolates
+premultiplied before/after backdrops rather than source-over compositing a second
+copy. Masks use the existing byte coverage rasterizer; color stays float32.
+
+Other layer types, artistic blends, sibling clipping, styles, raster erasures,
+frequency separation, contrast/saturation and other adjustment types reject
+atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
+palette and context controls disable unsupported creation/color tools. Move,
+Hand, selections, Crop, Artboard and mask drawing retain their existing commands;
+mask brush/pencil/eraser and mask Pen require their corresponding mask target.
+Device soft proofing is unavailable. Selecting float mode disables it; isolated
+precision conversion clears existing proof state with a visible notice. Saved
+float workspaces with proof enabled reject before publication.
+
+## Ownership, rendering and persistence
+
+Float assets retain native width/height and exact original Blob bytes. Their
+bitmap and thumbnail are bounded 96-pixel display images, explicitly unsuitable
+for native color processing. Shared source-role validation rejects use of these
+display-only pixels as byte raster artwork, masks, brush textures or other byte
+roles. Ordinary native-sized byte assets remain unchanged.
+
+The source service prepares lossless float32 tiles in IndexedDB. Captured scenes
+pin original leases and mask sources before callbacks, validate source identity
+across awaits and reject stale/disposed owners. All source preparation precedes
+display/output ICC acquisition, preventing cold-source work from deadlocking
+behind the shared two-owner ICC queue. Each captured scene owns a cancellation
+signal and a final identity check. Renderer disposal/cache clearing aborts queued
+source and output ICC work without waiting for unrelated owners to close. PNG
+checks original ownership again after its last pixel read and final compression.
+The renderer retains at most 64 original
+source leases, with no full decoded color plane or bitmap ownership in that LRU.
+
+Projection uses float64 geometry and premultiplied bilinear filtering with
+analytic transformed-rectangle coverage, rounding output to float32. Output
+windows and adaptive source ROIs are bounded to 262,144 pixels; this is a working
+allocation budget, not an original image or document resolution cap. Heavy
+minification can read many source windows. No sustained 60fps or whole-process
+peak-memory claim is made. The current viewport uses the standard float path;
+WebGPU does not silently run the byte compositor for these documents.
+
+The model stores `schemaVersion: 49`, `colorSpace: 'linear-srgb'`,
+`precision: 'float32'`. Legacy byte documents omit precision or use `uint8` with
+`srgb`; contradictory pairs and precision in older schemas reject. Native
+projects, retained history, workspace/recovery and existing original-bearing
+transport retain the working state plus `tiff.editingPrecision`. Tile caches are
+derived, separate from authoritative original files. Older strict readers reject
+the new model/choice rather than reinterpret a thumbnail as original pixels.
+Admission validates source roles across the current document, both Undo/Redo
+directions, branch forks/tips and saved comparisons before returning a project.
+A malformed byte state that references a float thumbnail rejects the complete
+load and disposes its privately prepared sources; Undo cannot admit that state.
+
+## Delivery
+
+```ts
+await editor.export({format: 'tiff', tiffPrecision: 'float32'});
+await editor.export({format: 'tiff', tiffPrecision: 'uint16',
+                     color: {profile: 'display-p3'}});
+await editor.exportTiffPages(editor.openDocuments,
+                            {precision: 'float32', variant: 'auto'});
+```
+
+`ExportOptions.tiffPrecision?: 'uint8' | 'uint16' | 'float32'` and multipage
+`TiffPagesExportOptions.precision` default to `uint8`. All high-precision pages
+must be float documents. Mixed byte/float pages are allowed for uint8 output.
+`tiffPrecision` on another format rejects. Classic/BigTIFF choice remains
+`auto | classic | big` with `auto` default. Each float page converts directly
+from linear float32 to the selected complete RGB ICC profile and file sample
+type, with correct integer/float tags and straight alpha. Omitted color defaults
+to linear-sRGB for high-precision TIFF and sRGB for byte output. Explicit output
+settings override the default. Float output retains finite extended values only
+where the selected profile/transform supports them.
+
+PNG/PDF convert directly to target RGB8 and embed the exact target profile.
+JPEG/WebP/AVIF retain their existing sRGB SDR delivery. Byte/integer formats
+quantize and clip unrepresentable colors without tone mapping; capability reports
+disclose this. SVG/PSD/PSB float interchange rejects before producing a file.
+Native projects remain the editable interchange path.
+
+Batch variants accept optional `tiffPrecision` only for TIFF. Prepared float
+project checkpoints preserve working mode through fitted delivery. Fitting
+samples the composed native artboard, excluding outside layers and applying
+fractional boundaries once. Explicit profile receipts use version 2 with
+`sourceSpace: 'linear-srgb-float32'` and the actual output sample format; byte
+receipts retain version 1. Settings, checkpoint precision and profile receipt
+must match before accepted-file reuse. Portable delivery presets and manifests
+retain the new precision and integrity fields. Direct batch image inputs retain
+their existing admission contract; this does not add direct float TIFF batch
+source selection.
+
+## Verification and remaining scope
+
+The dated implementation roadmap records actual completed checks and failed
+pilots. `scripts/check-float-document.py` reads every delivered channel with
+independent native libtiff/Pillow/MuPDF and compares it against independent native
+CMM source references, exact power-of-two exposure and native output conversion.
+Float identity/exposure and integer checks require exact words, with no widened
+rounding tolerance. Pure projection tests separately cover affine partitioning,
+hidden RGB/alpha, sparse large geometry and cancellation.
+
+Required later work includes broader source/working profiles and conversion,
+16-bit and non-TIFF high-precision admission, all remaining tools/layer types,
+blends/styles/clipping, float coverage, device proofing, HDR transfer/display/tone
+mapping, CMYK delivery, interchange, wider photographic/device validation and
+sustained all-tool performance. This initial mode is not full F10 acceptance.

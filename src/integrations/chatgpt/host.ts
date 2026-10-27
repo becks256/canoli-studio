@@ -5,6 +5,7 @@ import type {DocumentSession} from '../../workspace/document-session';
 import {execute} from '../../core/commands';
 import {parseCommands} from '../../core/validation';
 import {referencedAssets} from '../../core/model';
+import{assetBitmapMatches}from'../../core/assets';
 import {validateWetPaintAssets} from '../../core/wet-assets';
 import {wetBrowserAssets} from '../../engine/wet-composite';
 import {bridgeEventSchema,boundedJson,connectionPermissionsSchema,failure,MCP_BRIDGE_VERSION,MCP_METADATA_BYTES,parseConnectionCode,type ConnectionOperation,type ConnectionPermissions,type ConnectionResult} from './protocol';
@@ -87,7 +88,7 @@ export class ChatGptConnections {
    const commands=parseCommands(operation.commands);command={type:'transaction',label:operation.label,commands};candidate=execute(document.toJSON(),command);
   }else candidate=(operation.kind==='undo'?stateBefore.past:stateBefore.future).at(-1)?.document??candidate;
   const pinned=[...referencedAssets(candidate)].map(id=>{const source=assets.get(id);return{id,source,bitmap:source.bitmap,blob:source.blob,width:source.width,height:source.height};});
-  const checkSources=()=>{check();lifetime();for(const entry of pinned){const source=assets.get(entry.id);if(source!==entry.source||source.bitmap!==entry.bitmap||source.blob!==entry.blob||source.width!==entry.width||source.height!==entry.height||source.bitmap.width!==entry.width||source.bitmap.height!==entry.height)throw new Error('Source assets changed while preparing the connected edit.');}};
+  const checkSources=()=>{check();lifetime();for(const entry of pinned){const source=assets.get(entry.id);if(source!==entry.source||source.bitmap!==entry.bitmap||source.blob!==entry.blob||source.width!==entry.width||source.height!==entry.height||!assetBitmapMatches(source))throw new Error('Source assets changed while preparing the connected edit.');}};
   await validateWetPaintAssets(candidate,wetBrowserAssets(assets,checkSources));checkSources();
   z.object({authorized:z.literal(true)}).strict().parse(await this.request(owner,'/authorize/'+id,{method:'POST',signal}));checkSources();
   let warning:string|undefined;
