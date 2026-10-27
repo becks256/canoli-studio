@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-DocumentOptions.precision defaults to uint8 and also accepts float32. Readonly document.precision and document.workingSpace expose effective state; document.convertToFloat() dispatches the shared idempotent command. Existing retained high-precision TIFF originals are required at host commit. Plugins/scripts gain no file/native/network privilege. Recipes record the zero-argument precision action. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+DocumentOptions.precision defaults to uint8 and also accepts float32. Readonly document.precision and document.workingSpace expose effective state; document.convertToFloat() dispatches the shared idempotent command. Existing retained high-precision TIFF originals are required at host commit. Plugins/scripts gain no file/native/network privilege. Recipes record the zero-argument precision action. Existing `Layer.clipped` updates also support the float raster/group/tone subset; source-bearing native files preserve the sibling flag. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Owned float source storage dependency
 

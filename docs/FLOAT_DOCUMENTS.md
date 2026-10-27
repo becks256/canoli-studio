@@ -145,7 +145,7 @@ changes the accumulated backdrop; pass-through group opacity interpolates
 premultiplied before/after backdrops rather than source-over compositing a second
 copy. Masks use the existing byte coverage rasterizer; color stays float32.
 
-Other layer types, artistic blends, sibling clipping, styles, raster erasures,
+Other layer types, artistic blends, styles, raster erasures,
 frequency separation and other adjustment types reject
 atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
 palette and context controls disable unsupported creation/color tools. Move,
@@ -154,6 +154,57 @@ mask brush/pencil/eraser and mask Pen require their corresponding mask target.
 Device soft proofing is unavailable. Selecting float mode disables it; isolated
 precision conversion clears existing proof state with a visible notice. Saved
 float workspaces with proof enabled reject before publication.
+
+## Sibling clipping in float documents
+
+The existing `Layer.clipped` boolean now works in float scenes through the same
+OO commands, Inspector checkbox, palette and history. Consecutive clipped
+siblings share the preceding unclipped pixel-bearing base. Orphans and members
+after an adjustment-only base are transparent. Membership never crosses groups;
+release/reorder/deletion recomputes the current sibling relationship.
+
+The renderer builds an owned float32 color plane, paints members there, and
+restores the base's pre-fill intrinsic alpha once. Repeating soft coverage per
+member would darken edges. Base fill changes its own color coverage; zero fill
+can still show independently visible members within the original boundary. Base
+mask and opacity apply to the completed stack. A pass-through base supplies
+isolated child coverage; pass-through members see the stack's color plane.
+Normal groups, raster transforms, full tone effects, clipped tone adjustment
+layers, member masks/opacity/fill and nested sibling stacks keep their existing
+float semantics. Pass-through fill still requires 1. Unsupported styles, blends
+and layer types remain gated; this does not add Photoshop advanced clipping
+switches or float SVG/PSD/PSB interchange.
+
+No bitmap/display pixel supplies clipping colors. Working arrays remain bounded
+to the existing per-window budget, with checks/yields and owned results. Source
+bytes, geometry and outside-base artwork remain editable in native projects,
+workspaces/history, copies and portable recipes. REST supports the structural
+commands in independent sessions; it still supplies no float raster admission
+or browser renderer/synchronization. Existing plugin document read/write grants
+suffice; installation is inert.
+
+For an original-bearing float document:
+
+<!-- example: float-clipping -->
+```js
+const base = document.layers.at(0);
+if (!(base instanceof RasterLayer)) throw new Error('Open a float TIFF raster');
+base.name = 'Float clipping base';
+base.fillOpacity = 0.375;
+base.opacity = 0.75;
+base.mask = new LayerMask({linked: false, selection: new MarqueeSelection({
+  shape: 'rectangle', x: 15, y: 10, width: 90, height: 55,
+})});
+const member = new RasterLayer({
+  name: 'Clipped float tone', assetId: base.assetId,
+  width: base.width, height: base.height, opacity: 0.5, clipped: true,
+});
+member.adjustments.add(new ToneAdjustment({
+  exposure: 1, contrast: 25, saturation: -40,
+}));
+document.layers.add(member);
+document.selectedLayer = member;
+```
 
 ## Ownership, rendering and persistence
 
@@ -244,6 +295,6 @@ hidden RGB/alpha, sparse large geometry and cancellation.
 
 Required later work includes broader source/working profiles and conversion,
 other integer depths and non-TIFF high-precision admission, all remaining tools/layer types,
-blends/styles/clipping, float coverage, device proofing, HDR transfer/display/tone
+blends/styles, float coverage, device proofing, HDR transfer/display/tone
 mapping, CMYK delivery, interchange, wider photographic/device validation and
 sustained all-tool performance. This initial mode is not full F10 acceptance.

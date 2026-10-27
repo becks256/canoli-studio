@@ -6387,3 +6387,114 @@ new isolated privilege or browser/REST synchronization is added. Full F10,
 remaining tools/working spaces/blends/HDR/proof/CMYK/interchange, physical/device,
 sustained performance and every other unfinished original gate remain required.
 The complete original implementation-roadmap goal remains active.
+
+
+### 2026-10-27 — F10 sibling clipping in float documents verified
+
+Owner: implementation agent; continuation from 676ba39. The existing shared
+sibling clipping contract now has an original-derived float implementation:
+owned straight color planes, base fill separated from intrinsic shape, visible
+members composited before once-only coverage restoration, then base mask/opacity.
+Pass-through bases isolate intrinsic child coverage; member pass-through groups
+retain the stack backdrop. Orphans, adjustment-only bases, hidden membership and
+nested group boundaries use the existing stack partition. UI and palette gates
+now admit clipping for supported float layer types without adding a mutation
+API, source privilege or document/container schema. [Contract](FLOAT_DOCUMENTS.md).
+
+Initial 20 focused unit/native checks pass. Six independently evaluated NumPy
+scenes match every actual browser sample word and reopened project sample, with
+zero partition differences: soft boundaries, partial/zero fill, masked/clipped
+tone adjustments, group bases/members, pass-through coverage, hidden bases,
+orphans and scoped siblings. Source original identity remains exact. Actual
+Inspector/palette/script/REST/recipe, 50 MP and final build/full unit/production
+checks remain required. Wider float layers/blends/styles/working spaces/HDR/
+proof/CMYK/interchange, physical/device and sustained performance plus every
+other unfinished original-roadmap gate remain active.
+
+The complete six-case workflow pilot passes: independent browser/project scenes,
+normal UI scripted/Inspector/palette clipping and both original/full-tone recipe
+paths with and without clipping. Both precision formats match native references,
+partial retry retains the accepted file without replaying edits, and checkpoint
+precision/source membership survives reopening. Initial build attempts exposed
+only test-side union narrowing and an implicit callback type; those are corrected
+before the successful build. Final UI coverage additionally checks direct PNG/PDF
+alongside precision TIFF. Full unit/build/source/50 MP/production gates follow.
+
+The complete actual WASM/unit/API suite passes all 2,686 tests in 278 files.
+The successful build publishes 40 developer guides and passes all TypeScript
+checks. The final browser matrix retains existing float/tone/group/recipe and
+legacy byte clipping cases alongside the new original-derived clipping scenes
+and authoring. Both genuine 50 MP source types and the complete 167-case
+production suite follow on frozen inputs. No tolerance/timeout relaxation or
+source geometry cap is introduced.
+
+The final focused source matrix passes all 57 cases across 18 files with no
+skips, retries, flaky or unexpected results. This includes the existing complete
+byte clipping authoring/rendering/source workflows and native 50 MP byte case,
+alongside original float clipping scenes, all four normal UI output types and
+four recipe partial-retry variants. The two new float clipping 50 MP source
+workflows and complete production acceptance remain in progress.
+
+The genuine 50 MP float-original workflow passes with 10,000 × 5,000 authored
+geometry, exact retained original bytes, restored workspace, one Undo/Redo and
+both precision file types. Each file independently matches all 200,000,000
+channel values with zero error and zero differing words. The float32 file retains
+21,002,496 extended RGB samples; its raw SHA-256 is
+`45f68dd0801ef15b385f847ac3f2329d178c93a0eb8e7b91c4b8f6b65d0448ff`,
+file SHA-256 `a17a52bfd0a4bade2e00bc04585c958714456e7ebe102a961f880c6a006de30f`
+(2,264,008 bytes). The uint16 file raw SHA-256 is
+`a9e0da0649c58c04318cbd388fc617551e04c54b553d6ebc567d2f801db2ea50`,
+file SHA-256 `1535b1f153f3dcc3e61c81983a0ceddfbce169266f0b201f441340aa693917d3`
+(757,624 bytes). The uint16-original workflow and complete production acceptance
+remain in progress. These native comparisons do not establish physical color
+quality, whole-process peak memory or sustained all-tool performance.
+
+The genuine 50 MP uint16-original workflow also passes all geometry, original
+byte identity, workspace restoration and Undo/Redo checks. Both precision files
+match all 200,000,000 channel values independently with zero error and zero
+differing words. The float32 file retains 13,591,250 extended RGB samples; raw
+SHA-256 `450cdb4ffd0486f1d14f9849be975c66cc45ec11d9044b711148b057ca1e1976`,
+file SHA-256 `184ff58d8c7199ecbd228af8c97080b0b6bbfa95c057f1f1db8ab9fd79c5f3fb`
+(89,405,336 bytes). The uint16 file raw SHA-256 is
+`dd88b8419cdbb78101a255f92cee91203ee7e80434b80fdeee94760d39e01ed0`,
+file SHA-256 `c9face74035d7707ef8f0969e020fe958b20dc9de5500b79be22caa77abe34c6`
+(49,530,752 bytes). The separate two-case run has no skips, retries, flaky or
+unexpected results and uses the existing 600-second per-case limit. Combined
+source acceptance is 59 distinct cases. Complete normal production acceptance
+is now running against the same frozen source and release inputs.
+
+
+Complete production acceptance passes all 167 cases without developer globals,
+including the new isolated example, palette release, Inspector creation, exact
+Undo/Redo, original-bearing project reopening and four direct output formats.
+Both source and production normal-UI float32 TIFF, uint16 TIFF, PNG and PDF files
+match the independent native/NumPy reference at every sample, with complete
+profile identity and zero error. All accepted final runs have no skips, retries,
+flaky or unexpected results. The 57-case focused source matrix and two genuine
+50 MP workflows are 59 distinct accepted source cases; the earlier six-case
+workflow and one-case numerical pilots remain separate evidence.
+
+The final audit checks all 2,204 frozen source-input identities and all 142
+release resources. No runtime, test, reference, guide or release correction was
+made after the freeze. All five native binaries remain unchanged from 676ba39,
+including pixels WASM SHA-256
+`8bcb47b4b65ede3e20f11f0cc24c309728386eeb3d3edbb677c9d26d37af1d51`.
+The roadmap observations are recorded separately from these frozen inputs.
+
+[Sealed float clipping evidence](benchmarks/float-clipping-2026-10-27.zip)
+contains the full changed-source overlay against 676ba39, complete release
+resources, independent source/reference/generator and native reader inputs,
+all four complete 50 MP TIFF outputs, original-bearing projects/workspaces,
+partial recipe retries, normal UI files, reports, screenshots and verification
+tools. Its version-2 content-addressed manifest reconstructs every complete
+file exactly while deduplicating repeated TIFF blocks. Payloads, reconstructed
+files and source/release identities are checked before staging; staged and
+committed source/archive bytes are checked against the sealed manifest.
+
+This completes the supported sibling clipping increment, not F10 or the complete
+roadmap. Other layers, adjustments, working spaces, blends, styles, HDR, proof,
+CMYK, interchange, physical/device quality, whole-process memory and sustained
+all-tool performance, plus every other unfinished original gate, remain required.
+No arbitrary original-resolution cap, paid call, account, upload, new isolated
+privilege, public mutation API, schema change or browser/REST synchronization
+was introduced. The complete original implementation-roadmap goal remains active.

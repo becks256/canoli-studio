@@ -928,7 +928,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     {id:'design-checks',label:'Design checks',keys:[],run:()=>setShowPreflight(true),enabled:()=>!busy},
     {id:'clipping-mask',label:selected?.clipped?'Release clipping mask':'Create clipping mask',keys:[],
       run:()=>selectedAction(layer=>{layer.clipped=!layer.clipped;}),
-      enabled:()=>dom.precision!=='float32'&&!busy&&!locked&&!!selected&&(!!selected.clipped||!!clippingBaseFor(state.document.children,selected.id))},
+      enabled:()=>!busy&&!locked&&!!selected&&(!!selected.clipped||!!clippingBaseFor(state.document.children,selected.id))},
     {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>dom.precision!=='float32'&&!busy},
     {
       id: "undo",

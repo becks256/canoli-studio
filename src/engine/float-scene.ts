@@ -1,3 +1,5 @@
+import{clippingStacks}from'../core/clipping';
+import{prepareFloatClipping,restoreFloatClipping}from'./float-clipping';
 import type{DocumentData,LayerData}from'../core/model';
 import{validateDocument}from'../core/model';
 import{floatSceneIssue,assertFloatSources}from'../core/float-document';
@@ -91,20 +93,31 @@ export class FloatSceneRenderer {
     const tone=async(pixels:Float32Array,settings:{exposure:number;contrast:number;saturation:number})=>{
      if(settings.exposure===0&&settings.contrast===0&&settings.saturation===0)return pixels;check();const result=await this.processor.floatTone(pixels,{exposure:settings.exposure,contrast:settings.contrast,saturation:settings.saturation});check();return result;
     };
-    const paint=async(layers:LayerData[],initial:Float32Array,parent:AffineTransform):Promise<Float32Array>=>{
+    const raster=async(layer:Extract<LayerData,{kind:'raster'}>,world:AffineTransform)=>{
+     const source=sources.get(layer.assetId)!,placement=renderTransform(full,world).multiply(AffineTransform.scale(layer.width/source.source.width,layer.height/source.source.height));
+     const effects=layer.effects.filter(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0)),adjusted:FloatWindowSource=effects.length?{width:source.source.width,height:source.source.height,readWindow:async(region,control)=>{let pixels:Float32Array=await source.source.readWindow(region,control);for(const effect of effects)pixels=await tone(pixels,effect);return pixels;}}:source.source;
+     return projectFloatWindow(adjusted,placement,bounds,{signal:control.signal,isCancelled:()=>{check();return false;}});
+    };
+    const paint=async(layers:LayerData[],initial:Float32Array,parent:AffineTransform,clippingMembers=false):Promise<Float32Array>=>{
      let backdrop=initial;
-     for(const layer of layers){
+     const stacks=clippingMembers?layers.map(base=>({base,layers:[]as LayerData[]})):clippingStacks(layers);
+     for(const stack of stacks){
+      const layer=stack.base,clipped=stack.layers.filter(member=>member.visible&&member.opacity>0);
       check();if(!layer.visible||layer.opacity===0)continue;const world=parent.multiply(localTransform(layer)),coverage=await mask(layer,world),opacity=layer.opacity*(layer.fillOpacity??1);
-      if(layer.kind==='group'){
+      if(clipped.length){
+       // A pass-through base supplies isolated intrinsic coverage; member
+       // pass-through groups still see this stack's working color plane.
+       const intrinsic=layer.kind==='raster'?await raster(layer,world):layer.kind==='group'?await paint(layer.children,new Float32Array(backdrop.length),world):null;
+       if(!intrinsic)throw new Error('A clipping base requires intrinsic pixels.');
+       const prepared=await prepareFloatClipping(intrinsic,layer.fillOpacity??1,check),colors=await paint(clipped,prepared.plane,parent,true),pixels=await restoreFloatClipping(colors,prepared.shape,check);
+       backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity:layer.opacity,mask:coverage});
+      }else if(layer.kind==='group'){
        if(layer.blendMode==='pass-through'){
         if(layer.opacity===1&&!coverage)backdrop=await paint(layer.children,backdrop,world);
         else{const after=await paint(layer.children,backdrop.slice(),world);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
        }else{const pixels=await paint(layer.children,new Float32Array(backdrop.length),world);backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity,mask:coverage});}
       }else if(layer.kind==='raster'){
-       const source=sources.get(layer.assetId)!,placement=renderTransform(full,world).multiply(AffineTransform.scale(layer.width/source.source.width,layer.height/source.source.height));
-       const effects=layer.effects.filter(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0)),adjusted:FloatWindowSource=effects.length?{width:source.source.width,height:source.source.height,readWindow:async(region,control)=>{let pixels:Float32Array=await source.source.readWindow(region,control);for(const effect of effects)pixels=await tone(pixels,effect);return pixels;}}:source.source;
-       const pixels=await projectFloatWindow(adjusted,placement,bounds,{signal:control.signal,isCancelled:()=>{check();return false;}});
-       check();backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity,mask:coverage});
+       const pixels=await raster(layer,world);check();backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity,mask:coverage});
       }else if(layer.kind==='adjustment'&&layer.adjustment.kind==='tone'){
        const after=await tone(backdrop,layer.adjustment);backdrop=await interpolateFloatBackdrops(backdrop,after,opacity,coverage,check);
       }else throw new Error('Unsupported float scene layer.');

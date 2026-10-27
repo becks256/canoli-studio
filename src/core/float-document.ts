@@ -8,7 +8,6 @@ export function isFloatDocument(document:{colorSpace:string;precision?:string}):
 export function floatSceneIssue(document:DocumentData):string|null {
   const visit=(layers:LayerData[]):string|null=>{
     for(const layer of layers){
-      if(layer.clipped)return 'Clipping stacks are not yet supported in float documents.';
       if(layer.blendMode!=='normal'&&!(layer.kind==='group'&&layer.blendMode==='pass-through'))return 'Float documents currently support Normal and pass-through groups. Other blend modes require their float integration.';
       const style=layer.styles;
       if(style&&(style.dropShadow.enabled||style.colorOverlay.enabled||style.blendIf.enabled))return 'Layer styles require their float document integration.';
