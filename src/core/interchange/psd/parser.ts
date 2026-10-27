@@ -8,6 +8,7 @@ import { unmattePreviewChannel } from "./composite";
 import { decodePsdZip, type PsdZipRequest } from "./zip";
 import { psdMaskIssue } from "./mask";
 import { psdHierarchyIssue } from './groups';
+import {psdClippingIssue} from './clipping';
 import {
   PSD_BLEND_MODE_MAP,
   PsdColorMode,
@@ -246,7 +247,7 @@ function* parsePsdSteps(buffer: ArrayBuffer | Uint8Array, options: PsdParseOptio
           let isGroup = false;
           let isGroupEnd = false;
           let hasVectorMask = false;
-          let groupBlendModeKey:string|undefined,fillOpacity:number|undefined,protectedFlags=0;
+          let groupBlendModeKey:string|undefined,fillOpacity:number|undefined,protectedFlags=0,blendClippedElements:boolean|undefined;
 
           while (reader.position + 12 <= extraEnd) {
             const tagSig = reader.readAscii(4);
@@ -276,6 +277,14 @@ function* parsePsdSteps(buffer: ArrayBuffer | Uint8Array, options: PsdParseOptio
             } else if (tagKey === 'iOpa') {
               if(tagDataLen<1)throw new Error('Truncated Photoshop fill opacity.');
               fillOpacity=reader.readUint8();
+            } else if (tagKey === 'clbl') {
+              if(tagDataLen!==4)throw new Error('Invalid Photoshop clipping blend setting.');
+              const value=reader.readUint8();
+              if(value>1)unsupportedAppearance.push('Unknown Photoshop clipping blend setting');
+              else blendClippedElements=!!value;
+            } else if(tagKey==='knko'){
+              if(tagDataLen!==4)throw new Error('Invalid Photoshop knockout setting.');
+              if(reader.readUint8()!==0)unsupportedAppearance.push('Photoshop knockout');
             } else if (['lrFX','lfx2','lmfx','lfxs'].includes(tagKey)) {
               unsupportedAppearance.push('Photoshop layer effects');
             } else if (tagKey === "luni" && tagDataLen >= 4) {
@@ -307,7 +316,7 @@ function* parsePsdSteps(buffer: ArrayBuffer | Uint8Array, options: PsdParseOptio
             isGroup,
             isGroupEnd,
             hasVectorMask,
-            groupBlendModeKey,fillOpacity,protectedFlags,unsupportedAppearance,
+            groupBlendModeKey,fillOpacity,protectedFlags,unsupportedAppearance,blendClippedElements,
             mask: maskInfo,
           });
         }
@@ -538,6 +547,9 @@ export function getPsdCapabilityReport(
   const degradedFeatures: string[] = [];
   const hierarchyIssue=psdHierarchyIssue(psd.layers);
   if(hierarchyIssue){warnings.push(hierarchyIssue);degradedFeatures.push('Unsupported Photoshop hierarchy');}
+  const clippingIssue=psd.layers.some(layer=>layer.clipping)&&psd.header.depth!==8?'Higher-precision Photoshop clipping':psdClippingIssue(psd.layers);
+  if(clippingIssue){warnings.push(`${clippingIssue} requires the merged composite.`);degradedFeatures.push('Unsupported Photoshop clipping semantics');}
+  else if(psd.layers.some(layer=>layer.clipping===1))supportedConstructs.push('Editable sibling pixel clipping with grouped base blending');
   if(psd.unsupportedCompositeCompression){warnings.push('The merged image uses ZIP or another unsupported compression and cannot be used for flattening.');degradedFeatures.push('Unsupported merged-image compression');}
 
   const colorModeName =
@@ -593,7 +605,7 @@ export function getPsdCapabilityReport(
       );
       degradedFeatures.push('Unsupported Photoshop blend mode');
     }
-    if(layer.unsupportedAppearance?.length||layer.clipping){warnings.push(`Layer '${layer.name}': ${[...(layer.unsupportedAppearance??[]),...(layer.clipping?['Photoshop clipping layers']:[])].join(', ')} requires the merged composite.`);degradedFeatures.push('Unsupported Photoshop appearance');}
+    if(layer.unsupportedAppearance?.length){warnings.push(`Layer '${layer.name}': ${layer.unsupportedAppearance.join(', ')} requires the merged composite.`);degradedFeatures.push('Unsupported Photoshop appearance');}
     if(unsupportedFill(layer)){warnings.push(`Layer '${layer.name}': Photoshop group or non-Normal fill-opacity semantics require the merged composite.`);degradedFeatures.push('Unsupported Photoshop fill-opacity semantics');}
     if((layer.protectedFlags||layer.flags.transparencyProtected)&&!((layer.protectedFlags??0)&0x80000000)){warnings.push(`Layer '${layer.name}': partial Photoshop protection is retained as a full native lock.`);degradedFeatures.push('Photoshop partial lock granularity');}
     if (layer.mask || layer.hasVectorMask) {
@@ -617,10 +629,10 @@ export function getPsdCapabilityReport(
 
   const canImportAsLayers =
     (supportedLayerCount > 0 || (psd.layers.some(layer=>layer.isGroup)&&psd.layers.every(layer=>layer.isGroup||layer.isGroupEnd))) &&
-    !hierarchyIssue &&
+    !hierarchyIssue && !clippingIssue &&
     !psd.layers.some(unsupportedFill) &&
     !psd.layers.some(layer=>layer.unsupportedCompression) &&
-    !psd.layers.some(layer=>!layer.isGroupEnd&&(layer.clipping||layer.unsupportedAppearance?.length||(!(PSD_BLEND_MODE_MAP[layer.isGroup?(layer.groupBlendModeKey??layer.blendModeKey):layer.blendModeKey])&&!(layer.isGroup&&(layer.groupBlendModeKey??layer.blendModeKey)==='pass')))) &&
+    !psd.layers.some(layer=>!layer.isGroupEnd&&(layer.unsupportedAppearance?.length||(!(PSD_BLEND_MODE_MAP[layer.isGroup?(layer.groupBlendModeKey??layer.blendModeKey):layer.blendModeKey])&&!(layer.isGroup&&(layer.groupBlendModeKey??layer.blendModeKey)==='pass')))) &&
     (options.preserveMasks === false || !psd.layers.some(layer => (layer.mask || layer.hasVectorMask) && (psd.header.depth !== 8 || psdMaskIssue(layer)))) &&
     (psd.header.colorMode === PsdColorMode.RGB ||
       psd.header.colorMode === PsdColorMode.Grayscale);

@@ -29,6 +29,7 @@ export async function buildPsd(
   options: PsdExportOptions = {},
 ): Promise<Uint8Array> {
   validatePsdDimensions(document.width, document.height);
+  if(layersWithPixels.some(item=>item.layer.clipped))throw new Error('Clipping requires rendered PSD export. Use editor.export({format: \'psd\'}).');
   if (!layersWithPixels.length) layersWithPixels = [{
     layer: createRaster("Background", "psd:empty", 1, 1),
     imageData: { width: 1, height: 1, data: new Uint8ClampedArray(4), colorSpace: "srgb" } as ImageData,

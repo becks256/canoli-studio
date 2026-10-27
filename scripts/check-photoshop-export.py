@@ -25,6 +25,7 @@ for case in cases:
  assert document._record.header.depth==8
  assert [layer.name for layer in document]==case['names']
  assert [layer.visible for layer in document]==case['visibility']
+ if 'clipping' in case:assert [layer.clipping_layer for layer in document]==case['clipping']
  preview=compare(document.topil(apply_icc=False),reference,1.01,0)
  if case.get('singleLayerReference'):
   assert len(document)==1 and document[0].opacity==255

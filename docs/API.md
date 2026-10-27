@@ -875,3 +875,7 @@ RAW import/development options accept optional strict `development.lens` version
 
 
 RAW inspection/development and retained asset/project metadata may include `report.shooting` with version 1, lensMake/lensModel (empty for unknown), and nullable positive finite focalLength/focalLength35mm (mm), aperture (f-number), exposureTime (seconds) and iso. Values are native-recorded declarations with float32 precision, not verified measurements or inferred calibrated crop factors. Invalid native values become unknown; malformed worker replies reject. Legacy reports remain valid without this object. Inspection remains read-only, accepted metadata follows ordinary source/undo/persistence boundaries, and REST sessions remain independent of the browser. See SCRIPTING_API.md for the complete report contract.
+
+### Photoshop clipping remains a trusted file boundary
+
+Supported browser Photoshop pixel clipping imports/exports map to the existing shared `clipped` flag; independent REST retains its existing document command surface and does not acquire a renderer, host file service or synchronization. See [the exact interchange subset and fallbacks](CLIPPING_MASKS.md#editable-photoshop-clipping-subset).

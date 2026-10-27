@@ -113,6 +113,7 @@ function parsedPsdToDocument(parsed: PsdParsedDocument, options: PsdImportOption
     layer.x=source.left-parent.x;layer.y=source.top-parent.y;
     layer.opacity=source.opacity/255;layer.visible=source.flags.visible;layer.locked=!!source.protectedFlags||source.flags.transparencyProtected;
     if(source.fillOpacity!==undefined)layer.fillOpacity=source.fillOpacity/255;
+    if(source.clipping===1)layer.clipped=true;
     layer.mask=nativeMask(source);
     return layer;
   }
@@ -135,7 +136,7 @@ export async function documentToPsd(
   // This low-level helper has no document renderer. Reject unsupported content
   // instead of silently dropping it; browser export uses engine/psd.ts.
   for (const node of document.children) {
-    if (node.kind !== "raster" || node.transform || node.mask || (node.fillOpacity ?? 1) !== 1 ||
+    if (node.kind !== "raster" || node.clipped || node.transform || node.mask || (node.fillOpacity ?? 1) !== 1 ||
       node.erasures?.length || node.styles?.blendIf.enabled || node.styles?.colorOverlay.enabled || node.styles?.dropShadow.enabled ||
       node.effects.some(effect => effect.enabled && (effect.exposure !== 0 || effect.contrast !== 0 || effect.saturation !== 0)))
       throw new Error("This document requires rendered PSD export. Use editor.export({format: 'psd'}) to preserve its appearance.");

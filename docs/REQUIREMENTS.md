@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Editable Photoshop pixel clipping (F02/F11)
+
+Retain supported consecutive pixel clipping, including nested folder scopes, through actual PSD/PSB import/export, shared edits/Undo and original-bearing native reopening. Validate grouped blending, intrinsic alpha, masks, opacity and hidden membership against independent files and forced recomposition. Unsupported group/orphan/Fill/advanced settings must disclose baking or actual merged fallback; renderer-free exports must reject. Keep source resolution and existing isolation/permission/schema contracts. See [the exact subset](CLIPPING_MASKS.md#editable-photoshop-clipping-subset).
+
 ## Editable clipping stacks (F02)
 
 Support schema-48 boolean sibling clipping through constructors/shared updates, Inspector and palette, one Undo, independent REST, isolated scripts/plugins, recipes and native persistence. Preserve source geometry and original bytes. Apply intrinsic base coverage once across multiple soft-edge members, with base opacity/blending and member adjustment isolation. Respect hidden/orphan/nested/group boundaries, masks/styles/fill, transforms, stale work and existing locks/grants. Native exports must retain complete sampling and source resolution; unsupported editable interchange must disclose baking/fallback. Verify wet painting, smart rasterization and frequency-source isolation, complete native reference pixels and the actual 50 MP workflow. Full F02 and advanced clipping/Photoshop fidelity remain open. [Exact contract](CLIPPING_MASKS.md).

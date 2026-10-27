@@ -6,6 +6,10 @@ Sibling clipping derives from current order, not ID links or mutated pixels. Res
 
 Private bounded rendering must retain its captured clipping-member/backdrop mode through recursion. Re-resolving a single captured member as a new orphan loses valid artwork; changing its authored flag would corrupt the public relationship. Child group scopes still resolve independently.
 
+## Photoshop clipping boundary
+
+Retain supported sibling pixel membership in PSD/PSB records while rendering complete individual member planes from private snapshots with only their outer clipping flag cleared. Native mutable state and originals remain untouched. Inspect Photoshop grouped-clipping/knockout settings and sibling base eligibility before layered admission; unsupported semantics use the actual merged image, never an inferred native approximation. Renderer-free exports reject clipping. Group/advanced-style/Fill and broader native interchange remain separate gates. See [the supported subset](CLIPPING_MASKS.md#editable-photoshop-clipping-subset).
+
 ## Vector cache and sampling invariant
 
 Retain conservative native geometric coverage independently of placement and allocation. Only a fully registry-owned immutable path array can key reusable footprint metadata; never trust caller freezing or stored IDs, and return owned rectangles. Compact working/cache rectangles must preserve the exact output-pixel lattice, canonical native-cell rasterization, mask coordinates and shadow support. Retention continues to share the established byte/entry budget. Pixel equivalence, model/Undo/source preservation and actual matching production frames are required; a small retained-byte count or a green functional suite does not prove all-tool responsiveness.

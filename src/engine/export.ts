@@ -309,7 +309,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
         featuresPreserved.push('Separate fill opacity on retained unstyled Normal pixel layers');
         if(plan.records.some(entry=>entry.kind==='group'))featuresPreserved.push('Nested folder hierarchy, supported pass-through blending, visibility and locks');
         if(plan.masks.length){
-          featuresPreserved.push('Editable pixel-mask channels with retained enabled state');
+          featuresPreserved.push('Editable pixel-mask channels with retained enabled state outside normalized clipping-base coverage');
           warnings.push('Separate masks retain final native coverage as editable document-bounded pixels. Vector/selection/paint identity, linkage, density, inversion and feather controls and off-canvas mask coverage are baked.');
           featuresDegradedOrOmitted.push('Original mask geometry and coverage controls');
         }
@@ -361,7 +361,9 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       if (layers.some(layer => layer.kind === "smart-object"))
         featuresDegradedOrOmitted.push("Editable smart objects, linked sources and smart filters (rendered to pixels)");
       warnings.push("Styles, paint operations and affine transforms are rendered into pixels. Group transforms are baked into descendant pixels; supported integer group origins and ordinary placed-raster bounds are retained. Other rendered content is clipped to document support. Save .luma to retain complete source editability.");
-      if(layers.some(layer=>layer.clipped)){warnings.push('Clipping stacks are rendered into merged sibling prefixes. Save a project to retain their editable layer relationships.');featuresDegradedOrOmitted.push('Editable clipping stacks');}
+      const retainedClipping=plan.layers.filter(layer=>layer.clipped).length,totalClipping=layers.filter(layer=>layer.clipped).length;
+      if(retainedClipping){featuresPreserved.push('Editable sibling pixel clipping with grouped base blending');warnings.push(`${retainedClipping} clipping member(s) retain editable pixel-layer relationships. Base intrinsic transparency and its final mask are combined into an enabled editable pixel mask, with binary intrinsic alpha, so coverage applies once after member blending. Original separate base-mask controls are baked. Original non-pixel authoring, transforms and rendered effects retain the format limitations described above.`);}
+      if(totalClipping>retainedClipping){warnings.push('Unsupported clipping stacks are rendered into merged sibling prefixes or baked group contents. Group clipping, styled bases, separate base Fill and dependent adjustments require a native project for complete editability.');featuresDegradedOrOmitted.push('Editable clipping relationships in baked portions');}
       featuresDegradedOrOmitted.push("Original affine transforms, styles, paint operations and metadata");
       break;
   }

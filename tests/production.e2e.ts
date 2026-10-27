@@ -1,5 +1,7 @@
 import {spacingWorkflow} from './helpers/spacing';
 import {clippingWorkflow} from './helpers/clipping';
+import {photoshopClippingWorkflow}from './helpers/photoshop-clipping';
+for(const fixture of ['normal','ungrouped']as const)test(`production Photoshop ${fixture} clipping retains the actual editable or fallback boundary`,async({page},info)=>{await photoshopClippingWorkflow(page,info,fixture);});
 test('production clipping masks preserve editable layers, native pixels, palette release, one Undo and portable reopening',async({page},info)=>{await clippingWorkflow(page,info,true);});
 import {preflightAlignmentWorkflow} from './helpers/preflight-alignment';
 import {verticalTextWorkflow} from './helpers/vertical-text';

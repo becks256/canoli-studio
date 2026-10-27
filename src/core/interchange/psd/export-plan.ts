@@ -3,6 +3,7 @@ import {AffineTransform} from '../../affine';
 import {localBounds,localTransform} from '../../spatial';
 import {maskTransform,type LayerMaskData} from '../../masks';
 import {captureFrequencyRadius} from '../../frequency-separation';
+import {clippingStacks} from '../../clipping';
 
 export type PsdExportMode='layers'|'flatten';
 export type PhotoshopFormat='psd'|'psb';
@@ -13,10 +14,12 @@ export function photoshopVersion(format:PhotoshopFormat):1|2{
 export interface PsdRenderedMask {
  id:string;mask:LayerMaskData;world:AffineTransform;enabled:boolean;
  left:number;top:number;width:number;height:number;document:DocumentData;
+ intrinsicCoverage?:boolean;
 }
 export interface PsdRenderedLayer {
- name:string;visible:boolean;opacity:number;blendMode:BlendMode;fillOpacity?:number;locked?:boolean;
+ name:string;visible:boolean;opacity:number;blendMode:BlendMode;fillOpacity?:number;locked?:boolean;clipped?:boolean;
  left:number;top:number;width:number;height:number;document:DocumentData;merged:boolean;mask?:PsdRenderedMask;
+ binaryAlpha?:boolean;
 }
 export interface PsdGroupRecord {
  name:string;visible:boolean;opacity:number;fillOpacity:number;blendMode:LayerBlendMode;locked:boolean;
@@ -37,9 +40,18 @@ export function validatePsdDimensions(width:number,height:number,format:Photosho
 
 /** Pass-through carries unsupported backdrop dependencies outward; ordinary
  * groups stop them. Native Photoshop adjustment serialization remains separate. */
-function backdropDependent(node:LayerData):boolean{
- return !!node.clipped||node.kind==='adjustment'||!!node.styles?.blendIf.enabled||
-  (node.kind==='group'&&node.blendMode==='pass-through'&&node.children.some(backdropDependent));
+function nativeClippingMembers(nodes:LayerData[]):Set<string>{
+ const members=new Set<string>();
+ for(const {base,layers}of clippingStacks(nodes)){
+  if(!layers.length||base.kind==='group'||base.kind==='adjustment'||styled(base)||(base.fillOpacity??1)!==1||base.styles?.blendIf.enabled)continue;
+  if(layers.some(layer=>layer.kind==='group'||layer.kind==='adjustment'||layer.styles?.blendIf.enabled))continue;
+  layers.forEach(layer=>members.add(layer.id));
+ }
+ return members;
+}
+function backdropDependent(node:LayerData,native:Set<string>):boolean{
+ return (!!node.clipped&&!native.has(node.id))||node.kind==='adjustment'||!!node.styles?.blendIf.enabled||
+  (node.kind==='group'&&node.blendMode==='pass-through'&&node.children.some(child=>backdropDependent(child,nativeClippingMembers(node.children))));
 }
 function styled(node:LayerData):boolean{return !!(node.styles?.dropShadow.enabled||node.styles?.colorOverlay.enabled);}
 
@@ -56,7 +68,7 @@ export function planPsdExport(document:DocumentData,mode:PsdExportMode='layers',
  const placed=(node:LayerData,world:AffineTransform):LayerData=>({...captureFrequencyRadius(document,node),x:world.e,y:world.f,transform:linear(world)});
  const scopeDoc=(nodes:LayerData[],world:AffineTransform,parent?:GroupLayerData):DocumentData=>{
   if(!parent)return doc(nodes);
-  return doc([{...captureFrequencyRadius(document,parent),kind:'group',children:nodes,visible:true,opacity:1,fillOpacity:1,blendMode:'normal',mask:undefined,styles:undefined,x:world.e,y:world.f,transform:linear(world)}]);
+  return doc([{...captureFrequencyRadius(document,parent),kind:'group',children:nodes,clipped:undefined,visible:true,opacity:1,fillOpacity:1,blendMode:'normal',mask:undefined,styles:undefined,x:world.e,y:world.f,transform:linear(world)}]);
  };
  const makeMask=(node:LayerData,world:AffineTransform):PsdRenderedMask|undefined=>{
   if(!node.mask)return;
@@ -71,7 +83,9 @@ export function planPsdExport(document:DocumentData,mode:PsdExportMode='layers',
  }
  let mergedThrough=-1;
  const scope=(nodes:LayerData[],world:AffineTransform,parent?:GroupLayerData)=>{
-  let through=-1;nodes.forEach((node,index)=>{if(backdropDependent(node))through=index;});
+  const nativeClips=nativeClippingMembers(nodes);
+  const nativeBases=new Set(clippingStacks(nodes).filter(stack=>stack.layers.some(layer=>nativeClips.has(layer.id))).map(stack=>stack.base.id));
+  let through=-1;nodes.forEach((node,index)=>{if(backdropDependent(node,nativeClips))through=index;});
   if(!parent)mergedThrough=through;
   if(through>=0){const name=`Merged through ${nodes[through].name}`;scopedMerges.push(name);merge(nodes.slice(0,through+1),name,world,parent);}
   for(const node of nodes.slice(through+1)){
@@ -98,8 +112,16 @@ export function planPsdExport(document:DocumentData,mode:PsdExportMode='layers',
      Object.values(nativeRect).every(Number.isSafeInteger)&&nativeRect.width<=maximum&&nativeRect.height<=maximum&&
      Math.min(nativeRect.left,nativeRect.top)>=-0x80000000&&Math.max(nativeRect.left+nativeRect.width,nativeRect.top+nativeRect.height)<=0x7fffffff;
     const rect=native?nativeRect:canvas;
-    const content=placed({...node,visible:true,opacity:1,blendMode:'normal',fillOpacity:bake?node.fillOpacity:1,mask:bake?node.mask:undefined},full);
-    pixel({...rect,name:node.name,visible:node.visible,opacity:node.opacity,fillOpacity:bake?1:node.fillOpacity??1,blendMode:node.blendMode,locked:node.locked,mask:bake?undefined:makeMask(node,full),document:doc([content]),merged:false});
+    const content=placed({...node,clipped:undefined,visible:true,opacity:1,blendMode:'normal',fillOpacity:bake?node.fillOpacity:1,mask:bake?node.mask:undefined},full);
+    const binaryAlpha=nativeBases.has(node.id);
+    let mask=bake?undefined:binaryAlpha?undefined:makeMask(node,full);
+    if(binaryAlpha){
+     // Keep an opaque color plane and apply intrinsic coverage only after the
+     // complete clipping stack. Combine the base's final mask in this plane.
+     mask={...canvas,id:node.id,mask:{kind:'paint',base:1,strokes:[],enabled:true,inverted:false,density:1,linked:false,x:0,y:0},world:new AffineTransform(),enabled:true,intrinsicCoverage:true,document:doc([{...content,mask:node.mask}])};
+     masks.push(mask);
+    }
+    pixel({...rect,name:node.name,clipped:nativeClips.has(node.id)||undefined,binaryAlpha:binaryAlpha||undefined,visible:node.visible,opacity:node.opacity,fillOpacity:bake?1:node.fillOpacity??1,blendMode:node.blendMode,locked:node.locked,mask,document:doc([content]),merged:false});
    }
   }
  };

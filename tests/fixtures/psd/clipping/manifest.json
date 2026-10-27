@@ -1,0 +1,149 @@
+{
+  "generator": "psd-tools",
+  "version": "1.10.9",
+  "cases": [
+    {
+      "name": "normal",
+      "file": "normal.psd",
+      "reference": "normal.png",
+      "width": 32,
+      "height": 24,
+      "editable": true,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "a63d952f61a4eeaa97d5a7dba69b95da11b49c3569ba216c53b9a37383071ba5",
+      "referenceSha256": "7587c2609cd818528f6e1b49fffda6990d4de9aa777155ea39822882e3df9d2f"
+    },
+    {
+      "name": "soft",
+      "file": "soft.psd",
+      "reference": "soft.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 254,
+      "sha256": "feb98fc70b15d2586a2d7d05a8d560a86e13db1fc80ca5f7ea7f4af700c8ae0a",
+      "referenceSha256": "74ea51024d24dd64fcb2836a581444ffbe772a1f9b11155342f2a2d2742d5b8a"
+    },
+    {
+      "name": "multiply",
+      "file": "multiply.psd",
+      "reference": "multiply.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 254,
+      "sha256": "c0b701ace81180f669b514051e9efb0c8341d7b2ae3c756c7d2d65264ae4dfbe",
+      "referenceSha256": "74ea51024d24dd64fcb2836a581444ffbe772a1f9b11155342f2a2d2742d5b8a"
+    },
+    {
+      "name": "opacity",
+      "file": "opacity.psd",
+      "reference": "opacity.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 254,
+      "sha256": "45444d84eab4c40e93e32a6e330daad48d4f8604e89dfc7ba0bb81a66bbbdfcb",
+      "referenceSha256": "88eb444159e7fb451e76317c392cf2a7f2e92f2cea9f86e1350a84b8e717d40c"
+    },
+    {
+      "name": "masked",
+      "file": "masked.psd",
+      "reference": "masked.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 254,
+      "sha256": "a30b179755c44f5188a1dd7ac5cc7bbf82936d53e5f26e1c1723970244f97501",
+      "referenceSha256": "b8be1eddf560e1e405f8db3567814d14e39e706a0933eca8dc7db520dbf93e60"
+    },
+    {
+      "name": "nested",
+      "file": "nested.psd",
+      "reference": "nested.png",
+      "width": 32,
+      "height": 24,
+      "editable": true,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "67f353533d7f72f00c84099f14dd7deb99b16566e52857284f4d74ee64efa97b",
+      "referenceSha256": "7587c2609cd818528f6e1b49fffda6990d4de9aa777155ea39822882e3df9d2f"
+    },
+    {
+      "name": "hidden",
+      "file": "hidden.psd",
+      "reference": "hidden.png",
+      "width": 32,
+      "height": 24,
+      "editable": true,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "8359ef53ebf6f87eae0ec34bd5fee9d89b48581fc95c5934e9ede9e27f2bba71",
+      "referenceSha256": "6b39a6a36aa6d6936c3021082c123f19d2792d049a9209a09ed4b4a5660648f3"
+    },
+    {
+      "name": "wide",
+      "file": "wide.psb",
+      "reference": "wide.png",
+      "width": 30001,
+      "height": 3,
+      "editable": true,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "03d7374eed5f3d97ade3bce53cb374eea83498c2cfc3df101ec4bd71de0152b0",
+      "referenceSha256": "bf7b5a4366ace90200085bb84b9a526d393c7953b8fedcde25edeece98c79e51"
+    },
+    {
+      "name": "ungrouped",
+      "file": "ungrouped.psd",
+      "reference": "ungrouped.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "9e020592715e0a1790428ef0c81c59491b4c0f8a7eaa6e77a383487a700bd347",
+      "referenceSha256": "7587c2609cd818528f6e1b49fffda6990d4de9aa777155ea39822882e3df9d2f"
+    },
+    {
+      "name": "base-fill",
+      "file": "base-fill.psd",
+      "reference": "base-fill.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 254,
+      "sha256": "45a74e561901d9ba350f3822b872d26b255ffe81c6fa2785576c535ccde911e5",
+      "referenceSha256": "f51d99b44d95006597d43d374ad91c2cfc3a96b45ff8d1a182b9ec707ac964e9"
+    },
+    {
+      "name": "group-member",
+      "file": "group-member.psd",
+      "reference": "group-member.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "58fb71e3980cfa10292cede3e791eb4fded37e400415ffec37a00dceaebf6f34",
+      "referenceSha256": "7587c2609cd818528f6e1b49fffda6990d4de9aa777155ea39822882e3df9d2f"
+    },
+    {
+      "name": "orphan",
+      "file": "orphan.psd",
+      "reference": "orphan.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "3c9ee84e4ec86918ba3eb4973eec7a382832644748c6a27e044b698cb6979e3a",
+      "referenceSha256": "3d2502c207a58349b92b258dc66789ffe692368e4a89cb6c2106039ee5680cf5"
+    },
+    {
+      "name": "knockout",
+      "file": "knockout.psd",
+      "reference": "knockout.png",
+      "width": 32,
+      "height": 24,
+      "editable": false,
+      "rawReferenceAlphaMinimum": 255,
+      "sha256": "4356465ca7c6dfbb168eb3d6d4e701b30c35a3d66fa6d154d7e7c94eba0d48ac",
+      "referenceSha256": "7587c2609cd818528f6e1b49fffda6990d4de9aa777155ea39822882e3df9d2f"
+    }
+  ]
+}

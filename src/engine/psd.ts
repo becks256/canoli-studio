@@ -62,7 +62,7 @@ async function renderChannels(
       current();
       const tileWidth = Math.min(2048, width - x);
       let tile:HTMLCanvasElement;
-      if(encoding==='mask'){
+      if(encoding==='mask'&&!('intrinsicCoverage'in layer&&layer.intrinsicCoverage)){
         if(!renderer.renderMaskCoverage||!('world'in layer))throw new Error('Editable Photoshop mask export requires native mask coverage. Choose Flatten or use the native renderer.');
         const origin=layer.world.point({x:0,y:0});
         tile=await renderer.renderMaskCoverage({...layer.mask,enabled:true},{x:left+x,y:top+y,width:tileWidth,height:rows,sx:1,sy:1},origin.x,origin.y,`photoshop-mask:${layer.id}`,false,layer.world,assets);
@@ -74,8 +74,9 @@ async function renderChannels(
         current();
         if (tile.width !== tileWidth || tile.height !== rows)
           throw new Error("PSD rendering did not produce native-resolution pixels.");
-        if(encoding==='mask'&&'world'in layer)applyMaskSettings(tile,layer.mask);
+        if(encoding==='mask'&&'world'in layer&&!layer.intrinsicCoverage)applyMaskSettings(tile,layer.mask);
         const pixels = tile.getContext("2d")!.getImageData(0, 0, tileWidth, rows).data;
+        if('binaryAlpha'in layer&&layer.binaryAlpha)for(let i=3;i<pixels.length;i+=4)if(pixels[i])pixels[i]=255;
         for (let row = 0; row < rows; row++)
           strip.set(pixels.subarray(row * tileWidth * 4, (row + 1) * tileWidth * 4), (row * width + x) * 4);
       } finally { release(tile); }
@@ -114,7 +115,7 @@ function layerRecord(layer: PsdRenderedLayer|PsdGroupRecord, channels: Channels,
   });
   if(maskChannels){writer.writeInt16(-2);writer.writeBytes(photoshopLength(2+maskChannels.tables[0].length+maskChannels.data[0].size,format));}
   writer.writeAscii("8BIM"); writer.writeAscii(layer.blendMode==='pass-through'?'norm':LUMA_TO_PSD_BLEND_MAP[layer.blendMode], 4);
-  writer.writeUint8(Math.round(layer.opacity * 255)); writer.writeUint8(0);
+  writer.writeUint8(Math.round(layer.opacity * 255)); writer.writeUint8('clipped'in layer&&layer.clipped?1:0);
   writer.writeUint8((layer.visible?0:2)|(divider?0x18:0)|(layer.locked?1:0)); writer.writeUint8(0);
   const extra = new ByteWriter();
   if(maskChannels&&layer.mask){const mask=layer.mask;extra.writeUint32(20);extra.writeInt32(mask.top);extra.writeInt32(mask.left);extra.writeInt32(mask.top+mask.height);extra.writeInt32(mask.left+mask.width);extra.writeUint8(0);extra.writeUint8(mask.enabled?0:2);extra.writeUint16(0);}else extra.writeUint32(0);
@@ -125,6 +126,8 @@ function layerRecord(layer: PsdRenderedLayer|PsdGroupRecord, channels: Channels,
   if(divider){extra.writeAscii('8BIM');extra.writeAscii('lsct');extra.writeUint32(divider===1?12:4);extra.writeUint32(divider);if(divider===1){extra.writeAscii('8BIM');extra.writeAscii(layer.blendMode==='pass-through'?'pass':LUMA_TO_PSD_BLEND_MAP[layer.blendMode]);}}
   if(layer.locked){extra.writeAscii('8BIM');extra.writeAscii('lspf');extra.writeUint32(4);extra.writeUint32(0x80000007);}
   if((layer.fillOpacity??1)!==1){extra.writeAscii('8BIM');extra.writeAscii('iOpa');extra.writeUint32(2);extra.writeUint8(Math.round((layer.fillOpacity??1)*255));extra.writeUint8(0);}
+  // Explicitly retain the grouped base-blend behavior used by native clipping.
+  extra.writeAscii('8BIM');extra.writeAscii('clbl');extra.writeUint32(4);extra.writeUint8(1);extra.writeUint8(0);extra.writeUint16(0);
   const data = bytes(extra); writer.writeUint32(data.length); writer.writeBytes(data);
   return bytes(writer);
 }

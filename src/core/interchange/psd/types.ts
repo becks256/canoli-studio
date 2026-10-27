@@ -100,6 +100,7 @@ export interface PsdLayerRecord {
   opacity: number; // 0 - 255
   fillOpacity?: number; // iOpa byte, effective default 255
   clipping: number;
+  blendClippedElements?: boolean; // clbl, default grouped clipping
   flags: {
     transparencyProtected: boolean;
     visible: boolean;
