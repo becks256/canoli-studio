@@ -779,6 +779,10 @@ The pure snapToCanvas kernel compares translated bounds anchors with canvas edge
 
 artworkSnapBounds traverses visible nonzero-opacity artwork, excludes moving subtrees and suppresses ancestor groups whose bounds would change with the selection. Geometric world bounds contribute edge/center coordinates to the same per-axis nearest-target solver as the canvas. Move gestures cache target bounds once per drag, avoiding repeated hierarchy scans during pointer movement. Canvas targets win exact distance ties by deterministic ordering. Snap results continue through existing canvas-to-parent movement conversion.
 
+### Measured spacing during movement
+
+`core/spacing.ts` measures nearest positive intervals and proposes centering/repeated-gap corrections against the existing cached authored bounds. The six-screen-pixel tolerance remains in document space; existing edge/center/guide attraction wins ties, and corrected axes recheck their orthogonal bands. `App` derives feedback from the actual executed preview, including affine parent conversion and placement clamping. Captured owner identity, selection and revision guard move publication even when a reopened document has the same stored IDs. `SpacingOverlay` uses pointer-inert DOM lines, screen-sized rounded labels and bounded collision placement; font loading rechecks label geometry. Settings/feedback remain browser session state, outside documents, commands, projects, plugins and separate REST. Existing shared movement commands retain one-step Undo. See [the user contract](LAYER_ALIGNMENT.md#spacing-feedback-while-moving-artwork).
+
 ### Revision-bound canvas gestures
 
 Layer and mask move gestures and single-layer resize now capture document identity/revision, matching multi-root rotation/scaling. A revision-change effect clears stale gestures, previews and snap guides; pointer updates also check the live revision before calculating from captured geometry or cached snap targets. Subsequent pointerup therefore cannot overwrite an intervening document edit. Gesture previews do not increment revision, so normal pointer movement remains uninterrupted.

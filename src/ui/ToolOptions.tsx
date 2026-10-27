@@ -21,6 +21,7 @@ export function ToolOptions({
   onSnapEnabled,
   snapArtwork = false,
   onSnapArtwork,
+  spacingHints=false,onSpacingHints,snapSpacing=false,onSnapSpacing,
   controller,
   settings,
   hasSelection,
@@ -45,6 +46,8 @@ export function ToolOptions({
   hasFilterMask?: boolean;
   hasVectorMask: boolean;
   hasTextPath?: boolean;
+  spacingHints?:boolean;onSpacingHints?(enabled:boolean):void;
+  snapSpacing?:boolean;onSnapSpacing?(enabled:boolean):void;
   snapArtwork?: boolean;
   onSnapArtwork?(enabled: boolean): void;
   snapEnabled?: boolean;
@@ -219,6 +222,8 @@ export function ToolOptions({
               Include artwork
             </label>
           )}
+          {moveTarget==='layer'&&snapEnabled&&snapArtwork&&onSnapSpacing&&<label className="tool-snap-toggle" title="Repeat neighboring gaps or center between neighbors; Alt bypasses attraction"><input type="checkbox" checked={snapSpacing} onChange={event=>onSnapSpacing(event.target.checked)}/>Equal spacing</label>}
+          {moveTarget==='layer'&&onSpacingHints&&<label className="tool-snap-toggle" title="Show document-pixel gaps to neighboring authored bounds while dragging"><input type="checkbox" checked={spacingHints} onChange={event=>onSpacingHints(event.target.checked)}/>Spacing guides</label>}
           {moveTarget === "mask" && (
             <span className="section-caption">
               Drag to move the selected mask · Arrow keys to nudge

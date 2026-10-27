@@ -1,3 +1,5 @@
+import {measureSpacing,snapToSpacing,type SpacingMatch} from '../core/spacing';
+import {SpacingOverlay} from './SpacingOverlay';
 import {alignmentCommands,layerAlignmentSchema,type LayerAlignment,type AlignmentTarget} from '../core/layer-layout';
 import {HistoryInspectorDialog} from './HistoryInspectorDialog';
 import {PaletteLibraryContext,type PalettePickerRequest} from './PaletteColorControl';
@@ -175,6 +177,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const [guidesVisible, setGuidesVisible] = useState(true);
   const [snapEnabled, setSnapEnabled] = useState(false);
   const [snapArtwork, setSnapArtwork] = useState(false);
+  const [spacingHints,setSpacingHints]=useState(true),[snapSpacing,setSnapSpacing]=useState(false);
   const [snapGuides, setSnapGuides] = useState<{ x?: number; y?: number }>({});
   useEffect(() => {
     if (!preview) setSnapGuides({});
@@ -324,6 +327,9 @@ export function App({ editor }: { editor: EditorApplication }) {
     | {
         kind: "move";
         snapTargets?: { x: number; y: number; width: number; height: number }[];
+        spacingMatches?: SpacingMatch[];
+        selection: string;
+        bypass?: boolean;
         mask?: LayerMaskData;
         members?: { id: string; x: number; y: number }[];
         revision: number;
@@ -372,20 +378,21 @@ export function App({ editor }: { editor: EditorApplication }) {
         patch: LayerPatch;
       }
   >(null);
+  const pointerDocument=useRef<EditorDocument|null>(null);
   useEffect(()=>editor.chatGpt.setInteractionGuard(sessionId=>editor.recoverySessionId===sessionId&&(capturedPointer.current!==null||gesture.current!==null||editor.tools.getSnapshot().drawing)),[editor]);
   useEffect(() => {
     const drag = gesture.current;
     if (
       drag &&
-      drag.kind !== "pan" &&
-      (drag.documentId !== dom.id || drag.revision !== state.revision)
+      (pointerDocument.current!==dom || drag.kind !== "pan" &&
+      (drag.documentId !== dom.id || drag.revision !== state.revision || drag.kind==='move'&&drag.selection!==state.selectedIds.join(':')))
     ) {
-      gesture.current = null;
+      gesture.current = null;pointerDocument.current=null;
       setPreview(null);
       setSnapGuides({});
       setResizingCursor(null);
     }
-  }, [dom.id, state.revision]);
+  }, [dom, state.revision,state.selectedIds]);
   const activePreview = toolState.preview ?? preview;
   const wetPreview=toolState.wetPreview?.isCurrent()?toolState.wetPreview:null;
   const viewDocument = useMemo(() => {
@@ -397,6 +404,12 @@ export function App({ editor }: { editor: EditorApplication }) {
       return state.document;
     }
   }, [state.document, activePreview,wetPreview]);
+  const spacingGuides=useMemo(()=>{
+    const drag=gesture.current;
+    if(!spacingHints||!guidesVisible||!preview||tool!=='move'||!drag||drag.kind!=='move'||drag.mask||drag.bypass||pointerDocument.current!==dom||drag.revision!==state.revision)return[];
+    const final=unionBounds((drag.members??[{id:drag.id}]).flatMap(member=>{const bounds=layerBounds(viewDocument,member.id);return bounds?[bounds]:[];}));
+    return final?measureSpacing(final,drag.snapTargets??[],snapEnabled&&snapArtwork&&snapSpacing?drag.spacingMatches:[]):[];
+  },[spacingHints,guidesVisible,preview,tool,dom,state.revision,viewDocument,snapEnabled,snapArtwork,snapSpacing]);
   const selected = findLayer(viewDocument, state.selectedId);
   const movingMask =
     tool === "move" && moveTarget === "mask" && !!selected?.mask;
@@ -719,7 +732,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   function cancelWorkspaceGesture(){
     editor.tools.cancel();clearPreview();setSpacePan(false);panelLayout.cancel();
     if(pendingCopy.current)pendingCopy.current.cancelled=true;
-    capturedPointer.current=null;gesture.current=null;setResizingCursor(null);
+    capturedPointer.current=null;gesture.current=null;pointerDocument.current=null;setResizingCursor(null);
   }
   function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
 
@@ -1249,7 +1262,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     onResetGestures: () => {
       if (pendingCopy.current) pendingCopy.current.cancelled = true;
       capturedPointer.current = null;
-      gesture.current = null;
+      gesture.current = null;pointerDocument.current=null;
       setResizingCursor(null);
     },
   });
@@ -1306,6 +1319,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     event.currentTarget.focus();
     event.currentTarget.setPointerCapture(event.pointerId);
     capturedPointer.current = event.pointerId;
+    pointerDocument.current=dom;
     if (tool === "hand" || spacePan || event.button === 1) {
       gesture.current = {
         kind: "pan",
@@ -1320,6 +1334,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       if (selected?.mask && !locked)
         gesture.current = {
           kind: "move",
+          selection:dom.getSnapshot().selectedIds.join(':'),
           revision: dom.getSnapshot().revision,
           documentId: dom.id,
           mask: selected.mask,
@@ -1520,6 +1535,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       if (members.some((layer) => isLocked(state.document, layer.id))) return;
       gesture.current = {
         kind: "move",
+        selection:dom.getSnapshot().selectedIds.join(':'),
         startX: event.clientX,
         startY: event.clientY,
         id: hitLayer.id,
@@ -1538,6 +1554,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (layer && !isLocked(state.document, layer.id))
       gesture.current = {
         kind: "move",
+        selection:dom.getSnapshot().selectedIds.join(':'),
         revision: dom.getSnapshot().revision,
         documentId: dom.id,
         startX: event.clientX,
@@ -1568,6 +1585,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
     const drag = gesture.current;
     if (!drag) return;
+    if(pointerDocument.current!==dom){gesture.current=null;pointerDocument.current=null;setPreview(null);setSnapGuides({});setResizingCursor(null);return;}
     if (drag.kind === "pan") {
       setPan({
         x: drag.x + event.clientX - drag.startX,
@@ -1577,9 +1595,10 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
     if (
       drag.documentId !== dom.id ||
-      drag.revision !== dom.getSnapshot().revision
+      drag.revision !== dom.getSnapshot().revision ||
+      drag.kind==='move'&&drag.selection!==dom.getSnapshot().selectedIds.join(':')
     ) {
-      gesture.current = null;
+      gesture.current = null;pointerDocument.current=null;
       setPreview(null);
       setSnapGuides({});
       setResizingCursor(null);
@@ -1648,7 +1667,8 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (drag.kind !== "move") return;
     drag.dx = Math.round((event.clientX - drag.startX) / zoom);
     drag.dy = Math.round((event.clientY - drag.startY) / zoom);
-    setSnapGuides({});
+    setSnapGuides({});drag.bypass=event.altKey;drag.spacingMatches=[];
+    if(!drag.mask&&(spacingHints&&guidesVisible||snapEnabled&&snapArtwork))drag.snapTargets??=artworkSnapBounds(state.document,(drag.members??[{id:drag.id}]).map(member=>member.id));
     if (snapEnabled && !event.altKey && !drag.mask) {
       const movingBounds = unionBounds(
         (drag.members ?? [{ id: drag.id }]).flatMap((member) => {
@@ -1663,7 +1683,7 @@ export function App({ editor }: { editor: EditorApplication }) {
               (drag.members ?? [{ id: drag.id }]).map((member) => member.id),
             ))
           : [];
-        const snapped = snapToCanvas(
+        let snapped:{x:number;y:number;guides:{x?:number;y?:number}} = snapToCanvas(
           movingBounds,
           { x: drag.dx, y: drag.dy },
           dom.width,
@@ -1672,6 +1692,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           artwork,
           guidesVisible ? state.document.guides : [],
         );
+        if(snapArtwork&&snapSpacing){const spacing=snapToSpacing(movingBounds,{x:drag.dx,y:drag.dy},snapped,artwork,6/zoom);snapped=spacing;drag.spacingMatches=spacing.matches;}
         drag.dx = snapped.x;
         drag.dy = snapped.y;
         setSnapGuides(snapped.guides);
@@ -1738,7 +1759,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       return;
     }
     const drag = gesture.current;
-    gesture.current = null;
+    gesture.current = null;pointerDocument.current=null;
     setResizingCursor(null);
     setPreview(null);
     if (drag?.kind === "move" && (drag.dx || drag.dy))
@@ -2062,7 +2083,7 @@ export function App({ editor }: { editor: EditorApplication }) {
               onNew={() => editor.newDocument()}
               onActivate={(document) => {
                 clearPreview();
-                gesture.current = null;
+                gesture.current = null;pointerDocument.current=null;
                 capturedPointer.current = null;
                 editor.activateDocument(document);
               }}
@@ -2163,6 +2184,10 @@ export function App({ editor }: { editor: EditorApplication }) {
               onSnapEnabled={setSnapEnabled}
               snapArtwork={snapArtwork}
               onSnapArtwork={setSnapArtwork}
+              spacingHints={spacingHints}
+              onSpacingHints={setSpacingHints}
+              snapSpacing={snapSpacing}
+              onSnapSpacing={setSnapSpacing}
               controller={editor.tools}
               settings={toolState.settings}
               hasSelection={!!state.document.selection}
@@ -2201,14 +2226,14 @@ export function App({ editor }: { editor: EditorApplication }) {
                 if (capturedPointer.current !== event.pointerId) return;
                 capturedPointer.current = null;
                 editor.tools.cancel();
-                gesture.current = null;
+                gesture.current = null;pointerDocument.current=null;
                 setResizingCursor(null);
                 setPreview(null);
               }}
               onPointerCancel={() => {
                 capturedPointer.current = null;
                 editor.tools.cancel();
-                gesture.current = null;
+                gesture.current = null;pointerDocument.current=null;
                 setResizingCursor(null);
                 setPreview(null);
               }}
@@ -2332,6 +2357,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                       onAttempt={attempt}
                     />
                   ))}
+                <SpacingOverlay guides={spacingGuides} zoom={zoom}/>
                 {snapGuides.x !== undefined && (
                   <div
                     className="snap-guide vertical"

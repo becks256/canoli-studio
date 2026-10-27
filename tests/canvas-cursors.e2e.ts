@@ -127,13 +127,18 @@ test('hover and tool switching avoid document serialization with a detailed pixe
     const e=window.luma.editor;
     e.recipes.recorder.start(e.document.selectedLayer!.id);
     e.document.selectedLayer!.x=10;
-    const active=(window as any).documentCopies;
-    e.recipes.recorder.stop();
+    const active=structuredClone(e.recipes.recorder.getRecordedSteps());
+    const recipe=e.recipes.recorder.stop();
+    const stoppedBefore=structuredClone(e.recipes.recorder.getRecordedSteps());
+    const copiesBeforeStoppedEdit=(window as any).documentCopies;
     e.document.selectedLayer!.x=20;
-    return {active,stopped:(window as any).documentCopies};
+    return {active,recipe:recipe.steps,stoppedBefore,stopped:e.recipes.recorder.getRecordedSteps(),copiesBeforeStoppedEdit,copiesAfterStoppedEdit:(window as any).documentCopies,position:e.document.selectedLayer!.x};
   });
-  expect(recording.active).toBeGreaterThan(0);
-  expect(recording.stopped).toBe(recording.active);
+  expect(recording.active.map(step=>step.action)).toEqual([{type:'layer.update',patch:{x:10}}]);
+  expect(recording.recipe.map(step=>step.action)).toEqual(recording.active.map(step=>step.action));
+  expect(recording.stopped).toEqual(recording.stoppedBefore);
+  expect(recording.copiesAfterStoppedEdit).toBe(recording.copiesBeforeStoppedEdit);
+  expect(recording.position).toBe(20);
 });
 
 test('custom cursor hides the native pointer over artwork and transform handles', async ({page}) => {

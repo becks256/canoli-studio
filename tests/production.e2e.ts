@@ -1,3 +1,4 @@
+import {spacingWorkflow} from './helpers/spacing';
 import {preflightAlignmentWorkflow} from './helpers/preflight-alignment';
 import {verticalTextWorkflow} from './helpers/vertical-text';
 import {publicTextPathWorkflow} from './helpers/public-text-path';
@@ -2151,3 +2152,6 @@ test('production Pen baseline editing retains exact pixels, cancellation, shared
 test('production vertical Inspector, native script example and project reopening',async({page},info)=>{await verticalTextWorkflow(page,info,true);});
 
 test('production declared alignment checks retain typed evidence, selection navigation and exact native artwork',async({page},info)=>{await preflightAlignmentWorkflow(page,info,true);});
+
+
+test('production measured spacing and equal-gap attraction preserve cancellation, exact pixels, one Undo and native reopening',async({page},info)=>{await spacingWorkflow(page,info,true);});

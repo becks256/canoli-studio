@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Spacing feedback invariant
+
+Measure gaps from the final authored preview after snap correction, affine conversion and clamping. Cache stationary geometry only for the captured owner/revision/selection. Existing anchors win attraction ties; equal-gap corrections retain final orthogonal overlap. Transient feedback/settings do not enter document commands, source data, persistence or exports. Movement still uses shared commands and one Undo, and replacement owners invalidate gestures even when persistent IDs/revisions match. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md#spacing-feedback-while-moving-artwork).
+
 ## Declared alignment inspection (A12)
 
 Design checks now accept optional explicit alignment rules against a canvas or independent key-layer frame, with document-pixel tolerance. Shared authored geometry includes affine parents, path/vertical text origins and active wet-paint/raster-replacement extents. Locked references remain readable; hidden targets, empty/unknown geometry and unresolved numerical precision remain explicit unverified results. Geometry work stays in private workers with scoped metadata and existing read/asset grants. Inspection changes no artwork/history or source bytes.
