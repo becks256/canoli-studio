@@ -48,14 +48,14 @@ export function rawLensSampler(image:OwnedRawImage,lens:LensCorrectionData,profi
     }
     return {value:coverage?Math.min(65535,Math.max(0,Math.floor(total/coverage+.5))):0,coverage};
   }
-  return {rows(top:number,count:number){
-    if(!Number.isSafeInteger(top)||!Number.isSafeInteger(count)||top<0||count<1||top+count>height)throw new Error('Invalid lens output rows.');
+  function region(left:number,top:number,width:number,count:number){
+    if(![left,top,width,count].every(Number.isSafeInteger)||left<0||width<1||left+width>image.width||top<0||count<1||top+count>height)throw new Error('Invalid lens output rows.');
     const pixels=new Uint16Array(width*count*3),alpha=new Uint8Array(width*count);
     if(profile){
       // Coordinate scratch is independent of original geometry and absolute pixel
       // positions make output invariant to strips, blocks and source-cache eviction.
       for(let y=0;y<count;y+=16)for(let x=0;x<width;x+=256){
-        const w=Math.min(256,width-x),h=Math.min(16,count-y),coordinates=profile.coordinates(x,top+y,w,h);
+        const w=Math.min(256,width-x),h=Math.min(16,count-y),coordinates=profile.coordinates(left+x,top+y,w,h);
         for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){
           const from=(yy*w+xx)*6,to=(y+yy)*width+x+xx;let coverage=1;
           for(let c=0;c<3;c++){const result=sample(coordinates[from+c*2],coordinates[from+c*2+1],c);pixels[to*3+c]=result.value;coverage=Math.min(coverage,result.coverage);}
@@ -65,7 +65,7 @@ export function rawLensSampler(image:OwnedRawImage,lens:LensCorrectionData,profi
       return{pixels,alpha};
     }
     for(let yy=0;yy<count;yy++)for(let x=0;x<width;x++){
-      const u=(x-cx)/(norm*lens.scale),v=(top+yy-cy)/(norm*lens.scale),r2=u*u+v*v,{k1,k2,k3}=lens.distortion;
+      const u=(left+x-cx)/(norm*lens.scale),v=(top+yy-cy)/(norm*lens.scale),r2=u*u+v*v,{k1,k2,k3}=lens.distortion;
       const factor=1+r2*(k1+r2*(k2+r2*k3)),dx=u*factor*norm,dy=v*factor*norm;let coverage=1;
       for(let c=0;c<3;c++){
         const scale=c===0?lens.chromatic.red:c===2?lens.chromatic.blue:1;
@@ -75,5 +75,6 @@ export function rawLensSampler(image:OwnedRawImage,lens:LensCorrectionData,profi
       if(!alpha[index])pixels.fill(0,index*3,index*3+3);
     }
     return{pixels,alpha};
-  },dispose(){tiles.clear();last=undefined;bytes=0;}};
+  }
+  return{rows:(top:number,count:number)=>region(0,top,image.width,count),region,dispose(){tiles.clear();last=undefined;bytes=0;}};
 }

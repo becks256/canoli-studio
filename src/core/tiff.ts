@@ -1,11 +1,12 @@
-/** TIFF 6 tiled RGBA8 / BigTIFF directories. Pixel payloads stay separate. */
+/** TIFF 6 tiled RGBA8/16/float32 / BigTIFF directories. Pixel payloads stay separate. */
+export type TiffSampleFormat='rgba8'|'rgba16'|'rgba-float32';
 export type TiffVariant = 'auto' | 'classic' | 'big';
 export interface TiffPagesExportOptions {color?:import('./color/color-settings').ColorOutput;variant?: TiffVariant}
 export interface TiffDirectoryInput {
   width: number; height: number; tileWidth: number; tileHeight: number;
   /** Page-local offsets relative to its first pixel payload, eight-byte aligned. */
   offsets: readonly number[]; counts: readonly number[]; payloadBytes: number; profile: Uint8Array;
-  variant?: TiffVariant;
+  variant?: TiffVariant; sampleFormat?: TiffSampleFormat;
 }
 export type TiffPageDirectoryInput = Omit<TiffDirectoryInput, 'variant'>;
 export interface TiffDirectory {header: Uint8Array<ArrayBuffer>; directory: Uint8Array<ArrayBuffer>; bigTiff: boolean; fileBytes: number}
@@ -33,6 +34,7 @@ function values(type: number, items: readonly number[]): Uint8Array<ArrayBuffer>
 }
 function validatePage(input: TiffPageDirectoryInput) {
   validateTiffGeometry(input.width, input.height);
+  if(input.sampleFormat!==undefined&&!['rgba8','rgba16','rgba-float32'].includes(input.sampleFormat))throw new Error('Invalid TIFF sample format.');
   if (![input.tileWidth, input.tileHeight].every(n => Number.isSafeInteger(n) && n > 0 && n <= 0xffffffff && n % 16 === 0)) throw new Error('TIFF tile dimensions must be positive multiples of 16.');
   const count = Math.ceil(input.width / input.tileWidth) * Math.ceil(input.height / input.tileHeight);
   if (!safe(count) || input.offsets.length !== count || input.counts.length !== count || !safe(input.payloadBytes) || input.payloadBytes % 8) throw new Error('TIFF tile table does not match native image geometry.');
@@ -52,10 +54,11 @@ function build(pages: readonly TiffPageDirectoryInput[], payloadBytes: number, b
   const field = (tag: number, type: number, items: readonly number[]): Field => ({tag, type, count: items.length, data: values(type, items)});
   for (let page = 0; page < pages.length; page++) {
     const input = pages[page], ascii = new TextEncoder().encode('Canoli Studio\0');
-    const fields: Field[] = [field(256, 4, [input.width]), field(257, 4, [input.height]), field(258, 3, [8, 8, 8, 8]), field(259, 3, [8]), field(262, 3, [2]), field(274, 3, [1]), field(277, 3, [4]),
+    const fields: Field[] = [field(256, 4, [input.width]), field(257, 4, [input.height]), field(258, 3, Array(4).fill(input.sampleFormat==='rgba16'?16:input.sampleFormat==='rgba-float32'?32:8)), field(259, 3, [8]), field(262, 3, [2]), field(274, 3, [1]), field(277, 3, [4]),
       {tag: 282, type: 5, count: 1, data: values(4, [72, 1])}, {tag: 283, type: 5, count: 1, data: values(4, [72, 1])}, field(284, 3, [1]), field(296, 3, [2]), {tag: 305, type: 2, count: ascii.length, data: ascii},
       field(322, 4, [input.tileWidth]), field(323, 4, [input.tileHeight]), field(324, big ? 16 : 4, input.offsets.map(n => pixelOffset + n)), field(325, big ? 16 : 4, input.counts), field(338, 3, [2]),
       {tag: 34675, type: 7, count: input.profile.length, data: new Uint8Array(input.profile)}];
+    if(input.sampleFormat&&input.sampleFormat!=='rgba8'){fields.push(field(339,3,Array(4).fill(input.sampleFormat==='rgba-float32'?3:1)));fields.sort((a,b)=>a.tag-b.tag);}
     if (pages.length > 1) {
       fields.push(field(254, 4, [2])); // One page of a multipage image.
       // PageNumber is optional and contains two SHORTs. Never truncate a large chain.

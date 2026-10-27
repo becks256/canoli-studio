@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Native RAW master TIFF (F10/F11/F12)
+
+Export native developed RAW masters directly to real RGB16/float32 TIFF with exact owned ICC sources, explicit intent/BPC, actual integer/float tags, straight alpha and Classic/BigTIFF addressing. Preserve original and accepted artwork/history, exclude layer appearance, share native owners and reject stale/cancelled/corrupt results without partial publication. Verify actual WASM, independent native file samples, normal UI/production and genuine 50 MP. This is separate from required working-space/high-precision scene editing and general format/physical/device gates. [Contract](RAW_TIFF.md).
+
 ## Explicit RGB precision dependency (F10)
 
 The internal ICC dependency must transform genuine straight RGBA8/16/float32 windows between complete explicit RGB source/destination profiles, preserve same-format alpha and disclose cross-format quantization/fallback. Reject incompatible profiles, malformed settings/results, nonfinite floats and invalid alpha; share existing cancellation/worker ownership without detaching callers. Verify actual WASM against independent native outputs and every sample of genuine 50 MP RGB16 input. This prerequisite does not implement working-space assignment/conversion or high-precision document editing/import/persistence/output. [Contract](ICC_ENGINE.md#internal-explicit-rgb-precision-dependency).

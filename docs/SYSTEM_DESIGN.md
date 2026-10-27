@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native RAW TIFF invariant
+
+Keep native linear RGB16 source, CMM conversion and typed TIFF payloads separate from accepted sRGB8 scene pixels. Capture exact originals/development/output choices; use shared single-RAW/two-ICC leases. Validate native report/receipts, real sample tags, bounded Deflate extents and complete original ICC before returning a file. Never relabel an 8-bit canvas as high precision or infer sensor detail/HDR from float encoding. [Contract](RAW_TIFF.md).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Keep source ICC bytes, immutable captured settings, actual CMM receipts and final file hashes distinct. Validate native profiles before starting a run; guard status/settings across delayed preflight; pin source/font lifetimes across fitted encoding. Retry or packaging cannot relabel existing files with a different profile/render contract. Own complete recipe/preset byte graphs and reject missing/corrupt/range-invalid dependencies before exposing them. [Contract and current verification](COLOR_DELIVERY.md).

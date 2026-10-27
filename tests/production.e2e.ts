@@ -2170,3 +2170,6 @@ test('production ICC canvas proof, independent converted files and complete work
 
 import{colorDeliveryWorkflow}from'./helpers/color-delivery';
 test('production portable ICC presets and recipe packages retain exact batch delivery after reload without developer globals',async({page},info)=>{test.setTimeout(240000);await colorDeliveryWorkflow(page,info,true);});
+
+import{rawTiffWorkflow}from'./helpers/raw-tiff';
+test('production RAW review exports genuine integer and float TIFF masters without 8-bit consent or artwork changes',async({page},info)=>{test.setTimeout(240000);await rawTiffWorkflow(page,info,true);});

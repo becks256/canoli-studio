@@ -54,3 +54,12 @@ export async function developRawFile(blob:Blob,options:RawDecodeOptions={},contr
   const release=await acquire(control.signal);
   try{return await run(blob,'develop',settings,control);}finally{release();}
 }
+
+/** Native TIFF shares the single RAW owner with inspection and 8-bit proxies. */
+export async function exportRawTiffFile(blob:Blob,options:import('./tiff-types').RawTiffSettings,control:import('./tiff-types').RawTiffControl={}){
+ const{rawTiffSettingsSchema}=await import('./tiff-types'),settings=rawTiffSettingsSchema.parse(options);
+ if(!(blob instanceof Blob)||!blob.size)throw new Error('Choose a complete RAW original.');
+ control.signal?.throwIfAborted();control.onProgress?.({phase:'waiting',fraction:null});control.signal?.throwIfAborted();
+ const release=await acquire(control.signal);let releaseIcc:(()=>void)|undefined;
+ try{const{acquireIccOwner}=await import('../../color/icc-client');control.signal?.throwIfAborted();releaseIcc=await acquireIccOwner(control.signal);const{runRawTiffWorker}=await import('./tiff-client');control.signal?.throwIfAborted();return await runRawTiffWorker(blob,settings,control);}finally{releaseIcc?.();release();}
+}

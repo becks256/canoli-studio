@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Native RAW master TIFF
+
+Trusted editor.exportRawTiff(source: File | SmartObjectLayer, options = {}, control = {}) returns native integer16 or float32 TIFF, inspection and an actual source/settings/color/native receipt. It exports the developed sensor master independently of document placement/effects and leaves artwork/history unchanged. Native options, captured RGB output, cancellation/progress, validation and limits: [RAW_TIFF.md](RAW_TIFF.md). No isolated/REST rendering capability is added.
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Trusted browser batch exposes captureColorOutput, exportDeliveryPreset/importDeliveryPreset and an optional ICC control on createBatch. RecipeService.attachDeliveryPreset accepts a Recipe or complete package plus a preset Blob and returns a new package without installing/editing. Package delivery defaults apply when createBatch omits variants. No isolated-script file service or headless REST rendering/synchronization is added. [Contract and current verification](COLOR_DELIVERY.md).

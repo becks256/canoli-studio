@@ -1,0 +1,17 @@
+import{expect,type Page,type TestInfo}from'@playwright/test';
+import{spawnSync}from'node:child_process';
+import{writeFile}from'node:fs/promises';
+export function checkRawTiff(path:string,reference:string,width:number,height:number,profile='display-p3',floating=false,channels=3,lensJson?:string){
+ const result=spawnSync('python3',['scripts/check-raw-tiff.py',path,'--rgb16','tests/fixtures/raw/'+reference,'--width',String(width),'--height',String(height),'--profile','tests/fixtures/icc-native/'+profile+'.icc','--native-lcms','/tmp/canoli-color-lcms2.19.1-native.so','--channels',String(channels),...(floating?['--float']:[]),...(lensJson?['--lens-json',lensJson]:[])],{encoding:'utf8',timeout:180000});expect(result.status,result.stderr||result.stdout).toBe(0);return JSON.parse(result.stdout);
+}
+export async function rawTiffWorkflow(page:Page,info:TestInfo,production=false){
+ const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(!production);
+ await page.getByRole('button',{name:'Color',exact:true}).click();const color=page.locator('.color-profile-dialog');await color.getByLabel('Output RGB profile',{exact:true}).selectOption('display-p3');await color.getByRole('button',{name:'Apply Settings',exact:true}).click();await expect(color).not.toBeVisible();
+ await page.getByTestId('import-input').setInputFiles('tests/fixtures/raw/bayer-rggb.dng');const dialog=page.getByRole('dialog',{name:'Import camera RAW',exact:true});await expect(dialog).toContainText('64 × 48');const consent=dialog.getByLabel('Convert RAW development to 8-bit editing precision',{exact:true});await expect(consent).not.toBeChecked();await expect(dialog.getByRole('button',{name:'Import RAW image',exact:true})).toBeDisabled();
+ await dialog.getByText('High-precision TIFF',{exact:true}).click();const results=[];
+ for(const floating of[false,true]){
+  await dialog.getByLabel('RAW TIFF precision',{exact:true}).selectOption(floating?'rgba-float32':'rgba16');await dialog.getByLabel('RAW TIFF container',{exact:true}).selectOption(floating?'big':'classic');const pending=page.waitForEvent('download');await dialog.getByRole('button',{name:'Export RAW TIFF',exact:true}).click();const path=info.outputPath(floating?'master-float32.tif':'master-uint16.tif');await(await pending).saveAs(path);await expect(dialog.getByRole('button',{name:'Export RAW TIFF',exact:true})).toBeEnabled();await expect(dialog).toContainText(floating?'32-bit float TIFF':'16-bit TIFF');results.push(checkRawTiff(path,'bayer-rggb.rgb16le',64,48,'display-p3',floating));await expect(consent).not.toBeChecked();await expect(dialog.getByRole('button',{name:'Import RAW image',exact:true})).toBeDisabled();await expect(page.locator('.layer-row')).toHaveCount(0);
+ }
+ await page.setViewportSize({width:1280,height:720});await dialog.getByRole('button',{name:'Export RAW TIFF',exact:true}).scrollIntoViewIfNeeded();await page.screenshot({path:info.outputPath('raw-tiff-review-1280.png')});expect(await dialog.evaluate(element=>element.scrollWidth<=element.clientWidth+1)).toBe(true);
+ await dialog.getByRole('button',{name:'Cancel',exact:true}).click();await expect(page.locator('.layer-row')).toHaveCount(0);expect(await page.evaluate(()=>'luma'in window)).toBe(!production);expect(errors).toEqual([]);await writeFile(info.outputPath('raw-tiff-workflow.json'),JSON.stringify({production,independent:results,no8BitConsent:true,documentArtworkUnchanged:true,errors},null,2));
+}

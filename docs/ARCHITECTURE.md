@@ -1,5 +1,9 @@
 # Architecture
 
+## Native RAW master TIFF
+
+Trusted editor.exportRawTiff captures a File or current retained RAW smart-object source and immutable RGB output settings. The private RAW TIFF worker performs native linear RGB16 development/lens sampling and CMM conversion into core/tiff-encoder uint16/float32 tiles. It shares RAW and ICC owner leases; tiff-client validates actual bounded decompression, complete ICC and source/settings/native receipts before publication. Current scene, command/history/persistence and isolated/REST boundaries remain unchanged. [Contract](RAW_TIFF.md).
+
 ## Explicit RGB precision dependency (F10)
 
 core/color/icc-native compiles explicit RGB input/output profiles over straight RGBA uint8, uint16 and float32 windows. The separate prepareRgb/applyWindow worker protocol uses the same two-owner semaphore, strict settings/result validation, cancellation and owned buffers as legacy sRGB8 proof/output. Native finite/alpha checks and pointer bounds precede publication; mutable returned reports cannot change compiled formats. This internal dependency adds no document/public scripting/REST/renderer or persistence contract. Working-space and high-precision scene integration remain required. [Contract](ICC_ENGINE.md#internal-explicit-rgb-precision-dependency).

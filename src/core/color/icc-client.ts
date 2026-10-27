@@ -14,7 +14,7 @@ type Response=z.infer<typeof responseSchema>;
 // Queued operations retain immutable profile Blobs, not decoded pixel planes.
 let active=0;const waiting:{start():void}[]=[];
 const pump=()=>{while(active<2&&waiting.length)waiting.shift()!.start();};
-function acquire(signal?:AbortSignal):Promise<()=>void>{
+export function acquireIccOwner(signal?:AbortSignal):Promise<()=>void>{
  signal?.throwIfAborted();return new Promise((resolve,reject)=>{
   const cancel=()=>{const at=waiting.indexOf(entry);if(at>=0)waiting.splice(at,1);signal?.removeEventListener('abort',cancel);reject(signal?.reason??new DOMException('ICC operation cancelled','AbortError'));pump();};
   const entry={start(){if(signal?.aborted){cancel();return;}active++;signal?.removeEventListener('abort',cancel);let released=false;resolve(()=>{if(released)return;released=true;active--;pump();});}};
@@ -76,7 +76,7 @@ export class IccSession{
  }
  private static async open(control:IccControl):Promise<IccSession>{
   control.signal?.throwIfAborted();if(typeof Worker==='undefined')throw new Error('ICC processing requires the browser worker host.');
-  control.onProgress?.('waiting');control.signal?.throwIfAborted();const release=await acquire(control.signal);
+  control.onProgress?.('waiting');control.signal?.throwIfAborted();const release=await acquireIccOwner(control.signal);
   let worker:Worker|undefined;
   try{control.signal?.throwIfAborted();worker=new Worker(new URL('./icc.worker.ts',import.meta.url),{type:'module'});return new IccSession(worker,release,control);}catch(error){try{worker?.terminate();}finally{release();}throw error;}
  }

@@ -1,5 +1,9 @@
 # Scripting API
 
+## RAW TIFF stays with the trusted host
+
+The trusted browser host can export a selected File or retained RAW smart object as native uint16/float32 TIFF without the canvas 8-bit proxy. This is a file-delivery service outside document constructors and commands. Existing RawDevelopment setters/commands still require explicit 8-bit editing consent and keep shared Undo. No isolated script/plugin file/native grant or headless REST rendering/synchronization is added. Exact host signature, options/defaults, example, error/cancellation behavior and limits: [RAW_TIFF.md](RAW_TIFF.md).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Recipe schema 3/package 4 can retain a complete delivery preset and existing font originals. Executing the recipe still applies its ordinary OO/shared commands; it does not export, inspect ICC files or change workspace preferences. Profile capture/preflight, batch output and downloads belong to the trusted host. No isolated scripting signature/grant changes. [Contract and current verification](COLOR_DELIVERY.md).

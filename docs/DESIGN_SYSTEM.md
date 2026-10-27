@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## RAW master delivery
+
+RAW review offers a separate High-precision TIFF section with explicit integer/float precision, container and current output profile. Export does not need the 8-bit editing consent checkbox, does not Apply draft development, and stays distinct from canvas layers/appearance. Explain native source precision and current TIFF reopening limits; expose real waiting/development/encoding/verification and keep Cancel active. Use existing custom controls and dialog scrolling. [Contract](RAW_TIFF.md).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Batch custom variants expose TIFF/PDF and an explicit capture of the current output profile for supported formats. Show the captured target in chips and actual conversion/fallback in review. Preset import/export and recipe attachment stay outside artwork/Undo. Disable conflicting controls while native preparation is pending, keep close/cancel active and expose errors rather than silently falling back to sRGB. [Contract and current verification](COLOR_DELIVERY.md).

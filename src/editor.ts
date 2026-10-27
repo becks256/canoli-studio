@@ -102,7 +102,11 @@ import {prepareAvifImport} from './engine/avif-import';
 import {importParagraphStyles} from './core/paragraph-styles';
 import {inspectTiffFile} from './core/interchange/tiff/client';
 import {inspectAvifFile} from './core/interchange/avif/client';
-import {inspectRawFile} from './core/interchange/raw/client';
+import {inspectRawFile,exportRawTiffFile} from './core/interchange/raw/client';
+import{rawComponentSource}from'./core/interchange/raw/commands';
+import{captureColorOutput}from'./core/color/output-source';
+import{colorOutputSchema}from'./core/color/color-settings';
+import{rawTiffSettingsSchema,type RawTiffExportOptions,type RawTiffControl,type RawTiffResult}from'./core/interchange/raw/tiff-types';
 import type {RawDecodeOptions,RawImportControl,RawImportReport} from './core/interchange/raw/types';
 import type {AvifDecodeOptions,AvifImportControl,AvifImportReport} from './core/interchange/avif/types';
 import type {TiffDecodeOptions,TiffImportControl,TiffImportReport} from './core/interchange/tiff/types';
@@ -1505,6 +1509,27 @@ export class EditorApplication {
 
   /** Trusted, read-only sensor preflight. Application RAW installation is separate. */
   async inspectRaw(file:File,image=0,control:RawImportControl={}):Promise<RawImportReport>{return inspectRawFile(file,image,control);}
+
+  /** Export a developed sensor master; document placement/effects are excluded. */
+  async exportRawTiff(source:File|SmartObjectLayer,options:RawTiffExportOptions={},control:RawTiffControl={}):Promise<RawTiffResult>{
+    const draft=z.object({development:rawDevelopOptionsSchema.optional(),sampleFormat:z.enum(['rgba16','rgba-float32']).default('rgba16'),variant:z.enum(['auto','classic','big']).default('auto'),color:colorOutputSchema.optional()}).strict().parse(options);
+    if(this.retouchDisposed)throw new Error('The editor is disposed.');control.signal?.throwIfAborted();
+    const document=this.document,assets=this.assets,revision=document.getSnapshot().revision,generation=this.ioGeneration;
+    const layer=source instanceof SmartObjectLayer?source:null;
+    if(layer&&(!layer.isAttached||layer.document!==document||document.getLayer(layer.id)!==layer))throw new Error('Choose an attached RAW smart object in the current document.');
+    const captured=layer?rawComponentSource(document._read(),layer.id,assets):null,lease=captured?captureAssetSource(assets,captured.asset.id):null;
+    const blob=captured?.raw.originalBlob??(source instanceof File?source:null);if(!blob)throw new Error('Choose a RAW file or attached RAW smart object.');
+    const development=draft.development??captured?.raw.settings.development??rawDevelopOptionsSchema.parse({}),color=draft.color??normalizeColorOutput(this.colorSettings.output);
+    const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);control.signal?.addEventListener('abort',cancel,{once:true});this.rawJobs.add(abort);
+    const check=()=>{abort.signal.throwIfAborted();if(this.retouchDisposed)throw new Error('The editor is disposed.');if(layer){lease!.check();if(this.ioGeneration!==generation||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(session=>session.document===document))throw new Error('Document session changed during RAW TIFF delivery. Try again.');}};
+    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=layer?document.subscribe(changed):()=>{},stopEditor=layer?this.subscribe(changed):()=>{};
+    try{
+      check();const output=await captureColorOutput(color,{signal:abort.signal});check();
+      const settings=rawTiffSettingsSchema.parse({development,sampleFormat:draft.sampleFormat,variant:draft.variant,color:output});
+      const result=await exportRawTiffFile(blob,settings,{signal:abort.signal,onProgress:value=>{check();control.onProgress?.(value);check();}});check();
+      if(captured&&result.receipt.sourceSha256!==captured.raw.original.sha256)throw new Error('Retained RAW source differs from its original fingerprint.');return result;
+    }finally{stopDocument();stopEditor();this.rawJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+  }
 
   async openRaw(file:File,options:RawDecodeOptions={},control:RawImportControl={}):Promise<Readonly<RawImportReport>>{
     control.signal?.throwIfAborted();

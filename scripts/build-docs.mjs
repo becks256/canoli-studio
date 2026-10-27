@@ -56,6 +56,7 @@ const generatedPages = [
   ["SVG_CLIPPING", "Editable SVG clipping"],
   ["ICC_ENGINE", "Native ICC engine dependency"],
   ["COLOR_DELIVERY", "Profile-aware batch and recipe delivery"],
+  ["RAW_TIFF", "Native RAW master TIFF delivery"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

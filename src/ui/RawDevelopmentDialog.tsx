@@ -11,6 +11,9 @@ import {Dialog} from './Dialog';
 import {RawProfileSettings} from './RawProfileSettings';
 import {validateRawLensProfile} from '../core/interchange/lens/client';
 import {RawLensLibrary} from './RawLensLibrary';
+import{download,fileName}from'./utils';
+import{iccTarget}from'../core/color/profile-source';
+import type{RawTiffControl}from'../core/interchange/raw/tiff-types';
 
 export {isCameraRawFile,rawFileAccept} from '../core/interchange/raw/files';
 
@@ -18,10 +21,11 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
   const [source]=useState(()=>{if(file)return null;if(!layer?.document)throw new Error('Choose a RAW image.');const master=new ComponentRegistry(layer.document._read().components).get(layer.componentId).source;return master.kind==='asset'?layer.document.assetStore?.get(master.assetId).raw??null:null;});
   const [settings,setSettings]=useState<RawDevelopSettings>(()=>source?.settings.development??rawDevelopOptionsSchema.parse({}));
   const [settingsIssue,setSettingsIssue]=useState('');
+  const[tiffFormat,setTiffFormat]=useState<'rgba16'|'rgba-float32'>('rgba16'),[tiffVariant,setTiffVariant]=useState<'auto'|'classic'|'big'>('auto'),[exported,setExported]=useState(''),[tiffRunning,setTiffRunning]=useState(false);
   const [libraryBusy,setLibraryBusy]=useState(false);
   const [profileValidation,setProfileValidation]=useState<{lens:RawDevelopSettings['lens'];report:Readonly<RawImportReport>;error:string}|null>(null);
   const [precision,setPrecision]=useState(source?.settings.allowPrecisionLoss??false),[report,setReport]=useState<Readonly<RawImportReport>|null>(source?.report??null),[error,setError]=useState(''),[running,setRunning]=useState(false),[stale,setStale]=useState(false);
-  const [progress,setProgress]=useState<Parameters<NonNullable<RawImportControl['onProgress']>>[0]|null>(null),[preview,setPreview]=useState<Blob|null>(null),[previewUrl,setPreviewUrl]=useState('');
+  const [progress,setProgress]=useState<Parameters<NonNullable<RawImportControl['onProgress']>>[0]|Parameters<NonNullable<RawTiffControl['onProgress']>>[0]|null>(null),[preview,setPreview]=useState<Blob|null>(null),[previewUrl,setPreviewUrl]=useState('');
   const pending=useRef<AbortController|null>(null),applying=useRef(false);
   useEffect(()=>()=>pending.current?.abort(),[]);
   useEffect(()=>{
@@ -59,13 +63,22 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
     }catch(cause){if(!abort.signal.aborted)setError(cause instanceof Error?cause.message:String(cause));}
     finally{applying.current=false;onBusyChange(false);if(!abort.signal.aborted)setRunning(false);}
   };
+  const exportTiff=async()=>{
+    const abort=new AbortController();pending.current?.abort();pending.current=abort;setRunning(true);setError('');setExported('');setProgress(null);setTiffRunning(true);onBusyChange(true);
+    try{
+      const input=file??layer;if(!input)throw new Error('Choose a RAW image.');
+      const result=await editor.exportRawTiff(input,{development:settings,sampleFormat:tiffFormat,variant:tiffVariant},{signal:abort.signal,onProgress:setProgress});abort.signal.throwIfAborted();
+      download(result.tiff,`${fileName((file?.name??source?.original.name??'RAW').replace(/\.[^.]*$/,''))}.tif`);setExported(`Exported ${result.receipt.width} × ${result.receipt.height} ${tiffFormat==='rgba16'?'16-bit':'32-bit float'} TIFF using ${result.receipt.profileName}.${result.receipt.warnings.length?' '+result.receipt.warnings.join(' '):''}`);
+    }catch(cause){if(!abort.signal.aborted)setError(cause instanceof Error?cause.message:String(cause));}
+    finally{setTiffRunning(false);onBusyChange(false);if(!abort.signal.aborted)setRunning(false);}
+  };
   let lensIssue='';if(report&&hasLensCorrection(settings.lens)){try{validateLensGeometry(settings.lens!,report.displayWidth,report.displayHeight);}catch(error){lensIssue=String(error);}}
   const activeProfile=!!(settings.lens?.enabled&&settings.lens.profile),profileValidated=profileValidation?.lens===settings.lens&&profileValidation?.report===report;
   const profilePending=activeProfile&&!profileValidated,profileIssue=activeProfile&&profileValidated?profileValidation?.error??'':'';
-  const disabled=running||stale||libraryBusy,ready=report?.canDevelop&&precision&&!lensIssue&&!settingsIssue&&!profilePending&&!profileIssue&&!(settings.whiteBalance==='camera'&&!report.hasCameraWhiteBalance&&report.channels>1);
+  const disabled=running||stale||libraryBusy,masterReady=report?.canDevelop&&!lensIssue&&!settingsIssue&&!profilePending&&!profileIssue&&!(settings.whiteBalance==='camera'&&!report.hasCameraWhiteBalance&&report.channels>1),ready=masterReady&&precision;
   return <Dialog localEscape titleId="raw-development-title" className="svg-import-dialog raw-development-dialog" onClose={close}>
     <div className="dialog-header"><h2 id="raw-development-title">{onQueued?'Queue camera RAW':file?'Import camera RAW':'Develop RAW'}</h2><IconButton label="Close RAW development" onClick={close}><X size={18}/></IconButton></div>
-    <div className="svg-import-body"><p><strong>{file?.name??source?.original.name}</strong></p><p>Keep the complete sensor original and editable development settings. Accepted pixels use 8-bit sRGB editing precision. {onQueued?'Queue the original with these settings; develop it in the batch without changing the open editor. Cancel skips remaining unreviewed files.':file?'Open as a smart object in a new document; existing edited documents stay open.':'Apply updates every instance of this shared master in one undo step, preserving layer placement and effects.'}</p>
+    <div className="svg-import-body"><p><strong>{file?.name??source?.original.name}</strong></p><p>Keep the complete sensor original and editable development settings. Canvas import and Apply use 8-bit sRGB editing precision. {onQueued?'Queue the original with these settings; develop it in the batch without changing the open editor. Cancel skips remaining unreviewed files.':file?'Open as a smart object in a new document; existing edited documents stay open.':'Apply updates every instance of this shared master in one undo step, preserving layer placement and effects.'}</p>
       {!report&&!error&&<p role="status">Inspecting RAW…</p>}
       {report&&<>
         <p>{report.make} {report.model} · {report.displayWidth} × {report.displayHeight} px{report.bitDepth!==null?` · ${report.bitDepth} bits per sample`:''}</p>
@@ -102,10 +115,17 @@ export function RawDevelopmentDialog({editor,file,layer,onClose,onBusyChange,onA
             </>}
           </>}
         </details>
+        {!onQueued&&<details><summary>High-precision TIFF</summary><p>Export the developed sensor master at full resolution with the current output profile. This excludes canvas placement, layer effects and other artwork. Sensor metadata stays with the RAW original. No 8-bit working image is used; the editing-precision checkbox below is only needed for Preview, Import or Apply.</p>
+          <Select layout="stacked" label="RAW TIFF precision" value={tiffFormat} disabled={disabled} options={[{value:'rgba16',label:'16-bit integer'},{value:'rgba-float32',label:'32-bit float from native 16-bit development'}]} onChange={value=>setTiffFormat(value as typeof tiffFormat)}/>
+          <Select layout="stacked" label="RAW TIFF container" value={tiffVariant} disabled={disabled} options={[{value:'auto',label:'Automatic'},{value:'classic',label:'Classic TIFF'},{value:'big',label:'BigTIFF'}]} onChange={value=>setTiffVariant(value as typeof tiffVariant)}/>
+          <p>Output profile: {iccTarget(editor.colorSettings.output.profile).name}. Float delivery retains fractional conversion values; it does not add sensor detail. Reopening a 16-bit TIFF requires 8-bit editing consent; float TIFF import is not supported yet.</p>
+          <Button disabled={!masterReady||disabled} onClick={()=>void exportTiff()}>Export RAW TIFF</Button>
+        </details>}
         <label className="check-field"><input type="checkbox" checked={precision} disabled={disabled} onChange={event=>setPrecision(event.target.checked)}/>Convert RAW development to 8-bit editing precision</label>
       </>}
+      {exported&&<p role="status">{exported}</p>}
       {previewUrl&&<figure><img src={previewUrl} alt="RAW development preview" className="raw-development-preview"/><figcaption>Native development preview; original sensor resolution is retained.</figcaption></figure>}
-      {running&&<div role="status"><p>{progress?.phase==='encoding'?'Preparing working image…':progress?.phase==='developing'?'Developing sensor pixels…':'Inspecting RAW…'}</p><progress aria-label="RAW development progress" max={1} value={progress?.fraction??undefined}/></div>}
+      {running&&<div role="status"><p>{progress?.phase==='verifying'?'Verifying TIFF…':progress?.phase==='waiting'?'Waiting for image processing…':progress?.phase==='encoding'?(tiffRunning?'Preparing TIFF…':'Preparing working image…'):progress?.phase==='developing'?'Developing sensor pixels…':'Inspecting RAW…'}</p><progress aria-label="RAW development progress" max={1} value={progress?.fraction??undefined}/></div>}
       {lensIssue&&<p role="alert">{lensIssue}</p>}
       {profilePending&&<p role="status">Validating lens calibration…</p>}
       {profileIssue&&<p role="alert">{profileIssue}</p>}

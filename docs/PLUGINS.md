@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## RAW TIFF grants no new capability
+
+Native RAW master TIFF delivery is a trusted browser file service. Plugin installation remains inert; existing RawDevelopment commands and read/write/asset grants remain unchanged. No selected-file/native worker/profile privilege is exposed to isolated commands. [Contract](RAW_TIFF.md).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Profile-aware batch output and portable recipe delivery sources add no plugin manifest version, worker/file/profile grant, network service or download privilege. Installation stays inert; ordinary commands retain shared permissions/revision/Undo validation. Native profile preparation and output remain trusted browser services. [Contract and current verification](COLOR_DELIVERY.md).
