@@ -2176,3 +2176,5 @@ test('production RAW review exports genuine integer and float TIFF masters witho
 
 import{floatTiffWorkflow}from'./helpers/float-tiff';
 test('production float TIFF import requires explicit precision/color choices and reopens original-bearing pixels without globals',async({page},info)=>{await floatTiffWorkflow(page,info,true);});
+
+test('production internal float worker retains independent float blend and affine samples without developer globals',async({page},info)=>{const{readdir}=await import('node:fs/promises'),worker=(await readdir('dist/assets')).find(name=>/^pixels\.worker-.*\.js$/.test(name));expect(worker).toBeTruthy();const{floatWorkerWorkflow}=await import('./helpers/float-pixels');await floatWorkerWorkflow(page,info,true,'/assets/'+worker);});

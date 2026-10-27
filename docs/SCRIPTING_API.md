@@ -1,5 +1,9 @@
 # Scripting API
 
+## Float processing dependency
+
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+
 ## Normalized float TIFF input increment
 
 The trusted browser host accepts normalized SDR float32 TIFF pages through `editor.openTiff(file, {page: 0, allowPrecisionLoss: true, floatColorSpace: 'linear-srgb'}, control)`. The optional interpretation is required only without ICC; embedded ICC is authoritative. Defaults remain page 0, precision consent false, and no assumed float space. Nonfinite/invalid-alpha/HDR input rejects. Isolated Scripts gain no file or worker privilege; public document constructors and commands remain unchanged. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.

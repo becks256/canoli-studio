@@ -58,6 +58,7 @@ const generatedPages = [
   ["COLOR_DELIVERY", "Profile-aware batch and recipe delivery"],
   ["RAW_TIFF", "Native RAW master TIFF delivery"],
   ["FLOAT_TIFF", "Float TIFF input and retained precision"],
+  ["FLOAT_PROCESSING", "Native float pixel processing dependency"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

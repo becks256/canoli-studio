@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "samples": 8195,
+  "modes": [
+    "normal",
+    "multiply",
+    "screen",
+    "overlay",
+    "darken",
+    "lighten",
+    "color-dodge",
+    "color-burn",
+    "hard-light",
+    "soft-light",
+    "difference",
+    "exclusion",
+    "hue",
+    "saturation",
+    "color",
+    "luminosity",
+    "linear-light",
+    "linear-burn"
+  ],
+  "opacity": 0.71321,
+  "matrix": [
+    1.7,
+    0.05,
+    -0.2,
+    -0.4,
+    0.1,
+    0.7,
+    0.11,
+    0.01,
+    -0.13,
+    0.08,
+    2.1,
+    0.25
+  ],
+  "files": {
+    "source.f32le.gz": {
+      "bytes": 115185,
+      "sha256": "c40b847c353e1bb08e693410a9282897984f892ebdb85dc6a1405f2ce8e12a53",
+      "decodedBytes": 131120,
+      "decodedSha256": "4244587b052bfcc1248bf308df9dde39a3c9d0b1426a67ed4d1771be701ac5c1"
+    },
+    "backdrop.f32le.gz": {
+      "bytes": 115517,
+      "sha256": "dcb06031439819bb55b2bf298c1bf9641340123aac58e66bb25008c250d1c67a",
+      "decodedBytes": 131120,
+      "decodedSha256": "51a3b0cbebfcf427b02856c4837b83a890836e1664d953f9acc4849662ae1b0f"
+    },
+    "mask.f32le.gz": {
+      "bytes": 26519,
+      "sha256": "502ff183cdd20511fe0b74e4f8a9ddefe3cda6f8331ee252135155f9a00e184a",
+      "decodedBytes": 32780,
+      "decodedSha256": "88b203be01d5aa79974cfe1ac35765852ba71027ab518c541e3b0121246076d8"
+    },
+    "composites.f32le.gz": {
+      "bytes": 2095779,
+      "sha256": "4dd1e1199874229b4f4838de7da772c8a4c8b0630c963ca09662e0a1ef79951b",
+      "decodedBytes": 2360160,
+      "decodedSha256": "77a7b398d13bd0cabfbf4c5cef19751b87db8b06e187257ec25ca734d0e84e3c"
+    },
+    "affine.f32le.gz": {
+      "bytes": 117102,
+      "sha256": "0661bab053163d81ad4620d206629cbd7d59c0a35d613835ead9ca74ace631d2",
+      "decodedBytes": 131120,
+      "decodedSha256": "acc77d65b5a7a2df90d6f387ccd98b46f98aa21735ae03ee6b13c6fcc1f0fe4a"
+    }
+  },
+  "sourceChannelLevels": [
+    8075,
+    8073,
+    8074
+  ],
+  "generatorSha256": "460bdcdc066636e9a482f21d7de6de91720006163e429d72e8fdcb401b3c4b3a",
+  "reference": "Independent NumPy float64 W3C compositing, source-over with float mask and opacity; straight float32 output.",
+  "referenceUrl": "https://www.w3.org/TR/2024/CRD-compositing-1-20240321/",
+  "tolerance": 2.384185791015625e-07
+}

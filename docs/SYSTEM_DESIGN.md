@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Float processing dependency
+
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+
 ## Normalized float TIFF input increment
 
 Float TIFF input retains original bytes/profile/settings independently of the sRGB8 proxy. Source reconstruction precedes native ICC conversion and quantization. Shared ICC leases precede decoding allocation; guarded host publication rejects stale/cancelled results. Independent REST sessions and isolated extension privileges remain unchanged. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.

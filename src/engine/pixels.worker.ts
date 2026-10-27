@@ -1,3 +1,4 @@
+import{FloatPixelProcessor,validateFloatWorkerWindow,type FloatCompositeOptions}from'./float-pixels';
 import type { RedEyeAdjustmentData } from "../core/red-eye";
 import type { LutAdjustmentData } from "../core/lut";
 import type { TextureMaskSettings } from '../core/brush-texture';
@@ -72,10 +73,13 @@ kernel
   );
 
 let matting:ClosedFormMatting|undefined;
+let floating:FloatPixelProcessor|undefined;
 self.onmessage = async (
   event: MessageEvent<{
     id: number;
     pixels: Uint8ClampedArray;
+    floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
+    floatAffine?:{pixels:Float32Array;matrix:number[]};
     filteredMix?: {
       filtered: Uint8ClampedArray;
       mask: Uint8ClampedArray;
@@ -149,6 +153,12 @@ self.onmessage = async (
 ) => {
   try {
     const data = event.data;
+    if(data.floatComposite||data.floatAffine){
+      const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;
+      if(data.floatComposite){const request=data.floatComposite;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);pixels=owned.composite(request.source,request.backdrop,request.options);}
+      else{const request=data.floatAffine!;validateFloatWorkerWindow(request.pixels);pixels=owned.affine(request.pixels,request.matrix);}
+      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;
+    }
     if(data.mattingBegin){matting?.dispose();matting=new ClosedFormMatting(data.mattingBegin.width,data.mattingBegin.height);self.postMessage({id:data.id});return;}
     if(data.mattingAccumulate){if(!matting)throw new Error('Missing matting session.');matting.add({...data.mattingAccumulate,...prepareMattingTile(data.pixels,data.mattingAccumulate)});self.postMessage({id:data.id});return;}
     if(data.mattingSolve){if(!matting)throw new Error('Missing matting session.');const mattingDiagnostics=await matting.solve((iteration,residual)=>self.postMessage({id:data.id,type:'progress',progress:{completed:iteration,total:2000,relativeResidual:residual}}),2000,'ic0',true,wasmMattingIterations(await kernel));self.postMessage({id:data.id,mattingDiagnostics});return;}

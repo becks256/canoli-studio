@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Float processing dependency
+
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+
 ## Normalized float TIFF input increment
 
 Trusted browser-host TIFF input adds optional `floatColorSpace: 'srgb' | 'linear-srgb'` for unprofiled float sources, with separate explicit precision-loss consent. Normalized SDR float32 sources use native ICC and retain complete originals. This adds no REST rendering or browser synchronization. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.

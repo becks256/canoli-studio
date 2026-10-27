@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Float processing dependency
+
+Private native/worker float32 compositing and affine windows now supply a precision-processing dependency. Public documents and editing remain sRGB8; no new isolated grant or REST/browser synchronization is added. [Numeric contract, verification and required integration](FLOAT_PROCESSING.md). Full F10 and the original roadmap remain open.
+
 ## Normalized float TIFF input increment
 
 Normalized SDR float TIFF input is a trusted host file workflow. Plugin installation remains inert; packages gain no file chooser, native ICC worker or profile-store privilege, and execute through the existing isolated command boundary. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.

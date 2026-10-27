@@ -1,3 +1,4 @@
+import{floatCompositeOptionsSchema,validateFloatWorkerWindow,type FloatCompositeOptions}from'./float-pixels';
 import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
 import { medianRadiusSchema } from '../core/smart/median-filter';
 import {bilateralOptionsSchema,type BilateralFilterOptions} from '../core/smart/bilateral-filter';
@@ -103,6 +104,17 @@ export class PixelProcessor {
     void this.ready.catch(() => {});
   }
 
+  /** Internal precision windows; complete original geometry is independent. */
+  async floatComposite(source:Float32Array,backdrop:Float32Array,options:FloatCompositeOptions={}):Promise<Float32Array>{
+    const settings=floatCompositeOptionsSchema.parse(options);validateFloatWorkerWindow(source);validateFloatWorkerWindow(backdrop);if(source.length!==backdrop.length)throw new Error('Float source and backdrop geometry differ.');
+    if(settings.mask&&(settings.mask.length!==source.length/4||!(settings.mask.buffer instanceof ArrayBuffer)))throw new Error('Float coverage geometry differs.');
+    const captured={source:source.slice(),backdrop:backdrop.slice(),options:{...settings,...(settings.mask?{mask:settings.mask.slice()}:{})}},length=source.length;
+    const result=await this.request(new Uint8ClampedArray(0),{floatComposite:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+  }
+  async floatAffine(pixels:Float32Array,matrix:readonly number[]):Promise<Float32Array>{
+    validateFloatWorkerWindow(pixels);if(!Array.isArray(matrix)||matrix.length!==12||![...matrix].every(Number.isFinite))throw new Error('Use twelve finite RGB affine coefficients.');const captured={pixels:pixels.slice(),matrix:[...matrix]},length=pixels.length;
+    const result=await this.request(new Uint8ClampedArray(0),{floatAffine:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+  }
   async bilateralFilter(pixels:Uint8ClampedArray,width:number,height:number,options:BilateralFilterOptions):Promise<Uint8ClampedArray> {
     const settings=bilateralOptionsSchema.parse(options);
     if(!(pixels instanceof Uint8ClampedArray)||![width,height,width*height].every(v=>Number.isSafeInteger(v)&&v>0)||width>8192||height>8192||width*height>4_000_000||pixels.length!==width*height*4)
@@ -369,6 +381,8 @@ export class PixelProcessor {
   private async request(
     pixels: Uint8ClampedArray,
     payload: {
+      floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
+      floatAffine?:{pixels:Float32Array;matrix:number[]};
       filteredMix?: {
         filtered: Uint8ClampedArray;
         mask: Uint8ClampedArray;
@@ -461,6 +475,8 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
+    if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}
+    if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
     if(payload.brushTextureSupport)tryTransfer(payload.brushTextureSupport.buffer);
     if(payload.frequencyEncoding)tryTransfer(payload.frequencyEncoding.low.buffer);
     if(payload.linearBlend)tryTransfer(payload.linearBlend.backdrop.buffer);

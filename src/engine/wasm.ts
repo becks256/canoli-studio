@@ -45,6 +45,8 @@ interface QuickSelectionKernel {
 }
 
 export interface PixelKernel extends QuickSelectionKernel {
+  compositeFloat(source:number,backdrop:number,output:number,mask:number,scratch:number,pixels:number,opacity:number,mode:number):number;
+  affineFloat(source:number,output:number,matrix:number,pixels:number):number;
   bilateralFilter(input:number,output:number,spatial:number,range:number,width:number,height:number,radius:number,amount:number):void;
   medianFilter(input:number,output:number,scratch:number,width:number,height:number,radius:number):void;
   encodeFrequencyBand(source:number,low:number,length:number,correction:boolean):void;
