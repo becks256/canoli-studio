@@ -1,4 +1,5 @@
 import {measureSpacing,snapToSpacing,type SpacingMatch} from '../core/spacing';
+import {clippingBaseFor} from '../core/clipping';
 import {SpacingOverlay} from './SpacingOverlay';
 import {alignmentCommands,layerAlignmentSchema,type LayerAlignment,type AlignmentTarget} from '../core/layer-layout';
 import {HistoryInspectorDialog} from './HistoryInspectorDialog';
@@ -921,6 +922,9 @@ export function App({ editor }: { editor: EditorApplication }) {
       run: () => setShowExportDialog(true),
     },
     {id:'design-checks',label:'Design checks',keys:[],run:()=>setShowPreflight(true),enabled:()=>!busy},
+    {id:'clipping-mask',label:selected?.clipped?'Release clipping mask':'Create clipping mask',keys:[],
+      run:()=>selectedAction(layer=>{layer.clipped=!layer.clipped;}),
+      enabled:()=>!busy&&!locked&&!!selected&&(!!selected.clipped||!!clippingBaseFor(state.document.children,selected.id))},
     {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>!busy},
     {
       id: "undo",

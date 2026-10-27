@@ -1,6 +1,7 @@
 import {test,expect} from '@playwright/test';
+import {SCHEMA_VERSION} from '../src/core/model';
 
-async function setup(page:import('@playwright/test').Page){await page.goto('/');await page.evaluate(async()=>{
+async function setup(page:import('@playwright/test').Page){await page.goto('/');await page.waitForFunction(()=>!!window.luma?.editor);await page.evaluate(async()=>{
  const {editor,RasterLayer}=window.luma;editor.newDocument({width:96,height:64});const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d')!,image=c.createImageData(64,32);
  for(let y=0;y<32;y++)for(let x=0;x<64;x++)image.data.set([(x*31+y*7)%256,(x*9+y*43)%256,(x*17+y*11)%256,[0,1,64,128,255][y%5]],(y*64+x)*4);
  c.putImageData(image,0,0);const blob=await new Promise<Blob>(resolve=>canvas.toBlob(v=>resolve(v!))),asset=await editor.assetStore.add(blob,'Original photo',undefined,false);editor.document.selectedLayer=editor.document.layers.add(new RasterLayer({name:'Photo',assetId:asset.id,width:64,height:32}));canvas.width=canvas.height=0;
@@ -18,12 +19,12 @@ test('native workflow reconstructs transparent photo pixels, retains original by
  });expect(result.max).toBeLessThanOrEqual(1);expect(result.alpha).toBe(0);expect(result.history).toBe(1);expect(result.sourceHidden).toBe(true);expect(result.undo).toEqual(result.before);expect(result.reopened).toEqual(result.after);expect(result.samePixels).toBe(true);expect(result.sourceHash).toBe(result.reopenedHash);expect(result.assets).toEqual([[64,32],[64,32]]);
 });
 
-test('native recomposition occurs before affine resampling and preserves outer masks and tone',async({page})=>{
- const results=[];for(const mode of ['affine','mask','erase','tone','all']){await setup(page);const result=await page.evaluate(async(mode)=>{
+for(const mode of ['affine','mask','erase','tone','all'])test(`native recomposition occurs before affine resampling and preserves outer masks and tone (${mode})`,async({page})=>{
+ await setup(page);const result=await page.evaluate(async(mode)=>{
   const {editor,RasterLayer,AffineTransform,LayerMask,MarqueeSelection}=window.luma,source=editor.document.selectedLayer as InstanceType<typeof RasterLayer>;source.width=32;source.height=16;source.transform=new AffineTransform(.9,.3,-.2,1.1,20,15);source.opacity=.7;if(mode==='tone'||mode==='all')source.setTone({contrast:15,saturation:-20});if(mode==='erase'||mode==='all')source.clear(new MarqueeSelection({shape:'rectangle',x:4,y:4,width:4,height:4}));if(mode==='mask'||mode==='all')source.mask=new LayerMask({selection:new MarqueeSelection({shape:'ellipse',x:0,y:0,width:32,height:16}),feather:1});
   const read=async()=>{const bmp=await createImageBitmap(await editor.exportPng()),c=document.createElement('canvas');c.width=96;c.height=64;c.getContext('2d')!.drawImage(bmp,0,0);bmp.close();const out=[...c.getContext('2d')!.getImageData(0,0,96,64).data];c.width=c.height=0;return out;};
   const before=await read();await editor.separateFrequencies(source.id,{sigma:2});const after=await read();let max=0,alpha=0,witness:unknown=null;for(let i=0;i<after.length;i+=4){if(Math.abs(before[i+3]-after[i+3])>alpha)witness={x:(i/4)%96,y:Math.floor(i/4/96),before:before.slice(i,i+4),after:after.slice(i,i+4)};alpha=Math.max(alpha,Math.abs(before[i+3]-after[i+3]));for(let c=0;c<3;c++)max=Math.max(max,Math.abs(Math.round(before[i+c]*before[i+3]/255)-Math.round(after[i+c]*after[i+3]/255)));}return{mode,max,alpha,witness,sourceSize:editor.assetStore.values().map(a=>[a.width,a.height])};
- },mode);results.push(result);}console.log('Affine frequency reconstruction:',JSON.stringify(results));for(const result of results){expect(result.alpha).toBeLessThanOrEqual(1);expect(result.max).toBeLessThanOrEqual(2);expect(result.sourceSize).toEqual([[64,32],[64,32]]);}
+ },mode);console.log('Affine frequency reconstruction:',JSON.stringify(result));expect(result.alpha).toBeLessThanOrEqual(1);expect(result.max).toBeLessThanOrEqual(2);expect(result.sourceSize).toEqual([[64,32],[64,32]]);
 });
 
 
@@ -32,11 +33,11 @@ test('documented isolated recipe prepares native pixels and commits one host und
  const result=await page.evaluate(async code=>{
   const {editor}=window.luma,before=editor.document.toJSON(),past=editor.document.getSnapshot().past.length,assets=editor.assetStore.values().length;
   const logs=await editor.runScript(code!);const after=editor.document.toJSON(),history=editor.document.getSnapshot().past.length-past;editor.document.undo();return{logs,history,undo:JSON.stringify(editor.document.toJSON())===JSON.stringify(before),assets:editor.assetStore.values().length-assets,schema:after.schemaVersion,originalHidden:after.children[0].visible===false};
- },code);expect(result).toMatchObject({history:1,undo:true,assets:1,schema:41,originalHidden:true});expect(result.logs.join(' ')).toContain('Frequency layers ready');
+ },code);expect(result).toMatchObject({history:1,undo:true,assets:1,schema:SCHEMA_VERSION,originalHidden:true});expect(result.logs.join(' ')).toContain('Frequency layers ready');
 });
 
-test('abort, human edits, selection changes and replaced assets reject private capture without output leaks',async({page})=>{
- for(const mode of ['abort','edit','selection','asset','geometry'] as const){await setup(page);const result=await page.evaluate(async mode=>{
+for(const mode of ['abort','edit','selection','asset','geometry'] as const)test(`abort, human edits, selection changes and replaced assets reject private capture without output leaks (${mode})`,async({page})=>{
+ await setup(page);const result=await page.evaluate(async mode=>{
   const {editor}=window.luma,doc=editor.document,source=doc.selectedLayer!,before=doc.toJSON(),past=doc.getSnapshot().past.length,asset=editor.assetStore.values()[0],ids=editor.assetStore.values().map(a=>a.id),abort=new AbortController();
   const render=editor.renderer.render.bind(editor.renderer);let entered!:()=>void,release!:()=>void;const waiting=new Promise<void>(r=>entered=r),gate=new Promise<void>(r=>release=r);
   editor.renderer.render=async(data,store,options)=>{if(data.children.length===1&&data.children[0].id!==source.id&&data.children[0].kind==='raster'){entered();await gate;}return render(data,store,options);};
@@ -48,7 +49,7 @@ test('abort, human edits, selection changes and replaced assets reject private c
    release();await pending;if(mode==='geometry')asset.width--;
    return{mode,error,assets:editor.assetStore.values().map(a=>a.id),ids,model:doc.toJSON(),expected:mode==='edit'?{...before,name:'Human edit'}:before,history:doc.getSnapshot().past.length-past};
   }finally{release();editor.renderer.render=render;}
- },mode);expect(result.error).toMatch(/abort|changed/i);expect(result.assets).toEqual(result.ids);expect(result.model).toEqual(result.expected);expect(result.history).toBe(mode==='edit'?1:0);}
+ },mode);expect(result.error).toMatch(/abort|changed/i);expect(result.assets).toEqual(result.ids);expect(result.model).toEqual(result.expected);expect(result.history).toBe(mode==='edit'?1:0);
 });
 
 test('active wet source captures expanded native ink and ordered clears before document tone',async({page})=>{
@@ -169,7 +170,7 @@ test('prepared native previews match actual bands, preserve source alpha and nev
    const abort=new AbortController();abort.abort();let cancelled=false;try{await prepared.preview({sigma:2},{signal:abort.signal});}catch{cancelled=true;}
    await prepared.commit({sigma:3});const after=editor.document.toJSON(),history=editor.document.getSnapshot().past.length-past;editor.document.undo();return{results,untouched,assetsUnchanged,historyUnchanged,cancelled,history,undo:JSON.stringify(editor.document.toJSON())===JSON.stringify(before),schema:after.schemaVersion};
   }finally{prepared.dispose();canvas.width=canvas.height=0;}
- });expect(result.untouched).toBe(true);expect(result.assetsUnchanged).toBe(true);expect(result.historyUnchanged).toBe(true);expect(result.cancelled).toBe(true);expect(result.history).toBe(1);expect(result.undo).toBe(true);expect(result.schema).toBe(40);for(const row of result.results){expect(row.error).toBeLessThanOrEqual(1);expect(row.alphaError).toBe(0);expect(row.released).toBe(true);expect(row.dimensions).toEqual([64,64,64]);}
+ });expect(result.untouched).toBe(true);expect(result.assetsUnchanged).toBe(true);expect(result.historyUnchanged).toBe(true);expect(result.cancelled).toBe(true);expect(result.history).toBe(1);expect(result.undo).toBe(true);expect(result.schema).toBe(SCHEMA_VERSION);for(const row of result.results){expect(row.error).toBeLessThanOrEqual(1);expect(row.alphaError).toBe(0);expect(row.released).toBe(true);expect(row.dimensions).toEqual([64,64,64]);}
 });
 
 test('live native preview responds to radius, pans with keyboard/pointer, compares original and cancels without document edits',async({page})=>{

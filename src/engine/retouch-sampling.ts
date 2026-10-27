@@ -16,15 +16,18 @@ export function retouchViewDocument(
     throw new Error("Unknown retouch sampling mode.");
   if (!options.layerId)
     throw new Error("Retouch sampling requires a selected layer.");
+  // Current-layer sampling owns this branch's source, independently of sibling
+  // clipping. Current-and-below retains the real preceding bases instead.
+  const isolate=(node:LayerData):LayerData=>options.mode==='current-layer'&&node.clipped?{...node,clipped:undefined}:node;
   const prune = (nodes: LayerData[]): LayerData[] | undefined => {
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
       const preceding =
         options.mode === "current-and-below" ? nodes.slice(0, i) : [];
-      if (node.id === options.layerId) return [...preceding, node];
+      if (node.id === options.layerId) return [...preceding, isolate(node)];
       if (node.kind === "group") {
         const children = prune(node.children);
-        if (children) return [...preceding, { ...node, children }];
+        if (children) return [...preceding, { ...node, ...(options.mode==='current-layer'&&node.clipped?{clipped:undefined}:{}), children }];
       }
     }
     return undefined;

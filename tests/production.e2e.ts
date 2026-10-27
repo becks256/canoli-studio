@@ -1,4 +1,6 @@
 import {spacingWorkflow} from './helpers/spacing';
+import {clippingWorkflow} from './helpers/clipping';
+test('production clipping masks preserve editable layers, native pixels, palette release, one Undo and portable reopening',async({page},info)=>{await clippingWorkflow(page,info,true);});
 import {preflightAlignmentWorkflow} from './helpers/preflight-alignment';
 import {verticalTextWorkflow} from './helpers/vertical-text';
 import {publicTextPathWorkflow} from './helpers/public-text-path';

@@ -73,6 +73,7 @@ const patch = z
     locked: z.boolean().optional(),
     opacity: z.number().min(0).max(1).optional(),
     fillOpacity: z.number().min(0).max(1).optional(),
+    clipped: z.boolean().optional(),
     frequencyRadius: z.number().finite().min(0).max(4096/3).nullable().optional(),
     styles: styleSchema.optional(),
     blendMode: z.enum(GROUP_BLEND_MODES).optional(),

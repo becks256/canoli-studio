@@ -1,5 +1,5 @@
 import {memo} from 'react';
-import {ChevronDown,ChevronRight,Component,Eye,EyeOff,Folder,Layers,LockKeyhole,Paintbrush,PenTool,SlidersHorizontal,Type,UnlockKeyhole} from 'lucide-react';
+import {CornerDownRight,ChevronDown,ChevronRight,Component,Eye,EyeOff,Folder,Layers,LockKeyhole,Paintbrush,PenTool,SlidersHorizontal,Type,UnlockKeyhole} from 'lucide-react';
 import type {DocumentData,LayerData} from '../core/model';
 import {isImmutable} from '../core/immutable';
 import type {RasterEditing} from '../raster-editing';
@@ -33,13 +33,14 @@ export const LayerTreeRow=memo(function LayerTreeRow({node,depth,selected,locked
   return <div
     className={`layer-row ${filterContext?'filter-context':''} ${selected?'selected':''} ${!node.visible?'muted':''} ${dropPlacement?`drop-${dropPlacement}`:''}`}
     data-layer-id={node.id}
-    style={{paddingLeft:8+depth*16}}
+    style={{paddingLeft:8+depth*16+(node.clipped?8:0)}}
     draggable={!busy&&!locked}
   >
     {node.kind==='group'?<button className="tree-toggle" aria-label={`Toggle ${node.name}`} disabled={filtered} data-layer-action="toggle">
       {collapsed?icons.collapsed:icons.expanded}
     </button>:<span className="tree-spacer"/>}
     <button className="layer-select" aria-pressed={selected} aria-label={`Select ${node.name}`} data-layer-action="select">
+      {node.clipped&&<span role="img" aria-label="Clipped to base layer"><CornerDownRight size={12}/></span>}
       {node.kind==='group'?<span className="layer-thumb group-thumb">{icons.group}</span>
         :(node.kind==='raster'||node.kind==='paint')&&pixels&&thumbnailDocument?<LayerThumbnail document={thumbnailDocument} layerId={node.id} name={node.name} pixels={pixels} paused={paused} fallback={fallback}/>
         :node.kind==='raster'?<img className="layer-thumb" src={fallback} alt=""/>

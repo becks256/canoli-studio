@@ -77,6 +77,7 @@ export type LayerPatch = Partial<
     | "locked"
     | "opacity"
     | "fillOpacity"
+    | "clipped"
     | "styles"
     | "x"
     | "y"
@@ -602,6 +603,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
               "locked",
               "opacity",
               "fillOpacity",
+              "clipped",
               "frequencyRadius",
               "styles",
               "blendMode",

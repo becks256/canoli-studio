@@ -16,7 +16,7 @@ export function createFrequencySeparation(document:Document,source:RasterLayer,s
     throw new Error('Use an unstyled native snapshot with integer source dimensions.');
   const master=new Document({name:`${source.name.slice(0,210)} frequency source`,width:data.width,height:data.height});
   master.layers.add(new RasterLayer({name:'Captured native source',assetId:snapshot.assetId,width:data.width,height:data.height}));
-  const outer=new LayerGroup({name:settings.name,opacity:source.opacity,fillOpacity:source.fillOpacity,visible:source.visible,blendMode:source.blendMode});
+  const outer=new LayerGroup({name:settings.name,opacity:source.opacity,fillOpacity:source.fillOpacity,visible:source.visible,blendMode:source.blendMode,...(original.clipped===undefined?{}:{clipped:original.clipped})});
   document.transaction('Create frequency separation',()=>{
     const componentId=document.defineComponent(master);
     document.layers.add(outer);outer.moveAfter(source);outer.transform=source.transform;

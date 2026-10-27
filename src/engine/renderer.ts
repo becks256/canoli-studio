@@ -1,4 +1,6 @@
 import {nativeVectorFootprint} from './native-vector-footprint';
+import {clippingStacks} from '../core/clipping';
+import {composeClippingStack} from './clipping';
 import {usesNativeTextWriting,isVerticalText} from '../core/text-writing';
 import {nativeToneSamplingGrid} from './smart-filter-grid';
 import {prepareStyledTextParagraph} from './styled-text-layout';
@@ -663,9 +665,16 @@ export class CanvasRenderer implements DocumentRenderer {
       parent: AffineTransform,
       isolated?: LayerData,
       externalBackdrop = false,
+      clippingMembers = false,
     ) => {
       const targetContext = target.getContext("2d")!;
-      for (const layer of nodes) {
+      const stacks=clippingMembers?nodes.map(base=>({base,layers:[]as LayerData[]})):clippingStacks(nodes);
+      for (const stack of stacks) {
+        const clipped=stack.layers.filter(node=>node.visible&&node.opacity>0);
+        // A group used as a clipping base needs intrinsic transparency rather
+        // than a copy of the external sibling backdrop.
+        const layer=clipped.length&&stack.base.kind==='group'&&stack.base.blendMode==='pass-through'
+          ? {...stack.base,blendMode:'normal' as const}:stack.base;
         checkRenderCurrent(options.isCancelled);
         if (!layer.visible || layer.opacity === 0) continue;
         const world = parent.multiply(localTransform(layer));
@@ -723,7 +732,7 @@ export class CanvasRenderer implements DocumentRenderer {
         const haloY = shadow.enabled
           ? Math.ceil((shadow.blur * 3 + Math.abs(shadow.y)) * current.sy) + 2
           : 0;
-        if (cache && isolated !== layer && !affected.has(layer.id) &&
+        if (!clipped.length && cache && isolated !== layer && !affected.has(layer.id) &&
             (layer.kind === "raster" || layer.kind === "text" || layer.kind === "vector" ||
               (layer.kind === "paint" && layer.strokes.every(stroke => stroke.kind === "fill" && !stroke.clip))) &&
             layer.blendMode === "normal" && (layer.fillOpacity ?? 1) === 1 &&
@@ -780,7 +789,7 @@ export class CanvasRenderer implements DocumentRenderer {
               }
               const surface = createCanvas(right-left,bottom-top);
               try {
-                await paint([layer],surface,bounded,parent,layer);
+                await paint([layer],surface,bounded,parent,layer,externalBackdrop,clippingMembers);
                 targetContext.save();
                 try {
                   targetContext.globalAlpha = isolated === layer ? 1 : layer.opacity;
@@ -836,7 +845,7 @@ export class CanvasRenderer implements DocumentRenderer {
           }
         }
 
-        const finishedStyle = layer.blendMode !== "linear-light" && layer.blendMode !== "linear-burn" && !!cache && cacheable && isImmutable(layer) &&
+        const finishedStyle = !clipped.length && layer.blendMode !== "linear-light" && layer.blendMode !== "linear-burn" && !!cache && cacheable && isImmutable(layer) &&
           !affected.has(layer.id) && !style.blendIf.enabled &&
           (shadow.enabled || !!(layer.mask?.enabled && layer.mask.density > 0));
         let finishedSignature = "";
@@ -851,7 +860,7 @@ export class CanvasRenderer implements DocumentRenderer {
         }
         // Composite a retained, unchanged surface synchronously. No cache-owned
         // canvas escapes across an await, and no postprocessing mutates it.
-        const rawComposite = layer.blendMode !== "linear-light" && layer.blendMode !== "linear-burn" && cacheable && !affected.has(layer.id) &&
+        const rawComposite = !clipped.length && layer.blendMode !== "linear-light" && layer.blendMode !== "linear-burn" && cacheable && !affected.has(layer.id) &&
           !shadow.enabled && !style.blendIf.enabled &&
           (layer.fillOpacity ?? 1) === 1 &&
           !(layer.mask?.enabled && layer.mask.density > 0);
@@ -869,7 +878,7 @@ export class CanvasRenderer implements DocumentRenderer {
         const content = createCanvas(
           padded.width,
           padded.height,
-          layer.kind === "group" && needsReadback(layer.children),
+          clipped.length>0 || layer.kind === "group" && needsReadback(layer.children),
         );
         // Ordinary content already has the exact output geometry. Keep a separate
         // surface only when shadow/fill/Blend If needs another processing stage.
@@ -881,6 +890,7 @@ export class CanvasRenderer implements DocumentRenderer {
           style.blendIf.enabled,
         );
         let occupied = layer.kind === "text" || layer.kind === "vector" ? cache?.bounds(key, signature) : undefined;
+        let clippingCoverage:HTMLCanvasElement|undefined;
         try {
           if (!cacheable || !cache?.read(key, signature, content)) {
             let textInk: ReturnType<typeof drawText>;
@@ -1215,6 +1225,8 @@ export class CanvasRenderer implements DocumentRenderer {
           }
           const c = content.getContext("2d")!,
             r = result.getContext("2d")!;
+          if(clipped.length)clippingCoverage=await composeClippingStack(content,layer.fillOpacity??1,
+            colorPlane=>paint(clipped,colorPlane,padded,parent,undefined,true,true),options.isCancelled);
           const maskData = previewMask(layer, preview);
           let maskCanvas: HTMLCanvasElement | undefined;
           if (maskData?.enabled && maskData.density > 0) {
@@ -1259,6 +1271,7 @@ export class CanvasRenderer implements DocumentRenderer {
                 c.globalCompositeOperation = "destination-in";
                 c.drawImage(mask, 0, 0);
                 c.restore();
+                if(clippingCoverage){const coverage=clippingCoverage.getContext('2d')!;coverage.save();try{coverage.globalCompositeOperation='destination-in';coverage.drawImage(mask,0,0);}finally{coverage.restore();}}
               }
             } finally {
               release(mask);
@@ -1268,7 +1281,7 @@ export class CanvasRenderer implements DocumentRenderer {
             const silhouette = createCanvas(padded.width, padded.height);
             const s = silhouette.getContext("2d")!;
             try {
-              s.drawImage(content, 0, 0);
+              s.drawImage(clippingCoverage??content, 0, 0);
               s.globalCompositeOperation = "source-in";
               s.fillStyle = shadow.color;
               s.fillRect(0, 0, padded.width, padded.height);
@@ -1371,7 +1384,7 @@ export class CanvasRenderer implements DocumentRenderer {
             }
           } else {
             if (!directContent) {
-              r.globalAlpha = layer.fillOpacity ?? 1;
+              r.globalAlpha = clipped.length?1:layer.fillOpacity ?? 1;
               r.drawImage(content, -haloX, -haloY);
               r.globalAlpha = 1;
             }
@@ -1427,6 +1440,7 @@ export class CanvasRenderer implements DocumentRenderer {
             }
           }
         } finally {
+          if(clippingCoverage)release(clippingCoverage);
           release(content);
           if (result !== content) release(result);
         }

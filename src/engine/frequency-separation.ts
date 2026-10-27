@@ -130,7 +130,7 @@ export async function prepareFrequencySeparation(editor:EditorApplication,layerI
     const draft=Document.fromJSON(state.document);draft.onCommand(command=>commands.push(structuredClone(command)));
     const original=draft.getLayer(layerId) as RasterLayer,working=original.duplicate() as RasterLayer;
     working.moveTo(draft);working.transform=new AffineTransform();working.width=native.width;working.height=native.height;
-    working.opacity=1;working.fillOpacity=1;working.blendMode='normal';working.mask=null;working.styles=new LayerStyle();working.visible=true;
+    working.opacity=1;working.fillOpacity=1;working.blendMode='normal';working.mask=null;working.styles=new LayerStyle();working.visible=true;working.clipped=false;
     const data=original.toJSON();if(data.kind!=='raster')throw new Error('Missing raster source.');
     const entries=data.erasures??[],nativeWet=entries.some(entry=>isActiveWetPaint(entry.stroke));
     working.update({erasures:nativeWet?entries:[]});working.resetAdjustments();

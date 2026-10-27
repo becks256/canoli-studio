@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+### Current F02 sibling clipping increment (2026-10-26)
+
+Schema 48 connects editable clipping membership to shared OO/history, Inspector/palette, isolated scripts/plugins, independent REST, recipes and original-bearing native persistence. The dated roadmap records source-isolation, native-alpha, styles/cache and large-image verification. Affected SVG/Photoshop prefixes are baked with explicit editability loss; Photoshop clipping import retains merged fallback. [Contract and remaining F02 scope](CLIPPING_MASKS.md). The full professional-editor, all-tool performance and original roadmap remain required.
+
 Public vertical writing is connected under F08; see [the current contract](VERTICAL_TEXT.md). Broader typography/flow/interchange and the full original portfolio remain required.
 
 ### Current F08 native vertical dependency (2026-10-26)

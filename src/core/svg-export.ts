@@ -32,7 +32,7 @@ export function* svgDocumentChunks(document: SvgDocument, rasterMasks?:SvgRaster
   function* layers(nodes: LayerData[],parent:AffineTransform): Generator<string> {
     for (const layer of nodes) {
       if (!layer.visible || layer.opacity === 0) continue;
-      if(layer.kind==='adjustment'||layer.styles?.blendIf.enabled||(layer.kind==='group'&&layer.blendMode==='pass-through'))throw new Error('Adjustments, pass-through groups and Blend If require native backdrop preparation. Use host editor.export({format: "svg"}).');
+      if(layer.clipped||layer.kind==='adjustment'||layer.styles?.blendIf.enabled||(layer.kind==='group'&&layer.blendMode==='pass-through'))throw new Error('Clipping layers, adjustments, pass-through groups and Blend If require native backdrop preparation. Use host editor.export({format: "svg"}).');
       if (layer.kind !== 'group' && layer.kind !== 'vector'&&layer.kind!=='raster'&&layer.kind!=='text'&&layer.kind!=='smart-object'&&layer.kind!=='paint') continue;
       const matrix = localTransform(layer),world=parent.multiply(matrix);
       const transform = [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].map(svgNumber).join(' ');

@@ -1,4 +1,5 @@
 import { LutControls } from "./LutControls";
+import {clippingBaseFor} from '../core/clipping';
 import { RedEyeControls } from "./RedEyeControls";
 import { WhiteBalanceControls } from "./WhiteBalanceControls";
 import { GradientMapControls } from "./GradientMapControls";
@@ -347,7 +348,11 @@ export function InspectorPanel({
           </InspectorSection>
           {frequencyGroup&&frequencyOwner?.frequencyRadius!=null&&<FrequencyRadiusControls key={`${dom.id}:${frequencyGroup.id}`} document={dom} group={frequencyGroup} value={frequencyOwner.frequencyRadius} busy={busy} onPreview={onPreview} onAttempt={onAttempt}/>}
           <InspectorSection title="Appearance">
-            {selected.blendMode==='pass-through'&&<p className="panel-description">Children blend with the surrounding stack. Choose Normal to use group styles or fill opacity.</p>}
+            <label className="check-field"><input type="checkbox" checked={selected.clipped??false}
+              disabled={locked||busy||(!selected.clipped&&!clippingBaseFor(dom._read().children,selected.id))}
+              onChange={event=>{onPreview(null);const value=event.target.checked;onSelectedAction(layer=>{layer.clipped=value;});}}/>Clip to base layer</label>
+            {selected.clipped&&<p className="panel-description">{clippingBaseFor(dom._read().children,selected.id)?.name??'No base layer'} controls this layer’s visible area.</p>}
+            {selected.blendMode==='pass-through'&&<p className="panel-description">Pass-through blends with surrounding layers unless this group is a clipping base. Choose Normal to use group styles or fill opacity.</p>}
             <Select
               label="Blend mode"
               hideLabel

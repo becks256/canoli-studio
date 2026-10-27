@@ -46,7 +46,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 47;
+export const SCHEMA_VERSION = 48;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -84,6 +84,8 @@ export interface ToneEffectData {
 }
 
 export interface LayerBaseData {
+  /** Use the transparency of the preceding unclipped sibling as the clipping base. */
+  clipped?: boolean;
   transform?: AffineData;
   mask?: LayerMaskData | null;
   metadata?: AuthoredMetadataData | null;
@@ -210,6 +212,7 @@ export interface DocumentData {
     | 44
     | 45
     | 46
+    | 47
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -619,7 +622,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -627,7 +630,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     value.colorSpace !== "srgb"
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–45), sRGB, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–48), sRGB, and positive, safely representable integer dimensions.",
     );
   }
   const checkSelection = (selection: unknown) => {
@@ -663,6 +666,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     const compIds = new Set<string>();
     for (const entry of value.layerComps) {
       const comp = layerCompSchema.parse(entry);
+      if(Number(value.schemaVersion)<48&&comp.layers.some(layer=>layer.appearance?.clipped!==undefined))throw new Error('Layer comp clipping requires document schema version 48.');
       if (comp.documentId !== value.id || compIds.has(comp.id))
         throw new Error("Invalid layer comp ownership or duplicate identity.");
       compIds.add(comp.id);
@@ -705,6 +709,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           "Invalid layer properties, duplicate IDs, or more than 64 layers.",
         );
       }
+      if(node.clipped!==undefined&&(typeof node.clipped!=='boolean'||Number(value.schemaVersion)<48))throw new Error('Clipping layers require a boolean and document schema version 48.');
       if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node||'characterRanges'in node||'textPath'in node||'textPathOrigin'in node||'writingMode'in node||'textOrientation'in node||'textFrameOrigin'in node||'textInlineExtent'in node))throw new Error('Native font features require a text layer.');
       if (node.blendMode === 'pass-through') {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 28)

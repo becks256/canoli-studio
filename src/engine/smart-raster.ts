@@ -48,6 +48,7 @@ export async function prepareSmartRaster(
       y: world.f,
       transform: { a: world.a, b: world.b, c: world.c, d: world.d, e: 0, f: 0 },
       visible: true,
+      clipped: undefined,
       opacity: 1,
       fillOpacity: 1,
       blendMode: "normal",

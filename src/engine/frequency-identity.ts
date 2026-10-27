@@ -6,7 +6,7 @@ import type {Rect} from '../core/drawing';
 import {localBounds} from '../core/spatial';
 
 const identity=(value?:{a:number;b:number;c:number;d:number;e:number;f:number})=>!value||(value.a===1&&value.b===0&&value.c===0&&value.d===1&&value.e===0&&value.f===0);
-const neutral=(layer:LayerData)=>layer.visible&&layer.opacity===1&&(layer.fillOpacity??1)===1&&layer.x===0&&layer.y===0&&identity(layer.transform)&&!layer.mask&&!layer.styles?.dropShadow.enabled&&!layer.styles?.colorOverlay.enabled&&!layer.styles?.blendIf.enabled;
+const neutral=(layer:LayerData)=>!layer.clipped&&layer.visible&&layer.opacity===1&&(layer.fillOpacity??1)===1&&layer.x===0&&layer.y===0&&identity(layer.transform)&&!layer.mask&&!layer.styles?.dropShadow.enabled&&!layer.styles?.colorOverlay.enabled&&!layer.styles?.blendIf.enabled;
 
 /** Exact native RGB8 reconstruction outside retouch ink, never an approximate preview.
  * The strict shape deliberately declines altered filters, transforms, masks or styles.
@@ -14,7 +14,7 @@ const neutral=(layer:LayerData)=>layer.visible&&layer.opacity===1&&(layer.fillOp
 export function frequencyIdentitySource(master:Pick<DocumentData,'width'|'height'|'children'>,registry:ComponentRegistry,assets:AssetStore):{raster:RasterLayerData;samplingHalo:number;unchanged(region:Rect):boolean}|null{
   if(master.children.length!==1)return null;
   const group=master.children[0];
-  if(group.kind!=='group'||group.children.length!==3||group.blendMode!=='normal'||!group.visible||group.opacity!==1||(group.fillOpacity??1)!==1||group.x!==0||group.y!==0||!identity(group.transform)||group.styles?.dropShadow.enabled||group.styles?.colorOverlay.enabled||group.styles?.blendIf.enabled)return null;
+  if(group.clipped||group.kind!=='group'||group.children.length!==3||group.blendMode!=='normal'||!group.visible||group.opacity!==1||(group.fillOpacity??1)!==1||group.x!==0||group.y!==0||!identity(group.transform)||group.styles?.dropShadow.enabled||group.styles?.colorOverlay.enabled||group.styles?.blendIf.enabled)return null;
   const alpha=group.mask;
   if(alpha?.kind!=='bitmap'||!alpha.enabled||alpha.inverted||alpha.density!==1||(alpha.feather??0)!==0||(alpha.x??0)!==0||(alpha.y??0)!==0||alpha.linked===false||!identity(alpha.basis)||alpha.strokes?.length)return null;
   const sources:SmartObjectInstanceData[]=[],retouches:PaintLayerData[]=[];

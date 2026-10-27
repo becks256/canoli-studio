@@ -260,9 +260,10 @@ for (const outcome of ["complete", "escape", "blur", "edit"]) test(`paste reques
   if (outcome === "blur") await page.evaluate(() => window.dispatchEvent(new Event('blur')));
   if (outcome === "edit") await page.evaluate(() => { window.luma.editor.document.selectedLayer!.x += 1; });
   await page.evaluate(() => (window as any).releaseCopy());
-  await expect(page.getByText('Working…', {exact:true})).toHaveCount(0);
   await expect(page.locator('.layer-row')).toHaveCount(cancel ? 1 : 3);
+  await expect(page.getByText('Working…', {exact:true})).toHaveCount(0);
   if (!cancel) {
+    await expect(page.getByRole('button',{name:'Undo (Mod+Z)',exact:true})).toBeEnabled();
     await page.keyboard.press('Control+z');
     await expect(page.locator('.layer-row')).toHaveCount(2);
     await page.keyboard.press('Control+z');

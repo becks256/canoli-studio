@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Clipping layers
+
+Schema-48 `Layer.clipped` uses existing shared layer.update validation and host-commit read/write grants. It adds no file, asset, network or other capability. Installation remains inert; execution stays isolated. [Defaults, stack semantics, example, errors and persistence/export limits](CLIPPING_MASKS.md).
+
 ## Declared alignment inspection (A12)
 
 Design checks now accept optional explicit alignment rules against a canvas or independent key-layer frame, with document-pixel tolerance. Shared authored geometry includes affine parents, path/vertical text origins and active wet-paint/raster-replacement extents. Locked references remain readable; hidden targets, empty/unknown geometry and unresolved numerical precision remain explicit unverified results. Geometry work stays in private workers with scoped metadata and existing read/asset grants. Inspection changes no artwork/history or source bytes.

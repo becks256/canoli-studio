@@ -750,6 +750,7 @@ export class WebGpuRenderer {
   ) {
     const neutral = {
       ...layer,
+      clipped: undefined,
       mask: null,
       // The supplied world matrix already includes the layer basis.
       transform: undefined,
@@ -808,6 +809,7 @@ export class WebGpuRenderer {
       stroke.points.every(point=>paintStampSize(stroke,point)*scale>=2);
   }
   private supported(nodes: LayerData[], scale: number): boolean {
+    if(nodes.some(node=>node.clipped))return false;
     return nodes.every(
       (node) =>
         !node.visible ||

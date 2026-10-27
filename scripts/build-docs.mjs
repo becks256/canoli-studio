@@ -52,6 +52,7 @@ const generatedPages = [
   ["SVG_FONT_IMPORT", "SVG fonts and editable text"],
   ["SVG_CHARACTER_IMPORT", "Editable SVG character formatting"],
   ["LAYER_ALIGNMENT", "Align layers to canvas or key object"],
+  ["CLIPPING_MASKS", "Editable clipping masks"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

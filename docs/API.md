@@ -34,6 +34,10 @@ The shared optional text/paragraph `fontVariationSettings` field carries validat
 
 Independent REST `layer.update` commands preserve authored text dimensions for position, transform, name, opacity/fill/blend, color, alignment, visibility, lock and other non-layout changes. Explicit content, font metrics, paragraph layout or legacy width/height requests recalculate text bounds; supplying the same text remains an explicit reflow request. Shared strict validation, expected revisions, atomic rollback and Undo apply. REST documents remain independent of the browser. See the [scripting measurement contract](SCRIPTING_API.md#text-property-edits-and-explicit-reflow).
 
+## Clipping layer updates
+
+The same independent `layer.update` surface accepts strict boolean `patch.clipped` in schema 48, with existing revision/lock/atomic Undo rules. It preserves editable sibling membership; REST remains separate from browser artwork. [Clipping defaults, orphan/base semantics, example, errors and export limits](CLIPPING_MASKS.md).
+
 ## Layer alignment command
 
 The existing independent command endpoint accepts layer.align with distinct ids, a six-value alignment and an optional strict selection/canvas/layer target. Omitted target uses the selection. Expected revisions, atomic validation and ordinary Undo remain authoritative; a key reference can be locked but cannot overlap a moving hierarchy. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md) for defaults, examples, errors and verification limits.

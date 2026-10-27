@@ -184,6 +184,7 @@ export function resolveSmartDocument(
     // transformed clip multiplies edge antialiasing and changes converted pixels.
     if (
       sole?.kind === "raster" &&
+      !sole.clipped &&
       sole.visible &&
       sole.x === 0 &&
       sole.y === 0 &&

@@ -38,7 +38,7 @@ export function validatePsdDimensions(width:number,height:number,format:Photosho
 /** Pass-through carries unsupported backdrop dependencies outward; ordinary
  * groups stop them. Native Photoshop adjustment serialization remains separate. */
 function backdropDependent(node:LayerData):boolean{
- return node.kind==='adjustment'||!!node.styles?.blendIf.enabled||
+ return !!node.clipped||node.kind==='adjustment'||!!node.styles?.blendIf.enabled||
   (node.kind==='group'&&node.blendMode==='pass-through'&&node.children.some(backdropDependent));
 }
 function styled(node:LayerData):boolean{return !!(node.styles?.dropShadow.enabled||node.styles?.colorOverlay.enabled);}

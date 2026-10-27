@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Clipping controls
+
+Use the existing Appearance check-field and command palette for clipping. Disable creation without an eligible preceding base or under existing busy/lock rules; allow release of an orphan. Show the current base name in the Inspector and an indented arrow in clipped layer rows. Do not expose renderer/cache implementation details in the control. [Behavior and limitations](CLIPPING_MASKS.md).
+
 ## Move spacing feedback
 
 Use the existing custom Move options for Spacing guides and opt-in Equal spacing under artwork attraction. Draw pointer-inert accent interval lines with endpoint ticks and screen-sized monospace pixel labels. Keep rounded values explicit, distinguish equal values and place nearby labels in separate lanes using their actual rendered extents. Clear transient feedback with cancelled/stale gestures and disabled guides. Preserve the ordinary selection outline, focus, Undo and export pixels. Do not add shortcuts, tool-rail icons or a new component framework. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md#spacing-feedback-while-moving-artwork).

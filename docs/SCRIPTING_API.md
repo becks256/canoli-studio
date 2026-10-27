@@ -600,6 +600,8 @@ To inspect metadata as text, use `JSON.stringify(document.toJSON())`. Editing th
 
 ## Layers and groups
 
+Schema 48 adds the common `clipped?: boolean` constructor option and writable `layer.clipped` property (default false). Updates use shared validation, locks and Undo. Consecutive clipped siblings use the preceding unclipped pixel-bearing base; orphan members render transparently. Moving/reordering changes sibling relationships. [Exact defaults, masks/styles/fill semantics, executable example, errors, persistence and export limits](CLIPPING_MASKS.md).
+
 `RasterLayer`, `PaintLayer`, `VectorLayer` and `LayerGroup` share the base Layer API. `Layer` is an abstract base class, not a constructor binding in the Scripts panel.
 
 Signatures:
@@ -614,6 +616,7 @@ Shared constructor options and writable properties:
 | `name`      | string  | `"Image"` / `"Group"` | Nonempty, at most 240 characters.                                                                                                          |
 | `x`, `y`    | number  | `0`                   | Offset relative to parent, in document pixels. Negative and fractional values are allowed; finite, within ±`Number.MAX_SAFE_INTEGER`.      |
 | `opacity`   | number  | `1`                   | Inclusive range 0…1.                                                                                                                       |
+| `clipped`   | boolean | `false`               | Clip to the preceding unclipped sibling base; see the clipping contract above. |
 | `visible`   | boolean | `true`                | Hidden groups also hide their descendants.                                                                                                 |
 | `locked`    | boolean | `false`               | Prevent ordinary edits to this node and its descendants. Lock-state changes remain possible; unlocking a child does not unlock its parent. |
 | `blendMode` | string  | `"normal"`            | See the supported blend modes below.                                                                                                       |

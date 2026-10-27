@@ -1,5 +1,11 @@
 # Architecture
 
+## Sibling clipping stacks (F02)
+
+Schema 48 adds optional LayerBaseData.clipped and the shared OO/command flag. core/clipping derives consecutive sibling stacks; orphan members and members behind an adjustment-only base have no intrinsic coverage. engine/clipping prepares a temporary color plane, composes members and restores base alpha once. Base fill precedes members, then the existing base mask/styles and final opacity/blending apply. Pre-fill alpha remains separate for shadows. Pass-through bases become isolated intrinsic groups. Raw cache surfaces remain independent; completed base-only shortcuts are disabled for active clipping stacks. Canvas fallback covers GPU clipping; export planners bake affected SVG/Photoshop prefixes with explicit loss reporting. Source-isolated preparation preserves the public outer relationship. [Contract and remaining scope](CLIPPING_MASKS.md).
+
+Bounded working-surface recursion carries its captured member/backdrop context. A member remains an eligible member when rendered alone into its private window; nested group children still resolve their own sibling stacks. Never reinterpret that private render as a public orphan or clear the authored flag to work around it.
+
 ## Compact vector working surfaces
 
 The Canvas compositor uses `nativeVectorFootprint` for eligible normal-blend vector working windows and compact raw/finished cache retention. The existing canonical native grid still rasterizes paths, and windows stay on the original output-pixel lattice. Masks/overlays do not expand vector ink; shadow support is propagated using the established effect halo. Other compositing conditions retain their full working path while raw retained pixels can remain compact. Cache-disabled rendering preserves the full native reference path.

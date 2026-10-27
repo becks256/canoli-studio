@@ -270,6 +270,7 @@ export interface DocumentOptions {
   assets?: AssetStore;
 }
 export interface LayerOptions {
+  clipped?: boolean;
   name?: string;
   x?: number;
   y?: number;
@@ -1183,6 +1184,8 @@ export abstract class Layer {
   set fillOpacity(value: number) {
     this.update({ fillOpacity: value });
   }
+  get clipped(): boolean { return this._read().clipped ?? false; }
+  set clipped(value: boolean) { this.update({clipped:value}); }
   get mask(): LayerMask | null {
     const value = this._read().mask;
     return value ? LayerMask._fromJSON(value) : null;

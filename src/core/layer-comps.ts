@@ -50,6 +50,7 @@ export const layerCompSchema = z
             .object({
               opacity: z.number().min(0).max(1),
               fillOpacity: z.number().min(0).max(1),
+              clipped: z.boolean().optional(),
               blendMode: z.custom<(typeof BLEND_MODES)[number]>((value) =>
                 BLEND_MODES.includes(value as (typeof BLEND_MODES)[number]),
               ),
@@ -121,6 +122,7 @@ function appearance(layer: LayerData) {
   return {
     opacity: layer.opacity,
     fillOpacity: layer.fillOpacity ?? 1,
+    ...(layer.clipped?{clipped:true}:{}),
     blendMode: layer.blendMode,
     styles: layer.styles ?? defaultStyle(),
   };
@@ -186,8 +188,11 @@ export function planLayerComp(
       if (!equivalent(saved.position, position(layer)))
         Object.assign(patch, saved.position);
     }
-    if (saved.appearance && !equivalent(saved.appearance, appearance(layer)))
-      Object.assign(patch, saved.appearance);
+    if (saved.appearance && !equivalent(
+      {...saved.appearance,clipped:saved.appearance.clipped??false},
+      {...appearance(layer),clipped:layer.clipped??false},
+    ))
+      Object.assign(patch, {clipped:false}, saved.appearance);
     if (Object.keys(patch).length)
       commands.push({ type: "layer.update", id: layer.id, patch });
   }

@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Editable clipping stacks (F02)
+
+Support schema-48 boolean sibling clipping through constructors/shared updates, Inspector and palette, one Undo, independent REST, isolated scripts/plugins, recipes and native persistence. Preserve source geometry and original bytes. Apply intrinsic base coverage once across multiple soft-edge members, with base opacity/blending and member adjustment isolation. Respect hidden/orphan/nested/group boundaries, masks/styles/fill, transforms, stale work and existing locks/grants. Native exports must retain complete sampling and source resolution; unsupported editable interchange must disclose baking/fallback. Verify wet painting, smart rasterization and frequency-source isolation, complete native reference pixels and the actual 50 MP workflow. Full F02 and advanced clipping/Photoshop fidelity remain open. [Exact contract](CLIPPING_MASKS.md).
+
 ## Vector working pixels and retained geometry (F14)
 
 Use conservative native vector footprints to bound eligible Canvas working surfaces and retained raw/finished pixels, keeping the original output-pixel lattice and authored geometry independent. Reuse geometry only for registry-proven complete immutable path arrays; caller freezing, mutable Pen previews, same-ID replacements and returned rectangles must not corrupt later bounds. Preserve gradients, caps/joins/dashes, compound fill rules, masks, opacity, blend behavior and effect support exactly against uncached/native references. Keep the shared cache byte/entry budget and release surfaces normally. Verify real production input-to-matching-canvas updates with actual pixel evidence, original-path/Undo/project equality and the 50 MP source workflow. This changes no document/API/schema/permission or source-resolution limit; broader all-tool F14 remains open.
