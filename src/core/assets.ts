@@ -1,3 +1,5 @@
+import{FloatRasterSource}from'./float-source/source';
+import type{ColorOutput}from'./color/color-settings';
 import { MetadataService } from "../intelligence/metadata/service";
 import {FontSourceStore} from '../fonts/store';
 import { AnalysisService } from "../intelligence/candidates/service";
@@ -139,6 +141,11 @@ export class AssetStore {
     sharedRecords.add(copy);
     lease.owners++;
     return copy;
+  }
+
+  /** Trusted readonly precision lease, independent of this store's bitmap lifetime. */
+  captureFloatSource(assetId:string,output:ColorOutput={profile:'linear-srgb'}):FloatRasterSource{
+    this.assertOpen();const asset=this.get(assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Choose a retained float32 TIFF source; byte proxies are not precision sources.');return FloatRasterSource.capture(asset.blob,asset.width,asset.height,asset.tiff,asset.tiffColor.source,output);
   }
 
   async add(

@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "reference": "Independent native libtiff float sample readback, native Linux Little CMS float32 original ICC -> linear-sRGB; no 8-bit intermediate.",
+  "libtiff": "LIBTIFF, Version 4.3.0",
+  "nativeCmmSha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6",
+  "generatorSha256": "ad7306b812ed40d1526995d775a03f8bc6490e4daf2ab1d5b2d336f8467fdde6",
+  "targetProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+  "cases": [
+    {
+      "file": "rgba-raw-le.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-raw-le-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "99f25377d308953a00dc2bb2ffbcfe148036c49e676652ef24bc1b07d81b11ec",
+      "sourceSha256": "fd282be083861874bfec3986dccab52ec375bf20250ed3bbf214fbb589c60a5a",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgba-deflate-be.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-deflate-be-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "99f25377d308953a00dc2bb2ffbcfe148036c49e676652ef24bc1b07d81b11ec",
+      "sourceSha256": "b3ed736c80e4c99769543de088459ff4e366bdac42d0c0ee90a5799fbfa3fb41",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgba-lzw-predictor3.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-lzw-predictor3-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "99f25377d308953a00dc2bb2ffbcfe148036c49e676652ef24bc1b07d81b11ec",
+      "sourceSha256": "69764a43975aa84d8022a32f699a69b986deec6393569457ddd90510ef160f26",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgba-deflate-predictor3-be.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-deflate-predictor3-be-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "99f25377d308953a00dc2bb2ffbcfe148036c49e676652ef24bc1b07d81b11ec",
+      "sourceSha256": "f869ef72ee9224f0bdeb7133b91f694140f57bf4ae4a39ac88aa85d3410dac46",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgba-planar-predictor3.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-planar-predictor3-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "99f25377d308953a00dc2bb2ffbcfe148036c49e676652ef24bc1b07d81b11ec",
+      "sourceSha256": "37900b540ee366bbfe3cff93634a3914d4eeb8058f0f7f5ac93f524e5f347f33",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgba-deflate-predictor2.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-deflate-predictor2-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "99f25377d308953a00dc2bb2ffbcfe148036c49e676652ef24bc1b07d81b11ec",
+      "sourceSha256": "9b27f123e3284892f5809f87d3a6d27f37b874e2593ca88f7790f6e90b82fca2",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgba-associated.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-associated-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "5caf5ffc589adfe4c4ccdc9972c0da321b2e009539d5d386a448a6385ae40e6a",
+      "sourceSha256": "7db6fb8b9f7d3e0e439fb5014f007de79f3c56c90930dbad02d9364e6d8494e1",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgba-packbits.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgba-packbits-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "99f25377d308953a00dc2bb2ffbcfe148036c49e676652ef24bc1b07d81b11ec",
+      "sourceSha256": "8d432efd73217d8bbc5293f21db0a50bc3b6bd38ef924a80098ba118dd02cbe1",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "rgb-opaque.tif",
+      "assumption": null,
+      "width": 131,
+      "height": 79,
+      "reference": "rgb-opaque-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "7f5149b45c94cd9cc27270bda8c1a02f573bfd6aef07fbcc34dc9674bd0cbe2d",
+      "sourceSha256": "7446c7e8b5ce45a1f4fdcceda2ccacf09cdafe5a11653646ce956ec0cf15d5d0",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    },
+    {
+      "file": "unprofiled-linear.tif",
+      "assumption": "linear-srgb",
+      "width": 131,
+      "height": 79,
+      "reference": "unprofiled-linear-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "b13ca4a60dd4873f171d4d1bb5536337bf1ffb9fbff1bdeae5c1bf9e6d6dc5c9",
+      "sourceSha256": "145e11677f72f91565620cbbeb0b8e900307ed96a0ec5c5be3ca10f00189b7d5",
+      "sourceProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae"
+    },
+    {
+      "file": "gray-linear.tif",
+      "assumption": "linear-srgb",
+      "width": 131,
+      "height": 79,
+      "reference": "gray-linear-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "b673c919207c511fafce8b8372fb6408ebdad451e48923805fed5657b8d964da",
+      "sourceSha256": "43604a57d4640b1ec19142835fce23c21732c0e3fd555ec3a2e92ef185c7e553",
+      "sourceProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae"
+    },
+    {
+      "file": "gray-white-associated.tif",
+      "assumption": "linear-srgb",
+      "width": 131,
+      "height": 79,
+      "reference": "gray-white-associated-linear.f32le.gz",
+      "samples": 41396,
+      "floatSha256": "7c11715f4fc2d8487ed84cb78daad8cb8bfa6e118fd17328df0af5c47b0eeae4",
+      "sourceSha256": "a25a00e5c79669344b7f1f7f001c9c839b1ee35583f876dc3584cd335e04e669",
+      "sourceProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae"
+    },
+    {
+      "file": "native-50mp.tif",
+      "assumption": null,
+      "width": 10000,
+      "height": 5000,
+      "reference": "native-50mp-linear.f32le.gz",
+      "samples": 200000000,
+      "floatSha256": "2cd09dbc60e652203827ae8431533301e568270e1c437642978f465849b64c19",
+      "sourceSha256": "47aa1c9c9e98f748797d706021521554dff988049d03e7216cce008c490409a8",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+    }
+  ],
+  "files": {
+    "gray-linear-linear.f32le.gz": {
+      "bytes": 42894,
+      "sha256": "208bd383999fe3d9398196d022311cee3a4fa7323e9ef12e3ffb2e8c1ee08bf6"
+    },
+    "gray-white-associated-linear.f32le.gz": {
+      "bytes": 35759,
+      "sha256": "49087104c665adcc2301cec80315538a6d8a7e1df26f60ff89d6c9dde8fd8503"
+    },
+    "native-50mp-linear.f32le.gz": {
+      "bytes": 2976164,
+      "sha256": "c68c375054f719f7587c0f511de9b57cbba58d128736e2f78bc4184443cf8d0b"
+    },
+    "rgb-opaque-linear.f32le.gz": {
+      "bytes": 121451,
+      "sha256": "402f8e830403867793607035d352d2d95a5711efc54b6c96967e772d2d87829e"
+    },
+    "rgba-associated-linear.f32le.gz": {
+      "bytes": 102027,
+      "sha256": "5f7556dfc0517099a148ec061a8f73308b63321d3fc16fc21d3a3884c7c56642"
+    },
+    "rgba-deflate-be-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+    },
+    "rgba-deflate-predictor2-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+    },
+    "rgba-deflate-predictor3-be-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+    },
+    "rgba-lzw-predictor3-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+    },
+    "rgba-packbits-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+    },
+    "rgba-planar-predictor3-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+    },
+    "rgba-raw-le-linear.f32le.gz": {
+      "bytes": 126341,
+      "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+    },
+    "unprofiled-linear-linear.f32le.gz": {
+      "bytes": 80711,
+      "sha256": "5207cc98d83457ae2efaf470761b383972aa528dd619368d692270fde0cc41a5"
+    }
+  }
+}

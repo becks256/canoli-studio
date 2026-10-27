@@ -1,4 +1,6 @@
 import {spacingWorkflow} from './helpers/spacing';
+import{productionFloatSources}from'./helpers/float-source-production';
+test('production float source workers preserve every independent original sample without developer globals',async({page},info)=>{await productionFloatSources(page,info);});
 import {svgClippingWorkflow}from './helpers/svg-clipping';
 test('production SVG geometric clipping preserves native controls, isolated edits, Undo, editable SVG and project reopening',async({page},info)=>{await svgClippingWorkflow(page,info,true);});
 import {clippingWorkflow} from './helpers/clipping';

@@ -1,0 +1,11 @@
+import{test,expect}from'@playwright/test';
+import{readFile,writeFile}from'node:fs/promises';
+test('malformed persisted manifest identities repair from originals while stale repair preserves a newer valid build',async({page},info)=>{
+ await page.goto('/');const result=await page.evaluate(async bytes=>{
+  const{FloatRasterSource}=await import(/* @vite-ignore */String('/src/core/float-source/source.ts')),{FloatTileRepository}=await import(/* @vite-ignore */String('/src/core/float-source/storage.ts')),original=new Blob([new Uint8Array(bytes)],{type:'image/tiff'}),first=await FloatRasterSource.openTiff(original),manifest=await first.prepare(),expected=await first.readWindow({x:0,y:0,width:131,height:79});first.dispose();
+  const db=await new Promise<IDBDatabase>((resolve,reject)=>{const r=indexedDB.open('canoli-float-tiles');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});const brokenId={invalid:'persisted build identity'};
+  try{await new Promise<void>((resolve,reject)=>{const tx=db.transaction('sources','readwrite');tx.objectStore('sources').put({...manifest,buildId:brokenId},manifest.key);tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error);});}finally{db.close();}
+  const source=await FloatRasterSource.openTiff(original);let rejected='',retry='',repaired=false,protectedBuild=false;
+  try{await source.prepare();}catch(error){rejected=String(error);}try{const next=await source.prepare(),actual=await source.readWindow({x:0,y:0,width:131,height:79});repaired=next.buildId!==manifest.buildId&&actual.every((v:number,i:number)=>v===expected[i]);const repo=new FloatTileRepository();try{await repo.invalidate({key:manifest.key,buildId:brokenId});const still=await repo.lookup(next.descriptor);protectedBuild=still?.buildId===next.buildId;}finally{repo.dispose();}}catch(error){retry=String(error);}finally{source.dispose();}return{rejected,retry,repaired,protectedBuild};
+ },[...await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif')]);await writeFile(info.outputPath('float-source-manifest-repair.json'),JSON.stringify(result,null,2));expect(result.rejected).toMatch(/corrupt/);expect(result).toMatchObject({retry:'',repaired:true,protectedBuild:true});
+});
