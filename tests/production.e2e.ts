@@ -2173,3 +2173,6 @@ test('production portable ICC presets and recipe packages retain exact batch del
 
 import{rawTiffWorkflow}from'./helpers/raw-tiff';
 test('production RAW review exports genuine integer and float TIFF masters without 8-bit consent or artwork changes',async({page},info)=>{test.setTimeout(240000);await rawTiffWorkflow(page,info,true);});
+
+import{floatTiffWorkflow}from'./helpers/float-tiff';
+test('production float TIFF import requires explicit precision/color choices and reopens original-bearing pixels without globals',async({page},info)=>{await floatTiffWorkflow(page,info,true);});

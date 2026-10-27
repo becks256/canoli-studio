@@ -1,5 +1,9 @@
 # Architecture
 
+## Normalized float TIFF input increment
+
+Float TIFF decoding reconstructs original float samples in private workers, applies native ICC before sRGB8 quantization and shares the existing ICC owner queue. Whole-document import guards cancellation, revision and session ownership; original bytes and decode choices remain authoritative. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+
 ## Native RAW master TIFF
 
 Trusted editor.exportRawTiff captures a File or current retained RAW smart-object source and immutable RGB output settings. The private RAW TIFF worker performs native linear RGB16 development/lens sampling and CMM conversion into core/tiff-encoder uint16/float32 tiles. It shares RAW and ICC owner leases; tiff-client validates actual bounded decompression, complete ICC and source/settings/native receipts before publication. Current scene, command/history/persistence and isolated/REST boundaries remain unchanged. [Contract](RAW_TIFF.md).

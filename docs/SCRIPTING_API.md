@@ -1,5 +1,9 @@
 # Scripting API
 
+## Normalized float TIFF input increment
+
+The trusted browser host accepts normalized SDR float32 TIFF pages through `editor.openTiff(file, {page: 0, allowPrecisionLoss: true, floatColorSpace: 'linear-srgb'}, control)`. The optional interpretation is required only without ICC; embedded ICC is authoritative. Defaults remain page 0, precision consent false, and no assumed float space. Nonfinite/invalid-alpha/HDR input rejects. Isolated Scripts gain no file or worker privilege; public document constructors and commands remain unchanged. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+
 ## RAW TIFF stays with the trusted host
 
 The trusted browser host can export a selected File or retained RAW smart object as native uint16/float32 TIFF without the canvas 8-bit proxy. This is a file-delivery service outside document constructors and commands. Existing RawDevelopment setters/commands still require explicit 8-bit editing consent and keep shared Undo. No isolated script/plugin file/native grant or headless REST rendering/synchronization is added. Exact host signature, options/defaults, example, error/cancellation behavior and limits: [RAW_TIFF.md](RAW_TIFF.md).

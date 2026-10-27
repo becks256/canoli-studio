@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Normalized float TIFF input increment
+
+Trusted browser-host TIFF input adds optional `floatColorSpace: 'srgb' | 'linear-srgb'` for unprofiled float sources, with separate explicit precision-loss consent. Normalized SDR float32 sources use native ICC and retain complete originals. This adds no REST rendering or browser synchronization. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+
 ## Native RAW master TIFF
 
 Trusted editor.exportRawTiff(source: File | SmartObjectLayer, options = {}, control = {}) returns native integer16 or float32 TIFF, inspection and an actual source/settings/color/native receipt. It exports the developed sensor master independently of document placement/effects and leaves artwork/history unchanged. Native options, captured RGB output, cancellation/progress, validation and limits: [RAW_TIFF.md](RAW_TIFF.md). No isolated/REST rendering capability is added.

@@ -199,6 +199,7 @@ export class EditorApplication {
   private ioGeneration = 0;
   private photoshopJobs=new Set<AbortController>();
   private rawJobs=new Set<AbortController>();
+  private tiffJobs=new Set<AbortController>();
   private avifJobs=new Set<AbortController>();
   private fontJobs=new Set<AbortController>();
   private photoshopCommits=new Set<AbortController>();
@@ -1502,7 +1503,10 @@ export class EditorApplication {
     finally{this.fontJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
   }
 
-  async inspectTiff(file:File,control:TiffImportControl={}):Promise<TiffImportReport>{return inspectTiffFile(file,control);}
+  async inspectTiff(file:File,control:TiffImportControl={}):Promise<TiffImportReport>{
+    if(this.retouchDisposed)throw new Error('The editor is disposed.');control.signal?.throwIfAborted();const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);this.tiffJobs.add(abort);control.signal?.addEventListener('abort',cancel,{once:true});
+    try{return await inspectTiffFile(file,{...control,signal:abort.signal});}finally{this.tiffJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
+  }
 
   /** Trusted local preflight; opening uses the separate guarded import transaction below. */
   async inspectAvif(file:File,control:AvifImportControl={}):Promise<AvifImportReport>{return inspectAvifFile(file,control);}
@@ -1564,9 +1568,13 @@ export class EditorApplication {
   }
 
   async openTiff(file:File,options:TiffDecodeOptions={},control:TiffImportControl={}):Promise<TiffImportReport>{
-    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime();
-    const check=()=>{control.signal?.throwIfAborted();alive();if(generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during TIFF import. Try again.');};
-    const prepared=await prepareTiffImport(file,options,control,check);try{check();this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'tiff');return prepared.report;}catch(error){prepared.assets.dispose();throw error;}
+    if(this.retouchDisposed)throw new Error('The editor is disposed.');control.signal?.throwIfAborted();for(const job of this.tiffJobs)job.abort(new Error('TIFF preparation was replaced.'));
+    const generation=++this.ioGeneration,document=this.document,assets=this.assets,revision=document.getSnapshot().revision,alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);this.tiffJobs.add(abort);control.signal?.addEventListener('abort',cancel,{once:true});
+    const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||generation!==this.ioGeneration||this.document!==document||this.assets!==assets||document.getSnapshot().revision!==revision||!this.sessions.some(s=>s.document===document))throw new Error('Document session changed during TIFF import. Try again.');};
+    const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);let prepared:Awaited<ReturnType<typeof prepareTiffImport>>|undefined;
+    try{check();prepared=await prepareTiffImport(file,options,{signal:abort.signal,onProgress:control.onProgress},check);check();stopDocument();stopEditor();this.tiffJobs.delete(abort);this.replace(prepared.document,prepared.assets);this.recentFiles?.remember(file,'tiff');return prepared.report;}
+    catch(error){prepared?.assets.dispose();throw error;}
+    finally{stopDocument();stopEditor();this.tiffJobs.delete(abort);control.signal?.removeEventListener('abort',cancel);}
   }
 
   /** Open a complete imported document; preserve existing edited tabs. */
@@ -2117,6 +2125,7 @@ export class EditorApplication {
     for(const job of this.fontJobs)job.abort(new Error('Editor disposed during font source preparation.'));this.fontJobs.clear();
     for(const job of this.photoshopJobs)job.abort(new Error('Editor disposed during Photoshop import.'));this.photoshopJobs.clear();this.photoshopCommits.clear();
     for(const job of this.rawJobs)job.abort(new Error('Editor disposed during RAW preparation.'));this.rawJobs.clear();
+    for(const job of this.tiffJobs)job.abort(new Error('Editor disposed during TIFF preparation.'));this.tiffJobs.clear();
     for(const job of this.avifJobs)job.abort(new Error('Editor disposed during AVIF import.'));this.avifJobs.clear();
     for(const controller of this.booleanControllers)controller.abort(new Error('Editor disposed during the Boolean operation.'));
     this.booleanControllers.clear();

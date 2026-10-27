@@ -5,7 +5,8 @@ real RGBA16 integer or RGBA32 float TIFF. This is separate from the document's
 sRGB8 renderer. Original sensor bytes and the document's accepted working image,
 placement, masks, layer styles, other artwork, history and save state remain
 independent. It does not add document working spaces, a high-precision canvas,
-float TIFF import, HDR reconstruction or CMYK delivery.
+HDR reconstruction or CMYK delivery. Normalized SDR float input is a separate
+original-preserving import with explicit sRGB8 editing consent; see [FLOAT_TIFF.md](FLOAT_TIFF.md).
 
 ## Host contract
 
@@ -95,8 +96,11 @@ samples with floating SampleFormat. All use little-endian, lossless Deflate,
 straight/unassociated alpha, independent tile payloads and the complete original
 ICC tag. Files retain current Software/72 DPI metadata; sensor/EXIF metadata
 stays in the RAW original and returned inspection report, not copied to TIFF.
-Current TIFF reopening requires explicit 16-to-8-bit editing consent; float
-TIFF input remains explicitly unsupported.
+Current TIFF reopening requires explicit precision-loss consent for 16-bit and
+normalized SDR float32 sources. Untagged float sources additionally require an
+explicit color interpretation. Native float import converts actual source ICC
+values before quantizing its sRGB8 proxy; HDR tone mapping remains unsupported.
+See [the float input contract](FLOAT_TIFF.md).
 
 The exporter shares the single RAW owner and the two-owner ICC semaphore with
 existing inspection, 8-bit development, proof and delivery. Waiting jobs retain

@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Normalized float TIFF input increment
+
+Normalized SDR float32 TIFF/BigTIFF input now retains original samples/profile and explicit precision/color choices while preparing an sRGB8 editing proxy through native ICC. HDR tone mapping, float editing/compositing and full color/precision acceptance remain required. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+
 ## Native RAW master TIFF (F10/F11/F12)
 
 Export native developed RAW masters directly to real RGB16/float32 TIFF with exact owned ICC sources, explicit intent/BPC, actual integer/float tags, straight alpha and Classic/BigTIFF addressing. Preserve original and accepted artwork/history, exclude layer appearance, share native owners and reject stale/cancelled/corrupt results without partial publication. Verify actual WASM, independent native file samples, normal UI/production and genuine 50 MP. This is separate from required working-space/high-precision scene editing and general format/physical/device gates. [Contract](RAW_TIFF.md).

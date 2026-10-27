@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Normalized float TIFF input increment
+
+Float TIFF input retains original bytes/profile/settings independently of the sRGB8 proxy. Source reconstruction precedes native ICC conversion and quantization. Shared ICC leases precede decoding allocation; guarded host publication rejects stale/cancelled results. Independent REST sessions and isolated extension privileges remain unchanged. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+
 ## Native RAW TIFF invariant
 
 Keep native linear RGB16 source, CMM conversion and typed TIFF payloads separate from accepted sRGB8 scene pixels. Capture exact originals/development/output choices; use shared single-RAW/two-ICC leases. Validate native report/receipts, real sample tags, bounded Deflate extents and complete original ICC before returning a file. Never relabel an 8-bit canvas as high precision or infer sensor detail/HDR from float encoding. [Contract](RAW_TIFF.md).

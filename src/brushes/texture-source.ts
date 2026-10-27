@@ -49,7 +49,7 @@ export class BrushTextureSourceOwner {
     const current=this.current?.asset;
     if(current&&current.raw===asset.raw&&current.bitmap===asset.bitmap&&current.blob===asset.blob&&current.name===asset.name&&
        current.width===asset.width&&current.height===asset.height&&current.tiff?.page===asset.tiff?.page&&
-       current.tiff?.allowPrecisionLoss===asset.tiff?.allowPrecisionLoss&&current.avif?.allowPrecisionLoss===asset.avif?.allowPrecisionLoss&&current.avif?.assumeSrgb===asset.avif?.assumeSrgb){
+       current.tiff?.allowPrecisionLoss===asset.tiff?.allowPrecisionLoss&&current.tiff?.floatColorSpace===asset.tiff?.floatColorSpace&&current.avif?.allowPrecisionLoss===asset.avif?.allowPrecisionLoss&&current.avif?.assumeSrgb===asset.avif?.assumeSrgb){
       staging.dispose();
       return current;
     }

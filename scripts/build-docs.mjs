@@ -57,6 +57,7 @@ const generatedPages = [
   ["ICC_ENGINE", "Native ICC engine dependency"],
   ["COLOR_DELIVERY", "Profile-aware batch and recipe delivery"],
   ["RAW_TIFF", "Native RAW master TIFF delivery"],
+  ["FLOAT_TIFF", "Float TIFF input and retained precision"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

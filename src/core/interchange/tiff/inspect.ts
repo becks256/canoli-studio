@@ -20,6 +20,13 @@ export class TiffField {
 }
 export interface TiffPage {fields:Map<number,TiffField>;report:TiffPageReport;blockWidth:number;blockHeight:number;blocksAcross:number;blocksDown:number;alpha:number;palette?:Uint8Array;icc?:Uint8Array}
 export interface InspectedTiff {reader:TiffReader;report:TiffImportReport;pages:TiffPage[]}
+// ICC cicpType: byte 9 is the H.273 transfer code. Known PQ/HLG
+// declarations require a separate HDR workflow even when RGB samples are 0..1.
+function floatIccTransfer(profile:Uint8Array):number|undefined{
+ if(profile.length<132)throw new Error('Float TIFF needs a complete ICC tag table.');const v=new DataView(profile.buffer,profile.byteOffset,profile.byteLength),count=v.getUint32(128);if(132+count*12>profile.length)throw new Error('Invalid float TIFF ICC tag table.');let transfer:number|undefined;
+ for(let i=0;i<count;i++){const at=132+i*12,offset=v.getUint32(at+4),size=v.getUint32(at+8);if(offset+size>profile.length)throw new Error('Float TIFF ICC tag lies outside its source.');if(v.getUint32(at)===0x63696370){if(transfer!==undefined||size!==12||v.getUint32(offset)!==0x63696370||v.getUint32(offset+4)!==0)throw new Error('Invalid float TIFF ICC CICP declaration.');transfer=v.getUint8(offset+9);}}
+ return transfer;
+}
 export async function inspectTiff(blob:Blob,progress?:(fraction:number|null)=>void):Promise<InspectedTiff>{
  const reader=new TiffReader(blob),visited=new Set<number>(),pages:TiffPage[]=[];let next=await reader.header();
  while(next){if(visited.has(next))throw new Error('Cyclic TIFF page directories.');if(pages.length>=256)throw new Error('TIFF exceeds the 256-page inspection budget.');visited.add(next);progress?.(null);const{fields:f,next:following}=await reader.directory(next);next=following;
@@ -29,11 +36,12 @@ export async function inspectTiff(blob:Blob,progress?:(fraction:number|null)=>vo
   const bitField=f.get(258);if(bitField){if(bitField.count!==1&&bitField.count!==samples)throw new Error('TIFF bit-depth table does not match samples.');for(let i=1;i<bitField.count;i++)if(await bitField.value(i)!==bits)unsupported.push('Mixed sample bit depths');}
   if(![1,5,8,32946,32773].includes(compression))unsupported.push(`Compression ${compression} (supported: raw, LZW, Deflate, PackBits)`);
   if(![0,1,2,3].includes(photometric))unsupported.push(`Photometric ${photometric} requires a different color decoder`);
-  if(![1,2,4,8,16].includes(bits)||(photometric===2&&bits<8)||(photometric===3&&bits>8))unsupported.push(`Unsupported ${bits}-bit sample layout`);
+  const sampleKind=await get(339,1),floating=sampleKind===3&&bits===32;
+  if(!(floating?[0,1,2].includes(photometric):[1,2,4,8,16].includes(bits))||(photometric===2&&bits<8)||(photometric===3&&bits>8))unsupported.push(`Unsupported ${bits}-bit sample layout`);
   if(![1,2].includes(planar))unsupported.push(`Planar configuration ${planar}`);
   if(await get(266,1)!==1)unsupported.push('Reversed bit fill order');
-  const sampleFormat=f.get(339);if(sampleFormat&&sampleFormat.count!==1&&sampleFormat.count!==samples)throw new Error('Invalid TIFF sample-format table.');if(sampleFormat)for(let i=0;i<sampleFormat.count;i++)if(await sampleFormat.value(i)!==1)unsupported.push('Signed or floating-point samples');
-  const predictor=await get(317,1);if(![1,2].includes(predictor)||predictor===2&&bits<8)unsupported.push(`Predictor ${predictor} for ${bits}-bit samples`);
+  const sampleFormat=f.get(339);if(sampleFormat&&sampleFormat.count!==1&&sampleFormat.count!==samples)throw new Error('Invalid TIFF sample-format table.');if(sampleFormat)for(let i=0;i<sampleFormat.count;i++)if(await sampleFormat.value(i)!==sampleKind)unsupported.push('Mixed sample formats');if(sampleKind!==1&&!floating)unsupported.push('Unsupported signed or floating-point sample format');
+  const predictor=await get(317,1);if(!(floating?[1,2,3]:[1,2]).includes(predictor)||predictor===2&&bits<8)unsupported.push(`Predictor ${predictor} for ${bits}-bit samples`);
   const colorSamples=photometric===2?3:1,extra=samples-colorSamples,alpha=extra===1&&f.get(338)?.count===1?await get(338):0;
   if(extra<0||extra>1||extra===1&&![1,2].includes(alpha))unsupported.push('Unspecified or multiple extra sample channels');
   const tiled=f.has(322)||f.has(323)||f.has(324)||f.has(325),blockWidth=tiled?await get(322):width,blockHeight=tiled?await get(323):Math.min(height,await get(278,0xffffffff));
@@ -41,11 +49,13 @@ export async function inspectTiff(blob:Blob,progress?:(fraction:number|null)=>vo
   if(!safe(count)||offsets?.count!==count||counts?.count!==count)throw new Error('TIFF block tables do not match image geometry.');
   let palette:Uint8Array|undefined,icc:Uint8Array|undefined;
   if(photometric===3){const table=f.get(320);if(!table||table.type!==3||table.count!==3*(2**bits))throw new Error('Invalid TIFF palette.');palette=await table.bytes(1536);}
-  if(f.has(34675)){icc=await f.get(34675)!.bytes(16*1024*1024);if(icc.length<128||new TextDecoder().decode(icc.subarray(36,40))!=='acsp'||new DataView(icc.buffer,icc.byteOffset).getUint32(0)!==icc.length)throw new Error('Invalid TIFF ICC profile.');if(photometric!==2||new TextDecoder().decode(icc.subarray(16,20))!=='RGB ')unsupported.push('ICC profile requires an unsupported source color conversion');else warnings.push('Embedded RGB ICC is passed to browser color management; broader profile/device fidelity remains unverified.');}
-  else warnings.push('No embedded ICC profile: samples are interpreted as sRGB.');
+  if(f.has(34675)){icc=await f.get(34675)!.bytes(16*1024*1024);if(icc.length<128||new TextDecoder().decode(icc.subarray(36,40))!=='acsp'||new DataView(icc.buffer,icc.byteOffset).getUint32(0)!==icc.length)throw new Error('Invalid TIFF ICC profile.');if(photometric!==2||new TextDecoder().decode(icc.subarray(16,20))!=='RGB ')unsupported.push('ICC profile requires an unsupported source color conversion');else warnings.push(floating?'Float RGB is converted through native ICC to an sRGB8 editing proxy; the original profile and samples remain intact.':'Embedded RGB ICC is passed to browser color management; broader profile/device fidelity remains unverified.');}
+  else warnings.push(floating?'Float TIFF has no ICC profile. Choose an explicit sRGB or linear-sRGB interpretation before importing.':'No embedded ICC profile: samples are interpreted as sRGB.');
+  if(floating)warnings.push('Float32 import requires explicit 8-bit editing consent. Nonfinite samples, invalid alpha and RGB outside the normalized SDR range reject; HDR tone mapping remains unsupported.');
+  if(floating&&icc){const transfer=floatIccTransfer(icc);if(transfer===16||transfer===18)unsupported.push(`HDR ICC transfer ${transfer} requires tone mapping; this TIFF import supports normalized SDR only.`);}
   if(bits===16)warnings.push('This editor currently uses 8-bit pixels. Import requires explicit consent to reduce 16-bit samples; original TIFF bytes remain intact.');
   warnings.push('Imports one selected page as a raster layer. Native TIFF layer/editing metadata is not reconstructed; original file bytes retain all pages and declarations.');
-  const report:TiffPageReport={index:pages.length,width,height,orientation,bits,samples,compression,photometric,planar,canDecode:unsupported.length===0,requiresPrecisionLoss:bits===16,hasIcc:!!icc,unsupported:[...new Set(unsupported)],warnings};pages.push({fields:f,report,blockWidth,blockHeight,blocksAcross,blocksDown,alpha,palette,icc});
+  const report:TiffPageReport={index:pages.length,width,height,orientation,bits,samples,compression,photometric,planar,canDecode:unsupported.length===0,requiresPrecisionLoss:bits===16||floating,hasIcc:!!icc,...(floating?{sampleFormat:3,requiresColorAssumption:!icc}:{}),unsupported:[...new Set(unsupported)],warnings};pages.push({fields:f,report,blockWidth,blockHeight,blocksAcross,blocksDown,alpha,palette,icc});
  }
  if(!pages.length)throw new Error('TIFF contains no image pages.');return{reader,pages,report:{version:1,bigTiff:reader.big,littleEndian:reader.little,pages:pages.map(p=>p.report)}};
 }

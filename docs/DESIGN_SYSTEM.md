@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Normalized float TIFF input increment
+
+TIFF review names float32 source precision and requires a separate explicit checkbox for the sRGB8 editing conversion. Untagged float sources also require a color interpretation with no preselected assumption. Source/HDR failures stay in review and retain the existing artwork. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+
 ## RAW master delivery
 
 RAW review offers a separate High-precision TIFF section with explicit integer/float precision, container and current output profile. Export does not need the 8-bit editing consent checkbox, does not Apply draft development, and stays distinct from canvas layers/appearance. Explain native source precision and current TIFF reopening limits; expose real waiting/development/encoding/verification and keep Cancel active. Use existing custom controls and dialog scrolling. [Contract](RAW_TIFF.md).

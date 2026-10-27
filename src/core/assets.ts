@@ -7,7 +7,7 @@ import {decodeAvifFile} from './interchange/avif/client';
 import {hasAvifBrand} from './interchange/avif/sniff';
 import {ownRawSource,verifyRawSource,type RawImageSource} from './interchange/raw/source';
 import {avifDecodeOptionsSchema,type AvifDecodeOptions,type AvifDecodeSettings,type AvifImportReport} from './interchange/avif/types';
-import {tiffDecodeOptionsSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl} from './interchange/tiff/types';
+import {tiffDecodeOptionsSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl,type TiffFloatColor} from './interchange/tiff/types';
 
 export interface SerializedAsset {
   id: string;
@@ -21,6 +21,8 @@ export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
   bitmap: ImageBitmap;
   thumbnail: string;
   readonly tiff?: Readonly<TiffDecodeSettings>;
+  /** Derived, checked color conversion of a float source; originals remain authoritative. */
+  readonly tiffColor?:Readonly<TiffFloatColor>;
   readonly avif?: Readonly<AvifDecodeSettings>;
   /** Derived from original bytes on decode; not a second persisted source of truth. */
   readonly avifReport?: Readonly<AvifImportReport>;
@@ -125,7 +127,7 @@ export class AssetStore {
     const copy: ImageAsset = Object.freeze({
       id: sharedId, name: source.name, width: source.width, height: source.height,
       blob: source.blob, bitmap, thumbnail: source.thumbnail,
-      ...(source.tiff ? {tiff: Object.freeze(tiffDecodeOptionsSchema.parse(source.tiff))} : {}),
+      ...(source.tiff ? {tiff: Object.freeze(tiffDecodeOptionsSchema.parse(source.tiff)),...(source.tiffColor?{tiffColor:source.tiffColor}:{})} : {}),
       ...(source.avif ? {avif: Object.freeze(avifDecodeOptionsSchema.parse(source.avif)),avifReport:source.avifReport} : {}),
       ...(source.raw ? {raw:ownRawSource(source.raw)} : {}),
     });
@@ -167,9 +169,10 @@ export class AssetStore {
     this.pending.add(assetId);
     let bitmap: ImageBitmap;
     let avifReport:Readonly<AvifImportReport>|undefined;
+    let tiffColor:Readonly<TiffFloatColor>|undefined;
     try {
       let decoded=blob;
-      if(tiff){if(typeof createImageBitmap==='undefined')throw new Error('TIFF source pixels require the browser image host.');decoded=(await decodeTiffFile(blob,tiff,{signal:options.signal,onProgress:p=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}})).png;}
+      if(tiff){if(typeof createImageBitmap==='undefined')throw new Error('TIFF source pixels require the browser image host.');const result=await decodeTiffFile(blob,tiff,{signal:options.signal,onProgress:p=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}});decoded=result.png;if(result.color){Object.freeze(result.color.source);Object.freeze(result.color.warnings);tiffColor=Object.freeze(result.color);}}
       if(avif){
         if(typeof createImageBitmap==='undefined')throw new Error('AVIF source pixels require the browser image host.');
         const result=await decodeAvifFile(blob,avif,{signal:options.signal,onProgress:p=>{if(generation!==this.generation)throw new Error('The asset store changed during import.');options.onProgress?.(p);}});
@@ -222,7 +225,7 @@ export class AssetStore {
         blob,
         bitmap,
         thumbnail: thumbnailDataUrl,
-        ...(tiff?{tiff}:{}),
+        ...(tiff?{tiff,...(tiffColor?{tiffColor}:{})}:{}),
         ...(avif?{avif,avifReport}:{}),
         ...(raw?{raw}:{}),
       };

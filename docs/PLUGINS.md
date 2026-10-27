@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Normalized float TIFF input increment
+
+Normalized SDR float TIFF input is a trusted host file workflow. Plugin installation remains inert; packages gain no file chooser, native ICC worker or profile-store privilege, and execute through the existing isolated command boundary. See [the input contract and current limits](FLOAT_TIFF.md). Full F10/F11 and the original roadmap remain open.
+
 ## RAW TIFF grants no new capability
 
 Native RAW master TIFF delivery is a trusted browser file service. Plugin installation remains inert; existing RawDevelopment commands and read/write/asset grants remain unchanged. No selected-file/native worker/profile privilege is exposed to isolated commands. [Contract](RAW_TIFF.md).
