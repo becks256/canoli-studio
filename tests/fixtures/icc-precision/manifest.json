@@ -1,0 +1,395 @@
+{
+  "version": 1,
+  "reference": "Independent native Linux Little CMS 2.19.1; direct ctypes API, no Canoli wrapper",
+  "nativeVersion": 2190,
+  "librarySha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6",
+  "generatorSha256": "66706f13e300bcdbffbabad6aa98968e7228bf292a966f01e23dbca4793eb3a8",
+  "profileHashes": {
+    "srgb": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
+    "display-p3": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+    "adobe-rgb": "1446f498b1e3d3e31ce7a53ff42ef1b93ba249ab1f4947f56e36c5772a595e5a",
+    "linear-srgb": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+    "narrow-rgb": "07e0193bda4335a2cc0849ec6d211f7a1cdee310e1fb72adf0fb65adfc72965c"
+  },
+  "limits": "Exact integer samples; float RGB absolute error <= 0.000002, alpha exact for matching formats. Cross-format alpha follows CMM normalized quantization. Synthetic profiles; no physical, scene-editing, HDR display or photographic quality acceptance.",
+  "cases": [
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba8.bin",
+      "output": "00-display-p3-adobe-rgb-rgba8-rgba8-1-0.bin",
+      "pixels": 513
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba8.bin",
+      "output": "01-display-p3-adobe-rgb-rgba8-rgba16-1-0.bin",
+      "pixels": 513
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba8.bin",
+      "output": "02-display-p3-adobe-rgb-rgba8-rgba-float32-1-0.bin",
+      "pixels": 513
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba16.bin",
+      "output": "03-display-p3-adobe-rgb-rgba16-rgba8-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba16.bin",
+      "output": "04-display-p3-adobe-rgb-rgba16-rgba16-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba16.bin",
+      "output": "05-display-p3-adobe-rgb-rgba16-rgba-float32-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba-float32.bin",
+      "output": "06-display-p3-adobe-rgb-rgba-float32-rgba8-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba-float32.bin",
+      "output": "07-display-p3-adobe-rgb-rgba-float32-rgba16-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "adobe-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba-float32.bin",
+      "output": "08-display-p3-adobe-rgb-rgba-float32-rgba-float32-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "adobe-rgb",
+      "destination": "linear-srgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba8.bin",
+      "output": "09-adobe-rgb-linear-srgb-rgba8-rgba8-1-0.bin",
+      "pixels": 513
+    },
+    {
+      "source": "adobe-rgb",
+      "destination": "linear-srgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba16.bin",
+      "output": "10-adobe-rgb-linear-srgb-rgba16-rgba16-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "adobe-rgb",
+      "destination": "linear-srgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba-float32.bin",
+      "output": "11-adobe-rgb-linear-srgb-rgba-float32-rgba-float32-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "display-p3",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba8.bin",
+      "output": "12-linear-srgb-display-p3-rgba8-rgba8-1-0.bin",
+      "pixels": 513
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "display-p3",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba16.bin",
+      "output": "13-linear-srgb-display-p3-rgba16-rgba16-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "display-p3",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba-float32.bin",
+      "output": "14-linear-srgb-display-p3-rgba-float32-rgba-float32-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "srgb",
+      "destination": "narrow-rgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba8.bin",
+      "output": "15-srgb-narrow-rgb-rgba8-rgba8-1-0.bin",
+      "pixels": 513
+    },
+    {
+      "source": "srgb",
+      "destination": "narrow-rgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba16.bin",
+      "output": "16-srgb-narrow-rgb-rgba16-rgba16-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "srgb",
+      "destination": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba-float32.bin",
+      "output": "17-srgb-narrow-rgb-rgba-float32-rgba-float32-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "srgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 0,
+      "blackPointCompensation": true,
+      "input": "input-rgba16.bin",
+      "output": "18-display-p3-srgb-rgba16-rgba16-0-1.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "srgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": true,
+      "input": "input-rgba16.bin",
+      "output": "19-display-p3-srgb-rgba16-rgba16-1-1.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "srgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 2,
+      "blackPointCompensation": true,
+      "input": "input-rgba16.bin",
+      "output": "20-display-p3-srgb-rgba16-rgba16-2-1.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "display-p3",
+      "destination": "srgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 3,
+      "blackPointCompensation": true,
+      "input": "input-rgba16.bin",
+      "output": "21-display-p3-srgb-rgba16-rgba16-3-1.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "srgb",
+      "destination": "srgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "input-rgba16.bin",
+      "output": "22-srgb-srgb-rgba16-rgba16-1-0.bin",
+      "pixels": 4096
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "linear-srgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "blackPointCompensation": false,
+      "input": "extended-float32.bin",
+      "output": "23-linear-srgb-linear-srgb-rgba-float32-rgba-float32-1-0.bin",
+      "pixels": 4
+    }
+  ],
+  "files": {
+    "input-rgba8.bin": {
+      "bytes": 2052,
+      "sha256": "05309f6eeac6a6267b22cafc589394d572c173d1803854acd67c63c22e335f3c"
+    },
+    "input-rgba16.bin": {
+      "bytes": 32768,
+      "sha256": "74893c554e3627d1558cc1279d3f2e04af46556a09886dd4de812118585e939b"
+    },
+    "input-rgba-float32.bin": {
+      "bytes": 65536,
+      "sha256": "be2f29e5c95af8795c0971a08f4d37cff952dd0ee0699924350246cf6934ccbe"
+    },
+    "00-display-p3-adobe-rgb-rgba8-rgba8-1-0.bin": {
+      "bytes": 2052,
+      "sha256": "0881e488ccf1bbe0ff597d27dcb171849994fabcea4b15a0b376ef58a5ec5e25"
+    },
+    "01-display-p3-adobe-rgb-rgba8-rgba16-1-0.bin": {
+      "bytes": 4104,
+      "sha256": "0fd1576619f9d557592ee7a8d44c3ffe6555d0e8440c2ab2b42b82d9b7b6e985"
+    },
+    "02-display-p3-adobe-rgb-rgba8-rgba-float32-1-0.bin": {
+      "bytes": 8208,
+      "sha256": "a17e7a347fba61140c12bf6d0cd5e11a4a22b1376d5fdf3e5a9cd7bbd2fd5524"
+    },
+    "03-display-p3-adobe-rgb-rgba16-rgba8-1-0.bin": {
+      "bytes": 16384,
+      "sha256": "7a0a369c61bc98cab0a177b306273fa1b547f33e6bee0a880fbd498f6ed2db6c"
+    },
+    "04-display-p3-adobe-rgb-rgba16-rgba16-1-0.bin": {
+      "bytes": 32768,
+      "sha256": "c728c34a65d5d6e55116267b02e389957647d6d123ea378f7dc249d990f45229"
+    },
+    "05-display-p3-adobe-rgb-rgba16-rgba-float32-1-0.bin": {
+      "bytes": 65536,
+      "sha256": "bf1425eae240b4043ccc7ca163644c22233364ac5f380fc1ed6d97ff5b1b43ef"
+    },
+    "06-display-p3-adobe-rgb-rgba-float32-rgba8-1-0.bin": {
+      "bytes": 16384,
+      "sha256": "8780a0e3f8b0f3ea1dfd732f2b699b2b96393ddda7055a5e848781675d0bbee1"
+    },
+    "07-display-p3-adobe-rgb-rgba-float32-rgba16-1-0.bin": {
+      "bytes": 32768,
+      "sha256": "09a4e4e1278790dbb79f7eec834f120c1915d33cf5049bd73c068c8d10019910"
+    },
+    "08-display-p3-adobe-rgb-rgba-float32-rgba-float32-1-0.bin": {
+      "bytes": 65536,
+      "sha256": "e64fdb121c8887f6864f06acb49725bc2bc08d519425bfefb4eaebf5ba3553bc"
+    },
+    "09-adobe-rgb-linear-srgb-rgba8-rgba8-1-0.bin": {
+      "bytes": 2052,
+      "sha256": "60c34fde84062ffc604227579a971591850b1a8edf154e97993e9023a449ea10"
+    },
+    "10-adobe-rgb-linear-srgb-rgba16-rgba16-1-0.bin": {
+      "bytes": 32768,
+      "sha256": "5f886f8ca4b2ae9e499cea33336cfe3f45aec87746d1c475bdab033d015fe8c6"
+    },
+    "11-adobe-rgb-linear-srgb-rgba-float32-rgba-float32-1-0.bin": {
+      "bytes": 65536,
+      "sha256": "a8a7b509739a876ee395e6e8bb614020bac87ea281073f564aa035ea685cf6c7"
+    },
+    "12-linear-srgb-display-p3-rgba8-rgba8-1-0.bin": {
+      "bytes": 2052,
+      "sha256": "635f20d650ed96a96e7827eb4a7a48ac1c838f05e660324ca8b13a26033a7158"
+    },
+    "13-linear-srgb-display-p3-rgba16-rgba16-1-0.bin": {
+      "bytes": 32768,
+      "sha256": "4525d385bc054411be7a34b89e4a5b2b99162196567478152f0e032fc0dee10c"
+    },
+    "14-linear-srgb-display-p3-rgba-float32-rgba-float32-1-0.bin": {
+      "bytes": 65536,
+      "sha256": "52f0b9a4dd310d2bad9b6d9806c260560a082bac586169bc09b27e7fe626e8ff"
+    },
+    "15-srgb-narrow-rgb-rgba8-rgba8-1-0.bin": {
+      "bytes": 2052,
+      "sha256": "1dc68e928d8bf55249f3daffa41e3fd55226c557c4e894c8ea311936e1f51791"
+    },
+    "16-srgb-narrow-rgb-rgba16-rgba16-1-0.bin": {
+      "bytes": 32768,
+      "sha256": "8a3e18f0a4db0bd2a0130297c6b569ef574b45afef2119c7d5671ae822cd201d"
+    },
+    "17-srgb-narrow-rgb-rgba-float32-rgba-float32-1-0.bin": {
+      "bytes": 65536,
+      "sha256": "d1bf3c59a65ad924e9446e3bfe36b3996d1723940b5fc78ae470c7d3633b0e1a"
+    },
+    "18-display-p3-srgb-rgba16-rgba16-0-1.bin": {
+      "bytes": 32768,
+      "sha256": "10cc610a6b2686a1bbd53dedeb3d329ffd19226e49d6e7d7edaee4ad11ada9bf"
+    },
+    "19-display-p3-srgb-rgba16-rgba16-1-1.bin": {
+      "bytes": 32768,
+      "sha256": "10cc610a6b2686a1bbd53dedeb3d329ffd19226e49d6e7d7edaee4ad11ada9bf"
+    },
+    "20-display-p3-srgb-rgba16-rgba16-2-1.bin": {
+      "bytes": 32768,
+      "sha256": "10cc610a6b2686a1bbd53dedeb3d329ffd19226e49d6e7d7edaee4ad11ada9bf"
+    },
+    "21-display-p3-srgb-rgba16-rgba16-3-1.bin": {
+      "bytes": 32768,
+      "sha256": "10cc610a6b2686a1bbd53dedeb3d329ffd19226e49d6e7d7edaee4ad11ada9bf"
+    },
+    "22-srgb-srgb-rgba16-rgba16-1-0.bin": {
+      "bytes": 32768,
+      "sha256": "74893c554e3627d1558cc1279d3f2e04af46556a09886dd4de812118585e939b"
+    },
+    "extended-float32.bin": {
+      "bytes": 64,
+      "sha256": "cb2cad2edd3a521a238d6665dd58ceefd7beb80e199c1a3c56e8cab189f94620"
+    },
+    "23-linear-srgb-linear-srgb-rgba-float32-rgba-float32-1-0.bin": {
+      "bytes": 64,
+      "sha256": "cb2cad2edd3a521a238d6665dd58ceefd7beb80e199c1a3c56e8cab189f94620"
+    }
+  }
+}

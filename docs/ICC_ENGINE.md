@@ -103,6 +103,54 @@ complete output sources and checked delivery contracts. Independent REST jobs, o
 output, assign/convert working spaces, true high precision/CMYK/HDR and physical
 device/performance acceptance remain open in the full roadmap.
 
+## Internal explicit RGB precision dependency
+
+`core/color/icc-client` additionally provides an internal host-owned
+`IccSession.prepareRgb(source: Blob, destination: Blob, options = {}, control = {})`.
+Both complete ICC profiles must describe usable RGB devices; CMYK input/output
+rejects. This is a sample-transform dependency for future working-space and
+precision integration. The editor, public constructors, isolated Scripts,
+plugins, headless REST, file imports and delivered files retain their current
+contracts and sRGB8 scene. It adds no working-space UI or document model field.
+
+Options are strict: `intent` defaults to `relative-colorimetric`,
+`blackPointCompensation` to false and `inputFormat` to `rgba8`.
+`outputFormat` defaults to the chosen input format. Supported formats are
+`rgba8` (`Uint8ClampedArray`), `rgba16` (`Uint16Array`) and `rgba-float32`
+(`Float32Array`), all interleaved straight RGBA. Every input/output pairing is
+native; 16-bit/float transforms consume genuine samples without an 8-bit proxy.
+The returned `{session, prepared}` includes independent source/destination
+native reports, normalized settings and disclosed intent fallback. Reports are
+owned values; mutating them cannot alter a compiled pipeline or its format.
+
+`await session.applyWindow(samples)` returns a complete owned typed window in
+the prepared output format. It accepts complete nonempty RGBA samples matching
+the prepared input type, including an ordinary subarray which is copied before
+transfer. Shared buffers, wrong types/shapes, NaN/Infinity and float alpha
+outside [0,1] reject. Float RGB may be any finite value; profile curves and gamut
+mapping can clip it. Extended linear identity preservation is tested; general
+unclipped/HDR processing is not implied. Same-format alpha is exact; cross-format
+alpha follows normalized CMM quantization. Native sample storage requires a
+little-endian host. Native pointer/allocation bounds apply to each window and
+are separate from original image dimensions or file sizes.
+
+These transforms share the existing two-owner queue with proofing/delivery,
+immutable queued profile Blobs, progress phases, cancellation and one in-flight
+window per owner. Invalid/mismatched/stale worker responses close the owner and
+reject pending work; callbacks and launch/native failures release resources.
+Caller samples are never transferred or detached. Dispose the session in a
+`finally` block. Legacy `prepare`/`apply` and new `prepareRgb`/`applyWindow` are
+separate protocols so one cannot accidentally reinterpret the other's samples.
+High-precision proofing and CMYK delivery remain unimplemented.
+
+Actual WASM/unit and browser checks compare 24 transformations to independent
+native Linux references. A separate streaming check covers every output byte
+of genuine 50 MP linear RGB16 input without first quantizing to 8-bit. See
+[precision fixture provenance](../tests/fixtures/icc-precision/README.md) and the
+dated roadmap for checks actually run. This dependency does not close F10's
+working-space model, compositing/effects, precision import/persistence/export,
+physical color or resource/performance gates.
+
 ## Implemented boundary
 
 The pinned MIT Little CMS 2.19.1 core runs in a memory-only WASM module inside
@@ -120,7 +168,7 @@ and native intent-table support are reported separately from the CMM's valid
 fallback behavior. A valid profile with missing requested tables can prepare
 through the native fallback, with an explicit preparation warning.
 
-Transforms consume straight RGBA8 windows in the existing sRGB editing space.
+The connected scene/delivery transforms consume straight RGBA8 windows in the existing sRGB editing space. The separate internal RGB precision dependency above accepts explicit source/destination profiles.
 RGB delivery converts to an actual RGB output profile; a CMYK target cannot be
 silently reduced to three channels. Device proofing simulates a supported
 profile back to display sRGB. Native rendering/display and proofing intents,

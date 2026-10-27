@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <limits>
+#include <cmath>
 
 // One private module per host operation. No file, device, network, or plugin API.
 static cmsContext context = nullptr;
@@ -11,6 +12,7 @@ static uint32_t fields[8] = {};
 static char text[4][2048] = {};
 static char message[1024] = {};
 static bool failed = false;
+static uint32_t input_format = 0, output_format = 0;
 static void log_error(cmsContext, cmsUInt32Number code, const char* detail) {
     failed = true;
     std::snprintf(message, sizeof(message), "Little CMS %u: %s", code, detail ? detail : "ICC operation failed");
@@ -23,6 +25,7 @@ extern "C" {
 void canoli_icc_close() {
     if (transform) cmsDeleteTransform(transform);
     transform = nullptr;
+    input_format = output_format = 0;
     if (context) cmsDeleteContext(context);
     context = nullptr;
 }
@@ -64,6 +67,22 @@ static void describe(cmsHPROFILE profile) {
         cmsGetProfileInfoUTF8(profile, types[i], "en", "US", text[i], sizeof(text[i]));
         text[i][sizeof(text[i]) - 1] = 0;
     }
+}
+static bool rgb_profile(cmsHPROFILE profile) {
+    const auto kind = cmsGetDeviceClass(profile);
+    return cmsGetColorSpace(profile) == cmsSigRgbData &&
+        (kind == cmsSigInputClass || kind == cmsSigDisplayClass ||
+         kind == cmsSigOutputClass || kind == cmsSigColorSpaceClass);
+}
+static cmsUInt32Number pixel_type(uint32_t format) {
+    return format == 0 ? TYPE_RGBA_8 : format == 1 ? TYPE_RGBA_16 : TYPE_RGBA_FLT;
+}
+static bool finite_window(const void* window, uint32_t pixels) {
+    const float* values = static_cast<const float*>(window);
+    for (uint64_t i = 0; i < uint64_t(pixels) * 4; ++i) {
+        if (!std::isfinite(values[i]) || (i % 4 == 3 && (values[i] < 0 || values[i] > 1))) return false;
+    }
+    return true;
 }
 extern "C" {
 int canoli_icc_inspect(const uint8_t* bytes, uint32_t length) {
@@ -122,11 +141,45 @@ int canoli_icc_begin(const uint8_t* bytes, uint32_t length, uint32_t mode,
     return 1;
 }
 int canoli_icc_apply(const uint8_t* input, uint8_t* output, uint32_t pixels) {
-    if (!transform || !input || !output || !pixels || uint64_t(pixels) * 4 > uint64_t(std::numeric_limits<ptrdiff_t>::max()))
+    if (!transform || input_format || output_format || !input || !output || !pixels || uint64_t(pixels) * 4 > uint64_t(std::numeric_limits<ptrdiff_t>::max()))
         return fail("Invalid ICC RGBA8 pixel window.");
     message[0] = 0;
     failed = false;
     cmsDoTransform(transform, input, output, pixels);
     return failed ? 0 : 1;
+}
+// Explicit RGB source/destination, straight alpha; formats: 0=uint8, 1=uint16,
+// 2=float32. These are sample windows, independent of document geometry.
+int canoli_icc_begin_rgb(const uint8_t* source, uint32_t source_length,
+                        const uint8_t* destination, uint32_t destination_length,
+                        uint32_t input, uint32_t output, uint32_t intent, uint32_t bpc) {
+    if (!begin()) return 0;
+    if (input > 2 || output > 2 || intent > 3 || bpc > 1) return fail("Invalid RGB ICC pipeline settings.");
+    cmsHPROFILE from = open_profile(source, source_length);
+    if (!from) return 0;
+    cmsHPROFILE to = open_profile(destination, destination_length);
+    if (!to) { cmsCloseProfile(from); return 0; }
+    if (!rgb_profile(from) || !rgb_profile(to)) {
+        cmsCloseProfile(from); cmsCloseProfile(to);
+        return fail("ICC sample conversion requires RGB input and output profiles.");
+    }
+    cmsUInt32Number flags = cmsFLAGS_COPY_ALPHA | cmsFLAGS_HIGHRESPRECALC;
+    if (bpc) flags |= cmsFLAGS_BLACKPOINTCOMPENSATION;
+    transform = cmsCreateTransformTHR(context, from, pixel_type(input), to, pixel_type(output), intent, flags);
+    cmsCloseProfile(from); cmsCloseProfile(to);
+    if (!transform || failed) { if (transform) cmsDeleteTransform(transform); transform = nullptr; return 0; }
+    input_format = input; output_format = output;
+    return 1;
+}
+int canoli_icc_apply_window(const void* input, void* output, uint32_t pixels) {
+    const uint32_t stride = 4u << (input_format > output_format ? input_format : output_format);
+    if (!transform || !input || !output || !pixels || uint64_t(pixels) * stride > uint64_t(std::numeric_limits<ptrdiff_t>::max()))
+        return fail("Invalid ICC sample window.");
+    if (input_format == 2 && !finite_window(input, pixels)) return fail("ICC float input must be finite with alpha in [0,1].");
+    message[0] = 0; failed = false;
+    cmsDoTransform(transform, input, output, pixels);
+    if (failed) return 0;
+    if (output_format == 2 && !finite_window(output, pixels)) return fail("ICC float output is not finite or has invalid alpha.");
+    return 1;
 }
 }

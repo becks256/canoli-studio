@@ -1,5 +1,9 @@
 # Architecture
 
+## Explicit RGB precision dependency (F10)
+
+core/color/icc-native compiles explicit RGB input/output profiles over straight RGBA uint8, uint16 and float32 windows. The separate prepareRgb/applyWindow worker protocol uses the same two-owner semaphore, strict settings/result validation, cancellation and owned buffers as legacy sRGB8 proof/output. Native finite/alpha checks and pointer bounds precede publication; mutable returned reports cannot change compiled formats. This internal dependency adds no document/public scripting/REST/renderer or persistence contract. Working-space and high-precision scene integration remain required. [Contract](ICC_ENGINE.md#internal-explicit-rgb-precision-dependency).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 core/color/output-record defines cloned source/receipt DTOs; output-source performs native inspection/hash/compilation. ai/batch/delivery-preset owns the strict source-bearing container; delivery-contract fingerprints settings and verifies accepted receipts. Runner pins original raster/font sources around fitted encoding, and storage owns complete sources/snapshots. Recipe schema 3/package 4 carries a separate delivery preset outside document commands; shared recipe commands/history and private file boundaries remain authoritative. [Contract and current verification](COLOR_DELIVERY.md).

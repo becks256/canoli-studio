@@ -3,14 +3,19 @@
 The implementation uses the MIT-licensed Little CMS core, release 2.19.1,
 commit `21c582a594fe5279f90c0b93437c398f93bf62b0`. Optional external plugins
 are excluded. The runtime has no filesystem, network, threads or shared memory.
-A private owner supplies complete ICC bytes and bounded straight-alpha RGBA8
-windows; transforms copy alpha and own their compiled pipelines. Native context,
+A private owner supplies complete ICC bytes and bounded straight-alpha RGBA8,
+RGBA16 or float32 windows; transforms copy same-format alpha, normalize/quantize cross-format alpha and
+own their compiled pipelines. Native context,
 profile, transform and caller allocation lifetimes remain explicit. Metadata
 labels are bounded to 2 KiB; the original profile bytes remain complete.
 
-The native boundary supports inert inspection, sRGB-to-RGB output conversion,
+The native boundary supports inert inspection, explicit RGB source/destination
+conversion for every uint8/uint16/float32 pairing, legacy sRGB-to-RGB8 output,
 and device-profile proofing back to display sRGB, with actual ICC intent,
-black-point compensation and optional opaque RGB gamut alarms. Valid profiles
+black-point compensation and optional opaque RGB gamut alarms on the legacy
+sRGB8 proof route. Float input/output must be finite with alpha in [0,1]; RGB
+may extend beyond [0,1], subject to native profile curve/gamut clipping. Sample
+windows use little-endian native storage. Valid profiles
 with missing native intent tables may use the CMM's standard fallback; each
 preparation reports this with an explicit warning. Invalid settings, native
 errors and unusable profiles cannot retain an earlier active transform. The current

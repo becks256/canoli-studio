@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "reference": "Independent native Linux Little CMS 2.19.1; direct ctypes, every stored sample",
+  "librarySha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6",
+  "generatorSha256": "72f4740d7b510dfb58228c22d528153856033b24d3d9397422b05c52feffeb72",
+  "source": "native-50mp.rgb16le.gz",
+  "compressedSourceSha256": "233da386622faaa12e3619d4ab8b5c381aa10f82c85233a9520874e4f3904d76",
+  "rgb16Sha256": "2318a0fdc66bf94cb4e8cc439c6d58158086c7723ecbc32d53c0161dd9d66620",
+  "sourceProfiles": {
+    "linear-srgb": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+    "display-p3": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8"
+  },
+  "width": 10000,
+  "height": 5000,
+  "pixels": 50000000,
+  "inputChannelLevels": [
+    223,
+    152,
+    306
+  ],
+  "windowPixels": 100000,
+  "windows": 500,
+  "outputFormat": "rgba16",
+  "outputBytes": 400000000,
+  "windowDigestRootSha256": "b5b7f4c1d4354c113a8bcc820061eac77f1d910674c46cd6fec49da0cb39df4f",
+  "digestDefinition": "SHA256(concat(SHA256(each contiguous output RGBA16LE window))). 100000 pixels/window, alpha=(globalPixel*53+11)&65535. Relative-colorimetric, no BPC.",
+  "limits": "Genuine synthetic sensor-development reference; bounded native sample conversion, not editor high-precision input/edit/export or a physical fidelity/resource/throughput acceptance."
+}

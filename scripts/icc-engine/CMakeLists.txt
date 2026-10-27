@@ -16,6 +16,6 @@ target_link_options(canoli_icc PRIVATE
  "-sMODULARIZE=1" "-sEXPORT_ES6=1" "-sEXPORT_NAME=createCanoliIcc"
  "-sENVIRONMENT=web,worker,node" "-sFILESYSTEM=0" "-sALLOW_MEMORY_GROWTH=1"
  "-sMAXIMUM_MEMORY=4294967296" "-sINITIAL_MEMORY=16777216" "-sSTACK_SIZE=1048576"
- "-sEXPORTED_FUNCTIONS=['_malloc','_free','_canoli_icc_close','_canoli_icc_error','_canoli_icc_info','_canoli_icc_text','_canoli_icc_version','_canoli_icc_inspect','_canoli_icc_begin','_canoli_icc_apply']"
+ "-sEXPORTED_FUNCTIONS=['_malloc','_free','_canoli_icc_close','_canoli_icc_error','_canoli_icc_info','_canoli_icc_text','_canoli_icc_version','_canoli_icc_inspect','_canoli_icc_begin','_canoli_icc_apply','_canoli_icc_begin_rgb','_canoli_icc_apply_window']"
  "-sEXPORTED_RUNTIME_METHODS=['HEAPU8']")
 set_target_properties(canoli_icc PROPERTIES SUFFIX ".js")

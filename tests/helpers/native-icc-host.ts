@@ -11,7 +11,9 @@ export async function nativeIccHost(){
   addEventListener(){}removeEventListener(){}
   postMessage(message:any){if(!String(this.url).includes('icc.worker'))return;void(async()=>{
    let data;try{
-    if(message.operation==='apply')data={id:message.id,kind:'pixels',pixels:this.engine!.apply(message.pixels)};
+    if(message.operation==='apply-window')data={id:message.id,kind:'pixels',pixels:this.engine!.applyWindow(message.pixels)};
+    else if(message.operation==='prepare-rgb'){this.engine=await NativeIccEngine.create(bytes);if(this.closed){this.engine.dispose();return;}data={id:message.id,kind:'rgb-prepared',prepared:this.engine.beginRgb(new Uint8Array(await message.source.arrayBuffer()),new Uint8Array(await message.destination.arrayBuffer()),message.settings)};}
+    else if(message.operation==='apply')data={id:message.id,kind:'pixels',pixels:this.engine!.apply(message.pixels)};
     else{this.engine=await NativeIccEngine.create(bytes);if(this.closed){this.engine.dispose();return;}const source=new Uint8Array(await message.source.arrayBuffer());data=message.operation==='inspect'?{id:message.id,kind:'report',report:this.engine.inspect(source)}:{id:message.id,kind:'prepared',prepared:this.engine.begin(source,message.settings)};}
    }catch(error){data={id:message.id,kind:'error',error:error instanceof Error?error.message:String(error)};}
    if(!this.closed)this.onmessage?.({data});

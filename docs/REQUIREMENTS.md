@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Explicit RGB precision dependency (F10)
+
+The internal ICC dependency must transform genuine straight RGBA8/16/float32 windows between complete explicit RGB source/destination profiles, preserve same-format alpha and disclose cross-format quantization/fallback. Reject incompatible profiles, malformed settings/results, nonfinite floats and invalid alpha; share existing cancellation/worker ownership without detaching callers. Verify actual WASM against independent native outputs and every sample of genuine 50 MP RGB16 input. This prerequisite does not implement working-space assignment/conversion or high-precision document editing/import/persistence/output. [Contract](ICC_ENGINE.md#internal-explicit-rgb-precision-dependency).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Profile-aware resumable delivery must own exact ICC sources/intent/BPC, preflight before publication, preserve source/history, convert actual fitted PNG/TIFF/PDF pixels, reject unsupported combinations and stale contracts, and retain independent file/settings hashes through retry/reload and portable recipe packages. Verify native WASM, independent file readers, actual UI and genuine 50 MP output. Full precision/device/REST/job and roadmap gates remain open. [Contract and current verification](COLOR_DELIVERY.md).

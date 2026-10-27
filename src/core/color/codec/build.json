@@ -1,5 +1,5 @@
 {
-  "protocolVersion": 1,
+  "protocolVersion": 2,
   "lcms": "2.19.1",
   "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.10 (b7dc6e5747465580df5984e723b9d1f10d8e804b)",
   "sourceRevisions": {
@@ -7,19 +7,19 @@
     "lcms": "21c582a594fe5279f90c0b93437c398f93bf62b0"
   },
   "sourceFiles": {
-    "scripts/icc-engine/engine.cpp": "9aab62e322e7be55efb733ff434b0bd09aac9352f2f735002120a0fd581d89d5",
-    "scripts/icc-engine/CMakeLists.txt": "db8410c2861b8e446c22ff2d1b2a311c7c368c84f3cea01ae498a46530795503",
-    "scripts/build-icc-engine.py": "f1f47aaba9568c35a958abc007ed0452651264bc41826e56832829d788424a12"
+    "scripts/icc-engine/engine.cpp": "69ae96988077c8c4c9c035ff71fab7af70289345013a742ebb2dcb3a0d7349be",
+    "scripts/icc-engine/CMakeLists.txt": "751ba6dfc5ce74aa122e9e9f9e4e7279bc87440f8adbd40ccea7818aad623d89",
+    "scripts/build-icc-engine.py": "eca0dff468b66082b6e5ae8fb23cac9fb604e747a591521edc17591159eaa7d2"
   },
   "artifacts": {
     "canoli_icc.js": {
-      "bytes": 14038,
-      "sha256": "2d57be3e86b153de900dfbaf31431fd8ad67cc46415d53c9cb7b9820b0af1ddb"
+      "bytes": 14233,
+      "sha256": "dfe0ef7d3745c88b1b770bfe89e1748efa3ed97582061e542f6ebb5e2fe23d9a"
     },
     "canoli_icc.wasm": {
-      "bytes": 249984,
-      "sha256": "3afd58e47dd3348cf4b30cf5169b23251eba1ea799b4dbdd6c1d2a5be8fd4405"
+      "bytes": 252086,
+      "sha256": "ced09817ed9f7a32e0208d38e4961a3295da75f2dc5855b6c0a91b9af4c1583b"
     }
   },
-  "scope": "Private memory-only ICC inspection, sRGB RGBA8 to RGB output, and device-profile proofing to display sRGB. Separate source/output/proof intent and black-point compensation; alpha copied unchanged. No filesystem, network, native plugins, threads or shared memory. This does not implement high-precision scene editing or CMYK delivery."
+  "scope": "Private memory-only ICC inspection; explicit RGB source/destination transforms over RGBA uint8, uint16 and float32 windows; legacy sRGB8 delivery and device-profile proofing to display sRGB. Separate source/output/proof intent and black-point compensation; same-format alpha copied unchanged and cross-format alpha normalized/quantized. No filesystem, network, native plugins, threads or shared memory. This does not implement high-precision scene editing or CMYK delivery."
 }
