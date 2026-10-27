@@ -40,7 +40,7 @@ export class FloatSceneRenderer {
  private captures=new Set<AbortController>();
  constructor(private processor:Pick<PixelProcessor,'floatComposite'|'floatAffine'>){}
  private source(store:AssetStore,asset:ImageAsset):FloatRasterSource{
-  if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original float TIFF sources. Byte editing proxies are not precision sources.');
+  if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF sources. Byte editing proxies are not precision sources.');
   const key=JSON.stringify([asset.width,asset.height,asset.tiff,asset.tiffColor.source]);let entries=this.entries.get(asset.blob);if(!entries){entries=new Map();this.entries.set(asset.blob,entries);}let entry=entries.get(key);
   if(!entry){entry={original:asset.blob,key,source:store.captureFloatSource(asset.id)};entries.set(key,entry);}
   this.lru.delete(entry);this.lru.set(entry,true);const share=entry.source.share();

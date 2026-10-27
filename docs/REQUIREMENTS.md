@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-Support schema-49 float32/linear-sRGB state, original-bearing float TIFF admission, shared OO conversion/Undo, guarded source roles, original-native raster composition and direct precision delivery. Stage output settings with precision, disable unsupported UI operations and retain exact originals through persistence. Complete all actual verification before acceptance; broader F10/F11/F14 and the original roadmap remain open. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+Support schema-49 float32/linear-sRGB state, original-bearing unsigned 16-bit or float32 TIFF admission, shared OO conversion/Undo, guarded source roles, original-native raster composition and direct precision delivery. Stage output settings with precision, disable unsupported UI operations and retain exact originals through persistence. Complete all actual verification before acceptance; broader F10/F11/F14 and the original roadmap remain open. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Owned float source storage dependency
 

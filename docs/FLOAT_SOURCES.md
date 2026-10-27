@@ -2,8 +2,9 @@
 
 The initial connected schema-49 float document workflow is now specified in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). The dependency/legacy byte-mode sections below retain their individual boundaries; they do not describe the new mode as byte editing. Broader F10 and full-roadmap acceptance remain required.
 
-The trusted browser host can retain independent leases over original float32 TIFF
-files and prepare persistent, losslessly compressed RGBA float32 tiles. This is
+The trusted browser host can retain independent leases over original unsigned
+16-bit or float32 TIFF files and prepare persistent, losslessly compressed RGBA
+float32 tiles. This is
 an internal F10 source-storage dependency, now used by the initial connected
 float Document workflow described above. Default byte documents retain sRGB8.
 Broader float authoring, working profiles, tools and performance remain required
@@ -13,14 +14,15 @@ by the original roadmap.
 
 `FloatRasterSource.openTiff(original, tiff = {}, output = {profile: 'linear-srgb'},
 control = {})` inspects a Blob without creating a bitmap or 8-bit proxy. It
-requires a supported float32 page; an unprofiled file requires explicit
+requires a supported unsigned 16-bit or float32 RGB/grayscale page. An unprofiled
+file requires explicit
 `floatColorSpace: 'srgb' | 'linear-srgb'`. Page defaults to zero. Existing
 `allowPrecisionLoss` defaults to false and does not authorize quantization in
 this service. Original ICC takes precedence over an assumption. Output profile,
 intent and black-point compensation use the existing ColorOutput validation.
 
 `assetStore.captureFloatSource(assetId, output = {profile: 'linear-srgb'})`
-captures an already retained float TIFF's exact original and source choices.
+captures a retained high-precision TIFF's exact original and source choices.
 It rejects missing assets and assets without original float color metadata.
 `FloatRasterSource.capture` is the lower trusted admission boundary; it checks
 geometry and source identity again in preparation. These are internal host
@@ -45,8 +47,8 @@ hashing and sample decoding happen in a dedicated worker.
 
 Metadata and cache lookup precede allocation of a native CMM owner. A complete
 cache hit requires no CMM binary fetch or owner slot. Cold preparation acquires
-the existing shared ICC semaphore, converts original straight float rows directly
-to target float32, and emits checked lossless Deflate tiles. RGB must be finite;
+the existing shared ICC semaphore, normalizes unsigned 16-bit originals without
+byte quantization, converts straight float rows directly to target float32, and emits checked lossless Deflate tiles. RGB must be finite;
 alpha must be in [0,1]. Signed/above-one finite RGB can remain in this internal
 service; this does not implement HDR transfer interpretation or tone mapping.
 

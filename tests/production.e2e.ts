@@ -2184,3 +2184,6 @@ test('production internal float worker retains independent float blend and affin
 test('production float documents retain original native samples through actual import, scripts, Undo and precise delivery without globals',async({page},info)=>{const{floatDocumentWorkflow}=await import('./helpers/float-document');await floatDocumentWorkflow(page,info,true);});
 
 test('production compiled float source workers preserve all twelve independent original layouts without developer globals',async({page},info)=>{const{productionFloatSources}=await import('./helpers/float-source-production');await productionFloatSources(page,info);});
+
+
+test('production unsigned 16-bit originals retain low-order samples through UI exposure, Undo, precise exports and reopening without globals',async({page},info)=>{const{floatDocumentWorkflow}=await import('./helpers/float-document');await floatDocumentWorkflow(page,info,true,'tests/fixtures/uint16-float/u16-all-levels.tif');});

@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "reference": "Independent libtiff original uint16 readback; float64 normalization/unassociation, float32 rounding, native Linux Little CMS RGB -> linear-sRGB. No byte intermediate.",
+  "nativeCmmSha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6",
+  "generatorSha256": "812361c34646448f256c000b6ce684bda5b0461e7d8973436cff66ddb3fab3fd",
+  "libtiff": "LIBTIFF, Version 4.3.0",
+  "cases": [
+    {
+      "file": "u16-raw.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-raw-linear.f32le.gz",
+      "floatSha256": "ab0332da51d71f8f41a9482606fb4fe91f9cfe8a3245fda63f82d3803bb390ee",
+      "originalWordSha256": "485ad8cf1e4351bae748908014d26d349c623ff5cac685013e884e1a014072a4",
+      "sourceSha256": "50ec4b635c92c6b6923c856e50fe3371b03c5055d5bbb8962b4fb881fb9106b6",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+      "assumption": null
+    },
+    {
+      "file": "u16-deflate-be.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-deflate-be-linear.f32le.gz",
+      "floatSha256": "ab0332da51d71f8f41a9482606fb4fe91f9cfe8a3245fda63f82d3803bb390ee",
+      "originalWordSha256": "485ad8cf1e4351bae748908014d26d349c623ff5cac685013e884e1a014072a4",
+      "sourceSha256": "32f076d5daf0d6205645c491954977f527ca304b2eedfc845122db112e9dea78",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+      "assumption": null
+    },
+    {
+      "file": "u16-lzw-predictor2.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-lzw-predictor2-linear.f32le.gz",
+      "floatSha256": "ab0332da51d71f8f41a9482606fb4fe91f9cfe8a3245fda63f82d3803bb390ee",
+      "originalWordSha256": "485ad8cf1e4351bae748908014d26d349c623ff5cac685013e884e1a014072a4",
+      "sourceSha256": "87a90a0a26f006c136b8c293b78ef33ea56ebe5707c4b182232876de619cbab2",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+      "assumption": null
+    },
+    {
+      "file": "u16-planar-tiled.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-planar-tiled-linear.f32le.gz",
+      "floatSha256": "ab0332da51d71f8f41a9482606fb4fe91f9cfe8a3245fda63f82d3803bb390ee",
+      "originalWordSha256": "485ad8cf1e4351bae748908014d26d349c623ff5cac685013e884e1a014072a4",
+      "sourceSha256": "b00bda488ae3e41ec9328fc53bf662031b8c709e6d777c9c7bd11342e06b3f48",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+      "assumption": null
+    },
+    {
+      "file": "u16-packbits.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-packbits-linear.f32le.gz",
+      "floatSha256": "ab0332da51d71f8f41a9482606fb4fe91f9cfe8a3245fda63f82d3803bb390ee",
+      "originalWordSha256": "485ad8cf1e4351bae748908014d26d349c623ff5cac685013e884e1a014072a4",
+      "sourceSha256": "d08e0af72d904a63571dca7bc8f354a89cd992547c5f97c0a6609f7c39dd6781",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+      "assumption": null
+    },
+    {
+      "file": "u16-associated.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-associated-linear.f32le.gz",
+      "floatSha256": "595957d3dd5e71ff76dc6f8255e383802c1edcb2810f94226152c774183edcce",
+      "originalWordSha256": "86021a03ca1c7cba8b5b64a5641051707976d020133f3191d69b8f11f094fdd2",
+      "sourceSha256": "fa28d1ac6a61f95e090395611f13250fc2bd445b09eef9f036dfcb7bb00116ca",
+      "sourceProfileSha256": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+      "assumption": null
+    },
+    {
+      "file": "u16-gray-black.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-gray-black-linear.f32le.gz",
+      "floatSha256": "fc74caa8e02404375c26edf3b0e856f2e00aebae934f1a328b1f91811d9d1cf2",
+      "originalWordSha256": "a563f46197f2e27c7a0a11059d28827558090cd1d7db10fc03d95c50885f5424",
+      "sourceSha256": "a1b1294ed3c5731fef36a1ac43cc85c06fdf2d47a5ac5e0503b7c3b2339a47f4",
+      "sourceProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+      "assumption": "linear-srgb"
+    },
+    {
+      "file": "u16-gray-white-associated.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-gray-white-associated-linear.f32le.gz",
+      "floatSha256": "52bf49c9ab86d530447dd7e3984ba1310827131c3ae7ae81e7c9ff888f0449ae",
+      "originalWordSha256": "88c70df87d8ae1c7d31789b309c3a8e3c04085a09da780e1e97c342e242e989a",
+      "sourceSha256": "69af9565be2c311ad45eca98b90c416226cddf002ea07b16b2fd6956939f10fb",
+      "sourceProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+      "assumption": "linear-srgb"
+    },
+    {
+      "file": "u16-rgb-opaque.tif",
+      "width": 131,
+      "height": 79,
+      "samples": 41396,
+      "reference": "u16-rgb-opaque-linear.f32le.gz",
+      "floatSha256": "0fec915359de385adea00ee7fc368b353fa6827cc78d467eadc211f602573116",
+      "originalWordSha256": "39309d6e1ac557ee58522fa589a3374f60fe03fa64d96aa85ca31c3921f2bbcf",
+      "sourceSha256": "0c90aaf7fd356beed6c7378fd290feb29ae480ad6b06ae79be62793408f1e9f2",
+      "sourceProfileSha256": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
+      "assumption": null
+    },
+    {
+      "file": "u16-all-levels.tif",
+      "width": 256,
+      "height": 256,
+      "samples": 262144,
+      "reference": "u16-all-levels-linear.f32le.gz",
+      "floatSha256": "9393a0e602b9a3d557822b40e3643f02766f274c30168d34e31236347bf1a0a6",
+      "originalWordSha256": "aa94c810d2996ae859f8f319fdf0e6f93fb27cb230ee91dd1268f7f6e1bc7854",
+      "sourceSha256": "21f5288a412c73c2ba0da40e57d3f6ddc60c29fe121cd2f6167fc7cc76e33305",
+      "sourceProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+      "assumption": null
+    },
+    {
+      "file": "u16-native-50mp.tif",
+      "width": 10000,
+      "height": 5000,
+      "samples": 200000000,
+      "reference": "u16-native-50mp-linear.f32le.gz",
+      "floatSha256": "1b312e574d608fb365fcffc3378c55de8e6a98531a647d2f08d3ad29badc16d6",
+      "originalWordSha256": "2561751856656897663d00258f2693a7e0effe172813004986250a5b66179771",
+      "sourceSha256": "51db60ac1377c69a75fc49328cbcca09a62e663dd277e08c967f85a3c792ac1c",
+      "sourceProfileSha256": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+      "assumption": null
+    }
+  ],
+  "files": {
+    "u16-all-levels-linear.f32le.gz": {
+      "bytes": 683914,
+      "sha256": "20b4481d18143a4f25294f9a089f61c76bf8ae9ed4a29598e85f3b3441cffd2f"
+    },
+    "u16-all-levels.tif": {
+      "bytes": 3754,
+      "sha256": "21f5288a412c73c2ba0da40e57d3f6ddc60c29fe121cd2f6167fc7cc76e33305"
+    },
+    "u16-associated-linear.f32le.gz": {
+      "bytes": 104198,
+      "sha256": "293985d54ab734aeeead99ec2ad2b65f757bf3bc7d1e7552abec4decaf148019"
+    },
+    "u16-associated.tif": {
+      "bytes": 85452,
+      "sha256": "fa28d1ac6a61f95e090395611f13250fc2bd445b09eef9f036dfcb7bb00116ca"
+    },
+    "u16-deflate-be-linear.f32le.gz": {
+      "bytes": 128927,
+      "sha256": "afe8309945fa517379bf1813efe4a56c6b203a3183ec06b93e6c05b3d03c376d"
+    },
+    "u16-deflate-be.tif": {
+      "bytes": 26806,
+      "sha256": "32f076d5daf0d6205645c491954977f527ca304b2eedfc845122db112e9dea78"
+    },
+    "u16-gray-black-linear.f32le.gz": {
+      "bytes": 58392,
+      "sha256": "385f080d3beabab08c82a5c9a91d003b4c5f99a09b28134efed29da472e12640"
+    },
+    "u16-gray-black.tif": {
+      "bytes": 1028,
+      "sha256": "a1b1294ed3c5731fef36a1ac43cc85c06fdf2d47a5ac5e0503b7c3b2339a47f4"
+    },
+    "u16-gray-white-associated-linear.f32le.gz": {
+      "bytes": 47651,
+      "sha256": "db84da5e125c1fe34f7fb356aef0180285e89b475bd2e9dda13119a6e5efeba5"
+    },
+    "u16-gray-white-associated.tif": {
+      "bytes": 21338,
+      "sha256": "69af9565be2c311ad45eca98b90c416226cddf002ea07b16b2fd6956939f10fb"
+    },
+    "u16-lzw-predictor2-linear.f32le.gz": {
+      "bytes": 128927,
+      "sha256": "afe8309945fa517379bf1813efe4a56c6b203a3183ec06b93e6c05b3d03c376d"
+    },
+    "u16-lzw-predictor2.tif": {
+      "bytes": 31588,
+      "sha256": "87a90a0a26f006c136b8c293b78ef33ea56ebe5707c4b182232876de619cbab2"
+    },
+    "u16-native-50mp-linear.f32le.gz": {
+      "bytes": 20429173,
+      "sha256": "d1e8c354216387e980a078f2be72ef4e10b6cbd80fb9100ca25dcbb11f0584bc"
+    },
+    "u16-native-50mp.tif": {
+      "bytes": 2150238,
+      "sha256": "51db60ac1377c69a75fc49328cbcca09a62e663dd277e08c967f85a3c792ac1c"
+    },
+    "u16-packbits-linear.f32le.gz": {
+      "bytes": 128927,
+      "sha256": "afe8309945fa517379bf1813efe4a56c6b203a3183ec06b93e6c05b3d03c376d"
+    },
+    "u16-packbits.tif": {
+      "bytes": 108732,
+      "sha256": "d08e0af72d904a63571dca7bc8f354a89cd992547c5f97c0a6609f7c39dd6781"
+    },
+    "u16-planar-tiled-linear.f32le.gz": {
+      "bytes": 128927,
+      "sha256": "afe8309945fa517379bf1813efe4a56c6b203a3183ec06b93e6c05b3d03c376d"
+    },
+    "u16-planar-tiled.tif": {
+      "bytes": 28510,
+      "sha256": "b00bda488ae3e41ec9328fc53bf662031b8c709e6d777c9c7bd11342e06b3f48"
+    },
+    "u16-raw-linear.f32le.gz": {
+      "bytes": 128927,
+      "sha256": "afe8309945fa517379bf1813efe4a56c6b203a3183ec06b93e6c05b3d03c376d"
+    },
+    "u16-raw.tif": {
+      "bytes": 108004,
+      "sha256": "50ec4b635c92c6b6923c856e50fe3371b03c5055d5bbb8962b4fb881fb9106b6"
+    },
+    "u16-rgb-opaque-linear.f32le.gz": {
+      "bytes": 115653,
+      "sha256": "266fbb73704cc7c581e3c78eb0283f306360ee292e806e8fe28f023aeaca4c1d"
+    },
+    "u16-rgb-opaque.tif": {
+      "bytes": 87384,
+      "sha256": "0c90aaf7fd356beed6c7378fd290feb29ae480ad6b06ae79be62793408f1e9f2"
+    }
+  }
+}

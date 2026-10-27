@@ -6168,3 +6168,105 @@ Independent exact acceptance retains the actual 50 MP source, authored exposure/
 [Sealed float document evidence](benchmarks/float-documents-2026-10-27.zip) contains exact source reconstruction against c6f50b1; initial, pre-admission and final frozen release identities; separately preserved source versions; independent original/profile/native-library/reference/generator/reader bytes and provenance; failed/interrupted/corrected build, unit and browser reports; actual file/project/workspace/recipe/batch/lifecycle/admission outputs; and screenshots/integrity audits. Earlier production reports are preserved separately from the authoritative final production artifacts. Task-owned older reports were relocated with byte/mode verification and original-path symlinks to keep room for verification and the archive; receipts retain the initial symlink-metadata verification correction without deleting unique data. Every payload and reconstructed/committed source byte is checked before reporting this increment.
 
 This is the initial supported float scene subset, not F10 or full-roadmap completion. Broader source/working profiles and precision formats, remaining tools/layers/blends/styles/clipping/coverage/proof/HDR/CMYK/interchange, actual photographic/device/process-memory/sustained F14 and every other unfinished original professional/AI/workflow/collaboration/commercial/specialist gate remain required. No physical accuracy, whole-process peak-memory or sustained 60fps acceptance is inferred. The complete original goal stays active.
+
+
+### 2026-10-27 — F10 unsigned 16-bit original admission to float documents
+
+Owner: implementation agent; continuation of the initial precision workflow from
+0a393f6. Original unsigned 16-bit RGB/grayscale TIFF pages can use the existing
+explicit float32 editing choice. Original samples normalize directly into float32
+source rows before native ICC conversion, preserving low-order integer detail
+without invoking the byte decoder. Float documents, bounded SDR thumbnails,
+source ownership/cache identity, shared edits/Undo and precision delivery retain
+their existing boundaries. Unprofiled float admission requires explicit source
+interpretation through the existing `floatColorSpace` choice; embedded RGB ICC
+remains authoritative. Default byte import and its explicit precision-loss consent
+remain available. Known PQ/HLG ICC declarations reject on unsigned 16-bit pages
+as on float originals. [Current contract](FLOAT_DOCUMENTS.md).
+
+Independent libtiff writer/readback plus pinned native Linux CMM references cover
+ten small original layouts, every one of the 65,536 unsigned levels and a genuine
+10,000 × 5,000 synthetic source. Initial focused unit/native checks pass 80 cases.
+Connected browser/source/production, final build/full unit and actual 50 MP
+edit/save/reopen/export acceptance remain required before committing this slice.
+Broader source/working spaces, non-TIFF/other-depth admission, remaining tools,
+HDR/CMYK/proof/interchange, physical photographic/device and sustained performance
+acceptance and every other unfinished original-roadmap requirement remain open.
+No paid call, account, upload, new isolated grant, browser/REST synchronization or
+arbitrary image-resolution cap is introduced. The complete goal remains active.
+
+The seven-case connected unsigned-source browser pilot passes with no skips,
+retries or unexpected results. Ten source layouts reopen with every composed
+float sample bit-exact against independent native references. The ordinary UI
+uses the published exposure script, Undo/Redo, both precision exports and project
+reopening; unprofiled review requires explicit interpretation in float mode.
+Cancellation, throwing progress and concurrent human edits publish neither
+staged sources nor precision changes. The genuine synthetic 50 MP original
+retains SHA-256 `51db60ac1377c69a75fc49328cbcca09a62e663dd277e08c967f85a3c792ac1c`
+through save/reopen. Float32 and uint16 output each match all 200,000,000 channel
+values exactly with zero differing words. Float32 output retains 68,645,155
+extended RGB values after exposure. This does not establish photographic quality,
+whole-process peak memory or sustained performance. Full unit/build and broader
+source/production regressions still follow before this slice is committed.
+
+Final build and all 2,664 unit/API tests in 276 files pass. The first full unit
+invocation was interrupted after local HTTP tests hit the restricted sandbox;
+a separate listener probe records `EPERM`. The complete rerun uses required
+loopback access. The production release has 142 frozen resources and 2,176
+frozen source inputs; application inputs remain unchanged during browser checks.
+
+The 164-case existing source regression run records 161 passes and three
+workspace reload/context failures. All precision, TIFF and native source cases
+pass. A separate unchanged 23-case workspace run reproduces those three failures.
+Traces show `ERR_INSUFFICIENT_RESOURCES` on Vite module requests; the context
+failure also records a GPU-process exit. The actual Chromium shared-memory
+namespace had only about 630 MB free (97% used), unlike the default tool's
+separate empty namespace. Six completed task-owned report directories were
+copied to a separate writable RAM volume with every file byte/mode verified,
+original paths retained as symlinks, and only verified duplicate copies removed.
+The initial root-owned `/run/user` destination rejected creation before any
+report moved; the writable `/run/lock` destination preserves all 2,836,143,908
+bytes in 806 files. Receipts retain the transfer manifests. Chromium temporary
+files now use their own private directory on the separate volume. No application,
+assertion, timeout, image geometry or precision tolerance changes are made.
+
+With that environment correction, all 23 unchanged workspace tests pass without
+skips/retries/flaky/unexpected cases. Together with the seven new-feature cases
+and the original regression results, this validates 171 distinct source-browser
+cases across separate runs. It is not a clean combined 164- or 171-case invocation;
+the failed reports/traces remain evidence. The complete production suite is now
+running on the same frozen build. Broader F10/F11/F14 and the original roadmap
+remain active; the test-environment correction does not establish permanent
+browser/device reliability or sustained performance.
+
+Final production acceptance passes all 165 cases with zero skipped, retried,
+flaky or unexpected results, including ordinary unsigned 16-bit import,
+published isolated exposure, Undo/Redo, both precision TIFF exports and native
+project reopening without developer globals. The final audit verifies all 2,176
+frozen source-input identities and all 142 served release resources; only this
+work log changes after the checks. All five native binaries remain byte-identical
+to the 0a393f6 baseline. Final build, complete unit/API results and the explicitly
+separate source-browser boundaries above are retained without claiming a clean
+combined source invocation.
+
+The native 50 MP float32 file has 79,312,008 bytes and SHA-256
+`435cc23bb27eacabae058fd770a8b68ad6a04dbdc5aad3ab953fffc1ec12730c`;
+its exact decoded sample SHA-256 is
+`8b4131414db96c638b386f6d4df79ffb306619d8bc4bca3eb5ff8be2a75dc229`.
+The uint16 file has 32,887,832 bytes and SHA-256
+`9f05d9bb8dad3711b8550e94aa3af0a85f3adffc8accda15d7137c34c7c4c675`;
+its exact decoded sample SHA-256 is
+`d701f5923e734758863c713bb2eb320d8dee96c1c00f95196aaa641045aacb13`.
+Each independently matches all 200,000,000 geometry samples with zero error.
+
+[Sealed unsigned-source evidence](benchmarks/uint16-float-2026-10-27.zip)
+retains complete final changed-source overlays against 0a393f6, all frozen release
+bytes, independent original/profile/reference/native-reader inputs, exact output
+files, successful and failed reports/traces, screenshots, environment-recovery
+receipts and verification tools. Its version-2 content-addressed manifest can
+reconstruct every byte of each file; repeated TIFF tile/strip blocks share
+payloads without dropping file metadata or image data. Every complete file and
+payload is verified after sealing and committed source bytes are checked before
+reporting this increment. This advances supported source admission; it does not
+complete F10, performance/device quality or the full original roadmap. The
+complete goal remains active.

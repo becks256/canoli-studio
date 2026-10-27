@@ -20,7 +20,7 @@ export interface SerializedAsset {
 }
 export interface ImageAsset extends Omit<SerializedAsset, "dataUrl"> {
   readonly blob: Blob;
-  /** Native byte surface, or a bounded display-only thumbnail for float32 TIFF editing. */
+  /** Native byte surface, or a bounded display-only thumbnail for float32 document editing. */
   bitmap: ImageBitmap;
   thumbnail: string;
   readonly tiff?: Readonly<TiffDecodeSettings>;
@@ -155,7 +155,7 @@ export class AssetStore {
 
   /** Trusted readonly precision lease, independent of this store's bitmap lifetime. */
   captureFloatSource(assetId:string,output:ColorOutput={profile:'linear-srgb'}):FloatRasterSource{
-    this.assertOpen();const asset=this.get(assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Choose a retained float32 TIFF source; byte proxies are not precision sources.');return FloatRasterSource.capture(asset.blob,asset.width,asset.height,asset.tiff,asset.tiffColor.source,output);
+    this.assertOpen();const asset=this.get(assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Choose a retained unsigned 16-bit or float32 TIFF source; byte proxies are not precision sources.');return FloatRasterSource.capture(asset.blob,asset.width,asset.height,asset.tiff,asset.tiffColor.source,output);
   }
 
   async add(

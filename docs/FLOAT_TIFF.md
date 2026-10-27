@@ -6,7 +6,7 @@ Canoli can inspect and open normalized SDR float32 TIFF/BigTIFF pages, retaining
 all original bytes and explicit decode choices. In the default byte mode,
 import requires precision-loss consent and converts original float samples
 through the actual source ICC profile before quantizing the editing proxy.
-Explicit float document admission is described above. HDR tone mapping,
+Explicit float document admission also supports unsigned 16-bit originals and is described above. HDR tone mapping,
 half/double TIFF input and physical color calibration remain required.
 
 ## Input and color contract
@@ -22,7 +22,7 @@ whole-document import. `TiffDecodeOptions` adds optional
 `floatColorSpace: 'srgb' | 'linear-srgb'` alongside `page` (default 0) and
 `allowPrecisionLoss` (default false). These choices are independent:
 
-- Every float import requires explicit 8-bit editing consent. No precision-loss
+- Every default byte-mode float import requires explicit 8-bit editing consent. No precision-loss
   acceptance is inferred from selecting a color interpretation.
 - A supported embedded RGB ICC profile is authoritative. It is compiled in
   native Little CMS as float32 source to sRGB8, with relative-colorimetric intent

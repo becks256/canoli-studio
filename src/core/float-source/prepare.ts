@@ -1,12 +1,13 @@
 import{inspectTiff}from'../interchange/tiff/inspect';
 import{floatTiffRows}from'../interchange/tiff/float-rows';
+import{supportsFloatTiff}from'../interchange/tiff/types';
 import{iccTarget}from'../color/profile-source';
 import{NativeIccEngine}from'../color/icc-native';
 import{descriptorKey,FLOAT_SOURCE_NATIVE_SHA,floatSourceInputSchema,floatSourceDescriptorSchema,type FloatSourceInput,type FloatSourceDescriptor,type FloatSourceControl}from'./types';
 import{hashBlob,encodeTile}from'./codec';
 export async function describeFloatSource(value:FloatSourceInput,control:FloatSourceControl={}){
  const input=floatSourceInputSchema.parse(value),check=()=>control.signal?.throwIfAborted();check();const inspection=await inspectTiff(input.original),page=inspection.pages[input.tiff.page];check();
- if(!page||!page.report.canDecode||page.report.sampleFormat!==3||page.report.bits!==32||page.report.width!==input.width||page.report.height!==input.height)throw new Error('A retained original float32 TIFF with exact native geometry is required.');
+ if(!page||!supportsFloatTiff(page.report)||page.report.width!==input.width||page.report.height!==input.height)throw new Error('A retained original unsigned 16-bit or float32 TIFF with exact native geometry is required.');
  if(!page.icc&&!input.tiff.floatColorSpace)throw new Error('Unprofiled float source requires its explicit original color interpretation.');
  const sourceProfile=page.icc??new Uint8Array(await iccTarget(input.tiff.floatColorSpace!).source.arrayBuffer()),sourceProfileSha256=await hashBlob(new Blob([new Uint8Array(sourceProfile)]),control.signal),targetProfileSha256=await hashBlob(input.target,control.signal);
  if(input.expectedSource.kind!==(page.icc?'icc':'assumed')||input.expectedSource.sha256!==sourceProfileSha256||!page.icc&&(input.expectedSource.kind!=='assumed'||input.expectedSource.id!==input.tiff.floatColorSpace))throw new Error('Float source color identity differs from the retained original.');

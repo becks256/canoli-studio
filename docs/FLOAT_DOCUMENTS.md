@@ -1,8 +1,9 @@
 # Float document editing
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
-default sRGB8 document. Original float TIFF samples, raster transformations,
-Normal composition, groups, masks and linear exposure use this mode. Display
+default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
+transformations, Normal composition, groups, masks and linear exposure use this
+mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
 
@@ -12,11 +13,11 @@ professional color/precision editing, all-tool performance or the full roadmap.
 ## Opening and changing precision
 
 The custom TIFF import dialog offers 8-bit sRGB or 32-bit linear sRGB editing for
-supported float32 pages. The default remains 8-bit, requiring explicit precision
-loss consent. Float editing does not require that consent. Both choices retain
+supported unsigned 16-bit and float32 RGB/grayscale pages. The default remains
+8-bit, requiring explicit precision-loss consent. Float editing does not require that consent. Both choices retain
 the complete original TIFF, selected page, orientation and color interpretation.
-An unprofiled file requires an explicit sRGB or linear-sRGB assumption; an
-embedded supported RGB ICC profile remains authoritative.
+In float mode, an unprofiled file requires an explicit sRGB or linear-sRGB
+assumption; an embedded supported RGB ICC profile remains authoritative.
 
 Trusted browser host:
 
@@ -31,8 +32,17 @@ await editor.openTiff(file, {
 
 `editingPrecision?: 'float32'` is optional. Omission retains the old byte import.
 Page defaults to zero; `allowPrecisionLoss` defaults to false. The float choice
-currently requires original float32 samples. Unsigned 16-bit TIFF, RAW and
-ordinary byte image admission do not acquire float precision through this flag.
+accepts original unsigned 16-bit or float32 samples. Other integer depths, RAW
+and ordinary byte image admission do not acquire float precision through this flag.
+Unsigned samples divide by 65535 in float64, invert white-zero grayscale and
+unassociate alpha where declared, then round once to float32 before native ICC
+conversion. Normalized float32 can distinguish all 65,536 unsigned levels.
+Declared alpha association still determines unassociated colors, and associated
+zero-alpha colors become zero. This is float32 working precision.
+The existing `floatColorSpace` option supplies the explicit original
+interpretation for either supported source type when ICC is absent; embedded ICC
+remains authoritative. Default byte-mode unsigned import keeps its existing sRGB
+assumption and consent. Float mode never invokes that byte decoder.
 Nonfinite color, alpha outside [0,1], unsupported pages/profiles and known PQ/HLG
 ICC transfer declarations reject. Finite negative and above-one RGB values are
 retained with supported source profiles; no HDR transfer decoding, tone mapping
@@ -42,8 +52,10 @@ An existing eligible byte document can switch using Color Settings → Working
 precision. Apply stages the output profile together with the precision choice;
 Cancel changes neither. All original sources and the actual float-to-output
 transform prepare before publication. Unsupported current layers block this
-conversion. A missing original float TIFF cannot be reconstructed from byte
-pixels. Trusted host signature:
+conversion. A missing high-precision original or source color identity cannot
+be reconstructed from byte pixels. Legacy byte imports of unsigned TIFF lack
+that precision-source identity; reopen the original with the explicit float
+editing choice. Trusted host signature:
 
 ```ts
 await editor.convertDocumentToFloat(
@@ -70,11 +82,11 @@ Readonly `document.precision` and `document.workingSpace` expose effective state
 `document.convertToFloat(): void` dispatches the shared strict zero-argument
 `{type: 'document.precision.float'}` command. It is idempotent in an existing
 float document; it does not expose decoding, files, workers or preference changes.
-Source validation at host commit requires retained original float TIFF raster
+Source validation at host commit requires retained original high-precision TIFF raster
 assets. Synchronous structural construction without an attached asset store
 still requires final source admission before rendering or host publication.
 
-For an already-open original float TIFF, an ordinary isolated script can use:
+For an already-open original high-precision TIFF, an ordinary isolated script can use:
 
 <!-- example: float-exposure -->
 ```js
@@ -100,7 +112,7 @@ choices independently of this zero-argument action.
 
 ## Supported scene and controls
 
-The initial mode supports original float TIFF raster layers, Normal isolated
+The initial mode supports original unsigned 16-bit or float32 TIFF raster layers, Normal isolated
 groups, pass-through groups, transforms, visibility, opacity, Normal fill
 opacity, existing masks and linear exposure in raster tone effects or Tone
 adjustment layers. Exposure multiplies native linear RGB by `2 ** exposure`,
@@ -207,7 +219,7 @@ rounding tolerance. Pure projection tests separately cover affine partitioning,
 hidden RGB/alpha, sparse large geometry and cancellation.
 
 Required later work includes broader source/working profiles and conversion,
-16-bit and non-TIFF high-precision admission, all remaining tools/layer types,
+other integer depths and non-TIFF high-precision admission, all remaining tools/layer types,
 blends/styles/clipping, float coverage, device proofing, HDR transfer/display/tone
 mapping, CMYK delivery, interchange, wider photographic/device validation and
 sustained all-tool performance. This initial mode is not full F10 acceptance.

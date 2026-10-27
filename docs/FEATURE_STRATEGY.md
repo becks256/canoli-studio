@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-An initial connected float32/linear-sRGB workflow extends original float TIFF raster edits through shared precision/exposure commands, direct file delivery and original-bearing persistence. Byte editing remains the default. This staged subset leaves broad tools, working profiles, HDR, physical/device and performance acceptance required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+An initial connected float32/linear-sRGB workflow extends original unsigned 16-bit or float32 TIFF raster edits through shared precision/exposure commands, direct file delivery and original-bearing persistence. Byte editing remains the default. This staged subset leaves broad tools, working profiles, HDR, physical/device and performance acceptance required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 

@@ -22,8 +22,9 @@ a=p.parse_args()
 root=Path(__file__).resolve().parents[1]
 fixtures=root/'tests/fixtures/float-source'
 manifest=json.loads((fixtures/'manifest.json').read_text())
-if not any(row['file']==a.source_name for row in manifest['cases']):
- fixtures=root/'tests/fixtures/float-document'
+for directory in ['float-document','uint16-float']:
+ if any(row['file']==a.source_name for row in manifest['cases']):break
+ fixtures=root/'tests/fixtures'/directory
  manifest=json.loads((fixtures/'manifest.json').read_text())
 case=next(row for row in manifest['cases']if row['file']==a.source_name)
 reference=fixtures/case['reference']

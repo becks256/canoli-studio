@@ -21,7 +21,7 @@ export function floatSceneIssue(document:DocumentData):string|null {
         if(layer.effects.some(effect=>effect.enabled&&(effect.contrast!==0||effect.saturation!==0)))return 'Float raster tone effects currently support linear exposure; contrast and saturation require their float integration.';
       }else if(layer.kind==='adjustment'){
         if(layer.adjustment.kind!=='tone'||layer.adjustment.contrast!==0||layer.adjustment.saturation!==0)return 'Float adjustment layers currently support linear exposure only.';
-      }else return 'This float document mode currently supports original float TIFF raster layers, groups, masks and linear exposure. Other layer types require their float integration.';
+      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and linear exposure. Other layer types require their float integration.';
     }
     return null;
   };
@@ -31,7 +31,7 @@ export function assertFloatSources(document:DocumentData,assets:Pick<AssetStore,
  const float=isFloatDocument(document);
  const checkByteRole=(id:string)=>{if(assets.get(id).tiff?.editingPrecision==='float32')throw new Error('This operation requires native byte pixels. A float source thumbnail is display-only; use the float document renderer.');};
  const visit=(layers:LayerData[])=>{for(const layer of layers){
-  if(layer.kind==='raster'&&float){const asset=assets.get(layer.assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original float TIFF raster sources.');}
+  if(layer.kind==='raster'&&float){const asset=assets.get(layer.assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF raster sources.');}
   visitLayerAssets(layer,reference=>{if(!(float&&layer.kind==='raster'&&reference===layer))checkByteRole(reference.assetId);});
   if(layer.kind==='group')visit(layer.children);
  }};

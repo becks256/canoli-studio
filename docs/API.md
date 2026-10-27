@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-The shared strict command {type: "document.precision.float"} and schema-49 state also apply to independent REST documents. REST original admission remains PNG-only; it supplies no original float TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+The shared strict command {type: "document.precision.float"} and schema-49 state also apply to independent REST documents. REST original admission remains PNG-only; it supplies no original unsigned 16-bit or float32 TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Owned float source storage dependency
 

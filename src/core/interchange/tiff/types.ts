@@ -7,6 +7,9 @@ export interface TiffImportProgress {phase:'inspecting'|'decoding';fraction:numb
 export interface TiffImportControl {signal?:AbortSignal;onProgress?:(value:TiffImportProgress)=>void}
 export const tiffPageReportSchema=z.object({index:z.number().int().nonnegative(),width:z.number().int().positive().safe(),height:z.number().int().positive().safe(),orientation:z.number().int().min(1).max(8),bits:z.number().int().positive(),samples:z.number().int().positive(),compression:z.number().int().nonnegative(),photometric:z.number().int().nonnegative(),planar:z.number().int().positive(),canDecode:z.boolean(),requiresPrecisionLoss:z.boolean(),hasIcc:z.boolean(),sampleFormat:z.number().int().positive().optional(),requiresColorAssumption:z.boolean().optional(),unsupported:z.array(z.string()),warnings:z.array(z.string())}).strict();
 export type TiffPageReport=z.infer<typeof tiffPageReportSchema>;
+/** Original color layouts that can be normalized directly to float32, without
+ * going through the byte editing decoder. Missing SampleFormat means unsigned. */
+export function supportsFloatTiff(page:TiffPageReport){return page.canDecode&&[0,1,2].includes(page.photometric)&&(page.sampleFormat===3&&page.bits===32||(page.sampleFormat??1)===1&&page.bits===16);}
 export const tiffReportSchema=z.object({version:z.literal(1),bigTiff:z.boolean(),littleEndian:z.boolean(),pages:z.array(tiffPageReportSchema).min(1).max(256)}).strict();
 export type TiffImportReport=z.infer<typeof tiffReportSchema>;
 export const tiffFloatColorSchema=z.object({version:z.literal(1),engine:z.literal('Little CMS 2.19.1'),wasmSha256:z.string().regex(/^[a-f0-9]{64}$/),source:z.discriminatedUnion('kind',[

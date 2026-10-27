@@ -1205,8 +1205,8 @@ export class EditorApplication {
   private precisionJob:AbortController|null=null;
   get floatConversionIssue():string|null{
     const document=this.document._read();if(isFloatDocument(document))return'This document already uses 32-bit linear editing.';const issue=floatSceneIssue(document);if(issue)return issue;
-    const rasters=allLayers(document.children).filter(layer=>layer.kind==='raster');if(!rasters.length)return'Open an original float32 TIFF raster before changing to float editing.';
-    for(const raster of rasters){const asset=this.assets.get(raster.assetId);if(!asset.tiff||!asset.tiffColor)return'Float editing requires retained original float32 TIFF raster sources.';}return null;
+    const rasters=allLayers(document.children).filter(layer=>layer.kind==='raster');if(!rasters.length)return'Open an original unsigned 16-bit or float32 TIFF raster before changing to float editing.';
+    for(const raster of rasters){const asset=this.assets.get(raster.assetId);if(!asset.tiff||!asset.tiffColor)return'Float editing requires retained original unsigned 16-bit or float32 TIFF raster sources.';}return null;
   }
   async convertDocumentToFloat(control:FloatSourceControl={},value?:ColorSettings):Promise<void>{
     const beforeSettings=this.colorSettings,settings=normalizeColorSettings(value??{...beforeSettings,proof:null});
