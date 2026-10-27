@@ -1,3 +1,6 @@
+import {readRecipePackage} from '../ai/recipes/package';
+import {iccTarget} from '../core/color/profile-source';
+import {download,fileName} from './utils';
 import {RawDevelopmentDialog,isCameraRawFile,rawFileAccept} from './RawDevelopmentDialog';
 import { RecipeParameterFields } from "./RecipeParameterFields";
 import { batchItemNames } from "../ai/batch/source-names";
@@ -72,7 +75,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
   const [nativeProgress,setNativeProgress]=useState<Record<string,string>>({});
   const uploadController=useRef<AbortController|null>(null);
   useEffect(()=>()=>uploadController.current?.abort(),[]);
-  const close=()=>{uploadController.current?.abort();exportController.current?.abort();onClose();};
+  const close=()=>{uploadController.current?.abort();exportController.current?.abort();deliveryController.current?.abort();onClose();};
 
   const selectedRecipe = selectedPackageId
     ? packages.find((recipe) => recipe.id === selectedPackageId)
@@ -86,8 +89,16 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
   const [customVarWidth, setCustomVarWidth] = useState(1200);
   const [customVarHeight, setCustomVarHeight] = useState(630);
   const [customVarFormat, setCustomVarFormat] = useState<
-    "png" | "jpeg" | "webp" | "avif"
+    DeliveryVariantSpec["format"]
   >("png");
+  const [customVarColor,setCustomVarColor]=useState(false),[deliveryBusy,setDeliveryBusy]=useState(false);
+  const deliveryController=useRef<AbortController|null>(null);
+  useEffect(()=>()=>deliveryController.current?.abort(),[]);
+  async function deliveryTask(action:(signal:AbortSignal)=>Promise<void>){
+    if(deliveryController.current)return;const controller=new AbortController();deliveryController.current=controller;setDeliveryBusy(true);setErrorMessage(null);
+    try{await action(controller.signal);}catch(error){if(!controller.signal.aborted)setErrorMessage(error instanceof Error?error.message:'Delivery settings could not be prepared.');}
+    finally{if(deliveryController.current===controller){deliveryController.current=null;if(!controller.signal.aborted)setDeliveryBusy(false);}}
+  }
   const [customVarQuality,setCustomVarQuality]=useState(80),[customVarLossless,setCustomVarLossless]=useState(false),[customVarSpeed,setCustomVarSpeed]=useState(8);
 
   // Preflight estimate
@@ -411,6 +422,8 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
 
   // Add custom delivery variant
   const handleAddCustomVariant = () => {
+    void deliveryTask(async signal=>{
+    const capturedOutput=editor.colorSettings.output;
     if (!customVarName.trim()) return;
     const newVar: DeliveryVariantSpec = {
       id: `custom-${Date.now()}`,
@@ -418,13 +431,16 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
       targetWidth: Math.max(16, customVarWidth),
       targetHeight: Math.max(16, customVarHeight),
       format: customVarFormat,
+      ...(customVarColor&&['png','tiff','pdf'].includes(customVarFormat)?{color:await editor.batch.captureColorOutput(capturedOutput,{signal})}:{}),
       ...(customVarFormat==='avif'?{quality:customVarQuality/100,avifLossless:customVarLossless,avifSpeed:customVarSpeed}:{}),
       fit: "cover",
       nameTemplate: `{name}_${customVarName.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
     };
+    signal.throwIfAborted();
     setSelectedVariants((prev) => [...prev, newVar]);
     setCustomVarName("");
     setShowAddVariant(false);
+    });
   };
 
   // Create and launch batch
@@ -754,6 +770,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                     type="text"
                     className="batch-input"
                     value={batchName}
+                    disabled={deliveryBusy}
                     onChange={(e) => setBatchName(e.target.value)}
                     placeholder="e.g. Summer Campaign Variant Pack"
                   />
@@ -765,6 +782,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                   </label>
                   <select
                     id="recipe-select"
+                    disabled={deliveryBusy}
                     className="batch-select"
                     value={selectedRecipeId}
                     onChange={(e) => {
@@ -803,8 +821,10 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                     id="package-select"
                     className="batch-select"
                     value={selectedPackageId}
+                    disabled={deliveryBusy}
                     onChange={(event) => {
-                      setSelectedPackageId(event.target.value);
+                      const packageId=event.target.value;setSelectedPackageId(packageId);
+                      if(packageId)void deliveryTask(async signal=>{const file=await editor.recipes.packages.get(packageId);if(!file)throw new Error('Recipe package is unavailable.');const contents=await readRecipePackage(file);if(contents.deliveryPreset){const preset=await editor.batch.importDeliveryPreset(contents.deliveryPreset,{signal});signal.throwIfAborted();setSelectedVariants(preset.variants);}});
                       setSelectedRecipeId("");
                       setRecipeParams({});
                       setQueueItems((items) =>
@@ -914,6 +934,13 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
 
                 {/* Delivery Variants Selector */}
                 <div className="variants-section">
+                  <div className="form-row">
+                    <Button variant="secondary" disabled={deliveryBusy} onClick={()=>void deliveryTask(async signal=>{const file=await editor.batch.exportDeliveryPreset({name:batchName||'Delivery preset',variants:selectedVariants},{signal});signal.throwIfAborted();download(file,`${fileName(batchName)}.canoli-delivery`);})}>Export delivery preset</Button>
+                    <label>Import delivery preset<input type="file" accept=".canoli-delivery,application/x-canoli-delivery" disabled={deliveryBusy} onChange={event=>{const file=event.target.files?.[0];event.target.value='';if(file)void deliveryTask(async signal=>{const preset=await editor.batch.importDeliveryPreset(file,{signal});signal.throwIfAborted();setSelectedVariants(preset.variants);setBatchName(preset.name);});}}/></label>
+                    {selectedRecipe&&<Button variant="secondary" disabled={deliveryBusy} onClick={()=>void deliveryTask(async signal=>{const preset=await editor.batch.exportDeliveryPreset({name:batchName||'Delivery preset',variants:selectedVariants},{signal});const source=selectedPackageId?await editor.recipes.packages.get(selectedPackageId):selectedRecipe;if(!source)throw new Error('Recipe package is unavailable.');const file=await editor.recipes.attachDeliveryPreset(source,preset,{signal});signal.throwIfAborted();download(file,`${fileName(selectedRecipe.name)}.luma-recipe`);})}>Export recipe with delivery preset</Button>}
+                  </div>
+                  {deliveryBusy&&<p role="status">Preparing delivery profiles…</p>}
+
                   <div className="variants-header">
                     <label>
                       Target Delivery Variants ({selectedVariants.length}{" "}
@@ -929,7 +956,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                   </div>
 
                   <div className="variants-list">
-                    {[...DEFAULT_DELIVERY_VARIANTS,...selectedVariants.filter(variant=>!DEFAULT_DELIVERY_VARIANTS.some(preset=>preset.id===variant.id))].map((v) => {
+                    {[...DEFAULT_DELIVERY_VARIANTS.map(preset=>selectedVariants.find(variant=>variant.id===preset.id)??preset),...selectedVariants.filter(variant=>!DEFAULT_DELIVERY_VARIANTS.some(preset=>preset.id===variant.id))].map((v) => {
                       const isSelected = selectedVariants.some(
                         (sel) => sel.id === v.id,
                       );
@@ -940,12 +967,13 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                         >
                           <input
                             type="checkbox"
+                            disabled={deliveryBusy}
                             checked={isSelected}
                             onChange={() => handleToggleVariant(v)}
                           />
                           <span className="variant-chip-name">{v.name}</span>
                           <span className="variant-chip-dims">
-                            {v.targetWidth}×{v.targetHeight} · {v.format.toUpperCase()}{v.format==='avif'?(v.avifLossless||v.quality===1?' · Lossless':` · ${Math.round((v.quality??.8)*100)}%`):''}
+                            {v.targetWidth}×{v.targetHeight} · {v.format.toUpperCase()}{v.color?` · ${v.color.profile.name}`:''}{v.format==='avif'?(v.avifLossless||v.quality===1?' · Lossless':` · ${Math.round((v.quality??.8)*100)}%`):''}
                           </span>
                         </label>
                       );
@@ -959,16 +987,18 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           type="text"
                           placeholder="Variant Name (e.g. Banner)"
                           className="batch-input"
+                          disabled={deliveryBusy}
                           value={customVarName}
                           onChange={(e) => setCustomVarName(e.target.value)}
                         />
                         <select
                           className="batch-select"
                           aria-label="Variant format"
+                          disabled={deliveryBusy}
                           value={customVarFormat}
                           onChange={(e) =>
                             setCustomVarFormat(
-                              e.target.value as "png" | "jpeg" | "webp" | "avif",
+                              e.target.value as DeliveryVariantSpec["format"],
                             )
                           }
                         >
@@ -976,8 +1006,12 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           <option value="jpeg">JPEG</option>
                           <option value="webp">WebP</option>
                           <option value="avif">AVIF</option>
+                          <option value="tiff">TIFF</option>
+                          <option value="pdf">PDF</option>
                         </select>
                       </div>
+                      {['png','tiff','pdf'].includes(customVarFormat)&&<label className="checkbox-field"><input type="checkbox" disabled={deliveryBusy} checked={customVarColor} onChange={event=>setCustomVarColor(event.target.checked)}/>Use current output profile: {iccTarget(editor.colorSettings.output.profile).name}</label>}
+                      {!['png','tiff','pdf'].includes(customVarFormat)&&<p>This format uses sRGB delivery.</p>}
                       {customVarFormat==='avif'&&<>
                         <label className="checkbox-field"><input type="checkbox" checked={customVarLossless} onChange={event=>setCustomVarLossless(event.target.checked)}/>Lossless AVIF variant</label>
                         {!customVarLossless&&<label>AVIF quality<input aria-label="AVIF quality" type="number" className="batch-input" min={1} max={100} value={customVarQuality} onChange={event=>setCustomVarQuality(Number(event.target.value))}/></label>}
@@ -988,6 +1022,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           type="number"
                           placeholder="Width"
                           className="batch-input"
+                          disabled={deliveryBusy}
                           value={customVarWidth}
                           onChange={(e) =>
                             setCustomVarWidth(
@@ -999,6 +1034,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                           type="number"
                           placeholder="Height"
                           className="batch-input"
+                          disabled={deliveryBusy}
                           value={customVarHeight}
                           onChange={(e) =>
                             setCustomVarHeight(
@@ -1009,6 +1045,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                         <Button
                           size="sm"
                           variant="secondary"
+                          disabled={deliveryBusy}
                           onClick={handleAddCustomVariant}
                         >
                           Add
@@ -1200,7 +1237,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                       disabled={
                         queueItems.length === 0 ||
                         selectedVariants.length === 0 ||
-                        loading ||
+                        loading ||deliveryBusy||
                         !estimate ||
                         !estimate.approved
                       }
@@ -1619,6 +1656,7 @@ export function BatchRunnerDialog({ editor, onClose }: BatchRunnerDialogProps) {
                                   <span className="deliv-name">
                                     {deliv.variantName}
                                   </span>
+                                  {deliv.color&&<span className="deliv-meta" title={deliv.color.warnings.join(' ')}>RGB: {deliv.color.profileName} · {deliv.color.intent}{deliv.color.blackPointCompensation?' · Black point compensation':''}{deliv.color.usesIntentFallback?' · Intent fallback':''}</span>}
                                   <span className="deliv-meta">
                                     {deliv.width}×{deliv.height} (
                                     {deliv.aspectRatio}) •{" "}

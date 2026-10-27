@@ -1,3 +1,4 @@
+import {readDeliveryPreset} from '../batch/delivery-preset';
 import {rawSourceMetadataSchema,rawSourceMetadata,ownRawSource,verifyRawSource,type RawImageSource} from "../../core/interchange/raw/source";
 import { z } from "zod";
 import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
@@ -37,7 +38,8 @@ const assetSchema = z
 const manifestSchema = z
   .object({
     format: z.literal("luma-recipe"),
-    version: z.union([z.literal(1),z.literal(2),z.literal(3)]),
+    version: z.union([z.literal(1),z.literal(2),z.literal(3),z.literal(4)]),
+    delivery:z.object({offset:safeInteger,size:safeInteger.positive(),sha256:z.string().regex(/^[a-f0-9]{64}$/)}).strict().optional(),
     fonts:projectFontsSchema.optional(),
     recipe: recipeSchema,
     assets: z.array(assetSchema),
@@ -76,16 +78,18 @@ export function recipeAssetIds(recipe: Recipe): Set<string> {
 
 export async function serializeRecipePackage(
   input: Recipe,
-  source: { get(id: string): RecipeAsset;fonts?:ProjectFontSource },
+  source: { get(id: string): RecipeAsset;fonts?:ProjectFontSource;deliveryPreset?:Blob },
 ): Promise<Blob> {
   const recipe = recipeSchema.parse(input) as Recipe;
+  const captured=new Map([...recipeAssetIds(recipe)].map(id=>{const asset=source.get(id);return[id,{...asset}]as const;}));
+  const deliveryPreset=source.deliveryPreset?new Blob([source.deliveryPreset],{type:'application/x-canoli-delivery'}):undefined;
   const fontSources=captureFontFileSources(recipe.fontFiles??[],source.fonts);
   const assets: z.infer<typeof assetSchema>[] = [];
   const blobs: Blob[] = [];
   let offset = 0;
   const originals=new Map<string,{blob:Blob;entries:z.infer<typeof assetSchema>[]}>();
   for (const id of recipeAssetIds(recipe)) {
-    const asset = source.get(id);
+    const asset = captured.get(id)!;
     if (asset.id !== id)
       throw new Error("Recipe source asset identity mismatch.");
     const checked=assetSchema.parse({
@@ -109,15 +113,22 @@ export async function serializeRecipePackage(
       throw new Error("Recipe package offsets exceed safe integer bounds.");
   }
   for(const original of originals.values()){for(const entry of original.entries)entry.raw!.originalOffset=offset;blobs.push(original.blob);offset+=original.blob.size;if(!Number.isSafeInteger(offset))throw new Error('Recipe size exceeds numeric addressing precision.');}
-  const fonts=await encodeProjectFonts(fontSources,offset),version=fonts.manifest?3:originals.size?2:1;
+  const fonts=await encodeProjectFonts(fontSources,offset);
+  let delivery:z.infer<typeof manifestSchema>['delivery'];
+  if(recipe.delivery){
+    const file=deliveryPreset;if(!file||file.size!==recipe.delivery.byteLength||hex(await hash(file))!==recipe.delivery.sha256)throw new Error('Recipe delivery preset is missing or corrupt. Keep the complete package.');
+    const preset=await readDeliveryPreset(file);if(preset.name!==recipe.delivery.name)throw new Error('Recipe delivery preset identity mismatch.');
+    delivery={offset:fonts.endOffset,size:file.size,sha256:recipe.delivery.sha256};
+  }else if(deliveryPreset)throw new Error('Unreferenced recipe delivery preset.');
+  const version=delivery?4:fonts.manifest?3:originals.size?2:1;
   const manifest = new Blob([
-    JSON.stringify({ format: "luma-recipe", version, recipe, assets,...(fonts.manifest?{fonts:fonts.manifest}:{}) }),
+    JSON.stringify({ format: "luma-recipe", version, recipe, assets,...(fonts.manifest?{fonts:fonts.manifest}:{}),...(delivery?{delivery}:{}) }),
   ]);
   const header = new Uint8Array(48);
   header.set(magic);header[5]=48+version;
   new DataView(header.buffer).setBigUint64(8, BigInt(manifest.size), true);
   header.set(await hash(manifest), 16);
-  return new Blob([header, manifest, ...blobs,...fonts.blobs], {
+  return new Blob([header, manifest, ...blobs,...fonts.blobs,...(delivery?[deliveryPreset!]:[])], {
     type: "application/x-luma-recipe",
   });
 }
@@ -125,11 +136,11 @@ export async function serializeRecipePackage(
 /** Validates bytes and references; image decoding and installation belong to the importing host. */
 export async function readRecipePackage(
   file: Blob,
-): Promise<{ recipe: Recipe; assets: RecipeAsset[];fonts:import('../../fonts/resources').FontResourceInput[] }> {
+): Promise<{ recipe: Recipe; assets: RecipeAsset[];fonts:import('../../fonts/resources').FontResourceInput[];deliveryPreset?:Blob }> {
   const header = new Uint8Array(await file.slice(0, 48).arrayBuffer());
   if (
     header.length !== 48 ||
-    !magic.every((byte, index) => index===5?(header[index]>=49&&header[index]<=51):header[index] === byte)
+    !magic.every((byte, index) => index===5?(header[index]>=49&&header[index]<=52):header[index] === byte)
   )
     throw new Error("Invalid recipe package header.");
   const length = Number(new DataView(header.buffer).getBigUint64(8, true));
@@ -141,7 +152,7 @@ export async function readRecipePackage(
     throw new Error("Recipe manifest checksum mismatch.");
   const manifest = manifestSchema.parse(JSON.parse(await manifestBlob.text()));
   if(manifest.version!==header[5]-48||manifest.version===1&&manifest.assets.some(entry=>entry.raw))throw new Error('RAW sources require recipe package version 2.');
-  if(manifest.version===3?manifest.fonts===undefined||manifest.recipe.schemaVersion!==2:manifest.fonts!==undefined||manifest.recipe.fontFiles!==undefined)throw new Error('Font sources require recipe package version 3 and recipe version 2.');
+  if(manifest.version===3?manifest.fonts===undefined||manifest.recipe.schemaVersion!==2:manifest.version!==4&&(manifest.fonts!==undefined||manifest.recipe.fontFiles!==undefined))throw new Error('Font sources require compatible recipe package version 3/4 and recipe version 2/3.');
   const originalRanges=new Map<number,{blob:Blob;size:number;key:string}>();
   const required = recipeAssetIds(manifest.recipe as Recipe);
   const seen = new Set<string>();
@@ -184,7 +195,15 @@ export async function readRecipePackage(
   if (seen.size !== required.size) throw new Error("Missing recipe assets.");
   for(const [originalOffset,original] of [...originalRanges].sort((a,b)=>a[0]-b[0])){if(originalOffset!==offset)throw new Error('Invalid recipe RAW original ranges.');offset+=original.size;}
   const fonts=await decodeFontFileSources(manifest.fonts,manifest.recipe.fontFiles??[],file,start,offset);offset=fonts.endOffset;
+  let deliveryPreset:Blob|undefined;
+  if(manifest.version===4){
+    const entry=manifest.delivery,descriptor=manifest.recipe.delivery;
+    if(!entry||!descriptor||manifest.recipe.schemaVersion!==3||entry.offset!==offset||entry.size!==descriptor.byteLength||entry.sha256!==descriptor.sha256||!Number.isSafeInteger(start+offset+entry.size)||start+offset+entry.size>file.size)throw new Error('Invalid recipe delivery dependency.');
+    deliveryPreset=file.slice(start+offset,start+offset+entry.size,'application/x-canoli-delivery');
+    if(hex(await hash(deliveryPreset))!==entry.sha256)throw new Error('Recipe delivery checksum mismatch.');
+    const preset=await readDeliveryPreset(deliveryPreset);if(preset.name!==descriptor.name)throw new Error('Recipe delivery identity mismatch.');offset+=entry.size;
+  }else if(manifest.delivery||manifest.recipe.delivery)throw new Error('Delivery dependencies require recipe package version 4.');
   if (start + offset !== file.size)
     throw new Error("Unexpected trailing recipe package bytes.");
-  return { recipe: manifest.recipe as Recipe, assets,fonts:fonts.fonts };
+  return { recipe: manifest.recipe as Recipe, assets,fonts:fonts.fonts,...(deliveryPreset?{deliveryPreset}:{}) };
 }

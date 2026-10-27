@@ -1,5 +1,9 @@
 # Architecture
 
+## Profile-aware batch and recipe delivery (F10/W01/W03)
+
+core/color/output-record defines cloned source/receipt DTOs; output-source performs native inspection/hash/compilation. ai/batch/delivery-preset owns the strict source-bearing container; delivery-contract fingerprints settings and verifies accepted receipts. Runner pins original raster/font sources around fitted encoding, and storage owns complete sources/snapshots. Recipe schema 3/package 4 carries a separate delivery preset outside document commands; shared recipe commands/history and private file boundaries remain authoritative. [Contract and current verification](COLOR_DELIVERY.md).
+
 ## Connected ICC browser workflow (F10/F11)
 
 core/color/profile-source owns immutable inspected ICC resources; color-settings normalizes guarded host preferences; workspace v3 retains complete profile sources. engine/icc-proof applies a fingerprint/settings-keyed transform only to the final private viewport frame, bypassing GPU presentation while proofing. engine/icc-output converts raw native RGBA8 readback directly before PNG/TIFF/PDF encoding; alpha and original target bytes remain independent. UI settings preflight atomically, and stale gesture/proof frames cannot present. The scene stays sRGB8; file services remain outside document mutation, isolated scripts and independent REST. See [ICC_ENGINE.md](ICC_ENGINE.md) for contracts, migration and remaining precision/device gates.

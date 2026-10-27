@@ -1,3 +1,8 @@
+import {prepareDeliveryVariants} from './delivery-preparation';
+import {captureColorOutput} from '../../core/color/output-source';
+import type {ColorOutput} from '../../core/color/color-settings';
+import type {IccControl} from '../../core/color/icc-client';
+import {encodeDeliveryPreset,readDeliveryPreset,type DeliveryPreset} from './delivery-preset';
 import {isCameraRawFile} from '../../core/interchange/raw/files';
 import {readBatchPreparation} from './preparation';
 import {prepareRawBatchSource,batchRawSourceSchema} from './raw';
@@ -43,6 +48,7 @@ export interface BatchServiceOptions {
 export class BatchRunnerService {
   private readonly recipes: RecipeService;
   private disposed=false;
+  private readonly colorControllers=new Set<AbortController>();
   private readonly rawControllers=new Set<AbortController>();
   private assertOpen(){if(this.disposed)throw new Error('The batch service is disposed.');}
   readonly storage: BatchStorage;
@@ -86,10 +92,22 @@ export class BatchRunnerService {
     finally{this.rawControllers.delete(controller);}
   }
 
-  async createBatch(
-    configInput: Partial<BatchConfig> & { name: string; budgetId: string },
-    sourceImages: BatchSourceInput[],
-  ): Promise<BatchRun> {
+  private async withColorControl<T>(control:IccControl,action:(control:IccControl)=>Promise<T>,commits=false):Promise<T>{
+    this.assertOpen();const controller=new AbortController();this.colorControllers.add(controller);
+    const signal=control.signal?AbortSignal.any([control.signal,controller.signal]):controller.signal;
+    try{signal.throwIfAborted();const result=await action({...control,signal});if(!commits){signal.throwIfAborted();this.assertOpen();}return result;}
+    finally{this.colorControllers.delete(controller);}
+  }
+  captureColorOutput(output:ColorOutput,control:IccControl={}){return this.withColorControl(control,current=>captureColorOutput(output,current));}
+  exportDeliveryPreset(input:DeliveryPreset,control:IccControl={}){const captured=structuredClone(input);return this.withColorControl(control,async current=>{await prepareDeliveryVariants(captured.variants,current);return encodeDeliveryPreset(captured,current.signal);});}
+  importDeliveryPreset(file:Blob,control:IccControl={}){return this.withColorControl(control,async current=>{const preset=await readDeliveryPreset(file,current.signal);await prepareDeliveryVariants(preset.variants,current);return preset;});}
+
+  createBatch(configInput:Partial<BatchConfig>&{name:string;budgetId:string},sourceImages:BatchSourceInput[],control:IccControl={}):Promise<BatchRun>{
+    return this.withColorControl(control,current=>this.createBatchOwned(configInput,sourceImages,current),true);
+  }
+  private async createBatchOwned(
+    configInput:Partial<BatchConfig>&{name:string;budgetId:string},sourceImages:BatchSourceInput[],control:IccControl,
+  ):Promise<BatchRun>{
     this.assertOpen();
     configInput = structuredClone(configInput);
     sourceImages = structuredClone(sourceImages);
@@ -126,7 +144,8 @@ export class BatchRunnerService {
         throw new Error("Choose either a JSON recipe or a portable package.");
       const file = await this.recipes.packages.get(config.recipePackageId);
       if (!file) throw new Error("Portable recipe package was not found.");
-      const { recipe } = await readRecipePackage(file);
+      const { recipe,deliveryPreset } = await readRecipePackage(file);
+      if(deliveryPreset){const preset=await this.importDeliveryPreset(deliveryPreset,control);if(configInput.variants===undefined)config.variants=preset.variants;}
       config.recipeId = recipe.id;
       config.recipeSnapshot = structuredClone(recipe);
       config.recipePackageSnapshot = file;
@@ -137,18 +156,20 @@ export class BatchRunnerService {
           `Recipe '${config.recipeId}' was not found. Batch was not created.`,
         );
       config.recipeSnapshot = structuredClone(recipe);
-      if(recipe.fontFiles?.length){config.recipePackageSnapshot=await this.recipes.exportRecipePackage(recipe);config.recipePackageId=recipe.id;}
+      if(recipe.fontFiles?.length||recipe.delivery){config.recipePackageSnapshot=await this.recipes.exportRecipePackage(recipe);config.recipePackageId=recipe.id;if(recipe.delivery&&configInput.variants===undefined){const contents=await readRecipePackage(config.recipePackageSnapshot);if(!contents.deliveryPreset)throw new Error('Missing recipe delivery preset.');config.variants=(await this.importDeliveryPreset(contents.deliveryPreset,control)).variants;}}
     }
 
+    await prepareDeliveryVariants(config.variants,control);this.assertOpen();control.signal?.throwIfAborted();
     const itemNames = batchItemNames(sourceImages);
     const items: BatchItem[] = [];
     for (let index = 0; index < sourceImages.length; index++) {
+      control.signal?.throwIfAborted();
       const { parameters, ...src } = sourceImages[index];
       if(!src.raw&&isCameraRawFile({name:src.name,type:src.mimeType}))throw new Error('Review RAW settings and explicit precision consent before creating a batch.');
       if(src.raw){
         src.raw=batchRawSourceSchema.parse(src.raw);
         if(!src.blob)throw new Error('RAW batch creation requires complete original bytes.');
-        const verified=await this.prepareRawSource(new File([src.blob],src.raw.originalName,{type:src.blob.type}),src.raw.options);
+        const verified=await this.prepareRawSource(new File([src.blob],src.raw.originalName,{type:src.blob.type}),src.raw.options,{signal:control.signal});
         if(verified.width!==src.width||verified.height!==src.height||JSON.stringify(verified.raw!.report)!==JSON.stringify(src.raw.report))throw new Error('RAW batch source metadata changed. Review the source again.');
       }
       if (src.blob) {
@@ -201,7 +222,7 @@ export class BatchRunnerService {
     };
 
     this.assertOpen();
-    await this.storage.createRun(run);
+    control.signal?.throwIfAborted();await this.storage.createRun(run,control.signal);
     return run;
   }
 
@@ -350,6 +371,10 @@ export class BatchRunnerService {
       entries.push({ name: deliv.filePath, data: blob });
     }
 
+    if(run.config.variants.some(variant=>variant.color||['tiff','pdf'].includes(variant.format))){
+      const preset=await encodeDeliveryPreset({name:run.config.name,variants:run.config.variants},options.signal);
+      entries.push({name:'delivery-preset.canoli-delivery',data:preset});
+    }
     const preparations=[],fontPreparations=[];
     for(const item of run.items.filter(item=>item.source.raw||item.preparation)){
       options.signal?.throwIfAborted();
@@ -372,7 +397,7 @@ export class BatchRunnerService {
   }
 
   dispose(): void {
-    this.disposed=true;for(const controller of this.rawControllers)controller.abort();this.rawControllers.clear();
+    this.disposed=true;for(const controller of this.colorControllers)controller.abort();this.colorControllers.clear();for(const controller of this.rawControllers)controller.abort();this.rawControllers.clear();
     this.runner.dispose();
     if (this.unsubscribeRunner) {
       this.unsubscribeRunner();

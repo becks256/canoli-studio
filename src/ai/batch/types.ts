@@ -26,7 +26,10 @@ export interface DeliveryVariantSpec {
   name: string;
   targetWidth: number;
   targetHeight: number;
-  format: "png" | "jpeg" | "webp" | "avif";
+  format: "png" | "jpeg" | "webp" | "avif" | "tiff" | "pdf";
+  color?:import('../../core/color/output-record').ColorOutputSource;
+  tiffVariant?:import('../../core/tiff').TiffVariant;
+  pdfDpi?:number;
   quality?:number;
   avifLossless?:boolean;
   avifSpeed?:number;
@@ -39,7 +42,9 @@ export interface DeliveryDeliverable {
   itemId: string;
   variantId: string;
   variantName: string;
-  format: "png" | "jpeg" | "webp" | "avif";
+  settingsSha256?:string;
+  color?:import('../../core/color/output-record').ColorOutputReceipt;
+  format: "png" | "jpeg" | "webp" | "avif" | "tiff" | "pdf";
   width: number;
   height: number;
   aspectRatio: string;
@@ -134,6 +139,8 @@ export interface DeliveryManifestDeliverable {
   itemId: string;
   itemName: string;
   sourceHash: string;
+  settingsSha256?:string;
+  color?:import('../../core/color/output-record').ColorOutputReceipt;
   variantName: string;
   filePath: string;
   format: string;
@@ -147,7 +154,7 @@ export interface DeliveryManifestDeliverable {
 }
 
 export interface DeliveryManifest {
-  schemaVersion: 2;
+  schemaVersion: 2|3;
   manifestId: string;
   batchId: string;
   batchName: string;

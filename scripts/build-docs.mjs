@@ -55,6 +55,7 @@ const generatedPages = [
   ["CLIPPING_MASKS", "Editable clipping masks"],
   ["SVG_CLIPPING", "Editable SVG clipping"],
   ["ICC_ENGINE", "Native ICC engine dependency"],
+  ["COLOR_DELIVERY", "Profile-aware batch and recipe delivery"],
 ];
 const pageDescriptions = {
   SCRIPTING_API:

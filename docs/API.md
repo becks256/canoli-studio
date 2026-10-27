@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Profile-aware batch and recipe delivery (F10/W01/W03)
+
+Trusted browser batch exposes captureColorOutput, exportDeliveryPreset/importDeliveryPreset and an optional ICC control on createBatch. RecipeService.attachDeliveryPreset accepts a Recipe or complete package plus a preset Blob and returns a new package without installing/editing. Package delivery defaults apply when createBatch omits variants. No isolated-script file service or headless REST rendering/synchronization is added. [Contract and current verification](COLOR_DELIVERY.md).
+
 ## ICC color services are trusted browser host APIs
 
 The browser host exposes inspectColorProfile, guarded setColorSettings, immutable colorSettings/colorWarnings and explicit ExportOptions.color for PNG/TIFF/PDF and TIFF pages. Complete custom profile bytes persist in workspace v3. This adds no independent REST rendering route, browser synchronization or isolated scripting service. Existing document commands and sRGB8 composition remain authoritative. [Signatures, defaults, errors and ownership](ICC_ENGINE.md).

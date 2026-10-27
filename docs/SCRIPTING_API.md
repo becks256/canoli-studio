@@ -1,5 +1,9 @@
 # Scripting API
 
+## Profile-aware batch and recipe delivery (F10/W01/W03)
+
+Recipe schema 3/package 4 can retain a complete delivery preset and existing font originals. Executing the recipe still applies its ordinary OO/shared commands; it does not export, inspect ICC files or change workspace preferences. Profile capture/preflight, batch output and downloads belong to the trusted host. No isolated scripting signature/grant changes. [Contract and current verification](COLOR_DELIVERY.md).
+
 ## ICC profiles remain outside isolated scripts
 
 The trusted browser host can inspect immutable ICC resources, preflight color preferences, proof the displayed canvas and convert PNG/TIFF/PDF delivery. These are view/output services; no constructor, profile/file/native import, document mutation command or isolated script signature is added. Scripts/plugins continue shared OO commands and sRGB8 scene behavior. Headless REST does not render or synchronize the browser. [Host signatures, persistence and exact limits](ICC_ENGINE.md).

@@ -98,7 +98,8 @@ Standalone native projects retain original artwork and existing document schema
 
 This is a trusted browser host service, not a document constructor, new command,
 recipe operation, REST rendering endpoint or isolated scripting/plugin service.
-Complete portable batch/delivery-job profile dependencies, other format color
+[Profile-aware browser batches and recipe packages](COLOR_DELIVERY.md) now own
+complete output sources and checked delivery contracts. Independent REST jobs, other format color
 output, assign/convert working spaces, true high precision/CMYK/HDR and physical
 device/performance acceptance remain open in the full roadmap.
 

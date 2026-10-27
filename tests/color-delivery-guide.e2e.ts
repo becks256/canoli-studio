@@ -1,0 +1,5 @@
+import{test,expect}from'@playwright/test';
+test('profile-aware delivery guide is readable without JavaScript and separates actual RGB transport from remaining color gates',async({browser},info)=>{
+ const context=await browser.newContext({baseURL:info.project.use.baseURL,javaScriptEnabled:false,viewport:{width:390,height:844}}),page=await context.newPage();
+ try{await page.goto('/developer/color-delivery.html');await expect(page.getByRole('heading',{level:1,name:'Profile-aware batch delivery and portable recipes',exact:true})).toBeVisible();await expect(page.locator('body')).toContainText('Recipe schema 3 requires a delivery descriptor');await expect(page.locator('body')).toContainText('The scene remains sRGB8');await expect(page.locator('body')).toContainText('Independent REST sessions remain headless');expect(await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth)).toBeLessThanOrEqual(1);await page.screenshot({path:info.outputPath('color-delivery-guide.png'),fullPage:true});}finally{await context.close();}
+});

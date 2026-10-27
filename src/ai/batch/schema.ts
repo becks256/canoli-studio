@@ -1,8 +1,9 @@
+import {colorOutputSourceSchema,colorOutputReceiptSchema} from '../../core/color/output-record';
 /**
  * Zod validation schemas for Batch Runner and Delivery Manifests.
  */
 
-import {batchRawSourceSchema} from './raw';
+import {batchRawSourceSchema} from './raw-record';
 import { z } from "zod";
 import { recipeSchema } from "../recipes/schema";
 import type { BatchConfig, BatchItem, DeliveryManifest } from "./types";
@@ -12,15 +13,21 @@ export const deliveryVariantSpecSchema = z.object({
   name: z.string().min(1).max(120),
   targetWidth: z.number().int().min(16).max(16384),
   targetHeight: z.number().int().min(16).max(16384),
-  format: z.enum(["png", "jpeg", "webp", "avif"]),
+  format: z.enum(["png", "jpeg", "webp", "avif", "tiff", "pdf"]),
+  color:colorOutputSourceSchema.optional(),
+  tiffVariant:z.enum(['auto','classic','big']).optional(),
+  pdfDpi:z.number().finite().positive().optional(),
   quality:z.number().finite().min(.01).max(1).optional(),
   avifLossless:z.boolean().optional(),
   avifSpeed:z.number().int().min(0).max(10).optional(),
   fit: z.enum(["cover", "contain", "fill"]),
   nameTemplate: z.string().min(1).max(240).optional(),
-}).superRefine((variant,context)=>{
+}).strict().superRefine((variant,context)=>{
+  if(variant.color&&!['png','tiff','pdf'].includes(variant.format))context.addIssue({code:'custom',message:'ICC conversion requires PNG, TIFF or PDF delivery.'});
+  if(variant.tiffVariant!==undefined&&variant.format!=='tiff')context.addIssue({code:'custom',message:'TIFF compatibility requires a TIFF variant.'});
+  if(variant.pdfDpi!==undefined&&variant.format!=='pdf')context.addIssue({code:'custom',message:'PDF page sizing requires a PDF variant.'});
   if(variant.format!=='avif'&&(variant.avifLossless!==undefined||variant.avifSpeed!==undefined))context.addIssue({code:'custom',message:'AVIF settings require an AVIF delivery variant.'});
-  if(variant.format==='png'&&variant.quality!==undefined)context.addIssue({code:'custom',message:'Quality settings require JPEG, WebP or AVIF.'});
+  if(['png','tiff','pdf'].includes(variant.format)&&variant.quality!==undefined)context.addIssue({code:'custom',message:'Quality settings require JPEG, WebP or AVIF.'});
 });
 
 export const batchSourceImageSchema = z.object({
@@ -43,7 +50,9 @@ export const deliveryDeliverableSchema = z.object({
   itemId: z.string().min(1).max(64),
   variantId: z.string().min(1).max(64),
   variantName: z.string().min(1).max(120),
-  format: z.enum(["png", "jpeg", "webp", "avif"]),
+  settingsSha256:z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  color:colorOutputReceiptSchema.optional(),
+  format: z.enum(["png", "jpeg", "webp", "avif", "tiff", "pdf"]),
   width: z.number().int().min(1),
   height: z.number().int().min(1),
   aspectRatio: z.string().min(1).max(32),
@@ -111,6 +120,8 @@ export const deliveryManifestDeliverableSchema = z
     itemName: z.string().min(1).max(240),
     sourceHash: z.string().regex(/^[a-f0-9]{64}$/),
     variantName: z.string().min(1).max(120),
+    settingsSha256:z.string().regex(/^[a-f0-9]{64}$/).optional(),
+    color:colorOutputReceiptSchema.optional(),
     filePath: z.string().min(1).max(260),
     format: z.string().min(1).max(16),
     width: z.number().int().min(1),
@@ -125,7 +136,7 @@ export const deliveryManifestDeliverableSchema = z
 
 export const deliveryManifestSchema = z
   .object({
-    schemaVersion: z.literal(2),
+    schemaVersion: z.union([z.literal(2),z.literal(3)]),
     manifestId: z.string().min(1).max(64),
     batchId: z.string().min(1).max(64),
     batchName: z.string().min(1).max(120),
@@ -148,7 +159,10 @@ export const deliveryManifestSchema = z
       })
       .strict(),
   })
-  .strict();
+  .strict().superRefine((manifest,context)=>{
+    if(manifest.schemaVersion===2&&manifest.deliverables.some(row=>row.color||row.settingsSha256))context.addIssue({code:'custom',message:'Color/setting receipts require delivery manifest version 3.'});
+    for(const row of manifest.deliverables)if(row.color&&(!row.settingsSha256||!['png','tiff','pdf'].includes(row.format)))context.addIssue({code:'custom',message:'A color receipt requires checked PNG/TIFF/PDF settings.'});
+  });
 
 export function validateBatchConfig(input: unknown): {
   valid: boolean;

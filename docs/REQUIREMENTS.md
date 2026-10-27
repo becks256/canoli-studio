@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Profile-aware batch and recipe delivery (F10/W01/W03)
+
+Profile-aware resumable delivery must own exact ICC sources/intent/BPC, preflight before publication, preserve source/history, convert actual fitted PNG/TIFF/PDF pixels, reject unsupported combinations and stale contracts, and retain independent file/settings hashes through retry/reload and portable recipe packages. Verify native WASM, independent file readers, actual UI and genuine 50 MP output. Full precision/device/REST/job and roadmap gates remain open. [Contract and current verification](COLOR_DELIVERY.md).
+
 ## ICC browser proof and RGB delivery (F10/F11)
 
 Support inspected complete RGB/device ICC profiles, native intent/BPC, staged atomic Color settings, actual current-frame proof/gamut alarms and explicit pending/applied/failed status. Convert RGB8 PNG/TIFF/PDF delivery with exact alpha and original embedded target profiles; exclude proof. Persist complete sources/settings per tab in workspace v3, validate before restore publication and visibly disable legacy unclipped proof. Verify actual WASM, independent decoded files, cancellation/stale ownership, real browser workflow and genuine 50 MP behavior. Working-space assignment/conversion, high precision, CMYK delivery, HDR, portable job dependencies, other-format profile fidelity and physical device/performance acceptance remain required. [Exact implemented boundary](ICC_ENGINE.md).

@@ -91,7 +91,7 @@ export function RecipePackagesPanel({
     >
       <p>
         Portable packages retain recipe source images and embedded font files,
-        including complete font originals. They remain available after reloading.
+        including complete font originals and captured delivery profiles. They remain available after reloading.
       </p>
       <div className="portable-package-actions">
         <Button
@@ -154,6 +154,7 @@ export function RecipePackagesPanel({
         <>
           <h3>{selected.recipe.name}</h3>
           <p>{selected.recipe.description}</p>
+          {selected.recipe.delivery&&<section aria-label="Package delivery preset"><h4>Delivery preset: {selected.recipe.delivery.name}</h4><p>Contains reusable output settings and complete profile sources. Choose this package in Batch to use them. Running the recipe here edits artwork and does not export files.</p></section>}
           {selected.recipe.fontFiles?.length&&<section aria-label="Package font files"><h4>Embedded font files</h4><p>These packages retain complete original font files. Only dependencies needed by executed steps attach to the document.</p><ul>{selected.recipe.fontFiles.map(file=><li key={file.id}>{file.name} · {file.resource.report.faces[0].fullName??'Unnamed face'} · {file.resource.report.format.toUpperCase()}</li>)}</ul></section>}
           {selected.recipe.parameters.map((parameter) => (
             <label className="portable-package-parameter" key={parameter.name}>

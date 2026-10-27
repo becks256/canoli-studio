@@ -57,6 +57,7 @@ function referencedBlobKeys(runs: unknown[]): Set<string> {
   return keys;
 }
 
+export const BATCH_STORAGE_VERSION=3;
 export class BatchStorage {
   private memRuns = new Map<string, BatchRun>();
   private memBlobs = new Map<string, Blob>();
@@ -70,7 +71,7 @@ export class BatchStorage {
     }
     if (!this.dbPromise) {
       this.dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
-        const request = indexedDB.open("luma-batch-storage", 2);
+        const request = indexedDB.open("luma-batch-storage", BATCH_STORAGE_VERSION);
         request.onupgradeneeded = () => {
           const db = request.result;
           if (!db.objectStoreNames.contains("runs"))
@@ -119,7 +120,8 @@ export class BatchStorage {
   }
 
   /** Publish a new run and its source bytes together; never overwrite an existing run. */
-  async createRun(run: BatchRun): Promise<void> {
+  async createRun(run: BatchRun,signal?:AbortSignal): Promise<void> {
+    signal?.throwIfAborted();
     const clone = structuredClone(run);
     const sources = clone.items.flatMap((item) =>
       item.source.blob
@@ -130,7 +132,7 @@ export class BatchStorage {
       delete item.source.blob;
       for (const delivery of item.deliverables) delete delivery.blob;
     }
-    const db = await this.getDb();
+    const db = await this.getDb();signal?.throwIfAborted();
     if (!db) {
       if (this.memRuns.has(clone.id))
         throw new Error("Batch run already exists.");
@@ -142,16 +144,19 @@ export class BatchStorage {
       durability: "strict",
     });
     const done = txComplete(tx);
+    const cancel=()=>{try{tx.abort();}catch{/* An already committed transaction stays acknowledged. */}};
+    signal?.addEventListener('abort',cancel,{once:true});
     try {
+      signal?.throwIfAborted();
       for (const source of sources)
         tx.objectStore("blobs").add(source.blob, source.key);
       tx.objectStore("runs").add(clone);
+      await done;
     } catch (error) {
-      tx.abort();
+      try{tx.abort();}catch{/* The transaction may already be aborted. */}
       await done.catch(() => {});
-      throw error;
-    }
-    await done;
+      if(signal?.aborted)throw signal.reason;throw error;
+    }finally{signal?.removeEventListener('abort',cancel);}
   }
 
   async saveRun(run: BatchRun): Promise<void> {

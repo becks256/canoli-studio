@@ -1,21 +1,14 @@
+export {batchRawSourceSchema,type BatchRawSource} from './raw-record';
+import {batchRawSourceSchema} from './raw-record';
 import type {HistoryOrigin} from '../../core/history-provenance';
-import {hasLensCorrection,validateLensGeometry} from '../../core/interchange/raw/lens';
-import {z} from 'zod';
 import {id} from '../../core/model';
 import {Document,SmartObjectLayer} from '../../dom';
 import {inspectRawFile} from '../../core/interchange/raw/client';
 import {validateRawLensProfile} from '../../core/interchange/lens/client';
 import {rawBlobHash} from '../../core/interchange/raw/source';
-import {parseRawDevelopmentOptions,rawDecodeOptionsSchema,rawImportReportSchema,type RawDecodeOptions,type RawImportControl} from '../../core/interchange/raw/types';
+import {parseRawDevelopmentOptions,type RawDecodeOptions,type RawImportControl} from '../../core/interchange/raw/types';
 import type {BatchSourceInput} from './types';
 
-/** Reviewed metadata only. Accepted pixels/provenance belong to the later prepared project. */
-export const batchRawSourceSchema=z.object({version:z.literal(1),originalName:z.string().min(1),options:rawDecodeOptionsSchema,report:rawImportReportSchema}).strict().superRefine((value,context)=>{
-  if(hasLensCorrection(value.options.development.lens)){try{validateLensGeometry(value.options.development.lens!,value.report.displayWidth,value.report.displayHeight);}catch(error){context.addIssue({code:'custom',message:String(error)});}}
-  if(!value.options.allowPrecisionLoss||!value.report.canDevelop||value.options.development.image!==value.report.image||value.options.development.whiteBalance==='camera'&&value.report.channels>1&&!value.report.hasCameraWhiteBalance)
-    context.addIssue({code:'custom',message:'RAW batch input requires explicit precision-loss consent and supported native settings.'});
-});
-export type BatchRawSource=z.infer<typeof batchRawSourceSchema>;
 export async function prepareRawBatchSource(file:File,options:RawDecodeOptions={},control:RawImportControl={}):Promise<BatchSourceInput>{
   const settings=parseRawDevelopmentOptions(options);control.signal?.throwIfAborted();
   const report=await inspectRawFile(file,settings.development.image,control);control.signal?.throwIfAborted();

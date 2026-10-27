@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Profile-aware batch and recipe delivery (F10/W01/W03)
+
+Profile-aware batch output and portable recipe delivery sources add no plugin manifest version, worker/file/profile grant, network service or download privilege. Installation stays inert; ordinary commands retain shared permissions/revision/Undo validation. Native profile preparation and output remain trusted browser services. [Contract and current verification](COLOR_DELIVERY.md).
+
 ## ICC browser integration adds no plugin grant
 
 Native ICC inspection, color preferences, viewport proof and file delivery belong to the trusted browser host. They add no file chooser, profile/native store or worker service to isolated plugin commands. Installation remains inert; manifest grants, host validation, shared Undo/revision and source ownership remain authoritative. [Exact host boundary](ICC_ENGINE.md).

@@ -193,8 +193,9 @@ export interface RecipeStep {
 }
 
 export interface Recipe {
-  schemaVersion: 1|2;
-  /** Version 2 only. Exact source/face metadata; bytes belong to a package/store. */
+  schemaVersion: 1|2|3;
+  delivery?:import('./delivery').RecipeDelivery;
+  /** Versions 2 and 3. Exact source/face metadata; bytes belong to a package/store. */
   fontFiles?:import('../../core/font-files').FontFileData[];
   id: string;
   name: string;

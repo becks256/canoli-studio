@@ -2167,3 +2167,6 @@ test('production dense vector movement preserves complete paths, exact native pi
 
 import {iccApplicationWorkflow}from './helpers/icc-application';
 test('production ICC canvas proof, independent converted files and complete workspace reopening without developer globals',async({page},info)=>{test.setTimeout(240000);await iccApplicationWorkflow(page,info,true);});
+
+import{colorDeliveryWorkflow}from'./helpers/color-delivery';
+test('production portable ICC presets and recipe packages retain exact batch delivery after reload without developer globals',async({page},info)=>{test.setTimeout(240000);await colorDeliveryWorkflow(page,info,true);});

@@ -1,3 +1,4 @@
+import {computeSha256} from '../batch/manifest';
 import type {FontResourceInput} from '../../fonts/resources';
 import {executeRecipeAsync} from './async-executor';
 import {compileRecipePackagePlan} from './package-plan';
@@ -8,6 +9,7 @@ import { executeRecipePackage } from "./package-executor";
 import {
   recipeAssetIds,
   serializeRecipePackage,
+  readRecipePackage,
   type RecipeAsset,
 } from "./package";
 import type { Document } from "../../dom";
@@ -212,8 +214,29 @@ export class RecipeService {
     );
   }
 
-  exportRecipePackage(recipe: Recipe): Promise<Blob> {
-    return serializeRecipePackage(recipe, this.editor.assetStore);
+  async exportRecipePackage(input:Recipe):Promise<Blob>{
+    const recipe=structuredClone(input),assets=this.editor.assetStore;
+    const captured=new Map([...recipeAssetIds(recipe)].map(id=>[id,assets.has(id)?{...assets.get(id)}:undefined]as const));
+    const previous=recipe.delivery?await this.packages.get(recipe.id):undefined;
+    const contents=previous?await readRecipePackage(previous):undefined;
+    if(recipe.delivery&&!contents?.deliveryPreset)throw new Error('Recipe delivery sources are unavailable. Import the complete package.');
+    return serializeRecipePackage(recipe,{
+      get:id=>{const source=contents?.assets.find(asset=>asset.id===id)??captured.get(id);if(!source)throw new Error(`Recipe source is unavailable: ${id}`);return source;},
+      fonts:{get:id=>contents?.fonts.find(font=>font.descriptor.report.faces[0].id===id)??assets.fonts.get(id)},
+      deliveryPreset:contents?.deliveryPreset,
+    });
+  }
+  /** File-only operation: attach reusable delivery settings without editing artwork. */
+  async attachDeliveryPreset(input:Recipe|Blob,presetFile:Blob,control:import('../../core/color/icc-client').IccControl={}):Promise<Blob>{
+    const original=input instanceof Blob?new Blob([input]):structuredClone(input),assets=this.editor.assetStore;
+    const captured=original instanceof Blob?undefined:new Map([...recipeAssetIds(original)].map(id=>[id,{...assets.get(id)}]as const));
+    const file=new Blob([presetFile],{type:'application/x-canoli-delivery'}),preset=await this.editor.batch.importDeliveryPreset(file,control);
+    const contents=original instanceof Blob?await readRecipePackage(original):undefined,recipe=structuredClone(contents?.recipe??original)as Recipe;control.signal?.throwIfAborted();
+    recipe.schemaVersion=3;recipe.delivery={version:1,name:preset.name,sha256:await computeSha256(await file.arrayBuffer()),byteLength:file.size};control.signal?.throwIfAborted();
+    const result=await serializeRecipePackage(recipe,{
+      get:id=>{const source=contents?.assets.find(asset=>asset.id===id)??captured?.get(id);if(!source)throw new Error(`Recipe source is unavailable: ${id}`);return source;},
+      fonts:{get:id=>contents?.fonts.find(font=>font.descriptor.report.faces[0].id===id)??assets.fonts.get(id)},deliveryPreset:file,
+    });control.signal?.throwIfAborted();return result;
   }
 
   executeRecipePackage(

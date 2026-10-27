@@ -8,7 +8,7 @@ export const recipeFontFilesSchema=z.array(fontFileSchema).min(1).refine(files=>
 /** Resource identities are content based, never source document identities. */
 export function recipeFontFiles(recipe:Pick<Recipe,'schemaVersion'|'fontFiles'>):FontFileData[]{
   if(recipe.fontFiles===undefined){if(recipe.schemaVersion===2)throw new Error('Font recipe version 2 requires fontFiles.');return[];}
-  if(recipe.schemaVersion!==2)throw new Error('Font resources require recipe version 2.');
+  if(recipe.schemaVersion!==2&&recipe.schemaVersion!==3)throw new Error('Font resources require recipe version 2 or 3.');
   return recipeFontFilesSchema.parse(recipe.fontFiles);
 }
 

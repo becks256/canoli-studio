@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Profile-aware batch and recipe delivery (F10/W01/W03)
+
+Batch custom variants expose TIFF/PDF and an explicit capture of the current output profile for supported formats. Show the captured target in chips and actual conversion/fallback in review. Preset import/export and recipe attachment stay outside artwork/Undo. Disable conflicting controls while native preparation is pending, keep close/cancel active and expose errors rather than silently falling back to sRGB. [Contract and current verification](COLOR_DELIVERY.md).
+
 ## Color settings and honest proof status
 
 Use the existing custom dialog, selects and check fields. Lead with the actual sRGB8 editing plane, then output RGB profile/intent/BPC and separately staged canvas-proof controls. File import shows inspected profile identity/class/space; CMYK is a proof target, never an RGB output choice. Apply preflights the whole draft; Cancel stays available during native work. Surface failures and intent fallback. Footer labels output preset separately from actual pending/applied/failed proof presentation. Export describes the selected RGB profile or explicit sRGB limitation; avoid working-space assignment or physical-print claims. [Workflow](ICC_ENGINE.md).

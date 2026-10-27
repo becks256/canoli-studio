@@ -170,7 +170,7 @@ export function compileEditPlan(
   // Working copy of document for simulation
   let simDoc = structuredClone(document);
   let dependencies:ReturnType<typeof recipeFontFiles>=[];
-  try{dependencies=recipeFontFiles(recipe);if(recipe.schemaVersion!==2&&recipe.steps.some(step=>step.action.type.startsWith('font.file.')))throw new Error('Font actions require recipe version 2.');}catch(error){errors.push(String(error));}
+  try{dependencies=recipeFontFiles(recipe);if(recipe.schemaVersion!==2&&recipe.schemaVersion!==3&&recipe.steps.some(step=>step.action.type.startsWith('font.file.')))throw new Error('Font actions require recipe version 2.');}catch(error){errors.push(String(error));}
   const fontFiles=new Map([...documentFontFiles(document),...dependencies].map(file=>[file.id,file]));
   const apply=(command:EditorCommand):DocumentData=>{
     for(const fontId of recipeFontIds(command)){

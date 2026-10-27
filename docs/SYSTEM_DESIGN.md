@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Profile-aware batch and recipe delivery (F10/W01/W03)
+
+Keep source ICC bytes, immutable captured settings, actual CMM receipts and final file hashes distinct. Validate native profiles before starting a run; guard status/settings across delayed preflight; pin source/font lifetimes across fitted encoding. Retry or packaging cannot relabel existing files with a different profile/render contract. Own complete recipe/preset byte graphs and reject missing/corrupt/range-invalid dependencies before exposing them. [Contract and current verification](COLOR_DELIVERY.md).
+
 ## Connected ICC invariants
 
 Separate immutable complete ICC sources, native metadata, output/proof preferences, prepared workers and owned pixel windows. Apply preferences atomically after native preflight; validate complete workspace v3 sources before publishing any restored tab. Stale or failed proof must not present partial pixels or report applied. Viewport proof never enters native caches or export. Convert straight-alpha readback directly into PNG/TIFF/PDF encoding and embed the exact target profile. Keep scene editing sRGB8 and preserve all document/command/isolation boundaries. [Contracts and remaining gates](ICC_ENGINE.md).

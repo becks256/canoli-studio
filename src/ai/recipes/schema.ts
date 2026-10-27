@@ -1,3 +1,4 @@
+import {recipeDeliverySchema} from './delivery';
 import { z } from "zod";
 import type { Recipe } from "./types";
 import { RECIPE_SCHEMA_VERSION } from "./types";
@@ -276,7 +277,8 @@ export const recipeStepSchema = z.object({
 
 export const recipeSchema = z
   .object({
-    schemaVersion: z.union([z.literal(RECIPE_SCHEMA_VERSION),z.literal(2)]),
+    schemaVersion: z.union([z.literal(RECIPE_SCHEMA_VERSION),z.literal(2),z.literal(3)]),
+    delivery:recipeDeliverySchema.optional(),
     fontFiles:recipeFontFilesSchema.optional(),
     id: z.string().min(1).max(120),
     name: z.string().min(1).max(240),
@@ -291,7 +293,7 @@ export const recipeSchema = z
     created: z.string().optional(),
     modified: z.string().optional(),
   })
-  .refine(data=>data.schemaVersion===2?data.fontFiles!==undefined:data.fontFiles===undefined&&!data.steps.some(step=>step.action.type.startsWith('font.file.')),{message:'Font dependencies and actions require recipe version 2 with fontFiles.'})
+  .refine(data=>(data.schemaVersion===3?data.delivery!==undefined:data.delivery===undefined)&&(data.schemaVersion===1?data.fontFiles===undefined:data.schemaVersion===2?data.fontFiles!==undefined:true)&&(!data.steps.some(step=>step.action.type.startsWith('font.file.'))||!!data.fontFiles?.length),{message:'Font dependencies require recipe version 2/3; delivery dependencies require version 3 and a complete package.'})
   .refine(
     (data) => {
       // Check that step IDs are unique

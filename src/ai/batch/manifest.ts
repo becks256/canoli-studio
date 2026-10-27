@@ -1,3 +1,4 @@
+import {verifyDeliveryContract} from './delivery-contract';
 /**
  * Delivery Manifest generation, filename templating,
  * SHA-256 cryptographic verification, and package export.
@@ -159,11 +160,15 @@ export async function generateDeliveryManifest(
     }
 
     for (const deliv of item.deliverables) {
+      const variant=run.config.variants?.find(value=>value.id===deliv.variantId);
+      if(!variant&&(deliv.settingsSha256||deliv.color))throw new Error('Delivery variant is missing from its accepted settings.');
+      if(variant)await verifyDeliveryContract(variant,deliv);
       deliverables.push({
         deliverableId: deliv.id,
         itemId: item.id,
         itemName: item.name,
         sourceHash,
+        ...(deliv.color||['tiff','pdf'].includes(deliv.format)?{settingsSha256:deliv.settingsSha256,...(deliv.color?{color:deliv.color}:{})}:{}),
         variantName: deliv.variantName,
         filePath: allocatePath(deliv.fileName, deliv.format),
         format: deliv.format,
@@ -182,7 +187,7 @@ export async function generateDeliveryManifest(
   }
 
   const manifest: DeliveryManifest = {
-    schemaVersion: 2,
+    schemaVersion: deliverables.some(row=>row.color||row.settingsSha256)?3:2,
     manifestId: `manifest-${id()}`,
     batchId: run.id,
     batchName: run.config.name,

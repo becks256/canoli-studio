@@ -1,3 +1,9 @@
+import {prepareDeliveryVariants} from './delivery-preparation';
+import {captureRasterExportSources} from '../../engine/raster-export-source';
+import {exportTiff} from '../../engine/tiff';
+import {exportPdf} from '../../engine/pdf';
+import {deliverySettingsKey,deliverySettingsHash,verifyDeliveryContract} from './delivery-contract';
+import {prepareColorOutputSource} from '../../core/color/output-source';
 import {documentFontFiles} from '../../core/font-files';
 import {withRecipeFonts} from '../recipes/font-preparation';
 import type {FontSourceStore} from '../../fonts/store';
@@ -345,7 +351,18 @@ export class BatchRunner {
       return this.startOrResume(runId, retryFailed);
     }
 
+    const capturedSettings=JSON.stringify(run.config.variants.map(deliverySettingsKey));
+    const capturedStatus=run.status;
+    const colors=await prepareDeliveryVariants(run.config.variants);
+    for(const item of run.items)for(const delivery of item.deliverables){
+      const variant=run.config.variants.find(v=>v.id===delivery.variantId);if(!variant)throw new Error('An accepted variant was removed from batch settings. Create a new batch.');
+      await verifyDeliveryContract(variant,delivery,colors.get(await deliverySettingsHash(variant))?.receipt);
+    }
+
+    const fresh=await this.storage.getRun(runId);
+    if(!fresh||fresh.status!==capturedStatus||JSON.stringify(fresh.config.variants.map(deliverySettingsKey))!==capturedSettings)throw new Error('Batch state or delivery settings changed during profile preflight. Start again explicitly.');
     run = await this.storage.updateRun(runId, (current) => {
+      if(current.status!==capturedStatus||JSON.stringify(current.config.variants.map(deliverySettingsKey))!==capturedSettings)throw new Error('Batch state changed during delivery preflight.');
       for (const item of current.items) {
         if (item.status === "running") item.status = "pending";
         if (retryFailed && item.status === "failed") {
@@ -829,6 +846,7 @@ export class BatchRunner {
         const existing = previousDeliverables.find(
           (d) => d.variantId === variant.id,
         );
+        if(existing)await verifyDeliveryContract(variant,existing);
         const existingBlob = existing
           ? await this.storage.getDeliverableBlob(existing.id)
           : null;
@@ -883,6 +901,10 @@ export class BatchRunner {
     signal?:AbortSignal,
   ): Promise<DeliveryDeliverable> {
     const delivId = `${item.id}:${variant.id}`;
+    const sourceCheck=captureRasterExportSources(doc,assets,{signal},'batch delivery');
+    try{
+    const settingsSha256=await deliverySettingsHash(variant);sourceCheck();
+    const preparedColor=variant.color?await prepareColorOutputSource(variant.color,{signal}):undefined;sourceCheck();
 
     // Scale and fit layers into variant geometry
     const variantDoc = createDocument(
@@ -903,7 +925,11 @@ export class BatchRunner {
     let blob: Blob;
     try {
       if (variant.format === "png") {
-        blob = await exportPng(variantDoc, assets, deliveryRenderer);
+        blob = await exportPng(variantDoc, assets, deliveryRenderer,{signal},preparedColor?.output);
+      } else if(variant.format==='tiff'){
+        blob=await exportTiff(variantDoc,assets,deliveryRenderer,variant.tiffVariant,{signal},preparedColor?.output);
+      } else if(variant.format==='pdf'){
+        blob=await exportPdf(variantDoc,assets,deliveryRenderer,variant.pdfDpi,{signal},preparedColor?.output);
       } else if(variant.format==='avif'){
         blob=await exportAvif(variantDoc,assets,deliveryRenderer,{quality:variant.quality,lossless:variant.avifLossless,speed:variant.avifSpeed},{signal},doc);
       } else if (variant.format === "jpeg" || variant.format === "webp") {
@@ -991,8 +1017,10 @@ export class BatchRunner {
       );
     }
 
+    sourceCheck();
     const arrayBuffer = await blob.arrayBuffer();
-    const digest = await computeSha256(arrayBuffer);
+    sourceCheck();
+    const digest = await computeSha256(arrayBuffer);sourceCheck();
 
     // Format safe deliverable filename
     const template =
@@ -1007,6 +1035,8 @@ export class BatchRunner {
       id: delivId,
       itemId: item.id,
       variantId: variant.id,
+      settingsSha256,
+      ...(preparedColor?{color:preparedColor.receipt}:{}),
       variantName: variant.name,
       format: variant.format,
       width: variant.targetWidth,
@@ -1018,6 +1048,7 @@ export class BatchRunner {
       blob,
       createdAt: new Date().toISOString(),
     };
+    }finally{sourceCheck.release();}
   }
 
   private updateRunSummary(run: BatchRun): void {
