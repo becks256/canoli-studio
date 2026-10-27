@@ -57,8 +57,19 @@ Invalid input/parameters and float32 overflow reject without publishing output.
 Worker `PixelProcessor.floatTone` captures samples and all settings before
 readiness, transfers private copies and checks complete returned sample geometry.
 
+`transfer(pixels, adjustment)` accepts an existing strict Curves/Levels DTO.
+The connected linear document path uses its continuous float64 master/channel
+operator with one final float32 store and exact alpha. Four owned control records
+replace byte color lookup tables. Identity channels preserve signed/extended RGB;
+Curves extend endpoint tangents and active Levels explicitly clip at their input
+endpoints. The UI and model use the same normalized controls; worker calls capture
+nested points/channels before readiness. Exact equations, limits and errors are
+specified in [the document contract](FLOAT_DOCUMENTS.md#continuous-curves-and-levels).
+The native private export `transferFloat` rejects invalid controls/samples and
+unrepresentable output; caller buffers never transfer. This adds no isolated API.
+
 Native scratch is reused in windows of at most 65,536 pixels. Worker entry points
-`PixelProcessor.floatComposite` and `floatAffine` accept at most 262,144 pixels
+`PixelProcessor.floatComposite`, `floatAffine`, `floatTone` and `floatTransfer` accept at most 262,144 pixels
 per request as a transport-buffer budget; this is independent of original file
 or document geometry. They capture complete samples, masks, coefficients and
 options before awaiting readiness and transfer only private copies. Replies must
@@ -66,8 +77,8 @@ be float32, finite, alpha-valid and dimensionally exact. Shutdown rejects pendin
 requests. Current worker disposal is cancellation for this internal service;
 there is no new isolated-script API or per-call AbortSignal contract.
 
-A private owner validates the native exports `compositeFloat`, `affineFloat`
-and `toneFloat`. Other pixel exports retain their signatures. Invalid native input,
+A private owner validates the native exports `compositeFloat`, `affineFloat`,
+`toneFloat` and `transferFloat`. Other pixel exports retain their signatures. Invalid native input,
 unsupported artistic numeric domain and nonrepresentable output have distinct
 status codes. Failure can leave private scratch changed but publishes no result;
 fresh work reuses the owner without changing other byte/float owners.

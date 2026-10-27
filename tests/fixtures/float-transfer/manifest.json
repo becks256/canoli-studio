@@ -1,0 +1,517 @@
+{
+  "samples": 280004,
+  "generatorSha256": "fc779982781b274085dfbe239ea5925ff7cd0814aefc03475208b2dc5283d97a",
+  "oracleSha256": "787d022e637ed7e164171c177913ac76600df7460b03b359d308c9de58ebdef1",
+  "files": {
+    "source.f32le.gz": {
+      "bytes": 744610,
+      "sha256": "9d2d8287fb3a37a843beaa61b901eef740bd13c4b48aa091efcb7e37a69da6cb",
+      "rawSha256": "5da5f70f825903808701a6286c6e95a624f88a2ca6ff070cfd618797bcc349e6"
+    },
+    "identity-curves.f32le.gz": {
+      "bytes": 744610,
+      "sha256": "9d2d8287fb3a37a843beaa61b901eef740bd13c4b48aa091efcb7e37a69da6cb",
+      "rawSha256": "5da5f70f825903808701a6286c6e95a624f88a2ca6ff070cfd618797bcc349e6"
+    },
+    "curves-rgb.f32le.gz": {
+      "bytes": 798092,
+      "sha256": "7c6cfeb43c32911abce3f863143f19848b98393543bf53e0ecd46c5f75f6e419",
+      "rawSha256": "77129206feb5bb9ec1569b15bc6df5069d51c78b6e7d372f5f4445fdba107d49"
+    },
+    "curves-turns.f32le.gz": {
+      "bytes": 668822,
+      "sha256": "2dd56f145863efab15610a02a53019035f8efab5566a5418a2362b2ee2deffb2",
+      "rawSha256": "02da67e6a1f44895ca8c7c13f07da518680314565e491ed4bd1bfc61ea4026a6"
+    },
+    "curves-short.f32le.gz": {
+      "bytes": 798492,
+      "sha256": "fb0967c01beee25518cf138be35b7922a257ab2a3b73a1369f6fbb7300a1a1b3",
+      "rawSha256": "ee5c5104115ddff44c6799c9b37c1698857b67393b4f84203e6f129433d50452"
+    },
+    "identity-levels.f32le.gz": {
+      "bytes": 744610,
+      "sha256": "9d2d8287fb3a37a843beaa61b901eef740bd13c4b48aa091efcb7e37a69da6cb",
+      "rawSha256": "5da5f70f825903808701a6286c6e95a624f88a2ca6ff070cfd618797bcc349e6"
+    },
+    "levels-rgb.f32le.gz": {
+      "bytes": 680401,
+      "sha256": "4c2a61bd6c7e39a5dbd9b522738e5aa721962441d7b0fa5a9105060b377f6560",
+      "rawSha256": "edea2416bd048029aadfda681dd84a7b48aced05df5ad725eb4aac5ecbd7ba93"
+    },
+    "levels-channel.f32le.gz": {
+      "bytes": 735568,
+      "sha256": "1864b230e7ede4f0f5c0cf39bac9d9272979f8e559a897175eede2e972654b31",
+      "rawSha256": "e634df09722a2d127da4c3b68ede3d68b1c0709102c38d039bf6ca9494dd8c83"
+    },
+    "scene-ordinary.f32le.gz": {
+      "bytes": 101027,
+      "sha256": "4d1f17107f56a18f02bfc01155f42ab1ee5227194662bc0571940507b3ac0e50",
+      "rawSha256": "ab37bc568123eac9f3563a6af75d67f0246e1a2b69498b3069f6fb27cef4790c"
+    },
+    "scene-clipped.f32le.gz": {
+      "bytes": 72206,
+      "sha256": "a457951f98288902c71c9d11b50cdea22a443ac21f77e4c364810cc7bd3218ff",
+      "rawSha256": "54d9d280fba6846a8a8becdaf17a2149c391858580365d456cc740fcc5b2757d"
+    },
+    "scene-groups.f32le.gz": {
+      "bytes": 99048,
+      "sha256": "2fbe0d518827da2068f908085a8054dafc61f1efb92b91a48808fa0526477ef2",
+      "rawSha256": "0f58af5157ce8f0d135b81804257527ed6ffd3a2dc72ba3698fbd8eb13434a94"
+    }
+  },
+  "cases": [
+    {
+      "name": "identity-curves",
+      "adjustment": {
+        "kind": "curves",
+        "rgb": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 255,
+            "y": 255
+          }
+        ]
+      },
+      "reference": "identity-curves.f32le.gz",
+      "rawSha256": "5da5f70f825903808701a6286c6e95a624f88a2ca6ff070cfd618797bcc349e6"
+    },
+    {
+      "name": "curves-rgb",
+      "adjustment": {
+        "kind": "curves",
+        "rgb": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 64,
+            "y": 48
+          },
+          {
+            "x": 128,
+            "y": 168
+          },
+          {
+            "x": 255,
+            "y": 255
+          }
+        ],
+        "red": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 120,
+            "y": 160
+          },
+          {
+            "x": 255,
+            "y": 255
+          }
+        ]
+      },
+      "reference": "curves-rgb.f32le.gz",
+      "rawSha256": "77129206feb5bb9ec1569b15bc6df5069d51c78b6e7d372f5f4445fdba107d49"
+    },
+    {
+      "name": "curves-turns",
+      "adjustment": {
+        "kind": "curves",
+        "rgb": [
+          {
+            "x": 0,
+            "y": 16
+          },
+          {
+            "x": 40,
+            "y": 210
+          },
+          {
+            "x": 90,
+            "y": 30
+          },
+          {
+            "x": 130,
+            "y": 200
+          },
+          {
+            "x": 180,
+            "y": 200
+          },
+          {
+            "x": 255,
+            "y": 224
+          }
+        ],
+        "blue": [
+          {
+            "x": 10,
+            "y": 30
+          },
+          {
+            "x": 240,
+            "y": 215
+          }
+        ]
+      },
+      "reference": "curves-turns.f32le.gz",
+      "rawSha256": "02da67e6a1f44895ca8c7c13f07da518680314565e491ed4bd1bfc61ea4026a6"
+    },
+    {
+      "name": "curves-short",
+      "adjustment": {
+        "kind": "curves",
+        "rgb": [
+          {
+            "x": 16,
+            "y": 40
+          },
+          {
+            "x": 240,
+            "y": 220
+          }
+        ],
+        "green": [
+          {
+            "x": 0,
+            "y": 255
+          },
+          {
+            "x": 255,
+            "y": 0
+          }
+        ]
+      },
+      "reference": "curves-short.f32le.gz",
+      "rawSha256": "ee5c5104115ddff44c6799c9b37c1698857b67393b4f84203e6f129433d50452"
+    },
+    {
+      "name": "identity-levels",
+      "adjustment": {
+        "kind": "levels",
+        "rgb": {
+          "inputBlack": 0,
+          "inputWhite": 255,
+          "gamma": 1,
+          "outputBlack": 0,
+          "outputWhite": 255
+        }
+      },
+      "reference": "identity-levels.f32le.gz",
+      "rawSha256": "5da5f70f825903808701a6286c6e95a624f88a2ca6ff070cfd618797bcc349e6"
+    },
+    {
+      "name": "levels-rgb",
+      "adjustment": {
+        "kind": "levels",
+        "rgb": {
+          "inputBlack": 12,
+          "inputWhite": 244,
+          "gamma": 0.85,
+          "outputBlack": 4,
+          "outputWhite": 251
+        },
+        "red": {
+          "inputBlack": 5,
+          "inputWhite": 250,
+          "gamma": 1.75,
+          "outputBlack": 240,
+          "outputWhite": 8
+        }
+      },
+      "reference": "levels-rgb.f32le.gz",
+      "rawSha256": "edea2416bd048029aadfda681dd84a7b48aced05df5ad725eb4aac5ecbd7ba93"
+    },
+    {
+      "name": "levels-channel",
+      "adjustment": {
+        "kind": "levels",
+        "rgb": {
+          "inputBlack": 0,
+          "inputWhite": 255,
+          "gamma": 1,
+          "outputBlack": 0,
+          "outputWhite": 255
+        },
+        "blue": {
+          "inputBlack": 0,
+          "inputWhite": 255,
+          "gamma": 2.2,
+          "outputBlack": 0,
+          "outputWhite": 255
+        }
+      },
+      "reference": "levels-channel.f32le.gz",
+      "rawSha256": "e634df09722a2d127da4c3b68ede3d68b1c0709102c38d039bf6ca9494dd8c83"
+    }
+  ],
+  "scenes": [
+    {
+      "name": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "reference": "scene-ordinary.f32le.gz",
+      "rawSha256": "ab37bc568123eac9f3563a6af75d67f0246e1a2b69498b3069f6fb27cef4790c"
+    },
+    {
+      "name": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "reference": "scene-clipped.f32le.gz",
+      "rawSha256": "54d9d280fba6846a8a8becdaf17a2149c391858580365d456cc740fcc5b2757d"
+    },
+    {
+      "name": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "reference": "scene-groups.f32le.gz",
+      "rawSha256": "0f58af5157ce8f0d135b81804257527ed6ffd3a2dc72ba3698fbd8eb13434a94"
+    }
+  ],
+  "sceneSource": {
+    "path": "tests/fixtures/float-source/rgba-raw-le-linear.f32le.gz",
+    "sha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1"
+  },
+  "sceneOracleSha256": "9c370911d5b43bd3c4334cedbf024783cda2dbd19a6874e1addacdd910f672fb",
+  "histogramSha256": "5cfc6693f201d2f6e8d958f3dfd271651b8e3704e27ae5cc15ca4b9a0e9a9ec6"
+}

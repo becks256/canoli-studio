@@ -1,3 +1,4 @@
+import{compileFloatTransfer}from'./float-transfer';
 import type {DocumentData,LayerData} from './model';
 import type{AssetStore}from'./assets';
 import{visitLayerAssets}from'./asset-references';
@@ -18,8 +19,9 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='raster'){
         if(layer.erasures?.some(entry=>entry.stroke.kind==='wet'))return 'Prepared wet raster replacements require their float document integration.';
       }else if(layer.kind==='adjustment'){
-        if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support tone adjustments only.';
-      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and tone adjustments. Other layer types require their float integration.';
+        if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
+        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support tone, Curves and Levels only.';
+      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and Tone/Curves/Levels adjustments. Other layer types require their float integration.';
     }
     return null;
   };

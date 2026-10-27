@@ -4,7 +4,7 @@
   "sourceReference": "tests/fixtures/float-source/rgba-raw-le-linear.f32le.gz",
   "sourceReferenceSha256": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1",
   "generatorSha256": "ff011f0f67ca5f98326367d3c82f7c2108bcdfc373d1bcba87be799d5a7ed772",
-  "oracleSha256": "7f2fe5021a19f72f1c0b26f3b726363f7af17b7d4e4ecf519a8de75ab2b5d7d8",
+  "oracleSha256": "9c370911d5b43bd3c4334cedbf024783cda2dbd19a6874e1addacdd910f672fb",
   "scenes": [
     {
       "name": "soft-boundary",

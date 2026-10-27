@@ -5,6 +5,7 @@ export type HistogramChannel = "rgb" | "red" | "green" | "blue" | "luminance";
 
 export interface HistogramViewProps {
   histogram: HistogramData | null;
+  showEncoding?:boolean;
   channel?: HistogramChannel;
   compact?: boolean;
   height?: number;
@@ -13,6 +14,7 @@ export interface HistogramViewProps {
 
 export function HistogramView({
   histogram,
+  showEncoding=true,
   channel: controlledChannel,
   compact = false,
   height = 100,
@@ -67,6 +69,7 @@ export function HistogramView({
 
   return (
     <div className="histogram-view">
+      {showEncoding&&<HistogramRangeNote histogram={histogram}/>}
       {!compact && (
         <div className="histogram-header">
           <div
@@ -257,4 +260,8 @@ export function HistogramView({
       )}
     </div>
   );
+}
+
+export function HistogramRangeNote({histogram}:{histogram:HistogramData|null}){
+ return histogram?.encoding==='linear-srgb'?<p className="section-description" data-testid="linear-histogram-status">Sampled linear RGB, 0–1 bins. RGB samples below 0: {histogram.belowRange}; above 1: {histogram.aboveRange}.</p>:null;
 }

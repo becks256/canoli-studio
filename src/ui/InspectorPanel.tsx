@@ -61,7 +61,7 @@ import {
   defaultLevelsAdjustment,
   defaultToneAdjustment,
 } from "../core/adjustments";
-import { computeHistogram, adjustmentBackdrop } from "../core/histogram";
+import { computeHistogram,computeFloatHistogram, adjustmentBackdrop } from "../core/histogram";
 import type { HistogramData } from "../core/histogram";
 
 export interface InspectorPanelProps {
@@ -156,33 +156,20 @@ export function InspectorPanel({
     if (!backdrop) return;
     const renderer = new CanvasRenderer();
     let cancelled = false;
-    void renderer
-      .render(backdrop, assets, {
-        cache: false,
-        readback: true,
-        maxDimension: 256,
-        maxPixels: 65536,
-      })
-      .then((canvas) => {
-        try {
-          if (!cancelled)
-            setHistogram(
-              computeHistogram(
-                canvas
-                  .getContext("2d")!
-                  .getImageData(0, 0, canvas.width, canvas.height).data,
-              ),
-            );
-        } finally {
-          canvas.width = canvas.height = 0;
-        }
-      })
+    void (async()=>{
+      if(backdrop.precision==='float32'){
+        const scale=Math.min(1,256/backdrop.width,256/backdrop.height),width=Math.max(1,Math.round(backdrop.width*scale)),height=Math.max(1,Math.round(backdrop.height*scale));
+        const scene=await renderer.captureFloatScene(backdrop,assets,{isCancelled:()=>cancelled});try{const samples=await scene.read({x:0,y:0,width,height},{region:{x:0,y:0,width:backdrop.width,height:backdrop.height},width,height});if(!cancelled)setHistogram(computeFloatHistogram(samples));}finally{scene.dispose();}return;
+      }
+      const canvas=await renderer.render(backdrop,assets,{cache:false,readback:true,maxDimension:256,maxPixels:65536});
+      try{if(!cancelled)setHistogram(computeHistogram(canvas.getContext('2d')!.getImageData(0,0,canvas.width,canvas.height).data));}finally{canvas.width=canvas.height=0;}
+    })()
       .catch(() => {
         if (!cancelled) setHistogram(null);
       })
       .finally(() => renderer.dispose());
     return () => {
-      cancelled = true;
+      cancelled = true;renderer.dispose();
     };
   }, [selected?.id, selected?.kind, viewDocument, assets]);
 
@@ -586,8 +573,8 @@ export function InspectorPanel({
                     { value: "red-eye", label: "Red Eye",disabled:float },
                     { value: "white-balance", label: "White Balance",disabled:float },
                     { value: "lut", label: "Color Lookup (LUT)",disabled:float },
-                    { value: "curves", label: "Curves",disabled:float },
-                    { value: "levels", label: "Levels",disabled:float },
+                    { value: "curves", label: "Curves" },
+                    { value: "levels", label: "Levels" },
                     { value: "tone", label: float?'Linear tone (Exposure / Contrast / Saturation)':"Tone (Exposure / Contrast)" },
                   ]}
                   onChange={(kind) => {
@@ -617,8 +604,10 @@ export function InspectorPanel({
                     {selected.adjustment.strokes.length} editable tonal strokes
                   </p>
                 )}
+                {float&&(selected.adjustment.kind==='curves'||selected.adjustment.kind==='levels')&&<p className="section-description">Linear RGB: 255 means 1. Curves extend their endpoint tangents; active Levels clip to their black/white range.</p>}
                 {selected.adjustment.kind === "curves" && (
                   <CurvesEditor
+                    linear={float}
                     value={selected.adjustment}
                     histogram={histogram}
                     disabled={locked || busy}

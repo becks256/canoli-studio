@@ -6605,3 +6605,130 @@ PNG-only independent headless REST source admission does not provide native
 float TIFF rendering or browser synchronization. No new schema, public mutation
 API, isolated privilege, paid call, account, upload or arbitrary original image
 resolution cap was introduced. The complete original roadmap goal remains active.
+
+### 2026-10-27 — F04/F10 continuous float Curves and Levels verified
+
+Owner: implementation agent; estimate L within T08/T17. The previous goal turn
+made progress at f429b61 with verified original-preserving float erasure. This
+increment connects existing Curves/Levels commands, controls and isolation to
+actual native continuous working-linear RGB transfer. Master precedes channels;
+alpha remains exact. Neutral channels preserve signed/HDR identity, curves use
+endpoint-tangent extension and active Levels explicitly clip their input range.
+Inspector curve graphs and sampled linear histograms now use the working space,
+including disclosed below/above-range counts. No 256-entry byte color LUT supplies
+float adjustments. [Exact contract](FLOAT_DOCUMENTS.md).
+
+Initial native acceptance matches every word in seven independent NumPy cases,
+280,004 channels each, including 65,536 low-order input levels, signed/HDR colors,
+alpha and arbitrary native-window cuts. An initial monolithic test exceeded its
+assertion-time budget; per-case checks use exact stream hashes rather than large
+recursive typed-array comparisons, without changing native math, tolerances or
+timeouts. Thirty current focused engine/worker/model checks, normal browser UI,
+independent full files, persistence/recipes, both 50 MP source types and complete
+build/unit/production gates remain required. Full F10, other tools/spaces/blends/
+HDR/proof/CMYK, physical/device quality, sustained performance and all other
+unfinished original-roadmap requirements remain active.
+
+Real Chrome acceptance passes the documented Curves/Levels workflow, Inspector
+point/gamma edits, cancelled preview, palette creation, exact Undo/Redo, sampled
+linear histogram disclosure, original-bearing reopening and independently exact
+float32 TIFF, uint16 TIFF, PNG and PDF files. The actual worker also matches all
+seven independent native reference streams while callers mutate original arrays
+and nested controls before readiness. Three scene references pass every native
+word across masks, clipped adjustments/raster members, isolated/pass-through
+groups, partitioned reads and reopening. Independent original histogram bins
+match all channels before SDR conversion. The generalized clipping oracle leaves
+all six earlier clipping reference byte streams unchanged; only its bound oracle
+identity changes. Two recorded-transfer package/batch retry cases pass with and
+without full raster tone, retaining accepted files and prepared transfer controls.
+An initial recipe test string error was corrected before those accepted runs;
+no application tolerance or timeout was relaxed. Final full gates follow.
+
+The complete actual WASM/unit/API suite passes all 2,703 tests in 280 files.
+The final build passes TypeScript and publishes 40 guides. The strict independent
+REST transfer case passes atomic invalid-control/precision rejection, stale
+revision checks and exact Undo/Redo in its own headless session; its PNG-only
+source admission still supplies no native TIFF rendering or browser sync. Final
+source acceptance is 88 cases across 25 files, followed by two genuine 50 MP
+source workflows and the complete 169-case production suite on frozen inputs.
+
+The complete final focused browser matrix passes all 88 cases across 25 files
+with no skips, retries, flaky or unexpected results. It retains earlier byte,
+float, clipping, erasure, cursor, source-lifecycle, layouts/orientations and recipe
+regressions alongside the new UI, worker, independent scene/histogram and portable
+transfer workflows. Both genuine 50 MP source types and complete production
+acceptance remain in progress on the same frozen inputs.
+
+The genuine 50 MP float-original transfer workflow passes 10,000 × 5,000 geometry,
+exact original bytes, workspace restoration and one Undo/Redo. Both precision
+files match every one of their 200,000,000 channel values independently, with
+zero error and zero differing words. The float32 file retains 87,014,983 extended
+RGB samples; raw SHA-256
+`44e3784656bc47eeb6556ca22551e7eb0a66c375fc1e0cce589f935fbe30fba0`,
+file SHA-256 `96c6da8573712bc3ff13e252a0cea2afe19b10cd024eb1e0228e9fe350a6d723`
+(2,740,776 bytes). Its uint16 file raw SHA-256 is
+`58597f161bd1398ef485da9be614d77f2f4b71db536492563fe35b295f7af30d`,
+file SHA-256 `6b01c03a9e80532e6d390bb9660d3839a41727f95122d856d2c3abc945ddef6c`
+(791,136 bytes). The uint16-original and complete production checks remain in
+progress; this is no claim of physical/device quality or sustained performance.
+
+The genuine 50 MP uint16-original transfer workflow also passes complete geometry,
+original byte identity, workspace restoration and exact Undo/Redo. Each precision
+file matches all 200,000,000 channel values independently with zero error and
+zero differing words. The float32 file retains 66,182,629 extended RGB samples;
+raw SHA-256 `7271f72890cd3552905929432513fdf104f37c3d0b6e3820c835ac4d291a087d`,
+file SHA-256 `832b6efc274122bbe9920379f0fa033b1eb2cc0e69d9f25ec563635dbbfe17c7`
+(94,493,824 bytes). Its uint16 file raw SHA-256 is
+`0627a9306734212f6ccbfbe2432a09ab8ae10a16a841495972871e8830cbcedf`,
+file SHA-256 `dbde391229d60888fcd182ad6f8c8e17c1bf4547ea5ba80d9fec2153f5ec5c57`
+(39,570,288 bytes). Both cases pass without skips, retries, flaky or unexpected
+results within the existing 600-second limit. Combined source acceptance is
+90 distinct cases. Complete production acceptance now runs on the frozen release;
+physical/device, photographic, process-memory and sustained performance gates
+remain open alongside the complete original roadmap.
+
+Source review retains a separate frame-sampling quality gate: viewport and fitted
+frames currently evaluate adjustment layers on the requested output lattice,
+following the existing float compositor. Exact native-size file/scene acceptance
+does not prove equivalence to resampling the completed native composition for
+nonlinear adjustments at arbitrary zoom. Native-scene resampling parity remains
+required under broader F10/F14 quality; these new operators do not close it.
+
+
+Complete production acceptance passes all 169 cases without developer globals,
+including continuous curve/gamma editing, cancelled preview, palette creation,
+sampled linear histogram disclosure, exact Undo/Redo and original-bearing native
+reopening. Source and production UI float32 TIFF, uint16 TIFF, PNG and PDF files
+match every 262,144 channel value independently with zero error and complete ICC
+identity. Final source acceptance is the 88-case focused matrix plus both native
+50 MP source workflows: 90 distinct cases. All accepted final runs have no skips,
+retries, flaky or unexpected results. Earlier assertion-time and test syntax
+failures remain separate diagnostics rather than accepted results.
+
+The final audit checks all 2,233 frozen source-input identities and all 142
+release resources without a post-freeze runtime, test, oracle, guide or release
+correction. Four tracked ICC/RAW/AVIF/lens native binaries remain unchanged.
+Rebuilt pixels WASM adds actual continuous transfer; SHA-256 is
+`a1f55fcf95aa552d6e2c0a231d4ea57cceed971e2073a17b4ad285d9f549a8b3`.
+The roadmap observations remain separate from the frozen inputs.
+
+[Sealed continuous float transfer evidence](benchmarks/float-transfer-2026-10-27.zip)
+contains the full changed-source overlay against f429b61, complete final release,
+independent NumPy original/reference/control/scene/histogram inputs and native
+reader tools, all four complete 50 MP TIFF outputs, original-bearing projects,
+workspace and portable recipe/retry evidence, normal UI output files, successful
+and failed reports, screenshots and verification tools. Its version-2 manifest
+reconstructs every full file exactly while sharing repeated TIFF blocks. Every
+payload/reconstructed file and source/release identity is checked before staging;
+staged and committed source/archive bytes are checked against sealed identities.
+
+This verifies continuous float Curves/Levels on the current compositor lattice,
+not complete F04/F10/F14 or the full roadmap. Native-scene resampling parity,
+other float tools/layers/adjustments/blends/styles/working spaces, HDR, proof,
+CMYK, broader interchange, physical/device quality, peak process memory,
+sustained all-tool performance and every other unfinished original gate remain
+required. Existing OO/command/history, inert plugin grants and separate PNG-only
+headless REST source admission remain authoritative. No new document/container
+schema, public mutation API, isolated privilege, paid call, account, upload,
+browser/REST synchronization or arbitrary original-resolution cap was added.
+The complete original roadmap goal remains active.

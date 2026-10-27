@@ -4,6 +4,8 @@
 
 DocumentOptions.precision defaults to uint8 and also accepts float32. Readonly document.precision and document.workingSpace expose effective state; document.convertToFloat() dispatches the shared idempotent command. Existing retained high-precision TIFF originals are required at host commit. Plugins/scripts gain no file/native/network privilege. Recipes record the zero-argument precision action. Existing `Layer.clipped` updates also support the float raster/group/tone subset; source-bearing native files preserve the sibling flag. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+Existing Curves/Levels `AdjustmentLayer` DTOs also support continuous working-linear float RGB with unchanged 0..255 control units, master-before-channel ordering and exact alpha. Curves extend endpoint tangents; active Levels clip at input endpoints, while neutral channels preserve signed/extended identity. Strict controls, masks, fill/opacity, Undo and isolated revision/permission checks remain authoritative. [Exact numeric definitions, executable example, limits and errors](FLOAT_DOCUMENTS.md#continuous-curves-and-levels).
+
 ## Owned float source storage dependency
 
 Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.

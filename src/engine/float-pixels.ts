@@ -1,3 +1,4 @@
+import{compileFloatTransfer,FLOAT_TRANSFER_VALUES,type FloatTransferAdjustment}from'../core/float-transfer';
 import{z}from'zod';
 import{BLEND_MODES,type BlendMode}from'../core/model';
 import{forkPixelKernel,type PixelKernel}from'./wasm';
@@ -17,11 +18,11 @@ function checked(status:number){if(status===1)throw new Error('Float pixels, alp
  * Private memory and owned outputs prevent ordinary byte work from overwriting it. */
 export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
- constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
+ constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
- private layout(pixels:number,masked=false){
-  const kernel=this.owner(),base=Math.ceil(kernel.bufferOffset()/8)*8,bytes=pixels*16,source=base,backdrop=source+bytes,output=backdrop+bytes,mask=output+bytes,scratch=Math.ceil((mask+(masked?pixels*4:0))/8)*8,matrix=scratch+24,required=matrix+96;
+ private layout(pixels:number,masked=false,extra=0){
+  const kernel=this.owner(),base=Math.ceil(kernel.bufferOffset()/8)*8,bytes=pixels*16,source=base,backdrop=source+bytes,output=backdrop+bytes,mask=output+bytes,scratch=Math.ceil((mask+(masked?pixels*4:0))/8)*8,matrix=scratch+24,required=matrix+96+extra;
   if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));return{kernel,source,backdrop,output,mask:masked?mask:0,scratch,matrix};
  }
  composite(source:Float32Array,backdrop:Float32Array,options:FloatCompositeOptions={}):Float32Array<ArrayBuffer>{
@@ -32,6 +33,10 @@ export class FloatPixelProcessor{
    new Float32Array(memory,p.source,count*4).set(source.subarray(at,at+count*4));new Float32Array(memory,p.backdrop,count*4).set(backdrop.subarray(at,at+count*4));if(coverage)new Float32Array(memory,p.mask,count).set(coverage.subarray(at/4,at/4+count));
    checked(p.kernel.compositeFloat(p.source,p.backdrop,p.output,p.mask,p.scratch,count,settings.opacity,mode));result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);
   }return result;
+ }
+ transfer(pixels:Float32Array,adjustment:FloatTransferAdjustment):Float32Array<ArrayBuffer>{
+  this.owner();const{values}=compileFloatTransfer(adjustment);samples(pixels,'Input');const result=new Float32Array(pixels.length);
+  for(let at=0;at<pixels.length;at+=WINDOW*4){const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count,false,FLOAT_TRANSFER_VALUES*8);new Float32Array(p.kernel.memory.buffer,p.source,count*4).set(pixels.subarray(at,at+count*4));new Float64Array(p.kernel.memory.buffer,p.matrix,FLOAT_TRANSFER_VALUES).set(values);checked(p.kernel.transferFloat(p.source,p.output,p.matrix,count));result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);}return result;
  }
  tone(pixels:Float32Array,options:FloatToneOptions={}):Float32Array<ArrayBuffer>{
   this.owner();const settings=floatToneOptionsSchema.parse(options);samples(pixels,'Input');const result=new Float32Array(pixels.length);

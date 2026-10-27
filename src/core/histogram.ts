@@ -1,4 +1,7 @@
 export interface HistogramData {
+  encoding?:'linear-srgb';
+  belowRange?:number;
+  aboveRange?:number;
   red: Uint32Array;
   green: Uint32Array;
   blue: Uint32Array;
@@ -144,4 +147,22 @@ export function adjustmentBackdrop(
   };
   const children = walk(document.children);
   return children ? { ...document, children } : null;
+}
+
+/** Bins describe sampled working-linear values. Extended RGB is counted at the
+ * edge bins and separately disclosed; colors are never read from an SDR canvas. */
+export function computeFloatHistogram(pixels:Float32Array):HistogramData{
+ if(!(pixels instanceof Float32Array)||pixels.length%4)throw new Error('Use RGBA float histogram samples.');
+ const result=emptyHistogram();result.encoding='linear-srgb';result.belowRange=0;result.aboveRange=0;
+ const bin=(value:number)=>Math.round(Math.max(0,Math.min(1,value))*255);
+ for(let i=0;i<pixels.length;i+=4){
+  for(let c=0;c<4;c++)if(!Number.isFinite(pixels[i+c])||c===3&&(pixels[i+c]<0||pixels[i+c]>1))throw new Error('Invalid float histogram samples.');
+  if(pixels[i+3]===0)continue;
+  const r=pixels[i],g=pixels[i+1],b=pixels[i+2];result.belowRange+=(r<0?1:0)+(g<0?1:0)+(b<0?1:0);result.aboveRange+=(r>1?1:0)+(g>1?1:0)+(b>1?1:0);
+  result.red[bin(r)]++;result.green[bin(g)]++;result.blue[bin(b)]++;result.luminance[bin(r*.2126+g*.7152+b*.0722)]++;result.totalPixels++;
+ }
+ if(!result.totalPixels)return result;
+ let sum=0,lo=255,hi=0;for(let i=0;i<256;i++){for(const channel of[result.red,result.green,result.blue,result.luminance])result.maxCount=Math.max(result.maxCount,channel[i]);if(result.luminance[i]){sum+=i*result.luminance[i];lo=Math.min(lo,i);hi=Math.max(hi,i);}}
+ const mean=sum/result.totalPixels;let variance=0,cumulative=0,median=-1;for(let i=0;i<256;i++){variance+=(i-mean)**2*result.luminance[i];cumulative+=result.luminance[i];if(median<0&&cumulative>=Math.ceil(result.totalPixels/2))median=i;}
+ result.mean=Math.round(mean*100)/100;result.median=median;result.stdDev=Math.round(Math.sqrt(variance/result.totalPixels)*100)/100;result.min=lo;result.max=hi;return result;
 }

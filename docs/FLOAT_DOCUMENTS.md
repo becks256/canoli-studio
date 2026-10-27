@@ -2,7 +2,7 @@
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
-transformations, Normal composition, groups, masks and linear tone adjustments use this
+transformations, Normal composition, groups, masks, linear tone and continuous Curves/Levels adjustments use this
 mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
@@ -131,7 +131,7 @@ choices independently of this zero-argument action.
 The initial mode supports original unsigned 16-bit or float32 TIFF raster layers, Normal isolated
 groups, pass-through groups, transforms, visibility, opacity, Normal fill
 opacity, existing masks and full tone controls in raster effects or Tone
-adjustment layers. Exposure multiplies native linear RGB by `2 ** exposure`.
+adjustment layers, plus continuous Curves/Levels adjustment layers. Exposure multiplies native linear RGB by `2 ** exposure`.
 Active contrast follows with `(value - 0.5) * 2 ** (contrast / 100) + 0.5`.
 Active saturation uses `luminance + (value - luminance) * (1 + saturation / 100)`,
 with linear-sRGB luminance weights 0.2126, 0.7152 and 0.0722. The contrast pivot
@@ -146,7 +146,7 @@ premultiplied before/after backdrops rather than source-over compositing a secon
 copy. Masks use the existing byte coverage rasterizer; color stays float32.
 
 Other layer types, artistic blends, styles, prepared wet raster replacements,
-frequency separation and other adjustment types reject
+frequency separation and adjustment types other than Tone/Curves/Levels reject
 atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
 palette and context controls disable unsupported creation/color tools. Move,
 Hand, selections, Crop, Artboard and mask drawing retain their existing commands;
@@ -154,6 +154,63 @@ Layer Eraser requires an original raster target. Mask brush/pencil/eraser and ma
 Device soft proofing is unavailable. Selecting float mode disables it; isolated
 precision conversion clears existing proof state with a visible notice. Saved
 float workspaces with proof enabled reject before publication.
+
+## Continuous Curves and Levels
+
+Existing `AdjustmentLayer` Curves/Levels controls now operate on accumulated
+working-linear float RGB, followed by existing mask/fill/opacity interpolation.
+They support isolated and pass-through groups and sibling clipping. Raster
+`ToneAdjustment` remains its existing separate original-space effect stack.
+
+Public control units stay 0..255; divide by 255 to obtain working RGB values.
+The RGB master runs before optional red/green/blue channels. All stages use
+float64 intermediates and round once to float32 at the end of each adjustment;
+alpha is copied exactly. No byte LUT or display canvas supplies adjusted colors.
+
+Curves use continuous cubic Hermite interpolation with averaged interior
+secants, sign-safe tangents, zero tangents at flat segments and a radius-three
+segment tangent limiter. Values outside the first/last knot use that endpoint's
+linear tangent. A curve whose every knot has x=y is an exact identity, including
+finite negative/above-one RGB and subnormals. This defines the float operator;
+it is not a claim of equivalence to another editor's HDR curve implementation.
+
+Levels normalizes `(value-inputBlack/255)/((inputWhite-inputBlack)/255)`, clips
+to 0..1, applies `power(1/gamma)`, then maps to outputBlack..outputWhite divided
+by 255. Active channels intentionally clip at their selected input endpoints.
+A neutral default channel bypasses math and retains signed/extended RGB exactly.
+Omitted per-channel settings are identity. Existing finite control ranges and
+strict unknown-field validation apply. Unrepresentable curve knots reject the
+shared edit atomically; nonrepresentable native output rejects rendering/export
+without publishing a partial result.
+
+Inspector graphs use the continuous curve. Histograms sample the native linear
+backdrop on a grid of at most 256×256, exclude zero alpha, bin 0..1 and disclose
+RGB samples below/above that range in edge bins. They describe sampled working
+colors, rather than SDR preview values or an exact whole-original distribution.
+
+<!-- example: float-transfer -->
+```js
+document.convertToFloat();
+const image = document.layers.at(0);
+if (!(image instanceof RasterLayer)) throw new Error('Select an original raster');
+const curve = document.layers.add(new AdjustmentLayer({
+  name: 'Linear curve',
+  adjustment: {kind: 'curves', rgb: [
+    {x: 0, y: 0}, {x: 64, y: 48}, {x: 128, y: 168}, {x: 255, y: 255},
+  ], red: [{x: 0, y: 0}, {x: 120, y: 160}, {x: 255, y: 255}]},
+}));
+const levels = document.layers.add(new AdjustmentLayer({
+  name: 'Linear levels', opacity: 0.625,
+  adjustment: {kind: 'levels', rgb: {
+    inputBlack: 12, inputWhite: 244, gamma: 0.85,
+    outputBlack: 4, outputWhite: 251,
+  }},
+}));
+levels.mask = new LayerMask({selection: new MarqueeSelection({
+  shape: 'rectangle', x: 15, y: 10, width: 90, height: 55,
+})});
+document.selectedLayer = levels;
+```
 
 ## Original-preserving raster erasure
 

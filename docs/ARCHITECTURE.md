@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-core/float-document gates scene structure and asset roles. engine/float-asset admits originals with bounded display-only thumbnails; float-scene captures original and coverage-source leases, uses float-projection and native float operations, and applies each authored erasure through float-coverage before intrinsic clipping shape, and converts only final display/output samples. float-delivery/float-tiff own profile-aware file sessions. Model/OO/shared command schema 49, independent source caches and existing host/isolated boundaries remain separate. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+core/float-document gates scene structure and asset roles. engine/float-asset admits originals with bounded display-only thumbnails; float-scene captures original and coverage-source leases, uses float-projection and native float operations, applies each authored erasure through float-coverage before intrinsic clipping shape, runs continuous Curves/Levels through the owned native transfer worker, and converts only final display/output samples. float-delivery/float-tiff own profile-aware file sessions. Model/OO/shared command schema 49, independent source caches and existing host/isolated boundaries remain separate. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Owned float source storage dependency
 

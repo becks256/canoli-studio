@@ -104,13 +104,14 @@ if a.clipping is not None:
  import runpy
  assert isinstance(a.clipping,list)and not a.tone
  clipping_reference=runpy.run_path(str(root/'scripts/float_clipping_reference.py'))['render']
+ transfer_reference=runpy.run_path(str(root/'scripts/float_transfer_reference.py'))['adjust']
 samples=0;different=0;maximum=0.;extended=0;actual_hash=hashlib.sha256();expected_hash=hashlib.sha256()
 try:
  with gzip.open(reference,'rb')as original:
   for top in range(0,height,th):
    count=min(th,height-top);raw=original.read(count*width*16);assert len(raw)==count*width*16
    linear=np.frombuffer(raw,dtype='<f4').reshape(count,width,4).copy()
-   if clipping_reference is not None:linear=clipping_reference(linear,a.clipping,origin=(0,top))
+   if clipping_reference is not None:linear=clipping_reference(linear,a.clipping,origin=(0,top),transfer=transfer_reference)
    elif a.tone:
     for settings in a.tone:
      assert isinstance(settings,dict)and set(settings)<=set(['exposure','contrast','saturation'])

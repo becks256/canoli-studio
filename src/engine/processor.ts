@@ -1,3 +1,4 @@
+import{parseFloatTransfer,type FloatTransferAdjustment}from'../core/float-transfer';
 import{floatCompositeOptionsSchema,floatToneOptionsSchema,validateFloatWorkerWindow,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
 import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
 import { medianRadiusSchema } from '../core/smart/median-filter';
@@ -110,6 +111,10 @@ export class PixelProcessor {
     if(settings.mask&&(settings.mask.length!==source.length/4||!(settings.mask.buffer instanceof ArrayBuffer)))throw new Error('Float coverage geometry differs.');
     const captured={source:source.slice(),backdrop:backdrop.slice(),options:{...settings,...(settings.mask?{mask:settings.mask.slice()}:{})}},length=source.length;
     const result=await this.request(new Uint8ClampedArray(0),{floatComposite:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+  }
+  async floatTransfer(pixels:Float32Array,input:FloatTransferAdjustment):Promise<Float32Array>{
+    const adjustment=parseFloatTransfer(input);validateFloatWorkerWindow(pixels);const captured={pixels:pixels.slice(),adjustment},length=pixels.length;
+    const result=await this.request(new Uint8ClampedArray(0),{floatTransfer:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
   }
   async floatTone(pixels:Float32Array,options:FloatToneOptions={}):Promise<Float32Array>{
     const settings=floatToneOptionsSchema.parse(options);validateFloatWorkerWindow(pixels);const captured={pixels:pixels.slice(),options:settings},length=pixels.length;
@@ -388,6 +393,7 @@ export class PixelProcessor {
       floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
       floatAffine?:{pixels:Float32Array;matrix:number[]};
       floatTone?:{pixels:Float32Array;options:FloatToneOptions};
+      floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
       filteredMix?: {
         filtered: Uint8ClampedArray;
         mask: Uint8ClampedArray;
@@ -483,6 +489,7 @@ export class PixelProcessor {
     if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}
     if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
     if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);
+    if(payload.floatTransfer)tryTransfer(payload.floatTransfer.pixels.buffer);
     if(payload.brushTextureSupport)tryTransfer(payload.brushTextureSupport.buffer);
     if(payload.frequencyEncoding)tryTransfer(payload.frequencyEncoding.low.buffer);
     if(payload.linearBlend)tryTransfer(payload.linearBlend.backdrop.buffer);

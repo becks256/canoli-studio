@@ -1,3 +1,4 @@
+import type{FloatTransferAdjustment}from'../core/float-transfer';
 import{FloatPixelProcessor,validateFloatWorkerWindow,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
 import type { RedEyeAdjustmentData } from "../core/red-eye";
 import type { LutAdjustmentData } from "../core/lut";
@@ -81,6 +82,7 @@ self.onmessage = async (
     floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
     floatAffine?:{pixels:Float32Array;matrix:number[]};
     floatTone?:{pixels:Float32Array;options:FloatToneOptions};
+      floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
     filteredMix?: {
       filtered: Uint8ClampedArray;
       mask: Uint8ClampedArray;
@@ -154,9 +156,10 @@ self.onmessage = async (
 ) => {
   try {
     const data = event.data;
-    if(data.floatComposite||data.floatAffine||data.floatTone){
+    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTransfer){
       const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;
       if(data.floatComposite){const request=data.floatComposite;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);pixels=owned.composite(request.source,request.backdrop,request.options);}
+      else if(data.floatTransfer){const request=data.floatTransfer;validateFloatWorkerWindow(request.pixels);pixels=owned.transfer(request.pixels,request.adjustment);}
       else if(data.floatTone){const request=data.floatTone;validateFloatWorkerWindow(request.pixels);pixels=owned.tone(request.pixels,request.options);}
       else{const request=data.floatAffine!;validateFloatWorkerWindow(request.pixels);pixels=owned.affine(request.pixels,request.matrix);}
       self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;

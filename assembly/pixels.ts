@@ -1,3 +1,4 @@
+export {transferFloat} from "./float-transfer";
 export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
 export { encodeFrequencyBand } from "./frequency-band";
 export { medianFilter } from "./median-filter";

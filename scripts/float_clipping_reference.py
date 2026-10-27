@@ -24,7 +24,7 @@ def interpolate(before,after,opacity,mask):
  rgb_values=np.divide(before[:,:,:3].astype(np.float64)*ba[:,:,None]+after[:,:,:3].astype(np.float64)*aa[:,:,None],alpha[:,:,None],out=np.zeros_like(before[:,:,:3],dtype=np.float64),where=alpha[:,:,None]>0)
  out=np.concatenate([rgb_values,alpha[:,:,None]],axis=2).astype(np.float32);out[amount==0]=before[amount==0];out[amount==1]=after[amount==1];return out
 
-def render(source,layers,origin=(0,0)):
+def render(source,layers,origin=(0,0),transfer=None):
  height,width=source.shape[:2];empty=lambda:np.zeros_like(source);grid_x=np.arange(width)[None,:]+origin[0];grid_y=np.arange(height)[:,None]+origin[1]
  def mask(layer):
   spec=layer.get('mask')
@@ -64,6 +64,8 @@ def render(source,layers,origin=(0,0)):
    elif kind=='group':
     if layer.get('blendMode','normal')=='pass-through':backdrop=interpolate(backdrop,paint(layer['children'],backdrop.copy(),world),opacity,coverage)
     else:backdrop=over(paint(layer['children'],empty(),world),backdrop,opacity*fill,coverage)
-   else:backdrop=interpolate(backdrop,tone(backdrop,layer.get('tone',{})),opacity*fill,coverage)
+   else:
+    adjusted=transfer(backdrop,layer['adjustment'])if 'adjustment'in layer else tone(backdrop,layer.get('tone',{}))
+    backdrop=interpolate(backdrop,adjusted,opacity*fill,coverage)
   return backdrop
  return paint(layers,empty())

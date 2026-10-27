@@ -2193,3 +2193,5 @@ test('production full float tone preserves native low-order samples through actu
 test('production float clipping retains exact original samples through Inspector, palette, isolated script, Undo and precision delivery',async({page},info)=>{const{floatClippingWorkflow}=await import('./helpers/float-clipping');await floatClippingWorkflow(page,info,true);});
 
 test('production float erasure preserves original samples through pointer cancellation, shared Undo, native files and reopening',async({page},info)=>{const{floatErasureWorkflow}=await import('./helpers/float-erasure');await floatErasureWorkflow(page,info,true);});
+
+test('production continuous float Curves and Levels retain linear histograms, exact Undo, native files and originals without developer globals',async({page},info)=>{const{floatTransferWorkflow}=await import('./helpers/float-transfer');await floatTransferWorkflow(page,info,true);});

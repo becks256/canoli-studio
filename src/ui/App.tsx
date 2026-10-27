@@ -629,7 +629,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" | "red-eye" = "curves",
   ) {
     attempt(() => {
-      if(dom.precision==='float32'&&kind!=='tone')throw new Error('Float editing currently supports linear tone adjustments only.');
+      if(dom.precision==='float32'&&!['tone','curves','levels'].includes(kind))throw new Error('Float editing currently supports linear tone, Curves and Levels.');
       const pupilSelection = kind === "red-eye" ? dom.selection : null;
       if (kind === "red-eye" && (!pupilSelection || !pupilSelection.toJSON().regions.length))
         throw new Error("Select the red pupils first, then add a Red Eye adjustment.");
@@ -986,7 +986,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       label: `New ${kind === "hsl" ? "HSL (Hue / Saturation / Lightness)" : kind === "color-balance" ? "Color Balance" : kind === "gradient-map" ? "Gradient Map" : kind === "white-balance" ? "White Balance" : kind === "lut" ? "Color Lookup (LUT)" : kind === "red-eye" ? "Red Eye" : kind[0].toUpperCase() + kind.slice(1)} adjustment layer`,
       keys: [],
       run: () => addAdjustmentLayer(kind),
-      enabled: () => !busy && !locked && (dom.precision!=='float32'||kind==='tone'),
+      enabled: () => !busy && !locked && (dom.precision!=='float32'||['tone','curves','levels'].includes(kind)),
     })),
     {
       id: "new-layer",
