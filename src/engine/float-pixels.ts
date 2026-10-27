@@ -1,6 +1,9 @@
 import{z}from'zod';
 import{BLEND_MODES,type BlendMode}from'../core/model';
 import{forkPixelKernel,type PixelKernel}from'./wasm';
+import{TONE_LIMITS}from'../core/tone';
+export const floatToneOptionsSchema=z.object({exposure:z.number().finite().min(TONE_LIMITS.exposure.min).max(TONE_LIMITS.exposure.max).default(0),contrast:z.number().finite().min(TONE_LIMITS.contrast.min).max(TONE_LIMITS.contrast.max).default(0),saturation:z.number().finite().min(TONE_LIMITS.saturation.min).max(TONE_LIMITS.saturation.max).default(0)}).strict();
+export type FloatToneOptions=z.input<typeof floatToneOptionsSchema>;
 export const floatCompositeOptionsSchema=z.object({mode:z.enum(BLEND_MODES).default('normal'),opacity:z.number().finite().min(0).max(1).default(1),mask:z.instanceof(Float32Array).optional()}).strict();
 export interface FloatCompositeOptions{mode?:BlendMode;opacity?:number;mask?:Float32Array}
 const WINDOW=65536;
@@ -14,7 +17,7 @@ function checked(status:number){if(status===1)throw new Error('Float pixels, alp
  * Private memory and owned outputs prevent ordinary byte work from overwriting it. */
 export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
- constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
+ constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
  private layout(pixels:number,masked=false){
@@ -29,6 +32,11 @@ export class FloatPixelProcessor{
    new Float32Array(memory,p.source,count*4).set(source.subarray(at,at+count*4));new Float32Array(memory,p.backdrop,count*4).set(backdrop.subarray(at,at+count*4));if(coverage)new Float32Array(memory,p.mask,count).set(coverage.subarray(at/4,at/4+count));
    checked(p.kernel.compositeFloat(p.source,p.backdrop,p.output,p.mask,p.scratch,count,settings.opacity,mode));result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);
   }return result;
+ }
+ tone(pixels:Float32Array,options:FloatToneOptions={}):Float32Array<ArrayBuffer>{
+  this.owner();const settings=floatToneOptionsSchema.parse(options);samples(pixels,'Input');const result=new Float32Array(pixels.length);
+  for(let at=0;at<pixels.length;at+=WINDOW*4){const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count);new Float32Array(p.kernel.memory.buffer,p.source,count*4).set(pixels.subarray(at,at+count*4));checked(p.kernel.toneFloat(p.source,p.output,count,settings.exposure,settings.contrast,settings.saturation));result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);}
+  return result;
  }
  affine(pixels:Float32Array,matrix:readonly number[]):Float32Array<ArrayBuffer>{
   this.owner();samples(pixels,'Input');if(!Array.isArray(matrix)||matrix.length!==12||![...matrix].every(Number.isFinite))throw new Error('Use twelve finite RGB affine coefficients.');const coefficients=new Float64Array(matrix),result=new Float32Array(pixels.length);

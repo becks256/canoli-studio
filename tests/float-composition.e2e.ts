@@ -3,14 +3,14 @@ import{readFile,writeFile}from'node:fs/promises';
 import{gunzipSync}from'node:zlib';
 import{createHash}from'node:crypto';
 
-test('masked isolated and pass-through groups retain independently evaluated linear float colors and partition-invariant alpha',async({page},info)=>{
+for(const fullTone of[false,true])test('masked isolated and pass-through groups retain independently evaluated linear float colors and partition-invariant alpha; full tone='+fullTone,async({page},info)=>{
  // Declare the numerical bound before running the actual editor. Independent
  // straight-alpha formulas can associate f64 sums differently than the kernel.
  const colorTolerance=2**-20,alphaTolerance=2**-22,width=131,height=79;
  const bytes=gunzipSync(await readFile('tests/fixtures/float-source/rgba-raw-le-linear.f32le.gz')),source=new Float32Array(new Uint8Array(bytes).buffer),f=Math.fround;
  const over=(s:number[],b:number[],opacity:number)=>{const sa=s[3]*opacity,ba=b[3],a=sa+ba*(1-sa);if(sa===0)return b.slice();return[...s.slice(0,3).map((v,c)=>f((v*sa+b[c]*ba*(1-sa))/a)),f(a)];};
  const mix=(before:number[],after:number[],amount:number)=>{if(!amount)return before.slice();const ba=before[3]*(1-amount),aa=after[3]*amount,a=ba+aa;return[...before.slice(0,3).map((v,c)=>a?f((v*ba+after[c]*aa)/a):0),f(a)];};
- const expose=(pixel:number[],ev:number)=>[...pixel.slice(0,3).map(v=>f(v*2**ev)),pixel[3]];
+ const expose=(pixel:number[],ev:number)=>{let rgb=pixel.slice(0,3).map(v=>v*2**ev);if(fullTone&&ev!==0){const contrast=ev>0?37:-61,saturation=ev>0?-43:79;rgb=rgb.map(v=>(v-.5)*2**(contrast/100)+.5);const lum=rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;rgb=rgb.map(v=>lum+(v-lum)*(1+saturation/100));}return[...rgb.map(f),pixel[3]];};
  const raster=(x:number,y:number,dx=0,dy=0,ev=0)=>{x-=dx;y-=dy;if(x<0||x>=width||y<0||y>=height)return[0,0,0,0];const at=(y*width+x)*4,p=[...source.subarray(at,at+4)];return p[3]?expose(p,ev):[0,0,0,0];};
  const expected=new Float32Array(width*height*4);
  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
@@ -23,22 +23,23 @@ test('masked isolated and pass-through groups retain independently evaluated lin
   expected.set(pixel,(y*width+x)*4);
  }
  await page.goto('/');await page.waitForFunction(()=>!!window.luma?.editor);
- const result=await page.evaluate(async bytes=>{
+ const result=await page.evaluate(async({bytes,fullTone})=>{
   const{editor,RasterLayer,LayerGroup,LayerMask,MarqueeSelection,AdjustmentLayer,ToneAdjustment}=window.luma;await editor.openTiff(new File([new Uint8Array(bytes)],'Float groups.tif',{type:'image/tiff'}),{editingPrecision:'float32'});
+  const options=(exposure:number)=>({exposure,contrast:fullTone?(exposure>0?37:-61):0,saturation:fullTone?(exposure>0?-43:79):0});
   const document=editor.document,base=document.layers.at(0)!;if(!(base instanceof RasterLayer))throw new Error('Expected raster');
   const rect=(x:number,y:number,width:number,height:number)=>new LayerMask({linked:false,selection:new MarqueeSelection({shape:'rectangle',x,y,width,height})});
   document.transaction('Compose original float groups',()=>{
-   base.opacity=.8125;base.adjustments.add(new ToneAdjustment({exposure:1}));
+   base.opacity=.8125;base.adjustments.add(new ToneAdjustment(options(1)));
    const isolated=new LayerGroup({name:'Isolated',opacity:.625,blendMode:'normal'});isolated.mask=rect(10,5,100,60);
-   const a=new RasterLayer({assetId:base.assetId,width:131,height:79,x:3,y:2,opacity:.75});a.adjustments.add(new ToneAdjustment({exposure:-1}));isolated.layers.add(a);isolated.layers.add(new RasterLayer({assetId:base.assetId,width:131,height:79,x:-5,y:-2,opacity:.25}));document.layers.add(isolated);
-   const pass=new LayerGroup({name:'Pass through',blendMode:'pass-through',opacity:.375});pass.mask=rect(35,10,65,35);pass.layers.add(new AdjustmentLayer({adjustment:{kind:'tone',exposure:-1,contrast:0,saturation:0},opacity:.5}));pass.layers.add(new RasterLayer({assetId:base.assetId,width:131,height:79,x:7,y:-3,opacity:.125}));document.layers.add(pass);
-   const adjustment=new AdjustmentLayer({adjustment:{kind:'tone',exposure:1,contrast:0,saturation:0},opacity:.5});adjustment.mask=rect(20,15,40,25);document.layers.add(adjustment);
+   const a=new RasterLayer({assetId:base.assetId,width:131,height:79,x:3,y:2,opacity:.75});a.adjustments.add(new ToneAdjustment(options(-1)));isolated.layers.add(a);isolated.layers.add(new RasterLayer({assetId:base.assetId,width:131,height:79,x:-5,y:-2,opacity:.25}));document.layers.add(isolated);
+   const pass=new LayerGroup({name:'Pass through',blendMode:'pass-through',opacity:.375});pass.mask=rect(35,10,65,35);pass.layers.add(new AdjustmentLayer({adjustment:{kind:'tone',...options(-1)},opacity:.5}));pass.layers.add(new RasterLayer({assetId:base.assetId,width:131,height:79,x:7,y:-3,opacity:.125}));document.layers.add(pass);
+   const adjustment=new AdjustmentLayer({adjustment:{kind:'tone',...options(1)},opacity:.5});adjustment.mask=rect(20,15,40,25);document.layers.add(adjustment);
   });
   const saved=document.toJSON(),scene=await editor.renderer.captureFloatScene(saved,editor.assetStore);try{
    const full=await scene.read({x:0,y:0,width:131,height:79});let differences=0;for(let y=0;y<79;y+=13){const height=Math.min(13,79-y),part=await scene.read({x:0,y,width:131,height});for(let i=0;i<part.length;i++)if(new Uint32Array(part.buffer)[i]!==new Uint32Array(full.buffer)[y*131*4+i])differences++;}
    document.undo();document.redo();return{pixels:[...full],partitionDifferentWords:differences,undoRedoExact:JSON.stringify(document.toJSON())===JSON.stringify(saved)};
   }finally{scene.dispose();}
- },[...await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif')]);
+ },{bytes:[...await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif')],fullTone});
  let maxColor=0,maxAlpha=0,different=0;const actual=new Float32Array(result.pixels);for(let i=0;i<actual.length;i++){const error=Math.abs(actual[i]-expected[i]);if(i%4===3)maxAlpha=Math.max(maxAlpha,error);else maxColor=Math.max(maxColor,error);if(actual[i]!==expected[i])different++;}
  expect(result.partitionDifferentWords).toBe(0);expect(result.undoRedoExact).toBe(true);expect(maxColor).toBeLessThanOrEqual(colorTolerance);expect(maxAlpha).toBeLessThanOrEqual(alphaTolerance);
  const hash=(value:Float32Array)=>createHash('sha256').update(new Uint8Array(value.buffer)).digest('hex');await writeFile(info.outputPath('float-group-reference.json'),JSON.stringify({width,height,samples:actual.length,maxColor,maxAlpha,colorTolerance,alphaTolerance,different,partitionDifferentWords:result.partitionDifferentWords,undoRedoExact:result.undoRedoExact,actualSha256:hash(actual),referenceSha256:hash(expected),reference:'Independent native source references; separately evaluated f64 source-over and premultiplied interpolation with explicit f32 stage boundaries.'},null,2));

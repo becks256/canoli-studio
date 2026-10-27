@@ -16,6 +16,7 @@ p.add_argument('--native-lcms',type=Path,required=True)
 p.add_argument('--precision',choices=['uint8','uint16','float32'],default='float32')
 p.add_argument('--profile',default='linear-srgb')
 p.add_argument('--exposure',type=int,default=1)
+p.add_argument('--tone',action='append',type=json.loads,default=[],help='Ordered original-space tone settings; replaces exposure-only reference when supplied')
 p.add_argument('--page',type=int,default=0)
 p.add_argument('--pages',type=int)
 a=p.parse_args()
@@ -97,7 +98,17 @@ try:
   for top in range(0,height,th):
    count=min(th,height-top);raw=original.read(count*width*16);assert len(raw)==count*width*16
    linear=np.frombuffer(raw,dtype='<f4').reshape(count,width,4).copy()
-   linear[:,:,:3]*=2.**a.exposure
+   if a.tone:
+    for settings in a.tone:
+     assert isinstance(settings,dict)and set(settings)<=set(['exposure','contrast','saturation'])
+     exposure=settings.get('exposure',0);contrast=settings.get('contrast',0);saturation=settings.get('saturation',0)
+     assert all(np.isfinite(v)for v in [exposure,contrast,saturation])and -3<=exposure<=3 and -100<=contrast<=100 and -100<=saturation<=100
+     working_rgb=linear[:,:,:3].astype(np.float64)*2.**exposure
+     if contrast!=0:working_rgb=(working_rgb-.5)*2.**(contrast/100)+.5
+     if saturation!=0:
+      lum=working_rgb[:,:,0]*.2126+working_rgb[:,:,1]*.7152+working_rgb[:,:,2]*.0722;working_rgb=lum[:,:,None]+(working_rgb-lum[:,:,None])*(1+saturation/100)
+     linear[:,:,:3]=working_rgb.astype(np.float32)
+   else:linear[:,:,:3]*=2.**a.exposure
    linear[linear[:,:,3]==0,:3]=0
    expected=np.empty((count,width,4),dtype=dtype);apply(transform,linear.ctypes.data,expected.ctypes.data,count*width)
    actual=rows(top,count);assert np.isfinite(actual).all()
@@ -112,4 +123,4 @@ finally:
  if image:image.close()
  if document:document.close()
 assert different==0 and maximum==0 and samples==case['samples'],(different,maximum,samples)
-print(json.dumps(dict(page=a.page,width=width,height=height,samplesCompared=samples,nonidenticalWords=different,maximumError=maximum,extendedSamples=extended,precision=a.precision,profile=a.profile,completeProfileExact=True,actualSampleSha256=actual_hash.hexdigest(),referenceSampleSha256=expected_hash.hexdigest(),outputBytes=a.output.stat().st_size,outputSha256=hashlib.sha256(a.output.read_bytes()).hexdigest(),reference='Independent native Linux CMM source references, NumPy exposure, native Linux CMM output, libtiff/Pillow/MuPDF readback.')))
+print(json.dumps(dict(page=a.page,width=width,height=height,samplesCompared=samples,nonidenticalWords=different,maximumError=maximum,extendedSamples=extended,precision=a.precision,profile=a.profile,completeProfileExact=True,tone=a.tone,actualSampleSha256=actual_hash.hexdigest(),referenceSampleSha256=expected_hash.hexdigest(),outputBytes=a.output.stat().st_size,outputSha256=hashlib.sha256(a.output.read_bytes()).hexdigest(),reference='Independent native Linux CMM source references, NumPy tone/exposure, native Linux CMM output, libtiff/Pillow/MuPDF readback.')))

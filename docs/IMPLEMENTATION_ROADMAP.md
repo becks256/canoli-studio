@@ -6270,3 +6270,120 @@ payload is verified after sealing and committed source bytes are checked before
 reporting this increment. This advances supported source admission; it does not
 complete F10, performance/device quality or the full original roadmap. The
 complete goal remains active.
+
+
+### 2026-10-27 — F10 full float tone controls in implementation
+
+Owner: implementation agent; continuation from d9d1a8e. Full existing tone
+parameters now connect to native working-linear float processing: exposure gain,
+contrast around linear 0.5 and Rec.709 luminance saturation. Float64 arithmetic
+rounds once per tone operation to float32; finite signed/extended RGB and exact
+alpha remain available. Neutral stages skip cancellation arithmetic. Native
+parameter/sample/overflow validation, owned windowed worker capture, shared OO
+validation and enabled precision controls replace the exposure-only gate. Raster
+effect order precedes projection; adjustment layers act on the working backdrop
+before existing mask/opacity interpolation. Default byte tone remains unchanged.
+No model/container schema, native source-cache identity, permission or REST/
+browser synchronization change is introduced. [Exact contract](FLOAT_DOCUMENTS.md).
+
+Initial actual WASM checks pass 50 focused cases, including nine independent
+NumPy float64 references with every output word exact, neutral subnormal/signed
+zero behavior, overflow/retry, worker capture and ordinary shared Undo. Source
+browser, original-preserving 50 MP files from both unsigned and float inputs,
+complete unit/API/build and production acceptance remain required. This is
+further precision integration; wider tools/layers/blends/working profiles,
+HDR/CMYK/proof/interchange, physical photographic/device and sustained performance
+acceptance and every other unfinished original-roadmap gate remain active.
+
+The complete actual WASM/unit/API suite passes all 2,680 tests in 277 files,
+including independent REST full-tone parameters, strict ranges, stale revisions,
+atomic rejection and Undo. The first seven-case browser pilot passes six cases;
+the ordinary UI case incorrectly assumed default project saves retained Undo.
+That test assumption is corrected: script Undo/Redo is checked before ordinary
+project reopening, which separately verifies exact saved state and original
+bytes. The corrected raster UI workflow passes with both precision files exact.
+Additional adjustment-layer Inspector coverage is added before final verification.
+The six other pilot cases include exact native worker samples, original exposure
+and full-tone masked isolated/pass-through groups, isolated plugin boundaries,
+and both original/full-tone portable recipe partial retries. Failed and corrected
+reports remain separate; final source/native 50 MP/build/production checks follow.
+
+The first focused 38-case source matrix passes 37 cases. Its ordered tone stack
+passes workspace Undo and both precision TIFFs plus profiled PNG, but the new
+PDF oracle fails: the verifier's working `rgb` variable overwrites its existing
+decoded PDF byte buffer. Renaming that calculation buffer to `working_rgb` fixes
+the verifier. The identical already-produced PDF then matches all 41,396 channel
+values exactly, with raw sample SHA-256
+`12f35b4583c81689c32ca0900c4f798eb365680d47e5f62d75bacdbc00dd5782`.
+No application code or numerical tolerance changes. The corrected complete
+38-case focused source run passes with zero skipped/retried/flaky/unexpected
+cases. Source data/renderer/native boundaries remain explicit; original failure,
+before-fix verifier bytes, frozen identities and corrected reports are retained.
+
+A separate compatibility sweep compares the former JS-gain/native-affine
+exposure path against native tone across 68 integer/fractional stop values and
+2,229,040 original signed/HDR/alpha samples. It observes zero numerical
+differences (zero signs compared numerically). This supplements the independent
+NumPy references, rather than replacing them or asserting a universal bound.
+
+Both genuine 10,000 × 5,000 original-bearing browser workflows pass, from
+float32 and unsigned 16-bit TIFF. Native editing, original byte identity, Undo,
+workspace restoration and both precision file types are verified. Each of four
+files independently matches every one of its 200,000,000 channel values with
+zero error and zero differing words. The float-original float32 file retains
+85,005,969 extended RGB values; its raw SHA-256 is
+`98f84ddd4fdd003c871271bdf1037cbab4c10574591fb7eabb059dc3c161a003`,
+file SHA-256 `14cbd600dcc012f528b60af5357c39b6f93caa4203c4ae05774ba91b4611391d`
+(2,790,552 bytes). Its uint16 file has SHA-256
+`e1a8efac0a85c11c4db12320793e85143fdc1c3e828d01758cc07e9f15b11b5f`
+(763,400 bytes), raw SHA-256
+`d0447d9e041dbffd5c9e040aa574e2cf3948e118a088fb9c3999c482b65fe86f`.
+The unsigned-original float32 file retains 57,949,088 extended RGB values;
+file SHA-256 `520acfdfad9220c68a3332c47b453e4e702bdd1736ca91bd920b3363408e7165`
+(80,949,336 bytes), raw SHA-256
+`68d4a29a0d8ae6023d76ca713e80c91f08fba22cd3572597f8d93eca1b71fcfd`.
+Its uint16 file has SHA-256
+`085029f4ad62c591acdb53e895506c6c6933abb1922ed7392578b7edfe2991d8`
+(35,828,192 bytes), raw SHA-256
+`41a8b0e8df2d96971636fda2a5466674eaf3e06a60c8c56a7bdaf13e64ac3128`.
+Actual precision/exposure/color and tool/format gates outside this supported tone
+path remain open; exact synthetic/native comparisons do not establish physical
+photographic quality, whole-process peak memory or sustained all-tool performance.
+The full original goal remains active while complete production checks finish.
+
+Final complete production acceptance passes all 166 cases, including ordinary
+full float tone controls, cancelled preview, both raster and adjustment-layer
+Inspector commands, isolated published script, exact Undo/Redo, original-bearing
+reopening and precise native files without developer globals. Final source
+acceptance is the separate complete 38-case focused matrix plus both 50 MP
+workflows: 40 distinct source cases. Each accepted final run has no skips,
+retries, flaky or unexpected results. Initial test-assumption and PDF-verifier
+failures remain separate from corrected acceptance; no app fix or tolerance
+relaxation was used to make those checks pass.
+
+A final documentation review corrects the private-export count in the processing
+guide. The final `npm run build` passes; only
+`developer/float-processing.html` differs from the production-tested release.
+Both existing processing/document guide browser checks pass afterward. All 141
+other served resources, including application/scripts/workers/native binaries,
+remain byte-identical to complete production acceptance. The final audit checks
+all 2,191 frozen source-input identities and 142 final release resources. Relative
+to the first focused-run freeze, only the independent PDF oracle and this one
+guide source change; the work log remains a separately recorded observation.
+Four pinned ICC/RAW/AVIF/lens native codecs remain unchanged. The rebuilt pixels
+WASM adds actual `toneFloat`; SHA-256 is
+`8bcb47b4b65ede3e20f11f0cc24c309728386eeb3d3edbb677c9d26d37af1d51`.
+
+[Sealed full float tone evidence](benchmarks/float-tone-2026-10-27.zip)
+contains exact changed-source overlays against d9d1a8e, complete final release
+bytes, pre-correction guide/verifier bytes and identities, independent NumPy
+reference/generator/native-reader inputs, original-bearing projects/workspaces,
+recipe partial retries, all four native 50 MP output files, successful and failed
+reports, screenshots and verification tools. The version-2 content-addressed
+manifest reconstructs each complete file exactly while sharing duplicate TIFF
+blocks. Every payload/full file and committed source byte is verified before
+reporting this increment. No original resolution cap, paid call, account, upload,
+new isolated privilege or browser/REST synchronization is added. Full F10,
+remaining tools/working spaces/blends/HDR/proof/CMYK/interchange, physical/device,
+sustained performance and every other unfinished original gate remain required.
+The complete original implementation-roadmap goal remains active.

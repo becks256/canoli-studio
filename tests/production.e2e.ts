@@ -2187,3 +2187,5 @@ test('production compiled float source workers preserve all twelve independent o
 
 
 test('production unsigned 16-bit originals retain low-order samples through UI exposure, Undo, precise exports and reopening without globals',async({page},info)=>{const{floatDocumentWorkflow}=await import('./helpers/float-document');await floatDocumentWorkflow(page,info,true,'tests/fixtures/uint16-float/u16-all-levels.tif');});
+
+test('production full float tone preserves native low-order samples through actual controls, cancelled preview, isolated edits and exact delivery',async({page},info)=>{const{floatToneWorkflow}=await import('./helpers/float-tone');await floatToneWorkflow(page,info,true);});

@@ -629,7 +629,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     kind: "curves" | "levels" | "tone" | "hsl" | "color-balance" | "vibrance" | "gradient-map" | "white-balance" | "lut" | "red-eye" = "curves",
   ) {
     attempt(() => {
-      if(dom.precision==='float32'&&kind!=='tone')throw new Error('Float editing currently supports linear exposure adjustments only.');
+      if(dom.precision==='float32'&&kind!=='tone')throw new Error('Float editing currently supports linear tone adjustments only.');
       const pupilSelection = kind === "red-eye" ? dom.selection : null;
       if (kind === "red-eye" && (!pupilSelection || !pupilSelection.toJSON().regions.length))
         throw new Error("Select the red pupils first, then add a Red Eye adjustment.");

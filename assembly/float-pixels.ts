@@ -68,3 +68,22 @@ export function affineFloat(source:usize,output:usize,matrix:usize,pixels:i32):i
  }
  return 0;
 }
+
+/** Tone in working RGB: contrast pivots around 0.5; saturation uses Rec.709
+ * luminance. Linear document exposure is physical gain. No gamut clipping. */
+export function toneFloat(source:usize,output:usize,pixels:i32,exposure:f64,contrast:f64,saturation:f64):i32{
+ if(pixels<0||!isFinite(exposure)||exposure< -3||exposure>3||!isFinite(contrast)||contrast< -100||contrast>100||!isFinite(saturation)||saturation< -100||saturation>100)return 1;
+ for(let i=0;i<pixels;i++)for(let c:usize=0;c<4;c++){const value=load<f32>(source+<usize>i*16+c*4);if(!isFinite(value)||c==3&&(value<0||value>1))return 1;}
+ const gain=Math.pow(2.0,exposure),contrastGain=Math.pow(2.0,contrast/100.0),saturationGain=1.0+saturation/100.0;
+ for(let i=0;i<pixels;i++){
+  const p=source+<usize>i*16,q=output+<usize>i*16;
+  let r=<f64>load<f32>(p)*gain,g=<f64>load<f32>(p+4)*gain,b=<f64>load<f32>(p+8)*gain;
+  // Neutral stages skip subtract/add cancellation, preserving low-order HDR
+  // and near-zero values exactly instead of perturbing an identity operation.
+  if(contrast!=0){r=(r-.5)*contrastGain+.5;g=(g-.5)*contrastGain+.5;b=(b-.5)*contrastGain+.5;}
+  if(saturation!=0){const luminance=r*.2126+g*.7152+b*.0722;r=luminance+(r-luminance)*saturationGain;g=luminance+(g-luminance)*saturationGain;b=luminance+(b-luminance)*saturationGain;}
+  const red=<f32>r,green=<f32>g,blue=<f32>b;if(!isFinite(red)||!isFinite(green)||!isFinite(blue))return 3;
+  store<f32>(q,red);store<f32>(q+4,green);store<f32>(q+8,blue);store<f32>(q+12,load<f32>(p+12));
+ }
+ return 0;
+}

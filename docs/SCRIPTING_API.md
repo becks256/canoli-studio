@@ -716,7 +716,7 @@ Signature: `new ToneAdjustment(options = {})`.
 | `contrast`        | number  | `0`     | −100…100.                      |
 | `saturation`      | number  | `0`     | −100…100; −100 removes color.  |
 
-All four properties are readable/writable. `id` is read-only. Values must be finite. Effects run in collection order; multiple tone adjustments accumulate. The initial operator works on encoded sRGB 8-bit channels, not a linear-light or color-managed photographic pipeline.
+All four properties are readable/writable. `id` is read-only. Values must be finite. Effects run in collection order; multiple tone adjustments accumulate. Byte documents use the existing encoded-sRGB 8-bit operator. Float documents use native working-linear float32 tone: exposure gain, contrast about linear 0.5, then Rec.709 luminance saturation, with float64 intermediates, one float32 rounding and unchanged alpha. Neutral stages are exact identities; signed/extended RGB is not clipped. Overflow rejects. See [the exact float contract and executed example](FLOAT_DOCUMENTS.md).
 
 | Method           | Return                  | Behavior                                                         |
 | ---------------- | ----------------------- | ---------------------------------------------------------------- |

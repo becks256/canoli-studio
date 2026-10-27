@@ -588,7 +588,7 @@ export function InspectorPanel({
                     { value: "lut", label: "Color Lookup (LUT)",disabled:float },
                     { value: "curves", label: "Curves",disabled:float },
                     { value: "levels", label: "Levels",disabled:float },
-                    { value: "tone", label: float?'Linear exposure':"Tone (Exposure / Contrast)" },
+                    { value: "tone", label: float?'Linear tone (Exposure / Contrast / Saturation)':"Tone (Exposure / Contrast)" },
                   ]}
                   onChange={(kind) => {
                     onSelectedAction((layer) => {
@@ -732,6 +732,7 @@ export function InspectorPanel({
 
                 {selected.adjustment.kind === "tone" && (
                   <div className="adjustment-tone-controls">
+                    {float&&<p className="section-description">Linear RGB tone. Contrast pivots at 0.5; extended colors can exceed the SDR preview.</p>}
                     <HistogramView histogram={histogram} compact height={80} />
                     {(["exposure", "contrast", "saturation"] as const).map(
                       (key) => {
@@ -745,7 +746,7 @@ export function InspectorPanel({
                             max={key === "exposure" ? 3 : 100}
                             step={key === "exposure" ? 0.05 : 1}
                             suffix={key === "exposure" ? " EV" : ""}
-                            disabled={locked || busy || float&&key!=='exposure'}
+                            disabled={locked || busy}
                             onPreview={(val) =>
                               onPreview({
                                 type: "layer.update",
@@ -804,7 +805,7 @@ export function InspectorPanel({
               }
             >
               <p className="section-description">
-                Explore a different tone.
+                {float?'Linear RGB tone. Contrast pivots at 0.5; extended colors can exceed the SDR preview.':'Explore a different tone.'}
                 <br />
                 Your original image stays untouched.
               </p>
@@ -817,7 +818,7 @@ export function InspectorPanel({
                   max={key === "exposure" ? 3 : 100}
                   step={key === "exposure" ? 0.05 : 1}
                   suffix={key === "exposure" ? " EV" : ""}
-                  disabled={locked || busy || !wasmReady || float&&key!=='exposure'}
+                  disabled={locked || busy || !wasmReady}
                   onPreview={(value) =>
                     onPreview({
                       type: "effect.tone",

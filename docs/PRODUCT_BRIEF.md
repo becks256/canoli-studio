@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-The local professional-editor objective now includes an explicit initial float32/linear-sRGB workflow for original unsigned 16-bit or float32 TIFF raster artwork, masks, groups and exposure. Display remains SDR; unsupported tools and interchange reject. No paid operation, account or upload is added. Full color/tool/device/performance acceptance remains required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+The local professional-editor objective now includes an explicit initial float32/linear-sRGB workflow for original unsigned 16-bit or float32 TIFF raster artwork, masks, groups and full linear tone. Display remains SDR; unsupported tools and interchange reject. No paid operation, account or upload is added. Full color/tool/device/performance acceptance remains required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Character formatting increment
 

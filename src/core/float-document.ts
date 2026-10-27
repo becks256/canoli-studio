@@ -18,10 +18,9 @@ export function floatSceneIssue(document:DocumentData):string|null {
         const issue=visit(layer.children);if(issue)return issue;
       }else if(layer.kind==='raster'){
         if(layer.erasures?.length)return 'Raster erasures require their float document integration.';
-        if(layer.effects.some(effect=>effect.enabled&&(effect.contrast!==0||effect.saturation!==0)))return 'Float raster tone effects currently support linear exposure; contrast and saturation require their float integration.';
       }else if(layer.kind==='adjustment'){
-        if(layer.adjustment.kind!=='tone'||layer.adjustment.contrast!==0||layer.adjustment.saturation!==0)return 'Float adjustment layers currently support linear exposure only.';
-      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and linear exposure. Other layer types require their float integration.';
+        if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support tone adjustments only.';
+      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and tone adjustments. Other layer types require their float integration.';
     }
     return null;
   };

@@ -45,6 +45,18 @@ clipped substitutes. Exposure has physical linear-light meaning only when the
 caller supplies linear-light pixels. This is not an implemented public adjustment
 layer, camera exposure control or arbitrary-ICC matrix approximation.
 
+`tone(pixels, {exposure = 0, contrast = 0, saturation = 0} = {})` uses the
+existing model ranges −3…3 and −100…100. It applies exposure, active contrast
+around working value 0.5, then active Rec.709 saturation. The connected linear
+document pipeline uses this native operation for raster effect stacks before
+projection and for adjustment-layer backdrops before mask/opacity interpolation.
+Float64 intermediates round once to float32 per tone. Alpha is copied exactly;
+signed/extended RGB is retained. Neutral contrast/saturation stages skip their
+subtract/add arithmetic so identity and exposure-only values stay exact.
+Invalid input/parameters and float32 overflow reject without publishing output.
+Worker `PixelProcessor.floatTone` captures samples and all settings before
+readiness, transfers private copies and checks complete returned sample geometry.
+
 Native scratch is reused in windows of at most 65,536 pixels. Worker entry points
 `PixelProcessor.floatComposite` and `floatAffine` accept at most 262,144 pixels
 per request as a transport-buffer budget; this is independent of original file
@@ -54,8 +66,8 @@ be float32, finite, alpha-valid and dimensionally exact. Shutdown rejects pendin
 requests. Current worker disposal is cancellation for this internal service;
 there is no new isolated-script API or per-call AbortSignal contract.
 
-A private owner prepares the two added native exports, `compositeFloat` and
-`affineFloat`. Other pixel exports retain their signatures. Invalid native input,
+A private owner validates the native exports `compositeFloat`, `affineFloat`
+and `toneFloat`. Other pixel exports retain their signatures. Invalid native input,
 unsupported artistic numeric domain and nonrepresentable output have distinct
 status codes. Failure can leave private scratch changed but publishes no result;
 fresh work reuses the owner without changing other byte/float owners.

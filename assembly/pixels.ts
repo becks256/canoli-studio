@@ -1,4 +1,4 @@
-export { compositeFloat, affineFloat } from "./float-pixels";
+export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
 export { encodeFrequencyBand } from "./frequency-band";
 export { medianFilter } from "./median-filter";
 export { bilateralFilter } from "./bilateral-filter";

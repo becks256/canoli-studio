@@ -10,8 +10,12 @@ it('float constructor and old schema validation reject contradictory precision i
 });
 it('unsupported operations and mixed transactions reject before changing a float document or its history',()=>{
  const document=new Document({precision:'float32'}),raster=new RasterLayer({assetId:'float-original',width:10,height:10});document.layers.add(raster);const before=document.toJSON(),revision=document.getSnapshot().revision;
- expect(()=>document.layers.add(new PaintLayer())).toThrow('Other layer types');expect(()=>{raster.blendMode='multiply';}).toThrow('Other blend modes');expect(()=>raster.adjustments.add(new ToneAdjustment({contrast:20}))).toThrow('contrast');expect(()=>document.transaction('Unsupported float edit',()=>{raster.opacity=.25;document.layers.add(new AdjustmentLayer({adjustment:{kind:'tone',exposure:0,contrast:.25,saturation:0}}));})).toThrow();expect(document.toJSON()).toEqual(before);expect(document.getSnapshot().revision).toBe(revision);
+ expect(()=>document.layers.add(new PaintLayer())).toThrow('Other layer types');expect(()=>{raster.blendMode='multiply';}).toThrow('Other blend modes');expect(()=>document.transaction('Unsupported float edit',()=>{raster.opacity=.25;document.layers.add(new PaintLayer());})).toThrow();expect(document.toJSON()).toEqual(before);expect(document.getSnapshot().revision).toBe(revision);
 });
 it('conversion gates unsupported legacy content and wire commands remain strict',()=>{
  const document=new Document();document.layers.add(new PaintLayer());const before=document.toJSON();expect(()=>document.convertToFloat()).toThrow('Other layer types');expect(document.toJSON()).toEqual(before);expect(parseCommands([{type:'document.precision.float'}])).toEqual([{type:'document.precision.float'}]);expect(()=>parseCommands([{type:'document.precision.float',force:true}])).toThrow();
+});
+
+it('float tone parameters share ordinary OO transactions, strict limits and exact Undo',()=>{
+ const document=new Document({precision:'float32'}),raster=new RasterLayer({assetId:'float-original',width:10,height:10});document.layers.add(raster);const before=document.toJSON();document.transaction('Linear tone',()=>{raster.adjustments.add(new ToneAdjustment({exposure:.5,contrast:35,saturation:-60}));document.layers.add(new AdjustmentLayer({adjustment:{kind:'tone',exposure:-1,contrast:-20,saturation:25}}));});const after=document.toJSON();document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);expect(()=>raster.adjustments.add(new ToneAdjustment({contrast:101}))).toThrow();expect(document.toJSON()).toEqual(after);
 });

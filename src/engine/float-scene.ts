@@ -38,7 +38,7 @@ export class FloatSceneRenderer {
  private entries=new Map<Blob,Map<string,CachedSource>>();
  private lru=new Map<CachedSource,true>();private epoch=0;private closed=false;
  private captures=new Set<AbortController>();
- constructor(private processor:Pick<PixelProcessor,'floatComposite'|'floatAffine'>){}
+ constructor(private processor:Pick<PixelProcessor,'floatComposite'|'floatTone'>){}
  private source(store:AssetStore,asset:ImageAsset):FloatRasterSource{
   if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF sources. Byte editing proxies are not precision sources.');
   const key=JSON.stringify([asset.width,asset.height,asset.tiff,asset.tiffColor.source]);let entries=this.entries.get(asset.blob);if(!entries){entries=new Map();this.entries.set(asset.blob,entries);}let entry=entries.get(key);
@@ -88,8 +88,8 @@ export class FloatSceneRenderer {
     const mask=async(layer:LayerData,world:AffineTransform)=>{
      if(!layer.mask?.enabled||layer.mask.density===0)return undefined;check();const result=await maskService(layer.mask,space,maskTransform(layer.mask,world),check);check();if(!(result instanceof Float32Array)||result.length!==bounds.width*bounds.height)throw new Error('Float mask coverage differs from its working window.');for(const value of result)if(!Number.isFinite(value)||value<0||value>1)throw new Error('Float mask coverage is invalid.');return result;
     };
-    const expose=async(pixels:Float32Array,stops:number)=>{
-     if(stops===0)return pixels;check();const gain=2**stops,result=await this.processor.floatAffine(pixels,[gain,0,0,0,0,gain,0,0,0,0,gain,0]);check();return result;
+    const tone=async(pixels:Float32Array,settings:{exposure:number;contrast:number;saturation:number})=>{
+     if(settings.exposure===0&&settings.contrast===0&&settings.saturation===0)return pixels;check();const result=await this.processor.floatTone(pixels,{exposure:settings.exposure,contrast:settings.contrast,saturation:settings.saturation});check();return result;
     };
     const paint=async(layers:LayerData[],initial:Float32Array,parent:AffineTransform):Promise<Float32Array>=>{
      let backdrop=initial;
@@ -102,11 +102,11 @@ export class FloatSceneRenderer {
        }else{const pixels=await paint(layer.children,new Float32Array(backdrop.length),world);backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity,mask:coverage});}
       }else if(layer.kind==='raster'){
        const source=sources.get(layer.assetId)!,placement=renderTransform(full,world).multiply(AffineTransform.scale(layer.width/source.source.width,layer.height/source.source.height));
-       const effects=layer.effects.filter(effect=>effect.enabled&&effect.exposure!==0),adjusted:FloatWindowSource=effects.length?{width:source.source.width,height:source.source.height,readWindow:async(region,control)=>{let pixels:Float32Array=await source.source.readWindow(region,control);for(const effect of effects)pixels=await expose(pixels,effect.exposure);return pixels;}}:source.source;
+       const effects=layer.effects.filter(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0)),adjusted:FloatWindowSource=effects.length?{width:source.source.width,height:source.source.height,readWindow:async(region,control)=>{let pixels:Float32Array=await source.source.readWindow(region,control);for(const effect of effects)pixels=await tone(pixels,effect);return pixels;}}:source.source;
        const pixels=await projectFloatWindow(adjusted,placement,bounds,{signal:control.signal,isCancelled:()=>{check();return false;}});
        check();backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity,mask:coverage});
       }else if(layer.kind==='adjustment'&&layer.adjustment.kind==='tone'){
-       const after=await expose(backdrop,layer.adjustment.exposure);backdrop=await interpolateFloatBackdrops(backdrop,after,opacity,coverage,check);
+       const after=await tone(backdrop,layer.adjustment);backdrop=await interpolateFloatBackdrops(backdrop,after,opacity,coverage,check);
       }else throw new Error('Unsupported float scene layer.');
      }
      check();return backdrop;

@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "samples": 8195,
+  "cases": [
+    {
+      "options": {
+        "exposure": 0,
+        "contrast": 0,
+        "saturation": 0
+      },
+      "reference": "tone-0.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": 1,
+        "contrast": 0,
+        "saturation": 0
+      },
+      "reference": "tone-1.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": -3,
+        "contrast": 0,
+        "saturation": 0
+      },
+      "reference": "tone-2.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": 0,
+        "contrast": 100,
+        "saturation": 0
+      },
+      "reference": "tone-3.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": 0,
+        "contrast": -100,
+        "saturation": 0
+      },
+      "reference": "tone-4.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": 0,
+        "contrast": 0,
+        "saturation": -100
+      },
+      "reference": "tone-5.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": 0,
+        "contrast": 0,
+        "saturation": 100
+      },
+      "reference": "tone-6.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": 0.7,
+        "contrast": 37,
+        "saturation": -43
+      },
+      "reference": "tone-7.f32le.gz"
+    },
+    {
+      "options": {
+        "exposure": -1.25,
+        "contrast": -61,
+        "saturation": 79
+      },
+      "reference": "tone-8.f32le.gz"
+    }
+  ],
+  "files": {
+    "source.f32le.gz": {
+      "bytes": 119580,
+      "sha256": "ae80595d8542ff74a2c275592eb1ae32aa63c370263a129b758b66399a78d31d",
+      "rawSha256": "e65ec226734255a722df3a3a510fcdc3c74fb419f43d580a207480ca3bcd2538"
+    },
+    "tone-0.f32le.gz": {
+      "bytes": 119580,
+      "sha256": "ae80595d8542ff74a2c275592eb1ae32aa63c370263a129b758b66399a78d31d",
+      "rawSha256": "e65ec226734255a722df3a3a510fcdc3c74fb419f43d580a207480ca3bcd2538"
+    },
+    "tone-1.f32le.gz": {
+      "bytes": 120361,
+      "sha256": "bb8e34d0328a781b892f955df34ce860b5b20f0ba408336f642e390de8dc6d2d",
+      "rawSha256": "475c318b71256d2653db468d032ef0da9c741c954c87598334a19f8728e42790"
+    },
+    "tone-2.f32le.gz": {
+      "bytes": 118982,
+      "sha256": "7cc5bd8101845b2cfc1b9233f42b75089e7593a1a3786e2f49fdbc92cbe8124a",
+      "rawSha256": "28dc5e1f27bf477ee9add193adf6ca5bd34c169b6fee1c44f9d5c583f782777b"
+    },
+    "tone-3.f32le.gz": {
+      "bytes": 120450,
+      "sha256": "57a0134769f3c99f7fc87e563d9a7238bee7b20d9703889a5a67577e078c89ff",
+      "rawSha256": "ca826752c15f130ace857557ac0787c45ba382b5f669180fe3c40cccf07e34f6"
+    },
+    "tone-4.f32le.gz": {
+      "bytes": 119275,
+      "sha256": "9510c77583fbe559efcf5adb313ed132c403fe487ff89d25f11462a6f1c1f4a8",
+      "rawSha256": "3425ccb43c7d3e1fa627770393c0bdc207e644148fe4559d1d5bd898d298eb01"
+    },
+    "tone-5.f32le.gz": {
+      "bytes": 64947,
+      "sha256": "c1d2222bc77edad20d54f52ca63b160efe039fefeac90b6e9d3f23cb5b5cb834",
+      "rawSha256": "fffdc9c1de06ad0152e8d796e55d9ac41cfdc4566bd9dc733621fd48cd62fab0"
+    },
+    "tone-6.f32le.gz": {
+      "bytes": 120922,
+      "sha256": "99bc1dad3906c949d34b36f5bbd568597b000a911b1a42ace734c2cafc8c65bb",
+      "rawSha256": "8d4714d6dc6aaa9094d5861b53632e8648b317f8ae7ac28c0f0fecd523b559ce"
+    },
+    "tone-7.f32le.gz": {
+      "bytes": 120328,
+      "sha256": "1267fff6882426ee5b75c45f04f4ebea8163b069d4c9fed51302c3686722d8a7",
+      "rawSha256": "e08c8e2bad7932157838959104990c51802509bc0cb1ded6611fa1fd82cddb9d"
+    },
+    "tone-8.f32le.gz": {
+      "bytes": 120002,
+      "sha256": "f893b90c08289c8381bdddf6a0d5f7e33636f893d17f19ca227495b886dcd18d",
+      "rawSha256": "8887eee4fa3ebd3323029fd802470bfffaccf7d39ec3367b8183e7b2e295e5ec"
+    }
+  },
+  "generatorSha256": "1b0db9edb384721ccd70fbfb3c09687e1f7061111d3a5b4025a4a1c208d13351",
+  "reference": "Independent NumPy float64 exposure -> active .5-pivot contrast -> active Rec.709 saturation, with one final float32 rounding and exact alpha."
+}

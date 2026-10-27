@@ -2,7 +2,7 @@
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
-transformations, Normal composition, groups, masks and linear exposure use this
+transformations, Normal composition, groups, masks and linear tone adjustments use this
 mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
@@ -96,6 +96,22 @@ if (!(original instanceof RasterLayer)) throw new Error('Select a raster origina
 original.adjustments.add(new ToneAdjustment({exposure: 1}));
 ```
 
+Full tone uses the same existing options and properties, with exposure −3…3
+and contrast/saturation −100…100. Defaults are zero; `enabled` defaults to true.
+In byte documents the existing encoded-sRGB byte operator remains unchanged.
+Float documents apply the working-linear definitions above. For example:
+
+<!-- example: float-tone -->
+```js
+document.convertToFloat();
+const original = document.layers.at(0);
+if (!(original instanceof RasterLayer)) throw new Error('Select a raster original');
+document.selectedLayer = original;
+original.adjustments.add(new ToneAdjustment({
+  exposure: 0.7, contrast: 37, saturation: -43,
+}));
+```
+
 The existing isolated execution transaction, expected revision, command limit,
 locks, permission checks and Undo boundary remain authoritative. Plugins require
 their existing document read/write grants; installation remains inert. No new
@@ -114,15 +130,23 @@ choices independently of this zero-argument action.
 
 The initial mode supports original unsigned 16-bit or float32 TIFF raster layers, Normal isolated
 groups, pass-through groups, transforms, visibility, opacity, Normal fill
-opacity, existing masks and linear exposure in raster tone effects or Tone
-adjustment layers. Exposure multiplies native linear RGB by `2 ** exposure`,
-leaving alpha unchanged. Raster exposure precedes projection. Adjustment exposure
+opacity, existing masks and full tone controls in raster effects or Tone
+adjustment layers. Exposure multiplies native linear RGB by `2 ** exposure`.
+Active contrast follows with `(value - 0.5) * 2 ** (contrast / 100) + 0.5`.
+Active saturation uses `luminance + (value - luminance) * (1 + saturation / 100)`,
+with linear-sRGB luminance weights 0.2126, 0.7152 and 0.0722. The contrast pivot
+is linear 0.5, rather than a camera middle-gray control. Each tone uses float64
+intermediates and rounds once to float32; it preserves alpha and finite signed/
+extended RGB without gamut clipping. Neutral stages skip subtract/add arithmetic
+to preserve identity and exposure-only precision. Nonfinite input, invalid alpha
+or unrepresentable float32 output rejects without publishing a partial result.
+Raster tone stacks run in collection order before projection. Adjustment exposure
 changes the accumulated backdrop; pass-through group opacity interpolates
 premultiplied before/after backdrops rather than source-over compositing a second
 copy. Masks use the existing byte coverage rasterizer; color stays float32.
 
 Other layer types, artistic blends, sibling clipping, styles, raster erasures,
-frequency separation, contrast/saturation and other adjustment types reject
+frequency separation and other adjustment types reject
 atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
 palette and context controls disable unsupported creation/color tools. Move,
 Hand, selections, Crop, Artboard and mask drawing retain their existing commands;
