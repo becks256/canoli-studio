@@ -1,3 +1,4 @@
+import {nativeVectorFootprint} from './native-vector-footprint';
 import {usesNativeTextWriting,isVerticalText} from '../core/text-writing';
 import {nativeToneSamplingGrid} from './smart-filter-grid';
 import {prepareStyledTextParagraph} from './styled-text-layout';
@@ -723,14 +724,16 @@ export class CanvasRenderer implements DocumentRenderer {
           ? Math.ceil((shadow.blur * 3 + Math.abs(shadow.y)) * current.sy) + 2
           : 0;
         if (cache && isolated !== layer && !affected.has(layer.id) &&
-            (layer.kind === "raster" || layer.kind === "text" ||
+            (layer.kind === "raster" || layer.kind === "text" || layer.kind === "vector" ||
               (layer.kind === "paint" && layer.strokes.every(stroke => stroke.kind === "fill" && !stroke.clip))) &&
             layer.blendMode === "normal" && (layer.fillOpacity ?? 1) === 1 &&
             !style.blendIf.enabled) {
           const placement = renderTransform(current, world);
           const ink = layer.kind === "text" && layer.textPath===undefined&&layer.characterRanges===undefined&&!usesNativeTextWriting(layer) ? measureTextInk(layer) : undefined;
+          const vectorInk=layer.kind==='vector'?nativeVectorFootprint(layer):undefined;
           const bounds = layer.kind === "raster"
             ? [localBounds(layer)!]
+            : layer.kind==='vector'?vectorInk?[vectorInk]:[]
             : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
             : ink ? [ink] : undefined;
           // Cold plain text needs the same bounded working area as shadows;
@@ -877,7 +880,7 @@ export class CanvasRenderer implements DocumentRenderer {
           current.height,
           style.blendIf.enabled,
         );
-        let occupied = layer.kind === "text" ? cache?.bounds(key, signature) : undefined;
+        let occupied = layer.kind === "text" || layer.kind === "vector" ? cache?.bounds(key, signature) : undefined;
         try {
           if (!cacheable || !cache?.read(key, signature, content)) {
             let textInk: ReturnType<typeof drawText>;
@@ -1169,8 +1172,10 @@ export class CanvasRenderer implements DocumentRenderer {
             // Mutable command previews are short-lived. Retaining their transformed
             // raw surface copies pixels and evicts reusable committed layers.
             if (cacheable && isImmutable(layer) && canCache()) {
+              const vectorInk=layer.kind==='vector'?nativeVectorFootprint(layer):undefined;
               const bounds = layer.kind === "raster"
                 ? [localBounds(layer)!]
+                : layer.kind==='vector'?vectorInk?[vectorInk]:[]
                 : layer.kind === "paint" ? layer.strokes.map(strokeBounds)
                 : layer.kind === "text" && textInk ? [textInk] : null;
               if (bounds) {
@@ -1294,10 +1299,10 @@ export class CanvasRenderer implements DocumentRenderer {
           // keeps its raw prefix; a later style change can rebuild cold content.
           // Text can also promote on ordinary edits: it has no stroke prefix to
           // preserve, and otherwise rebuilds every overlay on each keystroke.
-          if ((preview || (layer.kind === "text" && isImmutable(layer))) &&
+          if ((preview || ((layer.kind === "text" || layer.kind === "vector") && isImmutable(layer))) &&
               rawComposite && style.colorOverlay.enabled && canCache())
             cache?.write(key, compositeSignature, content, 1,
-              layer.kind === "text" ? occupied : undefined);
+              layer.kind === "text" || layer.kind === "vector" ? occupied : undefined);
           if (layer.kind === "adjustment") {
             try {
               const directPatch = layer.adjustment.kind === "patch" &&
@@ -1389,7 +1394,7 @@ export class CanvasRenderer implements DocumentRenderer {
             // same bounded budget rather than keeping duplicate full surfaces.
             if (finishedStyle && canCache()) {
               let finishedBounds: typeof occupied;
-              if (layer.kind === "text" && occupied) {
+              if ((layer.kind === "text" || layer.kind === "vector") && occupied) {
                 // Raw coverage uses padded coordinates; the completed appearance
                 // is on the current output grid. Masks/overlays cannot expand ink.
                 const blur = shadow.enabled ? shadow.blur * 3 * Math.max(current.sx, current.sy) : 0;

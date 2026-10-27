@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Vector working pixels and retained geometry (F14)
+
+Use conservative native vector footprints to bound eligible Canvas working surfaces and retained raw/finished pixels, keeping the original output-pixel lattice and authored geometry independent. Reuse geometry only for registry-proven complete immutable path arrays; caller freezing, mutable Pen previews, same-ID replacements and returned rectangles must not corrupt later bounds. Preserve gradients, caps/joins/dashes, compound fill rules, masks, opacity, blend behavior and effect support exactly against uncached/native references. Keep the shared cache byte/entry budget and release surfaces normally. Verify real production input-to-matching-canvas updates with actual pixel evidence, original-path/Undo/project equality and the 50 MP source workflow. This changes no document/API/schema/permission or source-resolution limit; broader all-tool F14 remains open.
+
 ## Declared alignment inspection (A12)
 
 Design checks now accept optional explicit alignment rules against a canvas or independent key-layer frame, with document-pixel tolerance. Shared authored geometry includes affine parents, path/vertical text origins and active wet-paint/raster-replacement extents. Locked references remain readable; hidden targets, empty/unknown geometry and unresolved numerical precision remain explicit unverified results. Geometry work stays in private workers with scoped metadata and existing read/asset grants. Inspection changes no artwork/history or source bytes.

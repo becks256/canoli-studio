@@ -1,3 +1,4 @@
+import {isImmutable} from '../core/immutable';
 import {pathBounds,pathContours,type Rect,type VectorPathData} from '../core/drawing';
 import type {VectorLayerData} from '../core/model';
 import {vectorStrokeValues} from '../core/vector-stroke';
@@ -52,8 +53,15 @@ function workingPath(path:VectorPathData):Rect {
  return pathBounds(uncertain?path:{...path,strokeMiterLimit:maximum});
 }
 
+const footprints=new WeakMap<VectorLayerData['paths'],Readonly<Rect>|null>();
+/** Only registry-proven complete immutable path arrays can retain geometry.
+ * Return owned bounds; layer placement and styles remain caller responsibilities. */
 export function nativeVectorFootprint(layer:Pick<VectorLayerData,'paths'>):Rect|undefined {
+ const reusable=isImmutable(layer.paths),cached=reusable?footprints.get(layer.paths):undefined;
+ if(cached!==undefined)return cached?{...cached}:undefined;
  let left=Infinity,top=Infinity,right=-Infinity,bottom=-Infinity;
  for(const path of layer.paths){const b=workingPath(path);left=Math.min(left,b.x);top=Math.min(top,b.y);right=Math.max(right,b.x+b.width);bottom=Math.max(bottom,b.y+b.height);}
- return left===Infinity?undefined:{x:left,y:top,width:right-left,height:bottom-top};
+ const bounds=left===Infinity?undefined:{x:left,y:top,width:right-left,height:bottom-top};
+ if(reusable)footprints.set(layer.paths,bounds?Object.freeze({...bounds}):null);
+ return bounds;
 }

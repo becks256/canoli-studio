@@ -1,5 +1,5 @@
 import {expect,it} from 'vitest';
-import {VectorPath} from '../src/dom';
+import {Document,VectorLayer,VectorPath} from '../src/dom';
 import {pathBounds} from '../src/core/drawing';
 import {nativeVectorFootprint} from '../src/engine/native-vector-footprint';
 const path=(limit:number)=>VectorPath.fromSvgPath('M24 112L64 16L104 112',{fill:null,stroke:'#ff0000',strokeWidth:16,strokeJoin:'miter',strokeMiterLimit:limit}).toJSON();
@@ -22,4 +22,15 @@ it('bounds maximum-size coincident contours with linear coordinate work and unch
   expect(nativeVectorFootprint({paths:[value]})).toEqual(expected);
   expect(reads).toBeLessThanOrEqual(64*count);
  }
+});
+
+const rectangle=()=>VectorPath.rectangle({x:0,y:0,width:20,height:10},0,{fill:'#2468ac',stroke:null,strokeWidth:0});
+it('retains placement-independent geometry while returned rectangles remain owned across edits and Undo',()=>{
+ const doc=new Document(),layer=doc.layers.add(new VectorLayer({x:100,y:200}));layer.paths.add(rectangle());const first=doc.getSnapshot().document.children[0];if(first.kind!=='vector')throw new Error('Expected vector');const bounds=nativeVectorFootprint(first)!;expect(bounds).toEqual({x:0,y:0,width:20,height:10});bounds.x=999;expect(nativeVectorFootprint(first)).toEqual({x:0,y:0,width:20,height:10});layer.x=500;const moved=doc.getSnapshot().document.children[0];if(moved.kind!=='vector')throw new Error('Expected vector');expect(moved.paths).toBe(first.paths);expect(nativeVectorFootprint(moved)).toEqual({x:0,y:0,width:20,height:10});layer.paths.at(0)!.stroke='#804020';layer.paths.at(0)!.strokeWidth=4;const stroked=doc.getSnapshot().document.children[0];if(stroked.kind!=='vector')throw new Error('Expected vector');expect(nativeVectorFootprint(stroked)!.width).toBeGreaterThan(20);doc.undo();doc.undo();const undone=doc.getSnapshot().document.children[0];if(undone.kind!=='vector')throw new Error('Expected vector');expect(nativeVectorFootprint(undone)).toEqual({x:0,y:0,width:20,height:10});
+});
+it('a caller-frozen path array with mutable descendants cannot produce stale geometry',()=>{
+ const path=rectangle().toJSON(),layer={paths:Object.freeze([path])as unknown as import('../src/core/model').VectorLayerData['paths']};expect(nativeVectorFootprint(layer)).toEqual({x:0,y:0,width:20,height:10});for(const point of path.points){point.x+=100;point.in.x+=100;point.out.x+=100;}expect(nativeVectorFootprint(layer)).toEqual({x:100,y:0,width:20,height:10});
+});
+it('empty-to-visible mutable geometry and immutable empty results remain distinct',()=>{
+ const mutable={paths:[]as import('../src/core/model').VectorLayerData['paths']};expect(nativeVectorFootprint(mutable)).toBeUndefined();mutable.paths.push(rectangle().toJSON());expect(nativeVectorFootprint(mutable)).toEqual({x:0,y:0,width:20,height:10});const doc=new Document();doc.layers.add(new VectorLayer());const empty=doc.getSnapshot().document.children[0];if(empty.kind!=='vector')throw new Error('Expected vector');expect(nativeVectorFootprint(empty)).toBeUndefined();expect(nativeVectorFootprint(empty)).toBeUndefined();
 });

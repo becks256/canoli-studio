@@ -2155,3 +2155,6 @@ test('production declared alignment checks retain typed evidence, selection navi
 
 
 test('production measured spacing and equal-gap attraction preserve cancellation, exact pixels, one Undo and native reopening',async({page},info)=>{await spacingWorkflow(page,info,true);});
+
+import {vectorWorkingWorkflow} from './helpers/vector-working-cache';
+test('production dense vector movement preserves complete paths, exact native pixels, one Undo and reopened projects',async({page},info)=>{await vectorWorkingWorkflow(page,info,true);});

@@ -1,5 +1,11 @@
 # Architecture
 
+## Compact vector working surfaces
+
+The Canvas compositor uses `nativeVectorFootprint` for eligible normal-blend vector working windows and compact raw/finished cache retention. The existing canonical native grid still rasterizes paths, and windows stay on the original output-pixel lattice. Masks/overlays do not expand vector ink; shadow support is propagated using the established effect halo. Other compositing conditions retain their full working path while raw retained pixels can remain compact. Cache-disabled rendering preserves the full native reference path.
+
+A private WeakMap retains only geometry keyed by registry-proven complete immutable path arrays. Bounds returned to callers are owned copies; layer placement, parent transforms, styles and allocation windows remain separate. Unregistered/caller-frozen arrays and mutable descendants are remeasured. Shape edits and restored/reopened owners naturally select their corresponding array identities. No public mutation/model/format/permission boundary changes. The dated roadmap records production profile evidence, exact pixels and remaining F14 scope.
+
 ## Declared alignment inspection (A12)
 
 Design checks now accept optional explicit alignment rules against a canvas or independent key-layer frame, with document-pixel tolerance. Shared authored geometry includes affine parents, path/vertical text origins and active wet-paint/raster-replacement extents. Locked references remain readable; hidden targets, empty/unknown geometry and unresolved numerical precision remain explicit unverified results. Geometry work stays in private workers with scoped metadata and existing read/asset grants. Inspection changes no artwork/history or source bytes.

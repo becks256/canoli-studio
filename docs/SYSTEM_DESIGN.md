@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Vector cache and sampling invariant
+
+Retain conservative native geometric coverage independently of placement and allocation. Only a fully registry-owned immutable path array can key reusable footprint metadata; never trust caller freezing or stored IDs, and return owned rectangles. Compact working/cache rectangles must preserve the exact output-pixel lattice, canonical native-cell rasterization, mask coordinates and shadow support. Retention continues to share the established byte/entry budget. Pixel equivalence, model/Undo/source preservation and actual matching production frames are required; a small retained-byte count or a green functional suite does not prove all-tool responsiveness.
+
 ## Spacing feedback invariant
 
 Measure gaps from the final authored preview after snap correction, affine conversion and clamping. Cache stationary geometry only for the captured owner/revision/selection. Existing anchors win attraction ties; equal-gap corrections retain final orthogonal overlap. Transient feedback/settings do not enter document commands, source data, persistence or exports. Movement still uses shared commands and one Undo, and replacement owners invalidate gestures even when persistent IDs/revisions match. See [LAYER_ALIGNMENT.md](LAYER_ALIGNMENT.md#spacing-feedback-while-moving-artwork).
