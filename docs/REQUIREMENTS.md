@@ -4,6 +4,17 @@
 
 Support schema-49 float32/linear-sRGB state, original-bearing unsigned 16-bit or float32 TIFF admission, shared OO conversion/Undo, guarded source roles, original-native raster composition, original-preserving erasure/clear, continuous Curves/Levels and direct precision delivery. Stage output settings with precision, disable unsupported UI operations and retain exact originals through persistence. Complete all actual verification before acceptance; broader F10/F11/F14 and the original roadmap remain open. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Float preview sampling consistency
+
+Complete native float effects/masks/clipping/groups must precede frame filtering,
+including nonlinear Curves/Levels. Pan/zoom and fitted previews must agree with
+native-first sampling, apply artboard border coverage once, and retain identical
+samples across read partitions. Native world reads preserve off-artboard artwork;
+framed reads exclude it. Working allocation tiles must not cap original or
+artboard geometry. Verify independent transformed references, ordinary production
+zoom controls, cancellation/source ownership and genuine 50 MP files. Broader
+quality, sustained performance and the complete roadmap remain required.
+
 ## Owned float source storage dependency
 
 Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.

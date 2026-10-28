@@ -2195,3 +2195,5 @@ test('production float clipping retains exact original samples through Inspector
 test('production float erasure preserves original samples through pointer cancellation, shared Undo, native files and reopening',async({page},info)=>{const{floatErasureWorkflow}=await import('./helpers/float-erasure');await floatErasureWorkflow(page,info,true);});
 
 test('production continuous float Curves and Levels retain linear histograms, exact Undo, native files and originals without developer globals',async({page},info)=>{const{floatTransferWorkflow}=await import('./helpers/float-transfer');await floatTransferWorkflow(page,info,true);});
+
+test('production float zoom gestures display independently filtered native scenes without developer globals',async({page},info)=>{const{floatFrameWorkflow}=await import('./helpers/float-frame');await floatFrameWorkflow(page,info,true);});

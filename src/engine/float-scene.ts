@@ -1,3 +1,5 @@
+import{projectFloatFrame,type FloatSceneFrame}from'./float-frame';
+export type{FloatSceneFrame}from'./float-frame';
 import{clippingStacks}from'../core/clipping';
 import{prepareFloatClipping,restoreFloatClipping}from'./float-clipping';
 import{applyFloatCoverage}from'./float-coverage';
@@ -23,13 +25,13 @@ import{validateFloatWorkerWindow}from'./float-pixels';
 
 export interface FloatSceneControl extends FloatSourceControl,FloatProjectionControl{}
 export type FloatMaskService=(mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>;
-export interface FloatSceneFrame {region:{x:number;y:number;width:number;height:number};width:number;height:number;rootTransform?:AffineTransform}
 export interface CapturedFloatScene {
  readonly document:DocumentData;
  readonly signal:AbortSignal;
  check():void;
  /** Bounds are indices on the complete frame's output-pixel lattice. Omitting
-  * the frame gives the document's native pixel plane, including outside borders. */
+  * the frame gives the native world plane, including outside borders. A frame
+  * filters the completed native artboard, with one boundary coverage pass. */
  read(bounds:FloatSourceWindow,frame?:FloatSceneFrame):Promise<Float32Array<ArrayBuffer>>;
  dispose():void;
 }
@@ -73,7 +75,7 @@ export class FloatSceneRenderer {
    for(const[id,value]of sources)if(!assets.has(id)||assets.get(id)!==value.asset||value.asset.blob!==value.source.original||value.asset.width!==value.source.width||value.asset.height!==value.source.height||value.asset.tiff!==value.tiff||value.asset.tiffColor!==value.color)throw new Error('Float scene source changed.');
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
    visitLayerAssets(layer,reference=>{if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
    if(layer.kind==='group')visit(layer.children);else if(layer.kind==='raster'&&!sources.has(layer.assetId)){const asset=assets.get(layer.assetId);sources.set(asset.id,{asset,source:this.source(assets,asset),tiff:asset.tiff,color:asset.tiffColor});}
@@ -84,10 +86,8 @@ export class FloatSceneRenderer {
    // session. Ready tiles need no native owner, avoiding semaphore deadlocks.
    for(const value of sources.values())await value.source.prepare({signal:control.signal,onProgress:progress=>{check();control.onProgress?.(progress);check();}});
    check();
-   return{document,signal:abort.signal,check,dispose,read:async(input,frame={region:{x:0,y:0,width:document.width,height:document.height},width:document.width,height:document.height})=>{
-    check();const bounds=validateWindow(input),r=frame.region;
-    if(![r.x,r.y,r.width,r.height].every(Number.isFinite)||r.width<=0||r.height<=0||![frame.width,frame.height].every(v=>Number.isSafeInteger(v)&&v>0))throw new Error('Float scene frame geometry is invalid.');
-    const full:RenderSpace={x:r.x,y:r.y,width:frame.width,height:frame.height,sx:frame.width/r.width,sy:frame.height/r.height},space:RenderSpace={x:r.x+bounds.x/full.sx,y:r.y+bounds.y/full.sy,width:bounds.width,height:bounds.height,sx:full.sx,sy:full.sy},root=frame.rootTransform??new AffineTransform();
+   const compose=async(input:FloatSourceWindow):Promise<Float32Array<ArrayBuffer>>=>{
+    check();const bounds=validateWindow(input),full:RenderSpace={x:0,y:0,width:document.width,height:document.height,sx:1,sy:1},space:RenderSpace={x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height,sx:1,sy:1},root=new AffineTransform();
     const mask=async(layer:LayerData,world:AffineTransform)=>{
      if(!layer.mask?.enabled||layer.mask.density===0)return undefined;check();const result=await maskService(layer.mask,space,maskTransform(layer.mask,world),check);check();if(!(result instanceof Float32Array)||result.length!==bounds.width*bounds.height)throw new Error('Float mask coverage differs from its working window.');for(const value of result)if(!Number.isFinite(value)||value<0||value>1)throw new Error('Float mask coverage is invalid.');return result;
     };
@@ -133,6 +133,22 @@ export class FloatSceneRenderer {
      check();return backdrop;
     };
     const output=await paint(document.children,new Float32Array(bounds.width*bounds.height*4),root);check();validateFloatWorkerWindow(output);return output as Float32Array<ArrayBuffer>;
+   };
+   const nativeRead=async(input:FloatSourceWindow):Promise<Float32Array<ArrayBuffer>>=>{
+    check();const bounds=validateWindow(input);
+    if(bounds.width<=2048&&bounds.height<=2048)return compose(bounds);
+    // Wide/tall valid windows must not become a single coverage canvas. These
+    // are allocation tiles, independent of original/artboard dimensions.
+    const output=new Float32Array(bounds.width*bounds.height*4);
+    for(let y=0;y<bounds.height;y+=128)for(let x=0;x<bounds.width;x+=2048){
+     check();const width=Math.min(2048,bounds.width-x),height=Math.min(128,bounds.height-y),pixels=await compose({x:bounds.x+x,y:bounds.y+y,width,height});check();
+     for(let row=0;row<height;row++)output.set(pixels.subarray(row*width*4,(row+1)*width*4),((y+row)*bounds.width+x)*4);
+    }
+    check();return output;
+   };
+   const nativeSource:FloatWindowSource={width:document.width,height:document.height,readWindow:nativeRead};
+   return{document,signal:abort.signal,check,dispose,read:async(bounds,frame)=>{
+    check();return frame?projectFloatFrame(nativeSource,bounds,frame,{signal:abort.signal,isCancelled:()=>{check();return false;}}):nativeRead(bounds);
    }};
   }catch(error){dispose();throw error;}
  }

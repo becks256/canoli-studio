@@ -1,3 +1,4 @@
+import{isFloatDocument}from'../core/float-document';
 import type { DocumentData } from "../core/model";
 import type { DocumentRenderer } from "./renderer";
 import{freeze,isImmutable}from'../core/immutable';
@@ -44,6 +45,8 @@ export function fittedRenderer(
         cache: false,
         readback: true,
       });
+      // Float frames already filter and cover the clipped native artboard once.
+      if(isFloatDocument(source))return canvas;
       // Contain margins must not reveal layers extending beyond the source artboard.
       const px = canvas.width / tile.width,
         py = canvas.height / tile.height;

@@ -4,6 +4,20 @@
 
 core/float-document gates scene structure and asset roles. engine/float-asset admits originals with bounded display-only thumbnails; float-scene captures original and coverage-source leases, uses float-projection and native float operations, applies each authored erasure through float-coverage before intrinsic clipping shape, runs continuous Curves/Levels through the owned native transfer worker, and converts only final display/output samples. float-delivery/float-tiff own profile-aware file sessions. Model/OO/shared command schema 49, independent source caches and existing host/isolated boundaries remain separate. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Native-first float frame sampling
+
+`engine/float-scene` resolves the captured scene on native world pixels;
+`engine/float-frame` projects the completed finite artboard with the existing
+premultiplied float sampler. Frame geometry is captured before awaits. Native
+world reads retain outside artwork, while framed reads clip the artboard and
+cover its transformed boundary once. Aligned grids preserve exact native words;
+nonaligned transparent samples canonicalize RGB. Coverage allocations split wide
+or tall work without limiting source/document geometry. Fitted float file reads
+already used native-first sampling; fitted canvas previews now share that order
+and skip the byte path's extra margin clear. Source leases, cancellation, native
+ICC display, OO commands and separate headless REST remain authoritative.
+See [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md) for the current contract and limits.
+
 ## Owned float source storage dependency
 
 Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.

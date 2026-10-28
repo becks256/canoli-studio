@@ -6732,3 +6732,102 @@ headless REST source admission remain authoritative. No new document/container
 schema, public mutation API, isolated privilege, paid call, account, upload,
 browser/REST synchronization or arbitrary original-resolution cap was added.
 The complete original roadmap goal remains active.
+
+
+### 2026-10-27 — Native-first float preview sampling (verified increment)
+
+Owner: implementation agent; F10/F14. Starting from `37cbf8d`, this increment
+addresses the separate native-scene frame parity gate recorded above. The full
+original roadmap objective remains active, including unfinished T23/T24 live
+acceptance and the other precision, photographic, interchange and performance
+gates. It does not redefine the objective around this rendering increment.
+
+A real-browser nonlinear Curves probe reproduced 7,057 differing float words at
+50% zoom (maximum linear error 0.1734538674), and 112,431 at 200% (0.1797043681).
+The old frame path composed adjustments on the output lattice. The corrected
+path resolves all effects, masks, clipping and groups at native document pixels
+before filtering the completed artboard. Both probe frames now match exactly.
+Independent scalar-f64 references cover three scenes and seven frames each:
+native, padded, half, double, shear, quarter-turn and reflection. Nonexact affine
+numerical bounds were declared before execution (RGB 2^-20, alpha 2^-22); exact
+frames additionally require full raw-word SHA identity. All frame partitions must
+match exactly. The first four source browser checks and four focused unit checks
+pass; complete unit/build/source/production/50 MP acceptance is pending.
+
+Native world reads still include off-artboard layers. Framed reads use a finite
+native artboard, clamped border taps and one analytic coverage pass. Aligned
+samples preserve hidden transparent RGB exactly; filtered transparent samples
+canonicalize RGB. Frame geometry and source identity stay pinned across awaits.
+Wide/tall reads split coverage allocations without limiting original geometry.
+Fitted float **file delivery already used native-first composition**; the earlier
+broad fitted-frame caveat applies to its canvas preview. That preview now avoids
+a second fractional contain-border clear. No native kernel, codec, public
+mutation API, schema or source admission contract changes in this increment.
+
+The ordinary UI zoom check verifies the actual canvas backing pixels at 50%,
+100% and 200%, plus unchanged authored state and exact original-bearing reopening.
+The existing viewport policy caps backing scale at native resolution: at 200%,
+its 130×78 backing canvas is magnified by CSS. This does not claim float-space
+filtering of the final browser/CSS magnification, HDR display, area-filtered
+minification, sustained 60fps or bounded whole-process peak memory. The separate
+explicit 200% frame test verifies the internal float output lattice itself.
+
+Full unit acceptance now passes 2,707 tests across 281 files, and `npm run build`
+passes with 40 developer documentation pages. The frozen 2,261 source identities
+and all 142 release resources are unchanged. Full source acceptance passes all
+93 focused browser cases with no skips, retries, flaky or unexpected results.
+The independent 21-frame check has zero RGB error, maximum alpha difference
+2.9802322387695312e-8 (four nonidentical words in nonexact shear cases), exact
+raw identities for every declared exact frame, and zero partition differences.
+Ordinary UI backing pixels at 50%/100%/200%, fitted fractional contain preview,
+and native-world versus framed artboard boundaries pass. Both original-bearing
+50 MP source workflows and complete production acceptance remain in progress.
+
+Both genuine 50 MP original-source workflows now pass within their unchanged
+600-second per-case budget: float32 original 345,427 ms and uint16 original
+441,489 ms. Each retains 10,000×5,000 geometry, complete original-byte identity,
+workspace restoration and exact Undo/Redo. All four float32/uint16 TIFF files
+match every 200,000,000 channel values independently with zero error/differing
+words and exact embedded profiles. Their complete file and raw sample hashes
+also match the preceding `37cbf8d` acceptance, confirming unchanged native file
+delivery for these scenes. These are end-to-end acceptance durations, not a
+controlled latency, sustained-frame-rate or peak-memory benchmark. Complete
+production acceptance is running against the same frozen release.
+
+Complete production acceptance passes all 170 cases without developer globals,
+including ordinary zoom controls at 50%/100%/200%, native-first display reference
+identity, unchanged authored state and exact original-bearing reopening. The
+existing Curves/Levels, erasure, clipping, tone, source-lifetime and delivery
+workflows also pass. Combined final browser acceptance is 95 distinct source
+cases (93 focused plus both genuine 50 MP originals) and 170 production cases.
+All accepted runs have no skips, retries, flaky or unexpected results. Earlier
+baseline-mismatch, test-locator and type-check failures are retained as separate
+diagnostics; they are not accepted results.
+
+The final audit checks all 2,261 frozen source identities and all 142 release
+resources. No runtime, test, reference, guide or release correction occurred
+after freezing. Four tracked ICC/RAW/AVIF/lens binaries and the rebuilt pixels
+WASM remain byte-identical to the baseline; pixels SHA-256 is
+`a1f55fcf95aa552d6e2c0a231d4ea57cceed971e2073a17b4ad285d9f549a8b3`.
+The separate roadmap observations remain outside the frozen inputs.
+
+[Sealed native-first frame evidence](benchmarks/float-frame-2026-10-27.zip)
+retains the complete changed-source overlay against `37cbf8d`, complete final
+release, all independent affine references and their native-scene inputs,
+native CMM/profile/reader tools, original input/reference samples, all four
+complete 50 MP TIFF outputs, UI/recipe projects and files, screenshots, successful
+and diagnostic reports and verification tools. The version-2 manifest verifies
+every payload and reconstructed file, retaining full TIFF bytes through shared
+content-addressed chunks. Staged and committed source/archive identities are
+checked against this sealed result.
+
+This closes native-first frame parity for the current premultiplied bilinear
+sampler and supported float scene subset. It does not complete F04/F10/F14 or
+the full roadmap. Other float tools, layers, adjustments, blends, styles and
+working spaces, area-filtered minification, HDR/proof/CMYK, broader interchange,
+photographic/physical/device quality, peak process memory and sustained all-tool
+performance remain required. Existing OO/shared commands/history, inert plugin
+grants and separate PNG-only headless REST source admission remain authoritative.
+No schema, public mutation API, isolated privilege, paid operation, account,
+upload, browser/REST synchronization or arbitrary original-resolution cap is
+added. The complete original roadmap goal remains active.

@@ -1,0 +1,2343 @@
+{
+  "generatorSha256": "a5babd43d3acd50a29f7806ecdca79bdd2450a13afed6efffb444bf45f78321a",
+  "nativeSources": [
+    {
+      "path": "tests/fixtures/float-transfer/scene-ordinary.f32le.gz",
+      "sha256": "4d1f17107f56a18f02bfc01155f42ab1ee5227194662bc0571940507b3ac0e50",
+      "rawSha256": "ab37bc568123eac9f3563a6af75d67f0246e1a2b69498b3069f6fb27cef4790c"
+    },
+    {
+      "path": "tests/fixtures/float-transfer/scene-clipped.f32le.gz",
+      "sha256": "a457951f98288902c71c9d11b50cdea22a443ac21f77e4c364810cc7bd3218ff",
+      "rawSha256": "54d9d280fba6846a8a8becdaf17a2149c391858580365d456cc740fcc5b2757d"
+    },
+    {
+      "path": "tests/fixtures/float-transfer/scene-groups.f32le.gz",
+      "sha256": "2fbe0d518827da2068f908085a8054dafc61f1efb92b91a48808fa0526477ef2",
+      "rawSha256": "0f58af5157ce8f0d135b81804257527ed6ffd3a2dc72ba3698fbd8eb13434a94"
+    }
+  ],
+  "cases": [
+    {
+      "scene": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "native",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 131,
+          "height": 79
+        },
+        "width": 131,
+        "height": 79,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "ordinary-native.f32le.gz",
+      "rawSha256": "ab37bc568123eac9f3563a6af75d67f0246e1a2b69498b3069f6fb27cef4790c"
+    },
+    {
+      "scene": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "padded",
+        "region": {
+          "x": -3,
+          "y": -2,
+          "width": 138,
+          "height": 86
+        },
+        "width": 138,
+        "height": 86,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "ordinary-padded.f32le.gz",
+      "rawSha256": "35b5a35d7dc1618e31a2b47a02d579fde8a88d1ddbd7def6a55e44074f44c15d"
+    },
+    {
+      "scene": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "half",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 130,
+          "height": 78
+        },
+        "width": 65,
+        "height": 39,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "ordinary-half.f32le.gz",
+      "rawSha256": "58c10bf3deca044286d8f5cb32ba68e644f64fc1c3bfcfb99a8e676f400d7a96"
+    },
+    {
+      "scene": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "double",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 131,
+          "height": 79
+        },
+        "width": 262,
+        "height": 158,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "ordinary-double.f32le.gz",
+      "rawSha256": "d760c757dd751d13227023baca8f4dda3897905f2e22b7c39bf74a859646302c"
+    },
+    {
+      "scene": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "shear",
+        "region": {
+          "x": -5.5,
+          "y": -7.25,
+          "width": 150,
+          "height": 110
+        },
+        "width": 150,
+        "height": 110,
+        "root": [
+          0.75,
+          0.25,
+          -0.25,
+          1,
+          4.25,
+          -3.5
+        ],
+        "exact": false
+      },
+      "reference": "ordinary-shear.f32le.gz",
+      "rawSha256": "0977ed391916b143d19fda64034f051d85a7cb731b92455fcdb913c9c6267a2a"
+    },
+    {
+      "scene": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "quarter-turn",
+        "region": {
+          "x": -2,
+          "y": -3,
+          "width": 100,
+          "height": 140
+        },
+        "width": 100,
+        "height": 140,
+        "root": [
+          0,
+          1,
+          -1,
+          0,
+          90.25,
+          -2.5
+        ],
+        "exact": true
+      },
+      "reference": "ordinary-quarter-turn.f32le.gz",
+      "rawSha256": "11012314dea2c94c3b719acd89a6e20e829b27800b416cf50362c6b6336401b5"
+    },
+    {
+      "scene": "ordinary",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 48
+              },
+              {
+                "x": 128,
+                "y": 168
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ],
+            "red": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 120,
+                "y": 160
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ]
+          },
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 12,
+              "inputWhite": 244,
+              "gamma": 0.85,
+              "outputBlack": 4,
+              "outputWhite": 251
+            },
+            "red": {
+              "inputBlack": 5,
+              "inputWhite": 250,
+              "gamma": 1.75,
+              "outputBlack": 240,
+              "outputWhite": 8
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "reflected",
+        "region": {
+          "x": -3.25,
+          "y": -4.5,
+          "width": 150,
+          "height": 90
+        },
+        "width": 150,
+        "height": 90,
+        "root": [
+          -1,
+          0,
+          0,
+          0.75,
+          135.5,
+          2.25
+        ],
+        "exact": true
+      },
+      "reference": "ordinary-reflected.f32le.gz",
+      "rawSha256": "55de3446c4b5972e918536fe21bb3a9d7594fbdfe107a0c20fc9c18bcd785411"
+    },
+    {
+      "scene": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "native",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 131,
+          "height": 79
+        },
+        "width": 131,
+        "height": 79,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "clipped-native.f32le.gz",
+      "rawSha256": "54d9d280fba6846a8a8becdaf17a2149c391858580365d456cc740fcc5b2757d"
+    },
+    {
+      "scene": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "padded",
+        "region": {
+          "x": -3,
+          "y": -2,
+          "width": 138,
+          "height": 86
+        },
+        "width": 138,
+        "height": 86,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "clipped-padded.f32le.gz",
+      "rawSha256": "43f288c4e532fc06710b6423517ee9551fbde5346786508e692b835a056602f3"
+    },
+    {
+      "scene": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "half",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 130,
+          "height": 78
+        },
+        "width": 65,
+        "height": 39,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "clipped-half.f32le.gz",
+      "rawSha256": "d389427c07881250d58b68e10db8965f10808fa10bcc9bbe40e2d40f6266190a"
+    },
+    {
+      "scene": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "double",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 131,
+          "height": 79
+        },
+        "width": 262,
+        "height": 158,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "clipped-double.f32le.gz",
+      "rawSha256": "0b5de93a001d0a5c650fd2afcdb40cf516fb2795c4c22910f9e0f1afb123c18c"
+    },
+    {
+      "scene": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "shear",
+        "region": {
+          "x": -5.5,
+          "y": -7.25,
+          "width": 150,
+          "height": 110
+        },
+        "width": 150,
+        "height": 110,
+        "root": [
+          0.75,
+          0.25,
+          -0.25,
+          1,
+          4.25,
+          -3.5
+        ],
+        "exact": false
+      },
+      "reference": "clipped-shear.f32le.gz",
+      "rawSha256": "0bb3853270d1805d4770f5b16cae4e83ae4e14fbf449b0b34f10b8713cce4797"
+    },
+    {
+      "scene": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "quarter-turn",
+        "region": {
+          "x": -2,
+          "y": -3,
+          "width": 100,
+          "height": 140
+        },
+        "width": 100,
+        "height": 140,
+        "root": [
+          0,
+          1,
+          -1,
+          0,
+          90.25,
+          -2.5
+        ],
+        "exact": true
+      },
+      "reference": "clipped-quarter-turn.f32le.gz",
+      "rawSha256": "be2b35152bcd3a5e722a189f4f85ae033932aeab35eda1ed907fa9cc50d06c06"
+    },
+    {
+      "scene": "clipped",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              5,
+              3,
+              115,
+              65
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "clipped": true,
+          "fillOpacity": 0.7,
+          "opacity": 0.625,
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 16
+              },
+              {
+                "x": 40,
+                "y": 210
+              },
+              {
+                "x": 90,
+                "y": 30
+              },
+              {
+                "x": 130,
+                "y": 200
+              },
+              {
+                "x": 180,
+                "y": 200
+              },
+              {
+                "x": 255,
+                "y": 224
+              }
+            ],
+            "blue": [
+              {
+                "x": 10,
+                "y": 30
+              },
+              {
+                "x": 240,
+                "y": 215
+              }
+            ]
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "opacity": 0.5,
+          "tones": [
+            {
+              "exposure": -1
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.4,
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 1,
+              "outputBlack": 0,
+              "outputWhite": 255
+            },
+            "blue": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 2.2,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "frame": {
+        "name": "reflected",
+        "region": {
+          "x": -3.25,
+          "y": -4.5,
+          "width": 150,
+          "height": 90
+        },
+        "width": 150,
+        "height": 90,
+        "root": [
+          -1,
+          0,
+          0,
+          0.75,
+          135.5,
+          2.25
+        ],
+        "exact": true
+      },
+      "reference": "clipped-reflected.f32le.gz",
+      "rawSha256": "1a7ddfa70e2238b38b523715a5fe80f6ce3a47c18d9cf56513f0682ae272f7d4"
+    },
+    {
+      "scene": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frame": {
+        "name": "native",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 131,
+          "height": 79
+        },
+        "width": 131,
+        "height": 79,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "groups-native.f32le.gz",
+      "rawSha256": "0f58af5157ce8f0d135b81804257527ed6ffd3a2dc72ba3698fbd8eb13434a94"
+    },
+    {
+      "scene": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frame": {
+        "name": "padded",
+        "region": {
+          "x": -3,
+          "y": -2,
+          "width": 138,
+          "height": 86
+        },
+        "width": 138,
+        "height": 86,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "groups-padded.f32le.gz",
+      "rawSha256": "f3d31ba3841f20815bb3aaaa090b6194c5cec46fe50e7448624421251202404c"
+    },
+    {
+      "scene": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frame": {
+        "name": "half",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 130,
+          "height": 78
+        },
+        "width": 65,
+        "height": 39,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "groups-half.f32le.gz",
+      "rawSha256": "c92cba55a21558c0330c9e60be884732f49d6b261d63daacd40d978513ea1636"
+    },
+    {
+      "scene": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frame": {
+        "name": "double",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 131,
+          "height": 79
+        },
+        "width": 262,
+        "height": 158,
+        "root": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "exact": true
+      },
+      "reference": "groups-double.f32le.gz",
+      "rawSha256": "c504fe5afddbef5bd114bb2961ccb49c825e85972e7890ad8b3613f64c295cee"
+    },
+    {
+      "scene": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frame": {
+        "name": "shear",
+        "region": {
+          "x": -5.5,
+          "y": -7.25,
+          "width": 150,
+          "height": 110
+        },
+        "width": 150,
+        "height": 110,
+        "root": [
+          0.75,
+          0.25,
+          -0.25,
+          1,
+          4.25,
+          -3.5
+        ],
+        "exact": false
+      },
+      "reference": "groups-shear.f32le.gz",
+      "rawSha256": "c878994c0648176ad1a76f42211820b6c1ae560fea5731934bf8a8788e8d2aa3"
+    },
+    {
+      "scene": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frame": {
+        "name": "quarter-turn",
+        "region": {
+          "x": -2,
+          "y": -3,
+          "width": 100,
+          "height": 140
+        },
+        "width": 100,
+        "height": 140,
+        "root": [
+          0,
+          1,
+          -1,
+          0,
+          90.25,
+          -2.5
+        ],
+        "exact": true
+      },
+      "reference": "groups-quarter-turn.f32le.gz",
+      "rawSha256": "f39324020e418f08ac6a690d76134b0ca6109edb0147a49af9c0970c9285e50b"
+    },
+    {
+      "scene": "groups",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              8,
+              5,
+              110,
+              65
+            ],
+            "density": 0.7
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "curves",
+                "rgb": [
+                  {
+                    "x": 16,
+                    "y": 40
+                  },
+                  {
+                    "x": 240,
+                    "y": 220
+                  }
+                ],
+                "green": [
+                  {
+                    "x": 0,
+                    "y": 255
+                  },
+                  {
+                    "x": 255,
+                    "y": 0
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "group",
+              "blendMode": "pass-through",
+              "opacity": 0.5,
+              "children": [
+                {
+                  "kind": "adjustment",
+                  "opacity": 0.75,
+                  "adjustment": {
+                    "kind": "levels",
+                    "rgb": {
+                      "inputBlack": 12,
+                      "inputWhite": 244,
+                      "gamma": 0.85,
+                      "outputBlack": 4,
+                      "outputWhite": 251
+                    },
+                    "red": {
+                      "inputBlack": 5,
+                      "inputWhite": 250,
+                      "gamma": 1.75,
+                      "outputBlack": 240,
+                      "outputWhite": 8
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "frame": {
+        "name": "reflected",
+        "region": {
+          "x": -3.25,
+          "y": -4.5,
+          "width": 150,
+          "height": 90
+        },
+        "width": 150,
+        "height": 90,
+        "root": [
+          -1,
+          0,
+          0,
+          0.75,
+          135.5,
+          2.25
+        ],
+        "exact": true
+      },
+      "reference": "groups-reflected.f32le.gz",
+      "rawSha256": "8ad5ed96c31ad18a76c92ba8f4fa56ac65ec18de48edc5c9943d7da9769e8d65"
+    }
+  ],
+  "files": {
+    "ordinary-native.f32le.gz": {
+      "bytes": 101027,
+      "sha256": "4d1f17107f56a18f02bfc01155f42ab1ee5227194662bc0571940507b3ac0e50",
+      "rawSha256": "ab37bc568123eac9f3563a6af75d67f0246e1a2b69498b3069f6fb27cef4790c"
+    },
+    "ordinary-padded.f32le.gz": {
+      "bytes": 101481,
+      "sha256": "93a848fc699d35e12f26f61fd72423af79d9e7aaa94ac13c240abb65820e68cf",
+      "rawSha256": "35b5a35d7dc1618e31a2b47a02d579fde8a88d1ddbd7def6a55e44074f44c15d"
+    },
+    "ordinary-half.f32le.gz": {
+      "bytes": 30745,
+      "sha256": "5f3dcd112023b2c2932ac42681b6d7927e878bec92fae89d5eba214135ab8fbd",
+      "rawSha256": "58c10bf3deca044286d8f5cb32ba68e644f64fc1c3bfcfb99a8e676f400d7a96"
+    },
+    "ordinary-double.f32le.gz": {
+      "bytes": 484312,
+      "sha256": "66b83db9e1fc8ad581b870c6d04721e171a5270dd9bb849b0d67b7ec7b36379e",
+      "rawSha256": "d760c757dd751d13227023baca8f4dda3897905f2e22b7c39bf74a859646302c"
+    },
+    "ordinary-shear.f32le.gz": {
+      "bytes": 106367,
+      "sha256": "b206c5d7c4a4f06273798e00f442327a99a6d1d624899824c06131614e36c57f",
+      "rawSha256": "0977ed391916b143d19fda64034f051d85a7cb731b92455fcdb913c9c6267a2a"
+    },
+    "ordinary-quarter-turn.f32le.gz": {
+      "bytes": 129756,
+      "sha256": "cc9f5735c5281ba3644cee1700480a91e9ffdda47096b60084323e7e189c2660",
+      "rawSha256": "11012314dea2c94c3b719acd89a6e20e829b27800b416cf50362c6b6336401b5"
+    },
+    "ordinary-reflected.f32le.gz": {
+      "bytes": 96831,
+      "sha256": "180b8974cebde84ff2248752511d80ed453e31ab2f6c26352cc027fce61e0b88",
+      "rawSha256": "55de3446c4b5972e918536fe21bb3a9d7594fbdfe107a0c20fc9c18bcd785411"
+    },
+    "clipped-native.f32le.gz": {
+      "bytes": 72206,
+      "sha256": "a457951f98288902c71c9d11b50cdea22a443ac21f77e4c364810cc7bd3218ff",
+      "rawSha256": "54d9d280fba6846a8a8becdaf17a2149c391858580365d456cc740fcc5b2757d"
+    },
+    "clipped-padded.f32le.gz": {
+      "bytes": 72519,
+      "sha256": "3fc5fcc0b763bf2cc8049397ddc6b74de4e52196e6b46b5ff67811633b300798",
+      "rawSha256": "43f288c4e532fc06710b6423517ee9551fbde5346786508e692b835a056602f3"
+    },
+    "clipped-half.f32le.gz": {
+      "bytes": 23222,
+      "sha256": "411a6de2767a25b9c3ae95c9222a3ea89c5e33c959fae82ccb4bda9a760be1d2",
+      "rawSha256": "d389427c07881250d58b68e10db8965f10808fa10bcc9bbe40e2d40f6266190a"
+    },
+    "clipped-double.f32le.gz": {
+      "bytes": 350910,
+      "sha256": "864de8bc84c53da03bcf33cd17c9027b5aca429e4ca725ec208c23db0fd5650c",
+      "rawSha256": "0b5de93a001d0a5c650fd2afcdb40cf516fb2795c4c22910f9e0f1afb123c18c"
+    },
+    "clipped-shear.f32le.gz": {
+      "bytes": 78893,
+      "sha256": "2d023754e49e78c113cbd9197de0e43f953f7a6332ab270c4b0f2295ad1fa545",
+      "rawSha256": "0bb3853270d1805d4770f5b16cae4e83ae4e14fbf449b0b34f10b8713cce4797"
+    },
+    "clipped-quarter-turn.f32le.gz": {
+      "bytes": 93337,
+      "sha256": "6f6acbb598dc17659ccf5b1ddc489e83cfa7c5e0094757e7aabd66e3a29df48f",
+      "rawSha256": "be2b35152bcd3a5e722a189f4f85ae033932aeab35eda1ed907fa9cc50d06c06"
+    },
+    "clipped-reflected.f32le.gz": {
+      "bytes": 69375,
+      "sha256": "c055f22de1e41c313eb4565775a485caf91c3a42eabacc042b424d451f8ea5fb",
+      "rawSha256": "1a7ddfa70e2238b38b523715a5fe80f6ce3a47c18d9cf56513f0682ae272f7d4"
+    },
+    "groups-native.f32le.gz": {
+      "bytes": 99048,
+      "sha256": "2fbe0d518827da2068f908085a8054dafc61f1efb92b91a48808fa0526477ef2",
+      "rawSha256": "0f58af5157ce8f0d135b81804257527ed6ffd3a2dc72ba3698fbd8eb13434a94"
+    },
+    "groups-padded.f32le.gz": {
+      "bytes": 99492,
+      "sha256": "6c64c70a7dcd539af3c7e11810da45f34edc0242c4a2dc55038572678d3f6a02",
+      "rawSha256": "f3d31ba3841f20815bb3aaaa090b6194c5cec46fe50e7448624421251202404c"
+    },
+    "groups-half.f32le.gz": {
+      "bytes": 30224,
+      "sha256": "6c63738caee2c619999f62ea9d9bec28b5cf67a5693aeb1aec0ecebf43b7d0c5",
+      "rawSha256": "c92cba55a21558c0330c9e60be884732f49d6b261d63daacd40d978513ea1636"
+    },
+    "groups-double.f32le.gz": {
+      "bytes": 477818,
+      "sha256": "6f342bb71b4c8db67191901d785b8da3385f272330ff990647fa1dffaa1b872d",
+      "rawSha256": "c504fe5afddbef5bd114bb2961ccb49c825e85972e7890ad8b3613f64c295cee"
+    },
+    "groups-shear.f32le.gz": {
+      "bytes": 105679,
+      "sha256": "2baaf9c1adf532425234a0385d4d76ec2f316b34171635ff28c435d5b03536a3",
+      "rawSha256": "c878994c0648176ad1a76f42211820b6c1ae560fea5731934bf8a8788e8d2aa3"
+    },
+    "groups-quarter-turn.f32le.gz": {
+      "bytes": 127400,
+      "sha256": "dcc12b653f0b648753ff3a94b482fd050d6d02767746fb30b17c894dd39bbefa",
+      "rawSha256": "f39324020e418f08ac6a690d76134b0ca6109edb0147a49af9c0970c9285e50b"
+    },
+    "groups-reflected.f32le.gz": {
+      "bytes": 95385,
+      "sha256": "6056d079408ca718f130e1418b5e001a9bc50f01b0c5e334112fff5a7053b61e",
+      "rawSha256": "8ad5ed96c31ad18a76c92ba8f4fa56ac65ec18de48edc5c9943d7da9769e8d65"
+    }
+  },
+  "colorTolerance": 9.5367431640625e-07,
+  "alphaTolerance": 2.384185791015625e-07
+}

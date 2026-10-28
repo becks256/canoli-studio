@@ -315,6 +315,24 @@ checks original ownership again after its last pixel read and final compression.
 The renderer retains at most 64 original
 source leases, with no full decoded color plane or bitmap ownership in that LRU.
 
+Viewport and explicit float frame reads now filter the completed native artboard.
+Raster effects, erasures, masks, adjustment layers, clipping and groups resolve
+on native document pixels before final frame resampling. Nonlinear Curves/Levels
+therefore have the same native-first interpretation at different zoom levels.
+A frame excludes off-artboard content, clamps native border taps, then applies
+transformed artboard coverage once. Integer-aligned frames copy native words
+exactly, including hidden transparent RGB inside the artboard; filtered fully
+transparent samples have zero RGB. Reading a captured scene without a frame
+retains the native world plane, including off-artboard layers. These are internal
+renderer reads, with no new isolated scripting or REST pixel surface.
+
+Fitted float file delivery already sampled the completed native artboard; its
+contract remains. Fitted canvas previews now use that same order and avoid a
+second fractional contain-margin clear. Arbitrary affine frame geometry is
+captured before asynchronous reads, and partitioning a frame preserves samples.
+Wide/tall native reads split coverage work into bounded tiles, independently of
+original or artboard geometry. No original-resolution limit is introduced.
+
 Projection uses float64 geometry and premultiplied bilinear filtering with
 analytic transformed-rectangle coverage, rounding output to float32. Output
 windows and adaptive source ROIs are bounded to 262,144 pixels; this is a working
