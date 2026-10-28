@@ -12,8 +12,20 @@ const responseSchema=z.discriminatedUnion('kind',[
 type Response=z.infer<typeof responseSchema>;
 // At most two live native owners: e.g. one viewport proof and one file export.
 // Queued operations retain immutable profile Blobs, not decoded pixel planes.
-let active=0;const waiting:{start():void}[]=[];
-const pump=()=>{while(active<2&&waiting.length)waiting.shift()!.start();};
+let active=0,pumping=false;const waiting:{start():void}[]=[],idleOwners=new Set<()=>void>();
+const pump=()=>{
+ if(pumping)return;pumping=true;
+ try{while(waiting.length){
+  if(active<2){waiting.shift()!.start();continue;}
+  const retire=idleOwners.values().next().value;if(!retire)break;
+  idleOwners.delete(retire);retire();
+ }}finally{pumping=false;}
+};
+/** Private host cooperation: idle sessions still count against the two-owner
+ * ceiling and retire before they can block queued source/profile work. */
+export function registerIdleIccOwner(retire:()=>void):()=>void{
+ idleOwners.add(retire);pump();return()=>{idleOwners.delete(retire);};
+}
 export function acquireIccOwner(signal?:AbortSignal):Promise<()=>void>{
  signal?.throwIfAborted();return new Promise((resolve,reject)=>{
   const cancel=()=>{const at=waiting.indexOf(entry);if(at>=0)waiting.splice(at,1);signal?.removeEventListener('abort',cancel);reject(signal?.reason??new DOMException('ICC operation cancelled','AbortError'));pump();};
@@ -24,6 +36,7 @@ export function acquireIccOwner(signal?:AbortSignal):Promise<()=>void>{
 /** Private host-owned transform lifetime; never an isolated script/plugin service. */
 export class IccSession{
  private closed=false;
+ get isClosed(){return this.closed;}
  private serial=0;
  private rgb?:IccRgbPreparation['settings'];
  private pending?:{id:number;kind:'report'|'prepared'|'rgb-prepared'|'pixels';length?:number;format?:IccSampleFormat;resolve:(value:Response)=>void;reject:(error:unknown)=>void};

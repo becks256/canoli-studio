@@ -7532,3 +7532,81 @@ photographic/interchange quality, physical GPU/display/tablet/device behavior,
 global memory, AI/provider/evaluation, live installed ChatGPT/identity,
 collaboration, specialist and commercial gates remain required. The full
 original implementation roadmap objective stays active and unfinished.
+
+
+### 2026-10-28 — Float preview transport and bounded-work follow-up (bounded increment)
+
+Owner: implementation agent; estimate XL within T01/F14, beginning at clean
+`ea1fa4a`. The previous turn made verified progress: Pen viewport presentation,
+retained controls, exact compiled pixels, broader performance inventory and
+sealed evidence are committed. The complete original roadmap remains active.
+
+The current sweep identifies 200–240 ms float LUT/Gradient Map copy p95 even
+for a 256-square frame. Profile actual worker/source/color stages before changing
+work partitions. Preserve original/native float samples, actual ICC conversion,
+complete effects-before-frame filtering, source and capture lifetimes,
+cancellation, worker-result validation, existing per-window allocation budgets,
+shared OO/Undo and separate extension surfaces. A smaller proxy or a bypassed
+color transform does not satisfy this work. Measure paired actual controls and
+independent pixels, then verify transformed/masked/interchange and large-image
+behavior where affected. Full all-tool/device/global-memory and every other
+unfinished roadmap gate remain required.
+
+
+### 2026-10-28 — Accepted bounded native float display reuse; full F14 remains open
+
+The final implementation retains the existing 65,536-output-pixel and 2,048-axis
+working bounds while reducing narrow display-window transactions. One idle
+prepared native linear-sRGB-to-sRGB transform may survive between previews in
+the same host realm. It still counts in the shared two-owner queue and retires
+when queued source/profile work needs the slot. Exclusive leases detach caller
+abort/progress state, retain no renderer/scene/source owner, preserve strict
+native result IDs/types/geometry, and retire after failure/cancellation/pending
+work or large scratch. Renderer clear/disposal retires its idle state; explicit
+ICC-session disposal still terminates immediately. Actual native conversion,
+complete effects-before-frame order, originals, commands, Undo, schema, file
+contracts and isolated/REST boundaries remain authoritative.
+
+All 2,871 tests in 286 unit files, the normal production build, 31 native browser
+cases, 175 normal-production cases, 77 performance guards, 12 compiled pixel
+comparisons and three alternating control pairs pass. Accepted phases have no
+skips, retries, flaky outcomes or unexpected failures. The fresh 142-file baseline
+is byte-identical to the prior verified ea1fa4a benchmark release, retaining its
+complete 77-case baseline. All 2,992 tested source inputs, 50 generated inputs and
+142 normal-release files remain frozen through production verification. Pixel
+WASM and the four tracked native codec binaries are byte-identical.
+
+Warm paced LUT copy p95 changes from 213.7–219.9 ms to 88.6–100.9 ms across the
+three pairs; Gradient Map changes from 224.6–238.7 ms to 93.3–96.3 ms. The final
+whole-editor sweep records 97.0 / 91.3 ms respectively, with no observed long
+tasks in those control cases. These remain above the 33 ms target; cold/missed/
+evicted contexts, contention, sustained gestures and physical presentation remain
+separate acceptance work. Script snapshot transport still records 356.2 ms,
+font replacement a 197 ms task and spot-heal completion 179.9 ms. Functional
+passes do not accept these broader timing budgets.
+
+An independent native Linux CMM corpus verifies all 16,400 display output bytes
+exactly across reuse and partitions. Real native tests cover source-job eviction,
+two-owner limits, cancellation, callback detachment and renderer clear/retry.
+Both genuine 50 MP gates pass: 200,000,000 independently compared original float
+samples with zero differing words, and all 500 RGB16 conversion-window digests
+with exact alpha. Complete compiled ordinary/clipped/group images across changed
+window boundaries match in all 3,280,284 RGBA channels, independently verified
+from raw arrays and PNGs. No original or requested output is downsampled for this
+acceptance. Sampled process memory remains an observation with oracle/server/
+browser overhead, not a global peak-memory or physical-device budget.
+
+[Measurements and limits](benchmarks/float-display-performance-2026-10-28.md) and
+[sealed evidence](benchmarks/float-display-performance-2026-10-28.zip) retain the
+source/release identities, actual terminals, worker timelines, independent
+references, complete pixels, process samples, failed diagnostic/type/helper
+attempts and verification scripts. Source-development evidence is explicitly
+separate from compiled/normal served-release evidence. Original commits and prior
+sealed artifacts are retained.
+
+This accepts the bounded float-display improvement. Remaining measured slow
+paths, sustained editor-wide/all-tool F14, broader float/HDR/working-space,
+photographic/interchange quality, global memory, physical GPU/display/tablet/
+device, AI/provider/evaluation, live installed ChatGPT/identity, collaboration,
+specialist and commercial gates remain required. The complete original roadmap
+objective remains active and unfinished.

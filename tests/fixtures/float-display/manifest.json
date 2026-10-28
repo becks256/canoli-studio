@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "reference": "Independent Linux Little CMS 2.19.1 direct ctypes API; complete native f32 ramp plus extended/hidden RGB and alpha. No editor/WASM/Canvas expected samples.",
+  "nativeVersion": 2190,
+  "librarySha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6",
+  "generatorSha256": "f40b60c2e422ad7bae897ec3eea80c6925b251fc72af94775a0a7bfeced79071",
+  "inputs": {
+    "tests/fixtures/icc-precision/input-rgba-float32.bin": "be2f29e5c95af8795c0971a08f4d37cff952dd0ee0699924350246cf6934ccbe",
+    "tests/fixtures/icc-precision/extended-float32.bin": "cb2cad2edd3a521a238d6665dd58ceefd7beb80e199c1a3c56e8cab189f94620",
+    "tests/fixtures/icc-native/linear-srgb.icc": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+    "tests/fixtures/icc-native/srgb.icc": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37"
+  },
+  "pixels": 4100,
+  "source": "linear-srgb",
+  "destination": "srgb",
+  "intent": 1,
+  "blackPointCompensation": false,
+  "files": {
+    "native-input.f32le": {
+      "bytes": 65600,
+      "sha256": "1ff4af2d32ee950bd5ef290c6c40b065eabcf709c6f6a0f0e886907360239e32"
+    },
+    "native-display.rgba8": {
+      "bytes": 16400,
+      "sha256": "35b5d7f445f2d1054be8b3f68479453f9af15cd92b1a6c4d10df03d93fc1042a"
+    }
+  },
+  "limits": "Exact RGBA8 native display words; synthetic profiles and one pinned CMM. No physical display, sustained-performance or whole-editor acceptance."
+}

@@ -811,3 +811,21 @@ marks retain their complete original paint order, including coincident handles.
 This reduces invisible browser paint chunks, without a compositor-hint dependency.
 Dated performance, pixel and interaction acceptance belongs in the roadmap;
 this contract alone does not establish sustained 60fps or full F14/device quality.
+
+
+## Float viewport batching and idle native display ownership (F14)
+
+FloatSceneRenderer batches display windows within the existing 65,536-output-pixel
+and 2,048-axis working bounds, then uses complete native scene evaluation before
+frame sampling and native ICC. A private display service retains at most one idle
+prepared linear-sRGB-to-sRGB session across renderers. It remains counted in the
+two-owner native queue and retires synchronously when queued source/profile work
+needs the slot. Queue pumping guards reentrant disposal and preserves FIFO/cancel.
+Active display leases remain exclusive, keep monotonic worker IDs and strict
+owned-output validation, and detach their scene abort/progress callbacks before
+idle retention. Symbols identify renderer ownership without retaining renderer or
+source objects. Errors, cancellation, pending work, large scratch and closed
+sessions cannot enter the idle cache; clear/disposal retires owned idle state.
+IccSession.dispose still terminates immediately. Model, schema, public commands,
+Undo, source resolution, file contracts and isolated/REST grants are unchanged.
+See ICC_ENGINE.md and FLOAT_DOCUMENTS.md for scope and remaining F14 gates.

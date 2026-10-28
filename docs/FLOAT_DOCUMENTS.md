@@ -765,3 +765,22 @@ tetrahedra, so full-strength mapping and selected table endpoints survive
 extreme finite unused inputs/table entries. The reflected transfer preserves
 exact signed unit endpoints. Analytical endpoint regressions supplement the
 independent Colour Science corpus.
+
+## Float viewport work and display ownership (F14)
+
+Viewport display partitions work by the existing 65,536-output-pixel ceiling,
+with each axis at most 2,048 pixels, so small frames avoid repeated narrow-strip
+source/worker transactions. Original samples and complete native effects still
+precede frame filtering and the actual native ICC conversion. These are working
+allocation bounds, not source/document geometry limits; file/native read
+partitioning retains its separate contract.
+
+One idle prepared display transform may be reused across renderers while still
+counting against the shared two-native-owner limit. Queued source/profile work
+retires idle display ownership instead of waiting behind it. Each active lease
+has its own abort/progress scope; release detaches it before idle retention.
+Failed, cancelled, pending, oversized-scratch or closed sessions retire, and
+renderer clear/disposal retires its own idle state. No artwork, original source
+or document capture is retained by the idle transform. Explicit ICC session
+disposal still terminates immediately. Source validation, exact output/window
+validation, shared commands, Undo, plugin grants and separate REST are unchanged.

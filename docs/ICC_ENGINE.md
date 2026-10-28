@@ -186,6 +186,20 @@ RGBA window geometry reject mismatched or stale native messages. Original
 caller pixels remain attached and unchanged. No document command, history,
 asset, schema or plugin permission is introduced by this dependency.
 
+Float viewport display may retain one idle prepared linear-sRGB-to-sRGB session
+across renderers. An idle session still owns one of the same two native slots;
+queued source/profile work can retire it synchronously before starting. Active
+sessions remain exclusive and FIFO admissions retain cancellation. A render
+lease detaches its caller's progress/abort scope before becoming idle, keeps no
+scene/source lease, and preserves the actual native transform and reply sequence.
+Closed/failed/cancelled/busy sessions are never reused. Larger valid windows still
+process, but windows above 65,536 pixels do not retain native scratch in this
+display cache. Renderer clear/disposal retires its idle session. Explicit
+`IccSession.dispose()` continues to terminate immediately; this is private host
+display reuse, not a new isolated grant or a substitute color conversion.
+Dated correctness/performance evidence is recorded in the implementation roadmap.
+Sustained all-tool, physical-device and global-memory F14 gates remain open.
+
 ## Verification and remaining integration
 
 The maintained tests execute the actual checked-in WASM. Twenty-three color-cube

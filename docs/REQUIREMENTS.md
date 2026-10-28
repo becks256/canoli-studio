@@ -1091,3 +1091,16 @@ whole visible pixels, real browser interaction and paired production timings;
 retain slow cases, long tasks and device/process-memory limitations. No source
 geometry cap, model/schema or extension privilege change follows from this UI
 policy. Broader all-tool F14 and the complete roadmap remain required.
+
+
+## Float viewport work (F14)
+
+Reduce measured float-control latency without changing original/native samples,
+scene-before-frame order, actual ICC conversion, per-window allocation budgets,
+commands, Undo or isolation. Idle native display reuse must count against the
+existing two-owner ceiling, yield to queued source/profile work, avoid retaining
+scene/source/caller scopes and reject failed/cancelled/pending/stale output.
+Verify actual controls, independent complete pixels, native queue/cancellation,
+transformed/masked scenes, precise delivery and genuine 50 MP behavior. Keep
+all-tool, sustained, physical-device and global peak-memory gates open until
+measured acceptance proves them.
