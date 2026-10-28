@@ -6833,7 +6833,7 @@ upload, browser/REST synchronization or arbitrary original-resolution cap is
 added. The complete original roadmap goal remains active.
 
 
-### 2026-10-27 — Connected normalized float blend modes (source verified; production report gap)
+### 2026-10-27 — Connected normalized float blend modes (verified; production report gap closed 2026-10-28)
 
 Owner: implementation agent; L within T16/T17/F04/F10. The previous goal turn
 made progress by committing native-first float previews as `e4d3430`. This turn
@@ -6996,3 +6996,49 @@ increment does not complete the original objective. Normalized artistic RGB,
 remaining float tools/layers/working spaces, HDR/CMYK/proof/interchange,
 photographic/physical/device quality, peak memory, sustained editor-wide
 performance and all other unfinished roadmap/live T23/T24 gates remain open.
+
+### 2026-10-28 — Float blend production verification completed
+
+Owner: implementation agent; verification follow-up to `628ef53`. The previous
+goal turn made concrete progress by committing the connected normalized float
+blend increment, with its missing production report explicitly disclosed. The
+user has resumed the complete original roadmap objective.
+
+A fresh complete production run on the unchanged source/generated/release bytes
+passes **all 172 cases**, with zero skips, retries, flaky or unexpected results,
+no suite errors and an observed CLI exit code of zero. Its full 1,506,536-byte
+JSON report is retained. A separately fsynced incremental ledger agrees on all
+172 unique test IDs, expected/passed statuses, zero retries and empty errors,
+and records successful run completion and reporter exit. This is a new run,
+not a reconstruction or relabelling of the lost report. Reports and artifacts
+were written to the filesystem with available space; the earlier gap and
+passing completion marker remain preserved.
+
+The final audit confirms every frozen identity: **2,380 source inputs, 50
+generated files and 142 release resources**, together with all five unchanged
+native binaries. Both ordinary production blend workflows retain all 18 exact
+display/file comparisons, original-bearing Undo/reopening and domain-failure
+recovery. The previous 103 distinct source cases and independent large files
+remain verified against those same bytes. Combined acceptance is now **275
+distinct browser cases**, including three genuine original-bearing 50 MP source
+workflows; the separate 15-case integration pilot is not counted again. The
+previous complete build and 2,732 unit/API tests apply to these unchanged inputs.
+
+[Recovery evidence](benchmarks/float-blend-production-recovery-2026-10-28.zip)
+contains the full fresh report, incremental ledger, observed CLI receipt,
+complete production artifacts, frozen identities, actual generated/release
+files, independent audit and verification tools, and the original report-gap
+records. It binds the preceding complete source/native evidence archive by
+SHA-256. This closes the missing production acceptance for the float blend
+increment; the entire original roadmap remains active and unfinished.
+
+Next selected implementation slice: **native linear float White Balance**, owner
+implementation agent, estimate M within T17/F04/F10. Current inspection confirms
+that shared validation and UI reject it in float documents despite the existing
+Bradford matrix and native float affine dependency. Twenty-four independent
+dependency controls pass with exact alpha and maximum observed scaled RGB error
+`8.4784490542714e-8`, below the preregistered `2^-20` bound. These controls are
+research evidence only. Public float support still requires implementation,
+actual UI/scripts/plugins/REST/recipe/file verification, original preservation,
+native-first ordering and a genuine 50 MP workflow. No paid operation, account,
+upload or source-resolution cap is introduced by this verification follow-up.
