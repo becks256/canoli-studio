@@ -55,6 +55,7 @@ import {ComponentRegistry} from '../core/smart/manager';
 import {findLayer} from '../core/model';
 import {rawDevelopOptionsSchema,parseRawDevelopmentOptions} from '../core/interchange/raw/types';
 import {rawDevelopmentPlanSchema} from '../core/interchange/raw/commands';
+import {freeze}from'../core/immutable';
 
 // Bundled into an isolated worker created by an opaque-origin sandbox iframe.
 // No UI references, credentials, source image bytes, or host globals enter here.
@@ -64,12 +65,18 @@ const pendingHostCalls = new Map<
   { resolve: (value: unknown) => void; reject: (reason: Error) => void }
 >();
 let nextCallId = 1;
+let connection:MessagePort|undefined;
+let started=false;
+function send(message:unknown){
+ if(!connection)throw new Error('Script data channel is unavailable.');
+ connection.postMessage(message);
+}
 
 function callHost(service: string, method: string, ...args: unknown[]) {
   const callId = nextCallId++;
   return new Promise((resolve, reject) => {
     pendingHostCalls.set(callId, { resolve, reject });
-    self.postMessage({
+    send({
       type: "host:call",
       id: callId,
       service,
@@ -79,7 +86,7 @@ function callHost(service: string, method: string, ...args: unknown[]) {
   });
 }
 
-self.onmessage = async (event) => {
+const receive = async (event:MessageEvent) => {
   const message = event.data;
   if (message?.type === "host:call:result") {
     const pending = pendingHostCalls.get(message.id);
@@ -101,6 +108,7 @@ self.onmessage = async (event) => {
   const commands: EditorCommand[] = [];
   const logs: string[] = [];
   try {
+    if(started)throw new Error('Duplicate script input.');started=true;
     const fonts=event.data.fonts??[];
     // Remove the private payload from the event before invoking untrusted code.
     delete event.data.fonts;
@@ -112,7 +120,10 @@ self.onmessage = async (event) => {
       registerFontVariationSource(set,bytes,source.info,()=>{if(faces.some(face=>face.status!=='loaded'||!set.has(face)))throw new Error('An isolated native font changed.');});
     }
     fonts.length=0;
-    const document = Document.fromJSON(event.data.document);
+    // This native structured-clone result belongs exclusively to this fresh
+    // worker. Register deep immutability before normal validated reconstruction;
+    // public fromJSON still defensively copies mutable caller-owned input.
+    const document = Document.fromJSON(freeze(event.data.document));
     document.selectLayers(
       (event.data.selectedIds ?? [])
         .map((id: string) => document.getLayer(id))
@@ -351,7 +362,7 @@ self.onmessage = async (event) => {
       print,
       host,
     );
-    self.postMessage({
+    send({
       type: "result",
       commands,
       selectedId: document.selectedLayer?.id ?? null,
@@ -359,10 +370,18 @@ self.onmessage = async (event) => {
       logs,
     });
   } catch (cause) {
-    self.postMessage({
+    send({
       type: "error",
       error: cause instanceof Error ? cause.message : "Script failed.",
       logs,
     });
   }
+};
+self.onmessage=event=>{
+ if(connection||event.data?.type!=='connect'||event.ports.length!==1)
+  throw new Error('Invalid script startup channel.');
+ connection=event.ports[0];self.onmessage=null;
+ connection.onmessage=receive;
+ connection.onmessageerror=()=>send({type:'error',error:'Unreadable script input.'});
+ connection.start();
 };

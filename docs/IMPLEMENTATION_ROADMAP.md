@@ -7610,3 +7610,76 @@ photographic/interchange quality, global memory, physical GPU/display/tablet/
 device, AI/provider/evaluation, live installed ChatGPT/identity, collaboration,
 specialist and commercial gates remain required. The complete original roadmap
 objective remains active and unfinished.
+
+
+### 2026-10-28 — Script snapshot handoff and owned reconstruction (in progress)
+
+Owner: implementation agent; estimate XL within T01/F14, starting at clean
+`3f96f7a`. The prior float-display increment is verified and committed. The
+complete original professional-editor/AI/workflow roadmap remains active.
+
+The current editor-wide sweep records script snapshot transport at 356.2 ms.
+A frozen-baseline diagnostic separates five actual runs: parent snapshot sends
+cost 19–20 ms, iframe-to-worker sends 54–65 ms, fresh worker initialization
+56–58 ms and full stroke-document reconstruction 119–143 ms. Preserve the fresh
+opaque-origin worker for every run, unchanged CSP and host grants, exact native
+structured-clone snapshot semantics, validation, font-payload isolation, five-second
+and 256-command limits, cancellation, revision/assets and atomic Undo. Test a
+direct transferred data channel with a separate trusted bootstrap/error channel,
+and freeze only the private worker-owned snapshot before normal validated OO
+reconstruction. Public mutable Document.fromJSON must remain defensive. Measure
+actual paired transport and keep all editor-wide/physical/global-memory and
+other unfinished roadmap gates open.
+
+
+### 2026-10-28 — Direct isolated script transport verified (bounded T01/F14)
+
+Owner: implementation agent; estimate XL. Starting at `3f96f7a`, the private
+script data channel now connects directly to each fresh opaque-origin worker;
+a separate trusted bootstrap channel controls startup/errors/stop. This removes
+the iframe's second full snapshot clone. Only the worker-owned native clone
+freezes before ordinary validated OO reconstruction. Public mutable fromJSON
+inputs retain defensive copying. Font payloads, CSP/grants, strict commands,
+starting revisions/assets, five-second/256-command limits, cancellation,
+rollback and atomic Undo retain their contracts. Raw worker-global postMessage
+cannot substitute a result through the bootstrap.
+
+Three alternating 20-sample comparisons record script transport p95 before /
+after of 306.6 / 246.0, 293.6 / 246.2 and 318.5 / 246.7 ms. No main-thread long
+tasks are observed in those script intervals; the observer excludes worker
+execution. The full 77-case/31-file performance sweep passes and records
+240.5 ms script p95, while font replacement still has a 207 ms task and spot-heal
+completion reaches 186.4 ms. These remain unmet performance budgets, not full
+F14 acceptance or a physical-presentation/60fps claim.
+
+All 2,871 unit tests in 286 files, the normal build, the 35-case compiled script/
+plugin/font/RAW integration matrix, all 175 normal-production browser cases and
+six final channel cases pass. A complete 64,000-point snapshot check compares
+192,000 x/y/pressure scalars, signed zero, stroke IDs and remaining fields with
+zero differences. Host ownership/revision, malformed input, fresh globals,
+worker destruction, timeout rollback, clean retry and exact Undo are verified.
+Final identities cover 2,993 source inputs, 50 generated files and 142 normal
+release files. Pixel WASM and four tracked native codec binaries are unchanged.
+
+A source-development font-navigation failure remains preserved and its original
+cause unproven; the same entire compiled matrix and a separate instrumented
+source probe pass. Two external-probe collection errors run zero product cases.
+A separate 65-command dense-stroke-copy stress run really exceeds five seconds;
+accepting read-only snapshot fidelity plus one captured edit does not accept
+that copying workload's performance. TypeScript/probe corrections and all
+failed attempts remain in the evidence. Sampled PSS includes browser/server/test
+overhead and does not establish global peak memory or physical-device limits.
+
+[Measurements and limits](benchmarks/script-transport-performance-2026-10-28.md)
+and [sealed evidence](benchmarks/script-transport-performance-2026-10-28.zip)
+retain source/release hashes, all reports, actual terminals, phase diagnostics,
+complete snapshots, worker lifecycle evidence, process samples and failures.
+Source development, instrumented probes, benchmark builds and normal production
+remain separate evidence modes. Prior commits and artifacts are retained.
+
+This accepts the bounded scripting improvement. Fresh startup/reconstruction,
+font/document/retouch tails, sustained editor-wide/all-tool F14, float/HDR/
+working-space and photographic/interchange quality, global memory and physical
+GPU/display/tablet/device acceptance, AI/provider/evaluation, live installed
+ChatGPT/identity, collaboration, specialist and commercial gates remain required.
+The complete original implementation-roadmap objective remains active.

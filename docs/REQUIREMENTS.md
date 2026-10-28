@@ -1104,3 +1104,14 @@ Verify actual controls, independent complete pixels, native queue/cancellation,
 transformed/masked scenes, precise delivery and genuine 50 MP behavior. Keep
 all-tool, sustained, physical-device and global peak-memory gates open until
 measured acceptance proves them.
+
+
+## Script transport work (F14)
+
+Remove duplicate iframe snapshot cloning while retaining a fresh opaque-origin
+worker per run, identical CSP/grants, exact structured-clone values and starting
+snapshot semantics. Owned worker reconstruction must still validate completely;
+public mutable inputs remain defensive. Verify actual worker destruction, no
+cross-run globals, malformed input/results, network isolation, permissions,
+fonts, concurrent human edits, cancellation/timeout and one-step Undo. Retain
+five-second and 256-command budgets, separate REST and all unfinished F14 gates.

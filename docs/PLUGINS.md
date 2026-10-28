@@ -492,3 +492,17 @@ LensCorrection is a pure isolated value usable inside RawDevelopment under the e
 
 
 Native RAW development results may include immutable optional `report.shooting` lens/exposure declarations through the existing grants and isolated return-value validation. This adds no file/native/network service, serial/location/time field, profile lookup or new permission. Original retained files still contain their complete metadata. Native protocol 2 is private; saved report version 1 remains compatible without shooting metadata. Installation stays inert. Exact fields and the exercised example are in SCRIPTING_API.md.
+
+
+## Per-run direct scripting channels (F14)
+
+Each execution keeps a fresh opaque-origin iframe and disposable worker under
+unchanged CSP. Bootstrap transfers a dedicated data endpoint to the worker and
+retains a separate trusted startup/error/stop channel. Snapshots and permitted
+host calls/results no longer relay through the iframe. Only the private worker's
+exclusive native clone freezes before normal validated OO reconstruction; public
+mutable fromJSON inputs remain defensively copied. Font payload consumption,
+strict commands, permissions, assets/revisions, five-second/256-command budgets,
+rollback and atomic Undo remain. Completion/cancellation closes both channels and
+removes the iframe/worker. Inert installation, package schema and separate REST
+sessions gain no new capability. Dated acceptance remains in the roadmap.

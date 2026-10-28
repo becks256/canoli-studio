@@ -24,15 +24,16 @@ test('scripts on a stroke-heavy document record snapshot transport latency',asyn
  for(const row of reconstruction){expect(row.layers).toBe(1);expect(row.history).toBe(0);}
  const samples=await page.evaluate(async()=>{
   const e=window.luma.editor,revision=e.document.getSnapshot().revision;
-  const samples=[];
-  for(let i=0;i<5;i++){
+  const samples=[],longTasks:number[]=[];const observer=new PerformanceObserver(list=>{for(const row of list.getEntries())longTasks.push(row.duration);});observer.observe({type:"longtask"});
+  for(let i=0;i<20;i++){
    const start=performance.now();
    const result=await e.scripts.run(e.document,'print(document.layers.length);');
    samples.push({ms:performance.now()-start,commands:result.commands.length,logs:result.logs,revision:e.document.getSnapshot().revision-revision});
   }
-  return samples;
+  longTasks.push(...observer.takeRecords().map(row=>row.duration));observer.disconnect();return{samples,longTasks};
  });
- console.log('script-transport-latency',JSON.stringify(samples));
+ console.log('script-transport-latency',JSON.stringify(samples.samples));
+ console.log('script-transport-longtasks',JSON.stringify({longTasks:samples.longTasks}));
  await info.attach('script-transport-latency',{body:JSON.stringify(samples),contentType:'application/json'});
- for(const row of samples){expect(row.commands).toBe(0);expect(row.logs).toEqual(['1']);expect(row.revision).toBe(0);}
+ expect(samples.samples).toHaveLength(20);for(const row of samples.samples){expect(row.commands).toBe(0);expect(row.logs).toEqual(['1']);expect(row.revision).toBe(0);}
 });

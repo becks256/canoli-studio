@@ -274,6 +274,12 @@ Open **Scripts** in the tool rail or press **Mod+Shift+K**. Run JavaScript using
 
 Successful edits apply together as one undo step. Script errors, cancellation, timeout, invalid assets or stale revisions apply no script edits. Import images through the editor first; the Scripts panel does not expose files, network access, export or host application services. See [application integration](SCRIPTING_API.md#application-integration) for the separate trusted application interface.
 
+The private snapshot/result channel now connects directly to the fresh worker
+after opaque-frame bootstrap; a separate control channel handles startup/errors.
+Owned worker snapshots freeze before normal validated OO reconstruction. Public
+signatures, mutable-input copies, allowed host services, result validation,
+5-second/256-command limits and separate REST sessions retain their contracts.
+
 ## Trusted TIFF file import
 
 Browser application code can call `editor.inspectTiff(file, control?)` and `editor.openTiff(file, {page?: number, allowPrecisionLoss?: boolean}, control?)`. These return a validated TIFF capability report; page defaults to 0, precision-loss consent to false. The UI reviews page/codec/color limitations before opening a selected raster page. Original TIFF bytes and decode settings persist independently of editing pixels, including recovery integrity keys. Cancellation, callback errors and changed/disposed host sessions reject without partial publication. See [the complete host contract](SCRIPTING_API.md#tiff-import-trusted-application-code) for supported codecs, sample/color layouts, progress, errors, budgets and the runnable constructor example. File access remains outside isolated scripts/plugins, and no TIFF REST decoder or browser synchronization is added.

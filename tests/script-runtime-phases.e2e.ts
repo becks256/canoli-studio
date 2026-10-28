@@ -7,9 +7,11 @@ test('fresh isolated script workers report initialization, document and command 
   banner:{js:'var __lumaBootStarted = performance.now();'},footer:{js:'var __lumaBootReady = performance.now();'},
   plugins:[{name:'benchmark-phases',setup(build){build.onLoad({filter:/scripting\/runtime\.ts$/},async({path})=>{
    let source=await readFile(path,'utf8');
-   source=source.replace('const document = Document.fromJSON(event.data.document);','const __lumaDocumentStart=performance.now(); const document = Document.fromJSON(event.data.document); const __lumaDocumentReady=performance.now();');
+   const reconstruction='const document = Document.fromJSON(freeze(event.data.document));';
+   expect(source).toContain(reconstruction);
+   source=source.replace(reconstruction,'const __lumaDocumentStart=performance.now(); '+reconstruction+' const __lumaDocumentReady=performance.now();');
    source=source.replace('    await run(', '    const __lumaExecuteStart=performance.now(); await run(');
-   source=source.replace('    self.postMessage({\n      type: "result",','    logs.push(JSON.stringify({phase:"runtime",initializationMs:__lumaBootReady-__lumaBootStarted,documentMs:__lumaDocumentReady-__lumaDocumentStart,executeMs:performance.now()-__lumaExecuteStart}));\n    self.postMessage({\n      type: "result",');
+   source=source.replace('    send({\n      type: "result",','    logs.push(JSON.stringify({phase:"runtime",initializationMs:__lumaBootReady-__lumaBootStarted,documentMs:__lumaDocumentReady-__lumaDocumentStart,executeMs:performance.now()-__lumaExecuteStart}));\n    send({\n      type: "result",');
    return {contents:source,loader:'ts'};
   });}}]});
  const runtimeSource=built.outputFiles[0].text;

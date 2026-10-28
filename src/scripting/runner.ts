@@ -67,24 +67,34 @@ export class ScriptRunner {
     // denied, and no same-origin permission is granted to the frame.
     iframe.srcdoc = `<!doctype html><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob:; connect-src 'none';"><script>
       window.onmessage = (event) => {
-        if (event.source !== parent || !event.ports[0] || typeof event.data?.runtimeSource !== "string") return;
-        const port = event.ports[0]; window.onmessage = null;
+        if (event.source !== parent || event.ports.length !== 2 || typeof event.data?.runtimeSource !== "string") return;
+        const [port, status] = event.ports; window.onmessage = null;
+        let worker;
+        status.onmessage = (event) => { if (event.data?.type === 'stop') { worker?.terminate(); status.close(); } }; status.start();
         try {
           const url = URL.createObjectURL(new Blob([event.data.runtimeSource], { type: 'application/javascript' }));
-          const worker = new Worker(url); URL.revokeObjectURL(url);
-          worker.onmessage = (event) => port.postMessage(event.data);
-          worker.onerror = () => port.postMessage({ type: 'error', error: 'Script worker failed.' });
-          port.onmessage = (event) => worker.postMessage(event.data); port.start();
-          port.postMessage({ type: 'ready' });
-        } catch (error) { port.postMessage({ type: 'error', error: error.message }); }
+          worker = new Worker(url); URL.revokeObjectURL(url);
+          worker.onerror = () => status.postMessage({ type: 'error', error: 'Script worker failed.' });
+          worker.onmessageerror = () => status.postMessage({ type: 'error', error: 'Unreadable script startup message.' });
+          worker.postMessage({ type: 'connect' }, [port]);
+          status.postMessage({ type: 'ready' });
+        } catch (error) { status.postMessage({ type: 'error', error: error.message }); }
       };
     <\/script>`;
     return new Promise((resolve, reject) => {
       const channel = new MessageChannel();
+      const bootstrap = new MessageChannel();
       let finished = false;
+      let started = false;
       const cleanup = () => {
         clearTimeout(timer);
+        channel.port1.onmessage = null;
+        channel.port1.onmessageerror = null;
         channel.port1.close();
+        bootstrap.port1.postMessage({ type: "stop" });
+        bootstrap.port1.onmessage = null;
+        bootstrap.port1.onmessageerror = null;
+        bootstrap.port1.close();
         iframe.remove();
         this.cancelCurrent = null;
       };
@@ -105,20 +115,25 @@ export class ScriptRunner {
       );
       this.cancelCurrent = () =>
         fail(new Error("Script stopped. No edits were applied."));
-      channel.port1.onmessage = async (event) => {
+      bootstrap.port1.onmessage = (event) => {
         if (finished) return;
         const data = event.data;
         if (data?.type === "ready") {
-          try{for(const check of fontChecks)check();}catch(error){fail(error instanceof Error?error:new Error(String(error)));return;}
-          channel.port1.postMessage({
-            document: snapshot,
-            fonts,
-            selectedId,
-            selectedIds,
-            code,
-          });
+          try{
+            if(started)throw new Error("Duplicate script startup message.");started=true;
+            for(const check of fontChecks)check();
+            channel.port1.postMessage({document:snapshot,fonts,selectedId,selectedIds,code});
+          }catch(error){fail(error instanceof Error?error:new Error(String(error)));}
           return;
         }
+        fail(new Error(data?.type === "error" && typeof data.error === "string" ? data.error.slice(0,2000) : "Unexpected script startup message."));
+      };
+      bootstrap.port1.onmessageerror = () => fail(new Error("Unreadable script startup message."));
+      channel.port1.onmessageerror = () => fail(new Error("Unreadable script result."));
+      channel.port1.onmessage = async (event) => {
+        if (finished) return;
+        if(!started){fail(new Error("Script result preceded startup."));return;}
+        const data = event.data;
         if (data?.type === "host:call") {
           const { id, service, method, args } = data;
           if (!options?.hostBridge) {
@@ -197,7 +212,7 @@ export class ScriptRunner {
         }
       };
       iframe.onload = () => {
-        iframe.contentWindow?.postMessage({ runtimeSource }, "*", [channel.port2]);
+        iframe.contentWindow?.postMessage({ runtimeSource }, "*", [channel.port2, bootstrap.port2]);
       };
       window.document.body.append(iframe);
     });

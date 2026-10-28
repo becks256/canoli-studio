@@ -656,6 +656,22 @@ Script code and output are not saved in `.luma` project files. Copy useful scrip
 
 Each run gets a fresh isolated worker. Local variables, listeners and object references do not persist between runs. The worker receives document metadata and selection, not image bytes, the application's `editor` service, UI elements or credentials. External network/code loading is blocked; scripts cannot import files or call the REST service. Standard JavaScript data processing is available.
 
+The private transport transfers a dedicated data-channel endpoint through the
+opaque bootstrap iframe into that fresh worker. Snapshots, validated results and
+permitted host calls use the direct channel; a separate bootstrap/error channel
+controls startup and cleanup. The iframe does not relay document snapshots.
+The worker's exclusively owned structured-clone snapshot is recursively frozen
+before ordinary validated `Document.fromJSON` reconstruction. This preserves
+numeric values, signed zero and native clone semantics while avoiding another
+worker-side defensive copy. Public `Document.fromJSON` continues to copy mutable
+caller input. No new binding, host grant, history, network or file capability is
+introduced. Use `document`, `print` and the documented `host` methods for results;
+raw worker-global `postMessage` is not the scripting result channel. The existing
+5-second deadline and 256-command limit include startup/reconstruction, and
+cancellation/error/timeout discards staged edits and closes both channels and
+the disposable iframe/worker. Dated correctness and performance verification is
+recorded in the implementation roadmap; full F14 remains required.
+
 Changes are collected while the script runs. After successful completion, the application validates the commands and asset references and applies them together. An uncaught error, cancellation, timeout, invalid result or changed document revision applies none of the script's edits. **Stop script**, closing the panel, or Escape cancels a pending run. A successful run with actual document changes adds one history entry named **Run script**; inspection-only, layer-selection-only and no-op runs do not create document history.
 
 The body executes as an async function, so top-level `await` is supported. Await all work needed by the run; detached timers/promises are not a persistent automation service. A `return` value is ignored. `print` output appears after successful completion, not as a live stream; the current panel shows the error instead of prior output when a run fails. Strings are printed directly and other values use `JSON.stringify`, so circular objects and BigInt values can cause serialization errors. `console.log` is not connected to the output panel.

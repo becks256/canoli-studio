@@ -829,3 +829,17 @@ sessions cannot enter the idle cache; clear/disposal retires owned idle state.
 IccSession.dispose still terminates immediately. Model, schema, public commands,
 Undo, source resolution, file contracts and isolated/REST grants are unchanged.
 See ICC_ENGINE.md and FLOAT_DOCUMENTS.md for scope and remaining F14 gates.
+
+
+## Per-run direct scripting channels (F14)
+
+Each execution keeps a fresh opaque-origin iframe and disposable worker under
+unchanged CSP. Bootstrap transfers a dedicated data endpoint to the worker and
+retains a separate trusted startup/error/stop channel. Snapshots and permitted
+host calls/results no longer relay through the iframe. Only the private worker's
+exclusive native clone freezes before normal validated OO reconstruction; public
+mutable fromJSON inputs remain defensively copied. Font payload consumption,
+strict commands, permissions, assets/revisions, five-second/256-command budgets,
+rollback and atomic Undo remain. Completion/cancellation closes both channels and
+removes the iframe/worker. Inert installation, package schema and separate REST
+sessions gain no new capability. Dated acceptance remains in the roadmap.
