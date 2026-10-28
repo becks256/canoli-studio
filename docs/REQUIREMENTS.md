@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Continuous float palette and lookup controls
+
+Admit Gradient Map and all existing Cube table sizes/interpolation modes in float documents through native continuous processing, current controls/import/export, shared history/isolation, original-bearing recipes and precise delivery. Preserve exact alpha and zero-amount identity; retain finite extended lookup output, explicit domain mapping and overflow failures. Verify independent references, handle lifetime/ownership, real UI and genuine 50 MP behavior. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## Continuous float color controls
 
 Connect existing HSL, Color Balance and Vibrance DTOs to native float scenes, shared commands/history, controls, isolation, original-bearing recipes and precision delivery. Use continuous encoded-sRGB controls over normalized linear inputs; preserve exact alpha and neutral finite extended words. Reject active out-of-range input before coverage without partial publication. Verify independent native/scene/file references, ordinary controls, grant/source/history ownership and genuine 50 MP delivery. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).

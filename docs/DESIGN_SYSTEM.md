@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Continuous float palette and lookup controls
+
+Enable existing Gradient Map and Color Lookup selectors/palette actions in float documents. Reuse stop controls, reversal, Cube import/export, fractional amount and interpolation, cancellation, locks and Undo. Explain intentional palette endpoints, signed lookup output, declared input domains and SDR/integer clipping. Retain controls during overflow/range failure so zero amount or Undo can recover. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## Continuous float color controls
 
 Enable existing HSL, Color Balance and Vibrance types and palette actions in supported float documents. Reuse fractional controls, gesture cancellation, locks and shared Undo. Explain the active normalized RGB range and exact-neutral extended-color recovery. Keep correction controls available during explicit preview failure; never display stale artwork as Ready. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).

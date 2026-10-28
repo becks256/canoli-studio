@@ -6,6 +6,21 @@ DocumentOptions.precision defaults to uint8 and also accepts float32. Readonly d
 
 Existing Curves/Levels `AdjustmentLayer` DTOs also support continuous working-linear float RGB with unchanged 0..255 control units, master-before-channel ordering and exact alpha. Curves extend endpoint tangents; active Levels clip at input endpoints, while neutral channels preserve signed/extended identity. Strict controls, masks, fill/opacity, Undo and isolated revision/permission checks remain authoritative. [Exact numeric definitions, executable example, limits and errors](FLOAT_DOCUMENTS.md#continuous-curves-and-levels).
 
+## Gradient Map and Color Lookup in float documents
+
+Existing gradient-map/LUT `AdjustmentLayer` DTOs and `setLut(source, options?)`
+also work in float scenes. Gradient maps continuously encode signed linear RGB,
+map encoded luma to palette endpoints/interpolated colors, then decode once.
+Lookups use reflected extended sRGB, declared input domains and existing 1D/
+tetrahedral/trilinear interpolation; float output retains finite signed/extended
+table and amount results. Zero amount is exact identity. Provably exact identity
+tables preserve in-domain words, while declared domains still bound lookup
+coordinates. Alpha remains exact. Overflow and invalid data reject atomically;
+SDR/integer output can clip. The existing grant/revision/Undo/source boundaries
+remain authoritative; no new API/schema/native/file privilege or REST/browser
+synchronization is added. [Signatures, defaults, limits, exact math, errors and
+executable example](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## HSL, Color Balance and Vibrance in float documents
 
 The existing `AdjustmentLayer` constructor and `.adjustment` setter accept HSL,
@@ -3508,7 +3523,7 @@ Trusted module exports from `src/dom` include `parseCubeLut(text): CubeLutData`,
 
 Supported files contain exactly one 1D or 3D table, optional quoted TITLE, DOMAIN_MIN/MAX, blank lines, # comments, BOM and CR/LF/CRLF separators. Keywords use standard uppercase spelling. Table rows contain three decimal/scientific numbers; counts and duplicate/misplaced directives are checked. Combined shaper+3D files, Resolve-specific INPUT_RANGE directives, other LUT formats and embedded color-space transforms reject explicitly. The importer does not silently discard unsupported sections. TITLE is inert text. Import/export .cube runs in a terminable worker. Imported bytes are also independently validated in cancellable chunks before command commit, with stale-target/lock checks. Reset returns the identity default; undo restores the imported table. Export .cube preserves the table/domain/title, without baking amount, masks or surrounding layers; save .luma for the complete editable effect.
 
-Processing uses straight encoded sRGB byte inputs normalized to [0,1], mapped by each domain, and clamped to table endpoints. 1D performs independent linear channel interpolation. 3D uses the chosen tetrahedral (default) or trilinear interpolation, with red-fastest indexing. Clamp interpolated outputs to [0,1], mix with original normalized RGB by amount/100, then round once to output bytes. Alpha is unchanged and zero amount is byte-identical. This does not automatically convert camera-log, scene-linear, HDR or ACES input; apply a LUT designed for the actual image encoding. Format/interpolation references: [Cube 1.0 specification](https://kono.phpage.fr/images/a/a1/Adobe-cube-lut-specification-1.0.pdf), [OpenColorIO's IRIDAS reader](https://github.com/AcademySoftwareFoundation/OpenColorIO/blob/main/src/OpenColorIO/fileformats/FileFormatIridasCube.cpp). Independent fixtures use Colour Science's separate Cube reader/writer and interpolators.
+In byte documents, processing uses straight encoded sRGB byte inputs normalized to [0,1], mapped by each domain, and clamped to table endpoints. 1D performs independent linear channel interpolation. 3D uses the chosen tetrahedral (default) or trilinear interpolation, with red-fastest indexing. Clamp interpolated outputs to [0,1], mix with original normalized RGB by amount/100, then round once to output bytes. Alpha is unchanged and zero amount is byte-identical. This does not automatically convert camera-log, scene-linear, HDR or ACES input; apply a LUT designed for the actual image encoding. Format/interpolation references: [Cube 1.0 specification](https://kono.phpage.fr/images/a/a1/Adobe-cube-lut-specification-1.0.pdf), [OpenColorIO's IRIDAS reader](https://github.com/AcademySoftwareFoundation/OpenColorIO/blob/main/src/OpenColorIO/fileformats/FileFormatIridasCube.cpp). Independent fixtures use Colour Science's separate Cube reader/writer and interpolators.
 
 Actual pixels execute in WASM on bounded native tiles with float32 tables and float64 coordinates/interpolation, or the corresponding float32 WGSL viewport shader. Decoded tables and GPU storage buffers have separate bounded caches; these do not cap image resolution. Tables exceeding GPU buffer budgets, float32-inexact domains/spans or extreme table magnitudes use the actual Canvas/WASM fallback without changing settings. Device/browser allocation failures remain possible for large standard tables. Export completion times and interactive latency require separate measurement; no hardware GPU, print, HDR or universal interchange fidelity claim follows from fixture tests.
 

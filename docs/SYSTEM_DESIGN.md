@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Continuous float palette and lookup controls
+
+Palette and LUT stages operate continuously over linear float sources using reflected extended sRGB. Palette endpoint mapping is authored behavior; LUT domains bound coordinates while finite extended table/amount results survive. One float32 store follows float64 arithmetic; alpha and neutral identity stay exact. Complete table validation precedes captured handle publication, private native memory cannot overlap other pixel operations, and every capture failure/disposal releases handles. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## Continuous float color controls
 
 HSL, Color Balance and Vibrance retain their bounded encoded-sRGB meanings through continuous float64 transfer/control arithmetic and one float32 color store. Complete active linear RGB must be normalized, including hidden samples before coverage. Exact neutral preserves finite extended and signed-zero words. Alpha is unchanged. Existing native-first filtering, group/clipping/blend/mask ordering, owned worker windows, sources and failure publication invariants remain authoritative. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).

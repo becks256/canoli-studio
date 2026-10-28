@@ -1,4 +1,6 @@
 export {colorFloat} from "./float-color";
+export {gradientFloat} from './float-gradient';
+export {lookupFloat} from './float-lookup';
 export {transferFloat} from "./float-transfer";
 export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
 export { encodeFrequencyBand } from "./frequency-band";

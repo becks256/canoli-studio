@@ -1,3 +1,4 @@
+import{FloatLookupProcessor}from'./float-lookup';
 import type{FloatTransferAdjustment}from'../core/float-transfer';
 import{FloatPixelProcessor,validateFloatWorkerWindow,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
 import type { RedEyeAdjustmentData } from "../core/red-eye";
@@ -76,6 +77,7 @@ kernel
 
 let matting:ClosedFormMatting|undefined;
 let floating:FloatPixelProcessor|undefined;
+let floatLookups:FloatLookupProcessor|undefined;
 self.onmessage = async (
   event: MessageEvent<{
     id: number;
@@ -85,6 +87,10 @@ self.onmessage = async (
     floatTone?:{pixels:Float32Array;options:FloatToneOptions};
       floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
     floatColor?:{pixels:Float32Array;adjustment:FloatColorAdjustment};
+    floatGradient?:{pixels:Float32Array;adjustment:GradientMapAdjustmentData};
+    floatLookupPrepare?:LutAdjustmentData;
+    floatLookupApply?:{handle:number;pixels:Float32Array};
+    floatLookupRelease?:number;
     filteredMix?: {
       filtered: Uint8ClampedArray;
       mask: Uint8ClampedArray;
@@ -158,11 +164,18 @@ self.onmessage = async (
 ) => {
   try {
     const data = event.data;
-    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTransfer||data.floatColor){
+    if(data.floatLookupPrepare||data.floatLookupApply||data.floatLookupRelease!==undefined){
+      const seed=await kernel,owner=floatLookups??=new FloatLookupProcessor(seed);
+      if(data.floatLookupPrepare){const floatLookupHandle=owner.prepare(data.floatLookupPrepare);self.postMessage({id:data.id,floatLookupHandle});}
+      else if(data.floatLookupApply){const pixels=owner.apply(data.floatLookupApply.handle,data.floatLookupApply.pixels);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});}
+      else{owner.release(data.floatLookupRelease!);self.postMessage({id:data.id});}return;
+    }
+    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTransfer||data.floatColor||data.floatGradient){
       const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;
       if(data.floatComposite){const request=data.floatComposite;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);pixels=owned.composite(request.source,request.backdrop,request.options);}
       else if(data.floatTransfer){const request=data.floatTransfer;validateFloatWorkerWindow(request.pixels);pixels=owned.transfer(request.pixels,request.adjustment);}
       else if(data.floatColor){const request=data.floatColor;validateFloatWorkerWindow(request.pixels);pixels=owned.color(request.pixels,request.adjustment);}
+      else if(data.floatGradient){const request=data.floatGradient;validateFloatWorkerWindow(request.pixels);pixels=owned.gradient(request.pixels,request.adjustment);}
       else if(data.floatTone){const request=data.floatTone;validateFloatWorkerWindow(request.pixels);pixels=owned.tone(request.pixels,request.options);}
       else{const request=data.floatAffine!;validateFloatWorkerWindow(request.pixels);pixels=owned.affine(request.pixels,request.matrix);}
       self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;

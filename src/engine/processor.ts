@@ -8,7 +8,7 @@ import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSetting
 import { textureMaskOptionsSchema, type TextureMaskOptions, type TextureMaskSettings } from '../core/brush-texture';
 import { wetPaintLoadSchema, wetPaintMixSchema, type WetPaintLoadOptions, type WetPaintLoadSettings, type WetPaintMixOptions, type WetPaintMixSettings, type WetPaintResult } from '../core/wet-paint';
 import { validateWetPixels, validateWetCarried, validateWetCoverage } from './wet-paint';
-import { lutAdjustmentSchema, type LutAdjustmentData } from "../core/lut";
+import { captureLutHeader, lutAdjustmentSchema, type LutAdjustmentData } from "../core/lut";
 import { whiteBalanceAdjustmentSchema, type WhiteBalanceAdjustmentData } from "../core/white-balance";
 import { gradientMapAdjustmentSchema, type GradientMapAdjustmentData } from "../core/gradient-map";
 import type { ClipboardRequest, ClipboardResult } from "./clipboard";
@@ -39,6 +39,7 @@ import type {
 import type { BlendIfData } from "../core/drawing";
 import type { ToneEffectData } from "../core/model";
 import type { HistogramData } from "../core/histogram";
+export interface FloatLookupLease{apply(pixels:Float32Array):Promise<Float32Array>;dispose():void}
 import type { SelectionTile, FeatherTile } from "./wasm";
 
 export class PixelProcessor {
@@ -93,6 +94,7 @@ export class PixelProcessor {
         else if (event.data.mattingDiagnostics) request.resolve(event.data.mattingDiagnostics);
         else if (event.data.colorRangeCoverage) request.resolve(event.data.colorRangeCoverage);
         else if (event.data.histogram) request.resolve(event.data.histogram);
+        else if (event.data.floatLookupHandle!==undefined)request.resolve(event.data.floatLookupHandle);
         else if (event.data.donorResult)
           request.resolve(event.data.donorResult);
         else if (event.data.poissonResult)
@@ -107,6 +109,13 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
+  async floatGradient(pixels:Float32Array,input:GradientMapAdjustmentData):Promise<Float32Array>{
+    const adjustment=gradientMapAdjustmentSchema.parse(input);validateFloatWorkerWindow(pixels);const length=pixels.length,result=await this.request(new Uint8ClampedArray(0),{floatGradient:{pixels:pixels.slice(),adjustment}});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');for(let i=0;i<result.length;i++)if(i%4!==3&&(result[i]<0||result[i]>1))throw new Error('Float gradient worker output must stay within normalized linear RGB.');return result;
+  }
+  async prepareFloatLookup(input:LutAdjustmentData):Promise<FloatLookupLease>{
+    const adjustment=captureLutHeader(input),handle=await this.request(new Uint8ClampedArray(0),{floatLookupPrepare:adjustment});if(!Number.isSafeInteger(handle)||handle<=0)throw new Error('Float lookup worker returned an invalid captured handle.');let disposed=false;
+    return{apply:async pixels=>{if(disposed)throw new Error('Captured float lookup is disposed.');validateFloatWorkerWindow(pixels);const length=pixels.length,result=await this.request(new Uint8ClampedArray(0),{floatLookupApply:{handle,pixels:pixels.slice()}});if(disposed)throw new Error('Captured float lookup is disposed.');validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;},dispose:()=>{if(disposed)return;disposed=true;void this.request(new Uint8ClampedArray(0),{floatLookupRelease:handle}).catch(()=>{});}};
+  }
   async floatComposite(source:Float32Array,backdrop:Float32Array,options:FloatCompositeOptions={}):Promise<Float32Array>{
     const settings=floatCompositeOptionsSchema.parse(options);validateFloatWorkerWindow(source);validateFloatWorkerWindow(backdrop);if(source.length!==backdrop.length)throw new Error('Float source and backdrop geometry differ.');
     if(settings.mask&&(settings.mask.length!==source.length/4||!(settings.mask.buffer instanceof ArrayBuffer)))throw new Error('Float coverage geometry differs.');
@@ -401,6 +410,10 @@ export class PixelProcessor {
       floatTone?:{pixels:Float32Array;options:FloatToneOptions};
       floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
       floatColor?:{pixels:Float32Array;adjustment:FloatColorAdjustment};
+      floatGradient?:{pixels:Float32Array;adjustment:GradientMapAdjustmentData};
+      floatLookupPrepare?:LutAdjustmentData;
+      floatLookupApply?:{handle:number;pixels:Float32Array};
+      floatLookupRelease?:number;
       filteredMix?: {
         filtered: Uint8ClampedArray;
         mask: Uint8ClampedArray;
@@ -498,6 +511,8 @@ export class PixelProcessor {
     if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);
     if(payload.floatTransfer)tryTransfer(payload.floatTransfer.pixels.buffer);
     if(payload.floatColor)tryTransfer(payload.floatColor.pixels.buffer);
+    if(payload.floatGradient)tryTransfer(payload.floatGradient.pixels.buffer);
+    if(payload.floatLookupApply)tryTransfer(payload.floatLookupApply.pixels.buffer);
     if(payload.brushTextureSupport)tryTransfer(payload.brushTextureSupport.buffer);
     if(payload.frequencyEncoding)tryTransfer(payload.frequencyEncoding.low.buffer);
     if(payload.linearBlend)tryTransfer(payload.linearBlend.backdrop.buffer);

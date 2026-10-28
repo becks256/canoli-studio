@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Continuous float palette and lookup controls
+
+Existing strict adjustment layer commands admit Gradient Map and Color Lookup metadata in float documents with shared revision/locks/rollback/Undo. Required fields, finite tables and original command/body limits remain unchanged. Independent REST remains PNG-only and supplies neither a browser float renderer nor original TIFF admission/synchronization. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## Continuous float color controls
 
 Existing strict `layer.add` and `layer.update` accept the same HSL, Color Balance and Vibrance DTOs in float documents, with shared revisions, locks, atomic rollback and Undo. Headless REST retains PNG-only asset admission and supplies neither native float TIFF admission/rendering nor browser synchronization. Pixel-domain failures belong to actual browser rendering/delivery. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).

@@ -2204,3 +2204,5 @@ test('production blend domain failures suppress stale artwork and recover throug
 test('production linear White Balance preserves native files, actual controls, isolated example, cancellation and originals without developer globals',async({page},info)=>{const{floatWhiteBalanceWorkflow}=await import('./helpers/float-white-balance');await floatWhiteBalanceWorkflow(page,info,true);});
 
 test('production float HSL, Color Balance and Vibrance preserve native files, actual controls and originals without developer globals',async({page},info)=>{const{floatColorWorkflow}=await import('./helpers/float-color');await floatColorWorkflow(page,info,true);});
+
+test('production float Gradient Map and Color Lookup preserve controls, Cube import/export, overflow recovery, native files and original-bearing reopening without developer globals',async({page},info)=>{const{floatPaletteWorkflow}=await import('./helpers/float-palette');await floatPaletteWorkflow(page,info,true);});

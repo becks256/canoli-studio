@@ -2,7 +2,7 @@
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
-transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels, White Balance, HSL, Color Balance and Vibrance adjustments use this
+transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup adjustments use this
 mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
@@ -211,6 +211,119 @@ Schema 49 and all grants remain unchanged. Older implementations that reject
 White Balance in their float subset still reject these documents. Independent
 REST sessions accept the metadata through shared validation/history; they gain
 no high-precision original admission, renderer or browser synchronization.
+
+## Continuous Gradient Map and Color Lookup
+
+Existing `AdjustmentLayer` gradient-map and LUT DTOs also work in float documents.
+Use `.adjustment` or existing `AdjustmentLayer.setLut(source, options?)`; no new
+public mutation method or command is added. Controls, strict validation, locks,
+Undo/Redo, isolated grants/revisions and original-bearing persistence remain
+shared. Helpers such as `defaultGradientMapAdjustment()` and
+`defaultLutAdjustment()` are trusted module exports, not sandbox globals.
+
+Gradient Map requires `{kind:'gradient-map', stops, reverse}`. There are 2–32
+strictly increasing finite stop positions from 0 to 1; each stop has exactly
+`{position, color}` with a six-digit RGB hex color. `reverse` is required boolean.
+The trusted default is black at zero, white at one, and false reversal. It maps
+to grayscale; it is not an identity color transform. Fractional stop positions
+remain float64 through the native stage, including positions that collapse in
+float32 GPU controls. Source working-linear RGB is encoded continuously using
+the reflected extended sRGB transfer. Encoded luma is
+`.2126*r + .7152*g + .0722*b`; reversal samples `1-luma`. Adjacent palette RGB
+channels interpolate continuously in encoded space, with endpoint colors outside
+the first/last stop. Decode to linear RGB and store float32 once. Alpha words
+remain exact. Finite negative/above-one inputs are accepted and deliberately map
+to palette endpoints; the retained original is never rewritten.
+
+Color Lookup requires `{kind:'lut', lut, amount, interpolation}` with the same
+Cube record, finite amount 0–100 (fractions accepted), and required `tetrahedral`
+or `trilinear` interpolation. `setLut(cubeText, options = {})` defaults amount to
+100 and interpolation to tetrahedral. A Cube contains `title`, dimension 1 or 3,
+size, finite three-element `domainMin`/`domainMax`, and canonical packed red-fastest
+little-endian RGB float32 `data`. 1D sizes remain 2–65,536; 3D sizes remain 2–256.
+Each domain maximum must exceed its minimum by a finite positive span. All table
+values must be finite float32. Missing/unknown/invalid controls, malformed table
+bytes and unsupported Cube directives reject atomically, including zero amount.
+The trusted default is the two-entry 1D identity on domain [0,1].
+
+Float lookup continuously encodes signed working-linear RGB, bounds each encoded
+coordinate to its declared table domain, and runs the existing 1D linear or 3D
+chosen interpolation. Amount blends the **unclipped encoded table result** with
+the encoded input with convex weights `(1 - amount/100)` and `amount/100`, then the reflected transfer decodes to linear
+RGB with one float32 store. Signed/above-one table results are retained when the
+final float32 value is finite. This is distinct from the byte path, which must
+clip mapped colors before byte mixing. Zero amount preserves exact finite input
+words, including signed zero, subnormals and extended colors. A mathematically
+exact identity table also preserves exact in-domain component words; its declared
+domain still bounds out-of-domain components. An approximate float32 ramp is not
+silently treated as an exact identity.
+
+The extended transfer reflects the ordinary sRGB power branch around zero:
+encode is `12.92*v` for `abs(v)<=.0031308`, otherwise
+`sign(v)*(1.055*abs(v)^(1/2.4)-.055)`. Decode is `v/12.92` for
+`abs(v)<=.04045`, otherwise `sign(v)*((abs(v)+.055)/1.055)^2.4`.
+The [CSS Color 4 conversion example](https://www.w3.org/TR/2026/CRD-css-color-4-20261027/#color-conversion-code)
+specifies this reflected extension. Float64 arithmetic is finite-precision; this
+is not an arbitrary working-profile, camera-log, ACES or photographic calibration
+inference. Use a LUT designed for the declared sRGB encoding. Nonfinite float32
+output rejects without a partial preview/file; zero amount can recover a finite
+source. SDR preview and integer files can clip extended results. Artistic blends
+still require normalized backdrop/result RGB; Normal retains finite extended
+colors. An explicitly bounded authored table can support artistic blending.
+
+The host captures controls before worker readiness and prepares a private lookup
+handle. The worker validates the complete table, owns a separate native table
+cache and applies bounded pixel windows through that handle. Multiple captured
+handles coexist; each retains validated decoded values until release, so native
+cache switches never decode or rescan the complete table again, even above the
+shared byte cache budget. Live handles retain their decoded tables in worker
+memory in addition to one active native table. Native cache changes cannot
+change their controls. Other float
+pixel operations use separate native memory. Preparation failures leave prior
+handles usable. Capture failure/disposal releases the handles, including a
+cancellation that occurs during preparation. No raw pixel, file, worker or native
+permission is exposed to scripts/plugins; installation remains inert. Normal
+source/revision/grant checks guard host commits. Headless REST accepts metadata
+through the same strict commands and remains a separate PNG-only session without
+float source admission/rendering or browser synchronization.
+
+Masks/fill/opacity, groups, clipping and blend order follow the existing float
+scene contract. Complete native adjustment processing precedes frame filtering.
+Projects/workspaces/history, recipes and portable batches retain the same table
+and stop DTOs, with exact originals. Schema 49 and existing container versions
+are unchanged. Older float implementations can reject these newly admitted kinds
+rather than flattening them.
+
+Open an original-backed TIFF in float mode first:
+
+<!-- example: float-palette -->
+```js
+document.convertToFloat();
+const one = document.layers.add(new AdjustmentLayer({name:'Float Lookup 1D'}));
+one.setLut('TITLE "Float 1D"\nLUT_1D_SIZE 3\n-.1 0 1.1\n.25 .5 .5\n1 .9 -.1',
+  {amount:37.25, interpolation:'tetrahedral'});
+const three = document.layers.add(new AdjustmentLayer({name:'Float Lookup 3D'}));
+three.setLut('TITLE "Float 3D"\nLUT_3D_SIZE 2\n0 0 0\n0 0 1\n0 1 0\n0 1 1\n1 0 0\n1 0 1\n1 1 0\n1 1 1',
+  {amount:62.5, interpolation:'tetrahedral'});
+const gradient = document.layers.add(new AdjustmentLayer({
+  name:'Float Gradient', opacity:.625,
+  adjustment:{kind:'gradient-map', reverse:false, stops:[
+    {position:0,color:'#171b46'},
+    {position:.45,color:'#b65a74'},
+    {position:1,color:'#ffe4a0'},
+  ]},
+}));
+document.selectedLayer = gradient;
+print('Float palette controls ready');
+```
+
+Independent references use pinned Colour Science 0.4.6 Cube reading and 1D/3D
+interpolators, NumPy palette interpolation and reflected transfers; no application
+or byte expected pixels supply float colors. Registered RGB tolerance is `2^-22`
+times `max(1,abs(reference RGB))` per pixel, integer color error at most one code,
+and exact alpha/neutral words. Native, scene, real UI/isolation/persistence/batch,
+independent full-file and genuine 50 MP checks remain in verification. This
+increment does not complete F04/F10/F14 or the original roadmap.
 
 ## Continuous HSL, Color Balance and Vibrance
 
@@ -646,3 +759,9 @@ other integer depths and non-TIFF high-precision admission, all remaining tools/
 blends/styles, float coverage, device proofing, HDR transfer/display/tone
 mapping, CMYK delivery, interchange, wider photographic/device validation and
 sustained all-tool performance. This initial mode is not full F10 acceptance.
+
+Lookup interpolation uses convex weights, including barycentric weights for
+tetrahedra, so full-strength mapping and selected table endpoints survive
+extreme finite unused inputs/table entries. The reflected transfer preserves
+exact signed unit endpoints. Analytical endpoint regressions supplement the
+independent Colour Science corpus.

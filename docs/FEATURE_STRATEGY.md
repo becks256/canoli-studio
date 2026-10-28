@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Continuous float palette and lookup controls
+
+Continuous Gradient Map and all existing 1D/3D Cube interpolation modes extend the float color workflow through current UI, commands, isolation, persistence and precision delivery. This retains the broad color/HDR/profile/tool/interchange/photographic/device/performance target; it does not establish full F04/F10/F14 acceptance. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## Continuous float color controls
 
 The existing HSL, Color Balance and Vibrance controls now have continuous native float scene paths with explicit normalized-input domains and exact neutral recovery. This staged F04/F10 increment leaves broader HDR/color/tool/photographic/device/interchange and sustained editor-wide performance acceptance required; the full professional-editor roadmap remains active. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).

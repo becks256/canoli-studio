@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Continuous float palette and lookup controls
+
+Existing document grants admit the same Gradient Map/LUT constructor and setter commands in float documents. Installation stays inert; third-party code uses isolated scripting with captured host source/revision/current-grant validation and one Undo. Numeric table handles and native buffers remain private; no file/worker/pixel permission or new package contract is added. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## Continuous float color controls
 
 Existing document grants permit the same strict HSL, Color Balance and Vibrance DTOs in float documents. Installation remains inert, third-party code runs only through isolated scripting, and host commit retains captured revision/source/command validation and one shared Undo. No permission, raw pixel, file, profile or worker service is exposed. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).

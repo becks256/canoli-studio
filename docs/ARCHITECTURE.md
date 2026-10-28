@@ -1,5 +1,9 @@
 # Architecture
 
+## Continuous float palette and lookup controls
+
+Private float-gradient compilation feeds gradientFloat through owned windows. FloatLookupProcessor validates complete captured tables and owns separate native lookupFloat memory; multiple immutable handles share one active native table cache. PixelProcessor captures headers before readiness and returns private apply/dispose leases. FloatSceneRenderer prepares and releases leases with captured source lifetimes, including cancellation during preparation. Existing adjustment blending and native-first frame filtering remain unchanged. Cube header capture is private transport validation; shared commands retain full table validation. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+
 ## Continuous float color controls
 
 `core/float-color` strictly captures the three existing DTOs and compiles a private discriminant/control vector. The owned worker calls the new native `colorFloat` export through bounded windows. Native float64 sRGB transfer/control math rounds color once to float32 and copies alpha. Neutral copies words after finite/alpha validation; active processing validates complete normalized RGB. `float-scene` runs these stages before existing adjustment blending/coverage and native-first frame filtering. Old native exports retain their contracts; stale pixel modules lacking `colorFloat` reject explicitly. No public mutation API, schema or host privilege is added. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).

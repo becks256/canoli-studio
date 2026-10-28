@@ -7302,3 +7302,124 @@ original professional/AI/provider/evaluation/production/installed ChatGPT/live
 identity/collaboration/commercial/specialist gate stays active. No account,
 upload, paid operation, dependency, public mutation API, schema, plugin grant,
 REST/browser synchronization or arbitrary original-resolution limit is added.
+
+### 2026-10-28 — Continuous float Gradient Map and Color Lookup (in progress)
+
+Owner: implementation agent; estimate XL within T17/F04/F10, beginning at clean
+`d4c9f03`. The previous goal turn made progress: native float HSL/Color Balance/
+Vibrance, complete independent/UI/50 MP acceptance and sealed evidence were
+committed. The full original roadmap objective remains active.
+
+The remaining float color gate still rejects Gradient Map and .cube Color Lookup.
+The target is both connected workflows: native continuous gradient mapping and
+1D/3D LUTs with both existing tetrahedral/trilinear modes, strict existing DTOs,
+controls/import/export, shared OO commands/history, isolated/inert-plugin edits,
+separate REST metadata, persistence/recipes/batch retry and direct precision
+files. These remain ordinary document adjustments; no new public mutation or
+file privilege is planned.
+
+Gradient Map will use continuous encoded-sRGB luma, ordered palette interpolation
+and linear float output. Palette endpoints intentionally bound out-of-range
+luma. LUTs will use the reflected extended sRGB transfer, explicit table domains,
+unclipped finite table/amount results and one float32 store. Zero amount must
+preserve exact finite extended identity; provable exact identity tables preserve
+in-domain words. Table domains still bound lookup coordinates. No camera-log or
+working-profile inference is introduced. The exact contract must be documented
+and independently verified before acceptance.
+
+Large existing .cube tables require a captured worker-owned lookup lease rather
+than retransmitting/decoding the table for every pixel window. One active native
+table cache must coexist with multiple immutable captured handles, release on
+capture failure/disposal and retain the format's existing 1D/3D ranges without
+introducing an image-resolution cap. Independent primitive/complete-scene/file
+and genuine 50 MP acceptance, stale/ownership/error cases, full build/unit and
+normal production verification remain required. Every other unfinished original
+professional/AI/provider/workflow/interchange/device/performance/commercial gate
+remains active. No paid call, account, upload or dependency is introduced.
+
+During acceptance, an analytical HDR probe found cancellation in full-strength
+lookup amount mixing: finite RGB `3e38` incorrectly became zero instead of the
+declared identity table's white endpoint. The first independent corpus shared
+that unstable amount expression and therefore did not detect it. Both paths now
+use convex amount weights; native 1D and tetrahedral interpolation use convex
+weights and exact signed unit transfer endpoints. Direct analytical regressions
+cover both extreme source signs and all eight cube corners against extreme
+unused table values. Previous fixtures and interrupted browser evidence are
+retained. The registered numerical bounds remain unchanged; acceptance requires
+a fresh full matrix against the corrected corpus.
+
+A final lifetime probe then exposed repeated base64 decoding when switching back
+to a maximum-size table above the shared byte cache budget. The native cache
+reused allocations, but its captured handle did not retain the decoded values.
+The actual maximum-size regression failed with one decode during application;
+captured handles now retain their validated read-only float arrays until release.
+Cache switches no longer decode/rescan tables. This explicitly retains decoded
+worker memory per live handle plus one active native table; it is not a measured
+whole-process peak-memory claim. The accepted intermediate 50 MP case and the
+gracefully interrupted subsequent run remain preserved.
+
+### 2026-10-28 — Continuous float Gradient Map and Color Lookup (accepted increment)
+
+Owner: implementation agent; delivered the XL T17/F04/F10 increment above.
+Float documents now admit continuous Gradient Map and 1D/3D Color Lookup through
+the existing OO adjustment controls, isolated scripts/inert plugins, strict
+shared commands/history, workspace/project persistence and portable batch retry.
+Both tetrahedral and trilinear modes and the existing format maxima execute
+natively. LUTs are privately captured once per scene with owned worker handles,
+separate native memory, bounded pixel windows, cancellation cleanup and reuse
+of a validated table allocation. Captured handles retain decoded values until
+release, including above the shared byte cache budget; maximum-table switching
+performs no new base64 decode. The focused regression reproduced one decode
+before this lifetime correction and none afterward. Original resolution and source bytes remain
+independent of viewport/cache budgets. REST metadata uses the shared validators
+and Undo but still has no browser synchronization or float source renderer.
+
+Acceptance against corrected frozen runtime bytes:
+
+- `npm run build` passed; `npm test -- --maxWorkers=2` passed all 2,859 tests in
+  285 files. Earlier sandbox/overloaded runs are preserved, including their
+  failures; worker concurrency was bounded without changing assertions or
+  timeouts.
+- All 332 distinct browser targets passed once without skips, retries or
+  flakiness: 155 source regressions, 175 production checks, the new genuine
+  50 MP palette case and the existing genuine 50 MP color case.
+- The new independent corpus covers 40 native primitive cases and 192 complete
+  scenes, exact alpha and source ownership, partition equivalence, 84 reopenings
+  and 12 exact native-first half frames. Controls, Cube round trips, isolated
+  edits/grants, atomic failures/Undo, original-bearing persistence and portable
+  batch failure/retry run through actual browser workflows.
+- Source and production UI files pass independent complete float32/uint16 TIFF,
+  PNG and PDF readers; actual SDR canvas output stays within one color code.
+  Genuine 10,000 × 5,000 float32 and uint16 files each compare all 200 million
+  channel samples. Their independent reference cache is content-verified;
+  wrong scene/code identity, altered sample bytes and truncation reject.
+- Registered RGB bounds remain `2^-22 * max(1,abs(reference RGB))` per pixel,
+  integer color at most one code, and alpha/neutral identity exact. Analytical
+  tests distinguish the reproduced earlier HDR cancellation bug from the fixed
+  native kernel and cover every cube corner with extreme unused table values.
+  The corrected independent corpus supersedes the earlier unstable amount
+  expression; no numerical tolerance was loosened.
+- Existing 50 MP HSL/Color Balance/Vibrance precision files remain byte-exact
+  against `d4c9f03`. All 39 previous native function signatures remain exact;
+  only `gradientFloat` and `lookupFloat` are added. The four tracked native
+  ICC/RAW/AVIF/lens codecs remain unchanged.
+
+Pixels WASM SHA-256: `bd6a519864eb8c8893e1ff8ef23ce5da6b8910c39532467fae9828ba9b305311`.
+
+A narrow native allocation probe retains all checksums while eliminating 100
+new native instances during 100 alternating 4,096-pixel lookup windows. It does
+not establish browser latency, peak whole-process memory or all-tool performance.
+Timing, original failed/interrupted attempts and previous reference bytes,
+source/generated/release identities, complete file streams, independent reader
+provenance and the verification/audit scripts are retained in
+[sealed evidence](benchmarks/float-palette-2026-10-28.zip). Byte-identical closed
+artifacts share verified hard links to reduce temporary RAM without losing paths
+or content; the receipt is retained.
+
+This accepts the bounded encoded-sRGB palette/lookup increment. Full HDR and
+wide-gamut working-profile models, remaining float tools/layer families, broader
+photographic/interchange/workflow quality, physical GPU/display/tablet/device
+acceptance, measured whole-process peak memory and sustained editor-wide/all-tool
+F14 performance remain required. Every other unfinished original professional,
+AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
+and commercial gate remains active. The full original roadmap is not complete.

@@ -570,10 +570,10 @@ export function InspectorPanel({
                     { value: "hsl", label: "Hue / Saturation / Lightness" },
                     { value: "color-balance", label: "Color Balance" },
                     { value: "vibrance", label: "Vibrance" },
-                    { value: "gradient-map", label: "Gradient Map",disabled:float },
+                    { value: "gradient-map", label: "Gradient Map" },
                     { value: "red-eye", label: "Red Eye",disabled:float },
                     { value: "white-balance", label: "White Balance" },
-                    { value: "lut", label: "Color Lookup (LUT)",disabled:float },
+                    { value: "lut", label: "Color Lookup (LUT)" },
                     { value: "curves", label: "Curves" },
                     { value: "levels", label: "Levels" },
                     { value: "tone", label: float?'Linear tone (Exposure / Contrast / Saturation)':"Tone (Exposure / Contrast)" },
@@ -654,6 +654,7 @@ export function InspectorPanel({
                   />
                 )}
 
+                {float&&selected.adjustment.kind==='lut'&&<p className="section-description">Signed sRGB lookup retains extended float colors. Table domains bound input; zero amount preserves original colors. The SDR preview and integer exports can clip.</p>}
                 {selected.adjustment.kind === "lut" && <LutControls key={selected.id}
                   adjustment={selected.adjustment} disabled={locked || busy}
                   onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
@@ -667,6 +668,7 @@ export function InspectorPanel({
                   adjustment={selected.adjustment} disabled={locked || busy}
                   onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
                   onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
+                {float&&selected.adjustment.kind==='gradient-map'&&<p className="section-description">Maps continuous sRGB luma to your palette. Extended inputs map to palette endpoints; source colors stay unchanged.</p>}
                 {selected.adjustment.kind === "gradient-map" && <GradientMapControls
                   key={selected.id} adjustment={selected.adjustment} disabled={locked || busy}
                   onPreview={adjustment => onPreview({type: "layer.update", id: selected.id, patch: {adjustment}})}

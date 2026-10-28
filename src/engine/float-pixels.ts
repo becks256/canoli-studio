@@ -1,4 +1,6 @@
 import{compileFloatColor,type FloatColorAdjustment}from'../core/float-color';
+import{compileFloatGradient}from'../core/float-gradient';
+import type{GradientMapAdjustmentData}from'../core/gradient-map';
 import{compileFloatTransfer,FLOAT_TRANSFER_VALUES,type FloatTransferAdjustment}from'../core/float-transfer';
 import{z}from'zod';
 import{BLEND_MODES,type BlendMode}from'../core/model';
@@ -19,7 +21,7 @@ function checked(status:number){if(status===1)throw new Error('Float pixels, alp
  * Private memory and owned outputs prevent ordinary byte work from overwriting it. */
 export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
- constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
+ constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
  private layout(pixels:number,masked=false,extra=0){
@@ -38,6 +40,10 @@ export class FloatPixelProcessor{
  color(pixels:Float32Array,adjustment:FloatColorAdjustment):Float32Array<ArrayBuffer>{
   this.owner();const{kind,values}=compileFloatColor(adjustment);samples(pixels,'Input');const result=new Float32Array(pixels.length);
   for(let at=0;at<pixels.length;at+=WINDOW*4){const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count);new Float32Array(p.kernel.memory.buffer,p.source,count*4).set(pixels.subarray(at,at+count*4));new Float64Array(p.kernel.memory.buffer,p.matrix,values.length).set(values);const status=p.kernel.colorFloat(p.source,p.output,p.matrix,count,kind);if(status===2)throw new Error('This color adjustment requires normalized linear RGB [0,1]. Use neutral settings or an explicit Levels range for extended colors.');checked(status);result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);}return result;
+ }
+ gradient(pixels:Float32Array,input:GradientMapAdjustmentData):Float32Array<ArrayBuffer>{
+  this.owner();const{adjustment,values}=compileFloatGradient(input);samples(pixels,'Input');const result=new Float32Array(pixels.length);
+  for(let at=0;at<pixels.length;at+=WINDOW*4){const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count,false,values.length*8);new Float32Array(p.kernel.memory.buffer,p.source,count*4).set(pixels.subarray(at,at+count*4));new Float64Array(p.kernel.memory.buffer,p.matrix,values.length).set(values);checked(p.kernel.gradientFloat(p.source,p.output,p.matrix,count,adjustment.stops.length,adjustment.reverse));result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);}return result;
  }
  transfer(pixels:Float32Array,adjustment:FloatTransferAdjustment):Float32Array<ArrayBuffer>{
   this.owner();const{values}=compileFloatTransfer(adjustment);samples(pixels,'Input');const result=new Float32Array(pixels.length);

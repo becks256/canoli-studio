@@ -103,10 +103,16 @@ export async function primeLutCache(input: CubeLutData, isCancelled: () => boole
 export const lutOptionsSchema = z.object({
   amount: z.number().finite().min(0).max(100).optional(), interpolation: z.enum(["tetrahedral", "trilinear"]).optional(),
 }).strict();
-export const lutAdjustmentSchema = z.object({
-  kind: z.literal("lut"), lut: cubeLutSchema, amount: z.number().finite().min(0).max(100),
+const lutHeaderSchema = z.object({
+  kind: z.literal("lut"), lut: cubeHeaderSchema, amount: z.number().finite().min(0).max(100),
   interpolation: z.enum(["tetrahedral", "trilinear"]),
 }).strict();
+export const lutAdjustmentSchema = lutHeaderSchema.extend({lut:cubeLutSchema});
+
+/** Private worker transport snapshot. Table validation follows in the receiving
+ * owner before it publishes a captured handle; ordinary commands use the full
+ * lutAdjustmentSchema above. This avoids decoding a large table on the UI thread. */
+export function captureLutHeader(input:LutAdjustmentData):LutAdjustmentData{return lutHeaderSchema.parse(input);}
 
 const numeric = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
 /** Adobe/IRIDAS Cube 1.0: exactly one 1D or 3D table, with red changing fastest. */
