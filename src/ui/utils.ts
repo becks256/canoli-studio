@@ -306,6 +306,26 @@ export function computeVisibleRegion(
   };
 }
 
+/** Padded visible UI plane, including space outside the artboard. This bounds
+ * presentation work only; every Pen anchor/handle and authored point remains.
+ * SVG coordinate rounding can differ from double-precision geometry: retain
+ * complete presentation when uncertainty exceeds 1/1024 of a screen pixel. */
+export function computePenOverlayWindow(
+  documentSize: {width:number;height:number},
+  viewportSize: {width:number;height:number},
+  pan: {x:number;y:number},
+  zoom: number,
+): Region|null {
+  if(![documentSize.width,documentSize.height,viewportSize.width,viewportSize.height,pan.x,pan.y,zoom].every(Number.isFinite)||
+    documentSize.width<=0||documentSize.height<=0||viewportSize.width<=0||viewportSize.height<=0||zoom<=0)return null;
+  const margin=32/zoom,width=viewportSize.width/zoom+2*margin,height=viewportSize.height/zoom+2*margin,
+    x=documentSize.width/2-(viewportSize.width/2+pan.x)/zoom-margin,
+    y=documentSize.height/2-(viewportSize.height/2+pan.y)/zoom-margin;
+  const values=[x,y,width,height,x+width,y+height];
+  if(!values.every(value=>Number.isFinite(value)&&Number.isFinite(Math.fround(value))&&Math.abs(value-Math.fround(value))*zoom<=1/1024))return null;
+  return{x,y,width,height};
+}
+
 /**
  * Calculates the zoom level required to fit the document comfortably inside the viewport box.
  */

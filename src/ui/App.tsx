@@ -142,6 +142,7 @@ import {
   canvasPoint,
   computeResizePatch,
   computeVisibleRegion,
+  computePenOverlayWindow,
   download,
   fileName,
   modifiers,
@@ -467,6 +468,10 @@ export function App({ editor }: { editor: EditorApplication }) {
       zoom,
     );
   }, [viewDocument.width, viewDocument.height, viewportSize, zoom, pan]);
+
+  const penOverlayWindow=useMemo(()=>computePenOverlayWindow(
+    {width:viewDocument.width,height:viewDocument.height},viewportSize,pan,zoom,
+  ),[viewDocument.width,viewDocument.height,viewportSize,zoom,pan]);
 
   function chooseTool(next: Tool) {
     if(!editor.tools.canUseTool(next)){notify('This tool requires its float document integration.');return;}
@@ -2289,6 +2294,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                   />
                 </div>
                 <CanvasOverlays
+                  viewportWindow={penOverlayWindow}
                   document={viewDocument}
                   selected={selected}
                   tool={tool}

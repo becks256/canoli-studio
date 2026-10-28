@@ -4,6 +4,7 @@ import {
   canvasPoint,
   computeResizePatch,
   computeVisibleRegion,
+  computePenOverlayWindow,
   download,
   fileName,
   modifiers,
@@ -263,4 +264,22 @@ describe("UI Utils", () => {
       expect(zoom).toBe(0.5);
     });
   });
+});
+
+
+describe('Pen overlay presentation region',()=>{
+ it('covers the visible plane and overscan outside every artboard edge without changing inputs',()=>{
+  const document=Object.freeze({width:200,height:100}),viewport=Object.freeze({width:1000,height:700}),pan=Object.freeze({x:0,y:0});
+  expect(computePenOverlayWindow(document,viewport,pan,2)).toEqual({x:-166,y:-141,width:532,height:382});
+  expect(document).toEqual({width:200,height:100});expect(viewport).toEqual({width:1000,height:700});expect(pan).toEqual({x:0,y:0});
+ });
+ it('falls back instead of clipping with unsafe SVG precision or an unavailable viewport',()=>{
+  expect(computePenOverlayWindow({width:1e10+1,height:600},{width:842,height:747},{x:0,y:0},1)).toBeNull();
+  for(const zoom of[0,NaN,Infinity,Number.MIN_VALUE])expect(computePenOverlayWindow({width:800,height:600},{width:842,height:747},{x:0,y:0},zoom)).toBeNull();
+  expect(computePenOverlayWindow({width:800,height:600},{width:0,height:747},{x:0,y:0},1)).toBeNull();
+ });
+ it('keeps exactly representable large document coordinates eligible without imposing a geometry cap',()=>{
+  const clip=computePenOverlayWindow({width:2**25,height:2**25},{width:1024,height:1024},{x:0,y:0},1);
+  expect(clip).toEqual({x:2**24-544,y:2**24-544,width:1088,height:1088});
+ });
 });

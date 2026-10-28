@@ -3,13 +3,14 @@ import {BrushSymmetryGuides} from './BrushSymmetryDialog';
 import { useSelectionOutlines } from "./hooks/useSelectionOutlines";
 import { memo, useSyncExternalStore } from "react";
 import type { DocumentData, LayerData } from "../core/model";
-import type { Point } from "../core/drawing";
+import type { Point, Rect } from "../core/drawing";
 import {paintStampSize,paintStampGeometry} from '../core/paint-stamps';
 import { maskTransform } from "../core/masks";
 import { layerTransform } from "../core/spatial";
 import type { Tool, ToolController } from "../tools";
 
 export function CanvasOverlays({
+  viewportWindow,
   document,
   selected,
   tool,
@@ -19,6 +20,7 @@ export function CanvasOverlays({
   showBrushCursor = true,
   onError,
 }: {
+  viewportWindow?: Rect|null;
   document: DocumentData;
   selected?: LayerData;
   tool: Tool;
@@ -53,6 +55,8 @@ export function CanvasOverlays({
       : selected?.kind === 'text' && selected.textPath
         ? [{...selected.textPath,id:'text-baseline'}]
       : [];
+  const penWindow=tool==="pen"&&pathTransform&&localPaths.length>0?viewportWindow:null;
+  const clipOffsetX=sharePenTranslation?pathTransform?.e??0:0,clipOffsetY=sharePenTranslation?pathTransform?.f??0:0;
   const selectedAnchor = controller.selectedMaskAnchor;
   const selectedTextAnchor = controller.selectedTextPathAnchor;
   return (
@@ -205,9 +209,11 @@ export function CanvasOverlays({
         </g>
       )}
       {tool === "pen" && pathTransform && localPaths.length > 0 && (
-        <g data-testid="pen-controls" transform={`translate(${sharePenTranslation ? pathTransform.e : 0} ${sharePenTranslation ? pathTransform.f : 0})`}>
+        <g data-testid="pen-controls" data-viewport-x={penWindow?.x} data-viewport-y={penWindow?.y} data-viewport-width={penWindow?.width} data-viewport-height={penWindow?.height} transform={`translate(${sharePenTranslation ? pathTransform.e : 0} ${sharePenTranslation ? pathTransform.f : 0})`}>
           {localPaths.map((path, pathIndex) => (
             <PenPathControls key={path.id} points={path.points}
+              clipLeft={penWindow?penWindow.x-clipOffsetX:undefined} clipTop={penWindow?penWindow.y-clipOffsetY:undefined}
+              clipRight={penWindow?penWindow.x+penWindow.width-clipOffsetX:undefined} clipBottom={penWindow?penWindow.y+penWindow.height-clipOffsetY:undefined}
               a={pathTransform.a} b={pathTransform.b} c={pathTransform.c}
               d={pathTransform.d} e={sharePenTranslation ? 0 : pathTransform.e} f={sharePenTranslation ? 0 : pathTransform.f}
               zoom={zoom} outline={editingMask || editingTextPath} closed={path.closed}
@@ -273,13 +279,23 @@ export function CanvasOverlays({
 // Numeric props let unchanged controls skip SVG reconciliation even when a
 // preview reconstructs the path DTOs or the cursor publishes a new position.
 // Compare fields directly to avoid two Object.keys arrays per anchor update.
+type PenClipEdges={clipLeft?:number;clipTop?:number;clipRight?:number;clipBottom?:number};
+
 const PenAnchor = memo(function PenAnchor({
-  x, y, inX, inY, outX, outY, zoom, active,
+  x, y, inX, inY, outX, outY, zoom, active,clipLeft,clipTop,clipRight,clipBottom,
 }: {
   x: number; y: number; inX: number; inY: number;
   outX: number; outY: number; zoom: number; active: boolean;
-}) {
-  return <g>
+}&PenClipEdges) {
+  // The footprint includes both handles and their joining line, even when
+  // the anchor itself is outside the view. Retain every element and index;
+  // only groups wholly outside the padded view suppress browser paint work.
+  const radius=5/zoom,left=Math.min(x,inX,outX)-radius,top=Math.min(y,inY,outY)-radius,
+    right=Math.max(x,inX,outX)+radius,bottom=Math.max(y,inY,outY)+radius;
+  const outside=clipLeft!==undefined&&clipTop!==undefined&&clipRight!==undefined&&clipBottom!==undefined&&
+    Number.isFinite(left)&&Number.isFinite(top)&&Number.isFinite(right)&&Number.isFinite(bottom)&&
+    (right<clipLeft||bottom<clipTop||left>clipRight||top>clipBottom);
+  return <g display={outside?'none':undefined}>
     <line x1={inX} y1={inY} x2={outX} y2={outY} stroke="#d5e79b" strokeWidth={1 / zoom} />
     <circle cx={inX} cy={inY} r={3 / zoom} fill="#202523" stroke="#d5e79b" strokeWidth={1 / zoom} />
     <circle cx={outX} cy={outY} r={3 / zoom} fill="#202523" stroke="#d5e79b" strokeWidth={1 / zoom} />
@@ -290,11 +306,12 @@ const PenAnchor = memo(function PenAnchor({
   previous.x === next.x && previous.y === next.y &&
   previous.inX === next.inX && previous.inY === next.inY &&
   previous.outX === next.outX && previous.outY === next.outY &&
-  previous.zoom === next.zoom && previous.active === next.active,
+  previous.zoom === next.zoom && previous.active === next.active &&
+  previous.clipLeft===next.clipLeft&&previous.clipTop===next.clipTop&&previous.clipRight===next.clipRight&&previous.clipBottom===next.clipBottom,
 );
 
 
-type PenPathProps = {
+type PenPathProps = PenClipEdges & {
   points: readonly { x: number; y: number; in: Point; out: Point }[];
   a: number; b: number; c: number; d: number; e: number; f: number;
   zoom: number; outline: boolean; contour: boolean; active: number; closed?: boolean;
@@ -326,12 +343,12 @@ type PenControlBlockProps = PenPathProps & {start: number};
 
 // A changed anchor must not recreate every React element in a long path.
 // Blocks add no SVG wrappers, omit no controls and preserve drawing order.
-function penAnchors({points, a, b, c, d, e, f, zoom, active}: PenPathProps, start: number) {
+function penAnchors({points, a, b, c, d, e, f, zoom, active,clipLeft,clipTop,clipRight,clipBottom}: PenPathProps, start: number) {
   return points.map((point, offset) =>
     <PenAnchor key={start + offset} x={a*point.x+c*point.y+e} y={b*point.x+d*point.y+f}
       inX={a*point.in.x+c*point.in.y+e} inY={b*point.in.x+d*point.in.y+f}
       outX={a*point.out.x+c*point.out.y+e} outY={b*point.out.x+d*point.out.y+f}
-      zoom={zoom} active={start + offset === active} />);
+      zoom={zoom} active={start + offset === active} clipLeft={clipLeft} clipTop={clipTop} clipRight={clipRight} clipBottom={clipBottom} />);
 }
 
 const PenControlBlock = memo(function PenControlBlock(props: PenControlBlockProps) {
@@ -339,7 +356,7 @@ const PenControlBlock = memo(function PenControlBlock(props: PenControlBlockProp
 }, (previous, next) => {
   if (previous.start !== next.start || previous.a !== next.a || previous.b !== next.b ||
       previous.c !== next.c || previous.d !== next.d || previous.e !== next.e ||
-      previous.f !== next.f || previous.zoom !== next.zoom) return false;
+      previous.f !== next.f || previous.zoom !== next.zoom || previous.clipLeft!==next.clipLeft||previous.clipTop!==next.clipTop||previous.clipRight!==next.clipRight||previous.clipBottom!==next.clipBottom) return false;
   if (previous.points.length !== next.points.length) return false;
   const end = previous.start + previous.points.length;
   const activeHere = (value: PenControlBlockProps) =>
@@ -354,6 +371,7 @@ const PenControlBlock = memo(function PenControlBlock(props: PenControlBlockProp
 });
 
 function samePenGeometry(previous: PenPathProps, next: PenPathProps) {
+  if(previous.clipLeft!==next.clipLeft||previous.clipTop!==next.clipTop||previous.clipRight!==next.clipRight||previous.clipBottom!==next.clipBottom)return false;
   if (previous.a!==next.a || previous.b!==next.b || previous.c!==next.c ||
       previous.d!==next.d || previous.e!==next.e || previous.f!==next.f ||
       previous.zoom!==next.zoom || previous.outline!==next.outline ||

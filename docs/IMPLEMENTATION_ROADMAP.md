@@ -7423,3 +7423,112 @@ acceptance, measured whole-process peak memory and sustained editor-wide/all-too
 F14 performance remain required. Every other unfinished original professional,
 AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
 and commercial gate remains active. The full original roadmap is not complete.
+
+### 2026-10-28 — F14 editor-wide production performance follow-up (bounded increment)
+
+Owner: implementation agent; estimate XL within T01/F14, beginning at clean
+`048926c`. The previous goal turn made verified progress: connected continuous
+float Gradient Map/Color Lookup, HDR endpoint corrections, captured decoded
+lookup lifetimes, independent complete-scene/file/50 MP acceptance and sealed
+evidence are committed. The full original roadmap objective remains active.
+
+The next work retains the editor-wide performance scope: measure the current
+optimized production runtime across the existing interaction families, complex
+and 50 MP documents, and newly connected float processing. Record actual backend,
+input-to-matching-render latency, long tasks and explicit memory-measurement
+boundaries. Use measured common bottlenecks to choose implementation changes,
+with paired source/runtime identities and unchanged visible-output checks.
+Existing green functionality or one native microbenchmark does not prove F14.
+Physical GPU/display/tablet and cross-device acceptance, broader professional,
+AI/provider/evaluation, installed ChatGPT/live identity, workflow/collaboration,
+specialist and commercial gates remain required. No paid call, account, upload,
+new plugin grant, source-resolution cap or REST/browser synchronization is added.
+
+
+The current optimized build completed all 75 existing performance cases in 30
+files. This is functional baseline evidence, not performance-budget acceptance.
+New real-input float LUT/Gradient Map checks also pass, matching the prepared
+model and independently generated native-scene pixels on every timed frame.
+Source/runtime identities and complete reports are preserved before changes.
+Observed process-tree PSS sampling reached about 2.13 GB including test/server
+overhead; it is not a global peak-memory/device guarantee.
+
+The 8,000-anchor Pen case recorded repeated 560–694 ms main-thread tasks. A
+separate trace attributed about 36 seconds to Chromium Layerize work; JavaScript
+function-call time was much smaller. Browser-only isolation/transform hints did
+not address those stalls and are not adopted. Explicit viewport clipping and
+suppression of completely covered handle marks retained all 8,000 rectangles
+and matched complete before/after viewport pixels in both 2,000-path and
+8,000-anchor fixtures. The combined prototype reduced the observed worst task
+to 71 ms, still above responsiveness targets. Actual application integration is
+in verification. It retains all control elements/indices, off-artboard access
+and a conservative SVG precision fallback; no geometry is discarded.
+
+
+Fractional-pixel studies are bound to an immutable baseline outDir and verify
+the actual loaded entry script plus all release hashes before/after. One earlier
+study served a rebuilt candidate instead; it is explicitly excluded, with its
+results retained. An inline-script URL guard also failed before fixture setup;
+its corrected check filters inline scripts without weakening the version guard.
+Verified fractional viewport images remain exact. Application work now uses a
+more general complete-control footprint: groups wholly outside the padded view
+suppress paint while retaining all anchor, circle and line elements. Visible
+marks retain their original paint, and a handle/line crossing into view must
+revive its group even when the anchor remains outside. This covers curved
+controls as well as coincident handles; actual UI acceptance remained pending at that prototype stage.
+
+
+The first application pilot passed 18/21. Independent affine pixel checks found
+two 2–5-code discrepancies introduced by the explicit SVG clipping effect;
+all seven untouched-baseline affine checks pass. The final approach removes that
+SVG effect and retains only double-precision footprint eligibility, preserving
+the original paint hierarchy. A separate frozen-baseline footprint-only study
+passes both dense fixtures with exact fractional viewport pixels and a dense
+observed worst task of 54 ms, still not a full responsiveness-budget pass.
+The pilot's mask-marker color assertion also assumed an inactive anchor after
+explicit selection; it now asserts the correct selected green, without changing
+application selection behavior. Failed pilots and their source versions remain
+retained; final application acceptance was still required at that pilot stage.
+
+
+### 2026-10-28 — Accepted Pen viewport performance increment; full F14 remains open
+
+The final footprint-only implementation passes the 21-case focused pilot, all
+175 normal-production browser cases, three additional Pen-mask regressions, the
+77-case/31-file performance inventory, normal production build and all 2,862
+unit tests in 285 files. Accepted phases have no skips, retries, flaky outcomes
+or unexpected failures. Ten compiled before/after viewport comparisons at DPR
+1/2 retain all 63,461,040 RGBA channels exactly, independently checked by Pillow
+with a known-background guard. Existing affine bounds remain unchanged. Real
+artwork/mask interactions preserve all controls, off-artboard editing, crossing
+handle revival, cancellation, Undo, pan, zoom, resize and accepted geometry.
+
+Three alternating immutable-release pairs reduce the dense 8,000-anchor
+fixture's worst observed main-thread task from 663–685 ms to 53–66 ms. The
+instrumented Layerize maximum falls from 631.794 ms to 1.720 ms. The multi-path
+case still has 97–108 ms paired tasks, and its canvas-copy p95 does not improve
+consistently. Actual reported backends are Canvas2D on one host. Fully visible
+dense controls, physical presentation and sustained all-tool budgets remain
+unaccepted. No SVG clipping effect or compositor hint is adopted.
+
+New real-input float-control diagnostics acknowledge both the matching model
+and independently checked canvas pixels, retain exact originals/dimensions and
+restore 20 edits through Undo. Their final canvas-copy p95 remains 200.8 ms for
+LUT and 240.2 ms for Gradient Map. The complete sweep also retains font,
+large-document, script and other slow paths. Async preparation, copies, readback
+and long tasks remain distinct. Sampled descendant PSS does not establish a
+memory improvement or a global/physical-device peak budget.
+
+[Measurements and limits](benchmarks/pen-viewport-performance-2026-10-28.md) and
+[sealed evidence](benchmarks/pen-viewport-performance-2026-10-28.zip) retain the
+baseline, source/generated/release identities, actual CLI terminals, raw
+metrics, traces, memory samples, exact pixels, failed/invalid explorations and
+verification scripts. Pixel WASM and all four tracked codec binaries remain
+byte-identical. The earlier sealed evidence and original commits are retained.
+
+This accepts the bounded Pen presentation improvement and broader current
+performance inventory. Full F14, remaining measured slow paths, HDR/precision,
+photographic/interchange quality, physical GPU/display/tablet/device behavior,
+global memory, AI/provider/evaluation, live installed ChatGPT/identity,
+collaboration, specialist and commercial gates remain required. The full
+original implementation roadmap objective stays active and unfinished.

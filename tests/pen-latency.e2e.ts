@@ -17,7 +17,7 @@ for(const {paths, anchors} of [{paths:20,anchors:4},{paths:200,anchors:4},{paths
  const box=(await page.locator('.canvas-wrap').boundingBox())!;
  const revision=await page.evaluate(()=>window.luma.editor.document.getSnapshot().revision);
  await page.evaluate(()=>{
-  const state={start:0,phase:'move',sequence:0,frames:[] as {phase:string;ms:number;prepareMs:number}[],longTasks:[] as number[],longTaskDetails:[] as {start:number;duration:number}[],events:[] as {phase:string;start:number}[]};(window as any).penTiming=state;
+  const state={start:0,phase:'move',sequence:0,frames:[] as {phase:string;ms:number;prepareMs:number;backend:string}[],longTasks:[] as number[],longTaskDetails:[] as {start:number;duration:number}[],events:[] as {phase:string;start:number}[]};(window as any).penTiming=state;
   const input=(phase:string)=>{state.start=performance.now();state.events.push({phase,start:state.start});state.phase=phase;state.sequence++;};
   window.addEventListener('pointerdown',()=>state.events.push({phase:'down',start:performance.now()}),true);
   window.addEventListener('pointermove',event=>{if(event.buttons===1)input('move');else state.events.push({phase:'hover',start:performance.now()});},true);window.addEventListener('pointerup',()=>input('commit'),true);
@@ -25,7 +25,7 @@ for(const {paths, anchors} of [{paths:20,anchors:4},{paths:200,anchors:4},{paths
   const renderer=window.luma.editor.renderer,prepare=renderer.prepareViewport.bind(renderer);
   renderer.prepareViewport=async(...args)=>{
    const {start,phase,sequence}=state,begin=performance.now(),frame=await prepare(...args),prepareMs=performance.now()-begin,present=frame.present.bind(frame);
-   frame.present=canvas=>{present(canvas);if(start){state.frames.push({phase,ms:performance.now()-start,prepareMs});if(sequence===state.sequence)state.start=0;}};return frame;
+   frame.present=canvas=>{present(canvas);if(start){state.frames.push({phase,ms:performance.now()-start,prepareMs,backend:frame.backend});if(sequence===state.sequence)state.start=0;}};return frame;
   };
  });
  const trace = process.env.LUMA_PEN_TRACE ? await page.context().newCDPSession(page) : null;
@@ -58,6 +58,6 @@ for(const {paths, anchors} of [{paths:20,anchors:4},{paths:200,anchors:4},{paths
  }
  const result=await page.evaluate(()=>({...((window as any).penTiming),revision:window.luma.editor.document.getSnapshot().revision,layer:window.luma.editor.document.selectedLayer!.toJSON()}));
  const timings = result.frames.filter((f:{phase:string})=>f.phase==='move').map((f:{ms:number})=>f.ms).sort((a:number,b:number)=>a-b);
- console.log('pen-latency',JSON.stringify({paths,anchors,frames:timings.length,median:timings[Math.floor(timings.length/2)],p95:timings[Math.floor(timings.length*.95)],commit:result.frames.filter((f:{phase:string})=>f.phase==='commit'),longTasks:result.longTasks,longTaskDetails:result.longTaskDetails,events:result.events}));await info.attach('pen-latency',{body:JSON.stringify({paths,anchors,...result}),contentType:'application/json'});
+ console.log('pen-latency',JSON.stringify({paths,anchors,backends:[...new Set(result.frames.map((frame:{backend:string})=>frame.backend))],frames:timings.length,median:timings[Math.floor(timings.length/2)],p95:timings[Math.floor(timings.length*.95)],commit:result.frames.filter((f:{phase:string})=>f.phase==='commit'),longTasks:result.longTasks,longTaskDetails:result.longTaskDetails,events:result.events}));await info.attach('pen-latency',{body:JSON.stringify({paths,anchors,...result}),contentType:'application/json'});
  expect(result.revision).toBe(revision+1);expect(result.layer.paths[0].points[0]).toMatchObject({x:80,y:50});expect(result.frames.filter((f:{phase:string})=>f.phase==='move').length).toBeGreaterThan(10);
 });

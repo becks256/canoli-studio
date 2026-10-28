@@ -1077,3 +1077,17 @@ The custom RAW dialog exposes manual exact controls and rejects invalid geometry
 ## Recorded RAW shooting declarations
 
 Native wire protocol 2 adds bounded recorded lens maker/model and positive finite focal length, 35 mm-equivalent focal length, aperture, exposure seconds and ISO to the existing RAW report flow. Missing or invalid native declarations are unknown; public report version 1 keeps the shooting object optional so old accepted files remain unchanged. Reports preserve native float32 precision and deep immutability. Native processing, original pixel geometry, accepted history/assets and all host/script/REST/batch/recovery transport and permission boundaries remain authoritative. No serial/location/time fields are added to the report; originals retain their complete bytes. The custom review disclosure formats declarations without treating them as calibrated measurements or selecting a profile. Precise fields, defaults/unknowns, error behavior and the executable isolated example are in SCRIPTING_API.md. This supplies required source context for the unfinished calibrated lens workflow; it does not implement profile matching/interpolation/databases or complete F12/F10/F14.
+
+
+## Pen presentation work (F14)
+
+Preserve every authored anchor/handle and normal manual editing while bounding
+Pen overlay paint work to the padded visible viewport, including off-artboard
+space. Pan/zoom/resize must refresh the private region. Unsafe view-coordinate precision
+must use full presentation. Suppress paint only for complete control footprints outside the padded view;
+retained indices, revived/crossing handles, masks/text baselines,
+transforms, exact model/Undo and original artwork must remain correct. Verify
+whole visible pixels, real browser interaction and paired production timings;
+retain slow cases, long tasks and device/process-memory limitations. No source
+geometry cap, model/schema or extension privilege change follows from this UI
+policy. Broader all-tool F14 and the complete roadmap remain required.

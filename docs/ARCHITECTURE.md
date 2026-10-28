@@ -1987,3 +1987,33 @@ The custom RAW dialog exposes manual exact controls and rejects invalid geometry
 ## Recorded RAW shooting declarations
 
 Native wire protocol 2 adds bounded recorded lens maker/model and positive finite focal length, 35 mm-equivalent focal length, aperture, exposure seconds and ISO to the existing RAW report flow. Missing or invalid native declarations are unknown; public report version 1 keeps the shooting object optional so old accepted files remain unchanged. Reports preserve native float32 precision and deep immutability. Native processing, original pixel geometry, accepted history/assets and all host/script/REST/batch/recovery transport and permission boundaries remain authoritative. No serial/location/time fields are added to the report; originals retain their complete bytes. The custom review disclosure formats declarations without treating them as calibrated measurements or selecting a profile. Precise fields, defaults/unknowns, error behavior and the executable isolated example are in SCRIPTING_API.md. This supplies required source context for the unfinished calibrated lens workflow; it does not implement profile matching/interpolation/databases or complete F12/F10/F14.
+
+
+## Pen overlay presentation bounds (F14, in verification)
+
+The UI derives a document-space view rectangle from current viewport size,
+pan and zoom, padded by 32 CSS pixels. It is deliberately not clamped to the
+artboard: off-artboard anchors remain editable when panned into view. JavaScript
+compares complete control footprints with that region; no SVG clipping effect
+is introduced into the original affine paint hierarchy.
+Every anchor, handle and control index stays in the DOM. Artwork, vector-mask
+and text-baseline controls share this presentation policy; native hit testing,
+authored geometry, commands, Undo, sources and exported artwork are unchanged.
+Pan, zoom, resize and document dimensions refresh the private rectangle.
+
+View bounds are admitted only when all coordinates/extents are finite and
+their float32 rounding uncertainty is at most 1/1024 of a CSS pixel. Unsafe or
+unavailable view geometry retains complete overlay presentation. This is a
+precision fallback, not a document/image-size or coordinate limit. Existing
+large-translation precision handling remains independent.
+
+Each complete control footprint includes the anchor square, both handle circles,
+the joining line and their stroke support. Only groups wholly outside the padded
+view suppress paint; all elements, coordinates and indices remain. A visible
+handle or crossing line keeps a group eligible even when its anchor is outside.
+Geometry, pan, zoom and resize revive groups through the existing memoization
+invalidation. Unsafe/nonfinite footprints retain full presentation. Visible
+marks retain their complete original paint order, including coincident handles.
+This reduces invisible browser paint chunks, without a compositor-hint dependency.
+Dated performance, pixel and interaction acceptance belongs in the roadmap;
+this contract alone does not establish sustained 60fps or full F14/device quality.

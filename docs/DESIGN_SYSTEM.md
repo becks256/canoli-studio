@@ -678,3 +678,15 @@ Reuse the existing RAW review/development dialog. A Lens correction disclosure e
 
 
 RAW review includes a Recorded lens and exposure disclosure showing declared lens identity, focal/equivalent mm, f-number, exposure seconds and ISO. Display unknowns explicitly and format native float32 values with seven significant digits for reading. Keep these read-only source details separate from editable development controls; disclose that they are not verified/calibrated sensor measurements or automatic profile matching. Existing dialog scrolling, actions, Escape/cancellation and preview/commit boundaries remain.
+
+
+## Pen overlay viewport policy
+
+Keep the complete Pen control graph and screen-sized markers. Bound only
+invisible paint work through the current padded viewport, including visible
+space outside the artboard; pan/zoom/resize must reveal the same controls.
+Retain full presentation when view coordinates cannot meet the precision budget.
+Groups outside the padded view retain all indexed elements but suppress paint
+until any anchor/handle/line reaches the view. Keep visible marks in their full
+original paint order. This must not change visible pixels, selection,
+hit testing, Undo or export, and must not clip crop/selection/other tool overlays.
