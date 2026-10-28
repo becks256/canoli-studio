@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Continuous float color controls
+
+Enable existing HSL, Color Balance and Vibrance types and palette actions in supported float documents. Reuse fractional controls, gesture cancellation, locks and shared Undo. Explain the active normalized RGB range and exact-neutral extended-color recovery. Keep correction controls available during explicit preview failure; never display stale artwork as Ready. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## Initial float document workflow (F10)
 
 Use the custom TIFF precision selector and staged Working precision choice in Color Settings. Keep Cancel active during preparation, apply output settings only after successful native preparation, display SDR preview status, disable unsupported tools and proofing, and explain quantization in export reports. Actual float documents use ordinary Undo for working precision; output preferences remain outside history. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).

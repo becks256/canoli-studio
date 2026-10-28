@@ -2202,3 +2202,5 @@ test('production float blend controls display and deliver every native mode with
 test('production blend domain failures suppress stale artwork and recover through Normal and Undo without developer globals',async({page},info)=>{const{floatBlendDomainWorkflow}=await import('./helpers/float-blend');await floatBlendDomainWorkflow(page,info,true);});
 
 test('production linear White Balance preserves native files, actual controls, isolated example, cancellation and originals without developer globals',async({page},info)=>{const{floatWhiteBalanceWorkflow}=await import('./helpers/float-white-balance');await floatWhiteBalanceWorkflow(page,info,true);});
+
+test('production float HSL, Color Balance and Vibrance preserve native files, actual controls and originals without developer globals',async({page},info)=>{const{floatColorWorkflow}=await import('./helpers/float-color');await floatColorWorkflow(page,info,true);});

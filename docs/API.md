@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Continuous float color controls
+
+Existing strict `layer.add` and `layer.update` accept the same HSL, Color Balance and Vibrance DTOs in float documents, with shared revisions, locks, atomic rollback and Undo. Headless REST retains PNG-only asset admission and supplies neither native float TIFF admission/rendering nor browser synchronization. Pixel-domain failures belong to actual browser rendering/delivery. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## Initial float document workflow (F10)
 
 The shared strict command {type: "document.precision.float"} and schema-49 state also apply to independent REST documents. REST original admission remains PNG-only; it supplies no original unsigned 16-bit or float32 TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).

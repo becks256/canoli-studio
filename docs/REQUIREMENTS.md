@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Continuous float color controls
+
+Connect existing HSL, Color Balance and Vibrance DTOs to native float scenes, shared commands/history, controls, isolation, original-bearing recipes and precision delivery. Use continuous encoded-sRGB controls over normalized linear inputs; preserve exact alpha and neutral finite extended words. Reject active out-of-range input before coverage without partial publication. Verify independent native/scene/file references, ordinary controls, grant/source/history ownership and genuine 50 MP delivery. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## Initial float document workflow (F10)
 
 Support schema-49 float32/linear-sRGB state, original-bearing unsigned 16-bit or float32 TIFF admission, shared OO conversion/Undo, guarded source roles, original-native raster composition, original-preserving erasure/clear, continuous Curves/Levels and direct precision delivery. Stage output settings with precision, disable unsupported UI operations and retain exact originals through persistence. Complete all actual verification before acceptance; broader F10/F11/F14 and the original roadmap remain open. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).

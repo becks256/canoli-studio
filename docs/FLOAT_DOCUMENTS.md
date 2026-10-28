@@ -2,7 +2,7 @@
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
-transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels and White Balance adjustments use this
+transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels, White Balance, HSL, Color Balance and Vibrance adjustments use this
 mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
@@ -211,6 +211,103 @@ Schema 49 and all grants remain unchanged. Older implementations that reject
 White Balance in their float subset still reject these documents. Independent
 REST sessions accept the metadata through shared validation/history; they gain
 no high-precision original admission, renderer or browser synchronization.
+
+## Continuous HSL, Color Balance and Vibrance
+
+The existing `AdjustmentLayer` DTOs also work in float documents:
+
+- HSL: `{kind: 'hsl', hue, saturation, lightness}`. Hue is −180…180 degrees;
+  saturation/lightness are −100…100. All three fields are required; neutral is
+  exactly zero for all three. Trusted `defaultHslAdjustment()` returns that DTO.
+- Color Balance: `{kind: 'color-balance', shadows, midtones, highlights,
+  preserveLuminosity}`. Each range is exactly `{red, green, blue}` with required
+  finite values −100…100; luminosity preservation is a required boolean. Trusted
+  `defaultColorBalanceAdjustment()` zeroes the nine channels and enables
+  preservation. All-zero channels are neutral with either boolean value.
+- Vibrance: `{kind: 'vibrance', vibrance, saturation}`, both required finite
+  values −100…100, defaulting to zero in trusted `defaultVibranceAdjustment()`.
+
+Fractional controls are accepted. Use constructors and the ordinary
+`layer.adjustment` setter; there are no new public mutation methods or command
+types. Unknown/missing/nonfinite/out-of-range controls reject shared edits
+atomically. Isolated scripts use explicit DTOs; trusted default helpers are not
+sandbox globals. Locks, revisions, ordinary Undo and cancellation remain shared.
+
+These controls retain their existing **encoded-sRGB** meanings. A native worker
+encodes normalized working-linear RGB with the continuous sRGB transfer, performs
+the control math in float64, fits the existing bounded gamut, decodes to linear
+RGB and stores float32 once. It uses no byte LUT, byte canvas or integer RGB
+intermediate. Alpha words are copied exactly. Globally neutral settings bypass
+the conversion and preserve all finite signed/extended RGB words, including
+subnormals and signed zero.
+
+Active settings require the complete captured working RGB input in [0,1],
+including hidden colors, before masking/opacity interpolation. Out-of-range
+working colors reject rendering/delivery explicitly. Use neutral settings or an
+active Levels range to bound those colors deliberately; originals are never
+clipped to admit the tool. Disabled/zero-opacity layers retain their existing
+render bypass. This bounded control model does not define an HDR HSL/vibrance
+model or complete wide-gamut/HDR editing.
+
+HSL rotates hue cyclically. Negative saturation/lightness multiply toward zero;
+positive values interpolate toward one. Achromatic input never acquires an
+arbitrary hue; hue/saturation-only edits preserve its original words. Equivalent
+sum/minimum forms avoid cancellation and zero division for extremely dark
+float samples. Color Balance weights the encoded luma
+`l=.3*r+.59*g+.11*b` with shadows `max(0,1-2*l)`, highlights `max(0,2*l-1)`
+and remaining midtones. Channels receive weighted offsets divided by 100.
+Preservation uses the existing SetLum/ClipColor model; without it, the result
+clamps to the bounded gamut. Vibrance uses
+`max(0,1+(saturation+vibrance*(1-chroma))/100)` as the chroma multiplier,
+then SetLum/ClipColor. These are encoded-luma controls, distinct from the linear
+Tone saturation operator and from physical luminance/skin detection.
+
+Mask/fill/opacity, artistic blending, isolated/pass-through groups and sibling
+clipping apply after the control stage in the established float order. Complete
+native processing precedes frame filtering and final SDR/file conversion. Failed
+previews hide stale artwork until a current successful frame; failed delivery
+publishes no partial file. Native project/workspace/history, semantic recipes and
+original-bearing portable packages retain the same DTOs and source bytes.
+Schema 49, plugin grants and REST/browser isolation are unchanged. Older float
+implementations that reject these kinds continue to reject those documents.
+
+Open a normalized original unsigned-16 TIFF in float editing mode first:
+
+<!-- example: float-color -->
+```js
+document.convertToFloat();
+document.layers.add(new AdjustmentLayer({
+  name: 'Float HSL',
+  adjustment: {kind: 'hsl', hue: 37.25, saturation: -43.5, lightness: 21.75},
+}));
+document.layers.add(new AdjustmentLayer({
+  name: 'Float Color Balance',
+  adjustment: {
+    kind: 'color-balance',
+    shadows: {red: -37.25, green: 12.5, blue: 71.25},
+    midtones: {red: 27.5, green: -41.25, blue: 16.75},
+    highlights: {red: 53.5, green: 19.25, blue: -61.5},
+    preserveLuminosity: true,
+  },
+}));
+const vibrance = document.layers.add(new AdjustmentLayer({
+  name: 'Float Vibrance', opacity: 0.625,
+  adjustment: {kind: 'vibrance', vibrance: 37.25, saturation: -41.5},
+}));
+document.selectedLayer = vibrance;
+print('Float color controls ready');
+```
+
+Independent references use Python colorsys HLS and a vectorized equivalent
+checked against every original scalar word stream, plus NumPy transfers and
+encoded-luma helpers. [sRGB conversion definitions](https://www.w3.org/TR/2026/CRD-css-color-4-20261027/#color-conversion-code),
+[SetLum/ClipColor](https://www.w3.org/TR/2024/CRD-compositing-1-20240321/#blendingnonseparable)
+and [colorsys](https://docs.python.org/3/library/colorsys.html) describe the
+reference methods. The registered primitive RGB bound is `2^-22`, scene RGB
+uses that bound times the per-pixel maximum of 1/source/reference absolute RGB,
+integer file color error is at most one code, and alpha/neutral words are exact.
+No older comparison bound is widened. Photographic/device/color/performance
+acceptance and the full original roadmap remain required.
 
 ## Continuous Curves and Levels
 

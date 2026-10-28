@@ -6,6 +6,21 @@ DocumentOptions.precision defaults to uint8 and also accepts float32. Readonly d
 
 Existing Curves/Levels `AdjustmentLayer` DTOs also support continuous working-linear float RGB with unchanged 0..255 control units, master-before-channel ordering and exact alpha. Curves extend endpoint tangents; active Levels clip at input endpoints, while neutral channels preserve signed/extended identity. Strict controls, masks, fill/opacity, Undo and isolated revision/permission checks remain authoritative. [Exact numeric definitions, executable example, limits and errors](FLOAT_DOCUMENTS.md#continuous-curves-and-levels).
 
+## HSL, Color Balance and Vibrance in float documents
+
+The existing `AdjustmentLayer` constructor and `.adjustment` setter accept HSL,
+Color Balance and Vibrance in float documents with their unchanged required
+fields/defaults and finite fractional ranges. The native worker applies their
+continuous encoded-sRGB control model to normalized working-linear inputs,
+without reducing RGB to bytes, and preserves exact alpha. Exact neutral controls
+preserve finite signed/extended words. Active out-of-range inputs reject preview
+or delivery before publication; bound them deliberately with an active Levels
+range or use neutral settings. Masks, groups, clipping, blending, native-first
+frame order, shared commands/history and host grant/revision/source validation
+remain authoritative. There is no new mutation API, schema, plugin capability or
+REST renderer/synchronization. Full signatures, defaults, math, example, errors
+and limits: [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## White Balance in float documents
 
 The existing `AdjustmentLayer({adjustment: {kind: 'white-balance', temperature,
@@ -2871,7 +2886,7 @@ Saved automation recipe `layerExists` conditions consider every output bound to 
 
 HSL adjustment layers use `new AdjustmentLayer({ name: "HSL", adjustment: { kind: "hsl", hue: 0, saturation: 0, lightness: 0 } })`. Hue accepts degrees from -180 to 180; saturation and lightness accept -100 to 100, with all defaults supplied explicitly by the DTO (the trusted DOM module also exports `defaultHslAdjustment()`). Replace `.adjustment` to update an attached layer through shared validation/history. Normal layer masks, opacity, visibility and ordering apply. Invalid/nonfinite values reject atomically. Project schema 15 stores HSL; older documents migrate when opened.
 
-HSL operates on encoded sRGB RGB values, preserves alpha and keeps neutral pixels neutral. Negative saturation/lightness scales toward zero; positive values interpolate toward one. Hue wraps cyclically. It is distinct from the existing luminance-based tone saturation. Current rendering uses bounded Canvas tiles with a WASM kernel executed in the pixel worker; supported WebGPU compositions use an HSL shader, with Canvas/WASM fallback for unsupported compositions or unavailable GPU. GPU/reference rounding differences can reach three premultiplied RGB byte levels in the tested cases; alpha matches exactly. No hardware performance claim is made.
+HSL operates on encoded sRGB RGB values, preserves alpha and keeps neutral pixels neutral. Negative saturation/lightness scales toward zero; positive values interpolate toward one. Hue wraps cyclically. It is distinct from the existing luminance-based tone saturation. In byte documents, rendering uses bounded Canvas tiles with a WASM kernel executed in the pixel worker; supported WebGPU compositions use an HSL shader, with Canvas/WASM fallback for unsupported compositions or unavailable GPU. GPU/reference rounding differences can reach three premultiplied RGB byte levels in the tested cases; alpha matches exactly. No hardware performance claim is made.
 
 The built-in automation recipe `preset-hsl-recolor` (“Recolor with HSL”) accepts numeric `hue` (-180…180), `saturation` and `lightness` (-100…100), all defaulting to zero. It adds an editable HSL adjustment at the top of the root composition; it does not isolate the selected layer. It can be used by deterministic batch delivery, with the existing global/per-item parameter rules. Recorder-created HSL layers and subsequent adjustment replacements retain their values through recipe JSON serialization and one-step replay undo. These are local operations with no provider invocation.
 
@@ -2964,7 +2979,7 @@ print("Chromatic adjustments", balance.adjustmentKind, vibrance.adjustmentKind);
 
 The processing contract is encoded-sRGB straight RGB with alpha copied unchanged. Let `l = .3*r + .59*g + .11*b` on normalized channels. Color Balance uses weights `shadows=max(0,1-2*l)`, `highlights=max(0,2*l-1)`, `midtones=1-shadows-highlights`; each channel receives its weighted range value divided by 100. Without luminosity preservation, output clamps to [0,1]. With preservation, it uses the [W3C SetLum/ClipColor helper](https://www.w3.org/TR/compositing-1/#blendingnonseparable) to restore the original encoded luma and fit the gamut. This is not a linear-light or physical luminance guarantee, nor a Photoshop formula/parity claim.
 
-For Vibrance, `chroma=max(r,g,b)-min(r,g,b)` and `scale=max(0,1+(saturation+vibrance*(1-chroma))/100)`. RGB scales away from its original luma by this factor, then uses SetLum/ClipColor. All RGB output rounds to 8-bit bytes; alpha is unchanged. Production pixels run in the existing WASM image worker or supported WGSL viewport, with the normal Canvas/WASM fallback for unsupported frames. Hardware GPU performance/presentation and wider color-fidelity gates require separate evidence.
+For Vibrance, `chroma=max(r,g,b)-min(r,g,b)` and `scale=max(0,1+(saturation+vibrance*(1-chroma))/100)`. RGB scales away from its original luma by this factor, then uses SetLum/ClipColor. In byte documents, RGB output rounds to 8-bit bytes; alpha is unchanged. Float documents use the continuous contract above. Byte production pixels run in the existing WASM image worker or supported WGSL viewport, with the normal Canvas/WASM fallback for unsupported frames. Hardware GPU performance/presentation and wider color-fidelity gates require separate evidence.
 
 Chromatic GPU conformance fixtures compare premultiplied 8-bit output with the WASM/Canvas reference: alpha must match exactly, maximum RGB difference is three byte levels, and mean difference is below one byte across the sampled transparent/partial-alpha, masked and opacity-adjusted compositions. These are software-adapter correctness checks; they do not establish hardware performance or every possible composition's fidelity.
 

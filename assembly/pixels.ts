@@ -1,3 +1,4 @@
+export {colorFloat} from "./float-color";
 export {transferFloat} from "./float-transfer";
 export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
 export { encodeFrequencyBand } from "./frequency-band";

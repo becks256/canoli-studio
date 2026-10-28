@@ -1,3 +1,4 @@
+import{compileFloatColor,isFloatColorAdjustment}from'./float-color';
 import{compileFloatTransfer}from'./float-transfer';
 import{compileFloatWhiteBalance}from'./float-white-balance';
 import type {DocumentData,LayerData} from './model';
@@ -21,8 +22,9 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='adjustment'){
         if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='white-balance'){try{compileFloatWhiteBalance(layer.adjustment);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support tone, Curves, Levels and White Balance only.';
-      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and Tone/Curves/Levels/White Balance adjustments. Other layer types require their float integration.';
+        else if(isFloatColorAdjustment(layer.adjustment)){try{compileFloatColor(layer.adjustment);}catch(error){return String(error);}}
+        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance and Vibrance only.';
+      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance adjustments. Other layer types require their float integration.';
     }
     return null;
   };

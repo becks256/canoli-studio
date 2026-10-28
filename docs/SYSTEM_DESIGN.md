@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Continuous float color controls
+
+HSL, Color Balance and Vibrance retain their bounded encoded-sRGB meanings through continuous float64 transfer/control arithmetic and one float32 color store. Complete active linear RGB must be normalized, including hidden samples before coverage. Exact neutral preserves finite extended and signed-zero words. Alpha is unchanged. Existing native-first filtering, group/clipping/blend/mask ordering, owned worker windows, sources and failure publication invariants remain authoritative. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## Initial float document workflow (F10)
 
 The explicit float document pipeline preserves original native samples separately from display-only thumbnails, derived IndexedDB tiles, captured float composition and final SDR/output conversions. Source preparation completes before an output/display ICC owner is acquired. Erasure coverage is captured in its authored resize plane; each operation changes float alpha before clipping and layer appearance, without passing RGB through a coverage canvas. Continuous Curves/Levels use normalized working values, a float64 master/channel pipeline and one float32 store; histogram samples precede SDR display conversion. Schema 49 and shared OO/history validation gate the initial supported scene; default byte documents keep their existing path. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).

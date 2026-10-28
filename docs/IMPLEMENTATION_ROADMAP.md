@@ -7174,3 +7174,131 @@ layer types, wider working spaces, HDR/CMYK/proof/interchange, photographic and
 physical/device quality, peak memory, sustained all-tool performance and every
 other unfinished original roadmap/provider/installed ChatGPT/live identity/
 commercial gate remain required. The complete original goal stays active.
+
+### 2026-10-28 — Continuous float HSL, Color Balance and Vibrance (implementation record; verified below)
+
+Owner: implementation agent; estimate L within T17/F04/F10, starting from verified
+`2b29546`. The preceding goal turn made progress with the committed White Balance
+workflow and complete production-report recovery. The full original objective
+remains active, including every unfinished professional/AI/workflow/quality/
+performance/interchange/live-provider/installed ChatGPT/identity/commercial gate.
+
+At the starting commit, these three existing byte controls were rejected by
+the float gate and UI. The new source connects all three through a private native
+`colorFloat` export, owned worker protocol, shared float validation, accumulated
+scene processing and existing Inspector/palette. Their bounded encoded-sRGB
+control meanings are retained with continuous float64 arithmetic and one float32
+store, exact alpha and neutral word identity. Active extended inputs fail
+explicitly rather than falling back to a byte proxy or silently clipping the
+original. Full HDR color models and the remaining float families remain required.
+
+The first native/protocol pilot passes **112 tests across six files**, including
+41 independently generated operator cases, source ownership/partitions, malformed
+worker replies, strict model/history and prior float/White Balance/byte HSL and
+chromatic references. A new stable HSL sum form avoids zero division for tiny
+float samples that the cancellation-prone `1-abs(2*l-1)` expression cannot
+represent. Existing byte pixel functions remain unchanged; the main pixels WASM
+necessarily changes and requires fresh full regression acceptance. Four other
+native codec binaries are outside this change.
+
+The reference corpus registers RGB `2^-22`, integer-code error one, exact alpha
+and neutral words before full scene evaluation. Python colorsys supplies scalar
+HLS references. The first vector control exposed omitted initial hue wrapping;
+correcting that ordering makes every one of the 41 vector/scalar/original
+float32 streams identical, with no bound or original word changed. The scalable
+oracle is used for 177 new registered complete scenes and the planned genuine
+50 MP workflow. The prior White Balance UI test now checks still-unsupported
+Gradient Map instead of expecting newly supported HSL to remain disabled.
+
+Public/UI/isolated/REST/recipe/persistence/delivery contracts and actual browser,
+full build/unit, native-binary compatibility and complete source/production/50 MP
+acceptance remain in progress. Private primitive success is not application
+acceptance or completion of F04/F10/F14 or the original roadmap.
+
+
+### 2026-10-28 — Continuous float HSL, Color Balance and Vibrance: verified increment
+
+Owner: implementation agent; estimate L within T17/F04/F10. The full original
+roadmap objective remains active. This increment connects the three existing
+adjustment DTOs to original-derived float scenes, ordinary fractional controls,
+shared OO commands/history, isolated scripts and inert plugins, independent REST
+metadata, original-bearing recipes/batch retry, native persistence and direct
+float32/uint16 TIFF plus PNG/PDF delivery. The exact numeric/domain/default/error
+contract and executable isolated example are in
+[FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
+Final accepted coverage is **2,808 passing unit tests across 284 files** and
+**305 distinct passing browser targets**: 129 affected source cases, two genuine
+50 MP workflows and all 174 production cases. The complete build passes,
+including all 40 developer pages and the regenerated isolated SDK. Source,
+generated/runtime and release checks bind **2,733 inputs, 50 generated files and
+142 release resources**. Nothing is skipped or accepted as flaky.
+
+The original 129-case source report contains 128 passes and one obsolete schema
+assertion (40 rather than the current 49). That assertion now uses
+`SCHEMA_VERSION`; its targeted rerun passes with the complete pixel/history/
+original checks retained. Independent evidence review also found that a primitive
+name prefix accidentally excluded Color Balance contexts from reopening. The
+filter now matches numeric primitive IDs only. The expanded complete scene case
+passes again, including **63 project reopenings and nine native-first half-size
+frames**. These two test-only corrections preserve every application/generated/
+release byte. The earlier UI pilot's HSL command selector was corrected to match
+the existing full label, and the byte-conversion fixture now uses an actually
+eligible original-backed float TIFF rather than a legacy unsigned-16 proxy.
+An earlier scene pilot interrupted by generated-runtime hot reload is retained;
+final application/runtime bytes were frozen before accepted verification.
+
+All **41 independently generated primitive cases** retain the original
+scalar/vector/reference word streams. All **177 complete source/group/clipping/
+mask/ordering/artistic scenes** pass independent sample review, with maximum
+scaled color error **1.1641532182693481e-10** against the registered **2^-22**
+bound, exact alpha and exact read partitions. Scene tolerance scales per pixel by
+`max(1, abs(source RGB), abs(reference RGB))`. Integer delivery retains its
+one-code color bound and exact alpha words. Exact-neutral native words include
+signed zero, subnormals and finite extended colors. No older gate is widened.
+
+The genuine **10,000 × 5,000** three-adjustment workflow preserves original
+geometry/bytes, workspace restore and Undo/Redo. Both complete files compare all
+**200,000,000 values each**, with **zero numerical error**: float32 TIFF is
+97,879,736 bytes (SHA-256
+`a4f99beba213df166747bad6283d80ecb5e718f415a2fc1034ffcda09988221a`),
+and unsigned-16 TIFF is 56,935,904 bytes (SHA-256
+`c882f60ac53d4587f0177e7bf278660fd9166717b8db486be2c129517ff8efa7`).
+The first case exceeded the unchanged 600,000 ms deadline at about 603 seconds,
+although both independent complete readers passed exactly. The verifier now
+computes its independent linear reference once and reuses the complete 800 MB
+word stream for the second format, still independently CMM-converting and reading
+every file sample. Source/scene/reference-code/CMM/geometry/length/SHA checks bind
+that stream; small fresh/cached controls agree exactly, while wrong-scene,
+changed-word and truncated streams reject. The accepted rerun records about
+**525 seconds**, and both complete file hashes match the first fresh-reference
+run. This is verification efficiency, not an editor latency improvement.
+
+The private pixel WASM adds only `colorFloat`: **36,649 bytes**, SHA-256
+`166c4c323647bdb8b12c0ada6d630af4b11fddb65d06fdb785b4e3b82711351f`.
+Independent binary parsing preserves all **38 previous function signatures**.
+The four other native codec binaries remain unchanged. The separate genuine
+50 MP White Balance regression preserves both previous complete file/raw-sample
+hashes exactly, checking the changed shared pixel module against committed
+numeric behavior. Ordinary source and production controls preserve cancellation,
+fractions, palette/type edits, one-step isolated Undo, original-bearing reopening,
+independently decoded files and the actual SDR canvas within one color code.
+Portable batch retry keeps the accepted first file, uses one replacement capture
+and retains all three DTOs and complete originals after package removal.
+
+Complete reports, phase ledgers/terminal receipts, failed pilots, exact source
+corrections, native files and independent references, frozen source/runtime/
+release identities, controls, audit code and reproducible verification commands
+are retained in [the sealed evidence](benchmarks/float-color-2026-10-28.zip).
+
+This delivers the bounded encoded-sRGB control increment. Active settings require
+normalized working-linear inputs; neutral controls preserve finite extended
+identity, and explicit Levels ranges can deliberately bound extended input.
+Full HDR/wide-gamut/working-profile models, the remaining float tools/layer
+families, broader photographic/interchange/workflow quality, physical device/
+GPU/display/tablet acceptance, measured whole-process peak memory and sustained
+editor-wide/all-tool F14 performance remain required. Every other unfinished
+original professional/AI/provider/evaluation/production/installed ChatGPT/live
+identity/collaboration/commercial/specialist gate stays active. No account,
+upload, paid operation, dependency, public mutation API, schema, plugin grant,
+REST/browser synchronization or arbitrary original-resolution limit is added.

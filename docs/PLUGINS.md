@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Continuous float color controls
+
+Existing document grants permit the same strict HSL, Color Balance and Vibrance DTOs in float documents. Installation remains inert, third-party code runs only through isolated scripting, and host commit retains captured revision/source/command validation and one shared Undo. No permission, raw pixel, file, profile or worker service is exposed. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## Initial float document workflow (F10)
 
 Existing document read/write grants permit shared document.convertToFloat() and supported float edits against already-retained original TIFF raster assets. Host commit validates working mode, sources, revision and commands. Installation stays inert; no import/export/profile/worker service or new permission is exposed. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).

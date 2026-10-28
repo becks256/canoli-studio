@@ -25,6 +25,7 @@ import { encodeCapturedPng } from "./png";
 import { prepareClipboard, type ClipboardRequest } from "./clipboard";
 import { encodeCoverage, wandCoverage, type CoverageRequest } from "../core/pixel-selection";
 import { applyEncodedFrequencyBand, applyLinearBlend, applyRedEye, applyHsl, applyChromatic, applyGradientMap, applyWhiteBalance, applyLookup, applyColorRange } from "./wasm";
+import type{FloatColorAdjustment}from'../core/float-color';
 import type { ChromaticAdjustmentData } from "../core/adjustments";
 import type { HslAdjustmentData } from "../core/adjustments";
 import type { SpatialFilterOptions } from "../core/smart/spatial-filter";
@@ -83,6 +84,7 @@ self.onmessage = async (
     floatAffine?:{pixels:Float32Array;matrix:number[]};
     floatTone?:{pixels:Float32Array;options:FloatToneOptions};
       floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
+    floatColor?:{pixels:Float32Array;adjustment:FloatColorAdjustment};
     filteredMix?: {
       filtered: Uint8ClampedArray;
       mask: Uint8ClampedArray;
@@ -156,10 +158,11 @@ self.onmessage = async (
 ) => {
   try {
     const data = event.data;
-    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTransfer){
+    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTransfer||data.floatColor){
       const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;
       if(data.floatComposite){const request=data.floatComposite;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);pixels=owned.composite(request.source,request.backdrop,request.options);}
       else if(data.floatTransfer){const request=data.floatTransfer;validateFloatWorkerWindow(request.pixels);pixels=owned.transfer(request.pixels,request.adjustment);}
+      else if(data.floatColor){const request=data.floatColor;validateFloatWorkerWindow(request.pixels);pixels=owned.color(request.pixels,request.adjustment);}
       else if(data.floatTone){const request=data.floatTone;validateFloatWorkerWindow(request.pixels);pixels=owned.tone(request.pixels,request.options);}
       else{const request=data.floatAffine!;validateFloatWorkerWindow(request.pixels);pixels=owned.affine(request.pixels,request.matrix);}
       self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;

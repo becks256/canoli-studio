@@ -1,5 +1,9 @@
 # Architecture
 
+## Continuous float color controls
+
+`core/float-color` strictly captures the three existing DTOs and compiles a private discriminant/control vector. The owned worker calls the new native `colorFloat` export through bounded windows. Native float64 sRGB transfer/control math rounds color once to float32 and copies alpha. Neutral copies words after finite/alpha validation; active processing validates complete normalized RGB. `float-scene` runs these stages before existing adjustment blending/coverage and native-first frame filtering. Old native exports retain their contracts; stale pixel modules lacking `colorFloat` reject explicitly. No public mutation API, schema or host privilege is added. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## Initial float document workflow (F10)
 
 core/float-document gates scene structure and asset roles. engine/float-asset admits originals with bounded display-only thumbnails; float-scene captures original and coverage-source leases, uses float-projection and native float operations, applies each authored erasure through float-coverage before intrinsic clipping shape, runs continuous Curves/Levels through the owned native transfer worker, and converts only final display/output samples. float-delivery/float-tiff own profile-aware file sessions. Model/OO/shared command schema 49, independent source caches and existing host/isolated boundaries remain separate. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).

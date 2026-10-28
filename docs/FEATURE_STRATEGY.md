@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Continuous float color controls
+
+The existing HSL, Color Balance and Vibrance controls now have continuous native float scene paths with explicit normalized-input domains and exact neutral recovery. This staged F04/F10 increment leaves broader HDR/color/tool/photographic/device/interchange and sustained editor-wide performance acceptance required; the full professional-editor roadmap remains active. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+
 ## Initial float document workflow (F10)
 
 An initial connected float32/linear-sRGB workflow extends original unsigned 16-bit or float32 TIFF raster, erasure and clipping edits through shared precision/tone commands, direct file delivery and original-bearing persistence. Byte editing remains the default. This staged subset leaves broad tools, working profiles, HDR, physical/device and performance acceptance required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).

@@ -1,3 +1,4 @@
+import{isFloatColorAdjustment}from'../core/float-color';
 import{compileFloatWhiteBalance}from'../core/float-white-balance';
 import{projectFloatFrame,type FloatSceneFrame}from'./float-frame';
 export type{FloatSceneFrame}from'./float-frame';
@@ -45,7 +46,7 @@ export class FloatSceneRenderer {
  private entries=new Map<Blob,Map<string,CachedSource>>();
  private lru=new Map<CachedSource,true>();private epoch=0;private closed=false;
  private captures=new Set<AbortController>();
- constructor(private processor:Pick<PixelProcessor,'floatComposite'|'floatTone'|'floatTransfer'|'floatAffine'>){}
+ constructor(private processor:Pick<PixelProcessor,'floatComposite'|'floatTone'|'floatTransfer'|'floatAffine'|'floatColor'>){}
  private source(store:AssetStore,asset:ImageAsset):FloatRasterSource{
   if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF sources. Byte editing proxies are not precision sources.');
   const key=JSON.stringify([asset.width,asset.height,asset.tiff,asset.tiffColor.source]);let entries=this.entries.get(asset.blob);if(!entries){entries=new Map();this.entries.set(asset.blob,entries);}let entry=entries.get(key);
@@ -140,8 +141,8 @@ export class FloatSceneRenderer {
        }else{const pixels=await paint(layer.children,new Float32Array(backdrop.length),world);backdrop=await composite(pixels,backdrop,{mode,opacity,mask:coverage});}
       }else if(layer.kind==='raster'){
        const pixels=await raster(layer,world);check();backdrop=await composite(pixels,backdrop,{mode,opacity,mask:coverage});
-      }else if(layer.kind==='adjustment'&&(layer.adjustment.kind==='tone'||layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'||layer.adjustment.kind==='white-balance')){
-       check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):layer.adjustment.kind==='white-balance'?await balance(layer.id,backdrop):await this.processor.floatTransfer(backdrop,layer.adjustment);check();backdrop=await blendFloatAdjustment(backdrop,after,mode,opacity,coverage,{floatComposite:composite},check);
+      }else if(layer.kind==='adjustment'&&(layer.adjustment.kind==='tone'||layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'||layer.adjustment.kind==='white-balance'||isFloatColorAdjustment(layer.adjustment))){
+       check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):layer.adjustment.kind==='white-balance'?await balance(layer.id,backdrop):isFloatColorAdjustment(layer.adjustment)?await this.processor.floatColor(backdrop,layer.adjustment):await this.processor.floatTransfer(backdrop,layer.adjustment);check();backdrop=await blendFloatAdjustment(backdrop,after,mode,opacity,coverage,{floatComposite:composite},check);
       }else throw new Error('Unsupported float scene layer.');
      }
      check();return backdrop;

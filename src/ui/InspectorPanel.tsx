@@ -567,9 +567,9 @@ export function InspectorPanel({
                   options={[
                     { value: "tonal", label: "Tonal strokes", disabled: true },
                     { value: "patch", label: "Retouch patch", disabled: true },
-                    { value: "hsl", label: "Hue / Saturation / Lightness",disabled:float },
-                    { value: "color-balance", label: "Color Balance",disabled:float },
-                    { value: "vibrance", label: "Vibrance",disabled:float },
+                    { value: "hsl", label: "Hue / Saturation / Lightness" },
+                    { value: "color-balance", label: "Color Balance" },
+                    { value: "vibrance", label: "Vibrance" },
                     { value: "gradient-map", label: "Gradient Map",disabled:float },
                     { value: "red-eye", label: "Red Eye",disabled:float },
                     { value: "white-balance", label: "White Balance" },
@@ -605,6 +605,7 @@ export function InspectorPanel({
                     {selected.adjustment.strokes.length} editable tonal strokes
                   </p>
                 )}
+                {float&&(selected.adjustment.kind==='hsl'||selected.adjustment.kind==='color-balance'||selected.adjustment.kind==='vibrance')&&<p className="section-description">sRGB color controls retain float precision. Active settings need RGB from 0 to 1; neutral settings preserve extended colors.</p>}
                 {float&&(selected.adjustment.kind==='curves'||selected.adjustment.kind==='levels')&&<p className="section-description">Linear RGB: 255 means 1. Curves extend their endpoint tangents; active Levels clip to their black/white range.</p>}
                 {selected.adjustment.kind === "curves" && (
                   <CurvesEditor
