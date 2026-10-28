@@ -4,6 +4,17 @@
 
 The explicit float document pipeline preserves original native samples separately from display-only thumbnails, derived IndexedDB tiles, captured float composition and final SDR/output conversions. Source preparation completes before an output/display ICC owner is acquired. Erasure coverage is captured in its authored resize plane; each operation changes float alpha before clipping and layer appearance, without passing RGB through a coverage canvas. Continuous Curves/Levels use normalized working values, a float64 master/channel pipeline and one float32 store; histogram samples precede SDR display conversion. Schema 49 and shared OO/history validation gate the initial supported scene; default byte documents keep their existing path. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Float White Balance invariant
+
+Keep the existing declared illuminant/tint model separate from inference, camera
+calibration and final display/output conversion. Capture a strict private
+linear-RGB matrix once per layer; native float64 multiplication rounds once to
+float32, copies alpha exactly and retains finite extended colors. Exact neutral
+settings bypass arithmetic. Apply the existing adjustment blend, mask/opacity,
+group/clipping and native-first frame boundaries afterward. Overflow/domain
+failures publish no partial pixels/files. Original sources, shared commands,
+isolation and independent REST remain unchanged. [Contract](FLOAT_DOCUMENTS.md#linear-white-balance).
+
 ## Connected native float blend modes
 
 The float document gate and custom Inspector admit every existing blend enum.

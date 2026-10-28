@@ -2200,3 +2200,5 @@ test('production float zoom gestures display independently filtered native scene
 
 test('production float blend controls display and deliver every native mode without developer globals',async({page},info)=>{const{floatBlendWorkflow}=await import('./helpers/float-blend');await floatBlendWorkflow(page,info,true);});
 test('production blend domain failures suppress stale artwork and recover through Normal and Undo without developer globals',async({page},info)=>{const{floatBlendDomainWorkflow}=await import('./helpers/float-blend');await floatBlendDomainWorkflow(page,info,true);});
+
+test('production linear White Balance preserves native files, actual controls, isolated example, cancellation and originals without developer globals',async({page},info)=>{const{floatWhiteBalanceWorkflow}=await import('./helpers/float-white-balance');await floatWhiteBalanceWorkflow(page,info,true);});

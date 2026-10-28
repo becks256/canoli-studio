@@ -4,6 +4,15 @@
 
 Existing document read/write grants permit shared document.convertToFloat() and supported float edits against already-retained original TIFF raster assets. Host commit validates working mode, sources, revision and commands. Installation stays inert; no import/export/profile/worker service or new permission is exposed. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Existing White Balance commands in float documents
+
+Existing document grants allow White Balance through the same strict adjustment
+DTO in float documents. Installation remains inert. Isolated execution captures
+commands; host commit enforces current grants, sources, revisions, atomicity and
+shared Undo. Native matrix/pixel workers, original bytes, file choosers and output
+services remain trusted host capabilities. This adds no manifest version or
+permission. [Defaults, errors and example](FLOAT_DOCUMENTS.md#linear-white-balance).
+
 ## Existing blend commands in float documents
 
 The existing document read/write grants permit the same 18 blend-mode edits as

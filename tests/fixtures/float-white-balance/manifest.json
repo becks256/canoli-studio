@@ -1,0 +1,3106 @@
+{
+  "version": 1,
+  "colorTolerance": 9.5367431640625e-07,
+  "toleranceScale": "max(1, abs(source RGB), abs(reference RGB)) per pixel",
+  "alphaTolerance": 0,
+  "integerColorTolerance": 1,
+  "neutralExactWords": true,
+  "width": 131,
+  "height": 79,
+  "pixels": [
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2000,
+        "tint": -100
+      },
+      "reference": "pixels-0.f32le.gz",
+      "rawSha256": "db1102ddcd8820fb04df398e0a956efe3eaeb2da83de4f7305e0ac0d6a9038ab"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2000,
+        "tint": 0
+      },
+      "reference": "pixels-1.f32le.gz",
+      "rawSha256": "a85c6c2e76737ce510ed0419f4b259d897f875aecd9c60e71c4cbb1e4d76661b"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2000,
+        "tint": 100
+      },
+      "reference": "pixels-2.f32le.gz",
+      "rawSha256": "767d7a5cb754dc1556da6c4af27f03f531462150d4cd723c29c877c41a1505f5"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2222,
+        "tint": -100
+      },
+      "reference": "pixels-3.f32le.gz",
+      "rawSha256": "cf19b7f289ffaf942e3e3dda162e2f61a8d6d8d0568504557b9cb48cabd8a98b"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2222,
+        "tint": 0
+      },
+      "reference": "pixels-4.f32le.gz",
+      "rawSha256": "0549f310489caa8bf84c9d69059727d81ca0f0e4ffe24f1b6840f235d7b03b24"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2222,
+        "tint": 100
+      },
+      "reference": "pixels-5.f32le.gz",
+      "rawSha256": "5f983a2b8b08a81e2828bcc8be2e1521eee344547d65024fc6aa921b64f2b065"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2222.5,
+        "tint": -100
+      },
+      "reference": "pixels-6.f32le.gz",
+      "rawSha256": "dfc10ce86fea6b106ad555099a9a0e0d9b4f35820223155c142e529a00d62b3e"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2222.5,
+        "tint": 0
+      },
+      "reference": "pixels-7.f32le.gz",
+      "rawSha256": "b75c24d4c1a1c1dbdd0d64416b13b45b6ba2c9897ef55652db05d350f5a994d1"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 2222.5,
+        "tint": 100
+      },
+      "reference": "pixels-8.f32le.gz",
+      "rawSha256": "cbb82d6ae1382229e0033a5a3f5642bfa7f42e50e29dcd30e29c4867de3f0c19"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 4000,
+        "tint": -100
+      },
+      "reference": "pixels-9.f32le.gz",
+      "rawSha256": "7f0dbc1e25e0de8f8e444421e0079e84f0c922cb5c0942664d28e55a6a79eabd"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 4000,
+        "tint": 0
+      },
+      "reference": "pixels-10.f32le.gz",
+      "rawSha256": "eb52588ddea7ea80353113b43acaf340b8bf42f0ef73d75410159d1d60917d0c"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 4000,
+        "tint": 100
+      },
+      "reference": "pixels-11.f32le.gz",
+      "rawSha256": "6ffc6f969bc704e618b42cb89794c7aa808069bedc3798ee3db913599dfccd64"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 4000.5,
+        "tint": -100
+      },
+      "reference": "pixels-12.f32le.gz",
+      "rawSha256": "f7e46cc3b4860cef7bfa9e9692b5563f3aea56144b46b6e51ac12ede13e4eb9d"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 4000.5,
+        "tint": 0
+      },
+      "reference": "pixels-13.f32le.gz",
+      "rawSha256": "44701057c55aa9783f1ae0713e6c0f40fa93c6c365d6c82c5ab9aa8a546a6d62"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 4000.5,
+        "tint": 100
+      },
+      "reference": "pixels-14.f32le.gz",
+      "rawSha256": "169beab097531d30503aebf305ff3f0b5edb764d83f69c743c36a242af743ddf"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 6504,
+        "tint": -100
+      },
+      "reference": "pixels-15.f32le.gz",
+      "rawSha256": "7eafa0fa409b0e4752de0046cb1615e974786c74e72f2896ca95617e372a86a8"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 6504,
+        "tint": 0
+      },
+      "reference": "pixels-16.f32le.gz",
+      "rawSha256": "84ed6a27e184654f00e2df7f58cafc79b3ecd4f53a3c795a14b971d32d79842a"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 6504,
+        "tint": 100
+      },
+      "reference": "pixels-17.f32le.gz",
+      "rawSha256": "644ff2e9ce4a54efef20f1f6f94ddd8a01b21478810b5428d97c9b758eaa5743"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 10000,
+        "tint": -100
+      },
+      "reference": "pixels-18.f32le.gz",
+      "rawSha256": "0fd9538a8f2c04ff1cd819b61a4cb5c251f6e89bbb821f3b413934f7d3297961"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 10000,
+        "tint": 0
+      },
+      "reference": "pixels-19.f32le.gz",
+      "rawSha256": "6576faf2b0261533444c1399484a4826f6a156a7f05588a033dc343ac62128d9"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 10000,
+        "tint": 100
+      },
+      "reference": "pixels-20.f32le.gz",
+      "rawSha256": "82c4e27f209222c77c8661dce3b075f56952015ab4d7a2743d49f8bd0cc5c595"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 25000,
+        "tint": -100
+      },
+      "reference": "pixels-21.f32le.gz",
+      "rawSha256": "7fbf533fade470119397cb0c5a2f1031ceffe7e352892406c731b4ad6b9d37bf"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 25000,
+        "tint": 0
+      },
+      "reference": "pixels-22.f32le.gz",
+      "rawSha256": "1ad592ca976f19ada0419c787768762f5b29686fcfb245a583791aa0c16e9fb5"
+    },
+    {
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 25000,
+        "tint": 100
+      },
+      "reference": "pixels-23.f32le.gz",
+      "rawSha256": "487c22d6ca0f501f011cb45e0f8baa660dff1f5e193b0af03f703c755a788fc3"
+    }
+  ],
+  "sources": [
+    {
+      "name": "rgba-raw-le.tif",
+      "original": "tests/fixtures/tiff-float/rgba-raw-le.tif",
+      "reference": "tests/fixtures/float-source/rgba-raw-le-linear.f32le.gz",
+      "width": 131,
+      "height": 79
+    },
+    {
+      "name": "hdr-high.tif",
+      "original": "tests/fixtures/tiff-float/hdr-high.tif",
+      "reference": "tests/fixtures/float-document/hdr-high-linear.f32le.gz",
+      "width": 131,
+      "height": 79
+    },
+    {
+      "name": "u16-all-levels.tif",
+      "original": "tests/fixtures/uint16-float/u16-all-levels.tif",
+      "reference": "tests/fixtures/uint16-float/u16-all-levels-linear.f32le.gz",
+      "width": 256,
+      "height": 256
+    }
+  ],
+  "scenes": [
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-0",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-0.f32le.gz",
+      "rawSha256": "5a3b7125f8eae8aa4d82c4c0fa4d4ff8838ba76b7dcd10737cfa3e8f907bee55"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-1",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-1.f32le.gz",
+      "rawSha256": "a8ff4f38d5e8a58dcb263f1d4dcb06f8dc11b350851fded002b01f8058e215f6"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-2",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-2.f32le.gz",
+      "rawSha256": "3cdd668cde6c977d8d99874fc21473139899298dfe1cf069143e65d6f1adae8e"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-3",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-3.f32le.gz",
+      "rawSha256": "71933e6aa76175c6ff595a803c37ecb0e21461b0b113a61950805b6370207681"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-4",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-4.f32le.gz",
+      "rawSha256": "aeab7482996fbe6c5247242fbc4b171945173224b63017b2269a540ef5173ae0"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-5",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-5.f32le.gz",
+      "rawSha256": "4579dd6b00807a2d5f58dbb2c1b6d2c85d027902a25343bcfccc59ee6aa052e0"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-6",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-6.f32le.gz",
+      "rawSha256": "749dad698f5e2578133e53d1947a90137fee722c11e22845ad142ec66f7cd963"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-7",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-7.f32le.gz",
+      "rawSha256": "5a1c0ff96ae4bc5bdce281d16cd5c756d03b3a399fd79178f4f5b029dae04dfa"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-8",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-8.f32le.gz",
+      "rawSha256": "0d95171f62ab2f80908b4cfec1be8393adbc917c4b398dbaba6499b8e8029c0d"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-9",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-9.f32le.gz",
+      "rawSha256": "166b0c99b6b3f4a152698255b18c0971f1fb7b56f4a8736b5c9817e5d66254f7"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-10",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-10.f32le.gz",
+      "rawSha256": "48689678733c3decb817cd149b9b208fe33a359dd0420efccb7ca0e38cfda853"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-11",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-11.f32le.gz",
+      "rawSha256": "aa78900b8d02be58c5944de1346fe49b2d8b6bf73b07a7866fa6222c4c719b55"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-12",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-12.f32le.gz",
+      "rawSha256": "1cd0e9bb89ac3488551c7f1c7ed1ebca0f45e9701454c2efac1fb4edc98b7d5c"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-13",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-13.f32le.gz",
+      "rawSha256": "c009dde16961cf30a4072e963e4b21734c661fef016b89a71fe65d9c6dac72e3"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-14",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-14.f32le.gz",
+      "rawSha256": "d813f29f3745710c87b3afc13051a79e5813a43fa8b0d8e217ae9e8eda9ec9ff"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-15",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-15.f32le.gz",
+      "rawSha256": "c3f4e585c4b54b7f64501a0e6e368f9646cc195d31178489255e0b8d1e5c46f3"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-16",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-16.f32le.gz",
+      "rawSha256": "5caf5ffc589adfe4c4ccdc9972c0da321b2e009539d5d386a448a6385ae40e6a"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-17",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-17.f32le.gz",
+      "rawSha256": "457f42be1a0ac1998d2cebdc08bfeef0207d077aa80d9807540a8fc1cf4461d5"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-18",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-18.f32le.gz",
+      "rawSha256": "fcb7ec082b7fef9a1c610f81f80613a72f8ff4cb265971bd8f42e31ce805167f"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-19",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-19.f32le.gz",
+      "rawSha256": "b02ef68bd8ab4620e67c24c6c6d19ae61d31960fe0b0d49c9053ddfa237809d4"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-20",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-20.f32le.gz",
+      "rawSha256": "c261dced7de74003cd16999b718d3862974905a634f3d686159a06d59c67f580"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-21",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-21.f32le.gz",
+      "rawSha256": "8ee12700c7432ea84ee83e5387d7bc1cd2271d4bb7215de422b22af4c10076c0"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-22",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-22.f32le.gz",
+      "rawSha256": "247d778cf97366bc1ddb2b291676cba5db4b42fab816fc576e234dbe463afb33"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "balance-23",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-balance-23.f32le.gz",
+      "rawSha256": "dc4188e66bbb3b2b3f87905cc667884c91b29e2328b79219fd662b48fec56a10"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "isolated",
+      "layers": [
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              10,
+              110,
+              55
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "rgba-raw-le.tif-isolated.f32le.gz",
+      "rawSha256": "85599443d127150b9677cb71ebe117b4dfb881254281d0efac00dfba66c6f7da"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "pass-through",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.375
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "rgba-raw-le.tif-pass-through.f32le.gz",
+      "rawSha256": "40eada72f92e553f941b0bd60f405426156ecbee3895613e25fa70026488425b"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "clipping",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "clipped": true
+        }
+      ],
+      "reference": "rgba-raw-le.tif-clipping.f32le.gz",
+      "rawSha256": "b4c592ff64b0b73861b82af043f0d7c69eec8021756b8ede1ceeb9deb88df2f4"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "group-base",
+      "layers": [
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 0
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "clipped": true
+        }
+      ],
+      "reference": "rgba-raw-le.tif-group-base.f32le.gz",
+      "rawSha256": "90c5de9293289ab0d6028b1efa5b4491f2a0847dd8a8593271fc2e897f990aac"
+    },
+    {
+      "source": "rgba-raw-le.tif",
+      "name": "ordered",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 128,
+                "y": 152
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 0
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 0.85,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "reference": "rgba-raw-le.tif-ordered.f32le.gz",
+      "rawSha256": "9b5cfeec7d4f3fd62d127b4b2ac321d441844bcf185549639187421494c1ac94"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-0",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-0.f32le.gz",
+      "rawSha256": "5a3b7125f8eae8aa4d82c4c0fa4d4ff8838ba76b7dcd10737cfa3e8f907bee55"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-1",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-1.f32le.gz",
+      "rawSha256": "a8ff4f38d5e8a58dcb263f1d4dcb06f8dc11b350851fded002b01f8058e215f6"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-2",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-2.f32le.gz",
+      "rawSha256": "3cdd668cde6c977d8d99874fc21473139899298dfe1cf069143e65d6f1adae8e"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-3",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-3.f32le.gz",
+      "rawSha256": "71933e6aa76175c6ff595a803c37ecb0e21461b0b113a61950805b6370207681"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-4",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-4.f32le.gz",
+      "rawSha256": "aeab7482996fbe6c5247242fbc4b171945173224b63017b2269a540ef5173ae0"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-5",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-5.f32le.gz",
+      "rawSha256": "4579dd6b00807a2d5f58dbb2c1b6d2c85d027902a25343bcfccc59ee6aa052e0"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-6",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-6.f32le.gz",
+      "rawSha256": "749dad698f5e2578133e53d1947a90137fee722c11e22845ad142ec66f7cd963"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-7",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-7.f32le.gz",
+      "rawSha256": "5a1c0ff96ae4bc5bdce281d16cd5c756d03b3a399fd79178f4f5b029dae04dfa"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-8",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-8.f32le.gz",
+      "rawSha256": "0d95171f62ab2f80908b4cfec1be8393adbc917c4b398dbaba6499b8e8029c0d"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-9",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-9.f32le.gz",
+      "rawSha256": "166b0c99b6b3f4a152698255b18c0971f1fb7b56f4a8736b5c9817e5d66254f7"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-10",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-10.f32le.gz",
+      "rawSha256": "48689678733c3decb817cd149b9b208fe33a359dd0420efccb7ca0e38cfda853"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-11",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-11.f32le.gz",
+      "rawSha256": "aa78900b8d02be58c5944de1346fe49b2d8b6bf73b07a7866fa6222c4c719b55"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-12",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-12.f32le.gz",
+      "rawSha256": "1cd0e9bb89ac3488551c7f1c7ed1ebca0f45e9701454c2efac1fb4edc98b7d5c"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-13",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-13.f32le.gz",
+      "rawSha256": "c009dde16961cf30a4072e963e4b21734c661fef016b89a71fe65d9c6dac72e3"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-14",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-14.f32le.gz",
+      "rawSha256": "d813f29f3745710c87b3afc13051a79e5813a43fa8b0d8e217ae9e8eda9ec9ff"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-15",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-15.f32le.gz",
+      "rawSha256": "c3f4e585c4b54b7f64501a0e6e368f9646cc195d31178489255e0b8d1e5c46f3"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-16",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-16.f32le.gz",
+      "rawSha256": "5caf5ffc589adfe4c4ccdc9972c0da321b2e009539d5d386a448a6385ae40e6a"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-17",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-17.f32le.gz",
+      "rawSha256": "457f42be1a0ac1998d2cebdc08bfeef0207d077aa80d9807540a8fc1cf4461d5"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-18",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-18.f32le.gz",
+      "rawSha256": "fcb7ec082b7fef9a1c610f81f80613a72f8ff4cb265971bd8f42e31ce805167f"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-19",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-19.f32le.gz",
+      "rawSha256": "b02ef68bd8ab4620e67c24c6c6d19ae61d31960fe0b0d49c9053ddfa237809d4"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-20",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-20.f32le.gz",
+      "rawSha256": "c261dced7de74003cd16999b718d3862974905a634f3d686159a06d59c67f580"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-21",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-21.f32le.gz",
+      "rawSha256": "8ee12700c7432ea84ee83e5387d7bc1cd2271d4bb7215de422b22af4c10076c0"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-22",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-22.f32le.gz",
+      "rawSha256": "247d778cf97366bc1ddb2b291676cba5db4b42fab816fc576e234dbe463afb33"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "balance-23",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-balance-23.f32le.gz",
+      "rawSha256": "dc4188e66bbb3b2b3f87905cc667884c91b29e2328b79219fd662b48fec56a10"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "isolated",
+      "layers": [
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              10,
+              110,
+              55
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "hdr-high.tif-isolated.f32le.gz",
+      "rawSha256": "85599443d127150b9677cb71ebe117b4dfb881254281d0efac00dfba66c6f7da"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "pass-through",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.375
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "hdr-high.tif-pass-through.f32le.gz",
+      "rawSha256": "40eada72f92e553f941b0bd60f405426156ecbee3895613e25fa70026488425b"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "clipping",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "clipped": true
+        }
+      ],
+      "reference": "hdr-high.tif-clipping.f32le.gz",
+      "rawSha256": "b4c592ff64b0b73861b82af043f0d7c69eec8021756b8ede1ceeb9deb88df2f4"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "group-base",
+      "layers": [
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 0
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "clipped": true
+        }
+      ],
+      "reference": "hdr-high.tif-group-base.f32le.gz",
+      "rawSha256": "90c5de9293289ab0d6028b1efa5b4491f2a0847dd8a8593271fc2e897f990aac"
+    },
+    {
+      "source": "hdr-high.tif",
+      "name": "ordered",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 128,
+                "y": 152
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 0
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 0.85,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "reference": "hdr-high.tif-ordered.f32le.gz",
+      "rawSha256": "9b5cfeec7d4f3fd62d127b4b2ac321d441844bcf185549639187421494c1ac94"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-0",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-0.f32le.gz",
+      "rawSha256": "bbff32483dae04fa0c37009815b20ae42fe2bc613f117835d2e95a6586bc7c9b"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-1",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-1.f32le.gz",
+      "rawSha256": "0be159af781a474ae5e9eaf74fa7e201f869da0500af36edf68d22bfe2813e50"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-2",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-2.f32le.gz",
+      "rawSha256": "dddeac41bf8601d925e7ef66f9f122f85a4ebf13cc15d98c0aad172bd8b833b1"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-3",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-3.f32le.gz",
+      "rawSha256": "ef51c6ed6079fb1fcecc0c0daf67d3fdb5356d35a2f62c11b7f2ed864c2ec5bc"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-4",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-4.f32le.gz",
+      "rawSha256": "2d010ca472dc51284a833d8a463876732326170e11ac6bd50a42adeef81b74d4"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-5",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-5.f32le.gz",
+      "rawSha256": "963726e04a7db78f016f2ebd74667bcacfbe3c621c8243e1823c9a99ca5061f4"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-6",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-6.f32le.gz",
+      "rawSha256": "7cb08a1c88e1067e2702fae017057b9dc5c9a26df752c946a7b73afce4371c9f"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-7",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-7.f32le.gz",
+      "rawSha256": "c32a1a4f2aecf4d87268a82b85d883f796bff3871891f202753ce75198504800"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-8",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 2222.5,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-8.f32le.gz",
+      "rawSha256": "2b38d7aff085d7afa87ca13c7573547ee7665714cbf3222b75d66180087571dd"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-9",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-9.f32le.gz",
+      "rawSha256": "afdf8b6fe8f40b1b0b56cb4221aa903d0882c8fdfcf1bc9330c790ed92cb3ffb"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-10",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-10.f32le.gz",
+      "rawSha256": "3ada2b8fea5313ae4843273ba9c9e286525daa2da0f116c32c56fdbdf1533fad"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-11",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-11.f32le.gz",
+      "rawSha256": "8d722185a106d36345b5656e6d99e6e40a25bedb39598d1d9bd79a6f40573ea4"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-12",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-12.f32le.gz",
+      "rawSha256": "ac93497e37a0e60035d505f483da75b0b5c149a60a66e55077f8f452e9183ba2"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-13",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-13.f32le.gz",
+      "rawSha256": "0ad5cb360b24e7d82a79bb67655b32c1ca442b585c9361d9ca267cac22504588"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-14",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-14.f32le.gz",
+      "rawSha256": "4f00e1b1b54cb3a2aad54c56e0abff23554f7a9005abc9ea1370254fc87b55f3"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-15",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-15.f32le.gz",
+      "rawSha256": "935d91b21b64d5b64bfef2e0b924ab0da81426e09f47c07317a3d597ec25abac"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-16",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-16.f32le.gz",
+      "rawSha256": "a18116abf77584a3e1da2824bb8cff6b6f6515c971c27fe1481fa61c8dbbc490"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-17",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-17.f32le.gz",
+      "rawSha256": "e4ca1a65a07ac1ffcb6fd62888011133b5c146d03505e12a3af3668aa8b4f0ae"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-18",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-18.f32le.gz",
+      "rawSha256": "32328f5bfecd048a1d446b43c86ff251434eca1b4b2e28205c7d67c7abcb1aaf"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-19",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-19.f32le.gz",
+      "rawSha256": "8fabbdea7eb3e702ea2d93f245816a9dd06cfb6ef71dc9c21a09a82022dfa865"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-20",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-20.f32le.gz",
+      "rawSha256": "2f0703c35044b0a77a650095a4b06f8b152efd6a907ea0c7e1a85b62bf8550f9"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-21",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": -100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-21.f32le.gz",
+      "rawSha256": "4e8d7e1e13920f6f644de396f06d0c5641fba14038c3eb3f244da9ba2b977c17"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-22",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": 0
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-22.f32le.gz",
+      "rawSha256": "7437a4e3a015d85010efac5be397f3bc33b028fcc57630894c7f332a2c10f33d"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "balance-23",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 25000,
+            "tint": 100
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-balance-23.f32le.gz",
+      "rawSha256": "14080c5fc6477cf95fdb611423421db7d0956132bae439f39e529ca6288f9921"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "isolated",
+      "layers": [
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              10,
+              110,
+              55
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "u16-all-levels.tif-isolated.f32le.gz",
+      "rawSha256": "c9bddbda9a45b2347384682a868ba698e1b4e01a1314e5c32e1d4a55f908a1dc"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "pass-through",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.375
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "u16-all-levels.tif-pass-through.f32le.gz",
+      "rawSha256": "6e0979f1924a2b22f763cb2e9f8152a16576421dffe0f8c611c6efbd7377c6a0"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "clipping",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "clipped": true
+        }
+      ],
+      "reference": "u16-all-levels.tif-clipping.f32le.gz",
+      "rawSha256": "92baae899435a6ad64a9fd41a66d91fb0f873ed37bfc82107bdfcefd31f1a3a4"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "group-base",
+      "layers": [
+        {
+          "kind": "group",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              5,
+              115,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625
+            },
+            {
+              "kind": "adjustment",
+              "adjustment": {
+                "kind": "white-balance",
+                "temperature": 4000.5,
+                "tint": 100
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 0
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "clipped": true
+        }
+      ],
+      "reference": "u16-all-levels.tif-group-base.f32le.gz",
+      "rawSha256": "bacc7cff481ca2ae7ba0b89eb4de1f7ee0a74bcd61c334967c234463efca814a"
+    },
+    {
+      "source": "u16-all-levels.tif",
+      "name": "ordered",
+      "layers": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "curves",
+            "rgb": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 128,
+                "y": 152
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 4000.5,
+            "tint": 100
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 6504,
+            "tint": 0
+          }
+        },
+        {
+          "kind": "adjustment",
+          "adjustment": {
+            "kind": "levels",
+            "rgb": {
+              "inputBlack": 0,
+              "inputWhite": 255,
+              "gamma": 0.85,
+              "outputBlack": 0,
+              "outputWhite": 255
+            }
+          }
+        }
+      ],
+      "reference": "u16-all-levels.tif-ordered.f32le.gz",
+      "rawSha256": "efda85b0888416792f80c98dcacf009400e8adbcb7263cab85f5adf8e5fcb13e"
+    }
+  ],
+  "subnormalExactPixel": 8195,
+  "largeLayers": [
+    {
+      "kind": "group",
+      "opacity": 0.75,
+      "fillOpacity": 0.625,
+      "mask": {
+        "rect": [
+          1000,
+          0,
+          8500,
+          5000
+        ],
+        "density": 0.5
+      },
+      "children": [
+        {
+          "kind": "raster"
+        },
+        {
+          "kind": "adjustment",
+          "opacity": 0.75,
+          "mask": {
+            "rect": [
+              2000,
+              0,
+              7000,
+              5000
+            ],
+            "density": 0.5
+          },
+          "adjustment": {
+            "kind": "white-balance",
+            "temperature": 10000,
+            "tint": 0
+          }
+        }
+      ]
+    },
+    {
+      "kind": "adjustment",
+      "clipped": true,
+      "opacity": 0.625,
+      "mask": {
+        "rect": [
+          3000,
+          0,
+          6000,
+          5000
+        ],
+        "density": 0.5
+      },
+      "adjustment": {
+        "kind": "white-balance",
+        "temperature": 4000.5,
+        "tint": -100
+      }
+    }
+  ],
+  "inputs": {
+    "scripts/float_clipping_reference.py": "9c370911d5b43bd3c4334cedbf024783cda2dbd19a6874e1addacdd910f672fb",
+    "scripts/float_transfer_reference.py": "787d022e637ed7e164171c177913ac76600df7460b03b359d308c9de58ebdef1",
+    "scripts/float_white_balance_reference.py": "4f59f935e7b3624d97a9654002aefeeec503afb4bf6f187ad47cc990ca12c697",
+    "scripts/generate-float-white-balance-fixtures.py": "2c4a1e26a07c8b5a7d76a20cf6b77f3a49e006dda6bcc57fa6814a9cd5b2718f",
+    "tests/fixtures/float-document/hdr-high-linear.f32le.gz": "ca2becc365b11ca3d2fc70d2c51665e946f7333d895e3b3d8862edba50099674",
+    "tests/fixtures/float-document/manifest.json": "9dd6b4c4bd0912538d5e9de5b61058776755b578529d391786f759dcc7f8baf8",
+    "tests/fixtures/float-source/manifest.json": "1052b80149c3d3720eae1edd65ae8815d8a51e82d173c6467df9e7e8205a5a85",
+    "tests/fixtures/float-source/rgba-raw-le-linear.f32le.gz": "e9941d28ab200e5959c08d540175f326f7fae739ff07493cbc9fefcfe91d0ea1",
+    "tests/fixtures/float-tone/source.f32le.gz": "ae80595d8542ff74a2c275592eb1ae32aa63c370263a129b758b66399a78d31d",
+    "tests/fixtures/tiff-float/hdr-high.tif": "da9e6934d429af2f8137deb764ef4a50cc02f8be678d50cbde4c36042937dd9e",
+    "tests/fixtures/tiff-float/rgba-raw-le.tif": "fd282be083861874bfec3986dccab52ec375bf20250ed3bbf214fbb589c60a5a",
+    "tests/fixtures/uint16-float/manifest.json": "a11f8c1e11fc9a95cd7fb1f9b3fefc0c2e52b568a0865b099ec5a4b8519b0e19",
+    "tests/fixtures/uint16-float/u16-all-levels-linear.f32le.gz": "20b4481d18143a4f25294f9a089f61c76bf8ae9ed4a29598e85f3b3441cffd2f",
+    "tests/fixtures/uint16-float/u16-all-levels.tif": "21f5288a412c73c2ba0da40e57d3f6ddc60c29fe121cd2f6167fc7cc76e33305",
+    "tests/fixtures/white-balance-reference.json": "5ba5fa41a715d91794b717766a94189588c0d66e4e0c229eb247c3d4b550ec0b"
+  },
+  "files": {
+    "source.f32le.gz": {
+      "bytes": 119598,
+      "sha256": "05d762f46685a877f5160186c6b3f627aa06b3c1ce4f91c29dc7d9701eebf994",
+      "rawSha256": "84ed6a27e184654f00e2df7f58cafc79b3ecd4f53a3c795a14b971d32d79842a"
+    },
+    "pixels-0.f32le.gz": {
+      "bytes": 121698,
+      "sha256": "74d075572bcfd76faf3ec88d3f3c8bea29027b229f8a89218909cdfb5045f3ef",
+      "rawSha256": "db1102ddcd8820fb04df398e0a956efe3eaeb2da83de4f7305e0ac0d6a9038ab"
+    },
+    "pixels-1.f32le.gz": {
+      "bytes": 121971,
+      "sha256": "5848e4585386fd67de96351d3c8b006e1eab8e06d1d94f71c9bb8fe97346c593",
+      "rawSha256": "a85c6c2e76737ce510ed0419f4b259d897f875aecd9c60e71c4cbb1e4d76661b"
+    },
+    "pixels-2.f32le.gz": {
+      "bytes": 122463,
+      "sha256": "cf9974469e5cccea6e62af60ddaa6e94073d40b968e622429532515a5f052869",
+      "rawSha256": "767d7a5cb754dc1556da6c4af27f03f531462150d4cd723c29c877c41a1505f5"
+    },
+    "pixels-3.f32le.gz": {
+      "bytes": 121498,
+      "sha256": "f6e95789c364b025a831e8866c5f171ee3a91abe6b0cac412302a657e602e6a4",
+      "rawSha256": "cf19b7f289ffaf942e3e3dda162e2f61a8d6d8d0568504557b9cb48cabd8a98b"
+    },
+    "pixels-4.f32le.gz": {
+      "bytes": 121730,
+      "sha256": "557a8f160d5407a059fc051b533e82fdb318ab9cdbcc6df406fc80c3fdf596c8",
+      "rawSha256": "0549f310489caa8bf84c9d69059727d81ca0f0e4ffe24f1b6840f235d7b03b24"
+    },
+    "pixels-5.f32le.gz": {
+      "bytes": 121878,
+      "sha256": "362e7e813a510beb16467d0fc465b83638f7cac6ee7180c9fa930bfdf91be6e8",
+      "rawSha256": "5f983a2b8b08a81e2828bcc8be2e1521eee344547d65024fc6aa921b64f2b065"
+    },
+    "pixels-6.f32le.gz": {
+      "bytes": 121507,
+      "sha256": "0ef563112b6f8199c7a3d7809784416de343a7f406679199b18230ccbb44695e",
+      "rawSha256": "dfc10ce86fea6b106ad555099a9a0e0d9b4f35820223155c142e529a00d62b3e"
+    },
+    "pixels-7.f32le.gz": {
+      "bytes": 121720,
+      "sha256": "3d3ae3297a33124f8128d6972a6b70f3fe89edde384760d1fcb143403db6ccad",
+      "rawSha256": "b75c24d4c1a1c1dbdd0d64416b13b45b6ba2c9897ef55652db05d350f5a994d1"
+    },
+    "pixels-8.f32le.gz": {
+      "bytes": 121865,
+      "sha256": "661be6e3442b1123f90fa1ff7689b489dc6662cf34a22df358dbd3661421508e",
+      "rawSha256": "cbb82d6ae1382229e0033a5a3f5642bfa7f42e50e29dcd30e29c4867de3f0c19"
+    },
+    "pixels-9.f32le.gz": {
+      "bytes": 120326,
+      "sha256": "4cb957fba438bca10e7e88d629053789e861e97eadc66c5e14a4fb95ae5f0798",
+      "rawSha256": "7f0dbc1e25e0de8f8e444421e0079e84f0c922cb5c0942664d28e55a6a79eabd"
+    },
+    "pixels-10.f32le.gz": {
+      "bytes": 120424,
+      "sha256": "c8f8645808b3cdffba8c7f4bbc99a65c0eb9dd145832a01075b05205b0ae757f",
+      "rawSha256": "eb52588ddea7ea80353113b43acaf340b8bf42f0ef73d75410159d1d60917d0c"
+    },
+    "pixels-11.f32le.gz": {
+      "bytes": 120442,
+      "sha256": "8c3f42a15e18eb3076273a72b8487f2b32a50df2297eef22df30afbde640e7f9",
+      "rawSha256": "6ffc6f969bc704e618b42cb89794c7aa808069bedc3798ee3db913599dfccd64"
+    },
+    "pixels-12.f32le.gz": {
+      "bytes": 120386,
+      "sha256": "35fdc36aeed0730c9b0c8fa10a3ca3993ecc870e52c8767b8d5590255f5456d8",
+      "rawSha256": "f7e46cc3b4860cef7bfa9e9692b5563f3aea56144b46b6e51ac12ede13e4eb9d"
+    },
+    "pixels-13.f32le.gz": {
+      "bytes": 120403,
+      "sha256": "69c63eeeb53774e326371001e18d6eb8cc21a0e56fc944102b70a1c76458007e",
+      "rawSha256": "44701057c55aa9783f1ae0713e6c0f40fa93c6c365d6c82c5ab9aa8a546a6d62"
+    },
+    "pixels-14.f32le.gz": {
+      "bytes": 120453,
+      "sha256": "8056275bf2f01d75717e11a8ad1b355bf2413a54ca4cbe3d69b62cbfd4331926",
+      "rawSha256": "169beab097531d30503aebf305ff3f0b5edb764d83f69c743c36a242af743ddf"
+    },
+    "pixels-15.f32le.gz": {
+      "bytes": 119694,
+      "sha256": "b0d6b6f634fde4100d348c41264bb317edfd3e461dcc57c1b092afd02fc4f498",
+      "rawSha256": "7eafa0fa409b0e4752de0046cb1615e974786c74e72f2896ca95617e372a86a8"
+    },
+    "pixels-16.f32le.gz": {
+      "bytes": 119598,
+      "sha256": "05d762f46685a877f5160186c6b3f627aa06b3c1ce4f91c29dc7d9701eebf994",
+      "rawSha256": "84ed6a27e184654f00e2df7f58cafc79b3ecd4f53a3c795a14b971d32d79842a"
+    },
+    "pixels-17.f32le.gz": {
+      "bytes": 119844,
+      "sha256": "d3ed3a0311a7fee070a9e90029a59c2be3e4cc9c80a52265f7fb8344c348fc16",
+      "rawSha256": "644ff2e9ce4a54efef20f1f6f94ddd8a01b21478810b5428d97c9b758eaa5743"
+    },
+    "pixels-18.f32le.gz": {
+      "bytes": 119893,
+      "sha256": "2eb1580ac7e2b69770c42ed4be659e3af6f7048c2a0a4725408c31befae1a920",
+      "rawSha256": "0fd9538a8f2c04ff1cd819b61a4cb5c251f6e89bbb821f3b413934f7d3297961"
+    },
+    "pixels-19.f32le.gz": {
+      "bytes": 119939,
+      "sha256": "95bdf3f9e5f2e4489d16bc12394c5a55614df86ad88f85cf8ebd111f30e26b0b",
+      "rawSha256": "6576faf2b0261533444c1399484a4826f6a156a7f05588a033dc343ac62128d9"
+    },
+    "pixels-20.f32le.gz": {
+      "bytes": 119980,
+      "sha256": "fe0f68320712d685fd51f51e1706e685273937574b52e7d6e6c42e27dd416ac0",
+      "rawSha256": "82c4e27f209222c77c8661dce3b075f56952015ab4d7a2743d49f8bd0cc5c595"
+    },
+    "pixels-21.f32le.gz": {
+      "bytes": 120062,
+      "sha256": "0bc568025f536ffa7383e5bac8eec66bc6529c00f4564727a03a2dbfbed6c54f",
+      "rawSha256": "7fbf533fade470119397cb0c5a2f1031ceffe7e352892406c731b4ad6b9d37bf"
+    },
+    "pixels-22.f32le.gz": {
+      "bytes": 120158,
+      "sha256": "82086a78c99c172109b7166d27f39882b1e5e7ed99d70c4ac9bb20cbbf574e9b",
+      "rawSha256": "1ad592ca976f19ada0419c787768762f5b29686fcfb245a583791aa0c16e9fb5"
+    },
+    "pixels-23.f32le.gz": {
+      "bytes": 120186,
+      "sha256": "67d9f9fa620ab63c3d02e48c7d93bb829d11512b9766ce397f739218d1b3973c",
+      "rawSha256": "487c22d6ca0f501f011cb45e0f8baa660dff1f5e193b0af03f703c755a788fc3"
+    },
+    "rgba-raw-le.tif-balance-0.f32le.gz": {
+      "bytes": 101840,
+      "sha256": "d9a703bb80d05d935ddc6b5a4c42c3f3597bfb9921353c20f10c41be88c912df",
+      "rawSha256": "5a3b7125f8eae8aa4d82c4c0fa4d4ff8838ba76b7dcd10737cfa3e8f907bee55"
+    },
+    "rgba-raw-le.tif-balance-1.f32le.gz": {
+      "bytes": 101097,
+      "sha256": "ed79e096801380196002e3122ddb535bb089686ae019398d31746d41cb9819d6",
+      "rawSha256": "a8ff4f38d5e8a58dcb263f1d4dcb06f8dc11b350851fded002b01f8058e215f6"
+    },
+    "rgba-raw-le.tif-balance-2.f32le.gz": {
+      "bytes": 99744,
+      "sha256": "7874f75434449a4df49442ad70b57016592d4dd1a54044b7c6412e6d709ca75b",
+      "rawSha256": "3cdd668cde6c977d8d99874fc21473139899298dfe1cf069143e65d6f1adae8e"
+    },
+    "rgba-raw-le.tif-balance-3.f32le.gz": {
+      "bytes": 101912,
+      "sha256": "23ad0b46e40926388fd17232c9974214c2baf1a7f46052dc00a9c61e72d9a6c8",
+      "rawSha256": "71933e6aa76175c6ff595a803c37ecb0e21461b0b113a61950805b6370207681"
+    },
+    "rgba-raw-le.tif-balance-4.f32le.gz": {
+      "bytes": 101678,
+      "sha256": "3d2a20c02b638472e5c3505af5ebc9916483b502bdbd79657518e53098de674e",
+      "rawSha256": "aeab7482996fbe6c5247242fbc4b171945173224b63017b2269a540ef5173ae0"
+    },
+    "rgba-raw-le.tif-balance-5.f32le.gz": {
+      "bytes": 100738,
+      "sha256": "877b18ef4773ee6ba007d6a7a2c8e74bc1f95d0e068ea8c800fe7d1ac21f7c74",
+      "rawSha256": "4579dd6b00807a2d5f58dbb2c1b6d2c85d027902a25343bcfccc59ee6aa052e0"
+    },
+    "rgba-raw-le.tif-balance-6.f32le.gz": {
+      "bytes": 101942,
+      "sha256": "8cf30a8c421e1571433880495b071d6bdc76d10c4920ec917bbbacdbb623f0d2",
+      "rawSha256": "749dad698f5e2578133e53d1947a90137fee722c11e22845ad142ec66f7cd963"
+    },
+    "rgba-raw-le.tif-balance-7.f32le.gz": {
+      "bytes": 101685,
+      "sha256": "c64e212777ecc452c2c4b1781ada48a7c721a72b8cf9eb86341600e8cc6ab457",
+      "rawSha256": "5a1c0ff96ae4bc5bdce281d16cd5c756d03b3a399fd79178f4f5b029dae04dfa"
+    },
+    "rgba-raw-le.tif-balance-8.f32le.gz": {
+      "bytes": 100706,
+      "sha256": "e444de6639517adec008d4f47781903a0a1aad83594ca35f6da7070776592180",
+      "rawSha256": "0d95171f62ab2f80908b4cfec1be8393adbc917c4b398dbaba6499b8e8029c0d"
+    },
+    "rgba-raw-le.tif-balance-9.f32le.gz": {
+      "bytes": 102165,
+      "sha256": "32c03758c4c65559f1085205eec5aa120c3caeab4593d69f7117baba4c84699c",
+      "rawSha256": "166b0c99b6b3f4a152698255b18c0971f1fb7b56f4a8736b5c9817e5d66254f7"
+    },
+    "rgba-raw-le.tif-balance-10.f32le.gz": {
+      "bytes": 102161,
+      "sha256": "b79153e61f475583aa0172b098ae509d30437396f73b5e2801bc4a529b240e12",
+      "rawSha256": "48689678733c3decb817cd149b9b208fe33a359dd0420efccb7ca0e38cfda853"
+    },
+    "rgba-raw-le.tif-balance-11.f32le.gz": {
+      "bytes": 102095,
+      "sha256": "c277463e35e976db4c99c4c30710b5a6f400dddd35eef3a332dadb8479283378",
+      "rawSha256": "aa78900b8d02be58c5944de1346fe49b2d8b6bf73b07a7866fa6222c4c719b55"
+    },
+    "rgba-raw-le.tif-balance-12.f32le.gz": {
+      "bytes": 102156,
+      "sha256": "e36a5a6bc7cc085fe2e322ef68329eef2676d30787efd9f73ceb7b46311eb36c",
+      "rawSha256": "1cd0e9bb89ac3488551c7f1c7ed1ebca0f45e9701454c2efac1fb4edc98b7d5c"
+    },
+    "rgba-raw-le.tif-balance-13.f32le.gz": {
+      "bytes": 102141,
+      "sha256": "821b0b1cce73a10eb7f57704c8cebe77c97076659ef0bfff89cc2b1c04c3e388",
+      "rawSha256": "c009dde16961cf30a4072e963e4b21734c661fef016b89a71fe65d9c6dac72e3"
+    },
+    "rgba-raw-le.tif-balance-14.f32le.gz": {
+      "bytes": 102057,
+      "sha256": "d2254d6183a7d9420d22a2622dae2edb559d5cb53ba16b5540f745d72133952f",
+      "rawSha256": "d813f29f3745710c87b3afc13051a79e5813a43fa8b0d8e217ae9e8eda9ec9ff"
+    },
+    "rgba-raw-le.tif-balance-15.f32le.gz": {
+      "bytes": 102049,
+      "sha256": "34e38ceb5e854f995959cac8c743631656461e0eb9c3081cf2c95dd1ffdf4be5",
+      "rawSha256": "c3f4e585c4b54b7f64501a0e6e368f9646cc195d31178489255e0b8d1e5c46f3"
+    },
+    "rgba-raw-le.tif-balance-16.f32le.gz": {
+      "bytes": 102027,
+      "sha256": "5f7556dfc0517099a148ec061a8f73308b63321d3fc16fc21d3a3884c7c56642",
+      "rawSha256": "5caf5ffc589adfe4c4ccdc9972c0da321b2e009539d5d386a448a6385ae40e6a"
+    },
+    "rgba-raw-le.tif-balance-17.f32le.gz": {
+      "bytes": 101848,
+      "sha256": "8f4aa7a11ecb946d9f6564c2330be2fd793dcdc0b31d8b75f96ada40c118cf61",
+      "rawSha256": "457f42be1a0ac1998d2cebdc08bfeef0207d077aa80d9807540a8fc1cf4461d5"
+    },
+    "rgba-raw-le.tif-balance-18.f32le.gz": {
+      "bytes": 101525,
+      "sha256": "4e067253cf80ba4f13c296c5740df1c9345e3a814c58b17a10fd4612783f12ab",
+      "rawSha256": "fcb7ec082b7fef9a1c610f81f80613a72f8ff4cb265971bd8f42e31ce805167f"
+    },
+    "rgba-raw-le.tif-balance-19.f32le.gz": {
+      "bytes": 101360,
+      "sha256": "22ca484dffc65a51c472813e5931dcef3ab99d3dcb56cccf302f87ff4debd17a",
+      "rawSha256": "b02ef68bd8ab4620e67c24c6c6d19ae61d31960fe0b0d49c9053ddfa237809d4"
+    },
+    "rgba-raw-le.tif-balance-20.f32le.gz": {
+      "bytes": 101291,
+      "sha256": "b85a62d605d9664ac90712d113bbfe4daebd98777f0685966ddcb228389bf6d4",
+      "rawSha256": "c261dced7de74003cd16999b718d3862974905a634f3d686159a06d59c67f580"
+    },
+    "rgba-raw-le.tif-balance-21.f32le.gz": {
+      "bytes": 101187,
+      "sha256": "3c42f9c35ba47a171426819b056c000ed467604460a0fefa1c92af4ffbc67f0d",
+      "rawSha256": "8ee12700c7432ea84ee83e5387d7bc1cd2271d4bb7215de422b22af4c10076c0"
+    },
+    "rgba-raw-le.tif-balance-22.f32le.gz": {
+      "bytes": 101112,
+      "sha256": "a4c4691cef388252811a2e200bf940deb0ca3a4936e0b42a3ecacc7553228df8",
+      "rawSha256": "247d778cf97366bc1ddb2b291676cba5db4b42fab816fc576e234dbe463afb33"
+    },
+    "rgba-raw-le.tif-balance-23.f32le.gz": {
+      "bytes": 101031,
+      "sha256": "5e125653d76885dee7b648226e5d18d417c0123ae9facb5294993cbff4b85842",
+      "rawSha256": "dc4188e66bbb3b2b3f87905cc667884c91b29e2328b79219fd662b48fec56a10"
+    },
+    "rgba-raw-le.tif-isolated.f32le.gz": {
+      "bytes": 102466,
+      "sha256": "0b9f4ebae4224def9bd0053ee4fb890ea1d82574cb85047188ad5977e0afb305",
+      "rawSha256": "85599443d127150b9677cb71ebe117b4dfb881254281d0efac00dfba66c6f7da"
+    },
+    "rgba-raw-le.tif-pass-through.f32le.gz": {
+      "bytes": 102380,
+      "sha256": "d1a7274e5a0c482d586701996e2be22ef0ff199e8d0b51effa93ba0996c2672e",
+      "rawSha256": "40eada72f92e553f941b0bd60f405426156ecbee3895613e25fa70026488425b"
+    },
+    "rgba-raw-le.tif-clipping.f32le.gz": {
+      "bytes": 102419,
+      "sha256": "f7c53a41e9863df50c75cc2342e09b0f9a7b175c16424a8f70ef54f6636aca58",
+      "rawSha256": "b4c592ff64b0b73861b82af043f0d7c69eec8021756b8ede1ceeb9deb88df2f4"
+    },
+    "rgba-raw-le.tif-group-base.f32le.gz": {
+      "bytes": 102373,
+      "sha256": "f2933ec139bcbaf3c324adef96af9698139084024485e514c3c0e55d612fd1b4",
+      "rawSha256": "90c5de9293289ab0d6028b1efa5b4491f2a0847dd8a8593271fc2e897f990aac"
+    },
+    "rgba-raw-le.tif-ordered.f32le.gz": {
+      "bytes": 74033,
+      "sha256": "1b6864c725956ae3b30ed933de5dca0930ab588e8cc76c4896b4a2ecdd4f1c20",
+      "rawSha256": "9b5cfeec7d4f3fd62d127b4b2ac321d441844bcf185549639187421494c1ac94"
+    },
+    "hdr-high.tif-balance-0.f32le.gz": {
+      "bytes": 101840,
+      "sha256": "d9a703bb80d05d935ddc6b5a4c42c3f3597bfb9921353c20f10c41be88c912df",
+      "rawSha256": "5a3b7125f8eae8aa4d82c4c0fa4d4ff8838ba76b7dcd10737cfa3e8f907bee55"
+    },
+    "hdr-high.tif-balance-1.f32le.gz": {
+      "bytes": 101097,
+      "sha256": "ed79e096801380196002e3122ddb535bb089686ae019398d31746d41cb9819d6",
+      "rawSha256": "a8ff4f38d5e8a58dcb263f1d4dcb06f8dc11b350851fded002b01f8058e215f6"
+    },
+    "hdr-high.tif-balance-2.f32le.gz": {
+      "bytes": 99744,
+      "sha256": "7874f75434449a4df49442ad70b57016592d4dd1a54044b7c6412e6d709ca75b",
+      "rawSha256": "3cdd668cde6c977d8d99874fc21473139899298dfe1cf069143e65d6f1adae8e"
+    },
+    "hdr-high.tif-balance-3.f32le.gz": {
+      "bytes": 101912,
+      "sha256": "23ad0b46e40926388fd17232c9974214c2baf1a7f46052dc00a9c61e72d9a6c8",
+      "rawSha256": "71933e6aa76175c6ff595a803c37ecb0e21461b0b113a61950805b6370207681"
+    },
+    "hdr-high.tif-balance-4.f32le.gz": {
+      "bytes": 101678,
+      "sha256": "3d2a20c02b638472e5c3505af5ebc9916483b502bdbd79657518e53098de674e",
+      "rawSha256": "aeab7482996fbe6c5247242fbc4b171945173224b63017b2269a540ef5173ae0"
+    },
+    "hdr-high.tif-balance-5.f32le.gz": {
+      "bytes": 100738,
+      "sha256": "877b18ef4773ee6ba007d6a7a2c8e74bc1f95d0e068ea8c800fe7d1ac21f7c74",
+      "rawSha256": "4579dd6b00807a2d5f58dbb2c1b6d2c85d027902a25343bcfccc59ee6aa052e0"
+    },
+    "hdr-high.tif-balance-6.f32le.gz": {
+      "bytes": 101942,
+      "sha256": "8cf30a8c421e1571433880495b071d6bdc76d10c4920ec917bbbacdbb623f0d2",
+      "rawSha256": "749dad698f5e2578133e53d1947a90137fee722c11e22845ad142ec66f7cd963"
+    },
+    "hdr-high.tif-balance-7.f32le.gz": {
+      "bytes": 101685,
+      "sha256": "c64e212777ecc452c2c4b1781ada48a7c721a72b8cf9eb86341600e8cc6ab457",
+      "rawSha256": "5a1c0ff96ae4bc5bdce281d16cd5c756d03b3a399fd79178f4f5b029dae04dfa"
+    },
+    "hdr-high.tif-balance-8.f32le.gz": {
+      "bytes": 100706,
+      "sha256": "e444de6639517adec008d4f47781903a0a1aad83594ca35f6da7070776592180",
+      "rawSha256": "0d95171f62ab2f80908b4cfec1be8393adbc917c4b398dbaba6499b8e8029c0d"
+    },
+    "hdr-high.tif-balance-9.f32le.gz": {
+      "bytes": 102165,
+      "sha256": "32c03758c4c65559f1085205eec5aa120c3caeab4593d69f7117baba4c84699c",
+      "rawSha256": "166b0c99b6b3f4a152698255b18c0971f1fb7b56f4a8736b5c9817e5d66254f7"
+    },
+    "hdr-high.tif-balance-10.f32le.gz": {
+      "bytes": 102161,
+      "sha256": "b79153e61f475583aa0172b098ae509d30437396f73b5e2801bc4a529b240e12",
+      "rawSha256": "48689678733c3decb817cd149b9b208fe33a359dd0420efccb7ca0e38cfda853"
+    },
+    "hdr-high.tif-balance-11.f32le.gz": {
+      "bytes": 102095,
+      "sha256": "c277463e35e976db4c99c4c30710b5a6f400dddd35eef3a332dadb8479283378",
+      "rawSha256": "aa78900b8d02be58c5944de1346fe49b2d8b6bf73b07a7866fa6222c4c719b55"
+    },
+    "hdr-high.tif-balance-12.f32le.gz": {
+      "bytes": 102156,
+      "sha256": "e36a5a6bc7cc085fe2e322ef68329eef2676d30787efd9f73ceb7b46311eb36c",
+      "rawSha256": "1cd0e9bb89ac3488551c7f1c7ed1ebca0f45e9701454c2efac1fb4edc98b7d5c"
+    },
+    "hdr-high.tif-balance-13.f32le.gz": {
+      "bytes": 102141,
+      "sha256": "821b0b1cce73a10eb7f57704c8cebe77c97076659ef0bfff89cc2b1c04c3e388",
+      "rawSha256": "c009dde16961cf30a4072e963e4b21734c661fef016b89a71fe65d9c6dac72e3"
+    },
+    "hdr-high.tif-balance-14.f32le.gz": {
+      "bytes": 102057,
+      "sha256": "d2254d6183a7d9420d22a2622dae2edb559d5cb53ba16b5540f745d72133952f",
+      "rawSha256": "d813f29f3745710c87b3afc13051a79e5813a43fa8b0d8e217ae9e8eda9ec9ff"
+    },
+    "hdr-high.tif-balance-15.f32le.gz": {
+      "bytes": 102049,
+      "sha256": "34e38ceb5e854f995959cac8c743631656461e0eb9c3081cf2c95dd1ffdf4be5",
+      "rawSha256": "c3f4e585c4b54b7f64501a0e6e368f9646cc195d31178489255e0b8d1e5c46f3"
+    },
+    "hdr-high.tif-balance-16.f32le.gz": {
+      "bytes": 102027,
+      "sha256": "5f7556dfc0517099a148ec061a8f73308b63321d3fc16fc21d3a3884c7c56642",
+      "rawSha256": "5caf5ffc589adfe4c4ccdc9972c0da321b2e009539d5d386a448a6385ae40e6a"
+    },
+    "hdr-high.tif-balance-17.f32le.gz": {
+      "bytes": 101848,
+      "sha256": "8f4aa7a11ecb946d9f6564c2330be2fd793dcdc0b31d8b75f96ada40c118cf61",
+      "rawSha256": "457f42be1a0ac1998d2cebdc08bfeef0207d077aa80d9807540a8fc1cf4461d5"
+    },
+    "hdr-high.tif-balance-18.f32le.gz": {
+      "bytes": 101525,
+      "sha256": "4e067253cf80ba4f13c296c5740df1c9345e3a814c58b17a10fd4612783f12ab",
+      "rawSha256": "fcb7ec082b7fef9a1c610f81f80613a72f8ff4cb265971bd8f42e31ce805167f"
+    },
+    "hdr-high.tif-balance-19.f32le.gz": {
+      "bytes": 101360,
+      "sha256": "22ca484dffc65a51c472813e5931dcef3ab99d3dcb56cccf302f87ff4debd17a",
+      "rawSha256": "b02ef68bd8ab4620e67c24c6c6d19ae61d31960fe0b0d49c9053ddfa237809d4"
+    },
+    "hdr-high.tif-balance-20.f32le.gz": {
+      "bytes": 101291,
+      "sha256": "b85a62d605d9664ac90712d113bbfe4daebd98777f0685966ddcb228389bf6d4",
+      "rawSha256": "c261dced7de74003cd16999b718d3862974905a634f3d686159a06d59c67f580"
+    },
+    "hdr-high.tif-balance-21.f32le.gz": {
+      "bytes": 101187,
+      "sha256": "3c42f9c35ba47a171426819b056c000ed467604460a0fefa1c92af4ffbc67f0d",
+      "rawSha256": "8ee12700c7432ea84ee83e5387d7bc1cd2271d4bb7215de422b22af4c10076c0"
+    },
+    "hdr-high.tif-balance-22.f32le.gz": {
+      "bytes": 101112,
+      "sha256": "a4c4691cef388252811a2e200bf940deb0ca3a4936e0b42a3ecacc7553228df8",
+      "rawSha256": "247d778cf97366bc1ddb2b291676cba5db4b42fab816fc576e234dbe463afb33"
+    },
+    "hdr-high.tif-balance-23.f32le.gz": {
+      "bytes": 101031,
+      "sha256": "5e125653d76885dee7b648226e5d18d417c0123ae9facb5294993cbff4b85842",
+      "rawSha256": "dc4188e66bbb3b2b3f87905cc667884c91b29e2328b79219fd662b48fec56a10"
+    },
+    "hdr-high.tif-isolated.f32le.gz": {
+      "bytes": 102466,
+      "sha256": "0b9f4ebae4224def9bd0053ee4fb890ea1d82574cb85047188ad5977e0afb305",
+      "rawSha256": "85599443d127150b9677cb71ebe117b4dfb881254281d0efac00dfba66c6f7da"
+    },
+    "hdr-high.tif-pass-through.f32le.gz": {
+      "bytes": 102380,
+      "sha256": "d1a7274e5a0c482d586701996e2be22ef0ff199e8d0b51effa93ba0996c2672e",
+      "rawSha256": "40eada72f92e553f941b0bd60f405426156ecbee3895613e25fa70026488425b"
+    },
+    "hdr-high.tif-clipping.f32le.gz": {
+      "bytes": 102419,
+      "sha256": "f7c53a41e9863df50c75cc2342e09b0f9a7b175c16424a8f70ef54f6636aca58",
+      "rawSha256": "b4c592ff64b0b73861b82af043f0d7c69eec8021756b8ede1ceeb9deb88df2f4"
+    },
+    "hdr-high.tif-group-base.f32le.gz": {
+      "bytes": 102373,
+      "sha256": "f2933ec139bcbaf3c324adef96af9698139084024485e514c3c0e55d612fd1b4",
+      "rawSha256": "90c5de9293289ab0d6028b1efa5b4491f2a0847dd8a8593271fc2e897f990aac"
+    },
+    "hdr-high.tif-ordered.f32le.gz": {
+      "bytes": 74033,
+      "sha256": "1b6864c725956ae3b30ed933de5dca0930ab588e8cc76c4896b4a2ecdd4f1c20",
+      "rawSha256": "9b5cfeec7d4f3fd62d127b4b2ac321d441844bcf185549639187421494c1ac94"
+    },
+    "u16-all-levels.tif-balance-0.f32le.gz": {
+      "bytes": 121267,
+      "sha256": "0df31999577bf647ddcce716a0e0ab5e84bb709cc12d8b1baf1de871eb4c3308",
+      "rawSha256": "bbff32483dae04fa0c37009815b20ae42fe2bc613f117835d2e95a6586bc7c9b"
+    },
+    "u16-all-levels.tif-balance-1.f32le.gz": {
+      "bytes": 120935,
+      "sha256": "4614b08d83456e79b067d80cb871f4d52e84711fb2abc9df2e7b88d12b2d97b2",
+      "rawSha256": "0be159af781a474ae5e9eaf74fa7e201f869da0500af36edf68d22bfe2813e50"
+    },
+    "u16-all-levels.tif-balance-2.f32le.gz": {
+      "bytes": 120665,
+      "sha256": "f4f9cf578009083c69317a24613e58198765f89c911dec4e9bacaddccd00055d",
+      "rawSha256": "dddeac41bf8601d925e7ef66f9f122f85a4ebf13cc15d98c0aad172bd8b833b1"
+    },
+    "u16-all-levels.tif-balance-3.f32le.gz": {
+      "bytes": 120610,
+      "sha256": "48381263ee063d2294f929460370f125cf293255d88e2ff4d1d17d1dac745167",
+      "rawSha256": "ef51c6ed6079fb1fcecc0c0daf67d3fdb5356d35a2f62c11b7f2ed864c2ec5bc"
+    },
+    "u16-all-levels.tif-balance-4.f32le.gz": {
+      "bytes": 120361,
+      "sha256": "21ab3554bda7fa3939322d6586f43193397e258ffd02fbce69eb284dc23a6f7c",
+      "rawSha256": "2d010ca472dc51284a833d8a463876732326170e11ac6bd50a42adeef81b74d4"
+    },
+    "u16-all-levels.tif-balance-5.f32le.gz": {
+      "bytes": 121190,
+      "sha256": "a598eadfc9f998207c07a6ef103b4838e6994a6784dbaa84a33829436f788a79",
+      "rawSha256": "963726e04a7db78f016f2ebd74667bcacfbe3c621c8243e1823c9a99ca5061f4"
+    },
+    "u16-all-levels.tif-balance-6.f32le.gz": {
+      "bytes": 120605,
+      "sha256": "f19223852430c15822fa5e84b14220375af8f0e0102c80414b0b88d4067844cc",
+      "rawSha256": "7cb08a1c88e1067e2702fae017057b9dc5c9a26df752c946a7b73afce4371c9f"
+    },
+    "u16-all-levels.tif-balance-7.f32le.gz": {
+      "bytes": 119579,
+      "sha256": "d296161c2625efe3c9706b24dfe931a85b04799b0e567dc1fd5a16b28813e8c0",
+      "rawSha256": "c32a1a4f2aecf4d87268a82b85d883f796bff3871891f202753ce75198504800"
+    },
+    "u16-all-levels.tif-balance-8.f32le.gz": {
+      "bytes": 121327,
+      "sha256": "36db7b80b0357ea51fa88ba24a5ee262f931229c8fd17f9b68630a97b53a4f69",
+      "rawSha256": "2b38d7aff085d7afa87ca13c7573547ee7665714cbf3222b75d66180087571dd"
+    },
+    "u16-all-levels.tif-balance-9.f32le.gz": {
+      "bytes": 120259,
+      "sha256": "e6cac1a967930a7f2628ebb7f660d22ee7ff45ceca488f4192f35787345e461a",
+      "rawSha256": "afdf8b6fe8f40b1b0b56cb4221aa903d0882c8fdfcf1bc9330c790ed92cb3ffb"
+    },
+    "u16-all-levels.tif-balance-10.f32le.gz": {
+      "bytes": 120693,
+      "sha256": "dce7d334771238d8b6096ef5b43f3d630193d7ef6a8ef89c86123a6052f36f84",
+      "rawSha256": "3ada2b8fea5313ae4843273ba9c9e286525daa2da0f116c32c56fdbdf1533fad"
+    },
+    "u16-all-levels.tif-balance-11.f32le.gz": {
+      "bytes": 120185,
+      "sha256": "84ff229ebe9abff69ab61f0292419ee4fceb60bacdf41e8b0f3279047a2885ad",
+      "rawSha256": "8d722185a106d36345b5656e6d99e6e40a25bedb39598d1d9bd79a6f40573ea4"
+    },
+    "u16-all-levels.tif-balance-12.f32le.gz": {
+      "bytes": 120742,
+      "sha256": "e6a24c3c727dde1bec51846a1380155058ac2c10c4395a290aafc74c738aeb95",
+      "rawSha256": "ac93497e37a0e60035d505f483da75b0b5c149a60a66e55077f8f452e9183ba2"
+    },
+    "u16-all-levels.tif-balance-13.f32le.gz": {
+      "bytes": 120777,
+      "sha256": "7c8eb50a04bb55bcf7f9b756cba3dc953c6a68dc18ffbfb502ac51dc2343a2bc",
+      "rawSha256": "0ad5cb360b24e7d82a79bb67655b32c1ca442b585c9361d9ca267cac22504588"
+    },
+    "u16-all-levels.tif-balance-14.f32le.gz": {
+      "bytes": 120163,
+      "sha256": "c28e85754e7fa50ff3084c3c7aaedda781e058d2a990da910e139b7ccfff8222",
+      "rawSha256": "4f00e1b1b54cb3a2aad54c56e0abff23554f7a9005abc9ea1370254fc87b55f3"
+    },
+    "u16-all-levels.tif-balance-15.f32le.gz": {
+      "bytes": 118587,
+      "sha256": "7965ec4ab664bd2e2dcad33e7e26d6a8a6f0ab72fadd2ea1ded2a42b958ea51d",
+      "rawSha256": "935d91b21b64d5b64bfef2e0b924ab0da81426e09f47c07317a3d597ec25abac"
+    },
+    "u16-all-levels.tif-balance-16.f32le.gz": {
+      "bytes": 107994,
+      "sha256": "c1d3c30cb0d542eb1d1325a6896038356d8dc5351a0b2eaabc87feb5ef90ad8c",
+      "rawSha256": "a18116abf77584a3e1da2824bb8cff6b6f6515c971c27fe1481fa61c8dbbc490"
+    },
+    "u16-all-levels.tif-balance-17.f32le.gz": {
+      "bytes": 118383,
+      "sha256": "1e41e93e4413dedeb6db32e800dc73e73e78ce8a8bfb33dd9c97890c71865784",
+      "rawSha256": "e4ca1a65a07ac1ffcb6fd62888011133b5c146d03505e12a3af3668aa8b4f0ae"
+    },
+    "u16-all-levels.tif-balance-18.f32le.gz": {
+      "bytes": 118405,
+      "sha256": "08a9cf029c10a6d53bc5353e40fcfc51288c5e3df00e293671caf5662a539d98",
+      "rawSha256": "32328f5bfecd048a1d446b43c86ff251434eca1b4b2e28205c7d67c7abcb1aaf"
+    },
+    "u16-all-levels.tif-balance-19.f32le.gz": {
+      "bytes": 116776,
+      "sha256": "d253a856d4c0d26ba50b7563ed50df78b1b99ed739a0729063a458a70033d7ef",
+      "rawSha256": "8fabbdea7eb3e702ea2d93f245816a9dd06cfb6ef71dc9c21a09a82022dfa865"
+    },
+    "u16-all-levels.tif-balance-20.f32le.gz": {
+      "bytes": 118252,
+      "sha256": "b10b18cd67c1105a5bd427c3e72b8359f29a5ae9058975a1427b9fbf0c8ef384",
+      "rawSha256": "2f0703c35044b0a77a650095a4b06f8b152efd6a907ea0c7e1a85b62bf8550f9"
+    },
+    "u16-all-levels.tif-balance-21.f32le.gz": {
+      "bytes": 118344,
+      "sha256": "d82b6030cd210a591d2c03735806d2d8809128fe80121241e875412f96c726fc",
+      "rawSha256": "4e8d7e1e13920f6f644de396f06d0c5641fba14038c3eb3f244da9ba2b977c17"
+    },
+    "u16-all-levels.tif-balance-22.f32le.gz": {
+      "bytes": 118596,
+      "sha256": "9b8f8ffa9c47c2ffede95641cff1aa5990fe4721e542e743e19371ad93ca2359",
+      "rawSha256": "7437a4e3a015d85010efac5be397f3bc33b028fcc57630894c7f332a2c10f33d"
+    },
+    "u16-all-levels.tif-balance-23.f32le.gz": {
+      "bytes": 118981,
+      "sha256": "ca27914949320126d041da4429859ba3d854c578c00b856df47d2ba30ced3ae2",
+      "rawSha256": "14080c5fc6477cf95fdb611423421db7d0956132bae439f39e529ca6288f9921"
+    },
+    "u16-all-levels.tif-isolated.f32le.gz": {
+      "bytes": 119750,
+      "sha256": "54a07a3bdfbabe6380c8ffc277db3c0f105b583f17be868470b72e9db4666eb5",
+      "rawSha256": "c9bddbda9a45b2347384682a868ba698e1b4e01a1314e5c32e1d4a55f908a1dc"
+    },
+    "u16-all-levels.tif-pass-through.f32le.gz": {
+      "bytes": 119769,
+      "sha256": "21651692c2688abd2074d91c2c1b21eab6c175d2716f19f3d6502c9e123934fa",
+      "rawSha256": "6e0979f1924a2b22f763cb2e9f8152a16576421dffe0f8c611c6efbd7377c6a0"
+    },
+    "u16-all-levels.tif-clipping.f32le.gz": {
+      "bytes": 119741,
+      "sha256": "691e5980f50c940e9658fa3f0fab4f7330cf1b688a09b55cec147e04dd47bdc5",
+      "rawSha256": "92baae899435a6ad64a9fd41a66d91fb0f873ed37bfc82107bdfcefd31f1a3a4"
+    },
+    "u16-all-levels.tif-group-base.f32le.gz": {
+      "bytes": 118895,
+      "sha256": "4813fb4451efc707b7118c53d4acd57f7369109a84e8238960428d6534d90fe3",
+      "rawSha256": "bacc7cff481ca2ae7ba0b89eb4de1f7ee0a74bcd61c334967c234463efca814a"
+    },
+    "u16-all-levels.tif-ordered.f32le.gz": {
+      "bytes": 103105,
+      "sha256": "468330ad1404e8eb161862279d7fa6999f6570f7345f46ed39f585bf74e89a80",
+      "rawSha256": "efda85b0888416792f80c98dcacf009400e8adbcb7263cab85f5adf8e5fcb13e"
+    }
+  },
+  "reference": "Independent Colour Science 0.4.6 Kang/Bradford matrices, numerical tint tangents, NumPy f64/f32 and independent clipping/transfer scene operators. No application, WASM or canvas expected pixels."
+}

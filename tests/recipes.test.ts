@@ -5,6 +5,8 @@ import {
   RasterLayer,
   TextLayer,
   AdjustmentLayer,
+  LayerMask,
+  MarqueeSelection,
 } from "../src/dom";
 import {
   createDocument,
@@ -2056,4 +2058,12 @@ it("replays recorded literal action values while retaining deliberate tone bindi
 it('all float blend modes retain semantic recipe targeting, shared Undo and exact immutable replay',async()=>{
  const{BLEND_MODES}=await import('../src/core/model');const document=new Document({precision:'float32'}),target=document.layers.add(new LayerGroup({name:'Blend target',blendMode:'normal'}));
  for(const mode of BLEND_MODES){const before=document.toJSON(),recipe:Recipe={schemaVersion:RECIPE_SCHEMA_VERSION,id:'float-'+mode,name:'Float '+mode,description:'Change blend modes through shared commands',version:1,parameters:[],steps:[{id:'blend',name:'Blend',target:{by:'name',pattern:'Blend target'},action:{type:'layer.update',patch:{blendMode:mode}}}]};const result=executeRecipe(recipe,document,{});expect(result.success).toBe(true);expect(target.blendMode).toBe(mode);const after=document.toJSON();if(mode!=='normal'){document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);}}
+});
+
+it('float White Balance recipes bind receiving layers, retain local masks and parameters, and undo or roll back atomically',()=>{
+ const document=new Document({precision:'float32'}),target=document.layers.add(new AdjustmentLayer({name:'Receiving balance',adjustment:{kind:'white-balance',temperature:6504,tint:0},opacity:.625}));
+ target.mask=new LayerMask({selection:new MarqueeSelection({shape:'rectangle',x:0,y:0,width:10,height:10}),density:.5});const mask=target.mask.toJSON();
+ const recipe:Recipe={schemaVersion:RECIPE_SCHEMA_VERSION,id:'float-white-balance',name:'Linear balance',description:'Retain receiving artwork',version:1,parameters:[],steps:[{id:'balance',name:'Balance',target:{by:'name',pattern:'Receiving balance'},action:{type:'layer.update',patch:{adjustment:{kind:'white-balance',temperature:4000.5,tint:-100}}}}]},source=structuredClone(recipe),before=document.toJSON();
+ expect(executeRecipe(recipe,document,{}).success).toBe(true);expect(target.adjustment).toEqual({kind:'white-balance',temperature:4000.5,tint:-100});expect(target.opacity).toBe(.625);expect(target.mask?.toJSON()).toEqual(mask);expect(recipe).toEqual(source);const after=document.toJSON();document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);
+ const invalid=structuredClone(recipe);invalid.steps.push({id:'invalid',name:'Invalid balance',target:{by:'name',pattern:'Receiving balance'},action:{type:'layer.update',patch:{adjustment:{kind:'white-balance',temperature:1999,tint:0}}}});expect(executeRecipe(invalid,document,{}).success).toBe(false);expect(document.toJSON()).toEqual(after);
 });

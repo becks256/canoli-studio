@@ -1,3 +1,4 @@
+import{compileFloatWhiteBalance}from'../core/float-white-balance';
 import{projectFloatFrame,type FloatSceneFrame}from'./float-frame';
 export type{FloatSceneFrame}from'./float-frame';
 import{clippingStacks}from'../core/clipping';
@@ -44,7 +45,7 @@ export class FloatSceneRenderer {
  private entries=new Map<Blob,Map<string,CachedSource>>();
  private lru=new Map<CachedSource,true>();private epoch=0;private closed=false;
  private captures=new Set<AbortController>();
- constructor(private processor:Pick<PixelProcessor,'floatComposite'|'floatTone'|'floatTransfer'>){}
+ constructor(private processor:Pick<PixelProcessor,'floatComposite'|'floatTone'|'floatTransfer'|'floatAffine'>){}
  private source(store:AssetStore,asset:ImageAsset):FloatRasterSource{
   if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF sources. Byte editing proxies are not precision sources.');
   const key=JSON.stringify([asset.width,asset.height,asset.tiff,asset.tiffColor.source]);let entries=this.entries.get(asset.blob);if(!entries){entries=new Map();this.entries.set(asset.blob,entries);}let entry=entries.get(key);
@@ -71,15 +72,17 @@ export class FloatSceneRenderer {
   if(this.closed)throw new Error('Float scene renderer is closed.');const document=isImmutable(input)?input:freeze(structuredClone(input));validateDocument(document);const issue=floatSceneIssue(document);if(issue)throw new Error(issue);
   assertFloatSources(document,assets);
   const epoch=this.epoch,lifetime=assets.captureLifetime(),sources=new Map<string,{asset:ImageAsset;source:FloatRasterSource;tiff:ImageAsset['tiff'];color:ImageAsset['tiffColor']}>(),masks=new Map<string,{asset:ImageAsset;bitmap:ImageBitmap;blob:Blob;width:number;height:number}>();let closed=false;
+  const whiteBalances=new Map<string,readonly number[]|null>();
   const abort=new AbortController(),incoming=control.signal,cancel=()=>abort.abort(incoming?.reason);incoming?.addEventListener('abort',cancel,{once:true});if(incoming?.aborted)cancel();this.captures.add(abort);control={...control,signal:abort.signal};
   const check=()=>{control.signal?.throwIfAborted();checkRenderCurrent(control.isCancelled);if(closed||this.closed||epoch!==this.epoch)throw new Error('Float scene capture is closed or superseded.');lifetime();
    for(const[id,value]of sources)if(!assets.has(id)||assets.get(id)!==value.asset||value.asset.blob!==value.source.original||value.asset.width!==value.source.width||value.asset.height!==value.source.height||value.asset.tiff!==value.tiff||value.asset.tiffColor!==value.color)throw new Error('Float scene source changed.');
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();whiteBalances.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
    visitLayerAssets(layer,reference=>{if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
    if(layer.kind==='group')visit(layer.children);else if(layer.kind==='raster'&&!sources.has(layer.assetId)){const asset=assets.get(layer.assetId);sources.set(asset.id,{asset,source:this.source(assets,asset),tiff:asset.tiff,color:asset.tiffColor});}
+   else if(layer.kind==='adjustment'&&layer.adjustment.kind==='white-balance')whiteBalances.set(layer.id,compileFloatWhiteBalance(layer.adjustment));
   }};
   try{
    check();visit(document.children);check();
@@ -87,6 +90,12 @@ export class FloatSceneRenderer {
    // session. Ready tiles need no native owner, avoiding semaphore deadlocks.
    for(const value of sources.values())await value.source.prepare({signal:control.signal,onProgress:progress=>{check();control.onProgress?.(progress);check();}});
    check();
+   const balance=async(id:string,pixels:Float32Array)=>{
+    const matrix=whiteBalances.get(id);if(matrix===undefined)throw new Error('Float white balance was not captured.');
+    // Neutral is an exact identity, including signed zero and hidden RGB.
+    if(matrix===null)return pixels;
+    check();const result=await this.processor.floatAffine(pixels,matrix);check();return result;
+   };
    const compose=async(input:FloatSourceWindow):Promise<Float32Array<ArrayBuffer>>=>{
     check();const bounds=validateWindow(input),full:RenderSpace={x:0,y:0,width:document.width,height:document.height,sx:1,sy:1},space:RenderSpace={x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height,sx:1,sy:1},root=new AffineTransform();
     const mask=async(layer:LayerData,world:AffineTransform)=>{
@@ -131,8 +140,8 @@ export class FloatSceneRenderer {
        }else{const pixels=await paint(layer.children,new Float32Array(backdrop.length),world);backdrop=await composite(pixels,backdrop,{mode,opacity,mask:coverage});}
       }else if(layer.kind==='raster'){
        const pixels=await raster(layer,world);check();backdrop=await composite(pixels,backdrop,{mode,opacity,mask:coverage});
-      }else if(layer.kind==='adjustment'&&(layer.adjustment.kind==='tone'||layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels')){
-       check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):await this.processor.floatTransfer(backdrop,layer.adjustment);check();backdrop=await blendFloatAdjustment(backdrop,after,mode,opacity,coverage,{floatComposite:composite},check);
+      }else if(layer.kind==='adjustment'&&(layer.adjustment.kind==='tone'||layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'||layer.adjustment.kind==='white-balance')){
+       check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):layer.adjustment.kind==='white-balance'?await balance(layer.id,backdrop):await this.processor.floatTransfer(backdrop,layer.adjustment);check();backdrop=await blendFloatAdjustment(backdrop,after,mode,opacity,coverage,{floatComposite:composite},check);
       }else throw new Error('Unsupported float scene layer.');
      }
      check();return backdrop;

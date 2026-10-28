@@ -2,7 +2,7 @@
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
-transformations, Normal and normalized artistic composition, groups, masks, linear tone and continuous Curves/Levels adjustments use this
+transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels and White Balance adjustments use this
 mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
@@ -154,6 +154,63 @@ Layer Eraser requires an original raster target. Mask brush/pencil/eraser and ma
 Device soft proofing is unavailable. Selecting float mode disables it; isolated
 precision conversion clears existing proof state with a visible notice. Saved
 float workspaces with proof enabled reject before publication.
+
+## Linear White Balance
+
+Existing `AdjustmentLayer` records with
+`{kind: 'white-balance', temperature, tint}` also operate directly on captured
+working-linear float RGB. Both fields are required finite numbers; temperature
+accepts 2000–25000 K and tint accepts −100–100, including fractional values.
+The neutral default is 6504 K / tint 0. The trusted
+`defaultWhiteBalanceAdjustment()` helper returns that record; isolated scripts
+use explicit parameters. Unknown/missing/out-of-range fields reject shared edits
+atomically. There is no new constructor, convenience setter or command type.
+
+The existing D65-relative Kang/Bradford control model supplies the same
+linear-sRGB adaptation matrix used before the byte operator's final clipping.
+Float scenes capture that matrix once per layer, multiply RGB in float64 in the
+native worker and round once to float32. They perform no input transfer decoding,
+gamut clamp, byte conversion or sRGB encoding at this stage. Alpha is copied
+exactly. Neutral settings bypass arithmetic and preserve the captured backdrop's
+words, including signed zero and subnormals. Existing raster sampling and
+transparent-composition canonicalization remain separate.
+
+White Balance changes the accumulated backdrop before mask/fill/opacity
+interpolation. Isolated/pass-through groups, sibling clipping and ordinary blend
+modes retain their existing ordering and alpha boundaries. Artistic modes still
+require normalized RGB for both blend inputs: a White Balance result outside
+that range fails explicitly instead of silently clipping. Normal preserves
+finite signed/extended results. Nonrepresentable float32 output rejects preview
+or delivery; correct the settings or Undo. Failed previews hide stale artwork
+until successful rendering, and exports publish no partial file.
+
+The Inspector and command palette use the existing Temperature/Tint controls,
+preview cancellation, locks and shared Undo. Original TIFF bytes and geometry
+remain unchanged. Native project/workspace/history, isolated scripts/plugins,
+semantic recipes and original-bearing portable packages retain the existing
+DTO. Default linear float TIFF output can retain extended colors; the SDR preview
+and integer deliveries still quantize/clip at their existing output boundary.
+This corrects a declared illuminant; it does not estimate illumination, use RAW
+camera multipliers, reconstruct clipped data or establish physical/HDR quality.
+
+For an already-open original-bearing float TIFF:
+
+<!-- example: float-white-balance -->
+```js
+document.convertToFloat();
+const balance = document.layers.add(new AdjustmentLayer({
+  name: 'Linear white balance',
+  adjustment: {kind: 'white-balance', temperature: 10000, tint: 100},
+}));
+balance.opacity = 0.75;
+document.selectedLayer = balance;
+print('Linear white balance ready');
+```
+
+Schema 49 and all grants remain unchanged. Older implementations that reject
+White Balance in their float subset still reject these documents. Independent
+REST sessions accept the metadata through shared validation/history; they gain
+no high-precision original admission, renderer or browser synchronization.
 
 ## Continuous Curves and Levels
 
@@ -478,8 +535,13 @@ The dated implementation roadmap records actual completed checks and failed
 pilots. `scripts/check-float-document.py` reads every delivered channel with
 independent native libtiff/Pillow/MuPDF and compares it against independent native
 CMM source references, exact power-of-two exposure and native output conversion.
-Float identity/exposure and integer checks require exact words, with no widened
-rounding tolerance. Pure projection tests separately cover affine partitioning,
+Identity/exposure comparisons retain exact words; no existing numeric bound is
+widened. White Balance uses independent Colour Science matrices with
+numerical tint tangents: its separately declared float bound is `2^-20` times
+the per-pixel maximum of 1, absolute source RGB and absolute reference RGB;
+integer color error is at most one code, and alpha words remain exact. These
+bounds do not relax any existing identity/exposure/tone/transfer/blend check.
+Pure projection tests separately cover affine partitioning,
 hidden RGB/alpha, sparse large geometry and cancellation.
 
 Required later work includes broader source/working profiles and conversion,

@@ -7042,3 +7042,135 @@ research evidence only. Public float support still requires implementation,
 actual UI/scripts/plugins/REST/recipe/file verification, original preservation,
 native-first ordering and a genuine 50 MP workflow. No paid operation, account,
 upload or source-resolution cap is introduced by this verification follow-up.
+
+### 2026-10-28 — Native linear float White Balance (verified increment)
+
+Owner: implementation agent; estimate M within T17/F04/F10, starting from verified
+`c17cdc1`. Shared float eligibility and existing UI actions now admit the strict
+White Balance DTO. A private compiler reuses the existing D65-relative matrix,
+represents exact neutral as a bypass and rejects nonfinite coefficients.
+Captured scenes compile one matrix per layer, use the existing native float
+affine worker and then preserve ordinary adjustment blend/coverage ordering.
+Disposal releases the compiled stages. The source does not clamp working RGB or
+reinterpret the display-only thumbnail as precision data. Schema, permissions,
+original-source roles and independent REST/browser boundaries remain unchanged.
+
+The initial 38-case native/model pilot passes. Twenty-four registered independent
+Colour Science matrix references cover temperature/tint extrema, fractional
+controls and polynomial boundaries against signed/extended float
+samples, exact alpha and partitions. Shared conversion/history, strict edits,
+locks, atomic unsupported transactions and nonrepresentable-output recovery are
+covered. A separate 133-case REST/recipe pilot passes, including independent
+session revision conflicts and semantic receiving-layer mask/opacity retention.
+
+The new fixture corpus registers 87 complete scenes across original float,
+extended float and unsigned-16 sources, isolated/pass-through groups, masks,
+clipping and ordered Curves/Levels. Its scaled float RGB bound is `2^-20`, integer
+color bound one code and alpha words exact, declared before application scene
+evaluation. Numerical tint tangents are independent approximations; these new
+bounds do not replace or widen prior checks. The generator initially looked for
+the retained HDR original beside its CMM reference; correcting that input path
+does not change the scene formulas or sample bounds.
+
+The actual isolated runtime must be rebuilt before browser acceptance. New
+coverage is prepared for all native scenes and native-first half frames, the
+documented example through ordinary controls, fractional fields/cancel/Undo,
+inert plugins/current grants, conversion from eligible byte originals, explicit
+artistic-domain delivery failures, portable partial batch retry after package
+removal, independent native files and a genuine original-bearing 50 MP workflow.
+Complete build/unit/source/production and large-file acceptance remain pending.
+The full original roadmap remains active; this is not full F04/F10/HDR/device or
+sustained editor-wide performance acceptance.
+
+The first source-browser pilot completes with five passed cases and one UI
+harness failure. All **87 independent scenes** pass: maximum observed scaled
+RGB error is `1.148597373088892e-7` (absolute maximum `9.5367431640625e-7`),
+within the preregistered bound, with exact alpha words and native partitions.
+Three ordered nonlinear scene half-frames match independent premultiplied
+four-tap filtering of completed native samples exactly. Model/history, retained
+original dimensions/bytes and selected original-bearing reopening pass.
+Isolated plugin grants/atomicity, eligible byte conversion, explicit artistic
+delivery rejection and durable portable batch retry also pass.
+
+The native option matcher reported HSL enabled while its recorded DOM contained
+the `disabled` attribute. The corrected UI assertions check the exact native
+`disabled` property for both allowed and unsupported types; product behavior is
+unchanged by that correction. A separate fresh UI run passes all controls,
+fractional values, preview cancellation, one-Undo example, palette/type changes,
+domain recovery, original-bearing reopening and independent file comparisons.
+All 262,144 values in each float32 TIFF, uint16 TIFF, PNG and PDF match exactly;
+the actual canvas also matches independently retained display-reference bytes
+exactly. The source screenshot was reviewed. The initial full failed report,
+source overlay, artifacts and corrected report are retained separately.
+
+A dedicated signed-zero/minimum-subnormal pixel was added to the registered
+native corpus before evaluation, with exact-word requirements in addition to
+the general color bound. All 27 new native/model checks pass on that corpus,
+including the 24 matrix/neutral cases, overflow recovery, strict shared history
+and complete fixture fingerprints. Final build/unit/frozen source/production
+acceptance and the genuine 50 MP workflow remain pending. No broader completion
+or sustained performance claim is made.
+
+The final complete build passes with 40 developer guides and rebuilt generated
+runtime. All **2,761 unit/API tests across 283 files** pass in one complete run.
+The acceptance freeze binds **2,502 source inputs, 50 generated files and 142
+release resources**. All five native binaries remain unchanged, including
+pixels WASM SHA-256
+`a1f55fcf95aa552d6e2c0a231d4ea57cceed971e2073a17b4ad285d9f549a8b3`.
+
+The complete affected source run now passes **113 cases across 33 files**, with
+zero retries, skips, flaky or unexpected results and CLI exit code zero. It
+retains prior float composition/blend/transfer/frame/source/lifecycle/clipping/
+erasure/precision contracts and adds the existing byte White Balance regression
+workflows. The separate genuine 50 MP White Balance case also passes on the same
+frozen bytes, within its unchanged 600,000 ms deadline. Current source acceptance
+therefore covers **114 distinct cases**, without counting pilot reruns again.
+
+Both 10,000×5,000 outputs match **all 200,000,000 channel values per file exactly**,
+with zero color error and zero differing alpha words. The float32 TIFF is
+125,382,504 bytes, file SHA-256
+`191b5c79a30626b19aeca96c927960b977db17bb92cde73dc19e8262e3ce1a54`,
+sample SHA-256 `f62cc6152431dd5349d579f75634ce8c5a41bed12d5590634d4f17d401b0ef2f`.
+The uint16 TIFF is 74,506,880 bytes, file SHA-256
+`c5db19b24820a4a68cabae63d9cb5da72f7493cdc0d7e6776c04822bf5bc0622`,
+sample SHA-256 `341cbc8d05747c260e377adb374c0cd8a82a80f90df5ab38cb4723d427aa145d`.
+The complete original hash is
+`51db60ac1377c69a75fc49328cbcca09a62e663dd277e08c967f85a3c792ac1c`;
+original geometry/bytes, masked group/clipping, workspace restoration and exact
+Undo/Redo pass. Cold admission, restoration, exports, downloads and complete
+reader phase timings are retained; they do not prove sustained interaction or
+peak-memory budgets.
+
+The independent source-only audit passes the frozen identities, complete scene
+samples, native-first frames, files, permission/history/source invariants and
+large outputs. Full 173-case production acceptance is still running. The broad
+original objective remains active and unfinished.
+
+Final production acceptance now passes **all 173 cases**, with zero skips,
+retries, flaky or unexpected results, empty suite errors and observed CLI exit
+code zero. The complete final source/large/production acceptance totals **287
+distinct browser cases**. All three full reports and separately fsynced per-case
+ledgers agree; no diagnostic/pilot rerun is counted twice.
+
+The final audit passes every frozen source/generated/release identity, all five
+unchanged native binaries, independently recomputed saved samples for the 87 new
+scenes, three native-first half frames and 21 actual original-bearing scene
+reopenings. It retains exact neutral words/alpha/partitions, ordinary source and
+production canvas/files, script/plugin permission and atomicity checks, prepared
+conversion, semantic/portable retry/history/source invariants and both complete
+50 MP outputs. Existing all-mode blend, frame and transfer UI/file contracts
+remain verified. Both final White Balance UI canvases and their four complete
+file outputs match the independent reference exactly for this fixture. No
+product/test/guide/generated/release correction occurred after the freeze; only
+this excluded planning work log records the completed observations.
+
+[Sealed source, runtime, release and verification evidence](benchmarks/float-white-balance-2026-10-28.zip)
+retains the exact changed-source overlay against `c17cdc1`, complete final and
+failed/corrected pilot reports/artifacts, full large TIFF files, native samples,
+independent input/profile/matrix/CMM references, registered bounds, dependency
+research, frozen identities and reproducible verification/audit tools. This
+completes the connected linear White Balance increment. Other float tools and
+layer types, wider working spaces, HDR/CMYK/proof/interchange, photographic and
+physical/device quality, peak memory, sustained all-tool performance and every
+other unfinished original roadmap/provider/installed ChatGPT/live identity/
+commercial gate remain required. The complete original goal stays active.

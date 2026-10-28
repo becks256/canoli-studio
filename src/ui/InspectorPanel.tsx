@@ -572,7 +572,7 @@ export function InspectorPanel({
                     { value: "vibrance", label: "Vibrance",disabled:float },
                     { value: "gradient-map", label: "Gradient Map",disabled:float },
                     { value: "red-eye", label: "Red Eye",disabled:float },
-                    { value: "white-balance", label: "White Balance",disabled:float },
+                    { value: "white-balance", label: "White Balance" },
                     { value: "lut", label: "Color Lookup (LUT)",disabled:float },
                     { value: "curves", label: "Curves" },
                     { value: "levels", label: "Levels" },
@@ -661,6 +661,7 @@ export function InspectorPanel({
                   adjustment={selected.adjustment} disabled={locked || busy}
                   onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}
                   onCommit={adjustment => {onPreview(null);onSelectedAction(layer => {if(layer instanceof AdjustmentLayer) layer.adjustment = adjustment;});}} />}
+                {float&&selected.adjustment.kind==='white-balance'&&<p className="section-description">Adjusts linear RGB without clipping. The SDR preview and integer exports can clip extended colors.</p>}
                 {selected.adjustment.kind === "white-balance" && <WhiteBalanceControls
                   adjustment={selected.adjustment} disabled={locked || busy}
                   onPreview={adjustment => onPreview({type:"layer.update", id:selected.id, patch:{adjustment}})}

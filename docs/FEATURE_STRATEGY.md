@@ -4,6 +4,15 @@
 
 An initial connected float32/linear-sRGB workflow extends original unsigned 16-bit or float32 TIFF raster, erasure and clipping edits through shared precision/tone commands, direct file delivery and original-bearing persistence. Byte editing remains the default. This staged subset leaves broad tools, working profiles, HDR, physical/device and performance acceptance required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Linear float White Balance increment (F04/F10)
+
+The existing declared illuminant correction now has a native float scene path
+through shared commands, ordinary controls, isolation and precision delivery.
+It preserves originals, alpha and finite extended working colors. This advances
+the broader color portfolio without substituting SDR preview quality for full
+working-space/HDR/CMYK/device/performance acceptance. Current verification and
+remaining scope are in the dated roadmap and [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md#linear-white-balance).
+
 ## Profile-aware batch and recipe delivery (F10/W01/W03)
 
 Profile-aware PNG/TIFF/PDF batch variants now retain complete ICC sources and native conversion receipts. Portable delivery presets and recipe packages preserve those dependencies across reload/library removal; canonical settings guard retry and package integrity. This advances repeatable professional delivery while full color/precision/device, independent REST jobs and the rest of the broad editor objective remain open. [Contract and current verification](COLOR_DELIVERY.md).

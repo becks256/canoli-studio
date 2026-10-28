@@ -4,6 +4,17 @@
 
 core/float-document gates scene structure and asset roles. engine/float-asset admits originals with bounded display-only thumbnails; float-scene captures original and coverage-source leases, uses float-projection and native float operations, applies each authored erasure through float-coverage before intrinsic clipping shape, runs continuous Curves/Levels through the owned native transfer worker, and converts only final display/output samples. float-delivery/float-tiff own profile-aware file sessions. Model/OO/shared command schema 49, independent source caches and existing host/isolated boundaries remain separate. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Captured float White Balance
+
+`core/float-white-balance` compiles the existing D65-relative control model into
+a private RGB affine matrix or exact-neutral identity sentinel. The shared float
+gate admits its strict existing DTO. `float-scene` captures one matrix per layer
+before source preparation, applies it through the existing owned native affine
+worker, then uses the existing adjustment blend/coverage path. Disposal clears
+compiled stages; captured document/source lifetimes remain authoritative.
+No byte proxy, new native export, public mutator, schema or plugin grant is
+introduced. [Contract and remaining scope](FLOAT_DOCUMENTS.md#linear-white-balance).
+
 ## Connected native float blend modes
 
 The float document gate and custom Inspector admit every existing blend enum.

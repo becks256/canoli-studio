@@ -4,6 +4,19 @@
 
 Support schema-49 float32/linear-sRGB state, original-bearing unsigned 16-bit or float32 TIFF admission, shared OO conversion/Undo, guarded source roles, original-native raster composition, original-preserving erasure/clear, continuous Curves/Levels and direct precision delivery. Stage output settings with precision, disable unsupported UI operations and retain exact originals through persistence. Complete all actual verification before acceptance; broader F10/F11/F14 and the original roadmap remain open. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Linear float White Balance
+
+Connect the existing White Balance adjustment DTO to native linear float scenes,
+shared commands/Undo, Inspector/palette, isolated scripts/plugins, separate REST
+metadata, recipes and original-bearing persistence/delivery. Capture the existing
+Bradford matrix per layer; preserve exact alpha and neutral identity, retain
+finite signed/extended RGB and reject overflow without publishing partial files.
+Keep mask/fill/opacity, group/clipping/blend ordering and native-first frame
+sampling. Disclose SDR/integer clipping and artistic-blend range failures.
+Verify independent matrix/scene/file references, real controls and cancellation,
+source/grant/history invariants and genuine 50 MP output. This is an F04/F10
+increment; remaining precision/color/device/performance/roadmap gates stay open.
+
 ## Normalized float blend integration
 
 Support every existing blend mode through raster, isolated/pass-through group,

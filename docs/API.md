@@ -4,6 +4,16 @@
 
 The shared strict command {type: "document.precision.float"} and schema-49 state also apply to independent REST documents. REST original admission remains PNG-only; it supplies no original unsigned 16-bit or float32 TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Float White Balance metadata
+
+Existing strict `layer.add`/`layer.update` commands also admit
+`{kind: 'white-balance', temperature, tint}` in float documents. Required finite
+controls keep 2000–25000 K and −100–100 tint, including fractions; neutral is
+6504 K / tint 0. Validation, locks, expected revisions, atomic rollback and Undo
+are shared. Independent REST still has PNG-only originals and no float renderer
+or browser synchronization. Native host processing and its range/output errors
+are documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md#linear-white-balance).
+
 ## Float blend metadata
 
 Existing strict `layer.update` commands permit all 18 blend modes on supported
@@ -711,7 +721,7 @@ Trusted browser `editor.openPsd(buffer, {mode?, legacyStraightAlpha?})` accepts 
 
 ### White Balance adjustment commands
 
-Existing revision-checked `layer.add`/`layer.update` commands accept schema-19 `{kind:"white-balance", temperature, tint}`. Both fields are required finite numbers: temperature 2000–25000, tint -100–100; unknown/missing/invalid fields return 400 atomically. Revision conflicts remain 409. Locks, history and transaction behavior are shared. SCRIPTING_API.md specifies D65-relative illuminant/tint semantics, Bradford adaptation in linear sRGB, defaults, clipping, alpha and byte precision. This does not add REST pixel rendering or synchronization with browser documents.
+Existing revision-checked `layer.add`/`layer.update` commands accept schema-19 `{kind:"white-balance", temperature, tint}`. Both fields are required finite numbers: temperature 2000–25000, tint -100–100; unknown/missing/invalid fields return 400 atomically. Revision conflicts remain 409. Locks, history and transaction behavior are shared. SCRIPTING_API.md specifies D65-relative illuminant/tint semantics, Bradford adaptation in linear sRGB, defaults, byte clipping, unclipped float working colors and exact alpha. This does not add REST pixel rendering or synchronization with browser documents.
 
 
 ### Color Lookup (LUT) adjustment commands

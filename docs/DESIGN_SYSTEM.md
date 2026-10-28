@@ -4,6 +4,14 @@
 
 Use the custom TIFF precision selector and staged Working precision choice in Color Settings. Keep Cancel active during preparation, apply output settings only after successful native preparation, display SDR preview status, disable unsupported tools and proofing, and explain quantization in export reports. Actual float documents use ordinary Undo for working precision; output preferences remain outside history. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## White Balance in float editing
+
+Enable the existing White Balance type and command-palette action for supported
+float documents. Reuse Temperature/Tint, cancellation, disabled/locked states and
+shared Undo. Explain that the linear adjustment retains extended colors while
+the SDR preview and integer deliveries can clip. Keep correction controls
+available after render failure. [Contract](FLOAT_DOCUMENTS.md#linear-white-balance).
+
 ## Float blending and failed previews
 
 Use the existing custom Blend mode select with all supported modes. Artistic
