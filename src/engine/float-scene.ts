@@ -20,6 +20,7 @@ import{iccTarget}from'../core/color/profile-source';
 import type{PixelProcessor}from'./processor';
 import{projectFloatWindow,type FloatProjectionControl,type FloatWindowSource}from'./float-projection';
 import{interpolateFloatBackdrops}from'./float-interpolate';
+import{blendFloatAdjustment}from'./float-adjustment-blend';
 import{checkRenderCurrent}from'./render-control';
 import{validateFloatWorkerWindow}from'./float-pixels';
 
@@ -111,23 +112,27 @@ export class FloatSceneRenderer {
      const stacks=clippingMembers?layers.map(base=>({base,layers:[]as LayerData[]})):clippingStacks(layers);
      for(const stack of stacks){
       const layer=stack.base,clipped=stack.layers.filter(member=>member.visible&&member.opacity>0);
-      check();if(!layer.visible||layer.opacity===0)continue;const world=parent.multiply(localTransform(layer)),coverage=await mask(layer,world),opacity=layer.opacity*(layer.fillOpacity??1);
+      check();if(!layer.visible||layer.opacity===0)continue;const world=parent.multiply(localTransform(layer)),coverage=await mask(layer,world),opacity=layer.opacity*(layer.fillOpacity??1),mode=layer.blendMode==='pass-through'?'normal':layer.blendMode;
+      const composite:PixelProcessor['floatComposite']=async(source,backdrop,options)=>{
+       try{return await this.processor.floatComposite(source,backdrop,options);}
+       catch(error){if(error instanceof Error&&error.message.startsWith('This blend mode requires normalized RGB'))throw new Error(`${layer.name} (${mode}): ${error.message}`);throw error;}
+      };
       if(clipped.length){
        // A pass-through base supplies isolated intrinsic coverage; member
        // pass-through groups still see this stack's working color plane.
        const intrinsic=layer.kind==='raster'?await raster(layer,world):layer.kind==='group'?await paint(layer.children,new Float32Array(backdrop.length),world):null;
        if(!intrinsic)throw new Error('A clipping base requires intrinsic pixels.');
        const prepared=await prepareFloatClipping(intrinsic,layer.fillOpacity??1,check),colors=await paint(clipped,prepared.plane,parent,true),pixels=await restoreFloatClipping(colors,prepared.shape,check);
-       backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity:layer.opacity,mask:coverage});
+       backdrop=await composite(pixels,backdrop,{mode,opacity:layer.opacity,mask:coverage});
       }else if(layer.kind==='group'){
        if(layer.blendMode==='pass-through'){
         if(layer.opacity===1&&!coverage)backdrop=await paint(layer.children,backdrop,world);
         else{const after=await paint(layer.children,backdrop.slice(),world);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
-       }else{const pixels=await paint(layer.children,new Float32Array(backdrop.length),world);backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity,mask:coverage});}
+       }else{const pixels=await paint(layer.children,new Float32Array(backdrop.length),world);backdrop=await composite(pixels,backdrop,{mode,opacity,mask:coverage});}
       }else if(layer.kind==='raster'){
-       const pixels=await raster(layer,world);check();backdrop=await this.processor.floatComposite(pixels,backdrop,{opacity,mask:coverage});
+       const pixels=await raster(layer,world);check();backdrop=await composite(pixels,backdrop,{mode,opacity,mask:coverage});
       }else if(layer.kind==='adjustment'&&(layer.adjustment.kind==='tone'||layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels')){
-       check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):await this.processor.floatTransfer(backdrop,layer.adjustment);check();backdrop=await interpolateFloatBackdrops(backdrop,after,opacity,coverage,check);
+       check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):await this.processor.floatTransfer(backdrop,layer.adjustment);check();backdrop=await blendFloatAdjustment(backdrop,after,mode,opacity,coverage,{floatComposite:composite},check);
       }else throw new Error('Unsupported float scene layer.');
      }
      check();return backdrop;

@@ -2052,3 +2052,8 @@ it("replays recorded literal action values while retaining deliberate tone bindi
   document.redo();
   expect(text.text).toBe("${exposure} / ${custom} / $$");
 });
+
+it('all float blend modes retain semantic recipe targeting, shared Undo and exact immutable replay',async()=>{
+ const{BLEND_MODES}=await import('../src/core/model');const document=new Document({precision:'float32'}),target=document.layers.add(new LayerGroup({name:'Blend target',blendMode:'normal'}));
+ for(const mode of BLEND_MODES){const before=document.toJSON(),recipe:Recipe={schemaVersion:RECIPE_SCHEMA_VERSION,id:'float-'+mode,name:'Float '+mode,description:'Change blend modes through shared commands',version:1,parameters:[],steps:[{id:'blend',name:'Blend',target:{by:'name',pattern:'Blend target'},action:{type:'layer.update',patch:{blendMode:mode}}}]};const result=executeRecipe(recipe,document,{});expect(result.success).toBe(true);expect(target.blendMode).toBe(mode);const after=document.toJSON();if(mode!=='normal'){document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);}}
+});

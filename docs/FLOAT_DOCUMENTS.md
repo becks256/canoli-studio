@@ -2,7 +2,7 @@
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
-transformations, Normal composition, groups, masks, linear tone and continuous Curves/Levels adjustments use this
+transformations, Normal and normalized artistic composition, groups, masks, linear tone and continuous Curves/Levels adjustments use this
 mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
@@ -261,8 +261,9 @@ mask and opacity apply to the completed stack. A pass-through base supplies
 isolated child coverage; pass-through members see the stack's color plane.
 Normal groups, raster transforms, full tone effects, clipped tone adjustment
 layers, member masks/opacity/fill and nested sibling stacks keep their existing
-float semantics. Pass-through fill still requires 1. Unsupported styles, blends
-and layer types remain gated; this does not add Photoshop advanced clipping
+float semantics. All existing normalized artistic modes are described below.
+Pass-through fill still requires 1. Unsupported styles and layer types remain
+gated; this does not add Photoshop advanced clipping
 switches or float SVG/PSD/PSB interchange.
 
 No bitmap/display pixel supplies clipping colors. Working arrays remain bounded
@@ -295,6 +296,79 @@ member.adjustments.add(new ToneAdjustment({
 document.layers.add(member);
 document.selectedLayer = member;
 ```
+
+## Artistic blend modes
+
+Float raster layers, isolated groups and supported adjustment layers now accept
+all 18 existing `blendMode` values: `normal`, `multiply`, `screen`, `overlay`,
+`darken`, `lighten`, `color-dodge`, `color-burn`, `hard-light`, `soft-light`,
+`difference`, `exclusion`, `hue`, `saturation`, `color`, `luminosity`,
+`linear-light` and `linear-burn`. Raster/adjustment defaults remain `normal`;
+groups retain their existing `pass-through` default and can select any isolated
+mode. Pass-through groups still require full fill opacity. Inspector choices,
+OO constructors/setters, `layer.update`, isolated scripts/plugins and semantic
+recipes use the same commands, validation and Undo history. No schema changes.
+
+These operations blend in the document's **linear-sRGB working encoding** using
+float64 intermediates and float32 stage results. They do not blend display bytes.
+The [native processor contract](FLOAT_PROCESSING.md) defines the normalized
+artistic formulas, including bounded Linear Light/Burn. Normal retains finite
+signed and extended RGB. All other modes currently require both complete input
+RGB windows in [0,1], including hidden-color samples; masks/opacity do not
+reinterpret extended colors as normalized. This is normalized SDR float blending,
+not an HDR artistic-blend extension, gamut mapping or implicit clipping.
+
+A mode change is an ordinary authored edit. Actual pixel-domain validation runs
+when rendering or delivering files, rather than guessing from thumbnails during
+a synchronous metadata command. An out-of-range artistic input rejects the
+render/export with an explicit instruction to choose Normal. The canvas hides
+stale artwork and displays **Preview unavailable** until a current render
+succeeds. The authored edit and original bytes remain intact: choose Normal,
+Undo, or deliberately bring both inputs into range with suitable adjustments.
+Export never substitutes the previous canvas frame for the failed document.
+
+Raster/group modes apply source-over with native mask/fill/opacity coverage.
+For clipping stacks, the base mode applies once after members and intrinsic
+shape restoration; clipped members use their own modes. An adjustment blends
+its computed RGB against the current backdrop, then applies mask/fill/opacity
+interpolation while preserving the backdrop alpha exactly. It does not
+source-over the backdrop onto itself. Native-first frame sampling happens after
+all of these operations. Supported TIFF/PNG/PDF and fitted recipe/batch outputs
+read the same float scene; display and byte deliveries retain SDR quantization.
+
+Open a normalized unsigned 16-bit TIFF in float editing mode before running this
+isolated example. Its original colors must be in range; the script never reads,
+clamps or rewrites original pixels.
+
+<!-- example: float-blends -->
+```js
+const original = document.layers.at(0);
+if (document.precision !== 'float32' || !(original instanceof RasterLayer)) {
+  throw new Error('Open a normalized original TIFF in float editing mode first.');
+}
+const screen = new RasterLayer({
+  name: 'Linear screen', assetId: original.assetId,
+  width: original.width, height: original.height,
+  blendMode: 'screen', opacity: 0.75,
+});
+screen.adjustments.add(new ToneAdjustment({
+  exposure: -0.5, contrast: -20, saturation: -25,
+}));
+document.layers.add(screen);
+const color = new AdjustmentLayer({
+  name: 'Linear color', blendMode: 'color', opacity: 0.5,
+  adjustment: {kind: 'tone', exposure: 0, contrast: -20, saturation: -25},
+});
+document.layers.add(color);
+document.selectedLayer = color;
+print('Linear float blends ready');
+```
+
+Independent REST sessions accept the same mode metadata and revision/history
+rules for supported float layers. Original admission remains PNG-only there;
+this adds no float TIFF asset admission, renderer or browser synchronization.
+Internal plugins retain existing document/asset permissions and inert
+installation; no file, native-worker, profile or network grant is added.
 
 ## Ownership, rendering and persistence
 
@@ -332,6 +406,13 @@ second fractional contain-margin clear. Arbitrary affine frame geometry is
 captured before asynchronous reads, and partitioning a frame preserves samples.
 Wide/tall native reads split coverage work into bounded tiles, independently of
 original or artboard geometry. No original-resolution limit is introduced.
+
+Aligned native raster/projection grids use owned direct copies rather than
+bilinear arithmetic. Padding stays transparent; the sampler still canonicalizes
+transparent colors and signed zeros, checks source identity/cancellation and
+yields during larger copies. This sampler behavior is distinct from the aligned
+completed-artboard frame contract above, which preserves native hidden words.
+Integer differences retain lattice detail even at very large safe world origins.
 
 Projection uses float64 geometry and premultiplied bilinear filtering with
 analytic transformed-rectangle coverage, rounding output to float32. Output

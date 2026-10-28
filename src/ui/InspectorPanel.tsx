@@ -347,7 +347,7 @@ export function InspectorPanel({
               className="wide-select"
               value={selected.blendMode}
               disabled={locked || busy}
-              options={(selected.kind==='group'?GROUP_BLEND_MODES:BLEND_MODES).filter(mode=>!float||mode==='normal'||mode==='pass-through').map((mode) => ({
+              options={(selected.kind==='group'?GROUP_BLEND_MODES:BLEND_MODES).map((mode) => ({
                 value: mode,
                 label:
                   mode[0].toUpperCase() + mode.slice(1).replaceAll("-", " "),
@@ -358,6 +358,7 @@ export function InspectorPanel({
                 })
               }
             />
+            {float&&selected.blendMode!=='normal'&&selected.blendMode!=='pass-through'&&<p className="panel-description">This blend uses the normal SDR color range. Choose Normal to retain extended-range colors.</p>}
             <Slider
               label="Opacity"
               value={selected.opacity * 100}

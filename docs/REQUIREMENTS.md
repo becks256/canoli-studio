@@ -4,6 +4,20 @@
 
 Support schema-49 float32/linear-sRGB state, original-bearing unsigned 16-bit or float32 TIFF admission, shared OO conversion/Undo, guarded source roles, original-native raster composition, original-preserving erasure/clear, continuous Curves/Levels and direct precision delivery. Stage output settings with precision, disable unsupported UI operations and retain exact originals through persistence. Complete all actual verification before acceptance; broader F10/F11/F14 and the original roadmap remain open. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Normalized float blend integration
+
+Support every existing blend mode through raster, isolated/pass-through group,
+adjustment and clipping workflows, native precision output, shared OO commands,
+Inspector, isolated scripts/plugins, semantic recipes and separate REST metadata.
+Preserve backdrop alpha for adjustments and apply clipping-base modes once after
+shape restoration. Normal retains finite extended RGB; artistic modes must reject
+out-of-domain RGB explicitly without clamping originals or publishing partial
+files. Failed previews suppress stale artwork and disclose failure until a current
+successful render. Verify independent native scene/alpha/partition samples,
+ordinary production controls/files/history, portable batch retry, source/grant
+validation and genuine 50 MP output. Full HDR blending, other float tools/color
+spaces and broader F10/F14/roadmap gates remain required.
+
 ## Float preview sampling consistency
 
 Complete native float effects/masks/clipping/groups must precede frame filtering,

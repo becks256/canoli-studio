@@ -4,6 +4,16 @@
 
 The shared strict command {type: "document.precision.float"} and schema-49 state also apply to independent REST documents. REST original admission remains PNG-only; it supplies no original unsigned 16-bit or float32 TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Float blend metadata
+
+Existing strict `layer.update` commands permit all 18 blend modes on supported
+float layer types; groups also retain pass-through. Independent REST sessions
+share validation, expected revisions, atomic commands and exact Undo/Redo.
+Pixel-domain validation belongs to actual browser rendering/delivery: artistic
+modes require normalized linear RGB, while Normal retains finite extended RGB.
+REST asset admission remains PNG-only and gains no float source or renderer.
+See [the exact blend contract and limits](FLOAT_DOCUMENTS.md#artistic-blend-modes).
+
 ## Owned float source storage dependency
 
 Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.

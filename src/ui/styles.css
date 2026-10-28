@@ -704,6 +704,22 @@ select {
   font-family: var(--font-mono);
   font-size: 8px;
 }
+.canvas-render-error {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100% - 32px));
+  z-index: 8;
+  padding: 18px;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-lg);
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+  box-shadow: var(--shadow-floating);
+}
+.canvas-render-error p { margin: 8px 0 0; }
+.status-dot.failed { background: var(--color-danger); }
 .canvas-status > span {
   white-space: nowrap;
   overflow: hidden;

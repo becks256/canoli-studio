@@ -1,0 +1,7716 @@
+{
+  "version": 1,
+  "width": 131,
+  "height": 79,
+  "originalWidth": 256,
+  "originalHeight": 256,
+  "crop": {
+    "x": 0,
+    "y": 0,
+    "width": 131,
+    "height": 79
+  },
+  "original": "tests/fixtures/uint16-float/u16-all-levels.tif",
+  "largeLayers": [
+    {
+      "kind": "raster",
+      "opacity": 0.625,
+      "mask": {
+        "rect": [
+          2000,
+          0,
+          7000,
+          5000
+        ],
+        "density": 0.5
+      }
+    },
+    {
+      "kind": "group",
+      "blendMode": "screen",
+      "opacity": 0.75,
+      "fillOpacity": 0.625,
+      "mask": {
+        "rect": [
+          1500,
+          0,
+          8000,
+          5000
+        ],
+        "density": 0.5
+      },
+      "children": [
+        {
+          "kind": "raster",
+          "blendMode": "multiply",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              3500,
+              0,
+              6500,
+              5000
+            ],
+            "density": 0.625
+          }
+        },
+        {
+          "kind": "adjustment",
+          "blendMode": "hue",
+          "opacity": 0.5,
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          }
+        }
+      ]
+    },
+    {
+      "kind": "adjustment",
+      "blendMode": "luminosity",
+      "clipped": true,
+      "opacity": 0.375,
+      "fillOpacity": 0.625,
+      "mask": {
+        "rect": [
+          1000,
+          0,
+          8000,
+          5000
+        ],
+        "density": 0.5
+      },
+      "tone": {
+        "contrast": -30,
+        "saturation": -25
+      }
+    }
+  ],
+  "largeColorTolerance": {
+    "float32": 9.5367431640625e-07,
+    "uint16": 1
+  },
+  "largeAlphaTolerance": 0,
+  "inputs": {
+    "tests/fixtures/uint16-float/u16-all-levels.tif": "21f5288a412c73c2ba0da40e57d3f6ddc60c29fe121cd2f6167fc7cc76e33305",
+    "tests/fixtures/uint16-float/u16-all-levels-linear.f32le.gz": "20b4481d18143a4f25294f9a089f61c76bf8ae9ed4a29598e85f3b3441cffd2f",
+    "tests/fixtures/uint16-float/manifest.json": "a11f8c1e11fc9a95cd7fb1f9b3fefc0c2e52b568a0865b099ec5a4b8519b0e19",
+    "scripts/float_clipping_reference.py": "9c370911d5b43bd3c4334cedbf024783cda2dbd19a6874e1addacdd910f672fb",
+    "scripts/float_blend_reference.py": "5f130c7596369b37260a4a4dfbcf9f41d9fb838a0260daf356540bbbdeee5c0a",
+    "scripts/generate-float-blend-fixtures.py": "366ef8fcd7bb9edaff6fd649f51d7feda3333bc166cbaec013e95b41b88fedb5"
+  },
+  "modes": [
+    "normal",
+    "multiply",
+    "screen",
+    "overlay",
+    "darken",
+    "lighten",
+    "color-dodge",
+    "color-burn",
+    "hard-light",
+    "soft-light",
+    "difference",
+    "exclusion",
+    "hue",
+    "saturation",
+    "color",
+    "luminosity",
+    "linear-light",
+    "linear-burn"
+  ],
+  "cases": [
+    {
+      "context": "raster",
+      "mode": "normal",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "normal"
+        }
+      ],
+      "reference": "raster-normal.f32le.gz",
+      "rawSha256": "65f7c0adc7c25141bda6d8d293a26df816a7fb692b778f8f080c07746e89f428"
+    },
+    {
+      "context": "adjustment",
+      "mode": "normal",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "normal"
+        }
+      ],
+      "reference": "adjustment-normal.f32le.gz",
+      "rawSha256": "634243d1e381b753936ff2cd83463121cb0481dad687fa9269232bd6eea4475c"
+    },
+    {
+      "context": "isolated",
+      "mode": "normal",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "normal",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-normal.f32le.gz",
+      "rawSha256": "86d8c96f7f35124afb3a9a35124d92d7e3277054f1f43732b59f3ad2c86bb939"
+    },
+    {
+      "context": "pass-through",
+      "mode": "normal",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "normal"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-normal.f32le.gz",
+      "rawSha256": "8545f7dd4e66c19c84fa209b6ed46a4ca0d6c796af53a5351ea384ccd77f975a"
+    },
+    {
+      "context": "clipping",
+      "mode": "normal",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "normal",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "normal"
+        }
+      ],
+      "reference": "clipping-normal.f32le.gz",
+      "rawSha256": "a64cd61b2686149b5f2662a9a19e8d7165a8077a66cd696e0967688a11bf9b8a"
+    },
+    {
+      "context": "group-base",
+      "mode": "normal",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "normal",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "normal"
+        }
+      ],
+      "reference": "group-base-normal.f32le.gz",
+      "rawSha256": "0d8d41202389f916be4fe78bd38535e733e39860144cd3d6c9046d094d875235"
+    },
+    {
+      "context": "raster",
+      "mode": "multiply",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "multiply"
+        }
+      ],
+      "reference": "raster-multiply.f32le.gz",
+      "rawSha256": "fc6ec220c9459d16c09c0dec9419a6f8b5da86a02caa3a3982c06083a3bc760c"
+    },
+    {
+      "context": "adjustment",
+      "mode": "multiply",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "multiply"
+        }
+      ],
+      "reference": "adjustment-multiply.f32le.gz",
+      "rawSha256": "01087de85ccdf88b9cee2fe9d06abfb7da0801e28a8dcec1f51831bd78b8eb83"
+    },
+    {
+      "context": "isolated",
+      "mode": "multiply",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "multiply",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-multiply.f32le.gz",
+      "rawSha256": "9f4a8565bb7693cd4f74926e80d039f409d37a3d34d5b7088ab93ea717eca3c6"
+    },
+    {
+      "context": "pass-through",
+      "mode": "multiply",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "multiply"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-multiply.f32le.gz",
+      "rawSha256": "4b14c4a620fcee635c789685290df43b46c6ff44b2b0f46c69db9db6b8c4eae8"
+    },
+    {
+      "context": "clipping",
+      "mode": "multiply",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "multiply",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        }
+      ],
+      "reference": "clipping-multiply.f32le.gz",
+      "rawSha256": "f726de0de6434d70fd807002d76adb1e5f90afafaf7b31174d8293174dd59db2"
+    },
+    {
+      "context": "group-base",
+      "mode": "multiply",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "multiply",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        }
+      ],
+      "reference": "group-base-multiply.f32le.gz",
+      "rawSha256": "0bcc1bad21a4a34cd0e14b940cc03f32c955fdfa4240df4999afcaaaa75720c3"
+    },
+    {
+      "context": "raster",
+      "mode": "screen",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "screen"
+        }
+      ],
+      "reference": "raster-screen.f32le.gz",
+      "rawSha256": "7dfbf3584049de5937f8cd69879fee20b5b431bbc4dbfa7850b8e19ced41384f"
+    },
+    {
+      "context": "adjustment",
+      "mode": "screen",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "screen"
+        }
+      ],
+      "reference": "adjustment-screen.f32le.gz",
+      "rawSha256": "5b9fd9bbc1a2b58bcfe079b37c0d45a60e13d652fc489937a1cf98462eb861e3"
+    },
+    {
+      "context": "isolated",
+      "mode": "screen",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "screen",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-screen.f32le.gz",
+      "rawSha256": "1cb0e426d5e3f1ae92fc0d3fbc63fdd867192429622e515931e0aceadbc28b8e"
+    },
+    {
+      "context": "pass-through",
+      "mode": "screen",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "screen"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-screen.f32le.gz",
+      "rawSha256": "914f5c1a732bce06a4872ed321570b47f25fb298ed7e7e3bbeb4b8813fe7257f"
+    },
+    {
+      "context": "clipping",
+      "mode": "screen",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "screen",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "screen"
+        }
+      ],
+      "reference": "clipping-screen.f32le.gz",
+      "rawSha256": "8959244e03cf7e26a6d9dcebdae802aad585d4c7b957d38f3ce7ec7fc5d7ffc7"
+    },
+    {
+      "context": "group-base",
+      "mode": "screen",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "screen",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "screen"
+        }
+      ],
+      "reference": "group-base-screen.f32le.gz",
+      "rawSha256": "decdf56c673daba83722cab60ed7815bed5fa6ec371dc48c4e9a0fe07d4cd8c8"
+    },
+    {
+      "context": "raster",
+      "mode": "overlay",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "overlay"
+        }
+      ],
+      "reference": "raster-overlay.f32le.gz",
+      "rawSha256": "a093b8f8cd410c42b247856dbcbe8f2a525cef1b85bee8a7732ce4ba27609105"
+    },
+    {
+      "context": "adjustment",
+      "mode": "overlay",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "overlay"
+        }
+      ],
+      "reference": "adjustment-overlay.f32le.gz",
+      "rawSha256": "7a49e51a6cf484058bf310a7aa0eee32abb3479a99d97e70cfbee0c2433446af"
+    },
+    {
+      "context": "isolated",
+      "mode": "overlay",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "overlay",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-overlay.f32le.gz",
+      "rawSha256": "4675c80a74d17a4869099fe2dada7294df4c5ece6a57867f2dc5c9772f061630"
+    },
+    {
+      "context": "pass-through",
+      "mode": "overlay",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "overlay"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-overlay.f32le.gz",
+      "rawSha256": "d344e08d313adb82443b786eb65b58e5705e71fc97118b1484eae57a648abacc"
+    },
+    {
+      "context": "clipping",
+      "mode": "overlay",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "overlay",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "overlay"
+        }
+      ],
+      "reference": "clipping-overlay.f32le.gz",
+      "rawSha256": "04843b1be5b7c7ddcce25738ce3e003606ecff95420254683daca4e4e71a155a"
+    },
+    {
+      "context": "group-base",
+      "mode": "overlay",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "overlay",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "overlay"
+        }
+      ],
+      "reference": "group-base-overlay.f32le.gz",
+      "rawSha256": "0e38326dd574cf505ff148df7cb7740c8e99fd935096901a2c5983c0cdce08bb"
+    },
+    {
+      "context": "raster",
+      "mode": "darken",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "darken"
+        }
+      ],
+      "reference": "raster-darken.f32le.gz",
+      "rawSha256": "a7ce061eb8b99cf77802d3231165d09641cc46fb6b6a33f1705e271a172ba862"
+    },
+    {
+      "context": "adjustment",
+      "mode": "darken",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "darken"
+        }
+      ],
+      "reference": "adjustment-darken.f32le.gz",
+      "rawSha256": "ac0ecbc2d2ea3156709122860df88115dbc927d8aa77dd11195c5d90e05ec33f"
+    },
+    {
+      "context": "isolated",
+      "mode": "darken",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "darken",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-darken.f32le.gz",
+      "rawSha256": "13c96570a8856ee933f01f8d51adeade1aaab572668a45adc4cde5efc8c85ef3"
+    },
+    {
+      "context": "pass-through",
+      "mode": "darken",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "darken"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-darken.f32le.gz",
+      "rawSha256": "109536b2ccee241e25459ee71d0c596d8c645181f87f2a769ac5f70b206c8437"
+    },
+    {
+      "context": "clipping",
+      "mode": "darken",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "darken",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "darken"
+        }
+      ],
+      "reference": "clipping-darken.f32le.gz",
+      "rawSha256": "4e1659301ca86cf0fb59690317df0d922ef1bcd5a66f387e89800a93054576bd"
+    },
+    {
+      "context": "group-base",
+      "mode": "darken",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "darken",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "darken"
+        }
+      ],
+      "reference": "group-base-darken.f32le.gz",
+      "rawSha256": "ff58df11003a50e58f8a6af07b276a94b4392f2724568a544443ea8abe3ec047"
+    },
+    {
+      "context": "raster",
+      "mode": "lighten",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "lighten"
+        }
+      ],
+      "reference": "raster-lighten.f32le.gz",
+      "rawSha256": "bf91233ed09be472ee22cc58689241199c475c59622a890e4bff35ed503798c2"
+    },
+    {
+      "context": "adjustment",
+      "mode": "lighten",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "lighten"
+        }
+      ],
+      "reference": "adjustment-lighten.f32le.gz",
+      "rawSha256": "fcf2459582d0a2c7f2d7a5179f73eb522e369a85cb8b5b5b66d48ea015d9c625"
+    },
+    {
+      "context": "isolated",
+      "mode": "lighten",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "lighten",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-lighten.f32le.gz",
+      "rawSha256": "183ae13b913af3bfbda66566dc108e2afcc102a1301e8be7dc2b758748cc7128"
+    },
+    {
+      "context": "pass-through",
+      "mode": "lighten",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "lighten"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-lighten.f32le.gz",
+      "rawSha256": "ea2899003c4c6118ba728fb9205349848da8be3ce3de3f5266066f00bb6b994d"
+    },
+    {
+      "context": "clipping",
+      "mode": "lighten",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "lighten",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "lighten"
+        }
+      ],
+      "reference": "clipping-lighten.f32le.gz",
+      "rawSha256": "fddd10fa488fd3d5600b03d21f4a6ad966c377eb7e0097eeb662773901ee40de"
+    },
+    {
+      "context": "group-base",
+      "mode": "lighten",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "lighten",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "lighten"
+        }
+      ],
+      "reference": "group-base-lighten.f32le.gz",
+      "rawSha256": "8e029dfb41625e7f97fb51e01151e0c0bfe6635b892d4d59a17f4fcf6b14a952"
+    },
+    {
+      "context": "raster",
+      "mode": "color-dodge",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "color-dodge"
+        }
+      ],
+      "reference": "raster-color-dodge.f32le.gz",
+      "rawSha256": "6c9c8d6416ca77b7c2528ebfa0503ada0d1b4d45e83379372a07f93fac3bf01b"
+    },
+    {
+      "context": "adjustment",
+      "mode": "color-dodge",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "color-dodge"
+        }
+      ],
+      "reference": "adjustment-color-dodge.f32le.gz",
+      "rawSha256": "c3dece122994a9bb1154021422eba680c0a843d24cb9aa8e1cc25f76ee56ed5b"
+    },
+    {
+      "context": "isolated",
+      "mode": "color-dodge",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "color-dodge",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-color-dodge.f32le.gz",
+      "rawSha256": "7fce4d0b0eeb570910809466de3f77a7fc6b93f1b3e9c6d25b34e8e5b5656dbc"
+    },
+    {
+      "context": "pass-through",
+      "mode": "color-dodge",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "color-dodge"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-color-dodge.f32le.gz",
+      "rawSha256": "cde0185c883c2d4e8c5af50eff261f56d24825d641b458a62d8cba7a396a75bf"
+    },
+    {
+      "context": "clipping",
+      "mode": "color-dodge",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "color-dodge",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "color-dodge"
+        }
+      ],
+      "reference": "clipping-color-dodge.f32le.gz",
+      "rawSha256": "f846af7848af00bde3c9c266f50210f0871985f1e730eb0a2d3f09a6fe0355c3"
+    },
+    {
+      "context": "group-base",
+      "mode": "color-dodge",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "color-dodge",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "color-dodge"
+        }
+      ],
+      "reference": "group-base-color-dodge.f32le.gz",
+      "rawSha256": "a72d2b2900fde0a4267931d91e0e8071be12301116473f18780eded9d25e6856"
+    },
+    {
+      "context": "raster",
+      "mode": "color-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "color-burn"
+        }
+      ],
+      "reference": "raster-color-burn.f32le.gz",
+      "rawSha256": "8d59a4e3b610f1cb974cd11a602001046588a6cd5f420013a047fb419f8bc03f"
+    },
+    {
+      "context": "adjustment",
+      "mode": "color-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "color-burn"
+        }
+      ],
+      "reference": "adjustment-color-burn.f32le.gz",
+      "rawSha256": "95d57328b777ff587f00fd6bd31d4262529c13b624ccac101d9ed959eea6aeb2"
+    },
+    {
+      "context": "isolated",
+      "mode": "color-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "color-burn",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-color-burn.f32le.gz",
+      "rawSha256": "a94051e3c50eccd13098d256108d5f504c3e92ca9e107ab357acc5bc27b880c8"
+    },
+    {
+      "context": "pass-through",
+      "mode": "color-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "color-burn"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-color-burn.f32le.gz",
+      "rawSha256": "3e985a3056298d45bd0b8d45049dd707cd9b6035e4400c7ede7eb6ef2fbbdcca"
+    },
+    {
+      "context": "clipping",
+      "mode": "color-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "color-burn",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "color-burn"
+        }
+      ],
+      "reference": "clipping-color-burn.f32le.gz",
+      "rawSha256": "009020d31713b2069f9fe20e0c84251f4402a742cd3de9b3ba14ba10a1c33ce5"
+    },
+    {
+      "context": "group-base",
+      "mode": "color-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "color-burn",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "color-burn"
+        }
+      ],
+      "reference": "group-base-color-burn.f32le.gz",
+      "rawSha256": "e94ee162c510ec21b4bc08934935d6e9926f976daccc1d9afae939da971af3ce"
+    },
+    {
+      "context": "raster",
+      "mode": "hard-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "hard-light"
+        }
+      ],
+      "reference": "raster-hard-light.f32le.gz",
+      "rawSha256": "9e78719938bcc7d0573d261736e13076dbd4d8ee188d37a1dfe392cd0d8b94ba"
+    },
+    {
+      "context": "adjustment",
+      "mode": "hard-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "hard-light"
+        }
+      ],
+      "reference": "adjustment-hard-light.f32le.gz",
+      "rawSha256": "257adbab1aed8baa799d971a05f59bf3527e179088205758b49cca73e6ff6b66"
+    },
+    {
+      "context": "isolated",
+      "mode": "hard-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "hard-light",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-hard-light.f32le.gz",
+      "rawSha256": "a945f3fe798f4e56b6e0358952ce253b6f54ae51895ec4a9c8b40822b9ac83a7"
+    },
+    {
+      "context": "pass-through",
+      "mode": "hard-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "hard-light"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-hard-light.f32le.gz",
+      "rawSha256": "315538b5a820ac04d326b4fa654770193f403e7ca8e46f600ea6f900bd9451e4"
+    },
+    {
+      "context": "clipping",
+      "mode": "hard-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "hard-light",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "hard-light"
+        }
+      ],
+      "reference": "clipping-hard-light.f32le.gz",
+      "rawSha256": "4d41044dc635bab5dedd9fff140dd3192847f19144e085b5157cd39b8104f8f6"
+    },
+    {
+      "context": "group-base",
+      "mode": "hard-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "hard-light",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "hard-light"
+        }
+      ],
+      "reference": "group-base-hard-light.f32le.gz",
+      "rawSha256": "ace228a5b6afcadd0a605f69a85c649bbe9eb8f6704a66fbf00ab91bc9c69900"
+    },
+    {
+      "context": "raster",
+      "mode": "soft-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "soft-light"
+        }
+      ],
+      "reference": "raster-soft-light.f32le.gz",
+      "rawSha256": "cc9290bce67acb3e2997dca37465a2d14dbe9a0bf8dc3601c6d5e49c0f9dd003"
+    },
+    {
+      "context": "adjustment",
+      "mode": "soft-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "soft-light"
+        }
+      ],
+      "reference": "adjustment-soft-light.f32le.gz",
+      "rawSha256": "b13e96b77e82329621032c44bec20bf7d94ce1b86ec46952c1b602e44a2934c8"
+    },
+    {
+      "context": "isolated",
+      "mode": "soft-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "soft-light",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-soft-light.f32le.gz",
+      "rawSha256": "9c2d2333761723616a06ecbb55dd24d23b01aa2acbe87a740e7b45340d0ed53a"
+    },
+    {
+      "context": "pass-through",
+      "mode": "soft-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "soft-light"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-soft-light.f32le.gz",
+      "rawSha256": "be65327999a4843359028e9c23844b021c15d9c279542494e31cbed77f7cc4de"
+    },
+    {
+      "context": "clipping",
+      "mode": "soft-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "soft-light",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "soft-light"
+        }
+      ],
+      "reference": "clipping-soft-light.f32le.gz",
+      "rawSha256": "0e4bb03ad17d160d1db802686c809b0b05e2c7a19153c7f7eb6ba3c362f011fd"
+    },
+    {
+      "context": "group-base",
+      "mode": "soft-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "soft-light",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "soft-light"
+        }
+      ],
+      "reference": "group-base-soft-light.f32le.gz",
+      "rawSha256": "91e8f6a0d6a236ea588e2d682943bc74412c7df92594d0318e350e8d2e06c488"
+    },
+    {
+      "context": "raster",
+      "mode": "difference",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "difference"
+        }
+      ],
+      "reference": "raster-difference.f32le.gz",
+      "rawSha256": "e3a6ebdc066be49bbeb74b7f9e92d79e6efc58528e53d4b302403e8db9c04b66"
+    },
+    {
+      "context": "adjustment",
+      "mode": "difference",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "difference"
+        }
+      ],
+      "reference": "adjustment-difference.f32le.gz",
+      "rawSha256": "abe2367c8be100a441a599508ccefb59b24d3c532ae01bab14e0cdf0be49e381"
+    },
+    {
+      "context": "isolated",
+      "mode": "difference",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "difference",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-difference.f32le.gz",
+      "rawSha256": "545588995e0149944edfa49b8d73b2a38c8d6517ae7b3ca1e6c5f015310ec55f"
+    },
+    {
+      "context": "pass-through",
+      "mode": "difference",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "difference"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-difference.f32le.gz",
+      "rawSha256": "1d04c9e762a7135b89b984fbf0862fb4e7d7f95517990e30f13571e7b7d16eea"
+    },
+    {
+      "context": "clipping",
+      "mode": "difference",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "difference",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "difference"
+        }
+      ],
+      "reference": "clipping-difference.f32le.gz",
+      "rawSha256": "934d8e1361a1d90efc1563d494a94199b34290cd994f183adb327e4a0612027a"
+    },
+    {
+      "context": "group-base",
+      "mode": "difference",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "difference",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "difference"
+        }
+      ],
+      "reference": "group-base-difference.f32le.gz",
+      "rawSha256": "96c96bf76192baddf6637197af194a050e2085f7efc59db7e5253c0dcaa0cd4f"
+    },
+    {
+      "context": "raster",
+      "mode": "exclusion",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "exclusion"
+        }
+      ],
+      "reference": "raster-exclusion.f32le.gz",
+      "rawSha256": "3ce30845b4b9c9c664f4ad96ad8c3ed8b9a4d456cd6a7632af1921f9144690bd"
+    },
+    {
+      "context": "adjustment",
+      "mode": "exclusion",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "exclusion"
+        }
+      ],
+      "reference": "adjustment-exclusion.f32le.gz",
+      "rawSha256": "b945d1630464a854cc1209bcbcd7ead9424972619e07445139687d882f6d7749"
+    },
+    {
+      "context": "isolated",
+      "mode": "exclusion",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "exclusion",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-exclusion.f32le.gz",
+      "rawSha256": "6ade64b85524fd8dc427f4b71e3454876851a646d6e0b2b05e328ebec79acae5"
+    },
+    {
+      "context": "pass-through",
+      "mode": "exclusion",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "exclusion"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-exclusion.f32le.gz",
+      "rawSha256": "27f7a4d8fff8f049320d44fbfe07aa513381feb1a348b60411c10ee976f02a9d"
+    },
+    {
+      "context": "clipping",
+      "mode": "exclusion",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "exclusion",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "exclusion"
+        }
+      ],
+      "reference": "clipping-exclusion.f32le.gz",
+      "rawSha256": "26ca019d88cf28b41effdd06151d29030efb8b2327c08be20e53588237664b69"
+    },
+    {
+      "context": "group-base",
+      "mode": "exclusion",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "exclusion",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "exclusion"
+        }
+      ],
+      "reference": "group-base-exclusion.f32le.gz",
+      "rawSha256": "f2cc9f7fc0ac642a161c86af3b2792708008cabd95e7f826963c31945723508c"
+    },
+    {
+      "context": "raster",
+      "mode": "hue",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "hue"
+        }
+      ],
+      "reference": "raster-hue.f32le.gz",
+      "rawSha256": "d7756e7bf8a7f2990629eb0bd7840c6008fdc0f256439176fe747d3da0a7bacc"
+    },
+    {
+      "context": "adjustment",
+      "mode": "hue",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "hue"
+        }
+      ],
+      "reference": "adjustment-hue.f32le.gz",
+      "rawSha256": "c6888a80adad92b09dcb0150e6aaab7143b448e3101fd28d0d33887ae5320315"
+    },
+    {
+      "context": "isolated",
+      "mode": "hue",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "hue",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-hue.f32le.gz",
+      "rawSha256": "bea9f9927fe3cf071996446c5d9582feb356f33e74750c3daabc96f5872777af"
+    },
+    {
+      "context": "pass-through",
+      "mode": "hue",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "hue"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-hue.f32le.gz",
+      "rawSha256": "550a9378e5b83cf11cbdbe586fd6fbf6466b251da937d36ab6bdc9f0f0b9a571"
+    },
+    {
+      "context": "clipping",
+      "mode": "hue",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "hue",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "hue"
+        }
+      ],
+      "reference": "clipping-hue.f32le.gz",
+      "rawSha256": "e3f626907181721577ab21eb10ece16d930e0e7c1a23a8e7368853030625eb98"
+    },
+    {
+      "context": "group-base",
+      "mode": "hue",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "hue",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "hue"
+        }
+      ],
+      "reference": "group-base-hue.f32le.gz",
+      "rawSha256": "03747ade797b24325f422b84c39abf715436353b5ad6c2b09e2d1175fd77e039"
+    },
+    {
+      "context": "raster",
+      "mode": "saturation",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "saturation"
+        }
+      ],
+      "reference": "raster-saturation.f32le.gz",
+      "rawSha256": "c68cdaf6f9dfeff1c438a5fcf7cfdee12465f9dec9697600dc6aec084b244a36"
+    },
+    {
+      "context": "adjustment",
+      "mode": "saturation",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "saturation"
+        }
+      ],
+      "reference": "adjustment-saturation.f32le.gz",
+      "rawSha256": "b0bf396cbc5a6970e090c8a4ac9cd616d9fc41d3a479e02ca0d09ddfb4eafbd2"
+    },
+    {
+      "context": "isolated",
+      "mode": "saturation",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "saturation",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-saturation.f32le.gz",
+      "rawSha256": "f9e9398d97ae367f3694716f49ef570d38dc01c9b54b70e3948d3f125d4407f6"
+    },
+    {
+      "context": "pass-through",
+      "mode": "saturation",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "saturation"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-saturation.f32le.gz",
+      "rawSha256": "737f002b9d3c90006e5f6abc736e8db39547229e96181956b8cb39a661dd777d"
+    },
+    {
+      "context": "clipping",
+      "mode": "saturation",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "saturation",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "saturation"
+        }
+      ],
+      "reference": "clipping-saturation.f32le.gz",
+      "rawSha256": "862ac8d0f90e9daba6709fe2abedb48d245b6c3ea2e7d085d23beea9c8eab54d"
+    },
+    {
+      "context": "group-base",
+      "mode": "saturation",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "saturation",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "saturation"
+        }
+      ],
+      "reference": "group-base-saturation.f32le.gz",
+      "rawSha256": "c8042bffe826bd07ac9d68654548b8d98e11689286a658091c5f3d2f0a149c6b"
+    },
+    {
+      "context": "raster",
+      "mode": "color",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "color"
+        }
+      ],
+      "reference": "raster-color.f32le.gz",
+      "rawSha256": "7470c655f8735f55af5d660878fcf13aed0e6a8f10628d50f6fc1ec98c45beff"
+    },
+    {
+      "context": "adjustment",
+      "mode": "color",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "color"
+        }
+      ],
+      "reference": "adjustment-color.f32le.gz",
+      "rawSha256": "4e17dd499b44fb7205043df87c303809d1a184daa7bd198fa624a973ab7340a0"
+    },
+    {
+      "context": "isolated",
+      "mode": "color",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "color",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-color.f32le.gz",
+      "rawSha256": "5a147013b5776312f1fa4eb6b66989b91d68497f97bc1b6e1e675bfbcc448e59"
+    },
+    {
+      "context": "pass-through",
+      "mode": "color",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "color"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-color.f32le.gz",
+      "rawSha256": "a9109498809f7860cba0af096ac7e15132cc1a51503883cc871364f4967e8d07"
+    },
+    {
+      "context": "clipping",
+      "mode": "color",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "color",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "color"
+        }
+      ],
+      "reference": "clipping-color.f32le.gz",
+      "rawSha256": "0c25f755299685846d0fa3e518dcc2d9be4efe44bda30f5138f9bc8615d787bd"
+    },
+    {
+      "context": "group-base",
+      "mode": "color",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "color",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "color"
+        }
+      ],
+      "reference": "group-base-color.f32le.gz",
+      "rawSha256": "a6f92bbbb02714d9145210b19bb71429638903b2f9626ecea152fec62205d33a"
+    },
+    {
+      "context": "raster",
+      "mode": "luminosity",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "luminosity"
+        }
+      ],
+      "reference": "raster-luminosity.f32le.gz",
+      "rawSha256": "8bd8024779cd296b2c390e2d142e1ef8681dae1648303ba49ed5cc5d913451e6"
+    },
+    {
+      "context": "adjustment",
+      "mode": "luminosity",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "luminosity"
+        }
+      ],
+      "reference": "adjustment-luminosity.f32le.gz",
+      "rawSha256": "31148b01a4016768617837a79e1d13b3705f1adeec662895a04266930abc3228"
+    },
+    {
+      "context": "isolated",
+      "mode": "luminosity",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "luminosity",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-luminosity.f32le.gz",
+      "rawSha256": "f8b3ef14b31483b67d819aec4b35c244b7a3e26c8262b6cbc9b2c28755057ccc"
+    },
+    {
+      "context": "pass-through",
+      "mode": "luminosity",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "luminosity"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-luminosity.f32le.gz",
+      "rawSha256": "371c4a3326b686a79450bb3e41a36ef37045043adbaffbe99d67084d69177f58"
+    },
+    {
+      "context": "clipping",
+      "mode": "luminosity",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "luminosity",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "luminosity"
+        }
+      ],
+      "reference": "clipping-luminosity.f32le.gz",
+      "rawSha256": "5af1d9788b269c4dce3add37e65e1dba50d55230c096ce7c013dc6ea0ffd1cce"
+    },
+    {
+      "context": "group-base",
+      "mode": "luminosity",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "luminosity",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "luminosity"
+        }
+      ],
+      "reference": "group-base-luminosity.f32le.gz",
+      "rawSha256": "b389303086de1ab3334526951c4d4c44a58a7cadb00f8a557a7c50e284e710ab"
+    },
+    {
+      "context": "raster",
+      "mode": "linear-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "linear-light"
+        }
+      ],
+      "reference": "raster-linear-light.f32le.gz",
+      "rawSha256": "13b3eb905fa4bf2da9f4ccaa743ceb440f9f39b1b45dd0bb4b54addb6aa98d16"
+    },
+    {
+      "context": "adjustment",
+      "mode": "linear-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "linear-light"
+        }
+      ],
+      "reference": "adjustment-linear-light.f32le.gz",
+      "rawSha256": "5e090c51a42c9ba1eb961e1636e09f3692e062aa3f9797e127e73614a68e2be5"
+    },
+    {
+      "context": "isolated",
+      "mode": "linear-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "linear-light",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-linear-light.f32le.gz",
+      "rawSha256": "a68a542bda64865b7449926a8cb926fe1146fab91b8c27755cc431b5ac8f60e8"
+    },
+    {
+      "context": "pass-through",
+      "mode": "linear-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "linear-light"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-linear-light.f32le.gz",
+      "rawSha256": "98e12f91dd745804c4d0e152d3780cc5d47cd2c5b41cbbcdc624a056b48b0a0d"
+    },
+    {
+      "context": "clipping",
+      "mode": "linear-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "linear-light",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "linear-light"
+        }
+      ],
+      "reference": "clipping-linear-light.f32le.gz",
+      "rawSha256": "e8ca2e2b7f474a82dbc8804ad7794edcf8cb8345bfc8b47b9abaef6019358e62"
+    },
+    {
+      "context": "group-base",
+      "mode": "linear-light",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "linear-light",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "linear-light"
+        }
+      ],
+      "reference": "group-base-linear-light.f32le.gz",
+      "rawSha256": "a91316f0ade1ec199ef4adc92b9b253428bd9c1d546ec4b55483f04b7436d664"
+    },
+    {
+      "context": "raster",
+      "mode": "linear-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "blendMode": "linear-burn"
+        }
+      ],
+      "reference": "raster-linear-burn.f32le.gz",
+      "rawSha256": "18771e16d2a52933ab4631cfac01b5bdd68c5b1593255bb0fa35f1cf0ffdbe86"
+    },
+    {
+      "context": "adjustment",
+      "mode": "linear-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "blendMode": "linear-burn"
+        }
+      ],
+      "reference": "adjustment-linear-burn.f32le.gz",
+      "rawSha256": "d1659c7d4810580c7ebb22d8fe52530af71b6fc8cbe65b9416b5617bb16fc35f"
+    },
+    {
+      "context": "isolated",
+      "mode": "linear-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "linear-burn",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              },
+              "blendMode": "screen"
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-linear-burn.f32le.gz",
+      "rawSha256": "42a7fa762ff8795e912ff1280cb7f04e54dbef7055473400214085faa3614f6b"
+    },
+    {
+      "context": "pass-through",
+      "mode": "linear-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          }
+        },
+        {
+          "kind": "group",
+          "blendMode": "pass-through",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "tones": [
+                {
+                  "contrast": -40,
+                  "saturation": -25
+                }
+              ],
+              "mask": {
+                "rect": [
+                  30,
+                  5,
+                  80,
+                  60
+                ],
+                "density": 0.625
+              },
+              "blendMode": "linear-burn"
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "pass-through-linear-burn.f32le.gz",
+      "rawSha256": "bedd31fa535d1cacc67729cbe2776db52e3d8538bdf4b40a802b12de013f15b0"
+    },
+    {
+      "context": "clipping",
+      "mode": "linear-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              10,
+              90,
+              55
+            ],
+            "density": 0.5
+          },
+          "blendMode": "linear-burn",
+          "fillOpacity": 0.625
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "multiply"
+        },
+        {
+          "kind": "adjustment",
+          "tone": {
+            "exposure": -0.5,
+            "contrast": -20,
+            "saturation": -25
+          },
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              5,
+              15,
+              100,
+              50
+            ],
+            "density": 0.5
+          },
+          "clipped": true,
+          "blendMode": "linear-burn"
+        }
+      ],
+      "reference": "clipping-linear-burn.f32le.gz",
+      "rawSha256": "0d0019cf155383730d366d8b038000a90174bb577bab8d24e962c2eedb4dd6ec"
+    },
+    {
+      "context": "group-base",
+      "mode": "linear-burn",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "group",
+          "blendMode": "linear-burn",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "mask": {
+            "rect": [
+              15,
+              5,
+              105,
+              65
+            ],
+            "density": 0.5
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "opacity": 0.625,
+              "mask": {
+                "rect": [
+                  15,
+                  10,
+                  90,
+                  55
+                ],
+                "density": 0.5
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -0.5,
+                "contrast": -20,
+                "saturation": -25
+              },
+              "opacity": 0.75,
+              "fillOpacity": 0.625,
+              "mask": {
+                "rect": [
+                  5,
+                  15,
+                  100,
+                  50
+                ],
+                "density": 0.5
+              }
+            }
+          ]
+        },
+        {
+          "kind": "raster",
+          "opacity": 0.75,
+          "fillOpacity": 0.625,
+          "tones": [
+            {
+              "contrast": -40,
+              "saturation": -25
+            }
+          ],
+          "mask": {
+            "rect": [
+              30,
+              5,
+              80,
+              60
+            ],
+            "density": 0.625
+          },
+          "clipped": true,
+          "blendMode": "linear-burn"
+        }
+      ],
+      "reference": "group-base-linear-burn.f32le.gz",
+      "rawSha256": "cd256c66108fb52c24c71b8d8eea484c9f9a76a987ce8be74523e270fc5778ef"
+    }
+  ],
+  "files": {
+    "raster-normal.f32le.gz": {
+      "bytes": 117544,
+      "sha256": "c1d4bb1a8d1c31ada5f6909b63c6552d82498a2afcaed8610862d81945c6c7a7",
+      "rawSha256": "65f7c0adc7c25141bda6d8d293a26df816a7fb692b778f8f080c07746e89f428"
+    },
+    "adjustment-normal.f32le.gz": {
+      "bytes": 118274,
+      "sha256": "663e30fb9c0e817192ddd5f0f065de2bebb3d7edd6d4d57048e6794341f85999",
+      "rawSha256": "634243d1e381b753936ff2cd83463121cb0481dad687fa9269232bd6eea4475c"
+    },
+    "isolated-normal.f32le.gz": {
+      "bytes": 119271,
+      "sha256": "0285e81696f02468dc8d673c2d2f086979176857e22170af1c9496f184b927bd",
+      "rawSha256": "86d8c96f7f35124afb3a9a35124d92d7e3277054f1f43732b59f3ad2c86bb939"
+    },
+    "pass-through-normal.f32le.gz": {
+      "bytes": 118707,
+      "sha256": "9a93e68b999c1173b2e2906b511ce407e0d4a0b7020bb1e981a04532c502d13d",
+      "rawSha256": "8545f7dd4e66c19c84fa209b6ed46a4ca0d6c796af53a5351ea384ccd77f975a"
+    },
+    "clipping-normal.f32le.gz": {
+      "bytes": 119515,
+      "sha256": "961ee5b1c2cb89b929897426223f2e5def7acc0657a32fe3e40ecc2d65355825",
+      "rawSha256": "a64cd61b2686149b5f2662a9a19e8d7165a8077a66cd696e0967688a11bf9b8a"
+    },
+    "group-base-normal.f32le.gz": {
+      "bytes": 118898,
+      "sha256": "4d29d0b5eaebfb035189060d4efd72bef5ea8f36e8676a336a0b171fc38b03ad",
+      "rawSha256": "0d8d41202389f916be4fe78bd38535e733e39860144cd3d6c9046d094d875235"
+    },
+    "raster-multiply.f32le.gz": {
+      "bytes": 119714,
+      "sha256": "8db61e8f81b20de1395e167c108f845def77435471e5f46b954c593ec2ced01c",
+      "rawSha256": "fc6ec220c9459d16c09c0dec9419a6f8b5da86a02caa3a3982c06083a3bc760c"
+    },
+    "adjustment-multiply.f32le.gz": {
+      "bytes": 119915,
+      "sha256": "8779c0c0b0a5074f77de006693d1a968115c6d57a41a2f33f64087a0ced1d800",
+      "rawSha256": "01087de85ccdf88b9cee2fe9d06abfb7da0801e28a8dcec1f51831bd78b8eb83"
+    },
+    "isolated-multiply.f32le.gz": {
+      "bytes": 119758,
+      "sha256": "636a453d525eedad6c81e18ae393cabe6b958083dc73d0c79ab9da889b354b5f",
+      "rawSha256": "9f4a8565bb7693cd4f74926e80d039f409d37a3d34d5b7088ab93ea717eca3c6"
+    },
+    "pass-through-multiply.f32le.gz": {
+      "bytes": 119381,
+      "sha256": "ad4d9597f13810be98546e8d49b1f08b9d7791931a9cdb107f4fc61f0685dbef",
+      "rawSha256": "4b14c4a620fcee635c789685290df43b46c6ff44b2b0f46c69db9db6b8c4eae8"
+    },
+    "clipping-multiply.f32le.gz": {
+      "bytes": 120360,
+      "sha256": "d5469f825683a10290890ceabd3e34b40939fd3478fc7533ccd5ff02acd887b2",
+      "rawSha256": "f726de0de6434d70fd807002d76adb1e5f90afafaf7b31174d8293174dd59db2"
+    },
+    "group-base-multiply.f32le.gz": {
+      "bytes": 120185,
+      "sha256": "1723e6632d9b862e2c43e9a252db55ba9f40d9f4ca0a52b4f1e0a676cb572cce",
+      "rawSha256": "0bcc1bad21a4a34cd0e14b940cc03f32c955fdfa4240df4999afcaaaa75720c3"
+    },
+    "raster-screen.f32le.gz": {
+      "bytes": 117964,
+      "sha256": "2b7b5dd65c07fc2175b3010ebd04ca710e466ae952c126d58f1dd44bc9f0e4bf",
+      "rawSha256": "7dfbf3584049de5937f8cd69879fee20b5b431bbc4dbfa7850b8e19ced41384f"
+    },
+    "adjustment-screen.f32le.gz": {
+      "bytes": 118257,
+      "sha256": "e9b9c887f5e3bdbf69547f7691174cac4f51e9f45d1b37b089427aba07ded8c4",
+      "rawSha256": "5b9fd9bbc1a2b58bcfe079b37c0d45a60e13d652fc489937a1cf98462eb861e3"
+    },
+    "isolated-screen.f32le.gz": {
+      "bytes": 119099,
+      "sha256": "6bcfd1406664783bceb928c681e238dae214d480768e7e88e7c116491074eed6",
+      "rawSha256": "1cb0e426d5e3f1ae92fc0d3fbc63fdd867192429622e515931e0aceadbc28b8e"
+    },
+    "pass-through-screen.f32le.gz": {
+      "bytes": 118510,
+      "sha256": "213da9125f193f24d011d97c395f70dc589829008306ce52a88ec4ec83ea0986",
+      "rawSha256": "914f5c1a732bce06a4872ed321570b47f25fb298ed7e7e3bbeb4b8813fe7257f"
+    },
+    "clipping-screen.f32le.gz": {
+      "bytes": 118487,
+      "sha256": "353695139dea181fdd0e55d20059be450e43c3a41662f904a207ace3d1660709",
+      "rawSha256": "8959244e03cf7e26a6d9dcebdae802aad585d4c7b957d38f3ce7ec7fc5d7ffc7"
+    },
+    "group-base-screen.f32le.gz": {
+      "bytes": 118890,
+      "sha256": "6ca105cf5df3429ef3eac0c0da0127e82bba9a257f91c47c0e73269dc7e7bf90",
+      "rawSha256": "decdf56c673daba83722cab60ed7815bed5fa6ec371dc48c4e9a0fe07d4cd8c8"
+    },
+    "raster-overlay.f32le.gz": {
+      "bytes": 119401,
+      "sha256": "bc5b138664199a9efb5cc633d765c7f3e76e3a423c53130f1797bec0352f1f24",
+      "rawSha256": "a093b8f8cd410c42b247856dbcbe8f2a525cef1b85bee8a7732ce4ba27609105"
+    },
+    "adjustment-overlay.f32le.gz": {
+      "bytes": 119893,
+      "sha256": "a73652dce2f916e3c1895ef6a8ade20ffb2964de883aab26de0becb3be0e108f",
+      "rawSha256": "7a49e51a6cf484058bf310a7aa0eee32abb3479a99d97e70cfbee0c2433446af"
+    },
+    "isolated-overlay.f32le.gz": {
+      "bytes": 119740,
+      "sha256": "b5703de9e20ded60301701e0ed69dbe5d08905648906d0cb17eae38d52931f86",
+      "rawSha256": "4675c80a74d17a4869099fe2dada7294df4c5ece6a57867f2dc5c9772f061630"
+    },
+    "pass-through-overlay.f32le.gz": {
+      "bytes": 119255,
+      "sha256": "926eb76a6544b8cb6675baf6b413d43fb6d092bd161a0d9655635912b292a68f",
+      "rawSha256": "d344e08d313adb82443b786eb65b58e5705e71fc97118b1484eae57a648abacc"
+    },
+    "clipping-overlay.f32le.gz": {
+      "bytes": 120350,
+      "sha256": "58948649e3370b49e85c56db0f9e948946762713256d55b2fc8d1800add80d19",
+      "rawSha256": "04843b1be5b7c7ddcce25738ce3e003606ecff95420254683daca4e4e71a155a"
+    },
+    "group-base-overlay.f32le.gz": {
+      "bytes": 119938,
+      "sha256": "e27c6946f88a1a694c8ba2a5d82b9c2cc65f67df825ec100ebac5cce6dc3333d",
+      "rawSha256": "0e38326dd574cf505ff148df7cb7740c8e99fd935096901a2c5983c0cdce08bb"
+    },
+    "raster-darken.f32le.gz": {
+      "bytes": 118318,
+      "sha256": "b285384199c668b10b30226025607c30908d60331270a71af25bd407ba9b1da9",
+      "rawSha256": "a7ce061eb8b99cf77802d3231165d09641cc46fb6b6a33f1705e271a172ba862"
+    },
+    "adjustment-darken.f32le.gz": {
+      "bytes": 114577,
+      "sha256": "5e67c99f7b32d0b408cc760125b9dad61c7e59ed792f900c0b684d0508b6da66",
+      "rawSha256": "ac0ecbc2d2ea3156709122860df88115dbc927d8aa77dd11195c5d90e05ec33f"
+    },
+    "isolated-darken.f32le.gz": {
+      "bytes": 119497,
+      "sha256": "f7056ba0ed6f4572243f81a1834af3132b6906e459c86f34f0b9c59c143f3de0",
+      "rawSha256": "13c96570a8856ee933f01f8d51adeade1aaab572668a45adc4cde5efc8c85ef3"
+    },
+    "pass-through-darken.f32le.gz": {
+      "bytes": 118372,
+      "sha256": "3e2a005100066d3cf56e9c932080bd52c0e7be8bd7acdd896e6bafb9c3512c1b",
+      "rawSha256": "109536b2ccee241e25459ee71d0c596d8c645181f87f2a769ac5f70b206c8437"
+    },
+    "clipping-darken.f32le.gz": {
+      "bytes": 119763,
+      "sha256": "cb7df6eb7a5365abc71ac1c0e3debd9da104e4200625fe7afc0e945aafa8edbe",
+      "rawSha256": "4e1659301ca86cf0fb59690317df0d922ef1bcd5a66f387e89800a93054576bd"
+    },
+    "group-base-darken.f32le.gz": {
+      "bytes": 119735,
+      "sha256": "a75416bff7e3fea9abe24887264a80ffbf9117188d2c37e875f3a4fd72890db6",
+      "rawSha256": "ff58df11003a50e58f8a6af07b276a94b4392f2724568a544443ea8abe3ec047"
+    },
+    "raster-lighten.f32le.gz": {
+      "bytes": 118144,
+      "sha256": "08be138e151a0e8cd3abce27909c93db93288d019c01531ef5f9e02adb320b6d",
+      "rawSha256": "bf91233ed09be472ee22cc58689241199c475c59622a890e4bff35ed503798c2"
+    },
+    "adjustment-lighten.f32le.gz": {
+      "bytes": 112880,
+      "sha256": "3e6214b99579aa82ab289587f37c34eabbd68830f4dc61fbdc1e857415fa7c6a",
+      "rawSha256": "fcf2459582d0a2c7f2d7a5179f73eb522e369a85cb8b5b5b66d48ea015d9c625"
+    },
+    "isolated-lighten.f32le.gz": {
+      "bytes": 119401,
+      "sha256": "f4f3876961383bfd2989ec322b87b61769eacf4e3d0052aada05399d16ff17e4",
+      "rawSha256": "183ae13b913af3bfbda66566dc108e2afcc102a1301e8be7dc2b758748cc7128"
+    },
+    "pass-through-lighten.f32le.gz": {
+      "bytes": 118869,
+      "sha256": "95604b636cc0fbd13d3fcf0a38caf08d392747bed87378c5b26ba359455fa9d6",
+      "rawSha256": "ea2899003c4c6118ba728fb9205349848da8be3ce3de3f5266066f00bb6b994d"
+    },
+    "clipping-lighten.f32le.gz": {
+      "bytes": 119770,
+      "sha256": "7767e07a59f5fa533ce0300cabb486b49bfdd7945523597c33cc5d60f87c65eb",
+      "rawSha256": "fddd10fa488fd3d5600b03d21f4a6ad966c377eb7e0097eeb662773901ee40de"
+    },
+    "group-base-lighten.f32le.gz": {
+      "bytes": 118964,
+      "sha256": "5cc14e16a310cf0a838a270b242bc134c64472fe8d33c5a23d7fcc06fbc0afac",
+      "rawSha256": "8e029dfb41625e7f97fb51e01151e0c0bfe6635b892d4d59a17f4fcf6b14a952"
+    },
+    "raster-color-dodge.f32le.gz": {
+      "bytes": 117912,
+      "sha256": "95918fffcfe96ad3171b0b05dbb68e3fdd928c1eaf8fab44dbdd8421fc8fd4c1",
+      "rawSha256": "6c9c8d6416ca77b7c2528ebfa0503ada0d1b4d45e83379372a07f93fac3bf01b"
+    },
+    "adjustment-color-dodge.f32le.gz": {
+      "bytes": 118306,
+      "sha256": "c25ab4c0f6273732305a6c1e3707690bdd33acb4900c8770acac85bed9c0001c",
+      "rawSha256": "c3dece122994a9bb1154021422eba680c0a843d24cb9aa8e1cc25f76ee56ed5b"
+    },
+    "isolated-color-dodge.f32le.gz": {
+      "bytes": 119048,
+      "sha256": "21127d56d83c8169689eb7306c6f69cf883c2ea3d64023827e793d6ffc4113c2",
+      "rawSha256": "7fce4d0b0eeb570910809466de3f77a7fc6b93f1b3e9c6d25b34e8e5b5656dbc"
+    },
+    "pass-through-color-dodge.f32le.gz": {
+      "bytes": 118374,
+      "sha256": "7d4250367e2683a357c3b8bcd492c7b502d3266d642fa01ae34dfd8a82d75001",
+      "rawSha256": "cde0185c883c2d4e8c5af50eff261f56d24825d641b458a62d8cba7a396a75bf"
+    },
+    "clipping-color-dodge.f32le.gz": {
+      "bytes": 118692,
+      "sha256": "e4c32747dd7d8e1253c755765fd8ca0badf71f5a5bf6eb85d2e93fb6a14548db",
+      "rawSha256": "f846af7848af00bde3c9c266f50210f0871985f1e730eb0a2d3f09a6fe0355c3"
+    },
+    "group-base-color-dodge.f32le.gz": {
+      "bytes": 118750,
+      "sha256": "ad40210d593558259479ed6828029465b287f355fb9a801b2b24d9e37ca6bcfa",
+      "rawSha256": "a72d2b2900fde0a4267931d91e0e8071be12301116473f18780eded9d25e6856"
+    },
+    "raster-color-burn.f32le.gz": {
+      "bytes": 119928,
+      "sha256": "e9ca135f60b0dd7e1b8d4236a79caa914ae29e9d43f3ddbe4a9cec5146d93355",
+      "rawSha256": "8d59a4e3b610f1cb974cd11a602001046588a6cd5f420013a047fb419f8bc03f"
+    },
+    "adjustment-color-burn.f32le.gz": {
+      "bytes": 118180,
+      "sha256": "c5671084dfbfee4c1d7120593bb0afa3cc92cadc05c5fd863ffd4644ea2bcde1",
+      "rawSha256": "95d57328b777ff587f00fd6bd31d4262529c13b624ccac101d9ed959eea6aeb2"
+    },
+    "isolated-color-burn.f32le.gz": {
+      "bytes": 119916,
+      "sha256": "73f1579640b63e13e42bca4440513f90f06e49fe88467fbcda20f99848050436",
+      "rawSha256": "a94051e3c50eccd13098d256108d5f504c3e92ca9e107ab357acc5bc27b880c8"
+    },
+    "pass-through-color-burn.f32le.gz": {
+      "bytes": 119618,
+      "sha256": "0d28298d7af6afe60955e58b5412c9616afb812460ec1c041470ca81ea7578a6",
+      "rawSha256": "3e985a3056298d45bd0b8d45049dd707cd9b6035e4400c7ede7eb6ef2fbbdcca"
+    },
+    "clipping-color-burn.f32le.gz": {
+      "bytes": 120681,
+      "sha256": "a1ffcf76a6bdbabc87e0bb65cdd2da16ca62bcce9d1d03abc8bf1edfe00545b7",
+      "rawSha256": "009020d31713b2069f9fe20e0c84251f4402a742cd3de9b3ba14ba10a1c33ce5"
+    },
+    "group-base-color-burn.f32le.gz": {
+      "bytes": 120635,
+      "sha256": "e61f0c7770caf97ae95bf55bf6af531f25b0fe4e68016236259d13679dd282d9",
+      "rawSha256": "e94ee162c510ec21b4bc08934935d6e9926f976daccc1d9afae939da971af3ce"
+    },
+    "raster-hard-light.f32le.gz": {
+      "bytes": 119384,
+      "sha256": "6af8bdbf1880880dbad812df5bcbbe2cd2509eb6b9ccb69099185143847b6356",
+      "rawSha256": "9e78719938bcc7d0573d261736e13076dbd4d8ee188d37a1dfe392cd0d8b94ba"
+    },
+    "adjustment-hard-light.f32le.gz": {
+      "bytes": 119889,
+      "sha256": "b4a173298bd3561ad74a15f0162b2e88c01a1512520ab6601655cec12dade70c",
+      "rawSha256": "257adbab1aed8baa799d971a05f59bf3527e179088205758b49cca73e6ff6b66"
+    },
+    "isolated-hard-light.f32le.gz": {
+      "bytes": 119762,
+      "sha256": "8131fb7d33ecdf774d833c0db98c838866ae39026161796560d210c880af4515",
+      "rawSha256": "a945f3fe798f4e56b6e0358952ce253b6f54ae51895ec4a9c8b40822b9ac83a7"
+    },
+    "pass-through-hard-light.f32le.gz": {
+      "bytes": 119262,
+      "sha256": "e3f1fb0e001de110d96febc714e2498c494730f296b018be1d45e2f6f9db9b04",
+      "rawSha256": "315538b5a820ac04d326b4fa654770193f403e7ca8e46f600ea6f900bd9451e4"
+    },
+    "clipping-hard-light.f32le.gz": {
+      "bytes": 120531,
+      "sha256": "45c0added545ce9e9a5c475a1f1d0994bb618d1b481977140393b708b36943e6",
+      "rawSha256": "4d41044dc635bab5dedd9fff140dd3192847f19144e085b5157cd39b8104f8f6"
+    },
+    "group-base-hard-light.f32le.gz": {
+      "bytes": 119981,
+      "sha256": "637ca57d6e2b3f78986635b73d873ab9ce0c6ff35bf37a6e027c8142ad6ec4f2",
+      "rawSha256": "ace228a5b6afcadd0a605f69a85c649bbe9eb8f6704a66fbf00ab91bc9c69900"
+    },
+    "raster-soft-light.f32le.gz": {
+      "bytes": 119515,
+      "sha256": "936c0ba5f6d426ec927a053041ec38be208b7080c06d7d085135c6106b3e103a",
+      "rawSha256": "cc9290bce67acb3e2997dca37465a2d14dbe9a0bf8dc3601c6d5e49c0f9dd003"
+    },
+    "adjustment-soft-light.f32le.gz": {
+      "bytes": 119673,
+      "sha256": "a69ded36101c4112b1a9df2d70913e57fc860cd9f5d253760579bd79dc01c96d",
+      "rawSha256": "b13e96b77e82329621032c44bec20bf7d94ce1b86ec46952c1b602e44a2934c8"
+    },
+    "isolated-soft-light.f32le.gz": {
+      "bytes": 119695,
+      "sha256": "df2a631a6d619f3c101f550ab3cfd686188db95e2f50388d87660898355cf384",
+      "rawSha256": "9c2d2333761723616a06ecbb55dd24d23b01aa2acbe87a740e7b45340d0ed53a"
+    },
+    "pass-through-soft-light.f32le.gz": {
+      "bytes": 119163,
+      "sha256": "d79d76d9f5bd5e21b781fee8750582d0f6932638046bd8e1d706f16957d31ec2",
+      "rawSha256": "be65327999a4843359028e9c23844b021c15d9c279542494e31cbed77f7cc4de"
+    },
+    "clipping-soft-light.f32le.gz": {
+      "bytes": 120212,
+      "sha256": "36bec518b1093ca0e48039686efd6872ec02de74a06a826bf3789859335c87bf",
+      "rawSha256": "0e4bb03ad17d160d1db802686c809b0b05e2c7a19153c7f7eb6ba3c362f011fd"
+    },
+    "group-base-soft-light.f32le.gz": {
+      "bytes": 119851,
+      "sha256": "d10b9efcfa517d505774f05d243a39689455063fa817d9895cfaecbc2b9a7b81",
+      "rawSha256": "91e8f6a0d6a236ea588e2d682943bc74412c7df92594d0318e350e8d2e06c488"
+    },
+    "raster-difference.f32le.gz": {
+      "bytes": 118252,
+      "sha256": "b871d11dc497d59165f21bd5ae0d4cabd2b98604c22cde45c5e0ebea4a4aa2e9",
+      "rawSha256": "e3a6ebdc066be49bbeb74b7f9e92d79e6efc58528e53d4b302403e8db9c04b66"
+    },
+    "adjustment-difference.f32le.gz": {
+      "bytes": 119204,
+      "sha256": "de481daf936ae1d521f309b41e2551886b62f71261ea7407779786b4f6d4d639",
+      "rawSha256": "abe2367c8be100a441a599508ccefb59b24d3c532ae01bab14e0cdf0be49e381"
+    },
+    "isolated-difference.f32le.gz": {
+      "bytes": 119171,
+      "sha256": "7bf98162274a6138076fe342be507a959982bb6b752de1bfff84859ebf97c997",
+      "rawSha256": "545588995e0149944edfa49b8d73b2a38c8d6517ae7b3ca1e6c5f015310ec55f"
+    },
+    "pass-through-difference.f32le.gz": {
+      "bytes": 118803,
+      "sha256": "a778cdc6f387ce4ded8f9ae9501512a29efc4722d06cf3d02b909b61ef17ef1a",
+      "rawSha256": "1d04c9e762a7135b89b984fbf0862fb4e7d7f95517990e30f13571e7b7d16eea"
+    },
+    "clipping-difference.f32le.gz": {
+      "bytes": 119168,
+      "sha256": "7a304c600328dfc9e064256735c889ee5ae8458e02503263d213e9bb18885e96",
+      "rawSha256": "934d8e1361a1d90efc1563d494a94199b34290cd994f183adb327e4a0612027a"
+    },
+    "group-base-difference.f32le.gz": {
+      "bytes": 119630,
+      "sha256": "db62862424d0fefa8ed3495bd3c8c1bc5e6d6f16f002c75984fec9140abd04b8",
+      "rawSha256": "96c96bf76192baddf6637197af194a050e2085f7efc59db7e5253c0dcaa0cd4f"
+    },
+    "raster-exclusion.f32le.gz": {
+      "bytes": 116285,
+      "sha256": "10fb95e77e54734e5d6a2f9a4d8a2d2ac6af09ac4cb38a0e064c7f33fea12f1f",
+      "rawSha256": "3ce30845b4b9c9c664f4ad96ad8c3ed8b9a4d456cd6a7632af1921f9144690bd"
+    },
+    "adjustment-exclusion.f32le.gz": {
+      "bytes": 116729,
+      "sha256": "a0b5c2f367210846e62dfb8c9e2fe593c700230ca8f935e08d21b64a92ec4672",
+      "rawSha256": "b945d1630464a854cc1209bcbcd7ead9424972619e07445139687d882f6d7749"
+    },
+    "isolated-exclusion.f32le.gz": {
+      "bytes": 118220,
+      "sha256": "213d70713ba38cd2395e17fd7c3edadfeea330173582bdf7b071cadac50b32ba",
+      "rawSha256": "6ade64b85524fd8dc427f4b71e3454876851a646d6e0b2b05e328ebec79acae5"
+    },
+    "pass-through-exclusion.f32le.gz": {
+      "bytes": 117795,
+      "sha256": "b5c75da4e53339582afca85b99b20590df407a8d65ed40ba31566ab8f782d2a4",
+      "rawSha256": "27f7a4d8fff8f049320d44fbfe07aa513381feb1a348b60411c10ee976f02a9d"
+    },
+    "clipping-exclusion.f32le.gz": {
+      "bytes": 116877,
+      "sha256": "0b02e861a33e1a9813e38e43bc63a2304467e63957d972ca4e7184e3167c3a2f",
+      "rawSha256": "26ca019d88cf28b41effdd06151d29030efb8b2327c08be20e53588237664b69"
+    },
+    "group-base-exclusion.f32le.gz": {
+      "bytes": 117816,
+      "sha256": "2700aebbf10d22f5c79e782af524ad40a789170e4f0c46541356e0a86b38e098",
+      "rawSha256": "f2cc9f7fc0ac642a161c86af3b2792708008cabd95e7f826963c31945723508c"
+    },
+    "raster-hue.f32le.gz": {
+      "bytes": 118825,
+      "sha256": "0c21b2a5bb8e1084cd46cdca183c54eb9abaa9215051638ca9c643bd51a8822c",
+      "rawSha256": "d7756e7bf8a7f2990629eb0bd7840c6008fdc0f256439176fe747d3da0a7bacc"
+    },
+    "adjustment-hue.f32le.gz": {
+      "bytes": 107580,
+      "sha256": "7159645febcc3a9e1c886c0ea15dfad4337f1d04efa478f8fa001ba4917e44a4",
+      "rawSha256": "c6888a80adad92b09dcb0150e6aaab7143b448e3101fd28d0d33887ae5320315"
+    },
+    "isolated-hue.f32le.gz": {
+      "bytes": 119609,
+      "sha256": "d622a0d3233c2b0ae69c9c2bc49014766f6a978dbbd5c6ddb8be5fd86a601fdd",
+      "rawSha256": "bea9f9927fe3cf071996446c5d9582feb356f33e74750c3daabc96f5872777af"
+    },
+    "pass-through-hue.f32le.gz": {
+      "bytes": 119031,
+      "sha256": "84b6b7c99532dedc184755dbcacace3398fc7960a44fa4755338b6eda8e87a3e",
+      "rawSha256": "550a9378e5b83cf11cbdbe586fd6fbf6466b251da937d36ab6bdc9f0f0b9a571"
+    },
+    "clipping-hue.f32le.gz": {
+      "bytes": 119929,
+      "sha256": "3499b9e07f1084192cfdba64809d6e843899e111e5916dcc59efaf2b0be055f9",
+      "rawSha256": "e3f626907181721577ab21eb10ece16d930e0e7c1a23a8e7368853030625eb98"
+    },
+    "group-base-hue.f32le.gz": {
+      "bytes": 119642,
+      "sha256": "64cc860638d1f4844461a8c1d9bec59e34bbcc1e5432532c62c9d0f239ff8da3",
+      "rawSha256": "03747ade797b24325f422b84c39abf715436353b5ad6c2b09e2d1175fd77e039"
+    },
+    "raster-saturation.f32le.gz": {
+      "bytes": 119244,
+      "sha256": "8e8b16d61ff08cec43cdff3458919fb9cabd7b2512efee58f527218dd9fe8244",
+      "rawSha256": "c68cdaf6f9dfeff1c438a5fcf7cfdee12465f9dec9697600dc6aec084b244a36"
+    },
+    "adjustment-saturation.f32le.gz": {
+      "bytes": 119195,
+      "sha256": "dc42021819e32b9f54640528ded188c081efea247e940d66c96bdeeb84c6f6e9",
+      "rawSha256": "b0bf396cbc5a6970e090c8a4ac9cd616d9fc41d3a479e02ca0d09ddfb4eafbd2"
+    },
+    "isolated-saturation.f32le.gz": {
+      "bytes": 119704,
+      "sha256": "744d7174315964155f9043a297723836a72bfb95ac7fa265dfe4d49aafbafb05",
+      "rawSha256": "f9e9398d97ae367f3694716f49ef570d38dc01c9b54b70e3948d3f125d4407f6"
+    },
+    "pass-through-saturation.f32le.gz": {
+      "bytes": 119221,
+      "sha256": "ce400fce885c5e1e74dd65005433447af324872a9eb46348a94ec6738e77f2ec",
+      "rawSha256": "737f002b9d3c90006e5f6abc736e8db39547229e96181956b8cb39a661dd777d"
+    },
+    "clipping-saturation.f32le.gz": {
+      "bytes": 119865,
+      "sha256": "8db88ebd8cb9cae16da4e99f6c50bb578f46f1b02c5beb60d0ad9f64edc49995",
+      "rawSha256": "862ac8d0f90e9daba6709fe2abedb48d245b6c3ea2e7d085d23beea9c8eab54d"
+    },
+    "group-base-saturation.f32le.gz": {
+      "bytes": 120083,
+      "sha256": "07c23d55724a15930ebb1199587d8ecdece824a41f71580147026101924265ea",
+      "rawSha256": "c8042bffe826bd07ac9d68654548b8d98e11689286a658091c5f3d2f0a149c6b"
+    },
+    "raster-color.f32le.gz": {
+      "bytes": 119250,
+      "sha256": "e63a611d958440077d7953bca2268aa96272f2f372adba96f26548a222db50f7",
+      "rawSha256": "7470c655f8735f55af5d660878fcf13aed0e6a8f10628d50f6fc1ec98c45beff"
+    },
+    "adjustment-color.f32le.gz": {
+      "bytes": 119188,
+      "sha256": "c6611b17bd721b0f41421b75d23a7e23bfd7e9a76e25f60f2a46ffe3fd173368",
+      "rawSha256": "4e17dd499b44fb7205043df87c303809d1a184daa7bd198fa624a973ab7340a0"
+    },
+    "isolated-color.f32le.gz": {
+      "bytes": 119679,
+      "sha256": "ffb612747605d1f3576255e830fca939d22f6a6fa673cd49ef454bcd0bd7839c",
+      "rawSha256": "5a147013b5776312f1fa4eb6b66989b91d68497f97bc1b6e1e675bfbcc448e59"
+    },
+    "pass-through-color.f32le.gz": {
+      "bytes": 119221,
+      "sha256": "3ae7e891ef03fdf18934c4acb108c2ebbab58622b39e34c495296b72e7d43af1",
+      "rawSha256": "a9109498809f7860cba0af096ac7e15132cc1a51503883cc871364f4967e8d07"
+    },
+    "clipping-color.f32le.gz": {
+      "bytes": 119838,
+      "sha256": "d5ec448e10d7bdcee36e4ae2d654cd1c9200bffae8927120eb145c24047291a7",
+      "rawSha256": "0c25f755299685846d0fa3e518dcc2d9be4efe44bda30f5138f9bc8615d787bd"
+    },
+    "group-base-color.f32le.gz": {
+      "bytes": 120073,
+      "sha256": "0b655f2643a87284a5fd2072d702479afca9b380f56e551d2327d7361bcaad08",
+      "rawSha256": "a6f92bbbb02714d9145210b19bb71429638903b2f9626ecea152fec62205d33a"
+    },
+    "raster-luminosity.f32le.gz": {
+      "bytes": 118263,
+      "sha256": "4d1918345c974b85e01f2994a535b1a17878d16870abf190777025c8cf80d847",
+      "rawSha256": "8bd8024779cd296b2c390e2d142e1ef8681dae1648303ba49ed5cc5d913451e6"
+    },
+    "adjustment-luminosity.f32le.gz": {
+      "bytes": 119586,
+      "sha256": "729141d699de7388e550734b95f339f6687651bd1ad61912f2ccc22271ff15ea",
+      "rawSha256": "31148b01a4016768617837a79e1d13b3705f1adeec662895a04266930abc3228"
+    },
+    "isolated-luminosity.f32le.gz": {
+      "bytes": 118854,
+      "sha256": "61420fd15ec8682c3d60bd563c5abcc862318e3205dafa7335e822df5caf8828",
+      "rawSha256": "f8b3ef14b31483b67d819aec4b35c244b7a3e26c8262b6cbc9b2c28755057ccc"
+    },
+    "pass-through-luminosity.f32le.gz": {
+      "bytes": 118554,
+      "sha256": "6c8e8d46b97c0fdab82db25be1e2b94f11168d4010c3906da1018eb3ae2f93e7",
+      "rawSha256": "371c4a3326b686a79450bb3e41a36ef37045043adbaffbe99d67084d69177f58"
+    },
+    "clipping-luminosity.f32le.gz": {
+      "bytes": 119923,
+      "sha256": "1900d9c4c53ba5f3af2049ffbf63d124420d4928cf06dc2e63e4a1bc737ff9a9",
+      "rawSha256": "5af1d9788b269c4dce3add37e65e1dba50d55230c096ce7c013dc6ea0ffd1cce"
+    },
+    "group-base-luminosity.f32le.gz": {
+      "bytes": 118475,
+      "sha256": "f9ab3b69ca23d114d67908b9836137fab7e7415eb3c741e507f22b8975909e18",
+      "rawSha256": "b389303086de1ab3334526951c4d4c44a58a7cadb00f8a557a7c50e284e710ab"
+    },
+    "raster-linear-light.f32le.gz": {
+      "bytes": 119650,
+      "sha256": "33ee7a999b02dc81488fc364da5f3e2669bb3cd7a322dd10c3f7e488b49c69f1",
+      "rawSha256": "13b3eb905fa4bf2da9f4ccaa743ceb440f9f39b1b45dd0bb4b54addb6aa98d16"
+    },
+    "adjustment-linear-light.f32le.gz": {
+      "bytes": 118096,
+      "sha256": "ecbe3a50973bfdf5e05f9b95b6816a9656c133ae857fdc0d7e118ab8537da05c",
+      "rawSha256": "5e090c51a42c9ba1eb961e1636e09f3692e062aa3f9797e127e73614a68e2be5"
+    },
+    "isolated-linear-light.f32le.gz": {
+      "bytes": 119671,
+      "sha256": "0a49ccf29308f0a253ae795a417b8b7137635b1802c6d72bfe43133512c3d01b",
+      "rawSha256": "a68a542bda64865b7449926a8cb926fe1146fab91b8c27755cc431b5ac8f60e8"
+    },
+    "pass-through-linear-light.f32le.gz": {
+      "bytes": 119419,
+      "sha256": "878c49026921b6320764fdcb0e5b35124d2e4b910300e42a305dbbf3964a4eaf",
+      "rawSha256": "98e12f91dd745804c4d0e152d3780cc5d47cd2c5b41cbbcdc624a056b48b0a0d"
+    },
+    "clipping-linear-light.f32le.gz": {
+      "bytes": 120808,
+      "sha256": "b1c7c180a086ed151b0cd0e8fea9b3e64dc91d538acc275f920d8667302fcd1f",
+      "rawSha256": "e8ca2e2b7f474a82dbc8804ad7794edcf8cb8345bfc8b47b9abaef6019358e62"
+    },
+    "group-base-linear-light.f32le.gz": {
+      "bytes": 120048,
+      "sha256": "82a1c50ef66c618123f27b63e69518dbf08c6546023cd5cb9e87483013aa41fd",
+      "rawSha256": "a91316f0ade1ec199ef4adc92b9b253428bd9c1d546ec4b55483f04b7436d664"
+    },
+    "raster-linear-burn.f32le.gz": {
+      "bytes": 119899,
+      "sha256": "d365a267f1122edb7caa1c9b5b5308155d3638a9306b9659fc5dbc084ec071a0",
+      "rawSha256": "18771e16d2a52933ab4631cfac01b5bdd68c5b1593255bb0fa35f1cf0ffdbe86"
+    },
+    "adjustment-linear-burn.f32le.gz": {
+      "bytes": 117873,
+      "sha256": "df398170cde6a8038b3348830a98fab960ac5934cd3a3b40e3b3a9cff194481e",
+      "rawSha256": "d1659c7d4810580c7ebb22d8fe52530af71b6fc8cbe65b9416b5617bb16fc35f"
+    },
+    "isolated-linear-burn.f32le.gz": {
+      "bytes": 119800,
+      "sha256": "3088baf8d75be58daeeb4f0b58354ca11b13ccee33bf733fae1f8ec339bcf182",
+      "rawSha256": "42a7fa762ff8795e912ff1280cb7f04e54dbef7055473400214085faa3614f6b"
+    },
+    "pass-through-linear-burn.f32le.gz": {
+      "bytes": 119058,
+      "sha256": "95683ecd3997996866ddfa0091c3b2e19e38b76ba4180c4fbbc0b4a17e538727",
+      "rawSha256": "bedd31fa535d1cacc67729cbe2776db52e3d8538bdf4b40a802b12de013f15b0"
+    },
+    "clipping-linear-burn.f32le.gz": {
+      "bytes": 120612,
+      "sha256": "b897d89da25dacfce570e1cdc65ccf6858f2bb57f82644a2bf3d98893cb28e8f",
+      "rawSha256": "0d0019cf155383730d366d8b038000a90174bb577bab8d24e962c2eedb4dd6ec"
+    },
+    "group-base-linear-burn.f32le.gz": {
+      "bytes": 120583,
+      "sha256": "3eadd0e69cfbe2c3e2d2eaffce8a94f3a0f9d7c8fd7da77ee554cd349054b07c",
+      "rawSha256": "cd256c66108fb52c24c71b8d8eea484c9f9a76a987ce8be74523e270fc5778ef"
+    }
+  },
+  "colorTolerance": 9.5367431640625e-07,
+  "alphaTolerance": 0,
+  "reference": "Independent NumPy float64 W3C blending and source-over; alpha-preserving adjustment interpolation. No editor/canvas/WASM expected samples.",
+  "referenceUrl": "https://www.w3.org/TR/2024/CRD-compositing-1-20240321/"
+}

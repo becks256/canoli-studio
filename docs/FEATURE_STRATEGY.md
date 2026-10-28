@@ -288,3 +288,12 @@ Pure immutable LensProfile values retain complete supported calibration tables a
 ### Current F12 dependency: recorded lens and exposure context (2026-10-23)
 
 Native wire protocol 2 now carries recorded lens maker/model, focal/equivalent focal length, aperture, exposure seconds and ISO into an optional immutable public report-1 shooting DTO. Missing/invalid values remain unknown. Read-only source disclosure, trusted/isolated/REST results and accepted batch/project/history transport retain those declarations without changing original pixels or applying a profile. Build, all 1,740 unit/API, 171 affected native and 109 production checks pass, including independently exact corrected 50 MP output. Calibrated profile selection, matching/coordinate conversion/interpolation/databases and physical quality remain in implementation; metadata context does not complete those gates, F12 or the broader professional, AI, workflow, ChatGPT plugin/sign-in and F10/F14 objective.
+
+
+2026-10-27 F10 increment: normalized linear-sRGB float artwork now integrates
+all existing native blend modes through raster/group/adjustment/clipping
+composition and shared commands. Actual pixel-domain failures retain authored
+state, suppress stale previews and require explicit correction; no HDR blend
+extension or automatic clipping is inferred. The implementation roadmap records
+verification and remaining quality/performance gates. This does not complete
+F10 or the full professional-editor objective.

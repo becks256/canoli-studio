@@ -2197,3 +2197,6 @@ test('production float erasure preserves original samples through pointer cancel
 test('production continuous float Curves and Levels retain linear histograms, exact Undo, native files and originals without developer globals',async({page},info)=>{const{floatTransferWorkflow}=await import('./helpers/float-transfer');await floatTransferWorkflow(page,info,true);});
 
 test('production float zoom gestures display independently filtered native scenes without developer globals',async({page},info)=>{const{floatFrameWorkflow}=await import('./helpers/float-frame');await floatFrameWorkflow(page,info,true);});
+
+test('production float blend controls display and deliver every native mode without developer globals',async({page},info)=>{const{floatBlendWorkflow}=await import('./helpers/float-blend');await floatBlendWorkflow(page,info,true);});
+test('production blend domain failures suppress stale artwork and recover through Normal and Undo without developer globals',async({page},info)=>{const{floatBlendDomainWorkflow}=await import('./helpers/float-blend');await floatBlendDomainWorkflow(page,info,true);});

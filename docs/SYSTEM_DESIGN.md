@@ -4,6 +4,20 @@
 
 The explicit float document pipeline preserves original native samples separately from display-only thumbnails, derived IndexedDB tiles, captured float composition and final SDR/output conversions. Source preparation completes before an output/display ICC owner is acquired. Erasure coverage is captured in its authored resize plane; each operation changes float alpha before clipping and layer appearance, without passing RGB through a coverage canvas. Continuous Curves/Levels use normalized working values, a float64 master/channel pipeline and one float32 store; histogram samples precede SDR display conversion. Schema 49 and shared OO/history validation gate the initial supported scene; default byte documents keep their existing path. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Connected native float blend modes
+
+The float document gate and custom Inspector admit every existing blend enum.
+`engine/float-scene` passes raster, isolated group and restored clipping-base
+modes to the native float compositor. `float-adjustment-blend` computes opaque
+blend colors, restores the captured backdrop alpha and uses coverage
+interpolation; Normal retains its prior exact path. Complete normalized RGB is
+required for artistic modes; finite extended Normal remains supported. Pixel
+failures publish no output. `useCanvasRenderer` retains a failure until a current
+successful presentation; App hides stale artwork and shows a persistent preview
+error instead of Ready. Source ownership, native-first frame order, OO/history,
+script/plugin grants and separate REST remain unchanged. Contract and remaining
+HDR/precision/performance gates: [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md).
+
 ## Native-first float frame sampling
 
 `engine/float-scene` resolves the captured scene on native world pixels;

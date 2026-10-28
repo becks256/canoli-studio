@@ -6,6 +6,23 @@ DocumentOptions.precision defaults to uint8 and also accepts float32. Readonly d
 
 Existing Curves/Levels `AdjustmentLayer` DTOs also support continuous working-linear float RGB with unchanged 0..255 control units, master-before-channel ordering and exact alpha. Curves extend endpoint tangents; active Levels clip at input endpoints, while neutral channels preserve signed/extended identity. Strict controls, masks, fill/opacity, Undo and isolated revision/permission checks remain authoritative. [Exact numeric definitions, executable example, limits and errors](FLOAT_DOCUMENTS.md#continuous-curves-and-levels).
 
+## Float layer blend modes
+
+Existing `RasterLayer`, `AdjustmentLayer` and `LayerGroup` constructor options,
+`layer.blendMode` setters and `layer.update` commands now permit all 18 existing
+artistic modes in float documents. Raster/adjustment defaults remain `normal`;
+groups also retain `pass-through` with full fill opacity. Normal preserves finite
+extended RGB; other modes require complete normalized [0,1] working RGB inputs
+at render/delivery time. Domain failures retain authored state and original
+bytes, suppress stale previews and can be recovered with Normal or Undo.
+Adjustment modes preserve backdrop alpha; clipping base/member and group modes
+retain their separate coverage boundaries. Host, isolated script/plugin,
+semantic recipe and independent REST metadata commands retain existing
+permissions, locks, revisions and shared history. REST gains no float originals
+or browser rendering/synchronization. Exact values, defaults, formulas/domain,
+errors, limits and the executable isolated example are in
+[FLOAT_DOCUMENTS.md#artistic-blend-modes](FLOAT_DOCUMENTS.md#artistic-blend-modes).
+
 ## Owned float source storage dependency
 
 Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.

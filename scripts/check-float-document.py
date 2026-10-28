@@ -19,6 +19,7 @@ p.add_argument('--exposure',type=int,default=1)
 p.add_argument('--tone',action='append',type=json.loads,default=[],help='Ordered original-space tone settings; replaces exposure-only reference when supplied')
 p.add_argument('--erasures',type=json.loads,help='Ordered rectangular byte-coverage selections; preserve float RGB and multiply alpha per operation')
 p.add_argument('--clipping',type=json.loads,help='Independent sibling clipping scene; replaces exposure/tone-only reference')
+p.add_argument('--blend-scene',type=json.loads,help='Independent normalized float blend scene; fixed f32/uint16 numerical bounds with exact alpha')
 p.add_argument('--page',type=int,default=0)
 p.add_argument('--pages',type=int)
 a=p.parse_args()
@@ -105,13 +106,19 @@ if a.clipping is not None:
  assert isinstance(a.clipping,list)and not a.tone
  clipping_reference=runpy.run_path(str(root/'scripts/float_clipping_reference.py'))['render']
  transfer_reference=runpy.run_path(str(root/'scripts/float_transfer_reference.py'))['adjust']
-samples=0;different=0;maximum=0.;extended=0;actual_hash=hashlib.sha256();expected_hash=hashlib.sha256()
+blend_reference=None
+if a.blend_scene is not None:
+ import runpy
+ assert isinstance(a.blend_scene,list)and a.clipping is None and a.erasures is None and not a.tone
+ blend_reference=runpy.run_path(str(root/'scripts/float_blend_reference.py'))['render']
+samples=0;different=0;maximum=0.;maximum_color=0.;maximum_alpha=0.;extended=0;actual_hash=hashlib.sha256();expected_hash=hashlib.sha256()
 try:
  with gzip.open(reference,'rb')as original:
   for top in range(0,height,th):
    count=min(th,height-top);raw=original.read(count*width*16);assert len(raw)==count*width*16
    linear=np.frombuffer(raw,dtype='<f4').reshape(count,width,4).copy()
-   if clipping_reference is not None:linear=clipping_reference(linear,a.clipping,origin=(0,top),transfer=transfer_reference)
+   if blend_reference is not None:linear=blend_reference(linear,a.blend_scene,origin=(0,top))
+   elif clipping_reference is not None:linear=clipping_reference(linear,a.clipping,origin=(0,top),transfer=transfer_reference)
    elif a.tone:
     for settings in a.tone:
      assert isinstance(settings,dict)and set(settings)<=set(['exposure','contrast','saturation'])
@@ -128,7 +135,7 @@ try:
    expected=np.empty((count,width,4),dtype=dtype);apply(transform,linear.ctypes.data,expected.ctypes.data,count*width)
    actual=rows(top,count);assert np.isfinite(actual).all()
    different+=int(np.count_nonzero(actual.view('u'+str(dtype.itemsize))!=expected.view('u'+str(dtype.itemsize))))
-   maximum=max(maximum,float(np.abs(actual.astype(np.float64)-expected.astype(np.float64)).max()))
+   delta=np.abs(actual.astype(np.float64)-expected.astype(np.float64));maximum=max(maximum,float(delta.max()));maximum_color=max(maximum_color,float(delta[:,:,:3].max()));maximum_alpha=max(maximum_alpha,float(delta[:,:,3].max()))
    if a.precision=='float32':extended+=int(np.count_nonzero((actual[:,:,:3]<0)|(actual[:,:,:3]>1)))
    samples+=actual.size;actual_hash.update(actual.tobytes());expected_hash.update(expected.tobytes())
   assert original.read(1)==b''
@@ -137,5 +144,8 @@ finally:
  if handle:close(handle)
  if image:image.close()
  if document:document.close()
-assert different==0 and maximum==0 and samples==case['samples'],(different,maximum,samples)
-print(json.dumps(dict(page=a.page,width=width,height=height,samplesCompared=samples,nonidenticalWords=different,maximumError=maximum,extendedSamples=extended,precision=a.precision,profile=a.profile,completeProfileExact=True,tone=a.tone,clipping=a.clipping,erasures=a.erasures,actualSampleSha256=actual_hash.hexdigest(),referenceSampleSha256=expected_hash.hexdigest(),outputBytes=a.output.stat().st_size,outputSha256=hashlib.sha256(a.output.read_bytes()).hexdigest(),reference='Independent native Linux CMM source references, NumPy clipping/erasure/tone/exposure, native Linux CMM output, libtiff/Pillow/MuPDF readback.')))
+if blend_reference is None:assert different==0 and maximum==0 and samples==case['samples'],(different,maximum,samples)
+else:assert maximum_color<=(2**-20 if a.precision=='float32'else 1)and maximum_alpha==0 and samples==case['samples'],(different,maximum_color,maximum_alpha,samples)
+result=dict(page=a.page,width=width,height=height,samplesCompared=samples,nonidenticalWords=different,maximumError=maximum,extendedSamples=extended,precision=a.precision,profile=a.profile,completeProfileExact=True,tone=a.tone,clipping=a.clipping,erasures=a.erasures,actualSampleSha256=actual_hash.hexdigest(),referenceSampleSha256=expected_hash.hexdigest(),outputBytes=a.output.stat().st_size,outputSha256=hashlib.sha256(a.output.read_bytes()).hexdigest(),reference='Independent native Linux CMM source references, NumPy clipping/erasure/tone/exposure, native Linux CMM output, libtiff/Pillow/MuPDF readback.')
+if blend_reference is not None:result.update(blendScene=a.blend_scene,maximumColorError=maximum_color,maximumAlphaError=maximum_alpha,colorTolerance=2**-20 if a.precision=='float32'else 1,alphaTolerance=0)
+print(json.dumps(result))

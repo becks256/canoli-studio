@@ -4,6 +4,17 @@
 
 Existing document read/write grants permit shared document.convertToFloat() and supported float edits against already-retained original TIFF raster assets. Host commit validates working mode, sources, revision and commands. Installation stays inert; no import/export/profile/worker service or new permission is exposed. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Existing blend commands in float documents
+
+The existing document read/write grants permit the same 18 blend-mode edits as
+trusted hosts. Installation remains inert; host commit validates source roles,
+commands, revisions, current grants and shared Undo. Rendering/file delivery
+separately enforce normalized artistic RGB without exposing native pixels or
+workers to third-party code. Normal retains finite extended RGB. See
+[FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md#artistic-blend-modes) for defaults, errors,
+alpha/clipping behavior and the executable isolated example. No manifest or
+permission change is introduced.
+
 ## Owned float source storage dependency
 
 Trusted host leases now prepare original-derived, lossless float32 tiles with atomic IndexedDB publication, independent ownership, bounded reads and original-backed corruption repair. The default byte mode remains sRGB8; the initial connected float mode is documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). This adds no isolated grant or browser/REST synchronization. [Source contract, budgets and remaining integration](FLOAT_SOURCES.md). The complete roadmap remains active.

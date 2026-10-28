@@ -6831,3 +6831,168 @@ grants and separate PNG-only headless REST source admission remain authoritative
 No schema, public mutation API, isolated privilege, paid operation, account,
 upload, browser/REST synchronization or arbitrary original-resolution cap is
 added. The complete original roadmap goal remains active.
+
+
+### 2026-10-27 — Connected normalized float blend modes (source verified; production report gap)
+
+Owner: implementation agent; L within T16/T17/F04/F10. The previous goal turn
+made progress by committing native-first float previews as `e4d3430`. This turn
+retains the complete original roadmap objective, including every unfinished
+professional/AI/interchange/physical/performance and live T23/T24 gate.
+
+Source inspection found all 18 modes already implemented in the private native
+float dependency, while the document gate and Inspector admitted Normal only.
+An actual baseline-production UI probe confirms one available mode where 18 are
+required. The connected implementation now passes raster/group/clipping modes
+through the same native processor. Adjustment modes blend computed RGB against
+the backdrop then interpolate coverage while preserving alpha, avoiding a second
+source-over of the backdrop. The native dependency's normalized artistic RGB
+restriction remains explicit; signed/extended Normal is unchanged. This does
+not infer an HDR blend formula or clamp original colors.
+
+The first source pilot passes 108 independent complete scenes: 18 modes across
+raster, adjustment, isolated group, pass-through group, raster clipping base and
+group clipping base. All float words and alpha match independently generated
+NumPy references exactly; partitions are identical. The declared RGB bound was
+2^-20 with exact alpha; final checks additionally require complete raw SHA
+identity for these fixtures. Focused native adjustment/OO checks pass all 25
+initial cases; the expanded focused run passed 156/157 before correcting a new
+recipe test's reversed arguments. The corrected recipe suite passes all 68.
+Independent REST all-mode revision/Undo coverage passes in that focused run.
+
+Ordinary source UI pilots pass all 18 native display frames and complete float32
+TIFF files exactly against independent native CMM/reference bytes, plus shared
+Undo/Redo and original-bearing reopening. A second pilot verifies explicit domain
+failure, hidden stale artwork, Normal recovery and Undo/Redo. This also fixes a
+real failure-state issue: rendering could previously leave old artwork labelled
+Ready. A persistent preview error now lasts until current successful presentation.
+The genuine 50 MP mixed-mode group/clipping/adjustment pilot and portable batch
+integration are in progress; complete unit/build/source/production acceptance is
+pending. No schema, new public mutator, plugin grant, paid call, account, upload,
+REST/browser synchronization or original-resolution cap is added.
+
+
+Expanded acceptance caught a stale generated sandbox: source-host/Inspector
+blends worked while isolated scripts still loaded the preceding Normal-only
+runtime. The integration run passed 13/15 cases and stopped before its queued
+large retry. Rebuilding the actual generated runtime is required, followed by
+fresh isolated/plugin/example checks. The first genuine 50 MP blend pilot
+exceeded its unchanged 600-second budget (633,100 ms observed); no pass is claimed.
+Its retained 159,716,200-byte float32 TIFF nevertheless matches all 200,000,000
+values and complete profiles exactly in a separate full independent reader run.
+
+Frozen before/after independent-reader profiling identifies repeated RGB
+conversions and reductions. Equivalent component-wise extrema and fewer
+intermediates reduce the observed standalone whole-file reader time from
+88.061 to 70.189 seconds. All 108 reference payload/raw hashes and the complete
+200-million-value result remain identical; no numeric bound or source scope was
+relaxed. The full-case timeout remains 600 seconds.
+
+A separate actual-browser native-window profile identifies unnecessary generic
+projection of integer-aligned rasters. A guarded owned-copy path now preserves
+sampler padding/transparent/signed-zero semantics, cancellation and source
+checks. Eight projection checks include partition/ownership and safe-origin
+lattice precision at 2^52. The 34-case focused projection/adjustment/OO run passes.
+One before/after profiled control retains every independent sample hash across
+16 completed 256×256 native reads. Observed median is 98.45→88.65 ms; largest
+sample 143→108.7 ms, with the generic projection loop absent from the candidate's
+leading CPU samples. This is a single-run synthetic native-working-window
+control, not human input-to-presentation latency, statistical no-regression
+proof, sustained 60fps, physical/device or whole-process memory acceptance.
+Broader F14 remains required. Full unit/build/source/production and complete
+50 MP blend acceptance remain pending.
+
+Full `npm run build` now passes with all 40 developer guides and rebuilt actual
+isolated runtime. All 2,732 unit/API tests across 282 files pass in one complete
+run. The current freeze records 2,380 source-input identities, 50 generated
+runtime/public/local-service files and all 142 production resources. Pinning the
+generated sandbox explicitly prevents source-host validation from being mistaken
+for verification of a stale isolated runtime. Current browser acceptance is
+running against these built/frozen bytes; the full roadmap remains active.
+
+A diagnostic driver reused the first expanded integration output path before
+preserving its full report. Its observed 13-pass/two-failure stats and exact
+stale-sandbox errors are retained as a recovery summary and in this work log,
+not presented as the original raw report. Subsequent final/diagnostic runs use
+separate output paths. No failed or incomplete run counts toward acceptance.
+
+The rebuilt-runtime integration run now passes all 15 cases, including isolated
+all-mode edits/inert-plugin grants, the documented example, durable portable
+blend batch retry, 108 native scenes, all 18 native-first half-size frames, UI
+pixel/file comparisons and prior composition/frame contracts. The full 50 MP
+mixed-mode retry also passes on the frozen code in 570,340 ms, within the same
+600,000 ms limit, with no skips, retries, flaky or unexpected results.
+
+Both 10,000×5,000 files match all 200,000,000 channel values independently with
+zero color/alpha error and zero differing words, exceeding the preregistered
+numerical bounds without changing them. The float32 TIFF is 159,716,200 bytes,
+file SHA-256 `0e6b638c897e64dee02fbbd531fb751bf8b3ea4a997d349afb46efeb1c635230`,
+raw sample SHA-256 `ba051761653928c9fa8f63d048b0621fb8dd31b3ac793053356a6dc2504a9cc4`.
+It is byte-identical to the retained pre-optimization file. The uint16 TIFF is
+97,798,848 bytes, file SHA-256
+`0e820bb0d7bcebf7a187e1950aef525a201ca9e3a87cbe5fff19b77811fac0c2`,
+raw sample SHA-256 `8a725301d16f3595bbdbbc3d59ef81bf40bbe0f128d4154bddea192c65113d59`.
+Original bytes/geometry, workspace restoration and exact Undo/Redo also pass.
+Phase records retain cold admission, authoring, restoration, each export,
+download and complete reader duration. End-to-end timings do not establish
+sustained interaction performance or process-memory bounds.
+
+Remaining final acceptance is the complete 100-case affected source matrix,
+both previous original-bearing Normal 50 MP workflows and all 172 production
+cases. The already-passing frozen mixed-blend 50 MP case is retained rather than
+repeated solely for a unified report. Full source acceptance will therefore
+combine 100 focused cases with three distinct 50 MP original-source workflows.
+The full original roadmap stays active.
+
+The complete frozen source matrix now passes all 100 cases with no skips,
+retries, flaky or unexpected results. It includes the new 108 exact native
+blend scenes and 18 half-size frames, isolated examples/plugins, full-mode UI
+pixels/files, persistent failure recovery and portable batch retry, alongside
+prior clipping, erasure, Curves/Levels, source ownership, TIFF roles, layouts,
+precision, raster editing and cursor contracts. The two original Normal 50 MP
+regressions and complete production acceptance remain in progress.
+
+Both previous original-bearing Normal 50 MP regressions now pass on the same
+frozen inputs: the float32-original workflow completes in 341,506 ms and the
+uint16-original workflow in 443,051 ms, each within its unchanged 600,000 ms
+budget. Their four complete native outputs are subject to the final audit's
+200-million-value exact comparisons and byte/hash equality with the preceding
+native-first preview acceptance. Production acceptance remains in progress.
+
+Final source/output audit confirms **103 distinct source-browser cases**: the
+100-case affected matrix and three original-bearing 50 MP workflows. All have
+complete passing reports without retries, skips, flaky or unexpected cases.
+The 15-case rebuilt integration report is additionally retained. All four
+Normal native files are byte/hash-identical to the previous accepted outputs;
+all six large files retain complete independent 200-million-value comparisons.
+The audit confirms the frozen 2,380 source inputs, 50 generated files and 142
+release resources, all four tracked native codecs and the unchanged pixels
+WASM SHA-256 `a1f55fcf95aa552d6e2c0a231d4ea57cceed971e2073a17b4ad285d9f549a8b3`.
+
+The 172-case production command finished with a `passed` completion marker and
+no failed-test IDs, and its complete new all-mode pixel/file/domain-recovery
+workflow artifacts independently pass the output audit. However, the final
+JSON report is empty, the original exec handle is unavailable and its CLI exit
+code was not observed. Filesystem exhaustion was observed at the same time;
+the precise report-write failure was not captured. **Full production per-case
+acceptance is therefore unconfirmed**: no complete pass count, zero-skip/retry
+claim or combined 275-case acceptance is asserted. A fresh complete production
+report is still required when this work resumes. The empty report, passing
+marker, surviving workflow artifacts and explicit recovery/limitation records
+are preserved. Completed older temporary outputs were copied, fsynced and
+hash-verified before reclaiming duplicate bytes; original-path symlinks retain
+their complete contents. No unique evidence was intentionally discarded.
+
+[Sealed evidence](benchmarks/float-blend-2026-10-27.zip) retains the exact changed
+source overlay, generated runtime and release, frozen identity manifests,
+complete passing source/integration/large reports and native output files,
+surviving production artifacts and report-gap record, independent inputs/CMM,
+reference/profile controls, verification tools, logs and diagnostic limitations.
+The initial overwritten integration report remains represented only by its
+explicit recovery summary, as disclosed above.
+
+The user paused the broader roadmap goal and requested this commit. This
+increment does not complete the original objective. Normalized artistic RGB,
+remaining float tools/layers/working spaces, HDR/CMYK/proof/interchange,
+photographic/physical/device quality, peak memory, sustained editor-wide
+performance and all other unfinished roadmap/live T23/T24 gates remain open.

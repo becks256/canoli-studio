@@ -1289,7 +1289,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     },
   }), [editor, dom, state.document, state.selectedIds, toolState.settings, toolState.drawing, zoom, pan, viewportSize, panelLayout.widths.layers, panelLayout.widths.inspector, viewDocument.width, viewDocument.height]);
 
-  const { rendering, renderBackend, paintedRegion, proofStatus } = useCanvasRenderer({
+  const { rendering, renderError, renderBackend, paintedRegion, proofStatus } = useCanvasRenderer({
     colorProof:editor.colorSettings.proof,
     editor,
     viewDocument,
@@ -1306,7 +1306,6 @@ export function App({ editor }: { editor: EditorApplication }) {
       if (cursorFrame.current !== null)
         cancelAnimationFrame(cursorFrame.current);
     },
-    onError: setError,
   });
 
   function toCanvasPoint(event: { clientX: number; clientY: number }) {
@@ -2280,6 +2279,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                     ref={displayHost}
                     className="artwork-host"
                     style={{
+                      visibility: renderError ? 'hidden' : undefined,
                       position: "absolute",
                       left: paintedRegion.x * zoom,
                       top: paintedRegion.y * zoom,
@@ -2450,6 +2450,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                     </div>
                   )}
               </div>
+              {renderError&&<div className="canvas-render-error" role="alert"><strong>Preview unavailable</strong><p>{renderError}</p></div>}
               <CanvasCursor viewport={viewport} enabled={customCursors} copies={cursorAdapters.copies} texturePreview={texturePreview.url} footprint={cursorAdapters.footprint} tool={tool} spacePan={spacePan} size={tool==='quick-select'?toolState.settings.quickSize:toolState.settings.size} zoom={zoom} />
               {!dom.layers.length &&
                 !dom.guides.length &&
@@ -2518,9 +2519,9 @@ export function App({ editor }: { editor: EditorApplication }) {
               </span>
               <span>
                 <span
-                  className={`status-dot ${rendering || busy ? "working" : ""}`}
+                  className={`status-dot ${rendering || busy ? "working" : renderError ? "failed" : ""}`}
                 />
-                {busy ? "Working…" : rendering ? "Rendering…" : "Ready"}
+                {busy ? "Working…" : rendering ? "Rendering…" : renderError ? "Preview unavailable" : "Ready"}
                 <span className="footer-divider">/</span>
                 {viewDocument.width} × {viewDocument.height} px
                 <span className="footer-divider">/</span>

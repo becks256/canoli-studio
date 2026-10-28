@@ -12,7 +12,7 @@ function samples(value:Float32Array,label:string){
  if(!(value instanceof Float32Array)||!(value.buffer instanceof ArrayBuffer)||('resizable'in value.buffer&&value.buffer.resizable)||('detached'in value.buffer&&value.buffer.detached)||value.length%4)throw new Error(label+' must be owned, fixed straight RGBA float32 samples.');
 }
 export function validateFloatWorkerWindow(value:Float32Array){samples(value,'Float window');if(value.length>262144*4)throw new Error('Split float work into windows of at most 262144 pixels; this is a working-buffer budget.');for(let i=0;i<value.length;i++)if(!Number.isFinite(value[i])||i%4===3&&(value[i]<0||value[i]>1))throw new Error('Float window samples or alpha are invalid.');}
-function checked(status:number){if(status===1)throw new Error('Float pixels, alpha, coverage or matrix are invalid.');if(status===2)throw new Error('Artistic float blending currently requires normalized RGB [0,1]; use normal for finite extended RGB.');if(status!==0)throw new Error('Float processing output is not finite float32.');}
+function checked(status:number){if(status===1)throw new Error('Float pixels, alpha, coverage or matrix are invalid.');if(status===2)throw new Error('This blend mode requires normalized RGB [0,1]. Choose Normal for signed or extended-range colors.');if(status!==0)throw new Error('Float processing output is not finite float32.');}
 /** Private native precision dependency. Does not change the document renderer
  * or expose another public mutation API. Callers supply one common RGB encoding.
  * Private memory and owned outputs prevent ordinary byte work from overwriting it. */

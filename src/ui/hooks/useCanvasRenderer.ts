@@ -25,6 +25,7 @@ export interface UseCanvasRendererOptions {
 
 export interface UseCanvasRendererResult {
   rendering: boolean;
+  renderError: string | null;
   renderBackend: "webgpu" | "canvas2d" | null;
   paintedRegion: RenderRegion;
   proofStatus: "pending" | "applied" | "failed" | "off";
@@ -48,6 +49,7 @@ export function useCanvasRenderer({
 }: UseCanvasRendererOptions): UseCanvasRendererResult {
   const colorState=editor.colorSettings;
   const [rendering, setRendering] = useState(false);
+  const [renderError, setRenderError] = useState<string | null>(null);
   const [proofFrame,setProofFrame]=useState<{proof:typeof colorProof;failed:boolean;colorState:typeof colorState}|null>(null);
   const [fontRevision, setFontRevision] = useState(0);
   useEffect(() => {
@@ -248,14 +250,15 @@ export function useCanvasRenderer({
             }
 
             setProofFrame({proof:job.options.colorProof??null,failed:false,colorState:job.colorState});
+            setRenderError(null);
             setRenderBackend(result.backend);
             setPaintedRegion(job.region);
           } catch (cause) {
             if (!isObsolete(job))setProofFrame(previous=>({proof:job.options.colorProof??null,failed:!!job.options.colorProof||!!previous?.proof||!!previous?.failed,colorState:job.colorState}));
-            if (!isObsolete(job) && onErrorRef.current) {
-              onErrorRef.current(
-                cause instanceof Error ? cause.message : "Rendering failed.",
-              );
+            if (!isObsolete(job)) {
+              const message=cause instanceof Error?cause.message:'Rendering failed.';
+              setRenderError(message);
+              onErrorRef.current?.(message);
             }
           } finally { job.release?.(); }
         }
@@ -322,6 +325,7 @@ export function useCanvasRenderer({
 
   return {
     rendering,
+    renderError,
     renderBackend,
     paintedRegion,
     proofStatus:(proofFrame?.proof!==colorProof||proofFrame?.colorState!==colorState)&&(colorProof||proofFrame?.proof||proofFrame?.failed)?"pending":proofFrame?.failed?"failed":colorProof?"applied":"off",

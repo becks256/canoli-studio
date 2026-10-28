@@ -27,6 +27,25 @@ export async function projectFloatWindow(
   if(![width,height].every(v=>Number.isSafeInteger(v)&&v>0))throw new Error('Float projection requires complete native source geometry.');
   const check=()=>{control.signal?.throwIfAborted();checkRenderCurrent(control.isCancelled);if(source.width!==width||source.height!==height)throw new Error('Float projection source changed.');};
   check();const output=new Float32Array(bounds.width*bounds.height*4);
+  // A native integer lattice needs no interpolation. This is especially common
+  // while composing complete native scenes before final frame resampling.
+  if(matrix.a===1&&matrix.b===0&&matrix.c===0&&matrix.d===1&&Number.isSafeInteger(matrix.e)&&Number.isSafeInteger(matrix.f)){
+    const nx=bounds.x-matrix.e,ny=bounds.y-matrix.f,left=Math.max(0,nx),top=Math.max(0,ny),right=Math.min(width,nx+bounds.width),bottom=Math.min(height,ny+bounds.height);
+    if(right<=left||bottom<=top)return output;
+    const w=right-left,h=bottom-top,native=await source.readWindow({x:left,y:top,width:w,height:h},{signal:control.signal,onProgress:check});check();validateFloatWorkerWindow(native);
+    if(native.length!==w*h*4)throw new Error('Float projection read differs from requested native geometry.');
+    if(w===bounds.width)output.set(native,(top-ny)*bounds.width*4);
+    else for(let row=0;row<h;row++)output.set(native.subarray(row*w*4,(row+1)*w*4),((top-ny+row)*bounds.width+left-nx)*4);
+    let deadline=performance.now()+2;
+    for(let at=0;at<output.length;at+=4){
+      // Keep the sampler's transparent and signed-zero canonicalization. A
+      // completed artboard's separate aligned-frame API retains native words.
+      if(output[at+3]===0)output[at]=output[at+1]=output[at+2]=output[at+3]=0;
+      else for(let c=0;c<3;c++)if(output[at+c]===0)output[at+c]=0;
+      if((at&127)===0&&performance.now()>=deadline){check();await yieldTask();check();deadline=performance.now()+2;}
+    }
+    check();return output;
+  }
   const corners=[matrix.point({x:0,y:0}),matrix.point({x:width,y:0}),matrix.point({x:width,y:height}),matrix.point({x:0,y:height})];
   const left=Math.min(...corners.map(p=>p.x)),right=Math.max(...corners.map(p=>p.x)),top=Math.min(...corners.map(p=>p.y)),bottom=Math.max(...corners.map(p=>p.y));
   const axis=matrix.b===0&&matrix.c===0||matrix.a===0&&matrix.d===0;

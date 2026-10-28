@@ -4,6 +4,22 @@
 
 core/float-document gates scene structure and asset roles. engine/float-asset admits originals with bounded display-only thumbnails; float-scene captures original and coverage-source leases, uses float-projection and native float operations, applies each authored erasure through float-coverage before intrinsic clipping shape, runs continuous Curves/Levels through the owned native transfer worker, and converts only final display/output samples. float-delivery/float-tiff own profile-aware file sessions. Model/OO/shared command schema 49, independent source caches and existing host/isolated boundaries remain separate. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
+## Connected native float blend modes
+
+The float document gate and custom Inspector admit every existing blend enum.
+The generated isolated runtime must be rebuilt from that same model validation;
+source-host success alone does not establish sandbox support.
+`engine/float-scene` passes raster, isolated group and restored clipping-base
+modes to the native float compositor. `float-adjustment-blend` computes opaque
+blend colors, restores the captured backdrop alpha and uses coverage
+interpolation; Normal retains its prior exact path. Complete normalized RGB is
+required for artistic modes; finite extended Normal remains supported. Pixel
+failures publish no output. `useCanvasRenderer` retains a failure until a current
+successful presentation; App hides stale artwork and shows a persistent preview
+error instead of Ready. Source ownership, native-first frame order, OO/history,
+script/plugin grants and separate REST remain unchanged. Contract and remaining
+HDR/precision/performance gates: [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md).
+
 ## Native-first float frame sampling
 
 `engine/float-scene` resolves the captured scene on native world pixels;
