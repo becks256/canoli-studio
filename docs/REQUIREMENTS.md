@@ -1115,3 +1115,15 @@ public mutable inputs remain defensive. Verify actual worker destruction, no
 cross-run globals, malformed input/results, network isolation, permissions,
 fonts, concurrent human edits, cancellation/timeout and one-step Undo. Retain
 five-second and 256-command budgets, separate REST and all unfinished F14 gates.
+
+
+## Cold layer-composition scheduling (F14)
+
+Cold byte-layer stacks must admit queued input/cancellation between bounded
+bursts while preserving order, full native pixels, source/font ownership and
+complete-frame publication. Nested groups share the same budget; cancellation
+releases temporary canvases and cannot publish an obsolete document frame.
+Distinguish benchmark setup tasks from actual user-control intervals. Verify
+native independent pixels, retry, real document switching, complete compiled
+before/after output and whole-editor performance; keep individual native calls,
+sustained/all-tool/device/global-memory and the full roadmap gates open.

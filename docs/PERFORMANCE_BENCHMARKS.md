@@ -742,3 +742,26 @@ All six measured filter-mask medians improve. Other paths are mixed: the unaffec
 The candidate also passes 19 focused grid/coverage checks, all 13 direct worker equation combinations, 24 cached/cropped styled-source comparisons and actual 50 MP original-byte/dimension/project preservation. [Sealed native-tone input evidence](benchmarks/native-tone-input-coalescing-2026-10-21.json) retains all final results and earlier experiment dependencies; all 46 previous sealed artifacts remain byte-identical. Final main validation follows below. The complete original roadmap and broader F14 gates remain active.
 
 Final verification passes the main production build, 1,458 unit/API cases across 178 files, 94 affected native cases and 86 production workflows, with no accepted skips/retries/flakes. All 54 actual served production resources and native WASM match the build; all 51 non-documentation resources match the frozen measured candidate. Only the three published developer guides differ. Engine/test/release identities are frozen across the browser jobs, WASM remains identical to the control, and all 46 prior sealed artifacts are unchanged. These checks establish this exact native-tone optimization and its measured workload; they do not establish full F14 or complete-roadmap acceptance.
+
+
+## 2026-10-28 — Cold layer scheduling attribution and measurements
+
+The earlier whole-editor sweep's 207 ms long task in the font-management fixture
+is not a measured font-replacement command stall. Aligned CPU/task samples place
+it in synchronous benchmark fixture construction, before the dialog opens.
+A separate cold text-render task measures 86 ms; actual replacement commands
+commit in 5–9 ms in the diagnostic. Retain the original observations and sealed
+artifacts, but do not use their broad fixture label as causal attribution.
+
+Font diagnostics now retain task start/duration and fixture/dialog/replacement
+phase stamps without dropping any task. The new flat/grouped cold-render cases
+measure queued input and full-render completion separately, keep all twelve
+samples and complete native pixel digests, and exclude fixture construction
+explicitly from their render interval. They complement rather than replace the
+existing whole-editor/control cases. Three alternating comparisons record queued-input p95 improving from 48.6–58.0
+to 8.8–10.6 ms for flat text and 54.6–64.0 to 9.2–30.8 ms for grouped text.
+Full-render p95 remains 46.7–63.9 ms with mixed throughput; all 144 complete frame
+digests match. The expanded 79-case performance sweep passes. Complete native,
+unit/build and normal-production acceptance is recorded in the dated roadmap and
+[measurement report](benchmarks/layer-render-performance-2026-10-28.md). Full F14
+and the complete original roadmap remain required.

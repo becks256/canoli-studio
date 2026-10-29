@@ -2045,3 +2045,26 @@ sessions cannot enter the idle cache; clear/disposal retires owned idle state.
 IccSession.dispose still terminates immediately. Model, schema, public commands,
 Undo, source resolution, file contracts and isolated/REST grants are unchanged.
 See ICC_ENGINE.md and FLOAT_DOCUMENTS.md for scope and remaining F14 gates.
+
+
+## Cooperative byte-compositor layer boundaries (F14)
+
+The existing eight-millisecond native-tile task budget is shared by ordinary
+byte-compositor layer stacks, recursive groups and bounded layer work too. An
+expired budget yields through the existing disposable MessageChannel helper and
+checks cancellation before continuing. Promise-only layer continuations do not
+admit input tasks. Layer order, complete-frame publication, output grids, native
+text drawing, source resolution and cache/font invalidation retain their existing
+contracts. Float scenes keep their separate native pipeline. Individual native
+Canvas calls, graph/setup work and final copies remain non-preemptible; this is
+cooperative scheduling, not an eight-millisecond or 60fps guarantee. Dated
+correctness and performance acceptance is recorded in the roadmap.
+
+
+Development dependency scanning explicitly includes paper/dist/paper-core.js,
+which the SVG/Boolean boundary first reaches after startup. A fresh-cache server
+otherwise discovers this CommonJS entry during the font/plugin/SVG workflow and
+its optimizer sends full-reload, interrupting the running page. Pre-optimization
+keeps that development session intact. This changes no runtime geometry kernel,
+production permission or artifact contract; fresh-cache verification and exact
+built resource identities are recorded with the F14 evidence.

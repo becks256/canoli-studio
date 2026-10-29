@@ -117,7 +117,7 @@ export interface RenderOptions {
 interface CanvasRenderOptions extends RenderOptions {
   /** Bounded sharing within one render only, including uncached reference/export work. */
   frequencyScratch?:FilterTileCache;
-  /** Shared by recursive native tiles so source shortcuts still allow input/cancellation. */
+  /** Shared by recursive layers and native tiles for input/cancellation. */
   taskBudget?:{deadline:number};
   componentDepth?: number;
   /** Internal basis for isolated GPU reference rendering; never serialized. */
@@ -705,6 +705,13 @@ export class CanvasRenderer implements DocumentRenderer {
       const targetContext = target.getContext("2d")!;
       const stacks=clippingMembers?nodes.map(base=>({base,layers:[]as LayerData[]})):clippingStacks(nodes);
       for (const stack of stacks) {
+        // Promise continuations between layers do not let input tasks run. Share
+        // the native-tile budget through groups and bounded layer recursion too.
+        if (options.taskBudget && performance.now() >= options.taskBudget.deadline) {
+          await yieldTask();
+          options.taskBudget.deadline = performance.now() + 8;
+        }
+        checkRenderCurrent(options.isCancelled);
         const clipped=stack.layers.filter(node=>node.visible&&node.opacity>0);
         // A group used as a clipping base needs intrinsic transparency rather
         // than a copy of the external sibling backdrop.

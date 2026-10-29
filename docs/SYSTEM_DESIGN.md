@@ -843,3 +843,14 @@ strict commands, permissions, assets/revisions, five-second/256-command budgets,
 rollback and atomic Undo remain. Completion/cancellation closes both channels and
 removes the iframe/worker. Inert installation, package schema and separate REST
 sessions gain no new capability. Dated acceptance remains in the roadmap.
+
+
+## Byte-compositor input boundaries (F14)
+
+The existing shared eight-millisecond task deadline now covers ordinary layer
+stacks, groups and bounded layer recursion as well as native filter tiles.
+An expired deadline yields through a disposable MessageChannel and rechecks
+cancellation. Complete-frame publication, layer order, source geometry, native
+text/pixels, cache/font invalidation and existing private cleanup remain. Float
+scenes retain their separate pipeline. Native calls and graph/setup work are
+not interrupted; broad performance/device/global-memory acceptance remains open.

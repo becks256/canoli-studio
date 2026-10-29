@@ -7683,3 +7683,131 @@ working-space and photographic/interchange quality, global memory and physical
 GPU/display/tablet/device acceptance, AI/provider/evaluation, live installed
 ChatGPT/identity, collaboration, specialist and commercial gates remain required.
 The complete original implementation-roadmap objective remains active.
+
+
+### 2026-10-28 — Dense-text/editor layout attribution (in progress)
+
+Owner: implementation agent; estimate XL within T01/F14, starting at clean
+`83396ff`. The prior scripting increment is verified and committed. The full
+original professional-editor/AI/workflow roadmap remains active.
+
+The complete sweep reports a 207 ms task during the 64-layer font-management
+fixture. A frozen-baseline CPU/task diagnostic reproduces a 206 ms task before
+the dialog opens; actual replacements commit in 5–9 ms. Do not label the earlier
+stall as font-command work. Locate the actual initial render/layout boundary,
+then reduce proven redundant work while preserving full-resolution artwork,
+native text/shaping, complete pixels, commands/Undo, source/font invalidation,
+independent REST and isolated script/plugin grants. Retain real control timing,
+whole-editor coverage and all unfinished F14/roadmap gates.
+
+
+### 2026-10-28 — Repeated development navigation interruption reproduced
+
+Within the active cold-layer T01/F14 increment, the first 46-case native matrix
+passes 45 cases and loses the page context in the recurring font/plugin/SVG
+transport case. Fresh-cache tracing reproduces Vite's full-reload frame. A
+server send-stack and dependency-registration receipt identify
+paper/dist/paper-core.js: the SVG/Boolean boundary discovers this CommonJS
+worker dependency after startup and runOptimizer forces a reload. This supplies
+new causal evidence for the reproduced failure; prior sealed runs remain intact.
+
+Add that existing dependency to optimizeDeps.include. The formerly failing
+complete workflow now passes on a genuinely fresh cache with zero server/client
+full-reload events. A fresh benchmark rebuild verifies all non-documentation
+release bytes are unchanged; only generated architecture/system-design pages
+differ. Preserve the measured before/after releases and their complete identities
+rather than relabeling them. The full native matrix is rerunning with a separate
+fresh cache before unit/normal-build/production acceptance. Failed traces,
+initial invalid layer-count fixture and helper log collisions remain preserved.
+
+
+### 2026-10-28 — Verification memory pressure relieved without losing evidence
+
+The corrected fresh-cache native run passes 45/46 cases, including the formerly
+interrupted font/plugin/SVG workflow, but the independent 50 MP clipping reader
+times out after the browser files are produced. The environment has roughly
+1.1 GiB available RAM and saturated 8 GiB swap during verification. Preserve the
+failure and every source/pixel/deadline assertion; do not relabel it as a pass or
+lower output resolution.
+
+Verify all 69 stored immutable synthetic 50 MP DNG copies against the pinned
+compressed fixture hash, then consolidate 67 exact duplicates using same-device
+hardlinks. Every original path remains a regular file with exact bytes/mode;
+receipts retain inode/mtime metadata for reversible materialization. No prior
+sealed artifact or source bytes are discarded. This reclaims about 6.7 GB of
+backing storage and leaves about 7.6 GiB RAM available. It is verification
+environment housekeeping, not an editor memory-improvement claim.
+
+The unchanged independent reader then verifies the exact previously timed-out
+PNG/PSB files in 21.9 seconds, retaining the 180-second subprocess deadline and
+complete original/preview/member/base-alpha comparisons. A new fresh-cache full
+native run is active before unit, normal build and production acceptance.
+
+
+### 2026-10-28 — Cooperative layer input boundaries verified (bounded T01/F14)
+
+Owner: implementation agent; estimate XL. Starting at `83396ff`, ordinary byte
+layer composition now shares the existing eight-millisecond native-tile deadline
+through flat stacks, groups and bounded recursion. Expired work yields to the
+input/task queue and checks cancellation before continuing. Complete frames,
+layer order, native pixels, original resolution, caches/fonts, OO commands/Undo,
+strict grants and independent REST retain their contracts. Individual native
+calls and graph/command setup remain non-preemptible; float scenes keep their
+separate pipeline.
+
+Three alternating release comparisons retain twelve samples for each flat/
+grouped cold case and each existing 16/64-layer real font-control case. Queued
+input p95 improves from 48.6–58.0 to 8.8–10.6 ms for flat text and 54.6–64.0 to
+9.2–30.8 ms for grouped text. Every candidate task runs before composition
+completes (72/72), versus 0/72 before. All 144 complete frame digests match,
+covering 276,480,000 hashed RGBA bytes. Complete-render p95 remains 46.7–63.9 ms
+with mixed throughput. Real font-presentation p95 is also mixed: the 64-layer
+pairs change 92.8/70.0/97.9 to 99.0/112.7/77.1 ms. Do not treat input fairness
+as font-presentation, all-tool, sustained 60fps or physical-display acceptance.
+
+The earlier 207 ms font-fixture task is correctly attributed to setup before
+the dialog/control interval. Raw task clocks, CPU stacks and all original
+observations remain. The candidate diagnostic still retains a 209 ms setup
+task; no such work is discarded. Actual replacement commands take roughly
+5–9 ms in the baseline diagnostic, while full user-visible presentation remains
+above target. Extra clean script measurements after resource recovery retain
+286.8/310.7 ms p95; the generated isolated runtime is byte-identical to the prior
+committed release and no script throughput improvement is claimed.
+
+All 2,871 unit tests in 286 files, the normal build, 46 native browser cases in
+ten files, 79 complete performance cases in 32 files, all 175 normal-production
+cases and four final compiled scheduling cases pass. New native references
+compare all 3,840,000 RGBA channels of two complete flat/grouped images exactly.
+Queued input, private-canvas release, cancellation/retry and rejection of an
+obsolete text frame on document switching pass. Final identities cover 2,995
+source inputs, 50 generated files and 142 normal release files. Pixel WASM and
+four tracked native codec binaries are unchanged.
+
+The reproduced development failure is fixed by explicitly pre-optimizing the
+existing Paper core dependency before SVG/Boolean use. A fresh-cache complete
+workflow passes without optimizer reloads, and a separate fresh-cache full
+native run passes. Fresh rebuild proof preserves every non-documentation timed
+application resource exactly; two generated guides differ. Earlier reload
+failures remain retained. A later 50 MP independent-reader timeout under
+observed memory/swap pressure is also retained. Byte-verified consolidation of
+67 duplicate immutable DNG copies keeps all 69 regular-file paths and bytes,
+reclaims about 6.7 GB backing storage, and preserves reversible metadata receipts.
+The unchanged reader verifies the exact old files in 21.9 seconds; the complete
+native run then passes within unchanged budgets. This is verification storage
+housekeeping, not an editor/global-memory acceptance claim. Initial invalid
+128-layer grouping and helper log collisions also remain preserved.
+
+[Measurements and tradeoffs](benchmarks/layer-render-performance-2026-10-28.md)
+and [sealed evidence](benchmarks/layer-render-performance-2026-10-28.zip) retain
+all source/release identities, raw reports/actual terminals, complete pixels,
+CPU/task attribution, lifecycle checks, preservation receipts and failures.
+Instrumented/source/benchmark/normal-production modes remain distinct, and
+prior commits/artifacts are retained.
+
+This accepts the bounded input/cancellation improvement and resolved fresh-cache
+development interruption. Full F14 and the complete original roadmap remain
+active: synchronous setup, frame/font/script/document/retouch tails, sustained
+all-tool timing, broader float/HDR/working-space and photographic/interchange
+quality, global memory and physical GPU/display/tablet/device acceptance,
+AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
+and commercial gates remain required.
