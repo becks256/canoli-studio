@@ -136,6 +136,16 @@ export class FloatSceneRenderer {
      for(const stack of stacks){
       const layer=stack.base,clipped=stack.layers.filter(member=>member.visible&&member.opacity>0);
       check();if(!layer.visible||layer.opacity===0)continue;const world=parent.multiply(localTransform(layer)),coverage=await mask(layer,world,area),opacity=layer.opacity*(layer.fillOpacity??1),mode=layer.blendMode==='pass-through'?'normal':layer.blendMode;
+      const shadow=layer.styles?.dropShadow,activeShadow=!!shadow?.enabled&&shadow.opacity>0;
+      // Only an unmodified native raster has no remaining color/geometry work
+      // whose validation could fail before zero Fill/mask coverage is applied.
+      // Groups, tone effects, erasures and general affine projections keep the
+      // complete intrinsic path, including hidden-color/overflow validation.
+      let directRaster=false;
+      if(activeShadow&&layer.kind==='raster'&&!layer.erasures?.length&&!layer.effects.some(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0))){
+       const source=sources.get(layer.assetId)!.source,placement=renderTransform(full,world).multiply(AffineTransform.scale(layer.width/source.width,layer.height/source.height));
+       directRaster=placement.a===1&&placement.b===0&&placement.c===0&&placement.d===1&&Number.isSafeInteger(placement.e)&&Number.isSafeInteger(placement.f);
+      }
       const composite:PixelProcessor['floatComposite']=async(source,backdrop,options)=>{
        try{return await this.processor.floatComposite(source,backdrop,options);}
        catch(error){if(error instanceof Error&&error.message.startsWith('This blend mode requires normalized RGB'))throw new Error(`${layer.name} (${mode}): ${error.message}`);throw error;}
@@ -146,12 +156,23 @@ export class FloatSceneRenderer {
        if(layer.kind==='group')return paint(layer.children,new Float32Array(region.width*region.height*4),world,false,region);
        throw new Error('A shadow requires intrinsic artwork pixels.');
       };
-      const compositeStyled=async(pixels:Float32Array,fill:number):Promise<Float32Array>=>{
-       const shadow=layer.styles?.dropShadow;
-       if(!shadow?.enabled||shadow.opacity===0){const styled=await applyFloatStyle(layer,pixels,backdrop,coverage,this.processor,check);return composite(styled.pixels,backdrop,{mode,opacity:layer.opacity*fill,mask:styled.mask});}
-       const field=await renderFloatShadow(area,shadow,async region=>{const intrinsic=await readIntrinsic(region),coverage=await mask(layer,world,region);return floatAlphaPlane(intrinsic,coverage,check);},this.processor,check,{store:shadowCache,key:layer.id});check();
-       const foreground=await fillFloatCoverage(pixels,coverage,fill,check),overlay=await applyFloatStyle(layer,foreground,backdrop,undefined,this.processor,check,'overlay');
-       const appearance=await this.processor.floatComposite(overlay.pixels,field,{mode:'normal'});check();
+      const compositeStyled=async(pixels:Float32Array|undefined,fill:number):Promise<Float32Array>=>{
+       if(!activeShadow){if(!pixels)throw new Error('Float foreground pixels are missing.');const styled=await applyFloatStyle(layer,pixels,backdrop,coverage,this.processor,check);return composite(styled.pixels,backdrop,{mode,opacity:layer.opacity*fill,mask:styled.mask});}
+       const field=await renderFloatShadow(area,shadow!,async region=>{
+        if(directRaster){const coverage=await mask(layer,world,region);if(coverage&&!coverage.some(value=>value!==0)){check();return new Float32Array(region.width*region.height);}return floatAlphaPlane(await readIntrinsic(region),coverage,check);}
+        const intrinsic=await readIntrinsic(region),coverage=await mask(layer,world,region);return floatAlphaPlane(intrinsic,coverage,check);
+       },this.processor,check,{store:shadowCache,key:layer.id});check();
+       let appearance:Float32Array;
+       if(fill===0){
+        // Foreground alpha is exactly zero. Intrinsic operations above/at the
+        // call site still validate unless the original native raster is direct.
+        // Normal zero-over is exact identity, including hidden backdrop words.
+        if(mode==='normal'&&!field.some((value,index)=>index%4===3&&value!==0)){check();return backdrop;}
+        appearance=field;
+       }else{
+        if(!pixels)throw new Error('Float foreground pixels are missing.');const foreground=await fillFloatCoverage(pixels,coverage,fill,check),overlay=await applyFloatStyle(layer,foreground,backdrop,undefined,this.processor,check,'overlay');
+        appearance=await this.processor.floatComposite(overlay.pixels,field,{mode:'normal'});check();
+       }
        const gated=await applyFloatStyle(layer,appearance,backdrop,undefined,this.processor,check,'blend-if');
        return composite(gated.pixels,backdrop,{mode,opacity:layer.opacity,mask:gated.mask});
       };
@@ -168,7 +189,7 @@ export class FloatSceneRenderer {
         else{const after=await paint(layer.children,backdrop.slice(),world,false,area);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
        }else{const pixels=await readIntrinsic(area);backdrop=await compositeStyled(pixels,layer.fillOpacity??1);}
       }else if(layer.kind==='raster'){
-       const pixels=await raster(layer,world,area);check();backdrop=await compositeStyled(pixels,layer.fillOpacity??1);
+       const fill=layer.fillOpacity??1,pixels=directRaster&&fill===0?undefined:await raster(layer,world,area);check();backdrop=await compositeStyled(pixels,fill);
       }else if(layer.kind==='adjustment'&&(layer.adjustment.kind==='tone'||layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'||layer.adjustment.kind==='white-balance'||isFloatColorAdjustment(layer.adjustment)||layer.adjustment.kind==='gradient-map'||layer.adjustment.kind==='lut')){
        check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):layer.adjustment.kind==='white-balance'?await balance(layer.id,backdrop):isFloatColorAdjustment(layer.adjustment)?await this.processor.floatColor(backdrop,layer.adjustment):layer.adjustment.kind==='gradient-map'?await this.processor.floatGradient(backdrop,layer.adjustment):layer.adjustment.kind==='lut'?await lookups.get(layer.id)!.apply(backdrop):await this.processor.floatTransfer(backdrop,layer.adjustment);check();const styled=await applyFloatStyle(layer,after,backdrop,coverage,this.processor,check);backdrop=await blendFloatAdjustment(backdrop,styled.pixels,mode,opacity,styled.mask,{floatComposite:composite},check);
       }else throw new Error('Unsupported float scene layer.');

@@ -894,9 +894,12 @@ The mask is not applied a second time to the shifted shadow. Completed native
 appearance precedes viewport/frame filtering and native PNG/TIFF/PDF delivery.
 Shadow disabled or zero opacity takes the exact previous no-shadow path.
 
-Each native request stays within 262144 alpha samples. Output blocks are at most
-128 by 128, source halo reads use 32-row bands, and the horizontal intermediate
-contains alpha only. The capture-local Gaussian alpha LRU retains at most 16 MiB
+Each native request stays within 262144 alpha samples. Output block edges adapt
+to blur/fractional offset (at most 512), keeping the complete horizontal
+intermediate/vertical input within that same alpha budget. Source halo bands
+use the existing 262144-pixel working budget; the intermediate contains alpha
+only. Native raster alpha is read once for each required band rather than
+repeated 32-row reads. The capture-local Gaussian alpha LRU retains at most 16 MiB
 and clears on disposal. These are working allocation budgets; source/artboard
 resolution is unchanged. Native worker validation, source ownership, cancellation,
 revision/grants, shared Undo, project/workspace and recipe contracts remain.
@@ -927,3 +930,14 @@ print('Float shadow example ready');
 This extends the existing linear-sRGB float scene subset. It does not establish
 Photoshop shadow equivalence, all-float layer/tool support, HDR/CMYK delivery,
 sustained 60fps or complete editor/device/process-memory performance acceptance.
+
+
+Native shadow evaluation validates complete returned alpha planes before omitting
+zero convolution work. At zero Fill, an unmodified original raster on the native
+integer grid can omit unused foreground reads and fully masked halo reads after
+original preparation. Groups, active raster effects/erasures and other affine
+projections retain intrinsic evaluation and its hidden-color/domain/overflow
+failures before own Fill/masks. Artistic blending still validates its required
+backdrop even when the shadow is empty. Capture/source lifetime checks guard
+these paths, including cancellation after an empty mask read. These are private
+execution optimizations, with unchanged public style/history/transport semantics.

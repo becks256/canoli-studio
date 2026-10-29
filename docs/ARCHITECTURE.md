@@ -6,7 +6,7 @@
 
 `core/float-shadow` validates the private alpha protocol; `convolveAlphaFloat`
 computes normalized finite Gaussian axes in owned worker/WASM memory.
-`engine/float-shadow` requests narrow intrinsic-alpha halo bands and retains a
+`engine/float-shadow` coalesces intrinsic-alpha halo reads within existing native working budgets and retains a
 capture-local 16 MiB LRU of Gaussian alpha fields. Source rasters remain native;
 only alpha enters convolution. Capture disposal clears these fields. Scene
 recursion carries each native region through groups, masks and clipping before

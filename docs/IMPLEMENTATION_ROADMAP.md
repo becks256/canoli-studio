@@ -8025,3 +8025,47 @@ full HDR/working-profile/CMYK delivery and broader interchange, sustained all-to
 F14 latency/process-memory/device gates, and every unfinished original
 professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
 requirement remain active. The full original roadmap remains active.
+
+
+### 2026-10-29 — F14 native shadow source-read performance (measured progress)
+
+Owner: implementation agent; delivered the M T17/F10/F14 increment beginning at
+`153617a`. Bounded adaptive halo/output batching reduces redundant native reads.
+Validated empty alpha omits native work; unmodified native-grid rasters omit
+unused zero-Fill foreground and fully masked source reads. Other intrinsic
+operations retain hidden-color/domain/overflow validation, artistic backdrop
+checks and captured source/cancellation/history semantics. Temporary RGBA bands
+may reach 4 MiB within the existing wire budget; no global-memory claim follows.
+
+Same original, controls and fixed two-MP scan: cold time changes from
+36.571 s to 10.564 s; source reads from
+1024 to 108.
+Retained time changes from 2.528 s to
+0.927 s, with no source rereads. Every round matches all
+8388608 independent RGBA words. Import remains about 120 seconds. A real normal-
+production 12-input drag changes p95 from 203.6 ms to
+84.2 ms with exact independently matching canvas alpha, one Undo,
+originals and no recorded drag-period long tasks. It still misses the unchanged
+33 ms target; this is not full F14 or continuous-60fps acceptance.
+
+The complete 50 MP shadow workflow improves from 595.189 s to
+226.145 s under the unchanged 600-second limit.
+All 200000000 PNG channel values, complete profile/container, source hash/native
+geometry and Undo remain exact. Visible outside-mask witnesses prevent vacuous
+acceptance. All 3684244 saved native RGBA words across 89
+shadow/appearance scenes are bit-identical to the actual accepted baseline.
+
+Full build/final typecheck and all 2959 unit/API tests across 289 files pass.
+One complete 46-case native matrix across 13 files and all 180 normal-production
+workflows pass without skips, retries, flakes or failures, with frozen
+source/release identities. Independent files, exact source/history/persistence/
+recipes and new hidden-error/empty-mask cancellation checks pass. The no-tests
+selector attempt is retained and excluded; no threshold or deadline was widened.
+Unused regenerable Vite cache was verified/backed up before reclaiming 11.8 MB;
+this task's dev cache uses RAM, with all sources/historical evidence preserved.
+[Measurements, limits and compact verification record](benchmarks/float-shadow-performance-2026-10-29.md).
+
+Import and remaining input latency, all-tool/global-memory/device F14, other
+float/layer/tool/HDR/color/interchange requirements and every unfinished original
+professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
+gate remain active. The complete original roadmap remains active.

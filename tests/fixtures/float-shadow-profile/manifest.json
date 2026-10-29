@@ -1,0 +1,15 @@
+{
+  "baseline": "153617a3e508d66f4883a3e42eb8b54f2ec9e77e",
+  "files": {
+    "float-scene": {
+      "file": "float-scene.ts.gz",
+      "rawSha256": "9119c4ba036af2fe357d605e186f7b2d720ce552b4dae2583aa383da838a27b4",
+      "sha256": "afe237b93cd3322ebb4f362996b1d91c7dde5cdfd8714b648cb63d1cc7e170a2"
+    },
+    "float-shadow": {
+      "file": "float-shadow.ts.gz",
+      "rawSha256": "d4dfc9a520f42eae71abd039e80941eb92daf898459d1e4c596a0ad7a3572db4",
+      "sha256": "16a72ad8d540055e4ea1e0a97323cbbcabe08ee36856ee05abbdcb29df368bfc"
+    }
+  }
+}

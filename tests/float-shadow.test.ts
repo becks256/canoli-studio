@@ -38,6 +38,16 @@ it('shadow cancellation after a completed native band rejects before publication
  let canceled=false,calls=0;const settings={...defaultStyle().dropShadow,enabled:true,blur:128};
  await expect(renderFloatShadow({x:0,y:0,width:129,height:129},settings,async b=>new Float32Array(b.width*b.height).fill(.5),{floatConvolveAlpha:async(a,o)=>{calls++;const result=native.convolveAlpha(a,o);canceled=true;return result;}},()=>{if(canceled)throw new Error('closed shadow');})).rejects.toThrow('closed shadow');expect(calls).toBe(1);
 });
+it('validated empty halos skip native work within the original window budget and retain exact cached zeros',async()=>{
+ let reads=0,calls=0,maximum=0;const store=new FloatShadowCache(),settings={...defaultStyle().dropShadow,enabled:true,blur:128},bounds={x:0,y:0,width:271,height:137},source=async(b:{x:number;y:number;width:number;height:number})=>{reads++;maximum=Math.max(maximum,b.width*b.height);return new Float32Array(b.width*b.height);},processor={floatConvolveAlpha:async()=>{calls++;throw new Error('Empty alpha must not enter native convolution.');}};
+ const first=await renderFloatShadow(bounds,settings,source,processor,()=>{},{store,key:'empty'});expect(first.every(v=>v===0)).toBe(true);expect(maximum).toBeLessThanOrEqual(262144);expect(calls).toBe(0);const before=reads;
+ expect(words(await renderFloatShadow(bounds,settings,source,processor,()=>{},{store,key:'empty'}))).toEqual(words(first));expect(reads).toBe(before);store.clear();await renderFloatShadow(bounds,settings,source,processor,()=>{},{store,key:'empty'});expect(reads).toBeGreaterThan(before);
+});
+it('empty shortcuts still reject malformed alpha and cancellation after an awaited source',async()=>{
+ const bounds={x:0,y:0,width:128,height:64},settings={...defaultStyle().dropShadow,enabled:true,blur:2.5},processor={floatConvolveAlpha:async()=>{throw new Error('Unexpected native work.');}};
+ await expect(renderFloatShadow(bounds,settings,async b=>{const alpha=new Float32Array(b.width*b.height);alpha[alpha.length-1]=NaN;return alpha;},processor,()=>{})).rejects.toThrow('finite');
+ let closed=false;await expect(renderFloatShadow(bounds,settings,async b=>{closed=true;return new Float32Array(b.width*b.height);},processor,()=>{if(closed)throw new Error('closed source');})).rejects.toThrow('closed source');
+});
 it('public raster and isolated group shadows share exact Undo, conversion and transaction boundaries',()=>{
  const document=new Document(),raster=document.layers.add(new RasterLayer({assetId:'source',width:10,height:10})),group=document.layers.add(new LayerGroup()),adjustment=document.layers.add(new AdjustmentLayer());document.convertToFloat();const before=document.toJSON();
  document.transaction('Float shadows',()=>{raster.fillOpacity=0;raster.styles=new LayerStyle({dropShadow:{enabled:true,x:9.25,blur:128}});group.styles.dropShadow={enabled:true,y:-4.75};});const edited=document.toJSON();expect(Document.fromJSON(edited).toJSON()).toEqual(edited);document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(edited);

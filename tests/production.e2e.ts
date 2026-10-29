@@ -2214,3 +2214,4 @@ test('production float CMYK device proofing retains native profiles, controls, U
 
 test('production float Color Overlay and Blend If retain controls, native files, isolated commands, Undo and originals without developer globals',async({page},info)=>{const{floatStyleWorkflow}=await import('./helpers/float-style');await floatStyleWorkflow(page,info,true);});
 test('production float shadows retain Inspector, isolated guide, native files, Undo and original-bearing projects',async({page},info)=>{const{floatShadowWorkflow}=await import('./helpers/float-shadow');await floatShadowWorkflow(page,info,true);});
+test('production float shadow pointer updates match independent frames and retain one Undo',async({page},info)=>{const{floatShadowInteraction}=await import('./helpers/float-shadow-interaction');await floatShadowInteraction(page,info,true);});
