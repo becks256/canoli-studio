@@ -1127,3 +1127,16 @@ Distinguish benchmark setup tasks from actual user-control intervals. Verify
 native independent pixels, retry, real document switching, complete compiled
 before/after output and whole-editor performance; keep individual native calls,
 sustained/all-tool/device/global-memory and the full roadmap gates open.
+
+
+## Committed viewport response (F14)
+
+Already-visible documents should admit eligible committed content revisions
+without waiting unnecessarily for another frame. Keep view-only and gesture
+preview cadence, first-owner fitting, single-active latest-job coalescing,
+document-instance/source/font/backend/color validation and complete-frame
+publication. An older view wait must not delay a newly eligible edit or publish
+stale parameters. Verify paused-frame committed edit/Undo/Redo, pending-view
+interruption, ordinary view coalescing, new/identical-data owner transitions,
+exact pixels, real controls and sustained/editor-wide limits. No new public
+model/command/grant or completion of full F14 is implied.

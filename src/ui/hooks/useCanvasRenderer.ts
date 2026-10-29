@@ -48,6 +48,7 @@ export function useCanvasRenderer({
   onError,
 }: UseCanvasRendererOptions): UseCanvasRendererResult {
   const colorState=editor.colorSettings;
+  const documentOwner = editor.document;
   const [rendering, setRendering] = useState(false);
   const [renderError, setRenderError] = useState<string | null>(null);
   const [proofFrame,setProofFrame]=useState<{proof:typeof colorProof;failed:boolean;colorState:typeof colorState}|null>(null);
@@ -81,6 +82,8 @@ export function useCanvasRenderer({
   onCleanupCursorRef.current = onCleanupCursor;
 
   const latestRender = useRef<{
+    owner: EditorApplication["document"];
+    committedEdit: boolean;
     document: DocumentData;
     colorState:typeof colorState;
     assets: typeof assets;
@@ -100,6 +103,19 @@ export function useCanvasRenderer({
   const renderActive = useRef(false);
   const renderVersion = useRef(0);
   const gestureFrame = useRef<{ gesture: object; ready: Promise<void> } | null>(null);
+  const presentedDocument = useRef<EditorApplication["document"] | null>(null);
+  const frameWait = useRef<{ wake(): void } | null>(null);
+
+  async function waitForFrame(ready: Promise<void>, cancel?: () => void) {
+    let wake!: () => void;
+    const interrupted = new Promise<void>(resolve => {
+      wake = () => { cancel?.(); resolve(); };
+    });
+    const current = { wake };
+    frameWait.current = current;
+    try { await Promise.race([ready, interrupted]); }
+    finally { if (frameWait.current === current) frameWait.current = null; }
+  }
 
   const isObsolete = (job: NonNullable<typeof latestRender.current>): boolean => {
     const target = renderTarget.current;
@@ -136,6 +152,7 @@ export function useCanvasRenderer({
       target.fontRevision===job.fontRevision&&target.backendState===job.backendState;
 
     return !!(
+      editor.document !== job.owner ||
       editor.document.getSnapshot().document !== job.sourceDocument ||
       editor.assetStore !== job.hostAssets ||
       editor.colorSettings !== job.colorState ||
@@ -151,13 +168,29 @@ export function useCanvasRenderer({
 
 
   useLayoutEffect(() => {
+    const owner = documentOwner;
+    const sourceDocument = owner.getSnapshot().document;
+    const previous = renderTarget.current;
+    if (presentedDocument.current !== owner) presentedDocument.current = null;
+    // React has already committed this atomic content revision. Views and
+    // previews still coalesce at a frame boundary; a new owner must fit first.
+    const committedEdit = presentedDocument.current === owner &&
+      previous?.owner === owner && previous.sourceDocument !== sourceDocument &&
+      previous.sourceDocument.id === sourceDocument.id &&
+      previous.region === renderRegion && previous.zoom === zoom &&
+      previous.fontRevision === fontRevision && previous.backendState === backendState &&
+      previous.colorState === colorState && previous.options.colorProof === colorProof &&
+      previous.hostAssets === assets && viewDocument === sourceDocument &&
+      !paintPreview && !wetPreview && !previewGesture;
     const key = ++renderVersion.current;
     latestRender.current?.release?.();
     latestRender.current = {
+      owner,
+      committedEdit,
       document: viewDocument,
       colorState,
       gesture: previewGesture,
-      sourceDocument: editor.document.getSnapshot().document,
+      sourceDocument,
       zoom, fontRevision, backendState,
       assets,
       hostAssets:wetPreview?.hostAssets??assets,
@@ -173,6 +206,8 @@ export function useCanvasRenderer({
       },
     };
     renderTarget.current = latestRender.current;
+    // An older view's frame wait must not delay an eligible content edit.
+    if (committedEdit) frameWait.current?.wake();
 
     async function drain() {
       if (renderActive.current) return;
@@ -186,11 +221,17 @@ export function useCanvasRenderer({
           // if that boundary passed during preparation, do not wait a new frame.
           // This permits at most one start per animation frame for the gesture.
           const queued = latestRender.current;
-          if (!queued.options.paintPreview) {
+          if (!queued.options.paintPreview && !queued.committedEdit) {
             const prior = gestureFrame.current;
             const cadence = queued.gesture ?? queued.wetPreview?.owner;
-            if (cadence && prior?.gesture === cadence) await prior.ready;
-            else if (!queued.wetPreview) await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+            if (cadence && prior?.gesture === cadence) await waitForFrame(prior.ready);
+            else if (!queued.wetPreview) {
+              let frame = 0;
+              const ready = new Promise<void>(resolve => {
+                frame = requestAnimationFrame(() => resolve());
+              });
+              await waitForFrame(ready, () => cancelAnimationFrame(frame));
+            }
           }
           if (!latestRender.current) break;
           const job = latestRender.current;
@@ -245,6 +286,7 @@ export function useCanvasRenderer({
                 }
                 present();
               }
+              presentedDocument.current = job.owner;
             } finally {
               result.dispose();
             }
@@ -271,7 +313,6 @@ export function useCanvasRenderer({
     void drain();
     // Continue the captured live stroke directly from the tool's frame batch.
     // New strokes, document edits and viewport changes still enter via React.
-    const sourceDocument = editor.document.getSnapshot().document;
     const previewCommand = editor.tools.getSnapshot().preview;
     let seenPreview = paintPreview;
     return editor.tools.subscribe(() => {
@@ -281,11 +322,14 @@ export function useCanvasRenderer({
           next.stroke.id !== paintPreview.stroke.id ||
           next.layerId !== paintPreview.layerId || next.maskMode !== paintPreview.maskMode ||
           state.preview !== previewCommand ||
+          editor.document !== documentOwner ||
           editor.document.getSnapshot().document !== sourceDocument) return;
       seenPreview = next;
       const key = ++renderVersion.current;
       latestRender.current?.release?.();
       latestRender.current = {
+        owner: editor.document,
+        committedEdit: false,
         document: viewDocument, colorState, assets, key, region: renderRegion,
         hostAssets:assets,
         gesture: previewGesture, sourceDocument, zoom, fontRevision, backendState,
@@ -298,6 +342,7 @@ export function useCanvasRenderer({
     viewDocument,
     assets,
     editor,
+    documentOwner,
     renderRegion,
     zoom,
     paintPreview,
@@ -317,6 +362,8 @@ export function useCanvasRenderer({
       latestRender.current?.release?.();
       latestRender.current = null;
       renderTarget.current = null;
+      presentedDocument.current = null;
+      frameWait.current?.wake();
       onCleanupCursorRef.current?.();
       editor.tools.cancel();
     },

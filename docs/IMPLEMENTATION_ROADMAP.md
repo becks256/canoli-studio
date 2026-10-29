@@ -7811,3 +7811,77 @@ all-tool timing, broader float/HDR/working-space and photographic/interchange
 quality, global memory and physical GPU/display/tablet/device acceptance,
 AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
 and commercial gates remain required.
+
+
+### 2026-10-28 — Committed-edit viewport scheduling (bounded acceptance)
+
+Owner: implementation agent; estimate XL within T01/F14, starting at clean
+`3932702`. The complete original professional-editor/AI/workflow roadmap stays
+active. The prior layer-composition increment is committed with verified input
+fairness, mixed completion/font timing and all remaining gates retained.
+
+An actual font-control CPU/frame trace finds most pre-preparation time idle
+behind requestAnimationFrame: warm native preparation is roughly 6–7 ms while
+some frame gates defer entry by 40–60 ms. Test immediate admission for committed
+content changes on the same already-presented document, while retaining frame
+cadence for view-only changes, previews/gestures and first-owner fitting. Pending
+view waits must yield to a newer eligible committed edit without publishing
+stale params. Preserve single-active coalescing, document-instance/source/font/
+view/backend validation, complete pixels, cancellation, cleanup and Undo. Verify
+controlled frame-clock cases, real controls, native output and editor-wide timing;
+do not accept full F14 or redefine the complete roadmap around this slice.
+
+Verification complete for this bounded increment. Private viewport jobs capture
+the actual Document instance; eligible committed revisions on the same presented
+owner can start immediately and wake an older pending view wait. The drain keeps
+single-active latest-job coalescing, complete-frame publication, owner/source/
+view/native-font/backend/color/gesture validation, fallback and resource cleanup.
+First owners and geometry/view/preview changes retain cadence and initial fit.
+No public constructor, serialization, history, API, script or plugin grant changes.
+
+Three alternating unchanged-fixture timing pairs retain all 12 samples at both
+16 and 64 layers, including every cold sample/outlier. Typical click-to-canvas
+completion improves; click-to-preparation p95 falls from 55.3–69.7 to 7.2–10.1 ms
+at 16 layers and 64.6–70.3 to 9.9–17.7 ms at 64. Completion tails remain mixed:
+the third 64-layer candidate reaches 149.4 ms versus 98.8 baseline, including
+131.6 ms preparation. No 60fps, physical display or cold-tail acceptance is claimed.
+Separate actual-control CPU/frame traces show 12 baseline animation-frame requests
+and zero candidate requests during edit windows. Paired long tasks predate the
+dialog; retain them as setup observations rather than command attribution.
+
+`npm test -- --maxWorkers=2`: 2871 tests / 286 files passed;
+`npm run build` passed. 357 accepted browser executions /
+324 distinct targets passed with no skips, retries or flaky accepted
+cases: 69 source native/lifecycle/font/gesture/scheduling cases, 79 editor timing
+cases across 32 files, 175 normal-production cases, controlled-clock candidate
+checks and separate instrumented/paired phases. The four new checks verify
+committed font edits/Undo/Redo with exact model/native pixels at zero frame
+advances, pending-view preemption/latest scale, view coalescing/new-owner cadence,
+and identical-data different owners with exact pixels. The unchanged baseline
+fails the two intended committed-edit cases while passing view/owner checks.
+The initial wrong exact-text Ready locator, its actual ready-status snapshot,
+corrected runs and expected baseline failures remain preserved.
+
+144 paired complete-frame digests cover 276,480,000 identical RGBA bytes;
+3,840,000 independently constructed native channels have zero differences.
+Cancellation/retry, stale-frame rejection, genuine 50 MP native output/interchange
+and independent readers pass. Pixel WASM
+`bd6a519864eb8c8893e1ff8ef23ce5da6b8910c39532467fae9828ba9b305311`,
+four tracked codecs and isolated script runtime
+`4813592f23e5b63bba1d923a33422731b64ff547ec7454984ca6d5474c3d2014`
+remain unchanged. 2996 tested inputs, 50 generated resources and 142 normal
+release files are fingerprinted. The report and sealed content-addressed archive
+are `docs/benchmarks/committed-render-performance-2026-10-28.md` and `.zip`;
+source development, instrumented traces, frozen benchmark and normal releases
+retain separate identities. Sampled process memory includes test/server overhead
+and is not physical GPU/global-memory acceptance.
+
+The full sweep still records script transport 269.9 ms, 64-layer document
+presentation 181.2 ms and spot healing 180.9 ms p95, among other retained tails.
+This accepts removal of an extra committed-edit frame gate. Full F14 and the
+complete original professional-editor roadmap remain active: cold native work,
+synchronous setup/graph/command and document/script/retouch tails, sustained
+all-tool and global-memory/device acceptance, physical GPU/display/tablet,
+broader float/HDR/working-space and photographic/interchange quality,
+AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
+and commercial gates remain required.

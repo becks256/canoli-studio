@@ -854,3 +854,15 @@ cancellation. Complete-frame publication, layer order, source geometry, native
 text/pixels, cache/font invalidation and existing private cleanup remain. Float
 scenes retain their separate pipeline. Native calls and graph/setup work are
 not interrupted; broad performance/device/global-memory acceptance remains open.
+
+
+## Committed viewport admission (F14)
+
+Private UI jobs capture the actual Document owner. Committed content on an
+already-presented owner with a stable queued view/context can bypass an extra
+frame wait and wake an older view wait. First owners, view-only work and
+previews keep their cadence. The drain stays single-active, consumes the latest
+job after any wake and rechecks owner/source/view/font/backend/color/gesture
+validity before complete-frame publication. Cleanup wakes pending waits and
+releases existing job ownership. No serialized model/API/grant changes; full
+F14 and the original roadmap remain required.

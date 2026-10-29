@@ -2068,3 +2068,19 @@ its optimizer sends full-reload, interrupting the running page. Pre-optimization
 keeps that development session intact. This changes no runtime geometry kernel,
 production permission or artifact contract; fresh-cache verification and exact
 built resource identities are recorded with the F14 evidence.
+
+
+## Committed viewport updates (F14)
+
+The UI keeps one active preparation and a coalesced latest job. Each job now
+captures its actual Document owner independently of serialized IDs/snapshot
+identity. A committed content revision may start without another animation-frame
+wait only on the same already-presented owner and stable queued view, assets,
+font/backend/color context, with no preview. New owners, document/view geometry
+changes, view-only updates and previews retain frame cadence and initial fitting.
+An eligible content revision can wake an older pending frame wait; the drain
+then consumes the latest captured job rather than the older view. The existing
+source/view/font/backend/gesture checks and complete-frame publication remain.
+Cleanup invalidates queued work, wakes pending waits and releases existing leases.
+This private scheduling state is not document data, history or a new public API.
+Dated output/cadence/timing verification remains in the roadmap.
