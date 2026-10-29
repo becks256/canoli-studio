@@ -2206,3 +2206,8 @@ test('production linear White Balance preserves native files, actual controls, i
 test('production float HSL, Color Balance and Vibrance preserve native files, actual controls and originals without developer globals',async({page},info)=>{const{floatColorWorkflow}=await import('./helpers/float-color');await floatColorWorkflow(page,info,true);});
 
 test('production float Gradient Map and Color Lookup preserve controls, Cube import/export, overflow recovery, native files and original-bearing reopening without developer globals',async({page},info)=>{const{floatPaletteWorkflow}=await import('./helpers/float-palette');await floatPaletteWorkflow(page,info,true);});
+
+import{floatProofWorkflow}from'./helpers/float-proof';
+test('production float device proofing preserves originals, native edits, Undo, workspace profiles and proof-independent delivery',async({page},info)=>{await floatProofWorkflow(page,info,true);});
+
+test('production float CMYK device proofing retains native profiles, controls, Undo and proof-independent precision delivery',async({page},info)=>{await floatProofWorkflow(page,info,true,'synthetic-cmyk');});

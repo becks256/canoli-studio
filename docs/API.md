@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Float proof remains a trusted host surface
+
+Float device proofing adds no REST renderer, original TIFF admission or browser synchronization. Shared document precision/adjustment edits retain existing OO commands and Undo; profile resources, preferences and proof workers stay in the trusted browser host. [Contract and current verification](FLOAT_PROOFING.md).
+
 ## Continuous float palette and lookup controls
 
 Existing strict adjustment layer commands admit Gradient Map and Color Lookup metadata in float documents with shared revision/locks/rollback/Undo. Required fields, finite tables and original command/body limits remain unchanged. Independent REST remains PNG-only and supplies neither a browser float renderer nor original TIFF admission/synchronization. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).

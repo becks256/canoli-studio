@@ -20,6 +20,7 @@ export function normalizeColorSettings(value:ColorSettings):ColorSettings{
 export const DEFAULT_COLOR_SETTINGS:ColorSettings=normalizeColorSettings({output:{profile:'srgb',intent:'relative-colorimetric',blackPointCompensation:false},proof:null});
 export function colorProofKey(proof:ColorProof):string{return JSON.stringify([iccTarget(proof.profile).key,proof.intent,proof.proofIntent,proof.blackPointCompensation,proof.gamutWarning,proof.warningColor]);}
 export const proofTransformSettings=(proof:ColorProof)=>({mode:'proof' as const,intent:proof.intent,proofIntent:proof.proofIntent,blackPointCompensation:proof.blackPointCompensation,gamutWarning:proof.gamutWarning,warningColor:proof.warningColor});
+export const floatProofTransformSettings=(proof:ColorProof)=>({intent:proof.intent,proofIntent:proof.proofIntent,blackPointCompensation:proof.blackPointCompensation,gamutWarning:proof.gamutWarning,warningColor:proof.warningColor,inputFormat:'rgba-float32' as const,outputFormat:'rgba8' as const});
 const targetRecord=(profile:IccTarget):IccTargetRecord=>typeof profile==='string'?{kind:'builtin',id:profile}:{kind:'icc',name:profile.name,sha256:profile.sha256,source:profile.source};
 export function serializeColorSettings(value:ColorSettings):ColorSettingsRecord{
  const settings=normalizeColorSettings(value);return{version:1,output:{...settings.output,profile:targetRecord(settings.output.profile)},proof:settings.proof?{...settings.proof,profile:targetRecord(settings.proof.profile)}:null};
@@ -33,9 +34,13 @@ export async function restoreColorSettings(value:ColorSettingsRecord,control:Icc
 export async function preflightColorSettings(value:ColorSettings,control:IccControl={},check:()=>void=()=>{},float=false):Promise<readonly string[]>{
  const settings=normalizeColorSettings(value),warnings:string[]=[];
  if(float){
-  if(settings.proof)throw new Error('Device proofing requires its float document integration.');
   check();control.signal?.throwIfAborted();const prepared=await IccSession.prepareRgb(iccTarget('linear-srgb').source,iccTarget(settings.output.profile).source,{inputFormat:'rgba-float32',outputFormat:'rgba8',intent:settings.output.intent,blackPointCompensation:settings.output.blackPointCompensation},control);
-  try{check();control.signal?.throwIfAborted();return Object.freeze([...prepared.prepared.warnings]);}finally{prepared.session.dispose();}
+  try{check();control.signal?.throwIfAborted();warnings.push(...prepared.prepared.warnings);}finally{prepared.session.dispose();}
+  if(settings.proof){
+   check();control.signal?.throwIfAborted();const proof=await IccSession.prepareProof(iccTarget('linear-srgb').source,iccTarget('srgb').source,iccTarget(settings.proof.profile).source,floatProofTransformSettings(settings.proof),control);
+   try{check();control.signal?.throwIfAborted();warnings.push(...proof.prepared.warnings);}finally{proof.session.dispose();}
+  }
+  return Object.freeze([...new Set(warnings)]);
  }
  const targets=[[settings.output.profile,{mode:'convert' as const,intent:settings.output.intent,blackPointCompensation:settings.output.blackPointCompensation}],...(settings.proof?[[settings.proof.profile,proofTransformSettings(settings.proof)]as const]:[])] as const;
  for(const[profile,options]of targets){

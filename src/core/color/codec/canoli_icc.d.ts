@@ -11,6 +11,7 @@ export interface NativeIccModule {
  _canoli_icc_begin(pointer:number,length:number,mode:number,intent:number,proofIntent:number,bpc:number,gamut:number,alarmRgb:number):number;
  _canoli_icc_apply(input:number,output:number,pixels:number):number;
  _canoli_icc_begin_rgb(source:number,sourceLength:number,destination:number,destinationLength:number,inputFormat:number,outputFormat:number,intent:number,bpc:number):number;
+ _canoli_icc_begin_proof(source:number,sourceLength:number,destination:number,destinationLength:number,device:number,deviceLength:number,inputFormat:number,outputFormat:number,intent:number,proofIntent:number,bpc:number,gamut:number,alarmRgb:number):number;
  _canoli_icc_apply_window(input:number,output:number,pixels:number):number;
 }
 export default function createCanoliIcc(options:{wasmBinary?:Uint8Array;locateFile?:(path:string)=>string}):Promise<NativeIccModule>;

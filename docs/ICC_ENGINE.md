@@ -1,5 +1,9 @@
 # Native ICC engine dependency
 
+The connected float device-proof path now consumes original composed linear
+float samples directly; see [FLOAT_PROOFING.md](FLOAT_PROOFING.md). Earlier
+dependency/byte-mode sections retain their individual historical boundaries.
+
 The initial connected schema-49 float document workflow is now specified in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md). The dependency/legacy byte-mode sections below retain their individual boundaries; they do not describe the new mode as byte editing. Broader F10 and full-roadmap acceptance remain required.
 
 The native Little CMS engine now connects to trusted browser color settings,
@@ -143,7 +147,8 @@ reject pending work; callbacks and launch/native failures release resources.
 Caller samples are never transferred or detached. Dispose the session in a
 `finally` block. Legacy `prepare`/`apply` and new `prepareRgb`/`applyWindow` are
 separate protocols so one cannot accidentally reinterpret the other's samples.
-High-precision proofing and CMYK delivery remain unimplemented.
+Explicit native sample proofing and the connected float display path are now
+documented in [FLOAT_PROOFING.md](FLOAT_PROOFING.md). CMYK delivery remains open.
 
 Actual WASM/unit and browser checks compare 24 transformations to independent
 native Linux references. A separate streaming check covers every output byte

@@ -1,5 +1,9 @@
 # Canoli Studio editor requirements
 
+## Native float device proofing
+
+Support direct composed-linear-float RGB/CMYK-device proofing and configurable native gamut alarms through Color Settings, precision conversion and workspace save/restore. Preserve originals, scene/history and proof-independent delivery; maintain existing source, revision, cancellation, alpha, owner and complete-frame checks. Verify independent native precision witnesses, real controls, malformed output, lifecycle, portable workspace and genuine 50 MP behavior before acceptance. [Contract and current verification](FLOAT_PROOFING.md).
+
 ## Continuous float palette and lookup controls
 
 Admit Gradient Map and all existing Cube table sizes/interpolation modes in float documents through native continuous processing, current controls/import/export, shared history/isolation, original-bearing recipes and precise delivery. Preserve exact alpha and zero-amount identity; retain finite extended lookup output, explicit domain mapping and overflow failures. Verify independent references, handle lifetime/ownership, real UI and genuine 50 MP behavior. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).

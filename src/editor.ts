@@ -403,7 +403,6 @@ export class EditorApplication {
         colorWarnings.push(warnings);
         const loaded = await loadProject(entry.project);
         try {
-          if(isFloatDocument(loaded.document)&&settings.proof)throw new Error('Saved float documents cannot use device proofing. Restore a workspace with proofing disabled.');
           if(typeof settings.output.profile!=='string'||settings.proof||isFloatDocument(loaded.document))warnings.push(...await preflightColorSettings(settings,{},()=>{},isFloatDocument(loaded.document)));
           decoded.push({
             document: Document._fromWorkspace(loaded.document, loaded.history),
@@ -1209,8 +1208,7 @@ export class EditorApplication {
     for(const raster of rasters){const asset=this.assets.get(raster.assetId);if(!asset.tiff||!asset.tiffColor)return'Float editing requires retained original unsigned 16-bit or float32 TIFF raster sources.';}return null;
   }
   async convertDocumentToFloat(control:FloatSourceControl={},value?:ColorSettings):Promise<void>{
-    const beforeSettings=this.colorSettings,settings=normalizeColorSettings(value??{...beforeSettings,proof:null});
-    if(settings.proof)throw new Error('Disable device proofing before choosing float32 editing.');
+    const beforeSettings=this.colorSettings,settings=normalizeColorSettings(value??beforeSettings);
     const issue=this.floatConversionIssue;if(issue)throw new Error(issue);control.signal?.throwIfAborted();this.precisionJob?.abort(new Error('Precision preparation was replaced.'));
     const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason),document=this.document,assets=this.assets,revision=document.getSnapshot().revision,generation=this.ioGeneration,alive=assets.captureLifetime();this.precisionJob=abort;control.signal?.addEventListener('abort',cancel,{once:true});
     const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||this.precisionJob!==abort||this.document!==document||this.assets!==assets||this.ioGeneration!==generation||document.getSnapshot().revision!==revision||this.colorSettings!==beforeSettings)throw new Error('The document or color settings changed during float preparation. Try again.');};
@@ -1227,7 +1225,6 @@ export class EditorApplication {
   /** Trusted host preferences; preflight both transforms before publishing anything. */
   async setColorSettings(value:ColorSettings,control:IccControl={}):Promise<readonly string[]> {
     const settings=normalizeColorSettings(value),session=this.activeSession,before=session.colorSettings,request=++this.colorRequest,generation=this.ioGeneration;
-    if(this.document.precision==='float32'&&settings.proof)throw new Error('Device proofing requires its float document integration. Disable proofing for float32 editing.');
     const warnings:string[]=[];
     const current=()=>{control.signal?.throwIfAborted();if(this.retouchDisposed||this.activeSession!==session||session.colorSettings!==before||this.ioGeneration!==generation||request!==this.colorRequest)throw new Error('The active document or color settings changed. Apply again from the current tab.');};
     current();
@@ -1235,7 +1232,6 @@ export class EditorApplication {
     current();this.commitColorSettings(settings,[...new Set(warnings)]);return this.colorWarnings;
   }
   private commitColorSettings(settings:ColorSettings,warnings:readonly string[]=[]){
-    if(this.document.precision==='float32'&&settings.proof)throw new Error('Device proofing requires its float document integration.');
     this.activeSession.colorSettings=settings;this.activeSession.colorWarnings=Object.freeze([...warnings]);
     this.currentProfileId=typeof settings.output.profile==='string'?settings.output.profile:'srgb';this.activeSession.colorProfile=this.currentProfileId;
     const proof=settings.proof;

@@ -24,6 +24,7 @@ import{interpolateFloatBackdrops}from'./float-interpolate';
 import{blendFloatAdjustment}from'./float-adjustment-blend';
 import{checkRenderCurrent}from'./render-control';
 import{validateFloatWorkerWindow}from'./float-pixels';
+import type{ColorProof}from'../core/color/color-settings';
 
 export interface FloatSceneControl extends FloatSourceControl,FloatProjectionControl{}
 export type FloatMaskService=(mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>;
@@ -57,11 +58,12 @@ export class FloatSceneRenderer {
  }
  clear(){this.epoch++;const captures=[...this.captures];this.captures.clear();for(const capture of captures)capture.abort(new Error('Float scene capture is closed or superseded.'));retireFloatDisplay(this.displayOwner);for(const entry of this.lru.keys())entry.source.dispose();this.lru.clear();this.entries.clear();}
  dispose(){this.closed=true;this.clear();}
- async render(document:DocumentData,assets:AssetStore,mask:FloatMaskService,frame:FloatSceneFrame,control:FloatSceneControl={},readback=false):Promise<HTMLCanvasElement>{
+ async render(document:DocumentData,assets:AssetStore,mask:FloatMaskService,frame:FloatSceneFrame,control:FloatSceneControl={},readback=false,proof:ColorProof|null=null):Promise<HTMLCanvasElement>{
+  const capturedProof=proof?Object.freeze({...proof}):null;
   const scene=await this.capture(document,assets,mask,control);let output:HTMLCanvasElement|undefined,display:Awaited<ReturnType<typeof borrowFloatDisplay>>|undefined,accepted=false;
   const check=()=>{control.signal?.throwIfAborted();scene.check();checkRenderCurrent(control.isCancelled);if(this.closed)throw new Error('Float scene renderer is closed.');};
   try{
-   check();output=createCanvas(frame.width,frame.height,readback);display=await borrowFloatDisplay(this.displayOwner,{signal:scene.signal,onProgress:check});check();const context=output.getContext('2d')!;
+   check();output=createCanvas(frame.width,frame.height,readback);display=await borrowFloatDisplay(this.displayOwner,{signal:scene.signal,onProgress:check},capturedProof);check();const context=output.getContext('2d')!;
    // Keep the existing 65,536-pixel allocation ceiling while avoiding eight
    // source/worker round trips for a small 256-square frame. Native scene
    // evaluation still precedes frame filtering and the actual ICC transform.

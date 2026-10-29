@@ -35,7 +35,6 @@ export class AdaptiveRenderer extends CanvasRenderer {
   ): Promise<ViewportFrame> {
     checkRenderCurrent(options.isCancelled);
     if(isFloatDocument(document)){
-      if(options.colorProof)throw new Error('Device proofing requires its float document integration. Disable proofing to view this float document.');
       this.proof.reset();return this.prepareFallback(document,assets,options);
     }
     if(options.colorProof)return this.prepareFallback(document,assets,options);
@@ -60,7 +59,7 @@ export class AdaptiveRenderer extends CanvasRenderer {
     options: RenderOptions = {},
   ): Promise<ViewportFrame> {
     const result = await this.render(document, assets, options);
-    try{if(options.colorProof)await this.proof.apply(result,options.colorProof,options.isCancelled);checkRenderCurrent(options.isCancelled);}
+    try{if(options.colorProof&&!isFloatDocument(document))await this.proof.apply(result,options.colorProof,options.isCancelled);checkRenderCurrent(options.isCancelled);}
     catch(error){release(result);throw error;}
     return {
       backend: "canvas2d",

@@ -1,5 +1,5 @@
 {
-  "protocolVersion": 2,
+  "protocolVersion": 3,
   "lcms": "2.19.1",
   "emscripten": "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 4.0.10 (b7dc6e5747465580df5984e723b9d1f10d8e804b)",
   "sourceRevisions": {
@@ -7,19 +7,19 @@
     "lcms": "21c582a594fe5279f90c0b93437c398f93bf62b0"
   },
   "sourceFiles": {
-    "scripts/icc-engine/engine.cpp": "69ae96988077c8c4c9c035ff71fab7af70289345013a742ebb2dcb3a0d7349be",
-    "scripts/icc-engine/CMakeLists.txt": "751ba6dfc5ce74aa122e9e9f9e4e7279bc87440f8adbd40ccea7818aad623d89",
-    "scripts/build-icc-engine.py": "eca0dff468b66082b6e5ae8fb23cac9fb604e747a591521edc17591159eaa7d2"
+    "scripts/icc-engine/engine.cpp": "26412e205427d1777869fc5116636725d5ce5f4b1e0a927639172a2c5278926d",
+    "scripts/icc-engine/CMakeLists.txt": "db9207446cdce283b3c0c795825c5a8e3c0121e6a46c5eeb38d3f80a98763064",
+    "scripts/build-icc-engine.py": "d481d1ee32957b3c3b0d7ca41d855b10cf51727f8581a8c39c2a1189981cd2cf"
   },
   "artifacts": {
     "canoli_icc.js": {
-      "bytes": 14233,
-      "sha256": "dfe0ef7d3745c88b1b770bfe89e1748efa3ed97582061e542f6ebb5e2fe23d9a"
+      "bytes": 14332,
+      "sha256": "8312f09874577491199057f919550f796d892cce55b1f5cbd5eb08022afba7d7"
     },
     "canoli_icc.wasm": {
-      "bytes": 252086,
-      "sha256": "ced09817ed9f7a32e0208d38e4961a3295da75f2dc5855b6c0a91b9af4c1583b"
+      "bytes": 253827,
+      "sha256": "19718461d704b6e20444e5a1ac2a426333ecb32513219b5e20cd2948b29cd8ff"
     }
   },
-  "scope": "Private memory-only ICC inspection; explicit RGB source/destination transforms over RGBA uint8, uint16 and float32 windows; legacy sRGB8 delivery and device-profile proofing to display sRGB. Separate source/output/proof intent and black-point compensation; same-format alpha copied unchanged and cross-format alpha normalized/quantized. No filesystem, network, native plugins, threads or shared memory. This does not implement high-precision scene editing or CMYK delivery."
+  "scope": "Private memory-only ICC inspection; explicit RGB source/destination transforms over RGBA uint8, uint16 and float32 windows; explicit RGB/CMYK-device proofing over those native sample formats; legacy sRGB8 delivery and proofing. Separate source/output/proof intent and black-point compensation; same-format alpha copied unchanged and cross-format alpha normalized/quantized. No filesystem, network, native plugins, threads or shared memory. This does not implement high-precision scene editing or CMYK delivery."
 }

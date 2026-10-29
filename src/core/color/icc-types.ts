@@ -28,6 +28,14 @@ export const iccRgbOptionsSchema=z.object({...common,inputFormat:iccSampleFormat
 export type IccRgbOptions=z.input<typeof iccRgbOptionsSchema>;
 export const iccRgbPreparationSchema=z.object({source:nativeIccReportSchema,destination:nativeIccReportSchema,settings:iccRgbOptionsSchema,usesIntentFallback:z.boolean(),warnings:z.array(z.string().max(2048)).max(16)}).strict();
 export type IccRgbPreparation=z.infer<typeof iccRgbPreparationSchema>;
+export const iccProofOptionsSchema=z.object({
+ ...common,proofIntent:iccIntentSchema.default('relative-colorimetric'),
+ gamutWarning:z.boolean().default(false),warningColor:z.string().regex(/^#[0-9a-f]{6}$/i).transform(v=>v.toLowerCase()).default('#00ffff'),
+ inputFormat:iccSampleFormatSchema.default('rgba-float32'),outputFormat:iccSampleFormatSchema.default('rgba8'),
+}).strict();
+export type IccProofOptions=z.input<typeof iccProofOptionsSchema>;
+export const iccProofPreparationSchema=z.object({source:nativeIccReportSchema,destination:nativeIccReportSchema,proof:nativeIccReportSchema,settings:iccProofOptionsSchema,usesIntentFallback:z.boolean(),warnings:z.array(z.string().max(2048)).max(16)}).strict();
+export type IccProofPreparation=z.infer<typeof iccProofPreparationSchema>;
 export function iccSampleFormat(samples:unknown):IccSampleFormat|undefined{
  if(samples instanceof Uint8ClampedArray)return'rgba8';if(samples instanceof Uint16Array)return'rgba16';if(samples instanceof Float32Array)return'rgba-float32';
 }

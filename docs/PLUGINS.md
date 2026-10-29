@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Float device proofing is host-owned
+
+Installation remains inert. Isolated precision/scene commands keep ordinary document read/write grants, source/revision checks and shared Undo. Host proof preferences survive those edits, but no profile chooser, CMM worker, native store, file or network authority is exposed to plugins. [Contract and current verification](FLOAT_PROOFING.md).
+
 ## Continuous float palette and lookup controls
 
 Existing document grants admit the same Gradient Map/LUT constructor and setter commands in float documents. Installation stays inert; third-party code uses isolated scripting with captured host source/revision/current-grant validation and one Undo. Numeric table handles and native buffers remain private; no file/worker/pixel permission or new package contract is added. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).

@@ -1,5 +1,11 @@
 # Canoli Studio design system
 
+## Float soft-proof controls
+
+High-precision TIFF shows its actual target profile and offers an explicit output-profile conversion checkbox. Preserve the native linear default when no override is chosen, start existing non-default presets enabled, and explain extended-color mapping. This per-export choice changes neither artwork nor workspace preferences.
+
+Keep the custom Color dialog header and actions outside a bounded scrolling body, including short viewports. Enable its staged proof controls in float mode and while choosing float conversion. Explain direct native float input and final SDR display separately from unchanged originals/exports. Keep RGB output choices separate from RGB/CMYK proof targets, Cancel during preparation, intent-fallback/error disclosure and pending/applied/failed footer state. [Contract and current verification](FLOAT_PROOFING.md).
+
 ## Continuous float palette and lookup controls
 
 Enable existing Gradient Map and Color Lookup selectors/palette actions in float documents. Reuse stop controls, reversal, Cube import/export, fractional amount and interpolation, cancellation, locks and Undo. Explain intentional palette endpoints, signed lookup output, declared input domains and SDR/integer clipping. Retain controls during overflow/range failure so zero amount or Undo can recover. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
@@ -10,7 +16,7 @@ Enable existing HSL, Color Balance and Vibrance types and palette actions in sup
 
 ## Initial float document workflow (F10)
 
-Use the custom TIFF precision selector and staged Working precision choice in Color Settings. Keep Cancel active during preparation, apply output settings only after successful native preparation, display SDR preview status, disable unsupported tools and proofing, and explain quantization in export reports. Actual float documents use ordinary Undo for working precision; output preferences remain outside history. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+Use the custom TIFF precision selector and staged Working precision choice in Color Settings. Keep Cancel active during preparation, apply output settings only after successful native preparation, display SDR preview status, disable unsupported tools and retain staged native proof controls, and explain quantization in export reports. Actual float documents use ordinary Undo for working precision; output preferences remain outside history. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## White Balance in float editing
 

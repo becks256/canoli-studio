@@ -1,11 +1,13 @@
 import {z}from 'zod';
 import {iccPreparationSchema,iccTransformOptionsSchema,nativeIccReportSchema,type IccTransformOptions,type IccPreparation,type NativeIccReport}from './icc-types';
 import {iccRgbOptionsSchema,iccRgbPreparationSchema,validateIccSamples,type IccRgbOptions,type IccRgbPreparation,type IccSampleFormat,type IccSamples}from './icc-types';
+import {iccProofOptionsSchema,iccProofPreparationSchema,type IccProofOptions,type IccProofPreparation}from './icc-types';
 export interface IccControl{signal?:AbortSignal;onProgress?:(phase:'waiting'|'preparing'|'processing')=>void}
 const responseSchema=z.discriminatedUnion('kind',[
  z.object({id:z.number().int().positive(),kind:z.literal('report'),report:nativeIccReportSchema}).strict(),
  z.object({id:z.number().int().positive(),kind:z.literal('prepared'),prepared:iccPreparationSchema}).strict(),
  z.object({id:z.number().int().positive(),kind:z.literal('rgb-prepared'),prepared:iccRgbPreparationSchema}).strict(),
+ z.object({id:z.number().int().positive(),kind:z.literal('proof-prepared'),prepared:iccProofPreparationSchema}).strict(),
  z.object({id:z.number().int().positive(),kind:z.literal('pixels'),pixels:z.union([z.instanceof(Uint8ClampedArray),z.instanceof(Uint16Array),z.instanceof(Float32Array)])}).strict(),
  z.object({id:z.number().int().positive(),kind:z.literal('error'),error:z.string().max(4096)}).strict(),
 ]);
@@ -39,7 +41,7 @@ export class IccSession{
  get isClosed(){return this.closed;}
  private serial=0;
  private rgb?:IccRgbPreparation['settings'];
- private pending?:{id:number;kind:'report'|'prepared'|'rgb-prepared'|'pixels';length?:number;format?:IccSampleFormat;resolve:(value:Response)=>void;reject:(error:unknown)=>void};
+ private pending?:{id:number;kind:'report'|'prepared'|'rgb-prepared'|'proof-prepared'|'pixels';length?:number;format?:IccSampleFormat;resolve:(value:Response)=>void;reject:(error:unknown)=>void};
  private readonly abort=()=>this.dispose(this.control.signal?.reason??new DOMException('ICC operation cancelled','AbortError'));
  private constructor(private readonly worker:Worker,private readonly release:()=>void,private readonly control:IccControl){
   worker.onmessage=event=>{
@@ -58,7 +60,7 @@ export class IccSession{
   worker.onmessageerror=()=>this.dispose(new Error('Invalid ICC worker message.'));
   control.signal?.addEventListener('abort',this.abort,{once:true});if(control.signal?.aborted)this.abort();
  }
- private async request(kind:'report'|'prepared'|'rgb-prepared'|'pixels',body:Record<string,unknown>,transfer:Transferable[]=[],length?:number,format?:IccSampleFormat):Promise<Response>{
+ private async request(kind:'report'|'prepared'|'rgb-prepared'|'proof-prepared'|'pixels',body:Record<string,unknown>,transfer:Transferable[]=[],length?:number,format?:IccSampleFormat):Promise<Response>{
   this.control.signal?.throwIfAborted();if(this.closed)throw new Error('ICC session is closed.');if(this.pending)throw new Error('Wait for the current ICC window before processing another.');
   const id=++this.serial;return new Promise((resolve,reject)=>{this.pending={id,kind,length,format,resolve,reject};try{this.worker.postMessage({id,...body},transfer);}catch(error){this.dispose(error);}});
  }
@@ -84,6 +86,16 @@ export class IccSession{
    control.signal?.throwIfAborted();control.onProgress?.('preparing');
    const result=await session.request('rgb-prepared',{operation:'prepare-rgb',source,destination,settings});
    if(result.kind!=='rgb-prepared'||JSON.stringify(result.prepared.settings)!==JSON.stringify(settings)||result.prepared.source.colorSpace!=='RGB '||result.prepared.destination.colorSpace!=='RGB ')throw new Error('ICC worker prepared a different RGB transform.');
+   session.rgb={...settings};return{session,prepared:result.prepared};
+  }catch(error){session.dispose();throw error;}
+ }
+ static async prepareProof(source:Blob,destination:Blob,device:Blob,value:IccProofOptions={},control:IccControl={}):Promise<{session:IccSession;prepared:IccProofPreparation}>{
+  for(const profile of[source,destination,device])if(!(profile instanceof Blob)||profile.size<132||profile.size>0xffffffff)throw new Error('Complete source, display and proof ICC profiles are required.');
+  const settings=iccProofOptionsSchema.parse(value),session=await this.open(control);
+  try{
+   control.signal?.throwIfAborted();control.onProgress?.('preparing');
+   const result=await session.request('proof-prepared',{operation:'prepare-proof',source,destination,device,settings});
+   if(result.kind!=='proof-prepared'||JSON.stringify(result.prepared.settings)!==JSON.stringify(settings)||result.prepared.source.colorSpace!=='RGB '||result.prepared.source.channels!==3||result.prepared.destination.colorSpace!=='RGB '||result.prepared.destination.channels!==3||!['RGB ','CMYK'].includes(result.prepared.proof.colorSpace)||result.prepared.proof.channels!==(result.prepared.proof.colorSpace==='CMYK'?4:3)||![result.prepared.source,result.prepared.destination,result.prepared.proof].every(p=>['scnr','mntr','prtr','spac'].includes(p.deviceClass)))throw new Error('ICC worker prepared a different proof transform.');
    session.rgb={...settings};return{session,prepared:result.prepared};
   }catch(error){session.dispose();throw error;}
  }

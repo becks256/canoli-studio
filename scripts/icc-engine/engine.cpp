@@ -171,6 +171,46 @@ int canoli_icc_begin_rgb(const uint8_t* source, uint32_t source_length,
     input_format = input; output_format = output;
     return 1;
 }
+// Explicit RGB input/display profiles with an independent RGB/CMYK proof device.
+// The float input goes directly to the CMM, including its native gamut check.
+int canoli_icc_begin_proof(const uint8_t* source, uint32_t source_length,
+                          const uint8_t* destination, uint32_t destination_length,
+                          const uint8_t* device, uint32_t device_length,
+                          uint32_t input, uint32_t output, uint32_t intent,
+                          uint32_t proof_intent, uint32_t bpc, uint32_t gamut, uint32_t alarm_rgb) {
+    if (!begin()) return 0;
+    if (input > 2 || output > 2 || intent > 3 || proof_intent > 3 || bpc > 1 || gamut > 1 || alarm_rgb > 0xffffff)
+        return fail("Invalid explicit ICC proof settings.");
+    cmsHPROFILE from = open_profile(source, source_length);
+    if (!from) return 0;
+    cmsHPROFILE to = open_profile(destination, destination_length);
+    if (!to) { cmsCloseProfile(from); return 0; }
+    cmsHPROFILE proof = open_profile(device, device_length);
+    if (!proof) { cmsCloseProfile(from); cmsCloseProfile(to); return 0; }
+    const auto kind = cmsGetDeviceClass(proof);
+    const auto space = cmsGetColorSpace(proof);
+    const bool device_ok = (kind == cmsSigInputClass || kind == cmsSigDisplayClass || kind == cmsSigOutputClass || kind == cmsSigColorSpaceClass) &&
+        (space == cmsSigRgbData || space == cmsSigCmykData);
+    if (!rgb_profile(from) || !rgb_profile(to) || !device_ok) {
+        cmsCloseProfile(from); cmsCloseProfile(to); cmsCloseProfile(proof);
+        return fail("ICC proofing requires RGB source/display profiles and an RGB or CMYK device profile.");
+    }
+    cmsUInt32Number flags = cmsFLAGS_COPY_ALPHA | cmsFLAGS_HIGHRESPRECALC | cmsFLAGS_SOFTPROOFING;
+    if (bpc) flags |= cmsFLAGS_BLACKPOINTCOMPENSATION;
+    if (gamut) {
+        flags |= cmsFLAGS_GAMUTCHECK;
+        cmsUInt16Number alarms[cmsMAXCHANNELS] = {};
+        alarms[0] = ((alarm_rgb >> 16) & 255) * 257;
+        alarms[1] = ((alarm_rgb >> 8) & 255) * 257;
+        alarms[2] = (alarm_rgb & 255) * 257;
+        cmsSetAlarmCodesTHR(context, alarms);
+    }
+    transform = cmsCreateProofingTransformTHR(context, from, pixel_type(input), to, pixel_type(output), proof, intent, proof_intent, flags);
+    cmsCloseProfile(from); cmsCloseProfile(to); cmsCloseProfile(proof);
+    if (!transform || failed) { if (transform) cmsDeleteTransform(transform); transform = nullptr; return 0; }
+    input_format = input; output_format = output;
+    return 1;
+}
 int canoli_icc_apply_window(const void* input, void* output, uint32_t pixels) {
     const uint32_t stride = 4u << (input_format > output_format ? input_format : output_format);
     if (!transform || !input || !output || !pixels || uint64_t(pixels) * stride > uint64_t(std::numeric_limits<ptrdiff_t>::max()))

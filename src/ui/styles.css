@@ -5392,6 +5392,32 @@ input[type="color"] {
   gap: var(--space-4, 16px);
 }
 
+.color-profile-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.color-profile-dialog > .dialog-header,
+.color-profile-dialog > .dialog-footer {
+  flex: 0 0 auto;
+}
+.color-profile-dialog > .dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+}
+.color-profile-dialog > .dialog-header h2 { margin: 0; }
+.color-profile-dialog > .color-profile-dialog-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+}
+.color-profile-dialog > .dialog-footer { flex-wrap: wrap; }
+
 .color-section,
 .soft-proof-section {
   display: flex;

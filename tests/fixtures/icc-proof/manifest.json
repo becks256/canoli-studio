@@ -1,0 +1,569 @@
+{
+  "version": 1,
+  "reference": "Independent native Linux Little CMS 2.19.1, direct ctypes API, without Canoli wrapper/WASM",
+  "nativeVersion": 2190,
+  "nativeLibrarySha256": "dc021a3a70e82f88eadff2deff512d155f846a87935658f5313d7cbb3ef9bcc6",
+  "generatorSha256": "e10668875fbb936f077c00c2ac58dcdbc5095cfce18bddacce496972b9c73a80",
+  "profileHashes": {
+    "linear-srgb": "b35eadd25844629b6f106c465d48ca1cd9b93fd0ac801133ea3bcfd7bb4a0eae",
+    "srgb": "9586e84ef42789daf10781762b2c4eefe913928bbfe74ec15f1cc2c87d0dcd37",
+    "narrow-rgb": "07e0193bda4335a2cc0849ec6d211f7a1cdee310e1fb72adf0fb65adfc72965c",
+    "synthetic-cmyk": "fe284480a22fd078e47f7728404ad4a8fee03dd8a7b7fabe681bab4cde9c87b9",
+    "display-p3": "43e54b7c83ebdf736d248ce16044a37f15142b0fe1364f5b66a5dfcc588eeef8",
+    "adobe-rgb": "1446f498b1e3d3e31ce7a53ff42ef1b93ba249ab1f4947f56e36c5772a595e5a"
+  },
+  "cases": [
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba8.bin",
+      "output": "00-narrow-rgb-rgba8-rgba8-1-1-0-0.bin",
+      "pixels": 1024
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba8.bin",
+      "output": "01-narrow-rgb-rgba8-rgba16-1-1-0-0.bin",
+      "pixels": 1024
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba8",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba8.bin",
+      "output": "02-narrow-rgb-rgba8-rgba-float32-1-1-0-0.bin",
+      "pixels": 1024
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba16.bin",
+      "output": "03-narrow-rgb-rgba16-rgba8-1-1-0-0.bin",
+      "pixels": 1024
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba16.bin",
+      "output": "04-narrow-rgb-rgba16-rgba16-1-1-0-0.bin",
+      "pixels": 1024
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba16",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba16.bin",
+      "output": "05-narrow-rgb-rgba16-rgba-float32-1-1-0-0.bin",
+      "pixels": 1024
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "06-narrow-rgb-rgba-float32-rgba8-1-1-0-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba16",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "07-narrow-rgb-rgba-float32-rgba16-1-1-0-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba-float32",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "08-narrow-rgb-rgba-float32-rgba-float32-1-1-0-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 0,
+      "proofIntent": 1,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "09-narrow-rgb-rgba-float32-rgba8-0-1-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 0,
+      "proofIntent": 1,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "10-narrow-rgb-rgba-float32-rgba8-0-1-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 2,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "11-narrow-rgb-rgba-float32-rgba8-1-2-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 2,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "12-narrow-rgb-rgba-float32-rgba8-1-2-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 2,
+      "proofIntent": 3,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "13-narrow-rgb-rgba-float32-rgba8-2-3-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 2,
+      "proofIntent": 3,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "14-narrow-rgb-rgba-float32-rgba8-2-3-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 3,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "15-narrow-rgb-rgba-float32-rgba8-3-0-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "narrow-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 3,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "16-narrow-rgb-rgba-float32-rgba8-3-0-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 0,
+      "proofIntent": 1,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "17-synthetic-cmyk-rgba-float32-rgba8-0-1-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 0,
+      "proofIntent": 1,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "18-synthetic-cmyk-rgba-float32-rgba8-0-1-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 2,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "19-synthetic-cmyk-rgba-float32-rgba8-1-2-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 2,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "20-synthetic-cmyk-rgba-float32-rgba8-1-2-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 2,
+      "proofIntent": 3,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "21-synthetic-cmyk-rgba-float32-rgba8-2-3-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 2,
+      "proofIntent": 3,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "22-synthetic-cmyk-rgba-float32-rgba8-2-3-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 3,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "gamutWarning": false,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "23-synthetic-cmyk-rgba-float32-rgba8-3-0-1-0.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "synthetic-cmyk",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 3,
+      "proofIntent": 0,
+      "blackPointCompensation": true,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "24-synthetic-cmyk-rgba-float32-rgba8-3-0-1-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "srgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "25-srgb-rgba-float32-rgba8-1-1-0-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "display-p3",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "26-display-p3-rgba-float32-rgba8-1-1-0-1.bin",
+      "pixels": 1027
+    },
+    {
+      "source": "linear-srgb",
+      "destination": "srgb",
+      "device": "adobe-rgb",
+      "inputFormat": "rgba-float32",
+      "outputFormat": "rgba8",
+      "intent": 1,
+      "proofIntent": 1,
+      "blackPointCompensation": false,
+      "gamutWarning": true,
+      "warningColor": "#c731e9",
+      "input": "input-rgba-float32.bin",
+      "output": "27-adobe-rgb-rgba-float32-rgba8-1-1-0-1.bin",
+      "pixels": 1027
+    }
+  ],
+  "files": {
+    "input-rgba8.bin": {
+      "bytes": 4096,
+      "sha256": "db8541361fb6c82e897e570ffd2af5f55fe27314a1e0a9aed19ee70c3de9588b"
+    },
+    "input-rgba16.bin": {
+      "bytes": 8192,
+      "sha256": "0a9bea759f0e5b0bd2d0dc93c9156dc8520a13a15d68d3a36839370f94d0c4ec"
+    },
+    "input-rgba-float32.bin": {
+      "bytes": 16432,
+      "sha256": "9ea77bc7d659c26515bd2a3ff8b736c16836634863ef906c5f660c6903d4f6b3"
+    },
+    "00-narrow-rgb-rgba8-rgba8-1-1-0-0.bin": {
+      "bytes": 4096,
+      "sha256": "8c99b65a00a5e497ad4c5acb98d69f1012dabcee6ebd501fcf12686b39e40800"
+    },
+    "01-narrow-rgb-rgba8-rgba16-1-1-0-0.bin": {
+      "bytes": 8192,
+      "sha256": "15f306615e2870e47290f63c838478eda4fd6b7da9d07d3c7f9dfeda8de57149"
+    },
+    "02-narrow-rgb-rgba8-rgba-float32-1-1-0-0.bin": {
+      "bytes": 16384,
+      "sha256": "54fec5172252b13d460e893e05a2c746e9b4b6a973046933117ba866e7d3b624"
+    },
+    "03-narrow-rgb-rgba16-rgba8-1-1-0-0.bin": {
+      "bytes": 4096,
+      "sha256": "a8a76195e271241abd58a00fb1e8aec9757afb3bb57532d861305f808fd1cbbc"
+    },
+    "04-narrow-rgb-rgba16-rgba16-1-1-0-0.bin": {
+      "bytes": 8192,
+      "sha256": "d8dd590e1b0dc061b75b7bfc912d9ebf427092388eff7bb370679822107d3aba"
+    },
+    "05-narrow-rgb-rgba16-rgba-float32-1-1-0-0.bin": {
+      "bytes": 16384,
+      "sha256": "8acb11f101344fe13fc59f7afda33ee829084cb8bf257fe300bb30ab6d36a656"
+    },
+    "06-narrow-rgb-rgba-float32-rgba8-1-1-0-0.bin": {
+      "bytes": 4108,
+      "sha256": "e0aca1882d2fae150577f3041d322abf8a28b62b3bc1391c179096e43d7f77fe"
+    },
+    "07-narrow-rgb-rgba-float32-rgba16-1-1-0-0.bin": {
+      "bytes": 8216,
+      "sha256": "d21c7b538a83a3fd7c087b33b059a854e5aa33764b32c03980273d6c9593fce3"
+    },
+    "08-narrow-rgb-rgba-float32-rgba-float32-1-1-0-0.bin": {
+      "bytes": 16432,
+      "sha256": "b219b7105d9cd236c4eaddfe9cad11a75dbf9782a2e663ec935c51614ee12849"
+    },
+    "09-narrow-rgb-rgba-float32-rgba8-0-1-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "e0aca1882d2fae150577f3041d322abf8a28b62b3bc1391c179096e43d7f77fe"
+    },
+    "10-narrow-rgb-rgba-float32-rgba8-0-1-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "8155f97f8d28691f964bdcccb63ba05eb132660dd78af8961cd7b58eab65668d"
+    },
+    "11-narrow-rgb-rgba-float32-rgba8-1-2-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "e0aca1882d2fae150577f3041d322abf8a28b62b3bc1391c179096e43d7f77fe"
+    },
+    "12-narrow-rgb-rgba-float32-rgba8-1-2-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "8155f97f8d28691f964bdcccb63ba05eb132660dd78af8961cd7b58eab65668d"
+    },
+    "13-narrow-rgb-rgba-float32-rgba8-2-3-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "e0aca1882d2fae150577f3041d322abf8a28b62b3bc1391c179096e43d7f77fe"
+    },
+    "14-narrow-rgb-rgba-float32-rgba8-2-3-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "8155f97f8d28691f964bdcccb63ba05eb132660dd78af8961cd7b58eab65668d"
+    },
+    "15-narrow-rgb-rgba-float32-rgba8-3-0-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "e0aca1882d2fae150577f3041d322abf8a28b62b3bc1391c179096e43d7f77fe"
+    },
+    "16-narrow-rgb-rgba-float32-rgba8-3-0-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "8155f97f8d28691f964bdcccb63ba05eb132660dd78af8961cd7b58eab65668d"
+    },
+    "17-synthetic-cmyk-rgba-float32-rgba8-0-1-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "777dcf22819d92f25087d2f482dbc8fdd9f54b3ff74dee44e50858a74d77d4cc"
+    },
+    "18-synthetic-cmyk-rgba-float32-rgba8-0-1-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "1efe01f032bdf888ffc23f4174da8978a95b6ec7ffd73f618134a99cfef74f9b"
+    },
+    "19-synthetic-cmyk-rgba-float32-rgba8-1-2-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "b0d9404bf90b7f44397f9228b9bc8d77c536f02d3be0f11010bf780b427c9cf8"
+    },
+    "20-synthetic-cmyk-rgba-float32-rgba8-1-2-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "06e7a3208e977fd584998ddecb8325ddf31cada6ea8f26929810d1d3f590b203"
+    },
+    "21-synthetic-cmyk-rgba-float32-rgba8-2-3-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "777dcf22819d92f25087d2f482dbc8fdd9f54b3ff74dee44e50858a74d77d4cc"
+    },
+    "22-synthetic-cmyk-rgba-float32-rgba8-2-3-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "1efe01f032bdf888ffc23f4174da8978a95b6ec7ffd73f618134a99cfef74f9b"
+    },
+    "23-synthetic-cmyk-rgba-float32-rgba8-3-0-1-0.bin": {
+      "bytes": 4108,
+      "sha256": "777dcf22819d92f25087d2f482dbc8fdd9f54b3ff74dee44e50858a74d77d4cc"
+    },
+    "24-synthetic-cmyk-rgba-float32-rgba8-3-0-1-1.bin": {
+      "bytes": 4108,
+      "sha256": "1efe01f032bdf888ffc23f4174da8978a95b6ec7ffd73f618134a99cfef74f9b"
+    },
+    "25-srgb-rgba-float32-rgba8-1-1-0-1.bin": {
+      "bytes": 4108,
+      "sha256": "fc4b891abfaa09b4a8050053ffe17c1e5e2b20a2c46554d1eafcc3177d4b9b01"
+    },
+    "26-display-p3-rgba-float32-rgba8-1-1-0-1.bin": {
+      "bytes": 4108,
+      "sha256": "29ba7aef6c11f967ccb7dba21c4ffe0aba282cee3c902756c284c89a3a1422e1"
+    },
+    "27-adobe-rgb-rgba-float32-rgba8-1-1-0-1.bin": {
+      "bytes": 4108,
+      "sha256": "fc4b891abfaa09b4a8050053ffe17c1e5e2b20a2c46554d1eafcc3177d4b9b01"
+    },
+    "quantized-display-proof.bin": {
+      "bytes": 4108,
+      "sha256": "bda10c2164204004c40932dc19181c27d7b7998c7d0b51a08f6c9d98d10162d6"
+    }
+  },
+  "directVersusByteProxyDifferentColorChannels": 202,
+  "limits": "Synthetic RGB/CMYK device models; exact integer samples and same-format alpha, float color absolute error <= 2e-6. No measured physical printer/display or HDR acceptance."
+}

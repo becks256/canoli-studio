@@ -1,9 +1,10 @@
 import{IccSession,registerIdleIccOwner,type IccControl}from'../core/color/icc-client';
 import{iccTarget}from'../core/color/profile-source';
 import type{IccSamples}from'../core/color/icc-types';
+import{colorProofKey,floatProofTransformSettings,type ColorProof}from'../core/color/color-settings';
 
 interface Entry{
- session:IccSession;abort:AbortController;owner:symbol;
+ session:IccSession;abort:AbortController;owner:symbol;key:string;
  activity:{control?:IccControl};unregister?:()=>void;
 }
 let idle:Entry|undefined;
@@ -21,11 +22,11 @@ export function retireFloatDisplay(owner:symbol){if(idle?.owner===owner)close(id
  * It remains an actual native owner, yields its slot to queued work, and holds
  * neither a scene/source lease nor a caller's progress/abort closure while idle.
  * IccSession disposal itself retains its immediate termination contract. */
-export async function borrowFloatDisplay(owner:symbol,control:IccControl={}):Promise<{
+export async function borrowFloatDisplay(owner:symbol,control:IccControl={},proof:ColorProof|null=null):Promise<{
  applyWindow(samples:IccSamples):Promise<IccSamples>;release():void;
 }>{
- control.signal?.throwIfAborted();let entry=idle;idle=undefined;
- if(entry){entry.unregister?.();entry.unregister=undefined;if(entry.session.isClosed){close(entry);entry=undefined;}}
+ control.signal?.throwIfAborted();const key=proof?colorProofKey(proof):'display',device=proof?iccTarget(proof.profile).source:null,settings=proof?floatProofTransformSettings(proof):null;let entry=idle;idle=undefined;
+ if(entry){entry.unregister?.();entry.unregister=undefined;if(entry.session.isClosed||entry.key!==key){close(entry);entry=undefined;}}
  const abort=entry?.abort??new AbortController(),activity=entry?.activity??{control};activity.control=control;
  const cancel=()=>abort.abort(control.signal?.reason);
  control.signal?.addEventListener('abort',cancel,{once:true});if(control.signal?.aborted)cancel();
@@ -33,10 +34,12 @@ export async function borrowFloatDisplay(owner:symbol,control:IccControl={}):Pro
  try{
   abort.signal.throwIfAborted();
   if(!entry){
-   const prepared=await IccSession.prepareRgb(iccTarget('linear-srgb').source,iccTarget('srgb').source,
+   const prepared=device&&settings?await IccSession.prepareProof(iccTarget('linear-srgb').source,iccTarget('srgb').source,device,
+    settings,
+    {signal:abort.signal,onProgress:progressFor(activity)}):await IccSession.prepareRgb(iccTarget('linear-srgb').source,iccTarget('srgb').source,
     {inputFormat:'rgba-float32',outputFormat:'rgba8'},
     {signal:abort.signal,onProgress:progressFor(activity)});
-   entry={session:prepared.session,abort,activity,owner};
+   entry={session:prepared.session,abort,activity,owner,key};
   }
   const captured=entry;captured.owner=owner;let released=false,healthy=true,cacheable=true,inFlight=0;
   abort.signal.throwIfAborted();

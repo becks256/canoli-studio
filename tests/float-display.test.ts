@@ -1,6 +1,6 @@
 import{it,expect,vi,afterEach}from'vitest';
 import{IccSession,acquireIccOwner}from'../src/core/color/icc-client';
-import{iccRgbOptionsSchema,iccTransformOptionsSchema}from'../src/core/color/icc-types';
+import{iccRgbOptionsSchema,iccTransformOptionsSchema,iccProofOptionsSchema}from'../src/core/color/icc-types';
 import{borrowFloatDisplay,retireFloatDisplay}from'../src/engine/float-display';
 
 const profile={version:1,engine:'Little CMS 2.19.1',nativeVersion:2190,profileVersion:'2.4.0',deviceClass:'mntr',colorSpace:'RGB ',connectionSpace:'XYZ ',channels:3,description:'Protocol fixture',copyright:'',manufacturer:'',model:'',inputIntents:['relative-colorimetric'],outputIntents:['relative-colorimetric'],proofIntents:['relative-colorimetric']};
@@ -11,7 +11,7 @@ class WorkerFixture{
  constructor(){WorkerFixture.all.push(this);}
  postMessage(message:Record<string,any>){
   expect(message.id).toBeGreaterThan(this.lastId);this.lastId=message.id;this.messages.push(message);
-  const reply=message.operation==='prepare-rgb'?{id:message.id,kind:'rgb-prepared',prepared:{source:profile,destination:profile,settings:iccRgbOptionsSchema.parse(message.settings),usesIntentFallback:false,warnings:[]}}:
+  const reply=message.operation==='prepare-proof'?{id:message.id,kind:'proof-prepared',prepared:{source:profile,destination:profile,proof:profile,settings:iccProofOptionsSchema.parse(message.settings),usesIntentFallback:false,warnings:[]}}:message.operation==='prepare-rgb'?{id:message.id,kind:'rgb-prepared',prepared:{source:profile,destination:profile,settings:iccRgbOptionsSchema.parse(message.settings),usesIntentFallback:false,warnings:[]}}:
    message.operation==='prepare'?{id:message.id,kind:'prepared',prepared:{profile,settings:iccTransformOptionsSchema.parse(message.settings),usesIntentFallback:false,warnings:[]}}:
    {id:message.id,kind:'pixels',pixels:WorkerFixture.invalid?new Float32Array(message.pixels.length):new Uint8ClampedArray(message.pixels.length)};
   if(message.operation==='apply-window'&&WorkerFixture.hold)return;
@@ -64,4 +64,15 @@ it('large valid windows still process but their native scratch does not stay idl
 
 it('a callback error on a reused session releases native ownership and preserves the next request',async()=>{
  install();const first=await borrow();first.release();const next=await borrow({onProgress:phase=>{if(phase==='processing')throw new Error('Current callback failed');}});await expect(next.applyWindow(input())).rejects.toThrow('Current callback failed');next.release();expect(WorkerFixture.all[0].terminations).toBe(1);const fresh=await borrow();await fresh.applyWindow(input());expect(WorkerFixture.all).toHaveLength(2);
+});
+
+it('proof and ordinary display leases cannot reuse different device, intent or gamut settings',async()=>{
+ install();const id=owner(),proof={profile:'srgb' as const,intent:'relative-colorimetric' as const,proofIntent:'relative-colorimetric' as const,blackPointCompensation:false,gamutWarning:true,warningColor:'#c731e9'};
+ const first=await borrowFloatDisplay(id,{},proof);leases.push(first);await first.applyWindow(input());first.release();
+ const same=await borrowFloatDisplay(id,{},proof);leases.push(same);await same.applyWindow(input());same.release();expect(WorkerFixture.all).toHaveLength(1);
+ const changed=await borrowFloatDisplay(id,{}, {...proof,warningColor:'#00ffff'});leases.push(changed);await changed.applyWindow(input());changed.release();expect(WorkerFixture.all[0].terminations).toBe(1);expect(WorkerFixture.all).toHaveLength(2);
+ const ordinary=await borrow({},id);await ordinary.applyWindow(input());ordinary.release();expect(WorkerFixture.all[1].terminations).toBe(1);expect(WorkerFixture.all[2].messages[0].operation).toBe('prepare-rgb');
+});
+it('a cancelled native proof never becomes a reusable display transform',async()=>{
+ install();const id=owner(),abort=new AbortController(),proof={profile:'srgb' as const,intent:'relative-colorimetric' as const,proofIntent:'perceptual' as const,blackPointCompensation:true,gamutWarning:false,warningColor:'#c731e9'},display=await borrowFloatDisplay(id,{signal:abort.signal},proof);leases.push(display);WorkerFixture.hold=true;const pending=display.applyWindow(input());abort.abort();await expect(pending).rejects.toThrow();display.release();expect(WorkerFixture.all[0].terminations).toBe(1);WorkerFixture.hold=false;const fresh=await borrow({},id);await fresh.applyWindow(input());expect(WorkerFixture.all).toHaveLength(2);
 });

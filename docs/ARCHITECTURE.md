@@ -1,5 +1,9 @@
 # Architecture
 
+## Native float device proofing
+
+Explicit source/display/device CMM transforms consume genuine float samples. FloatSceneRenderer captures proof settings, composes/filters native pixels, then borrows a proof-keyed display owner. AdaptiveRenderer skips the old byte proof pass for float frames. Native settings preflight, conversion, workspace ownership, cancellation and complete-frame publication retain their host boundaries. [Contract and current verification](FLOAT_PROOFING.md).
+
 ## Continuous float palette and lookup controls
 
 Private float-gradient compilation feeds gradientFloat through owned windows. FloatLookupProcessor validates complete captured tables and owns separate native lookupFloat memory; multiple immutable handles share one active native table cache. PixelProcessor captures headers before readiness and returns private apply/dispose leases. FloatSceneRenderer prepares and releases leases with captured source lifetimes, including cancellation during preparation. Existing adjustment blending and native-first frame filtering remain unchanged. Cube header capture is private transport validation; shared commands retain full table validation. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).

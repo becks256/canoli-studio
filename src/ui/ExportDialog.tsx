@@ -31,6 +31,7 @@ export function ExportDialog({
   const [psdMode, setPsdMode] = useState<"layers" | "flatten">("layers");
   const [tiffVariant,setTiffVariant]=useState<"auto"|"classic"|"big">("auto");
   const[tiffPrecision,setTiffPrecision]=useState<'uint8'|'uint16'|'float32'>('uint8');
+  const[tiffUseOutputProfile,setTiffUseOutputProfile]=useState(!!color);
   const pages=suppliedPages??[{key:document.id,document}];
   const [tiffScope,setTiffScope]=useState('current');
   const [pageKeys,setPageKeys]=useState(()=>pages.map(page=>page.key));
@@ -91,7 +92,12 @@ export function ExportDialog({
     };
   }, [fontKey, reportKey]);
 
-  const deliveryColor=['png','tiff','pdf'].includes(format)?color:undefined;
+  const deliveryColor=useMemo<ExportDialogProps['color']>(()=>{
+    if(!['png','tiff','pdf'].includes(format))return undefined;
+    if(format==='tiff'&&tiffPrecision!=='uint8')return tiffUseOutputProfile?(color??{profile:'srgb',intent:'relative-colorimetric',blackPointCompensation:false}):undefined;
+    return color;
+  },[format,tiffPrecision,tiffUseOutputProfile,color]);
+  const nativeTiffProfile=format==='tiff'&&tiffPrecision!=='uint8'&&!deliveryColor;
   const report = useMemo(() => {
     if(multiPage&&selectedPages.length&&!selectedPages.some(page=>!page))return getTiffPagesCapabilityReport(selectedPages.map(page=>page!.document),tiffVariant,deliveryColor,tiffPrecision);
     return getExportCapabilityReport(document, {
@@ -177,7 +183,7 @@ export function ExportDialog({
           onChange={(val) => setFormat(val as ExportFormat)}
         />
 
-        <p>{deliveryColor?`RGB output: ${iccTarget(deliveryColor.profile).name}. Pixel conversion and original ICC profile embedding; canvas proofing is excluded.`:'Output uses sRGB. Custom ICC delivery currently supports PNG, TIFF and PDF.'}</p>
+        <p>{deliveryColor?`RGB output: ${iccTarget(deliveryColor.profile).name}. Pixel conversion and original ICC profile embedding; canvas proofing is excluded.`:nativeTiffProfile?'RGB output: Linear sRGB. Native working colors and the linear profile are retained; canvas proofing is excluded.':'Output uses sRGB. Custom ICC delivery currently supports PNG, TIFF and PDF.'}</p>
 
         {(format === "psd"||format==='psb') && <Select label={format==='psb'?'PSB layers':'PSD layers'} layout="stacked" value={psdMode} disabled={busy || exporting}
           options={[{ value: "layers", label: "Keep independent layers; merge dependent effects" }, { value: "flatten", label: "Flatten visible composition into one layer" }]}
@@ -187,6 +193,10 @@ export function ExportDialog({
           options={[{value:'auto',label:'Automatic — TIFF or BigTIFF as needed'},{value:'classic',label:'Classic TIFF — widest compatibility'},{value:'big',label:'BigTIFF — requires a compatible viewer'}]}
           onChange={value=>setTiffVariant(value as 'auto'|'classic'|'big')} />}
         {format==='tiff'&&<Select label="TIFF precision" layout="stacked" value={tiffPrecision} disabled={busy||exporting} options={[{value:'uint8',label:'8-bit integer'},{value:'uint16',label:'16-bit integer — requires a float document'},{value:'float32',label:'32-bit float — requires a float document'}]} onChange={value=>setTiffPrecision(value as typeof tiffPrecision)}/>}
+        {format==='tiff'&&tiffPrecision!=='uint8'&&<div>
+          <label className="checkbox-control"><input type="checkbox" checked={tiffUseOutputProfile} disabled={busy||exporting} onChange={event=>setTiffUseOutputProfile(event.target.checked)}/>Use output RGB profile for high-precision TIFF</label>
+          <p>{tiffUseOutputProfile?`Convert to ${iccTarget(color?.profile??'srgb').name} using the output settings. The selected profile may map extended colors.`:'Keep linear sRGB working colors. Enable conversion to use the output profile from Color Settings.'}</p>
+        </div>}
 
         {format==='tiff'&&<>
           <Select label="TIFF pages" layout="stacked" value={tiffScope} disabled={busy||exporting}

@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Float proof boundary
+
+Resolve complete native composition, coverage and frame sampling before the explicit float-to-device-to-sRGB proof transform. Display/profile preparation shares the existing two-owner queue; source preparation precedes display acquisition. Exact proof settings/fingerprints bind idle reuse. Only a complete current proof frame may publish; exports retain their separate native scene/output path. [Contract and current verification](FLOAT_PROOFING.md).
+
 ## Continuous float palette and lookup controls
 
 Palette and LUT stages operate continuously over linear float sources using reflected extended sRGB. Palette endpoint mapping is authored behavior; LUT domains bound coordinates while finite extended table/amount results survive. One float32 store follows float64 arithmetic; alpha and neutral identity stay exact. Complete table validation precedes captured handle publication, private native memory cannot overlap other pixel operations, and every capture failure/disposal releases handles. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).

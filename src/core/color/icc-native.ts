@@ -3,6 +3,7 @@ import createCanoliIcc,{type NativeIccModule}from './codec/canoli_icc.js';
 export *from './icc-types';
 import {iccIntents,iccTransformOptionsSchema,nativeIccReportSchema,type IccTransformOptions,type NativeIccReport,type IccPreparation}from './icc-types';
 import {iccRgbOptionsSchema,iccSampleFormats,validateIccSamples,type IccRgbOptions,type IccRgbPreparation,type IccSamples}from './icc-types';
+import {iccProofOptionsSchema,type IccProofOptions,type IccProofPreparation}from './icc-types';
 const signature=(value:number)=>String.fromCharCode(value>>>24,(value>>>16)&255,(value>>>8)&255,value&255);
 
 /** Inert native boundary. Only a private worker/Node caller owns this module.
@@ -72,6 +73,19 @@ export class NativeIccEngine{
    return{source:from,destination:to,settings,usesIntentFallback,warnings:usesIntentFallback?['The input or output profile does not declare the requested intent table; Little CMS applies its supported fallback.']:[]};
   }catch(error){this.module._canoli_icc_close();throw error;}
   finally{if(input)this.module._free(input);if(output)this.module._free(output);}
+ }
+ beginProof(source:Uint8Array,destination:Uint8Array,device:Uint8Array,value:IccProofOptions={}):IccProofPreparation{
+  this.active();this.ready=false;this.rgb=undefined;this.module._canoli_icc_close();
+  const settings=iccProofOptionsSchema.parse(value),from=this.inspect(source),to=this.inspect(destination),proof=this.inspect(device);
+  const allocated:number[]=[];
+  try{
+   const pointers=[source,destination,device].map(bytes=>{const p=this.module._malloc(bytes.length)>>>0;if(!p)throw new Error('ICC proof profile allocation failed.');allocated.push(p);this.module.HEAPU8.set(bytes,p);return p;});
+   if(!this.module._canoli_icc_begin_proof(pointers[0],source.length,pointers[1],destination.length,pointers[2],device.length,iccSampleFormats.indexOf(settings.inputFormat),iccSampleFormats.indexOf(settings.outputFormat),iccIntents.indexOf(settings.intent),iccIntents.indexOf(settings.proofIntent),Number(settings.blackPointCompensation),Number(settings.gamutWarning),parseInt(settings.warningColor.slice(1),16)))this.error();
+   const usesIntentFallback=!from.inputIntents.includes(settings.intent)||!to.outputIntents.includes(settings.intent)||!proof.proofIntents.includes(settings.proofIntent);
+   this.rgb={...settings};this.ready=true;
+   return{source:from,destination:to,proof,settings,usesIntentFallback,warnings:usesIntentFallback?['The source, display or proof device does not declare every requested intent table; Little CMS applies its supported fallback.']:[]};
+  }catch(error){this.module._canoli_icc_close();throw error;}
+  finally{for(const p of allocated)this.module._free(p);}
  }
  applyWindow(samples:IccSamples):IccSamples{
   this.active();if(!this.ready||!this.rgb)throw new Error('Prepare an explicit RGB transform before converting sample windows.');

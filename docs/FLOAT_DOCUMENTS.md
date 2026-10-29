@@ -67,11 +67,11 @@ await editor.convertDocumentToFloat(
 
 `control: FloatSourceControl = {}` accepts an optional abort signal and source
 preparation progress callback. `settings?: ColorSettings` defaults to the current
-output settings with proof disabled. `editor.floatConversionIssue: string | null`
+output and proof settings. `editor.floatConversionIssue: string | null`
 provides the current eligibility reason. Already-float conversion through this
 host preparation service rejects. Replacement preparation, document edit, tab
 change, asset disposal, changed preferences, cancellation or preparation failure
-reject without applying precision or staged preferences. Output preferences are
+reject without applying precision or staged preferences. Output and proof preferences are
 workspace settings outside document history; ordinary Undo restores precision.
 
 ## Object model, commands and isolation
@@ -151,9 +151,11 @@ atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts
 palette and context controls disable unsupported creation/color tools. Move,
 Hand, selections, Crop, Artboard and mask drawing retain their existing commands;
 Layer Eraser requires an original raster target. Mask brush/pencil/eraser and mask Pen require their corresponding mask target.
-Device soft proofing is unavailable. Selecting float mode disables it; isolated
-precision conversion clears existing proof state with a visible notice. Saved
-float workspaces with proof enabled reject before publication.
+Device soft proofing now uses the completed native float scene directly, before
+SDR display conversion. Selecting float precision or applying isolated precision
+commands retains proof preferences. Saved float workspaces restore complete proof
+profiles/settings after native validation. Proof and alarms never affect native
+file delivery. See [the precise proof contract](FLOAT_PROOFING.md).
 
 ## Linear White Balance
 
@@ -719,7 +721,12 @@ must be float documents. Mixed byte/float pages are allowed for uint8 output.
 from linear float32 to the selected complete RGB ICC profile and file sample
 type, with correct integer/float tags and straight alpha. Omitted color defaults
 to linear-sRGB for high-precision TIFF and sRGB for byte output. Explicit output
-settings override the default. Float output retains finite extended values only
+settings override the default. In the Export dialog, high-precision TIFF shows
+its actual embedded profile. **Use output RGB profile for high-precision TIFF**
+explicitly selects the current output settings, including default sRGB. Leaving
+it off keeps linear-sRGB working colors; an existing non-default output preset
+starts enabled. This per-export choice does not change document or workspace
+preferences. Float output retains finite extended values only
 where the selected profile/transform supports them.
 
 PNG/PDF convert directly to target RGB8 and embed the exact target profile.
@@ -756,7 +763,7 @@ hidden RGB/alpha, sparse large geometry and cancellation.
 
 Required later work includes broader source/working profiles and conversion,
 other integer depths and non-TIFF high-precision admission, all remaining tools/layer types,
-blends/styles, float coverage, device proofing, HDR transfer/display/tone
+blends/styles, float coverage, physical device proof/color quality, HDR transfer/display/tone
 mapping, CMYK delivery, interchange, wider photographic/device validation and
 sustained all-tool performance. This initial mode is not full F10 acceptance.
 

@@ -7885,3 +7885,46 @@ all-tool and global-memory/device acceptance, physical GPU/display/tablet,
 broader float/HDR/working-space and photographic/interchange quality,
 AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
 and commercial gates remain required.
+
+### 2026-10-29 — Native float device proofing (bounded acceptance)
+
+Owner: implementation agent; estimate L within T17/F10/F11, starting at clean
+`c96278d`. Float documents now send completed native linear-float scene samples
+directly through RGB/CMYK device proofing before final SDR display. Native gamut
+alarms, intents/BPC, exact proof-keyed reuse, source-first acquisition, the
+two-owner ceiling, cancellation/failure recovery and complete-frame publication
+remain enforced. Color Settings, eligible precision conversion and workspace
+restore retain complete proof preferences outside document/history and delivery.
+PNG/TIFF/PDF remain proof-independent. High-precision TIFF now labels its native
+linear-sRGB default accurately and offers explicit output-profile conversion.
+The Color Settings header/actions stay visible while its body scrolls.
+
+2916 unit/API tests / 287 files and builds pass.
+326 browser executions / 326 distinct targets pass without
+skips, retries or flaky accepted cases: 70 source cases /21 files, 79 performance
+cases /32 files and 177 normal-production cases. Twenty-eight independent native
+proof references include a 202-channel float-versus-byte-proxy precision witness.
+Eighty-four complete proof frames compare 5,287,104 displayed channels
+exactly. Actual RGB/CMYK controls, alarms, isolated edits/Undo/Redo, original-bearing
+workspace restore, independent three-format delivery and byte-identical proof-on/
+off files pass in source and normal production. Real queue/disposal and native
+failure/retry checks pass. Genuine 50 MP originals retain 10000×5000 geometry;
+proof display uses 500×250, and the independent full PNG reader compares all
+200,000,000 channels exactly. Full-resolution workflows remain slow.
+
+3037 tested inputs, 51 generated resources and
+143 normal release resources are fingerprinted; actual ICC WASM
+is rebuilt against pinned Little CMS 2.19.1 with protocol 3. The other three
+tracked codecs, pixel WASM and isolated script runtime remain unchanged. Source,
+frozen benchmark and normal release retain separate identities. Report and sealed
+evidence: `docs/benchmarks/float-proofing-2026-10-29.md` and `.zip`. Failed native
+build attempts, incorrect TIFF/profile-label test assumptions and corrected runs
+remain preserved. Automatic review rejected broad historical-directory relocation;
+it was not executed. Task-owned verified executable copies and an isolated cache
+supplied the successful build without moving the historical folders.
+
+This accepts bounded native float device proofing, not full F10/F14 or the
+complete roadmap. Physical device/photographic quality, working spaces, HDR/CMYK
+delivery, remaining editor latency and all-tool/global-memory/device acceptance,
+AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
+and commercial gates remain required. The complete original objective stays active.
