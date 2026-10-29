@@ -501,6 +501,7 @@ export function InspectorPanel({
             onCancel={() => onPreview(null)}
             value={selected.styles ?? defaultStyle()}
             float={float}
+            shadowUnavailable={float && selected.kind === 'adjustment'}
             disabled={locked || busy || selected.blendMode==='pass-through'}
             onPreview={(styles) =>
               onPreview({

@@ -1,0 +1,757 @@
+{
+  "version": 1,
+  "numpy": "1.26.4",
+  "inputs": {
+    "scripts/generate-float-shadow-fixtures.py": "c132c2572db58dd2dc05329b7b321142069ea617812c74708a170e406f41719b",
+    "scripts/float_shadow_reference.py": "9b5f70a67025f78fae141be6230854bc2dd63252358201a050ebc6e4a8eb0c2d",
+    "scripts/float_style_reference.py": "fa2bdc7522fce4f0c6e0d3795a0a07b01e31a55fb5b066e6a7d65c42db7a6bd6",
+    "scripts/float_clipping_reference.py": "9c370911d5b43bd3c4334cedbf024783cda2dbd19a6874e1addacdd910f672fb",
+    "scripts/float_blend_reference.py": "5f130c7596369b37260a4a4dfbcf9f41d9fb838a0260daf356540bbbdeee5c0a",
+    "tests/fixtures/uint16-float/u16-raw.tif": "50ec4b635c92c6b6923c856e50fe3371b03c5055d5bbb8962b4fb881fb9106b6",
+    "tests/fixtures/uint16-float/u16-raw-linear.f32le.gz": "afe8309945fa517379bf1813efe4a56c6b203a3183ec06b93e6c05b3d03c376d"
+  },
+  "files": {
+    "alpha-0.gz": {
+      "bytes": 1045,
+      "sha256": "5cbdf12f1f513bb56a9472c2c3cda115ec4e8f1a04084bf51d8449cc8be85805",
+      "rawSha256": "272c27499b2a30607a22b3a3000a1e495d4af29e70bfd25d7beaf2f0fe336bd9"
+    },
+    "filtered-0.gz": {
+      "bytes": 1045,
+      "sha256": "5cbdf12f1f513bb56a9472c2c3cda115ec4e8f1a04084bf51d8449cc8be85805",
+      "rawSha256": "272c27499b2a30607a22b3a3000a1e495d4af29e70bfd25d7beaf2f0fe336bd9"
+    },
+    "alpha-1.gz": {
+      "bytes": 1150,
+      "sha256": "dc2a1d0bcac1f411fc3f791cfa61a8c80986b8b981859dae12b06718fdbbd60f",
+      "rawSha256": "600e853ef2962925c450d12ff13ef723be8215078c74b7e691665af8714c2af1"
+    },
+    "filtered-1.gz": {
+      "bytes": 1113,
+      "sha256": "eea6ba45b0ac763ebc0d5b6b6a1ff64da8ac65d86d1d918494040ef38ae68438",
+      "rawSha256": "10a83c59b365dcab6ca648fb2e438afdfa74a059d102486c1bffbe4f04527485"
+    },
+    "alpha-2.gz": {
+      "bytes": 1548,
+      "sha256": "213802c3b8824e3b06197fcdf514b06d560cd37167032c52517de82f4b54d18e",
+      "rawSha256": "7affa2a6b26a4b34e060d5f17a2849cb1d87dcba4276884c90d485774292390b"
+    },
+    "filtered-2.gz": {
+      "bytes": 1128,
+      "sha256": "1fab303fc9b0636ad463cf54efe87ba2ee9e8aadc5262a47ef5d539804e76c39",
+      "rawSha256": "d451466e1b784b3c02cb6bf8f2f78b0efd748490fa1e0981b1d6432b881edcee"
+    },
+    "alpha-3.gz": {
+      "bytes": 2205,
+      "sha256": "575e3c7bef8512b479d0045c947e6669f8a2d453595e847e1b28cfdd5cc5cb62",
+      "rawSha256": "9644b36fff5561bba1b8a578c334dcb16bcbb7e2927766f666a7db60b79f4ccc"
+    },
+    "filtered-3.gz": {
+      "bytes": 1096,
+      "sha256": "a82e1df52d04135827cc181c0af95764df7aea5a025f631531b8a124ea406a9a",
+      "rawSha256": "5bc882cca256df617d83a6f13790a59de6dae6b942f2ae3930415f5eaa3b1c5a"
+    },
+    "alpha-4.gz": {
+      "bytes": 5525,
+      "sha256": "4bc352d56a8344d0b21997ae7f1f0a5950e9fa27d97f9dcff144e15aa1c8e2ff",
+      "rawSha256": "927d2b43658bf73839aa9bc906b445fa2ccb3211742a9a9895d2fb9d8eeb81c0"
+    },
+    "filtered-4.gz": {
+      "bytes": 1099,
+      "sha256": "fac8b9947d3886ecbd3aef68f4f61a3aa4cdea4b3ee027e463a5c50237871256",
+      "rawSha256": "7db50067cfc0474dd3280e9527567ab431baadaf9fb3e7244c5f83e6356a3d4f"
+    },
+    "alpha-5.gz": {
+      "bytes": 42312,
+      "sha256": "c0359bc109e84d195154e0b589f356b61838641f4451df1b125bf3c20353b427",
+      "rawSha256": "1186e28aa4819e3095b440616d2d3d251fcb1e33a5d8a621164eebc5b8d25766"
+    },
+    "filtered-5.gz": {
+      "bytes": 998,
+      "sha256": "9e19d104f8b8500029d7b82902dcc0d05726bf3778bda6483b2a0e48d9e47da6",
+      "rawSha256": "61fe303b64e72c057b1c70a0962b4b744a5ffa56ed526d82f0559476c0bfedc3"
+    },
+    "alpha-6.gz": {
+      "bytes": 49089,
+      "sha256": "4ed838e7576f38894010ea7d82a5361f3a66e8de260be86b0ae01fe074eb638e",
+      "rawSha256": "a0c317e127bc600ce7651f50e3b4dc4e39ceb6e58762b12d014e945836779a2a"
+    },
+    "filtered-6.gz": {
+      "bytes": 1035,
+      "sha256": "af1d2db58385d0f82333060041cfef11e77e31d024615132d3da33ed5eee603c",
+      "rawSha256": "992b16f37e2eafdfc07c2eba328c39a25625aa93347c2d353413b5599d28b38d"
+    },
+    "fractional.gz": {
+      "bytes": 105594,
+      "sha256": "8d2f7a0b398821df9b27c0b3e0ea0bf7292d222b0097580d65c78c968458d97a",
+      "rawSha256": "3ba47b6468909d8cd91464535762e5901fc5798dfdfbb04d6b1e194311f9b2a6"
+    },
+    "fill-zero-masked.gz": {
+      "bytes": 6811,
+      "sha256": "2b8a1c0771c13998637ab7b90607bdc13c8be6f6b4c8e876d376fdfaabbbc19c",
+      "rawSha256": "5406a4fb0c784bd2c8ef04bf39654ae86327b6fe0c031ac2e90bb5c89788f20e"
+    },
+    "density-inverted.gz": {
+      "bytes": 102781,
+      "sha256": "cfd72406c4a7b73cbfbab90b60ede4c169d15a179c20caf15e4faa728438fa9c",
+      "rawSha256": "f9378b5da02af6f8ee3cccf95609bbe8e12d047c051ce27be995ec16066daa06"
+    },
+    "max-halo.gz": {
+      "bytes": 42307,
+      "sha256": "d7312d4fc1da053177fb6822f02b189b3cc41a4df66bc9ff945dada4ec43d57b",
+      "rawSha256": "ac05d350832da614e8f4bdf82a175661a6cdcb83e977cb3114d993600eabde2b"
+    },
+    "affine-quarter-turn.gz": {
+      "bytes": 62860,
+      "sha256": "b0796d91f88cb897df2f287215d34733c3b24091d231e897245cad713bae6d53",
+      "rawSha256": "a59ed239b120095c3dfbccb033809915187c40f80700a752ef63c25408f8cecb"
+    },
+    "clipping-base-shape.gz": {
+      "bytes": 37851,
+      "sha256": "b7d87d3c6a1110b6f3a9320530031287bee7b21b8cb445585055277048ebfec4",
+      "rawSha256": "ae6dd6d196942ef537c41fb53971264ed3defb9eb9ade1832c79c8b62ee81fcd"
+    },
+    "isolated-group.gz": {
+      "bytes": 6166,
+      "sha256": "b1cc9c2c47510327e52339dd0c854dde902c8dfd4de8b658de1bde00ccba40c2",
+      "rawSha256": "685fc01acfa578aea58c146acf1a858a9dd6986e6082625e9f3cfbd107e67023"
+    },
+    "nested.gz": {
+      "bytes": 93719,
+      "sha256": "2dbad46199f8e1c2a4e47d58222676ef0d2d29db0751a6aeef4f53f05a476d17",
+      "rawSha256": "8d4000977b2498640d58a50c0a793918c315a3ce7ed67dfa0430560edf063603"
+    },
+    "disabled-exact.gz": {
+      "bytes": 104210,
+      "sha256": "c77fd09420ee95053757a9325753808a8715283ff8f026e585ad29e027c6cca9",
+      "rawSha256": "c4566a51b5f0761425c745a5c81a93a117ea8b5e70db43457a5b8370a6cfe35b"
+    },
+    "zero-exact.gz": {
+      "bytes": 104210,
+      "sha256": "c77fd09420ee95053757a9325753808a8715283ff8f026e585ad29e027c6cca9",
+      "rawSha256": "c4566a51b5f0761425c745a5c81a93a117ea8b5e70db43457a5b8370a6cfe35b"
+    },
+    "completed-appearance-gate.gz": {
+      "bytes": 109619,
+      "sha256": "2281974ee42db97f5c63ba7748edbe42106c2e7580fdcb7dbda62414b15742d7",
+      "rawSha256": "6ae3219947fb92d07620cee233a75d1f09401071513df68055d53bc08681469e"
+    }
+  },
+  "cases": [
+    {
+      "width": 19,
+      "height": 17,
+      "sigma": 0,
+      "axis": "vertical",
+      "source": "alpha-0.gz",
+      "reference": "filtered-0.gz"
+    },
+    {
+      "width": 21,
+      "height": 17,
+      "sigma": 0.125,
+      "axis": "horizontal",
+      "source": "alpha-1.gz",
+      "reference": "filtered-1.gz"
+    },
+    {
+      "width": 19,
+      "height": 25,
+      "sigma": 1.25,
+      "axis": "vertical",
+      "source": "alpha-2.gz",
+      "reference": "filtered-2.gz"
+    },
+    {
+      "width": 41,
+      "height": 17,
+      "sigma": 3.5,
+      "axis": "horizontal",
+      "source": "alpha-3.gz",
+      "reference": "filtered-3.gz"
+    },
+    {
+      "width": 19,
+      "height": 89,
+      "sigma": 12,
+      "axis": "vertical",
+      "source": "alpha-4.gz",
+      "reference": "filtered-4.gz"
+    },
+    {
+      "width": 787,
+      "height": 17,
+      "sigma": 128,
+      "axis": "horizontal",
+      "source": "alpha-5.gz",
+      "reference": "filtered-5.gz"
+    },
+    {
+      "width": 19,
+      "height": 785,
+      "sigma": 128,
+      "axis": "vertical",
+      "source": "alpha-6.gz",
+      "reference": "filtered-6.gz"
+    }
+  ],
+  "scenes": [
+    {
+      "name": "fractional",
+      "layers": [
+        {
+          "kind": "raster",
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 2.5
+            }
+          }
+        }
+      ],
+      "reference": "fractional.gz"
+    },
+    {
+      "name": "fill-zero-masked",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0,
+          "mask": {
+            "rect": [
+              18,
+              13,
+              67,
+              37
+            ]
+          },
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 2.5
+            }
+          }
+        }
+      ],
+      "reference": "fill-zero-masked.gz"
+    },
+    {
+      "name": "density-inverted",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0.375,
+          "opacity": 0.625,
+          "mask": {
+            "rect": [
+              24,
+              19,
+              43,
+              29
+            ],
+            "density": 0.625,
+            "inverted": true
+          },
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": -7.5,
+              "y": 12.25,
+              "blur": 0
+            }
+          }
+        }
+      ],
+      "reference": "density-inverted.gz"
+    },
+    {
+      "name": "max-halo",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0,
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": -256,
+              "y": 256,
+              "blur": 128
+            }
+          }
+        }
+      ],
+      "reference": "max-halo.gz"
+    },
+    {
+      "name": "affine-quarter-turn",
+      "layers": [
+        {
+          "kind": "raster",
+          "x": 90,
+          "y": 3,
+          "transform": {
+            "a": 0,
+            "b": 1,
+            "c": -1,
+            "d": 0,
+            "e": 0,
+            "f": 0
+          },
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 7,
+              "y": 3,
+              "blur": 1.25
+            }
+          }
+        }
+      ],
+      "reference": "affine-quarter-turn.gz"
+    },
+    {
+      "name": "clipping-base-shape",
+      "layers": [
+        {
+          "kind": "raster",
+          "fillOpacity": 0,
+          "mask": {
+            "rect": [
+              12,
+              9,
+              89,
+              51
+            ]
+          },
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 2.5
+            }
+          }
+        },
+        {
+          "kind": "raster",
+          "clipped": true,
+          "x": 19,
+          "y": 9,
+          "opacity": 0.625
+        }
+      ],
+      "reference": "clipping-base-shape.gz"
+    },
+    {
+      "name": "isolated-group",
+      "layers": [
+        {
+          "kind": "group",
+          "fillOpacity": 0,
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 2.5
+            }
+          },
+          "mask": {
+            "rect": [
+              5,
+              7,
+              103,
+              61
+            ]
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "x": 9,
+              "y": 3,
+              "opacity": 0.5
+            }
+          ]
+        }
+      ],
+      "reference": "isolated-group.gz"
+    },
+    {
+      "name": "nested",
+      "layers": [
+        {
+          "kind": "group",
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 1.25
+            }
+          },
+          "children": [
+            {
+              "kind": "raster",
+              "x": 5,
+              "y": 4,
+              "fillOpacity": 0.25,
+              "styles": {
+                "colorOverlay": {
+                  "enabled": false,
+                  "color": "#e35f27",
+                  "opacity": 0
+                },
+                "blendIf": {
+                  "enabled": false,
+                  "channel": "luminance",
+                  "source": [
+                    0,
+                    0,
+                    255,
+                    255
+                  ],
+                  "underlying": [
+                    0,
+                    0,
+                    255,
+                    255
+                  ]
+                },
+                "dropShadow": {
+                  "enabled": true,
+                  "color": "#ad3f79",
+                  "opacity": 0.625,
+                  "x": -3.25,
+                  "y": 7.5,
+                  "blur": 0
+                }
+              }
+            },
+            {
+              "kind": "adjustment",
+              "tone": {
+                "exposure": -1
+              }
+            }
+          ]
+        }
+      ],
+      "reference": "nested.gz"
+    },
+    {
+      "name": "disabled-exact",
+      "layers": [
+        {
+          "kind": "raster",
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": false,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 2.5
+            }
+          }
+        }
+      ],
+      "reference": "disabled-exact.gz"
+    },
+    {
+      "name": "zero-exact",
+      "layers": [
+        {
+          "kind": "raster",
+          "styles": {
+            "colorOverlay": {
+              "enabled": false,
+              "color": "#e35f27",
+              "opacity": 0
+            },
+            "blendIf": {
+              "enabled": false,
+              "channel": "luminance",
+              "source": [
+                0,
+                0,
+                255,
+                255
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 2.5
+            }
+          }
+        }
+      ],
+      "reference": "zero-exact.gz"
+    },
+    {
+      "name": "completed-appearance-gate",
+      "layers": [
+        {
+          "kind": "raster",
+          "opacity": 0.375
+        },
+        {
+          "kind": "raster",
+          "fillOpacity": 0.625,
+          "styles": {
+            "colorOverlay": {
+              "enabled": true,
+              "color": "#e35f27",
+              "opacity": 0.375
+            },
+            "blendIf": {
+              "enabled": true,
+              "channel": "red",
+              "source": [
+                12.25,
+                67.5,
+                193.75,
+                246.5
+              ],
+              "underlying": [
+                0,
+                0,
+                255,
+                255
+              ]
+            },
+            "dropShadow": {
+              "enabled": true,
+              "color": "#ad3f79",
+              "opacity": 0.625,
+              "x": 9.25,
+              "y": -4.75,
+              "blur": 2.5
+            }
+          }
+        }
+      ],
+      "reference": "completed-appearance-gate.gz"
+    }
+  ],
+  "colorTolerance": 2.384185791015625e-07,
+  "alphaTolerance": 0
+}

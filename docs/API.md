@@ -2,7 +2,7 @@
 
 ## Float style metadata
 
-Existing strict `layer.update` style DTOs admit Color Overlay and Blend If in float documents, retaining revisions, locks, atomic rollback and Undo. Drop shadows reject. Independent REST remains PNG-only for assets, supplies no original float TIFF renderer/admission and does not synchronize with browser tabs. [Exact interpretation and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+Existing strict `layer.update` style DTOs admit Color Overlay and Blend If in float documents, retaining revisions, locks, atomic rollback and Undo. Float raster/group shadow metadata also uses the shared commands; direct adjustment shadows reject atomically. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). Independent REST remains PNG-only for assets, supplies no original float TIFF renderer/admission and does not synchronize with browser tabs. [Exact interpretation and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
 ## Float proof remains a trusted host surface
 

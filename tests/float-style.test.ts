@@ -40,7 +40,7 @@ it('existing OO styles share float conversion, locks, transaction rollback, owne
  const document=new Document(),raster=document.layers.add(new RasterLayer({assetId:'original',width:10,height:10})),group=document.layers.add(new LayerGroup()),adjustment=document.layers.add(new AdjustmentLayer());raster.styles=new LayerStyle(manifest.cases.at(-1).style);const before=document.toJSON();document.convertToFloat();const converted=document.toJSON();expect(Document.fromJSON(converted).toJSON()).toEqual(converted);document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(converted);
  document.transaction('Float appearance',()=>{group.styles=new LayerStyle(manifest.cases.at(-1).style);adjustment.styles=new LayerStyle(manifest.cases[2].style);});const edited=document.toJSON();document.undo();expect(document.toJSON()).toEqual(converted);document.redo();expect(document.toJSON()).toEqual(edited);
  const returned=raster.styles.colorOverlay;returned.opacity=0;expect(raster.styles.colorOverlay.opacity).not.toBe(0);
- expect(()=>document.transaction('Rejected shadow',()=>{raster.opacity=.125;raster.styles.dropShadow={enabled:true};})).toThrow('Drop shadows');expect(document.toJSON()).toEqual(edited);
+ expect(()=>document.transaction('Rejected adjustment shadow',()=>{raster.opacity=.125;adjustment.styles.dropShadow={enabled:true};})).toThrow('intrinsic shadow silhouette');expect(document.toJSON()).toEqual(edited);
  group.locked=true;const locked=document.toJSON();expect(()=>group.styles.colorOverlay={enabled:true}).toThrow(/lock/i);expect(document.toJSON()).toEqual(locked);
 });
 it('independent references bind the generator, original source and every complete sample stream',async()=>{

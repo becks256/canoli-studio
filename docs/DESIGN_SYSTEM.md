@@ -2,7 +2,7 @@
 
 ## Float appearance controls
 
-Enable the existing Color overlay and Blend If controls in float documents, with existing disabled/locked/pass-through and preview/commit/cancel behavior. Explain linear-light overlay and continuous sRGB selectors separately from unchanged float samples. Keep drop-shadow controls disabled with the actual missing-capability explanation. Preserve correction controls after preview failure. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+Enable the existing Color overlay and Blend If controls in float documents, with existing disabled/locked/pass-through and preview/commit/cancel behavior. Explain linear-light overlay and continuous sRGB selectors separately from unchanged float samples. Enable drop-shadow controls for float rasters and isolated groups; explain document-pixel blur/offset and Fill versus layer opacity. For float adjustments, disable only shadow controls and explain the isolated artwork group workflow. Preserve correction controls after preview failure. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
 ## Float soft-proof controls
 

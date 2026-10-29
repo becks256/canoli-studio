@@ -5,7 +5,8 @@ import{projectFloatFrame,type FloatSceneFrame}from'./float-frame';
 export type{FloatSceneFrame}from'./float-frame';
 import{clippingStacks}from'../core/clipping';
 import{prepareFloatClipping,restoreFloatClipping}from'./float-clipping';
-import{applyFloatCoverage}from'./float-coverage';
+import{applyFloatCoverage,floatAlphaPlane,fillFloatCoverage}from'./float-coverage';
+import{renderFloatShadow,FloatShadowCache}from'./float-shadow';
 import type{DocumentData,LayerData}from'../core/model';
 import{validateDocument}from'../core/model';
 import{floatSceneIssue,assertFloatSources}from'../core/float-document';
@@ -48,7 +49,7 @@ export class FloatSceneRenderer {
  private entries=new Map<Blob,Map<string,CachedSource>>();
  private lru=new Map<CachedSource,true>();private epoch=0;private closed=false;
  private captures=new Set<AbortController>();
- constructor(private processor:Pick<PixelProcessor,'floatStyle'|'floatComposite'|'floatTone'|'floatTransfer'|'floatAffine'|'floatColor'|'floatGradient'|'prepareFloatLookup'>){}
+ constructor(private processor:Pick<PixelProcessor,'floatConvolveAlpha'|'floatStyle'|'floatComposite'|'floatTone'|'floatTransfer'|'floatAffine'|'floatColor'|'floatGradient'|'prepareFloatLookup'>){}
  private source(store:AssetStore,asset:ImageAsset):FloatRasterSource{
   if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF sources. Byte editing proxies are not precision sources.');
   const key=JSON.stringify([asset.width,asset.height,asset.tiff,asset.tiffColor.source]);let entries=this.entries.get(asset.blob);if(!entries){entries=new Map();this.entries.set(asset.blob,entries);}let entry=entries.get(key);
@@ -80,6 +81,7 @@ export class FloatSceneRenderer {
   if(this.closed)throw new Error('Float scene renderer is closed.');const document=isImmutable(input)?input:freeze(structuredClone(input));validateDocument(document);const issue=floatSceneIssue(document);if(issue)throw new Error(issue);
   assertFloatSources(document,assets);
   const epoch=this.epoch,lifetime=assets.captureLifetime(),sources=new Map<string,{asset:ImageAsset;source:FloatRasterSource;tiff:ImageAsset['tiff'];color:ImageAsset['tiffColor']}>(),masks=new Map<string,{asset:ImageAsset;bitmap:ImageBitmap;blob:Blob;width:number;height:number}>();let closed=false;
+  const shadowCache=new FloatShadowCache();
   const whiteBalances=new Map<string,readonly number[]|null>();
   const lookups=new Map<string,FloatLookupLease>();
   const abort=new AbortController(),incoming=control.signal,cancel=()=>abort.abort(incoming?.reason);incoming?.addEventListener('abort',cancel,{once:true});if(incoming?.aborted)cancel();this.captures.add(abort);control={...control,signal:abort.signal};
@@ -87,7 +89,7 @@ export class FloatSceneRenderer {
    for(const[id,value]of sources)if(!assets.has(id)||assets.get(id)!==value.asset||value.asset.blob!==value.source.original||value.asset.width!==value.source.width||value.asset.height!==value.source.height||value.asset.tiff!==value.tiff||value.asset.tiffColor!==value.color)throw new Error('Float scene source changed.');
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
    visitLayerAssets(layer,reference=>{if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
    if(layer.kind==='group')visit(layer.children);else if(layer.kind==='raster'&&!sources.has(layer.assetId)){const asset=assets.get(layer.assetId);sources.set(asset.id,{asset,source:this.source(assets,asset),tiff:asset.tiff,color:asset.tiffColor});}
@@ -108,50 +110,65 @@ export class FloatSceneRenderer {
     check();const result=await this.processor.floatAffine(pixels,matrix);check();return result;
    };
    const compose=async(input:FloatSourceWindow):Promise<Float32Array<ArrayBuffer>>=>{
-    check();const bounds=validateWindow(input),full:RenderSpace={x:0,y:0,width:document.width,height:document.height,sx:1,sy:1},space:RenderSpace={x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height,sx:1,sy:1},root=new AffineTransform();
-    const mask=async(layer:LayerData,world:AffineTransform)=>{
-     if(!layer.mask?.enabled||layer.mask.density===0)return undefined;check();const result=await maskService(layer.mask,space,maskTransform(layer.mask,world),check);check();if(!(result instanceof Float32Array)||result.length!==bounds.width*bounds.height)throw new Error('Float mask coverage differs from its working window.');for(const value of result)if(!Number.isFinite(value)||value<0||value>1)throw new Error('Float mask coverage is invalid.');return result;
+    check();const bounds=validateWindow(input),full:RenderSpace={x:0,y:0,width:document.width,height:document.height,sx:1,sy:1},root=new AffineTransform();
+    const spaceFor=(area:FloatSourceWindow):RenderSpace=>({x:area.x,y:area.y,width:area.width,height:area.height,sx:1,sy:1});
+    const mask=async(layer:LayerData,world:AffineTransform,area:FloatSourceWindow=bounds)=>{
+     if(!layer.mask?.enabled||layer.mask.density===0)return undefined;check();const result=await maskService(layer.mask,spaceFor(area),maskTransform(layer.mask,world),check);check();if(!(result instanceof Float32Array)||result.length!==area.width*area.height)throw new Error('Float mask coverage differs from its working window.');for(const value of result)if(!Number.isFinite(value)||value<0||value>1)throw new Error('Float mask coverage is invalid.');return result;
     };
     const tone=async(pixels:Float32Array,settings:{exposure:number;contrast:number;saturation:number})=>{
      if(settings.exposure===0&&settings.contrast===0&&settings.saturation===0)return pixels;check();const result=await this.processor.floatTone(pixels,{exposure:settings.exposure,contrast:settings.contrast,saturation:settings.saturation});check();return result;
     };
-    const raster=async(layer:Extract<LayerData,{kind:'raster'}>,world:AffineTransform)=>{
+    const raster=async(layer:Extract<LayerData,{kind:'raster'}>,world:AffineTransform,area:FloatSourceWindow=bounds):Promise<Float32Array>=>{
      const source=sources.get(layer.assetId)!,placement=renderTransform(full,world).multiply(AffineTransform.scale(layer.width/source.source.width,layer.height/source.source.height));
      const effects=layer.effects.filter(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0)),adjusted:FloatWindowSource=effects.length?{width:source.source.width,height:source.source.height,readWindow:async(region,control)=>{let pixels:Float32Array=await source.source.readWindow(region,control);for(const effect of effects)pixels=await tone(pixels,effect);return pixels;}}:source.source;
-     let pixels=await projectFloatWindow(adjusted,placement,bounds,{signal:control.signal,isCancelled:()=>{check();return false;}});
+     let pixels=await projectFloatWindow(adjusted,placement,area,{signal:control.signal,isCancelled:()=>{check();return false;}});
      // Capture dimensions belong to each authored stroke; later raster resizing
      // changes coverage placement without changing the original source geometry.
      for(const entry of layer.erasures??[]){
-      check();const coverage=await maskService({kind:'raster-erasures',width:layer.width,height:layer.height,erasures:[entry],enabled:true,inverted:false,density:1},space,world,check);check();
+      check();const coverage=await maskService({kind:'raster-erasures',width:layer.width,height:layer.height,erasures:[entry],enabled:true,inverted:false,density:1},spaceFor(area),world,check);check();
       pixels=await applyFloatCoverage(pixels,coverage,check);
      }
      return pixels;
     };
-    const paint=async(layers:LayerData[],initial:Float32Array,parent:AffineTransform,clippingMembers=false):Promise<Float32Array>=>{
+    const paint=async(layers:LayerData[],initial:Float32Array,parent:AffineTransform,clippingMembers=false,area:FloatSourceWindow=bounds):Promise<Float32Array>=>{
      let backdrop=initial;
      const stacks=clippingMembers?layers.map(base=>({base,layers:[]as LayerData[]})):clippingStacks(layers);
      for(const stack of stacks){
       const layer=stack.base,clipped=stack.layers.filter(member=>member.visible&&member.opacity>0);
-      check();if(!layer.visible||layer.opacity===0)continue;const world=parent.multiply(localTransform(layer)),coverage=await mask(layer,world),opacity=layer.opacity*(layer.fillOpacity??1),mode=layer.blendMode==='pass-through'?'normal':layer.blendMode;
+      check();if(!layer.visible||layer.opacity===0)continue;const world=parent.multiply(localTransform(layer)),coverage=await mask(layer,world,area),opacity=layer.opacity*(layer.fillOpacity??1),mode=layer.blendMode==='pass-through'?'normal':layer.blendMode;
       const composite:PixelProcessor['floatComposite']=async(source,backdrop,options)=>{
        try{return await this.processor.floatComposite(source,backdrop,options);}
        catch(error){if(error instanceof Error&&error.message.startsWith('This blend mode requires normalized RGB'))throw new Error(`${layer.name} (${mode}): ${error.message}`);throw error;}
       };
+      const readIntrinsic=async(region:FloatSourceWindow):Promise<Float32Array>=>{
+       check();validateWindow(region);
+       if(layer.kind==='raster')return raster(layer,world,region);
+       if(layer.kind==='group')return paint(layer.children,new Float32Array(region.width*region.height*4),world,false,region);
+       throw new Error('A shadow requires intrinsic artwork pixels.');
+      };
+      const compositeStyled=async(pixels:Float32Array,fill:number):Promise<Float32Array>=>{
+       const shadow=layer.styles?.dropShadow;
+       if(!shadow?.enabled||shadow.opacity===0){const styled=await applyFloatStyle(layer,pixels,backdrop,coverage,this.processor,check);return composite(styled.pixels,backdrop,{mode,opacity:layer.opacity*fill,mask:styled.mask});}
+       const field=await renderFloatShadow(area,shadow,async region=>{const intrinsic=await readIntrinsic(region),coverage=await mask(layer,world,region);return floatAlphaPlane(intrinsic,coverage,check);},this.processor,check,{store:shadowCache,key:layer.id});check();
+       const foreground=await fillFloatCoverage(pixels,coverage,fill,check),overlay=await applyFloatStyle(layer,foreground,backdrop,undefined,this.processor,check,'overlay');
+       const appearance=await this.processor.floatComposite(overlay.pixels,field,{mode:'normal'});check();
+       const gated=await applyFloatStyle(layer,appearance,backdrop,undefined,this.processor,check,'blend-if');
+       return composite(gated.pixels,backdrop,{mode,opacity:layer.opacity,mask:gated.mask});
+      };
       if(clipped.length){
        // A pass-through base supplies isolated intrinsic coverage; member
        // pass-through groups still see this stack's working color plane.
-       const intrinsic=layer.kind==='raster'?await raster(layer,world):layer.kind==='group'?await paint(layer.children,new Float32Array(backdrop.length),world):null;
+       const intrinsic=layer.kind==='raster'||layer.kind==='group'?await readIntrinsic(area):null;
        if(!intrinsic)throw new Error('A clipping base requires intrinsic pixels.');
-       const prepared=await prepareFloatClipping(intrinsic,layer.fillOpacity??1,check),colors=await paint(clipped,prepared.plane,parent,true),pixels=await restoreFloatClipping(colors,prepared.shape,check);
-       const styled=await applyFloatStyle(layer,pixels,backdrop,coverage,this.processor,check);
-       backdrop=await composite(styled.pixels,backdrop,{mode,opacity:layer.opacity,mask:styled.mask});
+       const prepared=await prepareFloatClipping(intrinsic,layer.fillOpacity??1,check),colors=await paint(clipped,prepared.plane,parent,true,area),pixels=await restoreFloatClipping(colors,prepared.shape,check);
+       backdrop=await compositeStyled(pixels,1);
       }else if(layer.kind==='group'){
        if(layer.blendMode==='pass-through'){
-        if(layer.opacity===1&&!coverage)backdrop=await paint(layer.children,backdrop,world);
-        else{const after=await paint(layer.children,backdrop.slice(),world);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
-       }else{const pixels=await paint(layer.children,new Float32Array(backdrop.length),world),styled=await applyFloatStyle(layer,pixels,backdrop,coverage,this.processor,check);backdrop=await composite(styled.pixels,backdrop,{mode,opacity,mask:styled.mask});}
+        if(layer.opacity===1&&!coverage)backdrop=await paint(layer.children,backdrop,world,false,area);
+        else{const after=await paint(layer.children,backdrop.slice(),world,false,area);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
+       }else{const pixels=await readIntrinsic(area);backdrop=await compositeStyled(pixels,layer.fillOpacity??1);}
       }else if(layer.kind==='raster'){
-       const pixels=await raster(layer,world);check();const styled=await applyFloatStyle(layer,pixels,backdrop,coverage,this.processor,check);backdrop=await composite(styled.pixels,backdrop,{mode,opacity,mask:styled.mask});
+       const pixels=await raster(layer,world,area);check();backdrop=await compositeStyled(pixels,layer.fillOpacity??1);
       }else if(layer.kind==='adjustment'&&(layer.adjustment.kind==='tone'||layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'||layer.adjustment.kind==='white-balance'||isFloatColorAdjustment(layer.adjustment)||layer.adjustment.kind==='gradient-map'||layer.adjustment.kind==='lut')){
        check();const after=layer.adjustment.kind==='tone'?await tone(backdrop,layer.adjustment):layer.adjustment.kind==='white-balance'?await balance(layer.id,backdrop):isFloatColorAdjustment(layer.adjustment)?await this.processor.floatColor(backdrop,layer.adjustment):layer.adjustment.kind==='gradient-map'?await this.processor.floatGradient(backdrop,layer.adjustment):layer.adjustment.kind==='lut'?await lookups.get(layer.id)!.apply(backdrop):await this.processor.floatTransfer(backdrop,layer.adjustment);check();const styled=await applyFloatStyle(layer,after,backdrop,coverage,this.processor,check);backdrop=await blendFloatAdjustment(backdrop,styled.pixels,mode,opacity,styled.mask,{floatComposite:composite},check);
       }else throw new Error('Unsupported float scene layer.');

@@ -14,7 +14,7 @@ export function floatSceneIssue(document:DocumentData):string|null {
   const visit=(layers:LayerData[]):string|null=>{
     for(const layer of layers){
       const style=layer.styles;
-      if(style?.dropShadow.enabled)return 'Drop shadows require their float document integration.';
+      if(style?.dropShadow.enabled&&layer.kind==='adjustment')return 'Float adjustment layers have no intrinsic shadow silhouette. Apply the shadow to an isolated artwork group.';
       if(layer.kind==='group'){
         if(layer.blendMode==='pass-through'&&(layer.fillOpacity??1)!==1)return 'Float pass-through groups currently require full fill opacity.';
         if(layer.frequencyRadius!=null)return 'Frequency separation requires its float document integration.';

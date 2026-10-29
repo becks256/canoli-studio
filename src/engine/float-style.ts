@@ -4,8 +4,8 @@ import{yieldTask}from'../core/task-yield';
 
 /** Apply appearance to completed layer colors; leave alpha and the original
  * backdrop intact. Mask/fill/layer opacity belong to the following composite. */
-export async function applyFloatStyle(layer:LayerData,pixels:Float32Array,backdrop:Float32Array,mask:Float32Array|undefined,processor:Pick<PixelProcessor,'floatStyle'>,check:()=>void){
- const style=layer.styles;
+export async function applyFloatStyle(layer:LayerData,pixels:Float32Array,backdrop:Float32Array,mask:Float32Array|undefined,processor:Pick<PixelProcessor,'floatStyle'>,check:()=>void,phase:'all'|'overlay'|'blend-if'='all'){
+ const original=layer.styles,style=original?{...original,dropShadow:{...original.dropShadow,enabled:false},colorOverlay:{...original.colorOverlay,enabled:phase!=='blend-if'&&original.colorOverlay.enabled},blendIf:{...original.blendIf,enabled:phase!=='overlay'&&original.blendIf.enabled}}:undefined;
  if(!style||!style.blendIf.enabled&&(!style.colorOverlay.enabled||style.colorOverlay.opacity===0))return{pixels,mask};
  check();const result=await processor.floatStyle(pixels,backdrop,style);check();
  if(!style.blendIf.enabled)return{pixels:result.pixels,mask};

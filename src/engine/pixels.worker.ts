@@ -1,4 +1,5 @@
 import{FloatLookupProcessor}from'./float-lookup';
+import type{FloatConvolutionOptions}from'../core/float-shadow';
 import type{FloatTransferAdjustment}from'../core/float-transfer';
 import{FloatPixelProcessor,validateFloatWorkerWindow,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
 import type { RedEyeAdjustmentData } from "../core/red-eye";
@@ -82,6 +83,7 @@ self.onmessage = async (
   event: MessageEvent<{
     id: number;
     pixels: Uint8ClampedArray;
+    floatConvolveAlpha?:{alpha:Float32Array;settings:FloatConvolutionOptions};
     floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
     floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
     floatAffine?:{pixels:Float32Array;matrix:number[]};
@@ -170,6 +172,10 @@ self.onmessage = async (
       if(data.floatLookupPrepare){const floatLookupHandle=owner.prepare(data.floatLookupPrepare);self.postMessage({id:data.id,floatLookupHandle});}
       else if(data.floatLookupApply){const pixels=owner.apply(data.floatLookupApply.handle,data.floatLookupApply.pixels);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});}
       else{owner.release(data.floatLookupRelease!);self.postMessage({id:data.id});}return;
+    }
+    if(data.floatConvolveAlpha){
+      const owned=floating??=new FloatPixelProcessor(await kernel),request=data.floatConvolveAlpha,pixels=owned.convolveAlpha(request.alpha,request.settings);
+      self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;
     }
     if(data.floatStyle){
       const owned=floating??=new FloatPixelProcessor(await kernel),request=data.floatStyle;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);const floatStyle=owned.style(request.source,request.backdrop,request.style);

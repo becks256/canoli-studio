@@ -7975,3 +7975,53 @@ float tools/layers, working spaces/HDR/CMYK, photographic/interchange and physic
 quality, sustained editor-wide F14/device/global-memory, AI/provider/evaluation,
 installed ChatGPT/live identity, collaboration, specialist and commercial gates
 remain required. The complete original objective stays active.
+
+
+### 2026-10-29 — F10 native float shadows (bounded acceptance)
+
+Owner: implementation agent; delivered the L T17/F10/F14 increment beginning at
+`6ad5213`. Original-derived raster/isolated-group shadows use bounded native
+Gaussian alpha halos, pre-Fill masked silhouette, completed-appearance Blend If
+and native-first frame/file ordering. Clipping bases preserve their own intrinsic
+shape. Direct float adjustments require an isolated artwork group. Existing OO
+commands, isolated grants, source/revision checks, history and native containers
+remain unchanged. [Defaults, math, executable example and limits](FLOAT_DOCUMENTS.md#native-float-drop-shadows).
+
+Both full builds pass; all **2957 unit/API tests across 289 files** pass. One
+complete native matrix passes **41 cases across 10 files**; a corrected-guide
+check passes separately. All **179 normal-production workflows** pass without
+developer globals. All final browser runs have zero skips, retries, flakes or
+failures. Seven independent native Gaussian planes (2261 output values), eleven
+complete scenes (455356 RGBA channels), half-size frames (111540 channels), tiled
+reads, capture cancellation, original hashes, exact Undo/projects/workspace and
+receiving recipes pass. Inspector/isolated example and independent complete
+float32/16-bit TIFF, PNG and PDF samples/profiles pass in source and production.
+
+The original 10000 by 5000 source remains intact. A separate 500 by 250 preview
+retains native source geometry. At zero Fill, 6912 native witness
+pixels visibly extend outside the source mask. The delivered PNG has
+711928 visible pixels and all 200000000 channel
+values match the independent streaming reference exactly. The oracle verifies
+complete source alpha and derives shadow geometry independently. No transparent
+or fully hidden-shadow comparison substitutes for visible acceptance.
+
+The large workflow took **595.189 seconds**, nearly the unchanged
+600-second deadline. This includes import/preview/export/readback and has no
+per-phase timing. It is a remaining performance concern, not 60fps, a speedup,
+or global memory/device acceptance. Profile and improve the large masked/empty
+halo and native-composition paths without weakening numeric/history/source gates.
+Capture-local 16 MiB alpha retention and bounded per-request windows do not prove
+an editor-wide memory or responsiveness guarantee.
+
+Final review corrected a guide-only default-opacity typo (35% to the existing
+45%). A complete rebuild changes only that guide HTML; product JavaScript/WASM
+remain exact. The corrected narrow/no-JavaScript guide and complete production
+suite pass. The native matrix's frozen product sources/releases remain identical
+apart from that separately recorded documentation correction. Thresholds and
+deadlines were not widened. [Reports, exact identities and retained delta evidence](benchmarks/float-shadow-2026-10-29.md).
+
+This accepts the bounded float shadow feature. Other float tools/layer families,
+full HDR/working-profile/CMYK delivery and broader interchange, sustained all-tool
+F14 latency/process-memory/device gates, and every unfinished original
+professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
+requirement remain active. The full original roadmap remains active.

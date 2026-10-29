@@ -2,7 +2,7 @@
 
 ## Float appearance invariant
 
-Mix authored sRGB overlay colors in linear working RGB. Blend If bounds only continuous encoded selector coordinates, leaving actual signed/extended colors intact; coverage stays separate from alpha. Apply completed layer/clipping appearance once against the captured sibling backdrop, then shared mask/fill/opacity/blending. Adjustments retain backdrop alpha. Drop shadows still reject. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+Mix authored sRGB overlay colors in linear working RGB. Blend If bounds only continuous encoded selector coordinates, leaving actual signed/extended colors intact; coverage stays separate from alpha. Apply completed layer/clipping appearance once against the captured sibling backdrop, then shared mask/fill/opacity/blending. Adjustments retain backdrop alpha. For raster/isolated-group shadows, capture intrinsic alpha after masks and before own Fill/styles/opacity, convolve bounded native alpha bands, offset in document pixels, then place styled foreground over the shadow. Gate completed appearance with Blend If before final layer opacity/blending. Direct adjustment shadows reject. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
 ## Float proof boundary
 

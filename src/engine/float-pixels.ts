@@ -1,3 +1,5 @@
+import{floatConvolutionSchema,floatConvolutionLength,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
+import{gaussianWeights}from'../core/smart/spatial-filter';
 import{compileFloatStyle}from'../core/float-style';
 import type{LayerStyleData}from'../core/drawing';
 import{compileFloatColor,type FloatColorAdjustment}from'../core/float-color';
@@ -31,9 +33,17 @@ function checked(status:number){if(status===1)throw new Error('Float pixels, alp
  * Private memory and owned outputs prevent ordinary byte work from overwriting it. */
 export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
- constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.styleFloat!=='function'||typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
+ constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.convolveAlphaFloat!=='function'||typeof kernel.styleFloat!=='function'||typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
+ convolveAlpha(alpha:Float32Array,input:FloatConvolutionOptions):Float32Array<ArrayBuffer>{
+  const kernel=this.owner(),settings=floatConvolutionSchema.parse(input),length=floatConvolutionLength(settings);validateFloatAlpha(alpha,settings.width*settings.height);
+  const weights=gaussianWeights(settings.sigma),source=Math.ceil(kernel.bufferOffset()/8)*8,output=source+alpha.length*4,coefficients=Math.ceil((output+length*4)/8)*8,required=coefficients+weights.byteLength;
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Float32Array(kernel.memory.buffer,source,alpha.length).set(alpha);new Float64Array(kernel.memory.buffer,coefficients,weights.length).set(weights);
+  checked(kernel.convolveAlphaFloat(source,output,coefficients,settings.width,settings.height,Math.ceil(settings.sigma*3),settings.axis==='horizontal'?0:1));
+  const result=new Float32Array(new Float32Array(kernel.memory.buffer,output,length));validateFloatAlpha(result,length);return result;
+ }
  private layout(pixels:number,masked=false,extra=0){
   const kernel=this.owner(),base=Math.ceil(kernel.bufferOffset()/8)*8,bytes=pixels*16,source=base,backdrop=source+bytes,output=backdrop+bytes,mask=output+bytes,scratch=Math.ceil((mask+(masked?pixels*4:0))/8)*8,matrix=scratch+24,required=matrix+96+extra;
   if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));return{kernel,source,backdrop,output,mask:masked?mask:0,scratch,matrix};

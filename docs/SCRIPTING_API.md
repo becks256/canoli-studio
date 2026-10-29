@@ -2,7 +2,7 @@
 
 ## Float layer appearance
 
-Existing `Layer.styles: LayerStyle`, `LayerStyle.colorOverlay`, `LayerStyle.blendIf` and immutable `BlendIf` values also support float rasters/groups/clipping/supported adjustments. Defaults/signatures remain unchanged. Overlay mixes linear RGB; Blend If uses continuous encoded selectors with separate coverage, preserving alpha and original data. Native services stay private; drop shadows reject atomically. [Defaults, math, executable example, errors and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+Existing `Layer.styles: LayerStyle`, `LayerStyle.colorOverlay`, `LayerStyle.blendIf` and immutable `BlendIf` values also support float rasters/groups/clipping/supported adjustments. Defaults/signatures remain unchanged. Overlay mixes linear RGB; Blend If uses continuous encoded selectors with separate coverage, preserving alpha and original data. Existing `LayerStyle.dropShadow` also supports float rasters and isolated groups, including clipping bases. Direct adjustment shadows reject atomically because they have no intrinsic silhouette. Native services stay private. [Shadow defaults, order, example and limits](FLOAT_DOCUMENTS.md#native-float-drop-shadows). [Defaults, math, executable example, errors and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
 ## Precision conversion with host proof preferences
 

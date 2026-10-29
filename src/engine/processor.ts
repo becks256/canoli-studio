@@ -1,6 +1,7 @@
 import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
 import{parseFloatTransfer,type FloatTransferAdjustment}from'../core/float-transfer';
 import{floatCompositeOptionsSchema,floatToneOptionsSchema,validateFloatWorkerWindow,validateFloatStyleResult,type FloatStyleResult,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
+import{floatConvolutionSchema,floatConvolutionLength,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
 import{compileFloatStyle}from'../core/float-style';
 import type{LayerStyleData}from'../core/drawing';
 import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
@@ -112,6 +113,10 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
+  async floatConvolveAlpha(alpha:Float32Array,input:FloatConvolutionOptions):Promise<Float32Array>{
+    const settings=floatConvolutionSchema.parse(input);validateFloatAlpha(alpha,settings.width*settings.height);const captured={alpha:alpha.slice(),settings},length=floatConvolutionLength(settings);
+    const result=await this.request(new Uint8ClampedArray(0),{floatConvolveAlpha:captured});validateFloatAlpha(result,length);return result;
+  }
   async floatStyle(source:Float32Array,backdrop:Float32Array,input:LayerStyleData):Promise<FloatStyleResult>{
     const {style}=compileFloatStyle(input);validateFloatWorkerWindow(source);validateFloatWorkerWindow(backdrop);if(source.length!==backdrop.length)throw new Error('Float style source and backdrop geometry differ.');
     const captured={source:source.slice(),backdrop:backdrop.slice(),style},length=source.length,alpha=new Uint32Array(length/4),words=new Uint32Array(source.buffer,source.byteOffset,source.length);
@@ -414,6 +419,7 @@ export class PixelProcessor {
   private async request(
     pixels: Uint8ClampedArray,
     payload: {
+      floatConvolveAlpha?:{alpha:Float32Array;settings:FloatConvolutionOptions};
       floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
       floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
       floatAffine?:{pixels:Float32Array;matrix:number[]};
@@ -516,6 +522,7 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
+    if(payload.floatConvolveAlpha)tryTransfer(payload.floatConvolveAlpha.alpha.buffer);
     if(payload.floatStyle){tryTransfer(payload.floatStyle.source.buffer);tryTransfer(payload.floatStyle.backdrop.buffer);}
     if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}
     if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);

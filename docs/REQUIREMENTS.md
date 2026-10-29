@@ -2,7 +2,7 @@
 
 ## Float Color Overlay and Blend If
 
-Existing controls, OO styles, strict commands, isolated edits and native persistence support linear float overlay and continuous split-range blending for rasters, isolated groups, clipping stacks and supported adjustments. Exact alpha/source preservation, preview cancellation, one-step Undo and independent display/file references are required. Drop shadows remain unavailable. [Defaults, math, example and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+Existing controls, OO styles, strict commands, isolated edits and native persistence support linear float overlay and continuous split-range blending for rasters, isolated groups, clipping stacks and supported adjustments. Exact alpha/source preservation, preview cancellation, one-step Undo and independent display/file references are required. Float rasters and isolated groups also support native Gaussian drop shadows; direct adjustment shadows reject with an isolated-group explanation. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). [Defaults, math, example and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
 ## Native float device proofing
 

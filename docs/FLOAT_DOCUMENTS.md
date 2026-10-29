@@ -145,7 +145,7 @@ changes the accumulated backdrop; pass-through group opacity interpolates
 premultiplied before/after backdrops rather than source-over compositing a second
 copy. Masks use the existing byte coverage rasterizer; color stays float32.
 
-Other layer types, drop shadows, prepared wet raster replacements,
+Other layer types, prepared wet raster replacements,
 frequency separation and adjustment types other than Tone/Curves/Levels reject
 atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
 palette and context controls disable unsupported creation/color tools. Move,
@@ -531,7 +531,7 @@ isolated child coverage; pass-through members see the stack's color plane.
 Normal groups, raster transforms, full tone effects, clipped tone adjustment
 layers, member masks/opacity/fill and nested sibling stacks keep their existing
 float semantics. All existing normalized artistic modes are described below.
-Pass-through fill still requires 1. Drop shadows and unsupported layer types remain
+Pass-through fill still requires 1. Unsupported layer types remain
 gated; this does not add Photoshop advanced clipping
 switches or float SVG/PSD/PSB interchange.
 
@@ -798,8 +798,8 @@ validation, shared commands, Undo, plugin grants and separate REST are unchanged
 Existing `LayerStyle` and `BlendIf` constructors now work on float rasters,
 isolated groups, clipping stacks and supported adjustment layers. Inspector
 controls retain their existing defaults, preview/cancel, locks and shared Undo.
-Drop shadow remains unavailable in float documents; enabling it rejects the
-complete command/transaction before mutation. Pass-through groups still require
+Raster/isolated-group drop shadows use the native shadow contract below. Direct
+adjustment shadows reject atomically. Pass-through groups still require
 disabled group styles and full Fill.
 
 Color Overlay uses the existing six-digit sRGB color and opacity in [0,1]. Its
@@ -862,3 +862,68 @@ renderer limits and do not synchronize with the browser. Malformed native
 results, nonfinite colors, changed alpha, coverage outside [0,1] and wrong window
 shapes reject before publication; caller buffers remain attached. The dated
 roadmap records verified coverage and remaining F10/F14/device/quality gates.
+
+
+## Native float drop shadows
+
+Existing `LayerStyle.dropShadow` supports float raster layers and isolated artwork
+groups, including clipping bases and nested groups. Its unchanged defaults are
+`{enabled:false,color:'#000000',opacity:.45,x:8,y:8,blur:12}`. Color is six-digit
+sRGB hex, opacity is 0..1, offsets are -256..256 and blur is Gaussian sigma 0..128;
+fractions are allowed. Invalid values reject the complete command/transaction.
+Direct adjustment shadows reject: an adjustment has no independent silhouette.
+Put artwork and its adjustments in an isolated `LayerGroup` and style that group.
+Pass-through groups still require disabled own styles and full Fill.
+
+The silhouette is intrinsic raster/group alpha after own erasures and mask, before
+own Fill, overlay, Blend If and layer opacity. Clipping-base shape excludes the
+clipped members and base Fill. Child appearance contributes to group intrinsic
+alpha. Mask coverage retains the existing rasterizer precision; source RGB never
+enters a byte canvas. Fill changes foreground coverage while zero Fill can retain
+a visible shadow. Layer opacity changes the complete artwork and shadow once.
+
+Blur uses document pixels after affine artwork placement: normalized finite
+Gaussian support `ceil(3*blur)` on each axis, ordered float64 sums and one float32
+store per axis. Sigma zero copies alpha exactly. Fractional offsets sample the
+blurred native field bilinearly. Shadow color is decoded to linear sRGB and rounded
+to float32; alpha is the sampled field times shadow opacity. Foreground alpha is
+rounded once after mask and Fill, Color Overlay affects foreground RGB, and normal
+source-over puts that foreground over the shadow. Blend If evaluates this completed
+appearance against its sibling backdrop before the final layer blend/opacity.
+The mask is not applied a second time to the shifted shadow. Completed native
+appearance precedes viewport/frame filtering and native PNG/TIFF/PDF delivery.
+Shadow disabled or zero opacity takes the exact previous no-shadow path.
+
+Each native request stays within 262144 alpha samples. Output blocks are at most
+128 by 128, source halo reads use 32-row bands, and the horizontal intermediate
+contains alpha only. The capture-local Gaussian alpha LRU retains at most 16 MiB
+and clears on disposal. These are working allocation budgets; source/artboard
+resolution is unchanged. Native worker validation, source ownership, cancellation,
+revision/grants, shared Undo, project/workspace and recipe contracts remain.
+Older float implementations can reject the newly supported style metadata.
+Independent REST accepts the metadata but has no browser float renderer or sync.
+No new public native/pixel/file capability is exposed to isolated code/plugins.
+
+Open an original-backed TIFF in float mode first. This isolated example is one
+ordinary script transaction and leaves a visible shadow at zero Fill:
+
+<!-- example: float-shadow -->
+```js
+const layer = document.layers.at(0);
+layer.fillOpacity = 0;
+layer.mask = new LayerMask({linked:false, selection:new MarqueeSelection({
+  shape:'rectangle', x:64, y:64, width:128, height:128,
+})});
+layer.styles = new LayerStyle({dropShadow:{
+  enabled:true, color:'#ad3f79', opacity:.625, x:9.25, y:-4.75, blur:2.5,
+}});
+document.layers.add(new AdjustmentLayer({name:'Float shadow adjustment',
+  adjustment:{kind:'tone', exposure:0, contrast:0, saturation:0},
+}));
+document.selectedLayer = layer;
+print('Float shadow example ready');
+```
+
+This extends the existing linear-sRGB float scene subset. It does not establish
+Photoshop shadow equivalence, all-float layer/tool support, HDR/CMYK delivery,
+sustained 60fps or complete editor/device/process-memory performance acceptance.

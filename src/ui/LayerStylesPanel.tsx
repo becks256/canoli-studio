@@ -102,6 +102,7 @@ export function LayerStylesPanel({
   value,
   disabled,
   float = false,
+  shadowUnavailable = false,
   onPreview,
   onCommit,
   onCancel,
@@ -109,6 +110,7 @@ export function LayerStylesPanel({
   value: LayerStyleData;
   disabled: boolean;
   float?: boolean;
+  shadowUnavailable?: boolean;
   onCancel(): void;
   onPreview(value: LayerStyleData): void;
   onCommit(value: LayerStyleData): void;
@@ -234,14 +236,14 @@ export function LayerStylesPanel({
         />
       </InspectorSection>
       <InspectorSection title="Drop shadow">
-        {float&&<p className="section-description">Drop shadows require their float document integration.</p>}
+        {float&&<p className="section-description">{shadowUnavailable?'Apply a shadow to an isolated artwork group containing this adjustment.':'Shadow blur and offsets use document pixels. Fill changes the artwork; layer opacity changes artwork and shadow.'}</p>}
         <div className="style-color-row">
           <label className="check-field">
             <input
               type="checkbox"
               aria-label="Enable drop shadow"
               checked={value.dropShadow.enabled}
-              disabled={disabled || float}
+              disabled={disabled || shadowUnavailable}
               onChange={(e) =>
                 onCommit({
                   ...value,
@@ -257,7 +259,7 @@ export function LayerStylesPanel({
           <ColorInput
             label="Shadow color"
             value={value.dropShadow.color}
-            disabled={disabled || float || !value.dropShadow.enabled}
+            disabled={disabled || shadowUnavailable || !value.dropShadow.enabled}
             onPreview={color => onPreview({ ...value, dropShadow: { ...value.dropShadow, color } })}
             onCommit={color => onCommit({ ...value, dropShadow: { ...value.dropShadow, color } })}
             onCancel={onCancel}
@@ -271,7 +273,7 @@ export function LayerStylesPanel({
               min={key === "blur" ? 0 : -256}
               max={key === "blur" ? 128 : 256}
               value={value.dropShadow[key]}
-              disabled={disabled || float || !value.dropShadow.enabled}
+              disabled={disabled || shadowUnavailable || !value.dropShadow.enabled}
               onPreview={(next) =>
                 onPreview({
                   ...value,
@@ -294,7 +296,7 @@ export function LayerStylesPanel({
           max={100}
           value={value.dropShadow.opacity * 100}
           suffix="%"
-          disabled={disabled || float || !value.dropShadow.enabled}
+          disabled={disabled || shadowUnavailable || !value.dropShadow.enabled}
           onPreview={(opacity) =>
             onPreview({
               ...value,

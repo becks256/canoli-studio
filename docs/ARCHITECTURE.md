@@ -4,6 +4,14 @@
 
 `core/float-style` compiles strict existing LayerStyle data into linear overlay colors and continuous sRGB selector ranges. The private `styleFloat` WASM operation returns unchanged-alpha colors and separate float coverage. Captured worker inputs/results remain owned and validated; float-scene applies appearance after intrinsic/clipping construction and before existing mask/fill/opacity/blend. Adjustment interpolation preserves backdrop alpha. No schema or public mutation surface changes. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
+`core/float-shadow` validates the private alpha protocol; `convolveAlphaFloat`
+computes normalized finite Gaussian axes in owned worker/WASM memory.
+`engine/float-shadow` requests narrow intrinsic-alpha halo bands and retains a
+capture-local 16 MiB LRU of Gaussian alpha fields. Source rasters remain native;
+only alpha enters convolution. Capture disposal clears these fields. Scene
+recursion carries each native region through groups, masks and clipping before
+final frame filtering. [Ordering and limits](FLOAT_DOCUMENTS.md#native-float-drop-shadows).
+
 ## Native float device proofing
 
 Explicit source/display/device CMM transforms consume genuine float samples. FloatSceneRenderer captures proof settings, composes/filters native pixels, then borrows a proof-keyed display owner. AdaptiveRenderer skips the old byte proof pass for float frames. Native settings preflight, conversion, workspace ownership, cancellation and complete-frame publication retain their host boundaries. [Contract and current verification](FLOAT_PROOFING.md).
