@@ -56,7 +56,7 @@ import {
   renderSelection,
 } from "./wasm";
 import type { SelectionTile, FeatherTile } from "./wasm";
-import type { BlendIfData } from "../core/drawing";
+import type { BlendIfData,LayerStyleData } from "../core/drawing";
 import type { ToneEffectData } from "../core/model";
 
 const kernel = fetch(`${import.meta.env.BASE_URL}wasm/pixels.wasm`)
@@ -82,6 +82,7 @@ self.onmessage = async (
   event: MessageEvent<{
     id: number;
     pixels: Uint8ClampedArray;
+    floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
     floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
     floatAffine?:{pixels:Float32Array;matrix:number[]};
     floatTone?:{pixels:Float32Array;options:FloatToneOptions};
@@ -169,6 +170,10 @@ self.onmessage = async (
       if(data.floatLookupPrepare){const floatLookupHandle=owner.prepare(data.floatLookupPrepare);self.postMessage({id:data.id,floatLookupHandle});}
       else if(data.floatLookupApply){const pixels=owner.apply(data.floatLookupApply.handle,data.floatLookupApply.pixels);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});}
       else{owner.release(data.floatLookupRelease!);self.postMessage({id:data.id});}return;
+    }
+    if(data.floatStyle){
+      const owned=floating??=new FloatPixelProcessor(await kernel),request=data.floatStyle;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);const floatStyle=owned.style(request.source,request.backdrop,request.style);
+      self.postMessage({id:data.id,floatStyle},{transfer:[floatStyle.pixels.buffer as ArrayBuffer,floatStyle.coverage.buffer as ArrayBuffer]});return;
     }
     if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTransfer||data.floatColor||data.floatGradient){
       const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;

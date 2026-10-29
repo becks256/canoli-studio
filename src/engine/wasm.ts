@@ -45,6 +45,7 @@ interface QuickSelectionKernel {
 }
 
 export interface PixelKernel extends QuickSelectionKernel {
+  styleFloat(source:number,backdrop:number,output:number,coverage:number,values:number,pixels:number,channel:number):number;
   gradientFloat(source:number,output:number,stops:number,pixels:number,count:number,reverse:boolean):number;
   lookupFloat(source:number,output:number,table:number,params:number,pixels:number,size:number,dimension:number,tetrahedral:boolean,identity:boolean):number;
   colorFloat(source:number,output:number,values:number,pixels:number,kind:number):number;

@@ -1,3 +1,5 @@
+import{compileFloatStyle}from'../core/float-style';
+import type{LayerStyleData}from'../core/drawing';
 import{compileFloatColor,type FloatColorAdjustment}from'../core/float-color';
 import{compileFloatGradient}from'../core/float-gradient';
 import type{GradientMapAdjustmentData}from'../core/gradient-map';
@@ -10,6 +12,14 @@ export const floatToneOptionsSchema=z.object({exposure:z.number().finite().min(T
 export type FloatToneOptions=z.input<typeof floatToneOptionsSchema>;
 export const floatCompositeOptionsSchema=z.object({mode:z.enum(BLEND_MODES).default('normal'),opacity:z.number().finite().min(0).max(1).default(1),mask:z.instanceof(Float32Array).optional()}).strict();
 export interface FloatCompositeOptions{mode?:BlendMode;opacity?:number;mask?:Float32Array}
+export interface FloatStyleResult{pixels:Float32Array;coverage:Float32Array}
+export function validateFloatStyleResult(value:unknown,length:number,alpha:Uint32Array):asserts value is FloatStyleResult{
+ if(!value||typeof value!=='object'||Object.keys(value).length!==2||!('pixels'in value)||!('coverage'in value))throw new Error('Invalid float style worker result.');
+ const {pixels,coverage}=value as FloatStyleResult;validateFloatWorkerWindow(pixels);
+ if(pixels.length!==length||!(coverage instanceof Float32Array)||!(coverage.buffer instanceof ArrayBuffer)||('resizable'in coverage.buffer&&coverage.buffer.resizable)||('detached'in coverage.buffer&&coverage.buffer.detached)||coverage.length!==length/4)throw new Error('Float style result geometry differs.');
+ const words=new Uint32Array(pixels.buffer,pixels.byteOffset,pixels.length);
+ for(let i=0;i<coverage.length;i++)if(!Number.isFinite(coverage[i])||coverage[i]<0||coverage[i]>1||words[i*4+3]!==alpha[i])throw new Error('Float style coverage or alpha differs.');
+}
 const WINDOW=65536;
 function samples(value:Float32Array,label:string){
  if(!(value instanceof Float32Array)||!(value.buffer instanceof ArrayBuffer)||('resizable'in value.buffer&&value.buffer.resizable)||('detached'in value.buffer&&value.buffer.detached)||value.length%4)throw new Error(label+' must be owned, fixed straight RGBA float32 samples.');
@@ -21,12 +31,22 @@ function checked(status:number){if(status===1)throw new Error('Float pixels, alp
  * Private memory and owned outputs prevent ordinary byte work from overwriting it. */
 export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
- constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
+ constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.styleFloat!=='function'||typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
  private layout(pixels:number,masked=false,extra=0){
   const kernel=this.owner(),base=Math.ceil(kernel.bufferOffset()/8)*8,bytes=pixels*16,source=base,backdrop=source+bytes,output=backdrop+bytes,mask=output+bytes,scratch=Math.ceil((mask+(masked?pixels*4:0))/8)*8,matrix=scratch+24,required=matrix+96+extra;
   if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));return{kernel,source,backdrop,output,mask:masked?mask:0,scratch,matrix};
+ }
+ style(source:Float32Array,backdrop:Float32Array,input:LayerStyleData):FloatStyleResult{
+  this.owner();const {values,channel}=compileFloatStyle(input);samples(source,'Source');samples(backdrop,'Backdrop');if(source.length!==backdrop.length)throw new Error('Float style source and backdrop geometry differ.');
+  const result=new Float32Array(source.length),coverage=new Float32Array(source.length/4);
+  for(let at=0;at<source.length;at+=WINDOW*4){
+   const count=Math.min(WINDOW,(source.length-at)/4),p=this.layout(count,true,values.length*8),memory=p.kernel.memory.buffer;
+   new Float32Array(memory,p.source,count*4).set(source.subarray(at,at+count*4));new Float32Array(memory,p.backdrop,count*4).set(backdrop.subarray(at,at+count*4));new Float64Array(memory,p.matrix,values.length).set(values);
+   checked(p.kernel.styleFloat(p.source,p.backdrop,p.output,p.mask,p.matrix,count,channel));result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);coverage.set(new Float32Array(p.kernel.memory.buffer,p.mask,count),at/4);
+  }
+  return{pixels:result,coverage};
  }
  composite(source:Float32Array,backdrop:Float32Array,options:FloatCompositeOptions={}):Float32Array<ArrayBuffer>{
   this.owner();const settings=floatCompositeOptionsSchema.parse(options);samples(source,'Source');samples(backdrop,'Backdrop');if(source.length!==backdrop.length)throw new Error('Float source and backdrop geometry differ.');

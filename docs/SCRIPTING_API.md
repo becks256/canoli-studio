@@ -1,5 +1,9 @@
 # Scripting API
 
+## Float layer appearance
+
+Existing `Layer.styles: LayerStyle`, `LayerStyle.colorOverlay`, `LayerStyle.blendIf` and immutable `BlendIf` values also support float rasters/groups/clipping/supported adjustments. Defaults/signatures remain unchanged. Overlay mixes linear RGB; Blend If uses continuous encoded selectors with separate coverage, preserving alpha and original data. Native services stay private; drop shadows reject atomically. [Defaults, math, executable example, errors and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+
 ## Precision conversion with host proof preferences
 
 document.convertToFloat() retains the current trusted host proof preferences; it does not expose profiles, native workers, files or rendering to isolated code. The existing one-transaction shared command, revision, source and permission checks remain. Subsequent edits and precision Undo/Redo render through the current proof settings. Trusted editor.convertDocumentToFloat(control = {}, settings = editor.colorSettings) now retains the current proof by default and preflights its direct float transform; an explicit settings.proof = null disables it. [Contract and current verification](FLOAT_PROOFING.md).

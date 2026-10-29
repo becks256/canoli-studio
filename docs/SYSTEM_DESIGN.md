@@ -1,5 +1,9 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Float appearance invariant
+
+Mix authored sRGB overlay colors in linear working RGB. Blend If bounds only continuous encoded selector coordinates, leaving actual signed/extended colors intact; coverage stays separate from alpha. Apply completed layer/clipping appearance once against the captured sibling backdrop, then shared mask/fill/opacity/blending. Adjustments retain backdrop alpha. Drop shadows still reject. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+
 ## Float proof boundary
 
 Resolve complete native composition, coverage and frame sampling before the explicit float-to-device-to-sRGB proof transform. Display/profile preparation shares the existing two-owner queue; source preparation precedes display acquisition. Exact proof settings/fingerprints bind idle reuse. Only a complete current proof frame may publish; exports retain their separate native scene/output path. [Contract and current verification](FLOAT_PROOFING.md).

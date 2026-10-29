@@ -22,6 +22,8 @@ p.add_argument('--clipping',type=json.loads,help='Independent sibling clipping s
 p.add_argument('--blend-scene',type=json.loads,help='Independent normalized float blend scene; fixed f32/uint16 numerical bounds with exact alpha')
 p.add_argument('--white-balance-scene',type=json.loads,help='Registered independent float White Balance scene; scaled f32 color bound, integer bound 1 and exact alpha words')
 p.add_argument('--palette-scene',type=json.loads,help='Independent continuous float Gradient Map/Color Lookup scene; expected-scaled f32 bound2^-22, integer1 and exact alpha')
+p.add_argument('--require-visible',action='store_true',help='Require visible nonzero artwork in addition to complete sample comparisons')
+p.add_argument('--style-scene',type=json.loads,help='Independent linear overlay and continuous Blend If scene; scaled f32 color 2^-22, integer 1, exact alpha')
 p.add_argument('--color-scene',type=json.loads,help='Independent continuous HSL/Color Balance/Vibrance scene; scaled f32 bound 2^-22, integer bound 1 and exact alpha words')
 p.add_argument('--write-linear-reference',type=Path,help='Retain the complete independent linear color-scene reference for another output format')
 p.add_argument('--read-linear-reference',type=Path,help='Reuse a complete independently computed color reference with checked source, scene, CMM, geometry and sample hashes')
@@ -132,6 +134,11 @@ if a.palette_scene is not None:
  import runpy
  assert isinstance(a.palette_scene,list)and a.color_scene is None and a.white_balance_scene is None and a.blend_scene is None and a.clipping is None and a.erasures is None and not a.tone
  palette_reference=runpy.run_path(str(root/'scripts/float_palette_reference.py'))['render']
+style_reference=None
+if a.style_scene is not None:
+ import runpy
+ assert isinstance(a.style_scene,list)and all(v is None for v in [a.palette_scene,a.color_scene,a.white_balance_scene,a.blend_scene,a.clipping,a.erasures])and not a.tone
+ style_reference=runpy.run_path(str(root/'scripts/float_style_reference.py'))['render']
 linear_cache=None;linear_hash=hashlib.sha256();linear_bytes=0
 cache_identity=dict(version=1,sourceName=a.source_name,sourceManifestSha256=hashlib.sha256((fixtures/'manifest.json').read_bytes()).hexdigest(),sourceReferenceSha256=hashlib.sha256(reference.read_bytes()).hexdigest(),nativeCmmSha256=manifest['nativeCmmSha256'],scene=a.palette_scene if a.palette_scene is not None else a.color_scene,width=width,height=height,sampleFormat='rgba-float32-le',referenceCodeSha256={name:hashlib.sha256((root/'scripts'/name).read_bytes()).hexdigest()for name in ['float_color_reference.py','float_clipping_reference.py','float_transfer_reference.py','float_white_balance_reference.py','float_blend_reference.py']})
 if a.write_linear_reference is not None or a.read_linear_reference is not None:
@@ -147,7 +154,7 @@ if a.write_linear_reference is not None or a.read_linear_reference is not None:
   linear_cache=cache_path.open('rb')
  else:
   assert not cache_metadata.exists();linear_cache=cache_path.open('xb')
-samples=0;different=0;maximum=0.;maximum_color=0.;maximum_alpha=0.;maximum_scaled_color=0.;alpha_words_different=0;extended=0;actual_hash=hashlib.sha256();expected_hash=hashlib.sha256()
+visible_pixels=0;visible_colors=0;samples=0;different=0;maximum=0.;maximum_color=0.;maximum_alpha=0.;maximum_scaled_color=0.;alpha_words_different=0;extended=0;actual_hash=hashlib.sha256();expected_hash=hashlib.sha256()
 reference_output=None
 if a.reference_raw is not None:
  assert a.reference_raw.resolve()!=a.output.resolve()
@@ -157,7 +164,10 @@ try:
   for top in range(0,height,th):
    count=min(th,height-top);raw=original.read(count*width*16);assert len(raw)==count*width*16
    linear=np.frombuffer(raw,dtype='<f4').reshape(count,width,4).copy()
-   if color_reference is not None or palette_reference is not None:
+   if style_reference is not None:
+    source_scale=np.max(np.abs(linear[:,:,:3]),axis=2).astype(np.float64)
+    linear=style_reference(linear,a.style_scene,origin=(0,top))
+   elif color_reference is not None or palette_reference is not None:
     source_scale=np.max(np.abs(linear[:,:,:3]),axis=2).astype(np.float64)
     if a.read_linear_reference is not None:
      cached_raw=linear_cache.read(count*width*16);assert len(cached_raw)==count*width*16
@@ -187,9 +197,11 @@ try:
    expected=np.empty((count,width,4),dtype=dtype);apply(transform,linear.ctypes.data,expected.ctypes.data,count*width)
    if reference_output:reference_output.write(expected.tobytes())
    actual=rows(top,count);assert np.isfinite(actual).all()
+   if a.require_visible:
+    visible=actual[:,:,3]>0;visible_pixels+=int(np.count_nonzero(visible));visible_colors+=int(np.count_nonzero(actual[:,:,:3][visible]))
    different+=int(np.count_nonzero(actual.view('u'+str(dtype.itemsize))!=expected.view('u'+str(dtype.itemsize))))
    delta=np.abs(actual.astype(np.float64)-expected.astype(np.float64));maximum=max(maximum,float(delta.max()));maximum_color=max(maximum_color,float(delta[:,:,:3].max()));maximum_alpha=max(maximum_alpha,float(delta[:,:,3].max()))
-   if white_balance_reference is not None or color_reference is not None or palette_reference is not None:
+   if style_reference is not None or white_balance_reference is not None or color_reference is not None or palette_reference is not None:
     scale=np.maximum(1,np.maximum(source_scale,np.maximum(np.maximum(np.abs(expected[:,:,0].astype(np.float64)),np.abs(expected[:,:,1].astype(np.float64))),np.abs(expected[:,:,2].astype(np.float64)))))
     if palette_reference is not None:scale=np.maximum(1,np.max(np.abs(expected[:,:,:3].astype(np.float64)),axis=2))
     maximum_scaled_color=max(maximum_scaled_color,float((delta[:,:,:3]/scale[:,:,None]).max()))
@@ -205,7 +217,9 @@ finally:
  if handle:close(handle)
  if image:image.close()
  if document:document.close()
-if palette_reference is not None:
+if style_reference is not None:
+ assert (maximum_scaled_color<=2**-22 if a.precision=='float32'else maximum_color<=1)and alpha_words_different==0 and samples==case['samples'],(maximum_color,maximum_scaled_color,alpha_words_different,samples)
+elif palette_reference is not None:
  assert (maximum_scaled_color<=2**-22 if a.precision=='float32'else maximum_color<=1)and alpha_words_different==0 and samples==case['samples'],(maximum_color,maximum_scaled_color,alpha_words_different,samples)
 elif color_reference is not None:
  assert (maximum_scaled_color<=2**-22 if a.precision=='float32'else maximum_color<=1)and alpha_words_different==0 and samples==case['samples'],(maximum_color,maximum_scaled_color,alpha_words_different,samples)
@@ -213,7 +227,10 @@ elif white_balance_reference is not None:
  assert (maximum_scaled_color<=2**-20 if a.precision=='float32'else maximum_color<=1)and alpha_words_different==0 and samples==case['samples'],(maximum_color,maximum_scaled_color,alpha_words_different,samples)
 elif blend_reference is None:assert different==0 and maximum==0 and samples==case['samples'],(different,maximum,samples)
 else:assert maximum_color<=(2**-20 if a.precision=='float32'else 1)and maximum_alpha==0 and samples==case['samples'],(different,maximum_color,maximum_alpha,samples)
+if a.require_visible:assert visible_pixels>0 and visible_colors>0,('Vacuous transparent output',visible_pixels,visible_colors)
 result=dict(page=a.page,width=width,height=height,samplesCompared=samples,nonidenticalWords=different,maximumError=maximum,extendedSamples=extended,precision=a.precision,profile=a.profile,completeProfileExact=True,tone=a.tone,clipping=a.clipping,erasures=a.erasures,actualSampleSha256=actual_hash.hexdigest(),referenceSampleSha256=expected_hash.hexdigest(),outputBytes=a.output.stat().st_size,outputSha256=hashlib.sha256(a.output.read_bytes()).hexdigest(),reference='Independent native Linux CMM source references, NumPy clipping/erasure/tone/exposure, native Linux CMM output, libtiff/Pillow/MuPDF readback.')
+if a.require_visible:result.update(visiblePixels=visible_pixels,visibleColorSamples=visible_colors)
+if style_reference is not None:result.update(styleScene=a.style_scene,maximumColorError=maximum_color,maximumScaledColorError=maximum_scaled_color,maximumAlphaError=maximum_alpha,alphaWordsDifferent=alpha_words_different,colorTolerance=2**-22 if a.precision=='float32'else 1,alphaTolerance=0,reference='Independent NumPy linear-light overlay, continuous sRGB split ranges and premultiplied scene composition; native Linux CMM and complete independent libtiff/Pillow/MuPDF output readback.')
 if blend_reference is not None:result.update(blendScene=a.blend_scene,maximumColorError=maximum_color,maximumAlphaError=maximum_alpha,colorTolerance=2**-20 if a.precision=='float32'else 1,alphaTolerance=0)
 if white_balance_reference is not None:result.update(whiteBalanceScene=a.white_balance_scene,maximumColorError=maximum_color,maximumScaledColorError=maximum_scaled_color,maximumAlphaError=maximum_alpha,alphaWordsDifferent=alpha_words_different,colorTolerance=2**-20 if a.precision=='float32'else 1,toleranceScale='max(1, abs(source RGB), abs(reference RGB)) per pixel'if a.precision=='float32'else'absolute integer codes',alphaTolerance=0)
 if white_balance_reference is not None:result['reference']='Independent Colour Science 0.4.6 Kang/Bradford matrices and numerical tint tangents, native Linux CMM original/output references, NumPy f64/f32 scene composition and complete libtiff/Pillow/MuPDF readback.'

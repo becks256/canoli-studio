@@ -2,7 +2,7 @@
 
 ## Initial float document workflow (F10)
 
-The local professional-editor objective now includes an explicit initial float32/linear-sRGB workflow for original unsigned 16-bit or float32 TIFF raster artwork, masks, raster erasure, sibling clipping, groups, full linear tone, continuous Curves/Levels, linear White Balance, continuous HSL/Color Balance/Vibrance/Gradient Map/Color Lookup and normalized artistic blend modes. Native device proofing now reads the completed float scene directly and retains original colors and proof-independent exports; display remains SDR. Unsupported tools and interchange reject. No paid operation, account or upload is added. Full color/tool/device/performance acceptance remains required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+The local professional-editor objective now includes an explicit initial float32/linear-sRGB workflow for original unsigned 16-bit or float32 TIFF raster artwork, masks, raster erasure, sibling clipping, groups, full linear tone, continuous Curves/Levels, linear White Balance, continuous HSL/Color Balance/Vibrance/Gradient Map/Color Lookup and normalized artistic blend modes. Linear-light Color Overlay and continuous Blend If retain original float colors and alpha. Native device proofing now reads the completed float scene directly and retains original colors and proof-independent exports; display remains SDR. Unsupported tools and interchange reject. No paid operation, account or upload is added. Full color/tool/device/performance acceptance remains required. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Character formatting increment
 

@@ -1,5 +1,9 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Float appearance increment
+
+F10 now connects linear-light Color Overlay and continuous Blend If through existing style authoring, native float rendering and source-preserving file delivery. Drop shadows, other float tools/layers, working spaces/HDR/CMYK and broader F10/F14/device/quality gates remain required. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+
 ## Native float proofing increment
 
 Direct native float RGB/CMYK-device proofing advances F10 through existing controls, precision conversion and workspace profile ownership. Source/history and proof-independent delivery remain separate. This does not close broader working-space, HDR/CMYK delivery, physical/photographic color, device/memory/performance or full-roadmap acceptance. [Contract and current verification](FLOAT_PROOFING.md).

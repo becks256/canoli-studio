@@ -1,5 +1,9 @@
 # Plugins and extensions
 
+## Float appearance keeps existing grants
+
+Color Overlay/Blend If use existing document read/write grants and isolated shared style commands, with current source/revision/lock/permission validation and Undo. Installation stays inert. No raw-pixel, worker, file, profile or network grant/package change is added. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+
 ## Float device proofing is host-owned
 
 Installation remains inert. Isolated precision/scene commands keep ordinary document read/write grants, source/revision checks and shared Undo. Host proof preferences survive those edits, but no profile chooser, CMM worker, native store, file or network authority is exposed to plugins. [Contract and current verification](FLOAT_PROOFING.md).

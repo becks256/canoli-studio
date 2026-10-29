@@ -2211,3 +2211,5 @@ import{floatProofWorkflow}from'./helpers/float-proof';
 test('production float device proofing preserves originals, native edits, Undo, workspace profiles and proof-independent delivery',async({page},info)=>{await floatProofWorkflow(page,info,true);});
 
 test('production float CMYK device proofing retains native profiles, controls, Undo and proof-independent precision delivery',async({page},info)=>{await floatProofWorkflow(page,info,true,'synthetic-cmyk');});
+
+test('production float Color Overlay and Blend If retain controls, native files, isolated commands, Undo and originals without developer globals',async({page},info)=>{const{floatStyleWorkflow}=await import('./helpers/float-style');await floatStyleWorkflow(page,info,true);});

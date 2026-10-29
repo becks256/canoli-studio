@@ -7928,3 +7928,50 @@ complete roadmap. Physical device/photographic quality, working spaces, HDR/CMYK
 delivery, remaining editor latency and all-tool/global-memory/device acceptance,
 AI/provider/evaluation, installed ChatGPT/live identity, collaboration, specialist
 and commercial gates remain required. The complete original objective stays active.
+
+### 2026-10-29 — F10 float Color Overlay and Blend If (bounded acceptance)
+
+Owner: implementation agent; estimate L within T17/F10/F14; baseline `e60d687`.
+Existing style constructors/commands/controls now mix decoded overlay colors in
+working-linear float and evaluate continuous encoded-sRGB Blend If selectors.
+Separate native float coverage preserves alpha, intrinsic clipping shape and
+one-time mask/Fill/opacity/blending; adjustments retain backdrop alpha. Signed/
+extended colors, ownership, strict worker validation and complete-frame
+publication remain. Shadow controls stay unavailable and shadow commands reject.
+No schema, public mutation surface, host/plugin privilege or image cap changes.
+
+Build and 2943 unit/API tests / 288 files pass. The final 36-case
+native matrix /9 files and all 178 normal-production cases pass without skips,
+retries or flakes. Twenty-one independent 4,612-pixel native cases, exact alpha,
+owned result validation and memory-growth/partition checks pass. Seventy-eight
+complete scenes cover all 18 blend modes across rasters/groups/adjustments plus
+clipping/pass-through/soft masks/Fill/opacity: 3,228,888 native channels,
+maximum scaled color error 0 within 2^-22, zero alpha and
+partition word differences. Another 790,920 filtered channels match
+premultiplied native-frame reductions exactly. Real controls, cancellation,
+shared isolated example, one-step Undo, original-bearing reopening and four
+independent file readers pass in source and production. Recorded appearance
+replays on receiving originals after author closure; real native cancellation
+rejects stale work and permits identical-style retry.
+
+Genuine 50 MP style output keeps 10000×5000 source geometry and a 500×250 preview;
+the independent PNG reader checks all 200,000,000 channels, exact alpha/profile
+and unchanged original hash/model/history. The case takes 309.267 seconds;
+functional scale does not establish fast interaction or memory acceptance.
+3168 inputs and 143 normal release resources are fingerprinted.
+All four tracked codecs remain unchanged; pixel WASM and isolated runtime are
+intentionally rebuilt and hashed. Report/sealed evidence:
+`docs/benchmarks/float-appearance-2026-10-29.md` and `.zip`. The initial missing
+selection, PDF-reader environment and test-annotation failures remain preserved.
+The audit rejected initially transparent large-image/recipe fixtures; a retained
+negative control rejects the old output. Corrected acceptance requires all
+50,000,000 output pixels visible and all 8,192 sampled native pixels changed.
+The provisional production run was deliberately interrupted before strengthening
+those witnesses; the full final checks then passed. No numeric, profile, source
+or history assertion was relaxed.
+
+This accepts bounded float overlay/Blend If integration. Float shadows, other
+float tools/layers, working spaces/HDR/CMYK, photographic/interchange and physical
+quality, sustained editor-wide F14/device/global-memory, AI/provider/evaluation,
+installed ChatGPT/live identity, collaboration, specialist and commercial gates
+remain required. The complete original objective stays active.

@@ -1,6 +1,8 @@
 import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
 import{parseFloatTransfer,type FloatTransferAdjustment}from'../core/float-transfer';
-import{floatCompositeOptionsSchema,floatToneOptionsSchema,validateFloatWorkerWindow,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
+import{floatCompositeOptionsSchema,floatToneOptionsSchema,validateFloatWorkerWindow,validateFloatStyleResult,type FloatStyleResult,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
+import{compileFloatStyle}from'../core/float-style';
+import type{LayerStyleData}from'../core/drawing';
 import { redEyeAdjustmentSchema, type RedEyeAdjustmentData } from "../core/red-eye";
 import { medianRadiusSchema } from '../core/smart/median-filter';
 import {bilateralOptionsSchema,type BilateralFilterOptions} from '../core/smart/bilateral-filter';
@@ -97,6 +99,7 @@ export class PixelProcessor {
         else if (event.data.floatLookupHandle!==undefined)request.resolve(event.data.floatLookupHandle);
         else if (event.data.donorResult)
           request.resolve(event.data.donorResult);
+        else if (event.data.floatStyle) request.resolve(event.data.floatStyle);
         else if (event.data.poissonResult)
           request.resolve(event.data.poissonResult);
         else if (event.data.wetPaint) request.resolve(event.data.wetPaint);
@@ -109,6 +112,12 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
+  async floatStyle(source:Float32Array,backdrop:Float32Array,input:LayerStyleData):Promise<FloatStyleResult>{
+    const {style}=compileFloatStyle(input);validateFloatWorkerWindow(source);validateFloatWorkerWindow(backdrop);if(source.length!==backdrop.length)throw new Error('Float style source and backdrop geometry differ.');
+    const captured={source:source.slice(),backdrop:backdrop.slice(),style},length=source.length,alpha=new Uint32Array(length/4),words=new Uint32Array(source.buffer,source.byteOffset,source.length);
+    for(let i=0;i<alpha.length;i++)alpha[i]=words[i*4+3];
+    const result=await this.request(new Uint8ClampedArray(0),{floatStyle:captured});validateFloatStyleResult(result,length,alpha);return result;
+  }
   async floatGradient(pixels:Float32Array,input:GradientMapAdjustmentData):Promise<Float32Array>{
     const adjustment=gradientMapAdjustmentSchema.parse(input);validateFloatWorkerWindow(pixels);const length=pixels.length,result=await this.request(new Uint8ClampedArray(0),{floatGradient:{pixels:pixels.slice(),adjustment}});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');for(let i=0;i<result.length;i++)if(i%4!==3&&(result[i]<0||result[i]>1))throw new Error('Float gradient worker output must stay within normalized linear RGB.');return result;
   }
@@ -405,6 +414,7 @@ export class PixelProcessor {
   private async request(
     pixels: Uint8ClampedArray,
     payload: {
+      floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
       floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
       floatAffine?:{pixels:Float32Array;matrix:number[]};
       floatTone?:{pixels:Float32Array;options:FloatToneOptions};
@@ -506,6 +516,7 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
+    if(payload.floatStyle){tryTransfer(payload.floatStyle.source.buffer);tryTransfer(payload.floatStyle.backdrop.buffer);}
     if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}
     if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
     if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);

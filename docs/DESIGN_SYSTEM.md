@@ -1,5 +1,9 @@
 # Canoli Studio design system
 
+## Float appearance controls
+
+Enable the existing Color overlay and Blend If controls in float documents, with existing disabled/locked/pass-through and preview/commit/cancel behavior. Explain linear-light overlay and continuous sRGB selectors separately from unchanged float samples. Keep drop-shadow controls disabled with the actual missing-capability explanation. Preserve correction controls after preview failure. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+
 ## Float soft-proof controls
 
 High-precision TIFF shows its actual target profile and offers an explicit output-profile conversion checkbox. Preserve the native linear default when no override is chosen, start existing non-default presets enabled, and explain extended-color mapping. This per-export choice changes neither artwork nor workspace preferences.

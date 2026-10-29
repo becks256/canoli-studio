@@ -1,5 +1,9 @@
 # REST and scripting APIs
 
+## Float style metadata
+
+Existing strict `layer.update` style DTOs admit Color Overlay and Blend If in float documents, retaining revisions, locks, atomic rollback and Undo. Drop shadows reject. Independent REST remains PNG-only for assets, supplies no original float TIFF renderer/admission and does not synchronize with browser tabs. [Exact interpretation and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+
 ## Float proof remains a trusted host surface
 
 Float device proofing adds no REST renderer, original TIFF admission or browser synchronization. Shared document precision/adjustment edits retain existing OO commands and Undo; profile resources, preferences and proof workers stay in the trusted browser host. [Contract and current verification](FLOAT_PROOFING.md).

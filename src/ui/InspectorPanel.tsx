@@ -500,7 +500,8 @@ export function InspectorPanel({
             key={selected.id}
             onCancel={() => onPreview(null)}
             value={selected.styles ?? defaultStyle()}
-            disabled={float || locked || busy || selected.blendMode==='pass-through'}
+            float={float}
+            disabled={locked || busy || selected.blendMode==='pass-through'}
             onPreview={(styles) =>
               onPreview({
                 type: "layer.update",

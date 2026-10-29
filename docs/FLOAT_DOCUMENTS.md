@@ -145,7 +145,7 @@ changes the accumulated backdrop; pass-through group opacity interpolates
 premultiplied before/after backdrops rather than source-over compositing a second
 copy. Masks use the existing byte coverage rasterizer; color stays float32.
 
-Other layer types, artistic blends, styles, prepared wet raster replacements,
+Other layer types, drop shadows, prepared wet raster replacements,
 frequency separation and adjustment types other than Tone/Curves/Levels reject
 atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts,
 palette and context controls disable unsupported creation/color tools. Move,
@@ -531,7 +531,7 @@ isolated child coverage; pass-through members see the stack's color plane.
 Normal groups, raster transforms, full tone effects, clipped tone adjustment
 layers, member masks/opacity/fill and nested sibling stacks keep their existing
 float semantics. All existing normalized artistic modes are described below.
-Pass-through fill still requires 1. Unsupported styles and layer types remain
+Pass-through fill still requires 1. Drop shadows and unsupported layer types remain
 gated; this does not add Photoshop advanced clipping
 switches or float SVG/PSD/PSB interchange.
 
@@ -791,3 +791,74 @@ renderer clear/disposal retires its own idle state. No artwork, original source
 or document capture is retained by the idle transform. Explicit ICC session
 disposal still terminates immediately. Source validation, exact output/window
 validation, shared commands, Undo, plugin grants and separate REST are unchanged.
+
+
+## Color Overlay and Blend If
+
+Existing `LayerStyle` and `BlendIf` constructors now work on float rasters,
+isolated groups, clipping stacks and supported adjustment layers. Inspector
+controls retain their existing defaults, preview/cancel, locks and shared Undo.
+Drop shadow remains unavailable in float documents; enabling it rejects the
+complete command/transaction before mutation. Pass-through groups still require
+disabled group styles and full Fill.
+
+Color Overlay uses the existing six-digit sRGB color and opacity in [0,1]. Its
+default is disabled; opacity zero is exact identity, including hidden colors and
+signed-zero words. The selected color is decoded continuously to linear sRGB;
+`(1-opacity) * workingRGB + opacity * linearOverlayRGB` computes in float64 and
+rounds once to float32. Alpha is copied exactly. Finite negative/extended working
+RGB remains valid; the original asset and source samples are never rewritten.
+
+Blend If retains `enabled` (default false), `channel` (`luminance`, `red`, `green`
+or `blue`) and the ascending four-handle `source` / `underlying` ranges in 0..255.
+The default ranges are `[0,0,255,255]`. Fractions are allowed. Selectors encode each
+linear channel continuously to sRGB, bounding only that selector to 0..255.
+Luminance is 0.2126 R + 0.7152 G + 0.0722 B of these encoded selector channels.
+Actual working colors are not bounded or quantized by that calculation. The
+inclusive outer cutoffs and linear inner feathers have the same authored units
+as byte documents; a zero-width feather is a hard edge. Source and underlying
+weights multiply and round once to float32 coverage. Full default ranges retain
+all finite extended colors. Overlay is applied before the source selector.
+
+Styles evaluate completed layer/clipping colors against the actual sibling
+backdrop. Separate coverage combines with the existing mask, Fill and opacity
+at final blending; it does not replace intrinsic clipping shape. Adjustment
+styles change adjusted colors while retaining backdrop alpha and interpolating
+once. Group isolation, pass-through children and native-first frame filtering
+keep their existing order. Final SDR or integer output may clip extended RGB;
+linear float TIFF retains the native scene. Source data, history and workspace
+proof preferences remain separate from display/output conversion.
+
+For an already-open original high-precision TIFF, this example runs through the
+ordinary isolated scripting host with existing document grants:
+
+<!-- example: float-style -->
+```js
+document.convertToFloat();
+const original = document.layers.at(0);
+if (!(original instanceof RasterLayer)) throw new Error('Open a TIFF original');
+original.styles = new LayerStyle({
+  colorOverlay: {enabled: true, color: '#ad3f79', opacity: .375},
+  blendIf: new BlendIf({enabled: true, channel: 'red',
+    source: [12.25, 67.5, 193.75, 246.5], underlying: [0, 0, 255, 255]})
+});
+const tone = document.layers.add(new AdjustmentLayer({
+  name: 'Float appearance', opacity: .75, fillOpacity: .625,
+  adjustment: {kind: 'tone', exposure: .5, contrast: 0, saturation: 0}
+}));
+tone.styles = new LayerStyle({
+  colorOverlay: {enabled: true, color: '#2468ac', opacity: .125},
+  blendIf: new BlendIf({enabled: true, channel: 'green',
+    source: [8, 32, 224, 252], underlying: [0, 48, 208, 255]})
+});
+document.selectedLayer = tone;
+```
+
+The same strict existing `layer.update` style DTOs, source/revision/lock checks,
+one-transaction isolated commit, native project/workspace transport and recipe
+commands apply. No public worker, raw pixel, file, native-profile or network
+privilege is added. Independent REST sessions retain their existing asset and
+renderer limits and do not synchronize with the browser. Malformed native
+results, nonfinite colors, changed alpha, coverage outside [0,1] and wrong window
+shapes reject before publication; caller buffers remain attached. The dated
+roadmap records verified coverage and remaining F10/F14/device/quality gates.

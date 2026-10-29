@@ -101,12 +101,14 @@ function RangeWindow({
 export function LayerStylesPanel({
   value,
   disabled,
+  float = false,
   onPreview,
   onCommit,
   onCancel,
 }: {
   value: LayerStyleData;
   disabled: boolean;
+  float?: boolean;
   onCancel(): void;
   onPreview(value: LayerStyleData): void;
   onCommit(value: LayerStyleData): void;
@@ -177,10 +179,11 @@ export function LayerStylesPanel({
         ))}
         <p className="section-description">
           Top handles set cutoffs. Lower handles feather the transition. Pixels
-          outside the range become transparent.
+          outside the range become transparent. {float&&'Selectors use continuous sRGB values; original float colors stay intact.'}
         </p>
       </InspectorSection>
       <InspectorSection title="Color overlay">
+        {float&&<p className="section-description">The selected sRGB color mixes in linear working RGB without reducing sample precision.</p>}
         <div className="style-color-row">
           <label className="check-field">
             <input
@@ -231,13 +234,14 @@ export function LayerStylesPanel({
         />
       </InspectorSection>
       <InspectorSection title="Drop shadow">
+        {float&&<p className="section-description">Drop shadows require their float document integration.</p>}
         <div className="style-color-row">
           <label className="check-field">
             <input
               type="checkbox"
               aria-label="Enable drop shadow"
               checked={value.dropShadow.enabled}
-              disabled={disabled}
+              disabled={disabled || float}
               onChange={(e) =>
                 onCommit({
                   ...value,
@@ -253,7 +257,7 @@ export function LayerStylesPanel({
           <ColorInput
             label="Shadow color"
             value={value.dropShadow.color}
-            disabled={disabled || !value.dropShadow.enabled}
+            disabled={disabled || float || !value.dropShadow.enabled}
             onPreview={color => onPreview({ ...value, dropShadow: { ...value.dropShadow, color } })}
             onCommit={color => onCommit({ ...value, dropShadow: { ...value.dropShadow, color } })}
             onCancel={onCancel}
@@ -267,7 +271,7 @@ export function LayerStylesPanel({
               min={key === "blur" ? 0 : -256}
               max={key === "blur" ? 128 : 256}
               value={value.dropShadow[key]}
-              disabled={disabled || !value.dropShadow.enabled}
+              disabled={disabled || float || !value.dropShadow.enabled}
               onPreview={(next) =>
                 onPreview({
                   ...value,
@@ -290,7 +294,7 @@ export function LayerStylesPanel({
           max={100}
           value={value.dropShadow.opacity * 100}
           suffix="%"
-          disabled={disabled || !value.dropShadow.enabled}
+          disabled={disabled || float || !value.dropShadow.enabled}
           onPreview={(opacity) =>
             onPreview({
               ...value,
