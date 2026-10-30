@@ -12,6 +12,22 @@ only alpha enters convolution. Capture disposal clears these fields. Scene
 recursion carries each native region through groups, masks and clipping before
 final frame filtering. [Ordering and limits](FLOAT_DOCUMENTS.md#native-float-drop-shadows).
 
+## Direct pointer preview admission
+
+`ui/gesture-previews` owns one detached snapshot produced by the shared command
+validator before React updates controls/overlays. The actual Document owner,
+immutable source, ordered selection and pointer gesture bind its authority.
+`useCanvasRenderer` subscribes directly for a warm, stable presented context;
+React reuses that exact snapshot instead of repeating validation/preparation.
+The drain remains single-active, consumes the latest queued preview and admits
+at most one start per animation frame within a gesture. A ready first warm
+preview need not wait an extra frame. New owners and view-only work retain
+normal admission. Source/owner/selection/gesture/context changes, clear and
+cancellation reject stale output; equivalent selection values remain valid.
+Private previews never mutate attached artwork/history or retarget a new owner
+or source. Actual commands still commit once through the existing OO boundary.
+No public API, format, source resolution, cache/worker budget or grant changes.
+
 ## Bounded native float viewport appearances
 
 `engine/float-appearance` retains one complete native float appearance of at

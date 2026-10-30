@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import{samePreviewSelection,type GesturePreviews,type GesturePreview}from'../gesture-previews';
 import {subscribeNativeFontChanges} from '../../fonts/native-events';
 import type { RefObject } from "react";
 import type { EditorApplication } from "../../editor";
@@ -17,6 +18,7 @@ export interface UseCanvasRendererOptions {
   wetPreview?: WetPaintPreview | null;
   previewGesture?: object | null;
   gestureRef?: RefObject<object | null>;
+  gesturePreviews?: GesturePreviews;
   backendState: unknown;
   displayHost: RefObject<HTMLDivElement | null>;
   onCleanupCursor?(): void;
@@ -42,6 +44,7 @@ export function useCanvasRenderer({
   wetPreview,
   previewGesture,
   gestureRef,
+  gesturePreviews,
   backendState,
   displayHost,
   onCleanupCursor,
@@ -91,6 +94,8 @@ export function useCanvasRenderer({
     options: RenderOptions;
     region: RenderRegion;
     gesture?: object | null;
+    preview?: GesturePreview;
+    immediateGesture?: boolean;
     sourceDocument: DocumentData;
     zoom: number;
     fontRevision: number;
@@ -159,6 +164,10 @@ export function useCanvasRenderer({
       (editor.colorSettings?.proof??null) !== (job.options.colorProof??null) ||
       (job.wetPreview&&!job.wetPreview.isCurrent()) ||
       job.options.paintPreview?.cloneSource?.isDisposed ||
+      (job.preview && (!gesturePreviews?.getSnapshot()?.valid ||
+        gesturePreviews.getSnapshot()?.owner!==job.owner ||
+        gesturePreviews.getSnapshot()?.source!==job.sourceDocument ||
+        !samePreviewSelection(editor.document.getSnapshot().selectedIds,job.preview.selection))) ||
       (job.gesture && (gestureRef?.current !== job.gesture ||
         editor.document.getSnapshot().document !== job.sourceDocument)) ||
       (!sameStroke && !sameGesture && !sameWet && job.key !== renderVersion.current) ||
@@ -182,32 +191,47 @@ export function useCanvasRenderer({
       previous.colorState === colorState && previous.options.colorProof === colorProof &&
       previous.hostAssets === assets && viewDocument === sourceDocument &&
       !paintPreview && !wetPreview && !previewGesture;
-    const key = ++renderVersion.current;
-    latestRender.current?.release?.();
-    latestRender.current = {
-      owner,
-      committedEdit,
-      document: viewDocument,
-      colorState,
-      gesture: previewGesture,
-      sourceDocument,
-      zoom, fontRevision, backendState,
-      assets,
-      hostAssets:wetPreview?.hostAssets??assets,
-      wetPreview,
-      release:wetPreview&&!wetPreview.isDisposed?wetPreview.retain():undefined,
-      key,
-      region: renderRegion,
-      options: {
-        region: renderRegion,
-        scale: Math.min(1, zoom * window.devicePixelRatio),
-        paintPreview,
-        colorProof,
-      },
+    const livePreview=()=>{
+      const captured=gesturePreviews?.getSnapshot(),state=owner.getSnapshot(),tools=editor.tools.getSnapshot();
+      return captured?.valid&&captured.owner===owner&&editor.document===owner&&captured.source===sourceDocument&&state.document===sourceDocument&&
+        samePreviewSelection(captured.selection,state.selectedIds)&&captured.gesture&&captured.gesture===gestureRef?.current&&
+        !paintPreview&&!wetPreview&&!tools.preview&&!tools.paintPreview&&!tools.wetPreview?.isCurrent()
+        ?captured:undefined;
     };
-    renderTarget.current = latestRender.current;
-    // An older view's frame wait must not delay an eligible content edit.
-    if (committedEdit) frameWait.current?.wake();
+    const captured=livePreview(),gesture=captured?.gesture??previewGesture;
+    // Pointer publication and React share this exact validated snapshot; the
+    // subsequent layout must not queue the same appearance a second time.
+    const represented=!!captured&&previous?.preview===captured&&previous.owner===owner&&previous.sourceDocument===sourceDocument&&
+      previous.region===renderRegion&&previous.zoom===zoom&&previous.fontRevision===fontRevision&&previous.backendState===backendState&&
+      previous.colorState===colorState&&previous.options.colorProof===colorProof&&previous.hostAssets===assets&&previous.assets===assets;
+    if(!represented){
+      const key = ++renderVersion.current;
+      latestRender.current?.release?.();
+      latestRender.current = {
+        owner,
+        committedEdit,
+        document: captured?.document??viewDocument,
+        colorState,
+        gesture,preview:captured,immediateGesture:!!captured&&presentedDocument.current===owner,
+        sourceDocument,
+        zoom, fontRevision, backendState,
+        assets,
+        hostAssets:wetPreview?.hostAssets??assets,
+        wetPreview,
+        release:wetPreview&&!wetPreview.isDisposed?wetPreview.retain():undefined,
+        key,
+        region: renderRegion,
+        options: {
+          region: renderRegion,
+          scale: Math.min(1, zoom * window.devicePixelRatio),
+          paintPreview,
+          colorProof,
+        },
+      };
+      renderTarget.current = latestRender.current;
+      // An older view's frame wait must not delay an eligible content edit.
+      if (committedEdit) frameWait.current?.wake();
+    }
 
     async function drain() {
       if (renderActive.current) return;
@@ -225,7 +249,7 @@ export function useCanvasRenderer({
             const prior = gestureFrame.current;
             const cadence = queued.gesture ?? queued.wetPreview?.owner;
             if (cadence && prior?.gesture === cadence) await waitForFrame(prior.ready);
-            else if (!queued.wetPreview) {
+            else if (!queued.wetPreview && !queued.immediateGesture) {
               let frame = 0;
               const ready = new Promise<void>(resolve => {
                 frame = requestAnimationFrame(() => resolve());
@@ -310,12 +334,27 @@ export function useCanvasRenderer({
       }
     }
 
-    void drain();
+    if(latestRender.current)void drain();
+    const stopGestures=gesturePreviews?.subscribe(()=>{
+      const captured=livePreview(),target=renderTarget.current;
+      if(!captured||!target||presentedDocument.current!==owner||editor.assetStore!==assets||editor.colorSettings!==colorState||
+        (editor.colorSettings?.proof??null)!==colorProof||target.owner!==owner||target.sourceDocument!==sourceDocument||
+        target.region!==renderRegion||target.zoom!==zoom||target.fontRevision!==fontRevision||target.backendState!==backendState||
+        target.assets!==assets||target.hostAssets!==assets||target.colorState!==colorState||target.options.colorProof!==colorProof||
+        target.options.paintPreview||target.wetPreview||!displayHost.current)return;
+      const key=++renderVersion.current;
+      latestRender.current?.release?.();
+      latestRender.current={owner,committedEdit:false,document:captured.document,colorState,assets,hostAssets:assets,key,
+        region:renderRegion,sourceDocument,zoom,fontRevision,backendState,gesture:captured.gesture,preview:captured,immediateGesture:true,
+        options:{region:renderRegion,scale:Math.min(1,zoom*window.devicePixelRatio),colorProof}};
+      renderTarget.current=latestRender.current;
+      void drain();
+    });
     // Continue the captured live stroke directly from the tool's frame batch.
     // New strokes, document edits and viewport changes still enter via React.
     const previewCommand = editor.tools.getSnapshot().preview;
     let seenPreview = paintPreview;
-    return editor.tools.subscribe(() => {
+    const stopPaint=editor.tools.subscribe(() => {
       const state = editor.tools.getSnapshot();
       const next = state.paintPreview;
       if (!next || next === seenPreview || !paintPreview ||
@@ -338,6 +377,7 @@ export function useCanvasRenderer({
       renderTarget.current = latestRender.current;
       void drain();
     });
+    return()=>{stopGestures?.();stopPaint();};
   }, [
     viewDocument,
     assets,
@@ -351,6 +391,7 @@ export function useCanvasRenderer({
     wetPreview,
     previewGesture,
     gestureRef,
+    gesturePreviews,
     backendState,
     fontRevision,
     displayHost,

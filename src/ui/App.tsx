@@ -52,6 +52,7 @@ import { WorkspaceCommandPalette } from "./WorkspaceCommandPalette";
 import {RecentFilesDialog,RecentFilesButton} from "./RecentFilesDialog";
 import type {RecentKind} from "../workspace/recent-files";
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -82,6 +83,7 @@ import {
   defaultToneAdjustment,
 } from "../core/adjustments";
 import { execute } from "../core/commands";
+import{GesturePreviews,samePreviewSelection}from'./gesture-previews';
 import type { LayerMaskData } from "../core/masks";
 import type { EditorCommand, LayerPatch } from "../core/commands";
 import { allLayers, findLayer, findParent, isLocked } from "../core/model";
@@ -174,7 +176,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     editor.renderer.subscribeBackend,
     editor.renderer.getBackendSnapshot,
   );
-  const [preview, setPreview] = useState<EditorCommand | null>(null);
+  const [preview, updatePreview] = useState<EditorCommand | null>(null);
+  const [gesturePreviews] = useState(() => new GesturePreviews());
+  const setPreview = useCallback((command:EditorCommand|null) => {
+    gesturePreviews.publish(command,{owner:dom,source:state.document,selection:state.selectedIds,gesture:gesture.current});
+    updatePreview(command);
+  },[gesturePreviews,dom,state.document,state.selectedIds]);
   const [tool, setTool] = useState<Tool>("move");
   const [guidesVisible, setGuidesVisible] = useState(true);
   const [snapEnabled, setSnapEnabled] = useState(false);
@@ -401,12 +408,17 @@ export function App({ editor }: { editor: EditorApplication }) {
   const viewDocument = useMemo(() => {
     if(wetPreview)return wetPreview.document;
     if (!activePreview) return state.document;
+    if(activePreview===preview){
+      const captured=gesturePreviews.getSnapshot();
+      return captured?.command===preview&&captured.owner===dom&&captured.source===state.document&&samePreviewSelection(captured.selection,state.selectedIds)
+        ?captured.document:state.document;
+    }
     try {
       return execute(state.document, activePreview);
     } catch {
       return state.document;
     }
-  }, [state.document, activePreview,wetPreview]);
+  }, [state.document,state.selectedIds,dom,activePreview,preview,gesturePreviews,wetPreview]);
   const spacingGuides=useMemo(()=>{
     const drag=gesture.current;
     if(!spacingHints||!guidesVisible||!preview||tool!=='move'||!drag||drag.kind!=='move'||drag.mask||drag.bypass||pointerDocument.current!==dom||drag.revision!==state.revision)return[];
@@ -1305,6 +1317,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     paintPreview: editor.tools.getSnapshot().paintPreview,
     previewGesture: preview && activePreview === preview ? gesture.current : null,
     gestureRef: gesture,
+    gesturePreviews,
     backendState,
     displayHost,
     onCleanupCursor: () => {

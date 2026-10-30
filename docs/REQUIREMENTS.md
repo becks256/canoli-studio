@@ -1148,3 +1148,18 @@ stale parameters. Verify paused-frame committed edit/Undo/Redo, pending-view
 interruption, ordinary view coalescing, new/identical-data owner transitions,
 exact pixels, real controls and sustained/editor-wide limits. No new public
 model/command/grant or completion of full F14 is implied.
+
+
+## Pointer preview admission (F14)
+
+Warm move/resize/rotate previews may prepare directly from a private, detached
+shared-command result while React updates controls and overlays. Reuse that exact
+validated snapshot; preserve one render start per gesture/frame, latest-input
+coalescing, exact artwork, a single final Undo and ordinary cancellation. Capture
+the actual owner, immutable source, ordered selection and gesture; clear or any
+changed authority must prevent stale publication or retargeting. Repeating an
+equivalent selection remains valid. New owners and view-only changes retain
+normal frame admission. Source resolution, renderer/color fidelity, existing
+paint/wet lifetimes, public API/history and script/plugin/REST grants are unchanged.
+The existing 33 ms input p95, routine <50 ms long-task, sustained/all-tool and
+process-memory/device requirements remain measurement/acceptance targets.

@@ -8104,3 +8104,39 @@ performance, global/process-memory/device F14, other native float/HDR/color/
 interchange and every unfinished original professional-editor/AI/provider/workflow/
 installed ChatGPT/live identity/commercial requirement remain active. The complete
 original roadmap remains active.
+
+
+### 2026-10-29 — F14 direct pointer preview admission (measured progress)
+
+Owner: implementation agent; delivered the UI admission increment beginning at
+`902cb47`. A private channel prepares one shared-command-validated detached
+snapshot before React controls/overlays update. Actual owner, immutable source,
+ordered selection and gesture pin its authority. The canvas and React share that
+snapshot; layout avoids duplicate preparation. A stable presented context can
+start the first warm preview directly; the single-active drain keeps later starts
+at the existing per-gesture frame boundary. Clear/changed authority rejects stale
+output; equivalent selections stay valid. No attached preview mutation/retargeting,
+API/schema/grant changes, new source/cache/native budgets or import caps occur.
+New owners/view-only work, exact source/color/rendering, paint/wet lifetimes,
+final OO commit and one Undo retain their contracts.
+
+Three sequential normal-production baseline/candidate pairs retain all 12
+independent pointer frames, original bytes and one Undo/Redo each. Across 36
+inputs per build, p95 changes from 50.7 ms to 30.1 ms; this
+meets the unchanged 33 ms measurement target for this warm fixture. This is one warm local fixture, not sustained 60fps or complete F14
+acceptance. Separate diagnostic stage profiles place median input-to-preparation
+at 9.3 ms and 0.5 ms, with remaining frame preparation explicit.
+
+Full build/final full rebuild, all 2,961 unit/API tests across 290 files, all 44
+affected browser cases across 11 files, all 180 normal-production workflows and
+six paired pointer sessions pass without skips, retries, flakes or failures.
+Paused-frame complete-pixel admission/coalescing, queued-input commit/Undo/Redo,
+held selection/owner invalidation, equivalent selection, existing transform/view/
+font/cancellation behavior, paint/wet ownership, native 50 MP production files,
+original/history/isolation and final source/release identities are verified.
+[Measurements, limits and compact verification record](benchmarks/gesture-preview-admission-2026-10-29.md).
+
+All-tool/sustained/cold/import/global-process-memory/device F14, other native
+float/HDR/color/interchange/layer/tool requirements and every unfinished original
+professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
+gate remain active. The complete original roadmap remains active.

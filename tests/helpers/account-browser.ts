@@ -5,7 +5,8 @@ import {accountHost} from './account-host';
 import {scriptedCanoliArtwork} from './chatgpt';
 import type {FixtureIdentity} from './identity-provider';
 export async function accountBrowser(context:BrowserContext,configured=true){
- const host=await accountHost(undefined,{configured});let profile:FixtureIdentity={subject:'artist-one',name:'Ada Artist',email:'same@example.test'};const pattern='https://auth.openai.com/**',bridge=host.origin+'/auth/openai';
+ // Browser verification can serve the same explicit build as the preview server.
+ const host=await accountHost(process.env.CANOLI_TEST_SITE_DIRECTORY,{configured});let profile:FixtureIdentity={subject:'artist-one',name:'Ada Artist',email:'same@example.test'};const pattern='https://auth.openai.com/**',bridge=host.origin+'/auth/openai';
  // Playwright routes only the first request in an HTTP redirect chain. Read the
  // real host's 303 without following it, then start a fresh fixture navigation.
  await context.route(bridge,async route=>{const response=await route.fetch({maxRedirects:0});if(response.status()!==303){await route.fulfill({response});return;}const location=response.headers().location;expect(location).toMatch(/^https:\/\/auth\.openai\.com\/api\/accounts\/authorize\?/);await route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><script>location.replace('+JSON.stringify(location).replaceAll('<','\\u003c')+')</script>'});});

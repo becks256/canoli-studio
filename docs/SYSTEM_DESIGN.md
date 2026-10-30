@@ -874,3 +874,24 @@ job after any wake and rechecks owner/source/view/font/backend/color/gesture
 validity before complete-frame publication. Cleanup wakes pending waits and
 releases existing job ownership. No serialized model/API/grant changes; full
 F14 and the original roadmap remain required.
+
+
+## Direct pointer preview admission (F14)
+
+A private UI publication captures one shared-command-validated detached document,
+the actual owner, immutable source revision, ordered selection and gesture token.
+React controls and canvas jobs consume that same snapshot; publishing a preview
+changes no attached model/history. A mismatched owner/source/selection cannot
+retarget the preview, including a replacement owner with equal persistent data.
+Equivalent ordered selection values do not cancel valid work.
+
+A stable already-presented context can start warm pointer preparation directly.
+The single-active drain keeps only the latest queued job and the existing
+per-gesture frame boundary; later starts wait only for the prior boundary.
+React layout recognizes an already represented snapshot and does not enqueue it
+twice. First-owner/view-only admission, complete-frame publication, source/asset/
+proof/font/backend/gesture checks and existing paint/wet lifetimes remain.
+Clearing or invalidating the private publication rejects old pointer work even
+before React can publish its next target. Final shared OO commit/Undo, source
+resolution, isolated scripts/plugins and independent REST retain their contracts.
+This is measured latency work, not all-tool/device/global-memory F14 acceptance.
