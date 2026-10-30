@@ -1,5 +1,14 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Native float tonal workflow (F05/F10)
+
+Existing Dodge/Burn tools and editable tonal constructors now have a native
+linear exposure path with retained original sources, brush coverage, previews,
+layer controls and shared Undo. This extends retouching into the float workflow;
+other float tools/layers, richer working spaces, photographic/device quality,
+sustained performance and every unfinished original gate remain required.
+[Behavior and verification scope](FLOAT_DOCUMENTS.md#native-linear-dodge-and-burn).
+
 ## Keyboard Layers increment (F13/T22)
 
 Contextual tree navigation, name search, explicit/range selection and native row

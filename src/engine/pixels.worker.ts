@@ -1,4 +1,5 @@
 import{FloatLookupProcessor}from'./float-lookup';
+import type {FloatTonalOptions} from '../core/float-tonal';
 import type{FloatConvolutionOptions}from'../core/float-shadow';
 import type{FloatTransferAdjustment}from'../core/float-transfer';
 import{FloatPixelProcessor,validateFloatWorkerWindow,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
@@ -88,6 +89,7 @@ self.onmessage = async (
     floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
     floatAffine?:{pixels:Float32Array;matrix:number[]};
     floatTone?:{pixels:Float32Array;options:FloatToneOptions};
+    floatTonal?:{pixels:Float32Array;coverage:Float32Array;options:FloatTonalOptions};
       floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
     floatColor?:{pixels:Float32Array;adjustment:FloatColorAdjustment};
     floatGradient?:{pixels:Float32Array;adjustment:GradientMapAdjustmentData};
@@ -181,13 +183,14 @@ self.onmessage = async (
       const owned=floating??=new FloatPixelProcessor(await kernel),request=data.floatStyle;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);const floatStyle=owned.style(request.source,request.backdrop,request.style);
       self.postMessage({id:data.id,floatStyle},{transfer:[floatStyle.pixels.buffer as ArrayBuffer,floatStyle.coverage.buffer as ArrayBuffer]});return;
     }
-    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTransfer||data.floatColor||data.floatGradient){
+    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTonal||data.floatTransfer||data.floatColor||data.floatGradient){
       const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;
       if(data.floatComposite){const request=data.floatComposite;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);pixels=owned.composite(request.source,request.backdrop,request.options);}
       else if(data.floatTransfer){const request=data.floatTransfer;validateFloatWorkerWindow(request.pixels);pixels=owned.transfer(request.pixels,request.adjustment);}
       else if(data.floatColor){const request=data.floatColor;validateFloatWorkerWindow(request.pixels);pixels=owned.color(request.pixels,request.adjustment);}
       else if(data.floatGradient){const request=data.floatGradient;validateFloatWorkerWindow(request.pixels);pixels=owned.gradient(request.pixels,request.adjustment);}
       else if(data.floatTone){const request=data.floatTone;validateFloatWorkerWindow(request.pixels);pixels=owned.tone(request.pixels,request.options);}
+      else if(data.floatTonal){const request=data.floatTonal;validateFloatWorkerWindow(request.pixels);pixels=owned.tonal(request.pixels,request.coverage,request.options);}
       else{const request=data.floatAffine!;validateFloatWorkerWindow(request.pixels);pixels=owned.affine(request.pixels,request.matrix);}
       self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});return;
     }

@@ -1,5 +1,22 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Float tonal authority
+
+Immutable stroke geometry, settings and originals remain separate from fixed-grid
+coverage and working-linear RGB. Worker packets own their inputs; replies must
+retain complete geometry and exact alpha. Empty/neutral work still validates;
+overflow and cancellation reject before frame publication. Scene checks bracket
+coverage/native awaits. Existing actual owner/revision/selection/lock checks own
+gesture commits and one Undo per stroke. Layer ordering and grants remain shared;
+no new persisted field or REST/browser synchronization is implied.
+
+Prepared precision replacements retain the identical original Blob, page,
+source-color choice and geometry. Shared attached command validation enforces
+that identity through nested transactions, and rejects replacement mappings
+outside byte-to-float conversion. This document-level operation cannot replace
+locked artwork with another original. Failed staging retains the byte document
+and releases newly admitted views; one Undo restores precision and source IDs.
+
 ## Layers tree keyboard ownership
 
 Tree focus, collapse state, search prefixes and range anchors are transient UI

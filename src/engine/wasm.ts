@@ -45,6 +45,7 @@ interface QuickSelectionKernel {
 }
 
 export interface PixelKernel extends QuickSelectionKernel {
+  tonalFloat(source:number,output:number,coverage:number,pixels:number,exposure:number,flow:number,mode:number,range:number,protect:boolean):number;
   convolveAlphaFloat(source:number,output:number,weights:number,width:number,height:number,radius:number,axis:number):number;
   styleFloat(source:number,backdrop:number,output:number,coverage:number,values:number,pixels:number,channel:number):number;
   gradientFloat(source:number,output:number,stops:number,pixels:number,count:number,reverse:boolean):number;

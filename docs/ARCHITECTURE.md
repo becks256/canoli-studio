@@ -1,5 +1,24 @@
 # Architecture
 
+## Native float tonal strokes
+
+`core/float-tonal` validates controls; private `tonalFloat` WASM applies linear
+exposure to straight float windows with exact alpha and finite-output checks.
+PixelProcessor captures source/coverage/settings before readiness and validates
+reply geometry/alpha words. The scene applies strokes sequentially before layer
+interpolation. Canvas supplies fixed-grid `renderRetouchCoverage` with affine
+planes and texture ownership; only coverage enters a byte canvas.
+`applyFloatTonal` captures inputs and transfers the nonzero rectangle, retaining
+complete-window validation. Preview DTOs append transient strokes; existing
+commands/gesture authority own commits, cancellation and Undo. Public
+constructors, document schema and permissions stay unchanged. The existing
+precision command accepts optional prepared-source mappings. Trusted conversion
+stages a native asset view from the same original Blob; attached commands verify
+original identity, page, source-color choice and geometry before rebinding.
+Precision and source references commit together, with the byte bitmap retained
+for Undo. Cancellation/stale preparation releases newly staged views; recipes
+explicitly reject recording conversions whose prepared sources cannot travel.
+
 ## Bounded native float source staging
 
 The preparation worker groups at most eight unchanged encoded tiles behind one

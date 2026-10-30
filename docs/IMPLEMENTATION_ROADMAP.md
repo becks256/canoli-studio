@@ -8249,3 +8249,49 @@ WebGPU, sustained editor-wide latency/memory and every unfinished original
 professional-editor, color/interchange/layout, AI/provider/evaluation, installed
 ChatGPT/live identity/commercial and release gate remain active. The full goal is
 not complete.
+
+### 2026-10-30 — F05/F10 native float tonal retouch and original-preserving conversion
+
+Owner: implementation agent; estimate L within T20/T17; baseline `6716df5`.
+Float validation now admits tonal adjustments and the existing Dodge/Burn tools
+render native linear exposure through exact alpha, full pressure/tip/symmetry/
+texture coverage, transient previews, masks/Fill/opacity/blends, shared Undo and
+source-bearing files. Reset clears strokes while keeping the tonal layer.
+Documented signed stop gains preserve extended colors; protection limits new
+positive highlights without reducing existing HDR. Byte roll-off stays unchanged
+and Color Settings explains the changed interpretation after conversion.
+
+Legacy byte-imported unsigned TIFFs prepare a separate native view of the same
+original Blob. Precision and raster references commit together; byte bitmaps
+remain for exact Undo. Shared attached validation enforces original identity,
+page, source-color choice and geometry through nested transactions and locked
+layers, rejecting unrelated or already-float rebindings. Cancellation/stale work
+releases staged views. Unprofiled sources still need an explicit assumption.
+Constructors, document schema and grants stay unchanged; the existing precision
+command adds optional prepared-source mappings. Recipes explicitly reject
+recording conversions requiring prepared-source transport.
+
+Final build passed. All 2,982 unit/API tests in 291 files, 145 affected browser
+cases and 185 normal-production cases passed. Both complete browser matrices
+used frozen source/release manifests, zero retries/skips/failures. Actual WASM,
+independent NumPy references, native CMM/libtiff readback, ownership, malformed
+replies, cancellation/retry, partitions, textured/transformed/masked strokes,
+permissions, controls, exact Undo and reopening were exercised. Earlier failures
+and the deliberately interrupted review run are retained separately.
+
+The new ordinary-production 50 MP workflow retains its 10,000 × 5,000 original
+raster while interacting with a 400 × 300 canvas crop, then restores native
+canvas dimensions before export. All 200,000,000 output samples match with zero
+different words, exact alpha/profile and 359,962 changed color samples. Original
+bytes and project-reopened output remain exact. This verifies cropped-area
+interaction and full native delivery, not uncropped 50 MP frame rates.
+
+Evidence: [verification record](benchmarks/float-tonal-2026-10-30.md) and
+[archive](benchmarks/float-tonal-2026-10-30.json.gz), 4,870,728 bytes, SHA-256
+`2c50030da01f95ceb0b1cd93025f596b5e9167c233abefc9b2c2f7a2b8479b92`.
+
+This advances this F05/F10 slice only. The full goal remains active: broader
+float tools, photographic/device quality, physical hardware WebGPU, sustained
+editor-wide latency/memory, accessibility, precision/color and every other
+unfinished original professional-editor, AI/provider/evaluation, installed
+ChatGPT/live identity/commercial and release gate remain open.

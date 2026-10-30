@@ -1,5 +1,14 @@
 # Canoli Studio design system
 
+## Float tonal controls
+
+Enable existing Dodge/Burn tools and tonal settings in float documents. Explain
+linear exposure and that protection limits new highlights without reducing
+existing HDR; turning protection off permits HDR brightening. Preserve editable
+controls after numeric failure, transient previews, Escape cancellation and one
+Undo per gesture. Reset retains the tonal type with zero strokes. Reuse existing
+tool/Inspector components and accessible labels.
+
 ## Float appearance controls
 
 Enable the existing Color overlay and Blend If controls in float documents, with existing disabled/locked/pass-through and preview/commit/cancel behavior. Explain linear-light overlay and continuous sRGB selectors separately from unchanged float samples. Enable drop-shadow controls for float rasters and isolated groups; explain document-pixel blur/offset and Fill versus layer opacity. For float adjustments, disable only shadow controls and explain the isolated artwork group workflow. Preserve correction controls after preview failure. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).

@@ -5,6 +5,20 @@ class ControlledWorker{
 }
 afterEach(()=>vi.unstubAllGlobals());
 function create(){vi.stubGlobal('Worker',ControlledWorker);const processor=new PixelProcessor();return{processor,worker:ControlledWorker.current};}
+it('float tonal captures controls, signed pixels and coverage before readiness and rejects altered alpha',async()=>{
+ const{processor,worker}=create(),source=new Float32Array([2,-.125,4,.375]),coverage=new Float32Array([.5]),options={mode:'dodge' as const,range:'highlights' as const,exposure:.625,protectTones:false};
+ const pending=processor.floatTonal(source,coverage,options);source.fill(0);coverage.fill(0);options.exposure=0;worker.ready();await processor.ready;
+ try{
+  const [message,transfer]=worker.postMessage.mock.calls[0];expect(message.floatTonal.pixels).toEqual(new Float32Array([2,-.125,4,.375]));expect(message.floatTonal.coverage).toEqual(new Float32Array([.5]));expect(message.floatTonal.options.exposure).toBe(.625);
+  expect(transfer).toEqual([message.floatTonal.pixels.buffer,message.floatTonal.coverage.buffer]);expect(transfer).not.toContain(source.buffer);expect(transfer).not.toContain(coverage.buffer);
+  worker.result(message.id,new Float32Array([4,-.25,8,.375]));await expect(pending).resolves.toEqual(new Float32Array([4,-.25,8,.375]));
+  const input=new Float32Array([.25,.5,.75,.375]);
+  for(const bad of[new Float32Array([.25,.5,.75,.5]),new Float32Array(8),new Float32Array([NaN,0,0,.375]),new Uint8Array(4)]){
+   const task=processor.floatTonal(input,coverage,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,bad);await expect(task).rejects.toThrow();
+  }
+  const retry=processor.floatTonal(input,coverage,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,input.slice());await expect(retry).resolves.toEqual(input);
+ }finally{processor.dispose();}
+});
 it('shadow alpha and Gaussian settings snapshot before readiness with owned transfers and strict reply recovery',async()=>{
  const{processor,worker}=create(),alpha=new Float32Array(9).fill(.375),settings={width:9,height:1,sigma:1,axis:'horizontal' as const},pending=processor.floatConvolveAlpha(alpha,settings);alpha.fill(0);settings.sigma=0;worker.ready();await processor.ready;
  try{const[message,transfers]=worker.postMessage.mock.calls[0];expect(message.floatConvolveAlpha.settings.sigma).toBe(1);expect(message.floatConvolveAlpha.alpha).toEqual(new Float32Array(9).fill(.375));expect(transfers).toEqual([message.floatConvolveAlpha.alpha.buffer]);expect(transfers).not.toContain(alpha.buffer);worker.result(message.id,new Float32Array(3).fill(.375));await expect(pending).resolves.toEqual(new Float32Array(3).fill(.375));

@@ -1,5 +1,13 @@
 # REST and scripting APIs
 
+## Float tonal metadata
+
+Existing strict tonal DTOs pass shared float validation. Signatures/body limits,
+locks, rollback, revisions and Undo remain shared. Actual browser Dodge/Burn uses
+native linear float processing; independent REST still has PNG-only admission
+and no browser float renderer or session synchronization.
+[Processing contract](FLOAT_DOCUMENTS.md#native-linear-dodge-and-burn).
+
 ## Float style metadata
 
 Existing strict `layer.update` style DTOs admit Color Overlay and Blend If in float documents, retaining revisions, locks, atomic rollback and Undo. Float raster/group shadow metadata also uses the shared commands; direct adjustment shadows reject atomically. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). Independent REST remains PNG-only for assets, supplies no original float TIFF renderer/admission and does not synchronize with browser tabs. [Exact interpretation and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
@@ -18,7 +26,7 @@ Existing strict `layer.add` and `layer.update` accept the same HSL, Color Balanc
 
 ## Initial float document workflow (F10)
 
-The shared strict command {type: "document.precision.float"} and schema-49 state also apply to independent REST documents. REST original admission remains PNG-only; it supplies no original unsigned 16-bit or float32 TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+The shared strict command {type: "document.precision.float", sources?: {layerId: string, assetId: string}[]} and schema-49 state also apply to independent REST documents. Optional replacements target distinct existing raster layers and remain subject to original-source validation. REST original admission remains PNG-only; it supplies no original unsigned 16-bit or float32 TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Float White Balance metadata
 

@@ -2199,6 +2199,7 @@ export function App({ editor }: { editor: EditorApplication }) {
               </button>
             </div>
             <ToolOptions
+              floatEditing={dom.precision==='float32'}
               onBrushPresets={()=>{editor.tools.cancel();setShowBrushPresets(true);}}
               onBrushSymmetry={()=>{editor.tools.cancel();setShowBrushSymmetry(true);}}
               onBrushTip={()=>{editor.tools.cancel();setShowBrushTip(true);}}

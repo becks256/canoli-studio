@@ -1,4 +1,5 @@
 import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
+import {floatTonalOptionsSchema, type FloatTonalOptions} from '../core/float-tonal';
 import{parseFloatTransfer,type FloatTransferAdjustment}from'../core/float-transfer';
 import{floatCompositeOptionsSchema,floatToneOptionsSchema,validateFloatWorkerWindow,validateFloatStyleResult,type FloatStyleResult,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
 import{floatConvolutionSchema,floatConvolutionLength,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
@@ -113,6 +114,14 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
+  async floatTonal(pixels:Float32Array,coverage:Float32Array,input:FloatTonalOptions):Promise<Float32Array>{
+    const options=floatTonalOptionsSchema.parse(input);validateFloatWorkerWindow(pixels);validateFloatAlpha(coverage,pixels.length/4);
+    const captured={pixels:pixels.slice(),coverage:coverage.slice(),options},length=pixels.length,alpha=new Uint32Array(length/4),words=new Uint32Array(pixels.buffer,pixels.byteOffset,length);
+    for(let i=0;i<alpha.length;i++)alpha[i]=words[i*4+3];
+    const result=await this.request(new Uint8ClampedArray(0),{floatTonal:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float tonal worker result geometry differs.');
+    const output=new Uint32Array(result.buffer,result.byteOffset,result.length);for(let i=0;i<alpha.length;i++)if(output[i*4+3]!==alpha[i])throw new Error('Float tonal worker changed backdrop alpha.');
+    return result;
+  }
   async floatConvolveAlpha(alpha:Float32Array,input:FloatConvolutionOptions):Promise<Float32Array>{
     const settings=floatConvolutionSchema.parse(input);validateFloatAlpha(alpha,settings.width*settings.height);const captured={alpha:alpha.slice(),settings},length=floatConvolutionLength(settings);
     const result=await this.request(new Uint8ClampedArray(0),{floatConvolveAlpha:captured});validateFloatAlpha(result,length);return result;
@@ -424,6 +433,7 @@ export class PixelProcessor {
       floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
       floatAffine?:{pixels:Float32Array;matrix:number[]};
       floatTone?:{pixels:Float32Array;options:FloatToneOptions};
+      floatTonal?:{pixels:Float32Array;coverage:Float32Array;options:FloatTonalOptions};
       floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
       floatColor?:{pixels:Float32Array;adjustment:FloatColorAdjustment};
       floatGradient?:{pixels:Float32Array;adjustment:GradientMapAdjustmentData};
@@ -527,6 +537,7 @@ export class PixelProcessor {
     if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}
     if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
     if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);
+    if(payload.floatTonal){tryTransfer(payload.floatTonal.pixels.buffer);tryTransfer(payload.floatTonal.coverage.buffer);}
     if(payload.floatTransfer)tryTransfer(payload.floatTransfer.pixels.buffer);
     if(payload.floatColor)tryTransfer(payload.floatColor.pixels.buffer);
     if(payload.floatGradient)tryTransfer(payload.floatGradient.pixels.buffer);

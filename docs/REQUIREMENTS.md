@@ -424,6 +424,18 @@ R16: Brush/pencil previews accumulate input samples without committing or valida
 
 R17: Prefer hardware WebGPU for supported viewport rendering, with automatic Canvas2D/WASM fallback on unsupported devices, unsupported effects, precision/allocation limits or device loss. Retain unchanged visible-region textures; draw new brush/pencil segments and run supported effects on the GPU without CPU readback for presentation. Keep source resolution, constructor APIs, history, clipping and exports intact. Report the actual displayed backend. Test real shader output against the reference renderer with documented rounding/antialiasing tolerances, check resource cleanup and device-loss recovery, and distinguish software-adapter correctness tests from real-GPU performance/presentation verification. See [GPU backend scope and limitations](ARCHITECTURE.md#gpu-viewport-backend).
 
+## Float Dodge/Burn (F05/F10)
+
+Editable tonal strokes and canvas tools must use native linear float backdrops
+with exact alpha/originals, complete brush coverage, affine planes, layer masks,
+preview cancellation and one Undo per gesture. Keep byte roll-off unchanged and
+explain float highlight protection/HDR behavior. Reset clears strokes while
+retaining the tonal type. Constructor scripts and native files retain ordinary
+authority and editable metadata. Verify actual WASM, independent references,
+worker ownership/failure, partitions, real controls and source-bearing native
+50 MP delivery/reopening. No source downsampling or arbitrary import cap.
+[Numeric contract](FLOAT_DOCUMENTS.md#native-linear-dodge-and-burn).
+
 ## Initial keyboard map
 
 `Mod` means Command on macOS and Control on Windows/Linux. Shortcuts are suspended while typing in inputs, textareas, selects, or editable content. Escape can close a dialog or cancel a gesture.

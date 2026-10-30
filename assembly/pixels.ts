@@ -1,6 +1,7 @@
 export {convolveAlphaFloat} from './float-shadow';
 export {styleFloat} from './float-style';
 export {colorFloat} from "./float-color";
+export {tonalFloat} from "./float-tonal";
 export {gradientFloat} from './float-gradient';
 export {lookupFloat} from './float-lookup';
 export {transferFloat} from "./float-transfer";

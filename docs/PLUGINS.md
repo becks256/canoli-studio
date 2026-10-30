@@ -1,5 +1,14 @@
 # Plugins and extensions
 
+## Float tonal edits keep existing grants
+
+Existing document grants admit constructor tonal edits against owned float
+documents. Installation stays inert; isolated execution retains captured
+revision/source/current-grant checks and one Undo. Byte brush textures keep
+ordinary asset validation; float thumbnails are not texture or precision sources.
+No worker, pixel, file, profile or network grant is added.
+[Behavior and limits](FLOAT_DOCUMENTS.md#native-linear-dodge-and-burn).
+
 ## Float appearance keeps existing grants
 
 Color Overlay/Blend If use existing document read/write grants and isolated shared style commands, with current source/revision/lock/permission validation and Undo. Installation stays inert. No raw-pixel, worker, file, profile or network grant/package change is added. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).

@@ -31,6 +31,7 @@ export function ToolOptions({
   onOpenArtboard,
   onOpenCrop,
   documentBusy,
+  floatEditing = false,
   onModifySelection,
   onColorRange,
   onPressureCurve,
@@ -40,6 +41,7 @@ export function ToolOptions({
   onBrushPresets,
 }: {
   tool: Tool;
+  floatEditing?: boolean;
   moveTarget: "layer" | "mask";
   hasMask: boolean;
   hasPaintMask: boolean;
@@ -308,10 +310,11 @@ export function ToolOptions({
               controller.configure({ tonalExposure: value / 100 })
             }
           />
-          <label className="check-field">
+          <label className="check-field" title={floatEditing?'Limit newly brightened positive peaks to reference white. Turn off to brighten HDR colors. Existing HDR values and signed colors are retained.':undefined}>
             <input
               type="checkbox"
               checked={settings.protectTones}
+              aria-description={floatEditing?'Linear exposure. Protection limits new highlights; turn off to brighten HDR colors.':undefined}
               disabled={disabled}
               onChange={(event) =>
                 controller.configure({ protectTones: event.target.checked })

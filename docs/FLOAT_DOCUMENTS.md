@@ -2,13 +2,78 @@
 
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
-transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup adjustments use this
+transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map/Color Lookup and editable linear Dodge/Burn adjustments use this
 mode. Display
 conversion happens at the final SDR canvas boundary. PNG, PDF and TIFF delivery
 reads the float scene directly, without reading colors from the display canvas.
 
 This is an initial connected precision workflow. It does not complete F10,
 professional color/precision editing, all-tool performance or the full roadmap.
+
+## Native linear Dodge and Burn
+
+Existing `TonalStroke`, `AdjustmentLayer.addTonalStroke(stroke)` and
+`document.applyTonalSculpt(path, mode, range, exposure, options?)` also work in
+float documents, with unchanged signatures/defaults. Dodge (`O`) and Burn
+(`Shift+O`) preview the float scene, create or reuse an editable tonal layer and
+commit one Undo per gesture. Existing owner/revision/selection/lock, Escape and
+capture-loss cancellation apply. Reset clears strokes while retaining the tonal
+type. Byte documents keep their existing roll-off operator.
+Converting working precision therefore changes how existing tonal settings are
+rendered; precision Undo restores the previous operator and appearance.
+
+Float strokes use direct linear exposure. For straight RGB let
+`L = clamp(.2126*r + .7152*g + .0722*b, 0, 1)`. Range weights are `1-L`,
+`4*L*(1-L)` and `L` for shadows, midtones and highlights. Gain is
+`2 ** ((mode === "dodge" ? 2 : -2) * exposure * coverage * weight)`.
+Exposure remains `[0,1]`, up to two stops. Coverage already includes brush
+opacity, flow, pressure, tip, texture, symmetry and clip; flow is applied once.
+A private numerical flow factor introduces no public stroke field.
+
+`protectTones` defaults to true. Brightening a positive RGB peak `P` caps gain
+at `max(1, 1/P)`: normalized colors gain no peak above reference white, and
+protection never reduces existing HDR. Turn it off to brighten HDR colors.
+Negative components receive the same positive gain. Only the range selector is
+clamped; RGB never enters integer staging or gamut clipping. Nonfinite float32
+output rejects rendering/delivery; controls and Undo remain available. Native
+transparent, uncovered and neutral samples retain their words; alpha is exact.
+
+Strokes operate sequentially on the live backdrop before existing mask/Fill/
+opacity/blend interpolation. Affine planes, clipping, proofing and artistic blend
+domain checks remain. Tonal layers have no intrinsic shadow silhouette. Coverage
+uses the fixed native grid; only its nonzero rectangle enters the color worker.
+This is a working-buffer policy, not an image limit. TIFF originals/descriptors
+and editable schema-49 metadata retain their existing persistence contracts.
+
+This example requires an open float document. Isolated execution adds one Undo.
+The solid brush fully covers its explicit clip without resizing original assets
+or the document.
+
+<!-- example: float-tonal -->
+```js
+const retouch = document.layers.add(new AdjustmentLayer({
+  name: "Linear burn",
+  adjustment: { kind: "tonal", strokes: [] },
+}));
+retouch.addTonalStroke(new TonalStroke({
+  brush: new BrushStroke({
+    points: [{ x: 200, y: 150, pressure: 1 }],
+    size: 2048, hardness: 1, flow: 1, opacity: 1,
+    clip: new MarqueeSelection({
+      shape: "rectangle", x: 0, y: 0, width: 400, height: 300,
+    }),
+  }),
+  mode: "burn", range: "highlights", exposure: 0.5,
+  protectTones: true,
+}));
+document.selectedLayer = retouch;
+```
+
+Scripts/plugins gain no worker, pixel, file, profile or network authority. Existing
+grants/source/revision checks and shared Undo apply. Independent REST accepts
+tonal metadata but still has no original float TIFF admission or browser float
+renderer/synchronization. Other tools/layers and broader color/device/performance
+gates remain required. The dated roadmap records verification status separately.
 
 ## Opening and changing precision
 
@@ -53,9 +118,14 @@ precision. Apply stages the output profile together with the precision choice;
 Cancel changes neither. All original sources and the actual float-to-output
 transform prepare before publication. Unsupported current layers block this
 conversion. A missing high-precision original or source color identity cannot
-be reconstructed from byte pixels. Legacy byte imports of unsigned TIFF lack
-that precision-source identity; reopen the original with the explicit float
-editing choice. Trusted host signature:
+be reconstructed from byte pixels. For legacy byte-imported unsigned TIFFs,
+the trusted host prepares a separate native float asset from the retained
+original Blob, verifies its samples, profile and geometry, then rebinds raster
+sources together with precision in one command. Repeated raster references
+share one prepared asset. The byte bitmap remains available for exact Undo;
+original bytes and layer metadata remain unchanged. Unsupported original depths
+and unprofiled sources without an explicit `floatColorSpace` still reject.
+Trusted host signature:
 
 ```ts
 await editor.convertDocumentToFloat(
@@ -68,11 +138,22 @@ await editor.convertDocumentToFloat(
 `control: FloatSourceControl = {}` accepts an optional abort signal and source
 preparation progress callback. `settings?: ColorSettings` defaults to the current
 output and proof settings. `editor.floatConversionIssue: string | null`
-provides the current eligibility reason. Already-float conversion through this
+provides the current structural eligibility reason; original sample/color
+admission is asynchronous and can still reject. Already-float conversion through this
 host preparation service rejects. Replacement preparation, document edit, tab
 change, asset disposal, changed preferences, cancellation or preparation failure
 reject without applying precision or staged preferences. Output and proof preferences are
-workspace settings outside document history; ordinary Undo restores precision.
+workspace settings outside document history; ordinary Undo restores precision
+and any replaced raster source references. Failed preparation releases newly
+staged asset views. The strict command optionally accepts
+`sources: {layerId: string, assetId: string}[]`; replacements must target distinct
+existing raster layers and pass the host's ordinary original-source validation.
+Attached replacements must retain the same immutable original Blob, TIFF page,
+explicit source-color choice and geometry, and are accepted only while changing
+from byte to float precision. They cannot substitute unrelated image content,
+including through nested transactions or locked layers.
+Recipe recording explicitly rejects conversions with prepared source
+replacements because recipe assets do not transport those TIFF sources.
 
 ## Object model, commands and isolation
 

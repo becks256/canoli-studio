@@ -1085,6 +1085,20 @@ export class Document {
     const activations=this.prepareFontCommands(command);this.fontTransactionActivations?.push(...activations);
     try{
     const changesPrecision=(value:EditorCommand):boolean=>value.type==='document.precision.float'||value.type==='transaction'&&value.commands.some(changesPrecision);
+    const replacesPrecisionSources=(value:EditorCommand):boolean=>value.type==='document.precision.float'&&!!value.sources?.length||value.type==='transaction'&&value.commands.some(replacesPrecisionSources);
+    if(this._assetStore&&replacesPrecisionSources(command)){
+      const assets=this._assetStore;
+      const verify=(value:EditorCommand,before:DocumentData):void=>{
+        if(value.type==='transaction'){for(const nested of value.commands){if(replacesPrecisionSources(nested))verify(nested,before);before=execute(before,nested);}return;}
+        if(value.type!=='document.precision.float')return;
+        for(const replacement of value.sources??[]){
+          const layer=findLayer(before,replacement.layerId);if(!layer||layer.kind!=='raster')throw new Error('Precision replacement requires an existing raster source.');
+          const original=assets.get(layer.assetId),prepared=assets.get(replacement.assetId);
+          if(original.blob!==prepared.blob||original.width!==prepared.width||original.height!==prepared.height||!original.tiff||prepared.tiff?.editingPrecision!=='float32'||original.tiff.page!==prepared.tiff.page||original.tiff.floatColorSpace!==prepared.tiff.floatColorSpace)throw new Error('Precision replacements must retain the same original TIFF bytes, page, source color and geometry.');
+        }
+      };
+      verify(command,this._read());
+    }
     if(this._assetStore&&(isFloatDocument(this._read())||this._assetStore.hasFloatAssets||changesPrecision(command)))assertFloatSources(execute(this._read(),command),this._assetStore);
     if (this.batch) {
       this.staged = freeze(execute(this._read(), command));

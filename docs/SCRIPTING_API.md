@@ -1,10 +1,34 @@
 # Scripting API
 
+## Float tonal retouching
+
+Existing `TonalStroke`, `AdjustmentLayer.addTonalStroke` and
+`document.applyTonalSculpt` signatures/defaults also apply to float documents.
+Strokes apply linear exposure with exact alpha; byte documents keep their
+roll-off. Default `protectTones = true` limits new highlights without reducing
+existing HDR; false permits HDR brightening. Overflow rejects rendering/delivery
+with editable controls/Undo retained. Flow enters coverage once. Schema,
+isolation, current grants, source/revision checks and one transaction per script
+remain unchanged. [Equations, example, errors and limits](FLOAT_DOCUMENTS.md#native-linear-dodge-and-burn).
+
 ## Float layer appearance
 
 Existing `Layer.styles: LayerStyle`, `LayerStyle.colorOverlay`, `LayerStyle.blendIf` and immutable `BlendIf` values also support float rasters/groups/clipping/supported adjustments. Defaults/signatures remain unchanged. Overlay mixes linear RGB; Blend If uses continuous encoded selectors with separate coverage, preserving alpha and original data. Existing `LayerStyle.dropShadow` also supports float rasters and isolated groups, including clipping bases. Direct adjustment shadows reject atomically because they have no intrinsic silhouette. Native services stay private. [Shadow defaults, order, example and limits](FLOAT_DOCUMENTS.md#native-float-drop-shadows). [Defaults, math, executable example, errors and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
 ## Precision conversion with host proof preferences
+
+The trusted `editor.convertDocumentToFloat` host service can also prepare
+legacy byte-imported unsigned 16-bit TIFF originals. It preserves the byte
+bitmap and switches prepared source IDs with precision in one undoable command.
+Unsupported depths and missing explicit source-color assumptions reject before
+publication; cancellation, stale edits and failures release staged views.
+`document.convertToFloat()` remains synchronous and requires already-admitted
+precision sources. The shared command accepts optional
+`sources: {layerId: string, assetId: string}[]` for distinct existing raster
+layers. Attached source validation rejects
+rebindings to other original Blobs/pages/color choices/geometries; source
+replacements are accepted only during byte-to-float conversion. Recipe recording rejects
+conversions with prepared replacements. [Full conversion contract](FLOAT_DOCUMENTS.md).
 
 document.convertToFloat() retains the current trusted host proof preferences; it does not expose profiles, native workers, files or rendering to isolated code. The existing one-transaction shared command, revision, source and permission checks remain. Subsequent edits and precision Undo/Redo render through the current proof settings. Trusted editor.convertDocumentToFloat(control = {}, settings = editor.colorSettings) now retains the current proof by default and preflights its direct float transform; an explicit settings.proof = null disables it. [Contract and current verification](FLOAT_PROOFING.md).
 

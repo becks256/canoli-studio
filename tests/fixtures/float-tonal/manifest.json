@@ -1,0 +1,184 @@
+{
+  "tolerance": 2.384185791015625e-07,
+  "cases": [
+    {
+      "options": {
+        "mode": "dodge",
+        "range": "shadows",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": false
+      },
+      "reference": "dodge-shadows-0.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "dodge",
+        "range": "shadows",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": true
+      },
+      "reference": "dodge-shadows-1.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "dodge",
+        "range": "midtones",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": false
+      },
+      "reference": "dodge-midtones-0.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "dodge",
+        "range": "midtones",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": true
+      },
+      "reference": "dodge-midtones-1.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "dodge",
+        "range": "highlights",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": false
+      },
+      "reference": "dodge-highlights-0.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "dodge",
+        "range": "highlights",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": true
+      },
+      "reference": "dodge-highlights-1.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "burn",
+        "range": "shadows",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": false
+      },
+      "reference": "burn-shadows-0.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "burn",
+        "range": "shadows",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": true
+      },
+      "reference": "burn-shadows-1.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "burn",
+        "range": "midtones",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": false
+      },
+      "reference": "burn-midtones-0.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "burn",
+        "range": "midtones",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": true
+      },
+      "reference": "burn-midtones-1.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "burn",
+        "range": "highlights",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": false
+      },
+      "reference": "burn-highlights-0.f32le.gz"
+    },
+    {
+      "options": {
+        "mode": "burn",
+        "range": "highlights",
+        "exposure": 0.625,
+        "flow": 0.75,
+        "protectTones": true
+      },
+      "reference": "burn-highlights-1.f32le.gz"
+    }
+  ],
+  "files": {
+    "source.f32le.gz": {
+      "bytes": 13224,
+      "sha256": "2959709bd5ebcc31874b2ae31d43c843bb6fd4de671c32f7634984e39d94a25d"
+    },
+    "coverage.f32le.gz": {
+      "bytes": 960,
+      "sha256": "0236c37813daa8969559cbdbb8922e42cdcc39914045db70eb075752ce6a6d18"
+    },
+    "dodge-shadows-0.f32le.gz": {
+      "bytes": 17198,
+      "sha256": "36b1091accf93d7591ad87a66f2c08325d0ae0123efb8081e9b86d1fee9d5061"
+    },
+    "dodge-shadows-1.f32le.gz": {
+      "bytes": 14178,
+      "sha256": "9e2fda01069da7ff32adaa1b14906b362797f80e00f7d2078154a8be283a680b"
+    },
+    "dodge-midtones-0.f32le.gz": {
+      "bytes": 17001,
+      "sha256": "c1a12fc476240b79de2deb2c39cc5fe7a74097bd25014539e0b6d23deda8004e"
+    },
+    "dodge-midtones-1.f32le.gz": {
+      "bytes": 13979,
+      "sha256": "d284aa2c52cde37b7fabbb4b97ada4a6c0026d0399f48fc5ab907c3641c84407"
+    },
+    "dodge-highlights-0.f32le.gz": {
+      "bytes": 23305,
+      "sha256": "c5e255cd246cdcc75beaca7579374bc9db235d37aa0eae8c2914c2fc5c6c24f6"
+    },
+    "dodge-highlights-1.f32le.gz": {
+      "bytes": 14008,
+      "sha256": "7d85a0428aebc7b330357507d8e15a1941e0e43a2e29fb0c0faf4517cf24cac5"
+    },
+    "burn-shadows-0.f32le.gz": {
+      "bytes": 17224,
+      "sha256": "9ba994d72fea098b123a10f0862069b21fcd86edfd12f97cd743a83e48a208a7"
+    },
+    "burn-shadows-1.f32le.gz": {
+      "bytes": 17224,
+      "sha256": "9ba994d72fea098b123a10f0862069b21fcd86edfd12f97cd743a83e48a208a7"
+    },
+    "burn-midtones-0.f32le.gz": {
+      "bytes": 17009,
+      "sha256": "4d84255f8f726c791004d582dc797133af48e22e737bf977ccc01f101a6e7186"
+    },
+    "burn-midtones-1.f32le.gz": {
+      "bytes": 17009,
+      "sha256": "4d84255f8f726c791004d582dc797133af48e22e737bf977ccc01f101a6e7186"
+    },
+    "burn-highlights-0.f32le.gz": {
+      "bytes": 23322,
+      "sha256": "4052d9f2600a00c195dc55c01ff49e0224fd30ee3b221de5fbee4dbcd5a2f2b3"
+    },
+    "burn-highlights-1.f32le.gz": {
+      "bytes": 23322,
+      "sha256": "4052d9f2600a00c195dc55c01ff49e0224fd30ee3b221de5fbee4dbcd5a2f2b3"
+    }
+  },
+  "generatorSha256": "8a50a3d1f20d25830511103eb18f9a14aafcdf93614343cdb5fb62d1fcbbe09d"
+}

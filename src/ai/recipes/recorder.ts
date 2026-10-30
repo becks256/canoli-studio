@@ -529,6 +529,7 @@ export class RecipeRecorder {
         this.lastCommandTargetLayerId=null;this.notify();break;
       }
       case 'document.precision.float':{
+        if(command.sources?.length){this.unsupported.add('document.precision.float with prepared source replacements');this.notify();break;}
         this.steps.push({id:`step-${id()}`,name:'Use 32-bit linear editing',action:{type:'document.precision.float'}});this.notify();break;
       }
       case "document.rename": {

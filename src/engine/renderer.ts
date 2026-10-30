@@ -35,7 +35,7 @@ import { createDocument, createRaster } from "../core/model";
 import { ComponentRegistry } from "../core/smart/manager";
 import { resolveSmartDocument } from "../core/smart/resolve";
 import type { DodgeBurnOptions } from "../core/retouch/types";
-import { renderTonalStroke } from "./retouch";
+import { renderTonalStroke, renderRetouchCoverage } from "./retouch";
 import { blendAdjustedTile } from "./adjustment-blend";
 import { localTransform, localBounds } from "../core/spatial";
 import { maskTransform, maskGeometry } from "../core/masks";
@@ -205,6 +205,17 @@ export class CanvasRenderer implements DocumentRenderer {
   private floatPreview(document:DocumentData,preview?:PaintPreview|null):DocumentData{
     if(!preview)return document;
     if(!preview.maskMode){
+      if(preview.tonal){
+        let found=false;
+        const visit=(layers:LayerData[]):LayerData[]=>layers.map(layer=>{
+          if(layer.id===preview.layerId){
+            if(layer.kind!=='adjustment'||layer.adjustment.kind!=='tonal')throw new Error('Float tonal preview requires a tonal adjustment layer.');
+            found=true;return{...layer,adjustment:{...layer.adjustment,strokes:[...layer.adjustment.strokes,{brush:preview.stroke,...preview.tonal!}]}};
+          }
+          return layer.kind==='group'?{...layer,children:visit(layer.children)}:layer;
+        });
+        const children=visit(document.children);if(!found)throw new Error('Float tonal preview target is unavailable.');return{...document,children};
+      }
       if(preview.stroke.kind!=='eraser')throw new Error('Color painting requires its float document integration.');
       let found=false;
       const visit=(layers:LayerData[]):LayerData[]=>layers.map(layer=>{
@@ -222,9 +233,15 @@ export class CanvasRenderer implements DocumentRenderer {
       try{check();applyMaskSettings(canvas,mask);const bytes=canvas.getContext('2d')!.getImageData(0,0,space.width,space.height).data,coverage=new Float32Array(space.width*space.height);for(let i=0;i<coverage.length;i++)coverage[i]=bytes[i*4+3]/255;check();return coverage;}finally{release(canvas);}
     };
   }
+  private floatStrokes(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatStrokeService{
+    return async(brush,space,world,check)=>{
+      check();const bytes=await renderRetouchCoverage(brush,space,this.processor,world,assets,this.brushTextures,()=>{check();return!!isCancelled?.();});check();
+      const coverage=new Float32Array(bytes.length);for(let i=0;i<bytes.length;i++)coverage[i]=bytes[i]/255;return coverage;
+    };
+  }
   async captureFloatScene(document:DocumentData,assets:AssetStore,control:FloatSceneControl={}):Promise<CapturedFloatScene>{
     if(!isFloatDocument(document))throw new Error('Native float scene output requires a float32 linear-sRGB document.');
-    return this.floatScene.capture(document,assets,this.floatMasks(assets,control.isCancelled),control);
+    return this.floatScene.capture(document,assets,this.floatMasks(assets,control.isCancelled),control,this.floatStrokes(assets,control.isCancelled));
   }
 
   private signature(layer: LayerData): string {
@@ -622,7 +639,7 @@ export class CanvasRenderer implements DocumentRenderer {
     checkRenderCurrent(options.isCancelled);
     if(isFloatDocument(document)){
       const sizeRegion=options.region??{x:0,y:0,width:document.width,height:document.height},size=workingSize(options.outputSize?.width??sizeRegion.width,options.outputSize?.height??sizeRegion.height,options.outputSize?1:options.scale,options.maxPixels,options.maxDimension);
-      return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback,options.colorProof,options.cache!==false);
+      return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback,options.colorProof,options.cache!==false,this.floatStrokes(assets,options.isCancelled));
     }
     if(!options.taskBudget)options={...options,taskBudget:{deadline:performance.now()+8}};
     const ownedFrequencyScratch=options.frequencyScratch?undefined:new FilterTileCache(8*1024*1024);

@@ -1,4 +1,7 @@
 import {spacingWorkflow} from './helpers/spacing';
+import {floatTonalWorkflow} from './helpers/float-tonal';
+test('production float Dodge and Burn retain previews, native samples, one Undo and original-bearing reopening',async({page},info)=>{test.setTimeout(600000);await floatTonalWorkflow(page,info,true);});
+test('production 50 MP float tonal delivery preserves every independent native sample and complete original',async({page},info)=>{test.setTimeout(900000);await floatTonalWorkflow(page,info,true,true);});
 import {layerKeyboardWorkflow} from './helpers/layer-keyboard';
 test('production keyboard tree selection and row edits preserve the 50 MP original, Undo and project reopening', async ({page}, info) => {
   test.setTimeout(180000); await layerKeyboardWorkflow(page, info, true);

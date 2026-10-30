@@ -264,7 +264,7 @@ const commandVariants = () =>
     z
       .object({ type: z.literal("document.guides"), guides: guidesSchema })
       .strict(),
-    z.object({type:z.literal('document.precision.float')}).strict(),
+    z.object({type:z.literal('document.precision.float'),sources:z.array(z.object({layerId:identifier,assetId:identifier}).strict()).optional()}).strict(),
     z.object({ type: z.literal("document.rename"), name: identifier }).strict(),
     z
       .object({ type: z.literal("document.crop"), bounds: cropBoundsSchema })

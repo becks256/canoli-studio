@@ -531,7 +531,7 @@ export function InspectorPanel({
                           const kind = layer.adjustmentKind;
                           layer.update({
                             adjustment:
-                              kind === "red-eye" ? defaultRedEyeAdjustment() : kind === "curves"
+                              kind === "tonal" ? {kind:"tonal",strokes:[]} : kind === "red-eye" ? defaultRedEyeAdjustment() : kind === "curves"
                                 ? defaultCurvesAdjustment()
                                 : kind === "levels"
                                   ? defaultLevelsAdjustment()
@@ -607,6 +607,7 @@ export function InspectorPanel({
                     {selected.adjustment.strokes.length} editable tonal strokes
                   </p>
                 )}
+                {float&&selected.adjustment.kind==='tonal'&&<p className="section-description">Linear exposure strokes preserve signed and HDR colors. Protect tones limits new highlights; turn it off to brighten HDR colors.</p>}
                 {float&&(selected.adjustment.kind==='hsl'||selected.adjustment.kind==='color-balance'||selected.adjustment.kind==='vibrance')&&<p className="section-description">sRGB color controls retain float precision. Active settings need RGB from 0 to 1; neutral settings preserve extended colors.</p>}
                 {float&&(selected.adjustment.kind==='curves'||selected.adjustment.kind==='levels')&&<p className="section-description">Linear RGB: 255 means 1. Curves extend their endpoint tangents; active Levels clip to their black/white range.</p>}
                 {selected.adjustment.kind === "curves" && (

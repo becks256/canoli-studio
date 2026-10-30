@@ -1205,7 +1205,7 @@ export class EditorApplication {
   get floatConversionIssue():string|null{
     const document=this.document._read();if(isFloatDocument(document))return'This document already uses 32-bit linear editing.';const issue=floatSceneIssue(document);if(issue)return issue;
     const rasters=allLayers(document.children).filter(layer=>layer.kind==='raster');if(!rasters.length)return'Open an original unsigned 16-bit or float32 TIFF raster before changing to float editing.';
-    for(const raster of rasters){const asset=this.assets.get(raster.assetId);if(!asset.tiff||!asset.tiffColor)return'Float editing requires retained original unsigned 16-bit or float32 TIFF raster sources.';}return null;
+    for(const raster of rasters){const asset=this.assets.get(raster.assetId);if(!asset.tiff)return'Float editing requires retained original unsigned 16-bit or float32 TIFF raster sources.';}return null;
   }
   async convertDocumentToFloat(control:FloatSourceControl={},value?:ColorSettings):Promise<void>{
     const beforeSettings=this.colorSettings,settings=normalizeColorSettings(value??beforeSettings);
@@ -1213,11 +1213,24 @@ export class EditorApplication {
     const abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason),document=this.document,assets=this.assets,revision=document.getSnapshot().revision,generation=this.ioGeneration,alive=assets.captureLifetime();this.precisionJob=abort;control.signal?.addEventListener('abort',cancel,{once:true});
     const check=()=>{abort.signal.throwIfAborted();alive();if(this.retouchDisposed||this.precisionJob!==abort||this.document!==document||this.assets!==assets||this.ioGeneration!==generation||document.getSnapshot().revision!==revision||this.colorSettings!==beforeSettings)throw new Error('The document or color settings changed during float preparation. Try again.');};
     const changed=()=>{try{check();}catch(error){abort.abort(error);}},stopDocument=document.subscribe(changed),stopEditor=this.subscribe(changed);
+    const installed=new Map<string,import('./core/assets').ImageAsset>();
     try{
-      check();const candidate=execute(document._read(),{type:'document.precision.float'}),scene=await this.renderer.captureFloatScene(candidate,assets,{signal:abort.signal,onProgress:progress=>{check();control.onProgress?.(progress);check();}});scene.dispose();check();
-      const warnings=await preflightColorSettings(settings,{signal:abort.signal,onProgress:check},check,true);check();
-      stopDocument();stopEditor();this.precisionJob=null;document.convertToFloat();this.commitColorSettings(settings,warnings);
-    }finally{stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);if(this.precisionJob===abort)this.precisionJob=null;}
+      check();const originals=allLayers(document._read().children).filter(layer=>layer.kind==='raster').map(layer=>({layer,source:captureAssetSource(assets,layer.assetId)})),replacements=new Map<string,string>(),stagedChecks:(()=>void)[]=[];
+      for(const {layer,source} of originals){
+        source.check();if(source.asset.tiffColor||replacements.has(layer.assetId))continue;
+        const asset=await assets.add(source.asset.blob,source.asset.name,undefined,false,{tiff:{...source.asset.tiff!,editingPrecision:'float32'},signal:abort.signal,onProgress:check});installed.set(asset.id,asset);stagedChecks.push(captureAssetSource(assets,asset.id).check);check();source.check();
+        if(asset.width!==source.asset.width||asset.height!==source.asset.height)throw new Error('Original TIFF geometry differs from the byte editing source.');
+        replacements.set(layer.assetId,asset.id);
+      }
+      const command:import('./core/commands').EditorCommand={type:'document.precision.float',...(replacements.size?{sources:originals.filter(({layer})=>replacements.has(layer.assetId)).map(({layer})=>({layerId:layer.id,assetId:replacements.get(layer.assetId)!}))}:{})};
+      const candidate=execute(document._read(),command),scene=await this.renderer.captureFloatScene(candidate,assets,{signal:abort.signal,onProgress:progress=>{check();control.onProgress?.(progress);check();}});scene.dispose();check();for(const {source} of originals)source.check();
+      const warnings=await preflightColorSettings(settings,{signal:abort.signal,onProgress:check},check,true);check();for(const {source} of originals)source.check();for(const stagedCheck of stagedChecks)stagedCheck();
+      stopDocument();stopEditor();this.precisionJob=null;document._dispatch(command);this.commitColorSettings(settings,warnings);
+    }finally{
+      stopDocument();stopEditor();control.signal?.removeEventListener('abort',cancel);if(this.precisionJob===abort)this.precisionJob=null;
+      const state=document.getSnapshot(),retained=new Set(retainedDocuments(state.document,captureRetainedHistory(state)).flatMap(value=>[...referencedAssets(value)]));
+      for(const [key,asset] of installed)if(!retained.has(key)&&assets.has(key)&&assets.get(key)===asset)assets.remove(key);
+    }
   }
   get colorWarnings():readonly string[] { return this.activeSession.colorWarnings; }
   inspectColorProfile(source:Blob,name?:string,control:IccControl={}) { return IccProfile.inspect(source,name,control); }

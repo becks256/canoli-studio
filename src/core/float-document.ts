@@ -1,4 +1,5 @@
 import{compileFloatColor,isFloatColorAdjustment}from'./float-color';
+import {floatTonalOptionsSchema} from './float-tonal';
 import{compileFloatGradient}from'./float-gradient';
 import{captureLutHeader}from'./lut';
 import{compileFloatTransfer}from'./float-transfer';
@@ -22,13 +23,14 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='raster'){
         if(layer.erasures?.some(entry=>entry.stroke.kind==='wet'))return 'Prepared wet raster replacements require their float document integration.';
       }else if(layer.kind==='adjustment'){
-        if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
+        if(layer.adjustment.kind==='tonal'){try{for(const {brush:_brush,...options} of layer.adjustment.strokes)floatTonalOptionsSchema.parse(options);}catch(error){return String(error);}}
+        else if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='white-balance'){try{compileFloatWhiteBalance(layer.adjustment);}catch(error){return String(error);}}
         else if(isFloatColorAdjustment(layer.adjustment)){try{compileFloatColor(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='gradient-map'){try{compileFloatGradient(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='lut'){try{captureLutHeader(layer.adjustment);}catch(error){return String(error);}}
-        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup only.';
-      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup adjustments. Other layer types require their float integration.';
+        else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup and editable Dodge/Burn only.';
+      }else return 'This float document mode currently supports original high-precision TIFF raster layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup and editable Dodge/Burn adjustments. Other layer types require their float integration.';
     }
     return null;
   };

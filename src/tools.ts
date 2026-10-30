@@ -408,6 +408,7 @@ export class ToolController {
   canUseTool(tool:Tool):boolean{
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
+    if(tool==='dodge'||tool==='burn')return true;
     if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer;
     if(tool==='pen')return this.state.settings.penEditTarget==='mask';
     return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');
@@ -886,7 +887,7 @@ export class ToolController {
     zoom: number,
     cropHandle?: CropHandle,
   ) {
-    if(!this.canUseTool(tool))throw new Error('This tool requires its float document integration. Use Move, selections, masks, crop or linear exposure in this mode.');
+    if(!this.canUseTool(tool))throw new Error('This tool requires its float document integration. Use Move, selections, masks, crop, linear exposure or Dodge/Burn in this mode.');
     if (tool === "lasso" && this.state.settings.lassoMode === "polygon") {
       this.beginPolygonLasso(point, modifiers, zoom);
       return;

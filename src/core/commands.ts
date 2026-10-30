@@ -118,7 +118,7 @@ export type LayerPatch = Partial<
 // Serializable commands are the single mutation boundary for UI, automation,
 // and a future AI adapter. No renderer or UI code mutates document nodes.
 export type EditorCommand =
-  | {type:'document.precision.float'}
+  | {type:'document.precision.float';sources?:{layerId:string;assetId:string}[]}
   | {type:'layer.align';ids:string[];alignment:LayerAlignment;target?:AlignmentTarget}
   | {type:'font.file.add';file:FontFileData}
   | {type:'font.file.rename';id:string;name:string}
@@ -239,7 +239,16 @@ const TEXT_REFLOW_KEYS: readonly (keyof LayerPatch)[] = [
   'width','height',
 ];
 function apply(document: DocumentData, command: EditorCommand): void {
-  if(command.type==='document.precision.float'){document.schemaVersion=SCHEMA_VERSION;document.colorSpace='linear-srgb';document.precision='float32';return;}
+  if(command.type==='document.precision.float'){
+    if(command.sources?.length&&document.precision==='float32')throw new Error('Prepared source replacements require a byte-to-float precision conversion.');
+    const seen=new Set<string>();
+    for(const source of command.sources??[]){
+      const layer=findLayer(document,source.layerId);
+      if(!layer||layer.kind!=='raster'||seen.has(source.layerId)||typeof source.assetId!=='string'||!source.assetId||source.assetId.length>240)throw new Error('Precision source replacements require distinct existing raster layers and valid asset IDs.');
+      seen.add(source.layerId);layer.assetId=source.assetId;
+    }
+    document.schemaVersion=SCHEMA_VERSION;document.colorSpace='linear-srgb';document.precision='float32';return;
+  }
   if(command.type==='font.file.add'){
     const file=fontFileSchema.parse(command.file),existing=documentFontFiles(document).find(value=>value.id===file.id);
     if(existing){if(!sameFontResource(existing.resource,file.resource))throw new Error('Font resource identity collision.');return;}
@@ -869,7 +878,7 @@ export function execute(
   let next: DocumentData;
   const rootOnly = ["document.precision.float", "document.rename", "document.resize", "document.guides", "selection.set", "selection.polygon"].includes(command.type);
   const targeted = command.type === "layer.update" || command.type === "paint.add" || command.type === "paint.remove" || command.type === "path.update" || command.type === "path.add" || command.type === "path.remove";
-  if (isImmutable(document) && rootOnly) next = { ...document };
+  if (isImmutable(document) && rootOnly && !(command.type==='document.precision.float'&&command.sources?.length)) next = { ...document };
   else if (isImmutable(document) && command.type === 'paths.replace') {
     const targets=new Set(command.operands.map(ref=>ref.layerId));
     const copy=(nodes:LayerData[]):LayerData[]=>nodes.map(node=>{

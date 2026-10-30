@@ -1,4 +1,5 @@
 import{floatConvolutionSchema,floatConvolutionLength,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
+import {floatTonalOptionsSchema, type FloatTonalOptions} from '../core/float-tonal';
 import{gaussianWeights}from'../core/smart/spatial-filter';
 import{compileFloatStyle}from'../core/float-style';
 import type{LayerStyleData}from'../core/drawing';
@@ -35,6 +36,17 @@ export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
  constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.convolveAlphaFloat!=='function'||typeof kernel.styleFloat!=='function'||typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
+ tonal(pixels:Float32Array,coverage:Float32Array,input:FloatTonalOptions):Float32Array<ArrayBuffer>{
+  const kernel=this.owner();if(typeof kernel.tonalFloat!=='function')throw new Error('Float tonal kernel export is unavailable.');const options=floatTonalOptionsSchema.parse(input);samples(pixels,'Input');validateFloatAlpha(coverage,pixels.length/4);
+  const result=new Float32Array(pixels.length);
+  for(let at=0;at<pixels.length;at+=WINDOW*4){
+   const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count,true),memory=p.kernel.memory.buffer;
+   new Float32Array(memory,p.source,count*4).set(pixels.subarray(at,at+count*4));new Float32Array(memory,p.mask,count).set(coverage.subarray(at/4,at/4+count));
+   checked(p.kernel.tonalFloat(p.source,p.output,p.mask,count,options.exposure,options.flow,options.mode==='dodge'?0:1,['shadows','midtones','highlights'].indexOf(options.range),options.protectTones));
+   result.set(new Float32Array(p.kernel.memory.buffer,p.output,count*4),at);
+  }
+  return result;
+ }
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
  convolveAlpha(alpha:Float32Array,input:FloatConvolutionOptions):Float32Array<ArrayBuffer>{
   const kernel=this.owner(),settings=floatConvolutionSchema.parse(input),length=floatConvolutionLength(settings);validateFloatAlpha(alpha,settings.width*settings.height);
