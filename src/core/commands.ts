@@ -71,6 +71,7 @@ export type LayerPatch = Partial<
   Pick<
     LayerBaseData,
     | "transform"
+    | "perspective"
     | "mask"
     | "metadata"
     | "name"
@@ -599,6 +600,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
       return;
     }
     case "layer.update":
+      if ('perspective' in command.patch && layer.kind!=='raster'&&layer.kind!=='smart-object')throw new Error('Perspective requires a raster or smart-object layer.');
       if ("frequencyRadius" in command.patch && layer.kind !== "group") throw new Error("A shared frequency radius requires a group.");
       if ("erasures" in command.patch && layer.kind !== "raster") throw new Error("Erasures require a raster layer.");
       if (layer.kind !== 'text' && ['text','textPath','writingMode','textOrientation','characterRanges','fontSize','fontFamily','color','align','lineHeight','letterSpacing','wordSpacing','fontKerning','fontVariantCaps','fontStretch','fontVariationSettings','fontWeight','fontStyle','direction'].some(key=>key in command.patch))
@@ -608,6 +610,7 @@ function apply(document: DocumentData, command: EditorCommand): void {
           (key) =>
             ![
               "transform",
+              "perspective",
               "mask",
               "metadata",
               "name",

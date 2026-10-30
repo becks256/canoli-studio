@@ -1,4 +1,5 @@
 import {measureSpacing,snapToSpacing,type SpacingMatch} from '../core/spacing';
+import {activePerspective} from '../core/perspective';
 import {clippingBaseFor} from '../core/clipping';
 import {SpacingOverlay} from './SpacingOverlay';
 import {alignmentCommands,layerAlignmentSchema,type LayerAlignment,type AlignmentTarget} from '../core/layer-layout';
@@ -495,7 +496,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   ),[viewDocument.width,viewDocument.height,viewportSize,zoom,pan]);
 
   function chooseTool(next: Tool) {
-    if(!editor.tools.canUseTool(next)){notify('This tool requires its float document integration.');return;}
+    if(!editor.tools.canUseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
     editor.tools.cancel();
     setPreview(null);
     updateCursor(null);
@@ -1370,6 +1371,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     // A transform starts from the model represented by this committed UI.
     if(tool==='move'&&(dom.getSnapshot().document!==state.document||!samePreviewSelection(dom.getSnapshot().selectedIds,state.selectedIds)))return;
     if (movingMask) {
+      if(selected?.perspective&&activePerspective(selected.perspective)&&selected.mask?.linked!==false){notify('Reset perspective before dragging this linked mask.');return;}
       if (selected?.mask && !locked)
         gesture.current = {
           kind: "move",
@@ -1485,7 +1487,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           layerY: selected.y,
           layerWidth: selected.width,
           layerHeight: selected.height,
-          layerContentBounds: selected.kind === 'raster' && selected.erasures?.some(entry => entry.stroke.kind === 'wet' && entry.stroke.opacity > 0) ? localBounds(selected) : undefined,
+          layerContentBounds: selected.kind === 'raster' && (activePerspective(selected.perspective)||selected.erasures?.some(entry => entry.stroke.kind === 'wet' && entry.stroke.opacity > 0)) ? localBounds(selected) : undefined,
           layerFontSize:
             selected.kind === "text" ? selected.fontSize : undefined,
           layerText: selected.kind === "text" ? selected.text : undefined,

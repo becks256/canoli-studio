@@ -224,7 +224,7 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       const rasterPlans=planSvgImages(document).filter(plan=>plan.layer.kind==='raster'&&!plan.prefix);
       if(composition?.prefixes){
         featuresPreserved.push('Native adjustment layers, pass-through groups and Blend If in document-resolution PNG prefixes');
-        warnings.push(`SVG renders ${composition.prefixes} affected sibling stack(s) through the last visible clipping layer, adjustment, pass-through group or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.`);
+        warnings.push(`SVG renders ${composition.prefixes} affected sibling stack(s) through the last visible perspective image, clipping layer, adjustment, pass-through group or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.`);
         warnings.push(`Native backdrop stacks end at: ${composition.stacks.map(name=>JSON.stringify(name)).join(', ')}.`);
         warnings.push('Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.');
         featuresDegradedOrOmitted.push('Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes');

@@ -1,5 +1,18 @@
 # REST and scripting APIs
 
+## Image perspective placement (schema 50)
+
+Raster/smart-object layer.update patches accept optional `perspective: null |
+{corners: [{x,y},{x,y},{x,y},{x,y}]}`. Points are finite normalized TL/TR/BR/BL
+boundary coordinates; strict convexity, invertibility, finite complete content,
+locks, source validation and expectedRevision protect atomic commits and Undo.
+Other layer kinds and schema versions below 50 reject the field. Omitting it
+preserves placement; null resets it. Public scripting uses PerspectiveTransform
+constructors. REST remains an independent headless session without composed
+rendering or browser synchronization. [Exact defaults, examples and current
+editing limits](SCRIPTING_API.md#perspectivetransform).
+
+
 ## Float tonal metadata
 
 Existing strict tonal DTOs pass shared float validation. Signatures/body limits,
@@ -969,4 +982,4 @@ Supported browser Photoshop pixel clipping imports/exports map to the existing s
 
 ## Perspective engine is not a new REST operation
 
-A private original-derived projective sampler is in verification for F03. It adds no document command, REST route, composed server renderer or browser synchronization. Public layer transforms and source-window routes retain their existing contracts. [Implemented dependency and required public integration](PERSPECTIVE_ENGINE.md).
+The original-derived sampler is connected to schema-50 image placement through the existing layer.update route, as described above. It adds no separate sampling endpoint, composed server renderer or browser synchronization. Source-window routes remain before placement/composition. [Implemented dependency and required public integration](PERSPECTIVE_ENGINE.md).

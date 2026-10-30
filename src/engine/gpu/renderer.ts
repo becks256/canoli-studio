@@ -1,4 +1,5 @@
 import{isFloatDocument}from'../../core/float-document';
+import {activePerspective} from '../../core/perspective';
 import {hasMaskRefinements} from '../../core/masks';
 import {symmetryMatrices} from '../../core/brush-symmetry';
 import {paintStampSize,paintStampAlpha,paintStampGeometry,sameStrokePoint} from '../../core/paint-stamps';
@@ -810,7 +811,7 @@ export class WebGpuRenderer {
       stroke.points.every(point=>paintStampSize(stroke,point)*scale>=2);
   }
   private supported(nodes: LayerData[], scale: number): boolean {
-    if(nodes.some(node=>node.clipped))return false;
+    if(nodes.some(node=>node.clipped||activePerspective(node.perspective)))return false;
     return nodes.every(
       (node) =>
         !node.visible ||

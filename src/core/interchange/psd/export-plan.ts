@@ -1,4 +1,5 @@
 import {SCHEMA_VERSION,type BlendMode,type LayerBlendMode,type DocumentData,type LayerData,type GroupLayerData} from '../../model';
+import {activePerspective} from '../../perspective';
 import {AffineTransform} from '../../affine';
 import {localBounds,localTransform} from '../../spatial';
 import {maskTransform,type LayerMaskData} from '../../masks';
@@ -108,7 +109,7 @@ export function planPsdExport(document:DocumentData,mode:PsdExportMode='layers',
     if(fillNeedsBaking)bakedLayerFill.push(node.name);
     const bounds=node.kind==='raster'?localBounds(node):undefined;
     const nativeRect=bounds?{left:full.e+Math.floor(bounds.x),top:full.f+Math.floor(bounds.y),width:Math.ceil(bounds.x+bounds.width)-Math.floor(bounds.x),height:Math.ceil(bounds.y+bounds.height)-Math.floor(bounds.y)}:undefined;
-    const bake=styled(node)||fillNeedsBaking,native=node.kind==='raster'&&nativeRect&&full.a===1&&full.b===0&&full.c===0&&full.d===1&&!node.styles?.dropShadow.enabled&&
+    const bake=styled(node)||fillNeedsBaking||activePerspective(node.perspective),native=node.kind==='raster'&&nativeRect&&full.a===1&&full.b===0&&full.c===0&&full.d===1&&!node.styles?.dropShadow.enabled&&
      Object.values(nativeRect).every(Number.isSafeInteger)&&nativeRect.width<=maximum&&nativeRect.height<=maximum&&
      Math.min(nativeRect.left,nativeRect.top)>=-0x80000000&&Math.max(nativeRect.left+nativeRect.width,nativeRect.top+nativeRect.height)<=0x7fffffff;
     const rect=native?nativeRect:canvas;

@@ -1,4 +1,5 @@
 import {retainedDocuments,captureRetainedHistory} from './core/history';
+import {activePerspective} from './core/perspective';
 import {brushSymmetrySchema,symmetryMatrices,type BrushSymmetryData} from './core/brush-symmetry';
 import {brushTipSchema,transformPenTilt,interpolatePenTilt,samePenTilt,type BrushTipData,type PenTiltData} from './core/brush-tip';
 import {paintStampGeometry} from './core/paint-stamps';
@@ -406,12 +407,21 @@ export class ToolController {
   }
   getSnapshot = () => this.state;
   canUseTool(tool:Tool):boolean{
+    if(this.perspectiveToolBlocked(tool))return false;
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
     if(tool==='dodge'||tool==='burn')return true;
     if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer;
     if(tool==='pen')return this.state.settings.penEditTarget==='mask';
     return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');
+  }
+  toolUnavailableReason(tool:Tool):string|null {
+    if(this.canUseTool(tool))return null;
+    return this.perspectiveToolBlocked(tool)?'Reset perspective before painting on this image or editing its mask.':'This tool requires its float document integration.';
+  }
+  private perspectiveToolBlocked(tool:Tool):boolean {
+    const document=this.editor.document,selected=document.selectedLayer;
+    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&(['smudge','mixer'].includes(tool)||(tool==='eraser'&&selected instanceof RasterLayer)||(this.state.settings.paintTarget!=='layer'&&['brush','pencil','eraser'].includes(tool))||(tool==='pen'&&this.state.settings.penEditTarget==='mask'));
   }
   /** Current gestures may begin before React flushes a selection preference reset. */
   get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&(gesture.document.selectedLayer?.id??null)===gesture.selectionId;}
@@ -887,7 +897,7 @@ export class ToolController {
     zoom: number,
     cropHandle?: CropHandle,
   ) {
-    if(!this.canUseTool(tool))throw new Error('This tool requires its float document integration. Use Move, selections, masks, crop, linear exposure or Dodge/Burn in this mode.');
+    if(!this.canUseTool(tool))throw new Error(this.toolUnavailableReason(tool)!);
     if (tool === "lasso" && this.state.settings.lassoMode === "polygon") {
       this.beginPolygonLasso(point, modifiers, zoom);
       return;
@@ -2374,6 +2384,7 @@ export class ToolController {
   fillSelection(erase = false) {
     const { doc, selected } = this.unlocked();
     if (erase && selected instanceof RasterLayer) {
+      if(activePerspective(selected.toJSON().perspective))throw new Error('Reset perspective before clearing document-selected pixels on this image.');
       const local = transformSelection(doc.selection?.toJSON(), layerTransform(doc._read(), selected.id)!.inverse());
       doc.transaction("Clear selected pixels", () => selected.clear(local ? new MarqueeSelection(local) : null));
       return;

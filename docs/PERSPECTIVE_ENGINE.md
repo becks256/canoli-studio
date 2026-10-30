@@ -1,10 +1,55 @@
 # Native perspective engine — application integration in progress
 
-This is a private dependency of F03's original-preserving perspective workflow.
-It is not a shipped perspective tool. Public layer transforms remain affine;
-perspective commands, authoring controls, masks/hit testing, persistence,
-interchange and the associated automation still require connected integration.
-The complete professional-editor roadmap remains active.
+Raster and smart-object instances now carry optional schema-50 normalized
+perspective corners through `PerspectiveTransform`, shared commands and Undo.
+The Inspector authors their eight pixel coordinates and resets the placement.
+Affine transforms remain a separate parent-placement matrix. Original assets,
+adjustments and intrinsic operations remain retained. This connected placement
+increment does not complete F03 or the professional-editor roadmap.
+
+## Public placement and current editing boundary
+
+`new PerspectiveTransform({corners})` accepts TL, TR, BR, BL normalized boundary
+coordinates; omission means identity. `fromPixels(width,height,corners)` converts
+layer-pixel corners, `toPixels` converts back, `withCorner(0..3,point)` returns a
+new normalized value, and `toJSON` returns an owned DTO. Finite strictly convex
+quads, including reflection, are accepted; folds, unresolved singularity and
+image/content-crossing horizons reject. Assign `layer.perspective` a constructor
+value or `null`; RasterLayer and SmartObjectLayer constructor options accept the
+same values. Attached edits share validation, locks, atomic revision and Undo.
+Layer comps capture perspective as position; legacy image poses clear it.
+Native project/workspace/recipe transport retains the state and original assets.
+Independent REST sessions accept the same `layer.update` DTO; they do not
+synchronize with the browser or provide a composed renderer.
+
+Byte rendering reconstructs intrinsic pixels in bounded original-resolution
+windows, then projects them. Existing tone, erasure and prepared-wet operations
+remain ordered before projection; wet support outside the frame is retained
+when its complete bounds remain on one finite side of the horizon. Float scenes
+project original-derived float pixels without a byte intermediary. Smart filters
+execute in the native master plane; unlinked filter masks mix the projected
+filtered/original planes in document coordinates. Linked layer masks project
+before native document-pixel feathering; unlinked masks retain their document
+plane. Completed coverage is subsequently sampled onto the viewport. Bounds,
+hit testing and selection outlines use projected geometry. Active perspective
+uses the standard Canvas/float path instead of the affine WebGPU compositor.
+
+Interactive erasing/wet painting on the projected image, interactive mask
+painting/path editing, linked-mask dragging, preserving-position mask relinking,
+and capturing document selections/paths as linked masks currently require
+resetting perspective. Those operations reject with an explicit message instead
+of writing an affine approximation. Local-coordinate constructor/API operations
+remain available. Correct projective pointer, clip, symmetry and cursor mapping
+are required follow-up work, not waived acceptance criteria. Numeric authoring
+is available; direct corner handles, general warp and photographic resampling
+quality/performance/device acceptance remain required.
+
+SVG uses a native composition prefix; Photoshop delivery bakes projected image
+appearance and its own mask into layer pixels. Explicit smart rasterization
+bakes perspective and linked masks, clears the perspective state, and preserves
+outer compositing and independent document masks. These deliveries retain the
+rendered appearance rather than an editable projective mesh; save a native
+project for original placement and mask editability.
 
 ## Geometry and numeric contract
 
@@ -113,10 +158,9 @@ output windows each retain the 262,144-sample working budget; support and
 original dimensions are not capped. This is native document-plane coverage;
 viewport resampling remains a separate renderer responsibility.
 
-Public layer perspective state, commands/controls, connected scene selection,
-hit testing, persistence, automation and native file delivery remain integration
-work. Public transforms are still affine. Applying image-quad clipping or
-source-space feathering here would change the established mask semantics.
+The connected scene uses this captured coverage without image-quad clipping or
+source-space feathering. The interactive mapping and broader acceptance work
+listed above remain open.
 
 There is no document schema migration, new public DOM constructor, mutation
 command, REST route, isolated script binding, plugin grant, account or upload in

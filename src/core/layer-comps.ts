@@ -3,6 +3,7 @@ import { allLayers, BLEND_MODES, findLayer, findParent, id } from "./model";
 import type { DocumentData, LayerData } from "./model";
 import { defaultStyle, styleSchema } from "./drawing";
 import { affineSchema } from "./transform-schema";
+import {perspectiveSchema} from './perspective';
 import { execute } from "./commands";
 import type { EditorCommand, LayerPatch } from "./commands";
 
@@ -41,6 +42,7 @@ export const layerCompSchema = z
               x: coordinate,
               y: coordinate,
               transform: affineSchema,
+              perspective:perspectiveSchema.nullable().optional(),
               width: dimension.optional(),
               height: dimension.optional(),
             })
@@ -115,6 +117,7 @@ function position(layer: LayerData) {
     x: layer.x,
     y: layer.y,
     transform: layer.transform ?? identity,
+    ...((layer.kind==='raster'||layer.kind==='smart-object')?{perspective:layer.perspective??null}:{}),
     ...("width" in layer ? { width: layer.width, height: layer.height } : {}),
   };
 }
@@ -177,6 +180,7 @@ export function planLayerComp(
     if (saved.visible !== undefined && saved.visible !== layer.visible)
       patch.visible = saved.visible;
     if (saved.position) {
+      const savedPosition=layer.kind==='raster'||layer.kind==='smart-object'?{...saved.position,perspective:saved.position.perspective??null}:saved.position;
       if ((findParent(document.children, layer.id) ?? null) !== saved.parentId)
         throw new Error(
           `Layer '${layer.name}' changed parent since this comp was captured. Recapture its position.`,
@@ -185,8 +189,8 @@ export function planLayerComp(
         throw new Error(
           `Layer '${layer.name}' no longer has compatible geometry.`,
         );
-      if (!equivalent(saved.position, position(layer)))
-        Object.assign(patch, saved.position);
+      if (!equivalent(savedPosition, position(layer)))
+        Object.assign(patch, savedPosition);
     }
     if (saved.appearance && !equivalent(
       {...saved.appearance,clipped:saved.appearance.clipped??false},

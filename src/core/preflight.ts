@@ -4,7 +4,7 @@ import {z} from 'zod';
 import {characterFontFamilies} from './character-layout';
 import type {PreflightDocumentView,PreflightLayerView,PreflightComponentView} from './preflight-view';
 import {AffineTransform} from './affine';
-import {localBounds} from './spatial';
+import {placedGeometryBounds} from './spatial';
 import {yieldTask} from './task-yield';
 
 const legacyPreflightOptionsSchema=z.object({
@@ -108,7 +108,7 @@ export async function inspectDesign(document:PreflightDocumentView,revision:numb
       catch{add({...target,code:'measurement-unavailable',severity:'info',message:'Layer placement exceeds numerical measurement precision.'});continue;}
       if(settings.checkBounds&&!inMaster&&node.kind!=='group'){
         try{
-          const local=localBounds(node),bounds=local?world.bounds(local):undefined;
+          const bounds=placedGeometryBounds(node,world);
           if(bounds&&(bounds.x<-1e-7||bounds.y<-1e-7||bounds.x+bounds.width>document.width+1e-7||bounds.y+bounds.height>document.height+1e-7))add({...target,code:'bounds-outside',severity:'warning',bounds,message:'Authored bounds extend beyond the canvas. Review intentional bleed and clipping; masks, effects and occlusion are not evaluated.'});
         }catch{add({...target,code:'measurement-unavailable',severity:'info',message:'Authored bounds exceed numerical measurement precision.'});}
       }

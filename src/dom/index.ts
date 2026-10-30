@@ -1,4 +1,7 @@
 import{isFloatDocument,assertFloatSources}from'../core/float-document';
+import {PerspectiveTransform} from './perspective';
+import {activePerspective} from '../core/perspective';
+export {PerspectiveTransform} from './perspective';
 import {textWritingSchema} from '../core/text-writing';
 export type {WritingMode,TextOrientation,TextWritingInput} from '../core/text-writing';
 import {characterBoundsSchema,characterBoundsForLayout} from '../core/character-layout';
@@ -283,6 +286,7 @@ export interface LayerOptions {
   blendMode?: BlendMode;
 }
 export interface RasterLayerOptions extends LayerOptions {
+  perspective?:PerspectiveTransform|null;
   assetId: string;
   width: number;
   height: number;
@@ -1198,6 +1202,12 @@ export abstract class Layer {
   get opacity() {
     return this._read().opacity;
   }
+  get perspective():PerspectiveTransform|null {const value=this._read().perspective;return value?new PerspectiveTransform(value):null;}
+  set perspective(value:PerspectiveTransform|null){
+    if(value!==null&&!(value instanceof PerspectiveTransform))throw new Error('Use a PerspectiveTransform constructor or null.');
+    const data=this._read();if(data.kind!=='raster'&&data.kind!=='smart-object')throw new Error('Perspective requires a raster or smart-object layer.');
+    this.update({perspective:value?.toJSON()??null});
+  }
   set opacity(value: number) {
     this.update({ opacity: value });
   }
@@ -1224,6 +1234,7 @@ export abstract class Layer {
     const mask = this.mask;
     if (!mask) throw new Error("This layer has no mask to link.");
     if (mask.linked === linked) return;
+    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before changing mask linkage while preserving its position.');
     const layerWorld = layerTransform(document._read(), this.id)!;
     const world = maskTransform(mask.toJSON(), layerWorld);
     const local = linked ? layerWorld.inverse().multiply(world) : world;
@@ -1236,6 +1247,7 @@ export abstract class Layer {
   }
   /** Capture a document-space selection as a mask that moves with this layer. */
   maskFromSelection(selection: MarqueeSelection) {
+    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before capturing a document selection as a linked mask. Local mask constructors remain available.');
     const document = this.requireDocument();
     const inverse = layerTransform(document._read(), this.id)!.inverse();
     this.mask = new LayerMask({
@@ -1244,6 +1256,7 @@ export abstract class Layer {
   }
   /** Copy closed paths from an attached vector layer without altering their world position. */
   maskFromPaths(source: VectorLayer) {
+    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before capturing document paths as a linked mask. Local mask constructors remain available.');
     const document = this.requireDocument();
     if (source.document !== document || !source.isAttached)
       throw new Error("Mask source must belong to the same document.");
@@ -1482,8 +1495,10 @@ export class SmartObjectLayer extends Layer {
       componentId: string;
       width: number;
       height: number;
+      perspective?:PerspectiveTransform|null;
     },
   ) {
+    if(options.perspective!==undefined&&options.perspective!==null&&!(options.perspective instanceof PerspectiveTransform))throw new Error('Use a PerspectiveTransform constructor.');
     super({
       ...createRaster(
         options.name ?? "Smart object",
@@ -1493,6 +1508,7 @@ export class SmartObjectLayer extends Layer {
       ),
       ...options,
       kind: "smart-object",
+      ...(options.perspective===undefined?{}:{perspective:options.perspective?.toJSON()??null}),
     } as SmartObjectInstanceData);
     delete (this.data as unknown as Record<string, unknown>).assetId;
     delete (this.data as unknown as Record<string, unknown>).effects;
@@ -1541,6 +1557,7 @@ export class SmartObjectLayer extends Layer {
     const mask = this.filterMask;
     if (!mask) throw new Error("This smart object has no filter mask to link.");
     if (mask.linked === linked) return;
+    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before changing filter-mask linkage while preserving its position.');
     const source = new ComponentRegistry(document._read().components).get(
       this.componentId,
     ).source;
@@ -1692,10 +1709,12 @@ export class RasterLayer extends Layer {
 
   readonly adjustments: AdjustmentCollection;
   constructor(options: RasterLayerOptions) {
-    const { assetId, width, height, ...base } = options;
+    const { assetId, width, height,perspective, ...base } = options;
+    if(perspective!==undefined&&perspective!==null&&!(perspective instanceof PerspectiveTransform))throw new Error('Use a PerspectiveTransform constructor.');
     super({
       ...createRaster(options.name ?? "Image", assetId, width, height),
       ...base,
+      ...(perspective===undefined?{}:{perspective:perspective?.toJSON()??null}),
     });
     validateDocument({ ...createDocument(), children: [this.data] });
     this.adjustments = new AdjustmentCollection(this);

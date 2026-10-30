@@ -1,4 +1,5 @@
 import {symmetryMatrices} from '../core/brush-symmetry';
+import {activePerspective,perspectiveLocalQuad} from '../core/perspective';
 import {BrushSymmetryGuides} from './BrushSymmetryDialog';
 import { useSelectionOutlines } from "./hooks/useSelectionOutlines";
 import { memo, useSyncExternalStore } from "react";
@@ -68,6 +69,7 @@ export function CanvasOverlays({
       aria-hidden="true"
     >
       {(["smudge","mixer","brush","pencil","eraser","clone","heal","dodge","burn"].includes(tool))&&<BrushSymmetryGuides data={state.settings.symmetry} width={document.width} height={document.height}/>}
+      {selected&&(selected.kind==='raster'||selected.kind==='smart-object')&&world&&activePerspective(selected.perspective)&&<polygon data-testid="perspective-outline" points={perspectiveLocalQuad(selected.width,selected.height,selected.perspective).map(p=>world.point(p)).map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke="var(--color-accent)" strokeWidth={1/zoom}/>}
       <defs>
         <pattern
           id="selection-hatch"

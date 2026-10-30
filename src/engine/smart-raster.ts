@@ -9,7 +9,8 @@ import {
   type DocumentData,
   type RasterLayerData,
 } from "../core/model";
-import { layerTransform, parentId } from "../core/spatial";
+import { layerTransform,layerBounds, parentId } from "../core/spatial";
+import {activePerspective} from '../core/perspective';
 import { exportPng } from "./png";
 import type { DocumentRenderer } from "./renderer";
 import { release } from "./canvas";
@@ -30,7 +31,8 @@ export async function prepareSmartRaster(
       "Rasterization requires an unlocked smart-object instance.",
     );
   const world = layerTransform(document, layerId)!;
-  const bounds = world.bounds({
+  const projected=activePerspective(instance.perspective),bakeMask=projected&&!!instance.mask&&instance.mask.linked!==false;
+  const bounds = projected?layerBounds(document,layerId)!:world.bounds({
     x: 0,
     y: 0,
     width: instance.width,
@@ -53,7 +55,7 @@ export async function prepareSmartRaster(
       fillOpacity: 1,
       blendMode: "normal",
       styles: undefined,
-      mask: null,
+      mask: bakeMask?instance.mask:null,
     },
   ];
   isolated.selection = null;
@@ -87,10 +89,12 @@ export async function prepareSmartRaster(
     componentId: _component,
     smartFilters: _filters,
     filterMask: _filterMask,
+    perspective:_perspective,
     ...outer
   } = structuredClone(instance);
   const layer: RasterLayerData = {
     ...outer,
+    ...(bakeMask?{mask:null}:{}),
     kind: "raster",
     id: id(),
     assetId: id(),

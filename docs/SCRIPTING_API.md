@@ -1336,6 +1336,53 @@ Rendering order: isolated layer/group content → shadow from original alpha →
 
 Luminance is computed from encoded 8-bit sRGB as `0.2126 R + 0.7152 G + 0.0722 B`. Source and underlying gates multiply source alpha; a transparent backdrop contributes no underlying occlusion. Semi-transparent backdrop gating is weighted by its alpha. The kernel changes alpha, never the input source asset. Members `enabled`, `channel`, `source`, `underlying` are read-only snapshots; use a new instance to change settings. `toJSON()` returns a copy.
 
+### PerspectiveTransform
+
+`new PerspectiveTransform({ corners }?)` is an immutable image placement value.
+`corners` are four `{x,y}` points ordered top left, top right, bottom right,
+bottom left in normalized layer coordinates. Defaults are `(0,0)`, `(1,0)`,
+`(1,1)`, `(0,1)`. Reflections are valid; nonfinite, crossed, concave, collinear or
+numerically unresolved quads throw. Corners can extend beyond `[0,1]`.
+
+- `PerspectiveTransform.fromPixels(width,height,corners)` converts layer-pixel
+  boundary coordinates; dimensions must be positive finite numbers.
+- `value.corners` and `value.toJSON()` return owned data.
+- `value.toPixels(width,height)` returns layer-pixel corners.
+- `value.withCorner(index,point)` returns a new value; index is an integer 0–3
+  and the replacement point uses normalized coordinates.
+- RasterLayer and SmartObjectLayer accept `perspective?: PerspectiveTransform |
+  null` constructor options. `layer.perspective` gets an immutable value or null;
+  assigning a value or null uses shared commands, ancestor locks and Undo.
+  Other layer types reject perspective assignment. Default/clear is null.
+
+Perspective applies before the independent affine placement. Resizing the layer
+retains normalized corners. Existing native pixels/operations stay retained;
+content bounds crossing a projective horizon reject atomically. Schema 50 stores
+`perspective: {corners: [{x,y}, ...]}` or null. Scripts use constructors, while
+serialized snapshots and REST commands use this DTO. A script commits atomically
+as one Undo under the existing captured revision/grant boundary.
+
+<!-- example: image-perspective -->
+```js
+const image = document.selectedLayer;
+if (!(image instanceof RasterLayer) && !(image instanceof SmartObjectLayer))
+  throw new Error("Select an image layer.");
+image.perspective = new PerspectiveTransform({ corners: [
+  { x: 0.1, y: 0.05 }, { x: 0.95, y: 0.15 },
+  { x: 1, y: 0.95 }, { x: 0, y: 1 }
+] });
+```
+
+Native projects and recorded layer updates retain placement. The current numeric
+Inspector and rendering support do not implement projective input mapping.
+Reset perspective before interactive image erasing/wet painting, mask painting
+or path editing, linked-mask dragging/relinking, or `maskFromSelection` /
+`maskFromPaths`; those paths explicitly reject while active. Local-coordinate
+mask/erasure constructors remain available. Smart rasterization bakes the
+projected appearance and linked mask; SVG/Photoshop delivery bakes placement.
+See [PERSPECTIVE_ENGINE.md](PERSPECTIVE_ENGINE.md) for sampling and remaining
+F03 acceptance requirements.
+
 ### AffineTransform
 
 `new AffineTransform(a = 1, b = 0, c = 0, d = 1, e = 0, f = 0)` creates an immutable matrix mapping `(x, y)` to `(a*x + c*y + e, b*x + d*y + f)`. Coefficients must be finite. Positive rotation is clockwise in the downward-positive canvas plane.

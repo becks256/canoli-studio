@@ -1,4 +1,5 @@
 import {writingModeSchema,textOrientationSchema} from './text-writing';
+import {perspectiveSchema} from './perspective';
 import {textPathSchema} from './text-path';
 import {fontVariantCapsSchema,fontStretchSchema,fontVariationSettingsSchema} from './font-features';
 import {characterRangeSchema} from './text-ranges';
@@ -62,6 +63,7 @@ const toneValues = z
 const patch = z
   .object({
     transform: affineSchema.optional(),
+    perspective:perspectiveSchema.nullable().optional(),
     mask: layerMaskSchema.nullable().optional(),
     metadata: authoredMetadataSchema.nullable().optional(),
     name: identifier.optional(),

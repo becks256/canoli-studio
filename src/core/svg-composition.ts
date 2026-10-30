@@ -1,4 +1,5 @@
 import { isActiveWetPaint } from './wet-operation';
+import {activePerspective} from './perspective';
 import type {DocumentData,LayerData,RasterLayerData,TextLayerData} from './model';
 import {visitLayerAssets} from './asset-references';
 import type {SvgDocument} from './svg-masks';
@@ -37,7 +38,7 @@ export function planSvgComposition(document:DocumentData):SvgCompositionPlan{
  }}
  function walk(nodes:LayerData[],path:string[]=[]):LayerData[]{
   let through=-1;
-  nodes.forEach((layer,i)=>{if(layer.visible&&layer.opacity>0&&(layer.clipped||layer.mask?.kind==='raster-erasures'||layer.kind==='adjustment'||(layer.blendMode==='linear-light'||layer.blendMode==='linear-burn')||layer.styles?.blendIf.enabled||(layer.kind==='group'&&layer.blendMode==='pass-through')||(layer.kind==='paint'&&layer.strokes.some(isActiveWetPaint))))through=i;});
+  nodes.forEach((layer,i)=>{if(layer.visible&&layer.opacity>0&&(activePerspective(layer.perspective)||layer.clipped||layer.mask?.kind==='raster-erasures'||layer.kind==='adjustment'||(layer.blendMode==='linear-light'||layer.blendMode==='linear-burn')||layer.styles?.blendIf.enabled||(layer.kind==='group'&&layer.blendMode==='pass-through')||(layer.kind==='paint'&&layer.strokes.some(isActiveWetPaint))))through=i;});
   const output:LayerData[]=[];
   if(through>=0){
    const prefix=nodes.slice(0,through+1),last=nodes[through];

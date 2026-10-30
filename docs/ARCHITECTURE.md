@@ -1,5 +1,17 @@
 # Architecture
 
+## Schema-50 image perspective placement
+
+Raster and smart-object instances retain normalized four-corner placement through
+an immutable public PerspectiveTransform and shared layer.update commands.
+Affine parent transforms stay independent. The bounded original-pixel reader
+feeds the native sampler; float scenes retain original-derived float windows.
+Masks project before document-space feather; geometric bounds/hit tests use
+projected coordinates. Active perspective falls back from the affine WebGPU
+compositor. World-to-local tool mapping remains gated where still affine.
+[Current contract and required follow-up](PERSPECTIVE_ENGINE.md).
+
+
 ## Native float tonal strokes
 
 `core/float-tonal` validates controls; private `tonalFloat` WASM applies linear
@@ -2191,7 +2203,7 @@ Dated output/cadence/timing verification remains in the roadmap.
 
 ## Private projective geometry and source sampling
 
-`core/projective.ts` and `projective-sampling.ts` provide immutable homogeneous geometry and strict exact-corner sampling settings. The actual WASM pixel kernel and existing worker supply premultiplied float32 perspective windows; `engine/projective-projection.ts` recursively bounds original-source ROIs. This is a dependency for the connected F03 workflow. Public layer placement, commands, schema 49, masks/hit testing, persistence and automation remain affine until integration. [Numeric/ownership contract and remaining work](PERSPECTIVE_ENGINE.md).
+`core/projective.ts` and `projective-sampling.ts` provide immutable homogeneous geometry and strict exact-corner sampling settings. The actual WASM pixel kernel and existing worker supply premultiplied float32 perspective windows; `engine/projective-projection.ts` recursively bounds original-source ROIs. This is a dependency for the connected F03 workflow. Schema-50 image placement, shared commands, masks/hit testing, persistence and automation now use this dependency alongside independent affine parent placement; interactive nonlinear tool mapping remains gated. [Numeric/ownership contract and remaining work](PERSPECTIVE_ENGINE.md).
 
 `core/mask-field.ts` bounds finite raw coverage deviations; the trusted renderer's
 `capturePerspectiveMask` adapter captures original-plane mask geometry/assets and
@@ -2200,5 +2212,6 @@ corners; unlinked fields stay in document coordinates. Existing fractional-box
 feathering follows projection with complete halos and float32 intermediates,
 then inversion/density. Captured masks, asset identity/geometry, store lifetime,
 renderer epoch and cancellation guard publication. This is a read-only renderer
-dependency. Public perspective authoring and connected document/scene/file
-integration remain required; no mutation or plugin authority is added.
+dependency used by schema-50 image rendering. Public numeric authoring and
+baked file delivery are connected; direct handles and projective tool mapping
+remain required. No pixel/worker or additional plugin authority is added.

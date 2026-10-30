@@ -1,4 +1,9 @@
 import {capturePerspectiveMask} from './projective-mask';
+import {activePerspective,perspectiveLocalQuad} from '../core/perspective';
+import {intrinsicLocalBounds} from '../core/spatial';
+import {drawPerspectiveContent} from './perspective-content';
+import {perspectiveMaskView} from './perspective-view';
+import type {FloatSourceWindow} from '../core/float-source/types';
 import {nativeVectorFootprint} from './native-vector-footprint';
 import{isFloatDocument}from'../core/float-document';
 import{FloatSceneRenderer,type CapturedFloatScene,type FloatSceneControl}from'./float-scene';
@@ -229,10 +234,12 @@ export class CanvasRenderer implements DocumentRenderer {
     return{...document,children:visit(document.children)};
   }
   private floatMasks(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatMaskService{
-    return async(mask,space,world,check)=>{
+    const service:import('./float-scene').FloatMaskService=async(mask,space,world,check)=>{
       check();const origin=world.point({x:0,y:0}),canvas=await this.renderMaskCoverage(mask,space,origin.x,origin.y,'float-mask',false,world,assets,()=>{check();return!!isCancelled?.();});
       try{check();applyMaskSettings(canvas,mask);const bytes=canvas.getContext('2d')!.getImageData(0,0,space.width,space.height).data,coverage=new Float32Array(space.width*space.height);for(let i=0;i<coverage.length;i++)coverage[i]=bytes[i*4+3]/255;check();return coverage;}finally{release(canvas);}
     };
+    service.perspective=(mask,options,check)=>this.capturePerspectiveMask(mask,options,assets,{isCancelled:()=>{check();return!!isCancelled?.();}});
+    return service;
   }
   private floatStrokes(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatStrokeService{
     return async(brush,space,world,check)=>{
@@ -360,6 +367,71 @@ export class CanvasRenderer implements DocumentRenderer {
           release(tile);
         }
       }
+  }
+
+  private perspectiveNativeSize(layer:RasterLayerData|SmartObjectInstanceData,assets:AssetStore,registry?:ComponentRegistry){
+    if(layer.kind==='raster'){const asset=assets.get(layer.assetId);return{width:asset.width,height:asset.height};}
+    if(!registry)throw new Error('Missing smart-object registry.');const source=registry.get(layer.componentId).source;
+    if(source.kind==='asset'){const asset=assets.get(source.assetId);return{width:asset.width,height:asset.height};}
+    return{width:Math.ceil(source.document.width),height:Math.ceil(source.document.height)};
+  }
+
+  private async perspectiveMaskCanvas(mask:LayerMaskData,layer:RasterLayerData|SmartObjectInstanceData,native:{width:number;height:number},assets:AssetStore,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions){
+    let value=mask;
+    if(mask.linked===false&&options.documentTransform){const m=options.documentTransform.multiply(maskTransform(mask,new AffineTransform()));value={...mask,x:m.e,y:m.f,basis:{a:m.a,b:m.b,c:m.c,d:m.d,e:0,f:0}};}
+    const corners=perspectiveLocalQuad(layer.width,layer.height,layer.perspective!).map(p=>world.point(p)) as unknown as import('../core/projective').ProjectiveQuad;
+    const captured=this.capturePerspectiveMask(value,{sourceWidth:native.width,sourceHeight:native.height,layerWidth:layer.width,layerHeight:layer.height,corners},assets,{isCancelled:options.isCancelled});
+    const canvas=createCanvas(space.width,space.height,true),context=canvas.getContext('2d')!;
+    try{
+      for(let y=0;y<space.height;y+=512)for(let x=0;x<space.width;x+=512){
+        const width=Math.min(512,space.width-x),height=Math.min(512,space.height-y),alpha=await perspectiveMaskView(b=>captured.read(b),space,{x,y,width,height},this.processor,options.isCancelled);
+        const image=context.createImageData(width,height);for(let i=0;i<alpha.length;i++){image.data[i*4]=image.data[i*4+1]=image.data[i*4+2]=255;image.data[i*4+3]=Math.round(alpha[i]*255);}context.putImageData(image,x,y);
+      }
+      captured.check();return canvas;
+    }catch(error){release(canvas);throw error;}finally{captured.dispose();}
+  }
+
+  private async perspectiveContent(layer:RasterLayerData|SmartObjectInstanceData,assets:AssetStore,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions,registry?:ComponentRegistry){
+    const native=this.perspectiveNativeSize(layer,assets,registry),lifetime=assets.captureLifetime(),epoch=this.epoch;
+    const check=()=>{lifetime();checkRenderCurrent(options.isCancelled);if(epoch!==this.epoch)throw new Error('Perspective content renderer was cleared.');};
+    const sourceWorld=AffineTransform.scale(native.width/layer.width,native.height/layer.height);
+    const baseOptions={...options,cache:false,documentTransform:sourceWorld.multiply(world.inverse()).multiply(options.documentTransform??new AffineTransform())};
+    const read=async(value:RasterLayerData|SmartObjectInstanceData,area:FloatSourceWindow)=>{
+      check();const pixels=new Uint8ClampedArray(area.width*area.height*4);
+      for(let y=0;y<area.height;y+=512)for(let x=0;x<area.width;x+=512){
+        const width=Math.min(512,area.width-x),height=Math.min(512,area.height-y),tile=createCanvas(width,height,true),nativeSpace={x:area.x+x,y:area.y+y,width,height,sx:1,sy:1};
+        try{
+          const preview=options.paintPreview,paint=preview&&preview.layerId===value.id&&!preview.maskMode&&!preview.filterMask?{stroke:preview.stroke,cloneSource:preview.cloneSource}:undefined;
+          if(value.kind==='smart-object'){
+            await this.smart(value,registry!,assets,tile,nativeSpace,sourceWorld,baseOptions);await this.documentTone(value,registry!,assets,tile,nativeSpace,sourceWorld,baseOptions);
+          }else if(hasWetContent(value))await drawNativeWetContent(value,assets,tile,nativeSpace,sourceWorld,this.processor,options.isCancelled,this.brushTextures,paint);
+          else{
+            await this.raster(value,assets,tile,nativeSpace,sourceWorld,options.isCancelled);
+            for(const entry of value.erasures??[])await drawPaint({...value,kind:'paint',strokes:[entry.stroke]},assets,tile,nativeSpace,AffineTransform.scale(native.width/entry.width,native.height/entry.height),this.processor,undefined,undefined,undefined,undefined,options.isCancelled,this.brushTextures);
+            if(paint)await drawPaint({...value,kind:'paint',strokes:[paint.stroke]},assets,tile,nativeSpace,sourceWorld,this.processor,undefined,undefined,undefined,paint.cloneSource,options.isCancelled,this.brushTextures);
+          }
+          check();const bytes=tile.getContext('2d')!.getImageData(0,0,width,height).data;
+          for(let row=0;row<height;row++)pixels.set(bytes.subarray(row*width*4,(row+1)*width*4),((y+row)*area.width+x)*4);
+        }finally{release(tile);}
+      }
+      check();return pixels;
+    };
+    const unlinked=layer.kind==='smart-object'&&layer.filterMask?.linked===false&&layer.filterMask.enabled&&layer.filterMask.density>0;
+    const filtered=unlinked?{...layer,filterMask:null}:layer;
+    await drawPerspectiveContent({...filtered,perspective:layer.perspective!},native,intrinsicLocalBounds(layer)!,target,space,world,this.processor,b=>read(filtered,b),options.isCancelled);
+    if(unlinked&&layer.kind==='smart-object'){
+      const original=createCanvas(space.width,space.height,true);let mask:HTMLCanvasElement|undefined;
+      try{
+        const base={...layer,smartFilters:[],filterMask:null};await drawPerspectiveContent({...base,perspective:layer.perspective!},native,intrinsicLocalBounds(base)!,original,space,world,this.processor,b=>read(base,b),options.isCancelled);
+        mask=await this.perspectiveMaskCanvas(layer.filterMask!,layer,native,assets,space,world,options);
+        const out=target.getContext('2d')!,input=original.getContext('2d')!,coverage=mask.getContext('2d')!;
+        for(let y=0;y<space.height;y+=512)for(let x=0;x<space.width;x+=512){
+          const width=Math.min(512,space.width-x),height=Math.min(512,space.height-y),mixed=await this.processor.mixFilteredOwned(input.getImageData(x,y,width,height).data,out.getImageData(x,y,width,height).data,coverage.getImageData(x,y,width,height).data,1,false);
+          check();const image=out.createImageData(width,height);image.data.set(mixed);out.putImageData(image,x,y);
+        }
+      }finally{release(original);if(mask)release(mask);}
+    }
+    check();
   }
 
   private async documentTone(layer:SmartObjectInstanceData,registry:ComponentRegistry,assets:AssetStore,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions){
@@ -960,7 +1032,9 @@ export class CanvasRenderer implements DocumentRenderer {
         try {
           if (!cacheable || !cache?.read(key, signature, content)) {
             let textInk: ReturnType<typeof drawText>;
-            if (layer.kind === "smart-object") {
+            if((layer.kind==='raster'||layer.kind==='smart-object')&&activePerspective(layer.perspective)){
+              await this.perspectiveContent(layer,assets,content,padded,world,options,registry);
+            } else if (layer.kind === "smart-object") {
               if (!registry) throw new Error("Missing smart-object registry.");
               await this.smart(
                 layer,
@@ -1270,6 +1344,7 @@ export class CanvasRenderer implements DocumentRenderer {
           }
           if (
             !nativeWetPreview &&
+            !activePerspective(layer.perspective) &&
             (layer.kind === "paint" || (layer.kind === "raster" && preview?.stroke.kind === "eraser")) &&
             !preview?.maskMode &&
             layer.id === preview?.layerId
@@ -1309,10 +1384,11 @@ export class CanvasRenderer implements DocumentRenderer {
               padded,
               maskWorld,
             ]);
-            let mask = cache
+            const projected=(layer.kind==='raster'||layer.kind==='smart-object')&&activePerspective(layer.perspective);
+            let mask = projected?await this.perspectiveMaskCanvas(maskData,layer as RasterLayerData|SmartObjectInstanceData,this.perspectiveNativeSize(layer as RasterLayerData|SmartObjectInstanceData,assets,registry),assets,padded,world,options):cache
               ? createCanvas(padded.width, padded.height)
               : undefined;
-            if (!mask || !cache!.read(maskKey, maskSignature, mask)) {
+            if (!projected&&(!mask || !cache!.read(maskKey, maskSignature, mask))) {
               if (mask) release(mask);
               mask = await this.renderMaskCoverage(
                 maskData,
@@ -1327,8 +1403,9 @@ export class CanvasRenderer implements DocumentRenderer {
               );
               if (canCache()) cache?.write(maskKey, maskSignature, mask);
             }
+            if(!mask)throw new Error('Mask coverage was not produced.');
             try {
-              applyMaskSettings(mask,maskData);
+              if(!projected)applyMaskSettings(mask,maskData);
               if (layer.kind === "adjustment") {
                 maskCanvas = createCanvas(mask.width, mask.height, true);
                 maskCanvas.getContext("2d")!.drawImage(mask, 0, 0);

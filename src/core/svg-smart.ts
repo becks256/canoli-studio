@@ -1,3 +1,4 @@
+import {activePerspective} from './perspective';
 import {allLayers,type DocumentData,type LayerData,type TextLayerData} from './model';
 import {ComponentRegistry} from './smart/manager';
 import {resolveSmartDocument} from './smart/resolve';
@@ -36,7 +37,7 @@ export function planSvgSmart(document:DocumentData):SvgSmartPlan{
     }
     if(layer.kind==='group')walk(layer.children,baked);
     else if(layer.kind==='smart-object'){
-      const render=!!layer.smartFilters?.some(isActiveSmartFilter);
+      const render=activePerspective(layer.perspective)||!!layer.smartFilters?.some(isActiveSmartFilter);
       if(!baked){if(render)filtered++;else expanded++;}
       if(render)mask(layer.filterMask);
       const source=definitions.get(layer.componentId)?.source;

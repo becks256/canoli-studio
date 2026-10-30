@@ -1,4 +1,5 @@
 import { LutControls } from "./LutControls";
+import {PerspectiveControls} from './PerspectiveControls';
 import {clippingBaseFor} from '../core/clipping';
 import { RedEyeControls } from "./RedEyeControls";
 import { WhiteBalanceControls } from "./WhiteBalanceControls";
@@ -223,6 +224,7 @@ export function InspectorPanel({
               </div>
             )}
           </InspectorSection>
+          {(selected.kind==='raster'||selected.kind==='smart-object')&&(selectedObject instanceof RasterLayer||selectedObject instanceof SmartObjectLayer)&&<PerspectiveControls layer={selectedObject} selected={selected} disabled={locked||busy} onPreview={onPreview} onAttempt={onAttempt} onSelectedAction={onSelectedAction}/>}
           <InspectorSection title="Layout">
             <div className="field-grid">
               <NumberField

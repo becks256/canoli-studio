@@ -1,5 +1,16 @@
 # Canoli Studio design system
 
+## Perspective Inspector
+
+Raster and smart-object layers expose a custom Perspective section with eight
+NumberFields for TL/TR/BR/BL pixel coordinates and a Reset perspective button.
+Preview uses transient shared-command validation; commit is one Undo and Escape
+retains the authored state. Use the existing fields, spacing, type and disabled
+states. No new keyboard binding is introduced. The projected canvas outline
+follows the quad. Direct corner handles and projective brush/mask pointer mapping
+remain required work; currently affected tools explain the reset requirement.
+
+
 ## Float tonal controls
 
 Enable existing Dodge/Burn tools and tonal settings in float documents. Explain

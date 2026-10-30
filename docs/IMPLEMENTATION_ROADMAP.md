@@ -8570,3 +8570,94 @@ testing, persistence, scripts/REST/recipes and native file delivery still requir
 connected integration. General warp, broader professional color/tool/workflow
 scope, sustained performance/device/photographic acceptance and all other
 unfinished original roadmap gates remain required. The full goal remains active.
+
+### 2026-10-30 — F03 public image perspective placement; full workflow remains open
+
+Baseline `f64b4f4`. Schema 50 adds optional normalized TL/TR/BR/BL corners on
+RasterLayer and SmartObjectLayer instances. PerspectiveTransform supplies owned,
+immutable constructor values; shared layer.update commands, ancestor locks,
+atomic validation, revision checks and Undo remain authoritative. The custom
+Inspector previews eight pixel-coordinate fields and commits/reset through the
+same mutation path. Affine placement remains independent. Layer comps capture
+and restore perspective; older image poses clear it. Source bytes and native
+geometry remain retained through project and recipe transport.
+
+Byte rendering reconstructs native intrinsic windows before projection. Float
+scenes project original-derived float pixels; masks project before native
+pixel-space feathering, and unlinked masks retain document coordinates. Smart
+filters run in master pixels; independent filter masks mix projected original
+and filtered appearance in document space. Bounds, hit testing, outlines and
+compact preflight geometry now include perspective. Active perspective declines
+the affine GPU compositor. SVG prefix rendering, Photoshop layer pixels and
+explicit smart rasterization bake projected appearance; linked masks bake on
+rasterization rather than acquiring an incorrect affine basis.
+
+This is a connected numeric placement increment, not F03 completion. Direct
+corner handles, general warp, correct projective pointer/selection-clip/symmetry/
+cursor mapping, preserving-position projective mask relinking, broader native
+interchange editability, photographic minification quality and sustained
+performance/device acceptance remain required. Affected interactive image and
+mask tools explicitly require resetting perspective while those paths remain
+affine. Local-coordinate constructor operations and retained edits remain
+available. This boundary is documented, not a replacement for the original
+acceptance target. The full roadmap goal remains active.
+
+Verification:
+
+- Full `npm run build` passes, including actual WASM, the isolated runtime,
+  TypeScript, site and **43 developer guides**. The final frozen `npm test`
+  run passes **3,077 tests in 298 files**.
+- **62 distinct source-browser checks** pass across the retained runs,
+  including the genuine 50 MP public scene, existing image/mask/smart/float
+  workflows and an additional native-float ordering check. One broader test
+  initially raced image import; its explicit completion wait passes in the
+  final matrix. No product import behavior was changed for that test fix.
+- **25 selected production checks** pass. The final corrected release also
+  passes **12 focused source checks**, **4 focused production checks** and
+  the additional native-float ordering check with unchanged sources. The
+  earlier broader runs span documented documentation/test corrections and
+  the final removal of a full-layer copy from tool availability; they are
+  not described as frozen acceptance runs. These matrices do not constitute
+  a new complete production-suite or sustained performance/device acceptance.
+- The genuine **10000 × 5000 TIFF** retains exact original SHA-256
+  `51db60ac1377c69a75fc49328cbcca09a62e663dd277e08c967f85a3c792ac1c`
+  while its display thumbnail is only **96 × 48**. All **9,620 composed float
+  output samples** in the tested 65 × 37 window match the independent
+  native-CMM/NumPy/SciPy reference exactly, SHA-256
+  `2a6fbdfd115f5e57e9adb923d1656843337257285f2a1331e011ad3efb83f991`.
+  Partitioned reads are bit-identical, authoring adds one Undo and rendering
+  changes no document state. The independent reader hashes all **200,000,000
+  native reference samples**. This is a bounded composed window over a real
+  original, not every possible transformed output or a process-memory bound.
+  That complete opening/preparation/projection/reference check took **545.606
+  seconds** in this environment; large-document latency remains open.
+- On a native **256 × 256** unsigned-16-bit original, linked/unlinked projected
+  mask alpha differs from the established captured coverage by at most
+  **1.4735860531800427e-8**. One-stop exposure has zero measured color error
+  against doubling the projected reference and preserves alpha exactly.
+  Retained native erasures reduce **1,138 projected alpha samples**.
+- Inspector preview/cancellation and one-Undo commit, the actual isolated
+  scripting example, recipe replay, original-bearing project reopening, mask
+  gates/reset recovery, SVG/Photoshop baked appearance and smart rasterization
+  pass. Preflight keeps projected bounds through its compact worker view.
+- All **145 final served release resources** retain their recorded hashes.
+  The native pixel WASM remains unchanged, SHA-256
+  `bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+  The native 50 MP run's renderer/source/DOM identities remain exact through
+  final acceptance. Its initial manifest also records concurrent doc/test
+  edits; the final frozen unit/browser manifests are retained separately.
+
+Initial schema admission and Inspector preview defects were corrected before
+acceptance. The executable guide caught an incorrect isolated `editor` binding;
+the corrected example uses `document`. A delivery test read a retired handle
+following Undo; the corrected check captures replacement metadata before Undo.
+The earlier complete unit suite passed, but its wrapper correctly rejected a
+source-freeze assertion during doc/e2e corrections; the fresh complete frozen
+run above passes. These failed/corrected runs remain in the evidence.
+
+[Complete evidence](benchmarks/image-perspective-2026-10-30.json.gz),
+**6,236,938 bytes**, SHA-256
+`5b0c2714fce7de40bfd0ec071f00a8f2e9c3219d28b81fbe39db32dda8fd7ff8`.
+
+The full roadmap goal remains active; the remaining F03 editing and broader
+professional-editor acceptance requirements above are still required.

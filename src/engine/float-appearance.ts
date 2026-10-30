@@ -1,4 +1,5 @@
 import type{DocumentData}from'../core/model';
+import {activePerspective} from '../core/perspective';
 import type{AssetStore}from'../core/assets';
 import type{FloatSourceWindow}from'../core/float-source/types';
 import type{FloatSceneFrame}from'./float-frame';
@@ -18,7 +19,7 @@ export class FloatAppearanceCache{
  plan(document:DocumentData,assets:AssetStore,frame:FloatSceneFrame):Plan|undefined{
   if(![document.width,document.height].every(v=>Number.isSafeInteger(v)&&v>0)||![frame.region.x+frame.width,frame.region.y+frame.height].every(Number.isSafeInteger)||document.children.length!==1||frame.width!==frame.region.width||frame.height!==frame.region.height||!identity(frame.rootTransform)||![frame.region.x,frame.region.y,frame.width,frame.height].every(Number.isSafeInteger)||frame.width<=0||frame.height<=0)return;
   const layer=document.children[0];
-  if(layer.kind!=='raster'||!layer.visible||layer.opacity===0||layer.clipped||layer.blendMode!=='normal'||!identity(layer.transform)||![layer.x,layer.y].every(Number.isSafeInteger)||layer.erasures?.length||layer.effects.some(e=>e.enabled&&(e.exposure!==0||e.contrast!==0||e.saturation!==0)))return;
+  if(layer.kind!=='raster'||activePerspective(layer.perspective)||!layer.visible||layer.opacity===0||layer.clipped||layer.blendMode!=='normal'||!identity(layer.transform)||![layer.x,layer.y].every(Number.isSafeInteger)||layer.erasures?.length||layer.effects.some(e=>e.enabled&&(e.exposure!==0||e.contrast!==0||e.saturation!==0)))return;
   if(layer.styles?.blendIf.enabled||layer.styles?.colorOverlay.enabled&&layer.styles.colorOverlay.opacity>0)return;
   const asset=assets.get(layer.assetId);
   if(layer.width!==asset.width||layer.height!==asset.height)return;

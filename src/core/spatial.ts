@@ -1,4 +1,5 @@
 import { isActiveWetPaint } from './wet-operation';
+import {activePerspective,perspectiveMatrix,perspectiveRect,perspectivePoint,type PerspectiveData} from './perspective';
 import { isImmutable } from './immutable';
 import type { DocumentData, LayerData, RasterLayerData, TextLayerData, PaintLayerData, VectorLayerData } from "./model";
 import { AffineTransform } from "./affine";
@@ -26,17 +27,17 @@ export function unionBounds(rects: Bounds[]): Bounds | undefined {
 }
 /** Read-only authored geometry shared by the editor and compact inspection workers. */
 export type LayerGeometry =
-  Pick<RasterLayerData,'kind'|'width'|'height'|'erasures'>|
+  Pick<RasterLayerData,'kind'|'width'|'height'|'erasures'|'perspective'>|
   Pick<TextLayerData,'kind'|'width'|'height'|'textPathOrigin'|'textFrameOrigin'>|
   Pick<PaintLayerData,'kind'|'strokes'>|
   Pick<VectorLayerData,'kind'|'paths'>|
-  {kind:'smart-object';width:number;height:number}|
+  {kind:'smart-object';width:number;height:number;perspective?:PerspectiveData|null}|
   {kind:'adjustment'}|
   {kind:'group';children:readonly (LayerGeometry&Pick<LayerData,'x'|'y'|'transform'>)[]};
 export function groupLocalBounds<T extends Pick<LayerData,'x'|'y'|'transform'>>(children:readonly T[],measure:(child:T)=>Bounds|undefined):Bounds|undefined{
   return unionBounds(children.flatMap(child=>{const bounds=measure(child);return bounds?[localTransform(child).bounds(bounds)]:[];}));
 }
-export function localBounds(node: LayerGeometry): Bounds | undefined {
+export function intrinsicLocalBounds(node: LayerGeometry): Bounds | undefined {
   if(node.kind==='text'&&(node.textPathOrigin||node.textFrameOrigin)){const origin=node.textPathOrigin??node.textFrameOrigin!;return{x:origin.x,y:origin.y,width:node.width,height:node.height};}
   if (node.kind === 'raster' && node.erasures?.some(entry => isActiveWetPaint(entry.stroke))) return unionBounds([{ x: 0, y: 0, width: node.width, height: node.height }, ...node.erasures.filter(entry => isActiveWetPaint(entry.stroke)).map(entry => AffineTransform.scale(node.width / entry.width, node.height / entry.height).bounds(strokeBounds(entry.stroke)))]);
   if (
@@ -48,9 +49,21 @@ export function localBounds(node: LayerGeometry): Bounds | undefined {
   if (node.kind === "paint") return unionBounds(node.strokes.filter(stroke => stroke.kind !== 'wet' || isActiveWetPaint(stroke)).map(strokeBounds));
   if (node.kind === "vector") return unionBounds(node.paths.map(pathBounds));
   if (node.kind === "group") {
-    return groupLocalBounds(node.children,localBounds);
+    return unionBounds(node.children.flatMap(child=>{const value=placedGeometryBounds(child,localTransform(child));return value?[value]:[];}));
   }
   return undefined;
+}
+export function localBounds(node:LayerGeometry):Bounds|undefined {
+  const bounds=intrinsicLocalBounds(node);
+  return bounds&&(node.kind==='raster'||node.kind==='smart-object')&&activePerspective(node.perspective)?perspectiveRect(perspectiveMatrix(node.width,node.height,node.perspective),bounds).bounds:bounds;
+}
+export function placedGeometryBounds(node:LayerGeometry,world:AffineTransform):Bounds|undefined {
+  const bounds=intrinsicLocalBounds(node);if(!bounds)return;
+  if((node.kind==='raster'||node.kind==='smart-object')&&activePerspective(node.perspective)){
+    const points=perspectiveRect(perspectiveMatrix(node.width,node.height,node.perspective),bounds).corners.map(p=>world.point(p));
+    const x=Math.min(...points.map(p=>p.x)),y=Math.min(...points.map(p=>p.y));return{x,y,width:Math.max(...points.map(p=>p.x))-x,height:Math.max(...points.map(p=>p.y))-y};
+  }
+  return world.bounds(bounds);
 }
 /** x/y remain translation aliases; schema 6 adds an optional invertible linear basis. */
 export function localTransform(node: Pick<LayerData,'x'|'y'|'transform'>): AffineTransform {
@@ -117,9 +130,7 @@ function computeLayerBounds(
   };
   const node = walk(document.children);
   if (!node) return;
-  const b = localBounds(node),
-    transform = layerTransform(document, targetId)!;
-  return b ? transform.bounds(b) : undefined;
+  return placedGeometryBounds(node,layerTransform(document,targetId)!);
 }
 export function parentId(
   document: DocumentData,
@@ -152,8 +163,9 @@ export function hitTest(
         const hit = walk(node.children, transform);
         if (hit) return hit;
       } else {
-        const b = localBounds(node);
-        const point = transform.inverse().point({ x, y });
+        const b = intrinsicLocalBounds(node);
+        let point=transform.inverse().point({x,y});
+        try{if(node.kind==='raster'||node.kind==='smart-object')point=perspectivePoint(node,point,true);}catch{continue;}
         if (
           b &&
           point.x >= b.x &&

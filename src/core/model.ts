@@ -1,4 +1,7 @@
 import{floatSceneIssue}from'./float-document';
+import {perspectiveSchema,type PerspectiveData} from './perspective';
+import {activePerspective,perspectiveMatrix,perspectiveRect} from './perspective';
+import {intrinsicLocalBounds} from './spatial';
 import {usesNativeTextWriting,isVerticalText,writingModeSchema,textOrientationSchema,assertTextWritingVersion,type TextWritingProperties} from './text-writing';
 import {textPathSchema,type TextPathData} from './text-path';
 import {validateDeclaredFontVariations} from './font-variations';
@@ -47,7 +50,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 49;
+export const SCHEMA_VERSION = 50;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -85,6 +88,8 @@ export interface ToneEffectData {
 }
 
 export interface LayerBaseData {
+  /** Normalized TL/TR/BR/BL image corners; raster and smart-object instances only. */
+  perspective?:PerspectiveData|null;
   /** Use the transparency of the preceding unclipped sibling as the clipping base. */
   clipped?: boolean;
   transform?: AffineData;
@@ -215,6 +220,7 @@ export interface DocumentData {
     | 46
     | 47
     | 48
+    | 49
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -625,7 +631,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48 && value.schemaVersion !== 49) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48 && value.schemaVersion !== 49 && value.schemaVersion !== 50) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -633,7 +639,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     !(value.colorSpace === "srgb" && (value.precision === undefined || value.precision === "uint8") || value.colorSpace === "linear-srgb" && value.precision === "float32")
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–49), a supported precision/working-space pair, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–50), a supported precision/working-space pair, and positive, safely representable integer dimensions.",
     );
   }
   if(value.precision!==undefined&&Number(value.schemaVersion)<49)throw new Error('Document precision requires schema version 49.');
@@ -670,6 +676,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     const compIds = new Set<string>();
     for (const entry of value.layerComps) {
       const comp = layerCompSchema.parse(entry);
+      if(Number(value.schemaVersion)<50&&comp.layers.some(layer=>layer.position?.perspective!==undefined))throw new Error('Layer comp perspective requires document schema version 50.');
       if(Number(value.schemaVersion)<48&&comp.layers.some(layer=>layer.appearance?.clipped!==undefined))throw new Error('Layer comp clipping requires document schema version 48.');
       if (comp.documentId !== value.id || compIds.has(comp.id))
         throw new Error("Invalid layer comp ownership or duplicate identity.");
@@ -714,6 +721,10 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
         );
       }
       if(node.clipped!==undefined&&(typeof node.clipped!=='boolean'||Number(value.schemaVersion)<48))throw new Error('Clipping layers require a boolean and document schema version 48.');
+      if(node.perspective!==undefined){
+        if(Number(value.schemaVersion)<50||(node.kind!=='raster'&&node.kind!=='smart-object'))throw new Error('Perspective requires an image layer and document schema version 50.');
+        if(node.perspective!==null)perspectiveSchema.parse(node.perspective);
+      }
       if(node.kind!=='text'&&('fontVariantCaps'in node||'fontStretch'in node||'fontVariationSettings'in node||'characterRanges'in node||'textPath'in node||'textPathOrigin'in node||'writingMode'in node||'textOrientation'in node||'textFrameOrigin'in node||'textInlineExtent'in node))throw new Error('Native font features require a text layer.');
       if (node.blendMode === 'pass-through') {
         if (node.kind !== 'group' || Number(value.schemaVersion) < 28)
@@ -795,6 +806,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           !number(node.height, 1, MAX_COORDINATE)
         )
           throw new Error("Invalid smart-object instance.");
+        if(node.perspective&&activePerspective(node.perspective as unknown as PerspectiveData)){const image=node as unknown as SmartObjectInstanceData;perspectiveRect(perspectiveMatrix(image.width,image.height,image.perspective!),{x:0,y:0,width:image.width,height:image.height});}
       } else if (node.kind === "raster") {
         if (
           !text(node.assetId) ||
@@ -811,6 +823,9 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
             checkBrush(stroke);
             yield;
           }
+        }
+        if(node.perspective&&activePerspective(node.perspective as unknown as PerspectiveData)){
+          const raster=node as unknown as RasterLayerData;perspectiveRect(perspectiveMatrix(raster.width,raster.height,raster.perspective!),intrinsicLocalBounds(raster)!);
         }
         const effectIds = new Set<string>();
         for (const effect of node.effects) {

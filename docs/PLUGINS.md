@@ -1,5 +1,14 @@
 # Plugins and extensions
 
+## Image perspective uses existing document grants
+
+PerspectiveTransform and shared layer.update commands require existing document
+read/write grants. Installation stays inert and third-party execution remains
+isolated with current grant, source, revision and lock validation and one Undo.
+No native pixel, worker, file, profile or network authority is added. Sampling
+and export remain host-owned. [Contract and editing limits](PERSPECTIVE_ENGINE.md).
+
+
 ## Float tonal edits keep existing grants
 
 Existing document grants admit constructor tonal edits against owned float
@@ -530,4 +539,4 @@ Independent REST TIFF admission and source reads use trusted native workers and 
 
 ## Private perspective sampler grants no authority
 
-Native perspective sampling is trusted engine work, outside the isolated command boundary. It adds no plugin permission, file/pixel access, worker method, network capability or install-time execution. Public perspective commands and end-to-end integration remain required. [Contract](PERSPECTIVE_ENGINE.md).
+Native perspective sampling is trusted engine work, outside the isolated command boundary. It adds no plugin permission, file/pixel access, worker method, network capability or install-time execution. Schema-50 image placement now uses existing document grants and isolated shared commands; direct projective tool mapping and full F03 acceptance remain required. [Contract](PERSPECTIVE_ENGINE.md).

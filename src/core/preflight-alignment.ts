@@ -1,7 +1,8 @@
 import {z} from 'zod';
+import {activePerspective} from './perspective';
 import {layerAlignmentSchema,type LayerAlignment} from './layer-alignment-schema';
 import {AffineTransform} from './affine';
-import {localBounds,localTransform,groupLocalBounds,type Bounds} from './spatial';
+import {localBounds,localTransform,placedGeometryBounds,unionBounds,type Bounds} from './spatial';
 import type {PreflightDocumentView,PreflightLayerView} from './preflight-view';
 import {yieldTask} from './task-yield';
 
@@ -73,10 +74,10 @@ export async function inspectPreflightAlignments(document:PreflightDocumentView,
       if(node.kind==='group'){
         for(const child of node.children)await measure(locals.get(child)!);
         if(node.children.some(child=>locals.get(child)!.invalid))entry.invalid=true;
-        if(!entry.invalid)entry.local=groupLocalBounds(node.children,child=>locals.get(child)?.local);
+        if(!entry.invalid)entry.local=unionBounds(node.children.flatMap(child=>{const local=locals.get(child)?.local;if(!local)return[];return[(child.kind==='raster'||child.kind==='smart-object')&&activePerspective(child.perspective)?placedGeometryBounds(child,localTransform(child))!:localTransform(child).bounds(local)];}));
       }else if(!entry.invalid)entry.local=localBounds(node);
       if(entry.local)preflightBoundsSchema.parse(entry.local);
-      if(entry.world&&entry.local)entry.bounds=preflightBoundsSchema.parse(entry.world.bounds(entry.local));
+      if(entry.world&&entry.local)entry.bounds=preflightBoundsSchema.parse((node.kind==='raster'||node.kind==='smart-object')&&activePerspective(node.perspective)?placedGeometryBounds(node,entry.world):entry.world.bounds(entry.local));
     }catch{entry.invalid=true;entry.local=undefined;entry.bounds=undefined;}
     await checkpoint();return entry.bounds;
   };

@@ -7,11 +7,11 @@ type Placement=Pick<LayerBaseData,'id'|'name'|'visible'|'opacity'|'x'|'y'|'trans
 /** @internal Compact worker metadata, never a render tree or a public mutation model. */
 export type PreflightLayerView=Placement&(
   {kind:'group';children:PreflightLayerView[]}|
-  Pick<RasterLayerData,'kind'|'assetId'|'width'|'height'|'erasures'>|
+  Pick<RasterLayerData,'kind'|'assetId'|'width'|'height'|'erasures'|'perspective'>|
   (Pick<TextLayerData,'kind'|'text'|'fontFamily'|'characterRanges'|'textPathOrigin'|'textFrameOrigin'|'width'|'height'>&{fontFamilies?:readonly string[]})|
   Pick<PaintLayerData,'kind'|'strokes'>|
   Pick<VectorLayerData,'kind'|'paths'>|
-  Pick<SmartObjectInstanceData,'kind'|'componentId'|'width'|'height'>|
+  Pick<SmartObjectInstanceData,'kind'|'componentId'|'width'|'height'|'perspective'>|
   {kind:'adjustment'}
 );
 export interface PreflightComponentView {
@@ -32,11 +32,11 @@ export function preflightDocumentView(document:DocumentData,checkBounds=true,ali
     const placement:Placement={id:node.id,name:node.name,visible:node.visible,opacity:node.opacity,x:node.x,y:node.y,transform:node.transform};
     switch(node.kind){
       case 'group':return{...placement,kind:node.kind,children:node.children.map(child=>layer(child,geometry))};
-      case 'raster':return{...placement,kind:node.kind,assetId:node.assetId,width:node.width,height:node.height,...(geometry&&node.erasures?.some(entry=>isActiveWetPaint(entry.stroke))?{erasures:node.erasures.filter(entry=>isActiveWetPaint(entry.stroke)).map(entry=>({width:entry.width,height:entry.height,stroke:geometryStroke(entry.stroke)}))}:{})};
+      case 'raster':return{...placement,kind:node.kind,assetId:node.assetId,width:node.width,height:node.height,...(geometry&&node.perspective?{perspective:node.perspective}:{}),...(geometry&&node.erasures?.some(entry=>isActiveWetPaint(entry.stroke))?{erasures:node.erasures.filter(entry=>isActiveWetPaint(entry.stroke)).map(entry=>({width:entry.width,height:entry.height,stroke:geometryStroke(entry.stroke)}))}:{})};
       case 'text':return{...placement,kind:node.kind,text:node.text,fontFamily:node.fontFamily,...(node.textPathOrigin?{textPathOrigin:{...node.textPathOrigin}}:{}),...(node.textFrameOrigin?{textFrameOrigin:{...node.textFrameOrigin}}:{}),width:node.width,height:node.height,...(node.characterRanges===undefined?{}:{fontFamilies:characterFontFamilies(node)})};
       case 'paint':return{...placement,kind:node.kind,strokes:geometry?node.strokes.map(geometryStroke):[]};
       case 'vector':return{...placement,kind:node.kind,paths:geometry?node.paths:[]};
-      case 'smart-object':return{...placement,kind:node.kind,componentId:node.componentId,width:node.width,height:node.height};
+      case 'smart-object':return{...placement,kind:node.kind,componentId:node.componentId,width:node.width,height:node.height,...(geometry&&node.perspective?{perspective:node.perspective}:{})};
       case 'adjustment':return{...placement,kind:node.kind};
     }
   };

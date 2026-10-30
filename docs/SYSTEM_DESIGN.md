@@ -1,5 +1,18 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Original-preserving image perspective placement
+
+Schema 50 adds normalized corner state to image instances. Immutable constructor
+values serialize into ordinary shared updates; Undo, layer comps and transport
+retain originals and placement. Rendering reconstructs bounded native intrinsic
+windows, projects image coverage and applies independently captured masks with
+document-space feather. Float scenes preserve float values. Spatial queries and
+outlines use the projected quad while affine parent placement remains distinct.
+The affine GPU path declines active perspective. Unsupported interactive input
+mapping rejects explicitly; projective tool/clip/cursor mapping and full F03
+quality/performance acceptance remain required. [Contract](PERSPECTIVE_ENGINE.md).
+
+
 ## Float tonal authority
 
 Immutable stroke geometry, settings and originals remain separate from fixed-grid
@@ -953,7 +966,7 @@ Node native TIFF preparation is globally serialized and final publication follow
 
 ## Private projective sampling invariant
 
-Authored target corners, rather than reconstructed matrix corners, own coverage. Strict convexity, singularity/horizon and representable-center preflight precede reads. Local rebasing protects coordinate precision; premultiplied float64 interpolation returns owned finite float32 windows. Original leases and operation lifetime controls remain caller-owned. Sparse footprint splitting bounds transient reads independently of source resolution. This adds no document mutation or public/plugin/REST authority; connected perspective integration remains required. [Contract](PERSPECTIVE_ENGINE.md).
+Authored target corners, rather than reconstructed matrix corners, own coverage. Strict convexity, singularity/horizon and representable-center preflight precede reads. Local rebasing protects coordinate precision; premultiplied float64 interpolation returns owned finite float32 windows. Original leases and operation lifetime controls remain caller-owned. Sparse footprint splitting bounds transient reads independently of source resolution. The sampler itself has no public mutation or worker authority. Existing document grants and layer.update commands now connect schema-50 image placement to it; the broader interactive workflow remains required. [Contract](PERSPECTIVE_ENGINE.md).
 
 The private perspective-mask capture now preserves full native bitmap support,
 selection/vector/stroke geometry and ordered refinements as a finite deviation
@@ -962,5 +975,7 @@ to the original pixel plane; unlinked masks remain in document coordinates.
 Three fractional-box feather pass pairs operate after projection in document
 pixels, before inversion/density. Every read/convolution has a complete bounded
 halo; source geometry and asset/renderer/capture lifetimes remain authoritative
-across awaits. Public document perspective state/commands and connected scene,
-selection, file and automation surfaces remain pending.
+across awaits. Schema-50 image state/commands, numeric authoring, scene rendering,
+hit testing, baked delivery and automation now consume this coverage. Correct
+projective tool/selection-clip/cursor mapping and preserving-position mask
+relinking remain pending.
