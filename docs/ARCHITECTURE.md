@@ -26,6 +26,11 @@ normal admission. Source/owner/selection/gesture/context changes, clear and
 cancellation reject stale output; equivalent selection values remain valid.
 Private previews never mutate attached artwork/history or retarget a new owner
 or source. Actual commands still commit once through the existing OO boundary.
+App observes owner, revision and ordered layer-selection publications synchronously
+for move/mask, resize, rotation and selection scaling. Selection-only changes do
+not advance revision; a change followed by restoration in one task still cancels
+the gesture before another pointer event or release can commit it. Equivalent
+ordered IDs preserve valid work. Same-owner panning is independent of selection.
 No public API, format, source resolution, cache/worker budget or grant changes.
 
 ## Bounded native float viewport appearances

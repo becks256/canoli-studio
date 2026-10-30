@@ -8140,3 +8140,29 @@ All-tool/sustained/cold/import/global-process-memory/device F14, other native
 float/HDR/color/interchange/layer/tool requirements and every unfinished original
 professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
 gate remain active. The complete original roadmap remains active.
+
+
+### 2026-10-29 — Selection authority through gesture continuation and commit (verified increment)
+
+Owner: implementation agent; bounded F03/F14 correctness follow-up at `758cea0`.
+Selection-only changes do not advance revision. The committed baseline reproduces
+unintended resize/rotation/selection-scale/move edits after selection changes,
+including change-and-restore within one task and delimiter-colliding imported IDs.
+All transforms now capture ordered IDs, cancel synchronously at owner/revision/
+selection publication and recheck continuation/release. Equivalent selections and
+same-owner panning stay valid. Alignment/key/scale drafts use unambiguous array
+identity. Cancellation adds no edit or Undo entry. Public APIs, schema, shortcuts
+and extension grants remain unchanged.
+
+Full build and all 2,961 unit/API tests across 290 files pass. All 14 focused,
+98 affected browser cases and 181 normal-production workflows pass without
+skips, retries, flakes or failures. Development and normal production verify a
+real 10000 x 5000 PNG through keyboard selection during captured resize, exact
+unchanged document/original bytes and ordinary Undo/Redo. Sources and served
+files are pinned; the retained expanded candidate selector failure is documented.
+No new latency or full F03/F14 acceptance follows from this correctness fix.
+
+[Reproduction, checks, limits and compact record](benchmarks/selection-authority-2026-10-29.md).
+All-tool/sustained/cold/import/global-process-memory/device F14, native precision/
+color/interchange/layout, AI/provider/evaluation, installed ChatGPT/live identity/
+commercial and every other unfinished original roadmap requirement remain active.

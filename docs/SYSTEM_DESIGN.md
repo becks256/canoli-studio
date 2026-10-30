@@ -895,3 +895,12 @@ Clearing or invalidating the private publication rejects old pointer work even
 before React can publish its next target. Final shared OO commit/Undo, source
 resolution, isolated scripts/plugins and independent REST retain their contracts.
 This is measured latency work, not all-tool/device/global-memory F14 acceptance.
+
+Gesture continuation and release share an actual-owner/revision/ordered-selection
+check. App subscribes to Document and editor publications during layout so a
+selection-only change cancels synchronously, including change-and-restore within
+one task. Revision alone is insufficient. A new transform requires the committed
+UI's source and selection to match the live model. Equivalent ordered IDs retain
+authority; pan remains independent of selection within the same owner. Alignment
+reference/key and scale drafts encode complete ordered ID arrays unambiguously;
+delimiter-containing imported IDs cannot share another selection's draft state.

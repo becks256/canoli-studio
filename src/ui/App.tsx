@@ -54,6 +54,7 @@ import type {RecentKind} from "../workspace/recent-files";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -338,7 +339,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         kind: "move";
         snapTargets?: { x: number; y: number; width: number; height: number }[];
         spacingMatches?: SpacingMatch[];
-        selection: string;
+        selection: readonly string[];
         bypass?: boolean;
         mask?: LayerMaskData;
         members?: { id: string; x: number; y: number }[];
@@ -354,6 +355,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       }
     | {
         kind: "rotate" | "scale-selection";
+        selection: readonly string[];
         initialVector?: { x: number; y: number };
         center: { x: number; y: number };
         startAngle: number;
@@ -368,6 +370,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       }
     | {
         kind: "resize";
+        selection: readonly string[];
         revision: number;
         documentId: string;
         handle: "nw" | "ne" | "sw" | "se";
@@ -390,19 +393,25 @@ export function App({ editor }: { editor: EditorApplication }) {
   >(null);
   const pointerDocument=useRef<EditorDocument|null>(null);
   useEffect(()=>editor.chatGpt.setInteractionGuard(sessionId=>editor.recoverySessionId===sessionId&&(capturedPointer.current!==null||gesture.current!==null||editor.tools.getSnapshot().drawing)),[editor]);
-  useEffect(() => {
-    const drag = gesture.current;
-    if (
-      drag &&
-      (pointerDocument.current!==dom || drag.kind !== "pan" &&
-      (drag.documentId !== dom.id || drag.revision !== state.revision || drag.kind==='move'&&drag.selection!==state.selectedIds.join(':')))
-    ) {
-      gesture.current = null;pointerDocument.current=null;
-      setPreview(null);
-      setSnapGuides({});
-      setResizingCursor(null);
-    }
-  }, [dom, state.revision,state.selectedIds]);
+  const gestureIsCurrent=useCallback((drag:NonNullable<typeof gesture.current>)=>{
+    if(pointerDocument.current!==dom||editor.document!==dom)return false;
+    if(drag.kind==='pan')return true;
+    const snapshot=dom.getSnapshot();
+    return drag.documentId===dom.id&&drag.revision===snapshot.revision&&samePreviewSelection(drag.selection,snapshot.selectedIds);
+  },[dom,editor]);
+  useLayoutEffect(()=>{
+    // Selection changes do not advance document revision. Observe them at
+    // publication so a change-and-restore in one task cannot revive a gesture.
+    const cancelStale=()=>{
+      const drag=gesture.current;if(!drag||gestureIsCurrent(drag))return;
+      gesture.current=null;pointerDocument.current=null;
+      setPreview(null);setSnapGuides({});setResizingCursor(null);
+    };
+    const stopDocument=dom.subscribe(cancelStale),stopEditor=editor.subscribe(cancelStale);
+    cancelStale();
+    return()=>{stopDocument();stopEditor();};
+  },[dom,editor,gestureIsCurrent,setPreview]);
+
   const activePreview = toolState.preview ?? preview;
   const wetPreview=toolState.wetPreview?.isCurrent()?toolState.wetPreview:null;
   const viewDocument = useMemo(() => {
@@ -758,7 +767,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
 
   const[chosenAlignmentKey,setChosenAlignmentKey]=useState<{owner:EditorDocument;selection:string;id:string}|null>(null);
-  const alignmentSelection=dom.getSnapshot().selectedIds.join(':'),alignmentRoots=dom.layerSelection.rootLayers;
+  const alignmentSelection=JSON.stringify(dom.getSnapshot().selectedIds),alignmentRoots=dom.layerSelection.rootLayers;
   useEffect(()=>setChosenAlignmentKey(null),[dom,alignmentSelection]);
   const requestedKey=chosenAlignmentKey?.owner===dom&&chosenAlignmentKey.selection===alignmentSelection?chosenAlignmentKey.id:dom.selectedLayer?.id;
   const alignmentKey=alignmentRoots.find(layer=>layer.id===requestedKey)??alignmentRoots.find(layer=>layer.id===dom.selectedLayer?.id)??alignmentRoots[0]??null;
@@ -1334,6 +1343,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (contextMenu) setContextMenu(null);
     if (
       busy ||
+      editor.document!==dom ||
       capturedPointer.current !== null ||
       ![0, 1].includes(event.button) ||
       ((event.target as HTMLElement).closest("button") &&
@@ -1357,11 +1367,13 @@ export function App({ editor }: { editor: EditorApplication }) {
       };
       return;
     }
+    // A transform starts from the model represented by this committed UI.
+    if(tool==='move'&&(dom.getSnapshot().document!==state.document||!samePreviewSelection(dom.getSnapshot().selectedIds,state.selectedIds)))return;
     if (movingMask) {
       if (selected?.mask && !locked)
         gesture.current = {
           kind: "move",
-          selection:dom.getSnapshot().selectedIds.join(':'),
+          selection:dom.getSnapshot().selectedIds,
           revision: dom.getSnapshot().revision,
           documentId: dom.id,
           mask: selected.mask,
@@ -1399,6 +1411,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       });
       gesture.current = {
         kind: "rotate",
+        selection:dom.getSnapshot().selectedIds,
         center,
         members,
         startAngle: Math.atan2(point.y - center.y, point.x - center.x),
@@ -1436,6 +1449,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         });
         gesture.current = {
           kind: "scale-selection",
+          selection:dom.getSnapshot().selectedIds,
           center,
           members,
           startAngle: 0,
@@ -1461,6 +1475,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       ) {
         gesture.current = {
           kind: "resize",
+          selection:dom.getSnapshot().selectedIds,
           revision: dom.getSnapshot().revision,
           documentId: dom.id,
           handle,
@@ -1562,7 +1577,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       if (members.some((layer) => isLocked(state.document, layer.id))) return;
       gesture.current = {
         kind: "move",
-        selection:dom.getSnapshot().selectedIds.join(':'),
+        selection:dom.getSnapshot().selectedIds,
         startX: event.clientX,
         startY: event.clientY,
         id: hitLayer.id,
@@ -1581,7 +1596,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     if (layer && !isLocked(state.document, layer.id))
       gesture.current = {
         kind: "move",
-        selection:dom.getSnapshot().selectedIds.join(':'),
+        selection:dom.getSnapshot().selectedIds,
         revision: dom.getSnapshot().revision,
         documentId: dom.id,
         startX: event.clientX,
@@ -1612,23 +1627,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
     const drag = gesture.current;
     if (!drag) return;
-    if(pointerDocument.current!==dom){gesture.current=null;pointerDocument.current=null;setPreview(null);setSnapGuides({});setResizingCursor(null);return;}
+    if(!gestureIsCurrent(drag)){gesture.current=null;pointerDocument.current=null;setPreview(null);setSnapGuides({});setResizingCursor(null);return;}
     if (drag.kind === "pan") {
       setPan({
         x: drag.x + event.clientX - drag.startX,
         y: drag.y + event.clientY - drag.startY,
       });
-      return;
-    }
-    if (
-      drag.documentId !== dom.id ||
-      drag.revision !== dom.getSnapshot().revision ||
-      drag.kind==='move'&&drag.selection!==dom.getSnapshot().selectedIds.join(':')
-    ) {
-      gesture.current = null;pointerDocument.current=null;
-      setPreview(null);
-      setSnapGuides({});
-      setResizingCursor(null);
       return;
     }
     if (drag.kind === "rotate" || drag.kind === "scale-selection") {
@@ -1785,10 +1789,11 @@ export function App({ editor }: { editor: EditorApplication }) {
       void task(() => editor.tools.end());
       return;
     }
-    const drag = gesture.current;
+    const drag = gesture.current,current=drag&&gestureIsCurrent(drag);
     gesture.current = null;pointerDocument.current=null;
     setResizingCursor(null);
     setPreview(null);
+    if(!current)return;
     if (drag?.kind === "move" && (drag.dx || drag.dy))
       attempt(() => {
         if (drag.members) {

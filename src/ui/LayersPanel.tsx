@@ -115,7 +115,7 @@ export function LayersPanel({
   const linkedFileTarget = useRef<SmartObjectLayer | null>(null);
   const [filter, setFilter] = useState({ ...emptyLayerFilter });
   const [scalePercent, setScalePercent] = useState(100);
-  const selectionKey = dom.getSnapshot().selectedIds.join(":");
+  const selectionKey = JSON.stringify(dom.getSnapshot().selectedIds);
   useEffect(() => {
     setScalePercent(100);
   }, [dom, selectionKey]);

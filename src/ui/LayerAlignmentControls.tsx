@@ -5,7 +5,7 @@ import {alignmentCommands,layerAlignmentSchema,type AlignmentTarget,type LayerAl
 
 /** Reference choice is local UI state; the actual edit remains one shared command. */
 export function LayerAlignmentControls({document:owner,viewDocument,busy,keyLayerId,onKeyChange,onAlign}:{document:Document;viewDocument:DocumentData;busy:boolean;keyLayerId?:string;onKeyChange?(id:string):void;onAlign(alignment:LayerAlignment,target:AlignmentTarget):void}){
- const roots=owner.layerSelection.rootLayers,selection=owner.getSnapshot().selectedIds.join(':'),active=owner.selectedLayer?.id;
+ const roots=owner.layerSelection.rootLayers,selection=JSON.stringify(owner.getSnapshot().selectedIds),active=owner.selectedLayer?.id;
  const[reference,setReference]=useState<'selection'|'canvas'|'layer'|null>(null),[chosenKey,setChosenKey]=useState<string|null>(null);
  useEffect(()=>{setReference(null);setChosenKey(null);},[owner,selection]);
  const selectedKey=keyLayerId??chosenKey,type=reference??(roots.length===1?'canvas':'selection'),key=selectedKey&&roots.some(layer=>layer.id===selectedKey)?selectedKey:roots.some(layer=>layer.id===active)?active:roots[0]?.id,target:AlignmentTarget=type==='layer'?{type,id:key??''}:{type};

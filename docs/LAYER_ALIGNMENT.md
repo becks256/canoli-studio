@@ -10,6 +10,14 @@ Selection aligns each independent selected root to their combined bounds. Canvas
 
 The command palette offers all six directions for each reference type. Key-object palette actions and custom bindings use the same current key choice as the Layers panel, falling back to the active selected root. These actions have no new default keyboard bindings. Existing typing shortcuts stay native in editable fields.
 
+Alignment reference/key choices and the selection-scale draft belong to the
+actual document and complete ordered selection. Changing selection resets those
+choices even when imported IDs contain punctuation; reselecting equivalent
+ordered IDs retains them. Selection changes also cancel an active Move, mask,
+resize, rotation or selection-scale drag before continuation/release. Changing
+away and immediately back cannot revive a cancelled drag. Cancellation creates
+no artwork edit or Undo entry. Same-owner panning remains available.
+
 ## Object-oriented scripting
 
 `document.layerSelection.align(alignment, reference = "selection")` accepts one of the six direction strings and a reference of `"selection"`, `"canvas"`, or an attached `Layer` handle from this document. A foreign/detached handle rejects even if its ID matches a local layer. A key may be outside the selection when supplied explicitly through this API. The key must be independent of all moving roots: neither a moving ancestor nor a descendant can be the stationary reference.

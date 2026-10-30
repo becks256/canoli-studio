@@ -1,4 +1,6 @@
 import {spacingWorkflow} from './helpers/spacing';
+import {gestureSelectionWorkflow} from './helpers/gesture-selection';
+test('production keyboard layer selection cancels a captured resize and preserves the 50 MP original and Undo',async({page},info)=>{await gestureSelectionWorkflow(page,info,true);});
 import{productionFloatSources}from'./helpers/float-source-production';
 test('production float source workers preserve every independent original sample without developer globals',async({page},info)=>{await productionFloatSources(page,info);});
 import {svgClippingWorkflow}from './helpers/svg-clipping';

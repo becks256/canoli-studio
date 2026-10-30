@@ -1163,3 +1163,12 @@ normal frame admission. Source resolution, renderer/color fidelity, existing
 paint/wet lifetimes, public API/history and script/plugin/REST grants are unchanged.
 The existing 33 ms input p95, routine <50 ms long-task, sustained/all-tool and
 process-memory/device requirements remain measurement/acceptance targets.
+
+Move/mask, resize, rotation and selection-scaling gestures must also reject stale
+continuation and final commit after any actual owner, revision or ordered layer
+selection change. Selection changes can occur without a revision; changing away
+and back before React renders must leave the gesture cancelled. Equivalent
+ordered selections stay valid, and same-owner panning can continue through
+selection changes. Imported IDs containing delimiters must remain unambiguous
+in selection ownership and transient alignment/scale controls. Cancellation adds
+no artwork change or Undo entry and retains full-resolution original assets.
