@@ -8069,3 +8069,38 @@ Import and remaining input latency, all-tool/global-memory/device F14, other
 float/layer/tool/HDR/color/interchange requirements and every unfinished original
 professional-editor/AI/provider/workflow/installed ChatGPT/live identity/commercial
 gate remain active. The complete original roadmap remains active.
+
+
+### 2026-10-29 — F14 bounded native float appearance reuse (measured progress)
+
+Owner: implementation agent; delivered the native-size viewport increment
+beginning at `8f4c26c`. One complete native appearance, including outside-artboard
+shadow support, can be reused for eligible exact integer moves. The single
+4 MiB plane has weak original identity and effective appearance keys; metadata,
+source leases, byte colors and history state are not retained. Current source
+capture/preparation/lifetime/cancellation and actual native display/proof
+conversion still run. Unsupported scenes/views fall back; `cache:false`, captured
+native reads and file delivery bypass the cache. Clear/disposal drops the plane.
+
+Three sequential normal-production baseline/candidate pairs preserve all 12
+independently matching pointer frames, original bytes and one Undo/Redo each.
+Across 36 inputs per build, p95 changes from 85.9 ms to 37.0 ms.
+This is warm eligible-view evidence on one device, not sustained 60fps or complete
+F14 acceptance; the target remains 33 ms. Import remains about 120 seconds.
+
+Full build/final full rebuild and all 2,959 unit/API tests across 289 files pass.
+All 49 native browser cases across 14 files and 14 relevant normal-production
+float workflows pass, plus the six paired timing sessions, without skips,
+retries, flakes or failures. All 5,006,020 saved native RGBA words across
+110 outputs and the complete 50 MP shadow PNG match the accepted baseline.
+Independent files, entering edges, all-channel display parity, invalidation,
+source/proof/cancellation/disposal, original/history/persistence/recipe and the
+unchanged 50 MP gates pass. Excluded assertion/type/disk attempts and verified
+regenerable-distribution RAM relocation are recorded separately.
+[Measurements, limits and compact verification record](benchmarks/float-viewport-appearance-2026-10-29.md).
+
+Cold/import latency, other layer sizes/graphs/views/tools, sustained all-tool
+performance, global/process-memory/device F14, other native float/HDR/color/
+interchange and every unfinished original professional-editor/AI/provider/workflow/
+installed ChatGPT/live identity/commercial requirement remain active. The complete
+original roadmap remains active.

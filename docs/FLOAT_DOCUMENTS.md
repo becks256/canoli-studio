@@ -782,6 +782,26 @@ precede frame filtering and the actual native ICC conversion. These are working
 allocation bounds, not source/document geometry limits; file/native read
 partitioning retains its separate contract.
 
+Aligned 100% previews may retain one complete native float appearance for a
+single visible, unclipped Normal raster at original dimensions. Eligibility
+requires identity geometry, integer placement with exact sampling arithmetic,
+no active tone/erasure/overlay/Blend If work, and either no effective mask or a
+linked, unfeathered, uninverted hard rectangular selection mask at full density.
+The complete source plus finite shadow/bilinear support must fit 262,144 pixels
+and 2,048 pixels per axis. These are private cache budgets, not import limits.
+The retained plane uses at most 4 MiB; transient evaluation and other caches have
+separate budgets. The entire appearance includes outside-artboard pixels, so
+moving artwork into view retains entering edges. Every displayed tile clips to
+the current artboard and still passes through the native display/proof transform.
+
+Intrinsic/source changes rebuild; unsupported scenes or views use ordinary native
+evaluation. Source capture/preparation, ownership/cancellation and proof validation
+still run on hits; immutable verified samples avoid repeat derived-tile reads.
+Failed/incomplete builds never publish cache entries. Renderer cache clear and
+disposal drop the plane. Explicit export/reference `cache:false` and captured
+native/file reads bypass it. This adds no document state, public API or privileges,
+and does not establish sustained all-tool 60fps or global-memory acceptance.
+
 One idle prepared display transform may be reused across renderers while still
 counting against the shared two-native-owner limit. Queued source/profile work
 retires idle display ownership instead of waiting behind it. Each active lease

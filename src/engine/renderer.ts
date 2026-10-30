@@ -622,7 +622,7 @@ export class CanvasRenderer implements DocumentRenderer {
     checkRenderCurrent(options.isCancelled);
     if(isFloatDocument(document)){
       const sizeRegion=options.region??{x:0,y:0,width:document.width,height:document.height},size=workingSize(options.outputSize?.width??sizeRegion.width,options.outputSize?.height??sizeRegion.height,options.outputSize?1:options.scale,options.maxPixels,options.maxDimension);
-      return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback,options.colorProof);
+      return this.floatScene.render(this.floatPreview(document,options.paintPreview),assets,this.floatMasks(assets,options.isCancelled),{region:sizeRegion,...size,rootTransform:options.rootTransform},{isCancelled:options.isCancelled},options.readback,options.colorProof,options.cache!==false);
     }
     if(!options.taskBudget)options={...options,taskBudget:{deadline:performance.now()+8}};
     const ownedFrequencyScratch=options.frequencyScratch?undefined:new FilterTileCache(8*1024*1024);

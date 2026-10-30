@@ -12,6 +12,21 @@ only alpha enters convolution. Capture disposal clears these fields. Scene
 recursion carries each native region through groups, masks and clipping before
 final frame filtering. [Ordering and limits](FLOAT_DOCUMENTS.md#native-float-drop-shadows).
 
+## Bounded native float viewport appearances
+
+`engine/float-appearance` retains one complete native float appearance of at
+most 262,144 pixels (4 MiB), including finite shadow support outside the artboard.
+A single unmodified native raster, optionally with a linked hard rectangular
+mask, can reuse that appearance for exactly representable integer moves in an
+aligned 100% view. The key captures all intrinsic layer/source interpretation;
+weak original-Blob identity does not retain a source lease. Every render still
+captures/prepares current sources, checks lifetime/cancellation and runs the
+actual native display/proof transform. Hits avoid derived-source tile rereads;
+the retained samples were validated on construction from the immutable original.
+Other geometry/graphs/styles use the established renderer. `cache:false`
+bypasses the appearance; clear/disposal drops it. No delivery/native-read,
+public mutation, history, serialization or isolation boundary changes.
+
 ## Native float device proofing
 
 Explicit source/display/device CMM transforms consume genuine float samples. FloatSceneRenderer captures proof settings, composes/filters native pixels, then borrows a proof-keyed display owner. AdaptiveRenderer skips the old byte proof pass for float frames. Native settings preflight, conversion, workspace ownership, cancellation and complete-frame publication retain their host boundaries. [Contract and current verification](FLOAT_PROOFING.md).

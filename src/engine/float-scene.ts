@@ -1,4 +1,5 @@
 import{applyFloatStyle}from'./float-style';
+import{FloatAppearanceCache}from'./float-appearance';
 import{isFloatColorAdjustment}from'../core/float-color';
 import{compileFloatWhiteBalance}from'../core/float-white-balance';
 import{projectFloatFrame,type FloatSceneFrame}from'./float-frame';
@@ -42,10 +43,11 @@ export interface CapturedFloatScene {
 }
 interface CachedSource{original:Blob;key:string;source:FloatRasterSource}
 
-/** Owns original-source leases, not authored data or quantized color caches.
+/** Owns original-source leases and a bounded native float preview cache, never authored data.
  * A captured scene pins its own shares across awaits and renderer-cache eviction. */
 export class FloatSceneRenderer {
  private readonly displayOwner=Symbol('float display owner');
+ private readonly appearance=new FloatAppearanceCache();
  private entries=new Map<Blob,Map<string,CachedSource>>();
  private lru=new Map<CachedSource,true>();private epoch=0;private closed=false;
  private captures=new Set<AbortController>();
@@ -58,20 +60,29 @@ export class FloatSceneRenderer {
   while(this.lru.size>64){const oldest=this.lru.keys().next().value!;this.lru.delete(oldest);const group=this.entries.get(oldest.original)!;group.delete(oldest.key);if(!group.size)this.entries.delete(oldest.original);oldest.source.dispose();}
   return share;
  }
- clear(){this.epoch++;const captures=[...this.captures];this.captures.clear();for(const capture of captures)capture.abort(new Error('Float scene capture is closed or superseded.'));retireFloatDisplay(this.displayOwner);for(const entry of this.lru.keys())entry.source.dispose();this.lru.clear();this.entries.clear();}
+ clear(){this.appearance.clear();this.epoch++;const captures=[...this.captures];this.captures.clear();for(const capture of captures)capture.abort(new Error('Float scene capture is closed or superseded.'));retireFloatDisplay(this.displayOwner);for(const entry of this.lru.keys())entry.source.dispose();this.lru.clear();this.entries.clear();}
  dispose(){this.closed=true;this.clear();}
- async render(document:DocumentData,assets:AssetStore,mask:FloatMaskService,frame:FloatSceneFrame,control:FloatSceneControl={},readback=false,proof:ColorProof|null=null):Promise<HTMLCanvasElement>{
+ async render(document:DocumentData,assets:AssetStore,mask:FloatMaskService,frame:FloatSceneFrame,control:FloatSceneControl={},readback=false,proof:ColorProof|null=null,cache=true):Promise<HTMLCanvasElement>{
   const capturedProof=proof?Object.freeze({...proof}):null;
   const scene=await this.capture(document,assets,mask,control);let output:HTMLCanvasElement|undefined,display:Awaited<ReturnType<typeof borrowFloatDisplay>>|undefined,accepted=false;
   const check=()=>{control.signal?.throwIfAborted();scene.check();checkRenderCurrent(control.isCancelled);if(this.closed)throw new Error('Float scene renderer is closed.');};
   try{
+   check();
+   const plan=cache?this.appearance.plan(scene.document,assets,frame):undefined;
+   let appearance=plan?this.appearance.get(plan):undefined;
+   if(plan&&!appearance){
+    // Complete native support includes artwork outside the artboard, so later
+    // integer moves can reveal edge pixels. Preparation/read failures retain
+    // the normal rejection boundary; incomplete appearances are never cached.
+    const pixels=await scene.read(plan.world);check();appearance=this.appearance.put(plan,pixels);
+   }
    check();output=createCanvas(frame.width,frame.height,readback);display=await borrowFloatDisplay(this.displayOwner,{signal:scene.signal,onProgress:check},capturedProof);check();const context=output.getContext('2d')!;
    // Keep the existing 65,536-pixel allocation ceiling while avoiding eight
    // source/worker round trips for a small 256-square frame. Native scene
    // evaluation still precedes frame filtering and the actual ICC transform.
    const columns=Math.min(2048,Math.max(1,frame.width)),rows=Math.min(2048,Math.floor(65536/columns));
    for(let y=0;y<frame.height;y+=rows)for(let x=0;x<frame.width;x+=columns){
-    check();const width=Math.min(columns,frame.width-x),height=Math.min(rows,frame.height-y),pixels=await scene.read({x,y,width,height},frame),bytes=await display.applyWindow(pixels);check();
+    check();const width=Math.min(columns,frame.width-x),height=Math.min(rows,frame.height-y),pixels=plan&&appearance?this.appearance.read(plan,appearance,{x,y,width,height},frame,scene.document):await scene.read({x,y,width,height},frame),bytes=await display.applyWindow(pixels);check();
     if(!(bytes instanceof Uint8ClampedArray)||!(bytes.buffer instanceof ArrayBuffer))throw new Error('Float display conversion did not return owned sRGB8 samples.');context.putImageData(new ImageData(new Uint8ClampedArray(bytes),width,height),x,y);
    }
    check();accepted=true;return output;
