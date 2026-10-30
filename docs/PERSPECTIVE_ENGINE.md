@@ -79,11 +79,44 @@ without allocating the whole plane. Unknown settings, missing ROI neighbors,
 malformed worker replies, cancelled/disposed work and changed source geometry
 reject. Callers must pin their mask assets and supply lifetime controls.
 
-This implements raw coverage projection only. Actual mask geometry/bitmap/stroke
-field capture, mask offsets/bases, document-space feathering, inversion/density,
-linked/unlinked scene selection and public editing remain integration work.
-Applying image-quad clipping or source-space feathering to this dependency would
-change the established mask semantics.
+## Captured renderer masks
+
+The trusted `CanvasRenderer.capturePerspectiveMask` read adapter now captures
+existing selection, vector, bitmap, painted and raster-erasure masks, including
+ordered brush/prepared-wet refinements. This is an internal read-only renderer
+surface, rather than a document mutation or isolated scripting binding. It
+requires original/reference dimensions, placed layer dimensions and exact
+world-space target corners. Linked mask offsets/bases map into the original
+pixel plane; unlinked masks retain document coordinates independently of those
+corners. Control-point/selection/stroke hulls and native bitmap dimensions bound
+finite deviations, with source-grid antialias padding. Raster-erasure capture
+dimensions retain their existing nonuniform-resize semantics.
+Prepared-wet reconstruction receives sampling padding in the native mask plane
+before the layer-to-original mapping, retaining its tails at large native scale.
+
+Raw coverage comes from the established mask rasterizer in bounded source-grid
+canvases. Its byte alpha becomes float32 coverage. Infinite paint-base coverage
+uses the rasterizer's actual alpha word, avoiding a seam between finite support
+and its background. This preserves the current byte-mask source role: float
+display thumbnails are rejected as bitmap/texture/prepared-tile sources.
+Captured mask values are immutable; bitmap identities/geometry, asset-store
+lifetime, renderer epoch and operation controls guard every awaited read.
+Closing a capture, retiring its renderer or losing a source rejects pending
+output. Captures own temporary texture caches only when no host cache is lent.
+
+Projection precedes the established feather shape: three horizontal/vertical
+fractional-box pass pairs with radius `feather / 3`. Complete halos and float32
+intermediates preserve partition identity. Inversion and density apply once,
+after feathering, in document-pixel space. Disabled/zero-density masks produce
+full coverage after normal source/geometry validation. Source, convolution and
+output windows each retain the 262,144-sample working budget; support and
+original dimensions are not capped. This is native document-plane coverage;
+viewport resampling remains a separate renderer responsibility.
+
+Public layer perspective state, commands/controls, connected scene selection,
+hit testing, persistence, automation and native file delivery remain integration
+work. Public transforms are still affine. Applying image-quad clipping or
+source-space feathering here would change the established mask semantics.
 
 There is no document schema migration, new public DOM constructor, mutation
 command, REST route, isolated script binding, plugin grant, account or upload in

@@ -8490,3 +8490,83 @@ commands/controls, hit testing, Undo, persistence, isolated scripting, REST,
 recipes and interchange still require connected perspective integration.
 General warp and every other unfinished original professional-editor release
 gate remain required; the complete roadmap goal is active.
+
+### 2026-10-30 — F03 captured perspective masks and native document feather
+
+Owner: implementation agent; baseline `394db68`; classification: progress toward
+the complete original-preserving perspective workflow. The previous verified
+increment supplied raw scalar projection. Current implementation connects real
+mask geometry/assets and final document-plane coverage through the trusted
+renderer, while public layer perspective authoring remains required.
+
+`CanvasRenderer.capturePerspectiveMask` now captures immutable selection,
+vector, bitmap, painted and raster-erasure masks, ordered brush/prepared-wet
+refinements, offsets/bases and erasure capture dimensions. Native bitmap extents
+and conservative geometric hulls bound finite deviations without allocating a
+whole support plane. Linked masks project from the original pixel grid through
+the exact world corners; unlinked masks stay in document coordinates. The
+infinite background uses the byte rasterizer's actual alpha word, preserving
+paint-base continuity. Asset identity/geometry, store/capture/renderer lifetime
+and cancellation checks guard every awaited read. Float display thumbnails
+remain invalid coverage sources under the existing byte-asset role contract.
+
+Source inspection confirmed that established mask feathering uses three
+fractional-box horizontal/vertical pass pairs. The existing native positive
+float convolution now accepts checked box weights alongside its unchanged
+Gaussian default. Complete halos and float32 intermediates retain that shape,
+pass order and finite support after projection; inversion/density apply once
+afterward. Source/convolution/output working planes remain at most 262,144
+samples, independently of original/support resolution. Captures release owned
+temporary caches and source pins on disposal. [Contract](PERSPECTIVE_ENGINE.md).
+
+Verification on the corrected frozen implementation:
+
+- Full `npm run build` passes with **43 developer guides**. All **3,065 unit/API
+  tests in 297 files**, **53 affected source-browser checks** and **24 selected
+  production checks** pass. Browser matrices have no skips, retries, flakes or
+  failures. These production checks cover the affected native/float workflows,
+  rather than another complete production-suite run.
+- Independent SciPy references cover **95,885 samples** across five native
+  six-pass feather settings; nine real mask-capture scenarios compare **90,513
+  final coverage samples** using independent NumPy/SciPy projection, feather
+  and settings. Maximum absolute error is **5.960464477539063e-8**, within the
+  declared `2^-21` gate. Partitioned reads are bit-identical. Unlinked masks
+  remain bit-identical when layer target corners change.
+- A genuine **10000 × 5000 PNG bitmap mask** retains complete native bitmap
+  geometry and original SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`.
+  Distant native alpha at `(9000,4000)` remains `128/255` (float32), followed by
+  zero at the next pixel. All **144 perspective/feather output samples** match
+  an independent Pillow PNG-crop/NumPy/SciPy reference exactly, SHA-256
+  `8362f62f0cef06fc6e5cecaf9d37d48ab34955b57a83809e0c24b76eab9e8321`.
+  The largest observed working canvas during that capture is **3,150 pixels**.
+  This is a verified small native output window over a real 50 MP original,
+  not a comparison of every possible transformed mask output or a process-memory
+  bound. Existing complete 50 MP processing/shadow and original-window checks
+  pass separately.
+- Genuine float thumbnails reject as mask sources. Lost sources, renderer
+  retirement, disposal and cancellation after the first actual native filter
+  reject without changing the document; a fresh capture succeeds. The production
+  worker rejects invalid box settings/halos and retains successful native retry.
+- Product sources remain exact from the final unit run through both browser
+  matrices. All **145 served release resources** retain their recorded hashes.
+  The native pixel WASM is unchanged, SHA-256
+  `bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+
+A native-scale review exposed a real wet-mask support defect: padding after an
+8× layer-to-original mapping clipped **84 of 1,280** coverage samples. Padding
+the native mask plane before that mapping corrects all **1,280 samples exactly**;
+the regression remains in the final matrix. The initial lifecycle pilot also
+called nonexistent `clear()`; its corrected `clearCache()` check verifies actual
+renderer retirement. Original failures and successful corrected runs are retained.
+
+[Complete evidence](benchmarks/projective-masks-2026-10-30.json.gz),
+**2,250,895 bytes**, SHA-256
+`ddf5aa1b8ae6d8be2fa2f7b424db152a296a0ff2f3ec6f5dcc1cfcb8d02426dd`.
+
+Public transforms remain affine and schema remains 49. Public perspective constructors/state,
+shared commands/Undo, authoring controls, scene content/mask selection, hit
+testing, persistence, scripts/REST/recipes and native file delivery still require
+connected integration. General warp, broader professional color/tool/workflow
+scope, sustained performance/device/photographic acceptance and all other
+unfinished original roadmap gates remain required. The full goal remains active.

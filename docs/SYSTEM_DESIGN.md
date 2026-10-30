@@ -954,3 +954,13 @@ Node native TIFF preparation is globally serialized and final publication follow
 ## Private projective sampling invariant
 
 Authored target corners, rather than reconstructed matrix corners, own coverage. Strict convexity, singularity/horizon and representable-center preflight precede reads. Local rebasing protects coordinate precision; premultiplied float64 interpolation returns owned finite float32 windows. Original leases and operation lifetime controls remain caller-owned. Sparse footprint splitting bounds transient reads independently of source resolution. This adds no document mutation or public/plugin/REST authority; connected perspective integration remains required. [Contract](PERSPECTIVE_ENGINE.md).
+
+The private perspective-mask capture now preserves full native bitmap support,
+selection/vector/stroke geometry and ordered refinements as a finite deviation
+field over its actual rasterized constant background. Linked offsets/bases map
+to the original pixel plane; unlinked masks remain in document coordinates.
+Three fractional-box feather pass pairs operate after projection in document
+pixels, before inversion/density. Every read/convolution has a complete bounded
+halo; source geometry and asset/renderer/capture lifetimes remain authoritative
+across awaits. Public document perspective state/commands and connected scene,
+selection, file and automation surfaces remain pending.

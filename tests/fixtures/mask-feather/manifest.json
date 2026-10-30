@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "source": {
+    "x": -179,
+    "y": -169,
+    "width": 409,
+    "height": 385
+  },
+  "output": {
+    "x": -50,
+    "y": -40,
+    "width": 151,
+    "height": 127
+  },
+  "sourceSha256": "32ac957acb435ec6293fbe808910d4361cae37f45ebed43c4564af57ecdf154f",
+  "absoluteError": 4.76837158203125e-07,
+  "numpy": "1.26.4",
+  "scipy": "1.13.0",
+  "reference": "SciPy float64 separable fractional box convolution, float32 after each of six passes.",
+  "cases": [
+    {
+      "feather": 0,
+      "reference": "feather-0.f32le.gz",
+      "floatSha256": "8d78aa52f9edc7d855cd4f08038b817d07a9b38067eb665573bc170863a32c70"
+    },
+    {
+      "feather": 0.1,
+      "reference": "feather-0.1.f32le.gz",
+      "floatSha256": "9c7c8cf7b21aca2e2991bcc17e677f2b8e1f74dcfd647409a2ff4ce0e7445a03"
+    },
+    {
+      "feather": 2.5,
+      "reference": "feather-2.5.f32le.gz",
+      "floatSha256": "469689a804972dcfe0346ca1ff90d0e26da5e0c3d844e1f9987f60659c2dfe83"
+    },
+    {
+      "feather": 7.75,
+      "reference": "feather-7.75.f32le.gz",
+      "floatSha256": "04f58981d8464f99c0190a3b32fd1e5b403321815b647364bc01e0566f61c487"
+    },
+    {
+      "feather": 128,
+      "reference": "feather-128.f32le.gz",
+      "floatSha256": "f737573abaae7f37d3d7c06719a7e5883c8ccecbe292167e3b20dc3e42de95e5"
+    }
+  ]
+}

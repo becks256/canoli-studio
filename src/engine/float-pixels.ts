@@ -1,4 +1,4 @@
-import{floatConvolutionSchema,floatConvolutionLength,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
+import{floatConvolutionSchema,floatConvolutionLength,floatConvolutionRadius,fractionalBoxWeights,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
 import {floatTonalOptionsSchema, type FloatTonalOptions} from '../core/float-tonal';
 import{gaussianWeights}from'../core/smart/spatial-filter';
 import{compileFloatStyle}from'../core/float-style';
@@ -77,10 +77,10 @@ export class FloatPixelProcessor{
  }
  convolveAlpha(alpha:Float32Array,input:FloatConvolutionOptions):Float32Array<ArrayBuffer>{
   const kernel=this.owner(),settings=floatConvolutionSchema.parse(input),length=floatConvolutionLength(settings);validateFloatAlpha(alpha,settings.width*settings.height);
-  const weights=gaussianWeights(settings.sigma),source=Math.ceil(kernel.bufferOffset()/8)*8,output=source+alpha.length*4,coefficients=Math.ceil((output+length*4)/8)*8,required=coefficients+weights.byteLength;
+  const weights=settings.kernel==='box'?fractionalBoxWeights(settings.radius):gaussianWeights(settings.sigma),source=Math.ceil(kernel.bufferOffset()/8)*8,output=source+alpha.length*4,coefficients=Math.ceil((output+length*4)/8)*8,required=coefficients+weights.byteLength;
   if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
   new Float32Array(kernel.memory.buffer,source,alpha.length).set(alpha);new Float64Array(kernel.memory.buffer,coefficients,weights.length).set(weights);
-  checked(kernel.convolveAlphaFloat(source,output,coefficients,settings.width,settings.height,Math.ceil(settings.sigma*3),settings.axis==='horizontal'?0:1));
+  checked(kernel.convolveAlphaFloat(source,output,coefficients,settings.width,settings.height,floatConvolutionRadius(settings),settings.axis==='horizontal'?0:1));
   const result=new Float32Array(new Float32Array(kernel.memory.buffer,output,length));validateFloatAlpha(result,length);return result;
  }
  private layout(pixels:number,masked=false,extra=0){

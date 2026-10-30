@@ -1,3 +1,4 @@
+import {capturePerspectiveMask} from './projective-mask';
 import {nativeVectorFootprint} from './native-vector-footprint';
 import{isFloatDocument}from'../core/float-document';
 import{FloatSceneRenderer,type CapturedFloatScene,type FloatSceneControl}from'./float-scene';
@@ -259,6 +260,12 @@ export class CanvasRenderer implements DocumentRenderer {
       this.styledIds.set(layer, identity);
     }
     return `styled:${identity}:${JSON.stringify(documentTransform)}`;
+  }
+
+  /** Trusted read-only capture; callers own its lifetime across awaited reads. */
+  capturePerspectiveMask(mask:LayerMaskData,options:import('./projective-mask').PerspectiveMaskOptions,assets:AssetStore,control:import('./float-projection').FloatProjectionControl={}){
+    const epoch=this.epoch,isCancelled=control.isCancelled;
+    return capturePerspectiveMask(mask,options,assets,this.processor,{...control,isCancelled:()=>{if(this.epoch!==epoch)throw new Error('Perspective mask renderer was cleared.');return!!isCancelled?.();}},this.brushTextures);
   }
 
   async renderMaskCoverage(
