@@ -946,3 +946,7 @@ UI's source and selection to match the live model. Equivalent ordered IDs retain
 authority; pan remains independent of selection within the same owner. Alignment
 reference/key and scale drafts encode complete ordered ID arrays unambiguously;
 delimiter-containing imported IDs cannot share another selection's draft state.
+
+## Independent REST precision-source invariant
+
+Node native TIFF preparation is globally serialized and final publication follows independent per-batch checks, complete source/native/color identities and a real validated PNG thumbnail. Service-created private files are disposable; reads reverify encoded bytes even on decoded-cache hits, and repair preserves the exact original/interpretation and document history. Source windows use raw encoded coordinates; affine orientation belongs to the layer. Disconnect, revision changes, document deletion and service disposal cancel owned work and release private derivatives. No bitmap is fabricated and no source-file path is exposed to requests. [Contract](REST_TIFF.md).

@@ -9,7 +9,8 @@ import {decodeAvifFile} from './interchange/avif/client';
 import {hasAvifBrand} from './interchange/avif/sniff';
 import {ownRawSource,verifyRawSource,type RawImageSource} from './interchange/raw/source';
 import {avifDecodeOptionsSchema,type AvifDecodeOptions,type AvifDecodeSettings,type AvifImportReport} from './interchange/avif/types';
-import {tiffDecodeOptionsSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl,type TiffFloatColor} from './interchange/tiff/types';
+import {tiffDecodeOptionsSchema,tiffFloatColorSchema,type TiffDecodeOptions,type TiffDecodeSettings,type TiffImportControl,type TiffFloatColor} from './interchange/tiff/types';
+import {FLOAT_SOURCE_NATIVE_SHA} from './float-source/types';
 
 export interface SerializedAsset {
   id: string;
@@ -117,6 +118,16 @@ export class AssetStore {
   installEncoded(input:Omit<ImageAsset,'bitmap'|'thumbnail'>):ImageAsset{
     if(input.blob.type!=='image/png'||!Number.isSafeInteger(input.width)||!Number.isSafeInteger(input.height)||input.width<=0||input.height<=0||!Number.isSafeInteger(input.width*input.height*4))throw new Error('Invalid encoded PNG asset geometry.');
     const asset:ImageAsset=Object.freeze({...input,...(input.raw?{raw:ownRawSource(input.raw)}:{}),thumbnail:'',get bitmap():ImageBitmap{throw new Error('This encoded image has no browser bitmap. Use the headless pixel decoder.');}});
+    encodedRecords.add(asset);return this.install(asset,false);
+  }
+
+  /** Trusted encoded host only, after validating the complete original, native
+   * samples and bounded sRGB PNG thumbnail. No browser bitmap is fabricated. */
+  installEncodedTiff(input:Omit<ImageAsset,'bitmap'>):ImageAsset{
+    const tiff=Object.freeze(tiffDecodeOptionsSchema.parse(input.tiff)),color=tiffFloatColorSchema.parse(input.tiffColor);
+    if(input.blob.type!=='image/tiff'||tiff.editingPrecision!=='float32'||color.wasmSha256!==FLOAT_SOURCE_NATIVE_SHA||input.raw||input.avif||![input.width,input.height].every(value=>Number.isSafeInteger(value)&&value>0)||!Number.isSafeInteger(input.width*input.height*4)||typeof input.thumbnail!=='string'||!input.thumbnail.startsWith('data:image/png;base64,')||input.thumbnail.length>(96*96*8+65536)*2)throw new Error('A verified native float TIFF and bounded encoded preview are required.');
+    Object.freeze(color.source);Object.freeze(color.warnings);Object.freeze(color);
+    const asset:ImageAsset=Object.freeze({...input,tiff,tiffColor:color,get bitmap():ImageBitmap{throw new Error('This native TIFF has no browser bitmap. Use its verified float source service.');}});
     encodedRecords.add(asset);return this.install(asset,false);
   }
 

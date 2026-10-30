@@ -120,3 +120,7 @@ serialize this cache. Versioned float Document/OO commands, actual scene/effects
 masks/tools/display, authored persistence/Undo/recovery, precision scene/batch
 delivery, scoped automation, broader HDR/CMYK and physical/device/performance
 acceptance remain required. REST sessions remain independent of the browser.
+
+## Independent Node source service
+
+The Node REST host now prepares the same pinned native linear-sRGB tiles through a separate private file service. Browser IndexedDB ownership is unchanged. Both actual reader workers share bounded window assembly, compressed/raw verification and a decoded LRU; Node sources are bound to exact accepted original/asset identities and rebuilt from originals after corrupt reads. [REST window/ownership contract](REST_TIFF.md).

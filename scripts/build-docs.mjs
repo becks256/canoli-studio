@@ -58,6 +58,7 @@ const generatedPages = [
   ["COLOR_DELIVERY", "Profile-aware batch and recipe delivery"],
   ["RAW_TIFF", "Native RAW master TIFF delivery"],
   ["FLOAT_TIFF", "Float TIFF input and retained precision"],
+  ["REST_TIFF", "Verified high-precision REST TIFF sources"],
   ["FLOAT_PROCESSING", "Native float pixel processing dependency"],
   ["FLOAT_SOURCES", "Owned float originals and derived tiles"],
   ["FLOAT_DOCUMENTS", "Float document editing"],

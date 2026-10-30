@@ -3,6 +3,10 @@ import {historyTargetSchema, historyRegionSchema, historyComparisonChangesSchema
 import {historyTimeline,inspectHistoryChange} from '../src/core/history-inspection';
 import {validateServerProjectSources} from "./project";
 import {inspectServerRaw} from "./raw";
+import {ServerTiffService} from './tiff';
+import {importServerTiff} from './tiff-document';
+import {tiffDecodeOptionsSchema} from '../src/core/interchange/tiff/types';
+import {validateWindow} from '../src/core/float-source/types';
 import {prepareServerFont} from './fonts';
 import {embedOptionsSchema,relinkOptionsSchema} from '../src/dom/fonts';
 import {importServerRaw,developServerRawComponent} from "./raw-document";
@@ -34,7 +38,7 @@ import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { Document, LayerGroup, RasterLayer, VectorLayer } from "../src/dom";
-import { AssetStore } from "../src/core/assets";
+import { AssetStore,type ImageAsset } from "../src/core/assets";
 import { BLEND_MODES, id, findLayer, allLayers, type DocumentData } from "../src/core/model";
 import {visitLayerAssets} from '../src/core/asset-references';
 import { validateWetPaintAssets, wetDocumentOperations,commandHasWetPaint } from '../src/core/wet-assets';
@@ -73,6 +77,8 @@ export interface ServerGenerationRequest {
 
 export interface ApiServerOptions {
   authToken?: string;
+  /** Private, disposable native TIFF caches; defaults to the OS temporary directory. */
+  precisionCacheDirectory?:string;
   /** Explicit host integration. Returns decoded RGBA; owns provider authorization/billing. */
   executeGeneration?: (
     request: ServerGenerationRequest,
@@ -106,6 +112,7 @@ interface DocumentSession {
 }
 
 export function createApiServer(options: ApiServerOptions = {}) {
+  const tiffSources=new ServerTiffService(options.precisionCacheDirectory);
   const configuredToken =
     options.authToken ??
     process.env.LUMA_API_KEY ??
@@ -117,6 +124,11 @@ export function createApiServer(options: ApiServerOptions = {}) {
   const jobSignatures = new Map<string, string>();
   const controllers = new Map<string, AbortController>();
   const selectionControllers = new Map<AbortController, string>();
+  const tiffMetadata=(asset:ImageAsset)=>{
+    if(asset.tiff?.editingPrecision!=='float32')return{};
+    const source=tiffSources.forAsset(asset),d=source.manifest.descriptor;
+    return{tiff:asset.tiff,precisionSource:{format:'rgba-float32-le',colorSpace:'linear-srgb',sourceSha256:d.sourceSha256,orientation:d.orientation,nativeWasmSha256:d.nativeWasmSha256},color:asset.tiffColor};
+  };
 
   const pruneJobs = () => {
     if (allJobs.size <= 100) return;
@@ -155,10 +167,10 @@ export function createApiServer(options: ApiServerOptions = {}) {
     response.end(JSON.stringify(value));
   };
 
-  async function rawScope<T>(document:Document,assets:AssetStore,control:RawImportControl,work:(control:RawImportControl,check:()=>void,beforeCommit:()=>void)=>Promise<T>):Promise<T>{
+  async function rawScope<T>(document:Document,assets:AssetStore,control:RawImportControl,work:(control:RawImportControl,check:()=>void,beforeCommit:()=>void)=>Promise<T>,operation='RAW'):Promise<T>{
     control.signal?.throwIfAborted();const revision=document.getSnapshot().revision,alive=assets.captureLifetime(),abort=new AbortController(),cancel=()=>abort.abort(control.signal?.reason);
     control.signal?.addEventListener('abort',cancel,{once:true});selectionControllers.set(abort,document.id);
-    const check=()=>{abort.signal.throwIfAborted();alive();const session=sessions.get(document.id);if(!session||session.document!==document||session.assets!==assets||document.getSnapshot().revision!==revision)throw new Error('Document session changed during RAW preparation.');};
+    const check=()=>{abort.signal.throwIfAborted();alive();const session=sessions.get(document.id);if(!session||session.document!==document||session.assets!==assets||document.getSnapshot().revision!==revision)throw new Error(`Document session changed during ${operation} preparation.`);};
     const stop=document.subscribe(()=>{try{check();}catch(error){abort.abort(error);}});
     try{return await work({signal:abort.signal,onProgress:control.onProgress},check,()=>{check();stop();});}
     finally{stop();control.signal?.removeEventListener('abort',cancel);selectionControllers.delete(abort);}
@@ -233,7 +245,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
       );
       response.setHeader(
         "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, X-API-Key, X-Asset-Name, X-Asset-Width, X-Asset-Height, X-Font-Options",
+        "Content-Type, Authorization, X-API-Key, X-Asset-Name, X-Asset-Width, X-Asset-Height, X-Font-Options, X-Raw-Options, X-Tiff-Options",
       );
       response.writeHead(204);
       response.end();
@@ -408,8 +420,9 @@ export function createApiServer(options: ApiServerOptions = {}) {
       }
 
       // Document scoped endpoints: /api/v1/documents/:id/...
-      const docMatch = path.match(
-        /^\/api\/v1\/documents\/([^/]+)(?:\/(fonts|commands|undo|redo|history|history-branches|history-comparisons|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|project))?(?:\/([^/]+))?$/,
+      const floatWindow=/^\/api\/v1\/documents\/[^/]+\/assets\/[^/]+\/float-window$/.test(path);
+      const docMatch = (floatWindow?path.slice(0,-'/float-window'.length):path).match(
+        /^\/api\/v1\/documents\/([^/]+)(?:\/(fonts|commands|undo|redo|history|history-branches|history-comparisons|assets|jobs|apply-candidate|tonal-sculpt|selection-modify|color-range|alpha-channel-load|quick-selection|select-subject|refine-edge|preflight|vector-boolean|raw-import|raw-inspect|raw-develop|tiff-import|tiff-inspect|project))?(?:\/([^/]+))?$/,
       );
       if (!docMatch || !sessions.has(docMatch[1])) {
         send(response, 404, { error: "Document or endpoint not found." });
@@ -420,6 +433,36 @@ export function createApiServer(options: ApiServerOptions = {}) {
       const document = session.document;
       const subresource = docMatch[2];
       const subresourceId = docMatch[3];
+      if(floatWindow){
+        if(method!=='GET'){send(response,405,{error:'Use GET for a native TIFF source window.'});return;}
+        const revision=document.getSnapshot().revision,parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined});
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        if(!session.assets.has(subresourceId)){send(response,404,{error:'Source asset not found.'});return;}
+        const bounds=validateWindow({x:url.searchParams.has('x')?Number(url.searchParams.get('x')):0,y:url.searchParams.has('y')?Number(url.searchParams.get('y')):0,width:Number(url.searchParams.get('width')),height:Number(url.searchParams.get('height'))}),asset=session.assets.get(subresourceId),source=tiffSources.forAsset(asset),abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Native TIFF read disconnected.'));};response.on('close',close);
+        try{
+          const pixels=await rawScope(document,session.assets,{signal:abort.signal},async(control,current)=>{const result=await source.readWindow(bounds,{signal:control.signal,onProgress:current});current();if(session.assets.get(asset.id)!==asset)throw new Error('Native TIFF source asset changed.');return result;},'TIFF');
+          let bytes=new Uint8Array(pixels.buffer,pixels.byteOffset,pixels.byteLength);
+          if(new Uint8Array(new Uint16Array([1]).buffer)[0]!==1){bytes=new Uint8Array(pixels.byteLength);const view=new DataView(bytes.buffer);for(let index=0;index<pixels.length;index++)view.setFloat32(index*4,pixels[index],true);}
+          response.writeHead(200,{'Content-Type':'application/octet-stream','Content-Length':bytes.byteLength,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Canoli-Pixel-Format':'rgba-float32-le','X-Canoli-Color-Space':'linear-srgb','X-Canoli-Document-Revision':String(revision),'X-Canoli-Source-Sha256':source.manifest.descriptor.sourceSha256,'X-Canoli-Source-Orientation':String(source.manifest.descriptor.orientation),'Access-Control-Expose-Headers':'X-Canoli-Pixel-Format, X-Canoli-Color-Space, X-Canoli-Document-Revision, X-Canoli-Source-Sha256, X-Canoli-Source-Orientation'});response.end(Buffer.from(bytes));
+        }catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during native TIFF reading.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during native TIFF reading.',revision:document.getSnapshot().revision});else throw error;}
+        finally{response.off('close',close);}return;
+      }
+      if((subresource==='tiff-import'||subresource==='tiff-inspect')&&!subresourceId&&method==='POST'){
+        const revision=document.getSnapshot().revision,parsed=revisionSchema.parse({expectedRevision:url.searchParams.has('expectedRevision')?Number(url.searchParams.get('expectedRevision')):undefined});
+        if(parsed.expectedRevision!==revision){send(response,409,{error:'Revision conflict. Read the document and retry.',revision});return;}
+        const header=request.headers['x-tiff-options'];if(header!==undefined&&typeof header!=='string')throw new Error('Invalid TIFF options header.');const options=tiffDecodeOptionsSchema.parse(JSON.parse(header??'{}'));
+        if(subresource==='tiff-import'&&options.editingPrecision!=='float32')throw new Error('Native TIFF import requires explicit editingPrecision float32.');
+        const mime=(request.headers['content-type']??'application/octet-stream').split(';')[0].trim();if(!['image/tiff','application/octet-stream'].includes(mime))throw new Error('Send binary TIFF original bytes.');
+        const name=z.string().min(1).max(240).parse(url.searchParams.get('name')??request.headers['x-asset-name']??'TIFF image'),abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Native TIFF import disconnected.'));};response.on('close',close);
+        try{
+          const result=await rawScope(document,session.assets,{signal:abort.signal},async(control,current,beforeCommit)=>{
+            const bytes=await readRawBody(request);current();const blob=new Blob([new Uint8Array(bytes)],{type:'image/tiff'});
+            if(subresource==='tiff-inspect'){const report=await tiffSources.inspect(blob,{signal:control.signal,onProgress:current});current();return{report};}
+            return importServerTiff(document,session.assets,tiffSources,blob,name,options,{signal:control.signal,onProgress:current},current,beforeCommit);
+          },'TIFF');send(response,subresource==='tiff-inspect'?200:201,{...snapshot(document),...result});
+        }catch(error){if(!sessions.has(document.id))send(response,404,{error:'Document was deleted during native TIFF import.'});else if(document.getSnapshot().revision!==revision)send(response,409,{error:'Document changed during native TIFF import.',revision:document.getSnapshot().revision});else throw error;}
+        finally{response.off('close',close);}return;
+      }
       if(subresource==='fonts'&&!subresourceId&&method==='GET'){send(response,200,{id:document.id,revision:document.getSnapshot().revision,fonts:document.fonts.items,files:document.fonts.files.items.map(file=>file.toJSON())});return;}
       if(subresource==='fonts'&&subresourceId&&method==='GET'){
         const file=document.fonts.files.getById(subresourceId);if(!file){send(response,404,{error:'Font file not found.'});return;}
@@ -478,7 +521,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
         const state=document.getSnapshot(),history=url.searchParams.get('history')==='true'?captureRetainedHistory(state):undefined;
         const abort=new AbortController(),close=()=>{if(!response.writableEnded)abort.abort(new Error('Project download disconnected.'));};response.on('close',close);selectionControllers.set(abort,document.id);
         try{
-          await validateServerProjectSources(state.document,session.assets,history,abort.signal);
+          await validateServerProjectSources(state.document,session.assets,history,abort.signal,asset=>{tiffSources.forAsset(asset);});
           const file=await serializeProject(state.document,session.assets,history),bytes=await file.arrayBuffer();abort.signal.throwIfAborted();
           if(sessions.get(document.id)!==session)throw new Error('Document was deleted during project encoding.');
           response.writeHead(200,{'Content-Type':'application/x-luma','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store'});response.end(Buffer.from(bytes));
@@ -615,6 +658,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
         sessions.delete(document.id);
         for (const [controller,documentId] of selectionControllers)
           if (documentId === document.id) controller.abort(new Error("Document was deleted."));
+        session.assets.dispose();await tiffSources.releaseDocument(document.id);
         send(response, 200, { deleted: document.id });
         return;
       }
@@ -776,6 +820,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
               name: a.name,
               width: a.width,
               height: a.height,
+              ...tiffMetadata(a),
               ...(a.raw?{raw:rawSourceMetadata(a.raw)}:{}),
             })),
           });
@@ -788,9 +833,13 @@ export function createApiServer(options: ApiServerOptions = {}) {
             return;
           }
           const asset = session.assets.get(subresourceId);
+          if(url.searchParams.get('preview')==='true'){
+            const source=tiffSources.forAsset(asset),bytes=await source.preview.arrayBuffer();response.writeHead(200,{'Content-Type':'image/png','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Canoli-Preview-Only':'true'});response.end(Buffer.from(bytes));return;
+          }
           if(url.searchParams.get('original')==='true'){
-            if(!asset.raw){send(response,404,{error:'No retained RAW original for this asset.'});return;}
-            const blob=asset.raw.originalBlob,bytes=await blob.arrayBuffer();response.writeHead(200,{'Content-Type':blob.type||'application/octet-stream','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store'});response.end(Buffer.from(bytes));return;
+            const blob=asset.raw?.originalBlob??(asset.tiff?.editingPrecision==='float32'?tiffSources.forAsset(asset).original:undefined);
+            if(!blob){send(response,404,{error:'No retained RAW or verified TIFF original for this asset.'});return;}
+            const bytes=await blob.arrayBuffer();response.writeHead(200,{'Content-Type':blob.type||'application/octet-stream','Content-Length':String(bytes.byteLength),'Cache-Control':'no-store'});response.end(Buffer.from(bytes));return;
           }
           const accept = request.headers.accept ?? "";
           const isRaw =
@@ -815,6 +864,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
               height: asset.height,
               mimeType: asset.blob.type || "image/png",
               byteLength: asset.blob.size,
+              ...tiffMetadata(asset),
               ...(asset.raw?{raw:rawSourceMetadata(asset.raw)}:{}),
             },
           });
@@ -1180,6 +1230,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
     for (const controller of controllers.values())
       controller.abort(new Error("Server closed"));
     controllers.clear();
+    void tiffSources.dispose().catch(error=>console.error('Native TIFF cache cleanup failed:',error));
   });
   return server;
 }

@@ -79,7 +79,9 @@ arbitrary original file-size/megapixel cap or downsampling is introduced.
 
 This is trusted file I/O. Isolated Scripts/plugins receive no file chooser,
 profile store/native worker access or new privilege; installation stays inert.
-Independent REST sessions do not gain TIFF rendering or browser synchronization.
+Independent REST sessions can separately [inspect/admit verified high-precision
+TIFF originals and read bounded source windows](REST_TIFF.md). This service does
+not render layer compositions or synchronize browser sessions.
 
 ## Verification and references
 

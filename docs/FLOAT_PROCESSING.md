@@ -111,3 +111,7 @@ persistence/history/recovery, color-managed display/delivery, supported group an
 blend semantics, independent REST/isolated/recipe surfaces as scoped, and physical
 quality/resource/sustained performance acceptance. No public schema, native
 project/workspace container, plugin grant or browser/REST synchronization changes.
+
+## Node source reads and composed processing
+
+The independent Node TIFF service returns verified original-derived linear-sRGB samples only. It shares the actual native preparation and bounded tile reader; layer transforms, masks, adjustments and blending remain separate scene processing. Browser reopening/export is required to validate composed output. [REST source contract](REST_TIFF.md).

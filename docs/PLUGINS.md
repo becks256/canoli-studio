@@ -523,3 +523,7 @@ strict commands, permissions, assets/revisions, five-second/256-command budgets,
 rollback and atomic Undo remain. Completion/cancellation closes both channels and
 removes the iframe/worker. Inert installation, package schema and separate REST
 sessions gain no new capability. Dated acceptance remains in the roadmap.
+
+## Native REST TIFF sources add no plugin grant
+
+Independent REST TIFF admission and source reads use trusted native workers and service-owned files. They expose no plugin permission or isolated global. Installation remains inert; existing granted OO edits still pass source, revision, asset, lock and final commit validation. [REST source ownership and limits](REST_TIFF.md).

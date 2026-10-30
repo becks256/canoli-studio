@@ -340,3 +340,7 @@ state, suppress stale previews and require explicit correction; no HDR blend
 extension or automatic clipping is inferred. The implementation roadmap records
 verification and remaining quality/performance gates. This does not complete
 F10 or the full professional-editor objective.
+
+## Native TIFF REST delivery increment
+
+Verified high-precision TIFF originals and bounded source windows extend independent local REST sessions using shared validation/history and native workers. This is incremental T17/F10/F11 progress; it does not close headless composed rendering, broad color/tools/device/performance gates or the complete roadmap. [Contract and verification boundary](REST_TIFF.md).

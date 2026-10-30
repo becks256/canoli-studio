@@ -4,29 +4,29 @@
 
 Existing strict tonal DTOs pass shared float validation. Signatures/body limits,
 locks, rollback, revisions and Undo remain shared. Actual browser Dodge/Burn uses
-native linear float processing; independent REST still has PNG-only admission
-and no browser float renderer or session synchronization.
+native linear float processing. Independent REST supports verified TIFF source
+admission/windows; it has no composed float renderer or session synchronization.
 [Processing contract](FLOAT_DOCUMENTS.md#native-linear-dodge-and-burn).
 
 ## Float style metadata
 
-Existing strict `layer.update` style DTOs admit Color Overlay and Blend If in float documents, retaining revisions, locks, atomic rollback and Undo. Float raster/group shadow metadata also uses the shared commands; direct adjustment shadows reject atomically. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). Independent REST remains PNG-only for assets, supplies no original float TIFF renderer/admission and does not synchronize with browser tabs. [Exact interpretation and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
+Existing strict `layer.update` style DTOs admit Color Overlay and Blend If in float documents, retaining revisions, locks, atomic rollback and Undo. Float raster/group shadow metadata also uses the shared commands; direct adjustment shadows reject atomically. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). Independent REST supports [verified original TIFF admission and source reads](REST_TIFF.md), with no composed float renderer or live browser synchronization. [Exact interpretation and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).
 
 ## Float proof remains a trusted host surface
 
-Float device proofing adds no REST renderer, original TIFF admission or browser synchronization. Shared document precision/adjustment edits retain existing OO commands and Undo; profile resources, preferences and proof workers stay in the trusted browser host. [Contract and current verification](FLOAT_PROOFING.md).
+Float device proofing remains a browser-host service. Independent [REST TIFF admission/source reads](REST_TIFF.md) provide no proof renderer or browser synchronization. Shared document precision/adjustment edits retain existing OO commands and Undo; profile resources, preferences and proof workers stay in the trusted browser host. [Contract and current verification](FLOAT_PROOFING.md).
 
 ## Continuous float palette and lookup controls
 
-Existing strict adjustment layer commands admit Gradient Map and Color Lookup metadata in float documents with shared revision/locks/rollback/Undo. Required fields, finite tables and original command/body limits remain unchanged. Independent REST remains PNG-only and supplies neither a browser float renderer nor original TIFF admission/synchronization. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
+Existing strict adjustment layer commands admit Gradient Map and Color Lookup metadata in float documents with shared revision/locks/rollback/Undo. Required fields, finite tables and original command/body limits remain unchanged. Independent REST supports [original TIFF admission/source reads](REST_TIFF.md), with no composed float renderer or browser synchronization. [Exact contracts and verification](FLOAT_DOCUMENTS.md#continuous-gradient-map-and-color-lookup).
 
 ## Continuous float color controls
 
-Existing strict `layer.add` and `layer.update` accept the same HSL, Color Balance and Vibrance DTOs in float documents, with shared revisions, locks, atomic rollback and Undo. Headless REST retains PNG-only asset admission and supplies neither native float TIFF admission/rendering nor browser synchronization. Pixel-domain failures belong to actual browser rendering/delivery. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
+Existing strict `layer.add` and `layer.update` accept the same HSL, Color Balance and Vibrance DTOs in float documents, with shared revisions, locks, atomic rollback and Undo. Headless REST supports [native TIFF original admission and source windows](REST_TIFF.md), with no composed float renderer or browser synchronization. Pixel-domain failures belong to actual browser rendering/delivery. [Exact controls, defaults, errors and limits](FLOAT_DOCUMENTS.md#continuous-hsl-color-balance-and-vibrance).
 
 ## Initial float document workflow (F10)
 
-The shared strict command {type: "document.precision.float", sources?: {layerId: string, assetId: string}[]} and schema-49 state also apply to independent REST documents. Optional replacements target distinct existing raster layers and remain subject to original-source validation. REST original admission remains PNG-only; it supplies no original unsigned 16-bit or float32 TIFF rasters or browser renderer/synchronization. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
+The shared strict command {type: "document.precision.float", sources?: {layerId: string, assetId: string}[]} and schema-49 state also apply to independent REST documents. Optional replacements target distinct existing raster layers and remain subject to original-source validation. REST can admit original unsigned 16-bit or float32 TIFF rasters through its [verified native source service](REST_TIFF.md). Source windows precede layer composition; no browser synchronization is provided. Trusted browser imports/output and isolated OO edits have separate contracts. [Exact signatures, defaults, errors, limits and verification](FLOAT_DOCUMENTS.md).
 
 ## Float White Balance metadata
 
@@ -34,8 +34,8 @@ Existing strict `layer.add`/`layer.update` commands also admit
 `{kind: 'white-balance', temperature, tint}` in float documents. Required finite
 controls keep 2000–25000 K and −100–100 tint, including fractions; neutral is
 6504 K / tint 0. Validation, locks, expected revisions, atomic rollback and Undo
-are shared. Independent REST still has PNG-only originals and no float renderer
-or browser synchronization. Native host processing and its range/output errors
+are shared. Independent REST admits [verified TIFF originals](REST_TIFF.md),
+without a composed float renderer or browser synchronization. Native host processing and its range/output errors
 are documented in [FLOAT_DOCUMENTS.md](FLOAT_DOCUMENTS.md#linear-white-balance).
 
 ## Float blend metadata
@@ -45,7 +45,8 @@ float layer types; groups also retain pass-through. Independent REST sessions
 share validation, expected revisions, atomic commands and exact Undo/Redo.
 Pixel-domain validation belongs to actual browser rendering/delivery: artistic
 modes require normalized linear RGB, while Normal retains finite extended RGB.
-REST asset admission remains PNG-only and gains no float source or renderer.
+REST admits [verified TIFF originals/source windows](REST_TIFF.md); blend output
+requires actual browser composition.
 See [the exact blend contract and limits](FLOAT_DOCUMENTS.md#artistic-blend-modes).
 
 ## Owned float source storage dependency
@@ -298,7 +299,7 @@ signatures, mutable-input copies, allowed host services, result validation,
 
 ## Trusted TIFF file import
 
-Browser application code can call `editor.inspectTiff(file, control?)` and `editor.openTiff(file, {page?: number, allowPrecisionLoss?: boolean}, control?)`. These return a validated TIFF capability report; page defaults to 0, precision-loss consent to false. The UI reviews page/codec/color limitations before opening a selected raster page. Original TIFF bytes and decode settings persist independently of editing pixels, including recovery integrity keys. Cancellation, callback errors and changed/disposed host sessions reject without partial publication. See [the complete host contract](SCRIPTING_API.md#tiff-import-trusted-application-code) for supported codecs, sample/color layouts, progress, errors, budgets and the runnable constructor example. File access remains outside isolated scripts/plugins, and no TIFF REST decoder or browser synchronization is added.
+Browser application code can call `editor.inspectTiff(file, control?)` and `editor.openTiff(file, {page?: number, allowPrecisionLoss?: boolean}, control?)`. These return a validated TIFF capability report; page defaults to 0, precision-loss consent to false. The UI reviews page/codec/color limitations before opening a selected raster page. Original TIFF bytes and decode settings persist independently of editing pixels, including recovery integrity keys. Cancellation, callback errors and changed/disposed host sessions reject without partial publication. See [the complete host contract](SCRIPTING_API.md#tiff-import-trusted-application-code) for supported codecs, sample/color layouts, progress, errors, budgets and the runnable constructor example. File access remains outside isolated scripts/plugins, while [independent REST TIFF admission](REST_TIFF.md) has its own native source contract and no browser synchronization.
 
 ## Trusted PDF export
 
@@ -961,3 +962,7 @@ RAW inspection/development and retained asset/project metadata may include `repo
 ### Photoshop clipping remains a trusted file boundary
 
 Supported browser Photoshop pixel clipping imports/exports map to the existing shared `clipped` flag; independent REST retains its existing document command surface and does not acquire a renderer, host file service or synchronization. See [the exact interchange subset and fallbacks](CLIPPING_MASKS.md#editable-photoshop-clipping-subset).
+
+## Verified TIFF originals in independent REST sessions
+
+`POST /api/v1/documents/:id/tiff-inspect` inspects headers/directories; `tiff-import` requires explicit float32 editing and admits verified uint16/float32 originals. `GET .../assets/:assetId/float-window` returns bounded linear-sRGB float32 source bytes before layer placement/composition. All require expectedRevision. Existing original/preview/project retrieval retains complete original bytes and genuine display thumbnails. [Options, response headers, defaults, cancellation, cache repair and limits](REST_TIFF.md).

@@ -1,19 +1,20 @@
 import {retainedDocuments} from '../src/core/history';
 import {Worker} from 'node:worker_threads';
 import {referencedAssets,type DocumentData} from '../src/core/model';
-import type {AssetStore} from '../src/core/assets';
+import type {AssetStore,ImageAsset} from '../src/core/assets';
 import type {RetainedHistory} from '../src/core/history';
 import {verifyRawSource} from '../src/core/interchange/raw/source';
 
 const verified=new WeakMap<Blob,{width:number;height:number}>();
 /** Deliver only actual supported encoded images, not legacy unverified metadata claims. */
-export async function validateServerProjectSources(document:DocumentData,assets:AssetStore,history?:RetainedHistory,signal?:AbortSignal){
+export async function validateServerProjectSources(document:DocumentData,assets:AssetStore,history?:RetainedHistory,signal?:AbortSignal,verifyTiff?:(asset:ImageAsset)=>void){
   const ids=new Set(retainedDocuments(document,history).flatMap(value=>[...referencedAssets(value)]));
   const sources=[...ids].map(id=>assets.get(id));
   for(const asset of sources){
     signal?.throwIfAborted();
+    if(asset.blob.type==='image/tiff'&&verifyTiff){verifyTiff(asset);continue;}
     if(asset.raw){await verifyRawSource(asset.raw,asset.blob,asset.width,asset.height,()=>signal?.throwIfAborted());continue;}
-    if(asset.blob.type!=='image/png')throw new Error('Headless native project delivery requires validated ordinary sRGB PNG or RAW-derived sources. Other metadata-only image formats are not decoded by this server.');
+    if(asset.blob.type!=='image/png')throw new Error('Headless native project delivery requires validated ordinary sRGB PNG, RAW-derived or service-verified high-precision TIFF sources. Other metadata-only image formats are not decoded by this server.');
     let proof=verified.get(asset.blob);
     if(!proof){
       const proof=(async()=>{

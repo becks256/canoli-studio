@@ -8295,3 +8295,60 @@ float tools, photographic/device quality, physical hardware WebGPU, sustained
 editor-wide latency/memory, accessibility, precision/color and every other
 unfinished original professional-editor, AI/provider/evaluation, installed
 ChatGPT/live identity/commercial and release gate remain open.
+
+### 2026-10-30 — T17/F10/F11 verified high-precision REST originals
+
+Owner: implementation agent; baseline `266105b`; classification: progress. The
+preceding goal turn committed native tonal editing and verified delivery. This
+continuation adds genuine high-precision original admission and source reads to
+independent local REST sessions. It retains the complete active roadmap.
+
+Private Node workers reuse the actual TIFF row decoder and pinned native ICC
+engine. Original uint16/float32 bytes and native geometry remain authoritative;
+independently checked lossless tile batches and a real bounded PNG thumbnail
+precede publication. All eight orientations use explicit layer placement.
+Admission uses OO RasterLayer/AffineTransform values and one shared precision/
+layer transaction with ordinary Undo. Verified original/project retrieval retains
+source choices and history for actual browser reopening. Source-window reads
+return owned linear-sRGB float32 bytes in raw encoded coordinates before layer
+composition. No bitmap object, source pixels or conversion receipt is fabricated.
+[Requests, defaults, identities, lifetime, errors and limits](REST_TIFF.md).
+
+The service serializes native preparation, bounds decoded read caches, checks
+file bytes even on cached reads, and rebuilds corrupt derivatives from the
+retained original on retry without editing history. Cancellation, disconnects,
+concurrent document changes, disposal and deletion retain private cleanup and
+atomic publication. PNG-only selection/matting tools keep their existing source
+boundary. There is no headless composed renderer, live browser synchronization,
+new isolated/plugin grant, source downsampling or arbitrary import-size cutoff.
+
+Native/browser pilots verify all eight orientations through actual project
+reopening, independent Pillow float-plane orientation and full native libtiff
+readback. The genuine 10000 × 5000 case streams all **200,000,000 raw source
+samples** through REST; its hash exactly matches the independent native corpus.
+A shared exposure edit, actual browser reopening and full-resolution float TIFF
+export then match all **200,000,000 composed samples** exactly (zero differing
+words/error), including **68,645,155 extended samples** and the complete output
+ICC. Exact original bytes and reopened model are retained. Earlier failed loader/
+checker pilots are retained with their corrected terminal successors.
+
+The final full actual-WASM unit/API regression passes **3,019 tests in 293 files**.
+All **52 affected real-browser cases** pass, including native 50 MP source reads,
+uint16/float32 file readback, cache repair, batched admission, source lifetime and
+float editing/reopening. The final release build passes with **42 generated
+guides**. Hash verification confirms the final release differs from that browser
+candidate only in the completed REST TIFF guide. All **188 production cases** pass with no skips, flakes or retries: the existing
+185-case matrix, all eight REST orientations, genuine 50 MP REST project exchange/
+full native output readback, and the linked **390 px JavaScript-disabled guide**.
+The final production 50 MP result again has exactly zero differing source/output
+words and exact original/profile bytes. Source identities remain exact during
+each recorded terminal matrix. Complete evidence, including earlier failed
+pilots/builds and their successful successors, native records, source/release
+identities and runner scripts: [archive](benchmarks/rest-tiff-2026-10-30.json.gz),
+3,523,043 bytes, SHA-256
+`bc7c51905159f86f15652af5df611ec730f763d4ff5d2dd95c921a8a53d52aba`.
+
+ Full color/rendering/device quality, sustained editor-wide
+latency/memory, broader tools and every other unfinished original roadmap,
+AI/provider/evaluation, installed ChatGPT/live identity/commercial and release
+gate remain required. The full goal remains active.

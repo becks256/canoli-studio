@@ -71,8 +71,8 @@ document.selectedLayer = retouch;
 
 Scripts/plugins gain no worker, pixel, file, profile or network authority. Existing
 grants/source/revision checks and shared Undo apply. Independent REST accepts
-tonal metadata but still has no original float TIFF admission or browser float
-renderer/synchronization. Other tools/layers and broader color/device/performance
+tonal metadata and [verified original TIFF admission/source windows](REST_TIFF.md),
+without a composed float renderer or browser synchronization. Other tools/layers and broader color/device/performance
 gates remain required. The dated roadmap records verification status separately.
 
 ## Opening and changing precision
@@ -197,9 +197,9 @@ The existing isolated execution transaction, expected revision, command limit,
 locks, permission checks and Undo boundary remain authoritative. Plugins require
 their existing document read/write grants; installation remains inert. No new
 file, native or network grant is added. REST accepts the shared structural state
-and strict command in its own independent sessions. Its PNG-only original asset
-admission does not provide original float TIFF sources, render the browser scene
-or synchronize with a browser document.
+and strict command in its own independent sessions. [Native TIFF admission](REST_TIFF.md)
+retains original float sources and provides bounded raw source windows. It does
+not render a composed scene or synchronize with a browser document.
 
 The semantic recipe action `{type: 'document.precision.float'}` records/replays
 the same command against recipient content. Recipe execution does not import
@@ -367,8 +367,8 @@ handles usable. Capture failure/disposal releases the handles, including a
 cancellation that occurs during preparation. No raw pixel, file, worker or native
 permission is exposed to scripts/plugins; installation remains inert. Normal
 source/revision/grant checks guard host commits. Headless REST accepts metadata
-through the same strict commands and remains a separate PNG-only session without
-float source admission/rendering or browser synchronization.
+through the same strict commands and supports [verified TIFF originals/source
+windows](REST_TIFF.md), without a composed renderer or browser synchronization.
 
 Masks/fill/opacity, groups, clipping and blend order follow the existing float
 scene contract. Complete native adjustment processing precedes frame filtering.
@@ -715,8 +715,9 @@ print('Linear float blends ready');
 ```
 
 Independent REST sessions accept the same mode metadata and revision/history
-rules for supported float layers. Original admission remains PNG-only there;
-this adds no float TIFF asset admission, renderer or browser synchronization.
+rules for supported float layers. [Native TIFF admission/source windows](REST_TIFF.md)
+retain complete originals; composed rendering and live browser synchronization
+remain outside the source service.
 Internal plugins retain existing document/asset permissions and inert
 installation; no file, native-worker, profile or network grant is added.
 

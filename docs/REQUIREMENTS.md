@@ -1229,3 +1229,7 @@ ordered selections stay valid, and same-owner panning can continue through
 selection changes. Imported IDs containing delimiters must remain unambiguous
 in selection ownership and transient alignment/scale controls. Cancellation adds
 no artwork change or Undo entry and retains full-resolution original assets.
+
+## Verified native TIFF sources in REST (T17/F10/F11)
+
+The local API must inspect without mutation, require explicit float32 admission, retain exact uint16/float32 originals and native geometry, apply all eight orientations as placement, share revisions/one Undo, and provide bounded original-derived linear-sRGB windows. Reject malformed data, unsupported layouts/profiles, stale ownership and cancelled work without partial publication. Source cache corruption must fail then rebuild from the retained original on retry. Original-bearing project transport must reopen in the browser with exact native output. These source capabilities do not fulfill a composed REST renderer, browser synchronization or full F10/F11 acceptance. [Contract](REST_TIFF.md).

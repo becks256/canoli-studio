@@ -2184,3 +2184,7 @@ source/view/font/backend/gesture checks and complete-frame publication remain.
 Cleanup invalidates queued work, wakes pending waits and releases existing leases.
 This private scheduling state is not document data, history or a new public API.
 Dated output/cadence/timing verification remains in the roadmap.
+
+## Independent Node precision-source ownership
+
+`ServerTiffService` owns immutable TIFF originals, pinned native ICC preparation, independently verified file-tile batches and a bounded Node reader worker. `importServerTiff` uses OO RasterLayer/AffineTransform values and one shared precision/layer transaction. Encoded headless assets explicitly reject bitmap access; portable projects retain original bytes. Browser and Node workers share private `FloatTileWindowReader` validation/cache semantics. No composed headless renderer or browser synchronization is supplied. [Ownership, native receipt and lifetime contract](REST_TIFF.md).

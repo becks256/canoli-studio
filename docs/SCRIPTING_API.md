@@ -4157,3 +4157,7 @@ await editor.artworkLibrary.importPack(pack); // Exact content reuses the saved 
 const placed = await editor.placeLibraryArtwork(saved.entry.id);
 return {entryId: saved.entry.id, placedLayerId: placed[0].id, packBytes: pack.size};
 ```
+
+## Native TIFF REST sources remain a separate host service
+
+The authenticated local Node API separately inspects/adopts original high-precision TIFFs and serves bounded linear-sRGB float32 source windows. These routes are not isolated script globals or browser synchronization. Public Document/RasterLayer constructors, schema 49, shared precision/layer commands, grants and Undo remain unchanged. Existing isolated edits can operate on retained compatible sources; no script file, pixel, profile or worker access is introduced. [Exact REST options, defaults, errors, lifetime and limits](REST_TIFF.md).
