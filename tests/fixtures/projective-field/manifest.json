@@ -1,0 +1,378 @@
+{
+  "version": 1,
+  "sourceSha256": "69814fa82f6faa69c8f0eb7f7728655b92b2068fe504fe819bdcfc4ee3a8432d",
+  "reference": "Independent NumPy 8-equation solve and SciPy grid-constant bilinear interpolation.",
+  "numpy": "1.26.4",
+  "scipy": "1.13.0",
+  "absoluteError": 4.76837158203125e-07,
+  "cases": [
+    {
+      "name": "identity",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 23
+          },
+          {
+            "x": 0,
+            "y": 23
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -10,
+          "y": -8,
+          "width": 48,
+          "height": 42
+        },
+        "background": 0
+      },
+      "reference": "identity.f32le.gz",
+      "floatSha256": "ef7567099f482f4a663fa45bf7587a579a7d31819216072edeb135d04431ff50"
+    },
+    {
+      "name": "constant-one-border",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 0.25,
+            "y": -0.5
+          },
+          {
+            "x": 31.25,
+            "y": -0.5
+          },
+          {
+            "x": 31.25,
+            "y": 22.5
+          },
+          {
+            "x": 0.25,
+            "y": 22.5
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -10,
+          "y": -8,
+          "width": 48,
+          "height": 42
+        },
+        "background": 1
+      },
+      "reference": "constant-one-border.f32le.gz",
+      "floatSha256": "be3bb7ee0ecc68eabe5dee72b412438f774b693e29922e7b613515877004acaa"
+    },
+    {
+      "name": "fractional-background",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1.125,
+            "y": 0.375
+          },
+          {
+            "x": 32.125,
+            "y": 0.375
+          },
+          {
+            "x": 32.125,
+            "y": 23.375
+          },
+          {
+            "x": 1.125,
+            "y": 23.375
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -10,
+          "y": -8,
+          "width": 48,
+          "height": 42
+        },
+        "background": 0.37
+      },
+      "reference": "fractional-background.f32le.gz",
+      "floatSha256": "d5e99ff0f128344c0f93e835fb88d649bde32f1dc5790cb172b9244c5ef6ae25"
+    },
+    {
+      "name": "reflection",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 36,
+            "y": 2
+          },
+          {
+            "x": 2,
+            "y": 4
+          },
+          {
+            "x": 5,
+            "y": 29
+          },
+          {
+            "x": 31,
+            "y": 26
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0.37
+      },
+      "reference": "reflection.f32le.gz",
+      "floatSha256": "23259cd0179f2a1aead113114252aea87f0541c39992d5ae133e44fd8118d939"
+    },
+    {
+      "name": "perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 3.25,
+            "y": 1.125
+          },
+          {
+            "x": 39.5,
+            "y": 4.25
+          },
+          {
+            "x": 31,
+            "y": 29
+          },
+          {
+            "x": 7.5,
+            "y": 25.75
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "perspective.f32le.gz",
+      "floatSha256": "b8e662517624a75e9e6f70c57cc3565c35948b9fee7236ff553ac70ff5d9d186"
+    },
+    {
+      "name": "inverse-horizon",
+      "options": {
+        "sourceWidth": 8,
+        "sourceHeight": 8,
+        "corners": [
+          {
+            "x": 0,
+            "y": -0.5
+          },
+          {
+            "x": 8,
+            "y": -0.5
+          },
+          {
+            "x": 4,
+            "y": 3.5
+          },
+          {
+            "x": 0,
+            "y": 3.5
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -12,
+          "y": -8,
+          "width": 36,
+          "height": 36
+        },
+        "background": 1
+      },
+      "reference": "inverse-horizon.f32le.gz",
+      "floatSha256": "5eaaa1c167bb42568e21e790ed89b32d1439d1d309947ce0e480b89d05feff5e"
+    },
+    {
+      "name": "strong-perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1,
+            "y": 1
+          },
+          {
+            "x": 39.5,
+            "y": 3
+          },
+          {
+            "x": 7.75,
+            "y": 30
+          },
+          {
+            "x": 6,
+            "y": 28
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0.37
+      },
+      "reference": "strong-perspective.f32le.gz",
+      "floatSha256": "d1009ad13f9921b8c2dd058da9a3ebd961c60cedc3a2a69350fbe7e373464c91"
+    },
+    {
+      "name": "large-placement",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 100000003.25,
+            "y": -199999998.875
+          },
+          {
+            "x": 100000039.5,
+            "y": -199999995.75
+          },
+          {
+            "x": 100000031,
+            "y": -199999971
+          },
+          {
+            "x": 100000007.5,
+            "y": -199999974.25
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": 99999985,
+          "y": -200000012,
+          "width": 70,
+          "height": 60
+        },
+        "background": 1
+      },
+      "reference": "large-placement.f32le.gz",
+      "floatSha256": "4b3c6090400c4c8bd6e5aad36582d53cefa4a3d29795fcfdf111c0129219e153"
+    }
+  ]
+}

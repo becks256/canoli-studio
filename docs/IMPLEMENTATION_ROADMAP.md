@@ -8424,3 +8424,69 @@ installed ChatGPT/live identity/commercial and release gate remain required.
 Public transforms are still affine; schema 49, plugin grants and independent
 REST/browser sessions are unchanged. No account, upload or paid call is added.
 The full goal remains active.
+
+### 2026-10-30 — F03 linked-mask perspective sampling dependency
+
+Owner: implementation agent; baseline `bacdae0`; classification: progress within
+the required original-preserving perspective workflow. Layer authoring, commands,
+rendering, mask editing and native delivery remain the intended connected result.
+
+The image sampler deliberately clips to authored image corners and clamps at
+original pixel edges. Linked masks need separate semantics: their coverage may
+extend outside that rectangle, paint/erasure masks can have a nonzero infinite
+background, and feathering must remain in document pixels. A private native
+scalar-field sampler now projects finite coverage deviations over a constant
+background without clipping to image corners. Relative inverse geometry,
+constant-border bilinear interpolation and explicit inverse-horizon handling
+preserve finite support on both sides of the horizon. Original/reference and
+support extents remain independent of the 262,144-sample working/read budget.
+
+The actual worker captures caller-owned coverage/settings before readiness and
+validates complete owned results. Unknown settings, invalid coverage, omitted
+native neighbors, changed source geometry, cancellation and disposal reject.
+Independent NumPy/SciPy fixtures cover eight cases and 24,144 output samples,
+including reflection, large placement, extended support, fractional/nonzero
+backgrounds and inverse-horizon crossings. Synthetic 50 MP support/reference
+checks retain bounded native reads; these are distinct from genuine original
+TIFF regression checks. [Private contract and pending integration](PERSPECTIVE_ENGINE.md).
+
+Verification:
+
+- Full `npm run build` passes, retaining **43 developer guides**; all **3,054
+  unit/API tests in 295 files** pass, including **35 native image/field geometry
+  and sampling cases**. All **41 distinct affected source-browser cases** pass
+  across a 40-case matrix and three-case field follow-up (two repeated cases).
+  All **26 selected production regressions** pass. Browser runs have no skips,
+  retries, flakes or failures. These are the selected production checks, rather
+  than another run of the complete production suite.
+- All **24,144 independent scalar reference samples** pass in the source and
+  production workers. Maximum absolute error is **2.9802322387695312e-8**, within
+  the declared `2^-21` gate; output partitioning is bit-identical. Rejection and
+  fresh retry checks cover malformed coverage/geometry, ownership and disposal.
+- Direct alpha-field projection from a genuine **10000 × 5000 original TIFF**
+  matches all **2,405 output samples exactly**, SHA-256
+  `14f259470932f663c54600342684a9956e9918cf85c38b96f7d6cc878a4f9c3d`.
+  The largest actual read is **260,451 pixels**; original bytes and native
+  geometry remain intact. The independent checker streams/hashes all
+  **200,000,000 source reference RGBA samples**, retaining only required alpha
+  neighborhoods. That source-hash scope is distinct from the 2,405 projected
+  scalar samples compared. Existing genuine 50 MP image projection, precision
+  delivery, project reopening and independent REST/browser exchange also pass.
+- Each browser matrix retains exact source identities during its run. Only the
+  additional browser case and independent checker were added after the complete
+  unit/40-case matrix; product source remains identical and the final test
+  additions pass type-checking. All **145 release resources** match the tested
+  runtime copy through final verification. Pixel WASM SHA-256:
+  `bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+
+[Complete evidence](benchmarks/projective-fields-2026-10-30.json.gz),
+**1,413,355 bytes**, SHA-256
+`cdb32e18bf426ac5123a560b6310c323fff71fba2bcfd800a48dc6a0886bdf82`.
+
+Public transforms remain affine and document schema remains 49. Actual mask
+field capture from geometry/bitmaps/strokes, offsets/bases, document-space
+feather/inversion/density, linked/unlinked scene selection, public constructors,
+commands/controls, hit testing, Undo, persistence, isolated scripting, REST,
+recipes and interchange still require connected perspective integration.
+General warp and every other unfinished original professional-editor release
+gate remain required; the complete roadmap goal is active.

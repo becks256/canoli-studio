@@ -58,6 +58,33 @@ and cancellation/current-owner checks guard every awaited operation. Callers
 must retain the original-source lease and supply their operation's lifetime
 control. These local window budgets do not bound whole-process memory.
 
+## Linked-mask scalar-field dependency
+
+`core/projective-field.ts`, `assembly/projective-field.ts` and
+`engine/projective-field.ts` supply a separate private scalar sampler. A mask is
+a finite rectangle of coverage deviations over a constant infinite background.
+The original/reference dimensions define the same homography as the image;
+they do not clip mask support. Negative support coordinates and support outside
+the image remain valid. Bilinear neighbors beyond that finite rectangle use the
+declared background rather than clamping edge coverage. Output sampling uses
+pixel centers, without image-quad area coverage. Raw coverage is finite float32
+in `[0,1]`, with float64 geometry/weights and owned inputs/outputs.
+
+Inverse-horizon crossings split output regions until a constant-sign inverse
+footprint can be bounded. A pixel center exactly on the horizon has the constant
+background, the limit of a finite-support deviation at infinity. Finite support
+on either side remains sampleable. Native coverage reads/output requests obey
+the same 262,144-sample working budget; a 50 MP reference/support extent is valid
+without allocating the whole plane. Unknown settings, missing ROI neighbors,
+malformed worker replies, cancelled/disposed work and changed source geometry
+reject. Callers must pin their mask assets and supply lifetime controls.
+
+This implements raw coverage projection only. Actual mask geometry/bitmap/stroke
+field capture, mask offsets/bases, document-space feathering, inversion/density,
+linked/unlinked scene selection and public editing remain integration work.
+Applying image-quad clipping or source-space feathering to this dependency would
+change the established mask semantics.
+
 There is no document schema migration, new public DOM constructor, mutation
 command, REST route, isolated script binding, plugin grant, account or upload in
 this dependency. Plugin installation remains inert. The API server's source

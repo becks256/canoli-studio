@@ -9,6 +9,7 @@ import type{GradientMapAdjustmentData}from'../core/gradient-map';
 import{compileFloatTransfer,FLOAT_TRANSFER_VALUES,type FloatTransferAdjustment}from'../core/float-transfer';
 import{z}from'zod';
 import {compileProjectiveSample,type ProjectiveSampleOptions} from '../core/projective-sampling';
+import {compileProjectiveField,type ProjectiveFieldOptions} from '../core/projective-field';
 import{BLEND_MODES,type BlendMode}from'../core/model';
 import{forkPixelKernel,type PixelKernel}from'./wasm';
 import{TONE_LIMITS}from'../core/tone';
@@ -49,6 +50,18 @@ export class FloatPixelProcessor{
   return result;
  }
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
+ projectiveField(alpha:Float32Array,input:ProjectiveFieldOptions):Float32Array<ArrayBuffer>{
+  this.owner();const {options,values}=compileProjectiveField(input);validateFloatAlpha(alpha,options.source.width*options.source.height);
+  const source=alpha.slice(),count=options.output.width*options.output.height,kernel=this.owner();
+  if(typeof kernel.sampleProjectiveFieldFloat!=='function')throw new Error('Native projective field sampler is unavailable.');
+  const at=Math.ceil(kernel.bufferOffset()/8)*8,output=at+source.byteLength,settings=Math.ceil((output+count*4)/8)*8,required=settings+values.byteLength;
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Float32Array(kernel.memory.buffer,at,source.length).set(source);new Float64Array(kernel.memory.buffer,settings,values.length).set(values);
+  const status=kernel.sampleProjectiveFieldFloat(at,output,settings);
+  if(status===3)throw new Error('Projective field sample falls outside the captured field window.');
+  if(status!==0)throw new Error('Invalid native projective field geometry or coverage.');
+  const result=new Float32Array(new Float32Array(kernel.memory.buffer,output,count));validateFloatAlpha(result,count);return result;
+ }
  projective(pixels:Float32Array,input:ProjectiveSampleOptions):Float32Array<ArrayBuffer>{
   this.owner();validateFloatWorkerWindow(pixels);
   const {options,values}=compileProjectiveSample(input),source=pixels.slice(),count=options.output.width*options.output.height;
