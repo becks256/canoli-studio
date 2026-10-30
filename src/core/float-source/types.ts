@@ -4,6 +4,8 @@ import{iccIntentSchema,iccRgbPreparationSchema}from'../color/icc-types';
 import{tiffDecodeOptionsSchema,tiffFloatColorSchema}from'../interchange/tiff/types';
 import{Sha256}from'../sha256';
 export const FLOAT_SOURCE_VERSION=1;
+/** Private preparation backpressure budget, independent of source dimensions. */
+export const FLOAT_TILE_BATCH_SIZE=8;
 export const FLOAT_SOURCE_NATIVE_SHA=build.artifacts['canoli_icc.wasm'].sha256;
 const hash=z.string().regex(/^[a-f0-9]{64}$/),integer=z.number().int().positive().safe();
 export const floatSourceInputSchema=z.object({original:z.instanceof(Blob),target:z.instanceof(Blob),width:integer,height:integer,tiff:tiffDecodeOptionsSchema,expectedSource:tiffFloatColorSchema.shape.source,intent:iccIntentSchema,blackPointCompensation:z.boolean()}).strict();

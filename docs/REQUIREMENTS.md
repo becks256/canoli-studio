@@ -1,5 +1,17 @@
 # Canoli Studio editor requirements
 
+## Bounded native float source staging
+
+Cold float-source preparation may acknowledge at most eight tiles per atomic
+staging transaction. Validate complete geometry, encoded/raw hashes and every
+native sample before that transaction. Capture metadata and Blob identities
+before awaiting; caller mutation must not retarget accepted bytes. Invalid later tiles, cancellation and
+quota/write failures must publish no partial ready source, retain existing valid
+cache identities and permit original-backed retry. Preserve original resolution,
+tile bytes/formats, conversion/read budgets, native ownership and ordinary shared
+commands/history. This increment requires measured cold import and independent
+native-pixel evidence; it does not close editor-wide performance acceptance.
+
 ## Float Color Overlay and Blend If
 
 Existing controls, OO styles, strict commands, isolated edits and native persistence support linear float overlay and continuous split-range blending for rasters, isolated groups, clipping stacks and supported adjustments. Exact alpha/source preservation, preview cancellation, one-step Undo and independent display/file references are required. Float rasters and isolated groups also support native Gaussian drop shadows; direct adjustment shadows reject with an isolated-group explanation. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). [Defaults, math, example and limits](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).

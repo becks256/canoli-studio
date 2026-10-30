@@ -1,5 +1,17 @@
 # Architecture
 
+## Bounded native float source staging
+
+The preparation worker groups at most eight unchanged encoded tiles behind one
+host acknowledgement. `FloatTileRepository.appendBatch` verifies every tile's
+geometry, compressed/raw hashes and native samples before one atomic staging
+transaction. It captures metadata and Blob identities before awaiting validation,
+so caller mutation cannot retarget the stored bytes. Failure leaves that batch
+unstaged; ready publication still requires
+the complete ordered manifest. Conversion bands, source geometry, cache formats,
+native CMM ownership and separate read budgets remain unchanged. See
+[FLOAT_SOURCES.md](FLOAT_SOURCES.md).
+
 ## Native float appearance
 
 `core/float-style` compiles strict existing LayerStyle data into linear overlay colors and continuous sRGB selector ranges. The private `styleFloat` WASM operation returns unchanged-alpha colors and separate float coverage. Captured worker inputs/results remain owned and validated; float-scene applies appearance after intrinsic/clipping construction and before existing mask/fill/opacity/blend. Adjustment interpolation preserves backdrop alpha. No schema or public mutation surface changes. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).

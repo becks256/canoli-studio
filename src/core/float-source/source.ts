@@ -9,13 +9,14 @@ import{supportsFloatTiff,tiffDecodeOptionsSchema,tiffFloatColorSchema,type TiffD
 import{FloatTileRepository}from'./storage';
 import{validatePixels,digest}from'./codec';
 import{FloatCacheError}from'./errors';
-import{descriptorKey,floatSourceDescriptorSchema,floatTileMetaSchema,tileCount,validateFloatPreparation,validateManifest,validateWindow,windowTiles,type FloatSourceInput,type FloatSourceManifest,type FloatSourceControl,type FloatSourceWindow,type FloatSourceProgress,type FloatTileMeta,type FloatEncodedTile}from'./types';
+import{descriptorKey,floatSourceDescriptorSchema,floatTileMetaSchema,tileCount,validateFloatPreparation,validateManifest,validateWindow,windowTiles,FLOAT_TILE_BATCH_SIZE,type FloatSourceInput,type FloatSourceManifest,type FloatSourceControl,type FloatSourceWindow,type FloatSourceProgress,type FloatTileMeta,type FloatEncodedTile}from'./types';
 const progressSchema=z.object({phase:z.enum(['inspecting','hashing','waiting','converting','reading','cached']),fraction:z.number().min(0).max(1).nullable()}).strict();
 const messages=z.discriminatedUnion('kind',[
  z.object({kind:z.literal('progress'),progress:progressSchema}).strict(),
  z.object({kind:z.literal('descriptor'),descriptor:floatSourceDescriptorSchema,key:z.string().regex(/^[a-f0-9]{64}$/)}).strict(),
  z.object({kind:z.literal('prepared'),prepared:iccRgbPreparationSchema}).strict(),
  z.object({kind:z.literal('tile'),tile:z.object({meta:floatTileMetaSchema,blob:z.instanceof(Blob)}).strict()}).strict(),
+ z.object({kind:z.literal('tiles'),tiles:z.array(z.object({meta:floatTileMetaSchema,blob:z.instanceof(Blob)}).strict()).min(1).max(FLOAT_TILE_BATCH_SIZE)}).strict(),
  z.object({kind:z.literal('complete')}).strict(),
  z.object({kind:z.literal('error'),error:z.string().max(8192)}).strict(),
 ]);
@@ -58,7 +59,7 @@ class SourceContext{
      this.progress(job,{phase:'waiting',fraction:null});signal.throwIfAborted();release=await acquireIccOwner(signal);signal.throwIfAborted();buildId=crypto.randomUUID();await repository.begin(descriptor,buildId,signal);signal.throwIfAborted();worker.postMessage({kind:'continue'});return;
     }
     if(value.kind==='prepared'){if(!descriptor||!buildId||prepared)throw new Error('Unexpected float source conversion receipt.');prepared=validateFloatPreparation(descriptor,value.prepared);return;}
-    if(value.kind==='tile'){if(!descriptor||!buildId||!prepared||value.tile.meta.index!==tiles.length)throw new Error('Unexpected float source tile sequence.');await repository.append(descriptor,buildId,value.tile,signal);signal.throwIfAborted();tiles.push(value.tile.meta);worker.postMessage({kind:'ack'});return;}
+    if(value.kind==='tile'||value.kind==='tiles'){const batch=value.kind==='tile'?[value.tile]:value.tiles;if(!descriptor||!buildId||!prepared||batch.some((tile,index)=>tile.meta.index!==tiles.length+index))throw new Error('Unexpected float source tile sequence.');await repository.appendBatch(descriptor,buildId,batch,signal);signal.throwIfAborted();for(const tile of batch)tiles.push(tile.meta);worker.postMessage({kind:'ack'});return;}
     if(!descriptor||!buildId||!prepared||tiles.length!==tileCount(descriptor))throw new Error('Float source completed without all verified tiles.');const manifest=validateManifest({version:1,key:descriptorKey(descriptor),buildId,descriptor,prepared,tiles},descriptor);await repository.publish(manifest,signal);published=true;complete(manifest);
    };
    worker.onmessage=event=>{queue=queue.then(()=>dispatch(event.data)).catch(fail);};worker.onerror=()=>fail(new Error('Float source worker failed. Check source/profile and available resources.'));worker.onmessageerror=()=>fail(new Error('Invalid float source worker message.'));

@@ -8166,3 +8166,34 @@ No new latency or full F03/F14 acceptance follows from this correctness fix.
 All-tool/sustained/cold/import/global-process-memory/device F14, native precision/
 color/interchange/layout, AI/provider/evaluation, installed ChatGPT/live identity/
 commercial and every other unfinished original roadmap requirement remain active.
+
+
+### 2026-10-30 — F14 cold native float source staging (verified increment)
+
+Owner: implementation agent; delivered M within T01/T17/F10/F14 at `3981d93`.
+Eight unchanged native tiles share one fully validated atomic staging transaction
+and acknowledgement. Metadata/Blob capture before awaits prevents caller mutation
+from retargeting stored bytes; malformed later tiles and failed writes stage none
+of that batch. Complete ready publication, cache formats, original resolution,
+CMM/read budgets, isolation and shared history retain their boundaries.
+
+The source diagnostic changes 3,883 transactions to 488 and 59.177 s preparation
+to 42.774 s in the initial measured pair. Complete descriptor/receipt/raw/encoded
+tile identities match across 800,000,000 native sample bytes. The normal-production
+three-pair click-to-complete-frame median changes 92.944 s → 73.742 s;
+all six native canvas/original hashes, ordinary Undo/Redo and reopening match.
+These local measurements do not establish all-tool/device/60fps or memory gates.
+
+Final build and all 2,961 unit/API tests across 290 files pass. All 71 affected
+native cases across 15 files, 182 normal-production workflows and six additional
+production imports pass without skips/retries/flakes/failures. Native 50 MP float
+and uint16 originals and independent complete file samples are retained. Earlier
+caller-mutation failures, the diagnostic TypeScript correction, pilots, generated
+storage byte proofs and exact frozen source/release identities remain recorded.
+
+[Measurements, native checks, corrections and compact record](benchmarks/float-source-staging-2026-10-30.md).
+Only reproducible developer pages and optional Node compile cache were losslessly
+rehomed; historical source/SDK/evidence/releases and host containment remain.
+Remaining import/projection, all-tool/sustained/global-process-memory/device F14,
+professional precision/color/interchange/layout, AI/provider/evaluation, installed
+ChatGPT/live identity/commercial and every unfinished original gate remain active.

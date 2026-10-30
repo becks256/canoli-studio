@@ -58,8 +58,15 @@ checks decoded length, geometry, both encoded/raw SHA-256 values, all samples,
 the native conversion receipt and complete ordered coverage. Only then does one
 transaction publish the full manifest and small ready pointer. Replacement
 removes the preceding derived build atomically. The preparation worker waits for
-host acknowledgement after each stored tile rather than filling an unbounded
-message queue. Quota, native, worker and callback failures publish no partial
+host acknowledgement after each batch of at most eight stored tiles rather than
+filling an unbounded message queue. All tiles are fully verified before one atomic
+staging transaction; a bad later tile or failed write leaves none of that batch.
+Ordered metadata and immutable Blob references are captured before any await;
+later caller mutation cannot replace already validated bytes during database open.
+The final partial batch follows the same checks. Progress may advance by a batch
+rather than a single tile. Descriptor, tile and persistent cache formats remain
+unchanged, so existing verified sources remain reusable.
+Quota, native, worker and callback failures publish no partial
 ready source; existing identities remain available. Retry starts fresh.
 
 Preparation is shared for identical retained originals and choices. One caller's
@@ -86,7 +93,11 @@ cache data. Corruption invalidates only the observed build; the next read can
 rebuild from the original. Concurrent replacement can require the same retry.
 
 Preparation tiles are at most 256 × 64. Band height adapts to an 8 MiB float
-conversion band, with a minimum of one full native row. TIFF block decompression,
+conversion band, with a minimum of one full native row. One worker packet owns at
+most eight compressed tiles (at most 2 MiB of raw samples, with each encoded tile
+bounded by its existing raw-size-plus-64-KiB limit). The host decodes/verifies
+one tile at a time before atomic staging and acknowledges before further packets.
+TIFF block decompression,
 row width, profile/WASM allocations, browser storage quota and process memory
 remain actual resource constraints. No arbitrary source megapixel/file-size cap
 or destructive downsampling is added. These budgets are not a measured peak

@@ -1,5 +1,17 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native float source batch authority
+
+Backpressure permits one packet of at most eight compressed native tiles. The
+host captures ordered metadata and Blob identities synchronously, then verifies
+all geometry, ordered indices, compressed/raw hashes and samples
+before one atomic IndexedDB staging transaction. A failed batch cannot increment
+its stage or leave earlier tiles; no ready source exists until the complete
+manifest passes existing publication checks. Each stored batch is acknowledged
+before another packet is emitted. Existing immutable originals, descriptors,
+conversion bands, two-owner CMM queue, cancellation/waiter isolation and separate
+read/cache budgets remain authoritative. See [FLOAT_SOURCES.md](FLOAT_SOURCES.md).
+
 ## Float appearance invariant
 
 Mix authored sRGB overlay colors in linear working RGB. Blend If bounds only continuous encoded selector coordinates, leaving actual signed/extended colors intact; coverage stays separate from alpha. Apply completed layer/clipping appearance once against the captured sibling backdrop, then shared mask/fill/opacity/blending. Adjustments retain backdrop alpha. For raster/isolated-group shadows, capture intrinsic alpha after masks and before own Fill/styles/opacity, convolve bounded native alpha bands, offset in document pixels, then place styled foreground over the shadow. Gate completed appearance with Blend If before final layer opacity/blending. Direct adjustment shadows reject. [Shadow contract](FLOAT_DOCUMENTS.md#native-float-drop-shadows). [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).

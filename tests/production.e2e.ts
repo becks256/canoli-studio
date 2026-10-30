@@ -1,4 +1,6 @@
 import {spacingWorkflow} from './helpers/spacing';
+import {floatSourceImportWorkflow} from './helpers/float-source-import';
+test('production native 50 MP float import preserves originals, Undo and reopened viewport',async({page},info)=>{test.setTimeout(600000);await floatSourceImportWorkflow(page,info,true);});
 import {gestureSelectionWorkflow} from './helpers/gesture-selection';
 test('production keyboard layer selection cancels a captured resize and preserves the 50 MP original and Undo',async({page},info)=>{await gestureSelectionWorkflow(page,info,true);});
 import{productionFloatSources}from'./helpers/float-source-production';
