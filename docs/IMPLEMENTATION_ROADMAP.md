@@ -8348,7 +8348,79 @@ identities and runner scripts: [archive](benchmarks/rest-tiff-2026-10-30.json.gz
 3,523,043 bytes, SHA-256
 `bc7c51905159f86f15652af5df611ec730f763d4ff5d2dd95c921a8a53d52aba`.
 
- Full color/rendering/device quality, sustained editor-wide
+Full color/rendering/device quality, sustained editor-wide
 latency/memory, broader tools and every other unfinished original roadmap,
 AI/provider/evaluation, installed ChatGPT/live identity/commercial and release
 gate remain required. The full goal remains active.
+
+### 2026-10-30 — F03 native perspective engine verified; public integration required
+
+Owner: implementation agent; baseline `afa62a2`; estimate XL within F03/T07/T16;
+classification: progress. The committed baseline supplies verified native REST
+TIFF sources. Current source inspection confirmed that public layer placement
+and original-native projection remained affine. The complete non-destructive
+perspective workflow remains the target: shared OO/commands, original/native
+geometry, masks/hit testing, history, persistence, actual authoring controls,
+isolation/REST/recipes and native file delivery. This private dependency is
+necessary implementation work, not a replacement completion target.
+
+Immutable homogeneous geometry now validates exact convex corners, reflections,
+singularities and image-crossing horizons. The actual WASM sampler uses float64
+polygon coverage/centroids and premultiplied bilinear interpolation, retaining
+signed/extended float32 colors and original bytes. Authoritative target corners
+avoid epsilon support introduced by reconstructing corners from a matrix.
+Relative-coordinate inversion and balanced fallback retain uniform scales from
+`1e-300` through `1e300` without a scale admission cutoff. The actual worker
+captures owned data before readiness, rejects malformed results and disposal,
+and never publishes failed partial output. Bounded original-source reads split
+sparse footprints without downsampling originals or capping their resolution.
+[Numeric, ownership, lifetime and remaining-integration contract](PERSPECTIVE_ENGINE.md).
+
+Verification on final frozen code:
+
+- Full `npm run build` passes with **43 developer guides**. All **3,040 unit/API
+  tests in 294 files** pass, including **21 native/geometry cases**; all **38
+  affected source-browser cases** and **190 production cases** pass with no
+  skips, retries, flakes or failures. Complete source identities remain exact
+  during each terminal matrix. All **145 release resources** match the verified
+  runtime copy used for production worker discovery.
+- Independent NumPy solving, half-plane line arrangements and SciPy interpolation
+  match all **40,432 projected RGBA samples** in nine cases exactly, in both the
+  actual source and production workers. Reflection, strong perspective, large
+  placement, minification and pixel-corner contacts retain caller ownership,
+  unchanged document state and exact output partition identity.
+- A genuine **10000 × 5000 original TIFF** retains its complete original hash and
+  native extent. Its **65 × 37 projective window (9,620 RGBA samples)** matches
+  independent readback exactly; the largest actual source ROI is **261,660
+  pixels**, within the existing 262,144-pixel working budget. The reference
+  checker streams/hashes all **200,000,000 source reference samples** while
+  retaining only required neighborhoods. This is a bounded projected window,
+  not a claim that 200 million projective output samples were compared.
+- Existing complete 50 MP float/uint16 delivery, originals, cache repair, tonal
+  editing, Undo/project reopening and REST/browser file exchange regressions
+  pass separately. They do not prove a public perspective editing workflow.
+  The new engine guide is linked and readable at **390 px without JavaScript**,
+  explicitly retaining its pending application boundary.
+
+Initial corner reconstruction produced epsilon-alpha support outside intended
+boundaries; exact authored corners fixed it without changing reference values or
+tolerances. Small-scale diagnostics exposed cofactor underflow, corrected by the
+balanced inverse and retained numeric regressions. The browser pilot's lifecycle
+assertion expected “disposed” instead of the established “Image worker closed.”
+error; the actual rejection/retry behavior was already correct. Its failed raw
+report and successful complete successor remain in the evidence.
+
+[Complete evidence](benchmarks/projective-engine-2026-10-30.json.gz),
+**2,377,353 bytes**, SHA-256
+`7ebc97ddb36b6626adcec1f9b8b9366cc0dbf08c938eacfc81696575551c9687`.
+
+**Next required work:** connect public perspective state/constructors/shared
+commands, original-aware scene projection, linked/unlinked masks and hit testing,
+controls/previews/cancellation, persistence, all required automation/recipe and
+native interchange/export surfaces. General warp, sustained latency/memory,
+physical-device/photographic quality and every other unfinished original
+professional-editor, color, AI/provider/evaluation, workflow/collaboration,
+installed ChatGPT/live identity/commercial and release gate remain required.
+Public transforms are still affine; schema 49, plugin grants and independent
+REST/browser sessions are unchanged. No account, upload or paid call is added.
+The full goal remains active.

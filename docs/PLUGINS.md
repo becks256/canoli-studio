@@ -527,3 +527,7 @@ sessions gain no new capability. Dated acceptance remains in the roadmap.
 ## Native REST TIFF sources add no plugin grant
 
 Independent REST TIFF admission and source reads use trusted native workers and service-owned files. They expose no plugin permission or isolated global. Installation remains inert; existing granted OO edits still pass source, revision, asset, lock and final commit validation. [REST source ownership and limits](REST_TIFF.md).
+
+## Private perspective sampler grants no authority
+
+Native perspective sampling is trusted engine work, outside the isolated command boundary. It adds no plugin permission, file/pixel access, worker method, network capability or install-time execution. Public perspective commands and end-to-end integration remain required. [Contract](PERSPECTIVE_ENGINE.md).

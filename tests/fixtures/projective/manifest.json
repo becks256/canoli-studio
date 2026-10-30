@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "sourceSha256": "456d0591503855b2ce3858c7454b0ce362bd1e73ab5daa628573fbb7a2949895",
+  "reference": "Independent NumPy linear solve and line-arrangement polygon intersections; SciPy float64 premultiplied bilinear sampling.",
+  "colorErrorScale": 4.76837158203125e-07,
+  "cases": [
+    {
+      "name": "identity",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 31,
+          "y": 0
+        },
+        {
+          "x": 31,
+          "y": 23
+        },
+        {
+          "x": 0,
+          "y": 23
+        }
+      ],
+      "output": {
+        "x": -3,
+        "y": -3,
+        "width": 39,
+        "height": 31
+      },
+      "reference": "identity.f32le.gz",
+      "floatSha256": "afa401ff908e6e02bd20457f8c5204827f1a7f2fcb95707387ea8502de6a5978"
+    },
+    {
+      "name": "trapezoid",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": 3.25,
+          "y": 1.125
+        },
+        {
+          "x": 39.5,
+          "y": 4.25
+        },
+        {
+          "x": 31,
+          "y": 29
+        },
+        {
+          "x": 7.5,
+          "y": 25.75
+        }
+      ],
+      "output": {
+        "x": 0,
+        "y": 0,
+        "width": 44,
+        "height": 33
+      },
+      "reference": "trapezoid.f32le.gz",
+      "floatSha256": "29a52df3d94e36c817e7e34b1c424aa7d3732310853518d07d6068796fecbfdb"
+    },
+    {
+      "name": "skew",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": -7.5,
+          "y": 4.25
+        },
+        {
+          "x": 26.5,
+          "y": -2
+        },
+        {
+          "x": 36,
+          "y": 28
+        },
+        {
+          "x": -10,
+          "y": 19.5
+        }
+      ],
+      "output": {
+        "x": -12,
+        "y": -5,
+        "width": 52,
+        "height": 38
+      },
+      "reference": "skew.f32le.gz",
+      "floatSha256": "16c4238ba13f4e4459066b5e46728841f9c2372b10f07635749cfd7c6578b5bd"
+    },
+    {
+      "name": "reflection",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": 36,
+          "y": 2
+        },
+        {
+          "x": 2,
+          "y": 4
+        },
+        {
+          "x": 5,
+          "y": 29
+        },
+        {
+          "x": 31,
+          "y": 26
+        }
+      ],
+      "output": {
+        "x": 0,
+        "y": 0,
+        "width": 41,
+        "height": 33
+      },
+      "reference": "reflection.f32le.gz",
+      "floatSha256": "ad978081443d76e874fd4e66cfe5f86225fcef995e5bd4f302980d1befb45b5a"
+    },
+    {
+      "name": "pixel-corner-contacts",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": -2,
+          "y": 2
+        },
+        {
+          "x": 2,
+          "y": -2
+        },
+        {
+          "x": 4,
+          "y": 2
+        },
+        {
+          "x": 2,
+          "y": 4
+        }
+      ],
+      "output": {
+        "x": -3,
+        "y": -3,
+        "width": 9,
+        "height": 9
+      },
+      "reference": "pixel-corner-contacts.f32le.gz",
+      "floatSha256": "d5a3ded066175d0e0a53d4a66fe6fe14eb3df1b503aa247cd2d504cdba5b2823"
+    },
+    {
+      "name": "quarter-turn",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": 26,
+          "y": 2
+        },
+        {
+          "x": 26,
+          "y": 33
+        },
+        {
+          "x": 3,
+          "y": 33
+        },
+        {
+          "x": 3,
+          "y": 2
+        }
+      ],
+      "output": {
+        "x": 0,
+        "y": 0,
+        "width": 30,
+        "height": 36
+      },
+      "reference": "quarter-turn.f32le.gz",
+      "floatSha256": "dac066cb6eea2408b5e7da2ee4c66b3841c3f0a4e1c19ae04049265a57b125aa"
+    },
+    {
+      "name": "minified",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": 0.25,
+          "y": 0.125
+        },
+        {
+          "x": 0.75,
+          "y": 0.25
+        },
+        {
+          "x": 0.875,
+          "y": 0.875
+        },
+        {
+          "x": 0.125,
+          "y": 0.75
+        }
+      ],
+      "output": {
+        "x": -1,
+        "y": -1,
+        "width": 3,
+        "height": 3
+      },
+      "reference": "minified.f32le.gz",
+      "floatSha256": "6cf805db9d3337e82451fcb10d8db64fbed9ed8ace3f37fd2f7c0ac38ea968fa"
+    },
+    {
+      "name": "strong-perspective",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": 1,
+          "y": 1
+        },
+        {
+          "x": 39.5,
+          "y": 3
+        },
+        {
+          "x": 7.75,
+          "y": 30
+        },
+        {
+          "x": 6,
+          "y": 28
+        }
+      ],
+      "output": {
+        "x": -1,
+        "y": -1,
+        "width": 44,
+        "height": 34
+      },
+      "reference": "strong-perspective.f32le.gz",
+      "floatSha256": "ff1033be3e270dabbaa2e3972488a0ad76f0ad3f330186fc95d991b3a01c2d71"
+    },
+    {
+      "name": "large-placement",
+      "source": "source.f32le.gz",
+      "width": 31,
+      "height": 23,
+      "corners": [
+        {
+          "x": 100000003.25,
+          "y": -199999998.875
+        },
+        {
+          "x": 100000039.5,
+          "y": -199999995.75
+        },
+        {
+          "x": 100000031,
+          "y": -199999971
+        },
+        {
+          "x": 100000007.5,
+          "y": -199999974.25
+        }
+      ],
+      "output": {
+        "x": 100000000,
+        "y": -200000000,
+        "width": 44,
+        "height": 33
+      },
+      "reference": "large-placement.f32le.gz",
+      "floatSha256": "29a52df3d94e36c817e7e34b1c424aa7d3732310853518d07d6068796fecbfdb"
+    }
+  ]
+}

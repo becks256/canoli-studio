@@ -966,3 +966,7 @@ Supported browser Photoshop pixel clipping imports/exports map to the existing s
 ## Verified TIFF originals in independent REST sessions
 
 `POST /api/v1/documents/:id/tiff-inspect` inspects headers/directories; `tiff-import` requires explicit float32 editing and admits verified uint16/float32 originals. `GET .../assets/:assetId/float-window` returns bounded linear-sRGB float32 source bytes before layer placement/composition. All require expectedRevision. Existing original/preview/project retrieval retains complete original bytes and genuine display thumbnails. [Options, response headers, defaults, cancellation, cache repair and limits](REST_TIFF.md).
+
+## Perspective engine is not a new REST operation
+
+A private original-derived projective sampler is in verification for F03. It adds no document command, REST route, composed server renderer or browser synchronization. Public layer transforms and source-window routes retain their existing contracts. [Implemented dependency and required public integration](PERSPECTIVE_ENGINE.md).

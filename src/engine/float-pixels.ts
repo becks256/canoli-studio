@@ -8,6 +8,7 @@ import{compileFloatGradient}from'../core/float-gradient';
 import type{GradientMapAdjustmentData}from'../core/gradient-map';
 import{compileFloatTransfer,FLOAT_TRANSFER_VALUES,type FloatTransferAdjustment}from'../core/float-transfer';
 import{z}from'zod';
+import {compileProjectiveSample,type ProjectiveSampleOptions} from '../core/projective-sampling';
 import{BLEND_MODES,type BlendMode}from'../core/model';
 import{forkPixelKernel,type PixelKernel}from'./wasm';
 import{TONE_LIMITS}from'../core/tone';
@@ -48,6 +49,19 @@ export class FloatPixelProcessor{
   return result;
  }
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
+ projective(pixels:Float32Array,input:ProjectiveSampleOptions):Float32Array<ArrayBuffer>{
+  this.owner();validateFloatWorkerWindow(pixels);
+  const {options,values}=compileProjectiveSample(input),source=pixels.slice(),count=options.output.width*options.output.height;
+  if(source.length!==options.source.width*options.source.height*4)throw new Error('Projective source pixels differ from captured window geometry.');
+  const kernel=this.owner();if(typeof kernel.sampleProjectiveFloat!=='function')throw new Error('Native projective sampler is unavailable.');
+  const at=Math.ceil(kernel.bufferOffset()/8)*8,output=at+source.byteLength,settings=output+count*16,scratch=settings+values.byteLength,required=scratch+512;
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Float32Array(kernel.memory.buffer,at,source.length).set(source);new Float64Array(kernel.memory.buffer,settings,values.length).set(values);
+  const status=kernel.sampleProjectiveFloat(at,output,settings,scratch);
+  if(status===3)throw new Error('Projective sample falls outside the captured original window.');
+  if(status!==0)throw new Error(status===2?'Projective output is not finite float32.':'Invalid native projective sampling geometry or pixels.');
+  const result=new Float32Array(new Float32Array(kernel.memory.buffer,output,count*4));validateFloatWorkerWindow(result);return result;
+ }
  convolveAlpha(alpha:Float32Array,input:FloatConvolutionOptions):Float32Array<ArrayBuffer>{
   const kernel=this.owner(),settings=floatConvolutionSchema.parse(input),length=floatConvolutionLength(settings);validateFloatAlpha(alpha,settings.width*settings.height);
   const weights=gaussianWeights(settings.sigma),source=Math.ceil(kernel.bufferOffset()/8)*8,output=source+alpha.length*4,coefficients=Math.ceil((output+length*4)/8)*8,required=coefficients+weights.byteLength;

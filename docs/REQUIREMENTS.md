@@ -1233,3 +1233,7 @@ no artwork change or Undo entry and retains full-resolution original assets.
 ## Verified native TIFF sources in REST (T17/F10/F11)
 
 The local API must inspect without mutation, require explicit float32 admission, retain exact uint16/float32 originals and native geometry, apply all eight orientations as placement, share revisions/one Undo, and provide bounded original-derived linear-sRGB windows. Reject malformed data, unsupported layouts/profiles, stale ownership and cancelled work without partial publication. Source cache corruption must fail then rebuild from the retained original on retry. Original-bearing project transport must reopen in the browser with exact native output. These source capabilities do not fulfill a composed REST renderer, browser synchronization or full F10/F11 acceptance. [Contract](REST_TIFF.md).
+
+## F03 perspective workflow — integration in progress
+
+The intended perspective tool must preserve complete originals and parent coordinates across masks, selection, rendering/export, shared OO/commands/Undo, persistence and automation. Private homogeneous geometry and a native float sampler are being verified as necessary groundwork. They do not implement public perspective authoring or close F03. Existing layer transforms remain affine. [Engine boundary and remaining integration](PERSPECTIVE_ENGINE.md).

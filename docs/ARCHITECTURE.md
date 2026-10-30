@@ -2188,3 +2188,7 @@ Dated output/cadence/timing verification remains in the roadmap.
 ## Independent Node precision-source ownership
 
 `ServerTiffService` owns immutable TIFF originals, pinned native ICC preparation, independently verified file-tile batches and a bounded Node reader worker. `importServerTiff` uses OO RasterLayer/AffineTransform values and one shared precision/layer transaction. Encoded headless assets explicitly reject bitmap access; portable projects retain original bytes. Browser and Node workers share private `FloatTileWindowReader` validation/cache semantics. No composed headless renderer or browser synchronization is supplied. [Ownership, native receipt and lifetime contract](REST_TIFF.md).
+
+## Private projective geometry and source sampling
+
+`core/projective.ts` and `projective-sampling.ts` provide immutable homogeneous geometry and strict exact-corner sampling settings. The actual WASM pixel kernel and existing worker supply premultiplied float32 perspective windows; `engine/projective-projection.ts` recursively bounds original-source ROIs. This is a dependency for the connected F03 workflow. Public layer placement, commands, schema 49, masks/hit testing, persistence and automation remain affine until integration. [Numeric/ownership contract and remaining work](PERSPECTIVE_ENGINE.md).

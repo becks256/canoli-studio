@@ -59,6 +59,7 @@ const generatedPages = [
   ["RAW_TIFF", "Native RAW master TIFF delivery"],
   ["FLOAT_TIFF", "Float TIFF input and retained precision"],
   ["REST_TIFF", "Verified high-precision REST TIFF sources"],
+  ["PERSPECTIVE_ENGINE", "Native perspective engine dependency"],
   ["FLOAT_PROCESSING", "Native float pixel processing dependency"],
   ["FLOAT_SOURCES", "Owned float originals and derived tiles"],
   ["FLOAT_DOCUMENTS", "Float document editing"],

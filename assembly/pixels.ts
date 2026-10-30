@@ -6,6 +6,7 @@ export {gradientFloat} from './float-gradient';
 export {lookupFloat} from './float-lookup';
 export {transferFloat} from "./float-transfer";
 export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
+export { sampleProjectiveFloat } from "./projective-sampling";
 export { encodeFrequencyBand } from "./frequency-band";
 export { medianFilter } from "./median-filter";
 export { bilateralFilter } from "./bilateral-filter";

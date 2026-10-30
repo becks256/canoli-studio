@@ -54,6 +54,7 @@ export interface PixelKernel extends QuickSelectionKernel {
   transferFloat(source:number,output:number,tables:number,pixels:number):number;
   compositeFloat(source:number,backdrop:number,output:number,mask:number,scratch:number,pixels:number,opacity:number,mode:number):number;
   affineFloat(source:number,output:number,matrix:number,pixels:number):number;
+  sampleProjectiveFloat(source:number,output:number,settings:number,scratch:number):number;
   toneFloat(source:number,output:number,pixels:number,exposure:number,contrast:number,saturation:number):number;
   bilateralFilter(input:number,output:number,spatial:number,range:number,width:number,height:number,radius:number,amount:number):void;
   medianFilter(input:number,output:number,scratch:number,width:number,height:number,radius:number):void;

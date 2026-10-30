@@ -950,3 +950,7 @@ delimiter-containing imported IDs cannot share another selection's draft state.
 ## Independent REST precision-source invariant
 
 Node native TIFF preparation is globally serialized and final publication follows independent per-batch checks, complete source/native/color identities and a real validated PNG thumbnail. Service-created private files are disposable; reads reverify encoded bytes even on decoded-cache hits, and repair preserves the exact original/interpretation and document history. Source windows use raw encoded coordinates; affine orientation belongs to the layer. Disconnect, revision changes, document deletion and service disposal cancel owned work and release private derivatives. No bitmap is fabricated and no source-file path is exposed to requests. [Contract](REST_TIFF.md).
+
+## Private projective sampling invariant
+
+Authored target corners, rather than reconstructed matrix corners, own coverage. Strict convexity, singularity/horizon and representable-center preflight precede reads. Local rebasing protects coordinate precision; premultiplied float64 interpolation returns owned finite float32 windows. Original leases and operation lifetime controls remain caller-owned. Sparse footprint splitting bounds transient reads independently of source resolution. This adds no document mutation or public/plugin/REST authority; connected perspective integration remains required. [Contract](PERSPECTIVE_ENGINE.md).

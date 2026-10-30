@@ -1,4 +1,5 @@
 import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
+import {compileProjectiveSample,type ProjectiveSampleOptions} from '../core/projective-sampling';
 import {floatTonalOptionsSchema, type FloatTonalOptions} from '../core/float-tonal';
 import{parseFloatTransfer,type FloatTransferAdjustment}from'../core/float-transfer';
 import{floatCompositeOptionsSchema,floatToneOptionsSchema,validateFloatWorkerWindow,validateFloatStyleResult,type FloatStyleResult,type FloatCompositeOptions,type FloatToneOptions}from'./float-pixels';
@@ -161,6 +162,12 @@ export class PixelProcessor {
   async floatAffine(pixels:Float32Array,matrix:readonly number[]):Promise<Float32Array>{
     validateFloatWorkerWindow(pixels);if(!Array.isArray(matrix)||matrix.length!==12||![...matrix].every(Number.isFinite))throw new Error('Use twelve finite RGB affine coefficients.');const captured={pixels:pixels.slice(),matrix:[...matrix]},length=pixels.length;
     const result=await this.request(new Uint8ClampedArray(0),{floatAffine:captured});validateFloatWorkerWindow(result);if(result.length!==length)throw new Error('Float worker result geometry differs.');return result;
+  }
+  async floatProjective(pixels:Float32Array,input:ProjectiveSampleOptions):Promise<Float32Array>{
+    validateFloatWorkerWindow(pixels);const {options}=compileProjectiveSample(input),captured=pixels.slice(),length=options.output.width*options.output.height*4;
+    if(captured.length!==options.source.width*options.source.height*4)throw new Error('Projective source pixels differ from captured window geometry.');
+    const result=await this.request(new Uint8ClampedArray(0),{floatProjective:{pixels:captured,options}});
+    validateFloatWorkerWindow(result);if(result.length!==length||result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Projective worker result differs from captured output geometry.');return result;
   }
   async bilateralFilter(pixels:Uint8ClampedArray,width:number,height:number,options:BilateralFilterOptions):Promise<Uint8ClampedArray> {
     const settings=bilateralOptionsSchema.parse(options);
@@ -432,6 +439,7 @@ export class PixelProcessor {
       floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
       floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
       floatAffine?:{pixels:Float32Array;matrix:number[]};
+      floatProjective?:{pixels:Float32Array;options:ProjectiveSampleOptions};
       floatTone?:{pixels:Float32Array;options:FloatToneOptions};
       floatTonal?:{pixels:Float32Array;coverage:Float32Array;options:FloatTonalOptions};
       floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
@@ -536,6 +544,7 @@ export class PixelProcessor {
     if(payload.floatStyle){tryTransfer(payload.floatStyle.source.buffer);tryTransfer(payload.floatStyle.backdrop.buffer);}
     if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}
     if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
+    if(payload.floatProjective)tryTransfer(payload.floatProjective.pixels.buffer);
     if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);
     if(payload.floatTonal){tryTransfer(payload.floatTonal.pixels.buffer);tryTransfer(payload.floatTonal.coverage.buffer);}
     if(payload.floatTransfer)tryTransfer(payload.floatTransfer.pixels.buffer);

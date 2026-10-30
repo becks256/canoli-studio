@@ -4161,3 +4161,7 @@ return {entryId: saved.entry.id, placedLayerId: placed[0].id, packBytes: pack.si
 ## Native TIFF REST sources remain a separate host service
 
 The authenticated local Node API separately inspects/adopts original high-precision TIFFs and serves bounded linear-sRGB float32 source windows. These routes are not isolated script globals or browser synchronization. Public Document/RasterLayer constructors, schema 49, shared precision/layer commands, grants and Undo remain unchanged. Existing isolated edits can operate on retained compatible sources; no script file, pixel, profile or worker access is introduced. [Exact REST options, defaults, errors, lifetime and limits](REST_TIFF.md).
+
+## Perspective authoring remains pending
+
+The private homogeneous geometry and native perspective sampler are not isolated globals or public layer setters. Existing AffineTransform/Layer.transform contracts, constructors, permissions and Undo remain unchanged. Do not use internal worker methods as a public scripting mutation API. [Dependency and remaining integration](PERSPECTIVE_ENGINE.md).
