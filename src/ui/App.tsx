@@ -2018,6 +2018,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           }
           layers={
           <LayersPanel
+            isCurrent={()=>editor.document===dom}
             deferThumbnails={toolState.drawing}
             onLoadTransparency={id => { editor.tools.cancel(); void task(() => editor.pixels.loadTransparency(id)); }}
             onRelinkSmartObject={(layer, file) => {

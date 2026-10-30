@@ -1,10 +1,13 @@
 import {LayerAlignmentControls} from './LayerAlignmentControls';
+import {visibleLayerTree} from './layer-tree';
+import {useLayerTreeKeyboard} from './hooks/useLayerTreeKeyboard';
+import {isImmutable} from '../core/immutable';
 import type {AlignmentTarget,LayerAlignment} from '../core/layer-layout';
 import { LayerTreeRow } from "./LayerTreeRow";
 import type { RasterEditing } from "../raster-editing";
 import { LayerFilterBar } from "./LayerFilterBar";
 import { emptyLayerFilter, filterLayers } from "./layer-filter";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent, MouseEvent, SyntheticEvent } from "react";
 import {
   ArrowDown,
@@ -44,6 +47,7 @@ const layerIcons = {
 
 export interface LayersPanelProps {
   document: Document;
+  isCurrent?(): boolean;
   viewDocument: DocumentData;
   selectedId: string | null;
   selectedLayer: Layer | null;
@@ -79,6 +83,7 @@ export interface LayersPanelProps {
 
 export function LayersPanel({
   document: dom,
+  isCurrent = () => true,
   viewDocument,
   selectedId,
   selectedLayer: selected,
@@ -122,10 +127,23 @@ export function LayersPanel({
   useEffect(() => {
     setFilter({ ...emptyLayerFilter });
   }, [dom]);
-  const filtered = filterLayers(viewDocument.children, filter);
+  const modelKey = isImmutable(viewDocument) ? viewDocument : {};
+  const filtered = useMemo(() => filterLayers(viewDocument.children, filter), [modelKey, filter]);
   const isCollapsed = (id: string) => !filtered.active && collapsed.has(id);
   const [showHistory, setShowHistory] = useState(false);
   const [collapsed, setCollapsed] = useState(new Set<string>());
+  const treeRows = useMemo(() => visibleLayerTree(viewDocument.children, filtered.included, collapsed, filtered.active), [modelKey, filtered, collapsed]);
+  const treeRowIndex = useMemo(() => new Map(treeRows.map(row => [row.node.id, row])), [treeRows]);
+  const tree = useLayerTreeKeyboard({document: dom, rows: treeRows, matches: filtered.matches, filtered: filtered.active, collapsed, isCurrent,
+    collapse: (id, value) => setCollapsed(old => { const next = new Set(old); if (value) next.add(id); else next.delete(id); return next; }),
+    select: ids => {
+      if (!isCurrent()) return false;
+      onCancelTools(); onClearPreview(); if (!isCurrent()) return false;
+      const layers = ids.map(id => dom.getLayer(id)); if (layers.some(layer => !layer)) return false;
+      dom.selectLayers(layers as Layer[]);
+      return isCurrent() && JSON.stringify(dom.getSnapshot().selectedIds) === JSON.stringify(ids);
+    },
+  });
   const [draggedLayer, setDraggedLayer] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<{
     id: string;
@@ -167,6 +185,7 @@ export function LayersPanel({
   }
 
   function clickRow(event:MouseEvent<HTMLDivElement>) {
+    if(!isCurrent())return;
     const hit=eventRow(event);if(!hit)return;
     const node=findLayer(viewDocument,hit.id);if(!node)return;
     if(hit.target?.closest('img.pixel-thumb')&&(event.ctrlKey||event.metaKey)&&!busy&&onLoadTransparency){
@@ -179,8 +198,10 @@ export function LayersPanel({
       setCollapsed(old=>{const next=new Set(old);if(next.has(hit.id))next.delete(hit.id);else next.add(hit.id);return next;});
     }else if(action==='select'){
       onCancelTools();onClearPreview();
+      if(!isCurrent())return;
       const object=dom.getLayer(hit.id);
       if(object)onSelectLayer(object,event.ctrlKey||event.metaKey||event.shiftKey);
+      tree.markAnchor(hit.id);tree.focus(hit.id);
     }else if(action==='lock'||action==='visibility'){
       onAttempt(()=>{
         const object=dom.getLayer(hit.id);if(!object)return;
@@ -208,13 +229,17 @@ export function LayersPanel({
   function renderLayers(nodes:LayerData[],depth=0) {
     return [...nodes].reverse().filter(node=>filtered.included.has(node.id)).map(node=>{
       const thumbnailPixels=node.kind==='raster'||node.kind==='paint'?pixels:undefined;
-      return <div key={node.id}>
+      const info=treeRowIndex.get(node.id)!;
+      return <div key={node.id} className={`layer-tree-node ${tree.hasFocus&&tree.focusId===node.id?'keyboard-active':''}`} data-layer-node-id={node.id} role="treeitem" aria-label={node.name}
+        aria-selected={dom.getSnapshot().selectedIds.includes(node.id)} aria-level={info.level} aria-posinset={info.position} aria-setsize={info.siblings}
+        aria-expanded={info.hasChildren?!isCollapsed(node.id):undefined} tabIndex={tree.focusId===node.id?0:-1}>
         <LayerTreeRow node={node} depth={depth} selected={dom.getSnapshot().selectedIds.includes(node.id)}
           locked={isLocked(viewDocument,node.id)} busy={busy} filterContext={filtered.active&&!filtered.matches.has(node.id)}
+          tabbable={tree.focusId===node.id}
           filtered={filtered.active} collapsed={isCollapsed(node.id)} dropPlacement={dropTarget?.id===node.id?dropTarget.placement:undefined}
           pixels={thumbnailPixels} thumbnailDocument={thumbnailPixels?dom.getSnapshot().document:undefined}
           paused={!!thumbnailPixels&&deferThumbnails} fallback={node.kind==='raster'?getThumbnail(node.assetId):undefined}/>
-        {node.kind==='group'&&!isCollapsed(node.id)&&renderLayers(node.children,depth+1)}
+        {node.kind==='group'&&!isCollapsed(node.id)&&info.hasChildren&&<div role="group">{renderLayers(node.children,depth+1)}</div>}
       </div>;
     });
   }
@@ -311,7 +336,9 @@ export function LayersPanel({
                 Selected layer: {selected?.name}. Outside current filter.
               </p>
             )}
-          <div className="layer-list" onClick={clickRow} onDragStart={startRowDrag} onDragOver={overRowDrag} onDrop={dropRow} onDragEnd={()=>{setDraggedLayer(null);setDropTarget(null);}}>
+          <div className="layer-list" role="tree" aria-label="Layers" aria-multiselectable="true" aria-description="Arrow keys move focus. Enter selects; Space toggles selection; Shift extends a range. Ctrl or Command+A selects visible matches." ref={tree.root} tabIndex={treeRows.length?-1:0}
+            onKeyDown={tree.onKeyDown} onFocusCapture={tree.onFocusCapture} onBlurCapture={tree.onBlurCapture}
+            onClick={clickRow} onDragStart={startRowDrag} onDragOver={overRowDrag} onDrop={dropRow} onDragEnd={()=>{setDraggedLayer(null);setDropTarget(null);}}>
             {filtered.active && !filtered.matches.size && (
               <p className="panel-empty">No matching layers.</p>
             )}

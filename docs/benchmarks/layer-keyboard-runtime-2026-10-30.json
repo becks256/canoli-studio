@@ -1,0 +1,33 @@
+{
+  "files": [
+    {
+      "path": "tsconfig.tsbuildinfo",
+      "target": "/run/lock/canoli-layer-keyboard-2026-10-30/generated-runtime-files/0-tsconfig.tsbuildinfo",
+      "bytes": 63640,
+      "sha256": "b8cb444544c5d5fa3c80e0a3d279e6c08754a8cf4b784d491034eb2018c1bd28",
+      "exact": true
+    },
+    {
+      "path": "public/plugins/canoli-studio-chatgpt.zip",
+      "target": "/run/lock/canoli-layer-keyboard-2026-10-30/generated-runtime-files/1-canoli-studio-chatgpt.zip",
+      "bytes": 922679,
+      "sha256": "fd5f1397f4b6dc5bf491f68ad6f845966b4d18ec512016826510c12f9c244fb6",
+      "exact": true
+    },
+    {
+      "path": "dist-site/index.mjs",
+      "target": "/run/lock/canoli-layer-keyboard-2026-10-30/generated-runtime-files/2-index.mjs",
+      "bytes": 499041,
+      "sha256": "9e3226751ed33050b08c63c680a8c526e0d01c7356dbb95d5d0ccd30f9a7c761",
+      "exact": true
+    }
+  ],
+  "sourceOrSdkChanged": false,
+  "siteSmoke": {
+    "status": 200,
+    "bodyBytes": 6810,
+    "bodySha256": "f6183f43493608033442bc528c017789fbade37bb6220e50d55a6b00c0e3d77a"
+  },
+  "typecheckExitCode": 0,
+  "pluginZipMatchesVerifiedRelease": true
+}

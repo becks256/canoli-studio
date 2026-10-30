@@ -838,6 +838,23 @@ Command discovery reads `ShortcutRegistry.actions`; palette execution rechecks a
 
 Layer filtering is view-only. A pure traversal computes direct matches and the union of matching ancestors while carrying effective visibility/locking down the tree. LayersPanel renders the original layer objects by those IDs, preserving commands, drag targets and active selection. Filter state is not serialized or added to history and resets on document replacement. Collapsed group state remains separate from the temporary filtered expansion.
 
+`layer-tree.ts` derives the same reverse-sibling visible order and hierarchy
+metadata. `useLayerTreeKeyboard` owns transient roving focus, type-ahead and range
+anchors. An anchor captures the actual `Document` object, ordered visible IDs,
+ordered selection and additive base; unambiguous JSON array tokens avoid imported
+ID delimiter collisions. A synchronous document subscription invalidates anchors
+on external selection publication, even change-and-restore before React renders.
+Owner/order changes reset anchors/search; removed focus repairs to a surviving
+parent or nearest row. Undo repopulating an empty focused tree transfers focus
+from its container back to a row. The App supplies actual current-document identity so old
+UI events cannot target a replacement with identical persistent IDs. Selection
+cancels tools/previews, rechecks ownership, resolves public layer handles and
+calls `Document.selectLayers`. Row edits retain existing attached commands/Undo.
+Immutable model traversal is memoized; mutable previews are recomputed. Fixed
+widget bindings live in `shortcuts.ts`, consume only their contextual keys and
+preserve editable fields/native action activation. No schema, REST, scripting or
+plugin contract changes are involved.
+
 EditorStore keeps immutable ordered `selectedIds` plus compatible `selectedId`, pruning absent handles after commands/undo/redo. LayerSelection is a document-owned OOP view; selected roots exclude descendants whose selected ancestors already receive a transform. Translation, alignment and removal use existing commands inside one transaction and preflight root locks. Script worker transport includes the full set, validates active/set consistency and extends read-only-plugin checks. Multi-layer canvas movement captures root positions and revision at pointer-down, previews a transaction, and validates revision before commit. Selection is not serialized into artwork or undo snapshots.
 
 ### Batch recipe ownership

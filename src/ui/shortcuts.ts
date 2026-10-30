@@ -9,6 +9,14 @@ export interface ShortcutAction {
   allowWhileBusy?: boolean;
 }
 
+/** Fixed composite-widget keys; scoped to the focused Layers tree. Global
+ * editor actions remain registered separately below and in App's registry. */
+export const LAYER_TREE_BINDINGS = {
+  previous: 'ArrowUp', next: 'ArrowDown', first: 'Home', last: 'End',
+  expand: 'ArrowRight', collapse: 'ArrowLeft', select: 'Enter', toggle: ' ',
+  selectAll: 'Mod+a',
+};
+
 export function isTextInput(target: EventTarget | null): boolean {
   return (
     target instanceof Element &&

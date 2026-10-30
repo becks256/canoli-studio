@@ -16,6 +16,7 @@ interface LayerTreeRowProps {
   node:LayerData;
   depth:number;
   selected:boolean;
+  tabbable:boolean;
   locked:boolean;
   busy:boolean;
   filterContext:boolean;
@@ -29,17 +30,17 @@ interface LayerTreeRowProps {
 }
 
 /** Presentation only. The panel routes events with its current document/callbacks. */
-export const LayerTreeRow=memo(function LayerTreeRow({node,depth,selected,locked,busy,filterContext,filtered,collapsed,dropPlacement,thumbnailDocument,pixels,paused,fallback}:LayerTreeRowProps){
+export const LayerTreeRow=memo(function LayerTreeRow({node,depth,selected,tabbable,locked,busy,filterContext,filtered,collapsed,dropPlacement,thumbnailDocument,pixels,paused,fallback}:LayerTreeRowProps){
   return <div
     className={`layer-row ${filterContext?'filter-context':''} ${selected?'selected':''} ${!node.visible?'muted':''} ${dropPlacement?`drop-${dropPlacement}`:''}`}
     data-layer-id={node.id}
     style={{paddingLeft:8+depth*16+(node.clipped?8:0)}}
     draggable={!busy&&!locked}
   >
-    {node.kind==='group'?<button className="tree-toggle" aria-label={`Toggle ${node.name}`} disabled={filtered} data-layer-action="toggle">
+    {node.kind==='group'?<button className="tree-toggle" tabIndex={tabbable?0:-1} aria-label={`Toggle ${node.name}`} disabled={filtered} data-layer-action="toggle">
       {collapsed?icons.collapsed:icons.expanded}
     </button>:<span className="tree-spacer"/>}
-    <button className="layer-select" aria-pressed={selected} aria-label={`Select ${node.name}`} data-layer-action="select">
+    <button className="layer-select" tabIndex={-1} aria-pressed={selected} aria-label={`Select ${node.name}`} data-layer-action="select">
       {node.clipped&&<span role="img" aria-label="Clipped to base layer"><CornerDownRight size={12}/></span>}
       {node.kind==='group'?<span className="layer-thumb group-thumb">{icons.group}</span>
         :(node.kind==='raster'||node.kind==='paint')&&pixels&&thumbnailDocument?<LayerThumbnail document={thumbnailDocument} layerId={node.id} name={node.name} pixels={pixels} paused={paused} fallback={fallback}/>
@@ -48,10 +49,10 @@ export const LayerTreeRow=memo(function LayerTreeRow({node,depth,selected,locked
         :<span className="layer-thumb group-thumb">{node.kind==='paint'?icons.paint:node.kind==='vector'?icons.vector:node.kind==='text'?icons.text:node.kind==='adjustment'?icons.adjustment:icons.layer}</span>}
       <span className="layer-name">{node.name}</span>
     </button>
-    <button className={`layer-control ${node.locked?'always':''}`} aria-label={`${node.locked?'Unlock':'Lock'} ${node.name}`} data-layer-action="lock">
+    <button className={`layer-control ${node.locked?'always':''}`} tabIndex={tabbable?0:-1} aria-label={`${node.locked?'Unlock':'Lock'} ${node.name}`} data-layer-action="lock">
       {node.locked?icons.locked:icons.unlocked}
     </button>
-    <button className="layer-control always" aria-label={`${node.visible?'Hide':'Show'} ${node.name}`} disabled={locked} data-layer-action="visibility">
+    <button className="layer-control always" tabIndex={tabbable?0:-1} aria-label={`${node.visible?'Hide':'Show'} ${node.name}`} disabled={locked} data-layer-action="visibility">
       {node.visible?icons.visible:icons.hidden}
     </button>
   </div>;

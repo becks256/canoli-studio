@@ -428,6 +428,39 @@ R17: Prefer hardware WebGPU for supported viewport rendering, with automatic Can
 
 `Mod` means Command on macOS and Control on Windows/Linux. Shortcuts are suspended while typing in inputs, textareas, selects, or editable content. Escape can close a dialog or cancel a gesture.
 
+While focus is in the Layers tree, the following fixed contextual bindings in
+`src/ui/shortcuts.ts` take precedence over canvas movement, tool switching and
+temporary Space pan. Focus and layer selection are independent.
+
+| Layers tree action | Key |
+| --- | --- |
+| Focus previous/next visible row | Up/Down |
+| Focus first/last visible row | Home/End |
+| Expand group, then enter first child | Right |
+| Collapse group, otherwise focus parent | Left |
+| Select focused layer alone | Enter |
+| Toggle focused layer selection | Space |
+| Extend/shrink selection from anchor | Shift+Up/Down/Home/End or Shift+Space |
+| Add range to the original selection | Mod+Shift with the range keys |
+| Select all visible matching rows | Mod+A |
+| Find a visible layer by name | Type a prefix; repeat a character to cycle |
+| Reach active row's native expand/lock/visibility controls | Tab / Shift+Tab |
+
+Ranges use display order and keep the endpoint active. A filtered tree includes
+ancestors for navigation, but range/select-all selects matching rows only;
+context ancestors can still be selected individually. Filtering temporarily
+expands groups without changing their saved collapsed view state. Document
+replacement, visible-order changes or external selection changes invalidate
+range anchors, including selection changed and restored in one synchronous task.
+Repair focus after row removal and return to a row when Undo repopulates an empty
+tree; after leaving the tree, its entry tab stop follows
+the current visible selection. Empty-tree keys must not edit artwork. Native row
+buttons retain Enter/Space activation and shared Undo, including narrow layouts.
+Navigation/selection changes affect neither artwork, history nor saved source
+bytes. Editable fields and canvas shortcuts outside this context keep their
+existing behavior. Screen-reader/device and full accessibility acceptance remain
+separate gates.
+
 | Action                                          | Shortcut                                                  |
 | ----------------------------------------------- | --------------------------------------------------------- |
 | Move tool                                       | V                                                         |

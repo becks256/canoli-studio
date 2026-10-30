@@ -53,6 +53,8 @@ export async function floatSourceImportWorkflow(page: Page, info: TestInfo, prod
     await page.getByRole('button', {name: 'Redo (Mod+Shift+Z)', exact: true}).click();
     expect((await historyProject(page, info, 'cold-import-redone.luma')).value.document).toEqual(hidden.value.document);
     await page.getByTestId('project-input').setInputFiles(saved.path);
+    // The previous frame can still match while the asynchronous open is working.
+    await expect(page.getByRole('button', {name: 'Save project', exact: true})).toBeEnabled({timeout: 300000});
     await expect.poll(async () => (await frame()).sha256, {timeout: 300000}).toBe(visible.sha256);
     const reopened = await historyProject(page, info, 'cold-import-reopened.luma');
     expect(reopened.value.document).toEqual(saved.value.document);

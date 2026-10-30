@@ -1,5 +1,14 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Keyboard Layers increment (F13/T22)
+
+Contextual tree navigation, name search, explicit/range selection and native row
+actions extend keyboard editing through existing document selection and commands.
+Keep focus distinct from selection and preserve source pixels/history during
+navigation. This increment leaves broader screen-reader, physical-device,
+accessibility, sustained performance and unfinished professional-editor gates
+required. See the [keyboard requirements](REQUIREMENTS.md#initial-keyboard-map).
+
 ## Float appearance increment
 
 F10 now connects linear-light Color Overlay and continuous Blend If through existing style authoring, native float rendering and source-preserving file delivery. Drop shadows, other float tools/layers, working spaces/HDR/CMYK and broader F10/F14/device/quality gates remain required. [Contract](FLOAT_DOCUMENTS.md#color-overlay-and-blend-if).

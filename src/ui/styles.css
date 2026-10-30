@@ -409,6 +409,10 @@ select {
   background: var(--color-selected);
   border-left-color: var(--color-accent);
 }
+.layer-tree-node:focus {outline: none;}
+.layer-tree-node:focus-visible > .layer-row {outline: 2px solid var(--color-accent); outline-offset: -2px;}
+.layer-tree-node.keyboard-active > .layer-row .layer-control,
+.layer-row:focus-within .layer-control {visibility: visible; display: flex;}
 .layer-row.muted .layer-select {
   opacity: 0.5;
 }

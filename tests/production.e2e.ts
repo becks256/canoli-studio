@@ -1,4 +1,8 @@
 import {spacingWorkflow} from './helpers/spacing';
+import {layerKeyboardWorkflow} from './helpers/layer-keyboard';
+test('production keyboard tree selection and row edits preserve the 50 MP original, Undo and project reopening', async ({page}, info) => {
+  test.setTimeout(180000); await layerKeyboardWorkflow(page, info, true);
+});
 import {floatSourceImportWorkflow} from './helpers/float-source-import';
 test('production native 50 MP float import preserves originals, Undo and reopened viewport',async({page},info)=>{test.setTimeout(600000);await floatSourceImportWorkflow(page,info,true);});
 import {gestureSelectionWorkflow} from './helpers/gesture-selection';

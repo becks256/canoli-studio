@@ -8197,3 +8197,55 @@ rehomed; historical source/SDK/evidence/releases and host containment remain.
 Remaining import/projection, all-tool/sustained/global-process-memory/device F14,
 professional precision/color/interchange/layout, AI/provider/evaluation, installed
 ChatGPT/live identity/commercial and every unfinished original gate remain active.
+
+
+### 2026-10-30 — F13 keyboard layer-tree navigation (implemented increment)
+
+Owner: implementation agent; estimate M within T22/F13; baseline `b238970`.
+Layers now exposes a named multiselect tree, independent roving focus,
+Arrow/Home/End/hierarchy navigation, name search, explicit/toggle/range selection
+and filtered select-all through public document selection. Native row controls
+remain reachable through Tab, including compressed layouts; Space activation
+retains shared Undo without canvas pan. Fixed contextual bindings remain in
+`shortcuts.ts`; editable fields and canvas keys outside the tree retain their
+behavior. Filter context ancestors stay navigable but do not enter matching-row
+bulk/range selection automatically.
+
+Range authority captures actual document ownership, ordered visible IDs and
+ordered selection. Synchronous external selection changes revoke anchors,
+including change-and-restore and imported delimiter-colliding IDs. Identical-ID
+document replacement rejects old UI events. Removed focus repairs to a parent or
+nearest row; Undo repopulating an empty tree returns focus to a row. Traversal is
+memoized only for proven immutable models. No schema/external API change.
+
+The original ArrowDown reproduction moved artwork Y 0→1 and history 6→7 while
+focus was in Layers. It now moves focus with identical artwork/history/selection.
+Real 50 MP original-bearing development/production tasks preserve exact original
+bytes/dimensions, complete model and PNG through navigation; native visibility
+changes pixels, one Undo restores them, and actual project reopening retains all
+three. Existing nudge tests now explicitly focus the canvas; the float reopen
+test waits for operation completion before checking its frame and saving.
+
+Verification: production build, final TypeScript checking and 2,961 unit/API tests
+in 290 files passed. Focused keyboard tests passed 17/17; final reviewed keyboard
+plus development text tests passed 18/18. Combined affected coverage validates
+95 distinct cases (93 initial passes plus a passing nine-case workspace rerun).
+Combined production coverage validates 183 distinct cases (181 initial passes
+plus two passing isolated reruns). Initial full suites exited 1: workspace
+reloads returned no UI, a 50 MP Photoshop case crashed its browser, and a text
+test retained the prior arrow-focus assumption. Restored test shared-memory
+settings, isolated large preflight and explicit text canvas focus passed; these
+are retained reruns, not a single clean full-suite claim.
+
+Evidence: [verification record](benchmarks/layer-keyboard-2026-10-30.md) and
+[archive](benchmarks/layer-keyboard-2026-10-30.json.gz), 485,628 bytes, SHA-256
+`bedf1337b317a0b4c4d3651f9113430919c1e491ba22dc99e297f9aaf4a01481`.
+Frozen source/release manifests, failures, terminal results, attachment/artifact
+hashes and exact-source workflow records are retained. Application source is
+unchanged after final build/unit verification; subsequent edits corrected tests.
+
+This advances F13/T22 only. Full screen-reader/WCAG, physical-device, hardware
+WebGPU, sustained editor-wide latency/memory and every unfinished original
+professional-editor, color/interchange/layout, AI/provider/evaluation, installed
+ChatGPT/live identity/commercial and release gate remain active. The full goal is
+not complete.

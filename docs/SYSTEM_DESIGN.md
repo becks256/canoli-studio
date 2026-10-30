@@ -1,5 +1,18 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Layers tree keyboard ownership
+
+Tree focus, collapse state, search prefixes and range anchors are transient UI
+state. Navigation never nudges artwork. Selection resolves attached public layer
+handles after gesture cancellation and actual-owner checks; edits keep shared
+command validation and Undo. Anchor authority includes actual document identity,
+ordered visible IDs and selection. Synchronous external selection publication
+revokes it; change-and-restore and identical-ID replacement cannot resurrect it.
+Filtered context groups remain navigable while bulk/range selection uses direct
+matches. Native row buttons remain reachable and consume Space independently of
+canvas pan. There is no new persisted field or external mutation surface. See
+the [architecture](ARCHITECTURE.md) and [keyboard requirements](REQUIREMENTS.md#initial-keyboard-map).
+
 ## Native float source batch authority
 
 Backpressure permits one packet of at most eight compressed native tiles. The

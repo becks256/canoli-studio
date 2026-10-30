@@ -323,6 +323,17 @@ Use subtle borders for persistent chrome and shadows for floating surfaces and t
 
 ## Accessibility and interaction
 
+The Layers panel uses a named multiselect tree with nested treeitem/group roles,
+explicit level/sibling metadata and a single roving row tab stop. Its accent focus
+outline is separate from selected-row styling. Arrow and name search move focus;
+Enter/Space and range keys change selection explicitly. Active row actions remain
+visible throughout Tab transitions, even in compressed panels; their native
+buttons retain names, state and activation. Scroll only the focused row into view,
+not its whole subtree. See the contextual [keyboard map](REQUIREMENTS.md#initial-keyboard-map)
+and the [WAI-ARIA tree pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/).
+Browser automation verifies these interactions; no complete screen-reader or
+WCAG audit is implied.
+
 - All controls have accessible names; native inputs and buttons provide baseline keyboard behavior.
 - Visible focus rings use the accent token; do not remove focus without a replacement.
 - Text entry keeps its native editing shortcuts. Application shortcuts apply outside editable elements.
