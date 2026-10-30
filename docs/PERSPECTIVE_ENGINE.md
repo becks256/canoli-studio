@@ -154,6 +154,38 @@ without allocating the whole plane. Unknown settings, missing ROI neighbors,
 malformed worker replies, cancelled/disposed work and changed source geometry
 reject. Callers must pin their mask assets and supply lifetime controls.
 
+## Bidirectional coverage transport
+
+The private scalar protocol accepts optional `direction: "quad-to-source" |
+"source-to-quad"`. Omission retains the existing quad-to-source pull sampling.
+If H maps the native reference rectangle to the authored quadrilateral:
+
+- `quad-to-source` samples an original-plane field at H inverse of each placed
+  output pixel center. This remains ordinary linked-mask rendering.
+- `source-to-quad` samples a placed-plane field at H of each original-grid output
+  pixel center. This is the required opposite transport for complete brush
+  coverage, including selection clips, symmetry and tip geometry. It does not
+  approximate a stroke by transforming only its points.
+
+Both modes use the same authoritative valid reference corners and unchanged
+scalar WASM ABI, infinite constant background, bilinear reconstruction, native
+window budgets, owned inputs/outputs, horizon handling and cancellation rules.
+The second mode separates the original-grid input origin from the coverage-field
+origin. Its source lattice is rebased around the fixed finite-field center,
+never around an individual read ROI; large placements retain fractional weights
+and partitioned reads remain word-identical. Source metadata/reads are restored
+to their original coordinates at the host boundary. A changed sampling direction
+invalidates an in-flight source just like changed geometry.
+
+`capturePerspectiveMask` admits the same optional private direction for linked
+coverage. It still validates/pins complete mask assets and applies feather and
+settings after sampling, in output-pixel units. Unlinked masks retain their
+independent plane. No document/schema/command, public scripting signature,
+plugin permission or REST route is added. Interactive projected erasing, wet
+painting and mask editing remain gated until their captured authoring-space
+metadata and preview/commit replay are connected. This is a necessary sampling
+dependency, not completion of that editing workflow or F03.
+
 ## Captured renderer masks
 
 The trusted `CanvasRenderer.capturePerspectiveMask` read adapter now captures

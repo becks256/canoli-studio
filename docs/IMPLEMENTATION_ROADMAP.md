@@ -8731,3 +8731,84 @@ The full F03 brush/mask/clip/symmetry/cursor mapping, preserving-position mask
 relinking, general warp and broader photographic, interchange, sustained
 performance/device and original roadmap gates remain required. Direct handles
 do not redefine those acceptance requirements. The full goal remains active.
+
+
+### 2026-10-30 — F03 placed-to-original coverage transport
+
+Baseline `470c13b`. The preceding direct-corner work was verified progress. The
+next required brush/mask integration needs full coverage transported back onto
+the original lattice: inverse-transforming only pointer points would distort
+size, tips, selection clips and symmetry. The private scalar compiler/worker
+and captured-mask service now accept a captured sampling direction. Default
+quad-to-source behavior remains; source-to-quad samples placed coverage at H
+of each original-grid output center. Authored corners remain authoritative.
+The forward field uses separate input and finite-field origins, rebasing around
+the complete fixed field rather than a per-read ROI. Working budgets, ownership,
+background/horizon semantics and output-plane feather/settings remain unchanged.
+There is no document/schema, public scripting, REST or grant change.
+
+Integration decision to carry forward: keep a new placed stroke's complete
+geometry, clip, tip/tilt and symmetry in the existing affine layer authoring
+plane. Capture the perspective used for that operation, then transport its
+coverage to original pixels. Do not replace this with inverse-mapped point
+samples or silently change the existing source-coordinate scripting defaults.
+Durable replay also needs a captured finite content footprint: an inverse
+homography can send a finite placed stroke across a horizon into unbounded
+source support, while the actual original/wet artwork remains finite. This is
+planned integration metadata, not a currently accepted document field or public
+method signature.
+
+Verification on the final frozen implementation:
+
+- Full `npm run build` passes with the actual native binary, isolated runtime,
+  TypeScript and **43 developer guides**. All **3,093 unit/API tests in 299
+  files**, **46 affected source-browser checks** and **10 selected production
+  checks** pass without skips, retries, flakes or failures. These selected
+  matrices do not constitute complete production/device/performance acceptance.
+- Seven independent forward cases add **22,128 scalar references** to the
+  unchanged eight inverse cases, for **46,272 samples** exercised by actual
+  source and production workers. NumPy homography solves and SciPy constant-
+  border interpolation cover identity, fractional backgrounds, reflection,
+  strong perspective, horizon crossings and placement near `2^40`/`-2^41`.
+  Maximum absolute error is **2.9802322387695312e-8**, within `2^-21`.
+  Captured inputs stay owned and partitioned outputs are word-identical.
+- Three complete coverage fields from the established rasterizer retain clip,
+  symmetry, elliptical tips, painted refinements, offsets/bases, feather,
+  inversion and density. Independent projection/feather/settings compare
+  **57,195 samples** at maximum error **2.9802322387695312e-8**. Two scenarios
+  match every float word. Rendering changes no document snapshot/history.
+- A genuine **10000 × 5000 PNG** retains exact original SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`
+  and native distant alpha **128 followed by 0**. All **144 reverse-transport /
+  feather samples** match the independent Pillow PNG-crop/NumPy/SciPy reference
+  exactly, SHA-256
+  `2875d7483f7e1c547db56e8dfe9b4014fc1df8c2f4965aed28723976ee039e28`.
+  This is a verified bounded output over a real original, not every transformed
+  pixel or a process-memory bound. Existing genuine high-precision 50 MP alpha
+  and wet bitmap-mask workflows also pass separately.
+- Unit checks verify a 50 MP reference/support with only its actual bounded
+  bilinear neighborhood, and a safely representable very large finite support
+  address space without allocating its extent. Field-origin rebasing introduces
+  no image import or megapixel limit. Native working windows retain the existing
+  262,144-sample budget, independently of original/support dimensions.
+- Unknown settings/directions, malformed coverage, changed direction/geometry,
+  cancellation and disposal reject without partial publication. A production
+  worker still processes valid forward work after three invalid requests.
+  Existing mask, float-frame, perspective authoring and native delivery checks
+  pass through the unchanged default direction.
+- Product sources remain exact through the final unit and both browser runs.
+  All **145 served release resources** retain their recorded hashes. The native
+  pixel WASM and its ABI are unchanged, SHA-256
+  `bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+
+[Complete evidence](benchmarks/forward-coverage-2026-10-30.json.gz),
+**4,519,279 bytes**, SHA-256
+`1f39714b55142c0398fd57f1c9c090e7e711a81d376093761c9fed6095b82881`.
+
+Next required work is captured authoring-space/
+finite-content metadata and native byte/float preview/commit replay for projected
+erasures, followed by mask/wet input, clips, symmetry, cursors and mask relinking
+through shared commands/history. General warp, photographic/interchange quality,
+sustained editor-wide performance/device acceptance and every unfinished
+original roadmap requirement remain active. No private sampler is being counted
+as a completed public editing workflow.

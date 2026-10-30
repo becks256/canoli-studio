@@ -16,7 +16,7 @@ beforeAll(async()=>{
 const sampler={floatProjectiveField:async(alpha:Float32Array,options:ProjectiveFieldOptions)=>processor.projectiveField(alpha,options)};
 function source(options:ProjectiveFieldOptions):ProjectiveFieldSource {
   const field=options.field;
-  return {width:options.sourceWidth,height:options.sourceHeight,bounds:{...field},background:options.background,readWindow:async b=>{
+  return {direction:options.direction,width:options.sourceWidth,height:options.sourceHeight,bounds:{...field},background:options.background,readWindow:async b=>{
     const out=new Float32Array(b.width*b.height);
     for(let y=0;y<b.height;y++)out.set(input.subarray((b.y-field.y+y)*field.width+b.x-field.x,(b.y-field.y+y)*field.width+b.x-field.x+b.width),y*b.width);
     return out;
@@ -28,7 +28,8 @@ function compare(actual:Float32Array,expected:Float32Array){
   expect(maximum).toBeLessThanOrEqual(manifest.absoluteError);
 }
 
-for(const row of manifest.cases)it(`actual native infinite field matches independent ${row.name} coverage, including partitions`,async()=>{
+const forward=JSON.parse(await readFile(folder+'forward-manifest.json','utf8'));
+for(const row of [...manifest.cases,...forward.cases.map((row:any)=>({...row,name:'forward '+row.name}))])it(`actual native infinite field matches independent ${row.name} coverage, including partitions`,async()=>{
   const options=row.options as ProjectiveFieldOptions,bounds=options.output,before=input.slice();
   const actual=processor.projectiveField(input,options),expected=new Float32Array(new Uint8Array(gunzipSync(await readFile(folder+row.reference))).buffer);
   compare(actual,expected);expect(input).toEqual(before);
@@ -103,4 +104,25 @@ it('field projection captures caller options and rejects changed sources, cancel
   await expect(projectPerspectiveFieldWindow(cancelled,sampler,row.options.corners,row.options.output,{signal:abort.signal})).rejects.toThrow();
   await expect(projectPerspectiveFieldWindow(source(row.options),{floatProjectiveField:async()=>new Float32Array(0)},row.options.corners,row.options.output)).rejects.toThrow(/expected length/);
   const fresh=processor.projectiveField(input,row.options);expect(fresh.length).toBe(row.options.output.width*row.options.output.height);
+});
+
+it('forward sampling preserves fractional coverage at large field translations without a large matrix origin',()=>{
+ const row=forward.cases.find((v:{name:string})=>v.name==='large-placement'),actual=processor.projectiveField(input,row.options),near={...row.options,corners:row.options.corners.map((p:{x:number;y:number})=>({x:p.x-2**40,y:p.y+2**41})),field:{...row.options.field,x:row.options.field.x-2**40,y:row.options.field.y+2**41},source:{...row.options.source,x:row.options.source.x-2**40,y:row.options.source.y+2**41}};
+ expect(new Uint32Array(actual.buffer)).toEqual(new Uint32Array(processor.projectiveField(input,near).buffer));
+ const compiled=compileProjectiveField(row.options);expect(compiled.inputOrigin).toEqual({x:0,y:0});expect(Math.max(...compiled.values.subarray(0,11).map(Math.abs))).toBeLessThan(100);
+});
+it('invalid direction and changed direction reject before publishing native coverage',async()=>{
+ expect(()=>compileProjectiveField({...identity,direction:'sideways'} as unknown as ProjectiveFieldOptions)).toThrow();
+ const row=forward.cases[0],changing=source(row.options),read=changing.readWindow;changing.readWindow=async b=>{const result=await read(b);changing.direction='quad-to-source';return result;};
+ await expect(projectPerspectiveFieldWindow(changing,sampler,row.options.corners,row.options.output)).rejects.toThrow(/geometry changed/);
+});
+
+it('forward 50 MP address spaces read only the requested original-derived bilinear neighborhood',async()=>{
+ const reads:FloatSourceWindow[]=[],bounds={x:0,y:0,width:10000,height:5000},corners=[{x:0,y:0},{x:5000,y:0},{x:4500,y:2500},{x:0,y:2200}]as const;
+ const actual=await projectPerspectiveFieldWindow({width:10000,height:5000,direction:'source-to-quad',bounds,background:1,readWindow:async b=>{reads.push({...b});return new Float32Array(b.width*b.height).fill(.25);}},sampler,corners,{x:9990,y:4990,width:2,height:2});
+ expect([...actual]).toEqual([.25,.25,.25,.25]);expect(reads.length).toBeGreaterThan(0);expect(Math.max(...reads.map(b=>b.width*b.height))).toBeLessThanOrEqual(64);
+});
+it('forward field rebasing does not impose a new finite-support extent cap',async()=>{
+ const bounds={x:-(2**52)+8,y:-16,width:2**53-32,height:32},corners=[{x:-(2**52)+16,y:0},{x:-(2**52)+47,y:0},{x:-(2**52)+47,y:23},{x:-(2**52)+16,y:23}]as const;
+ const result=await projectPerspectiveFieldWindow({width:31,height:23,direction:'source-to-quad',bounds,background:1,readWindow:async b=>new Float32Array(b.width*b.height).fill(.5)},sampler,corners,{x:0,y:0,width:2,height:2});expect([...result]).toEqual([.5,.5,.5,.5]);
 });

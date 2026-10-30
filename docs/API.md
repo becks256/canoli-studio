@@ -1,5 +1,14 @@
 # REST and scripting APIs
 
+## Private coverage transport keeps API boundaries
+
+The native scalar engine now supports both sampling directions for original and
+placed coverage. It is host-owned rendering work; no new REST route, composed
+server renderer, browser synchronization or isolated pixel/worker service is
+exposed. Public perspective/tool availability retains its documented current
+boundary. [Private dependency and remaining integration](PERSPECTIVE_ENGINE.md#bidirectional-coverage-transport).
+
+
 ## Image perspective placement (schema 50)
 
 Raster/smart-object layer.update patches accept optional `perspective: null |

@@ -1,5 +1,14 @@
 # Plugins and extensions
 
+## Bidirectional coverage stays host-owned
+
+The private original/placed scalar sampler adds no plugin permission, package
+field, worker/pixel method, network access or installation-time execution.
+Existing document grants, isolation, revision/source/asset validation and Undo
+remain authoritative. Projected brush/mask controller integration remains
+required. [Engine boundary](PERSPECTIVE_ENGINE.md#bidirectional-coverage-transport).
+
+
 ## Image perspective uses existing document grants
 
 PerspectiveTransform and shared layer.update commands require existing document

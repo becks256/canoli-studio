@@ -1,5 +1,18 @@
 # Architecture
 
+## Placed coverage back to original pixels
+
+Private scalar-field sampling now supports both quad-to-source and source-to-
+quad pull mappings. The original authored corners remain authoritative; the
+forward mode rebases its finite coverage lattice around a fixed field center,
+keeping large placement out of interpolation and preserving partition identity.
+Captured masks share the direction flag, asset/lifetime checks, native output
+feathering and working budgets. This is the native dependency for complete
+clipped/symmetric brush coverage on projected originals. Public controller and
+history integration remain required; document schema and grants stay unchanged.
+[Contract](PERSPECTIVE_ENGINE.md#bidirectional-coverage-transport).
+
+
 ## Schema-50 image perspective placement
 
 Raster and smart-object instances retain normalized four-corner placement through

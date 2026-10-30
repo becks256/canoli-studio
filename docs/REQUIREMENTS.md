@@ -1,5 +1,17 @@
 # Canoli Studio editor requirements
 
+## F03 placed coverage sampling dependency
+
+Native scalar coverage must support original-to-placed and placed-to-original
+transport without image-quad clipping, source downsampling or transforming only
+stroke points. Preserve complete coverage/clip/symmetry geometry, constant
+background, float ownership, output partition identity, invalid-direction and
+changed-source rejection, actual WASM execution and genuine 50 MP originals.
+Controller metadata, previews, durable edits and existing Undo/isolation remain
+required before projected tools are enabled. This dependency does not close F03.
+[Numeric contract](PERSPECTIVE_ENGINE.md#bidirectional-coverage-transport).
+
+
 ## Bounded native float source staging
 
 Cold float-source preparation may acknowledge at most eight tiles per atomic

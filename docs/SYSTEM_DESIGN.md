@@ -1,5 +1,18 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Bidirectional projective coverage
+
+The private scalar compiler captures direction together with corners and source
+metadata. Default pull sampling maps placed output through the inverse; the
+opposite mapping samples the complete placed coverage field on the original
+lattice. Input/reference and finite-field origins stay separate; rebasing uses
+the fixed complete field, so native ROI partitioning cannot retarget a sample.
+The unchanged worker/WASM path validates owned coverage and rejects malformed,
+cancelled or changed-source work. Captured masks use output-plane feathering and
+settings afterward. Public projected stroke/mask authoring and history replay
+remain required. [Contract](PERSPECTIVE_ENGINE.md).
+
+
 ## Original-preserving image perspective placement
 
 Schema 50 adds normalized corner state to image instances. Immutable constructor

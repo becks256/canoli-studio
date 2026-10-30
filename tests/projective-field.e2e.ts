@@ -6,19 +6,19 @@ import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 
 test('real scalar-field worker retains extended mask support, independent coverage and caller ownership',async({page},info)=>{
-  const folder='tests/fixtures/projective-field/',manifest=JSON.parse(await readFile(folder+'manifest.json','utf8'));
+  const folder='tests/fixtures/projective-field/',manifest=JSON.parse(await readFile(folder+'manifest.json','utf8')),forward=JSON.parse(await readFile(folder+'forward-manifest.json','utf8'));
   const source=[...new Uint8Array(gunzipSync(await readFile(folder+'source.f32le.gz')))];
   await page.goto('/');await page.waitForFunction(()=>!!window.luma?.editor);const records=[];
-  for(const row of manifest.cases){
+  for(const row of [...manifest.cases,...forward.cases]){
     const result=await page.evaluate(async({row,source})=>{
       const {PixelProcessor}=await import(/* @vite-ignore */String('/src/engine/processor.ts'));
       const {projectPerspectiveFieldWindow}=await import(/* @vite-ignore */String('/src/engine/projective-field.ts'));
       const processor=new PixelProcessor(),original=new Float32Array(new Uint8Array(source).buffer),alpha=original.slice(),options=structuredClone(row.options);
       const before=JSON.stringify(window.luma.editor.document.toJSON()),reads:FloatSourceWindow[]=[];
       try{
-        const pending=processor.floatProjectiveField(alpha,options);alpha.fill(99);options.corners[0].x=999;options.field.width=1;options.output.width=1;options.background=0;
+        const pending=processor.floatProjectiveField(alpha,options);alpha.fill(99);options.corners[0].x=999;options.field.width=1;options.output.width=1;options.background=0;options.direction='quad-to-source';
         const actual=await pending,b=row.options.field;
-        const projected=await projectPerspectiveFieldWindow({width:row.options.sourceWidth,height:row.options.sourceHeight,bounds:b,background:row.options.background,
+        const projected=await projectPerspectiveFieldWindow({width:row.options.sourceWidth,height:row.options.sourceHeight,bounds:b,background:row.options.background,direction:row.options.direction,
           readWindow:async(area:FloatSourceWindow)=>{
             reads.push({...area});const out=new Float32Array(area.width*area.height);
             for(let y=0;y<area.height;y++)out.set(original.subarray((area.y-b.y+y)*b.width+area.x-b.x,(area.y-b.y+y)*b.width+area.x-b.x+area.width),y*area.width);

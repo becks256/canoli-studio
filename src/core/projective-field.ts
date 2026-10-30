@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import {compileProjectiveSample} from './projective-sampling';
-import type {ProjectiveQuad} from './projective';
+import {ProjectiveTransform,type ProjectiveQuad} from './projective';
+import {AffineTransform} from './affine';
 import {validateWindow,type FloatSourceWindow} from './float-source/types';
 
 const integer=z.number().int().safe(),extent=integer.positive();
@@ -8,12 +9,14 @@ const rectangle=z.object({x:integer,y:integer,width:extent,height:extent}).stric
 const schema=z.object({
   sourceWidth:extent,sourceHeight:extent,corners:z.array(z.object({x:z.number().finite(),y:z.number().finite()}).strict()).length(4),
   field:rectangle,source:rectangle,output:rectangle,background:z.number().finite().min(0).max(1),
+  direction:z.enum(['quad-to-source','source-to-quad']).optional(),
 }).strict();
 
 /** Finite scalar deviations from a constant infinite background. Reference
  * geometry defines the homography, not a clip or clamp boundary for the field. */
+export type ProjectiveFieldDirection='quad-to-source'|'source-to-quad';
 export interface ProjectiveFieldOptions {
-  sourceWidth:number;sourceHeight:number;corners:ProjectiveQuad;
+  sourceWidth:number;sourceHeight:number;corners:ProjectiveQuad;direction?:ProjectiveFieldDirection;
   field:FloatSourceWindow;source:FloatSourceWindow;output:FloatSourceWindow;background:number;
 }
 
@@ -32,9 +35,19 @@ export function compileProjectiveField(input:ProjectiveFieldOptions) {
   const frame=compileProjectiveSample({sourceWidth:options.sourceWidth,sourceHeight:options.sourceHeight,
     source:{x:0,y:0,width:1,height:1},output,corners:options.corners as unknown as ProjectiveQuad});
   const corners=frame.options.corners;
-  return {options:{...options,field,source,output,corners},values:new Float64Array([
-    ...frame.values.subarray(0,9),corners[0].x,corners[0].y,
-    field.x,field.y,field.width,field.height,source.x,source.y,source.width,source.height,
+  let inputOrigin={...corners[0]},sourceOrigin={x:0,y:0},matrix=frame.values.subarray(0,9);
+  if(options.direction==='source-to-quad'){
+    // Pull coverage from the placed/brush plane onto the original reference
+    // lattice. Keep both coordinate origins separate: a large placement must
+    // not enter matrix cofactors or erase subpixel interpolation precision.
+    inputOrigin={x:0,y:0};sourceOrigin={x:Math.floor(field.x+field.width/2),y:Math.floor(field.y+field.height/2)};
+    const forward=ProjectiveTransform.rectangle(options.sourceWidth,options.sourceHeight,corners.map(p=>({x:p.x-corners[0].x,y:p.y-corners[0].y})) as unknown as ProjectiveQuad);
+    matrix=Float64Array.from(ProjectiveTransform.fromAffine(AffineTransform.translation(corners[0].x-sourceOrigin.x,corners[0].y-sourceOrigin.y)).multiply(forward).values);
+  }
+  const localField=captureFieldBounds({...field,x:field.x-sourceOrigin.x,y:field.y-sourceOrigin.y}),localSource=validateWindow({...source,x:source.x-sourceOrigin.x,y:source.y-sourceOrigin.y});
+  return {inputOrigin,sourceOrigin,options:{...options,field,source,output,corners},values:new Float64Array([
+    ...matrix,inputOrigin.x,inputOrigin.y,
+    localField.x,localField.y,localField.width,localField.height,localSource.x,localSource.y,localSource.width,localSource.height,
     output.x,output.y,output.width,output.height,options.background,
   ])};
 }

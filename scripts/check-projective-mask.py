@@ -12,6 +12,9 @@ from scipy.ndimage import convolve1d
 spec = importlib.util.spec_from_file_location('field_oracle', Path(__file__).with_name('generate-projective-field-fixtures.py'))
 oracle = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(oracle)
+forward_spec = importlib.util.spec_from_file_location('forward_oracle', Path(__file__).with_name('generate-forward-projective-field-fixtures.py'))
+forward_oracle = importlib.util.module_from_spec(forward_spec)
+forward_spec.loader.exec_module(forward_oracle)
 p = argparse.ArgumentParser()
 p.add_argument('actual', type=Path)
 p.add_argument('--case', type=Path, required=True)
@@ -34,20 +37,25 @@ halo = 3*extent
 padded = {'x': output['x']-halo, 'y': output['y']-halo, 'width': output['width']+2*halo, 'height': output['height']+2*halo}
 if mask.get('linked', True):
     options = {'sourceWidth': case['sourceWidth'], 'sourceHeight': case['sourceHeight'], 'field': field,
-               'output': padded, 'background': case['background'], 'corners': case['corners']}
+               'output': padded, 'background': case['background'], 'corners': case['corners'], 'direction': case.get('direction', 'quad-to-source')}
     if a.png_source:
         quad = np.array([[v['x'], v['y']] for v in case['corners']], dtype=np.float64)
         origin, inverse = oracle.homography(case['sourceWidth'], case['sourceHeight'], quad)
+        forward = np.linalg.inv(inverse)
         denominators = []
         for x in [padded['x']+.5, padded['x']+padded['width']-.5]:
             for y in [padded['y']+.5, padded['y']+padded['height']-.5]:
-                q = inverse @ np.append(np.array([x, y])-origin, 1)
+                if options['direction'] == 'source-to-quad':
+                    q = forward @ np.array([x, y, 1])
+                    u, v = q[:2]/q[2]+origin-.5
+                else:
+                    q = inverse @ np.append(np.array([x, y])-origin, 1)
+                    u, v = q[:2]/q[2]-.5
                 denominators.append(q[2])
-                u, v = q[:2]/q[2]-.5
                 assert field['x']+1 <= u < field['x']+field['width']-2
                 assert field['y']+1 <= v < field['y']+field['height']-2
         assert all(v > 0 for v in denominators) or all(v < 0 for v in denominators)
-    values = oracle.reference(source, options)
+    values = forward_oracle.reference(source, options) if options['direction'] == 'source-to-quad' else oracle.reference(source, options)
 else:
     values = np.full((padded['height'], padded['width']), case['background'], dtype='<f4')
     for y in range(padded['height']):

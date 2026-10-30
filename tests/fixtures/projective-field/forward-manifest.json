@@ -1,0 +1,339 @@
+{
+  "version": 1,
+  "reference": "Independent NumPy homography solve and SciPy grid-constant bilinear interpolation, with separately rebased coverage field.",
+  "numpy": "1.26.4",
+  "scipy": "1.13.0",
+  "absoluteError": 4.76837158203125e-07,
+  "sourceSha256": "69814fa82f6faa69c8f0eb7f7728655b92b2068fe504fe819bdcfc4ee3a8432d",
+  "cases": [
+    {
+      "name": "identity",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 23
+          },
+          {
+            "x": 0,
+            "y": 23
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -10,
+          "y": -8,
+          "width": 48,
+          "height": 42
+        },
+        "background": 0
+      },
+      "reference": "forward-identity.f32le.gz",
+      "floatSha256": "ef7567099f482f4a663fa45bf7587a579a7d31819216072edeb135d04431ff50"
+    },
+    {
+      "name": "fractional-background",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1.125,
+            "y": 0.375
+          },
+          {
+            "x": 32.125,
+            "y": 0.375
+          },
+          {
+            "x": 32.125,
+            "y": 23.375
+          },
+          {
+            "x": 1.125,
+            "y": 23.375
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -10,
+          "y": -8,
+          "width": 48,
+          "height": 42
+        },
+        "background": 0.37
+      },
+      "reference": "forward-fractional-background.f32le.gz",
+      "floatSha256": "cb1c189330e7bba4820f341322b367fa1b8170cc4cc2b89e5a203c1ffd60b1f8"
+    },
+    {
+      "name": "reflection",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 36,
+            "y": 2
+          },
+          {
+            "x": 2,
+            "y": 4
+          },
+          {
+            "x": 5,
+            "y": 29
+          },
+          {
+            "x": 31,
+            "y": 26
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0.37
+      },
+      "reference": "forward-reflection.f32le.gz",
+      "floatSha256": "b0a311a47f5fb6cba5532eeb740a202d1071b60d83d4da41bb9937ecdecbfbe1"
+    },
+    {
+      "name": "perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 3.25,
+            "y": 1.125
+          },
+          {
+            "x": 39.5,
+            "y": 4.25
+          },
+          {
+            "x": 31,
+            "y": 29
+          },
+          {
+            "x": 7.5,
+            "y": 25.75
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 1
+      },
+      "reference": "forward-perspective.f32le.gz",
+      "floatSha256": "b3fbb46f1f625a43c8179340fff1062182cc912875ab1f9ea6b10ea237b89579"
+    },
+    {
+      "name": "forward-horizon",
+      "options": {
+        "sourceWidth": 6,
+        "sourceHeight": 3,
+        "corners": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 6,
+            "y": 0
+          },
+          {
+            "x": 2,
+            "y": 1
+          },
+          {
+            "x": 0,
+            "y": 1
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -12,
+          "y": -8,
+          "width": 36,
+          "height": 36
+        },
+        "background": 1
+      },
+      "reference": "forward-forward-horizon.f32le.gz",
+      "floatSha256": "169bdc2d1a7098485ae0b3ed110ab1ef2abc899832073486dcc09020edb03a62"
+    },
+    {
+      "name": "strong-perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1,
+            "y": 1
+          },
+          {
+            "x": 39.5,
+            "y": 3
+          },
+          {
+            "x": 7.75,
+            "y": 30
+          },
+          {
+            "x": 6,
+            "y": 28
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0.37
+      },
+      "reference": "forward-strong-perspective.f32le.gz",
+      "floatSha256": "500421bdd314876c667ecc142984c03d03a8e938177b98c5d4a5ba4a9af79632"
+    },
+    {
+      "name": "large-placement",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1099511627779.25,
+            "y": -2199023255550.875
+          },
+          {
+            "x": 1099511627815.5,
+            "y": -2199023255547.75
+          },
+          {
+            "x": 1099511627807,
+            "y": -2199023255523
+          },
+          {
+            "x": 1099511627783.5,
+            "y": -2199023255526.25
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": 1099511627772,
+          "y": -2199023255556,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": 1099511627772,
+          "y": -2199023255556,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 1
+      },
+      "reference": "forward-large-placement.f32le.gz",
+      "floatSha256": "6d86b28d30d34ea36183780e4413a202b8ec351d76d8952098390ed53003dfad"
+    }
+  ]
+}
