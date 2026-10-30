@@ -6550,3 +6550,18 @@ input[type="color"] {
 .spacing-guide.equal > span { border-color:var(--color-accent); }
 
 .spacing-overlay { position:absolute; inset:0; pointer-events:none; z-index:8; }
+
+.perspective-corners { position:absolute; inset:0; pointer-events:none; }
+.perspective-corner {
+  position:absolute; width:28px; height:28px; padding:0; border:0;
+  transform:translate(-50%,-50%); background:transparent; border-radius:4px;
+  pointer-events:auto; cursor:crosshair; touch-action:none;
+}
+.perspective-corner::after {
+  content:""; position:absolute; inset:8px; background:var(--color-app);
+  border:2px solid var(--color-selection); border-radius:2px;
+}
+.perspective-corner:hover::after { background:var(--color-accent); }
+.perspective-corner:focus-visible { outline:2px solid var(--color-accent); outline-offset:2px; }
+
+.perspective-issue { position:absolute; left:16px; bottom:16px; max-width:360px; padding:10px 12px; border:1px solid var(--color-selection); border-radius:6px; background:var(--color-panel); color:var(--color-text); pointer-events:none; font-size:12px; }

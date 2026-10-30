@@ -4,17 +4,19 @@ import type {EditorCommand} from '../core/commands';
 import {InspectorSection} from './InspectorSection';
 import {NumberField,Button} from './controls';
 
-export function PerspectiveControls({layer,selected,disabled,onPreview,onAttempt,onSelectedAction}:{
-  layer:RasterLayer|SmartObjectLayer;selected:{id:string;width:number;height:number;perspective?:PerspectiveData|null};disabled:boolean;
+export function PerspectiveControls({layer,selected,disabled,editing,canEdit,onToggleEditing,onPreview,onAttempt,onSelectedAction}:{
+  layer:RasterLayer|SmartObjectLayer;selected:{id:string;width:number;height:number;perspective?:PerspectiveData|null};disabled:boolean;editing:boolean;canEdit:boolean;onToggleEditing():void;
   onPreview(command:EditorCommand|null):void;onAttempt(action:()=>void):void;onSelectedAction(action:(layer:Layer)=>void):void;
 }){
   const corners=layer.perspective?.corners??IDENTITY_PERSPECTIVE;
   const width=layer.width,height=layer.height;
   const value=(index:number,axis:'x'|'y',coordinate:number)=>new PerspectiveTransform({corners}).withCorner(index,{...corners[index],[axis]:coordinate/(axis==='x'?width:height)});
   return <InspectorSection title="Perspective">
+    <Button disabled={disabled||!canEdit} aria-pressed={editing} onClick={onToggleEditing}>{editing?'Done editing corners':'Edit perspective corners'}</Button>
+    {editing&&<p className="muted">Drag a corner on the canvas. Focus a corner and use arrow keys for 1 canvas pixel, or Shift for 10. Escape cancels a drag.</p>}
     <p className="muted">Image corners in layer pixels. Original pixels and existing paint are retained. Reset perspective to paint on this image or edit its linked mask.</p>
     {['Top left','Top right','Bottom right','Bottom left'].map((label,index)=><div className="field-grid" key={label}>
-      {(['x','y'] as const).map(axis=><NumberField key={axis} label={`${label} ${axis.toUpperCase()}`} value={corners[index][axis]*(axis==='x'?width:height)} min={-Number.MAX_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} step="any" disabled={disabled}
+      {(['x','y'] as const).map(axis=><NumberField layout="stacked" key={axis} label={`${label} ${axis.toUpperCase()}`} value={corners[index][axis]*(axis==='x'?width:height)} min={-Number.MAX_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} step="any" disabled={disabled}
         onPreview={coordinate=>onAttempt(()=>onPreview(coordinate===corners[index][axis]*(axis==='x'?width:height)?null:{type:'layer.update',id:selected.id,patch:{perspective:value(index,axis,coordinate).toJSON()}}))}
         onCommit={coordinate=>{onPreview(null);onSelectedAction(target=>{if(target instanceof RasterLayer||target instanceof SmartObjectLayer)target.perspective=value(index,axis,coordinate);});}}/>)}
     </div>)}

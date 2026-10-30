@@ -2,7 +2,8 @@
 
 Raster and smart-object instances now carry optional schema-50 normalized
 perspective corners through `PerspectiveTransform`, shared commands and Undo.
-The Inspector authors their eight pixel coordinates and resets the placement.
+The Inspector authors their eight pixel coordinates, enables direct corner
+editing on the canvas, and resets the placement.
 Affine transforms remain a separate parent-placement matrix. Original assets,
 adjustments and intrinsic operations remain retained. This connected placement
 increment does not complete F03 or the professional-editor roadmap.
@@ -41,8 +42,37 @@ resetting perspective. Those operations reject with an explicit message instead
 of writing an affine approximation. Local-coordinate constructor/API operations
 remain available. Correct projective pointer, clip, symmetry and cursor mapping
 are required follow-up work, not waived acceptance criteria. Numeric authoring
-is available; direct corner handles, general warp and photographic resampling
+and direct corner handles are available; general warp and photographic resampling
 quality/performance/device acceptance remain required.
+
+## Direct corner editing
+
+Select one visible, unlocked raster or smart-object instance and choose **Edit
+perspective corners** in the Inspector or command search. Four focusable corner
+buttons replace ordinary resize/rotation handles. Dragging changes only the
+chosen normalized corner. Grab offset is retained, and displacement passes
+through the captured inverse affine parent/layer basis, so rotation, shear and
+reflection do not change canvas-space pointer motion. The overlay follows the
+validated temporary document without mutating the attached model or originals.
+
+Pointer-up samples its final endpoint and commits one shared perspective edit;
+a click without motion creates no Undo entry. Folded/nonfinite/unsupported
+content-horizon placements show a correction message and do not commit on
+release. Returning to a valid placement allows the same drag to continue.
+Escape, pointer cancellation/lost capture, window blur, actual owner/revision/
+ordered-selection changes (including change-and-restore), tool changes and
+modal opening cancel the gesture. The ordinary lock and command validation
+remain authoritative. Idle corner-edit mode survives saving/quick PNG delivery;
+starting busy work cancels any active drag and temporarily hides the handles.
+**Done editing corners** restores the ordinary Move handles.
+
+Focus a corner and use Arrow keys to move it by **1 canvas pixel**, or
+Shift+Arrow for **10**; each key operation is one Undo. These keys affect only
+the focused corner and do not intercept editable fields. Buttons have fixed
+28-pixel hit areas, focus rings and labels; mouse, pen and touch use the same
+captured pointer path. No new default global shortcut, schema, scripting
+signature, permission, source replacement or renderer service is introduced.
+The command can be rebound through the existing shortcut editor.
 
 SVG uses a native composition prefix; Photoshop delivery bakes projected image
 appearance and its own mask into layer pixels. Explicit smart rasterization

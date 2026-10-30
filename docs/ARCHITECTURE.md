@@ -9,6 +9,13 @@ feeds the native sampler; float scenes retain original-derived float windows.
 Masks project before document-space feather; geometric bounds/hit tests use
 projected coordinates. Active perspective falls back from the affine WebGPU
 compositor. World-to-local tool mapping remains gated where still affine.
+App's perspective gesture captures the actual document, revision, ordered
+selection, original corners and inverse affine basis. PerspectiveCornerDrag
+maps canvas displacement into one normalized corner; GesturePreviews validates
+its shared update without attached mutation. Pointer-up commits once. Owner,
+selection, revision, tool/modal, pointer and blur cancellation discard the draft;
+keyboard nudges use the same constructor/setter. The overlay owns fixed screen
+hit areas and scoped keys, not document data. Numeric controls remain available.
 [Current contract and required follow-up](PERSPECTIVE_ENGINE.md).
 
 
@@ -2213,5 +2220,5 @@ feathering follows projection with complete halos and float32 intermediates,
 then inversion/density. Captured masks, asset identity/geometry, store lifetime,
 renderer epoch and cancellation guard publication. This is a read-only renderer
 dependency used by schema-50 image rendering. Public numeric authoring and
-baked file delivery are connected; direct handles and projective tool mapping
-remain required. No pixel/worker or additional plugin authority is added.
+baked file delivery and direct corner handles are connected; projective brush/
+mask tool mapping remains required. No pixel/worker or additional plugin authority is added.

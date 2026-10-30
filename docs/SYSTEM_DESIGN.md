@@ -8,7 +8,12 @@ retain originals and placement. Rendering reconstructs bounded native intrinsic
 windows, projects image coverage and applies independently captured masks with
 document-space feather. Float scenes preserve float values. Spatial queries and
 outlines use the projected quad while affine parent placement remains distinct.
-The affine GPU path declines active perspective. Unsupported interactive input
+Direct corner gestures capture source/owner/revision/ordered selection, retain
+grab offsets and map document displacement through the inverse affine basis.
+Detached shared-command preview and one-edit release keep originals and history
+separate. Scoped keyboard nudges share the same constructor. Pointer, owner,
+selection, revision, tool/modal and blur cancellation discard the draft.
+The affine GPU path declines active perspective. Unsupported brush/mask input
 mapping rejects explicitly; projective tool/clip/cursor mapping and full F03
 quality/performance acceptance remain required. [Contract](PERSPECTIVE_ENGINE.md).
 

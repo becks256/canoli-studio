@@ -6,9 +6,16 @@ Raster and smart-object layers expose a custom Perspective section with eight
 NumberFields for TL/TR/BR/BL pixel coordinates and a Reset perspective button.
 Preview uses transient shared-command validation; commit is one Undo and Escape
 retains the authored state. Use the existing fields, spacing, type and disabled
-states. No new keyboard binding is introduced. The projected canvas outline
-follows the quad. Direct corner handles and projective brush/mask pointer mapping
-remain required work; currently affected tools explain the reset requirement.
+states. Stack the corner coordinate labels above their fields so long corner
+names do not overflow narrow Inspector columns. **Edit perspective corners**
+replaces ordinary Move resize/rotation handles with four labelled, focusable
+28-pixel hit areas and 12-pixel marks using existing selection tokens. Keep hit
+areas fixed across zoom; the projected outline follows the quad. Preserve grab
+offset and parent transforms. Live preview remains detached; release commits
+once, invalid folds show a correction message, and cancellation restores the
+authored state. Scope Arrow/Shift+Arrow to the focused corner for 1/10 canvas
+pixels. No new default global chord is introduced. Projective brush/mask pointer
+mapping remains required; affected tools still explain the reset requirement.
 
 
 ## Float tonal controls

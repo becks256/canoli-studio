@@ -8661,3 +8661,73 @@ run above passes. These failed/corrected runs remain in the evidence.
 
 The full roadmap goal remains active; the remaining F03 editing and broader
 professional-editor acceptance requirements above are still required.
+
+
+### 2026-10-30 — F03 direct image perspective corners
+
+Baseline `8d0f071`. The prior public image placement increment was verified
+progress. Direct corner authoring now advances its remaining editing workflow:
+mouse/touch pointer capture, focusable corner controls, canvas-pixel Arrow and
+Shift+Arrow nudges, shared detached previews and one-edit pointer release. The
+initial inverse affine basis and grab offset keep parent rotation/shear/reflection
+independent of pointer displacement. Invalid folds/content horizons do not commit;
+valid correction remains available. Actual owner, revision and ordered-selection
+changes, Escape, pointer cancel/lost capture, blur, tool/modal changes and busy
+work discard an active draft. Idle corner mode survives Save/quick PNG output.
+The command registry exposes the same mode without a default global chord.
+Corner fields now use stacked labels in narrow Inspectors. No public API/schema,
+permission or rendering contract changes.
+
+Verification:
+
+- Full `npm run build` passes, including the actual WASM, isolated runtime,
+  TypeScript and **43 developer guides**. All **3,082 unit/API tests in 299
+  files** pass on frozen inputs. Geometry tests cover retained grab offset,
+  fractional source sizes, affine rotation/shear/reflection, large translation,
+  identity placement, folds and unchanged captured values.
+- **45 distinct source-browser workflows** pass across the final matrix and
+  corrected TIFF fixture. The matrix initially passed 44 checks and failed the
+  new float fixture because its imported layer was unselected. The corrected
+  fixture explicitly selects the image and passes. Only that Playwright
+  scaffold changed after the full unit run; product and unit-test sources
+  remain exact. The original failure and corrected run are retained.
+- **6 selected production checks** pass on the frozen release without developer
+  globals: real corner dragging/nudging, one-edit Undo/Redo, exported pixels and
+  original-bearing projects, existing numeric perspective, native 50 MP
+  selection cancellation, float pointer transport, the independent perspective
+  worker and the guide at 390 px without JavaScript. This is not a new complete
+  production-suite or physical-device/performance acceptance claim.
+- Source checks cover raster and smart-object corners under transformed parents,
+  private previews, final pointer-up sampling, real touch input, invalid release
+  recovery, focused keys, field typing, no-op clicks, locks, command search,
+  and cancellation on Escape, lost/cancelled capture, selection round trips,
+  revisions, Undo, owner changes, tool/modal changes and blur. Existing resize,
+  rotation, selection-scaling, panning and preview-admission checks also pass.
+- A genuine **10000 × 5000 PNG** retains original SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`,
+  native distant alpha **128 followed by 0**, one-Undo behavior and exact project
+  reopening after corner dragging. A rendered **4 × 4** distant native window
+  compares all **16 alpha samples** with independent NumPy polygon/inverse
+  geometry and Pillow original pixels. Maximum error is **0.27083375636040685
+  byte levels**, within the declared one-byte output gate; four samples are
+  nonzero. This is a verified crop over a real original, not every transformed
+  pixel, a memory bound or a performance measurement.
+- A native **256 × 256 unsigned-16-bit TIFF** retains complete original bytes,
+  float32/linear-sRGB mode and one Undo after pointer authoring. All **3,072
+  sampled RGB components** in the checked 32 × 32 scene window retain values
+  distinguishable from byte quantization. The native pixel WASM is unchanged,
+  SHA-256 `bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+- All **145 served release resources** retain their recorded hashes. Browser
+  runs have no skips/retries/flakes; the corrected fixture failure is disclosed
+  above. Early pilots also corrected a broad command-search selector and fitted
+  the large canvas before grabbing its previously offscreen corner. No product
+  behavior was weakened to accommodate those test corrections.
+
+[Complete evidence](benchmarks/perspective-corners-2026-10-30.json.gz),
+**1,484,004 bytes**, SHA-256
+`c3694b67dae74257f875777e4a9e5abbeca70ab6ff08496b157fa4d94c06089d`.
+
+The full F03 brush/mask/clip/symmetry/cursor mapping, preserving-position mask
+relinking, general warp and broader photographic, interchange, sustained
+performance/device and original roadmap gates remain required. Direct handles
+do not redefine those acceptance requirements. The full goal remains active.

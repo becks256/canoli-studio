@@ -17,6 +17,11 @@ export const LAYER_TREE_BINDINGS = {
   selectAll: 'Mod+a',
 };
 
+/** Scoped to a focused image perspective corner; never handled in fields. */
+export const PERSPECTIVE_CORNER_BINDINGS:Readonly<Record<string,{x:number;y:number}>>={
+  ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},
+};
+
 export function isTextInput(target: EventTarget | null): boolean {
   return (
     target instanceof Element &&
@@ -103,6 +108,7 @@ export function formatShortcut(shortcut: string): string {
 export const SHORTCUT_BINDINGS: Record<string, string[]> = {
   'chatgpt-connection': [],
   account: [],
+  'edit-perspective': [],
   "artwork-library": [],
   "history-inspector": [],
   "color-palettes": [],

@@ -1,5 +1,8 @@
 import {measureSpacing,snapToSpacing,type SpacingMatch} from '../core/spacing';
 import {activePerspective} from '../core/perspective';
+import {PerspectiveCornerDrag} from './perspective-corner';
+import {PerspectiveOverlay} from './PerspectiveOverlay';
+import {PerspectiveTransform} from '../dom/perspective';
 import {clippingBaseFor} from '../core/clipping';
 import {SpacingOverlay} from './SpacingOverlay';
 import {alignmentCommands,layerAlignmentSchema,type LayerAlignment,type AlignmentTarget} from '../core/layer-layout';
@@ -333,9 +336,15 @@ export function App({ editor }: { editor: EditorApplication }) {
   const viewport = useRef<HTMLDivElement>(null);
   const displayHost = useRef<HTMLDivElement>(null);
   const capturedPointer = useRef<number | null>(null);
+  const [perspectiveTarget,setPerspectiveTarget]=useState<{owner:EditorDocument;id:string}|null>(null);
+  const [perspectiveIssue,setPerspectiveIssue]=useState<string|null>(null);
   const gesture = useRef<
     | null
     | { kind: "pan"; startX: number; startY: number; x: number; y: number }
+    | {
+        kind:'perspective';id:string;selection:readonly string[];revision:number;documentId:string;
+        source:PerspectiveCornerDrag;patch:LayerPatch;changed:boolean;valid:boolean;
+      }
     | {
         kind: "move";
         snapTargets?: { x: number; y: number; width: number; height: number }[];
@@ -406,7 +415,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     const cancelStale=()=>{
       const drag=gesture.current;if(!drag||gestureIsCurrent(drag))return;
       gesture.current=null;pointerDocument.current=null;
-      setPreview(null);setSnapGuides({});setResizingCursor(null);
+      setPreview(null);setPerspectiveIssue(null);setSnapGuides({});setResizingCursor(null);
     };
     const stopDocument=dom.subscribe(cancelStale),stopEditor=editor.subscribe(cancelStale);
     cancelStale();
@@ -440,6 +449,48 @@ export function App({ editor }: { editor: EditorApplication }) {
     tool === "move" && moveTarget === "mask" && !!selected?.mask;
   const selectedObject = dom.getLayer(state.selectedId);
   const locked = selected ? isLocked(viewDocument, selected.id) : false;
+  const modalOpen=showPreflight ||
+      showRecovery ||
+      showPalette ||
+      !!recentRequest ||
+      showHelp ||
+      showWorkspaceLayout ||
+      !!fontManagerOwner ||
+      showChatGptConnection ||
+      showAccount ||
+      showHistoryInspector || showArtworkLibrary || showColorPalettes || !!colorPaletteRequest ||
+      showPressureCurve ||
+      showBrushTip ||
+      showBrushTexture ||
+      showBrushSymmetry ||
+      showBrushPresets ||
+      showScripts ||
+      showPlugins ||
+      showImageSizeDialog ||
+      showArtboardDialog ||
+      showCropDialog ||
+      !!selectionModification ||
+      showColorRange ||
+      showVectorBoolean ||
+      !!subjectProgress ||
+      !!mattingProgress ||
+      showExportDialog ||
+      showGenerateDialog ||
+      showRecipeDialog ||
+      showBatchDialog ||
+      showColorDialog ||
+      showRefineEdgeDialog ||
+      !!photoshopFile;
+  const perspectiveEligible=!!selected&&selected.visible&&!locked&&state.selectedIds.length===1&&(selected.kind==='raster'||selected.kind==='smart-object');
+  const canEditPerspective=perspectiveEligible&&!busy;
+  const perspectiveEditing=perspectiveEligible&&!modalOpen&&!svgFile&&!tiffFile&&!rawFile&&!rawLayer&&!avifFile&&tool==='move'&&!movingMask&&perspectiveTarget?.owner===dom&&perspectiveTarget.id===selected?.id;
+  useLayoutEffect(()=>{
+    if(busy&&gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;setPreview(null);setPerspectiveIssue(null);}
+    if(perspectiveTarget&&!perspectiveEditing){
+      if(gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;setPreview(null);}
+      setPerspectiveTarget(null);setPerspectiveIssue(null);
+    }
+  },[perspectiveTarget,perspectiveEditing,busy,setPreview]);
   const isResizable = selected
     ? !locked && (selected.kind === "raster" || selected.kind === "text")
     : false;
@@ -497,6 +548,8 @@ export function App({ editor }: { editor: EditorApplication }) {
 
   function chooseTool(next: Tool) {
     if(!editor.tools.canUseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
+    if(gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;}
+    setPerspectiveTarget(null);setPerspectiveIssue(null);
     editor.tools.cancel();
     setPreview(null);
     updateCursor(null);
@@ -586,6 +639,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     });
   }
   function clearPreview() {
+    setPerspectiveIssue(null);
     editor.tools.cancel();
     setPreview(null);
   }
@@ -765,6 +819,22 @@ export function App({ editor }: { editor: EditorApplication }) {
     if(pendingCopy.current)pendingCopy.current.cancelled=true;
     capturedPointer.current=null;gesture.current=null;pointerDocument.current=null;setResizingCursor(null);
   }
+  function togglePerspectiveEditing(){
+    cancelWorkspaceGesture();setPerspectiveIssue(null);
+    if(perspectiveEditing){setPerspectiveTarget(null);return;}
+    if(!canEditPerspective||!selected)return;
+    chooseTool('move');setMoveTarget('layer');setPerspectiveTarget({owner:dom,id:selected.id});
+  }
+  function nudgePerspectiveCorner(index:number,dx:number,dy:number){
+    if(busy||!perspectiveEditing||!selected||capturedPointer.current!==null||editor.document!==dom)return;
+    const current=dom.getSnapshot();
+    if(current.document!==state.document||!samePreviewSelection(current.selectedIds,state.selectedIds))return;
+    attempt(()=>{
+      const target=dom.getLayer(selected.id);if(!(target instanceof RasterLayer||target instanceof SmartObjectLayer))return;
+      const drag=new PerspectiveCornerDrag(target.perspective,target.width,target.height,layerTransform(current.document,target.id)!,index,{x:0,y:0});
+      target.perspective=drag.at({x:dx,y:dy});setPerspectiveIssue(null);
+    });
+  }
   function openWorkspaceLayout(){cancelWorkspaceGesture();setShowWorkspaceLayout(true);}
 
   const[chosenAlignmentKey,setChosenAlignmentKey]=useState<{owner:EditorDocument;selection:string;id:string}|null>(null);
@@ -774,6 +844,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   const alignmentKey=alignmentRoots.find(layer=>layer.id===requestedKey)??alignmentRoots.find(layer=>layer.id===dom.selectedLayer?.id)??alignmentRoots[0]??null;
   const alignLayers=(alignment:LayerAlignment,target:AlignmentTarget)=>{cancelWorkspaceGesture();attempt(()=>dom.layerSelection.align(alignment,target.type==='layer'?dom.getLayer(target.id)!:target.type));};
   const defaultShortcuts = new ShortcutRegistry([
+    {id:'edit-perspective',label:'Edit perspective corners',category:'Layout',keys:SHORTCUT_BINDINGS['edit-perspective'],enabled:()=>canEditPerspective,run:togglePerspectiveEditing},
     ...(['selection','canvas','layer']as const).flatMap(type=>layerAlignmentSchema.options.map(alignment=>({
       id:`align-${alignment}-${type}`,label:`Align ${alignment} to ${type==='layer'?'key object':type}`,category:'Layout',keys:SHORTCUT_BINDINGS[`align-${alignment}-${type}`],
       description:type==='layer'?'Keep the active selected root stationary':'Align selected-root geometry in canvas space',
@@ -1228,39 +1299,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     shortcuts,
     editor,
     busy,
-    modalOpen:
-      showPreflight ||
-      showRecovery ||
-      showPalette ||
-      !!recentRequest ||
-      showHelp ||
-      showWorkspaceLayout ||
-      !!fontManagerOwner ||
-      showChatGptConnection ||
-      showAccount ||
-      showHistoryInspector || showArtworkLibrary || showColorPalettes || !!colorPaletteRequest ||
-      showPressureCurve ||
-      showBrushTip ||
-      showBrushTexture ||
-      showBrushSymmetry ||
-      showBrushPresets ||
-      showScripts ||
-      showPlugins ||
-      showImageSizeDialog ||
-      showArtboardDialog ||
-      showCropDialog ||
-      !!selectionModification ||
-      showColorRange ||
-      showVectorBoolean ||
-      !!subjectProgress ||
-      !!mattingProgress ||
-      showExportDialog ||
-      showGenerateDialog ||
-      showRecipeDialog ||
-      showBatchDialog ||
-      showColorDialog ||
-      showRefineEdgeDialog ||
-      !!photoshopFile,
+    modalOpen,
     onDismissModals: () => {
       setShowPressureCurve(false);
       setShowBrushTip(false);
@@ -1296,6 +1335,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     onSetSpacePan: setSpacePan,
     onClearPreview: clearPreview,
     onResetGestures: () => {
+      setPerspectiveIssue(null);
       if (pendingCopy.current) pendingCopy.current.cancelled = true;
       capturedPointer.current = null;
       gesture.current = null;pointerDocument.current=null;
@@ -1349,12 +1389,13 @@ export function App({ editor }: { editor: EditorApplication }) {
       ![0, 1].includes(event.button) ||
       ((event.target as HTMLElement).closest("button") &&
         !(event.target as HTMLElement).closest(
-          "[data-crop-handle], [data-rotate]",
+          "[data-crop-handle], [data-rotate], [data-perspective-corner]",
         ))
     )
       return;
     event.preventDefault();
-    event.currentTarget.focus();
+    const perspectiveHandle=(event.target as HTMLElement).closest<HTMLElement>('[data-perspective-corner]');
+    if(perspectiveHandle)perspectiveHandle.focus({preventScroll:true});else event.currentTarget.focus();
     event.currentTarget.setPointerCapture(event.pointerId);
     capturedPointer.current = event.pointerId;
     pointerDocument.current=dom;
@@ -1370,6 +1411,12 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
     // A transform starts from the model represented by this committed UI.
     if(tool==='move'&&(dom.getSnapshot().document!==state.document||!samePreviewSelection(dom.getSnapshot().selectedIds,state.selectedIds)))return;
+    if(perspectiveHandle&&perspectiveEditing&&selected&&(selected.kind==='raster'||selected.kind==='smart-object')){
+      const index=Number(perspectiveHandle.dataset.perspectiveCorner),value=selected.perspective?new PerspectiveTransform(selected.perspective):null;
+      gesture.current={kind:'perspective',id:selected.id,selection:state.selectedIds,revision:state.revision,documentId:dom.id,
+        source:new PerspectiveCornerDrag(value,selected.width,selected.height,layerTransform(state.document,selected.id)!,index,toCanvasPoint(event)),patch:{},changed:false,valid:true};
+      setPerspectiveIssue(null);return;
+    }
     if (movingMask) {
       if(selected?.perspective&&activePerspective(selected.perspective)&&selected.mask?.linked!==false){notify('Reset perspective before dragging this linked mask.');return;}
       if (selected?.mask && !locked)
@@ -1637,6 +1684,17 @@ export function App({ editor }: { editor: EditorApplication }) {
       });
       return;
     }
+    if(drag.kind==='perspective'){
+      try{
+        const value=drag.source.at(point),before=drag.source.value.corners,after=value.corners;
+        drag.changed=after.some((p,i)=>p.x!==before[i].x||p.y!==before[i].y);
+        drag.patch={perspective:value.toJSON()};
+        setPreview(drag.changed?{type:'layer.update',id:drag.id,patch:drag.patch}:null);
+        drag.valid=!drag.changed||gesturePreviews.getSnapshot()?.valid===true;
+      }catch{drag.valid=false;drag.patch={};setPreview(null);}
+      setPerspectiveIssue(drag.valid?null:'That corner would fold the image or make its content infinite. Move it back before releasing.');
+      return;
+    }
     if (drag.kind === "rotate" || drag.kind === "scale-selection") {
       const point = toCanvasPoint(event);
       let delta =
@@ -1778,7 +1836,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
     if (capturedPointer.current !== event.pointerId) return;
     if (
-      ["move", "resize", "rotate", "scale-selection"].includes(
+      ["move", "resize", "rotate", "scale-selection", "perspective"].includes(
         gesture.current?.kind ?? "",
       )
     )
@@ -1796,6 +1854,11 @@ export function App({ editor }: { editor: EditorApplication }) {
     setResizingCursor(null);
     setPreview(null);
     if(!current)return;
+    if(drag?.kind==='perspective'){
+      if(drag.changed&&drag.valid)attempt(()=>{const target=dom.getLayer(drag.id);if(target instanceof RasterLayer||target instanceof SmartObjectLayer)target.perspective=new PerspectiveTransform(drag.patch.perspective!);});
+      else if(!drag.valid){setPerspectiveIssue('Perspective was not applied. Drag a corner to keep the complete image convex and finite.');notify('Perspective was not applied. Keep the corners convex and the complete image finite.');}
+      return;
+    }
     if (drag?.kind === "move" && (drag.dx || drag.dy))
       attempt(() => {
         if (drag.members) {
@@ -2262,6 +2325,7 @@ export function App({ editor }: { editor: EditorApplication }) {
               onLostPointerCapture={(event) => {
                 if (capturedPointer.current !== event.pointerId) return;
                 capturedPointer.current = null;
+                setPerspectiveIssue(null);
                 editor.tools.cancel();
                 gesture.current = null;pointerDocument.current=null;
                 setResizingCursor(null);
@@ -2269,6 +2333,7 @@ export function App({ editor }: { editor: EditorApplication }) {
               }}
               onPointerCancel={() => {
                 capturedPointer.current = null;
+                setPerspectiveIssue(null);
                 editor.tools.cancel();
                 gesture.current = null;pointerDocument.current=null;
                 setResizingCursor(null);
@@ -2417,10 +2482,11 @@ export function App({ editor }: { editor: EditorApplication }) {
                     }}
                   />
                 )}
+                {perspectiveEditing&&!busy&&selected&&(selected.kind==='raster'||selected.kind==='smart-object')&&<PerspectiveOverlay layer={selected} world={layerTransform(viewDocument,selected.id)!} zoom={zoom} onNudge={nudgePerspectiveCorner}/>}
                 {bounds &&
                   selected?.visible &&
                   tool === "move" &&
-                  !movingMask && (
+                  !movingMask && !perspectiveEditing && (
                     <div
                       className={`selection-outline ${locked ? "locked" : ""}`}
                       style={{
@@ -2478,6 +2544,7 @@ export function App({ editor }: { editor: EditorApplication }) {
                     </div>
                   )}
               </div>
+              {perspectiveEditing&&perspectiveIssue&&<div className="perspective-issue" role="status">{perspectiveIssue}</div>}
               {renderError&&<div className="canvas-render-error" role="alert"><strong>Preview unavailable</strong><p>{renderError}</p></div>}
               <CanvasCursor viewport={viewport} enabled={customCursors} copies={cursorAdapters.copies} texturePreview={texturePreview.url} footprint={cursorAdapters.footprint} tool={tool} spacePan={spacePan} size={tool==='quick-select'?toolState.settings.quickSize:toolState.settings.size} zoom={zoom} />
               {!dom.layers.length &&
@@ -2609,6 +2676,7 @@ export function App({ editor }: { editor: EditorApplication }) {
           }
           inspector={
           <InspectorPanel
+            perspectiveEditing={perspectiveEditing} canEditPerspective={canEditPerspective} onTogglePerspective={togglePerspectiveEditing}
             guidesVisible={guidesVisible}
             onGuidesVisible={setGuidesVisible}
             assets={assets}

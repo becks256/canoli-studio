@@ -505,7 +505,7 @@ separate gates.
 | New empty layer                                 | Mod+Shift+N                                               |
 | Add group containing selection                  | Mod+G                                                     |
 | Move selected layer forward/backward            | Mod+] / Mod+[                                             |
-| Nudge layer, mask, anchor or crop frame         | Arrow keys; Shift for 10 px                               |
+| Nudge layer, mask, anchor, crop frame or focused perspective corner         | Arrow keys; Shift for 10 px                               |
 | Fit canvas                                      | Mod+0                                                     |
 | Actual size                                     | Mod+1                                                     |
 | Zoom                                            | + / −                                                     |
@@ -1236,4 +1236,4 @@ The local API must inspect without mutation, require explicit float32 admission,
 
 ## F03 perspective workflow — integration in progress
 
-The intended perspective tool must preserve complete originals and parent coordinates across masks, selection, rendering/export, shared OO/commands/Undo, persistence and automation. Schema-50 RasterLayer/SmartObjectLayer placement now has an immutable constructor, shared commands, numeric Inspector, native byte/float rendering, masks, bounds/hit tests and persistence. Affine parent placement remains independent. Unsupported projective tool input explicitly requires resetting perspective; correct nonlinear pointer/clip/symmetry/cursor mapping, direct handles, general warp and full quality/performance acceptance remain required. This increment does not close F03. [Engine boundary and remaining integration](PERSPECTIVE_ENGINE.md).
+The intended perspective tool must preserve complete originals and parent coordinates across masks, selection, rendering/export, shared OO/commands/Undo, persistence and automation. Schema-50 RasterLayer/SmartObjectLayer placement now has an immutable constructor, shared commands, numeric Inspector, direct mouse/touch/keyboard corner editing, native byte/float rendering, masks, bounds/hit tests and persistence. Affine parent placement remains independent. Unsupported projective tool input explicitly requires resetting perspective; correct nonlinear brush/mask pointer/clip/symmetry/cursor mapping, general warp and full quality/performance acceptance remain required. This increment does not close F03. [Engine boundary and remaining integration](PERSPECTIVE_ENGINE.md).

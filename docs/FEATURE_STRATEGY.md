@@ -1,5 +1,15 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Direct image perspective authoring increment (2026-10-30)
+
+Raster/smart-object instances now have numeric and direct pointer/touch/keyboard
+corner authoring through shared perspective commands, detached previews and
+Undo. Parent coordinates and originals stay retained. Correct projective brush/
+mask/selection-clip/cursor mapping, general warp, broader interchange and full
+photographic/performance/device acceptance remain required for F03. See the
+[current contract](PERSPECTIVE_ENGINE.md) and dated roadmap verification.
+
+
 ## Native float tonal workflow (F05/F10)
 
 Existing Dodge/Burn tools and editable tonal constructors now have a native

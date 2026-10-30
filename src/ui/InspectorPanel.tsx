@@ -66,6 +66,7 @@ import { computeHistogram,computeFloatHistogram, adjustmentBackdrop } from "../c
 import type { HistogramData } from "../core/histogram";
 
 export interface InspectorPanelProps {
+  perspectiveEditing:boolean;canEditPerspective:boolean;onTogglePerspective():void;
   guidesVisible: boolean;
   onGuidesVisible(value: boolean): void;
   assets: AssetStore;
@@ -88,6 +89,7 @@ export interface InspectorPanelProps {
 }
 
 export function InspectorPanel({
+  perspectiveEditing,canEditPerspective,onTogglePerspective,
   guidesVisible,
   onGuidesVisible,
   assets,
@@ -224,7 +226,7 @@ export function InspectorPanel({
               </div>
             )}
           </InspectorSection>
-          {(selected.kind==='raster'||selected.kind==='smart-object')&&(selectedObject instanceof RasterLayer||selectedObject instanceof SmartObjectLayer)&&<PerspectiveControls layer={selectedObject} selected={selected} disabled={locked||busy} onPreview={onPreview} onAttempt={onAttempt} onSelectedAction={onSelectedAction}/>}
+          {(selected.kind==='raster'||selected.kind==='smart-object')&&(selectedObject instanceof RasterLayer||selectedObject instanceof SmartObjectLayer)&&<PerspectiveControls editing={perspectiveEditing} canEdit={canEditPerspective} onToggleEditing={onTogglePerspective} layer={selectedObject} selected={selected} disabled={locked||busy} onPreview={onPreview} onAttempt={onAttempt} onSelectedAction={onSelectedAction}/>}
           <InspectorSection title="Layout">
             <div className="field-grid">
               <NumberField

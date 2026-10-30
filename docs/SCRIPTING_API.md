@@ -1373,8 +1373,12 @@ image.perspective = new PerspectiveTransform({ corners: [
 ] });
 ```
 
-Native projects and recorded layer updates retain placement. The current numeric
-Inspector and rendering support do not implement projective input mapping.
+Native projects and recorded layer updates retain placement. The Inspector also
+provides direct perspective corners: drag with a pointer or focus a corner and
+use Arrow/Shift+Arrow for 1/10 canvas pixels. A valid drag commits once; stale,
+cancelled or folded placements do not commit. This UI uses the same constructor
+and setter; it adds no scripting method. Perspective brush/mask input mapping
+remains separate unfinished work.
 Reset perspective before interactive image erasing/wet painting, mask painting
 or path editing, linked-mask dragging/relinking, or `maskFromSelection` /
 `maskFromPaths`; those paths explicitly reject while active. Local-coordinate
