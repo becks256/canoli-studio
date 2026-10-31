@@ -2262,6 +2262,14 @@ const result = await editor.applyWetPaint(stroke, {
 
 Import constructors from the host DOM module and provide an AbortController as `controller`. No changed pixels returns null without history/assets. Abort, callback errors, quota/source-lifetime failures or changed document/revision/active selection/session reject without late publication. Private storage is disposed before commit; staged assets publish only after validation and remain for undo/redo. Original-first symmetry order, separate spatial pigment per copy, once-only selection/brush opacity, native replacement and complete path replay are preserved. Numerical work uses at most 4 million pixels/request and native composition at most 4 million pixels/4096 pixels per side per working surface; these are working budgets, not source limits. The tool controller connects incremental private previews, Smudge/Mixer controls, mask/filter-mask targets and presets through this adapter. Native float wet tools and full sustained/device/photographic acceptance remain open.
 
+Live native preparation may compact carried working cells to their complete
+captured support and admit ready tool prefixes directly to the viewport queue.
+This preserves the existing local/placed coordinates, prepared pixels, source
+ownership, cancellation and one-Undo contracts. It changes no public signature,
+model/container version, isolated capability or source-resolution limit. Private
+working storage geometry is not a portable document format. Timing evidence
+and remaining sustained/device performance gates are tracked in the roadmap.
+
 ## Maintaining this contract
 
 Update this guide whenever a constructor, public member, default, validation rule, runtime binding, budget or history behavior changes. Keep the [API overview](API.md), [requirements](REQUIREMENTS.md) and [architecture](ARCHITECTURE.md) consistent. Keep examples runnable in the Scripts panel without invented assets or page globals.

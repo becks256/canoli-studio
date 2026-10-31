@@ -1,0 +1,12 @@
+{
+  "baseCommit": "ff1d711d10e919dc45506dbfa01f8ad481d63940",
+  "reference": "Pre-optimization actual-WASM complete native output; independently sampled dense/compact fields are checked separately.",
+  "sourceFiles": {
+    "src/engine/wet-session.ts": "7008a48336ca2806c3116a90b26297ad64caf1154875cdcb925a374d039cb03c",
+    "src/engine/wet-spatial.ts": "9c50c121ad8be4cb27fa140239a26350f3cb32d99a971cb32ca53ef00f39a530",
+    "src/engine/wet-paint.ts": "598e4394a391b23fdc17e53bf3592246f080a35350a4b4ddab25586d54d2af2b",
+    "assembly/pixels.ts": "3396e6267809875598bf0428088d049f877792a6b25b265a89356584ea95534c"
+  },
+  "fixtureSha256": "2eae519e0fb381def8595dfa6abfd857fc99d745adab25eafc2799754b298f34",
+  "generator": "/tmp/canoli-wet-performance-2026-10-31/capture-reference.mts; retained in sealed evidence"
+}

@@ -1,10 +1,12 @@
 import { beforeAll, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
+import { gunzipSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
 import { AffineTransform } from '../src/core/affine';
-import { BrushStroke, PencilStroke } from '../src/dom';
+import { BrushStroke, PencilStroke, BrushSymmetry } from '../src/dom';
 import type { BrushStrokeData, Rect } from '../src/core/drawing';
 import { prepareWetStroke, type WetStrokeOptions, type WetStrokeResult } from '../src/engine/wet-stroke';
-import { sampleWetField, wetRegion, wetTileKey, type WetField } from '../src/engine/wet-spatial';
+import { sampleWetField, wetRegion, wetTileKey, type WetField, type WetFieldTile } from '../src/engine/wet-spatial';
 import type { WetTile, WetTileStore } from '../src/engine/wet-store';
 import { instantiateKernel, mixFiltered, prepareBrushTexture, renderSelection, type PixelKernel } from '../src/engine/wasm';
 import { loadWetPaint, mixWetPaint } from '../src/engine/wet-paint';
@@ -154,4 +156,37 @@ it('unsafe native geometry, unsupported kinds and malformed working policies fai
   await expect(run(brush({ kind: 'eraser' }), read)).rejects.toThrow(/footprint/);
   const singular = new AffineTransform(0, 0, 0, 0, 0, 0), region = { x: 0, y: 0, width: 1, height: 1 };
   await expect(sampleWetField({ bounds: region, transform: singular, tiles: new Map() }, singular, region, 8, async () => new Float32Array(256), () => {})).rejects.toThrow(/singular/);
+});
+
+for(const offset of[0,2**38])it(`compact carried fields preserve every dense bilinear word across partial cells at origin ${offset}`,async()=>{
+ const bounds={x:offset-3,y:offset-5,width:13,height:17},tileSize=8,dense=new Map<string,WetFieldTile>(),compact=new Map<string,WetFieldTile>(),data=new Map<string,Float32Array>();
+ const value=(x:number,y:number)=>{const a=Math.fround(((x-offset)*17+(y-offset)*31&255)/255);return[Math.fround(.25*a),Math.fround(.75*a),0,a];};
+ for(let y=Math.floor(bounds.y/8)*8;y<bounds.y+bounds.height;y+=8)for(let x=Math.floor(bounds.x/8)*8;x<bounds.x+bounds.width;x+=8){
+  const cell=wetTileKey(x,y),full=new Float32Array(8*8*4);for(let py=0;py<8;py++)for(let px=0;px<8;px++)full.set(value(x+px,y+py),(py*8+px)*4);dense.set(cell,'dense/'+cell);data.set('dense/'+cell,full);
+  const left=Math.max(x,bounds.x),top=Math.max(y,bounds.y),region={x:left,y:top,width:Math.min(x+8,bounds.x+bounds.width)-left,height:Math.min(y+8,bounds.y+bounds.height)-top},pixels=new Float32Array(region.width*region.height*4);for(let py=0;py<region.height;py++)for(let px=0;px<region.width;px++)pixels.set(value(left+px,top+py),(py*region.width+px)*4);compact.set(cell,{key:'compact/'+cell,region});data.set('compact/'+cell,pixels);
+ }
+ const frames=offset?[new AffineTransform(1,0,0,1,.25,-.5)]:[new AffineTransform(),new AffineTransform(.7,-.4,.2,1.3,-.5,.25),new AffineTransform(-1,.3,.1,1.2,.125,-.375),new AffineTransform(2,.125,.25,.5,-.25,.75)];
+ for(const frame of frames){const sourceFrame=offset?new AffineTransform(1,0,0,1,.25,-.5):new AffineTransform(1.1,.2,-.125,.9,.25,-.5),region={x:offset-4,y:offset-4,width:8,height:8},expected=await sampleWetField({bounds,transform:sourceFrame,tiles:dense},frame,region,tileSize,async key=>data.get(key)!,()=>{}),actual=await sampleWetField({bounds,transform:sourceFrame,tiles:compact},frame,region,tileSize,async key=>data.get(key)!,()=>{});expect(new Uint32Array(actual.buffer)).toEqual(new Uint32Array(expected.buffer));expect(actual.some(value=>value>0)).toBe(true);}
+});
+
+it('captures compact native metadata before reads and rejects incomplete support or malformed stored planes',async()=>{
+ const region={x:1,y:2,width:2,height:2},reference={key:'pigment',region:{...region}},field:WetField={bounds:region,transform:new AffineTransform(),tiles:new Map([['0,0',reference]])},source=new Float32Array(16);for(let i=0;i<16;i+=4)source.set([.125,.25,0,.5],i);
+ let release!:(value:Float32Array)=>void;const pending=sampleWetField(field,new AffineTransform(),region,8,()=>new Promise(resolve=>{release=resolve;}),()=>{});reference.region.x=99;(field.tiles as Map<string,WetFieldTile>).clear();release(source);expect(await pending).toEqual(source);
+ for(const patch of[{x:0},{width:1},{height:3}])await expect(sampleWetField({...field,tiles:new Map([['0,0',{key:'pigment',region:{...region,...patch}}]])},new AffineTransform(),region,8,async()=>source,()=>{})).rejects.toThrow(/complete native cell support/);
+ await expect(sampleWetField({...field,tiles:new Map([['0,0',{key:'pigment',region}]])},new AffineTransform(),region,8,async()=>source.subarray(4),()=>{})).rejects.toThrow(/matching Float32/);
+});
+
+it('preserves complete pre-optimization native output across dense tile sizes, cache pressure, reflected tips and symmetry',async()=>{
+ const bytes=await readFile('tests/fixtures/wet-compact/native-reference.json.gz'),manifest=JSON.parse(await readFile('tests/fixtures/wet-compact/manifest.json','utf8')),reference=JSON.parse(gunzipSync(bytes).toString());expect(createHash('sha256').update(bytes).digest('hex')).toBe(manifest.fixtureSha256);
+ for(const row of reference.cases)for(const cacheBytes of[0,512*1024]){
+  const stroke=new BrushStroke({size:6,spacing:.3,opacity:.63,flow:.57,pressureSize:true,pressureOpacity:true,tip:{roundness:.6,angle:37,tiltAngle:true},symmetry:BrushSymmetry.mirrorVertical(5),points:[{x:-3.5,y:-1.5,pressure:.4,tilt:{altitude:.4,azimuth:.2}},{x:7.5,y:5.5,pressure:1,tilt:{altitude:.8,azimuth:1}},{x:4.5,y:9.5,pressure:.3,tilt:{altitude:.5,azimuth:2}}]}).toJSON()as BrushStrokeData,read=source((x,y)=>[(x*73+y*19)&255,(y*47)&255,(x*31)&255,((x+y)*59)&255]),transform=new AffineTransform(row.reflected?-1.1:1.1,.2,.1,.9,-.5,1.5),{result}=await run(stroke,read,{tileSize:row.tileSize,cacheBytes,transform,mix:{pickup:.43,wetness:.17},load:{color:[255,10,60,191],load:.23}});
+  try{const actual=[...await pixels(result)].map(([key,rgba])=>[...key.split(',').map(Number),...rgba]).sort((a,b)=>a[1]-b[1]||a[0]-b[0]);expect(actual).toEqual(row.pixels);expect(createHash('sha256').update(JSON.stringify(actual)).digest('hex')).toBe(row.sha256);}finally{await result.dispose();}
+ }
+});
+
+it('retains only bounded processor footprint pigment instead of a full floating backing cell',async()=>{
+ const store=new MemoryStore(),put=store.put.bind(store);let maximumStored=0,maximumWorking=0,carriedWrites=0;
+ store.put=async(key,value)=>{if(key.startsWith('carried/')){expect(value).toBeInstanceOf(Float32Array);maximumStored=Math.max(maximumStored,value.byteLength);carriedWrites++;}await put(key,value);};
+ const stroke=new BrushStroke({size:6,pressureSize:false,spacing:.3,points:[{x:24,y:24},{x:52,y:24}]}).toJSON()as BrushStrokeData,result=await prepareWetStroke(stroke,source(()=>[255,0,0,255]),{...processor,mixWetPaint:async(...args)=>{maximumWorking=Math.max(maximumWorking,args[1].byteLength);return processor.mixWetPaint(...args);}},{tileSize:128,coverage:hardCoverage,storage:async()=>store,load:{load:1,color:[0,255,0,255]},mix:{pickup:0}});
+ try{expect(carriedWrites).toBeGreaterThan(1);expect(maximumStored).toBeLessThanOrEqual(maximumWorking);expect(maximumStored).toBeLessThan(128*128*4*Float32Array.BYTES_PER_ELEMENT);expect((await pixels(result)).size).toBeGreaterThan(0);}finally{await result.dispose();}
 });

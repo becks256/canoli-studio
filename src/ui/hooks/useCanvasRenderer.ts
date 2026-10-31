@@ -201,9 +201,15 @@ export function useCanvasRenderer({
     const captured=livePreview(),gesture=captured?.gesture??previewGesture;
     // Pointer publication and React share this exact validated snapshot; the
     // subsequent layout must not queue the same appearance a second time.
-    const represented=!!captured&&previous?.preview===captured&&previous.owner===owner&&previous.sourceDocument===sourceDocument&&
+    const representedGesture=!!captured&&previous?.preview===captured&&previous.owner===owner&&previous.sourceDocument===sourceDocument&&
       previous.region===renderRegion&&previous.zoom===zoom&&previous.fontRevision===fontRevision&&previous.backendState===backendState&&
       previous.colorState===colorState&&previous.options.colorProof===colorProof&&previous.hostAssets===assets&&previous.assets===assets;
+    const representedWet=!!wetPreview&&wetPreview.isCurrent()&&previous?.wetPreview===wetPreview&&previous.owner===owner&&
+      previous.sourceDocument===sourceDocument&&previous.document===viewDocument&&previous.assets===assets&&
+      previous.hostAssets===wetPreview.hostAssets&&previous.region===renderRegion&&previous.zoom===zoom&&
+      previous.fontRevision===fontRevision&&previous.backendState===backendState&&previous.colorState===colorState&&
+      previous.options.colorProof===colorProof&&!paintPreview&&!gesture;
+    const represented=representedGesture||representedWet;
     if(!represented){
       const key = ++renderVersion.current;
       latestRender.current?.release?.();
@@ -377,7 +383,33 @@ export function useCanvasRenderer({
       renderTarget.current = latestRender.current;
       void drain();
     });
-    return()=>{stopGestures?.();stopPaint();};
+    // A completed wet prefix already owns its prepared document and source
+    // leases. Queue it before the surrounding React controls rerender, then
+    // let the layout above recognize that exact frame without preparing twice.
+    // First owner/view fits and transitions from other preview kinds still go
+    // through the ordinary React path.
+    const hostAssets=wetPreview?.hostAssets??assets;
+    let seenWet=wetPreview;
+    const stopWet=editor.tools.subscribe(()=>{
+      const frame=editor.tools.getSnapshot().wetPreview,target=renderTarget.current;
+      if(!frame||frame===seenWet)return;
+      if(frame.isDisposed||!frame.isCurrent()||frame.hostAssets!==hostAssets||!target||presentedDocument.current!==owner||
+        editor.document!==owner||owner.getSnapshot().document!==sourceDocument||editor.assetStore!==hostAssets||
+        editor.colorSettings!==colorState||(editor.colorSettings?.proof??null)!==colorProof||
+        target.owner!==owner||target.sourceDocument!==sourceDocument||target.hostAssets!==hostAssets||
+        target.region!==renderRegion||target.zoom!==zoom||target.fontRevision!==fontRevision||target.backendState!==backendState||
+        target.colorState!==colorState||target.options.colorProof!==colorProof||target.options.paintPreview||target.preview||target.gesture||
+        (target.wetPreview?target.wetPreview.owner!==frame.owner:target.document!==sourceDocument)||!displayHost.current)return;
+      seenWet=frame;
+      const key=++renderVersion.current,release=frame.retain();
+      latestRender.current?.release?.();
+      latestRender.current={owner,committedEdit:false,document:frame.document,colorState,assets:frame.assets,hostAssets,key,
+        region:renderRegion,sourceDocument,zoom,fontRevision,backendState,wetPreview:frame,release,
+        options:{region:renderRegion,scale:Math.min(1,zoom*window.devicePixelRatio),colorProof}};
+      renderTarget.current=latestRender.current;
+      void drain();
+    });
+    return()=>{stopGestures?.();stopPaint();stopWet();};
   }, [
     viewDocument,
     assets,

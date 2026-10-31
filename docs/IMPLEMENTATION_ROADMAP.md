@@ -9373,3 +9373,61 @@ workflow, installed ChatGPT/live identity, commercial, enterprise, specialist
 and motion requirement remain required. No paid call, cloud upload, account,
 new isolated/plugin permission, headless/browser synchronization or arbitrary
 source-resolution limit is added by this increment.
+
+### 2026-10-31 — F06/F14 compact pigment and direct wet feedback
+
+Owner: implementation engineer; estimate M/L across native storage, source/frame
+ownership and normal-production feedback. Starting from `ff1d711`, this increment
+compacts each carried cell to its complete captured native dab intersection and
+admits completed tool prefixes directly to the existing serialized viewport queue
+before surrounding React controls update. React recognizes the exact prefix and
+does not prepare it twice. Source/document/assets/proof/view/backend/gesture
+checks, frame leases, cadence and obsolete-output rejection remain authoritative.
+
+Destination/original cells stay complete, including hidden RGB. Explicit owned
+carrier geometry preserves all four bilinear neighbors, summation order and
+Float32 rounding. Complete pre-change actual-WASM arrays match across six native
+tile/reflection cases and two cache budgets. Independent bilinear and exact
+float-word comparisons cover partial negative cells, reflection/shear and distant
+origins. Actual 6-pixel custom-store writes use 1,600–1,760 bytes per carried cell
+instead of 262,144 padded bytes. This is private-plane storage evidence, not total
+process-memory acceptance. No accepted input, source geometry or output precision
+is reduced; native/custom cache, epochs, snapshots, failures and disposal retain
+their existing boundaries.
+
+One same-harness profiled production pair covers six affine/projected
+raster/ordinary-mask/filter-mask targets with twelve real pointer endpoints each.
+All 72 complete foreground hashes and six final PNGs are byte-identical. Original
+source bytes, all accepted points, complete one-Undo restoration and exact
+Redo/native PNG are checked. Median event-to-matching-foreground feedback changes
+from 99.0→67.6 / 91.9→72.6 / 99.9→87.5 ms for affine targets and
+111.1→102.7 / 134.4→118.7 / 143.9→124.5 ms for projected targets. All six p95s still
+exceed 33 ms; projected filter-mask p95 is essentially unchanged at 197 ms.
+These small profiled gestures report no long tasks; sampling/readback, twelve
+samples and one pair limit the claim. Physical display and sustained/device
+performance remain unverified.
+
+The full build and all 3,181 unit/API/native tests across 309 files pass. The
+complete affected browser matrix passes all 116 cases without retries, skips,
+failures or flakes, including real 50 MP source preservation, storage/quota,
+cancellation, masks, selection authority and renderer admission. The dedicated
+`playwright.wet-feedback.config.ts` runs ordinary production without developer
+globals. All six rebuilt, unprofiled workflows pass and preserve the same 72
+complete foreground hashes and six exported PNGs. An additional unprofiled
+baseline run preserves those same outputs. Its paired medians change from
+102.9→94.9 / 120.9→87.1 / 125.0→121.5 ms for affine targets and
+162.5→131.3 / 162.3→143.4 / 197.3→163.3 ms for projected targets; all six p95s
+also decrease but still exceed 33 ms. Higher absolute readings than the profiled
+pair reinforce the limit on general claims. Both complete pairs remain recorded.
+The initial full-unit static
+build failures and exhaustive-reference timeout, unchanged pixel checks, corrected
+21-case rerun and final full acceptance are retained in the
+[readable findings and compact evidence](benchmarks/wet-feedback-2026-10-31.md).
+
+Public constructors/commands, schema55, prepared PNGs, container formats, source
+resolution, isolated/plugin permissions and separate REST sessions are unchanged.
+The ≤33 ms live-input p95 / <50 ms routine-task targets, full sustained all-tool /
+device/process-memory F14, native float wet tools, projective relinking, broader
+photographic quality and every other unfinished original professional/AI/workflow/
+ChatGPT/live identity/commercial/specialist/motion gate remain required. The
+complete implementation goal remains active.

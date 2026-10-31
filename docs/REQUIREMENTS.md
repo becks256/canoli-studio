@@ -1,5 +1,21 @@
 # Canoli Studio editor requirements
 
+## Native wet feedback fidelity
+
+Reduce live preparation/viewport overhead while preserving every accepted
+point, complete dab support and interpolation neighbors, original-first
+symmetry, full alpha/color, source bytes, snapshots and one shared Undo.
+Compact carried working cells must be bit-identical to dense replay across
+negative/large coordinates, reflected/tilted transforms, tile/cache partitions,
+textures, masks and selection clips. Source/destination geometry must stay
+independent of the cache budget. Cancellation, quota failures and retired frame
+leases retain their existing behavior. Direct viewport admission must reject
+stale owner/source/proof/view frames and avoid duplicate preparation when React
+acknowledges a prefix. Measure actual normal-production foreground feedback;
+retain the existing ≤33 ms live-input p95 / <50 ms routine-task targets and broad
+sustained all-tool/device/process-memory acceptance.
+
+
 ## Captured projected wet editing (schema 55)
 
 Smudge/Mixer must author complete prepared fields in the image plane after

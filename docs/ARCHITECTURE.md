@@ -1,5 +1,27 @@
 # Architecture
 
+## Wet feedback and compact native pigment
+
+Live wet sessions retain each carried float cell's complete intersection with
+the captured dab support, on the same absolute native lattice. Destination and
+original cells stay complete. `wet-spatial.ts` captures explicit carried-cell
+geometry before awaits, rejects missing/inconsistent support and gathers the
+same four bilinear neighbors in the same double-precision summation order.
+Legacy dense internal fields remain readable. Processor output is owned before
+cache writes; native resident/evicted/zero-cache and custom-store failure paths
+retain the existing epoch and snapshot boundaries. No field is clipped to a
+viewport, image rectangle or nonzero-pixel estimate.
+
+Completed tool prefixes enter the existing viewport queue directly, retaining a
+frame lease before async preparation. The renderer checks original document,
+source/host assets, proof, view, backend, gesture owner and lifetime; React later
+acknowledges that exact frame without preparing it twice. Existing cadence and
+stale-frame cancellation remain authoritative. New-owner/view transitions retain
+normal admission. Public commands, schema, prepared PNGs and grants are unchanged.
+Production timing and exact before/after output verification are tracked in the
+roadmap; the full sustained all-tool/device performance gate remains open.
+
+
 ## Captured projected wet fields (schema 55)
 
 `wet-authoring.ts` captures original image/master dimensions, perspective and

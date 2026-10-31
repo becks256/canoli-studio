@@ -7,13 +7,17 @@ import { useCanvasRenderer } from '../../src/ui/hooks/useCanvasRenderer';
 
 /** Mount the real renderer hook with independently prepared native prefixes.
  * Its frame clock is controlled without blocking pointer sample batching. */
-export function createWetCadenceHarness(editor: EditorApplication) {
+export function createWetCadenceHarness(editor: EditorApplication, options:{toolFrames?:boolean}={}) {
   const element = document.createElement('div'); element.dataset.testid = 'wet-cadence-fixture'; Object.assign(element.style, { position: 'fixed', top: '0', left: '0', zIndex: '99999' }); document.body.append(element);
   const root = createRoot(element), region = { x: 0, y: 0, width: 128, height: 96 };
   const request = window.requestAnimationFrame, cancel = window.cancelAnimationFrame, prepare = editor.renderer.prepareViewport;
   const held = new Map<number, FrameRequestCallback>(); let next = 10_000_000, starts = 0, rendering = false;
   editor.renderer.prepareViewport = function (...args) { if (args[2]?.region === region) starts++; return prepare.apply(this, args); };
   function View({ frame }: { frame: WetPaintPreview | null }) {
+    // The direct-handoff fixture deliberately has no tool-state subscription
+    // and receives no new frame prop. Internal hook state can acknowledge the
+    // exact prefix after its tool notification has queued native preparation.
+    if(options.toolFrames)frame=editor.tools.getSnapshot().wetPreview;
     const host = useRef<HTMLDivElement>(null);
     const result = useCanvasRenderer({ editor, viewDocument: frame?.document ?? editor.document._read(), assets: frame?.assets ?? editor.assetStore, renderRegion: region, zoom: 1, paintPreview: undefined, wetPreview: frame, backendState: editor.renderer.getBackendSnapshot(), displayHost: host, onError: error => { throw new Error(error); } });
     rendering = result.rendering;

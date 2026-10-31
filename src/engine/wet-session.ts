@@ -7,7 +7,7 @@ import { BrushTextureSampler } from './brush-texture';
 import { yieldTask } from './task-yield';
 import { wetDabCoverage } from './wet-coverage';
 import { validateWetCarried, validateWetCoverage, validateWetPixels } from './wet-paint';
-import { sampleWetField, wetRegion, wetTileKey, type WetField } from './wet-spatial';
+import { sampleWetField, wetRegion, wetTileKey, wetFieldStorageKey, type WetField, type WetFieldTile } from './wet-spatial';
 import { createWetTileStore, type WetTileStore, type WetTileChange } from './wet-store';
 import { WetStrokeResult, WetTileCache, type WetProcessor, type WetStrokeOptions, type WetStrokeProjection, type WetTileRevision } from './wet-state';
 import {createWetWorkingCache} from './wet-cache';
@@ -135,7 +135,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
       frame.inverse();
       const support = frame.bounds({ x: -1, y: -1, width: 2, height: 2 }), left = Math.floor(support.x - 2), top = Math.floor(support.y - 2), right = Math.ceil(support.x + support.width + 2), bottom = Math.ceil(support.y + support.height + 2);
       const bounds = wetRegion({ x: left, y: top, width: right - left, height: bottom - top });
-      const copy = point.copy ? JSON.stringify(point.copy.toJSON()) : 'original', previous = fields.get(copy), next = new Map<string, string>(), updates = new Map<string, string>();
+      const copy = point.copy ? JSON.stringify(point.copy.toJSON()) : 'original', previous = fields.get(copy), next = new Map<string, WetFieldTile>(), updates = new Map<string, string>();
       dabs++;
       for (let y = Math.floor(top / tileSize) * tileSize; y < bottom; y += tileSize) for (let x = Math.floor(left / tileSize) * tileSize; x < right; x += tileSize) {
         check(); const region = wetRegion({ x, y, width: tileSize, height: tileSize }), key = wetTileKey(x, y), before = await original(region);
@@ -144,7 +144,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
         // Backing cells retain the complete captured source. Numerical sampling,
         // native coverage and worker transfers need only the dab's support/halo
         // within this cell. Preserve the original global pixel-center grid.
-        const wx=Math.max(x,left),wy=Math.max(y,top),working=wetRegion({x:wx,y:wy,width:Math.min(x+tileSize,right)-wx,height:Math.min(y+tileSize,bottom)-wy});
+        const wx=Math.max(x,left),wy=Math.max(y,top),working=Object.freeze(wetRegion({x:wx,y:wy,width:Math.min(x+tileSize,right)-wx,height:Math.min(y+tileSize,bottom)-wy}));
         const rowLength=working.width*4,workingPixels=new Uint8ClampedArray(rowLength*working.height),offsetX=working.x-x,offsetY=working.y-y;
         for(let row=0;row<working.height;row++){const start=((offsetY+row)*tileSize+offsetX)*4;workingPixels.set(pixels.subarray(start,start+rowLength),row*rowLength);}
         const pigment = previous ? await sampleWetField(previous, frame, working, tileSize, carried, check) : await processor.loadWetPaint(workingPixels, load);
@@ -153,10 +153,12 @@ class RetainedWetStrokeSession implements WetStrokeSession {
         const output = await processor.mixWetPaint(workingPixels, pigment, mask, { ...mix, flow }); check();
         validateWetPixels(output.pixels); validateWetCarried(output.carried, workingPixels.length);
         if (output.pixels.length !== workingPixels.length) throw new Error('Wet-paint processor returned a wrong destination extent.');
-        // Outside support, retain every original destination byte (including
-        // hidden RGB) and the same zero carrier used by full-cell simulation.
-        const nextPixels=pixels.slice(),nextCarried=new Float32Array(pixels.length);
-        for(let row=0;row<working.height;row++){const start=((offsetY+row)*tileSize+offsetX)*4;nextPixels.set(output.pixels.subarray(row*rowLength,(row+1)*rowLength),start);nextCarried.set(output.carried.subarray(row*rowLength,(row+1)*rowLength),start);}
+        // Keep all destination bytes, including hidden RGB. The complete
+        // carried support already occupies this bounded native intersection;
+        // zero padding outside it never needs a full floating-point cell.
+        // Own processor output even for write-through/custom backing stores.
+        const nextPixels=pixels.slice(),nextCarried=output.carried.slice();
+        for(let row=0;row<working.height;row++){const start=((offsetY+row)*tileSize+offsetX)*4;nextPixels.set(output.pixels.subarray(row*rowLength,(row+1)*rowLength),start);}
         const resultKey = `canvas/${dabs}/${key}`, pigmentKey = `carried/${dabs}/${key}`;
         const writes:WetTileChange[]=[{type:'put',key:resultKey,value:nextPixels},{type:'put',key:pigmentKey,value:nextCarried}];
         const stale=current.get(key),projected=this.projected.get(key);
@@ -164,7 +166,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
         // One bounded cell's two new planes and superseded destination share a
         // native transaction. Old reservoirs remain readable for other cells.
         await cache.batch(writes);check();
-        updates.set(key, resultKey); next.set(key, pigmentKey); workingTiles++;
+        updates.set(key, resultKey); next.set(key, Object.freeze({key:pigmentKey,region:working})); workingTiles++;
         if (performance.now() >= deadline) { await yieldTask(); check(); deadline = performance.now() + 4; }
       }
       // Advance only after the entire dab succeeds. All reads above see the
@@ -178,8 +180,8 @@ class RetainedWetStrokeSession implements WetStrokeSession {
         // Bound each cleanup transaction, so a very large footprint retains
         // cancellation checks without restricting source or stroke geometry.
         let removals:WetTileChange[]=[];
-        for(const key of previous.tiles.values()){
-          removals.push({type:'remove',key});
+        for(const tile of previous.tiles.values()){
+          removals.push({type:'remove',key:wetFieldStorageKey(tile)});
           if(removals.length===64){await cache.batch(removals);check();removals=[];}
         }
         if(removals.length){await cache.batch(removals);check();}
@@ -265,7 +267,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
       const prepared = await this.materialize(this.store);
       await this.cache.flush(prepared.records.flatMap(record=>[record.original,record.result]),this.check);
       for (const key of this.current.values()) { await this.cache.remove(key); this.check(); }
-      for (const field of this.fields.values()) for (const key of field.tiles.values()) { await this.cache.remove(key); this.check(); }
+      for (const field of this.fields.values()) for (const tile of field.tiles.values()) { await this.cache.remove(wetFieldStorageKey(tile)); this.check(); }
       for (const entry of this.projected.values()) if (entry.pixels) { await this.cache.remove(entry.pixels); this.check(); }
       const retained = new Set(prepared.records.map(record => record.original));
       for (const key of this.originals) if (!retained.has(this.originalKey(key))) { await this.cache.remove(this.originalKey(key)); this.check(); }

@@ -16,6 +16,7 @@ it('actual WASM matches an independent luminance/alpha reference over all alpha 
   const original = source.slice();
   for (const channel of ['alpha', 'luminance'] as const) for (const invert of [false, true]) {
     const actual = prepareBrushTexture(kernel, source, { channel, invert });
+    let maximumReferenceDelta = 0;
     for (let i = 0; i < source.length; i += 4) {
       const brightness = (source[i] * .2126 + source[i + 1] * .7152 + source[i + 2] * .0722) / 255;
       const coverage = channel === 'alpha' ? (invert ? 255 - source[i + 3] : source[i + 3]) :
@@ -23,10 +24,13 @@ it('actual WASM matches an independent luminance/alpha reference over all alpha 
       // Use exact integer arithmetic to resolve only the floating-point half ties.
       const integer = source[i] * 2126 + source[i + 1] * 7152 + source[i + 2] * 722;
       const exact = channel === 'alpha' ? coverage : Math.floor((source[i + 3] * (invert ? integer : 2550000 - integer) + 1275000) / 2550000);
-      expect(Math.abs(exact - coverage)).toBeLessThanOrEqual(1);
+      maximumReferenceDelta = Math.max(maximumReferenceDelta, Math.abs(exact - coverage));
       if (actual[i] !== 255 || actual[i + 1] !== 255 || actual[i + 2] !== 255 || actual[i + 3] !== exact)
         throw new Error(`Texture mismatch at ${i / 4}: ${channel}, invert=${invert}, ${actual.slice(i, i + 4)} expected alpha ${exact}`);
     }
+    // Preserve the bound for every pixel without hundreds of thousands of
+    // matcher calls dominating this exhaustive native reference check.
+    expect(maximumReferenceDelta).toBeLessThanOrEqual(1);
     expect(source).toEqual(original);
     actual.fill(0);
   }

@@ -3,7 +3,11 @@ import type { Rect } from '../core/drawing';
 import { yieldTask } from './task-yield';
 import { validateWetCarried } from './wet-paint';
 
-export interface WetField { readonly bounds: Rect; readonly transform: AffineTransform; readonly tiles: ReadonlyMap<string, string>; }
+/** Dense strings remain readable for internal callers. Native sessions retain
+ * only the cell's complete intersection with the captured dab support. */
+export type WetFieldTile = string | Readonly<{ key: string; region: Readonly<Rect> }>;
+export interface WetField { readonly bounds: Rect; readonly transform: AffineTransform; readonly tiles: ReadonlyMap<string, WetFieldTile>; }
+export const wetFieldStorageKey = (tile: WetFieldTile): string => typeof tile === 'string' ? tile : tile.key;
 export function wetTileKey(x: number, y: number): string { return `${x},${y}`; }
 export function wetRegion(region: Rect): Rect {
   const owned = { ...region };
@@ -24,13 +28,17 @@ export async function sampleWetField(
   if (!Number.isSafeInteger(tileSize) || tileSize < 1 || tileSize > 256 || region.width > tileSize || region.height > tileSize)
     throw new Error('Wet-paint sampling requires bounded native working tiles.');
   const sourceBounds = wetRegion(field.bounds);
+  // Own metadata before cooperative yields or asynchronous backing reads.
+  // Carried samples still belong to the source owner's checked store.
+  const tiles = new Map([...field.tiles].map(([cell, tile]) => [cell, typeof tile === 'string' ? tile : {key:tile.key,region:wetRegion(tile.region)}]));
   const inverse = frame.inverse();
   field.transform.inverse();
   const sameBasis = (['a', 'b', 'c', 'd', 'e', 'f'] as const).every(key => field.transform[key] === frame[key]);
   const transform = sameBasis ? new AffineTransform() : field.transform.multiply(inverse);
   // Separate neighbor slots give every pixel the same summation order even
   // when source tiles are visited in a different order or backing layout.
-  const groups = new Map<string, number[]>(), result = new Float64Array(region.width * region.height * 16);
+  const groups = new Map<string, { length:number; entries:number[] }>(), result = new Float64Array(region.width * region.height * 16);
+  const captured = new Map<string, { key:string; region:Rect }>();
   let deadline = performance.now() + 4;
   for (let y = 0; y < region.height; y++) {
     for (let x = 0; x < region.width; x++) {
@@ -42,16 +50,29 @@ export async function sampleWetField(
         const sx = left + dx, sy = top + dy, weight = (dx ? fx : 1 - fx) * (dy ? fy : 1 - fy);
         if (!weight || sx < sourceBounds.x || sy < sourceBounds.y || sx >= sourceBounds.x + sourceBounds.width || sy >= sourceBounds.y + sourceBounds.height) continue;
         const tx = Math.floor(sx / tileSize) * tileSize, ty = Math.floor(sy / tileSize) * tileSize;
-        const key = field.tiles.get(wetTileKey(tx, ty));
-        if (!key) throw new Error('Wet-paint carried field is incomplete.');
-        let entries = groups.get(key); if (!entries) groups.set(key, entries = []);
-        entries.push(target + (dy * 2 + dx) * 4, ((sy - ty) * tileSize + sx - tx) * 4, weight);
+        const cell=wetTileKey(tx,ty);
+        let tile=captured.get(cell);
+        if(!tile){
+          const reference=tiles.get(cell);
+          if(!reference)throw new Error('Wet-paint carried field is incomplete.');
+          const box=typeof reference==='string'?{x:tx,y:ty,width:tileSize,height:tileSize}:reference.region;
+          if(typeof reference!=='string'){
+            const left=Math.max(tx,sourceBounds.x),top=Math.max(ty,sourceBounds.y),right=Math.min(tx+tileSize,sourceBounds.x+sourceBounds.width),bottom=Math.min(ty+tileSize,sourceBounds.y+sourceBounds.height);
+            if(box.x!==left||box.y!==top||box.width!==right-left||box.height!==bottom-top)throw new Error('Wet-paint compact reservoir must retain the complete native cell support.');
+          }
+          const key=wetFieldStorageKey(reference);if(typeof key!=='string'||!key)throw new Error('Wet-paint carried field is incomplete.');
+          tile={key,region:box};captured.set(cell,tile);
+        }
+        const length=tile.region.width*tile.region.height*4;
+        let group=groups.get(tile.key);if(!group)groups.set(tile.key,group={length,entries:[]});
+        if(group.length!==length)throw new Error('Wet-paint carried field has inconsistent native extents.');
+        group.entries.push(target + (dy * 2 + dx) * 4, ((sy-tile.region.y)*tile.region.width+sx-tile.region.x)*4, weight);
       }
     }
     if (performance.now() >= deadline) { check(); await yieldTask(); check(); deadline = performance.now() + 4; }
   }
-  for (const [key, entries] of groups) {
-    check(); const source = await read(key); check(); validateWetCarried(source, tileSize * tileSize * 4);
+  for (const [key, {length,entries}] of groups) {
+    check(); const source = await read(key); check(); validateWetCarried(source, length);
     for (let i = 0; i < entries.length; i += 3) for (let c = 0; c < 4; c++) result[entries[i] + c] = source[entries[i + 1] + c] * entries[i + 2];
     if (performance.now() >= deadline) { await yieldTask(); check(); deadline = performance.now() + 4; }
   }

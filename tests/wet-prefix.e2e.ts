@@ -1,5 +1,22 @@
 import { expect, test } from '@playwright/test';
 
+for(const projected of[false,true])test(`completed ${projected?'projected':'affine'} wet prefixes enter the real renderer before a React frame-prop update`,async({page})=>{
+ await page.goto('/');await page.evaluate(async projected=>{
+  const{editor,RasterLayer,PerspectiveTransform}=window.luma,{createWetCadenceHarness}=await import(/* @vite-ignore */ String('/tests/fixtures/wet-cadence.tsx'));editor.newDocument({width:128,height:96});const c=new OffscreenCanvas(128,96),ctx=c.getContext('2d')!;ctx.fillStyle='#0000ff';ctx.fillRect(0,0,128,96);const asset=await editor.assetStore.add(await c.convertToBlob(),'Direct prefix original',undefined,false),layer=editor.document.layers.add(new RasterLayer({assetId:asset.id,width:128,height:96,...(projected?{perspective:new PerspectiveTransform({corners:[{x:0,y:0},{x:1,y:0},{x:.9,y:1},{x:.05,y:1}]})}:{})}));editor.document.selectedLayer=layer;editor.tools.configure({size:8,hardness:1,pressureSize:false,pressureOpacity:false,color:'#ff0000',mixer:{load:1,wetness:0,pickup:0}});await document.fonts.ready;const fixture=createWetCadenceHarness(editor,{toolFrames:true});fixture.show(null);Object.assign(window,{directWetFixture:fixture,directWetBefore:JSON.stringify(editor.document.toJSON()),directWetPast:editor.document.getSnapshot().past.length});
+ },projected);
+ const pixel=(x:number)=>page.evaluate(x=>(window as any).directWetFixture.pixel(x),x),state=()=>page.evaluate(()=>{const f=(window as any).directWetFixture;return{starts:f.starts,rendering:f.rendering};});await expect.poll(()=>pixel(32)).toEqual([0,0,255,255]);await expect.poll(async()=>(await state()).rendering).toBe(false);await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
+ try{
+  await page.evaluate(async()=>{(window as any).directWetFixture.pause();await window.luma.editor.tools.begin('mixer',{x:32,y:40},{pressure:1,shift:false,alt:false},1);});
+  await expect.poll(async()=>(await pixel(32)).slice(0,3)).toEqual([255,0,0]);await expect.poll(()=>state()).toEqual({starts:1,rendering:false});
+  // A later React acknowledgment must not render the already prepared frame twice.
+  await page.evaluate(()=>(window as any).directWetFixture.show(null));expect(await state()).toEqual({starts:1,rendering:false});
+  await page.evaluate(()=>{window.luma.editor.tools.move({x:64,y:40},{pressure:1,shift:false,alt:false});(window as any).directWetFixture.releaseFrame();});
+  await expect.poll(async()=>(await pixel(64)).slice(0,3)).toEqual([255,0,0]);await expect.poll(()=>state()).toEqual({starts:2,rendering:false});
+  expect(await page.evaluate(()=>({model:JSON.stringify(window.luma.editor.document.toJSON()),past:window.luma.editor.document.getSnapshot().past.length}))).toEqual(await page.evaluate(()=>({model:(window as any).directWetBefore,past:(window as any).directWetPast})));
+  await page.evaluate(()=>{window.luma.editor.tools.cancel();(window as any).directWetFixture.show(null);(window as any).directWetFixture.restore();});await expect.poll(()=>pixel(32)).toEqual([0,0,255,255]);
+ }finally{await page.evaluate(()=>{window.luma.editor.tools.cancel();(window as any).directWetFixture.dispose();});}
+});
+
 for (const target of ['layer', 'mask', 'filter-mask'] as const) test(`native ${target} prefixes reuse unchanged pixels, own retired frames and commit without decoding again`, async ({ page }) => {
   await page.goto('/');
   const result = await page.evaluate(async target => {

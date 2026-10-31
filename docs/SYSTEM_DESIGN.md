@@ -1,5 +1,22 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Wet carried-cell and viewport handoff invariants
+
+Store the complete native cell/dab intersection for carried pigment; keep its
+absolute region explicit and owned. Every source neighbor within captured dab
+support must resolve to a complete valid stored plane. Preserve the original
+four-neighbor arithmetic and Float32 rounding. Complete original/destination
+cells, snapshot immutability, cache bounds, native transactions, custom storage,
+quota and disposal behavior remain separate from carrier compaction.
+
+A tool prefix may enter the existing serialized viewport queue before surrounding
+React controls update. Retain its independent frame lease, validate source owner,
+host assets, proof/view/backend and live gesture, and recognize the same frame in
+React's layout acknowledgment. Never prepare an acknowledged prefix twice or
+publish an obsolete frame. The shared document/undo publication boundary and
+all physical/sustained/editor-wide performance gates remain unchanged.
+
+
 ## Captured wet-field invariant (schema 55)
 
 Treat placed wet output as one coupled field `(premultiplied RGB, replacement
