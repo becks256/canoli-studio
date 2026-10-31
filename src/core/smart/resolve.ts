@@ -1,7 +1,7 @@
 import { AffineTransform } from "../affine";
 import { isActiveSmartFilter } from './filters';
 import {activePerspective} from '../perspective';
-import { maskTransform } from "../masks";
+import { maskTransform,withoutMaskPlacedOffset } from "../masks";
 import {
   base,
   type DocumentData,
@@ -106,7 +106,7 @@ export function resolveSmartDocument(
         .inverse()
         .multiply(maskTransform(properties.mask, world));
       properties.mask = {
-        ...properties.mask,
+        ...withoutMaskPlacedOffset(properties.mask),
         linked: true,
         x: relative.e,
         y: relative.f,
@@ -142,7 +142,7 @@ export function resolveSmartDocument(
         .inverse()
         .multiply(maskTransform(layer.filterMask, world));
       (properties as typeof layer).filterMask = {
-        ...layer.filterMask,
+        ...withoutMaskPlacedOffset(layer.filterMask),
         linked: true,
         x: relative.e,
         y: relative.f,

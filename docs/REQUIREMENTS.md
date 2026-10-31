@@ -1248,4 +1248,18 @@ The local API must inspect without mutation, require explicit float32 admission,
 
 ## F03 perspective workflow — integration in progress
 
-The intended perspective tool must preserve complete originals and parent coordinates across masks, selection, rendering/export, shared OO/commands/Undo, persistence and automation. Schema-50 RasterLayer/SmartObjectLayer placement now has an immutable constructor, shared commands, numeric Inspector, direct mouse/touch/keyboard corner editing, native byte/float rendering, masks, bounds/hit tests and persistence. Affine parent placement remains independent. Schema-51 placed raster erasing now captures complete brush/clip/tip/texture/symmetry coverage, shares preview and one Undo, and survives later perspective edits/reset and resizing in byte/float rendering. Schema-52 placed selection clearing now connects Delete and constructor-based clearing through captured coverage and shared Undo. Schema-53 ordinary/filter-mask brush, pencil and eraser input now captures complete placed coverage, preserves off-frame/unbounded support, shares preview/Undo and cancels stale gestures. Perspective Pen now edits native Bézier mask paths with rational outlines/hits, native handle behavior, canvas-pixel nudges, transient previews and one Undo. Wet input and mask dragging/relinking still require their perspective integration. General warp and full quality/performance acceptance remain required. This increment does not close F03. [Engine boundary and remaining integration](PERSPECTIVE_ENGINE.md).
+The intended perspective tool must preserve complete originals and parent coordinates across masks, selection, rendering/export, shared OO/commands/Undo, persistence and automation. Schema-50 RasterLayer/SmartObjectLayer placement now has an immutable constructor, shared commands, numeric Inspector, direct mouse/touch/keyboard corner editing, native byte/float rendering, masks, bounds/hit tests and persistence. Affine parent placement remains independent. Schema-51 placed raster erasing now captures complete brush/clip/tip/texture/symmetry coverage, shares preview and one Undo, and survives later perspective edits/reset and resizing in byte/float rendering. Schema-52 placed selection clearing now connects Delete and constructor-based clearing through captured coverage and shared Undo. Schema-53 ordinary/filter-mask brush, pencil and eraser input now captures complete placed coverage, preserves off-frame/unbounded support, shares preview/Undo and cancels stale gestures. Perspective Pen now edits native Bézier mask paths with rational outlines/hits, native handle behavior, canvas-pixel nudges, transient previews and one Undo. Schema-54 ordinary mask drag and canvas nudges now retain a separate post-perspective offset with private previews and one Undo; Brush and Pen remain aligned. Wet input and preserving-position projective mask relinking still require their integration. General warp and full quality/performance acceptance remain required. This increment does not close F03. [Engine boundary and remaining integration](PERSPECTIVE_ENGINE.md).
+
+
+## Ordinary mask placement (F03, schema 54)
+
+Move → Mask must translate complete ordinary mask coverage after image perspective
+in canvas space, preserve authored geometry/refinements and original sources,
+and share OO commands, one-step Undo, strict revisions/locks and isolated scripts.
+Retain off-image support and mask-wide settings; keep the placement on perspective
+reset. Offer stacked Mask placement X/Y fields using the custom design system.
+Arrow/Shift+Arrow moves 1/10 canvas pixels without intercepting editable fields.
+Selection-away/back, owner/revision, Escape and pointer cancellation must discard
+the draft. Verify actual byte/float/smart preview/commit and source/project data,
+all mask forms, affine rebase/filter roles and a genuine 50 MP native window.
+Relinking with active perspective and remaining full F03 gates stay required.

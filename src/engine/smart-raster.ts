@@ -1,7 +1,7 @@
 import type { AssetStore } from "../core/assets";
 import { AffineTransform } from "../core/affine";
 import { cropDocument } from "../core/crop";
-import { maskTransform } from "../core/masks";
+import { maskTransform,withoutMaskPlacedOffset } from "../core/masks";
 import {
   findLayer,
   isLocked,
@@ -117,7 +117,7 @@ export async function prepareSmartRaster(
       maskTransform(layer.mask, world),
     );
     layer.mask = {
-      ...layer.mask,
+      ...withoutMaskPlacedOffset(layer.mask),
       x: relative.e,
       y: relative.f,
       basis: {

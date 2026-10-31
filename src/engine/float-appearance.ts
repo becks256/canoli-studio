@@ -25,12 +25,13 @@ export class FloatAppearanceCache{
   if(layer.width!==asset.width||layer.height!==asset.height)return;
   const mask=layer.mask;let maskKey:readonly number[]|null=null;
   if(mask?.enabled&&mask.density!==0){
-   if(mask.linked===false||mask.kind!=='selection'||mask.inverted||mask.density!==1||mask.feather||mask.strokes?.length||!identity(mask.basis)||![mask.x??0,mask.y??0].every(Number.isSafeInteger)||mask.selection.regions.length!==1)return;
+   const mx=(mask.x??0)+(mask.placedX??0),my=(mask.y??0)+(mask.placedY??0);
+   if(mask.linked===false||mask.kind!=='selection'||mask.inverted||mask.density!==1||mask.feather||mask.strokes?.length||!identity(mask.basis)||![mx,my].every(Number.isSafeInteger)||mask.selection.regions.length!==1)return;
    const r=mask.selection.regions[0];
    if(r.shape!=='rectangle'||r.operation!=='add'||!identity(r.transform)||![r.x,r.y,r.width,r.height].every(Number.isSafeInteger))return;
-   maskKey=[mask.x??0,mask.y??0,r.x,r.y,r.width,r.height];
+   maskKey=[mx,my,r.x,r.y,r.width,r.height];
    // Keep Canvas mask coordinates and native sampling exactly representable.
-   for(const [offset,start,size,position]of[[mask.x??0,r.x,r.width,layer.x],[mask.y??0,r.y,r.height,layer.y]])for(const end of[start,start+size])if(!Number.isSafeInteger(end+offset)||!Number.isSafeInteger(end+offset+position)||(end+offset+position)-position!==end+offset)return;
+   for(const [offset,start,size,position]of[[mx,r.x,r.width,layer.x],[my,r.y,r.height,layer.y]])for(const end of[start,start+size])if(!Number.isSafeInteger(end+offset)||!Number.isSafeInteger(end+offset+position)||(end+offset+position)-position!==end+offset)return;
   }
   const shadow=layer.styles?.dropShadow,active=!!shadow?.enabled&&shadow.opacity>0,radius=active?Math.ceil(3*shadow.blur):0;
   // Include a transparent safety sample beyond the finite Gaussian/bilinear

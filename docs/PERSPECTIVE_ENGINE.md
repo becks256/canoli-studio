@@ -35,8 +35,8 @@ plane. Completed coverage is subsequently sampled onto the viewport. Bounds,
 hit testing and selection outlines use projected geometry. Active perspective
 uses the standard Canvas/float path instead of the affine WebGPU compositor.
 
-Interactive wet painting on the projected image, linked-mask dragging,
-preserving-position mask relinking,
+Interactive wet painting on the projected image, preserving-position mask
+relinking,
 and capturing document selections/paths as linked masks currently require
 resetting perspective. Those operations reject with an explicit message instead
 of writing an affine approximation. Local-coordinate constructor/API operations
@@ -263,7 +263,7 @@ Ordinary and smart-filter mask Brush/Pencil/Eraser gestures now author complete 
 
 Private forward scalar sampling precomposes a strict affine mapping after subtracting an explicit input origin. Raw brush fields remain on their fixed captured ceil-sized image-pixel lattice. Existing mask geometry is not resampled onto a new mask grid. Conservative inverse bounds include raster/interpolation support; if a support rectangle crosses the inverse horizon, the mask capture marks `unbounded:true` and streams original-mask windows. Its `bounds` then describes only finite diagnostic/base support, not a clip. Unknown-support sources use inverse sampling and per-packet finite neighborhoods with fixed matrix origins, preserving partition identity without allocating an infinite grid. Exact horizon samples keep the existing background convention; image artwork itself retains its finite, validated support.
 
-Captures pin byte mask/texture sources, own copied metadata and release request/scene resources on cancellation/disposal. Mask-wide feather/inversion/density follow complete ordered composition. Preview and commit share placement; actual revision/ordered-selection changes retire mask gestures synchronously, with equivalent selection allowed. Schema 53 gates placement on Hide/Reveal brush/pencil entries in all mask/history/embedded contexts. Public constructors, existing commands/Undo, project/workspace formats and plugin grants remain. No pixel WASM ABI or REST route is added. Projected Wet input, mask Pen/dragging/relinking, general warp and full photographic/performance/device acceptance remain required.
+Captures pin byte mask/texture sources, own copied metadata and release request/scene resources on cancellation/disposal. Mask-wide feather/inversion/density follow complete ordered composition. Preview and commit share placement; actual revision/ordered-selection changes retire mask gestures synchronously, with equivalent selection allowed. Schema 53 gates placement on Hide/Reveal brush/pencil entries in all mask/history/embedded contexts. Public constructors, existing commands/Undo, project/workspace formats and plugin grants remain. No pixel WASM ABI or REST route is added. Projected Wet input, mask Pen/preserving-position relinking, general warp and full photographic/performance/device acceptance remain required.
 
 
 ## Perspective Bézier mask paths
@@ -295,5 +295,38 @@ equivalent selection values remain valid. Escape, tool/owner changes and existin
 pointer cancellation discard previews. The same existing mask updates preserve
 locks, native project/workspace/history, originals, isolation and REST contracts.
 No schema, public constructor signature, worker ABI or plugin grant is added.
-Wet input, mask dragging/relinking, document-selection/path capture, general warp
+Wet input, preserving-position mask relinking, document-selection/path capture, general warp
 and full photographic/performance/device acceptance remain required.
+
+
+## Ordinary mask movement after perspective (schema 54)
+
+`LayerMask.placedX/Y` retain a separate post-perspective translation in the
+ordinary linked image plane before layer/ancestor affine placement. Native
+`x/y/basis`, geometry and ordered refinements remain unchanged. `Layer.translateMask`
+and Move → Mask convert containing-document displacement through the inverse
+linear layer world transform and update placement once. Other mask movement
+retains existing affine/document coordinates. Resetting image perspective keeps
+the offset. Fixed affine relinking/rebasing folds it once; generic projective
+relinking remains unfinished. Linked filter offsets retain their native-master
+compositing plane, consistent with their existing native filter-mask semantics.
+
+`capturePerspectiveMask` captures the original mask and a private optional
+`postTransform` affine value (default identity). For linked ordinary masks it
+removes placement from the raw affine/native field and translates authoritative
+target corners through that transform's linear part. Native raw capture, full
+finite/unbounded support, resource ownership, document-pixel feather/settings and
+scalar working budgets remain. Byte and float renderers supply the actual world
+transform; no native WASM ABI change is needed. Paint capture includes placement
+in its authored perspective corners, while native mask basis excludes it. Pen
+uses the same outer translation and unchanged native cubics. Existing affine
+mask readers include placement once, including image resize, SVG, smart
+conversion/rasterization and wet neutral-source preparation.
+
+Actual owner/revision/ordered-selection authority still retires Move previews
+synchronously. Pointer-up consumes its endpoint, commits once, and zero motion
+creates no history. Placement fields use existing custom NumberFields; editable
+fields keep their normal keys. This does not complete projected wet input,
+preserving-position projective relinking, document selection/path capture,
+general warp, full photographic/interchange quality, sustained editor-wide
+performance, process-memory or physical-device acceptance.

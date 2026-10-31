@@ -566,3 +566,8 @@ Schema-51 placed eraser records and `RasterLayer.erase(stroke,{space:"placed"})`
 ## Perspective mask path editing
 
 Perspective mask path authoring uses existing native LayerMask/VectorPath values and shared layer updates. It adds no permission or host service: installation stays inert and third-party code remains inside the existing isolated scripting boundary.
+
+
+## Mask placement and canvas translation
+
+Layer.translateMask and schema-54 mask placement fields use existing constructor/layer-update permission and revision/history/asset validation. They add no host call or grant. Installation remains inert; command code still runs only through the isolated scripting boundary. Native sources and ordinary mask geometry remain retained.

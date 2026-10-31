@@ -1,3 +1,4 @@
+import {activePerspective} from '../core/perspective';
 import { useState } from "react";
 import { allLayers } from "../core/model";
 import type { Document, Layer } from "../dom";
@@ -35,7 +36,7 @@ export function LayerMaskPanel({
     patch: Partial<
       Pick<
         LayerMaskData,
-        "enabled" | "inverted" | "density" | "feather" | "x" | "y"
+        "enabled" | "inverted" | "density" | "feather" | "x" | "y" | "placedX" | "placedY"
       >
     >,
   ) => {
@@ -194,6 +195,13 @@ export function LayerMaskPanel({
               onCommit={(y) => commit({ y })}
             />
           </div>
+          {(value.linked!==false&&activePerspective(layer._read().perspective)||value.placedX!==undefined||value.placedY!==undefined)&&<>
+            <div className="field-grid">
+              <NumberField layout="stacked" label="Mask placement X" value={value.placedX??0} min={-Number.MAX_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} disabled={disabled} onCommit={placedX=>commit({placedX})}/>
+              <NumberField layout="stacked" label="Mask placement Y" value={value.placedY??0} min={-Number.MAX_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} disabled={disabled} onCommit={placedY=>commit({placedY})}/>
+            </div>
+            <p className="section-caption">Placement moves the whole mask without changing its geometry.</p>
+          </>}
           <label className="check-field">
             <input
               type="checkbox"

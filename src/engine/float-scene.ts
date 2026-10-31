@@ -137,7 +137,7 @@ export class FloatSceneRenderer {
       if(!capture){
        if(!maskService.perspective)throw new Error('Perspective mask capture is unavailable.');const source=sources.get(layer.assetId)!.source;
        const corners=perspectiveLocalQuad(layer.width,layer.height,layer.perspective).map(p=>world.point(p)) as unknown as import('../core/projective').ProjectiveQuad;
-       capture=maskService.perspective(layer.mask,{sourceWidth:source.width,sourceHeight:source.height,layerWidth:layer.width,layerHeight:layer.height,corners},check);perspectiveMasks.set(layer.id,capture);
+       capture=maskService.perspective(layer.mask,{sourceWidth:source.width,sourceHeight:source.height,layerWidth:layer.width,layerHeight:layer.height,corners,postTransform:world.toJSON()},check);perspectiveMasks.set(layer.id,capture);
       }
       const result=await capture.read(area);check();return result;
      }

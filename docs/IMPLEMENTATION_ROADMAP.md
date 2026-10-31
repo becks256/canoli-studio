@@ -9102,3 +9102,82 @@ diagnostics. Native pixel WASM is unchanged, SHA-256
 These selected checks do not establish full F03, photographic/interchange
 quality, sustained editor-wide latency, whole-process memory or physical-device
 acceptance; every unfinished original roadmap requirement remains active.
+
+
+### 2026-10-30 — F03 ordinary mask movement after perspective
+
+Owner: implementation agent. Previous turn: progress, committed as `80a89ec`.
+Schema 54 retains a separate ordinary-mask offset after image perspective. Real
+Move → Mask drags, canvas nudges and Layer.translateMask share complete-coverage
+movement, private previews, cancellation and one-command Undo without rewriting
+geometry, refinements or source assets. Brush/Pen remain aligned with placement.
+Affine rebase/resize/filter/wet-source paths include the offset once.
+
+This implements ordinary mask movement, not preserving-position projective
+relinking. Relinking/selection/path capture with active perspective, projected
+wet input, general warp, broad photographic/interchange quality, sustained
+editor-wide/device/resource acceptance and every unfinished original roadmap
+requirement remain required. Complete verification/evidence follow below.
+
+Design decision: canvas displacement is an outer translation of the complete
+mask field. Inverse-mapping only a pointer or adding a native x/y delta would
+distort the intended movement through perspective. Generic preserving-position
+relinking remains separate: its projective plane cannot be encoded in the
+existing affine mask basis, and must retain the native sampling grid. The
+projected-child/unlinked-mask smart conversion/expansion paths also need an
+authoritative plane audit before full F03 interoperability acceptance.
+
+Final main build/typecheck passed. The complete `npm test -- --maxWorkers=2`
+run passed **3,144 tests across 305 files**. All **15 selected production
+checks** passed without failures/skips/retries, including real pointer movement,
+the isolated guide, original-bearing projects and independently expected PNG
+pixels after resetting perspective. All **122 affected source-browser checks** also passed with zero failures,
+skips or retries, including float appearance-cache invalidation, prepared mask
+neutral sampling with placement, legacy Pen/text, native masks and 50 MP work.
+All accepted runtime/test/documentation identities remain unchanged; all **145
+served release resources** retain their recorded hashes.
+
+The final new-workflow evidence includes:
+
+- Painted, selection, vector, bitmap, raster-erasure and prepared-wet mask
+  fields each match **19,200 scalar samples** of their translated reference
+  with **zero error**, retaining nonuniform coverage, inversion/density and
+  **1.25-pixel feathering**. Partitioned reads match exactly. The mask's native
+  geometry/refinements remain byte-for-byte equal; each movement has one Undo.
+- Real raster, reflected smart-object and genuine float-TIFF pointer drags
+  match their committed displayed pixels, retain sources/geometry, and survive
+  exact Undo/redo and native project reopening.
+- Actual Escape, pointer cancellation, revision and selection-away/back discard
+  drafts. Canvas nudges, placement NumberFields with Escape, Brush after moving
+  and native Pen anchor overlays remain aligned. The brush witness reaches
+  coverage outside the captured mask-image frame.
+- Native filter-mask placement matches equivalent native x/y positioning.
+  Affine smart conversion and rasterization apply already-folded placement only
+  once. Focused unit cases cover all mask values, validation/no-op/locks and
+  strict ordinary/filter/embedded version labels.
+- A genuine **10000 × 5000 PNG** retains dimensions and original SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`.
+  Moving its projected mask changes a distant native alpha **128 → 0** and
+  shares exact one-step Undo/redo. This is a bounded native window check, not
+  a full 50 MP comparison or process-memory bound.
+
+Development diagnostics retain an initially omitted selection shape, a false
+assumption that raster smart conversion created an embedded-document master,
+NumberField label suffixes and an obsolete screen rectangle across Inspector
+layout changes. Fixtures now use actual constructor/asset-master contracts and
+the current SVG screen transform. Native coordinate comparisons account for
+roundoff between equivalent affine inverse calculations; image/coverage/history
+gates and timeouts remain unchanged. Placement fields use stacked labels.
+
+[Complete evidence](benchmarks/mask-offset-2026-10-30.json.gz),
+**949,258 bytes**, SHA-256
+`fc77e528307eb3b5629b50024ad0cc8cf65dec91467fbfbb6204ab4b7785245a`.
+The receipt includes exact commands, full reports/logs, source/release identities,
+all **12 raw scalar comparison fields**, actual native project/PNG witnesses and
+development diagnostics. Actual/reference scalar payloads are byte-identical.
+Native pixel WASM/ABI is unchanged, SHA-256
+`bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+This accepts ordinary mask movement. It does not complete projective relinking,
+wet input, general warp, photographic/interchange quality, sustained editor-wide
+latency, whole-process memory, physical-device or any other unfinished original
+roadmap requirement. The full goal remains active.

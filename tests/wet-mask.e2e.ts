@@ -20,16 +20,16 @@ test('prepared mask replacements preserve hide/wet/reveal order, native pixels, 
  });expect(result).toEqual({native:[[0,0,255,255],[0,0,255,128],[0,0,255,255]],svg:[[0,0,255,255],[0,0,255,128],[0,0,255,255]],psd:[[[0,0,255,255],[0,0,255,128],[0,0,255,255]],[[0,0,255,255],[0,0,255,128],[0,0,255,255]]],reopened:[[0,0,255,255],[0,0,255,128],[0,0,255,255]],one:true,undo:true,model:true,kinds:['wet','hide','wet','reveal']});
 });
 
-test('mask smudge samples neutral coverage before disabled/inverted/density/feather settings and clips once in the mask plane',async({page})=>{
- await page.goto('/');const result=await page.evaluate(async()=>{
+for(const placed of [0,3])test(`mask smudge samples neutral coverage before disabled/inverted/density/feather settings and clips once in the mask plane: offset=${placed}`,async({page})=>{
+ await page.goto('/');const result=await page.evaluate(async placed=>{
   const {editor,PaintLayer,LayerMask,PencilStroke,MarqueeSelection,AffineTransform}=window.luma;editor.newDocument({width:64,height:64});const layer=editor.document.layers.add(new PaintLayer());
   const world=new AffineTransform(1.5,.25,.5,1.25,8,4);layer.transform=world;
-  layer.mask=new LayerMask({base:0,enabled:false,inverted:true,density:.4,feather:6,x:2,y:3}).paint(new PencilStroke({size:1,pressureSize:false,points:[{x:4.5,y:4.5}]}),'reveal');editor.document.selectedLayer=layer;
-  const maskWorld=world.multiply(AffineTransform.translation(2,3));editor.document.selection=new MarqueeSelection({x:6,y:4,width:1,height:1,shape:'rectangle'}).transformed(maskWorld);
+  layer.mask=new LayerMask({base:0,enabled:false,inverted:true,density:.4,feather:6,x:2,y:3,placedX:placed,placedY:-placed}).paint(new PencilStroke({size:1,pressureSize:false,points:[{x:4.5,y:4.5}]}),'reveal');editor.document.selectedLayer=layer;
+  const maskWorld=world.multiply(AffineTransform.translation(2+placed,3-placed));editor.document.selection=new MarqueeSelection({x:6,y:4,width:1,height:1,shape:'rectangle'}).transformed(maskWorld);
   const operation=await editor.applyWetPaint(new PencilStroke({size:1,pressureSize:false,points:[{x:4.5,y:4.5},{x:8.5,y:4.5}]}),{target:'mask',mode:'smudge',mix:{pickup:0}});
   const mask=layer.mask!,raw=mask.with({enabled:true,inverted:false,density:1,feather:0}),canvas=await editor.renderer.renderMaskCoverage(raw.toJSON(),{x:0,y:0,width:16,height:16,sx:1,sy:1},0,0,'raw',false,new AffineTransform(),editor.assetStore);
-  try{return{alpha:[4,5,6,7,8].map(x=>canvas.getContext('2d')!.getImageData(x,4,1,1).data[3]),settings:{enabled:mask.enabled,inverted:mask.inverted,density:mask.density,feather:mask.feather,x:mask.x,y:mask.y},kind:operation?.kind,maskKind:mask.kind};}finally{canvas.width=canvas.height=0;}
- });expect(result).toEqual({alpha:[255,0,255,0,0],settings:{enabled:false,inverted:true,density:.4,feather:6,x:2,y:3},kind:'wet',maskKind:'paint'});
+  try{return{alpha:[4,5,6,7,8].map(x=>canvas.getContext('2d')!.getImageData(x,4,1,1).data[3]),settings:{enabled:mask.enabled,inverted:mask.inverted,density:mask.density,feather:mask.feather,x:mask.x,y:mask.y,placedX:mask.placedX,placedY:mask.placedY},kind:operation?.kind,maskKind:mask.kind};}finally{canvas.width=canvas.height=0;}
+ },placed);expect(result).toEqual({alpha:[255,0,255,0,0],settings:{enabled:false,inverted:true,density:.4,feather:6,x:2,y:3,placedX:placed,placedY:-placed},kind:'wet',maskKind:'paint'});
 });
 
 test('filter-mask pointer transport uses the native master and preserves ordinary mask, source and filter stack',async({page})=>{

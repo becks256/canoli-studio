@@ -1014,3 +1014,8 @@ Placed ordinary/filter-mask brush coverage evaluates captured perspective and ma
 ## Perspective mask path editing
 
 Direct perspective mask path input resolves mask basis → image homography → layer/ancestor affine placement. Native cubic values remain authoritative. Presentation and hit testing use homogeneous rational curves with viewport/work budgets, not polynomial control-point transformation. Projected gestures and drafts observe revision/ordered-selection authority synchronously; shared mask commands remain the only publication path.
+
+
+## Mask placement and canvas translation
+
+Ordinary linked image-mask placement is W × T(placedX,placedY) × H × native mask geometry. Raw capture excludes placement; scalar target corners include W-linear displacement before document feather/settings. Affine/unlinked masks include placement once in their existing transform. Linked filter masks retain native-master compositing before image projection. UI/OO displacement resolves containing-document deltas through inverse W-linear geometry and shares ordinary mask commands. Version gates, immutable captures, native source ownership and existing gesture authority remain required; no arbitrary image limit or WASM/permission boundary changes.

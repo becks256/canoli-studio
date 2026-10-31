@@ -17,6 +17,7 @@ export function resizeImage(document: DocumentData, width: number, height: numbe
   const scaleMask = (mask: LayerMaskData | null | undefined) => {
     if (!mask || mask.linked !== false) return;
     mask.x = (mask.x ?? 0) * sx; mask.y = (mask.y ?? 0) * sy;
+    if(mask.placedX!==undefined)mask.placedX*=sx;if(mask.placedY!==undefined)mask.placedY*=sy;
     mask.basis = scale.multiply(mask.basis ? AffineTransform.fromJSON(mask.basis) : new AffineTransform()).toJSON();
   };
   for (const layer of document.children) scalePosition(layer);

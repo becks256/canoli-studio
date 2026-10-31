@@ -1,3 +1,4 @@
+import {translateMaskData} from '../core/masks';
 import {measureSpacing,snapToSpacing,type SpacingMatch} from '../core/spacing';
 import {activePerspective} from '../core/perspective';
 import {PerspectiveCornerDrag} from './perspective-corner';
@@ -798,16 +799,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     }
     selectedAction((layer) => {
       if (movingMask && layer.mask) {
-        layer.update(
-          movePatch({
-            id: layer.id,
-            x: layer.mask.x,
-            y: layer.mask.y,
-            dx: x,
-            dy: y,
-            mask: layer.mask.toJSON(),
-          }),
-        );
+        layer.translateMask(x,y);
       } else {
         const delta = parentSpaceDelta(dom.getSnapshot().document, layer.id, { x, y });
         layer.update({ x: layer.x + delta.x, y: layer.y + delta.y });
@@ -1419,7 +1411,6 @@ export function App({ editor }: { editor: EditorApplication }) {
       setPerspectiveIssue(null);return;
     }
     if (movingMask) {
-      if(selected?.perspective&&activePerspective(selected.perspective)&&selected.mask?.linked!==false){notify('Reset perspective before dragging this linked mask.');return;}
       if (selected?.mask && !locked)
         gesture.current = {
           kind: "move",
@@ -1790,7 +1781,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         setSnapGuides(snapped.guides);
       }
     }
-    setPreview(
+    try {setPreview(
       drag.members
         ? {
             type: "transaction",
@@ -1802,7 +1793,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             })),
           }
         : { type: "layer.update", id: drag.id, patch: movePatch(drag) },
-    );
+    );}catch(error){gesture.current=null;pointerDocument.current=null;setPreview(null);notify(error instanceof Error?error.message:String(error));}
   }
   function movePatch(drag: {
     id: string;
@@ -1815,13 +1806,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     const snapshot = dom.getSnapshot().document;
     let delta = { x: drag.dx, y: drag.dy };
     if (!drag.mask) delta = parentSpaceDelta(snapshot, drag.id, delta);
-    else if (drag.mask.linked !== false) {
-      const inverse = layerTransform(snapshot, drag.id)!.inverse();
-      delta = {
-        x: inverse.a * drag.dx + inverse.c * drag.dy,
-        y: inverse.b * drag.dx + inverse.d * drag.dy,
-      };
-    }
+    else return {mask:translateMaskData(drag.mask,layerTransform(snapshot,drag.id)!,drag.dx,drag.dy,activePerspective(findLayer(snapshot,drag.id)?.perspective))};
     const position = {
       x: Math.max(
         -Number.MAX_SAFE_INTEGER,
@@ -1832,7 +1817,7 @@ export function App({ editor }: { editor: EditorApplication }) {
         Math.min(Number.MAX_SAFE_INTEGER, drag.y + delta.y),
       ),
     };
-    return drag.mask ? { mask: { ...drag.mask, ...position } } : position;
+    return position;
   }
   function pointerUp(event: ReactPointerEvent<HTMLDivElement>) {
     if (capturedPointer.current !== event.pointerId) return;

@@ -45,7 +45,7 @@ import type { DodgeBurnOptions } from "../core/retouch/types";
 import { renderTonalStroke, renderRetouchCoverage } from "./retouch";
 import { blendAdjustedTile } from "./adjustment-blend";
 import { localTransform, localBounds } from "../core/spatial";
-import { maskTransform, maskGeometry } from "../core/masks";
+import { maskTransform, maskGeometry,withoutMaskPlacedOffset } from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
 import { maskCoverage, PaintedMaskRaster, applyMaskSettings } from "./masks";
 import type { AssetStore } from "../core/assets";
@@ -382,9 +382,9 @@ export class CanvasRenderer implements DocumentRenderer {
 
   private async perspectiveMaskCanvas(mask:LayerMaskData,layer:RasterLayerData|SmartObjectInstanceData,native:{width:number;height:number},assets:AssetStore,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions){
     let value=mask;
-    if(mask.linked===false&&options.documentTransform){const m=options.documentTransform.multiply(maskTransform(mask,new AffineTransform()));value={...mask,x:m.e,y:m.f,basis:{a:m.a,b:m.b,c:m.c,d:m.d,e:0,f:0}};}
+    if(mask.linked===false&&options.documentTransform){const m=options.documentTransform.multiply(maskTransform(mask,new AffineTransform()));value={...withoutMaskPlacedOffset(mask),x:m.e,y:m.f,basis:{a:m.a,b:m.b,c:m.c,d:m.d,e:0,f:0}};}
     const corners=perspectiveLocalQuad(layer.width,layer.height,layer.perspective!).map(p=>world.point(p)) as unknown as import('../core/projective').ProjectiveQuad;
-    const captured=this.capturePerspectiveMask(value,{sourceWidth:native.width,sourceHeight:native.height,layerWidth:layer.width,layerHeight:layer.height,corners},assets,{isCancelled:options.isCancelled});
+    const captured=this.capturePerspectiveMask(value,{sourceWidth:native.width,sourceHeight:native.height,layerWidth:layer.width,layerHeight:layer.height,corners,postTransform:world.toJSON()},assets,{isCancelled:options.isCancelled});
     const canvas=createCanvas(space.width,space.height,true),context=canvas.getContext('2d')!;
     try{
       for(let y=0;y<space.height;y+=512)for(let x=0;x<space.width;x+=512){

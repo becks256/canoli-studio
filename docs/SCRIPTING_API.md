@@ -1378,7 +1378,7 @@ provides direct perspective corners: drag with a pointer or focus a corner and
 use Arrow/Shift+Arrow for 1/10 canvas pixels. A valid drag commits once; stale,
 cancelled or folded placements do not commit. This UI uses the same constructor
 and setter; it adds no scripting method.
-Placed raster erasing, selection clearing and ordinary/filter-mask Brush/Pencil/Eraser input now retain captured perspective coverage. Reset perspective before wet painting, linked-mask dragging/relinking or `maskFromSelection` / `maskFromPaths`; those paths still reject while active. Default local constructors remain available. See the placed-mask contract below. Smart rasterization bakes the
+Placed raster erasing, selection clearing and ordinary/filter-mask Brush/Pencil/Eraser input now retain captured perspective coverage. Reset perspective before wet painting, preserving-position mask relinking or `maskFromSelection` / `maskFromPaths`; those paths still reject while active. Default local constructors remain available. See the placed-mask contract below. Smart rasterization bakes the
 projected appearance and linked mask; SVG/Photoshop delivery bakes placement.
 See [PERSPECTIVE_ENGINE.md](PERSPECTIVE_ENGINE.md) for sampling and remaining
 F03 acceptance requirements.
@@ -2376,7 +2376,7 @@ With `space:"placed"`, a linked mask on an active RasterLayer/SmartObjectLayer p
 
 Later image corner edits/reset and mask offset/basis changes retain the captured field. Existing mask geometry keeps its own resolution and coordinate plane; no raster conversion or clipping to the image frame is introduced. A stroke near the inverse horizon can have unbounded pullback support. Its field streams bounded native windows instead of storing a guessed finite extent or imposing an image limit. Mask-wide feather, inversion and density remain after ordered stroke composition, with the existing byte mask role. Float image RGB remains original-derived; masks affect alpha through the existing float pipeline.
 
-The UI captures the document selection and pen/symmetry input through the affine inverse in this placed plane. Cursors use that same plane. Preview and commit carry the same metadata; a completed gesture creates one Undo. Actual revision or ordered layer-selection changes, Escape, tool changes and owner changes cancel rather than retarget the gesture; an equivalent selection remains valid. Projected wet input, dragging/relinking and complete F03 quality/performance/device acceptance remain required.
+The UI captures the document selection and pen/symmetry input through the affine inverse in this placed plane. Cursors use that same plane. Preview and commit carry the same metadata; a completed gesture creates one Undo. Actual revision or ordered layer-selection changes, Escape, tool changes and owner changes cancel rather than retarget the gesture; an equivalent selection remains valid. Projected wet input, preserving-position relinking and complete F03 quality/performance/device acceptance remain required.
 
 <!-- example: placed-mask -->
 ```js
@@ -4288,7 +4288,7 @@ cancel on actual revision or ordered-selection changes, Escape or owner/tool
 changes. Inverse-horizon pointer input cancels rather than committing a partial
 edit. Rational outlines are clipped for display at 0.2 CSS-pixel error, with
 explicit bounded-work/precision errors; native data and file rendering are not
-approximated by the overlay. General warp, mask dragging/relinking, wet input and
+approximated by the overlay. General warp, mask preserving-position relinking, wet input and
 full F03 quality/performance/device acceptance remain required.
 
 <!-- example: perspective-mask-path -->
@@ -4311,3 +4311,58 @@ layer.mask = new LayerMask({paths: [new VectorPath({
 The example explicitly replaces the selected image's mask. Image perspective and
 original assets remain unchanged. It runs through the existing isolated script
 transaction; it exposes no canvas, pixel, file or worker access.
+
+
+### Mask placement and canvas translation (schema 54)
+
+`LayerMask` constructors and `with` accept optional finite `placedX` and
+`placedY`, each between ±`Number.MAX_SAFE_INTEGER`; getters default to zero.
+Omitted fields remain absent in serialized older masks. Explicit values,
+including zero, require document schema 54 in ordinary/filter masks, history and
+embedded masters. Values and existing geometry/refinements survive `with`,
+constructor getters, JSON reconstruction and native project/workspace transport.
+Invalid/null/nonfinite/out-of-range offsets reject.
+
+For an ordinary linked raster/smart-object mask with image perspective, these
+offsets translate the completed mask **after perspective and before layer/parent
+affine placement**. `x`, `y` and `basis` still position native mask geometry
+before perspective. Placement retains the entire mask, including off-image
+coverage and captured paint/wet refinements; it never bakes geometry or clips it
+to the image. Mask-wide inversion/density/document feather retain their order.
+When perspective is reset/absent, placement remains as an additional affine
+offset; it is not discarded. Unlinked offsets are in the containing-document
+plane. Linked filter masks retain their existing native-master compositing
+plane: `placedX/Y` there are additive native-master offsets before filtering and
+image projection, rather than an ordinary mask's post-perspective displacement.
+
+`layer.translateMask(dx: number, dy: number): void` moves the existing ordinary
+mask by containing-document pixels through one shared command/Undo. It requires
+an attached layer and a mask. Linked projected masks record placement offsets
+through the inverse linear layer/ancestor transform; other masks retain their
+existing native `x/y` translation. Zero movement is a no-op. Finite fractional
+deltas are accepted; invalid values, unresolved/overflowing geometry and locked
+ancestry reject without publication. The method never reads document selection
+or moves filter masks. UI Move → Mask dragging and Arrow/Shift+Arrow use this
+behavior for 1/10 canvas-pixel nudges; drag displacement retains its existing
+canvas-pixel rounding. Selection/revision/owner changes, Escape and pointer
+cancellation discard previews; release commits once.
+
+The Inspector's Mask placement X/Y fields adjust the ordinary mask's placement
+in its resolved plane without changing native geometry. Brush/Pencil/Eraser
+placement capture includes the offset; Pen projects the same native anchors.
+Native source RGB/precision, assets and original bytes remain retained.
+Affine preserving-position relinking folds placement once into the new affine
+basis. Relinking with active image perspective still requires reset; projected
+wet input, general warp and full F03 quality/performance/device gates remain.
+
+<!-- example: mask-placement -->
+```js
+const layer = document.selectedLayer;
+if (!layer?.mask) throw new Error("Select a layer with a mask.");
+layer.translateMask(12, -6);
+```
+
+The pure OO method uses existing layer updates/locks/history inside isolated
+scripts. It adds no file/pixel/worker/network access or plugin grant. REST
+accepts the strict mask DTO through existing layer updates in its independent
+headless session; it does not synchronize with the browser.

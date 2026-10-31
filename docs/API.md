@@ -1009,3 +1009,8 @@ Existing `layer.update` mask/filterMask DTOs now accept optional strict `placeme
 ## Perspective mask path editing
 
 Perspective Pen editing commits existing strict native vector-mask DTOs through layer.update. Independent REST retains shared validation/locks/revisions/Undo but supplies no browser pointer service, composed renderer or synchronization. Public constructors and isolated scripting signatures remain unchanged.
+
+
+## Mask placement and canvas translation
+
+Schema-54 mask DTOs accept optional finite placedX/placedY within the existing coordinate range, including strict root/history/filter/embedded version gates. Public Layer.translateMask(dx,dy) uses shared ordinary mask updates/Undo and containing-document pixels; default constructors and missing fields remain compatible. Existing REST layer.update commands admit the same DTO and retain strict atomicity, locks and expectedRevision. REST provides no browser synchronization or composed renderer. Exact planes, defaults, error behavior and scripting example are in SCRIPTING_API.md.

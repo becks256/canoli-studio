@@ -1,6 +1,6 @@
 import { AffineTransform } from "../affine";
 import { cropDocument } from "../crop";
-import { maskTransform } from "../masks";
+import { maskTransform,withoutMaskPlacedOffset } from "../masks";
 import {
   allLayers,
   base,
@@ -98,7 +98,7 @@ export function convertLayers(
         .inverse()
         .multiply(maskTransform(node.mask, world));
       node.mask = {
-        ...node.mask,
+        ...withoutMaskPlacedOffset(node.mask),
         linked: true,
         x: relative.e,
         y: relative.f,
@@ -125,7 +125,7 @@ export function convertLayers(
         .inverse()
         .multiply(maskTransform(node.filterMask, world));
       node.filterMask = {
-        ...node.filterMask,
+        ...withoutMaskPlacedOffset(node.filterMask),
         linked: true,
         x: relative.e,
         y: relative.f,

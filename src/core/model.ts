@@ -51,7 +51,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 53;
+export const SCHEMA_VERSION = 54;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -225,6 +225,7 @@ export interface DocumentData {
     | 50
     | 51
     | 52
+    | 53
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -635,7 +636,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       value.schemaVersion !== 27 &&
       value.schemaVersion !== 28 &&
       value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48 && value.schemaVersion !== 49 && value.schemaVersion !== 50 && value.schemaVersion !== 51 && value.schemaVersion !== 52 && value.schemaVersion !== 53) ||
+      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48 && value.schemaVersion !== 49 && value.schemaVersion !== 50 && value.schemaVersion !== 51 && value.schemaVersion !== 52 && value.schemaVersion !== 53 && value.schemaVersion !== 54) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -643,7 +644,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     !(value.colorSpace === "srgb" && (value.precision === undefined || value.precision === "uint8") || value.colorSpace === "linear-srgb" && value.precision === "float32")
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–53), a supported precision/working-space pair, and positive, safely representable integer dimensions.",
+      "Invalid document. Use a supported schema version (1–54), a supported precision/working-space pair, and positive, safely representable integer dimensions.",
     );
   }
   if(value.precision!==undefined&&Number(value.schemaVersion)<49)throw new Error('Document precision requires schema version 49.');

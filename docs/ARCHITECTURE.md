@@ -2256,3 +2256,8 @@ Large/feathered placed-mask surfaces retain existing canvas budgets while scalar
 ## Perspective mask path editing
 
 `core/mask-path.ts` keeps world translation outside native-mask projective arithmetic and supplies positional inverses. `core/projective-bezier.ts` uses homogeneous rational subdivision, viewport half-space hull culling and exact native parameter hit candidates. `ui/ProjectivePenControls.tsx` presents bounded rational outlines/handles; legacy affine Pen presentation stays on its existing path. ToolController captures mapping/grab offsets and projected path/draft authority, then commits ordinary native mask updates. No renderer/schema/worker or grant boundary changes.
+
+
+## Mask placement and canvas translation
+
+Schema 54 adds optional mask placedX/Y in the compositing plane. Ordinary linked perspective masks keep raw x/y/basis separate; capturePerspectiveMask translates authoritative output corners through an owned optional postTransform, preserving native field sampling and feather/settings. Byte/float callers pass the actual world transform. translateMaskData supplies shared document-pixel displacement for Layer.translateMask and Move previews; attached commands remain publication authority. Brush capture and Pen mapping include the same outer placement. Affine rebases remove already-folded placement once; neutral wet input clears it and affine float appearance keys include the resolved offset. The native ABI, source budgets, grants and independent REST/session boundaries remain unchanged.

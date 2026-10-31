@@ -119,7 +119,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
     const load = wetPaintLoadSchema.parse({ color: foreground, load: mode === 'mixer' ? 1 : 0, ...options.load }), mix = wetPaintMixSchema.parse({ wetness: mode === 'mixer' ? .25 : 0, ...options.mix });
     if(maskData)load.color=[255,255,255,load.color[3]];
     const native = !maskData&&source.kind === 'raster' ? base.get(source.assetId) : undefined, localToNative = native && source.kind === 'raster' ? AffineTransform.scale(native.width / source.width, native.height / source.height) : new AffineTransform();
-    const neutralMask=maskData?{...maskData,x:0,y:0,basis:undefined,linked:true,enabled:true,inverted:false,density:1,feather:0}:undefined;
+    const neutralMask=maskData?{...maskData,x:0,y:0,placedX:0,placedY:0,basis:undefined,linked:true,enabled:true,inverted:false,density:1,feather:0}:undefined;
     const neutral = maskData?{...new PaintLayer().toJSON(),mask:neutralMask}:{ ...source, clipped:undefined, x: 0, y: 0, transform: undefined, visible: true, opacity: 1, fillOpacity: 1, mask: null, styles: undefined, blendMode: 'normal' as const, ...(source.kind === 'raster' ? { width: native!.width, height: native!.height, effects: [] } : {}) };
     const sourceDocument = freeze({ ...snapshot.document, children: [neutral], layerComps: undefined,...(maskData?{components:undefined}: {}) } as DocumentData), checkSources = captureRasterExportSources(sourceDocument, base, { signal: abort.signal }, 'wet-paint target preparation');
     releaseSources=()=>checkSources.release();

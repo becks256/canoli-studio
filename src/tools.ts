@@ -49,7 +49,7 @@ import type { Document, Layer, ShapeOptions } from "./dom";
 import type { EditorCommand } from "./core/commands";
 import { isLocked, findLayer } from "./core/model";
 import type { LayerMaskData } from "./core/masks";
-import { maskOrigin, maskTransform } from "./core/masks";
+import { maskOrigin, maskTransform,maskPlacedPerspective } from "./core/masks";
 import { hitTestPath, splitPathSegment } from "./core/bezier";
 import type { CurveHit } from "./core/bezier";
 import { AffineTransform } from "./core/affine";
@@ -1061,7 +1061,7 @@ export class ToolController {
         layerPosition.x,
         layerPosition.y,
       );
-      let maskWorld = this.maskWorld(doc, selected, data),placementBasis=maskTransform(data,new AffineTransform());
+      let maskWorld = this.maskWorld(doc, selected, data),placementBasis=maskTransform(data,new AffineTransform(),false);
       if (filterMask && selected instanceof SmartObjectLayer) {
         const master = doc.getComponent(selected.componentId);
         const nativeWorld = layerTransform(doc._read(), selected.id)!.multiply(
@@ -1074,7 +1074,7 @@ export class ToolController {
         placementBasis=maskTransform(data,AffineTransform.scale(selected.width/master.width,selected.height/master.height));
       }
       const image=findLayer(doc._read(),selected.id),placed=!!image&&activePerspective(image.perspective)&&data.linked!==false;
-      const placement=placed&&(image.kind==='raster'||image.kind==='smart-object')?{width:image.width,height:image.height,perspective:image.perspective!,basis:placementBasis.toJSON()}:undefined;
+      const placement=placed&&(image.kind==='raster'||image.kind==='smart-object')?{width:image.width,height:image.height,perspective:filterMask?image.perspective!:maskPlacedPerspective(image.perspective!,image.width,image.height,data),basis:placementBasis.toJSON()}:undefined;
       const inputTransform = placement?layerTransform(doc._read(),selected.id)!.inverse():maskWorld.inverse();
       const stroke = new (tool === "pencil" ? PencilStroke : BrushStroke)({
         points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],

@@ -120,7 +120,7 @@ export type { PatchRegionOptions } from "../core/retouch/patch-region";
 export { PatchAdjustment, TonalStroke } from "./retouch";
 import { GuideCollection } from "./guides";
 export { Guide, GuideCollection } from "./guides";
-import { maskTransform } from "../core/masks";
+import { maskTransform,maskPlacedPerspective,translateMaskData,withoutMaskPlacedOffset } from "../core/masks";
 import { LayerSelection } from "./layer-selection";
 export { LayerSelection } from "./layer-selection";
 export { AffineTransform } from "../core/affine";
@@ -1239,10 +1239,17 @@ export abstract class Layer {
       if(layer.kind!=='raster'&&layer.kind!=='smart-object')throw new Error('Placed mask painting requires an image.');
       let parent=new AffineTransform();
       if(options.filterMask&&this instanceof SmartObjectLayer){const master=this.requireDocument().getComponent(this.componentId);parent=AffineTransform.scale(this.width/master.width,this.height/master.height);}
-      placement={width:layer.width,height:layer.height,perspective:new PerspectiveTransform(layer.perspective),basis:maskTransform(mask.toJSON(),parent)};
+      placement={width:layer.width,height:layer.height,perspective:new PerspectiveTransform(options.filterMask?layer.perspective:maskPlacedPerspective(layer.perspective,layer.width,layer.height,mask.toJSON())),basis:maskTransform(mask.toJSON(),parent,!!options.filterMask)};
     }
     const next=mask.paint(stroke,mode,placement?{placement}:{});
     if(options.filterMask&&this instanceof SmartObjectLayer)this.filterMask=next;else this.mask=next;
+  }
+  /** Move the ordinary mask in containing-document pixels without changing its geometry. */
+  translateMask(dx:number,dy:number):void {
+    const document=this.requireDocument(),mask=this.mask;
+    if(!mask)throw new Error('This layer has no mask to move.');
+    const data=this._read(),source=mask.toJSON(),next=translateMaskData(source,layerTransform(document._read(),this.id)!,dx,dy,activePerspective(data.perspective));
+    if(next!==source)this.mask=LayerMask._fromJSON(next);
   }
   /** Toggle coordinate planes while preserving the mask's current world position. */
   setMaskLinked(linked: boolean) {
@@ -1258,6 +1265,7 @@ export abstract class Layer {
     const local = linked ? layerWorld.inverse().multiply(world) : world;
     this.mask = mask.with({
       linked,
+      ...(mask.placedX||mask.placedY?{placedX:0,placedY:0}:{}),
       x: local.e,
       y: local.f,
       basis: new AffineTransform(local.a, local.b, local.c, local.d, 0, 0),
@@ -1590,6 +1598,7 @@ export class SmartObjectLayer extends Layer {
     const local = linked ? nativeWorld.inverse().multiply(world) : world;
     this.filterMask = mask.with({
       linked,
+      ...(mask.placedX||mask.placedY?{placedX:0,placedY:0}:{}),
       x: local.e,
       y: local.f,
       basis: new AffineTransform(local.a, local.b, local.c, local.d, 0, 0),
@@ -2157,7 +2166,7 @@ export class VectorLayer extends Layer {
       const frame=parent?layerTransform(this.document._read(),parent):undefined;
       if(frame){
         const m=frame.inverse().multiply(maskTransform(layer.mask,new AffineTransform()));
-        layer={...layer,mask:{...layer.mask,x:m.e,y:m.f,basis:{a:m.a,b:m.b,c:m.c,d:m.d,e:0,f:0}}};
+        layer={...layer,mask:{...withoutMaskPlacedOffset(layer.mask),x:m.e,y:m.f,basis:{a:m.a,b:m.b,c:m.c,d:m.d,e:0,f:0}}};
       }
     }
     return exportVectorLayerSvg(

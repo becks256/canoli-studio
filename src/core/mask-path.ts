@@ -29,7 +29,7 @@ export class MaskPathMapping implements PointMapping {
 export function maskPathMapping(document:DocumentData,id:string,mask:LayerMaskData){
   const world=layerTransform(document,id)!,layer=findLayer(document,id)!;
   if(mask.linked!==false&&(layer.kind==='raster'||layer.kind==='smart-object')&&activePerspective(layer.perspective))
-    return new MaskPathMapping(world,perspectiveMatrix(layer.width,layer.height,layer.perspective)
-      .multiply(ProjectiveTransform.fromAffine(maskTransform(mask,new AffineTransform()))));
+    return new MaskPathMapping(world.multiply(AffineTransform.translation(mask.placedX??0,mask.placedY??0)),perspectiveMatrix(layer.width,layer.height,layer.perspective)
+      .multiply(ProjectiveTransform.fromAffine(maskTransform(mask,new AffineTransform(),false))));
   return new MaskPathMapping(maskTransform(mask,world));
 }

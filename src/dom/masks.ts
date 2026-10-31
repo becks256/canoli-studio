@@ -29,6 +29,8 @@ interface MaskSettings {
   strokes?: MaskPaint[];
   x?: number;
   y?: number;
+  placedX?:number;
+  placedY?:number;
   linked?: boolean;
   feather?: number;
   enabled?: boolean;
@@ -97,12 +99,8 @@ export class LayerMask {
       throw new Error("Fill rule applies only to vector masks.");
     if (options.assetId && options.fillRule !== undefined)
       throw new Error("Fill rule applies only to vector masks.");
-    const strokeSettings =
-      options.strokes === undefined
-        ? {}
-        : {
-            strokes: options.strokes.map(paintData),
-          };
+    const placed={...(options.placedX!==undefined?{placedX:options.placedX}:{}),...(options.placedY!==undefined?{placedY:options.placedY}:{})};
+    const strokeSettings = {...placed,...(options.strokes===undefined?{}:{strokes:options.strokes.map(paintData)})};
     if (native) {
       this.data=layerMaskSchema.parse({kind:'raster-erasures',width:native.width,height:native.height,
         erasures:native.operations.map(entry=>({width:entry.width,height:entry.height,stroke:entry.stroke.toJSON(),...(entry.placement?{placement:{perspective:entry.placement.perspective.toJSON(),bounds:{...entry.placement.bounds}}}:{})})),...strokeSettings,enabled,inverted,density,feather,x,y,linked,
@@ -110,6 +108,7 @@ export class LayerMask {
     } else if (options.base !== undefined) {
       this.data = layerMaskSchema.parse({
         kind: "paint",
+        ...placed,
         base: options.base,
         strokes: (options.strokes === undefined ? [] : options.strokes).map(paintData),
         enabled,
@@ -203,6 +202,8 @@ export class LayerMask {
   get y() {
     return this.data.y ?? 0;
   }
+  get placedX(){return this.data.placedX??0;}
+  get placedY(){return this.data.placedY??0;}
   get linked() {
     return this.data.linked ?? true;
   }
@@ -264,6 +265,8 @@ export class LayerMask {
     const strokes =
       values.strokes === undefined ? this.strokes : values.strokes;
     const settings = {
+      ...(values.placedX!==undefined||this.data.placedX!==undefined?{placedX:values.placedX===undefined?this.placedX:values.placedX}:{}),
+      ...(values.placedY!==undefined||this.data.placedY!==undefined?{placedY:values.placedY===undefined?this.placedY:values.placedY}:{}),
       basis: values.basis ?? (this.data.basis ? this.basis : undefined),
       enabled,
       inverted,
