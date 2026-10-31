@@ -1,5 +1,15 @@
 # Architecture
 
+## Projected wet composition bounds
+
+`projected-wet.ts` samples each complete canonical native field window before
+bounding its pointwise byte composition by nonzero removal coverage. Replacement
+alpha alone cannot bound transparent pigment that clears existing artwork.
+Conversion, scratch surfaces, readback and optional once-only opacity mixing use
+that integer rectangle; untouched target pixels stay in place. Four nonzero
+coverage corners prove full-window bounds without a dense scan. Native sampling,
+source validation, cancellation and the coupled-field invariants stay unchanged.
+
 ## Conservative projective field footprints
 
 Bounded scalar and coupled wet-field windows retain the existing homography,

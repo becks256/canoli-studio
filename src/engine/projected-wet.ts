@@ -69,21 +69,30 @@ export async function compositeProjectedWetPaint(
  const context=target.getContext('2d')!;
  for(let y=0;y<target.height;y+=512)for(let x=0;x<target.width;x+=512){
   const w=Math.min(512,target.width-x),h=Math.min(512,target.height-y),field=await projectPerspectiveFieldWindow(source,processor,corners,{x,y,width:w,height:h},{isCancelled:()=>{check();return false;}});check();
-  let changed=false;for(let i=4;i<field.length;i+=5)if(field[i]){changed=true;break;}if(!changed)continue;
-  const raw=createCanvas(w,h,true),mask=createCanvas(w,h,true),replacement=createCanvas(w,h,true);
-  try{
-   const c=raw.getContext('2d')!,m=mask.getContext('2d')!,p=replacement.getContext('2d')!,colors=p.createImageData(w,h),coverage=m.createImageData(w,h);
-   for(let i=0;i<w*h;i++){
-    const a=field[i*5+3],at=i*4;colors.data[at+3]=Math.round(a*255);coverage.data[at+3]=Math.round(field[i*5+4]*255);
-    for(let channel=0;channel<3;channel++)colors.data[at+channel]=a?Math.round(field[i*5+channel]/a*255):0;
+  // Sampling remains on the complete canonical grid. Only the pointwise byte
+  // composition can be bounded afterward: zero removal coverage implies zero
+  // replacement alpha/RGB, including transparent pigment that clears artwork.
+  let left=w,top=h,right=0,bottom=0;
+  if(field[4]&&field[(w-1)*5+4]&&field[((h-1)*w)*5+4]&&field[(w*h-1)*5+4]){left=top=0;right=w;bottom=h;}
+  else for(let row=0;row<h;row++)for(let col=0;col<w;col++)if(field[(row*w+col)*5+4]){
+    left=Math.min(left,col);top=Math.min(top,row);right=Math.max(right,col+1);bottom=Math.max(bottom,row+1);
    }
-   p.putImageData(colors,0,0);m.putImageData(coverage,0,0);c.drawImage(target,x,y,w,h,0,0,w,h);
-   const before=stroke.opacity===1?undefined:c.getImageData(0,0,w,h).data;
+  if(right<=left||bottom<=top)continue;
+  const width=right-left,height=bottom-top,dx=x+left,dy=y+top;
+  const raw=createCanvas(width,height,true),mask=createCanvas(width,height,true),replacement=createCanvas(width,height,true);
+  try{
+   const c=raw.getContext('2d')!,m=mask.getContext('2d')!,p=replacement.getContext('2d')!,colors=p.createImageData(width,height),coverage=m.createImageData(width,height);
+   for(let row=0;row<height;row++)for(let col=0;col<width;col++){
+    const from=((top+row)*w+left+col)*5,a=field[from+3],at=(row*width+col)*4;colors.data[at+3]=Math.round(a*255);coverage.data[at+3]=Math.round(field[from+4]*255);
+    for(let channel=0;channel<3;channel++)colors.data[at+channel]=a?Math.round(field[from+channel]/a*255):0;
+   }
+   p.putImageData(colors,0,0);m.putImageData(coverage,0,0);c.drawImage(target,dx,dy,width,height,0,0,width,height);
+   const before=stroke.opacity===1?undefined:c.getImageData(0,0,width,height).data;
    c.globalCompositeOperation='destination-out';c.drawImage(mask,0,0);c.globalCompositeOperation='lighter';c.drawImage(replacement,0,0);
    if(before){
-    const after=c.getImageData(0,0,w,h).data,amount=new Uint8ClampedArray(after.length);for(let i=0;i<amount.length;i+=4)if(before[i]!==after[i]||before[i+1]!==after[i+1]||before[i+2]!==after[i+2]||before[i+3]!==after[i+3])amount[i+3]=Math.round(stroke.opacity*255);
-    const pixels=await processor.mixFiltered(before,after,amount);check();const image=c.createImageData(w,h);image.data.set(pixels);context.putImageData(image,x,y);
-   }else context.putImageData(c.getImageData(0,0,w,h),x,y);
+    const after=c.getImageData(0,0,width,height).data,amount=new Uint8ClampedArray(after.length);for(let i=0;i<amount.length;i+=4)if(before[i]!==after[i]||before[i+1]!==after[i+1]||before[i+2]!==after[i+2]||before[i+3]!==after[i+3])amount[i+3]=Math.round(stroke.opacity*255);
+    const pixels=await processor.mixFiltered(before,after,amount);check();const image=c.createImageData(width,height);image.data.set(pixels);context.putImageData(image,dx,dy);
+   }else context.putImageData(c.getImageData(0,0,width,height),dx,dy);
   }finally{release(raw);release(mask);release(replacement);}
   if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+2;}
  }

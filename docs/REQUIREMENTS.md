@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Projected wet composition fidelity
+
+Bound post-sampling composition only by the complete nonzero removal-coverage
+rectangle, preserving transparent clearing pigment, sub-byte coverage, once-only
+operation opacity and every output RGBA byte. Retain the full native sampling
+grid, bilinear neighbors, source geometry and external tile validation. Empty
+fields allocate no composition surfaces; dense fields retain complete output.
+Verify translucent backgrounds and canonical-window boundaries with actual
+native output and production raster/ordinary-mask/filter-mask workflows. This
+resource reduction does not satisfy the broader all-tool performance gates.
+
 ## Projective empty-window fidelity
 
 Skip native work only when a complete mapped pixel-center footprint provably

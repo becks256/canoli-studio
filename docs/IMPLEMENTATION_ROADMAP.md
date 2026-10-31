@@ -9548,3 +9548,56 @@ The full ≤33 ms live-input p95 / <50 ms routine-task, sustained all-tool/devic
 process-memory and every unfinished original professional/AI/workflow/ChatGPT /
 live identity/commercial/specialist/motion gate remain required. The complete
 implementation goal stays active.
+
+
+### 2026-10-31 — F03/F06/F14 projected wet composition bounds verified
+
+Owner: implementation engineer; estimate M/L across native parity, workflow
+regressions and production evidence. Starting from `00c8c70`, thin projected wet
+fields still converted/composited each nonempty canonical output window in full.
+The compositor now finds integer bounds of nonzero independent removal coverage
+**after** complete native sampling. Only byte conversion, temporary composition
+surfaces/readback and the optional once-only native opacity envelope use those
+bounds. Transparent pigment that removes artwork remains included; replacement
+alpha alone would be incorrect. Four covered corners prove full-window bounds
+for dense fields. Native ROI/grids/homography/bilinear support, original source
+geometry and validation, cancellation and shared publication remain unchanged.
+
+Two new real-browser/native controls compare every RGBA byte across 36 identity /
+perspective cases, including canonical-window boundaries, seven background alpha
+levels, sparse/empty/dense fields, transparent clearing, sub-byte coverage and
+three operation opacities. The control independently composes the complete canvas
+using actual returned WASM fields and the final Canvas storage round trip.
+The committed baseline also passes that control; all 36 complete output hashes
+match exactly. For an opacity-0.5 sparse patch, actual conversion-image pixel
+counts fall 221,184→144 for identity placement and 221,184→231 for perspective.
+Boundary/transparent/low-coverage cases also reduce work; dense and empty totals
+remain unchanged. This counts conversion work, not total process memory or a
+reduction in native sampling. Initial type/control/fixture corrections and all
+reports remain retained; final output comparisons have no tolerance relaxation.
+
+The complete release build and all 3,185 unit/API/native tests across 310 files
+pass on Node 26.13.0. All 122 affected browser cases across 17 files pass in one
+complete run without retries, failures, skips or flakes. They cover native wet
+fields/storage, source-aware masks and placement, distant 50 MP original-source
+editing, project/workspace/SVG/Photoshop transport, reflected gestures, preview
+ownership and cancellation. The full-suite and browser WASM kernels are exact.
+
+Two unprofiled ordinary-production pairs preserve 72 complete foreground hashes
+and six PNG exports per pair, original source bytes, twelve accepted samples and
+exact one Undo/Redo. Latency is mixed: first projected filter-mask median changes
+104.6→110.5 ms; final reverse-order median is flat at 104.0→103.9 ms. Final
+projected ordinary-mask median/p95 changes 98.8→90.6 / 147.4→131.0 ms; controls
+vary. Every measured p95 remains above 33 ms. All raw timings, exact outputs,
+resource witnesses, final source/runtime identities and checks are retained in
+[readable findings and compact evidence](benchmarks/projected-wet-composition-2026-10-31.md).
+This proves composition-work reduction and exact current output, not universal
+latency, physical presentation, sustained or process-memory acceptance.
+
+The original ≤33 ms live-input p95 / <50 ms routine-task targets, full all-tool /
+sustained/device/process-memory F14, native float wet tools, projective relinking,
+photographic/interchange quality and every other unfinished professional/AI /
+workflow/ChatGPT/live identity/commercial/specialist/motion requirement remain
+required. The complete implementation goal stays active. No public constructor /
+command, schema/container, source-resolution limit, isolated/plugin grant,
+REST/browser separation, paid operation or account changes.

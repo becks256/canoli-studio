@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Post-sampling wet support invariant
+
+For a validated coupled wet field, zero removal coverage implies zero replacement
+alpha and RGB. The pointwise removal/replacement operator is therefore identity
+outside nonzero coverage. Find integer bounds after complete native sampling,
+then perform the same Canvas operations and optional native opacity envelope
+only within those bounds. Include transparent clearing pigment and every positive
+float coverage value before byte quantization. Preserve final Canvas storage
+rounding in exact-output controls. This must not change sampling windows, prepared
+sources, document geometry, history or cancellation/publication authority.
+
 ## Proven empty field windows
 
 A constant-sign homography maps the output pixel-center rectangle to a convex
