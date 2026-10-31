@@ -18,6 +18,28 @@ export interface ProjectiveFieldSampler {
   floatProjectiveWet?(alpha:Float32Array,options:ProjectiveFieldOptions):Promise<Float32Array>;
 }
 
+/** A constant-sign homography maps a rectangle to a convex quadrilateral.
+ * Its bounding box can overlap finite support while the actual footprint misses
+ * it. Separate on edge normals only with a strictly positive guarded gap. */
+function missesField(points:readonly {x:number;y:number}[],field:FloatSourceWindow,padding:number):boolean {
+  if(points.length!==4||!Number.isFinite(padding)||!points.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)))return false;
+  const quad=[points[0],points[1],points[3],points[2]],origin=quad[0];
+  const left=field.x-origin.x-padding,top=field.y-origin.y-padding,right=field.x-origin.x+field.width+padding,bottom=field.y-origin.y+field.height+padding;
+  for(let i=0;i<4;i++){
+    const p=quad[i],q=quad[(i+1)%4],dx=q.x-p.x,dy=q.y-p.y,scale=Math.max(Math.abs(dx),Math.abs(dy));
+    if(!scale||!Number.isFinite(scale))continue;
+    const nx=-dy/scale,ny=dx/scale;
+    let min=Infinity,max=-Infinity;
+    for(const point of quad){const value=(point.x-origin.x)*nx+(point.y-origin.y)*ny;min=Math.min(min,value);max=Math.max(max,value);}
+    const a=left*nx,b=right*nx,c=top*ny,d=bottom*ny,lo=Math.min(a,b)+Math.min(c,d),hi=Math.max(a,b)+Math.max(c,d);
+    if(!Number.isFinite(min)||!Number.isFinite(max)||!Number.isFinite(lo)||!Number.isFinite(hi))continue;
+    const magnitude=Math.max(1,Math.abs(min),Math.abs(max),Math.abs(a),Math.abs(b),Math.abs(c),Math.abs(d));
+    const tolerance=magnitude*Number.EPSILON*128;
+    if(Number.isFinite(tolerance)&&(max<lo-tolerance||hi<min-tolerance))return true;
+  }
+  return false;
+}
+
 /** Project a scalar field, optionally bounded by finite support. Unknown support
  * streams complete inverse-sampling neighborhoods rather than clipping to an
  * image frame. A
@@ -48,13 +70,19 @@ export async function projectPerspectiveFieldWindow(
   const render=async(region:FloatSourceWindow):Promise<void>=>{
     check();if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+2;}
     const points=[];let negative=false,positive=false,horizon=false;
+    let numeratorMagnitude=0,denominatorMagnitude=0,minimumDenominator=Infinity,coordinateMagnitude=1;
     for(const py of [region.y,region.y+region.height-1])for(const px of [region.x,region.x+region.width-1]){
       // Match native relative-frame arithmetic exactly, including pixel centers.
       const x=(px-compiled.inputOrigin.x)+.5,y=(py-compiled.inputOrigin.y)+.5,w=m[6]*x+m[7]*y+m[8];
       const nu=m[0]*x+m[1]*y+m[2],nv=m[3]*x+m[4]*y+m[5];
       if(!Number.isFinite(w)||!Number.isFinite(nu)||!Number.isFinite(nv))throw new Error('Perspective field mapping exceeds working precision.');
       negative ||= w<0;positive ||= w>0;horizon ||= w===0;
-      if(w!==0)points.push({x:nu/w-.5,y:nv/w-.5});
+      if(w!==0){
+        const u=nu/w,v=nv/w;points.push({x:u-.5,y:v-.5});
+        numeratorMagnitude=Math.max(numeratorMagnitude,Math.abs(m[0]*x)+Math.abs(m[1]*y)+Math.abs(m[2]),Math.abs(m[3]*x)+Math.abs(m[4]*y)+Math.abs(m[5]));
+        denominatorMagnitude=Math.max(denominatorMagnitude,Math.abs(m[6]*x)+Math.abs(m[7]*y)+Math.abs(m[8]));
+        minimumDenominator=Math.min(minimumDenominator,Math.abs(w));coordinateMagnitude=Math.max(coordinateMagnitude,Math.abs(u),Math.abs(v));
+      }
     }
     const split=async()=>{
       if(region.width>=region.height&&region.width>1){const half=Math.floor(region.width/2);await render({...region,width:half});await render({...region,x:region.x+half,width:region.width-half});}
@@ -71,6 +99,15 @@ export async function projectPerspectiveFieldWindow(
     const minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x));
     const minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y));
     if(field&&(maxX<field.x-1||maxY<field.y-1||minX>=field.x+field.width||minY>=field.y+field.height))return;
+    if(field){
+      // Cover dot-product/division roundoff throughout this rectangle, not only
+      // projection arithmetic in the separating test. Ill-conditioned windows
+      // retain the existing native sampling path. Two extra native neighbors
+      // conservatively contain complete bilinear support and integer half ties.
+      const denominatorError=denominatorMagnitude*Number.EPSILON*32,lower=minimumDenominator-denominatorError;
+      const error=lower>0?(numeratorMagnitude*Number.EPSILON*32+coordinateMagnitude*denominatorError)/lower+coordinateMagnitude*Number.EPSILON*32:Infinity;
+      if(missesField(points,field,2+error*4))return;
+    }
     const x=field?Math.max(field.x,Math.floor(Math.max(field.x-1,minX))-1):Math.floor(minX)-1,y=field?Math.max(field.y,Math.floor(Math.max(field.y-1,minY))-1):Math.floor(minY)-1;
     const right=field?Math.min(field.x+field.width,Math.floor(Math.min(field.x+field.width,maxX))+3):Math.floor(maxX)+3;
     const bottom=field?Math.min(field.y+field.height,Math.floor(Math.min(field.y+field.height,maxY))+3):Math.floor(maxY)+3;

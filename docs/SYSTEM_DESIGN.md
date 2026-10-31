@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Proven empty field windows
+
+A constant-sign homography maps the output pixel-center rectangle to a convex
+quadrilateral. Its axis bounds may intersect finite support despite a separating
+edge normal. Reject native sampling only with a strict positive gap after
+expanding support for native neighbors and bounded dot/division roundoff, plus
+projection tolerance. Unknown support, uncertain denominators and nonfinite
+proof arithmetic fall through; horizon branches keep recursive splitting.
+Keep existing complete output/background, canonical source origins, sampling,
+validation, cancellation and original-resolution contracts.
+
 ## Wet footprint lease invariant
 
 A session may retain one idle native footprint surface. Each active operation

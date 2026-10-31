@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Projective empty-window fidelity
+
+Skip native work only when a complete mapped pixel-center footprint provably
+misses finite field support, including every bilinear neighbor and arithmetic
+uncertainty. Preserve exact scalar background and coupled replacement/coverage
+words. Grazing/degenerate windows, reflection, affine inputs, distant origins,
+horizon branches, unknown support and large finite fields retain their correct
+native behavior. No source cap, raster-grid change, reduced field precision or
+weakened external prepared-PNG validation is permitted. Full all-tool/device /
+sustained performance targets remain required.
+
 ## Wet footprint resource fidelity
 
 Reusing private footprint storage must preserve every native coverage byte,

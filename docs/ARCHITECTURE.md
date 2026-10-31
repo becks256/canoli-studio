@@ -1,5 +1,16 @@
 # Architecture
 
+## Conservative projective field footprints
+
+Bounded scalar and coupled wet-field windows retain the existing homography,
+canonical grids, complete bilinear support and native ROI budgets. After the
+ordinary axis bounds test, constant-sign mapped rectangles may be separated from
+expanded finite support using convex edge normals. Conservative dot/division
+roundoff bounds and projection tolerance guard the proof. Horizon branches still
+split; unknown support and uncertain arithmetic retain native sampling. This
+only avoids reads/worker packets for proven empty windows, preserving background,
+source/cancellation validation and all source geometry and public boundaries.
+
 ## Private wet footprint surfaces
 
 Native wet sessions own a lazily allocated 260×260 coverage surface, reused on

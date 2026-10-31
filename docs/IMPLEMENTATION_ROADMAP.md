@@ -9491,3 +9491,60 @@ workflow/ChatGPT/live identity/commercial/specialist/motion requirement remain
 required. The complete implementation goal stays active. This increment changes
 no public constructor/command, schema/container, source-resolution limit,
 isolated/plugin grant, REST/browser separation, paid operation or account.
+
+
+### 2026-10-31 — F03/F06/F14 bounded field footprint culling verified
+
+Owner: implementation engineer; estimate M/L across numerical/native parity,
+mask/perspective workflows and production feedback. Starting from clean `5315447`,
+the preceding footprint reuse increment is verified progress, while wet and
+editor-wide latency gates remain open. A new real-pointer trace locates about
+56 ms median filter-mask viewport preparation and 29 coupled-field calls across
+12 viewport preparations. PNG stream writes/closes are about 0.1/0 ms median,
+and asset adds about 2 ms, so this increment targets native field work instead.
+
+Canonical side windows can have overlapping source axis bounds while their
+actual slanted footprint misses finite support. A conservative convex separating
+axis check now skips only proven-empty finite windows. Keep the exact homography,
+canonical raster/input/source origins, complete output/background and bilinear
+neighbors. A native dot/division roundoff bound, expanded support and projection
+tolerance guard the gap. Uncertain arithmetic/unknown support retain the old
+native path; horizons still split. Actual sources, validation, cancellation,
+original resolution and public model/history/isolation contracts are unchanged.
+
+All 47 focused actual-WASM/native cases pass, including four new field tests:
+the measured empty five-channel window now reads/samples nothing; scalar constant
+backgrounds remain exact; grazing and degenerate windows preserve fractional
+neighbors; 144 complete-native differential cases cover both directions, affine
+inputs, reflection, large origins and subpixel phases. Existing independent
+scalar/coupled references, huge finite/unbounded/50 MP support, horizon and exact
+partition checks remain unchanged. The matched diagnostic trace reduces field
+calls from 29 to 13 and requested field pixels from 1,960,400 to 878,800; viewport
+median changes 55.65→51.35 ms, still above target and diagnostic only.
+
+The expanded browser matrix also corrects a stale test expecting Mixer to be
+disabled after perspective. That expectation predates the committed projected
+wet implementation; current production editing already exercises enabled Mixer.
+The test now checks availability before and after reset, including the actual
+shared tool controller. No product capability is removed to satisfy the test.
+The final fresh build and all 3,185 unit/API/native tests across 310 files pass.
+All 148 expanded browser cases across 22 files pass in one final run, including
+50 MP byte/float originals and alpha, all mask geometries/refinements, forward /
+inverse transport, native projects, SVG/Photoshop, storage and cancellation.
+Review added explicit finite interval checks to the proof; the earlier browser
+attempt was stopped by scoped SIGINT and retained as diagnostic, then complete
+acceptance reran against the guard. No accepted run retries, skips or flakes.
+
+Two unprofiled production pairs preserve 72 complete foreground hashes and six
+PNG exports per pair, original source bytes, all accepted samples and exact one
+Undo/Redo. Projected filter-mask median changes 122.2→106.3 ms in the first pair
+and 120.6→105.1 ms in the reverse-order final pair. Final targeted p95 is almost
+unchanged at 180.9→181.0 ms; other controls vary. Final source/kernel identities
+and every initial/interrupted/final observation are retained in the
+[readable findings and compact evidence](benchmarks/projective-field-culling-2026-10-31.md).
+This proves targeted native-work reduction and exact current behavior, not
+universal latency, physical presentation, sustained or process-memory acceptance.
+The full ≤33 ms live-input p95 / <50 ms routine-task, sustained all-tool/device /
+process-memory and every unfinished original professional/AI/workflow/ChatGPT /
+live identity/commercial/specialist/motion gate remain required. The complete
+implementation goal stays active.
