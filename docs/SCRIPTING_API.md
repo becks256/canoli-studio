@@ -1377,12 +1377,8 @@ Native projects and recorded layer updates retain placement. The Inspector also
 provides direct perspective corners: drag with a pointer or focus a corner and
 use Arrow/Shift+Arrow for 1/10 canvas pixels. A valid drag commits once; stale,
 cancelled or folded placements do not commit. This UI uses the same constructor
-and setter; it adds no scripting method. Perspective brush/mask input mapping
-remains separate unfinished work.
-Reset perspective before interactive image erasing/wet painting, mask painting
-or path editing, linked-mask dragging/relinking, or `maskFromSelection` /
-`maskFromPaths`; those paths explicitly reject while active. Local-coordinate
-mask/erasure constructors remain available. Smart rasterization bakes the
+and setter; it adds no scripting method.
+Placed raster erasing, selection clearing and ordinary/filter-mask Brush/Pencil/Eraser input now retain captured perspective coverage. Reset perspective before wet painting, mask path editing, linked-mask dragging/relinking or `maskFromSelection` / `maskFromPaths`; those paths still reject while active. Default local constructors remain available. See the placed-mask contract below. Smart rasterization bakes the
 projected appearance and linked mask; SVG/Photoshop delivery bakes placement.
 See [PERSPECTIVE_ENGINE.md](PERSPECTIVE_ENGINE.md) for sampling and remaining
 F03 acceptance requirements.
@@ -2337,7 +2333,7 @@ print(layer.mask.x, layer.mask.y, layer.mask.linked);
 
 `new LayerMask({ base, strokes = [], ...settings })` creates brush-based coverage. `base` is required and finite in 0–1: 1 initially reveals everything, 0 hides everything, and intermediate values give uniform coverage. Settings (`x`, `y`, `linked`, `enabled`, `inverted`, `density`, `feather`) have the same defaults and meaning as other masks. Supply exactly one geometry source: `base`, `selection`, or `paths`. Painted masks record brush operations and rasterize them at rendering time; bitmap coverage is available through the separate assetId geometry source. Selection and vector masks can also receive strokes directly, retaining their own geometry beneath the refinements.
 
-`mask.paint(stroke, mode = "hide")` returns a new immutable mask with one operation appended. Assign the result to `layer.mask` to commit. Only `BrushStroke` and `PencilStroke` without source tiles are accepted; clone and fill operations are rejected. Mode is `"hide"` or `"reveal"`. The stroke's color is ignored: pressure, size, hardness and clipping determine coverage, and opacity applies once to the complete stroke. Hide multiplies existing coverage by `(1 - stroke coverage × opacity)`; Reveal composites opaque coverage over it. Inversion, density and feather are mask-wide settings applied after these operations, so inversion reverses the apparent hide/reveal result.
+`mask.paint(stroke, mode = "hide", options?: {placement?: MaskPaintPlacement})` returns a new immutable mask with one operation appended. Assign the result to `layer.mask` to commit. Only `BrushStroke` and `PencilStroke` without source tiles are accepted; clone and fill operations are rejected. Mode is `"hide"` or `"reveal"`. The stroke's color is ignored: pressure, size, hardness and clipping determine coverage, and opacity applies once to the complete stroke. Hide multiplies existing coverage by `(1 - stroke coverage × opacity)`; Reveal composites opaque coverage over it. Inversion, density and feather are mask-wide settings applied after these operations, so inversion reverses the apparent hide/reveal result.
 
 Stroke points and clip regions use the mask's coordinate plane. They do not automatically capture `document.selection` in scripts. UI brush painting converts the document selection and pointer positions into that plane at gesture start. The default linked plane moves with the layer; unlinked masks use document coordinates plus mask x/y.
 
@@ -2371,6 +2367,31 @@ layer.mask = new LayerMask({ base: 1 })
 document.selectedLayer = layer;
 print(layer.mask.kind, layer.mask.strokes.length);
 ```
+
+### Placed ordinary and filter-mask brushes (schema 53)
+
+`layer.paintMask(stroke: BrushStroke | PencilStroke, mode: "hide" | "reveal" = "hide", options?: {space?: "local" | "placed", filterMask?: boolean}): void` refines an existing mask through one shared layer update. Omitted options use local mask coordinates and the ordinary mask. `filterMask:true` selects a SmartObjectLayer's existing filter mask; other layer kinds reject that option. A missing target mask throws. Invalid constructors, modes, spaces, extra option keys, singular/nonfinite placement, unsupported source tiles, locks and existing stroke/point budgets reject before publication. No document selection is implicitly read.
+
+With `space:"placed"`, a linked mask on an active RasterLayer/SmartObjectLayer perspective uses the affine image plane **after perspective and before layer/parent affine placement**. The entire stroke field carries clipping, pressure, tip/tilt, symmetry and texture through captured perspective; pointer points alone are not inverse-mapped. The method captures image width/height, normalized perspective and the mask-local-to-image affine basis. Filter-mask capture includes master-to-instance scaling and requires an attached instance to resolve its master. Ordinary placed masks can be constructed without source pixel access. Identity/absent image perspective and unlinked masks retain their existing local mask-plane behavior and add no placement metadata.
+
+Later image corner edits/reset and mask offset/basis changes retain the captured field. Existing mask geometry keeps its own resolution and coordinate plane; no raster conversion or clipping to the image frame is introduced. A stroke near the inverse horizon can have unbounded pullback support. Its field streams bounded native windows instead of storing a guessed finite extent or imposing an image limit. Mask-wide feather, inversion and density remain after ordered stroke composition, with the existing byte mask role. Float image RGB remains original-derived; masks affect alpha through the existing float pipeline.
+
+The UI captures the document selection and pen/symmetry input through the affine inverse in this placed plane. Cursors use that same plane. Preview and commit carry the same metadata; a completed gesture creates one Undo. Actual revision or ordered layer-selection changes, Escape, tool changes and owner changes cancel rather than retarget the gesture; an equivalent selection remains valid. Mask Pen paths, projected wet input, dragging/relinking and complete F03 quality/performance/device acceptance remain required.
+
+<!-- example: placed-mask -->
+```js
+const layer = document.selectedLayer;
+if (!(layer instanceof RasterLayer || layer instanceof SmartObjectLayer)) {
+  throw new Error("Select an image layer.");
+}
+if (!layer.mask) throw new Error("Add a mask first.");
+layer.paintMask(new BrushStroke({
+  points: [{x: 32, y: 32}], size: 10, hardness: 1,
+  opacity: 1, flow: 1, pressureSize: false,
+}), "hide", {space: "placed"});
+```
+
+`MaskPaintPlacement` is the immutable-value input `{width, height, perspective: PerspectiveTransform, basis: AffineTransform}`. Advanced callers may supply it to `mask.paint(stroke, mode, {placement})` or to constructor/`with` stroke entries `{mode,stroke,placement}`. Getters, `with`, JSON reconstruction, project/workspace/history/embedded transport and semantic layer updates retain independent values. The serialized DTO is strict `{width,height,perspective:{corners},basis:{a,b,c,d,e,f}}` on Hide/Reveal brush/pencil entries only. Wet entries reject placement; explicit null placement and using ordinary `paint` as a Wet append also reject. Large/feathered mask surfaces use bounded scalar subwindows without a new image limit. Schema **53** gates the field in every mask context; falsely old labels reject, and valid older masks upgrade without injected fields. Existing project/workspace formats, plugin grants, inert installation and separate headless REST sessions remain unchanged. The pure OO method adds no pixel/file/network access or host call to isolated scripts.
 
 ### Paint refinements on selection and vector masks
 

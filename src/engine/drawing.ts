@@ -1,3 +1,4 @@
+import {PlacedMaskCaptures} from './placed-mask';
 import {ProjectedErasureCaptures,drawProjectedErasure} from './projected-erasure';
 import {nativeVectorFootprint} from './native-vector-footprint';
 import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
@@ -670,8 +671,9 @@ export async function paintedMask(
   textures?:BrushTextureSampler,
   isCancelled?:()=>boolean,
   nativeWetResolved=false,
+  borrowedPlaced?:PlacedMaskCaptures,
 ): Promise<HTMLCanvasElement> {
-  if(!nativeWetResolved&&hasWetMask(mask)){if(!assets)throw new Error('Prepared wet mask coverage requires its image asset store.');return nativeWetMask(mask,space,processor,world,bitmap,assets,textures,isCancelled);}
+  if(!nativeWetResolved&&hasWetMask(mask)){if(!assets)throw new Error('Prepared wet mask coverage requires its image asset store.');return nativeWetMask(mask,space,processor,world,bitmap,assets,textures,isCancelled,borrowedPlaced);}
   const output =
     mask.kind === "selection"
       ? await selectionMask(mask.selection, space, x, y, processor, world)
@@ -683,6 +685,9 @@ export async function paintedMask(
   const projected=mask.kind==='raster-erasures'&&mask.erasures.some(entry=>entry.placement);
   if(projected&&!assets){release(output);throw new Error('Projected erasure coverage requires its asset store.');}
   const captures=projected?new ProjectedErasureCaptures(assets!,processor,{isCancelled},textures):undefined;
+  const hasPlaced=!!mask.strokes?.some(entry=>entry.mode!=='wet'&&entry.placement);
+  if(hasPlaced&&!assets){release(output);throw new Error('Placed mask painting requires its asset store.');}
+  const placed=hasPlaced?(borrowedPlaced??new PlacedMaskCaptures(assets!,processor,textures,isCancelled)):undefined;
   const scratch = hasMaskRefinements(mask)
     ? createCanvas(space.width, space.height)
     : undefined;
@@ -702,7 +707,8 @@ export async function paintedMask(
       target.fillRect(0, 0, space.width, space.height);
       target.globalAlpha = 1;
     }
-    for (const entry of mask.strokes ?? [])
+    for (const entry of mask.strokes ?? []) {
+      if(entry.mode!=='wet'&&entry.placement){await placed!.draw(entry,output,space,world);continue;}
       await drawMaskStroke(
         entry,
         output,
@@ -717,11 +723,13 @@ export async function paintedMask(
         textures,
         isCancelled,
       );
+    }
     return output;
   } catch (error) {
     release(output);
     throw error;
   } finally {
+    if(!borrowedPlaced)placed?.dispose();
     captures?.dispose();
     if (scratch) release(scratch);
   }

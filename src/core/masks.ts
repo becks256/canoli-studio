@@ -1,14 +1,18 @@
 import { z } from "zod";
 import { affineSchema } from "./transform-schema";
 import { AffineTransform } from "./affine";
+import {perspectiveSchema,perspectiveLocalQuad} from './perspective';
 import { assertRasterErasureVersion,rasterErasureSchema, paintOperationSchema, pathSchema, selectionSchema } from "./drawing";
 
 import type { WetPaintStrokeData } from "./wet-operation";
 import type { BrushStrokeData } from "./drawing";
 
+export interface MaskPlacementData {width:number;height:number;perspective:import('./perspective').PerspectiveData;basis:import('./affine').AffineData}
+export const maskPlacementSchema:z.ZodType<MaskPlacementData>=z.object({width:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),height:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),perspective:perspectiveSchema,basis:affineSchema}).strict().superRefine((value,context)=>{try{perspectiveLocalQuad(Math.ceil(value.width),Math.ceil(value.height),value.perspective);}catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}});
 export const maskStrokeSchema = z
   .object({
     mode: z.enum(["hide", "reveal"]),
+    placement:maskPlacementSchema.optional(),
     stroke: paintOperationSchema.refine(
       (value) =>
         (value.kind === "brush" || value.kind === "pencil") &&
@@ -21,7 +25,7 @@ export const wetMaskStrokeSchema=z.object({mode:z.literal('wet'),stroke:paintOpe
 export const maskOperationSchema=z.discriminatedUnion('mode',[maskStrokeSchema,wetMaskStrokeSchema]);
 export type MaskOperationData=z.infer<typeof maskOperationSchema>;
 export const maskStrokePointCount=(entry:MaskOperationData)=>entry.stroke.kind==='wet'?entry.stroke.brush.points.length:entry.stroke.points.length;
-export function assertMaskOperationVersion(mask:LayerMaskData,version:number){if(mask.kind==='raster-erasures'&&version<36)throw new Error('Raster erasure masks require schema version 36.');if(mask.kind==='raster-erasures')for(const entry of mask.erasures)assertRasterErasureVersion(entry,version);if(version<34&&(mask.strokes??[]).some(entry=>entry.mode==='wet'))throw new Error('Wet mask coverage requires schema version 34.');}
+export function assertMaskOperationVersion(mask:LayerMaskData,version:number){if(mask.kind==='raster-erasures'&&version<36)throw new Error('Raster erasure masks require schema version 36.');if(mask.kind==='raster-erasures')for(const entry of mask.erasures)assertRasterErasureVersion(entry,version);if(version<53&&(mask.strokes??[]).some(entry=>'placement'in entry&&entry.placement))throw new Error('Placed mask strokes require schema version 53.');if(version<34&&(mask.strokes??[]).some(entry=>entry.mode==='wet'))throw new Error('Wet mask coverage requires schema version 34.');}
 export const maskStrokesSchema = z
   .array(maskOperationSchema)
   .max(2048)

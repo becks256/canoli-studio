@@ -130,7 +130,7 @@ import { splitPathSegment } from "../core/bezier";
 import { layerTransform } from "../core/spatial";
 import { LayerMask } from "./masks";
 export { LayerMask } from "./masks";
-export type { RasterErasureMaskSource } from "./masks";
+export type { MaskPaintPlacement,RasterErasureMaskSource } from "./masks";
 import { LayerMetadata } from "./metadata";
 export { LayerMetadata } from "./metadata";
 import {
@@ -1226,6 +1226,23 @@ export abstract class Layer {
   }
   set mask(value: LayerMask | null) {
     this.update({ mask: value?.toJSON() ?? null });
+  }
+  /** Refine an existing mask using local or captured placed-image coordinates. */
+  paintMask(stroke:BrushStroke|import('./values').PencilStroke,mode:'hide'|'reveal'='hide',options:{space?:'local'|'placed';filterMask?:boolean}={}):void {
+    if(!(stroke instanceof BrushStroke))throw new Error('Use a BrushStroke or PencilStroke value.');
+    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>!['space','filterMask'].includes(key))||options.space!==undefined&&!['local','placed'].includes(options.space)||options.filterMask!==undefined&&typeof options.filterMask!=='boolean')throw new Error('Invalid mask painting options.');
+    if(options.filterMask&&!(this instanceof SmartObjectLayer))throw new Error('Filter masks require a smart object.');
+    const mask=options.filterMask&&this instanceof SmartObjectLayer?this.filterMask:this.mask;
+    if(!mask)throw new Error('Add a mask before painting.');
+    const layer=this._read();let placement:import('./masks').MaskPaintPlacement|undefined;
+    if(options.space==='placed'&&activePerspective(layer.perspective)&&mask.linked){
+      if(layer.kind!=='raster'&&layer.kind!=='smart-object')throw new Error('Placed mask painting requires an image.');
+      let parent=new AffineTransform();
+      if(options.filterMask&&this instanceof SmartObjectLayer){const master=this.requireDocument().getComponent(this.componentId);parent=AffineTransform.scale(this.width/master.width,this.height/master.height);}
+      placement={width:layer.width,height:layer.height,perspective:new PerspectiveTransform(layer.perspective),basis:maskTransform(mask.toJSON(),parent)};
+    }
+    const next=mask.paint(stroke,mode,placement?{placement}:{});
+    if(options.filterMask&&this instanceof SmartObjectLayer)this.filterMask=next;else this.mask=next;
   }
   /** Toggle coordinate planes while preserving the mask's current world position. */
   setMaskLinked(linked: boolean) {

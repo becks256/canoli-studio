@@ -100,3 +100,10 @@ it("regional signatures retain feather-reaching and transformed strokes but igno
   ).toHaveLength(2);
   expect(edited.toJSON().strokes).toHaveLength(2);
 });
+it('placed filter-mask support uses captured image and mask basis instead of authored point bounds',()=>{
+ const mask=LayerMask._fromJSON({kind:'paint',base:1,enabled:true,inverted:false,density:1,strokes:[{mode:'hide',stroke:new BrushStroke({points:[{x:100,y:50}],size:10,pressureSize:false}).toJSON(),placement:{width:128,height:96,perspective:{corners:[{x:0,y:0},{x:1,y:0},{x:1,y:1},{x:0,y:1}]},basis:{a:2,b:0,c:0,d:2,e:0,f:0}}}]}).toJSON();
+ const region={x:45,y:20,width:10,height:10},basis=new AffineTransform();expect(uniformFilterMaskCoverage(mask,region,basis)).toBeUndefined();expect(regionalFilterMask(mask,region,basis).strokes).toHaveLength(1);
+});
+it('unbounded placed filter strokes remain present in distant native regions',()=>{
+ const mask=LayerMask._fromJSON({kind:'paint',base:1,enabled:true,inverted:false,density:1,strokes:[{mode:'hide',stroke:new BrushStroke({points:[{x:32,y:96}],size:12,pressureSize:false}).toJSON(),placement:{width:64,height:48,perspective:{corners:[{x:0,y:0},{x:1,y:0},{x:.75,y:1},{x:.25,y:1}]},basis:{a:1,b:0,c:0,d:1,e:0,f:0}}}]}).toJSON();const region={x:0,y:480000,width:8,height:8},basis=new AffineTransform();expect(uniformFilterMaskCoverage(mask,region,basis)).toBeUndefined();expect(regionalFilterMask(mask,region,basis).strokes).toHaveLength(1);
+});

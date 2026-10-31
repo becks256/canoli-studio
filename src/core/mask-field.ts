@@ -1,14 +1,18 @@
 import {AffineTransform,type AffineBounds} from './affine';
 import {strokeBounds,selectionRegionTransform} from './drawing';
 import type {LayerMaskData} from './masks';
-import {captureFieldBounds} from './projective-field';
+import {captureFieldBounds,compileProjectiveField} from './projective-field';
+import {perspectiveLocalQuad,perspectiveRect} from './perspective';
+import {ProjectiveTransform} from './projective';
 
-/** Conservative finite support of raw deviations, before feather/settings.
+/** Conservative raw deviation support, before feather/settings. A horizon
+ * intersection marks unbounded support; its finite bounds are diagnostic only.
  * Background is the authored paint base; the byte rasterizer captures its
  * actual alpha word. Bounds are an address space, never an allocation limit. */
 export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,bitmap?:{width:number;height:number}) {
   // Prepared wet coverage reconstructs the whole mask on its own pixel grid
   // before affine sampling. Its interpolation support grows with that mapping.
+  let unbounded=false;
   const nativeWet=!!mask.strokes?.some(entry=>entry.mode==='wet'&&entry.stroke.opacity>0);
   const basis=nativeWet?new AffineTransform():transform;
   const rects:AffineBounds[]=[];
@@ -39,7 +43,19 @@ export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,b
       add(bounds,basis.multiply(AffineTransform.scale(mask.width/entry.width,mask.height/entry.height)));
     }
   }
-  for(const entry of mask.strokes??[])add(strokeBounds(entry.stroke));
+  for(const entry of mask.strokes??[]){
+    if(entry.mode==='wet'||!entry.placement){add(strokeBounds(entry.stroke));continue;}
+    const p=entry.placement,width=Math.ceil(p.width),height=Math.ceil(p.height),sx=width/p.width,sy=height/p.height,stroke=strokeBounds(entry.stroke);
+    try{
+      // Bound the complete captured raster and its bilinear neighbors, then
+      // invert in a corner-relative frame. A horizon intersection has genuinely
+      // unbounded pullback support and must use the streaming field path.
+      const frame=compileProjectiveField({sourceWidth:width,sourceHeight:height,corners:perspectiveLocalQuad(width,height,p.perspective),field:{x:0,y:0,width:1,height:1},source:{x:0,y:0,width:1,height:1},output:{x:0,y:0,width:1,height:1},background:0});
+      const x=Math.floor(stroke.x*sx)-3,y=Math.floor(stroke.y*sy)-3;
+      const matrix=ProjectiveTransform.fromAffine(AffineTransform.fromJSON(p.basis).inverse().multiply(AffineTransform.scale(1/sx,1/sy))).multiply(new ProjectiveTransform(Array.from(frame.values.subarray(0,9))));
+      add(perspectiveRect(matrix,{x:x-frame.inputOrigin.x,y:y-frame.inputOrigin.y,width:Math.ceil((stroke.x+stroke.width)*sx)+3-x,height:Math.ceil((stroke.y+stroke.height)*sy)+3-y}).bounds);
+    }catch{unbounded=true;}
+  }
   let bounds={x:0,y:0,width:1,height:1};
   if(rects.length){
     let left=Infinity,top=Infinity,right=-Infinity,bottom=-Infinity;
@@ -53,5 +69,5 @@ export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,b
       bounds={x,y,width:Math.ceil(mapped.x+mapped.width)+2-x,height:Math.ceil(mapped.y+mapped.height)+2-y};
     }
   }
-  return {bounds:captureFieldBounds(bounds),background:mask.kind==='paint'?mask.base:mask.kind==='raster-erasures'?1:0};
+  return {bounds:captureFieldBounds(bounds),background:mask.kind==='paint'?mask.base:mask.kind==='raster-erasures'?1:0,...(unbounded?{unbounded:true}:{})};
 }

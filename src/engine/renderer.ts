@@ -82,6 +82,7 @@ export interface PaintPreview {
   layerId: string;
   stroke: BrushStrokeData;
   erasurePlacement?:import('../core/drawing').ErasurePlacementData;
+  maskPlacement?:import('../core/masks').MaskPlacementData;
   cloneSource?: ClonePreviewSource;
   /** Mask coverage target; absent for normal paint-layer previews. */
   maskMode?: "hide" | "reveal";
@@ -100,7 +101,7 @@ export function previewMask(
         ...mask,
         strokes: [
           ...(mask.strokes ?? []),
-          { mode: preview.maskMode, stroke: preview.stroke },
+          { mode: preview.maskMode, stroke: preview.stroke,...(preview.maskPlacement?{placement:preview.maskPlacement}:{}) },
         ],
       }
     : mask;
@@ -443,7 +444,7 @@ export class CanvasRenderer implements DocumentRenderer {
   private async documentTone(layer:SmartObjectInstanceData,registry:ComponentRegistry,assets:AssetStore,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions){
     const effects=(layer.smartFilters??[]).filter(effect=>effect.enabled&&effect.kind==='document-tone').map(effect=>({...effect,kind:'tone' as const})) as ToneEffectData[];
     if(!effects.length)return;
-    const preview=options.paintPreview,mask=layer.filterMask&&preview?.filterMask&&preview.maskMode&&preview.layerId===layer.id?{...layer.filterMask,strokes:[...(layer.filterMask.strokes??[]),{mode:preview.maskMode,stroke:preview.stroke}]}:layer.filterMask;
+    const preview=options.paintPreview,mask=layer.filterMask&&preview?.filterMask&&preview.maskMode&&preview.layerId===layer.id?{...layer.filterMask,strokes:[...(layer.filterMask.strokes??[]),{mode:preview.maskMode,stroke:preview.stroke,...(preview.maskPlacement?{placement:preview.maskPlacement}:{})}]}:layer.filterMask;
     let coverage:HTMLCanvasElement|undefined;
     try{
       if(mask?.enabled&&mask.density>0){
@@ -498,7 +499,7 @@ export class CanvasRenderer implements DocumentRenderer {
     const placement = renderTransform(space, nativeWorld);
     const preview = options.paintPreview;
     const filterMask = layer.filterMask && preview?.filterMask && preview.maskMode && preview.layerId === layer.id
-      ? { ...layer.filterMask, strokes: [...(layer.filterMask.strokes ?? []), { mode: preview.maskMode, stroke: preview.stroke }] }
+      ? { ...layer.filterMask, strokes: [...(layer.filterMask.strokes ?? []), { mode: preview.maskMode, stroke: preview.stroke,...(preview.maskPlacement?{placement:preview.maskPlacement}:{}) }] }
       : layer.filterMask;
     const epoch = this.epoch;
     const maskBasis = filterMask

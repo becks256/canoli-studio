@@ -16,12 +16,29 @@ beforeAll(async()=>{
 const sampler={floatProjectiveField:async(alpha:Float32Array,options:ProjectiveFieldOptions)=>processor.projectiveField(alpha,options)};
 function source(options:ProjectiveFieldOptions):ProjectiveFieldSource {
   const field=options.field;
-  return {direction:options.direction,width:options.sourceWidth,height:options.sourceHeight,bounds:{...field},background:options.background,readWindow:async b=>{
+  return {direction:options.direction,input:options.input,width:options.sourceWidth,height:options.sourceHeight,bounds:{...field},background:options.background,readWindow:async b=>{
     const out=new Float32Array(b.width*b.height);
     for(let y=0;y<b.height;y++)out.set(input.subarray((b.y-field.y+y)*field.width+b.x-field.x,(b.y-field.y+y)*field.width+b.x-field.x+b.width),y*b.width);
     return out;
   }};
 }
+
+it('unbounded native fields retain distant values and exact partitions without allocating their address space',async()=>{
+ const reads:FloatSourceWindow[]=[],value=(x:number,y:number)=>((x%7+7)%7+(y%5+5)%5)/16;
+ const field:ProjectiveFieldSource={width:5,height:4,bounds:undefined,background:0,readWindow:async b=>{reads.push({...b});return Float32Array.from({length:b.width*b.height},(_,i)=>value(b.x+i%b.width,b.y+Math.floor(i/b.width)));}};
+ const corners=[{x:0,y:0},{x:5,y:0},{x:5,y:4},{x:0,y:4}]as const,bounds={x:-700002,y:480000,width:23,height:19},actual=await projectPerspectiveFieldWindow(field,sampler,corners,bounds);
+ expect([...actual]).toEqual(Array.from({length:23*19},(_,i)=>value(bounds.x+i%23,bounds.y+Math.floor(i/23))));
+ const split=new Float32Array(actual.length);for(let y=0;y<19;y+=7)split.set(await projectPerspectiveFieldWindow(field,sampler,corners,{...bounds,y:bounds.y+y,height:Math.min(7,19-y)}),y*23);expect(new Uint32Array(split.buffer)).toEqual(new Uint32Array(actual.buffer));expect(reads.every(b=>b.width*b.height<=262144)).toBe(true);
+});
+it('native input affine sampling subtracts a large origin before applying the captured matrix',async()=>{
+ const base=forward.cases[0].options,inputMapping={origin:{x:2**40+.125,y:-(2**40)+.375},matrix:{a:1,b:0,c:0,d:1,e:5.125,f:.375}},options:ProjectiveFieldOptions={...base,input:inputMapping,output:{x:2**40,y:-(2**40),width:10,height:8}};
+ const actual=await projectPerspectiveFieldWindow(source(options),sampler,options.corners,options.output),expected=Float32Array.from({length:80},(_,i)=>input[(Math.floor(i/10)-base.field.y)*base.field.width+5+i%10-base.field.x]);expect(new Uint32Array(actual.buffer)).toEqual(new Uint32Array(expected.buffer));
+ const changed=source(options),read=changed.readWindow;changed.readWindow=async b=>{const pixels=await read(b);changed.input!.matrix.e++;return pixels;};await expect(projectPerspectiveFieldWindow(changed,sampler,options.corners,options.output)).rejects.toThrow(/geometry changed/);
+});
+it('unknown-support forward requests and invalid affine input reject before sampling',async()=>{
+ const noRead=async()=>{throw Error('Unexpected source read');};await expect(projectPerspectiveFieldWindow({width:1,height:1,bounds:undefined,background:0,direction:'source-to-quad',readWindow:noRead},sampler,identity.corners,{x:0,y:0,width:1,height:1})).rejects.toThrow(/quad-to-source/);
+ expect(()=>compileProjectiveField({...identity,direction:'source-to-quad',input:{origin:{x:0,y:0},matrix:{a:0,b:0,c:0,d:0,e:0,f:0}}})).toThrow();
+});
 function compare(actual:Float32Array,expected:Float32Array){
   expect(actual.length).toBe(expected.length);let maximum=0;
   for(let i=0;i<actual.length;i++)maximum=Math.max(maximum,Math.abs(actual[i]-expected[i]));
@@ -97,7 +114,7 @@ it('field projection captures caller options and rejects changed sources, cancel
   const pending=projectPerspectiveFieldWindow(source(options),sampler,options.corners,options.output);
   options.output.width=1;options.corners[0].x=500;expect((await pending).length).toBe(row.options.output.width*row.options.output.height);
   const changing=source(row.options),read=changing.readWindow;
-  changing.readWindow=async b=>{const alpha=await read(b);changing.bounds.width++;return alpha;};
+  changing.readWindow=async b=>{const alpha=await read(b);changing.bounds!.width++;return alpha;};
   await expect(projectPerspectiveFieldWindow(changing,sampler,row.options.corners,row.options.output)).rejects.toThrow(/geometry changed/);
   const abort=new AbortController(),cancelled=source(row.options),original=cancelled.readWindow;
   cancelled.readWindow=async b=>{const alpha=await original(b);abort.abort();return alpha;};

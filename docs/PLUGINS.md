@@ -557,3 +557,7 @@ Schema-51 placed eraser records and `RasterLayer.erase(stroke,{space:"placed"})`
 ## Placed clear fills (schema 52)
 
 `RasterLayer.clear(selectionOrNull,{space:"placed"})` and its strict captured clear DTO use existing isolated document grants and shared validation/Undo. Schema 52 admits placed `PaintFill` records only when `erase:true`; schema-51 placed erasers remain valid. The pure method reads geometry and constructs commands without obtaining pixel/file/network access. Host commit still checks revision, assets, locks and atomic publication. No permission, package/lifecycle change or install-time execution is introduced.
+
+## Placed mask brushes use existing grants (schema 53)
+
+`Layer.paintMask` and immutable `LayerMask.paint` placement values emit existing shared mask updates. Isolated code captures geometry without reading source pixels or obtaining a new host call. Host commit still validates strict mask DTOs, schema, sources, locks, revisions and atomic Undo. Placement is limited to Hide/Reveal brush/pencil entries; prepared Wet entries reject it. Existing package/lifecycle/permission formats and inert installation remain unchanged. No pixel/file/network/export capability is added.

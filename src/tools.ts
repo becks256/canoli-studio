@@ -253,6 +253,8 @@ interface FillGesture extends BaseGesture {
   fill: PaintFill;
 }
 interface MaskPaintGesture extends BaseGesture {
+  stopChanges?:()=>void;
+  placement?:import('./core/masks').MaskPlacementData;
   inputTransform: AffineTransform;
   kind: "mask-paint";
   filterMask: boolean;
@@ -422,7 +424,7 @@ export class ToolController {
   }
   private perspectiveToolBlocked(tool:Tool):boolean {
     const document=this.editor.document,selected=document.selectedLayer;
-    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&(['smudge','mixer'].includes(tool)||(this.state.settings.paintTarget!=='layer'&&['brush','pencil','eraser'].includes(tool))||(tool==='pen'&&this.state.settings.penEditTarget==='mask'));
+    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&(['smudge','mixer'].includes(tool)||(tool==='pen'&&this.state.settings.penEditTarget==='mask'));
   }
   /** Current gestures may begin before React flushes a selection preference reset. */
   get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&(gesture.document.selectedLayer?.id??null)===gesture.selectionId;}
@@ -442,12 +444,15 @@ export class ToolController {
       const mask = filter ? record?.kind === 'smart-object' ? record.filterMask : null : record?.mask;
       if (selected && mask) {
         let plane = layerTransform(snapshot, selected.id)!;
+        if(activePerspective(record?.perspective)&&mask.linked!==false)world=plane;
+        else {
         if (filter && selected instanceof SmartObjectLayer) {
           const source = snapshot.components!.find(component=>component.id === selected.componentId)!.source;
           const master = source.kind === 'document' ? source.document : source;
           plane = plane.multiply(AffineTransform.scale(selected.width / master.width, selected.height / master.height));
         }
         world = maskTransform(mask, plane);
+        }
       }
     } else if (tool !== 'heal' && selected && (
       tool === 'dodge' || tool === 'burn'
@@ -591,6 +596,7 @@ export class ToolController {
     this.publish({ settings: { ...this.state.settings, ...patch } });
   }
   cancel() {
+    if(this.gesture?.kind==='mask-paint')this.gesture.stopChanges?.();
     if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
     this.state.wetPreview?.dispose();
     this.quickAbort?.abort();this.quickAbort=null;
@@ -617,6 +623,7 @@ export class ToolController {
     });
   }
   reset() {
+    if(this.gesture?.kind==='mask-paint')this.gesture.stopChanges?.();
     this.textPathPoint = null;
     if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
     this.state.wetPreview?.dispose();
@@ -1054,7 +1061,7 @@ export class ToolController {
         layerPosition.x,
         layerPosition.y,
       );
-      let maskWorld = this.maskWorld(doc, selected, data);
+      let maskWorld = this.maskWorld(doc, selected, data),placementBasis=maskTransform(data,new AffineTransform());
       if (filterMask && selected instanceof SmartObjectLayer) {
         const master = doc.getComponent(selected.componentId);
         const nativeWorld = layerTransform(doc._read(), selected.id)!.multiply(
@@ -1064,8 +1071,11 @@ export class ToolController {
           ),
         );
         maskWorld = maskTransform(data, nativeWorld);
+        placementBasis=maskTransform(data,AffineTransform.scale(selected.width/master.width,selected.height/master.height));
       }
-      const inputTransform = maskWorld.inverse();
+      const image=findLayer(doc._read(),selected.id),placed=!!image&&activePerspective(image.perspective)&&data.linked!==false;
+      const placement=placed&&(image.kind==='raster'||image.kind==='smart-object')?{width:image.width,height:image.height,perspective:image.perspective!,basis:placementBasis.toJSON()}:undefined;
+      const inputTransform = placement?layerTransform(doc._read(),selected.id)!.inverse():maskWorld.inverse();
       const stroke = new (tool === "pencil" ? PencilStroke : BrushStroke)({
         points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
         size: this.state.settings.size,
@@ -1085,6 +1095,7 @@ export class ToolController {
       const gesture: MaskPaintGesture = {
         ...base,
         kind: "mask-paint",
+        placement,
         filterMask,
         layer: selected,
         mask,
@@ -1100,6 +1111,8 @@ export class ToolController {
               : "reveal",
       };
       this.gesture = gesture;
+      const selection=[...doc.getSnapshot().selectedIds];
+      gesture.stopChanges=doc.subscribe(()=>{if(this.gesture!==gesture)return;const state=doc.getSnapshot();if(state.revision!==gesture.revision||state.selectedIds.length!==selection.length||state.selectedIds.some((id,i)=>id!==selection[i]))this.cancel();});
       this.updateMaskPreview(gesture);
       this.publish({ drawing: true });
       return;
@@ -1932,6 +1945,7 @@ export class ToolController {
         layerId: gesture.layer.id,
         filterMask: gesture.filterMask,
         maskMode: gesture.mode,
+        maskPlacement:gesture.placement,
         stroke: { ...gesture.stroke, points: gesture.stroke.points.slice() },
       },
     });
@@ -2073,6 +2087,7 @@ export class ToolController {
     if (!gesture) return;
     if(gesture.kind==='wet'){await this.endWet(gesture);return;}
     this.gesture = null;
+    if(gesture.kind==='mask-paint')gesture.stopChanges?.();
     // Keep the displayed frame, but stop source work for previews that can no
     // longer be updated. Durable capture owns its own sampling resources.
     if (gesture.kind === "paint") gesture.cloneSource?.dispose();
@@ -2163,13 +2178,7 @@ export class ToolController {
           throw new Error(
             "The mask target changed during this gesture. Try again.",
           );
-        const mask = gesture.mask.paint(
-          PaintOperation.fromJSON(gesture.stroke) as BrushStroke | PencilStroke,
-          gesture.mode,
-        );
-        if (gesture.filterMask)
-          (gesture.layer as SmartObjectLayer).filterMask = mask;
-        else gesture.layer.mask = mask;
+        gesture.layer.paintMask(PaintOperation.fromJSON(gesture.stroke) as BrushStroke | PencilStroke,gesture.mode,{space:gesture.placement?'placed':'local',filterMask:gesture.filterMask});
         return;
       }
       if (gesture.kind === "lasso") {

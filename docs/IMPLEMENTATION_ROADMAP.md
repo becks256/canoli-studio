@@ -8975,3 +8975,61 @@ Mask/wet tool mapping, mask relinking, general warp, photographic/interchange
 quality, sustained editor-wide performance and physical-device acceptance remain
 required. All unfinished original roadmap requirements remain active; this
 selection-clearing slice does not close F03 or the overall goal.
+
+
+### 2026-10-30 — F03 captured perspective mask brush editing
+
+Implemented Brush, Pencil and Eraser input for linked ordinary and smart-object
+filter masks on perspective images. Pointer input and `Layer.paintMask` capture
+the complete authored coverage field, image perspective, dimensions and mask
+basis; later corner changes or perspective reset retain that field. Existing
+local and unlinked mask painting retains its coordinate contract. Schema 53
+persists placement and rejects falsely old documents in every mask context.
+
+The renderer pulls each native sample through the captured field, including
+support outside the image and pullbacks crossing an inverse horizon. It streams
+unknown support and splits large feathered surfaces into bounded scalar reads.
+Scaled filter-mask culling uses the transformed support. Preview and commit use
+the same placement; selection or document revisions cancel the active gesture.
+The public OO method uses existing commands, validation, permissions and history;
+REST remains a separate headless session.
+
+Final build and selected browser verification passed: **88 source-browser
+checks** and **13 production checks**, with zero failures, retries or skips.
+The complete `npm test -- --maxWorkers=2` run passed **3,122 tests in 302
+files**. Runtime/test sources stayed identical throughout the accepted checks;
+the receipt records one subsequent correction of obsolete scripting-guide
+wording. All **145 served release resources** retain their recorded hashes.
+The native pixel WASM/ABI remains unchanged, SHA-256
+`bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+
+- Three **131 × 79** outputs each match **41,396 RGBA float words** from an
+  independent NumPy homography/affine solve and SciPy constant-border sampler,
+  followed by captured byte-mask composition. Byte Hide/Reveal and genuine TIFF
+  float Hide match every reference word with zero retained-RGB differences.
+- Each case also checks **3,763 scalar samples** through arbitrary affine input
+  at an origin around **2^40**; all samples match the independent reference
+  exactly. Partitioned native reads and project originals remain exact.
+- Actual pointer preview equals committed rendering for ordinary and scaled
+  filter masks. Filter authored points outside the master region still change
+  native pixels. Selection-away/back and revision changes cancel immediately;
+  Undo/redo and the documented isolated production example pass.
+- A **601 × 551** feathered surface (**331,151 pixels**) matches cropped
+  partitions with zero byte differences. An inverse-horizon witness retains
+  unbounded support through later mask movement.
+- A genuine **10000 × 5000 PNG** retains its original dimensions and SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`.
+  A distant native pixel changes alpha **128 → 64**, its transparent neighbor
+  remains zero, and one-step Undo/redo is exact. This verifies a bounded window,
+  not every transformed pixel or a process-memory bound.
+
+Mask Pen, wet tools, mask dragging/relinking, general warp, photographic and
+interchange quality, sustained editor-wide performance and physical-device
+acceptance remain required. This slice does not close F03 or the overall goal.
+
+[Complete evidence](benchmarks/placed-mask-2026-10-30.json.gz),
+**1,150,786 bytes**, SHA-256
+`88eb3087cf1696c18bbf9cdd6041d1ed15b1c8982d04caa6c7665bb9808ca9e8`.
+The receipt includes reports, command logs, source/release identities, raw
+comparison fields and the independent oracle results. Selected browser checks
+do not replace the remaining full quality/performance/device gates.

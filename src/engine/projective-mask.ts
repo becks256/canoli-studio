@@ -5,7 +5,7 @@ import {maskFieldGeometry} from '../core/mask-field';
 import {visitMaskAssets} from '../core/asset-references';
 import {captureAssetSource,isFloatAsset,type AssetStore} from '../core/assets';
 import {freeze} from '../core/immutable';
-import {compileProjectiveField,type ProjectiveFieldDirection} from '../core/projective-field';
+import {compileProjectiveField,fieldInputSchema,type ProjectiveFieldInput,type ProjectiveFieldDirection} from '../core/projective-field';
 import type {ProjectiveQuad} from '../core/projective';
 import {validateWindow,type FloatSourceWindow} from '../core/float-source/types';
 import {validateFloatAlpha} from '../core/float-shadow';
@@ -14,6 +14,8 @@ import {featherFloatMask} from './float-mask-feather';
 import type {FloatProjectionControl} from './float-projection';
 import type {PixelProcessor} from './processor';
 import {maskCoverage} from './masks';
+import {paintedMask} from './drawing';
+import {PlacedMaskCaptures} from './placed-mask';
 import {BrushTextureSampler} from './brush-texture';
 import {createCanvas,release} from './canvas';
 import {checkRenderCurrent} from './render-control';
@@ -24,8 +26,8 @@ const optionsSchema=z.object({sourceWidth:extent,sourceHeight:extent,layerWidth:
   corners:z.array(z.object({x:z.number().finite(),y:z.number().finite()}).strict()).length(4),direction:z.enum(['quad-to-source','source-to-quad']).optional()}).strict();
 export interface PerspectiveMaskOptions {sourceWidth:number;sourceHeight:number;layerWidth:number;layerHeight:number;corners:ProjectiveQuad;direction?:ProjectiveFieldDirection}
 export interface CapturedPerspectiveMask {
-  readonly mask:LayerMaskData;readonly bounds:Readonly<FloatSourceWindow>;readonly background:number;
-  check():void;read(bounds:FloatSourceWindow):Promise<Float32Array<ArrayBuffer>>;dispose():void;
+  readonly mask:LayerMaskData;readonly unbounded:boolean;readonly bounds:Readonly<FloatSourceWindow>;readonly background:number;
+  check():void;read(bounds:FloatSourceWindow,input?:ProjectiveFieldInput):Promise<Float32Array<ArrayBuffer>>;dispose():void;
 }
 
 /** Capture existing mask geometry/assets into the original/reference pixel
@@ -61,13 +63,15 @@ export function capturePerspectiveMask(
     signal?.throwIfAborted();checkRenderCurrent(isCancelled);if(closed)throw new Error('Perspective mask capture is closed.');lifetime();
     for(const pin of pins.values()){pin.check();if(isFloatAsset(pin.asset))throw new Error('Mask source changed during projection.');}
   };
+  const placed=mask.strokes?.some(entry=>entry.mode!=='wet'&&entry.placement)?new PlacedMaskCaptures(assets,processor,sampler,()=>{check();return false;}):undefined;
   const readRaw=async(input:FloatSourceWindow):Promise<Float32Array<ArrayBuffer>>=>{
     check();const area=validateWindow(input),out=new Float32Array(area.width*area.height).fill(background);
-    const left=Math.max(area.x,bounds.x),top=Math.max(area.y,bounds.y),right=Math.min(area.x+area.width,bounds.x+bounds.width),bottom=Math.min(area.y+area.height,bounds.y+bounds.height);
+    const left=geometry.unbounded?area.x:Math.max(area.x,bounds.x),top=geometry.unbounded?area.y:Math.max(area.y,bounds.y),right=geometry.unbounded?area.x+area.width:Math.min(area.x+area.width,bounds.x+bounds.width),bottom=geometry.unbounded?area.y+area.height:Math.min(area.y+area.height,bounds.y+bounds.height);
     let deadline=performance.now()+2;
     for(let y=top;y<bottom;y+=512)for(let x=left;x<right;x+=512){
       check();const width=Math.min(512,right-x),height=Math.min(512,bottom-y);
-      const canvas=await maskCoverage(raw,{x,y,width,height,sx:1,sy:1},mapping.e,mapping.f,processor,undefined,mapping,bitmap,assets,sampler,()=>{check();return false;});
+      const space={x,y,width,height,sx:1,sy:1};
+      const canvas=placed?await paintedMask(raw,space,mapping.e,mapping.f,processor,mapping,bitmap,assets,sampler,()=>{check();return false;},false,placed):await maskCoverage(raw,space,mapping.e,mapping.f,processor,undefined,mapping,bitmap,assets,sampler,()=>{check();return false;});
       try{
         check();const bytes=canvas.getContext('2d')!.getImageData(0,0,width,height).data;
         for(let row=0;row<height;row++)for(let col=0;col<width;col++)out[(y-area.y+row)*area.width+x-area.x+col]=bytes[(row*width+col)*4+3]/255;
@@ -76,11 +80,11 @@ export function capturePerspectiveMask(
     }
     check();validateFloatAlpha(out,area.width*area.height);return out;
   };
-  const source:ProjectiveFieldSource={width:options.sourceWidth,height:options.sourceHeight,bounds,background,direction:options.direction,readWindow:readRaw};
-  const read=async(input:FloatSourceWindow):Promise<Float32Array<ArrayBuffer>>=>{
-    check();const area=validateWindow(input);
+  const source:ProjectiveFieldSource={width:options.sourceWidth,height:options.sourceHeight,bounds:geometry.unbounded?undefined:bounds,background,direction:options.direction,readWindow:readRaw};
+  const read=async(input:FloatSourceWindow,inputMapping?:ProjectiveFieldInput):Promise<Float32Array<ArrayBuffer>>=>{
+    check();const area=validateWindow(input),current=inputMapping?{...source,input:fieldInputSchema.parse(inputMapping)}:source;
     if(!mask.enabled||mask.density===0)return new Float32Array(area.width*area.height).fill(1);
-    const coverage=await featherFloatMask(area,mask.feather??0,linked?b=>projectPerspectiveFieldWindow(source,processor,compiled.options.corners,b,{signal,isCancelled:()=>{check();return false;}}):readRaw,processor,check);
+    const coverage=await featherFloatMask(area,mask.feather??0,linked?b=>projectPerspectiveFieldWindow(current,processor,compiled.options.corners,b,{signal,isCancelled:()=>{check();return false;}}):readRaw,processor,check);
     check();let deadline=performance.now()+2;
     for(let i=0;i<coverage.length;i++){
       coverage[i]=Math.max(0,Math.min(1,1-mask.density+mask.density*(mask.inverted?1-coverage[i]:coverage[i])));
@@ -88,6 +92,6 @@ export function capturePerspectiveMask(
     }
     check();return coverage;
   };
-  try{check();}catch(error){ownTextures?.dispose();throw error;}
-  return Object.freeze({mask,bounds,background,check,read,dispose(){if(closed)return;closed=true;pins.clear();ownTextures?.dispose();}});
+  try{check();}catch(error){placed?.dispose();ownTextures?.dispose();throw error;}
+  return Object.freeze({mask,bounds,unbounded:!!geometry.unbounded,background,check,read,dispose(){if(closed)return;closed=true;pins.clear();placed?.dispose();ownTextures?.dispose();}});
 }

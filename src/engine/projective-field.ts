@@ -1,4 +1,4 @@
-import {captureFieldBounds,compileProjectiveField,type ProjectiveFieldOptions,type ProjectiveFieldDirection} from '../core/projective-field';
+import {captureFieldBounds,compileProjectiveField,type ProjectiveFieldOptions,type ProjectiveFieldDirection,type ProjectiveFieldInput} from '../core/projective-field';
 import type {ProjectiveQuad} from '../core/projective';
 import {validateWindow,type FloatSourceWindow,type FloatSourceControl} from '../core/float-source/types';
 import {validateFloatAlpha} from '../core/float-shadow';
@@ -8,14 +8,16 @@ import {yieldTask} from '../core/task-yield';
 
 export interface ProjectiveFieldSource {
   /** Original/reference rectangle for the homography, independent of support. */
-  width:number;height:number;bounds:FloatSourceWindow;background:number;direction?:ProjectiveFieldDirection;
+  width:number;height:number;bounds:FloatSourceWindow|undefined;background:number;direction?:ProjectiveFieldDirection;input?:ProjectiveFieldInput;
   readWindow(bounds:FloatSourceWindow,control?:FloatSourceControl):Promise<Float32Array>;
 }
 export interface ProjectiveFieldSampler {
   floatProjectiveField(alpha:Float32Array,options:ProjectiveFieldOptions):Promise<Float32Array>;
 }
 
-/** Project a finite deviation field over an infinite constant background. A
+/** Project a scalar field, optionally bounded by finite support. Unknown support
+ * streams complete inverse-sampling neighborhoods rather than clipping to an
+ * image frame. A
  * linked mask may extend beyond the image; the image quad never clips this
  * plane. Sampling is at output pixel centers, with constant border neighbors.
  * Callers retain source leases and apply output-plane feather/settings later. */
@@ -23,15 +25,18 @@ export async function projectPerspectiveFieldWindow(
   source:ProjectiveFieldSource,processor:ProjectiveFieldSampler,corners:ProjectiveQuad,input:FloatSourceWindow,
   control:FloatProjectionControl={},
 ):Promise<Float32Array<ArrayBuffer>> {
-  const width=source.width,height=source.height,absoluteField=captureFieldBounds(source.bounds),background=source.background,direction=source.direction;
+  const width=source.width,height=source.height,absoluteField=source.bounds?captureFieldBounds(source.bounds):undefined,background=source.background,direction=source.direction;
+  if(!absoluteField&&(direction==='source-to-quad'||source.input))throw new Error('Unbounded fields require quad-to-source sampling.');
+  const capturedInput=source.input,signature=JSON.stringify(capturedInput);
+  const frameField=absoluteField??{x:0,y:0,width:1,height:1};
   const bounds=validateWindow(input),read=source.readWindow;
-  const compiled=compileProjectiveField({sourceWidth:width,sourceHeight:height,field:absoluteField,background,direction,
-    source:{x:absoluteField.x,y:absoluteField.y,width:1,height:1},output:bounds,corners});
-  const field={...absoluteField,x:absoluteField.x-compiled.sourceOrigin.x,y:absoluteField.y-compiled.sourceOrigin.y},quad=compiled.options.corners,m=compiled.values,signal=control.signal,isCancelled=control.isCancelled;
+  const compiled=compileProjectiveField({sourceWidth:width,sourceHeight:height,field:frameField,background,direction,input:capturedInput,
+    source:{x:frameField.x,y:frameField.y,width:1,height:1},output:bounds,corners});
+  const field=absoluteField?{...absoluteField,x:absoluteField.x-compiled.sourceOrigin.x,y:absoluteField.y-compiled.sourceOrigin.y}:undefined,quad=compiled.options.corners,m=compiled.values,signal=control.signal,isCancelled=control.isCancelled;
   const check=()=>{
     signal?.throwIfAborted();checkRenderCurrent(isCancelled);
     if(source.width!==width||source.height!==height||source.direction!==direction||source.background!==background||source.readWindow!==read||
-      source.bounds.x!==absoluteField.x||source.bounds.y!==absoluteField.y||source.bounds.width!==absoluteField.width||source.bounds.height!==absoluteField.height)
+      JSON.stringify(source.input)!==signature||!!source.bounds!==!!absoluteField||absoluteField&&(source.bounds!.x!==absoluteField.x||source.bounds!.y!==absoluteField.y||source.bounds!.width!==absoluteField.width||source.bounds!.height!==absoluteField.height))
       throw new Error('Perspective field source geometry changed.');
   };
   check();const output=new Float32Array(bounds.width*bounds.height).fill(background);let deadline=performance.now()+2;
@@ -60,14 +65,14 @@ export async function projectPerspectiveFieldWindow(
     // roundoff; the native kernel rejects any missing finite-support sample.
     const minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x));
     const minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y));
-    if(maxX<field.x-1||maxY<field.y-1||minX>=field.x+field.width||minY>=field.y+field.height)return;
-    const x=Math.max(field.x,Math.floor(Math.max(field.x-1,minX))-1),y=Math.max(field.y,Math.floor(Math.max(field.y-1,minY))-1);
-    const right=Math.min(field.x+field.width,Math.floor(Math.min(field.x+field.width,maxX))+3);
-    const bottom=Math.min(field.y+field.height,Math.floor(Math.min(field.y+field.height,maxY))+3);
+    if(field&&(maxX<field.x-1||maxY<field.y-1||minX>=field.x+field.width||minY>=field.y+field.height))return;
+    const x=field?Math.max(field.x,Math.floor(Math.max(field.x-1,minX))-1):Math.floor(minX)-1,y=field?Math.max(field.y,Math.floor(Math.max(field.y-1,minY))-1):Math.floor(minY)-1;
+    const right=field?Math.min(field.x+field.width,Math.floor(Math.min(field.x+field.width,maxX))+3):Math.floor(maxX)+3;
+    const bottom=field?Math.min(field.y+field.height,Math.floor(Math.min(field.y+field.height,maxY))+3):Math.floor(maxY)+3;
     if((right-x)*(bottom-y)>262144){await split();return;}
-    const nativeBounds={x:x+compiled.sourceOrigin.x,y:y+compiled.sourceOrigin.y,width:right-x,height:bottom-y};
+    const nativeBounds=captureFieldBounds({x:x+compiled.sourceOrigin.x,y:y+compiled.sourceOrigin.y,width:right-x,height:bottom-y});
     const alpha=await read.call(source,{...nativeBounds},{signal,onProgress:check});check();validateFloatAlpha(alpha,nativeBounds.width*nativeBounds.height);
-    const result=await processor.floatProjectiveField(alpha,{sourceWidth:width,sourceHeight:height,corners:quad,field:absoluteField,background,direction,source:nativeBounds,output:region});
+    const result=await processor.floatProjectiveField(alpha,{sourceWidth:width,sourceHeight:height,corners:quad,field:absoluteField??nativeBounds,background,direction,input:compiled.options.input,source:nativeBounds,output:region});
     check();validateFloatAlpha(result,region.width*region.height);
     for(let row=0;row<region.height;row++)output.set(result.subarray(row*region.width,(row+1)*region.width),(region.y-bounds.y+row)*bounds.width+region.x-bounds.x);
   };

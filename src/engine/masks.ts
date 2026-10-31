@@ -1,4 +1,4 @@
-import {hasWetMask} from './wet-mask';
+import {hasWetMask,hasPlacedMask} from './wet-mask';
 import { featherRegion } from "./feather-region";
 import type {AssetStore} from '../core/assets';
 import type {BrushTextureSampler} from './brush-texture';
@@ -103,7 +103,7 @@ export class PaintedMaskRaster {
     textures?:BrushTextureSampler,
     isCancelled?:()=>boolean,
   ) {
-    if (hasWetMask(mask) || !mask.strokes?.length || !canCache())
+    if (hasWetMask(mask)||hasPlacedMask(mask) || !mask.strokes?.length || !canCache())
       return paintedMask(mask, space, x, y, processor, world, bitmap,assets,textures,isCancelled);
     const location = JSON.stringify([space, world]);
     const cacheKey = `painted:${key}:${location}`;

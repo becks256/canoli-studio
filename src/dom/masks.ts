@@ -14,7 +14,14 @@ import {
 import { VectorPath } from "./index";
 import { pathContours } from "../core/drawing";
 
-export type MaskPaint = {stroke:BrushStroke|PencilStroke;mode:"hide"|"reveal"}|{stroke:WetPaintStroke;mode:"wet"};
+export interface MaskPaintPlacement {width:number;height:number;perspective:PerspectiveTransform;basis:AffineTransform}
+export type MaskPaint = {stroke:BrushStroke|PencilStroke;mode:"hide"|"reveal";placement?:MaskPaintPlacement}|{stroke:WetPaintStroke;mode:"wet"};
+function paintData(entry:MaskPaint){
+ const placement='placement'in entry?entry.placement:undefined;
+ if(placement!==undefined&&(entry.mode==='wet'||!placement||!(placement.perspective instanceof PerspectiveTransform)||!(placement.basis instanceof AffineTransform)))throw new Error('Placed mask values require BrushStroke/PencilStroke, PerspectiveTransform and AffineTransform.');
+ return{stroke:entry.stroke.toJSON(),mode:entry.mode,...(placement?{placement:{width:placement.width,height:placement.height,perspective:placement.perspective.toJSON(),basis:placement.basis.toJSON()}}:{})};
+}
+function paintValue(entry:import('../core/masks').MaskOperationData):MaskPaint{return entry.mode==='wet'?{mode:'wet',stroke:PaintOperation.fromJSON(entry.stroke) as WetPaintStroke}:{mode:entry.mode,stroke:PaintOperation.fromJSON(entry.stroke) as BrushStroke|PencilStroke,...(entry.placement?{placement:{width:entry.placement.width,height:entry.placement.height,perspective:new PerspectiveTransform(entry.placement.perspective),basis:AffineTransform.fromJSON(entry.placement.basis)}}:{})};}
 export interface RasterErasureMaskSource {width:number;height:number;operations:readonly {width:number;height:number;stroke:EraserStroke|PaintFill;placement?:{perspective:PerspectiveTransform;bounds:import('../core/drawing').Rect}}[]}
 interface MaskSettings {
   rasterErasures?: RasterErasureMaskSource;
@@ -94,10 +101,7 @@ export class LayerMask {
       options.strokes === undefined
         ? {}
         : {
-            strokes: options.strokes.map(({ stroke, mode }) => ({
-              stroke: stroke.toJSON(),
-              mode,
-            })),
+            strokes: options.strokes.map(paintData),
           };
     if (native) {
       this.data=layerMaskSchema.parse({kind:'raster-erasures',width:native.width,height:native.height,
@@ -107,9 +111,7 @@ export class LayerMask {
       this.data = layerMaskSchema.parse({
         kind: "paint",
         base: options.base,
-        strokes: (options.strokes === undefined ? [] : options.strokes).map(
-          ({ stroke, mode }) => ({ stroke: stroke.toJSON(), mode }),
-        ),
+        strokes: (options.strokes === undefined ? [] : options.strokes).map(paintData),
         enabled,
         inverted,
         density,
@@ -178,10 +180,13 @@ export class LayerMask {
     return this.data.kind === "bitmap" ? this.data.assetId : null;
   }
   get strokes(): MaskPaint[] {
-    return (this.data.strokes ?? []).map(entry => entry.mode==='wet'?{mode:'wet',stroke:PaintOperation.fromJSON(entry.stroke) as WetPaintStroke}:{mode:entry.mode,stroke:PaintOperation.fromJSON(entry.stroke) as BrushStroke|PencilStroke});
+    return (this.data.strokes ?? []).map(paintValue);
   }
-  paint(stroke: BrushStroke | PencilStroke, mode: "hide" | "reveal" = "hide") {
-    return this.with({ strokes: [...this.strokes, { stroke, mode }] });
+  paint(stroke: BrushStroke | PencilStroke, mode: "hide" | "reveal" = "hide", options:{placement?:MaskPaintPlacement}={}) {
+    if(!(stroke instanceof BrushStroke)||!['hide','reveal'].includes(mode))throw new Error('Use a BrushStroke or PencilStroke with Hide/Reveal.');
+    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='placement'))throw new Error('Invalid mask paint options.');
+    if(options.placement!==undefined&&(!options.placement||!(options.placement.perspective instanceof PerspectiveTransform)||!(options.placement.basis instanceof AffineTransform)))throw new Error('Use PerspectiveTransform and AffineTransform placement values.');
+    return this.with({ strokes: [...this.strokes, { stroke, mode,...(options.placement?{placement:options.placement}:{}) }] });
   }
   applyWetPaint(stroke:WetPaintStroke):LayerMask {
     if(!(stroke instanceof WetPaintStroke))throw new Error('Use a WetPaintStroke value for prepared mask coverage.');
@@ -336,7 +341,7 @@ export class LayerMask {
     const basis = value.basis
       ? AffineTransform.fromJSON(value.basis)
       : undefined;
-    const strokes:MaskPaint[]|undefined = value.strokes?.map(entry=>entry.mode==='wet'?{mode:'wet',stroke:PaintOperation.fromJSON(entry.stroke) as WetPaintStroke}:{mode:entry.mode,stroke:PaintOperation.fromJSON(entry.stroke) as BrushStroke|PencilStroke});
+    const strokes:MaskPaint[]|undefined = value.strokes?.map(paintValue);
     if(value.kind==='raster-erasures')return new LayerMask({...value,basis,strokes,rasterErasures:{width:value.width,height:value.height,operations:value.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill,...(entry.placement?{placement:{perspective:new PerspectiveTransform(entry.placement.perspective),bounds:{...entry.placement.bounds}}}:{})}))}});
     if (value.kind === "paint")
       return new LayerMask({ ...value, basis, strokes });
