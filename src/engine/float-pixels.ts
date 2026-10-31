@@ -11,6 +11,7 @@ import{compileFloatTransfer,FLOAT_TRANSFER_VALUES,type FloatTransferAdjustment}f
 import{z}from'zod';
 import {compileProjectiveSample,type ProjectiveSampleOptions} from '../core/projective-sampling';
 import {compileProjectiveField,type ProjectiveFieldOptions} from '../core/projective-field';
+import {compileMappedField,type MappedFieldOptions} from '../core/mapped-field';
 import{BLEND_MODES,type BlendMode}from'../core/model';
 import{forkPixelKernel,type PixelKernel}from'./wasm';
 import{TONE_LIMITS}from'../core/tone';
@@ -52,7 +53,13 @@ export class FloatPixelProcessor{
  }
  private owner(){if(!this.kernel)throw new Error('Float pixel processor is disposed.');return this.kernel;}
  projectiveField(alpha:Float32Array,input:ProjectiveFieldOptions):Float32Array<ArrayBuffer>{
-  this.owner();const {options,values}=compileProjectiveField(input);validateFloatAlpha(alpha,options.source.width*options.source.height);
+  this.owner();return this.sampleField(alpha,compileProjectiveField(input));
+ }
+ mappedField(alpha:Float32Array,input:MappedFieldOptions):Float32Array<ArrayBuffer>{
+  this.owner();return this.sampleField(alpha,compileMappedField(input));
+ }
+ private sampleField(alpha:Float32Array,{options,values}:{options:{source:{width:number;height:number};output:{width:number;height:number}};values:Float64Array}):Float32Array<ArrayBuffer>{
+  validateFloatAlpha(alpha,options.source.width*options.source.height);
   const source=alpha.slice(),count=options.output.width*options.output.height,kernel=this.owner();
   if(typeof kernel.sampleProjectiveFieldFloat!=='function')throw new Error('Native projective field sampler is unavailable.');
   const at=Math.ceil(kernel.bufferOffset()/8)*8,output=at+source.byteLength,settings=Math.ceil((output+count*4)/8)*8,required=settings+values.byteLength;

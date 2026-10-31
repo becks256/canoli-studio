@@ -1,5 +1,17 @@
 # Architecture
 
+## Retained scalar-field mappings
+
+`mapped-field.ts` captures an invertible homogeneous pull matrix with independent
+input/source origins. It preserves compiled coefficients without normalization
+or another corner solve, and compiles the existing scalar WASM ABI. Native and
+worker boundaries validate owned maps, geometry and coverage. Both field entry
+points share the same bounded streaming/culling/horizon/cancellation code.
+Ordinary linked-mask capture retains its compiled map; forward brush transport
+keeps its existing corner/input contract. The public mask model and linkage
+guards remain unchanged. Retained native-grid provenance, public mask planes,
+tools and transport still need integration before projective relinking ships.
+
 ## Projected wet composition bounds
 
 `projected-wet.ts` samples each complete canonical native field window before

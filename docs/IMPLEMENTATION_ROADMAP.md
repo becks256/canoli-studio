@@ -9601,3 +9601,67 @@ workflow/ChatGPT/live identity/commercial/specialist/motion requirement remain
 required. The complete implementation goal stays active. No public constructor /
 command, schema/container, source-resolution limit, isolated/plugin grant,
 REST/browser separation, paid operation or account changes.
+
+
+### 2026-10-31 — F03 retained mask-map transport dependency verified
+
+Owner: implementation engineer; estimate M/L for the private numerical/native /
+renderer dependency, followed by substantial model/tool/transport integration.
+The preceding `e58ecc5` turn completed verified composition-work reduction while
+full performance remained open. Review of the next explicit F03 gap confirms
+that active-perspective relinking cannot preserve native geometry through an
+ordinary affine basis. A retained mapping also needs original raster-grid/source
+provenance; storing coefficients alone or sampling an already rendered mask
+would not complete that workflow. The public linkage guards remain in place.
+
+`FieldMapping` now captures exact finite invertible homogeneous pull coefficients
+with separate input/source origins. `compileMappedField` writes the existing
+scalar native ABI without another corner solve or coefficient normalization.
+Both entry points share the bounded streamer, conservative footprint proof,
+bilinear neighbors, horizon splitting and cancellation/source checks. Actual
+host/native/worker boundaries capture and validate owned pixels/maps/results.
+Ordinary linked-mask capture retains its compiled map; forward brush transport
+keeps its existing direction/affine-input contract. No native algorithm, public
+constructor/command/schema, isolated/plugin privilege or original limit changes.
+
+All 53 focused actual-WASM cases across three files pass. New cases preserve
+every prior ABI float64/output float32 word, independent fixture coverage and
+irregular partitions, and add arbitrary/origin-crossing horizons, large separated
+origins, affine inputs, unknown support, bounded 50 MP reads and lifetime/error
+checks. A later homogeneous-scale/signed-zero invariant passes its selected probe
+and is included with all 22 new cases in the final full suite. Initial test-only
+readonly/tuple annotation corrections remain recorded. All four production
+worker cases pass, including independent coverage and rejection/retry behavior.
+
+The final fresh release build passes on Node 26.13.0. The final documentation
+rebuild changes only the perspective-engine guide; every application/worker byte
+is exact to the measured candidate. The complete browser matrix passes all
+167 cases across 24 files in one run without retries, skips, failures or flakes.
+It includes actual 50 MP byte/float originals, all captured mask kinds/refinements,
+source-aware wet/brush tools, reflected/placed gestures, native project/workspace /
+SVG/Photoshop retention and cancellation. All 3,207 unit/API/native tests across
+311 files pass in one full run. The release and full-suite kernels are exact.
+
+Two unprofiled ordinary-production pairs preserve 72 complete foreground hashes
+and six PNG exports per pair, original source bytes, all twelve accepted points
+and exact one Undo/Redo. Timing is mixed and some observations worsen: projected
+raster median changes 104.5→117.5 ms and 100.1→138.5 ms in the two pairs. A separate
+matched CPU-profile pair has flat medians around 107 ms but slower candidate p95;
+it does not isolate a cause or disprove a regression. All observations remain
+retained; no universal speedup or performance-regression clearance is claimed.
+Every measured p95 exceeds 33 ms. [Readable findings and compact evidence](benchmarks/retained-mask-maps-2026-10-31.md).
+
+Next required F03 work is the versioned immutable mask plane and retained native
+grid/source descriptor, composition with current placement before one sampling
+pass, all mask kinds and ordinary/filter-mask tools/cursors, source ownership /
+copy/recipe/native persistence, shared OO/script/independent REST validation,
+Undo and real production/high-resolution acceptance. Existing asset-metadata
+access has permission checks; this integration must not silently add a pixel,
+worker, file or network grant. These are remaining gates, not shipped signatures.
+
+Preserving-position public projective relinking, full F03/F06/F14 and the original
+≤33 ms live-input p95 / <50 ms routine-task, sustained all-tool/device/process-memory,
+native float wet tools, quality/interchange, every unfinished professional/AI /
+workflow/ChatGPT/live identity/commercial/specialist/motion requirement and the
+complete implementation goal remain active. No account, upload or paid call is
+introduced by this dependency.

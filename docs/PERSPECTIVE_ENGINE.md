@@ -1,5 +1,51 @@
 # Native perspective engine — application integration in progress
 
+## Retained scalar pull maps
+
+The private `FieldMapping` transport retains exact homogeneous coefficients plus
+independent `inputOrigin` and integer `sourceOrigin`. `compileMappedField` writes
+the existing scalar native ABI without solving another reference quadrilateral
+or changing coefficients. `projectMappedFieldWindow` shares the existing bounded
+field streamer, conservative empty-footprint proof, bilinear neighbors and horizon
+splitting. Finite deviations remain independent of image bounds; unknown support
+streams native neighborhoods. Native inputs/replies and pixel ownership validate
+on both sides of the actual worker boundary.
+
+Ordinary linked-mask capture reuses its compiled matrix through this path.
+Forward brush capture retains its existing direction/affine-input contract.
+The WASM algorithm, public constructors, schema, scripting/REST contracts and
+plugin grants are unchanged. This dependency does not remove the explicit
+projective linkage guards. Preserving-position relinking still needs a retained
+native-grid/source descriptor, a versioned mask plane, composition before one
+sampling pass, and full tool/persistence/automation integration.
+
+## Remaining projective mask-plane integration
+
+The retained-map dependency above is connected; the following public integration
+is still proposed and required before the existing linkage rejection can be
+removed:
+
+1. Retain the actual original/master rasterization grid and its mask-to-grid
+   basis. Layer size, viewport size and an already sampled mask are not adequate
+   substitutes. Any retained original reference must participate in asset
+   ownership, validation, collection, copies and portable transports.
+2. Represent the retained plane through immutable OO values and a strict,
+   versioned mask record. Compose current image placement and the retained plane
+   before one scalar sampling pass; unlink/relink must not introduce another
+   interpolation or approximate a homography with an affine basis. Keep distant
+   coordinate origins separate and permit legitimate mask horizons.
+3. Connect every mask kind, ordered refinements, ordinary/filter masks, rational
+   Pen presentation, complete brush/wet/selection coverage, cursor mapping,
+   move/resize/crop/reparent/master conversion and document-pixel settings.
+4. Preserve one shared Undo and atomic source/revision/lock validation through
+   UI, constructor-based scripting and independent REST sessions. Verify schema
+   ages, retained history, native projects/workspaces, recipes/cross-document
+   sources, SVG/Photoshop appearance, actual 50 MP originals and normal release
+   operation. Public scripting documentation must ship with the new contract.
+
+These are remaining integration gates, not implemented constructor signatures or
+permission to weaken source preservation, resolution or sampling requirements.
+
 ## Smart-master mask planes
 
 Group/selection conversion retains unlinked ordinary/filter masks in the new

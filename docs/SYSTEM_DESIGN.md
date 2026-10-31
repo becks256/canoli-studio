@@ -1,5 +1,17 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Retained field-map invariant
+
+A scalar pull map owns nine unchanged finite invertible homogeneous coefficients
+and separate coordinate origins. Subtract the input origin before evaluating
+the matrix; add the source origin only when addressing native field pixels.
+Never fold a distant world translation into matrix cofactors or require a
+fictitious horizon-free reference rectangle. Both scalar entry points share one
+streaming implementation and the unchanged native ABI. Composition of future
+mask planes must also preserve the original rasterization lattice and source
+provenance; a retained matrix alone does not implement preserving-position
+relinking or permit a second interpolation pass through an already sampled mask.
+
 ## Post-sampling wet support invariant
 
 For a validated coupled wet field, zero removal coverage implies zero replacement

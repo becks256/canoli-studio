@@ -7,10 +7,11 @@ import {visitMaskAssets} from '../core/asset-references';
 import {captureAssetSource,isFloatAsset,type AssetStore} from '../core/assets';
 import {freeze} from '../core/immutable';
 import {compileProjectiveField,fieldInputSchema,type ProjectiveFieldInput,type ProjectiveFieldDirection} from '../core/projective-field';
+import {fieldMappingFromFrame} from '../core/mapped-field';
 import type {ProjectiveQuad} from '../core/projective';
 import {validateWindow,type FloatSourceWindow} from '../core/float-source/types';
 import {validateFloatAlpha} from '../core/float-shadow';
-import {projectPerspectiveFieldWindow,type ProjectiveFieldSource} from './projective-field';
+import {projectPerspectiveFieldWindow,projectMappedFieldWindow,type ProjectiveFieldSource} from './projective-field';
 import {featherFloatMask} from './float-mask-feather';
 import type {FloatProjectionControl} from './float-projection';
 import type {PixelProcessor} from './processor';
@@ -56,6 +57,7 @@ export function capturePerspectiveMask(
   const geometry=maskFieldGeometry(nativeMask,mapping,bitmap);
   const compiled=compileProjectiveField({sourceWidth:options.sourceWidth,sourceHeight:options.sourceHeight,direction:options.direction,corners,
     field:geometry.bounds,source:{x:geometry.bounds.x,y:geometry.bounds.y,width:1,height:1},output:{x:0,y:0,width:1,height:1},background:geometry.background});
+  const retainedMapping=fieldMappingFromFrame(compiled);
   // Match the existing byte mask rasterizer's constant alpha exactly. Using an
   // unquantized paint base outside finite support would introduce a visible seam.
   const sample=createCanvas(1,1,true);let background:number;
@@ -88,7 +90,9 @@ export function capturePerspectiveMask(
   const read=async(input:FloatSourceWindow,inputMapping?:ProjectiveFieldInput):Promise<Float32Array<ArrayBuffer>>=>{
     check();const area=validateWindow(input),current=inputMapping?{...source,input:fieldInputSchema.parse(inputMapping)}:source;
     if(!mask.enabled||mask.density===0)return new Float32Array(area.width*area.height).fill(1);
-    const coverage=await featherFloatMask(area,mask.feather??0,linked?b=>projectPerspectiveFieldWindow(current,processor,compiled.options.corners,b,{signal,isCancelled:()=>{check();return false;}}):readRaw,processor,check);
+    const coverage=await featherFloatMask(area,mask.feather??0,linked?b=>options.direction==='source-to-quad'||inputMapping
+      ?projectPerspectiveFieldWindow(current,processor,compiled.options.corners,b,{signal,isCancelled:()=>{check();return false;}})
+      :projectMappedFieldWindow(current,processor,retainedMapping,b,{signal,isCancelled:()=>{check();return false;}}):readRaw,processor,check);
     check();let deadline=performance.now()+2;
     for(let i=0;i<coverage.length;i++){
       coverage[i]=Math.max(0,Math.min(1,1-mask.density+mask.density*(mask.inverted?1-coverage[i]:coverage[i])));

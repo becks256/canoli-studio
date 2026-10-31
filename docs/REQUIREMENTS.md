@@ -1,5 +1,17 @@
 # Canoli Studio editor requirements
 
+## Retained mask-transport dependency
+
+Retain exact homogeneous coefficients and separate input/source origins when
+reusing a scalar-field mapping. Native sampling must preserve complete finite
+deviations, constant background, every bilinear neighbor, horizon behavior and
+the original lattice without solving fabricated corners. Capture options/pixels
+before awaits, reject malformed worker results and stale sources, and preserve
+bounded native reads independently of original resolution. Existing linked-mask
+output must match prior native controls exactly. This is a private dependency;
+preserving-position projective relinking, retained grid/source provenance and
+the remaining model/tool/persistence integration still require implementation.
+
 ## Projected wet composition fidelity
 
 Bound post-sampling composition only by the complete nonzero removal-coverage
