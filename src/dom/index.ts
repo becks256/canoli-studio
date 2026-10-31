@@ -38,7 +38,7 @@ import {inspectDesign,preflightOptionsSchema,preflightReportSchema,type Prefligh
 export type {PreflightOptions,PreflightReport,PreflightFinding,PreflightControl,PreflightAlignmentRule,PreflightAlignmentInput,PreflightAlignmentSummary} from '../core/preflight';
 import { selectSubjectOptionsSchema, type SelectSubjectSettings, type SelectSubjectControl } from '../core/subject-selection';
 import {refineEdgeOptionsSchema,mattingPlanSchema,type MattingRequest,type PreparedMatting,type RefineEdgeControl} from '../core/matting';
-import {parentId} from '../core/spatial';
+import {parentId,intrinsicLocalBounds} from '../core/spatial';
 import { colorRangeOptionsSchema, type ColorRangeOptions, type ColorRangeSettings, type ColorRangeControl } from "../core/color-range";
 import { quickSelectionOptionsSchema, type QuickSelectionOptions, type QuickSelectionSettings, type QuickSelectionControl } from '../core/quick-selection';
 export type { QuickSelectionOptions, QuickSelectionControl } from '../core/quick-selection';
@@ -1679,8 +1679,14 @@ export class RasterLayer extends Layer {
     this.appendErasure(stroke);
   }
   /** Non-destructive alpha erasure in layer-local coordinates. */
-  erase(stroke: EraserStroke): void {
+  erase(stroke: EraserStroke, options: {space?:'local'|'placed'} = {}): void {
     if (!(stroke instanceof EraserStroke)) throw new Error("Use an EraserStroke value.");
+    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='space')||options.space!==undefined&&!['local','placed'].includes(options.space))throw new Error('Eraser space must be local or placed.');
+    const layer=this._read() as RasterLayerData;
+    if(options.space==='placed'&&activePerspective(layer.perspective)){
+      this.update({erasures:[...(layer.erasures??[]),{width:this.width,height:this.height,stroke:stroke.toJSON(),placement:{perspective:layer.perspective,bounds:intrinsicLocalBounds(layer)!}}]});
+      return;
+    }
     this.appendErasure(stroke);
   }
   /** Clear a local-coordinate selection, or the complete image when omitted. */

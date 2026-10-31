@@ -549,3 +549,7 @@ Independent REST TIFF admission and source reads use trusted native workers and 
 ## Private perspective sampler grants no authority
 
 Native perspective sampling is trusted engine work, outside the isolated command boundary. It adds no plugin permission, file/pixel access, worker method, network capability or install-time execution. Schema-50 image placement now uses existing document grants and isolated shared commands; direct projective tool mapping and full F03 acceptance remain required. [Contract](PERSPECTIVE_ENGINE.md).
+
+## Placed erasing uses existing document grants
+
+Schema-51 placed eraser records and `RasterLayer.erase(stroke,{space:"placed"})` use the existing isolated OO/shared-command path. The pure method captures current perspective and content geometry without host pixel reads. Host commit still validates commands, schema, locks, assets, revision and atomic Undo. Raster-erasure masks retain captured placement through ordinary constructors. Installation remains inert; there is no new permission, package version, network/file access, pixel export or host-call capability. Mask/wet projective input and full F03 acceptance remain required.

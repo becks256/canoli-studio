@@ -35,7 +35,7 @@ import{validateFloatWorkerWindow}from'./float-pixels';
 import type{ColorProof}from'../core/color/color-settings';
 
 export interface FloatSceneControl extends FloatSourceControl,FloatProjectionControl{}
-export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask};
+export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask;erasure?(entry:import('../core/drawing').RasterErasureData,check:()=>void):import('./projected-erasure').CapturedProjectedErasure};
 export type FloatStrokeService=(brush:BrushStrokeData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>;
 export interface CapturedFloatScene {
  readonly document:DocumentData;
@@ -99,6 +99,7 @@ export class FloatSceneRenderer {
   assertFloatSources(document,assets);
   const epoch=this.epoch,lifetime=assets.captureLifetime(),sources=new Map<string,{asset:ImageAsset;source:FloatRasterSource;tiff:ImageAsset['tiff'];color:ImageAsset['tiffColor']}>(),masks=new Map<string,{asset:ImageAsset;bitmap:ImageBitmap;blob:Blob;width:number;height:number}>();let closed=false;
   const shadowCache=new FloatShadowCache();
+  const erasureCaptures=new Map<object,import('./projected-erasure').CapturedProjectedErasure>();
   const perspectiveMasks=new Map<string,CapturedPerspectiveMask>();
   const whiteBalances=new Map<string,readonly number[]|null>();
   const lookups=new Map<string,FloatLookupLease>();
@@ -107,7 +108,7 @@ export class FloatSceneRenderer {
    for(const[id,value]of sources)if(!assets.has(id)||assets.get(id)!==value.asset||value.asset.blob!==value.source.original||value.asset.width!==value.source.width||value.asset.height!==value.source.height||value.asset.tiff!==value.tiff||value.asset.tiffColor!==value.color)throw new Error('Float scene source changed.');
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
    visitLayerAssets(layer,reference=>{if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
    if(layer.kind==='group')visit(layer.children);else if(layer.kind==='raster'&&!sources.has(layer.assetId)){const asset=assets.get(layer.assetId);sources.set(asset.id,{asset,source:this.source(assets,asset),tiff:asset.tiff,color:asset.tiffColor});}
@@ -148,11 +149,15 @@ export class FloatSceneRenderer {
     const raster=async(layer:Extract<LayerData,{kind:'raster'}>,world:AffineTransform,area:FloatSourceWindow=bounds):Promise<Float32Array>=>{
      const source=sources.get(layer.assetId)!,placement=renderTransform(full,world).multiply(AffineTransform.scale(layer.width/source.source.width,layer.height/source.source.height));
      const effects=layer.effects.filter(effect=>effect.enabled&&(effect.exposure!==0||effect.contrast!==0||effect.saturation!==0)),adjusted:FloatWindowSource=effects.length?{width:source.source.width,height:source.source.height,readWindow:async(region,control)=>{let pixels:Float32Array=await source.source.readWindow(region,control);for(const effect of effects)pixels=await tone(pixels,effect);return pixels;}}:source.source;
-     if(activePerspective(layer.perspective)){
+     if(activePerspective(layer.perspective)||layer.erasures?.some(entry=>entry.placement)){
       const original=adjusted,worldToNative=AffineTransform.scale(source.source.width/layer.width,source.source.height/layer.height);
       const content:FloatWindowSource={width:original.width,height:original.height,readWindow:async(region,readControl)=>{
        let pixels:Float32Array=await original.readWindow(region,readControl);check();
        for(const entry of layer.erasures??[]){
+        if(entry.placement){
+         let captured=erasureCaptures.get(entry);if(!captured){if(!maskService.erasure)throw new Error('Projected erasure capture is unavailable.');captured=maskService.erasure(entry,check);erasureCaptures.set(entry,captured);}
+         const coverage=await captured.read({x:region.x,y:region.y,width:region.width,height:region.height,sx:1,sy:1},new AffineTransform(),source.source.width,source.source.height);check();pixels=await applyFloatCoverage(pixels,coverage,check);continue;
+        }
         const coverage=new Float32Array(region.width*region.height);
         for(let y=0;y<region.height;y+=512)for(let x=0;x<region.width;x+=512){
          const width=Math.min(512,region.width-x),height=Math.min(512,region.height-y),alpha=await maskService({kind:'raster-erasures',width:layer.width,height:layer.height,erasures:[entry],enabled:true,inverted:false,density:1},{x:region.x+x,y:region.y+y,width,height,sx:1,sy:1},worldToNative,check);check();
@@ -162,6 +167,7 @@ export class FloatSceneRenderer {
        }
        return pixels;
       }};
+      if(!activePerspective(layer.perspective))return projectFloatWindow(content,placement,area,{signal:control.signal,isCancelled:()=>{check();return false;}});
       const corners=perspectiveLocalQuad(layer.width,layer.height,layer.perspective).map(p=>world.point(p)) as unknown as import('../core/projective').ProjectiveQuad;
       return projectPerspectiveWindow(content,this.processor,corners,area,{signal:control.signal,isCancelled:()=>{check();return false;}});
      }

@@ -10,6 +10,7 @@ import { affineSchema } from "./transform-schema";
 import { z } from "zod";
 import { wetPaintOperationSchema, wetPaintBounds, type WetPaintStrokeData } from './wet-operation';
 import {pressureCurveSchema,pressureSizeResponse,type PressureCurveData} from './pressure-curve';
+import {perspectiveSchema,perspectiveMatrix,perspectiveRect,type PerspectiveData} from './perspective';
 
 export interface Point {
   x: number;
@@ -395,8 +396,16 @@ export function pathBounds(path: VectorPathData): Rect {
 }
 
 /** Capture the layer geometry so erasure follows later nonuniform raster resizing. */
-export interface RasterErasureData { width: number; height: number; stroke: PaintOperationData }
+export interface ErasurePlacementData {perspective:PerspectiveData;bounds:Rect}
+export interface RasterErasureData { width: number; height: number; stroke: PaintOperationData;placement?:ErasurePlacementData }
 export const rasterErasureSchema: z.ZodType<RasterErasureData> = z.object({
   width: dimension, height: dimension,
   stroke: paintOperationSchema.refine(stroke => stroke.kind === 'wet' || stroke.kind === 'eraser' || (stroke.kind === 'fill' && stroke.erase), 'Raster modifiers require wet paint, an eraser or a clear operation.'),
-}).strict();
+  placement:z.object({perspective:perspectiveSchema,bounds:rect}).strict().optional(),
+}).strict().superRefine((entry,context)=>{
+  if(!entry.placement)return;
+  try{
+    if(entry.stroke.kind!=='eraser')throw new Error('Placed coverage requires an eraser stroke.');
+    perspectiveRect(perspectiveMatrix(entry.width,entry.height,entry.placement.perspective),entry.placement.bounds);
+  }catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}
+});

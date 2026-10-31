@@ -992,3 +992,7 @@ Supported browser Photoshop pixel clipping imports/exports map to the existing s
 ## Perspective engine is not a new REST operation
 
 The original-derived sampler is connected to schema-50 image placement through the existing layer.update route, as described above. It adds no separate sampling endpoint, composed server renderer or browser synchronization. Source-window routes remain before placement/composition. [Implemented dependency and required public integration](PERSPECTIVE_ENGINE.md).
+
+## Placed erasure records (schema 51)
+
+The existing `layer.update` erasures field now admits optional strict `placement:{perspective:{corners:[TL,TR,BR,BL]},bounds:{x,y,width,height}}` on eraser records `{width,height,stroke}` only. Corners are captured normalized image perspective, bounds are finite original/local content support, and the stroke/clip/symmetry live in the captured affine layer plane after perspective. Invalid shapes, non-eraser operations, horizons across captured content and falsely old document labels reject. The browser/OO `erase(stroke,{space:"placed"})` constructs this capture; default erase/clear remain local. Retained placement survives current perspective reset and resizing. Raster-erasure masks, embedded documents and history preserve it. Project/workspace formats and revision/locks/atomic Undo are unchanged. This adds no REST route, composed headless renderer or browser synchronization. [Sampling and public signature](SCRIPTING_API.md#raster-erasure-and-pixel-selections-schema-16).

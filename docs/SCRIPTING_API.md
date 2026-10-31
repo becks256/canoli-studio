@@ -3018,7 +3018,7 @@ Automation recipe steps accept optional `literalValues: boolean` (default `false
 
 ### Raster erasure and pixel selections (schema 16)
 
-`RasterLayer.erase(stroke: EraserStroke): void` appends an undoable erasure. `RasterLayer.clear(selection: MarqueeSelection | null = null): void` clears the supplied selection, or the entire image when omitted. In float32/linear-sRGB documents these operations preserve original RGB and apply existing byte coverage to float alpha once per operation, before clipping and layer appearance; prepared wet replacements remain unsupported. [Float erasure contract and executable example](FLOAT_DOCUMENTS.md#original-preserving-raster-erasure). Coordinates and clips are layer-local. These methods do not implicitly read `document.selection`; UI tools translate the document selection for you. They preserve original asset bytes and respect layer locks. Invalid constructors throw. Each layer accepts at most 2,048 erasure records. Captured layer dimensions make erasures scale with subsequent image resizing.
+`RasterLayer.erase(stroke: EraserStroke, options?: {space?: "local" | "placed"}): void` appends an undoable erasure. Omitted options/space use `"local"`. `RasterLayer.clear(selection: MarqueeSelection | null = null): void` clears the supplied selection, or the entire image when omitted. In float32/linear-sRGB documents these operations preserve original RGB and apply existing byte coverage to float alpha once per operation, before clipping and layer appearance; prepared wet replacements remain unsupported. [Float erasure contract and executable example](FLOAT_DOCUMENTS.md#original-preserving-raster-erasure). Default coordinates and clips are layer-local. These methods do not implicitly read `document.selection`; UI tools translate the document selection for you. They preserve original asset bytes and respect layer locks. Invalid constructors throw. Each layer accepts at most 2,048 erasure records. Captured layer dimensions make erasures scale with subsequent image resizing.
 
 ```js
 const image = document.selectedLayer;
@@ -3027,6 +3027,24 @@ image.clear(new MarqueeSelection({
   shape: "rectangle", x: 10, y: 10, width: 40, height: 40,
 }));
 ```
+
+With `{space:"placed"}`, eraser points, clip, tip/tilt and symmetry are authored in the affine layer plane **after** the current image perspective, before the layer/ancestor affine transform. They are not original-source coordinates or document coordinates. The tool converts document input/selection through the affine inverse, then captures perspective with the complete stroke. The nominal cursor remains in this authoring plane. The call captures current dimensions, normalized perspective and the finite existing intrinsic content bounds in the same shared command. Subsequent resizing, perspective edits/reset, duplication, smart conversion, project/workspace transport and Undo retain that capture; they do not retarget the erasure. An identity/absent perspective creates the compatible ordinary record. Default/local calls and `clear` retain their original semantics; world-selection clearing on a projected image remains gated.
+
+Placed coverage is rasterized on a fixed captured layer-pixel grid of `ceil(captured width)` × `ceil(captured height)`, then sampled through the captured forward homography onto original coordinates and through the current size/affine placement. This is an authored coverage grid, independent of retained asset resolution. Whole brush coverage (including clipping, tip, texture and symmetry) is transported, not just pointer points. Reads use bounded windows without allocating this complete grid or capping image dimensions. Float RGB stays original-derived; each retained alpha operation rounds once in float32. Byte output rounds transported coverage at compositing. Existing texture-source validation still applies. Invalid spaces/extra option fields, invalid constructors, locked ancestry or invalid/nonfinite capture geometry reject before publication. Placed metadata accepts eraser strokes only, not clear/wet operations. Both attached and detached constructor use and isolated scripts work without reading original pixels or requesting host calls.
+
+<!-- example: placed-erasure -->
+```js
+const layer = document.selectedLayer;
+if (!(layer instanceof RasterLayer)) throw new Error("Select an image layer.");
+layer.perspective = new PerspectiveTransform({corners: [
+  {x: 0, y: 0}, {x: 1, y: 0.1}, {x: 0.9, y: 1}, {x: 0.1, y: 0.9},
+]});
+layer.erase(new EraserStroke({
+  points: [{x: 60, y: 40}], size: 8, pressureSize: false,
+}), {space: "placed"});
+```
+
+Schema **51** adds optional strict `placement:{perspective:{corners},bounds:{x,y,width,height}}` to each captured raster erasure, including raster-erasure mask geometry and embedded documents/history. A falsely old schema label rejects the field; valid older documents upgrade without injecting it. Project v3/workspace v2 remain unchanged. `LayerMask` raster-erasure `operations` also accepts `placement:{perspective:PerspectiveTransform,bounds}`; getters/`with` retain independent constructor values. REST uses the serialized DTO through existing `layer.update` commands/revisions/Undo, with separate headless sessions. Existing plugin document permissions and inert installation remain unchanged.
 
 `MarqueeSelection` also accepts `shape: "pixels"` with `coverage: { width, height, runs }`. Coverage dimensions are positive integer sample dimensions; region geometry controls placement and scaling. `runs` contains pairs of exclusive linear end offsets and alpha bytes (0–255), in row-major order. End offsets must strictly increase and the last must equal width × height. For example, `{ shape: "pixels", x: 0, y: 0, width: 2, height: 1, coverage: { width: 2, height: 1, runs: [1, 128, 2, 255] } }` selects two pixels at half and full coverage. Fractional coverage survives rendering, masks, clipping and project persistence. Existing add/subtract/intersect operations and the 128-region limit apply. Pixel coverage is required only for pixel regions and prohibited for geometric regions.
 

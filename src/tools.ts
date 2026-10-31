@@ -50,7 +50,7 @@ import { maskOrigin, maskTransform } from "./core/masks";
 import { hitTestPath, splitPathSegment } from "./core/bezier";
 import type { CurveHit } from "./core/bezier";
 import { AffineTransform } from "./core/affine";
-import { layerOrigin, layerTransform } from "./core/spatial";
+import { intrinsicLocalBounds,layerOrigin, layerTransform } from "./core/spatial";
 import { strokeBounds, transformSelection } from "./core/drawing";
 import type {
   BrushStrokeData,
@@ -174,6 +174,7 @@ interface PaintGesture extends BaseGesture {
   offset: Point | null;
   stroke: BrushStrokeData;
   cloneSource?: ClonePreviewSource;
+  erasurePlacement?:import('./core/drawing').ErasurePlacementData;
 }
 interface WetGesture extends BaseGesture {
   kind: 'wet';
@@ -421,7 +422,7 @@ export class ToolController {
   }
   private perspectiveToolBlocked(tool:Tool):boolean {
     const document=this.editor.document,selected=document.selectedLayer;
-    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&(['smudge','mixer'].includes(tool)||(tool==='eraser'&&selected instanceof RasterLayer)||(this.state.settings.paintTarget!=='layer'&&['brush','pencil','eraser'].includes(tool))||(tool==='pen'&&this.state.settings.penEditTarget==='mask'));
+    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&(['smudge','mixer'].includes(tool)||(this.state.settings.paintTarget!=='layer'&&['brush','pencil','eraser'].includes(tool))||(tool==='pen'&&this.state.settings.penEditTarget==='mask'));
   }
   /** Current gestures may begin before React flushes a selection preference reset. */
   get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&(gesture.document.selectedLayer?.id??null)===gesture.selectionId;}
@@ -1209,9 +1210,11 @@ export class ToolController {
               y: this.state.cloneSource!.y - point.y,
             }
         : null;
+    const raster=layer instanceof RasterLayer?findLayer(doc._read(),layer.id):undefined;
     this.gesture = {
       ...base,
       kind: "paint",
+      erasurePlacement:raster&&activePerspective(raster.perspective)?{perspective:raster.perspective,bounds:intrinsicLocalBounds(raster)!}:undefined,
       tool,
       layer,
       fresh,
@@ -1962,6 +1965,7 @@ export class ToolController {
       paintPreview: {
         layerId: gesture.layer.id,
         cloneSource: gesture.cloneSource,
+        erasurePlacement:gesture.erasurePlacement,
         stroke: { ...gesture.stroke, color: gesture.tool === "clone" ? "#ffffff" : gesture.stroke.color, points: gesture.points.slice() },
         tonal:
           gesture.tool === "dodge" || gesture.tool === "burn"
@@ -2238,7 +2242,7 @@ export class ToolController {
                 protectTones: gesture.settings.protectTones,
               }),
             );
-          } else if (gesture.layer instanceof RasterLayer) gesture.layer.erase(this.stroke(gesture) as EraserStroke);
+          } else if (gesture.layer instanceof RasterLayer) gesture.layer.erase(this.stroke(gesture) as EraserStroke,{space:gesture.erasurePlacement?'placed':'local'});
           else gesture.layer.strokes.add(this.stroke(gesture, tiles));
         },
       );

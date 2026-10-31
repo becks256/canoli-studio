@@ -1,3 +1,4 @@
+import {ProjectedErasureCaptures,captureProjectedErasure} from './projected-erasure';
 import {capturePerspectiveMask} from './projective-mask';
 import {activePerspective,perspectiveLocalQuad} from '../core/perspective';
 import {intrinsicLocalBounds} from '../core/spatial';
@@ -33,7 +34,7 @@ import {
   regionalFilterMask,
 } from "./filter-mask-coverage";
 import { FilterTileCache } from "./filter-tile-cache";
-import { drawNativeWetContent, hasWetContent } from './wet-native';
+import { drawNativeWetContent, needsNativeRasterContent } from './wet-native';
 import { filteredMasterTile, drawCompletedFilterTile } from "./smart-filters";
 import { smartFilterHalo, isActiveSmartFilter } from "../core/smart/filters";
 import type { SmartObjectInstanceData } from "../core/smart/types";
@@ -80,6 +81,7 @@ export interface RenderRegion {
 export interface PaintPreview {
   layerId: string;
   stroke: BrushStrokeData;
+  erasurePlacement?:import('../core/drawing').ErasurePlacementData;
   cloneSource?: ClonePreviewSource;
   /** Mask coverage target; absent for normal paint-layer previews. */
   maskMode?: "hide" | "reveal";
@@ -225,7 +227,7 @@ export class CanvasRenderer implements DocumentRenderer {
       if(preview.stroke.kind!=='eraser')throw new Error('Color painting requires its float document integration.');
       let found=false;
       const visit=(layers:LayerData[]):LayerData[]=>layers.map(layer=>{
-        if(layer.id===preview.layerId){if(layer.kind!=='raster')throw new Error('Float eraser preview requires an original raster layer.');found=true;return{...layer,erasures:[...(layer.erasures??[]),{width:layer.width,height:layer.height,stroke:preview.stroke}]};}
+        if(layer.id===preview.layerId){if(layer.kind!=='raster')throw new Error('Float eraser preview requires an original raster layer.');found=true;return{...layer,erasures:[...(layer.erasures??[]),{width:layer.width,height:layer.height,stroke:preview.stroke,...(preview.erasurePlacement?{placement:preview.erasurePlacement}:{})}]};}
         return layer.kind==='group'?{...layer,children:visit(layer.children)}:layer;
       });
       const children=visit(document.children);if(!found)throw new Error('Float eraser preview target is unavailable.');return{...document,children};
@@ -239,6 +241,7 @@ export class CanvasRenderer implements DocumentRenderer {
       try{check();applyMaskSettings(canvas,mask);const bytes=canvas.getContext('2d')!.getImageData(0,0,space.width,space.height).data,coverage=new Float32Array(space.width*space.height);for(let i=0;i<coverage.length;i++)coverage[i]=bytes[i*4+3]/255;check();return coverage;}finally{release(canvas);}
     };
     service.perspective=(mask,options,check)=>this.capturePerspectiveMask(mask,options,assets,{isCancelled:()=>{check();return!!isCancelled?.();}});
+    service.erasure=(entry,check)=>captureProjectedErasure(entry,assets,this.processor,{isCancelled:()=>{check();return!!isCancelled?.();}},this.brushTextures);
     return service;
   }
   private floatStrokes(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatStrokeService{
@@ -396,15 +399,17 @@ export class CanvasRenderer implements DocumentRenderer {
     const check=()=>{lifetime();checkRenderCurrent(options.isCancelled);if(epoch!==this.epoch)throw new Error('Perspective content renderer was cleared.');};
     const sourceWorld=AffineTransform.scale(native.width/layer.width,native.height/layer.height);
     const baseOptions={...options,cache:false,documentTransform:sourceWorld.multiply(world.inverse()).multiply(options.documentTransform??new AffineTransform())};
+    const captures=new ProjectedErasureCaptures(assets,this.processor,{isCancelled:options.isCancelled},this.brushTextures);
+    try {
     const read=async(value:RasterLayerData|SmartObjectInstanceData,area:FloatSourceWindow)=>{
       check();const pixels=new Uint8ClampedArray(area.width*area.height*4);
       for(let y=0;y<area.height;y+=512)for(let x=0;x<area.width;x+=512){
         const width=Math.min(512,area.width-x),height=Math.min(512,area.height-y),tile=createCanvas(width,height,true),nativeSpace={x:area.x+x,y:area.y+y,width,height,sx:1,sy:1};
         try{
-          const preview=options.paintPreview,paint=preview&&preview.layerId===value.id&&!preview.maskMode&&!preview.filterMask?{stroke:preview.stroke,cloneSource:preview.cloneSource}:undefined;
+          const preview=options.paintPreview,paint=preview&&preview.layerId===value.id&&!preview.maskMode&&!preview.filterMask?{stroke:preview.stroke,cloneSource:preview.cloneSource,erasurePlacement:preview.erasurePlacement}:undefined;
           if(value.kind==='smart-object'){
             await this.smart(value,registry!,assets,tile,nativeSpace,sourceWorld,baseOptions);await this.documentTone(value,registry!,assets,tile,nativeSpace,sourceWorld,baseOptions);
-          }else if(hasWetContent(value))await drawNativeWetContent(value,assets,tile,nativeSpace,sourceWorld,this.processor,options.isCancelled,this.brushTextures,paint);
+          }else if(needsNativeRasterContent(value)||paint?.erasurePlacement)await drawNativeWetContent(value,assets,tile,nativeSpace,sourceWorld,this.processor,options.isCancelled,this.brushTextures,paint,captures);
           else{
             await this.raster(value,assets,tile,nativeSpace,sourceWorld,options.isCancelled);
             for(const entry of value.erasures??[])await drawPaint({...value,kind:'paint',strokes:[entry.stroke]},assets,tile,nativeSpace,AffineTransform.scale(native.width/entry.width,native.height/entry.height),this.processor,undefined,undefined,undefined,undefined,options.isCancelled,this.brushTextures);
@@ -432,6 +437,7 @@ export class CanvasRenderer implements DocumentRenderer {
       }finally{release(original);if(mask)release(mask);}
     }
     check();
+    }finally{captures.dispose();}
   }
 
   private async documentTone(layer:SmartObjectInstanceData,registry:ComponentRegistry,assets:AssetStore,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions){
@@ -949,7 +955,7 @@ export class CanvasRenderer implements DocumentRenderer {
         // Cache unstyled content; opacity/blending and backdrop-dependent
         // Blend If are evaluated on every composition. Ancestors of a live
         // stroke are recomposed from their cached, unchanged children.
-        const nativeWetPreview = (layer.kind === 'paint' || (layer.kind === 'raster' && preview?.stroke.kind === 'eraser')) && hasWetContent(layer) && preview?.layerId === layer.id && !preview.maskMode ? preview : undefined;
+        const nativeWetPreview = (layer.kind === 'paint' || (layer.kind === 'raster' && preview?.stroke.kind === 'eraser')) && (needsNativeRasterContent(layer)||preview?.layerId===layer.id&&!!preview.erasurePlacement) && preview?.layerId === layer.id && !preview.maskMode ? preview : undefined;
         const cacheable =
           !nativeWetPreview &&
           !(preview?.filterMask && preview.layerId === layer.id) &&
@@ -1046,7 +1052,7 @@ export class CanvasRenderer implements DocumentRenderer {
                 options,
               );
               await this.documentTone(layer,registry,assets,content,padded,world,options);
-            } else if ((layer.kind === 'raster' || layer.kind === 'paint') && hasWetContent(layer)) {
+            } else if ((layer.kind === 'raster' || layer.kind === 'paint') && (needsNativeRasterContent(layer)||preview?.layerId===layer.id&&!!preview.erasurePlacement)) {
               await drawNativeWetContent(layer, assets, content, padded, world, this.processor, options.isCancelled, options.cache === false ? undefined : this.brushTextures, nativeWetPreview);
             } else if (layer.kind === "raster") {
               const basis = contentSignature({ ...layer, erasures: [] });

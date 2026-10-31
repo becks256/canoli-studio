@@ -997,3 +997,7 @@ across awaits. Schema-50 image state/commands, numeric authoring, scene renderin
 hit testing, baked delivery and automation now consume this coverage. Correct
 projective tool/selection-clip/cursor mapping and preserving-position mask
 relinking remain pending.
+
+## Placed erasure integration (schema 51)
+
+Captured original-local support and normalized perspective are retained with each placed eraser operation through the existing layer command. The authored fixed ceil-sized layer-pixel grid is independent of original asset geometry; both homography/affine scalar-field stages read bounded windows. The complete coverage field carries clips, symmetry, tips/tilt and texture. Current perspective is applied to the original-derived image after ordered erasures, so editing/resetting corners keeps the erased area attached. Byte, float, preview and raster-erasure mask replay share captured coverage; request/scene leases guard assets and cancellation. Default local APIs remain compatible. World-selection clear, wet/mask editing, relinking and general warp retain their explicit remaining integration boundary.

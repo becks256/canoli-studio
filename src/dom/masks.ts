@@ -1,3 +1,4 @@
+import {PerspectiveTransform} from './perspective';
 import { AffineTransform } from "../core/affine";
 import { layerMaskSchema } from "../core/masks";
 import type { LayerMaskData } from "../core/masks";
@@ -14,7 +15,7 @@ import { VectorPath } from "./index";
 import { pathContours } from "../core/drawing";
 
 export type MaskPaint = {stroke:BrushStroke|PencilStroke;mode:"hide"|"reveal"}|{stroke:WetPaintStroke;mode:"wet"};
-export interface RasterErasureMaskSource {width:number;height:number;operations:readonly {width:number;height:number;stroke:EraserStroke|PaintFill}[]}
+export interface RasterErasureMaskSource {width:number;height:number;operations:readonly {width:number;height:number;stroke:EraserStroke|PaintFill;placement?:{perspective:PerspectiveTransform;bounds:import('../core/drawing').Rect}}[]}
 interface MaskSettings {
   rasterErasures?: RasterErasureMaskSource;
   basis?: AffineTransform;
@@ -100,7 +101,7 @@ export class LayerMask {
           };
     if (native) {
       this.data=layerMaskSchema.parse({kind:'raster-erasures',width:native.width,height:native.height,
-        erasures:native.operations.map(entry=>({width:entry.width,height:entry.height,stroke:entry.stroke.toJSON()})),...strokeSettings,enabled,inverted,density,feather,x,y,linked,
+        erasures:native.operations.map(entry=>({width:entry.width,height:entry.height,stroke:entry.stroke.toJSON(),...(entry.placement?{placement:{perspective:entry.placement.perspective.toJSON(),bounds:{...entry.placement.bounds}}}:{})})),...strokeSettings,enabled,inverted,density,feather,x,y,linked,
         ...(options.basis?{basis:options.basis.toJSON()}:{})});
     } else if (options.base !== undefined) {
       this.data = layerMaskSchema.parse({
@@ -168,7 +169,7 @@ export class LayerMask {
     }
   }
   get rasterErasures(): RasterErasureMaskSource | null {
-    return this.data.kind==='raster-erasures'?{width:this.data.width,height:this.data.height,operations:this.data.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill}))}:null;
+    return this.data.kind==='raster-erasures'?{width:this.data.width,height:this.data.height,operations:this.data.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill,...(entry.placement?{placement:{perspective:new PerspectiveTransform(entry.placement.perspective),bounds:{...entry.placement.bounds}}}:{})}))}:null;
   }
   get base() {
     return this.data.kind === "paint" ? this.data.base : null;
@@ -336,7 +337,7 @@ export class LayerMask {
       ? AffineTransform.fromJSON(value.basis)
       : undefined;
     const strokes:MaskPaint[]|undefined = value.strokes?.map(entry=>entry.mode==='wet'?{mode:'wet',stroke:PaintOperation.fromJSON(entry.stroke) as WetPaintStroke}:{mode:entry.mode,stroke:PaintOperation.fromJSON(entry.stroke) as BrushStroke|PencilStroke});
-    if(value.kind==='raster-erasures')return new LayerMask({...value,basis,strokes,rasterErasures:{width:value.width,height:value.height,operations:value.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill}))}});
+    if(value.kind==='raster-erasures')return new LayerMask({...value,basis,strokes,rasterErasures:{width:value.width,height:value.height,operations:value.erasures.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill,...(entry.placement?{placement:{perspective:new PerspectiveTransform(entry.placement.perspective),bounds:{...entry.placement.bounds}}}:{})}))}});
     if (value.kind === "paint")
       return new LayerMask({ ...value, basis, strokes });
     if (value.kind === "bitmap")

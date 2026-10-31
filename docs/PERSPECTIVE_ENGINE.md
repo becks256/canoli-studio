@@ -242,3 +242,11 @@ verification is recorded separately in the dated implementation roadmap.
 The public perspective workflow and general warp, all native document/export/
 mask/automation integration, sustained performance and physical-device/quality
 acceptance remain required. A passing private sampler is not full F03 acceptance.
+
+## Connected placed eraser workflow (schema 51)
+
+The earlier private sampling dependency is now connected to public `RasterLayer.erase(stroke,{space:"placed"})` and the raster Eraser tool. Points, selection clip, tip/tilt, texture and symmetry remain in the affine layer plane after perspective. A strict erasure record captures normalized perspective and finite existing intrinsic content bounds; its width/height retain the authored size. A fixed `ceil(width)` × `ceil(height)` layer-pixel lattice defines coverage independently of source geometry and without source access in isolated scripts. The complete field is sampled forward through captured H onto original coordinates, then through current size/affine placement. Both stages use bounded native scalar windows. Captured-grid interpolation neighbors are padded before mask resizing, preserving enlarged erasure-mask tails outside the image frame. This grid is coverage authoring geometry, not a resized copy of the image.
+
+Native byte replay and original float-window composition apply captured erasures in order even after current perspective reset/change. Float RGB stays original-derived; byte coverage is quantized only after transport, while float alpha rounds per operation. Preview captures identical metadata; final commit uses shared validation/Undo. Captures are request/scene-owned, retain coverage-source leases and reject cancellation/source loss. Raster-erasure mask constructors/getters/refinements and frequency-separation coverage preserve the metadata. Schema 51 gates it everywhere, including saved history/embedded documents; project v3/workspace v2 and plugin grants are unchanged.
+
+Default `.erase(stroke)` and `.clear(selection)` retain original/local semantics. World-selection clear on an active perspective image, wet/mask tool mapping, mask relinking, general warp and full sustained/device quality acceptance remain required. This increment does not close F03 or the implementation roadmap.

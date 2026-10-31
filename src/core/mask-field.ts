@@ -26,7 +26,18 @@ export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,b
       add({x:left,y:top,width:right-left,height:bottom-top});
     }
   }else if(mask.kind==='raster-erasures'){
-    for(const entry of mask.erasures)add(strokeBounds(entry.stroke),basis.multiply(AffineTransform.scale(mask.width/entry.width,mask.height/entry.height)));
+    for(const entry of mask.erasures){
+      let bounds=strokeBounds(entry.stroke);
+      if(entry.placement){
+        // Captured coverage is bilinearly sampled from a fixed ceil-sized
+        // lattice. Include its border neighbors BEFORE later mask resizing;
+        // two output pixels cannot cover a magnified interpolation tail.
+        const source=entry.placement.bounds,sx=Math.ceil(entry.width)/entry.width,sy=Math.ceil(entry.height)/entry.height;
+        const x=(Math.floor(source.x*sx)-1)/sx,y=(Math.floor(source.y*sy)-1)/sy;
+        bounds={x,y,width:(Math.ceil((source.x+source.width)*sx)+1)/sx-x,height:(Math.ceil((source.y+source.height)*sy)+1)/sy-y};
+      }
+      add(bounds,basis.multiply(AffineTransform.scale(mask.width/entry.width,mask.height/entry.height)));
+    }
   }
   for(const entry of mask.strokes??[])add(strokeBounds(entry.stroke));
   let bounds={x:0,y:0,width:1,height:1};

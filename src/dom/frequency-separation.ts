@@ -1,3 +1,4 @@
+import {PerspectiveTransform} from './perspective';
 import {isActiveWetPaint} from "../core/wet-operation";
 import {PaintOperation,EraserStroke,PaintFill} from "./values";
 import { Document, RasterLayer, LayerGroup, SmartObjectLayer, PaintLayer, LayerMask } from './index';
@@ -37,7 +38,7 @@ export function createFrequencySeparation(document:Document,source:RasterLayer,s
     const coverage=outer.layers.add(new LayerGroup({name:'Source coverage'}));
     const entries=original.erasures??[],nativeWet=entries.some(entry=>isActiveWetPaint(entry.stroke));
     const tail=nativeWet?[]:entries.filter(entry=>entry.stroke.kind!=='wet');
-    if(tail.length)coverage.mask=new LayerMask({rasterErasures:{width:source.width,height:source.height,operations:tail.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill}))}});
+    if(tail.length)coverage.mask=new LayerMask({rasterErasures:{width:source.width,height:source.height,operations:tail.map(entry=>({width:entry.width,height:entry.height,stroke:PaintOperation.fromJSON(entry.stroke) as EraserStroke|PaintFill,...(entry.placement?{placement:{perspective:new PerspectiveTransform(entry.placement.perspective),bounds:{...entry.placement.bounds}}}:{})}))}});
     const instance=coverage.layers.add(new SmartObjectLayer({name:'Frequency layers — edit contents',componentId:compositionId,width:data.width,height:data.height}));
     instance.transform=snapshot.transform;
     instance.setFilters([new NativeCompositionFilter(),...original.effects.map(effect=>new DocumentToneFilter({enabled:effect.enabled,exposure:effect.exposure,contrast:effect.contrast,saturation:effect.saturation}))]);

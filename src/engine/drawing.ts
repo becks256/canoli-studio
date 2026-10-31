@@ -1,3 +1,4 @@
+import {ProjectedErasureCaptures,drawProjectedErasure} from './projected-erasure';
 import {nativeVectorFootprint} from './native-vector-footprint';
 import {drawProjectedBitmap,bitmapProjectionRequiresPrecision} from './bitmap-projection';
 import {NativeCanvasGrid} from './native-canvas-grid';
@@ -679,6 +680,9 @@ export async function paintedMask(
         : mask.kind === "bitmap" && bitmap
           ? await bitmapMask(bitmap, space, x, y, world,isCancelled)
           : createCanvas(space.width, space.height);
+  const projected=mask.kind==='raster-erasures'&&mask.erasures.some(entry=>entry.placement);
+  if(projected&&!assets){release(output);throw new Error('Projected erasure coverage requires its asset store.');}
+  const captures=projected?new ProjectedErasureCaptures(assets!,processor,{isCancelled},textures):undefined;
   const scratch = hasMaskRefinements(mask)
     ? createCanvas(space.width, space.height)
     : undefined;
@@ -687,6 +691,7 @@ export async function paintedMask(
     if (mask.kind === "raster-erasures") {
       target.fillStyle="#ffffff";target.fillRect(0,0,space.width,space.height);
       for(const entry of mask.erasures){
+        if(entry.placement){await drawProjectedErasure(captures!.get(entry),output,space,world,mask.width,mask.height);continue;}
         await drawPaint({id:`erasure-mask:${entry.stroke.id}`,name:"Raster erasure coverage",kind:"paint",x:0,y:0,visible:true,locked:false,opacity:1,blendMode:"normal",strokes:[entry.stroke]},assets!,output,space,
           world.multiply(AffineTransform.scale(mask.width/entry.width,mask.height/entry.height)),processor,undefined,undefined,undefined,undefined,isCancelled,textures);
       }
@@ -717,6 +722,7 @@ export async function paintedMask(
     release(output);
     throw error;
   } finally {
+    captures?.dispose();
     if (scratch) release(scratch);
   }
 }

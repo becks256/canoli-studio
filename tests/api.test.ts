@@ -34,6 +34,19 @@ afterAll(async () => {
     server.close((error) => (error ? reject(error) : resolve())),
   );
 });
+it('retains placed eraser DTOs through REST revisions and Undo and rejects malformed placement atomically',async()=>{
+  const{RasterLayer,PerspectiveTransform,EraserStroke,PaintFill}=await import('../src/dom'),{PngRowEncoder}=await import('../src/core/png-stream');
+  const created=await request('/documents',{width:64,height:48}),endpoint=`/documents/${created.body.document.id}`,png=new PngRowEncoder(1,1);await png.append(new Uint8Array([255,0,0,255]),1);const blob=await png.finish();
+  const uploaded=await request(endpoint+'/assets',{name:'Retained original',width:1,height:1,contentType:'image/png',data:Buffer.from(await blob.arrayBuffer()).toString('base64')});expect(uploaded.status).toBe(201);
+  const layer=new RasterLayer({assetId:uploaded.body.asset.id,width:64,height:48,perspective:new PerspectiveTransform({corners:[{x:0,y:0},{x:1,y:0},{x:.75,y:1},{x:.25,y:1}]})});
+  const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:layer.toJSON()}]});expect(added.status).toBe(200);
+  layer.erase(new EraserStroke({points:[{x:32,y:32}],size:10,pressureSize:false}),{space:'placed'});const entries=(layer.toJSON() as import('../src/core/model').RasterLayerData).erasures!;
+  const edited=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{erasures:entries}}]});expect(edited.status,JSON.stringify(edited.body)).toBe(200);expect(edited.body.document.children[0].erasures).toEqual(entries);
+  const invalid={...entries[0],stroke:new PaintFill({bounds:{x:0,y:0,width:64,height:48},erase:true}).toJSON()};
+  const rejected=await request(endpoint+'/commands',{expectedRevision:edited.body.revision,commands:[{type:'document.rename',name:'Rejected'},{type:'layer.update',id:layer.id,patch:{erasures:[invalid]}}]});expect(rejected.status).toBe(400);expect((await request(endpoint)).body.document).toEqual(edited.body.document);
+  expect((await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{erasures:[]}}]})).status).toBe(409);
+  const undo=await request(endpoint+'/undo',{expectedRevision:edited.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(edited.body.document);
+});
 it('validates prepared wet pixels before atomic REST edits, revision checks and undo', async () => {
   const { WetPaintStroke } = await import('../src/dom'), { PngRowEncoder } = await import('../src/core/png-stream');
   const created = await request('/documents', { width: 16, height: 16 }), endpoint = `/documents/${created.body.document.id}`, paint = new PaintLayer();

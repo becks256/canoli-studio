@@ -8812,3 +8812,87 @@ through shared commands/history. General warp, photographic/interchange quality,
 sustained editor-wide performance/device acceptance and every unfinished
 original roadmap requirement remain active. No private sampler is being counted
 as a completed public editing workflow.
+
+
+### 2026-10-30 — F03: captured placed raster erasing
+
+Connected the bidirectional coverage sampler to the public raster Eraser tool
+and `RasterLayer.erase(stroke,{space:"placed"})`. Preview and final commit share
+captured normalized perspective, layer dimensions and finite existing intrinsic
+content support. The completed brush field transports points, clip, symmetry,
+tip/tilt and texture together; changing/resetting perspective keeps the erasure
+attached to the original image. Ordered replay now works in native byte content,
+original-derived float windows and raster-erasure mask geometry. The ordinary
+command path retains locks, revisions, atomic Undo, project/workspace/embedded
+transport and independent headless REST sessions. Default local erase/clear
+semantics remain compatible.
+
+Decision: coverage uses a fixed captured layer-pixel lattice of
+`ceil(width)` × `ceil(height)`, independent of original asset geometry. This
+defines fractional dimensions deterministically and permits pure constructor
+use in isolated scripts without obtaining pixel access. No complete image/grid
+is allocated: forward perspective and subsequent size/affine transport use
+bounded scalar-field windows with constant-one coverage outside captured
+original support. Byte alpha quantizes after transport; float RGB remains
+original-derived and alpha rounds once per retained operation. Captures have
+request/scene ownership, source leases and cooperative cancellation; there is no
+global stroke cache or new native ABI. Captured-grid border neighbors are included
+before mask resizing so a magnified coverage tail remains visible outside the
+original image frame; an identity-capture browser comparison verifies it.
+
+Schema 51 strictly admits captured placement on eraser records only, including
+mask-contained erasures and retained history/embedded documents; falsely old
+labels reject. Mask constructor values, getters/refinements and frequency-band
+coverage preserve placement. Project v3/workspace v2, inert plugin installation
+and existing grants remain unchanged. The public scripting signature/defaults,
+errors, coordinate contract, example and limits are documented in the same slice.
+
+Final frozen verification:
+
+- `npm run build` passes actual WASM, isolated runtime, TypeScript and all
+  **43 developer guides**. All **3,100 unit/API tests in 300 files**, **75
+  selected source-browser checks** and **11 selected production checks** pass
+  without skips, retries, flakes or failures. Earlier production worker checks
+  discovered files through an old ignored `dist` symlink; matching it to the
+  tested release resolves that harness mismatch. The evidence retains that
+  earlier attempt alongside the final successful runs.
+- Actual pointer preview equals committed pixels; cancellation and perspective
+  changes publish no erasure, and one completed stroke creates one Undo. The
+  documented placed-erasure example runs in the real isolated worker. Project
+  round trips retain placement and originals. REST verifies strict DTOs,
+  atomic rejection, stale-revision conflicts and Undo/redo independently.
+- A genuine high-precision **131 × 79 TIFF** supplies **41,396 float words**
+  compared with an independent NumPy forward homography over established raw
+  brush coverage, followed by original alpha multiplication. All words match
+  exactly, SHA-256
+  `398f39ee66b236c4b005d99d59cd7034536723085e3c55e82ddca02ad2646bd2`.
+  **885 alpha samples** decrease with **zero retained-RGB word differences**.
+  Elliptical tips, simulated tilt, symmetry and selection clipping survive;
+  partitioned native reads are word-identical and resizing retains erasure.
+- A real **10000 × 5000 PNG** retains native geometry and exact original SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`.
+  A distant placed erasure changes alpha **128 → 64**, retains its transparent
+  neighbor and restores every tested crop byte on Undo. This checks a bounded
+  distant window, not every image pixel or a process-memory limit. Other native
+  50 MP scalar/mask regressions pass separately.
+- Texture alpha transports to the expected byte result; closing the retained
+  texture rejects rendering without changing artwork. Magnifying a one-pixel
+  captured erasure into a 64-pixel mask retains **12,132 reduced samples outside
+  the image frame**; captured and uncaptured browser coverage match exactly.
+  Captured bounds include native interpolation neighbors before enlargement.
+- Product sources remain identical through all final runs. All **145 served
+  release resources** retain recorded hashes. The native pixel WASM/ABI is
+  unchanged, SHA-256
+  `bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+
+[Complete evidence](benchmarks/projected-erasure-2026-10-30.json.gz),
+**1,116,240 bytes**, SHA-256
+`05919d6deab3ecd593e1f4ff2d8f59b7553857b2f8bdaaf08082c08419c1018a`.
+These selected checks do not constitute full production, sustained performance
+or physical-device acceptance.
+
+Mask/wet tool mapping, projected world-selection clearing, mask relinking,
+general warp, photographic/interchange quality, sustained editor-wide
+performance and physical-device acceptance remain required. Every unfinished
+original roadmap requirement remains active; this slice does not close F03 or
+the overall goal.
