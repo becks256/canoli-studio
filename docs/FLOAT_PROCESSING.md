@@ -179,9 +179,70 @@ compare every output uint32 word, not canvas or display colors. Native and real
 worker tests also exercise window boundaries, caller partitions, byte work,
 ownership, malformed replies, overflow, disposal and retry.
 
-Connected float spatial reservoir sampling, retained worker stroke sessions,
-HDR replacement/field assets, native replay and projection, persistence/history,
-authoring previews/commit and actual tools remain required. Existing byte PNG
+Float spatial reservoirs and retained sessions now use these primitives as
+specified below. HDR replacement/field assets, composed replay and projection,
+persistence/history, authoring previews/commit and actual tools remain required. Existing byte PNG
 replacement assets cannot represent HDR results. The current float wet-tool
 admission guard stays in force; no schema, scripting/REST signature, plugin
 permission or public mutation authority changes in this increment.
+
+
+## Retained linear float wet sessions
+
+Private `createFloatWetStrokeSession(stroke, readSource, processor, options = {},
+releaseSources?)` and one-shot `prepareFloatWetStroke` share the existing byte
+retained lifecycle. `readSource(region)` returns complete straight linear
+Float32 RGBA tiles. Options retain the existing affine transform, texture assets,
+flow/pickup, cancellation/source checks, progress, tile/cache/storage policies.
+`load` uses the float load contract above. When omitted, the stroke's sRGB hex
+color is converted to linear RGB for the default load color; default load is
+still zero. An explicit load color is already linear.
+
+Append captures newly supplied points before asynchronous work and processes
+only new dabs. Each symmetry copy owns a separate premultiplied reservoir.
+`sampleFloatWetField` retains complete compact-cell support and full bilinear
+neighborhoods through previous/current affine bases, using a fixed float64
+summation order and final float32 stores. Signed/HDR RGB is never clamped to
+[0,alpha]. Alpha remains normalized; if interpolation stores zero alpha, pigment
+RGB is canonical zero. Invalid native extents, incomplete fields, malformed
+samples and unsafe pixel-center geometry reject rather than fill missing data.
+
+The default fixed-grid brush/texture rasterizer supplies existing 8-bit scalar
+coverage, promoted to normalized float coverage before native mixing. This does
+not stage source/destination color through bytes. A private float `coverage`
+callback can return normalized Float32 coverage directly, including values
+below one byte. Custom byte/wrong-length/nonfinite coverage rejects. Existing
+selection rasterization also supplies scalar byte alpha; float final opacity
+multiplies normalized selection in native math without rounding opacity to a
+byte. Whole-stroke selection and opacity apply once to completed work; unchanged
+pixels preserve original hidden color and signed-zero words.
+
+Original, destination and premultiplied pigment planes stay Float32 in the
+existing private IndexedDB job store and byte-budgeted resident cache. Native
+write groups keep complete destination/pigment cell epochs together. Bounded
+cache eviction and tile partitions cannot change results. The byte format keeps
+its existing encoded/rounded mixing and clamp semantics on the same lifecycle.
+This is job storage, not a native project/workspace HDR replacement format.
+
+`snapshot(crop?)` owns an independent result database; cropping does not crop the
+simulation/reservoir. `snapshotSince(epochs)` returns independently owned delta
+tiles plus frozen reuse proofs for already owned host tiles. `finish()` flushes
+referenced originals/results, transfers the working job to its result and
+releases processing sources. `WetStrokeResult<Float32Array>` reports precision
+`float32` and yields fresh Float32 `before`/`pixels` plus per-pixel changed flags.
+Float change detection includes signed-zero word differences. Previously owned
+prefixes remain readable after new appends, source closure, cancellation, quota
+failure or parent disposal. Each result must be disposed separately.
+
+Source release callbacks run once on initialization failure, successful finish,
+processing failure or disposal; cleanup failures remain visible. Invalid source,
+processor or storage output cannot publish a completed result. Session creation
+owns the supplied release callback immediately, including rejected controls or
+failed storage creation. Both byte and float factories share this ownership.
+
+These services prepare read-only native output. HDR asset/field serialization,
+composed replay/projection, public authoring/previews/commit, source-bearing
+history/project/recipe/workspace transport and actual tools remain required.
+Float Smudge/Mixer stay unavailable. No document schema, isolated service, REST
+route, plugin permission, account/upload or browser/headless synchronization
+contract changes in this increment.

@@ -1160,6 +1160,22 @@ capture inputs before readiness; mix replies own two independent full buffers.
 [Equations, errors, budgets and remaining connected work](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
 
 The current byte-session/PNG replacement transport is not an HDR edit format.
-The existing float wet-tool gate stays closed pending native retained sessions,
-HDR replay/assets, persistence and authoring/tool integration. Shared document
+The existing float wet-tool gate stays closed pending HDR replay/assets,
+persistence and authoring/tool integration. Retained preparation is specified below. Shared document
 commands, independent REST sessions and isolated plugin authority remain.
+
+
+## Retained HDR wet preparation
+
+Byte and float wet sessions now share append ordering, cache/backing ownership,
+independent snapshots, delta proofs, finish and failure cleanup. Private float
+formats retain straight destination and premultiplied signed/HDR pigment in
+Float32 storage; affine spatial sampling does not apply normalized-RGB clamps.
+Final selection/opacity uses native float interpolation once. Existing scalar
+brush/texture and selection coverage remains explicitly byte-rasterized by
+default; custom private dab coverage can retain Float32 precision. Complete
+results outlive source closure and parent disposal.
+[Contract and pending public integration](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).
+These private read-only jobs do not add project HDR replacement assets, schema,
+shared commands, script/REST services or plugin authority; actual float wet
+authoring remains rejected pending those connected boundaries.

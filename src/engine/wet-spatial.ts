@@ -2,6 +2,7 @@ import { AffineTransform } from '../core/affine';
 import type { Rect } from '../core/drawing';
 import { yieldTask } from './task-yield';
 import { validateWetCarried } from './wet-paint';
+import { validateFloatWetCarried } from '../core/float-wet';
 
 /** Dense strings remain readable for internal callers. Native sessions retain
  * only the cell's complete intersection with the captured dab support. */
@@ -24,6 +25,21 @@ export async function sampleWetField(
   field: WetField, frame: AffineTransform, region: Rect, tileSize: number,
   read: (key: string) => Promise<Float32Array>, check: () => void,
 ): Promise<Float32Array> {
+  return sampleField(field,frame,region,tileSize,read,check,false);
+}
+
+/** Linear signed/HDR pigment uses the same neighbor ownership and summation
+ * order as byte wet fields, with no normalized RGB/alpha gamut clamp. */
+export async function sampleFloatWetField(
+  field:WetField,frame:AffineTransform,region:Rect,tileSize:number,
+  read:(key:string)=>Promise<Float32Array>,check:()=>void,
+):Promise<Float32Array>{
+  return sampleField(field,frame,region,tileSize,read,check,true);
+}
+async function sampleField(
+  field:WetField,frame:AffineTransform,region:Rect,tileSize:number,
+  read:(key:string)=>Promise<Float32Array>,check:()=>void,linear:boolean,
+):Promise<Float32Array>{
   region = wetRegion(region);
   if (!Number.isSafeInteger(tileSize) || tileSize < 1 || tileSize > 256 || region.width > tileSize || region.height > tileSize)
     throw new Error('Wet-paint sampling requires bounded native working tiles.');
@@ -72,7 +88,7 @@ export async function sampleWetField(
     if (performance.now() >= deadline) { check(); await yieldTask(); check(); deadline = performance.now() + 4; }
   }
   for (const [key, {length,entries}] of groups) {
-    check(); const source = await read(key); check(); validateWetCarried(source, length);
+    check(); const source = await read(key); check(); (linear?validateFloatWetCarried:validateWetCarried)(source, length);
     for (let i = 0; i < entries.length; i += 3) for (let c = 0; c < 4; c++) result[entries[i] + c] = source[entries[i + 1] + c] * entries[i + 2];
     if (performance.now() >= deadline) { await yieldTask(); check(); deadline = performance.now() + 4; }
   }
@@ -80,7 +96,8 @@ export async function sampleWetField(
   for (let i = 0; i < output.length; i += 4) {
     const base = i * 4, sum = (c: number) => (result[base + c] + result[base + 4 + c]) + (result[base + 8 + c] + result[base + 12 + c]);
     const alpha = Math.max(0, Math.min(1, sum(3))); output[i + 3] = alpha;
-    for (let c = 0; c < 3; c++) output[i + c] = Math.max(0, Math.min(alpha, sum(c)));
+    for (let c = 0; c < 3; c++) output[i + c] = linear ? (output[i+3]===0 ? 0 : sum(c)) : Math.max(0, Math.min(alpha, sum(c)));
   }
+  if(linear)validateFloatWetCarried(output,output.length);
   check(); return output;
 }

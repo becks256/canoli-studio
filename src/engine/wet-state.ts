@@ -3,16 +3,18 @@ import type { AssetStore } from '../core/assets';
 import type { Rect } from '../core/drawing';
 import type { WetPaintLoadOptions, WetPaintMixOptions } from '../core/wet-paint';
 import type { PixelProcessor } from './processor';
+import type { FloatWetLoadOptions } from '../core/float-wet';
+import {byteWetPixels,type WetPixelFormat} from './wet-format';
 import type { WetTile, WetTileStore, WetTileChange } from './wet-store';
 import { assertWetTileStoreAlive } from './wet-store';
 import type { wetDabCoverage } from './wet-coverage';
 import { wetRegion } from './wet-spatial';
 
-export interface WetStrokeTile { readonly region: Rect; readonly before: Uint8ClampedArray; readonly pixels: Uint8ClampedArray; readonly changed: Uint8Array; readonly epoch?: string; }
+export interface WetStrokeTile<P extends WetTile=Uint8ClampedArray> { readonly region: Rect; readonly before: P; readonly pixels: P; readonly changed: Uint8Array; readonly epoch?: string; }
 export interface WetTileRevision { readonly region: Readonly<Rect>; readonly epoch: string; }
 /** Internal delta handoff: reused pixels must already be owned by its caller.
  * Ordinary snapshot()/finish() still return independently complete results. */
-export interface WetStrokeProjection { readonly result: WetStrokeResult; readonly reused: readonly WetTileRevision[]; }
+export interface WetStrokeProjection<P extends WetTile=Uint8ClampedArray> { readonly result: WetStrokeResult<P>; readonly reused: readonly WetTileRevision[]; }
 export interface WetStrokeControl {
   signal?: AbortSignal;
   check?(): void;
@@ -31,6 +33,13 @@ export interface WetStrokeOptions extends WetStrokeControl {
   coverage?: typeof wetDabCoverage;
 }
 export type WetProcessor = Pick<PixelProcessor, 'loadWetPaint' | 'mixWetPaint' | 'mixFiltered' | 'selection' | 'brushTexture'>;
+export type FloatWetProcessor=Pick<PixelProcessor,'floatWetLoad'|'floatWetMix'|'floatWetEnvelope'|'selection'|'brushTexture'>;
+export interface FloatWetStrokeOptions extends Omit<WetStrokeOptions,'load'|'coverage'> {
+  load?:FloatWetLoadOptions;
+  /** Optional private float coverage, without reducing it to byte alpha. */
+  coverage?:(...args:Parameters<typeof wetDabCoverage>)=>Promise<Float32Array>;
+}
+
 
 export class WetTileCache {
   protected values = new Map<string, WetTile>();
@@ -67,10 +76,11 @@ export class WetTileCache {
 
 /** Complete privately prepared native output; result tiles never resimulate a
  * viewport crop. Its job-owned backing database remains alive until dispose. */
-export class WetStrokeResult {
+export class WetStrokeResult<P extends WetTile=Uint8ClampedArray> {
   private closed = false;
-  constructor(private readonly store: WetTileStore, private readonly records: readonly { region: Rect; original: string; result: string; epoch?: string }[], readonly diagnostics: Readonly<{ dabs: number; workingTiles: number; resultTiles: number; peakCacheBytes: number }>, private readonly scope?: Rect) {}
-  async *tiles(crop?: Rect, reuse?: (region: Readonly<Rect>, epoch: string | undefined) => boolean): AsyncGenerator<WetStrokeTile> {
+  constructor(private readonly store: WetTileStore, private readonly records: readonly { region: Rect; original: string; result: string; epoch?: string }[], readonly diagnostics: Readonly<{ dabs: number; workingTiles: number; resultTiles: number; peakCacheBytes: number }>, private readonly scope?: Rect, private readonly format:WetPixelFormat<P>=byteWetPixels as unknown as WetPixelFormat<P>) {}
+  get precision(){return this.format.precision;}
+  async *tiles(crop?: Rect, reuse?: (region: Readonly<Rect>, epoch: string | undefined) => boolean): AsyncGenerator<WetStrokeTile<P>> {
     if (this.closed) throw new Error('Wet-paint result is disposed.');
     let clip = crop ? wetRegion(crop) : this.scope;
     if (crop && this.scope) {
@@ -87,12 +97,12 @@ export class WetStrokeResult {
       const original = await this.store.get(record.original), result = await this.store.get(record.result);
       if (this.closed) throw new Error('Wet-paint result is disposed.');
       const length = box.width * box.height * 4;
-      if (!(original instanceof Uint8ClampedArray) || !(result instanceof Uint8ClampedArray) || original.length !== length || result.length !== length) throw new Error('Wet-paint result storage is incomplete.');
-      const region = { x: left, y: top, width: right - left, height: bottom - top }, before = new Uint8ClampedArray(region.width * region.height * 4), pixels = new Uint8ClampedArray(before.length), changed = new Uint8Array(before.length / 4);
+      const checkedOriginal=this.format.validate(original,length),checkedResult=this.format.validate(result,length);
+      const region = { x: left, y: top, width: right - left, height: bottom - top }, before = this.format.create(region.width * region.height * 4), pixels = this.format.create(before.length), changed = new Uint8Array(before.length / 4);
       let any = false;
       for (let y = 0; y < region.height; y++) for (let x = 0; x < region.width; x++) {
         const source = ((top - box.y + y) * box.width + left - box.x + x) * 4, target = (y * region.width + x) * 4;
-        for (let c = 0; c < 4; c++) { before[target + c] = original[source + c]; pixels[target + c] = result[source + c]; if (before[target + c] !== pixels[target + c]) changed[target / 4] = 255; }
+        for (let c = 0; c < 4; c++) { before[target + c] = checkedOriginal[source + c]; pixels[target + c] = checkedResult[source + c]; if (!this.format.equal(before[target + c], pixels[target + c])) changed[target / 4] = 255; }
         if (changed[target / 4]) any = true;
       }
       if (any) yield { region, before, pixels, changed, epoch: record.epoch };

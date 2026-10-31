@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "oracle": "Independent NumPy/scalar float64 math with final float32 stores; no editor code or WASM",
+  "generatorSha256": "c8e6046abce5a64c0a2330c00c5e1d640b8b54d6cf280921bcd48c86ec9af142",
+  "region": {
+    "x": -8,
+    "y": -4,
+    "width": 20,
+    "height": 16
+  },
+  "points": [
+    [
+      -1.5,
+      2.5
+    ],
+    [
+      -0.5,
+      2.5
+    ],
+    [
+      0.5,
+      2.5
+    ],
+    [
+      0.5,
+      3.5
+    ],
+    [
+      1.5,
+      3.5
+    ],
+    [
+      2.5,
+      3.5
+    ]
+  ],
+  "load": {
+    "color": [
+      4.5,
+      -2.25,
+      13.125,
+      0.375
+    ],
+    "load": 0.37
+  },
+  "mix": {
+    "flow": 0.8,
+    "wetness": 0.2,
+    "pickup": 0.7
+  },
+  "opacity": 0.625,
+  "flow": 0.625,
+  "clip": {
+    "x": -3,
+    "y": 1,
+    "width": 6,
+    "height": 4
+  },
+  "bounds": {
+    "x": -16,
+    "y": -16,
+    "width": 32,
+    "height": 32
+  },
+  "window": {
+    "x": -3,
+    "y": -2,
+    "width": 7,
+    "height": 6
+  },
+  "frames": [
+    {
+      "previous": [
+        1,
+        -0.5,
+        0.25,
+        2,
+        1.25,
+        -0.75
+      ],
+      "current": [
+        2,
+        0.5,
+        0,
+        1,
+        -0.5,
+        0.25
+      ]
+    },
+    {
+      "previous": [
+        -1,
+        0.5,
+        0,
+        2,
+        0.25,
+        -0.5
+      ],
+      "current": [
+        0,
+        1,
+        -1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "previous": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "current": [
+        1,
+        0,
+        0,
+        1,
+        8.25,
+        9.5
+      ]
+    }
+  ],
+  "files": {
+    "source": {
+      "bytes": 1042,
+      "sha256": "b7c24a856ece6bb28810b5f16fd94a38c2fe2abc5c62e854e8385c69a74c55e7",
+      "rawBytes": 5120,
+      "rawSha256": "30a02999a662785f87545cb58517c7b132c42e7f41f983d274c29907d702b50d"
+    },
+    "prefix": {
+      "bytes": 1260,
+      "sha256": "6e3ec5c36a175f79125af2aa887b57e1d4cdbc6e423708a6834915f947fd40d3",
+      "rawBytes": 5120,
+      "rawSha256": "5a57b94ce80fe02ae4580b50200947d5f9bf3694e18d2daef16d9850c9a958fc"
+    },
+    "middle": {
+      "bytes": 1311,
+      "sha256": "78c00b221cfdb05d03172f98e5b4d30611519e795425c75c283a863726b98555",
+      "rawBytes": 5120,
+      "rawSha256": "6c578c8d3d49dad26a54c243309edcdba658157f34fa49295204b6260d25c12c"
+    },
+    "final": {
+      "bytes": 1399,
+      "sha256": "98c75659849b961e9d5b3d1f00caae8cd68acef02cbc973dfc68e4019a33289d",
+      "rawBytes": 5120,
+      "rawSha256": "5aa3291bca22a330b7c654a1ddb54e9bb39b3de8c98424655d8dfa6444fa0276"
+    },
+    "field": {
+      "bytes": 9289,
+      "sha256": "ccd2d8d21b20e262502a5823c8b4f1c3434ac9d5b0d5545cc79eb7a50d2bdbe5",
+      "rawBytes": 16384,
+      "rawSha256": "c55a3cc60e699c398c1d55f5ce329e4ef9098b14255e18f89cdb1b653844ae23"
+    },
+    "spatial-0": {
+      "bytes": 608,
+      "sha256": "72092e3705e2a4e4b08debc24c6114f9d71a062c4e8409b945992f4ba7e2f472",
+      "rawBytes": 672,
+      "rawSha256": "14823cfe139d351a5adcc7bb1784e3113b5e362d002e5c959ae6b6a0d45f6f96"
+    },
+    "spatial-1": {
+      "bytes": 574,
+      "sha256": "453446bc40147bdf917e054da2d39a91503709919bc17bde1259cedc46eb6304",
+      "rawBytes": 672,
+      "rawSha256": "b8955d9e484c75c05c41d1921c53be8903a6242b7352ee7302a121e5b0dfe594"
+    },
+    "spatial-2": {
+      "bytes": 549,
+      "sha256": "5cdfcf209e8cd9f18de077dc23d460236b0ae489f158a71c6360654360203dfc",
+      "rawBytes": 672,
+      "rawSha256": "97968de9ab604171c26ecff31efc6794f7fc9daab84e81874d93ffc3d1b6b424"
+    }
+  }
+}

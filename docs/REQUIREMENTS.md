@@ -1401,9 +1401,20 @@ retained previews, replay, history, source-bearing persistence and delivery.
 Pickup must read pre-deposit pixels; selection and stroke opacity apply once to
 completed work. Byte PNG replacements cannot establish this requirement.
 
-The private load/mix/envelope numerical and worker dependency is implemented;
-[its exact boundary](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives) leaves
-retained sessions, spatial HDR sampling/assets, composed replay and actual
-authoring/tool integration required. Float color Smudge/Mixer remain unavailable
+The private numerical/worker and retained preparation dependencies are implemented;
+[their exact boundary](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions) leaves
+HDR assets, composed replay/projection and actual authoring/tool integration
+required. Float color Smudge/Mixer remain unavailable
 until connected acceptance proves those requirements. No public API or schema
 change follows from this dependency alone.
+
+
+The retained float preparation dependency now preserves signed/HDR spatial
+reservoirs and Float32 destination tiles across new-dab append, bounded cache
+eviction, independent snapshots, cropping/deltas and finish. Validate native
+source and processor output; preserve prior prefixes after source closure,
+quota failure and cancellation. Default scalar brush/selection rasterization
+retains its existing precision, while private custom dab coverage supports
+Float32. HDR edit asset serialization, document replay/projection, persistence
+and public authoring/tools remain required before F03/F10 wet-tool acceptance.
+[Exact lifecycle](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).

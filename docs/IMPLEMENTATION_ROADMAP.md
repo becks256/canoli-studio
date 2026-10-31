@@ -9913,3 +9913,44 @@ other unfinished original professional, AI, workflow, ChatGPT/live identity,
 commercial, specialist and motion gate remain required. No continuous-60fps,
 physical pigment/device quality, paid operation, upload or browser/REST
 synchronization claim follows from this numerical dependency.
+
+
+### 2026-10-31 — F03/F10 retained Float32 wet sessions and HDR spatial pigment
+
+Owner: implementation agent; bounded increment from `c7b222f`; classification:
+progress. The previous numerical/worker foundation is now connected to actual
+retained preparation. One shared typed lifecycle preserves byte behavior while
+private float policies retain straight Float32 originals/destinations and
+signed/HDR premultiplied reservoirs. Complete compact-cell bilinear sampling
+keeps unclipped RGB, normalized alpha and zero-alpha canonicalization.
+
+New-dab append, native cache/backing epochs, source checks, independent snapshots,
+cropping/delta reuse, finish and failure cleanup retain existing ownership.
+Final selection/stroke opacity applies once in native float math without byte
+opacity rounding. Default brush/texture/selection scalar rasterization keeps its
+existing precision; custom private dab coverage accepts Float32. Float result
+iteration preserves complete native words and returns owned arrays. Creation
+owns the source-release callback even when control/storage initialization fails.
+[Exact private lifecycle and current integration boundary](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).
+
+Verified: **3,246 unit/API/native tests across 314 files; 76 source-browser cases across 11 files; 11 selected normal-production cases across 4 files**. No browser skips, retries, flakes or runner errors.
+Independent scalar references match all three prefixes across native tile and
+real cache/IndexedDB partitions, and all three affine bilinear fields. Real
+textured/tilted/affine symmetry, source closure, snapshot ownership, cancellation,
+quota failure and recovery pass. Actual 131x79 and genuine 10000x5000 float
+originals retain geometry and original-derived 64x48 windows; every window word
+matches the independent native reader. The preparation stays read-only, and
+retained results outlive the original scene/assets. This is not full-image HDR
+wet editing/delivery acceptance. Product and test sources stay frozen, the
+build/typecheck passes, and compact evidence keeps Git free of new raw ZIPs.
+[Detailed findings and scope](benchmarks/float-wet-session-2026-10-31.md).
+
+The full original goal stays active. Next required work is versioned HDR wet
+asset/field transport, composed native replay/projection, source-bearing history
+and project/workspace/recipe persistence, then guarded authoring previews/commit
+and actual float tools/automation as scoped. Float Smudge/Mixer remain disabled.
+Wider mask/source/master and nested-projective acceptance, general warp,
+photographic/device/sustained F14 memory/performance and every unfinished
+original professional, AI, workflow, ChatGPT/live identity, commercial,
+specialist and motion gate remain required. No performance clearance, physical
+pigment/device quality, paid operation, upload or browser/REST sync is inferred.

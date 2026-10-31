@@ -2,40 +2,42 @@ import { AffineTransform } from '../core/affine';
 import { brushStrokeSchema, paintOperationSchema, strokeBounds, type BrushStrokeData, type Rect, type StrokePoint } from '../core/drawing';
 import { freeze } from '../core/immutable';
 import { paintStampAlpha, paintStampGeometry, paintStampSize, strokeStamps } from '../core/paint-stamps';
-import { wetPaintLoadSchema, wetPaintMixSchema } from '../core/wet-paint';
+import { wetPaintMixSchema,type WetPaintMixSettings } from '../core/wet-paint';
 import { BrushTextureSampler } from './brush-texture';
 import { yieldTask } from './task-yield';
 import { createWetDabCoverage, wetDabCoverage } from './wet-coverage';
-import { validateWetCarried, validateWetCoverage, validateWetPixels } from './wet-paint';
-import { sampleWetField, wetRegion, wetTileKey, wetFieldStorageKey, type WetField, type WetFieldTile } from './wet-spatial';
-import { createWetTileStore, type WetTileStore, type WetTileChange } from './wet-store';
-import { WetStrokeResult, WetTileCache, type WetProcessor, type WetStrokeOptions, type WetStrokeProjection, type WetTileRevision } from './wet-state';
+import {byteWetFormat,floatWetFormat,type WetSessionFormat,type WetSource} from './wet-format';
+import type {PixelProcessor} from './processor';
+import { wetRegion, wetTileKey, wetFieldStorageKey, type WetField, type WetFieldTile } from './wet-spatial';
+import { createWetTileStore, type WetTileStore, type WetTileChange,type WetTile } from './wet-store';
+import { WetStrokeResult, WetTileCache, type WetProcessor, type WetStrokeOptions, type WetStrokeProjection, type WetTileRevision,type FloatWetProcessor,type FloatWetStrokeOptions } from './wet-state';
 import {createWetWorkingCache} from './wet-cache';
 
 const appendedPoints = brushStrokeSchema.shape.points.element.array().max(20000);
 type RecordTile = { region: Rect; original: string; result: string; epoch: string };
-type Configuration = ReturnType<typeof capture>;
+type CommonOptions=Omit<WetStrokeOptions,'load'|'coverage'> & {coverage?:(...args:Parameters<typeof wetDabCoverage>)=>Promise<Uint8Array|Float32Array>};
+type CommonProcessor=Pick<PixelProcessor,'selection'|'brushTexture'>;
+type Configuration<P extends WetTile> = ReturnType<typeof capture<P>>;
 
 /** Internal retained workspace. Appends own only new samples; completed native
  * dabs and separate spatial reservoirs are never replayed for a later prefix.
  * Snapshots own separate storage and outlive subsequent appends/disposal. */
-export interface WetStrokeSession {
+export interface WetStrokeSession<P extends WetTile=Uint8ClampedArray> {
   readonly stroke: BrushStrokeData;
   readonly diagnostics: Readonly<{ dabs: number; workingTiles: number; completedPoints: number; peakCacheBytes: number }>;
   assertStorageCurrent(): void;
   append(points: readonly StrokePoint[]): Promise<void>;
-  snapshot(crop?: Rect): Promise<WetStrokeResult>;
+  snapshot(crop?: Rect): Promise<WetStrokeResult<P>>;
   /** Partial projection plus proofs for tiles already owned by the host adapter. */
-  snapshotSince(previous: ReadonlyMap<string, string>): Promise<WetStrokeProjection>;
-  finish(): Promise<WetStrokeResult>;
+  snapshotSince(previous: ReadonlyMap<string, string>): Promise<WetStrokeProjection<P>>;
+  finish(): Promise<WetStrokeResult<P>>;
   dispose(): Promise<void>;
 }
 
-function capture(input: BrushStrokeData, readSource: (region: Rect) => Promise<Uint8ClampedArray>, processor: WetProcessor, options: WetStrokeOptions) {
+function capture<P extends WetTile>(input: BrushStrokeData, readSource: WetSource<P>, processor: CommonProcessor, options: CommonOptions,makeFormat:(stroke:BrushStrokeData,mix:WetPaintMixSettings)=>WetSessionFormat<P>) {
   const stroke = freeze(paintOperationSchema.parse(input));
   if (stroke.kind !== 'brush' && stroke.kind !== 'pencil') throw new Error('Wet-paint preparation requires a brush or pencil footprint.');
-  const load = wetPaintLoadSchema.parse(options.load === undefined ? { color: [parseInt(stroke.color.slice(1, 3), 16), parseInt(stroke.color.slice(3, 5), 16), parseInt(stroke.color.slice(5, 7), 16), 255] } : options.load);
-  const mix = wetPaintMixSchema.parse(options.mix === undefined ? {} : options.mix);
+  const mix = wetPaintMixSchema.parse(options.mix === undefined ? {} : options.mix),format=makeFormat(stroke,mix);
   const world = options.transform === undefined ? new AffineTransform() : AffineTransform.fromJSON(options.transform.toJSON()), inverse = world.inverse();
   const tileSize = options.tileSize ?? 128, cacheBudget = options.cacheBytes ?? 32 * 1024 * 1024;
   if (!Number.isSafeInteger(tileSize) || tileSize < 1 || tileSize > 256 || !Number.isSafeInteger(cacheBudget) || cacheBudget < 0) throw new Error('Wet-paint working tile/cache policies are invalid.');
@@ -43,11 +45,11 @@ function capture(input: BrushStrokeData, readSource: (region: Rect) => Promise<U
   const lifetime = assets?.captureLifetime(), texture = stroke.texture && assets ? assets.get(stroke.texture.assetId) : undefined, bitmap = texture?.bitmap, blob = texture?.blob;
   const check = () => { signal?.throwIfAborted(); externalCheck?.(); lifetime?.(); if (stroke.texture && (!assets || !texture || !bitmap || !assets.has(texture.id) || assets.get(texture.id) !== texture || texture.bitmap !== bitmap || texture.blob !== blob || bitmap.width !== texture.width || bitmap.height !== texture.height)) throw new Error('Wet-paint texture source changed.'); };
   check();
-  return { stroke, readSource, processor, load, mix, world, inverse, tileSize, cacheBudget, signal, onProgress, coverage, storage, assets, check };
+  return { stroke, readSource, processor, format, mix, world, inverse, tileSize, cacheBudget, signal, onProgress, coverage, storage, assets, check };
 }
 
-class RetainedWetStrokeSession implements WetStrokeSession {
-  private config?: Configuration;
+class RetainedWetStrokeSession<P extends WetTile> implements WetStrokeSession<P> {
+  private config?: Configuration<P>;
   private strokeData: BrushStrokeData;
   private readonly cache: WetTileCache;
   private readonly current = new Map<string, string>();
@@ -73,7 +75,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
     this.failed = true; this.failure = this.config?.signal?.reason ?? new DOMException('Wet-paint session aborted.', 'AbortError');
     void this.dispose().catch(() => { /* Explicit disposal retains the cleanup rejection for its caller. */ });
   };
-  constructor(config: Configuration, private readonly store: WetTileStore, private releaseSources?: () => void) {
+  constructor(config: Configuration<P>, private readonly store: WetTileStore, private releaseSources?: () => void) {
     this.config = config; this.strokeData = config.stroke; this.reservedPoints = config.stroke.points.length;
     this.cache = createWetWorkingCache(store, config.cacheBudget,this.check); this.issued.add(store);
     this.textures = config.stroke.texture ? new BrushTextureSampler(config.processor) : undefined;
@@ -115,17 +117,16 @@ class RetainedWetStrokeSession implements WetStrokeSession {
   private async original(region: Rect) {
     const config = this.config!, key = wetTileKey(region.x, region.y), storageKey = this.originalKey(key); this.check();
     if (!this.originals.has(key)) {
-      const source = await config.readSource({ ...region }); this.check(); validateWetPixels(source);
+      const source = await config.readSource({ ...region }); this.check(); config.format.pixels.validate(source,config.tileSize*config.tileSize*4);
       if (source.length !== config.tileSize * config.tileSize * 4) throw new Error('Wet-paint source returned the wrong native tile extent.');
       await this.cache.put(storageKey, source.slice()); this.check(); this.originals.add(key);
     }
     const value = await this.cache.get(storageKey); this.check();
-    if (!(value instanceof Uint8ClampedArray) || value.length !== config.tileSize * config.tileSize * 4) throw new Error('Wet-paint original tile is missing.');
-    return value;
+    return config.format.pixels.validate(value,config.tileSize*config.tileSize*4);
   }
   private carried = async (key: string) => { const value = await this.cache.get(key); this.check(); if (!(value instanceof Float32Array)) throw new Error('Wet-paint carried tile is missing.'); return value; };
   private async process(stroke: BrushStrokeData, from: number) {
-    const { processor, load, mix, world, tileSize, coverage, assets, onProgress } = this.config!;
+    const { format, mix, world, tileSize, coverage, assets, onProgress } = this.config!;
     const { cache, current, fields, textures } = this, check = this.check, original = (region: Rect) => this.original(region), carried = this.carried;
     let { dabs, workingTiles } = this, deadline = performance.now() + 4;
     for (const point of strokeStamps(stroke, strokeBounds({ ...stroke, points: stroke.points.slice(Math.max(0, from - 1)) }), from)) {
@@ -141,19 +142,18 @@ class RetainedWetStrokeSession implements WetStrokeSession {
       dabs++;
       for (let y = Math.floor(top / tileSize) * tileSize; y < bottom; y += tileSize) for (let x = Math.floor(left / tileSize) * tileSize; x < right; x += tileSize) {
         check(); const region = wetRegion({ x, y, width: tileSize, height: tileSize }), key = wetTileKey(x, y), before = await original(region);
-        const oldKey = current.get(key), pixels = oldKey ? await cache.get(oldKey) : before; check();
-        if (!(pixels instanceof Uint8ClampedArray) || pixels.length !== before.length) throw new Error('Wet-paint destination tile is missing.');
+        const oldKey = current.get(key), pixels = format.pixels.validate(oldKey ? await cache.get(oldKey) : before,before.length); check();
         // Backing cells retain the complete captured source. Numerical sampling,
         // native coverage and worker transfers need only the dab's support/halo
         // within this cell. Preserve the original global pixel-center grid.
         const wx=Math.max(x,left),wy=Math.max(y,top),working=Object.freeze(wetRegion({x:wx,y:wy,width:Math.min(x+tileSize,right)-wx,height:Math.min(y+tileSize,bottom)-wy}));
-        const rowLength=working.width*4,workingPixels=new Uint8ClampedArray(rowLength*working.height),offsetX=working.x-x,offsetY=working.y-y;
+        const rowLength=working.width*4,workingPixels=format.pixels.create(rowLength*working.height),offsetX=working.x-x,offsetY=working.y-y;
         for(let row=0;row<working.height;row++){const start=((offsetY+row)*tileSize+offsetX)*4;workingPixels.set(pixels.subarray(start,start+rowLength),row*rowLength);}
-        const pigment = previous ? await sampleWetField(previous, frame, working, tileSize, carried, check) : await processor.loadWetPaint(workingPixels, load);
-        check(); validateWetCarried(pigment, workingPixels.length);
-        const mask = await (this.coverage?.sample ?? coverage)(stroke, frame, working, check, assets, textures); check(); validateWetCoverage(mask, workingPixels.length);
-        const output = await processor.mixWetPaint(workingPixels, pigment, mask, { ...mix, flow }); check();
-        validateWetPixels(output.pixels); validateWetCarried(output.carried, workingPixels.length);
+        const pigment = previous ? await format.sample(previous, frame, working, tileSize, carried, check) : await format.load(workingPixels);
+        check(); format.validateCarried(pigment, workingPixels.length);
+        const mask = await (this.coverage?.sample ?? coverage)(stroke, frame, working, check, assets, textures); check();
+        const output = await format.mix(workingPixels, pigment, mask, flow); check();
+        format.pixels.validate(output.pixels,workingPixels.length); format.validateCarried(output.carried, workingPixels.length);
         if (output.pixels.length !== workingPixels.length) throw new Error('Wet-paint processor returned a wrong destination extent.');
         // Keep all destination bytes, including hidden RGB. The complete
         // carried support already occupies this bounded native intersection;
@@ -195,9 +195,9 @@ class RetainedWetStrokeSession implements WetStrokeSession {
     this.check(); this.strokeData = stroke; this.completedPoints = stroke.points.length;
   }
   private async materialize(destination: WetTileStore, crop?: Rect, previous?: ReadonlyMap<string, string>) {
-    const { processor, inverse, tileSize } = this.config!, stroke = this.strokeData, records: RecordTile[] = [];
+    const { processor, format, inverse, tileSize } = this.config!, stroke = this.strokeData, records: RecordTile[] = [];
     const reused: WetTileRevision[] = [];
-    const writePair = async (original: string, before: Uint8ClampedArray, output: string, result: Uint8ClampedArray) => {
+    const writePair = async (original: string, before: P, output: string, result: P) => {
       this.check();
       if (destination.batch) await destination.batch([{ type: 'put', key: original, value: before }, { type: 'put', key: output, value: result }]);
       else { await destination.put(original, before); this.check(); await destination.put(output, result); }
@@ -211,25 +211,21 @@ class RetainedWetStrokeSession implements WetStrokeSession {
         if (prior.raw !== rawKey) throw new Error('Wet-paint projection no longer matches its native prefix.');
         if (!prior.pixels) continue;
         if (previous?.get(key) === rawKey) { reused.push(Object.freeze({ region: Object.freeze({ ...region }), epoch: rawKey })); continue; }
-        const before = await this.original(region), result = await this.cache.get(prior.pixels); this.check();
-        if (!(result instanceof Uint8ClampedArray) || result.length !== before.length) throw new Error('Wet-paint projected tile is incomplete.');
+        const before = await this.original(region), result = format.pixels.validate(await this.cache.get(prior.pixels),before.length); this.check();
         if (destination !== this.store) await writePair(this.originalKey(key), before, `result/${key}`, result);
         else await this.cache.put(`result/${key}`, result);
         this.check(); records.push({ region, original: this.originalKey(key), result: `result/${key}`, epoch: rawKey }); continue;
       }
-      const before = await this.original(region), raw = await this.cache.get(rawKey); this.check();
-      if (!(raw instanceof Uint8ClampedArray) || raw.length !== before.length) throw new Error('Wet-paint final tile is missing.');
-      let mask: Uint8ClampedArray;
+      const before = await this.original(region), raw = format.pixels.validate(await this.cache.get(rawKey),before.length); this.check();
+      let mask: Uint8ClampedArray|undefined;
       if (stroke.clip) {
         const origin = inverse.point(region);
         mask = await processor.selection({ selection: stroke.clip, ...region, x: origin.x, y: origin.y, stepX: inverse.a, stepY: inverse.d, stepXY: inverse.c, stepYX: inverse.b }); this.check();
         if (!(mask instanceof Uint8ClampedArray) || mask.length !== raw.length) throw new Error('Wet-paint selection returned invalid native coverage.');
-        for (let p = 3; p < mask.length; p += 4) mask[p] = Math.round(mask[p] * stroke.opacity);
-      } else { mask = new Uint8ClampedArray(raw.length); for (let p = 3; p < mask.length; p += 4) mask[p] = Math.round(255 * stroke.opacity); }
-      for (let p = 0; p < raw.length; p += 4) if (raw[p] === before[p] && raw[p + 1] === before[p + 1] && raw[p + 2] === before[p + 2] && raw[p + 3] === before[p + 3]) mask[p + 3] = 0;
-      const result = await processor.mixFiltered(before, raw, mask); this.check(); validateWetPixels(result);
+      }
+      const result = await format.envelope(before, raw, mask,stroke.opacity); this.check(); format.pixels.validate(result,raw.length);
       if (result.length !== raw.length) throw new Error('Wet-paint final mixing returned the wrong native extent.');
-      if (result.some((value, index) => value !== before[index])) {
+      if (result.some((value, index) => !format.pixels.equal(value,before[index]))) {
         const original = this.originalKey(key), output = `result/${key}`;
         const projected = `projected/${key}`; await this.cache.put(projected, result); this.check(); this.projected.set(key, { raw: rawKey, pixels: projected });
         if (destination !== this.store) await writePair(original, before, output, result);
@@ -240,30 +236,30 @@ class RetainedWetStrokeSession implements WetStrokeSession {
     records.sort((a, b) => a.region.y - b.region.y || a.region.x - b.region.x);
     return { records, reused: Object.freeze(reused), diagnostics: Object.freeze({ dabs: this.dabs, workingTiles: this.workingTiles, resultTiles: records.length, peakCacheBytes: this.cache.peak }) };
   }
-  async snapshot(crop?: Rect): Promise<WetStrokeResult> {
+  async snapshot(crop?: Rect): Promise<WetStrokeResult<P>> {
     this.requireOpen(); const scope = crop === undefined ? undefined : wetRegion(crop);
     return (await this.snapshotProjection(scope)).result;
   }
-  async snapshotSince(previous: ReadonlyMap<string, string>): Promise<WetStrokeProjection> {
+  async snapshotSince(previous: ReadonlyMap<string, string>): Promise<WetStrokeProjection<P>> {
     this.requireOpen();
     // Capture before queueing, just like newly appended pointer samples.
     return this.snapshotProjection(undefined, new Map(previous));
   }
-  private snapshotProjection(scope?: Rect, previous?: ReadonlyMap<string, string>): Promise<WetStrokeProjection> {
+  private snapshotProjection(scope?: Rect, previous?: ReadonlyMap<string, string>): Promise<WetStrokeProjection<P>> {
     return this.enqueue(async () => {
       let output: WetTileStore | undefined;
       try {
         output = await this.config!.storage();
         if (this.issued.has(output)) { output = undefined; throw new Error('Wet-paint snapshots require a fresh private tile store.'); }
         this.issued.add(output); this.check(); const prepared = await this.materialize(output, scope, previous); this.check();
-        return { result: new WetStrokeResult(output, prepared.records, prepared.diagnostics, scope), reused: prepared.reused };
+        return { result: new WetStrokeResult<P>(output, prepared.records, prepared.diagnostics, scope,this.config!.format.pixels), reused: prepared.reused };
       } catch (error) {
         try { await output?.dispose(); } catch (cleanup) { throw new AggregateError([error, cleanup], 'Wet-paint snapshot and private storage cleanup failed.'); }
         throw error;
       }
     });
   }
-  async finish(): Promise<WetStrokeResult> {
+  async finish(): Promise<WetStrokeResult<P>> {
     this.requireOpen(); this.accepting = false;
     return this.enqueue(async () => {
       const prepared = await this.materialize(this.store);
@@ -273,8 +269,8 @@ class RetainedWetStrokeSession implements WetStrokeSession {
       for (const entry of this.projected.values()) if (entry.pixels) { await this.cache.remove(entry.pixels); this.check(); }
       const retained = new Set(prepared.records.map(record => record.original));
       for (const key of this.originals) if (!retained.has(this.originalKey(key))) { await this.cache.remove(this.originalKey(key)); this.check(); }
-      this.check(); this.releaseProcessing(); this.transferred = true;
-      return new WetStrokeResult(this.store, prepared.records, prepared.diagnostics);
+      this.check(); const format=this.config!.format.pixels; this.releaseProcessing(); this.transferred = true;
+      return new WetStrokeResult<P>(this.store, prepared.records, prepared.diagnostics,undefined,format);
     });
   }
   private releaseProcessing() {
@@ -302,12 +298,18 @@ class RetainedWetStrokeSession implements WetStrokeSession {
 
 /** The internal source owner releases at processing completion, failure or
  * disposal; immutable output tiles no longer depend on the captured source. */
-export async function createWetStrokeSession(input: BrushStrokeData, readSource: (region: Rect) => Promise<Uint8ClampedArray>, processor: WetProcessor, options: WetStrokeOptions = {}, releaseSources?: () => void): Promise<WetStrokeSession> {
-  const config = capture(input, readSource, processor, options), store = await config.storage();
-  let session: RetainedWetStrokeSession | undefined;
-  try { config.check(); session = new RetainedWetStrokeSession(config, store, releaseSources); await session.initialize(); return session; }
-  catch (error) {
-    if (!session) { try { await store.dispose(); } catch (cleanup) { throw new AggregateError([error, cleanup], 'Wet-paint initialization and private storage cleanup failed.'); } }
+async function createSession<P extends WetTile>(input:BrushStrokeData,readSource:WetSource<P>,processor:CommonProcessor,options:CommonOptions,makeFormat:(stroke:BrushStrokeData,mix:WetPaintMixSettings)=>WetSessionFormat<P>,releaseSources?:()=>void):Promise<WetStrokeSession<P>>{
+  let store:WetTileStore|undefined,session:RetainedWetStrokeSession<P>|undefined,released=false;
+  const release=()=>{if(!released){released=true;releaseSources?.();}};
+  try{const config=capture(input,readSource,processor,options,makeFormat);store=await config.storage();config.check();session=new RetainedWetStrokeSession(config,store,release);await session.initialize();return session;}
+  catch(error){
+    if(!session){const errors=[error];try{await store?.dispose();}catch(cleanup){errors.push(cleanup);}try{release();}catch(cleanup){errors.push(cleanup);}if(errors.length>1)throw new AggregateError(errors,'Wet-paint initialization and private storage cleanup failed.');}
     throw error;
   }
+}
+export function createWetStrokeSession(input:BrushStrokeData,readSource:WetSource<Uint8ClampedArray>,processor:WetProcessor,options:WetStrokeOptions={},releaseSources?:()=>void):Promise<WetStrokeSession>{
+  return createSession(input,readSource,processor,options,(stroke,mix)=>byteWetFormat(stroke,processor,options,mix),releaseSources);
+}
+export function createFloatWetStrokeSession(input:BrushStrokeData,readSource:WetSource<Float32Array>,processor:FloatWetProcessor,options:FloatWetStrokeOptions={},releaseSources?:()=>void):Promise<WetStrokeSession<Float32Array>>{
+  return createSession(input,readSource,processor,options,(stroke,mix)=>floatWetFormat(stroke,processor,options,mix),releaseSources);
 }

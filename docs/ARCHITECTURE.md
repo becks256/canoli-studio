@@ -2433,9 +2433,28 @@ strictly validated owned Float32 results. Native scratch remains bounded at
 65,536 pixels and worker requests at 262,144; neither limits image geometry.
 [Exact numerical and ownership contract](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
 
-The byte retained sessions, projected five-channel fields and PNG replacements
-retain their existing domains. Float retained sessions, HDR assets/replay,
+Projected five-channel fields and PNG replacements retain their byte domains.
+Retained float sessions are implemented below; HDR assets/composed replay,
 projection, persistence, previews and tool admission still need integration.
 These private primitives add no document schema, public mutation API, script
 service, REST route or plugin authority. Float wet-paint authoring remains
 rejected until those connected boundaries retain actual HDR samples.
+
+
+## Retained native float wet sessions
+
+`wet-session.ts` shares one typed lifecycle across byte and float formats.
+`wet-format.ts` keeps encoded byte math separate from linear float load/mix and
+completed opacity while retaining the existing source/cache/storage authority.
+`createFloatWetStrokeSession` and `prepareFloatWetStroke` retain Float32 originals,
+destinations and signed/HDR spatial reservoirs. Native stored cells/snapshots
+never use byte RGB. `sampleFloatWetField` shares complete bilinear-neighbor
+geometry and compact support with the byte sampler, using its own numeric
+validation and zero-alpha canonicalization. Result iteration validates its
+format and returns fresh arrays. Shared creation now owns source release even
+when capture/storage initialization fails.
+
+[Exact private lifecycle, coverage precision and limits](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).
+Job databases and read-only native source replay are not a public HDR wet edit
+format. Float tools still require assets/replay/projection, persistence and
+guarded authoring integration through shared document commands.

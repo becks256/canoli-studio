@@ -1064,7 +1064,14 @@ execution optimizations, with unchanged public style/history/transport semantics
 
 Private linear Float32 wet load, deposit/pre-deposit pickup and completed-stroke
 selection/opacity primitives now preserve signed/HDR RGB without byte staging.
-They do not enable Smudge/Mixer in float documents. The existing byte retained
-session and PNG replacement transport cannot retain HDR edits; native float
-spatial reservoirs, retained authoring, assets/replay and persistence still need
-connection. [Numerical/ownership contract and verification scope](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
+They do not enable Smudge/Mixer in float documents. Float retained preparation
+is specified below. The byte PNG replacement transport cannot retain HDR edits;
+public retained authoring, HDR assets/replay and persistence still need connection. [Numerical/ownership contract and verification scope](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
+
+
+Private retained float wet preparation now preserves original-derived Float32
+destinations and signed/HDR spatial pigment through append, snapshots, finish
+and source closure. These read-only job results do not become document edits.
+HDR replacement assets, composed replay/projection, source-bearing persistence
+and public authoring/previews/commit remain required; float Smudge/Mixer stay
+unavailable. [Retained preparation contract](FLOAT_PROCESSING.md#retained-linear-float-wet-sessions).
