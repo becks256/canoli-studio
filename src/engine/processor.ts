@@ -1,3 +1,4 @@
+import {validateWetField} from '../core/wet-field';
 import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
 import {compileProjectiveSample,type ProjectiveSampleOptions} from '../core/projective-sampling';
 import {compileProjectiveField,type ProjectiveFieldOptions} from '../core/projective-field';
@@ -175,6 +176,12 @@ export class PixelProcessor {
     const captured=alpha.slice(),length=options.output.width*options.output.height;
     const result=await this.request(new Uint8ClampedArray(0),{floatProjectiveField:{alpha:captured,options}});
     validateFloatAlpha(result,length);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Projective field worker result differs from captured output geometry.');return result;
+  }
+  async floatProjectiveWet(alpha:Float32Array,input:ProjectiveFieldOptions):Promise<Float32Array>{
+    const {options}=compileProjectiveField(input);validateWetField(alpha,options.source.width*options.source.height);
+    const captured=alpha.slice(),length=options.output.width*options.output.height*5;
+    const result=await this.request(new Uint8ClampedArray(0),{floatProjectiveWet:{alpha:captured,options}});
+    validateWetField(result,length/5);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Projective field worker result differs from captured output geometry.');return result;
   }
   async bilateralFilter(pixels:Uint8ClampedArray,width:number,height:number,options:BilateralFilterOptions):Promise<Uint8ClampedArray> {
     const settings=bilateralOptionsSchema.parse(options);
@@ -448,6 +455,7 @@ export class PixelProcessor {
       floatAffine?:{pixels:Float32Array;matrix:number[]};
       floatProjective?:{pixels:Float32Array;options:ProjectiveSampleOptions};
       floatProjectiveField?:{alpha:Float32Array;options:ProjectiveFieldOptions};
+      floatProjectiveWet?:{alpha:Float32Array;options:ProjectiveFieldOptions};
       floatTone?:{pixels:Float32Array;options:FloatToneOptions};
       floatTonal?:{pixels:Float32Array;coverage:Float32Array;options:FloatTonalOptions};
       floatTransfer?:{pixels:Float32Array;adjustment:FloatTransferAdjustment};
@@ -554,6 +562,7 @@ export class PixelProcessor {
     if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
     if(payload.floatProjective)tryTransfer(payload.floatProjective.pixels.buffer);
     if(payload.floatProjectiveField)tryTransfer(payload.floatProjectiveField.alpha.buffer);
+    if(payload.floatProjectiveWet)tryTransfer(payload.floatProjectiveWet.alpha.buffer);
     if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);
     if(payload.floatTonal){tryTransfer(payload.floatTonal.pixels.buffer);tryTransfer(payload.floatTonal.coverage.buffer);}
     if(payload.floatTransfer)tryTransfer(payload.floatTransfer.pixels.buffer);

@@ -563,7 +563,10 @@ export async function drawMaskStroke(
 ) {
   const { stroke, mode } = entry;
   if(stroke.kind==='wet'){
-    if(stroke.opacity===0||!overlaps(world.bounds(strokeBounds(stroke)),space,0,0))return;
+    // A captured mask pullback may cross the inverse horizon and have
+    // unbounded support. The placed compositor resolves bounded native ROIs;
+    // finite artwork bounds must not cull or reject this coverage plane.
+    if(stroke.opacity===0||!stroke.placement&&!overlaps(world.bounds(strokeBounds(stroke)),space,0,0))return;
     if(!assets)throw new Error('Prepared wet mask coverage requires its image asset store.');
     await compositeWetPaint(stroke,assets,output,space,world,processor,isCancelled);return;
   }

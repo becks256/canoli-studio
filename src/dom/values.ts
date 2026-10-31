@@ -1,6 +1,8 @@
 import {brushSymmetrySchema,type BrushSymmetryData} from '../core/brush-symmetry';
 import {brushTextureSourceSchema,type BrushTextureData,type BrushTextureSource} from '../core/brush-texture';
 import {AffineTransform,type AffineData} from '../core/affine';
+import {PerspectiveTransform} from './perspective';
+import type {WetPaintPlacementData} from '../core/wet-operation';
 import {brushTipSchema,type BrushTipData,type PenTiltData} from '../core/brush-tip';
 import {freeze} from '../core/immutable';
 import type { WetPaintStrokeData, WetPaintTileData } from '../core/wet-operation';
@@ -274,6 +276,7 @@ export interface WetPaintStrokeOptions {
   brush: BrushStroke | BrushStrokeData;
   tiles: WetPaintTileData[];
   nativeTransform?: AffineTransform | AffineData;
+  placement?:Omit<WetPaintPlacementData,'perspective'|'basis'>&{perspective:PerspectiveTransform|WetPaintPlacementData['perspective'];basis:AffineTransform|AffineData};
   opacity?: number;
   load?: WetPaintLoadOptions;
   mix?: WetPaintMixOptions;
@@ -283,6 +286,7 @@ export class WetPaintStroke extends PaintOperation {
     super({ id: id(), kind: 'wet', opacity: options.opacity === undefined ? 1 : options.opacity, clip: null,
       brush: options.brush instanceof BrushStroke ? options.brush.toJSON() : options.brush,
       tiles: options.tiles, nativeTransform: options.nativeTransform instanceof AffineTransform ? options.nativeTransform.toJSON() : options.nativeTransform === undefined ? new AffineTransform().toJSON() : options.nativeTransform,
+      ...(options.placement===undefined?{}:{placement:{...options.placement,perspective:options.placement?.perspective instanceof PerspectiveTransform?options.placement.perspective.toJSON():options.placement?.perspective,basis:options.placement?.basis instanceof AffineTransform?options.placement.basis.toJSON():options.placement?.basis}}),
       load: wetPaintLoadSchema.parse(options.load === undefined ? {} : options.load), mix: wetPaintMixSchema.parse(options.mix === undefined ? {} : options.mix),
     });
   }
@@ -291,6 +295,7 @@ export class WetPaintStroke extends PaintOperation {
   get brush() { return PaintOperation.fromJSON((this.data as WetPaintStrokeData).brush) as BrushStroke; }
   get tiles() { return structuredClone((this.data as WetPaintStrokeData).tiles); }
   get nativeTransform() { return AffineTransform.fromJSON((this.data as WetPaintStrokeData).nativeTransform); }
+  get placement(){const p=(this.data as WetPaintStrokeData).placement;return p?{width:p.width,height:p.height,perspective:new PerspectiveTransform(p.perspective),basis:AffineTransform.fromJSON(p.basis)}:undefined;}
   get load() { return structuredClone((this.data as WetPaintStrokeData).load); }
   get mix() { return structuredClone((this.data as WetPaintStrokeData).mix); }
 }

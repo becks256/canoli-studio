@@ -44,7 +44,8 @@ export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,b
     }
   }
   for(const entry of mask.strokes??[]){
-    if(entry.mode==='wet'||!entry.placement){add(strokeBounds(entry.stroke));continue;}
+    if(entry.mode==='wet'){if(entry.stroke.opacity===0)continue;try{add(strokeBounds(entry.stroke));}catch{unbounded=true;}continue;}
+    if(!entry.placement){add(strokeBounds(entry.stroke));continue;}
     const p=entry.placement,width=Math.ceil(p.width),height=Math.ceil(p.height),sx=width/p.width,sy=height/p.height,stroke=strokeBounds(entry.stroke);
     try{
       // Bound the complete captured raster and its bilinear neighbors, then

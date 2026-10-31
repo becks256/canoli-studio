@@ -1,5 +1,26 @@
 # REST and scripting APIs
 
+## Captured wet placement (document schema 55)
+
+Prepared `WetPaintStroke` DTOs accept optional strict
+`placement:{width,height,perspective,basis}` metadata. `nativeTransform` then
+maps prepared pixels into the captured placed image plane; replay pulls the
+complete coupled replacement/coverage field back into owner-local content.
+The same constructors, shared validation, locks, atomic revision and Undo apply
+to paint/raster layers and ordinary/filter masks, including retained history
+and embedded documents. Actual PNG dimensions and premasked alpha still validate
+before external results commit. Invalid/null metadata, false schema ages,
+missing sources and finite-artwork horizon crossings reject.
+
+Trusted browser `editor.applyWetPaint` accepts `space:"local"|"placed"`, default
+local. Active projected raster/linked-mask preparation uses placed image pixels;
+unlinked masks keep local behavior. Isolated scripts/plugins submit prepared
+values using existing assets; they gain no host preparation, pixel, worker,
+file or network service. REST sessions remain independent of the browser and
+do not provide a composed renderer or synchronize human edits.
+[Signatures, defaults and example](SCRIPTING_API.md#captured-perspective-wet-fields-schema-55).
+
+
 ## Native worker runtime
 
 The source API host uses the existing tsx dependency to load its TypeScript
@@ -306,7 +327,7 @@ Existing `layer.add` / `layer.update` adjustment DTOs accept strict `{kind:"red-
 Ordinary mask values in layer.add/layer.update.mask and smartObject.filterMask accept ordered `{mode:"wet",stroke:<complete WetPaintStroke DTO>}` entries. Embedded master definitions use the same version rule and asset discovery. Upload original output/coverage PNGs through the existing assets endpoint first. Native output alpha must not exceed coverage alpha, even for opacity0 metadata, disabled masks or hidden layers. The shared host validates these bytes before a synchronous command batch; invalid content returns400 with no partial rename/mask edits, stale revisions return409, and success is one undo step. No server brush-simulation endpoint or browser/session synchronization is added. Mask/filter-mask engine authoring is a separate trusted-browser `editor.applyWetPaint(...,{target})` contract documented in SCRIPTING_API.md.
 
 
-Prepared wet `opacity:0` remains serialized with all image references, whose validity is still checked before commands commit; it does not force native reconstruction or SVG rasterization. Constructor opacity/nativeTransform defaults apply only to undefined; explicit null rejects like invalid raw DTO fields. Retained spatial sessions remain internal to the browser engine, with no new REST endpoint or isolated host service. Current document schema37/project3/workspace2 apply; ordinary prepared layer records retain their schema33 introduction.
+Prepared wet `opacity:0` remains serialized with all image references, whose validity is still checked before commands commit; it does not force native reconstruction or SVG rasterization. Constructor opacity/nativeTransform defaults apply only to undefined; explicit null rejects like invalid raw DTO fields. Retained spatial sessions remain internal to the browser engine, with no new REST endpoint or isolated host service. Current documents use schema55; prepared wet metadata does not change project/workspace container versions; ordinary prepared layer records retain their schema33 introduction.
 
 Schema 33 introduces prepared `WetPaintStroke` values through existing `paint.add`, `layer.add` and raster `layer.update.erasures` commands. No new REST simulation/render endpoint is added. A wet record contains `id`, `kind:"wet"`, independent `opacity` (0–1), `clip:null`, brush/pencil `brush` metadata, normalized `load`/`mix`, invertible `nativeTransform`, and native `tiles:[{x,y,width,height,assetId,coverage:{assetId}}]`. See [the constructor contract and runnable isolated example](SCRIPTING_API.md#prepared-wet-paint-schema-33). Native pixels are authoritative; metadata does not execute a brush engine on the server.
 
@@ -684,7 +705,7 @@ Define masters before adding their instances in the command array. Nested master
 
 The REST session remains separate from the browser; these commands do not implement headless smart-object rendering or file-linked masters. Public constructors and detached editing semantics are documented in [SmartObjectLayer and shared masters](SCRIPTING_API.md#smartobjectlayer-and-shared-masters).
 
-`{ type: "smartObject.convertRaster", id, componentId, instanceId }` converts an existing raster layer through the same REST command endpoint. Supply a fresh component ID and fresh layer instance ID. It keeps the parent/stack index and placement properties, embeds existing tone effects and reuses original assets. Non-raster targets, missing targets, locked ancestry and duplicate IDs reject the transaction. Undo restores the raster and removes the newly created definition; redo retains the same generated identities. The constructor equivalent is `RasterLayer.convertToSmartObject()`.
+`{ type: "smartObject.convertRaster", id, componentId, instanceId }` converts an existing raster layer through the same REST command endpoint. Supply a fresh component ID and fresh layer instance ID. It keeps the parent/stack index and rendered placement, embeds existing tone/native modifiers and reuses original assets. Compact conversion retains outer placement/mask/appearance properties. Extended wet content uses containing-master bounds, with the raster and its mask/appearance editable inside the master, so off-image pixels remain retained. Non-raster targets, missing targets, locked ancestry and duplicate IDs reject the transaction. Undo restores the raster and removes the newly created definition; redo retains the same generated identities. The constructor equivalent is `RasterLayer.convertToSmartObject()`.
 
 `{ type: "smartObject.duplicateIndependent", id, instanceId, componentIds }` creates an independent smart-object copy. `componentIds` maps every master reachable from the selected instance (including its root) to a fresh component ID. The map must contain exactly those keys; missing/extra mappings, duplicate destination IDs, existing component IDs, reused layer IDs, non-smart targets and locked ancestry reject atomically. The new instance is inserted directly above the source with the ordinary 24-pixel duplicate offset. Root/nested definitions are cloned and references remapped without copying asset bytes. A command-array transaction preserves revision protection and one-step undo/redo. The public constructor method `SmartObjectLayer.duplicateIndependent()` allocates this mapping automatically.
 

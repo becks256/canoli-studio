@@ -1,5 +1,25 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Captured wet-field invariant (schema 55)
+
+Treat placed wet output as one coupled field `(premultiplied RGB, replacement
+alpha, removal coverage)`, with `0 <= RGB <= alpha <= coverage <= 1`.
+Compose tiles in authored order on their prepared native grid. Pull that field
+through `basis^-1 * H^-1 * nativeTransform` before current image/parent placement.
+Apply `destination * (1-coverage) + replacement` once; operation opacity envelopes
+the complete result once. Never mask the replacement again, inverse-map only
+points, bake original sources, or use image-quad clipping for mask support.
+
+Use existing homography precision/origin and bounded native-window machinery
+for all five channels. Pin source identities/lifetimes, copy inputs before
+worker readiness, validate replies, retain private preview leases and reject
+stale revision/ordered-selection work before shared publication. Unbounded mask
+support streams; finite artwork rejects horizon crossings. Extended wet raster
+conversion uses containing masters. Local legacy metadata keeps its existing
+replay path. Native float wet tools and full editor-wide sustained/device and
+photographic quality gates remain open.
+
+
 ## Worker-owned TypeScript loading
 
 Native Node services register their existing ESM TypeScript loader once inside

@@ -2093,13 +2093,89 @@ Underscore-prefixed members (`_dispatch`, `_read`, `_attach`, etc.), worker mess
 
 ## Prepared wet paint (schema 33)
 
-`new WetPaintStroke({brush, tiles, nativeTransform?, opacity?, load?, mix?})` creates an immutable prepared replacement value. Add it to `PaintLayer.strokes`, or call `RasterLayer.applyWetPaint(stroke): void`. Raster replacements retain their order relative to erase/clear, capture the current logical width/height, and preserve the original image asset. Attached mutations use ordinary commands, ancestor locks, transactions and undo. DTOs use `kind: "wet"` and require schema 33, including retained history and embedded masters. Older valid documents migrate; falsely old wet records reject. Project v3/workspace v2 are unchanged.
+### Captured perspective wet fields (schema 55)
 
-`brush` is a `BrushStroke`/`PencilStroke` value or its complete DTO, without clone tiles. It records the footprint, path, captured selection, opacity, flow, pressure, tilt, symmetry and optional texture. These settings describe preparation: **the supplied pixels are authoritative**, and editing metadata does not rerun the simulation. Eraser/clone/fill footprints reject. `tiles` is a nonempty array of `{x,y,width,height,assetId,coverage:{assetId}}`. Geometry is integral native pixels with positive extents and safe numeric addressing. `nativeTransform` maps native tile coordinates into layer-local coordinates and defaults to identity. Explicit null opacity/nativeTransform rejects; only omitted/undefined values use defaults. Zero operation opacity keeps metadata and asset references but does not select native reconstruction, GPU fallback, expanded visual bounds or SVG prefix baking. Independent operation `opacity` defaults to 1 and blends the complete replacement once, including overlapping tiles. The brush's opacity/selection must already be baked into supplied pixels; outer DTO `clip` is always null.
+`WetPaintStrokeOptions.placement?` retains an optional
+`{width:number,height:number,perspective:PerspectiveTransform|PerspectiveData,basis:AffineTransform|AffineData}`.
+Width/height are positive finite reference image dimensions; the perspective
+quad is strictly convex and the affine basis invertible. All four fields are
+required when placement is present; omission retains the prior affine behavior.
+The readonly `.placement` getter returns owned constructor values or `undefined`;
+`toJSON()` retains owned plain data. Invalid/null/unknown placement fields reject.
+
+For a placed value, `nativeTransform` maps prepared tile pixels to the placed
+authoring image plane. `basis` maps original owner-local content into the image
+plane before the captured homography H. Thus tiles map back into original content
+through `basis.inverse() × H.inverse() × nativeTransform`. Color replacement and
+independent removal coverage are transported together, without image-quad
+clipping or multiplying the replacement by coverage twice. Reconstruct original
+native pixels before the owner's current affine/perspective display transform.
+Changing/resetting current image perspective does not retarget the captured edit.
+Prepared brush/clip/tip/texture/symmetry metadata and the original image/mask
+geometry remain retained; this is prepared pixel output, not a claim that changing
+brush metadata regenerates its pixels.
+
+Schema 55 is required in paint/raster/ordinary-mask/filter-mask, embedded and
+retained-history contexts, even for inert placed metadata. Old valid values
+migrate without an injected placement. Constant coverage outside stored tiles
+is zero; partial removal is distinct from replacement alpha. Image/paint layers
+require finite complete pullback support. Mask fields can retain unbounded
+pullback support through native streaming instead of guessing a clip rectangle.
+Original blobs, existing source/alpha validation, grants, commands and Undo stay
+authoritative. No pixel/worker capability is exposed to isolated scripts/plugins.
+
+Tiles compose in their prepared native grid in array order before projective
+sampling. Each tile removes its coverage and adds its already masked output.
+The coupled field carries premultiplied RGB, replacement alpha and independent
+removal coverage. This avoids seams at adjacent native tile edges. New placed
+values round at this reconstruction boundary; explicitly overlapping tiles can
+differ by a byte from legacy per-tile intermediate rounding. Values without
+placement keep the previous path. Whole-operation opacity applies once after
+the complete replacement.
+
+Import valid one-pixel PNG layers named **Wet output** (transparent) and
+**Wet coverage** (opaque) before this example. It demonstrates a captured
+translation using the perspective value: the prepared pixel at (8,8) pulls back
+to mask pixel (4,6). The image sources remain unchanged. General convex
+perspective values use the same field contract.
+
+<!-- example: wet-placed-prepared -->
+
+```js
+const output = [...document.layers].find(layer => layer.name === "Wet output");
+const coverage = [...document.layers].find(layer => layer.name === "Wet coverage");
+if (!(output instanceof RasterLayer) || !(coverage instanceof RasterLayer)) {
+  throw new Error("Import Wet output and Wet coverage PNG layers first.");
+}
+const layer = new PaintLayer({name: "Captured wet mask"});
+layer.strokes.add(new PaintFill({bounds: {x: 0, y: 0, width: 16, height: 16}, color: "#2a5968"}));
+layer.mask = new LayerMask({base: 1}).applyWetPaint(new WetPaintStroke({
+  brush: new PencilStroke({points: [{x: 8.5, y: 8.5}], size: 1, pressureSize: false}),
+  placement: {
+    width: 16, height: 16, basis: new AffineTransform(),
+    perspective: new PerspectiveTransform({corners: [
+      {x: 0.25, y: 0.125}, {x: 1.25, y: 0.125},
+      {x: 1.25, y: 1.125}, {x: 0.25, y: 1.125}
+    ]})
+  },
+  tiles: [{x: 8, y: 8, width: 1, height: 1, assetId: output.assetId, coverage: {assetId: coverage.assetId}}]
+}));
+document.layers.add(layer);
+output.visible = false;
+coverage.visible = false;
+document.selectedLayer = layer;
+print("Captured wet mask ready");
+```
+Float-document wet painting still requires its separate integration.
+
+
+`new WetPaintStroke({brush, tiles, nativeTransform?, placement?, opacity?, load?, mix?})` creates an immutable prepared replacement value. Add it to `PaintLayer.strokes`, or call `RasterLayer.applyWetPaint(stroke): void`. Raster replacements retain their order relative to erase/clear, capture the current logical width/height, and preserve the original image asset. Attached mutations use ordinary commands, ancestor locks, transactions and undo. DTOs use `kind: "wet"` and require schema 33, including retained history and embedded masters. Older valid documents migrate; falsely old wet records reject. Existing project/workspace container versions are unchanged by prepared wet metadata.
+
+`brush` is a `BrushStroke`/`PencilStroke` value or its complete DTO, without clone tiles. It records the footprint, path, captured selection, opacity, flow, pressure, tilt, symmetry and optional texture. These settings describe preparation: **the supplied pixels are authoritative**, and editing metadata does not rerun the simulation. Eraser/clone/fill footprints reject. `tiles` is a nonempty array of `{x,y,width,height,assetId,coverage:{assetId}}`. Geometry is integral native pixels with positive extents and safe numeric addressing. Without placement, `nativeTransform` maps native tile coordinates into layer-local coordinates and defaults to identity. The captured perspective mapping above defines its placed behavior. Explicit null opacity/nativeTransform rejects; only omitted/undefined values use defaults. Zero operation opacity keeps metadata and asset references but does not select native reconstruction, GPU fallback, expanded visual bounds or SVG prefix baking. Independent operation `opacity` defaults to 1 and blends the complete replacement once, including overlapping tiles. The brush's opacity/selection must already be baked into supplied pixels; outer DTO `clip` is always null.
 
 Both image references must resolve to decoded, noninterlaced RGB8/RGBA8 PNG assets whose actual dimensions match their tile. Output alpha must be at most coverage alpha at every native pixel: output is already masked, coverage removes destination pixels, and output is added once. This permits reducing alpha. Coverage RGB is ignored. Browser/script commits and REST decode/check native alpha before publishing; invalid/missing/replaced sources reject the entire transaction. This derived-output contract does not restrict original-image or brush-texture import formats/resolution. Native tile coordinates, count and original dimensions have no arbitrary image-tier cap; working buffers, storage quota and numeric/format precision can still fail explicitly.
 
-`load` accepts `{color?: [r,g,b,a], load?: number}`; channels are integral 0–255 and load is 0–1, defaulting to opaque black and 0. `mix` accepts `{flow?,wetness?,pickup?}`, each 0–1, defaulting to 1/0/0.5. Unknown keys/nonfinite or out-of-range values reject. These normalized settings are retained metadata on prepared values. Read-only members are `id`, `kind`, `opacity`, `brush`, `tiles`, `nativeTransform`, `load`, `mix`, and `toJSON()`; returned arrays/DTOs are owned copies.
+`load` accepts `{color?: [r,g,b,a], load?: number}`; channels are integral 0–255 and load is 0–1, defaulting to opaque black and 0. `mix` accepts `{flow?,wetness?,pickup?}`, each 0–1, defaulting to 1/0/0.5. Unknown keys/nonfinite or out-of-range values reject. These normalized settings are retained metadata on prepared values. Read-only members are `id`, `kind`, `opacity`, `brush`, `tiles`, `nativeTransform`, `placement`, `load`, `mix`, and `toJSON()`; returned arrays/DTOs are owned copies.
 
 This isolated example requires two already imported PNG image layers named **Wet output** and **Wet coverage**, with matching original pixel dimensions and valid premasked output. Source layers are kept as imported; use hidden source layers if their images should appear only in the replacement. No files, pixels, native simulation or export service is exposed to the sandbox.
 
@@ -2127,7 +2203,7 @@ Use original dimensions without resizing the two source layers. The host validat
 
 `mask.applyWetPaint(stroke: WetPaintStroke): LayerMask` returns a new immutable mask with one prepared replacement appended. Assign it to `layer.mask` or `instance.filterMask` to commit through the shared commands, locks, transaction and undo path. Ordinary `mask.paint` still accepts only BrushStroke/PencilStroke and Hide/Reveal; it does not accept WetPaintStroke. Constructors, `with({strokes})`, `strokes` getters and `toJSON()` preserve the ordered union `{mode:"hide"|"reveal", stroke:BrushStroke|PencilStroke}` or `{mode:"wet", stroke:WetPaintStroke}`. Clone/fill or a mode/value mismatch rejects. Ordinary and wet operations share the existing 2,048-operation / 200,000-total-point mask budget (20,000 points per brush); wet point counts use the retained brush metadata, not native tile count. There is no arbitrary image/native-tile count tier.
 
-Raw coverage is reconstructed in the mask's native coordinate plane before its linked/unlinked/master transform, then mask-wide feather, inversion and density apply once. Bitmap originals and vector/selection/base geometry remain unchanged and editable. Prepared output alpha is authoritative coverage; RGB is ignored. Prepared alpha must already be bounded by its native coverage PNG, just as for layer replacements. Independent operation opacity applies once; zero-opacity records retain validated references and metadata while bypassing native reconstruction and preserving pure-vector SVG masks. Both ordinary and filter masks require schema 34 for this new operation, including retained history and embedded masters; normal layer wet values still date from schema 33. Project3/workspace2 containers stay unchanged. Old readers may reject new document schemas.
+Raw coverage is reconstructed in the mask's native coordinate plane before its linked/unlinked/master transform, then mask-wide feather, inversion and density apply once. Bitmap originals and vector/selection/base geometry remain unchanged and editable. Prepared output alpha is authoritative coverage; RGB is ignored. Prepared alpha must already be bounded by its native coverage PNG, just as for layer replacements. Independent operation opacity applies once; zero-opacity records retain validated references and metadata while bypassing native reconstruction and preserving pure-vector SVG masks. Both ordinary and filter masks require schema 34 for this new operation, including retained history and embedded masters; normal layer wet values still date from schema 33. Prepared wet metadata does not change project/workspace container versions. Old readers may reject new document schemas.
 
 Import valid one-pixel PNG layers named **Wet output** and **Wet coverage** before running the example. Output alpha must not exceed coverage alpha. The script references those existing originals; it does not read files, fetch pixels or run a simulation.
 
@@ -2154,9 +2230,23 @@ print("Prepared mask ready");
 
 ### Wet preparation (trusted application code)
 
-`await editor.applyWetPaint(brush, options?): Promise<WetPaintStroke|null>` runs actual native spatial preparation and atomically commits the result. `brush` is a BrushStroke/PencilStroke whose coordinates are **target-local**, while captured document selection is transformed into that plane. `options` accepts only `mode?: "smudge"|"mixer"` (default smudge), `target?: "layer"|"mask"|"filter-mask"` (default layer), `targetId?: string` (default selected layer), `respectSelection?: boolean` (default true), `load?`, `mix?`, `signal?: AbortSignal`, and `onProgress?: ({dabs,workingTiles}) => void`. An explicit brush clip takes precedence over document selection; false respectSelection clears both. For layer pixels, no selected target creates a paint layer; an existing target must be a paint/image layer. Mask targets require an existing mask; filter-mask targets require a smart object with an existing filter mask. All layer kinds/groups may receive ordinary mask coverage. Locked ancestry rejects. Targets are never silently redirected.
+`await editor.applyWetPaint(brush, options?): Promise<WetPaintStroke|null>` runs actual native spatial preparation and atomically commits the result. `brush` is a BrushStroke/PencilStroke whose default local-space coordinates are **target-local**, while captured document selection is transformed into that plane. `options` accepts only `space?: "local"|"placed"` (default local), `mode?: "smudge"|"mixer"` (default smudge), `target?: "layer"|"mask"|"filter-mask"` (default layer), `targetId?: string` (default selected layer), `respectSelection?: boolean` (default true), `load?`, `mix?`, `signal?: AbortSignal`, and `onProgress?: ({dabs,workingTiles}) => void`. An explicit brush clip takes precedence over document selection; false respectSelection clears both. For layer pixels, no selected target creates a paint layer; an existing target must be a paint/image layer. Mask targets require an existing mask; filter-mask targets require a smart object with an existing filter mask. All layer kinds/groups may receive ordinary mask coverage. Locked ancestry rejects. Targets are never silently redirected.
 
-For mask/filter-mask targets, brush coordinates are **mask-local native pixels**, before its x/y/basis/linking transform. Filter-mask coordinates are in the smart master plane, independently of instance size. Selection is captured through that complete mapping. Preparation samples raw mask coverage, ignoring enabled/inverted/density/feather and artwork/filter appearance; these settings remain stored and apply afterward. Mask load RGB normalizes to white, with alpha retained from a valid `load.color` tuple (default alpha255). Mixer alpha255 loads revealed coverage; alpha0 loads hidden coverage. Smudge defaults load0 and transports existing coverage. The UI Hide/Reveal target supplies that initial alpha; current load/wetness/pickup and brush opacity/flow still apply. Foreground RGB is not a mask control. Source identities, revision/cancellation, private previews, no-op and atomic publication contracts are the same as layer pixels.
+With `space:"placed"`, an active projected raster or linked ordinary/filter
+mask uses image pixels after perspective and before layer/parent affine placement.
+The complete brush, selection clip, symmetry, tip/tilt and texture field remains
+in that plane. Preparation samples neutral projected pixels/coverage on the
+original image/master grid and retains prepared tiles plus the captured mapping;
+it does not inverse-map only pointer points. Mask density/inversion/feather/enabled
+settings remain separate. Identity/absent perspective and unlinked masks keep
+local behavior and produce no placement metadata. Default local preparation
+samples intrinsic content before perspective. Every finished nonempty gesture
+has one Undo; previews stay private. Actual owner/revision/ordered-selection
+changes, including away-and-back, cancel stale work. An equivalent selection
+remains valid. Existing finite-artwork/horizon and native buffer limits apply;
+no original resolution is reduced.
+
+For default/local mask/filter-mask targets, brush coordinates are **mask-local native pixels**, before its x/y/basis/linking transform. Filter-mask coordinates are in the smart master plane, independently of instance size. Selection is captured through that complete mapping. Preparation samples raw mask coverage, ignoring enabled/inverted/density/feather and artwork/filter appearance; these settings remain stored and apply afterward. Mask load RGB normalizes to white, with alpha retained from a valid `load.color` tuple (default alpha255). Mixer alpha255 loads revealed coverage; alpha0 loads hidden coverage. Smudge defaults load0 and transports existing coverage. The UI Hide/Reveal target supplies that initial alpha; current load/wetness/pickup and brush opacity/flow still apply. Foreground RGB is not a mask control. Source identities, revision/cancellation, private previews, no-op and atomic publication contracts are the same as layer pixels.
 
 Preparation samples the target's neutral content, including preceding ordered operations, before its opacity/mask/styles/tone effects or parent appearance. Raster sampling uses original pixels independently of current logical size; source blobs remain unchanged. Foreground defaults to the brush's opaque RGB. Smudge defaults load to 0 and wetness to 0; mixer defaults load to 1 and wetness to 0.25. Partial load/mix options override those mode defaults; remaining mix flow/pickup defaults are 1/0.5. This is finite encoded-sRGB pigment transport, not a physical/spectral model.
 
@@ -2170,7 +2260,7 @@ const result = await editor.applyWetPaint(stroke, {
 });
 ```
 
-Import constructors from the host DOM module and provide an AbortController as `controller`. No changed pixels returns null without history/assets. Abort, callback errors, quota/source-lifetime failures or changed document/revision/active selection/session reject without late publication. Private storage is disposed before commit; staged assets publish only after validation and remain for undo/redo. Original-first symmetry order, separate spatial pigment per copy, once-only selection/brush opacity, native replacement and complete path replay are preserved. Numerical work uses at most 4 million pixels/request and native composition at most 4 million pixels/4096 pixels per side per working surface; these are working budgets, not source limits. This adapter does not implement incremental live gestures, mixer/smudge tool controls, mask/filter-mask painting or preset integration. Those roadmap gates remain open.
+Import constructors from the host DOM module and provide an AbortController as `controller`. No changed pixels returns null without history/assets. Abort, callback errors, quota/source-lifetime failures or changed document/revision/active selection/session reject without late publication. Private storage is disposed before commit; staged assets publish only after validation and remain for undo/redo. Original-first symmetry order, separate spatial pigment per copy, once-only selection/brush opacity, native replacement and complete path replay are preserved. Numerical work uses at most 4 million pixels/request and native composition at most 4 million pixels/4096 pixels per side per working surface; these are working budgets, not source limits. The tool controller connects incremental private previews, Smudge/Mixer controls, mask/filter-mask targets and presets through this adapter. Native float wet tools and full sustained/device/photographic acceptance remain open.
 
 ## Maintaining this contract
 
@@ -2835,7 +2925,15 @@ Document schema 14 persists definitions, placements, per-instance filter stacks,
 
 ### Convert a raster layer to a smart object
 
-`raster.convertToSmartObject(): SmartObjectLayer` converts one attached `RasterLayer` and selects the returned instance. It replaces the raster at the same parent and stack index, retaining placement dimensions, affine transform, mask, opacity, blend mode, styles and metadata. Tone effects move into the embedded master; immutable source image bytes are reused. The operation uses one shared command and one undo entry (or the enclosing script's transaction). A fresh instance ID prevents old RasterLayer handles from pretending to have a different class: the old handle is detached after conversion and becomes attached again on undo. Unknown/detached targets, locks on the raster or ancestors, and invalid geometry reject atomically.
+`raster.convertToSmartObject(): SmartObjectLayer` converts one attached `RasterLayer` and selects the returned instance. It replaces the raster at the same parent and stack index. Compact original-image conversion retains placement dimensions, affine transform, mask, opacity, blend mode, styles and metadata on the instance. Tone effects and native modifiers move into the embedded master; immutable source image bytes are reused. Extended wet content uses the containing-master behavior described below. The operation uses one shared command and one undo entry (or the enclosing script's transaction). A fresh instance ID prevents old RasterLayer handles from pretending to have a different class: the old handle is detached after conversion and becomes attached again on undo. Unknown/detached targets, locks on the raster or ancestors, and invalid geometry reject atomically.
+
+When raster wet pixels extend beyond the original image bounds,
+`convertToSmartObject()` uses the existing containing-master conversion. The
+original raster, its mask and appearance remain editable inside `editContents()`;
+the containing instance includes the artboard and extended content. This differs
+from the compact original-image conversion, which retains an outer mask on the
+instance. It prevents trimming off-image paint while preserving source metadata,
+independent mask planes and Undo. Native projects retain both forms.
 
 ```js
 if (!(document.selectedLayer instanceof RasterLayer)) {
@@ -2869,7 +2967,7 @@ keeps unlinked masks independent of the child affine/perspective transform,
 including repeated instances and native rendering frames. Full-frame projected
 children retain their perspective; master clipping is retained whenever their
 intrinsic support extends outside the master artboard. This does not enable
-preserving-position projective relinking or projected wet input.
+preserving-position projective relinking. Projected byte wet input is described in the schema-55 contract above.
 
 ### Independent smart-object copies
 

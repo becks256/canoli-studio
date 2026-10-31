@@ -183,7 +183,7 @@ export {
   PaintFill,
 } from "./values";
 export type { BrushOptions,BrushTipOptions,WetPaintStrokeOptions } from "./values";
-export type { WetPaintStrokeData, WetPaintTileData } from '../core/wet-operation';
+export type { WetPaintStrokeData, WetPaintTileData,WetPaintPlacementData } from '../core/wet-operation';
 export type {PressureCurveData,PressureKnot} from '../core/pressure-curve';
 export type {BrushSymmetryData} from '../core/brush-symmetry';
 export type {BrushTextureData,BrushTextureSource} from '../core/brush-texture';

@@ -182,7 +182,8 @@ interface PaintGesture extends BaseGesture {
 }
 interface WetGesture extends BaseGesture {
   kind: 'wet';
-  selectionId:string|null;
+  selectionIds:readonly string[];
+  unsubscribe?:()=>void;
   maxPoints:number;
   tool: 'smudge' | 'mixer';
   inputTransform: AffineTransform;
@@ -414,7 +415,6 @@ export class ToolController {
   }
   getSnapshot = () => this.state;
   canUseTool(tool:Tool):boolean{
-    if(this.perspectiveToolBlocked(tool))return false;
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
     if(tool==='dodge'||tool==='burn')return true;
@@ -424,14 +424,10 @@ export class ToolController {
   }
   toolUnavailableReason(tool:Tool):string|null {
     if(this.canUseTool(tool))return null;
-    return this.perspectiveToolBlocked(tool)?'Reset perspective before painting on this image or editing its mask.':'This tool requires its float document integration.';
-  }
-  private perspectiveToolBlocked(tool:Tool):boolean {
-    const document=this.editor.document,selected=document.selectedLayer;
-    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&['smudge','mixer'].includes(tool);
+    return 'This tool requires its float document integration.';
   }
   /** Current gestures may begin before React flushes a selection preference reset. */
-  get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&(gesture.document.selectedLayer?.id??null)===gesture.selectionId;}
+  get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&gesture.document.getSnapshot().selectedIds.length===gesture.selectionIds.length&&gesture.document.getSnapshot().selectedIds.every((id,i)=>id===gesture.selectionIds[i]);}
 
   /** Trusted cursor adapter: use the same stroke plane as begin(), without mutations. */
   brushCursorAxes(tool: Tool, tilt?: PenTiltData, includeDefault=false) {
@@ -944,7 +940,8 @@ export class ToolController {
       if(maskData&&((maskData.strokes?.length??0)>=2048||maxPoints<1))throw new Error('This mask has reached its stroke or point budget.');
       let world=selected?layerTransform(doc._read(),selected.id)!:new AffineTransform();
       if(target==='filter-mask'&&selected instanceof SmartObjectLayer){const master=doc.getComponent(selected.componentId);world=world.multiply(AffineTransform.scale(selected.width/master.width,selected.height/master.height));}
-      if(maskData)world=maskTransform(maskData,world);
+      const image=findLayer(doc._read(),selected?.id??''),placed=!!image&&activePerspective(image.perspective)&&(!maskData||maskData.linked!==false);
+      if(placed&&selected)world=layerTransform(doc._read(),selected.id)!;else if(maskData)world=maskTransform(maskData,world);
       const inputTransform=world.inverse();
       const first=this.point(point,{x:0,y:0},modifiers.pressure,inputTransform,modifiers.tilt),abort=new AbortController();
       const dynamics=settings[tool],symmetry=this.symmetryIn(inputTransform);
@@ -954,9 +951,11 @@ export class ToolController {
         ...(settings.pressureCurve?{pressureCurve:settings.pressureCurve}:{}),...(settings.tip?{tip:settings.tip}:{}),...(symmetry?{symmetry}:{}),
         texture:settings.texture?{assetId:this.editor.brushTextureSource.leaseIn(assets).asset.id,...settings.texture}:null,
         color:settings.color,points:[first],clip:transformSelection(doc.selection?.toJSON(),inputTransform),
-      }),{mode:tool,target,signal:abort.signal,load:{load:dynamics.load,...(maskData?{color:[255,255,255,settings.paintTarget.endsWith('hide')?0:255] as [number,number,number,number]}:{})},mix:{wetness:dynamics.wetness,pickup:dynamics.pickup,flow:1}});
-      const gesture:WetGesture={...base,kind:'wet',selectionId:selected?.id??null,maxPoints,tool,inputTransform,settings,points:[first],processed:1,previewed:0,abort,ready,running:null,finishing:false};
-      this.gesture=gesture;this.publish({drawing:true,error:null});void this.pumpWet(gesture).catch(()=>{});return;
+      }),{mode:tool,target,space:placed?'placed':'local',signal:abort.signal,load:{load:dynamics.load,...(maskData?{color:[255,255,255,settings.paintTarget.endsWith('hide')?0:255] as [number,number,number,number]}:{})},mix:{wetness:dynamics.wetness,pickup:dynamics.pickup,flow:1}});
+      const gesture:WetGesture={...base,kind:'wet',selectionIds:[...doc.getSnapshot().selectedIds],maxPoints,tool,inputTransform,settings,points:[first],processed:1,previewed:0,abort,ready,running:null,finishing:false};
+      this.gesture=gesture;
+      gesture.unsubscribe=doc.subscribe(()=>{const state=doc.getSnapshot();if(this.gesture===gesture&&!gesture.finishing&&(state.revision!==gesture.revision||state.selectedIds.length!==gesture.selectionIds.length||state.selectedIds.some((id,i)=>id!==gesture.selectionIds[i])))this.cancel();});
+      this.publish({drawing:true,error:null});void this.pumpWet(gesture).catch(()=>{});return;
     }
     if(tool==='quick-select'){
       const settings=this.state.settings,layer=doc.selectedLayer;
@@ -2037,6 +2036,7 @@ export class ToolController {
       throw new Error("The document changed during this gesture. Try again.");
   }
   private releaseWet(gesture: WetGesture) {
+    gesture.unsubscribe?.();gesture.unsubscribe=undefined;
     gesture.abort.abort(new Error('Wet stroke cancelled.'));
     void gesture.ready.then(job=>job.dispose(),()=>{}).catch(()=>{});
   }

@@ -1,0 +1,628 @@
+{
+  "version": 1,
+  "reference": "Independent NumPy DLT and bilinear five-channel fields; fixed relative frames for large coordinates.",
+  "generatorSha256": "af8159e35ca25f77f8501d6b5b1aae806dd96e06c2cd5996b39aafb896b7d4c9",
+  "absoluteError": 2e-07,
+  "sourceSha256": "0287ce457a3e3c5d9b56f9a7c364a748270439c0698e68c2c5794324989a030a",
+  "cases": [
+    {
+      "name": "identity",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 23
+          },
+          {
+            "x": 0,
+            "y": 23
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -10,
+          "y": -8,
+          "width": 48,
+          "height": 42
+        },
+        "background": 0
+      },
+      "reference": "identity.f32le.gz",
+      "floatSha256": "cc46a4ed62e9eced48c116b1161a4a64559df6e12cf8cb7ab95e9424a2c99c2d"
+    },
+    {
+      "name": "reflection",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 36,
+            "y": 2
+          },
+          {
+            "x": 2,
+            "y": 4
+          },
+          {
+            "x": 5,
+            "y": 29
+          },
+          {
+            "x": 31,
+            "y": 26
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "reflection.f32le.gz",
+      "floatSha256": "9716cebf5cbbb7a3c741063e74719fbc1ac5bf3683e304b58e4e66cd93fea1a2"
+    },
+    {
+      "name": "perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 3.25,
+            "y": 1.125
+          },
+          {
+            "x": 39.5,
+            "y": 4.25
+          },
+          {
+            "x": 31,
+            "y": 29
+          },
+          {
+            "x": 7.5,
+            "y": 25.75
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "perspective.f32le.gz",
+      "floatSha256": "b9508f94129031ba13ee32c0fdc5503f83af26b0cd3014415edd39b1a74b1569"
+    },
+    {
+      "name": "inverse-horizon",
+      "options": {
+        "sourceWidth": 8,
+        "sourceHeight": 8,
+        "corners": [
+          {
+            "x": 0,
+            "y": -0.5
+          },
+          {
+            "x": 8,
+            "y": -0.5
+          },
+          {
+            "x": 4,
+            "y": 3.5
+          },
+          {
+            "x": 0,
+            "y": 3.5
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -12,
+          "y": -8,
+          "width": 36,
+          "height": 36
+        },
+        "background": 0
+      },
+      "reference": "inverse-horizon.f32le.gz",
+      "floatSha256": "43ddcccdcb21606020173b538c50a091ab28455c9f626bb4e316ed6c09ded924"
+    },
+    {
+      "name": "strong-perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1,
+            "y": 1
+          },
+          {
+            "x": 39.5,
+            "y": 3
+          },
+          {
+            "x": 7.75,
+            "y": 30
+          },
+          {
+            "x": 6,
+            "y": 28
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "strong-perspective.f32le.gz",
+      "floatSha256": "18d613446e69774e8cb2f95ec494afe6c76f71c9a6f29a9488b1fc1bfcfb656e"
+    },
+    {
+      "name": "large-placement",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 100000003.25,
+            "y": -199999998.875
+          },
+          {
+            "x": 100000039.5,
+            "y": -199999995.75
+          },
+          {
+            "x": 100000031,
+            "y": -199999971
+          },
+          {
+            "x": 100000007.5,
+            "y": -199999974.25
+          }
+        ],
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": 99999985,
+          "y": -200000012,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "large-placement.f32le.gz",
+      "floatSha256": "b9508f94129031ba13ee32c0fdc5503f83af26b0cd3014415edd39b1a74b1569"
+    },
+    {
+      "name": "forward-identity",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 0
+          },
+          {
+            "x": 31,
+            "y": 23
+          },
+          {
+            "x": 0,
+            "y": 23
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -10,
+          "y": -8,
+          "width": 48,
+          "height": 42
+        },
+        "background": 0
+      },
+      "reference": "forward-identity.f32le.gz",
+      "floatSha256": "cc46a4ed62e9eced48c116b1161a4a64559df6e12cf8cb7ab95e9424a2c99c2d"
+    },
+    {
+      "name": "forward-reflection",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 36,
+            "y": 2
+          },
+          {
+            "x": 2,
+            "y": 4
+          },
+          {
+            "x": 5,
+            "y": 29
+          },
+          {
+            "x": 31,
+            "y": 26
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "forward-reflection.f32le.gz",
+      "floatSha256": "03de36c35d07423e30375810d9a4e7b83d8b33bf19151853daa4349b642cf0f8"
+    },
+    {
+      "name": "forward-perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 3.25,
+            "y": 1.125
+          },
+          {
+            "x": 39.5,
+            "y": 4.25
+          },
+          {
+            "x": 31,
+            "y": 29
+          },
+          {
+            "x": 7.5,
+            "y": 25.75
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "forward-perspective.f32le.gz",
+      "floatSha256": "8bb04cbecc0436fff447bd153ba78f4d21f692769d55750e428cf5fc7de6cfc8"
+    },
+    {
+      "name": "forward-forward-horizon",
+      "options": {
+        "sourceWidth": 6,
+        "sourceHeight": 3,
+        "corners": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 6,
+            "y": 0
+          },
+          {
+            "x": 2,
+            "y": 1
+          },
+          {
+            "x": 0,
+            "y": 1
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -15,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -12,
+          "y": -8,
+          "width": 36,
+          "height": 36
+        },
+        "background": 0
+      },
+      "reference": "forward-forward-horizon.f32le.gz",
+      "floatSha256": "2d3e65a6fd59f16b8f8f1b53163937d6c0a11aaaffbabf9bf78d009f5487f6f4"
+    },
+    {
+      "name": "forward-strong-perspective",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1,
+            "y": 1
+          },
+          {
+            "x": 39.5,
+            "y": 3
+          },
+          {
+            "x": 7.75,
+            "y": 30
+          },
+          {
+            "x": 6,
+            "y": 28
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": -7,
+          "y": -5,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "forward-strong-perspective.f32le.gz",
+      "floatSha256": "fb4424cbfe0bef310773dd6859d21ef13c7e1a414e617a17c5b300bf58d2e7f6"
+    },
+    {
+      "name": "forward-large-placement",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1099511627779.25,
+            "y": -2199023255550.875
+          },
+          {
+            "x": 1099511627815.5,
+            "y": -2199023255547.75
+          },
+          {
+            "x": 1099511627807,
+            "y": -2199023255523
+          },
+          {
+            "x": 1099511627783.5,
+            "y": -2199023255526.25
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": 1099511627772,
+          "y": -2199023255556,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": 1099511627772,
+          "y": -2199023255556,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": -15,
+          "y": -12,
+          "width": 70,
+          "height": 60
+        },
+        "background": 0
+      },
+      "reference": "forward-large-placement.f32le.gz",
+      "floatSha256": "fb032aa21197c45fb98937991f6c6ddbe9f97f6d395a96d43134c90a2552d1db"
+    },
+    {
+      "name": "affine-large-origin",
+      "options": {
+        "sourceWidth": 31,
+        "sourceHeight": 23,
+        "corners": [
+          {
+            "x": 1099511627779.25,
+            "y": -2199023255550.875
+          },
+          {
+            "x": 1099511627815.5,
+            "y": -2199023255547.75
+          },
+          {
+            "x": 1099511627807,
+            "y": -2199023255523
+          },
+          {
+            "x": 1099511627783.5,
+            "y": -2199023255526.25
+          }
+        ],
+        "direction": "source-to-quad",
+        "field": {
+          "x": 1099511627772,
+          "y": -2199023255556,
+          "width": 39,
+          "height": 33
+        },
+        "source": {
+          "x": 1099511627772,
+          "y": -2199023255556,
+          "width": 39,
+          "height": 33
+        },
+        "output": {
+          "x": 1099511627776,
+          "y": -1099511627776,
+          "width": 20,
+          "height": 15
+        },
+        "background": 0,
+        "input": {
+          "origin": {
+            "x": 1099511627776.125,
+            "y": -1099511627775.625
+          },
+          "matrix": {
+            "a": 1,
+            "b": 0.125,
+            "c": -0.25,
+            "d": 1,
+            "e": 7.125,
+            "f": 0.375
+          }
+        }
+      },
+      "reference": "affine-large-origin.f32le.gz",
+      "floatSha256": "76fa6a16797d9d8e7496abe22343a397de64431b86ca87baa885dacca540cc37"
+    }
+  ]
+}

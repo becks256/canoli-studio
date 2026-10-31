@@ -5,6 +5,15 @@ class ControlledWorker{
 }
 afterEach(()=>vi.unstubAllGlobals());
 function create(){vi.stubGlobal('Worker',ControlledWorker);const processor=new PixelProcessor();return{processor,worker:ControlledWorker.current};}
+it('placed wet worker snapshots all five coupled channels and rejects malformed replies before a valid retry',async()=>{
+ const{processor,worker}=create(),field=new Float32Array([.125,.25,0,.5,.75]),options={sourceWidth:1,sourceHeight:1,field:{x:0,y:0,width:1,height:1},source:{x:0,y:0,width:1,height:1},output:{x:0,y:0,width:1,height:1},background:0,corners:[{x:0,y:0},{x:1,y:0},{x:1,y:1},{x:0,y:1}]as [{x:number;y:number},{x:number;y:number},{x:number;y:number},{x:number;y:number}]};
+ const expected=field.slice(),pending=processor.floatProjectiveWet(field,options);field.fill(0);options.corners[0].x=99;worker.ready();await processor.ready;
+ try{
+  const[message,transfers]=worker.postMessage.mock.calls[0];expect(message.floatProjectiveWet.alpha).toEqual(expected);expect(message.floatProjectiveWet.options.corners[0].x).toBe(0);expect(transfers).toEqual([message.floatProjectiveWet.alpha.buffer]);expect(transfers).not.toContain(field.buffer);worker.result(message.id,expected.slice());await expect(pending).resolves.toEqual(expected);options.corners[0].x=0;
+  for(const bad of[new Uint8Array(5),new Float32Array(4),new Float32Array([NaN,0,0,.5,.75]),new Float32Array([.75,0,0,.5,.75]),new Float32Array([0,0,0,.75,.5]),new Float32Array([0,0,0,1,2])]){const work=processor.floatProjectiveWet(expected,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,bad);await expect(work).rejects.toThrow();}
+  const retry=processor.floatProjectiveWet(expected,options);await Promise.resolve();worker.result(worker.postMessage.mock.calls.at(-1)![0].id,expected.slice());await expect(retry).resolves.toEqual(expected);expect(field).toEqual(new Float32Array(5));
+ }finally{processor.dispose();}
+});
 it('float tonal captures controls, signed pixels and coverage before readiness and rejects altered alpha',async()=>{
  const{processor,worker}=create(),source=new Float32Array([2,-.125,4,.375]),coverage=new Float32Array([.5]),options={mode:'dodge' as const,range:'highlights' as const,exposure:.625,protectTones:false};
  const pending=processor.floatTonal(source,coverage,options);source.fill(0);coverage.fill(0);options.exposure=0;worker.ready();await processor.ready;

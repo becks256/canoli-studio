@@ -1,3 +1,4 @@
+import {validateWetField} from '../core/wet-field';
 import{floatConvolutionSchema,floatConvolutionLength,floatConvolutionRadius,fractionalBoxWeights,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
 import {floatTonalOptionsSchema, type FloatTonalOptions} from '../core/float-tonal';
 import{gaussianWeights}from'../core/smart/spatial-filter';
@@ -61,6 +62,18 @@ export class FloatPixelProcessor{
   if(status===3)throw new Error('Projective field sample falls outside the captured field window.');
   if(status!==0)throw new Error('Invalid native projective field geometry or coverage.');
   const result=new Float32Array(new Float32Array(kernel.memory.buffer,output,count));validateFloatAlpha(result,count);return result;
+ }
+ projectiveWet(alpha:Float32Array,input:ProjectiveFieldOptions):Float32Array<ArrayBuffer>{
+  this.owner();const {options,values}=compileProjectiveField(input);validateWetField(alpha,options.source.width*options.source.height);
+  const source=alpha.slice(),count=options.output.width*options.output.height*5,kernel=this.owner();
+  if(typeof kernel.sampleProjectiveWetFloat!=='function')throw new Error('Native projective field sampler is unavailable.');
+  const at=Math.ceil(kernel.bufferOffset()/8)*8,output=at+source.byteLength,settings=Math.ceil((output+count*4)/8)*8,required=settings+values.byteLength;
+  if(required>kernel.memory.buffer.byteLength)kernel.memory.grow(Math.ceil((required-kernel.memory.buffer.byteLength)/65536));
+  new Float32Array(kernel.memory.buffer,at,source.length).set(source);new Float64Array(kernel.memory.buffer,settings,values.length).set(values);
+  const status=kernel.sampleProjectiveWetFloat(at,output,settings);
+  if(status===3)throw new Error('Projective field sample falls outside the captured field window.');
+  if(status!==0)throw new Error('Invalid native projective field geometry or coverage.');
+  const result=new Float32Array(new Float32Array(kernel.memory.buffer,output,count));validateWetField(result,count/5);return result;
  }
  projective(pixels:Float32Array,input:ProjectiveSampleOptions):Float32Array<ArrayBuffer>{
   this.owner();validateFloatWorkerWindow(pixels);

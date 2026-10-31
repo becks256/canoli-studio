@@ -7,7 +7,7 @@ export {lookupFloat} from './float-lookup';
 export {transferFloat} from "./float-transfer";
 export { compositeFloat, affineFloat, toneFloat } from "./float-pixels";
 export { sampleProjectiveFloat } from "./projective-sampling";
-export { sampleProjectiveFieldFloat } from "./projective-field";
+export { sampleProjectiveFieldFloat,sampleProjectiveWetFloat } from "./projective-field";
 export { encodeFrequencyBand } from "./frequency-band";
 export { medianFilter } from "./median-filter";
 export { bilateralFilter } from "./bilateral-filter";

@@ -1,3 +1,8 @@
+import {activePerspective,perspectiveLocalQuad} from '../core/perspective';
+import {maskPlacedPerspective} from '../core/masks';
+import type {WetPaintPlacementData} from '../core/wet-operation';
+import {isFloatDocument} from '../core/float-document';
+import {capturePerspectiveMask,type CapturedPerspectiveMask} from './projective-mask';
 import {retainedDocuments,captureRetainedHistory} from '../core/history';
 import { AffineTransform } from '../core/affine';
 import { AssetStore } from '../core/assets';
@@ -25,7 +30,7 @@ import { wetBrowserAssets } from './wet-composite';
 import { WetPaintPreview } from './wet-preview';
 
 export interface ApplyWetPaintOptions {
-  mode?: 'smudge' | 'mixer'; target?:'layer'|'mask'|'filter-mask'; targetId?: string; respectSelection?: boolean;
+  space?:'local'|'placed'; mode?: 'smudge' | 'mixer'; target?:'layer'|'mask'|'filter-mask'; targetId?: string; respectSelection?: boolean;
   load?: WetPaintLoadOptions; mix?: WetPaintMixOptions;
   signal?: AbortSignal; onProgress?: WetStrokeControl['onProgress'];
 }
@@ -46,14 +51,16 @@ export interface PreparedWetPaintJob {
  * path: current source checks, native alpha validation and one OO transaction. */
 export async function createPreparedWetPaintJob(editor: EditorApplication, input: WetBrushBuilder, options: ApplyWetPaintOptions, hostCheck: () => void): Promise<PreparedWetPaintJob> {
   if (!(input instanceof BrushStroke) && typeof input !== 'function') throw new Error('Use a BrushStroke or PencilStroke value.');
-  if (!options || typeof options !== 'object' || Array.isArray(options) || Object.keys(options).some(key => !['mode','target', 'targetId', 'respectSelection', 'load', 'mix', 'signal', 'onProgress'].includes(key))) throw new Error('Invalid wet-paint application options.');
+  if (!options || typeof options !== 'object' || Array.isArray(options) || Object.keys(options).some(key => !['space','mode','target', 'targetId', 'respectSelection', 'load', 'mix', 'signal', 'onProgress'].includes(key))) throw new Error('Invalid wet-paint application options.');
+  const inputSpace=options.space===undefined?'local':options.space;if(inputSpace!=='local'&&inputSpace!=='placed')throw new Error('Wet paint space must be local or placed.');
   const targetKind=options.target===undefined?'layer':options.target;
   if(!['layer','mask','filter-mask'].includes(targetKind))throw new Error('Wet paint target must be layer, mask or filter-mask.');
   const mode = options.mode === undefined ? 'smudge' : options.mode, respectSelection = options.respectSelection === undefined ? true : options.respectSelection, requestedId = options.targetId, signal = options.signal, progress = options.onProgress;
   if ((mode !== 'smudge' && mode !== 'mixer') || typeof respectSelection !== 'boolean' || (requestedId !== undefined && (typeof requestedId !== 'string' || !requestedId || requestedId.length > 240)) || (progress !== undefined && typeof progress !== 'function')) throw new Error('Invalid wet-paint application controls.');
   if (signal !== undefined && !(signal instanceof AbortSignal)) throw new Error('Wet paint requires an AbortSignal.');
   signal?.throwIfAborted(); hostCheck();
-  const document = editor.document, assets = editor.assetStore, snapshot = document.getSnapshot(), selected = document.selectedLayer?.id ?? null;
+  const document = editor.document, assets = editor.assetStore, snapshot = document.getSnapshot(), selected = [...snapshot.selectedIds];
+  if(isFloatDocument(snapshot.document))throw new Error('Wet painting requires its native float document integration.');
   const target = requestedId ? document.getLayer(requestedId) : document.selectedLayer;
   if (targetKind==='layer' && target && !(target instanceof PaintLayer) && !(target instanceof RasterLayer)) throw new Error('Wet paint requires an image or paint layer.');
   if (requestedId && !target) throw new Error('Wet-paint target does not exist.');
@@ -70,10 +77,10 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
   const relay = () => abort.abort(signal?.reason); signal?.addEventListener('abort', relay, { once: true });
   const check = () => {
     abort.signal.throwIfAborted(); hostCheck(); alive(); baseAlive();
-    if (editor.document !== document || editor.assetStore !== assets || document.getSnapshot().revision !== snapshot.revision || (document.selectedLayer?.id ?? null) !== selected) throw new Error('The wet-paint document, selection or revision changed. No stroke was applied.');
+    if (editor.document !== document || editor.assetStore !== assets || document.getSnapshot().revision !== snapshot.revision || (document.getSnapshot().selectedIds.length!==selected.length||document.getSnapshot().selectedIds.some((id,i)=>id!==selected[i]))) throw new Error('The wet-paint document, selection or revision changed. No stroke was applied.');
     for (const [key, item] of pinned) { const asset = assets.get(key); if (asset !== item.asset || asset.bitmap !== item.bitmap || asset.blob !== item.blob || asset.width !== item.width || asset.height !== item.height || asset.bitmap.width !== item.width || asset.bitmap.height !== item.height) throw new Error('Wet-paint source assets changed.'); }
   };
-  const unsubscribe = document.subscribe(() => { if (document.getSnapshot().revision !== snapshot.revision || (document.selectedLayer?.id ?? null) !== selected) abort.abort(new Error('The wet-paint target changed.')); });
+  const unsubscribe = document.subscribe(() => { if (document.getSnapshot().revision !== snapshot.revision || (document.getSnapshot().selectedIds.length!==selected.length||document.getSnapshot().selectedIds.some((id,i)=>id!==selected[i]))) abort.abort(new Error('The wet-paint target changed.')); });
   type PreparedTile = { region: Readonly<Rect>; epoch?: string; tile: WetPaintTileData };
   const tileKey = (region: Readonly<Rect>) => `${region.x},${region.y}`;
   const prefixRecords = new WeakMap<WetPaintPreview, ReadonlyMap<string, PreparedTile>>();
@@ -106,9 +113,16 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
     const data = value.toJSON();
     if ((data.kind !== 'brush' && data.kind !== 'pencil') || data.tiles.length) throw new Error('Wet paint requires a brush or pencil footprint without clone tiles.');
     visitBrushAssets(data, reference => { if (!base.has(reference.assetId)) retainOriginal(reference.assetId); });
+    const projected=inputSpace==='placed'&&(source.kind==='raster'||source.kind==='smart-object')&&activePerspective(source.perspective)&&(!maskData||maskData.linked!==false);
+    const master=target instanceof SmartObjectLayer&&(projected||targetKind==='filter-mask')?snapshot.document.components?.find(definition=>definition.id===target.componentId)?.source:undefined;
+    if(target instanceof SmartObjectLayer&&(projected||targetKind==='filter-mask')&&!master)throw new Error('The wet-paint smart-object master is missing.');
+    const masterSize=master?(master.kind==='asset'?master:master.document):undefined;
+    const masterToImage=masterSize&&source.kind==='smart-object'?AffineTransform.scale(source.width/masterSize.width,source.height/masterSize.height):new AffineTransform();
+    let placement:WetPaintPlacementData|undefined;
+    if(projected&&(source.kind==='raster'||source.kind==='smart-object'))placement={width:source.width,height:source.height,perspective:maskData&&targetKind==='mask'?maskPlacedPerspective(source.perspective!,source.width,source.height,maskData):source.perspective!,basis:maskData?maskTransform(maskData,targetKind==='filter-mask'?masterToImage:new AffineTransform(),targetKind==='filter-mask').toJSON():new AffineTransform().toJSON()};
     let world = target ? layerTransform(snapshot.document, target.id)! : new AffineTransform();
-    if(targetKind==='filter-mask'&&target instanceof SmartObjectLayer){const master=document.getComponent(target.componentId);world=world.multiply(AffineTransform.scale(target.width/master.width,target.height/master.height));}
-    if(maskData)world=maskTransform(maskData,world);
+    if(!projected&&targetKind==='filter-mask')world=world.multiply(masterToImage);
+    if(maskData&&!projected)world=maskTransform(maskData,world);
     if (!respectSelection) data.clip = null;
     else if (!data.clip && snapshot.document.selection) data.clip = transformSelection(snapshot.document.selection, world.inverse());
     if(data.points.length>maxPoints)throw new Error('This stroke exceeds the mask point budget.');
@@ -118,15 +132,27 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
     if (options.mix !== undefined) wetPaintMixSchema.parse(options.mix);
     const load = wetPaintLoadSchema.parse({ color: foreground, load: mode === 'mixer' ? 1 : 0, ...options.load }), mix = wetPaintMixSchema.parse({ wetness: mode === 'mixer' ? .25 : 0, ...options.mix });
     if(maskData)load.color=[255,255,255,load.color[3]];
-    const native = !maskData&&source.kind === 'raster' ? base.get(source.assetId) : undefined, localToNative = native && source.kind === 'raster' ? AffineTransform.scale(native.width / source.width, native.height / source.height) : new AffineTransform();
+    const native = source.kind==='raster'&&(!maskData||projected)?base.get(source.assetId):projected&&master?.kind==='asset'?base.get(master.assetId):projected&&masterSize?{width:Math.ceil(masterSize.width),height:Math.ceil(masterSize.height)}:undefined;
+    const localToNative=native&&(source.kind==='raster'||source.kind==='smart-object')?AffineTransform.scale(native.width/source.width,native.height/source.height):new AffineTransform();
     const neutralMask=maskData?{...maskData,x:0,y:0,placedX:0,placedY:0,basis:undefined,linked:true,enabled:true,inverted:false,density:1,feather:0}:undefined;
-    const neutral = maskData?{...new PaintLayer().toJSON(),mask:neutralMask}:{ ...source, clipped:undefined, x: 0, y: 0, transform: undefined, visible: true, opacity: 1, fillOpacity: 1, mask: null, styles: undefined, blendMode: 'normal' as const, ...(source.kind === 'raster' ? { width: native!.width, height: native!.height, effects: [] } : {}) };
+    const neutral = maskData?{...new PaintLayer().toJSON(),mask:neutralMask}:{ ...source, clipped:undefined, x: 0, y: 0, transform: undefined, visible: true, opacity: 1, fillOpacity: 1, mask: null, styles: undefined, blendMode: 'normal' as const, ...(source.kind === 'raster' ? { width: native!.width, height: native!.height, effects: [],perspective:projected?source.perspective:undefined } : {}) };
     const sourceDocument = freeze({ ...snapshot.document, children: [neutral], layerComps: undefined,...(maskData?{components:undefined}: {}) } as DocumentData), checkSources = captureRasterExportSources(sourceDocument, base, { signal: abort.signal }, 'wet-paint target preparation');
-    releaseSources=()=>checkSources.release();
+    let projectedMask:CapturedPerspectiveMask|undefined;
+    releaseSources=()=>{checkSources.release();projectedMask?.dispose();};
     if(maskData)maskTextures=new BrushTextureSampler(editor.renderer.processor);
+    if(placement&&neutralMask&&native){
+      const basis=AffineTransform.fromJSON(placement.basis),raw={...neutralMask,x:basis.e,y:basis.f,basis:{a:basis.a,b:basis.b,c:basis.c,d:basis.d,e:0,f:0}};
+      projectedMask=capturePerspectiveMask(raw,{sourceWidth:native.width,sourceHeight:native.height,layerWidth:placement.width,layerHeight:placement.height,corners:perspectiveLocalQuad(native.width,native.height,placement.perspective)},base,editor.renderer.processor,{isCancelled:()=>{check();return false;}},maskTextures);
+    }
     const current = () => { check(); checkSources(); session?.assertStorageCurrent(); };
     const read = async (region: Rect) => {
-      current();let canvas:HTMLCanvasElement;
+      current();
+      if(projectedMask){
+        const alpha=await projectedMask.read(region);current();const pixels=new Uint8ClampedArray(alpha.length*4);
+        for(let i=0;i<alpha.length;i++){const a=Math.round(alpha[i]*255);pixels[i*4]=pixels[i*4+1]=pixels[i*4+2]=a?255:0;pixels[i*4+3]=a;}
+        return pixels;
+      }
+      let canvas:HTMLCanvasElement;
       if(neutralMask){
         canvas=await maskCoverage(neutralMask,{...region,sx:1,sy:1},0,0,editor.renderer.processor,undefined,new AffineTransform(),neutralMask.kind==='bitmap'?base.get(neutralMask.assetId).bitmap:undefined,base,maskTextures,()=>{current();return false;});
       }else{
@@ -174,7 +200,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
         }
         const tiles = [...entries.values()].sort((a, b) => a.region.y - b.region.y || a.region.x - b.region.x).map(entry => entry.tile);
         if (!view || !tiles.length) return null;
-        const operation = new WetPaintStroke({ brush: session!.stroke, load, mix, nativeTransform: localToNative.inverse(), tiles }), command = commandFor(operation), candidate = execute(snapshot.document, command);
+        const operation = new WetPaintStroke({ brush: session!.stroke, load, mix, nativeTransform: localToNative.inverse(), tiles,...(placement?{placement}:{}) }), command = commandFor(operation), candidate = execute(snapshot.document, command);
         await validateWetPaintAssets(candidate, wetBrowserAssets(view, current)); current();
         const frame = new WetPaintPreview(owner, assets, view, candidate, command, operation, ++version);
         prefixRecords.set(frame, entries);

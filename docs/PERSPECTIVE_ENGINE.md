@@ -48,15 +48,13 @@ plane. Completed coverage is subsequently sampled onto the viewport. Bounds,
 hit testing and selection outlines use projected geometry. Active perspective
 uses the standard Canvas/float path instead of the affine WebGPU compositor.
 
-Interactive wet painting on the projected image, preserving-position mask
-relinking,
-and capturing document selections/paths as linked masks currently require
-resetting perspective. Those operations reject with an explicit message instead
-of writing an affine approximation. Local-coordinate constructor/API operations
-remain available. Correct projective pointer, clip, symmetry and cursor mapping
-are required follow-up work, not waived acceptance criteria. Numeric authoring
-and direct corner handles are available; general warp and photographic resampling
-quality/performance/device acceptance remain required.
+Smudge/Mixer support projected byte raster pixels and linked ordinary/filter
+masks through captured prepared fields, as described below. Preserving-position
+projective mask relinking and capturing document selections/paths as linked
+masks still require resetting perspective; those operations reject explicitly.
+Local constructor/API operations remain available. Native float wet painting,
+general warp and photographic resampling/performance/device acceptance remain
+required. Numeric authoring and direct corner handles are available.
 
 ## Direct corner editing
 
@@ -343,3 +341,55 @@ fields keep their normal keys. This does not complete projected wet input,
 preserving-position projective relinking, document selection/path capture,
 general warp, full photographic/interchange quality, sustained editor-wide
 performance, process-memory or physical-device acceptance.
+
+## Captured projected wet editing (schema 55)
+
+Smudge/Mixer author the complete brush/selection/tip/pressure/texture/symmetry
+field after image H and before parent/layer affine placement. Raster sampling
+uses the original bitmap grid; linked ordinary/filter masks sample raw neutral
+coverage on original image/master reference grids. Ordinary-mask placed offsets
+enter captured H, while mask x/y/basis and filter master scaling enter captured
+basis. Unlinked masks retain existing local behavior. The trusted preparation
+option `space:"placed"` selects this path; default/local calls sample intrinsic
+content before H. Identity/absent H produces no new placement metadata.
+
+`WetPaintStroke.placement` retains width/height, normalized H and invertible
+owner-local-to-image basis B. Native prepared pixels map into placed image
+coordinates through N (`nativeTransform`), then pull back by `B^-1 H^-1 N`.
+Ordered tiles first compose a native coupled field of premultiplied replacement
+RGB, replacement alpha and independent removal coverage. Native five-channel
+sampling uses the scalar engine's exact homography/origin/ROI contract, a zero
+outside field, and bounded copied worker windows. Independent NumPy fixtures
+cover reflection, strong perspective, large placement, both directions,
+horizons and affine origins. Output applies removal then already premasked
+replacement; operation opacity applies once. Explicit overlaps round at the
+new native-field reconstruction boundary; legacy unplaced records retain their
+existing per-tile replay.
+
+Current corner edits/reset, image resize, mask movement and source-preserving
+persistence keep the captured edit. Finite image/paint support rejects inverse
+horizons before publication. Mask support can be unbounded and streams distant
+ROIs without a guessed image clip; feather, inversion, density and enabled
+settings remain separate. Extended raster wet support converts through the
+existing containing-master path, retaining off-image pixels and mask planes.
+
+Real tools use private retained native previews and drain final input before
+one shared command/Undo. Actual revision or full ordered-selection changes,
+including away-and-back, synchronously cancel; equivalent selection remains
+valid. Source replacement/disposal and cancellation reject stale work. Prepared
+constructors/JSON/getters preserve owned values through every schema-55 owner,
+embedded master and retained-history context. Isolated scripts/plugins use
+existing prepared assets and permissions; REST sessions remain separate.
+
+Functional verification is tracked in the dated roadmap. This does not close F03/F06,
+float wet painting, projective relinking, selection/path capture, general warp,
+photographic/interchange breadth, sustained all-tool performance or physical
+input/display/device gates.
+
+When raster wet pixels extend beyond the original image bounds,
+`convertToSmartObject()` uses the existing containing-master conversion. The
+original raster, its mask and appearance remain editable inside `editContents()`;
+the containing instance includes the artboard and extended content. This differs
+from the compact original-image conversion, which retains an outer mask on the
+instance. It prevents trimming off-image paint while preserving source metadata,
+independent mask planes and Undo. Native projects retain both forms.

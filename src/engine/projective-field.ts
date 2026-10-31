@@ -1,3 +1,4 @@
+import {validateWetField} from '../core/wet-field';
 import {captureFieldBounds,compileProjectiveField,type ProjectiveFieldOptions,type ProjectiveFieldDirection,type ProjectiveFieldInput} from '../core/projective-field';
 import type {ProjectiveQuad} from '../core/projective';
 import {validateWindow,type FloatSourceWindow,type FloatSourceControl} from '../core/float-source/types';
@@ -8,11 +9,13 @@ import {yieldTask} from '../core/task-yield';
 
 export interface ProjectiveFieldSource {
   /** Original/reference rectangle for the homography, independent of support. */
+  channels?:1|5;
   width:number;height:number;bounds:FloatSourceWindow|undefined;background:number;direction?:ProjectiveFieldDirection;input?:ProjectiveFieldInput;
   readWindow(bounds:FloatSourceWindow,control?:FloatSourceControl):Promise<Float32Array>;
 }
 export interface ProjectiveFieldSampler {
   floatProjectiveField(alpha:Float32Array,options:ProjectiveFieldOptions):Promise<Float32Array>;
+  floatProjectiveWet?(alpha:Float32Array,options:ProjectiveFieldOptions):Promise<Float32Array>;
 }
 
 /** Project a scalar field, optionally bounded by finite support. Unknown support
@@ -25,6 +28,8 @@ export async function projectPerspectiveFieldWindow(
   source:ProjectiveFieldSource,processor:ProjectiveFieldSampler,corners:ProjectiveQuad,input:FloatSourceWindow,
   control:FloatProjectionControl={},
 ):Promise<Float32Array<ArrayBuffer>> {
+  const channels=source.channels??1;if(channels!==1&&channels!==5||channels===5&&(source.background!==0||!processor.floatProjectiveWet))throw new Error('Invalid projective field channels or background.');
+  const validate:(value:unknown,pixels:number)=>asserts value is Float32Array=channels===5?validateWetField:validateFloatAlpha;
   const width=source.width,height=source.height,absoluteField=source.bounds?captureFieldBounds(source.bounds):undefined,background=source.background,direction=source.direction;
   if(!absoluteField&&(direction==='source-to-quad'||source.input))throw new Error('Unbounded fields require quad-to-source sampling.');
   const capturedInput=source.input,signature=JSON.stringify(capturedInput);
@@ -35,11 +40,11 @@ export async function projectPerspectiveFieldWindow(
   const field=absoluteField?{...absoluteField,x:absoluteField.x-compiled.sourceOrigin.x,y:absoluteField.y-compiled.sourceOrigin.y}:undefined,quad=compiled.options.corners,m=compiled.values,signal=control.signal,isCancelled=control.isCancelled;
   const check=()=>{
     signal?.throwIfAborted();checkRenderCurrent(isCancelled);
-    if(source.width!==width||source.height!==height||source.direction!==direction||source.background!==background||source.readWindow!==read||
+    if((source.channels??1)!==channels||source.width!==width||source.height!==height||source.direction!==direction||source.background!==background||source.readWindow!==read||
       JSON.stringify(source.input)!==signature||!!source.bounds!==!!absoluteField||absoluteField&&(source.bounds!.x!==absoluteField.x||source.bounds!.y!==absoluteField.y||source.bounds!.width!==absoluteField.width||source.bounds!.height!==absoluteField.height))
       throw new Error('Perspective field source geometry changed.');
   };
-  check();const output=new Float32Array(bounds.width*bounds.height).fill(background);let deadline=performance.now()+2;
+  check();const output=new Float32Array(bounds.width*bounds.height*channels).fill(background);let deadline=performance.now()+2;
   const render=async(region:FloatSourceWindow):Promise<void>=>{
     check();if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+2;}
     const points=[];let negative=false,positive=false,horizon=false;
@@ -71,10 +76,10 @@ export async function projectPerspectiveFieldWindow(
     const bottom=field?Math.min(field.y+field.height,Math.floor(Math.min(field.y+field.height,maxY))+3):Math.floor(maxY)+3;
     if((right-x)*(bottom-y)>262144){await split();return;}
     const nativeBounds=captureFieldBounds({x:x+compiled.sourceOrigin.x,y:y+compiled.sourceOrigin.y,width:right-x,height:bottom-y});
-    const alpha=await read.call(source,{...nativeBounds},{signal,onProgress:check});check();validateFloatAlpha(alpha,nativeBounds.width*nativeBounds.height);
-    const result=await processor.floatProjectiveField(alpha,{sourceWidth:width,sourceHeight:height,corners:quad,field:absoluteField??nativeBounds,background,direction,input:compiled.options.input,source:nativeBounds,output:region});
-    check();validateFloatAlpha(result,region.width*region.height);
-    for(let row=0;row<region.height;row++)output.set(result.subarray(row*region.width,(row+1)*region.width),(region.y-bounds.y+row)*bounds.width+region.x-bounds.x);
+    const alpha=await read.call(source,{...nativeBounds},{signal,onProgress:check});check();validate(alpha,nativeBounds.width*nativeBounds.height);
+    const result=await (channels===5?processor.floatProjectiveWet!.bind(processor):processor.floatProjectiveField.bind(processor))(alpha,{sourceWidth:width,sourceHeight:height,corners:quad,field:absoluteField??nativeBounds,background,direction,input:compiled.options.input,source:nativeBounds,output:region});
+    check();validate(result,region.width*region.height);
+    for(let row=0;row<region.height;row++)output.set(result.subarray(row*region.width*channels,(row+1)*region.width*channels),((region.y-bounds.y+row)*bounds.width+region.x-bounds.x)*channels);
   };
-  await render(bounds);check();validateFloatAlpha(output,bounds.width*bounds.height);return output;
+  await render(bounds);check();validate(output,bounds.width*bounds.height);return output;
 }

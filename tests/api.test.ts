@@ -86,6 +86,20 @@ it('validates prepared wet pixels before atomic REST edits, revision checks and 
   const undo = await request(endpoint + '/undo', { expectedRevision: changed.body.revision }); expect(undo.body.document).toEqual(added.body.document);
   const redo = await request(endpoint + '/redo', { expectedRevision: undo.body.revision }); expect(redo.body.document).toEqual(changed.body.document);
 });
+it('shares schema-55 placed wet replacements through separate REST sessions with real PNG validation and atomic history',async()=>{
+ const{RasterLayer,WetPaintStroke,PerspectiveTransform}=await import('../src/dom'),{PngRowEncoder}=await import('../src/core/png-stream');
+ const created=await request('/documents',{width:32,height:24}),endpoint=`/documents/${created.body.document.id}`;
+ const upload=async(alpha:number)=>{const png=new PngRowEncoder(1,1);await png.append(new Uint8Array([0,255,0,alpha]),1);const blob=await png.finish(),out=await request(endpoint+'/assets',{name:'Placed native PNG',width:1,height:1,contentType:'image/png',data:Buffer.from(await blob.arrayBuffer()).toString('base64')});expect(out.status).toBe(201);return out.body.asset.id as string;};
+ const original=await upload(255),pixels=await upload(128),coverage=await upload(255),empty=await upload(0),layer=new RasterLayer({assetId:original,width:16,height:16});
+ const added=await request(endpoint+'/commands',{expectedRevision:0,commands:[{type:'layer.add',layer:layer.toJSON()}]}),placement={width:16,height:16,perspective:new PerspectiveTransform({corners:[{x:0,y:0},{x:1,y:0},{x:.75,y:1},{x:.125,y:1}]}),basis:new AffineTransform()};
+ const prepared=new WetPaintStroke({brush:new BrushStroke({points:[{x:5,y:6}],size:2}),placement,tiles:[{x:4,y:5,width:1,height:1,assetId:pixels,coverage:{assetId:coverage}}]}).toJSON(),wet=(support:string)=>({...prepared,tiles:prepared.tiles.map(tile=>({...tile,coverage:{assetId:support}}))});
+ const patch=(support:string)=>({type:'layer.update',id:layer.id,patch:{erasures:[{width:16,height:16,stroke:wet(support)}]}});
+ const bad=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[{type:'document.rename',name:'Rollback'},patch(empty)]});expect(bad.status).toBe(400);expect((await request(endpoint)).body.document).toEqual(added.body.document);
+ const changed=await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[patch(coverage)]});expect(changed.status,JSON.stringify(changed.body)).toBe(200);expect(changed.body.document.children[0].erasures[0].stroke).toEqual(wet(coverage));
+ expect((await request(endpoint+'/commands',{expectedRevision:added.body.revision,commands:[patch(coverage)]})).status).toBe(409);
+ const undo=await request(endpoint+'/undo',{expectedRevision:changed.body.revision});expect(undo.body.document).toEqual(added.body.document);const redo=await request(endpoint+'/redo',{expectedRevision:undo.body.revision});expect(redo.body.document).toEqual(changed.body.document);
+ const locked=await request(endpoint+'/commands',{expectedRevision:redo.body.revision,commands:[{type:'layer.update',id:layer.id,patch:{locked:true}}]});const rejected=await request(endpoint+'/commands',{expectedRevision:locked.body.revision,commands:[patch(coverage)]});expect(rejected.status).toBe(400);expect((await request(endpoint)).body.document).toEqual(locked.body.document);
+});
 async function request(
   path: string,
   data?: unknown,

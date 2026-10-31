@@ -5,7 +5,7 @@ import type { AffineTransform } from "../core/affine";
 import type { Rect } from "../core/drawing";
 
 function support(entry:MaskOperationData,basis:AffineTransform){
-  if(entry.mode==='wet'||!entry.placement)return basis.bounds(strokeBounds(entry.stroke));
+  if(entry.mode==='wet'||!entry.placement){try{return basis.bounds(strokeBounds(entry.stroke));}catch{return undefined;}}
   const geometry=maskFieldGeometry({kind:'paint',base:0,strokes:[entry],enabled:true,inverted:false,density:1},basis);
   return geometry.unbounded?undefined:geometry.bounds;
 }

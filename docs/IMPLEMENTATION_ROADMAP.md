@@ -9313,3 +9313,63 @@ This closes the observed native Node 26 module-loading defect. It does not close
 projective relinking/wet tools, broad color/device/interchange conformance,
 sustained all-tool latency/process-memory, other operating systems or any other
 unfinished original roadmap gate. The full implementation goal remains active.
+
+
+### 2026-10-31 — F03/F06 captured projected wet editing verified; performance remains open
+
+Owner: implementation engineer; estimate L across authoring, native replay,
+source ownership, persistence and actual tools. This implements byte raster
+Smudge/Mixer and linked ordinary/filter-mask authoring after image perspective,
+with retained original image/master resolution. Unlinked masks keep their local
+plane. It does not close F03/F06 or the complete professional-editor goal.
+The preceding native Node repair is `775832f` after the unpublished-history
+cleanup; original recorded IDs remain mapped in the benchmark history index.
+
+Schema-55 WetPaintStroke placement captures reference dimensions, perspective
+and mask/image basis. Ordered prepared tiles stay on their native placed grid;
+virtual replay pulls the coupled premultiplied RGB, replacement alpha and
+independent removal coverage into original content before current image
+placement. No pointer-only inverse, image-quad mask clipping, source bake,
+second coverage multiplication or reduced original resolution is introduced.
+Default local preparation explicitly samples before perspective. Finite artwork
+rejects unbounded support atomically; horizon-crossing mask fields stream real
+bounded distant native windows. Mask-wide settings remain separate.
+
+Real pointers, selection clips, pressure/tip/texture/symmetry and cursor share
+the placed affine plane. Completed private prefixes match committed pixels and
+release drains accepted input into one shared Undo. Actual revision and full
+ordered-selection changes, including away-and-back, retire gestures
+synchronously; equivalent selection stays valid. Source removal/abort/disposal
+reject late publication while independently retained frame leases stay readable.
+Extended wet raster conversion now uses the existing containing-master path,
+retaining off-image pixels and editable original mask/appearance/source metadata
+inside the master. Ordinary compact conversion retains its outer mask contract.
+
+Verification: the full build and 3,176 unit/API/native cases across 309 files
+pass. All 95 unchanged existing wet/perspective/mask/smart-object browser
+regressions, 22 projected workflows and six normal-production workflows pass:
+123 unique cases. Independent NumPy DLT/bilinear fixtures verify all 13 coupled
+native fields, with complete/bounded and irregular partitions bit-identical.
+Native references, actual PNG removal/replacement/opacity, reflected/nonuniform
+pointer and selection planes, cancellation/ownership, strict field ages,
+malformed replies, OO/REST/isolated atomicity, source-bearing recipe replay,
+project/workspace redo-only recovery, SVG/layered PSD/rasterization and a real
+50 MP unchanged original are exercised. Pilot failures and corrected new-test
+assumptions remain in the evidence; no accepted test uses automatic retries,
+skips or flakes. Final documentation rebuilding changes five developer pages;
+all other production-tested release bytes remain identical.
+
+Measured twelve-event pointer-to-matching-artwork feedback remains about
+149 ms median for raster pixels, 148 ms for ordinary masks and 212 ms for filter
+masks on this headless browser, with recorded long tasks. This is functional
+acceptance, not a 60 fps or physical presentation claim. Input latency, long
+frames and full sustained editor-wide/device/process-memory performance remain
+required work. See the [compact evidence and raw measurements](benchmarks/projected-wet-2026-10-31.md).
+
+The original goal remains active: preserving-position projective relinking,
+document-selection/path capture, general warp, native float wet painting,
+photographic/interchange quality and every other unfinished professional, AI,
+workflow, installed ChatGPT/live identity, commercial, enterprise, specialist
+and motion requirement remain required. No paid call, cloud upload, account,
+new isolated/plugin permission, headless/browser synchronization or arbitrary
+source-resolution limit is added by this increment.

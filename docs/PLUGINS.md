@@ -1,5 +1,19 @@
 # Plugins and extensions
 
+## Captured wet fields (document schema 55)
+
+The existing isolated `WetPaintStroke` constructor accepts optional captured
+perspective placement. Packages still require their existing `document:write`
+grant and existing source assets. Host commit validates the complete prepared
+DTO, field age, finite artwork bounds, original PNG dimensions/premasked alpha,
+locks, revision and atomic Undo. Ordinary/filter mask pullbacks may retain
+unbounded streaming support. Installation stays inert; command code runs only
+through the isolated scripting boundary. Package versions, permissions and
+host file/network/pixel capabilities are unchanged. Trusted browser wet
+preparation is not an isolated plugin service.
+[Prepared contract and runnable example](SCRIPTING_API.md#captured-perspective-wet-fields-schema-55).
+
+
 ## Bidirectional coverage stays host-owned
 
 The private original/placed scalar sampler adds no plugin permission, package

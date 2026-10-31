@@ -1,5 +1,27 @@
 # Architecture
 
+## Captured projected wet fields (schema 55)
+
+`wet-authoring.ts` captures original image/master dimensions, perspective and
+owner-local-to-image basis while preparing neutral projected pixels/coverage.
+Tools author the full brush field in the affine image plane after H. Default
+local preparation samples intrinsic content before H; unlinked masks remain
+local. `projected-wet.ts` reconstructs ordered tiles on their prepared native
+grid, then streams a five-channel premultiplied replacement/alpha/removal field
+through the existing native homography and bounded-ROI machinery. Reconstruction
+precedes current layer placement; mask-wide settings apply afterward. Mask
+horizon support is unbounded, while finite artwork rejects it atomically.
+
+The worker copies and validates owned inputs/replies; renderer captures pin
+original sources and reject stale lifetimes/geometry. Preview assets remain
+private until shared command publication; revision and full ordered-selection
+changes retire gestures synchronously. Schema 55 gates every owner/history/
+embedded context without changing project/workspace containers or privileges.
+Raster conversion with extended intrinsic wet support uses the existing
+containing-master conversion, retaining its masks, originals and halos.
+[Exact contract and current limits](PERSPECTIVE_ENGINE.md#captured-projected-wet-editing-schema-55).
+
+
 ## Native Node worker startup
 
 Trusted REST native workers share `server/typescript-worker.mjs`. It rejects
@@ -2294,3 +2316,11 @@ Large/feathered placed-mask surfaces retain existing canvas budgets while scalar
 ## Mask placement and canvas translation
 
 Schema 54 adds optional mask placedX/Y in the compositing plane. Ordinary linked perspective masks keep raw x/y/basis separate; capturePerspectiveMask translates authoritative output corners through an owned optional postTransform, preserving native field sampling and feather/settings. Byte/float callers pass the actual world transform. translateMaskData supplies shared document-pixel displacement for Layer.translateMask and Move previews; attached commands remain publication authority. Brush capture and Pen mapping include the same outer placement. Affine rebases remove already-folded placement once; neutral wet input clears it and affine float appearance keys include the resolved offset. The native ABI, source budgets, grants and independent REST/session boundaries remain unchanged.
+
+When raster wet pixels extend beyond the original image bounds,
+`convertToSmartObject()` uses the existing containing-master conversion. The
+original raster, its mask and appearance remain editable inside `editContents()`;
+the containing instance includes the artboard and extended content. This differs
+from the compact original-image conversion, which retains an outer mask on the
+instance. It prevents trimming off-image paint while preserving source metadata,
+independent mask planes and Undo. Native projects retain both forms.

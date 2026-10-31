@@ -1,5 +1,19 @@
 # Canoli Studio design system
 
+## Projected Smudge/Mixer interaction
+
+Keep the existing two-column rail, paint-target selector, exact brush controls,
+presets and footprint/symmetry overlays. Raster pixels and linked ordinary/
+filter masks accept Smudge/Mixer directly on projected images. Pointer samples,
+selection clips and the cursor share the affine image plane after perspective;
+unlinked masks retain their local/document behavior. Hide/Reveal still loads
+coverage rather than foreground RGB. Preview actual private native output;
+pointer release drains accepted samples and commits one Undo. Escape, pointer
+cancellation, revision or ordered-selection changes discard the gesture.
+Native float wet painting retains its explicit unavailable state. No new
+shortcut or component library is introduced.
+
+
 ## Perspective Inspector
 
 Raster and smart-object layers expose a custom Perspective section with eight

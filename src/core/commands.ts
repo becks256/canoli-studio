@@ -42,7 +42,7 @@ import type {
   VectorPathData,
 } from "./drawing";
 import { layerMaskSchema, type LayerMaskData } from "./masks";
-import { layerTransform, parentId } from "./spatial";
+import { layerTransform, parentId, intrinsicLocalBounds } from "./spatial";
 import {
   allLayers,
   createDocument,
@@ -559,6 +559,14 @@ function apply(document: DocumentData, command: EditorCommand): void {
     case "smartObject.convertRaster": {
       if (layer.kind !== "raster")
         throw new Error("Conversion currently requires a raster layer.");
+      const content = intrinsicLocalBounds(layer)!;
+      if(content.x<0||content.y<0||content.x+content.width>layer.width||content.y+content.height>layer.height){
+        // Prepared wet pixels can extend past the original image. Use the
+        // existing containing-master conversion, including its mask rebasing
+        // and interpolation/style halo, rather than clip them to the bitmap.
+        convertLayers(document,[layer.id],command.componentId,command.instanceId);
+        return;
+      }
       if (
         document.components?.some(
           (component) => component.id === command.componentId,

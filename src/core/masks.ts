@@ -1,3 +1,4 @@
+import {assertWetPaintVersion} from './wet-operation';
 import { z } from "zod";
 import { affineSchema } from "./transform-schema";
 import { AffineTransform } from "./affine";
@@ -25,7 +26,7 @@ export const wetMaskStrokeSchema=z.object({mode:z.literal('wet'),stroke:paintOpe
 export const maskOperationSchema=z.discriminatedUnion('mode',[maskStrokeSchema,wetMaskStrokeSchema]);
 export type MaskOperationData=z.infer<typeof maskOperationSchema>;
 export const maskStrokePointCount=(entry:MaskOperationData)=>entry.stroke.kind==='wet'?entry.stroke.brush.points.length:entry.stroke.points.length;
-export function assertMaskOperationVersion(mask:LayerMaskData,version:number){if(version<54&&(mask.placedX!==undefined||mask.placedY!==undefined))throw new Error('Placed mask offsets require schema version 54.');if(mask.kind==='raster-erasures'&&version<36)throw new Error('Raster erasure masks require schema version 36.');if(mask.kind==='raster-erasures')for(const entry of mask.erasures)assertRasterErasureVersion(entry,version);if(version<53&&(mask.strokes??[]).some(entry=>'placement'in entry&&entry.placement))throw new Error('Placed mask strokes require schema version 53.');if(version<34&&(mask.strokes??[]).some(entry=>entry.mode==='wet'))throw new Error('Wet mask coverage requires schema version 34.');}
+export function assertMaskOperationVersion(mask:LayerMaskData,version:number){for(const entry of mask.strokes??[])if(entry.mode==='wet')assertWetPaintVersion(entry.stroke,version);if(version<54&&(mask.placedX!==undefined||mask.placedY!==undefined))throw new Error('Placed mask offsets require schema version 54.');if(mask.kind==='raster-erasures'&&version<36)throw new Error('Raster erasure masks require schema version 36.');if(mask.kind==='raster-erasures')for(const entry of mask.erasures)assertRasterErasureVersion(entry,version);if(version<53&&(mask.strokes??[]).some(entry=>'placement'in entry&&entry.placement))throw new Error('Placed mask strokes require schema version 53.');if(version<34&&(mask.strokes??[]).some(entry=>entry.mode==='wet'))throw new Error('Wet mask coverage requires schema version 34.');}
 export const maskStrokesSchema = z
   .array(maskOperationSchema)
   .max(2048)

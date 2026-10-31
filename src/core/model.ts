@@ -1,3 +1,4 @@
+import {assertWetPaintVersion,wetPaintBounds} from './wet-operation';
 import{floatSceneIssue}from'./float-document';
 import {perspectiveSchema,type PerspectiveData} from './perspective';
 import {activePerspective,perspectiveMatrix,perspectiveRect} from './perspective';
@@ -51,7 +52,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 54;
+export const SCHEMA_VERSION = 55;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -226,6 +227,7 @@ export interface DocumentData {
     | 51
     | 52
     | 53
+    | 54
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;
@@ -607,36 +609,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     number(v, 1, MAX_COORDINATE) && Number.isSafeInteger(v);
   if (
     !record(value) ||
-    (value.schemaVersion !== 1 &&
-      value.schemaVersion !== 2 &&
-      value.schemaVersion !== 3 &&
-      value.schemaVersion !== 4 &&
-      value.schemaVersion !== 5 &&
-      value.schemaVersion !== 6 &&
-      value.schemaVersion !== 7 &&
-      value.schemaVersion !== 8 &&
-      value.schemaVersion !== 9 &&
-      value.schemaVersion !== 10 &&
-      value.schemaVersion !== 11 &&
-      value.schemaVersion !== 12 &&
-      value.schemaVersion !== 13 &&
-      value.schemaVersion !== 14 &&
-      value.schemaVersion !== 15 &&
-      value.schemaVersion !== 16 &&
-      value.schemaVersion !== 17 &&
-      value.schemaVersion !== 18 &&
-      value.schemaVersion !== 19 &&
-      value.schemaVersion !== 20 &&
-      value.schemaVersion !== 21 &&
-      value.schemaVersion !== 22 &&
-      value.schemaVersion !== 23 &&
-      value.schemaVersion !== 24 &&
-      value.schemaVersion !== 25 &&
-      value.schemaVersion !== 26 &&
-      value.schemaVersion !== 27 &&
-      value.schemaVersion !== 28 &&
-      value.schemaVersion !== 29 &&
-      value.schemaVersion !== 30 && value.schemaVersion !== 31 && value.schemaVersion !== 32 && value.schemaVersion !== 33 && value.schemaVersion !== 34 && value.schemaVersion !== 35 && value.schemaVersion !== 36 && value.schemaVersion !== 37 && value.schemaVersion !== 38 && value.schemaVersion !== 39 && value.schemaVersion !== 40 && value.schemaVersion !== 41 && value.schemaVersion !== 42 && value.schemaVersion !== 43 && value.schemaVersion !== 44 && value.schemaVersion !== 45 && value.schemaVersion !== 46 && value.schemaVersion !== 47 && value.schemaVersion !== 48 && value.schemaVersion !== 49 && value.schemaVersion !== 50 && value.schemaVersion !== 51 && value.schemaVersion !== 52 && value.schemaVersion !== 53 && value.schemaVersion !== 54) ||
+    (!Number.isInteger(value.schemaVersion)||Number(value.schemaVersion)<1||Number(value.schemaVersion)>SCHEMA_VERSION) ||
     !text(value.id) ||
     !text(value.name) ||
     !dimension(value.width) ||
@@ -644,7 +617,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
     !(value.colorSpace === "srgb" && (value.precision === undefined || value.precision === "uint8") || value.colorSpace === "linear-srgb" && value.precision === "float32")
   ) {
     throw new Error(
-      "Invalid document. Use a supported schema version (1–54), a supported precision/working-space pair, and positive, safely representable integer dimensions.",
+      `Invalid document. Use a supported schema version (1–${SCHEMA_VERSION}), a supported precision/working-space pair, and positive, safely representable integer dimensions.`,
     );
   }
   if(value.precision!==undefined&&Number(value.schemaVersion)<49)throw new Error('Document precision requires schema version 49.');
@@ -699,7 +672,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
       channelIds.add(channel.id);yield;
     }
   }
-  const checkBrush=(brush:{kind?:string;brush?:import('./drawing').BrushStrokeData;pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[];clip:unknown})=>{if(brush.kind==='wet'){if(Number(value.schemaVersion)<33)throw new Error('Prepared wet paint requires schema version 33.');if(!brush.brush)throw new Error('Missing wet-paint brush metadata.');checkBrush(brush.brush);}assertBrushVersion(brush,Number(value.schemaVersion));checkSelection(brush.clip);};
+  const checkBrush=(brush:{kind?:string;brush?:import('./drawing').BrushStrokeData;placement?:unknown;pressureCurve?:unknown;tip?:unknown;symmetry?:unknown;texture?:unknown;points?:readonly {tilt?:unknown}[];clip:unknown})=>{if(brush.kind==='wet'){assertWetPaintVersion(brush,Number(value.schemaVersion));if(Number(value.schemaVersion)<33)throw new Error('Prepared wet paint requires schema version 33.');if(!brush.brush)throw new Error('Missing wet-paint brush metadata.');checkBrush(brush.brush);}assertBrushVersion(brush,Number(value.schemaVersion));checkSelection(brush.clip);};
   checkSelection(value.selection);
   const ids = new Set<string>();
   let count = 0;
@@ -877,6 +850,7 @@ function* documentValidationSteps(value: unknown, checkComponents: boolean): Gen
           if(node.kind==='vector'&&Number(value.schemaVersion)<24&&('subpaths' in (entry as object)||'fillRule' in (entry as object)))throw new Error('Compound paths and fill rules require schema version 24.');
           if(node.kind==='vector'&&Number(value.schemaVersion)<22&&vectorStrokeKeys.some(key=>key in (entry as object)))throw new Error('Vector stroke styles require schema version 22.');
           if ("clip" in parsed) {if(parsed.kind!=='fill')checkBrush(parsed);else checkSelection(parsed.clip);}
+          if('kind'in parsed&&parsed.kind==='wet'&&parsed.placement&&parsed.opacity>0)wetPaintBounds(parsed);
           if (entryIds.has(parsed.id))
             throw new Error("Duplicate drawing object ID.");
           entryIds.add(parsed.id);

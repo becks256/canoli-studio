@@ -8,7 +8,7 @@ import { AffineTransform } from "./affine";
 import type { AffineData } from "./affine";
 import { affineSchema } from "./transform-schema";
 import { z } from "zod";
-import { wetPaintOperationSchema, wetPaintBounds, type WetPaintStrokeData } from './wet-operation';
+import { wetPaintOperationSchema, wetPaintBounds,assertWetPaintVersion, type WetPaintStrokeData } from './wet-operation';
 import {pressureCurveSchema,pressureSizeResponse,type PressureCurveData} from './pressure-curve';
 import {perspectiveSchema,perspectiveMatrix,perspectiveRect,type PerspectiveData} from './perspective';
 
@@ -403,6 +403,7 @@ export const rasterErasureSchema: z.ZodType<RasterErasureData> = z.object({
   stroke: paintOperationSchema.refine(stroke => stroke.kind === 'wet' || stroke.kind === 'eraser' || (stroke.kind === 'fill' && stroke.erase), 'Raster modifiers require wet paint, an eraser or a clear operation.'),
   placement:z.object({perspective:perspectiveSchema,bounds:rect}).strict().optional(),
 }).strict().superRefine((entry,context)=>{
+  if(entry.stroke.kind==='wet'&&entry.stroke.placement&&entry.stroke.opacity>0){try{wetPaintBounds(entry.stroke);}catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}}
   if(!entry.placement)return;
   try{
     if(entry.stroke.kind!=='eraser'&&!(entry.stroke.kind==='fill'&&entry.stroke.erase))throw new Error('Placed coverage requires an eraser or clear operation.');
@@ -410,6 +411,7 @@ export const rasterErasureSchema: z.ZodType<RasterErasureData> = z.object({
   }catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}
 });
 export function assertRasterErasureVersion(entry:RasterErasureData,version:number):void {
+  assertWetPaintVersion(entry.stroke,version);
   if(!entry.placement)return;
   const required=entry.stroke.kind==='fill'?52:51;
   if(version<required)throw new Error(`Placed ${entry.stroke.kind==='fill'?'clears':'erasures'} require document schema version ${required}.`);

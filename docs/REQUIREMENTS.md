@@ -1,5 +1,22 @@
 # Canoli Studio editor requirements
 
+## Captured projected wet editing (schema 55)
+
+Smudge/Mixer must author complete prepared fields in the image plane after
+perspective for raster pixels and linked ordinary/filter masks. Keep original
+pixels, mask geometry/settings, selection clips, pressure/tip/texture/symmetry
+metadata and finite native resolution. Unlinked masks retain local behavior.
+Pull premultiplied replacement color, replacement alpha and independent removal
+coverage together into original content before current display placement;
+never inverse-map only pointer points or clip coverage to the image quad.
+Private previews and final commits must match, with one Undo and synchronous
+cancellation on actual revision/ordered-selection changes. Retain expanded wet
+pixels through containing-master conversion. Native float wet painting remains
+explicitly unsupported. Full F03/F06, general warp, relinking, photographic,
+sustained performance and physical-device acceptance remain required.
+[Contract](PERSPECTIVE_ENGINE.md#captured-projected-wet-editing-schema-55).
+
+
 ## Native Node worker compatibility
 
 Native services must load their TypeScript runtime from an ordinary JavaScript

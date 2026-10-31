@@ -7,6 +7,7 @@ import { createCanvas, release, renderTransform, type RenderSpace } from './canv
 import type { PixelProcessor } from './processor';
 import { checkRenderCurrent } from './render-control';
 import { yieldTask } from './task-yield';
+import {compositeProjectedWetPaint} from './projected-wet';
 
 export function wetBrowserAssets(assets: Pick<AssetStore, 'get' | 'captureLifetime'>, check: () => void = () => {}): WetAssetProvider {
   const lifetime = assets.captureLifetime();
@@ -32,6 +33,7 @@ export function wetBrowserAssets(assets: Pick<AssetStore, 'get' | 'captureLifeti
  * second time after interpolation. Envelope opacity blends the full result once. */
 export async function compositeWetPaint(stroke: WetPaintStrokeData, assets: AssetStore, target: HTMLCanvasElement, space: RenderSpace, world: AffineTransform, processor: PixelProcessor, isCancelled?: () => boolean): Promise<void> {
   if (stroke.opacity === 0) return;
+  if(stroke.placement)return compositeProjectedWetPaint(stroke,assets,target,space,world,processor,wetBrowserAssets(assets,()=>checkRenderCurrent(isCancelled)),isCancelled);
   const check = () => checkRenderCurrent(isCancelled), placement = renderTransform(space, world.multiply(AffineTransform.fromJSON(stroke.nativeTransform)));
   const before = target.getContext('2d')!.getImageData(0, 0, target.width, target.height).data;
   const raw = createCanvas(target.width, target.height, true), coverage = createCanvas(target.width, target.height);
