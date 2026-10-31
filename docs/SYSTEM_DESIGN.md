@@ -1,5 +1,19 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Independent masks inside smart masters
+
+Smart conversion rebases unlinked ordinary/filter masks into the containing
+master document while retaining their independent relationship. Ephemeral
+expansion carries a separate master-to-output affine frame through nested
+instances; child pose and perspective never become mask linkage. Renderer
+root/document transforms adapt that frame once, while root document masks keep
+their existing coordinate contract. Full-frame projected children retain their
+perspective. A redundant master clip is omitted only for a sole ordinary raster
+whose complete intrinsic support is contained; out-of-artboard perspective or
+prepared wet support keeps the clip. Sources, shared commands/history, schema,
+isolation and separate REST sessions retain their existing boundaries.
+
+
 ## Bidirectional projective coverage
 
 The private scalar compiler captures direction together with corners and source

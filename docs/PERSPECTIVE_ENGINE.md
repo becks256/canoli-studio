@@ -1,5 +1,18 @@
 # Native perspective engine — application integration in progress
 
+## Smart-master mask planes
+
+Group/selection conversion retains unlinked ordinary/filter masks in the new
+containing master frame instead of linking them to projected child artwork.
+Nested instances carry that frame independently through placement/scaling and
+renderer reference transforms. Full-frame projected raster masters retain their
+perspective and avoid redundant clipping only when their complete intrinsic
+support stays within the artboard. Child movement leaves its unlinked mask
+fixed in master coordinates. Existing native geometry/settings, commands,
+Undo, original sources and persistence remain authoritative; no schema or
+public projective-relink capability is added.
+
+
 Raster and smart-object instances now carry optional schema-50 normalized
 perspective corners through `PerspectiveTransform`, shared commands and Undo.
 The Inspector authors their eight pixel coordinates, enables direct corner

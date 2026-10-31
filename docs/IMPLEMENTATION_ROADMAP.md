@@ -9181,3 +9181,69 @@ This accepts ordinary mask movement. It does not complete projective relinking,
 wet input, general warp, photographic/interchange quality, sustained editor-wide
 latency, whole-process memory, physical-device or any other unfinished original
 roadmap requirement. The full goal remains active.
+
+
+### 2026-10-31 — F03/F06 independent masks in smart masters
+
+Starting from `a6c1dba`, conversion/expansion forced unlinked ordinary and filter
+masks into child linkage. A real projected-child group conversion changed 5,954
+RGBA channel bytes (maximum error 255) and changed `linked:false` to true.
+Conversion now rebases masks into the new containing master document while
+retaining their independent relationship, geometry, refinements and settings.
+Ephemeral expansion carries the containing master frame separately from child
+pose/perspective, including nested/shared instances and renderer root/document
+frames. Existing placement offsets fold once. Child movement leaves independent
+mask placement fixed; moving/scaling instances carries their master and masks.
+
+The audit also found that the sole full-frame raster shortcut discarded source
+perspective. Projected sources retain their child projection, without duplicate
+artboard antialiasing when their complete intrinsic support is contained.
+Out-of-artboard projected/prepared-wet support retains actual master clipping.
+No schema, constructor signature, command, worker ABI, plugin grant, original
+resolution or REST/browser synchronization boundary changes. The maintained
+scripting guide includes an executable group-conversion example.
+
+The original broad roadmap remains active. This correction does not complete
+preserving-position projective relinking, projected wet input, general warp,
+full photographic/interchange fidelity, sustained all-tool latency, whole-process
+memory or physical-device acceptance. Final verification and evidence follow.
+
+
+Final verification: full build/typecheck passes with 43 developer guides.
+The complete serial `npm test -- --maxWorkers=1` passes **3,151 tests across
+306 files**. All **22 final production workflows**, **10 final direct pixel
+comparisons** and **89 SVG recovery/composition checks** pass without retries,
+skips or failures. The initial 199-case source matrix passes 174; 25 cases hit
+stale temporary SVG report symlinks after the environment reset. Every failed
+title passes unchanged after destination repair. Together the initial matrix
+and SVG recovery verify **242 distinct browser titles**; this is not presented
+as an initially green full matrix.
+
+Conversion and independent root-plane ordinary/filter mask references match
+every RGBA byte, including reflection/shear, root/document adapters, cached
+frames and full-frame projected masters. Production executes the maintained
+isolated group-conversion example, retains unlinked child masks and original
+PNG bytes, and verifies exact Undo/Redo, native models and reopened PNG output.
+Existing genuine 50 MP scalar/bitmap masks, source sharing and native SVG-prefix
+delivery pass. This slice does not add a new full 50 MP mask-plane comparison.
+
+Diagnostics retain the baseline 5,954-byte/255-error defect, duplicate reference
+IDs, a fixture selection assumption after Redo, the obsolete SVG linkage unit
+assertion, one transient production Delete failure, the unchanged five-second
+WASM timeout under concurrent load and its passing isolated/complete serial
+retries. Default Node 26 native RAW/TIFF acceptance remains unverified; final
+full unit/API acceptance uses Node 24.0.1. Generated/cache/report destinations
+were restored after the environment reset. During the initial browser run only
+an architecture sentence and the older unit assertion changed; runtime and
+executed browser tests stayed unchanged. Final direct, production and SVG runs
+pin current identities and all 145 release resources. Existing feather/effect
+context semantics remain; universal photographic parity is not claimed.
+
+[Verification record](benchmarks/smart-mask-planes-2026-10-31.md) and
+[sealed evidence](benchmarks/smart-mask-planes-2026-10-31.json.gz),
+**5,939,848 bytes**, SHA-256
+`695f3d420ab7b11723348f30c84f4fa6a9e10c58ae7d4c7033373d1edba41f9f`.
+The archive retains full reports/commands/logs, 36 raw RGBA arrays, native
+project/PNG witnesses, source/release identities and diagnostics. Native pixel
+WASM/ABI remains unchanged. This accepts the independent smart-master mask
+plane correction; all unfinished F03 and original roadmap gates remain active.

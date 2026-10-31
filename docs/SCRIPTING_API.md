@@ -2852,7 +2852,24 @@ const instance = document.createSmartObject(document.selectedLayers);
 print(instance.componentId);
 ```
 
-The master includes the source artboard and conservative off-canvas content/style bounds. Document-space masks are captured into linked local coordinates to preserve their position in the new master. Contents blend against one another inside an isolated component: backdrop-dependent blends and adjustments may change when their previous backdrop is outside the selection. Include that backdrop in the selection when it should become part of the master. Source layers remain editable through `editContents()` until rasterized.
+The master includes the source artboard and conservative off-canvas content/style bounds. Unlinked ordinary and filter masks retain `linked:false` and are rebased into the new containing master document. Their geometry, refinements and settings stay native; placement offsets are folded into that frame once. Child movement or perspective does not move these masks; moving/scaling a placed instance carries its containing master and masks together. Contents blend against one another inside an isolated component: backdrop-dependent blends and adjustments may change when their previous backdrop is outside the selection. Include that backdrop in the selection when it should become part of the master. Source layers remain editable through `editContents()` until rasterized.
+
+<!-- example: smart-mask-plane -->
+```js
+if (!(document.selectedLayer instanceof LayerGroup)) {
+  throw new Error("Select an artwork group first.");
+}
+const instance = document.createSmartObject([document.selectedLayer]);
+print(instance.componentId);
+```
+
+This existing method has no new options or defaults. Conversion errors and the
+single transaction/Undo boundary remain as above. Embedded master expansion
+keeps unlinked masks independent of the child affine/perspective transform,
+including repeated instances and native rendering frames. Full-frame projected
+children retain their perspective; master clipping is retained whenever their
+intrinsic support extends outside the master artboard. This does not enable
+preserving-position projective relinking or projected wet input.
 
 ### Independent smart-object copies
 

@@ -1,6 +1,6 @@
 import { AffineTransform } from "../affine";
 import { cropDocument } from "../crop";
-import { maskTransform,withoutMaskPlacedOffset } from "../masks";
+import { rebaseUnlinkedMask } from "../masks";
 import {
   allLayers,
   base,
@@ -91,53 +91,13 @@ export function convertLayers(
   if(document.paragraphStyles)master.paragraphStyles=structuredClone(document.paragraphStyles);
   master.children = structuredClone(selected.map(layer=>captureFrequencyRadius(document,layer)));
   const registry = new ComponentRegistry(document.components);
+  const toParent=parentWorld.inverse();
   for (const node of allLayers(master.children)) {
-    const world = layerTransform(document, node.id)!;
     if (node.mask?.linked === false) {
-      const relative = world
-        .inverse()
-        .multiply(maskTransform(node.mask, world));
-      node.mask = {
-        ...withoutMaskPlacedOffset(node.mask),
-        linked: true,
-        x: relative.e,
-        y: relative.f,
-        basis: {
-          a: relative.a,
-          b: relative.b,
-          c: relative.c,
-          d: relative.d,
-          e: 0,
-          f: 0,
-        },
-      };
+      node.mask = rebaseUnlinkedMask(node.mask,toParent);
     }
     if (node.kind === "smart-object" && node.filterMask?.linked === false) {
-      const source = registry.get(node.componentId).source;
-      const native = source.kind === "asset" ? source : source.document;
-      const basis = world.multiply(
-        AffineTransform.scale(
-          node.width / native.width,
-          node.height / native.height,
-        ),
-      );
-      const relative = basis
-        .inverse()
-        .multiply(maskTransform(node.filterMask, world));
-      node.filterMask = {
-        ...withoutMaskPlacedOffset(node.filterMask),
-        linked: true,
-        x: relative.e,
-        y: relative.f,
-        basis: {
-          a: relative.a,
-          b: relative.b,
-          c: relative.c,
-          d: relative.d,
-          e: 0,
-          f: 0,
-        },
-      };
+      node.filterMask = rebaseUnlinkedMask(node.filterMask,toParent);
     }
   }
   cropDocument(master, { x, y, width, height });

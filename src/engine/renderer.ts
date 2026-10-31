@@ -740,6 +740,7 @@ export class CanvasRenderer implements DocumentRenderer {
       document = resolveSmartDocument(document, registry, {
         preserveFiltered: true,
         retainImmutable: true,
+        maskFrame:options.documentTransform?options.documentTransform.inverse().multiply(options.rootTransform??new AffineTransform()):options.rootTransform,
       });
     if ((options.componentDepth ?? 0) > 64)
       throw new Error(

@@ -1,5 +1,19 @@
 # Architecture
 
+## Independent masks inside smart masters
+
+Smart conversion rebases unlinked ordinary/filter masks into the containing
+master document while retaining their independent relationship. Ephemeral
+expansion carries a separate master-to-output affine frame through nested
+instances; child pose and perspective never become mask linkage. Renderer
+root/document transforms adapt that frame once, while root document masks keep
+their existing coordinate contract. Full-frame projected children retain their
+perspective. A redundant master clip is omitted only for a sole ordinary raster
+whose complete intrinsic support is contained; out-of-artboard perspective or
+prepared wet support keeps the clip. Sources, shared commands/history, schema,
+isolation and separate REST sessions retain their existing boundaries.
+
+
 ## Placed coverage back to original pixels
 
 Private scalar-field sampling now supports both quad-to-source and source-to-
@@ -1292,7 +1306,7 @@ Delivery ZIP exports use the shared ZIP/ZIP64 serializer through an asynchronous
 
 ### Selection-to-smart conversion
 
-`smartObject.convertLayers` accepts distinct contiguous sibling IDs plus new component/instance IDs. It validates all targets, ancestry locks, stack contiguity and identity collisions before replacement. It moves cloned authored layers, in stack order, into an embedded master, retaining source assets and nested master references. Bounds include the parent-plane source artboard, layer geometry and conservative cumulative style halos, rounded outward to integral master pixels. Unlinked layer/filter masks are converted to local linked bases before rebasing into the master. The original sibling span is replaced atomically by a neutral smart-object placement; the shared command supplies UI, DOM, isolated scripts and REST with identical validation/history. This introduces group isolation rather than promising equivalence for external backdrop-dependent effects. Local linked snapshots are described below.
+`smartObject.convertLayers` accepts distinct contiguous sibling IDs plus new component/instance IDs. It validates all targets, ancestry locks, stack contiguity and identity collisions before replacement. It moves cloned authored layers, in stack order, into an embedded master, retaining source assets and nested master references. Bounds include the parent-plane source artboard, layer geometry and conservative cumulative style halos, rounded outward to integral master pixels. Unlinked layer/filter masks retain their independent relationship and rebase into the containing master document without following child affine/perspective placement. The original sibling span is replaced atomically by a neutral smart-object placement; the shared command supplies UI, DOM, isolated scripts and REST with identical validation/history. This introduces group isolation rather than promising equivalence for external backdrop-dependent effects. Local linked snapshots are described below.
 
 ### Smart-object rasterization preparation and commit
 

@@ -120,6 +120,15 @@ export function withoutMaskPlacedOffset(mask:LayerMaskData):LayerMaskData {
   const{placedX:_x,placedY:_y,...raw}=mask;return raw;
 }
 
+/** Change an independent mask's containing-document frame without linking it
+ * to artwork (which may have its own perspective). Geometry stays native. */
+export function rebaseUnlinkedMask(mask:LayerMaskData,frame:AffineTransform):LayerMaskData {
+  if(mask.linked!==false)throw new Error('Mask document rebasing requires an unlinked mask.');
+  const matrix=frame.multiply(maskTransform(mask,new AffineTransform()));
+  return{...withoutMaskPlacedOffset(mask),x:matrix.e,y:matrix.f,
+    basis:{a:matrix.a,b:matrix.b,c:matrix.c,d:matrix.d,e:0,f:0}};
+}
+
 /** Capture ordinary mask painting in the placed image plane, including the
  * mask's independent post-perspective translation. */
 export function maskPlacedPerspective(value:import('./perspective').PerspectiveData,width:number,height:number,mask:LayerMaskData){

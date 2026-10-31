@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Smart-master independent mask planes
+
+Converting groups/selections must preserve unlinked ordinary/filter masks and
+appearance on perspective children. Masks remain in their containing master
+plane, independent of child motion, and follow each instance placement/scale.
+Retain original pixels, native mask geometry, one Undo, project reopening and
+render/export frame behavior. Full-frame perspective and genuine artboard
+clipping must survive expansion. This increment leaves broader F03 and full
+roadmap acceptance open.
+
+
 ## F03 placed coverage sampling dependency
 
 Native scalar coverage must support original-to-placed and placed-to-original
