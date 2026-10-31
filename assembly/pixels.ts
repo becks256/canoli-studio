@@ -1,4 +1,5 @@
 export {convolveAlphaFloat} from './float-shadow';
+export {loadWetPaintFloat,mixWetPaintFloat,envelopeWetPaintFloat} from './float-wet';
 export {styleFloat} from './float-style';
 export {colorFloat} from "./float-color";
 export {tonalFloat} from "./float-tonal";

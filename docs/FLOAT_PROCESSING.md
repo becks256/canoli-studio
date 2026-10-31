@@ -115,3 +115,73 @@ project/workspace container, plugin grant or browser/REST synchronization change
 ## Node source reads and composed processing
 
 The independent Node TIFF service returns verified original-derived linear-sRGB samples only. It shares the actual native preparation and bounded tile reader; layer transforms, masks, adjustments and blending remain separate scene processing. Browser reopening/export is required to validate composed output. [REST source contract](REST_TIFF.md).
+
+## Linear float wet-paint primitives
+
+The private `FloatPixelProcessor` now provides `wetLoad`, `wetMix` and
+`wetEnvelope`, through worker methods `PixelProcessor.floatWetLoad`,
+`floatWetMix` and `floatWetEnvelope`. These are numerical dependencies for F03/F10
+Smudge/Mixer, not public document constructors or enabled float painting tools.
+They operate on one explicit common linear RGB encoding, without byte staging,
+gamma conversion, gamut clipping or spectral pigment simulation.
+
+Source and destination use straight Float32 RGBA. Carried pigment uses
+premultiplied Float32 RGBA: RGB may be any finite signed/HDR value, alpha must
+be finite in [0,1], and zero alpha requires zero RGB. Unlike the existing byte
+wet-paint reservoir, RGB is not bounded by alpha. Straight samples may retain
+hidden RGB at zero alpha. Coverage is Float32, finite in [0,1], with one value
+per pixel. All sample buffers must be fixed ArrayBuffers; shared, detached and
+resizable storage rejects. Each request accepts at most 262,144 pixels and
+processes reusable native scratch windows of at most 65,536 pixels. These are
+transport/scratch budgets, independent of image resolution.
+
+`wetLoad(source, {color = [0,0,0,1], load = 0} = {})` returns carried pigment.
+The color is straight linear RGBA; RGB must round to finite float32 and alpha
+and load must be in [0,1]. For source straight color `S`, alpha `a`, load color
+`L`, alpha `b` and amount `l`, the premultiplied result is
+`P = S*a*(1-l) + L*b*l`, `p = a*(1-l) + b*l`.
+Loading converts representations even at load zero; it does not promise source
+word identity or preservation of hidden transparent color.
+
+`wetMix(source, carried, coverage, {flow = 1, wetness = 0, pickup = 0.5} = {})`
+returns independently owned `{pixels, carried}`. All settings are finite in
+[0,1]. For strength `t = flow*coverage`, deposit `d = t*(1-wetness)` and
+pickup `k = t*pickup`, the destination alpha is `a' = a*(1-d) + p*d`, and
+straight RGB is `(S*a*(1-d) + P*d)/a'`. The next reservoir is
+`P' = P*(1-k) + S*a*k`, `p' = p*(1-k) + a*k`.
+Pickup always reads the pre-deposit source. Zero deposit copies every source
+word exactly, including hidden color and signed zero; zero pickup copies every
+carried word exactly. Full wetness therefore allows pickup without depositing.
+Transparent carried pigment can clear destination alpha.
+
+`wetEnvelope(before, after, coverage, opacity = 1)` interpolates completed
+stroke work once with amount `m = opacity*coverage`. Alpha is
+`a = before.a*(1-m) + after.a*m`; RGB is the sum of the corresponding
+premultiplied contributions divided by `a`. Amount zero/one copies the
+respective endpoint words exactly. The caller must apply whole-stroke opacity
+and captured selection here, rather than scaling every dab's pickup.
+
+All arithmetic uses float64 intermediates and stores float32 once per result.
+An active weighted operation whose stored alpha rounds to zero canonicalizes
+RGB to zero. Nonfinite inputs, invalid geometry/controls and nonrepresentable
+float32 outputs reject without publishing a partial result. Native exports
+`loadWetPaintFloat`, `mixWetPaintFloat` and `envelopeWetPaintFloat` return status
+0 for success, 1 for invalid input and 3 for float32 overflow. Private scratch
+may change after rejection; caller buffers stay unchanged and later work can
+retry. Worker calls capture samples, coverage and nested settings before
+readiness and transfer only private copies. Replies require complete owned
+buffers, exact lengths, finite colors and valid alpha; mix outputs must use
+distinct buffers. Disposal rejects pending work.
+
+Independent NumPy float64 fixtures cover 8,197 signed/HDR pixels per operation,
+three loads, six deposit/pickup configurations and three final envelopes. Tests
+compare every output uint32 word, not canvas or display colors. Native and real
+worker tests also exercise window boundaries, caller partitions, byte work,
+ownership, malformed replies, overflow, disposal and retry.
+
+Connected float spatial reservoir sampling, retained worker stroke sessions,
+HDR replacement/field assets, native replay and projection, persistence/history,
+authoring previews/commit and actual tools remain required. Existing byte PNG
+replacement assets cannot represent HDR results. The current float wet-tool
+admission guard stays in force; no schema, scripting/REST signature, plugin
+permission or public mutation authority changes in this increment.

@@ -1,4 +1,5 @@
 import{FloatLookupProcessor}from'./float-lookup';
+import type {FloatWetLoadSettings} from '../core/float-wet';
 import type {ProjectiveSampleOptions} from '../core/projective-sampling';
 import type {ProjectiveFieldOptions} from '../core/projective-field';
 import type {MappedFieldOptions} from '../core/mapped-field';
@@ -87,6 +88,9 @@ self.onmessage = async (
   event: MessageEvent<{
     id: number;
     pixels: Uint8ClampedArray;
+    floatWetLoad?:{pixels:Float32Array;options:FloatWetLoadSettings};
+    floatWetMix?:{pixels:Float32Array;carried:Float32Array;coverage:Float32Array;options:WetPaintMixSettings};
+    floatWetEnvelope?:{before:Float32Array;after:Float32Array;coverage:Float32Array;opacity:number};
     floatConvolveAlpha?:{alpha:Float32Array;settings:FloatConvolutionOptions};
     floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
     floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
@@ -177,6 +181,11 @@ self.onmessage = async (
 ) => {
   try {
     const data = event.data;
+    if(data.floatWetLoad||data.floatWetMix||data.floatWetEnvelope){
+      const owned=floating??=new FloatPixelProcessor(await kernel);
+      if(data.floatWetMix){const r=data.floatWetMix,floatWetPaint=owned.wetMix(r.pixels,r.carried,r.coverage,r.options);self.postMessage({id:data.id,floatWetPaint},{transfer:[floatWetPaint.pixels.buffer as ArrayBuffer,floatWetPaint.carried.buffer as ArrayBuffer]});}
+      else{const r=data.floatWetLoad,e=data.floatWetEnvelope,pixels=r?owned.wetLoad(r.pixels,r.options):owned.wetEnvelope(e!.before,e!.after,e!.coverage,e!.opacity);self.postMessage({id:data.id,pixels},{transfer:[pixels.buffer as ArrayBuffer]});}return;
+    }
     if(data.floatLookupPrepare||data.floatLookupApply||data.floatLookupRelease!==undefined){
       const seed=await kernel,owner=floatLookups??=new FloatLookupProcessor(seed);
       if(data.floatLookupPrepare){const floatLookupHandle=owner.prepare(data.floatLookupPrepare);self.postMessage({id:data.id,floatLookupHandle});}

@@ -1,4 +1,5 @@
 import {validateWetField} from '../core/wet-field';
+import {floatWetLoadSchema,floatWetMixSchema,floatWetOpacitySchema,validateFloatWetCarried,validateFloatWetResult,type FloatWetLoadOptions,type FloatWetLoadSettings,type FloatWetResult} from '../core/float-wet';
 import{compileFloatColor,parseFloatColor,type FloatColorAdjustment}from'../core/float-color';
 import {compileProjectiveSample,type ProjectiveSampleOptions} from '../core/projective-sampling';
 import {compileProjectiveField,type ProjectiveFieldOptions} from '../core/projective-field';
@@ -106,6 +107,7 @@ export class PixelProcessor {
         else if (event.data.donorResult)
           request.resolve(event.data.donorResult);
         else if (event.data.floatStyle) request.resolve(event.data.floatStyle);
+        else if (event.data.floatWetPaint) request.resolve(event.data.floatWetPaint);
         else if (event.data.poissonResult)
           request.resolve(event.data.poissonResult);
         else if (event.data.wetPaint) request.resolve(event.data.wetPaint);
@@ -118,6 +120,21 @@ export class PixelProcessor {
   }
 
   /** Internal precision windows; complete original geometry is independent. */
+  async floatWetLoad(pixels:Float32Array,input:FloatWetLoadOptions={}):Promise<Float32Array>{
+    validateFloatWorkerWindow(pixels);const options=floatWetLoadSchema.parse(input),length=pixels.length;
+    const result=await this.request(new Uint8ClampedArray(0),{floatWetLoad:{pixels:pixels.slice(),options}});
+    validateFloatWetCarried(result,length);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Float wet reservoir result must own its complete buffer.');return result;
+  }
+  async floatWetMix(pixels:Float32Array,carried:Float32Array,coverage:Float32Array,input:WetPaintMixOptions={}):Promise<FloatWetResult>{
+    validateFloatWorkerWindow(pixels);validateFloatWetCarried(carried,pixels.length);validateFloatAlpha(coverage,pixels.length/4);const options=floatWetMixSchema.parse(input),length=pixels.length;
+    const result=await this.request(new Uint8ClampedArray(0),{floatWetMix:{pixels:pixels.slice(),carried:carried.slice(),coverage:coverage.slice(),options}});
+    validateFloatWetResult(result,length);return result;
+  }
+  async floatWetEnvelope(before:Float32Array,after:Float32Array,coverage:Float32Array,opacity=1):Promise<Float32Array>{
+    validateFloatWorkerWindow(before);validateFloatWorkerWindow(after);if(before.length!==after.length)throw new Error('Float wet envelope geometry differs.');validateFloatAlpha(coverage,before.length/4);floatWetOpacitySchema.parse(opacity);const length=before.length;
+    const result=await this.request(new Uint8ClampedArray(0),{floatWetEnvelope:{before:before.slice(),after:after.slice(),coverage:coverage.slice(),opacity}});
+    validateFloatWorkerWindow(result);if(result.length!==length||result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Float wet envelope result geometry differs.');return result;
+  }
   async floatTonal(pixels:Float32Array,coverage:Float32Array,input:FloatTonalOptions):Promise<Float32Array>{
     const options=floatTonalOptionsSchema.parse(input);validateFloatWorkerWindow(pixels);validateFloatAlpha(coverage,pixels.length/4);
     const captured={pixels:pixels.slice(),coverage:coverage.slice(),options},length=pixels.length,alpha=new Uint32Array(length/4),words=new Uint32Array(pixels.buffer,pixels.byteOffset,length);
@@ -462,6 +479,9 @@ export class PixelProcessor {
   private async request(
     pixels: Uint8ClampedArray,
     payload: {
+      floatWetLoad?:{pixels:Float32Array;options:FloatWetLoadSettings};
+      floatWetMix?:{pixels:Float32Array;carried:Float32Array;coverage:Float32Array;options:WetPaintMixSettings};
+      floatWetEnvelope?:{before:Float32Array;after:Float32Array;coverage:Float32Array;opacity:number};
       floatConvolveAlpha?:{alpha:Float32Array;settings:FloatConvolutionOptions};
       floatStyle?:{source:Float32Array;backdrop:Float32Array;style:LayerStyleData};
       floatComposite?:{source:Float32Array;backdrop:Float32Array;options:FloatCompositeOptions};
@@ -571,6 +591,9 @@ export class PixelProcessor {
     };
 
     if (pixels.byteLength > 0) tryTransfer(pixels.buffer);
+    if(payload.floatWetLoad)tryTransfer(payload.floatWetLoad.pixels.buffer);
+    if(payload.floatWetMix){tryTransfer(payload.floatWetMix.pixels.buffer);tryTransfer(payload.floatWetMix.carried.buffer);tryTransfer(payload.floatWetMix.coverage.buffer);}
+    if(payload.floatWetEnvelope){tryTransfer(payload.floatWetEnvelope.before.buffer);tryTransfer(payload.floatWetEnvelope.after.buffer);tryTransfer(payload.floatWetEnvelope.coverage.buffer);}
     if(payload.floatConvolveAlpha)tryTransfer(payload.floatConvolveAlpha.alpha.buffer);
     if(payload.floatStyle){tryTransfer(payload.floatStyle.source.buffer);tryTransfer(payload.floatStyle.backdrop.buffer);}
     if(payload.floatComposite){tryTransfer(payload.floatComposite.source.buffer);tryTransfer(payload.floatComposite.backdrop.buffer);tryTransfer(payload.floatComposite.options.mask?.buffer);}

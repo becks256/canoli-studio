@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "pixels": 8197,
+  "encoding": "linear RGB, straight source/destination, premultiplied carried pigment",
+  "oracle": "NumPy float64 weighted sums and one final float32 store; no editor code or WASM",
+  "generatorSha256": "2c6548576b733976fe0c7099de292ede36eafd911ed3fcbc62b309ab6056f251",
+  "loads": [
+    {
+      "name": "zero",
+      "options": {
+        "color": [
+          4.5,
+          -2.25,
+          13.125,
+          0.375
+        ],
+        "load": 0
+      }
+    },
+    {
+      "name": "partial",
+      "options": {
+        "color": [
+          4.5,
+          -2.25,
+          13.125,
+          0.375
+        ],
+        "load": 0.37
+      }
+    },
+    {
+      "name": "full",
+      "options": {
+        "color": [
+          4.5,
+          -2.25,
+          13.125,
+          0.375
+        ],
+        "load": 1
+      }
+    }
+  ],
+  "mixes": [
+    {
+      "name": "default",
+      "options": {}
+    },
+    {
+      "name": "zero-flow",
+      "options": {
+        "flow": 0
+      }
+    },
+    {
+      "name": "pickup-only",
+      "options": {
+        "wetness": 1,
+        "pickup": 1
+      }
+    },
+    {
+      "name": "partial",
+      "options": {
+        "flow": 0.625,
+        "wetness": 0.2,
+        "pickup": 0.7
+      }
+    },
+    {
+      "name": "replace",
+      "options": {
+        "pickup": 0
+      }
+    },
+    {
+      "name": "partial-no-pickup",
+      "options": {
+        "flow": 0.125,
+        "pickup": 0
+      }
+    }
+  ],
+  "envelopes": [
+    {
+      "name": "zero",
+      "opacity": 0
+    },
+    {
+      "name": "partial",
+      "opacity": 0.625
+    },
+    {
+      "name": "full",
+      "opacity": 1
+    }
+  ],
+  "files": {
+    "source": {
+      "bytes": 121828,
+      "sha256": "9641ad3c6c9f6a249d90f6c6aebdcc7d1ecd20200c33be118acf7346aad2078d",
+      "rawBytes": 131152,
+      "rawSha256": "d1d0809390644e3b2a0ef5e0fb0644d8d2b2c84ed060b0a982bd3c45c34279e9"
+    },
+    "pigment": {
+      "bytes": 121909,
+      "sha256": "6b125069563ab7e81300c6cc11ce0c4edfc624375f3773d5249804792700e960",
+      "rawBytes": 131152,
+      "rawSha256": "b6e927e4068feadb13e55c105758ac68774ff9b54d9be18010a91fdd57990133"
+    },
+    "coverage": {
+      "bytes": 29350,
+      "sha256": "1fcc3de47947674f22a1d29efc1f300a71b2e1523666a5fa0c5d4b204fe91839",
+      "rawBytes": 32788,
+      "rawSha256": "e822e152523975d0e00ac0a296b9290b313be9b048f5c35ee7ad2c6af5d9a8d4"
+    },
+    "load-zero": {
+      "bytes": 122774,
+      "sha256": "cfdafa2ef4dfcd2bc43aff8c5a080900a4b3678eddae731bf82fe40a4fc2cdb8",
+      "rawBytes": 131152,
+      "rawSha256": "b212e913511e35dc098148c61563c2b8c4daef076dc084a36ce0414ab32e5f66"
+    },
+    "load-partial": {
+      "bytes": 121777,
+      "sha256": "3f127cff491721e20666008ed499b11ccdeb3c988ec634a362dd426dd779f9ff",
+      "rawBytes": 131152,
+      "rawSha256": "4857dad38ba20b9c4a0711039f3013b2bb0047599ae721c09b92951de4ffca90"
+    },
+    "load-full": {
+      "bytes": 307,
+      "sha256": "a5d7b8a11fb04dfd3adfc2fc668b1cba2e290343fe97033b15d79639323b38ab",
+      "rawBytes": 131152,
+      "rawSha256": "43bceff5b8156b7890d7bb8921a3c133c804940e418b03b2ff445beabda6db3c"
+    },
+    "carried": {
+      "bytes": 122622,
+      "sha256": "b2464fc5dd0fd97116e9f21af7809707bb3aa2984e57bf8ab7d959e68ee3303f",
+      "rawBytes": 131152,
+      "rawSha256": "1771ee902fae57e3f2bad732e5e44541bcf59e886f0e6fee258aa77ac7b45d4c"
+    },
+    "mix-default": {
+      "bytes": 121812,
+      "sha256": "2d9b44e28036488bf5189678e1a059f368627d4ff5763ac5b8267898d99e0b1e",
+      "rawBytes": 131152,
+      "rawSha256": "ddbc7c98bc1d4200a1b4ea4ba59e19f0981359c0cca56e36d6c7f0ac8c48879f"
+    },
+    "carry-default": {
+      "bytes": 122020,
+      "sha256": "5804e1417e8300af89c3d935ae4e855495ee593612141bb15cb4b30a81af24a8",
+      "rawBytes": 131152,
+      "rawSha256": "5e6f5a90da46df8992113f967b23c9eb076399051ba660239f436c3e7b297529"
+    },
+    "mix-zero-flow": {
+      "bytes": 121828,
+      "sha256": "9641ad3c6c9f6a249d90f6c6aebdcc7d1ecd20200c33be118acf7346aad2078d",
+      "rawBytes": 131152,
+      "rawSha256": "d1d0809390644e3b2a0ef5e0fb0644d8d2b2c84ed060b0a982bd3c45c34279e9"
+    },
+    "carry-zero-flow": {
+      "bytes": 122622,
+      "sha256": "b2464fc5dd0fd97116e9f21af7809707bb3aa2984e57bf8ab7d959e68ee3303f",
+      "rawBytes": 131152,
+      "rawSha256": "1771ee902fae57e3f2bad732e5e44541bcf59e886f0e6fee258aa77ac7b45d4c"
+    },
+    "mix-pickup-only": {
+      "bytes": 121828,
+      "sha256": "9641ad3c6c9f6a249d90f6c6aebdcc7d1ecd20200c33be118acf7346aad2078d",
+      "rawBytes": 131152,
+      "rawSha256": "d1d0809390644e3b2a0ef5e0fb0644d8d2b2c84ed060b0a982bd3c45c34279e9"
+    },
+    "carry-pickup-only": {
+      "bytes": 122134,
+      "sha256": "c112fbf2e796a4f60972504e4eb00aa13f92c234f6a79ce1a501684f5b70e72f",
+      "rawBytes": 131152,
+      "rawSha256": "e5e3b43f120b53c6ac50280f38a267def748e0e114e44d1f23e447776b2b1644"
+    },
+    "mix-partial": {
+      "bytes": 121782,
+      "sha256": "05c4575271b183d67130722c505df0afc01f173fe07142c77f4652ad79d9286e",
+      "rawBytes": 131152,
+      "rawSha256": "a597eb358da9ff343540dbf4f4b63dd326f432cf4a10279370c243cb8dd71d55"
+    },
+    "carry-partial": {
+      "bytes": 122038,
+      "sha256": "67bc1385ee66e349f6c08a980fb5d7071d8747a41944e2b16be18a0ad80fa536",
+      "rawBytes": 131152,
+      "rawSha256": "6d84b1602b1854aa1d9dc7e315a1ff1f9f5fc2226fc9bcd958aa476b23b267c9"
+    },
+    "mix-replace": {
+      "bytes": 121812,
+      "sha256": "2d9b44e28036488bf5189678e1a059f368627d4ff5763ac5b8267898d99e0b1e",
+      "rawBytes": 131152,
+      "rawSha256": "ddbc7c98bc1d4200a1b4ea4ba59e19f0981359c0cca56e36d6c7f0ac8c48879f"
+    },
+    "carry-replace": {
+      "bytes": 122622,
+      "sha256": "b2464fc5dd0fd97116e9f21af7809707bb3aa2984e57bf8ab7d959e68ee3303f",
+      "rawBytes": 131152,
+      "rawSha256": "1771ee902fae57e3f2bad732e5e44541bcf59e886f0e6fee258aa77ac7b45d4c"
+    },
+    "mix-partial-no-pickup": {
+      "bytes": 121878,
+      "sha256": "3713a9abb51e1d963e26eacc6e1cbcb3fd7b9dffa2627e67ad132deaa2ae4d55",
+      "rawBytes": 131152,
+      "rawSha256": "d03c2a78ce2c9be89f51fbc224a21b7b223de63698ec8d2bee492dd29f63787f"
+    },
+    "carry-partial-no-pickup": {
+      "bytes": 122622,
+      "sha256": "b2464fc5dd0fd97116e9f21af7809707bb3aa2984e57bf8ab7d959e68ee3303f",
+      "rawBytes": 131152,
+      "rawSha256": "1771ee902fae57e3f2bad732e5e44541bcf59e886f0e6fee258aa77ac7b45d4c"
+    },
+    "envelope-zero": {
+      "bytes": 121828,
+      "sha256": "9641ad3c6c9f6a249d90f6c6aebdcc7d1ecd20200c33be118acf7346aad2078d",
+      "rawBytes": 131152,
+      "rawSha256": "d1d0809390644e3b2a0ef5e0fb0644d8d2b2c84ed060b0a982bd3c45c34279e9"
+    },
+    "envelope-partial": {
+      "bytes": 121813,
+      "sha256": "b88c04e995fe2dea8dcfc55b1b41b853134251922753f2ed0023313d8a981475",
+      "rawBytes": 131152,
+      "rawSha256": "c4776aeca3ab8e1a140e8112cfa687697007a89db9d1590b7af9d94990f0955c"
+    },
+    "envelope-full": {
+      "bytes": 121816,
+      "sha256": "a180bee3c8c884406f690b67739f75ea5107ea18a742b13ff08f93932a6d0bbc",
+      "rawBytes": 131152,
+      "rawSha256": "47b66530f94518de5a0d73c4b53f710304bb5ac53baf0b56b33d4402fba21a53"
+    }
+  }
+}

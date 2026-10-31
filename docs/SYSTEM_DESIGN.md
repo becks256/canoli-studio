@@ -1147,3 +1147,19 @@ Direct perspective mask path input resolves mask basis → image homography → 
 ## Mask placement and canvas translation
 
 Ordinary linked image-mask placement is W × T(placedX,placedY) × H × native mask geometry. Raw capture excludes placement; scalar target corners include W-linear displacement before document feather/settings. Affine/unlinked masks include placement once in their existing transform. Linked filter masks retain native-master compositing before image projection. UI/OO displacement resolves containing-document deltas through inverse W-linear geometry and shares ordinary mask commands. Version gates, immutable captures, native source ownership and existing gesture authority remain required; no arbitrary image limit or WASM/permission boundary changes.
+
+
+## Linear float wet-paint numerical boundary
+
+The private pixel worker now supports signed/HDR Float32 wet load, deposit and
+pre-deposit pickup plus final selection/opacity interpolation. Source and
+destination are straight linear RGBA; carried pigment is premultiplied, with
+normalized alpha and finite unclipped RGB. Private native float64 arithmetic
+stores float32 once, rejects overflow and never publishes partial work. Calls
+capture inputs before readiness; mix replies own two independent full buffers.
+[Equations, errors, budgets and remaining connected work](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
+
+The current byte-session/PNG replacement transport is not an HDR edit format.
+The existing float wet-tool gate stays closed pending native retained sessions,
+HDR replay/assets, persistence and authoring/tool integration. Shared document
+commands, independent REST sessions and isolated plugin authority remain.

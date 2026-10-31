@@ -1391,3 +1391,19 @@ Selection-away/back, owner/revision, Escape and pointer cancellation must discar
 the draft. Verify actual byte/float/smart preview/commit and source/project data,
 all mask forms, affine rebase/filter roles and a genuine 50 MP native window.
 Relinking with active perspective and remaining full F03 gates stay required.
+
+
+## Native float Smudge/Mixer dependency (F03/F10, integration required)
+
+Signed/HDR wet painting must preserve native linear Float32 color and fractional
+alpha through reservoir sampling, load, deposit/pickup, completed-stroke opacity,
+retained previews, replay, history, source-bearing persistence and delivery.
+Pickup must read pre-deposit pixels; selection and stroke opacity apply once to
+completed work. Byte PNG replacements cannot establish this requirement.
+
+The private load/mix/envelope numerical and worker dependency is implemented;
+[its exact boundary](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives) leaves
+retained sessions, spatial HDR sampling/assets, composed replay and actual
+authoring/tool integration required. Float color Smudge/Mixer remain unavailable
+until connected acceptance proves those requirements. No public API or schema
+change follows from this dependency alone.

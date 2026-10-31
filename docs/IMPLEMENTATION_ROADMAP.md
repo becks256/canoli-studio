@@ -9862,3 +9862,54 @@ general warp, native float wet tools, photographic/device/sustained F14 memory
 and performance, and every unfinished original professional, AI, workflow,
 ChatGPT/live identity, commercial, specialist and motion gate remain required.
 No latency improvement, speedup or continuous-60fps clearance is inferred.
+
+
+### 2026-10-31 — F03/F10 linear float wet-paint numerical and worker foundation
+
+Owner: implementation agent; bounded increment from `5f858d0`; classification:
+progress. Native float color Smudge/Mixer remains a required roadmap gap. The
+existing byte wet sessions and PNG replacements cannot preserve signed/HDR
+color, so this increment supplies their actual linear float numerical dependency.
+It does not enable tools or substitute mask painting for native color editing.
+
+Three AssemblyScript/WASM operations load straight linear color into a
+premultiplied signed/HDR reservoir, deposit with pre-deposit pickup, and apply
+selection/stroke opacity once to completed before/after work. Float64 arithmetic
+stores float32 once without byte staging or normalized-RGB clamps. Inert
+endpoints preserve hidden RGB/signed-zero words. Active alpha underflow stores
+canonical transparent zero; unrepresentable output rejects without publication.
+Private worker calls capture complete inputs/settings before readiness, transfer
+owned copies and validate exact geometry, finite samples, normalized alpha and
+independent output buffers. Existing byte wet math and public schema remain.
+[Exact private contract](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
+
+All **3,234 unit/API/native tests across 313 files** pass, including 18 new
+independent native cases. The full affected source-browser run passes **37 cases
+across seven files**, including all four new worker cases, existing retained
+sessions, spatial/storage failure handling and actual 50 MP paths. The existing
+50 MP float pipeline independently matches every one of 200 million output
+samples with zero color/alpha error and identical native words. All **five
+selected normal-production cases across three files** pass without developer
+globals: new HDR worker/gating checks, actual float-mask input/delivery and byte
+projected Mixer preview/cancel/Undo. No skips, retries, flakes or runner errors.
+
+Independent NumPy references cover 8,197 signed/HDR pixels for three loads, six
+deposit/pickup configurations and three completed envelopes, compared by every
+output uint32 word in native, source-worker and built-worker paths. Additional
+checks cover 65,539-pixel native/caller partitions, concurrent byte work,
+pre-readiness input ownership, malformed replies, overflow, disposal/retry,
+minimum-alpha underflow and the 262,144-pixel working-buffer boundary. Product
+and test sources stay frozen through acceptance; the build/typecheck passes.
+[Findings and compact, independently checked evidence](benchmarks/float-wet-2026-10-31.md).
+
+The full original goal remains active. Next required connected float wet work
+includes native spatial reservoir sampling, retained worker stroke sessions, HDR
+replacement/field assets and replay/projection, source-bearing persistence and
+history, guarded authoring previews/commit and actual tool/script/REST surfaces
+as scoped. Existing float wet authoring remains rejected until those boundaries
+retain HDR samples. Wider mask/source/master and nested-projective acceptance,
+general warp, photographic/device/sustained F14 memory/performance and every
+other unfinished original professional, AI, workflow, ChatGPT/live identity,
+commercial, specialist and motion gate remain required. No continuous-60fps,
+physical pigment/device quality, paid operation, upload or browser/REST
+synchronization claim follows from this numerical dependency.

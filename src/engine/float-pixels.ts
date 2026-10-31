@@ -1,4 +1,6 @@
 import {validateWetField} from '../core/wet-field';
+import {floatWetLoadSchema,floatWetMixSchema,floatWetOpacitySchema,validateFloatWetCarried,validateFloatWetResult,type FloatWetLoadOptions,type FloatWetResult} from '../core/float-wet';
+import type {WetPaintMixOptions} from '../core/wet-paint';
 import{floatConvolutionSchema,floatConvolutionLength,floatConvolutionRadius,fractionalBoxWeights,validateFloatAlpha,type FloatConvolutionOptions}from'../core/float-shadow';
 import {floatTonalOptionsSchema, type FloatTonalOptions} from '../core/float-tonal';
 import{gaussianWeights}from'../core/smart/spatial-filter';
@@ -40,6 +42,24 @@ export class FloatPixelProcessor{
  private kernel:PixelKernel|null;
  constructor(seed:PixelKernel){const kernel=forkPixelKernel(seed);if(typeof kernel.convolveAlphaFloat!=='function'||typeof kernel.styleFloat!=='function'||typeof kernel.compositeFloat!=='function'||typeof kernel.affineFloat!=='function'||typeof kernel.toneFloat!=='function'||typeof kernel.transferFloat!=='function'||typeof kernel.colorFloat!=='function'||typeof kernel.gradientFloat!=='function')throw new Error('Float pixel kernel exports are unavailable.');this.kernel=kernel;}
  dispose(){this.kernel=null;}
+ wetLoad(pixels:Float32Array,input:FloatWetLoadOptions={}):Float32Array<ArrayBuffer>{
+  const kernel=this.owner();if(typeof kernel.loadWetPaintFloat!=='function')throw new Error('Native float wet-load export is unavailable.');
+  validateFloatWorkerWindow(pixels);const options=floatWetLoadSchema.parse(input),result=new Float32Array(pixels.length);
+  for(let at=0;at<pixels.length;at+=WINDOW*4){const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count);new Float32Array(kernel.memory.buffer,p.source,count*4).set(pixels.subarray(at,at+count*4));checked(kernel.loadWetPaintFloat(p.source,p.output,count,...options.color,options.load));result.set(new Float32Array(kernel.memory.buffer,p.output,count*4),at);}
+  validateFloatWetCarried(result,pixels.length);return result;
+ }
+ wetMix(pixels:Float32Array,carried:Float32Array,coverage:Float32Array,input:WetPaintMixOptions={}):FloatWetResult{
+  const kernel=this.owner();if(typeof kernel.mixWetPaintFloat!=='function')throw new Error('Native float wet-mix export is unavailable.');
+  validateFloatWorkerWindow(pixels);validateFloatWetCarried(carried,pixels.length);validateFloatAlpha(coverage,pixels.length/4);const options=floatWetMixSchema.parse(input),result=new Float32Array(pixels.length),next=new Float32Array(pixels.length);
+  for(let at=0;at<pixels.length;at+=WINDOW*4){const count=Math.min(WINDOW,(pixels.length-at)/4),p=this.layout(count,true);new Float32Array(kernel.memory.buffer,p.source,count*4).set(pixels.subarray(at,at+count*4));new Float32Array(kernel.memory.buffer,p.backdrop,count*4).set(carried.subarray(at,at+count*4));new Float32Array(kernel.memory.buffer,p.mask,count).set(coverage.subarray(at/4,at/4+count));checked(kernel.mixWetPaintFloat(p.source,p.backdrop,p.mask,p.output,p.backdrop,count,options.flow,options.wetness,options.pickup));result.set(new Float32Array(kernel.memory.buffer,p.output,count*4),at);next.set(new Float32Array(kernel.memory.buffer,p.backdrop,count*4),at);}
+  const output={pixels:result,carried:next};validateFloatWetResult(output,pixels.length);return output;
+ }
+ wetEnvelope(before:Float32Array,after:Float32Array,coverage:Float32Array,opacity=1):Float32Array<ArrayBuffer>{
+  const kernel=this.owner();if(typeof kernel.envelopeWetPaintFloat!=='function')throw new Error('Native float wet-envelope export is unavailable.');
+  validateFloatWorkerWindow(before);validateFloatWorkerWindow(after);if(before.length!==after.length)throw new Error('Float wet envelope geometry differs.');validateFloatAlpha(coverage,before.length/4);floatWetOpacitySchema.parse(opacity);const result=new Float32Array(before.length);
+  for(let at=0;at<before.length;at+=WINDOW*4){const count=Math.min(WINDOW,(before.length-at)/4),p=this.layout(count,true);new Float32Array(kernel.memory.buffer,p.source,count*4).set(before.subarray(at,at+count*4));new Float32Array(kernel.memory.buffer,p.backdrop,count*4).set(after.subarray(at,at+count*4));new Float32Array(kernel.memory.buffer,p.mask,count).set(coverage.subarray(at/4,at/4+count));checked(kernel.envelopeWetPaintFloat(p.source,p.backdrop,p.mask,p.output,count,opacity));result.set(new Float32Array(kernel.memory.buffer,p.output,count*4),at);}
+  validateFloatWorkerWindow(result);return result;
+ }
  tonal(pixels:Float32Array,coverage:Float32Array,input:FloatTonalOptions):Float32Array<ArrayBuffer>{
   const kernel=this.owner();if(typeof kernel.tonalFloat!=='function')throw new Error('Float tonal kernel export is unavailable.');const options=floatTonalOptionsSchema.parse(input);samples(pixels,'Input');validateFloatAlpha(coverage,pixels.length/4);
   const result=new Float32Array(pixels.length);

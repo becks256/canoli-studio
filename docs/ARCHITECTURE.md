@@ -2421,3 +2421,21 @@ the containing instance includes the artboard and extended content. This differs
 from the compact original-image conversion, which retains an outer mask on the
 instance. It prevents trimming off-image paint while preserving source metadata,
 independent mask planes and Undo. Native projects retain both forms.
+
+
+## Native linear float wet-paint dependency (F03/F10)
+
+`core/float-wet.ts` defines private signed/HDR load and premultiplied reservoir
+validation. `FloatPixelProcessor` invokes three new AssemblyScript exports for
+linear load, deposit/pre-deposit pickup and final completed-stroke opacity.
+The ordinary pixel worker captures private inputs before readiness and returns
+strictly validated owned Float32 results. Native scratch remains bounded at
+65,536 pixels and worker requests at 262,144; neither limits image geometry.
+[Exact numerical and ownership contract](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
+
+The byte retained sessions, projected five-channel fields and PNG replacements
+retain their existing domains. Float retained sessions, HDR assets/replay,
+projection, persistence, previews and tool admission still need integration.
+These private primitives add no document schema, public mutation API, script
+service, REST route or plugin authority. Float wet-paint authoring remains
+rejected until those connected boundaries retain actual HDR samples.

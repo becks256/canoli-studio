@@ -45,6 +45,9 @@ interface QuickSelectionKernel {
 }
 
 export interface PixelKernel extends QuickSelectionKernel {
+  loadWetPaintFloat(source:number,output:number,pixels:number,red:number,green:number,blue:number,alpha:number,amount:number):number;
+  mixWetPaintFloat(source:number,carried:number,coverage:number,output:number,next:number,pixels:number,flow:number,wetness:number,pickup:number):number;
+  envelopeWetPaintFloat(before:number,after:number,coverage:number,output:number,pixels:number,opacity:number):number;
   tonalFloat(source:number,output:number,coverage:number,pixels:number,exposure:number,flow:number,mode:number,range:number,protect:boolean):number;
   convolveAlphaFloat(source:number,output:number,weights:number,width:number,height:number,radius:number,axis:number):number;
   styleFloat(source:number,backdrop:number,output:number,coverage:number,values:number,pixels:number,channel:number):number;

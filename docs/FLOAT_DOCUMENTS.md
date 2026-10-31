@@ -1058,3 +1058,13 @@ failures before own Fill/masks. Artistic blending still validates its required
 backdrop even when the shadow is empty. Capture/source lifetime checks guard
 these paths, including cancellation after an empty mask read. These are private
 execution optimizations, with unchanged public style/history/transport semantics.
+
+
+## Native float wet-paint dependency; tool integration pending
+
+Private linear Float32 wet load, deposit/pre-deposit pickup and completed-stroke
+selection/opacity primitives now preserve signed/HDR RGB without byte staging.
+They do not enable Smudge/Mixer in float documents. The existing byte retained
+session and PNG replacement transport cannot retain HDR edits; native float
+spatial reservoirs, retained authoring, assets/replay and persistence still need
+connection. [Numerical/ownership contract and verification scope](FLOAT_PROCESSING.md#linear-float-wet-paint-primitives).
