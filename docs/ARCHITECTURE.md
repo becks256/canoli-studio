@@ -1,5 +1,15 @@
 # Architecture
 
+## Float mask tool selection
+
+`ToolController.canChooseTool` distinguishes selecting a tool from starting a
+gesture with its current settings. In float documents the UI registry and rail
+permit Brush/Pencil selection when an ordinary mask exists. The shared
+`chooseTool` handler sets Mask Hide only when the existing paint target is
+incompatible. `canUseTool` remains the gesture guard, so a direct attempt to
+paint float artwork with byte color tools still rejects. Mask values, commands,
+native scene rendering, schema and script/plugin authority remain unchanged.
+
 ## Retained mask-plane increment (schema 56)
 
 The current implementation retains native grid/source provenance and editable

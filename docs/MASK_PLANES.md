@@ -73,6 +73,14 @@ references on each stroke. Brush/Pencil/Eraser pointer input and cursor use the
 layer's affine plane for linked masks and document space for unlinked masks.
 Selection, tip/tilt, pressure, texture and symmetry use that same authoring frame.
 
+In float documents, choosing Brush/Pencil on a masked layer through the rail,
+existing shortcuts or command palette selects Mask Hide when the current paint
+target is incompatible; an existing Mask Hide/Reveal choice stays selected.
+Gesture admission still checks the actual target. These tools edit scalar mask
+coverage while artwork color stays in the native float scene. Pen retains its
+existing vector-mask target. Native float color painting and wet tools require
+their separate integration.
+
 Prepared `WetPaintStroke.placement` accepts the same mapped constructor input
 and validated mapped DTO in addition to the prior perspective form. Its
 `nativeTransform` maps prepared field pixels to captured authoring coordinates.
@@ -156,9 +164,31 @@ sources, coupled native output/partitions, isolated scripts, source/lifetime /
 cancellation checks and existing tools. Earlier failed reports and observations
 are retained. [Fidelity findings and compact evidence](benchmarks/mask-plane-fidelity-2026-10-31.md).
 
+### Native float and portable ownership follow-up
+
+Actual float documents now have exact native-word acceptance for both initial
+link states across all five mask kinds, including HDR RGB, fractional alpha,
+Undo/Redo and project reopening. Four actual Brush/Pen pointer cases retain
+preview/commit identity, cancellation, visible color words, rational cubic
+controls and 17x11-window partition identity. These use the original 131x79
+float TIFF; its 96x58 thumbnail remains display-only. Mask tool selection is
+reachable through the rail, B/N and command palette while color painting rejects.
+
+Copied retained artwork now has specific acceptance for geometry-only float
+originals, colliding receiving IDs, source-tab closure, fresh stroke identities
+and workspace reload while only redo history owns the copied sources. Recorded
+recipes also retain and remap those geometry originals after source closure,
+with exact artwork and original-bearing reopening. These are the tested copy
+and recipe workflows, not every cross-document or source-swapping operation.
+
+Normal production Brush/Pencil editing exports native float TIFFs without debug
+globals. Independent libtiff checks verify actual linear-sRGB float samples,
+reduced alpha, unchanged visible HDR RGB, fractional alpha and every reopened
+output word. [Follow-up evidence](benchmarks/mask-plane-float-2026-10-31.md).
+
 This increment does not complete the broader roadmap. Remaining acceptance
-includes geometry-source swapping, copied/recipe/workspace ownership specifically
-for retained planes, wider owner/master/pose changes, all-kind mapped tool edits,
+includes geometry-source swapping, wider copied/nested/recipe/workspace ownership,
+wider owner/master/pose changes, all-kind mapped tool edits,
 broader float/horizon/cache/resource behavior and photographic/physical-device /
 sustained process-memory quality. General warp and native float wet tools remain
 separate required work. No speedup, 60 fps or performance-regression clearance is

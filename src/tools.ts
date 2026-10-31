@@ -416,6 +416,14 @@ export class ToolController {
     );
   }
   getSnapshot = () => this.state;
+  /** Choosing a coverage tool may first switch its target to an existing mask.
+   * Gesture admission still checks the actual current target in canUseTool. */
+  canChooseTool(tool:Tool):boolean{
+    if(this.canUseTool(tool))return true;
+    if(this.editor.document.precision!=='float32'||!['brush','pencil'].includes(tool))return false;
+    const document=this.editor.document,selected=document.selectedLayer;
+    return !!selected&&!!findLayer(document._read(),selected.id)?.mask;
+  }
   canUseTool(tool:Tool):boolean{
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;

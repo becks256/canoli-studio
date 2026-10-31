@@ -232,6 +232,11 @@ atomically. Pass-through groups require fill opacity 1. The tool rail, shortcuts
 palette and context controls disable unsupported creation/color tools. Move,
 Hand, selections, Crop, Artboard and mask drawing retain their existing commands;
 Layer Eraser requires an original raster target. Mask brush/pencil/eraser and mask Pen require their corresponding mask target.
+With a masked layer selected, Brush/Pencil can be chosen directly through the
+rail, B/N shortcuts or command palette. An incompatible paint target switches to
+Mask Hide; an existing Mask Hide/Reveal choice is retained. Gesture admission
+still rejects byte color painting on float artwork. Projected mask relinking and
+native editing acceptance are recorded in [MASK_PLANES.md](MASK_PLANES.md).
 Device soft proofing now uses the completed native float scene directly, before
 SDR display conversion. Selecting float precision or applying isolated precision
 commands retains proof preferences. Saved float workspaces restore complete proof

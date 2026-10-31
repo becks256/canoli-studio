@@ -1,5 +1,15 @@
 # Canoli Studio editor requirements
 
+## Float mask tool access
+
+Selecting a masked layer in a float document must make Brush and Pencil reachable
+through the rail, existing shortcuts and command palette. Choosing either tool
+switches an incompatible paint target to Mask Hide and preserves an existing
+Mask Hide/Reveal choice. Gesture admission must still reject color painting on
+float artwork. Retained projected masks must preserve native HDR RGB, float
+alpha, preview/commit parity, cancellation and shared Undo through editing and
+source-bearing persistence. See [the mask-plane contract](MASK_PLANES.md).
+
 ## Retained mask-plane increment (schema 56)
 
 The current implementation retains native grid/source provenance and editable

@@ -9775,3 +9775,48 @@ all original <=33 ms input p95 / <50 ms routine-task targets and every unfinishe
 professional/AI/workflow/ChatGPT/live identity/commercial/specialist/motion
 requirement remain required. No new latency improvement or regression clearance,
 account, upload, paid call or headless REST/browser synchronization is claimed.
+
+### 2026-10-31 — F03/F10 float mask tools and portable ownership
+
+Owner: implementation agent; bounded increment from `e1dc85e`; classification:
+progress. Native-word acceptance now covers both initial linkage states across
+all five mask kinds in real float documents. Actual linked/independent Brush and
+Pen edits preserve previews, cancellation, visible HDR colors, float alpha,
+rational controls, 17x11 output partitions, original bytes and shared Undo.
+
+The new input pilot found a UI gap: default Layer targeting made Brush/Pencil
+unreachable even with a selected mask. Selection availability now permits the
+existing coverage workflow, choosing Mask Hide only when the current target is
+incompatible. Rail, B/N and palette share this behavior; actual gesture admission
+still rejects float color painting. Pen keeps its existing vector-mask targeting.
+
+Specific copy, recipe and workspace checks retain geometry-only float TIFF
+originals after source closure and receiving ID collisions. Copied geometry stays
+exact with fresh identities; redo-only workspace history retains both sources.
+Recorded packages preserve/remap the original lattice independently of the
+receiving artwork, retain exact pixels and undo once. The native original remains
+all 190,816 bytes at 131x79, with its separate 96x58 display thumbnail.
+
+All 3,216 unit/API/native tests across 312 files pass. A complete affected run
+passes all 52 browser cases across five files, including 17 new cases and the
+existing 50 MP original. Both normal-production workflows pass without debug
+globals. Native libtiff verifies actual float output: Brush changes 157 alpha
+samples and Pencil changes 10 more, preserving visible HDR RGB, fractional alpha
+and every reopened output word. The stronger per-tool output assertion passes
+the full production rerun after the native matrix; product/native test sources
+remain unchanged. Build/typecheck and final application-asset comparison pass.
+Default discovery now routes every dedicated production spec to the production
+suite instead of admitting most into the source suite. Discovery covers all 16
+production files; only the stated two production workflows were run here.
+
+Earlier disabled-tool, fixture, sandbox and missing-PDF-reader reports are kept.
+The corrected complete suites retain their existing assertions and timeouts.
+[Detailed findings, exact verification boundary and compact evidence](benchmarks/mask-plane-float-2026-10-31.md).
+
+The full original goal stays active. Actual source swapping and wider nested /
+copy/recipe/workspace acceptance, owner/master/pose changes, all-kind mapped
+edits, general warp, native float wet tools, sustained photographic/device /
+process-memory F14 and every other unfinished original professional, AI,
+workflow, ChatGPT/live identity, commercial, specialist and motion gate remain
+required. No performance-clearance, paid call, upload or browser/REST
+synchronization claim follows from this increment.

@@ -19,7 +19,7 @@ function chromiumSharedMemoryAvailable() {
 export default defineConfig({
   testDir: "./tests",
   testMatch: "**/*.e2e.ts",
-  testIgnore: ["**/production.e2e.ts", "**/wet-feedback-production.e2e.ts"],
+  testIgnore: ["**/*production.e2e.ts"],
   fullyParallel: false,
   workers: 1,
   timeout: 120_000,

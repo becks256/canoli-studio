@@ -548,6 +548,8 @@ export function App({ editor }: { editor: EditorApplication }) {
   ),[viewDocument.width,viewDocument.height,viewportSize,zoom,pan]);
 
   function chooseTool(next: Tool) {
+    if(!editor.tools.canChooseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
+    if(dom.precision==='float32'&&(next==='brush'||next==='pencil')&&!editor.tools.getSnapshot().settings.paintTarget.startsWith('mask-'))editor.tools.configure({paintTarget:'mask-hide'});
     if(next==='pen'&&dom.precision==='float32'&&dom.selectedLayer?.mask?.kind==='vector')editor.tools.configure({penEditTarget:'mask'});
     if(!editor.tools.canUseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
     if(gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;}
@@ -882,7 +884,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       id: key,
       label,
       keys: [binding],
-      enabled:()=>editor.tools.canUseTool(key),
+      enabled:()=>editor.tools.canChooseTool(key),
       run: () => chooseTool(key),
     })),
     {
@@ -2053,7 +2055,7 @@ export function App({ editor }: { editor: EditorApplication }) {
             tool={tool}
             spacePan={spacePan}
             busy={busy}
-            canUseTool={value=>editor.tools.canUseTool(value)}
+            canUseTool={value=>editor.tools.canChooseTool(value)}
             onChooseTool={chooseTool}
             onImport={() => importInput.current?.click()}
             onNewDocument={() => editor.newDocument()}

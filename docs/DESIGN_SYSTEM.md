@@ -1,5 +1,15 @@
 # Canoli Studio design system
 
+## Float mask tool targeting
+
+When a masked layer is selected in a float document, enable Brush and Pencil in
+the existing rail and command registry. Choosing either defaults an incompatible
+target to Mask Hide; retain an existing Mask Hide/Reveal choice. Keep the target
+visible in the existing Tool options selector. Reuse the existing B/N bindings,
+cursor, controls, cancellation and one-Undo gesture. Color Brush/Pencil painting
+and float Smudge/Mixer remain unavailable. Vector-mask Pen keeps its existing
+Mask paths targeting behavior. No new shortcut or component is introduced.
+
 ## Retained mask-plane increment (schema 56)
 
 The current implementation retains native grid/source provenance and editable
