@@ -2,7 +2,9 @@ import {brushSymmetrySchema,type BrushSymmetryData} from '../core/brush-symmetry
 import {brushTextureSourceSchema,type BrushTextureData,type BrushTextureSource} from '../core/brush-texture';
 import {AffineTransform,type AffineData} from '../core/affine';
 import {PerspectiveTransform} from './perspective';
-import type {WetPaintPlacementData} from '../core/wet-operation';
+import type {WetPerspectivePlacementData} from '../core/wet-operation';
+import {MaskPlane} from './mask-plane';
+import type {MappedMaskPlacementData} from '../core/mask-plane-brush';
 import {brushTipSchema,type BrushTipData,type PenTiltData} from '../core/brush-tip';
 import {freeze} from '../core/immutable';
 import type { WetPaintStrokeData, WetPaintTileData } from '../core/wet-operation';
@@ -276,17 +278,21 @@ export interface WetPaintStrokeOptions {
   brush: BrushStroke | BrushStrokeData;
   tiles: WetPaintTileData[];
   nativeTransform?: AffineTransform | AffineData;
-  placement?:Omit<WetPaintPlacementData,'perspective'|'basis'>&{perspective:PerspectiveTransform|WetPaintPlacementData['perspective'];basis:AffineTransform|AffineData};
+  placement?:(Omit<WetPerspectivePlacementData,'perspective'|'basis'>&{perspective:PerspectiveTransform|WetPerspectivePlacementData['perspective'];basis:AffineTransform|AffineData})|MappedMaskPlacementData|{width:number;height:number;plane:MaskPlane;authoring:AffineTransform};
   opacity?: number;
   load?: WetPaintLoadOptions;
   mix?: WetPaintMixOptions;
+}
+function mappedWetPlacement(p:{width:number;height:number;plane:MaskPlane;authoring:AffineTransform}){
+ if(!(p.plane instanceof MaskPlane)||!(p.authoring instanceof AffineTransform))throw new Error('Mapped wet placement requires MaskPlane and AffineTransform values.');
+ const {basis,pose,steps}=p.plane.toJSON();return{kind:'mapped' as const,width:p.width,height:p.height,geometry:{basis,pose,steps},authoring:p.authoring.toJSON()};
 }
 export class WetPaintStroke extends PaintOperation {
   constructor(options: WetPaintStrokeOptions) {
     super({ id: id(), kind: 'wet', opacity: options.opacity === undefined ? 1 : options.opacity, clip: null,
       brush: options.brush instanceof BrushStroke ? options.brush.toJSON() : options.brush,
       tiles: options.tiles, nativeTransform: options.nativeTransform instanceof AffineTransform ? options.nativeTransform.toJSON() : options.nativeTransform === undefined ? new AffineTransform().toJSON() : options.nativeTransform,
-      ...(options.placement===undefined?{}:{placement:{...options.placement,perspective:options.placement?.perspective instanceof PerspectiveTransform?options.placement.perspective.toJSON():options.placement?.perspective,basis:options.placement?.basis instanceof AffineTransform?options.placement.basis.toJSON():options.placement?.basis}}),
+      ...(options.placement===undefined?{}:{placement:'plane'in options.placement?mappedWetPlacement(options.placement):'geometry'in options.placement?options.placement:{...options.placement,perspective:options.placement?.perspective instanceof PerspectiveTransform?options.placement.perspective.toJSON():options.placement?.perspective,basis:options.placement?.basis instanceof AffineTransform?options.placement.basis.toJSON():options.placement?.basis}}),
       load: wetPaintLoadSchema.parse(options.load === undefined ? {} : options.load), mix: wetPaintMixSchema.parse(options.mix === undefined ? {} : options.mix),
     });
   }
@@ -295,7 +301,7 @@ export class WetPaintStroke extends PaintOperation {
   get brush() { return PaintOperation.fromJSON((this.data as WetPaintStrokeData).brush) as BrushStroke; }
   get tiles() { return structuredClone((this.data as WetPaintStrokeData).tiles); }
   get nativeTransform() { return AffineTransform.fromJSON((this.data as WetPaintStrokeData).nativeTransform); }
-  get placement(){const p=(this.data as WetPaintStrokeData).placement;return p?{width:p.width,height:p.height,perspective:new PerspectiveTransform(p.perspective),basis:AffineTransform.fromJSON(p.basis)}:undefined;}
+  get placement(){const p=(this.data as WetPaintStrokeData).placement;if(!p)return undefined;if('geometry'in p)return{width:p.width,height:p.height,plane:MaskPlane._fromJSON({...p.geometry,reference:{kind:'pixels',width:p.geometry.pose.width,height:p.geometry.pose.height},phase:'document'}),authoring:AffineTransform.fromJSON(p.authoring)};return{width:p.width,height:p.height,perspective:new PerspectiveTransform(p.perspective),basis:AffineTransform.fromJSON(p.basis)};}
   get load() { return structuredClone((this.data as WetPaintStrokeData).load); }
   get mix() { return structuredClone((this.data as WetPaintStrokeData).mix); }
 }

@@ -9665,3 +9665,113 @@ native float wet tools, quality/interchange, every unfinished professional/AI /
 workflow/ChatGPT/live identity/commercial/specialist/motion requirement and the
 complete implementation goal remain active. No account, upload or paid call is
 introduced by this dependency.
+
+### 2026-10-31 — F03 retained mask-plane integration in progress
+
+Owner: implementation engineer; estimate L for model/tool/render/transport
+integration and acceptance. The retained-map dependency in `7ef37e7` remains the
+accepted baseline. The current uncommitted schema-56 candidate adds immutable
+`MaskPlane` values, retained original native grid/source provenance, exact
+inverse/forward pose cancellation and original native/document filter mixing
+phase. Ordinary/filter preserving-position relinking and document selection/path
+capture now retain editable geometry rather than affine approximations or baked
+coverage. Central asset discovery/remapping includes geometry-only originals.
+
+Mapped Brush/Pencil/Eraser fields and coupled Smudge/Mixer replacement/removal
+fields reconstruct ordered mask edits before current placement. Linked tools /
+cursors use the owner's affine authoring frame; unlinked tools use the document
+frame. The coupled retained-map entry point shares existing native wet sampling,
+bounded reads, validation and complete interpolation neighborhoods. Shared OO /
+script commands and separate REST validation/revisions/Undo remain. REST rejects
+missing authored geometry grids atomically. No new isolated host/pixel/file /
+network grant, paid operation or source-resolution limit is introduced.
+
+A fresh candidate build passes. All 61 focused model/actual-WASM probes pass,
+including every legacy coupled-field word and irregular crop partitions. Initial
+five-kind ordinary relinking and ten filter phase/kind probes preserve every
+rendered byte. Browser tool probes exposed and corrected missing native brush
+reconstruction, post-reopen paint-target fixtures, uniform-blur visibility
+fixtures and an affine-position fixture; a live-source edit invalidated one
+intermediate browser context. Failed reports remain retained locally. The first
+full unit run used default concurrency: 3,208 passed and seven hit existing
+five-second timeouts, with no assertion mismatch. A matched two-worker full run
+and the expanded browser matrix remain pending at this checkpoint.
+
+The candidate contract, defaults, errors, examples and unfinished acceptance are
+in [MASK_PLANES.md](MASK_PLANES.md). Full script/REST/geometry-source ownership,
+all-kind editing, wet pickup/cancellation, Pen, source/lifetime/error paths,
+project/workspace/copy/recipe, nested/master/current-frame transforms, export /
+GPU fallback, genuine 50 MP and normal-production acceptance still require
+verification. This work log records implementation progress, not release or
+performance clearance. The original full professional/AI/workflow/ChatGPT/live
+identity/commercial/specialist/motion roadmap, native float wet tools, general
+warp and all unfinished F03/F06/F14/quality/device/sustained-memory gates remain
+active, including the original <=33 ms live-input p95 and <50 ms routine-task
+requirements. Do not mark the complete roadmap goal achieved from this slice.
+
+
+The same candidate checkpoint now has all **3,215 unit/API/native tests across
+312 files passing with `npm test -- --maxWorkers=2`**, without changing existing
+timeouts or assertions. Its rebuilt candidate passes. The expanded new browser
+matrix has 32/33 passing in one complete run; the final malformed-pigment case
+correctly rejected but its expected-message regex omitted “premultiplied” /
+“coverage”. Correcting only that assertion yields a passing focused rerun.
+Together these verify all 33 cases, including native-grid parity at 0.5x/2x,
+genuine 50 MP source SHA, ordinary/filter Brush and Mixer preview/commit/project /
+Undo, rational Pen, document selection/path capture and the isolated guide's
+single transaction/rollback. Path capture now keeps translation outside the
+linear-only outer basis. The isolated rollback fixture now puts its explicit
+throw on a new line after the example's trailing comment. Complete brush fields
+sample directly on the retained original grid, avoiding an intermediate logical
+mask bitmap. All earlier failures remain recorded.
+
+[Compact progress receipt and precise pending gates](benchmarks/mask-planes-progress-2026-10-31.md).
+This is still uncommitted integration work. The full existing browser regression
+matrix, normal production/worker workflows, all mask/tool/ownership transports,
+nested/master/current-frame transforms, export fallback and source/lifetime /
+float/horizon/resource acceptance remain open. The full original goal and all
+performance/quality/device gates remain active.
+
+### 2026-10-31 — F03 native mask-grid and render-frame fidelity verified
+
+The schema-56 retained-plane increment now has a fresh build, all 3,216
+unit/API/native tests across 312 files, and all 227 relevant browser cases across
+27 files passing. The complete browser run has zero skips, retries, flakes or
+runner errors. A separate normal-production UI workflow passes projected mask
+relinking, actual Brush/Mixer input, shared Undo/Redo, PNG output, original source
+bytes and project reopening without debug globals. Source fingerprints stay
+unchanged throughout the full run.
+
+Wider acceptance found two real defects beyond the preceding progress probes.
+Mapped wet coverage passed through a logical-grid bitmap and averaged away all
+96 alternating prepared samples. Positive mapped edits now replay directly on
+the retained native grid. Any preceding legacy wet prefix keeps its original
+composition; zero-opacity mapped metadata does not change reconstruction. Fresh
+and legacy-prefix fields retain every native value, and all ten legacy wet
+kind/ordinary-filter relinking cases remain byte exact. Three retained native
+filter cases also used inconsistent root/document frames. Native capture now
+retains the original physical render frames with the owner pose across intrinsic
+rendering and includes that context in composite signatures. Expanded scoped
+cases all match their independent root controls.
+
+Actual SVG and layered Photoshop delivery/reimport retain every tested RGBA byte
+for ordinary and both filter phases; capability reports explicitly disclose baked
+planes/mixing controls. Geometry-only float TIFF originals now pass the shared
+asset-lifetime check without treating their display thumbnails as pixels. A byte
+wet/project workflow retains all 190,816 source bytes and 131x79 native dimensions
+with a separate 96x58 thumbnail. The complete-length assertion passes a focused
+strengthened rerun after the full matrix. Production's first input fixture used
+a stale canvas box after tool options moved the canvas 48.5 pixels; recomputing
+the current box fixes that fixture without changing Mixer defaults or product
+layout. Earlier failures and observations remain retained.
+
+[Readable fidelity findings and compact evidence](benchmarks/mask-plane-fidelity-2026-10-31.md).
+This is a verified implementation increment, not full F03/F06/F14 or completion
+of the original roadmap. Remaining retained-plane acceptance includes source
+swapping, specific copy/recipe/workspace ownership, wider owner/master/pose /
+all-kind mapped edits, broader float/horizon/cache/resource and photographic /
+physical-device/sustained-memory behavior. General warp, native float wet tools,
+all original <=33 ms input p95 / <50 ms routine-task targets and every unfinished
+professional/AI/workflow/ChatGPT/live identity/commercial/specialist/motion
+requirement remain required. No new latency improvement or regression clearance,
+account, upload, paid call or headless REST/browser synchronization is claimed.

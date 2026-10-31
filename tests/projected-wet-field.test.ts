@@ -4,9 +4,10 @@ import {gunzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
 import {instantiateKernel} from '../src/engine/wasm';
 import {FloatPixelProcessor} from '../src/engine/float-pixels';
-import {projectPerspectiveFieldWindow,type ProjectiveFieldSource} from '../src/engine/projective-field';
+import {projectPerspectiveFieldWindow,projectMappedFieldWindow,type ProjectiveFieldSource} from '../src/engine/projective-field';
 import {validateWetField} from '../src/core/wet-field';
-import type {ProjectiveFieldOptions} from '../src/core/projective-field';
+import {compileProjectiveField,type ProjectiveFieldOptions} from '../src/core/projective-field';
+import {fieldMappingFromFrame,type MappedFieldOptions} from '../src/core/mapped-field';
 const base='tests/fixtures/projected-wet/',manifest=JSON.parse(await readFile(base+'manifest.json','utf8'));
 const data=async(name:string)=>new Float32Array(new Uint8Array(gunzipSync(await readFile(base+name))).buffer);
 let engine:FloatPixelProcessor,pixels:Float32Array;
@@ -18,8 +19,11 @@ for(const row of manifest.cases)it(`coupled actual WASM matches independent ${ro
  const source:ProjectiveFieldSource={channels:5,width:options.sourceWidth,height:options.sourceHeight,bounds:options.field,background:0,direction:options.direction,input:options.input,readWindow:async b=>{
   const out=new Float32Array(b.width*b.height*5);for(let y=0;y<b.height;y++){const at=((b.y-options.field.y+y)*options.field.width+b.x-options.field.x)*5;out.set(pixels.subarray(at,at+b.width*5),y*b.width*5);}return out;
  }};
+ const mapping=fieldMappingFromFrame(compileProjectiveField(options)),settings={mapping,field:options.field,source:options.source,output:options.output,background:0};
+ const mapped=engine.mappedWet(pixels,settings);expect(new Uint32Array(mapped.buffer)).toEqual(new Uint32Array(actual.buffer));
+ const mappedSampler={floatMappedField:async(p:Float32Array,o:MappedFieldOptions)=>engine.mappedField(p,o),floatMappedWet:async(p:Float32Array,o:MappedFieldOptions)=>engine.mappedWet(p,o)},transported=await projectMappedFieldWindow(source,mappedSampler,mapping,options.output);expect(new Uint32Array(transported.buffer)).toEqual(new Uint32Array(actual.buffer));
  const all=await projectPerspectiveFieldWindow(source,sampler,options.corners,options.output);expect(new Uint32Array(all.buffer)).toEqual(new Uint32Array(actual.buffer));
- const cut=new Float32Array(all.length);for(let y=0;y<options.output.height;y+=7){const h=Math.min(7,options.output.height-y);cut.set(await projectPerspectiveFieldWindow(source,sampler,options.corners,{...options.output,y:options.output.y+y,height:h}),y*options.output.width*5);}expect(new Uint32Array(cut.buffer)).toEqual(new Uint32Array(all.buffer));
+ const cut=new Float32Array(all.length);for(let y=0;y<options.output.height;y+=7){const h=Math.min(7,options.output.height-y);cut.set(await projectMappedFieldWindow(source,mappedSampler,mapping,{...options.output,y:options.output.y+y,height:h}),y*options.output.width*5);}expect(new Uint32Array(cut.buffer)).toEqual(new Uint32Array(all.buffer));
 });
 it('rejects malformed replacement fields and supports a valid native retry without mutating input',()=>{
  const options=manifest.cases[0].options as ProjectiveFieldOptions,before=pixels.slice();for(const [at,value]of[[0,NaN],[0,-.1],[0,2],[3,2],[4,-.1],[4,0]]as const){const broken=pixels.slice();broken[at]=value;expect(()=>engine.projectiveWet(broken,options)).toThrow();}

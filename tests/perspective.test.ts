@@ -54,9 +54,9 @@ it('smart conversion and duplication retain instance perspective while contents 
  const smart=layer.convertToSmartObject();expect(smart).toBeInstanceOf(SmartObjectLayer);expect(smart.perspective?.corners).toEqual(quad);
  const duplicate=smart.duplicate() as SmartObjectLayer;expect(duplicate.perspective?.corners).toEqual(quad);duplicate.perspective=null;expect(smart.perspective?.corners).toEqual(quad);
 });
-it('pending world-mask capture and relinking reject atomically rather than storing affine approximations',()=>{
+it('world-mask relinking retains native grid geometry and one shared Undo',()=>{
  const doc=new Document(),layer=doc.layers.add(image());layer.mask=new LayerMask({base:.5});layer.perspective=new PerspectiveTransform({corners:quad});
- const before=doc.toJSON(),count=doc.getSnapshot().past.length;expect(()=>layer.setMaskLinked(false)).toThrow(/Reset perspective/);expect(doc.toJSON()).toEqual(before);expect(doc.getSnapshot().past.length).toBe(count);
+ const before=doc.toJSON(),count=doc.getSnapshot().past.length;layer.setMaskLinked(false);expect(layer.mask!.linked).toBe(false);expect(layer.mask!.plane!.reference).toEqual({assetId:'original'});expect(layer.mask!.toJSON().kind).toBe('paint');expect(doc.getSnapshot().past.length).toBe(count+1);doc.undo();expect(doc.toJSON()).toEqual(before);doc.redo();layer.setMaskLinked(true);expect(layer.mask!.linked).toBe(true);expect(layer.mask!.plane!.steps).toHaveLength(1);
 });
 it('SVG and Photoshop plans bake perspective and its mask without changing source authoring',async()=>{
  const{planSvgComposition}=await import('../src/core/svg-composition'),{planPsdExport}=await import('../src/core/interchange/psd/export-plan');

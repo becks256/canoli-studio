@@ -811,7 +811,7 @@ export class WebGpuRenderer {
       stroke.points.every(point=>paintStampSize(stroke,point)*scale>=2);
   }
   private supported(nodes: LayerData[], scale: number): boolean {
-    if(nodes.some(node=>node.clipped||activePerspective(node.perspective)))return false;
+    if(nodes.some(node=>node.clipped||activePerspective(node.perspective)||node.mask?.plane||node.kind==='smart-object'&&node.filterMask?.plane))return false;
     return nodes.every(
       (node) =>
         !node.visible ||

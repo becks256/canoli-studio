@@ -2,6 +2,7 @@ import {characterBoundsSchema} from '../core/character-layout';
 import {registerFontVariationSource} from '../fonts/variations';
 import {
   LayerMask,
+  MaskPlane,
   LayerMetadata,
   Document,
   RasterLayer,
@@ -263,6 +264,7 @@ const receive = async (event:MessageEvent) => {
     const run = new Function(
       "document",
       "LayerMask",
+      "MaskPlane",
       "LayerMetadata",
       "Document",
       "RasterLayer",
@@ -316,6 +318,7 @@ const receive = async (event:MessageEvent) => {
     await run(
       document,
       LayerMask,
+      MaskPlane,
       LayerMetadata,
       Document,
       RasterLayer,

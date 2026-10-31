@@ -52,7 +52,7 @@ import type {
   PaintOperationData,
   VectorPathData,
 } from "./drawing";
-export const SCHEMA_VERSION = 55;
+export const SCHEMA_VERSION = 56;
 export const MAX_LAYERS = 64;
 // Document geometry is independent of renderer allocation budgets.
 export const MAX_COORDINATE = Number.MAX_SAFE_INTEGER;
@@ -228,6 +228,7 @@ export interface DocumentData {
     | 52
     | 53
     | 54
+    | 55
     | typeof SCHEMA_VERSION;
   id: string;
   name: string;

@@ -1,3 +1,7 @@
+import {captureMaskMappedPlacement} from '../core/mask-plane-brush';
+import {maskOwnerPose} from '../core/mask-plane';
+import {maskPaintPlacementValue} from '../dom/masks';
+import {captureMaskPlane,type CapturedMaskPlane} from './mask-plane';
 import {activePerspective,perspectiveLocalQuad} from '../core/perspective';
 import {maskPlacedPerspective} from '../core/masks';
 import type {WetPaintPlacementData} from '../core/wet-operation';
@@ -5,7 +9,7 @@ import {isFloatDocument} from '../core/float-document';
 import {capturePerspectiveMask,type CapturedPerspectiveMask} from './projective-mask';
 import {retainedDocuments,captureRetainedHistory} from '../core/history';
 import { AffineTransform } from '../core/affine';
-import { AssetStore } from '../core/assets';
+import { AssetStore,assetBitmapMatches } from '../core/assets';
 import { execute, type EditorCommand } from '../core/commands';
 import { transformSelection, type BrushStrokeData, type Rect, type StrokePoint } from '../core/drawing';
 import { freeze } from '../core/immutable';
@@ -78,7 +82,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
   const check = () => {
     abort.signal.throwIfAborted(); hostCheck(); alive(); baseAlive();
     if (editor.document !== document || editor.assetStore !== assets || document.getSnapshot().revision !== snapshot.revision || (document.getSnapshot().selectedIds.length!==selected.length||document.getSnapshot().selectedIds.some((id,i)=>id!==selected[i]))) throw new Error('The wet-paint document, selection or revision changed. No stroke was applied.');
-    for (const [key, item] of pinned) { const asset = assets.get(key); if (asset !== item.asset || asset.bitmap !== item.bitmap || asset.blob !== item.blob || asset.width !== item.width || asset.height !== item.height || asset.bitmap.width !== item.width || asset.bitmap.height !== item.height) throw new Error('Wet-paint source assets changed.'); }
+    for (const [key, item] of pinned) { const asset = assets.get(key); if (asset !== item.asset || asset.bitmap !== item.bitmap || asset.blob !== item.blob || asset.width !== item.width || asset.height !== item.height || !assetBitmapMatches(asset)) throw new Error('Wet-paint source assets changed.'); }
   };
   const unsubscribe = document.subscribe(() => { if (document.getSnapshot().revision !== snapshot.revision || (document.getSnapshot().selectedIds.length!==selected.length||document.getSnapshot().selectedIds.some((id,i)=>id!==selected[i]))) abort.abort(new Error('The wet-paint target changed.')); });
   type PreparedTile = { region: Readonly<Rect>; epoch?: string; tile: WetPaintTileData };
@@ -113,16 +117,18 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
     const data = value.toJSON();
     if ((data.kind !== 'brush' && data.kind !== 'pencil') || data.tiles.length) throw new Error('Wet paint requires a brush or pencil footprint without clone tiles.');
     visitBrushAssets(data, reference => { if (!base.has(reference.assetId)) retainOriginal(reference.assetId); });
-    const projected=inputSpace==='placed'&&(source.kind==='raster'||source.kind==='smart-object')&&activePerspective(source.perspective)&&(!maskData||maskData.linked!==false);
+    const retained=inputSpace==='placed'&&!!maskData?.plane;
+    const projected=!retained&&inputSpace==='placed'&&(source.kind==='raster'||source.kind==='smart-object')&&activePerspective(source.perspective)&&(!maskData||maskData.linked!==false);
     const master=target instanceof SmartObjectLayer&&(projected||targetKind==='filter-mask')?snapshot.document.components?.find(definition=>definition.id===target.componentId)?.source:undefined;
     if(target instanceof SmartObjectLayer&&(projected||targetKind==='filter-mask')&&!master)throw new Error('The wet-paint smart-object master is missing.');
     const masterSize=master?(master.kind==='asset'?master:master.document):undefined;
     const masterToImage=masterSize&&source.kind==='smart-object'?AffineTransform.scale(source.width/masterSize.width,source.height/masterSize.height):new AffineTransform();
     let placement:WetPaintPlacementData|undefined;
     if(projected&&(source.kind==='raster'||source.kind==='smart-object'))placement={width:source.width,height:source.height,perspective:maskData&&targetKind==='mask'?maskPlacedPerspective(source.perspective!,source.width,source.height,maskData):source.perspective!,basis:maskData?maskTransform(maskData,targetKind==='filter-mask'?masterToImage:new AffineTransform(),targetKind==='filter-mask').toJSON():new AffineTransform().toJSON()};
-    let world = target ? layerTransform(snapshot.document, target.id)! : new AffineTransform();
-    if(!projected&&targetKind==='filter-mask')world=world.multiply(masterToImage);
-    if(maskData&&!projected)world=maskTransform(maskData,world);
+    const ownerWorld=target?layerTransform(snapshot.document,target.id)!:new AffineTransform(),ownerPose=maskOwnerPose(source,ownerWorld,targetKind==='filter-mask'?masterSize:undefined);
+    let world=ownerWorld;
+    if(retained){world=maskData!.linked!==false?ownerWorld:new AffineTransform();const image=source.kind==='raster'||source.kind==='smart-object';placement=captureMaskMappedPlacement(maskData!,ownerPose,world,maskData!.linked!==false&&image?source.width:document.width,maskData!.linked!==false&&image?source.height:document.height,targetKind==='filter-mask');}
+    else{if(!projected&&targetKind==='filter-mask')world=world.multiply(masterToImage);if(maskData&&!projected)world=maskTransform(maskData,world);}
     if (!respectSelection) data.clip = null;
     else if (!data.clip && snapshot.document.selection) data.clip = transformSelection(snapshot.document.selection, world.inverse());
     if(data.points.length>maxPoints)throw new Error('This stroke exceeds the mask point budget.');
@@ -133,14 +139,17 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
     const load = wetPaintLoadSchema.parse({ color: foreground, load: mode === 'mixer' ? 1 : 0, ...options.load }), mix = wetPaintMixSchema.parse({ wetness: mode === 'mixer' ? .25 : 0, ...options.mix });
     if(maskData)load.color=[255,255,255,load.color[3]];
     const native = source.kind==='raster'&&(!maskData||projected)?base.get(source.assetId):projected&&master?.kind==='asset'?base.get(master.assetId):projected&&masterSize?{width:Math.ceil(masterSize.width),height:Math.ceil(masterSize.height)}:undefined;
-    const localToNative=native&&(source.kind==='raster'||source.kind==='smart-object')?AffineTransform.scale(native.width/source.width,native.height/source.height):new AffineTransform();
-    const neutralMask=maskData?{...maskData,x:0,y:0,placedX:0,placedY:0,basis:undefined,linked:true,enabled:true,inverted:false,density:1,feather:0}:undefined;
+    const localToNative=retained?AffineTransform.scale(Math.ceil(placement!.width)/placement!.width,Math.ceil(placement!.height)/placement!.height):native&&(source.kind==='raster'||source.kind==='smart-object')?AffineTransform.scale(native.width/source.width,native.height/source.height):new AffineTransform();
+    const neutralMask=maskData?{...maskData,plane:undefined,x:0,y:0,placedX:0,placedY:0,basis:undefined,linked:true,enabled:true,inverted:false,density:1,feather:0}:undefined;
     const neutral = maskData?{...new PaintLayer().toJSON(),mask:neutralMask}:{ ...source, clipped:undefined, x: 0, y: 0, transform: undefined, visible: true, opacity: 1, fillOpacity: 1, mask: null, styles: undefined, blendMode: 'normal' as const, ...(source.kind === 'raster' ? { width: native!.width, height: native!.height, effects: [],perspective:projected?source.perspective:undefined } : {}) };
     const sourceDocument = freeze({ ...snapshot.document, children: [neutral], layerComps: undefined,...(maskData?{components:undefined}: {}) } as DocumentData), checkSources = captureRasterExportSources(sourceDocument, base, { signal: abort.signal }, 'wet-paint target preparation');
-    let projectedMask:CapturedPerspectiveMask|undefined;
+    let projectedMask:CapturedPerspectiveMask|CapturedMaskPlane|undefined;
     releaseSources=()=>{checkSources.release();projectedMask?.dispose();};
     if(maskData)maskTextures=new BrushTextureSampler(editor.renderer.processor);
-    if(placement&&neutralMask&&native){
+    if(retained){
+      const raw={...maskData!,enabled:true,inverted:false,density:1,feather:0};
+      projectedMask=captureMaskPlane(raw,ownerPose,base,editor.renderer.processor,{isCancelled:()=>{check();return false;}},{filterMask:targetKind==='filter-mask',documentTransform:localToNative.multiply(world.inverse())},maskTextures);
+    }else if(placement&&'basis'in placement&&neutralMask&&native){
       const basis=AffineTransform.fromJSON(placement.basis),raw={...neutralMask,x:basis.e,y:basis.f,basis:{a:basis.a,b:basis.b,c:basis.c,d:basis.d,e:0,f:0}};
       projectedMask=capturePerspectiveMask(raw,{sourceWidth:native.width,sourceHeight:native.height,layerWidth:placement.width,layerHeight:placement.height,corners:perspectiveLocalQuad(native.width,native.height,placement.perspective)},base,editor.renderer.processor,{isCancelled:()=>{check();return false;}},maskTextures);
     }
@@ -200,7 +209,7 @@ export async function createPreparedWetPaintJob(editor: EditorApplication, input
         }
         const tiles = [...entries.values()].sort((a, b) => a.region.y - b.region.y || a.region.x - b.region.x).map(entry => entry.tile);
         if (!view || !tiles.length) return null;
-        const operation = new WetPaintStroke({ brush: session!.stroke, load, mix, nativeTransform: localToNative.inverse(), tiles,...(placement?{placement}:{}) }), command = commandFor(operation), candidate = execute(snapshot.document, command);
+        const operation = new WetPaintStroke({ brush: session!.stroke, load, mix, nativeTransform: localToNative.inverse(), tiles,...(placement?{placement:'geometry'in placement?maskPaintPlacementValue(placement):placement}:{}) }), command = commandFor(operation), candidate = execute(snapshot.document, command);
         await validateWetPaintAssets(candidate, wetBrowserAssets(view, current)); current();
         const frame = new WetPaintPreview(owner, assets, view, candidate, command, operation, ++version);
         prefixRecords.set(frame, entries);

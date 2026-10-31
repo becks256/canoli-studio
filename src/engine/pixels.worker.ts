@@ -93,6 +93,7 @@ self.onmessage = async (
     floatAffine?:{pixels:Float32Array;matrix:number[]};
     floatProjective?:{pixels:Float32Array;options:ProjectiveSampleOptions};
     floatProjectiveField?:{alpha:Float32Array;options:ProjectiveFieldOptions};
+    floatMappedWet?:{alpha:Float32Array;options:MappedFieldOptions};
     floatMappedField?:{alpha:Float32Array;options:MappedFieldOptions};
     floatProjectiveWet?:{alpha:Float32Array;options:ProjectiveFieldOptions};
     floatTone?:{pixels:Float32Array;options:FloatToneOptions};
@@ -190,11 +191,12 @@ self.onmessage = async (
       const owned=floating??=new FloatPixelProcessor(await kernel),request=data.floatStyle;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);const floatStyle=owned.style(request.source,request.backdrop,request.style);
       self.postMessage({id:data.id,floatStyle},{transfer:[floatStyle.pixels.buffer as ArrayBuffer,floatStyle.coverage.buffer as ArrayBuffer]});return;
     }
-    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTonal||data.floatTransfer||data.floatColor||data.floatGradient||data.floatProjective||data.floatProjectiveField||data.floatMappedField||data.floatProjectiveWet){
+    if(data.floatComposite||data.floatAffine||data.floatTone||data.floatTonal||data.floatTransfer||data.floatColor||data.floatGradient||data.floatProjective||data.floatProjectiveField||data.floatMappedField||data.floatMappedWet||data.floatProjectiveWet){
       const owned=floating??=new FloatPixelProcessor(await kernel);let pixels:Float32Array;
       if(data.floatComposite){const request=data.floatComposite;validateFloatWorkerWindow(request.source);validateFloatWorkerWindow(request.backdrop);pixels=owned.composite(request.source,request.backdrop,request.options);}
       else if(data.floatProjectiveWet){const request=data.floatProjectiveWet;pixels=owned.projectiveWet(request.alpha,request.options);}
       else if(data.floatProjectiveField){const request=data.floatProjectiveField;pixels=owned.projectiveField(request.alpha,request.options);}
+      else if(data.floatMappedWet){const request=data.floatMappedWet;pixels=owned.mappedWet(request.alpha,request.options);}
       else if(data.floatMappedField){const request=data.floatMappedField;pixels=owned.mappedField(request.alpha,request.options);}
       else if(data.floatProjective){const request=data.floatProjective;pixels=owned.projective(request.pixels,request.options);}
       else if(data.floatTransfer){const request=data.floatTransfer;validateFloatWorkerWindow(request.pixels);pixels=owned.transfer(request.pixels,request.adjustment);}

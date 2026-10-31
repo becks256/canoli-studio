@@ -71,25 +71,27 @@ export async function projectPerspectiveFieldWindow(
 }
 
 export interface MappedFieldSource {
+  channels?:1|5;
   bounds:FloatSourceWindow|undefined;background:number;
   readWindow(bounds:FloatSourceWindow,control?:FloatSourceControl):Promise<Float32Array>;
 }
-export interface MappedFieldSampler {floatMappedField(alpha:Float32Array,options:MappedFieldOptions):Promise<Float32Array>}
+export interface MappedFieldSampler {floatMappedField(alpha:Float32Array,options:MappedFieldOptions):Promise<Float32Array>;floatMappedWet?(alpha:Float32Array,options:MappedFieldOptions):Promise<Float32Array>}
 
 /** Retained relative-frame homography, including maps whose horizon crosses
  * an arbitrary reference rectangle. The field remains an independent plane. */
 export async function projectMappedFieldWindow(source:MappedFieldSource,processor:MappedFieldSampler,inputMapping:FieldMapping,input:FloatSourceWindow,control:FloatProjectionControl={}):Promise<Float32Array<ArrayBuffer>>{
+  const channels=source.channels??1;if(channels!==1&&channels!==5||channels===5&&(source.background!==0||!processor.floatMappedWet))throw new Error('Invalid mapped field channels or background.');
   const mapping=captureFieldMapping(inputMapping),absoluteField=source.bounds?captureFieldBounds(source.bounds):undefined,background=source.background,bounds=validateWindow(input),read=source.readWindow,signal=control.signal,isCancelled=control.isCancelled;
   const frameField=absoluteField??{...mapping.sourceOrigin,width:1,height:1};
   const compiled=compileMappedField({mapping,field:frameField,source:{x:frameField.x,y:frameField.y,width:1,height:1},output:bounds,background});
   const field=absoluteField?{...absoluteField,x:absoluteField.x-mapping.sourceOrigin.x,y:absoluteField.y-mapping.sourceOrigin.y}:undefined;
   const check=()=>{
     signal?.throwIfAborted();checkRenderCurrent(isCancelled);
-    if(source.background!==background||source.readWindow!==read||!!source.bounds!==!!absoluteField||absoluteField&&(source.bounds!.x!==absoluteField.x||source.bounds!.y!==absoluteField.y||source.bounds!.width!==absoluteField.width||source.bounds!.height!==absoluteField.height))
+    if((source.channels??1)!==channels||source.background!==background||source.readWindow!==read||!!source.bounds!==!!absoluteField||absoluteField&&(source.bounds!.x!==absoluteField.x||source.bounds!.y!==absoluteField.y||source.bounds!.width!==absoluteField.width||source.bounds!.height!==absoluteField.height))
       throw new Error('Mapped field source geometry changed.');
   };
-  return streamFieldWindow({channels:1,field,bounds,background,...compiled,read:(b,c)=>read.call(source,b,c),check,
-    sample:(alpha,nativeBounds,region)=>processor.floatMappedField(alpha,{mapping,field:absoluteField??nativeBounds,background,source:nativeBounds,output:region})},control);
+  return streamFieldWindow({channels,field,bounds,background,...compiled,read:(b,c)=>read.call(source,b,c),check,
+    sample:(alpha,nativeBounds,region)=>(channels===5?processor.floatMappedWet!.bind(processor):processor.floatMappedField.bind(processor))(alpha,{mapping,field:absoluteField??nativeBounds,background,source:nativeBounds,output:region})},control);
 }
 
 interface FieldStream {

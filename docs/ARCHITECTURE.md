@@ -1,5 +1,16 @@
 # Architecture
 
+## Retained mask-plane increment (schema 56)
+
+The current implementation retains native grid/source provenance and editable
+mask geometry through projected relinking, shape capture and mapped Brush/Wet
+fields. Filter masks retain their original native/document mixing phase.
+Shared OO commands, independent REST sessions and existing isolated/plugin
+authority remain. Verified tool/export/production behavior and remaining broader acceptance are
+recorded in [the current contract and verification boundary](MASK_PLANES.md). Earlier
+scalar-dependency/reset limitations below describe the prior accepted baseline.
+
+
 ## Retained scalar-field mappings
 
 `mapped-field.ts` captures an invertible homogeneous pull matrix with independent

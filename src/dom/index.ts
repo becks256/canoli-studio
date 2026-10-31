@@ -1,3 +1,4 @@
+import {captureMaskMappedPlacement} from '../core/mask-plane-brush';
 import{isFloatDocument,assertFloatSources}from'../core/float-document';
 import {PerspectiveTransform} from './perspective';
 import {activePerspective,perspectiveMatrix,perspectiveRect} from '../core/perspective';
@@ -128,8 +129,11 @@ import type { CropBounds } from "../core/crop";
 export type { CropBounds } from "../core/crop";
 import { splitPathSegment } from "../core/bezier";
 import { layerTransform } from "../core/spatial";
-import { LayerMask } from "./masks";
+import { LayerMask,maskPaintPlacementValue } from "./masks";
+import {maskOwnerPose,relinkMaskPlane} from '../core/mask-plane';
 export { LayerMask } from "./masks";
+export {MaskPlane} from './mask-plane';
+export type {MaskPlaneOptions,MaskPlanePose} from './mask-plane';
 export type { MaskPaintPlacement,RasterErasureMaskSource } from "./masks";
 import { LayerMetadata } from "./metadata";
 export { LayerMetadata } from "./metadata";
@@ -1235,7 +1239,12 @@ export abstract class Layer {
     const mask=options.filterMask&&this instanceof SmartObjectLayer?this.filterMask:this.mask;
     if(!mask)throw new Error('Add a mask before painting.');
     const layer=this._read();let placement:import('./masks').MaskPaintPlacement|undefined;
-    if(options.space==='placed'&&activePerspective(layer.perspective)&&mask.linked){
+    if(options.space==='placed'&&mask.plane){
+      const document=this.requireDocument(),world=layerTransform(document._read(),this.id)!;
+      const master=options.filterMask&&this instanceof SmartObjectLayer?document.getComponent(this.componentId):undefined;
+      const owner=maskOwnerPose(layer,world,master),image=layer.kind==='raster'||layer.kind==='smart-object',width=mask.linked&&image?layer.width:document.width,height=mask.linked&&image?layer.height:document.height;
+      placement=maskPaintPlacementValue(captureMaskMappedPlacement(mask.toJSON(),owner,mask.linked?world:new AffineTransform(),width,height,!!options.filterMask));
+    }else if(options.space==='placed'&&activePerspective(layer.perspective)&&mask.linked){
       if(layer.kind!=='raster'&&layer.kind!=='smart-object')throw new Error('Placed mask painting requires an image.');
       let parent=new AffineTransform();
       if(options.filterMask&&this instanceof SmartObjectLayer){const master=this.requireDocument().getComponent(this.componentId);parent=AffineTransform.scale(this.width/master.width,this.height/master.height);}
@@ -1259,8 +1268,14 @@ export abstract class Layer {
     const mask = this.mask;
     if (!mask) throw new Error("This layer has no mask to link.");
     if (mask.linked === linked) return;
-    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before changing mask linkage while preserving its position.');
     const layerWorld = layerTransform(document._read(), this.id)!;
+    const data=this._read();
+    if(mask.plane||activePerspective(data.perspective)){
+      let reference:import('../core/mask-plane').MaskPlaneData['reference']|undefined;
+      if(data.kind==='raster')reference={kind:'asset',assetId:data.assetId};
+      else if(data.kind==='smart-object'){const source=new ComponentRegistry(document._read().components).get(data.componentId).source;reference=source.kind==='asset'?{kind:'asset',assetId:source.assetId}:{kind:'pixels',width:Math.ceil(source.document.width),height:Math.ceil(source.document.height)};}
+      this.mask=LayerMask._fromJSON(relinkMaskPlane(mask.toJSON(),maskOwnerPose(data,layerWorld),linked,reference));return;
+    }
     const world = maskTransform(mask.toJSON(), layerWorld);
     const local = linked ? layerWorld.inverse().multiply(world) : world;
     this.mask = mask.with({
@@ -1273,22 +1288,26 @@ export abstract class Layer {
   }
   /** Capture a document-space selection as a mask that moves with this layer. */
   maskFromSelection(selection: MarqueeSelection) {
-    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before capturing a document selection as a linked mask. Local mask constructors remain available.');
     const document = this.requireDocument();
-    const inverse = layerTransform(document._read(), this.id)!.inverse();
+    const world=layerTransform(document._read(),this.id)!;
+    if(activePerspective(this._read().perspective)){
+      const raw=new LayerMask({selection,linked:false});
+      this.mask=LayerMask._fromJSON(relinkMaskPlane(raw.toJSON(),maskOwnerPose(this._read(),world),true));return;
+    }
+    const inverse = world.inverse();
     this.mask = new LayerMask({
       selection: selection.transformed(inverse),
     });
   }
   /** Copy closed paths from an attached vector layer without altering their world position. */
   maskFromPaths(source: VectorLayer) {
-    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before capturing document paths as a linked mask. Local mask constructors remain available.');
     const document = this.requireDocument();
     if (source.document !== document || !source.isAttached)
       throw new Error("Mask source must belong to the same document.");
     const target = layerTransform(document._read(), this.id)!;
     const origin = layerTransform(document._read(), source.id)!;
-    const mapping = target.inverse().multiply(origin);
+    const projected=activePerspective(this._read().perspective);
+    const mapping = projected?new AffineTransform():target.inverse().multiply(origin);
     const sources = [...source.paths];
     const explicitRules = sources.some(path => path.subpaths.length || path._pathRecord().fillRule !== undefined);
     const rules = new Set(sources.map(path => explicitRules ? path.fillRule : "evenodd"));
@@ -1306,7 +1325,8 @@ export abstract class Layer {
     ));
     if (!paths.length)
       throw new Error("The vector layer has no paths to copy.");
-    this.mask = new LayerMask({ paths, fillRule: [...rules][0] ?? "nonzero" });
+    const mask=new LayerMask({ paths, fillRule: [...rules][0] ?? "nonzero",...(projected?{linked:false,x:origin.e,y:origin.f,basis:new AffineTransform(origin.a,origin.b,origin.c,origin.d)}:{}) });
+    this.mask=projected?LayerMask._fromJSON(relinkMaskPlane(mask.toJSON(),maskOwnerPose(this._read(),target),true)):mask;
   }
   /** Create a bitmap mask referencing an asset in the document's AssetStore. */
   maskFromBitmap(assetId: string) {
@@ -1583,11 +1603,14 @@ export class SmartObjectLayer extends Layer {
     const mask = this.filterMask;
     if (!mask) throw new Error("This smart object has no filter mask to link.");
     if (mask.linked === linked) return;
-    if(activePerspective(this._read().perspective))throw new Error('Reset perspective before changing filter-mask linkage while preserving its position.');
     const source = new ComponentRegistry(document._read().components).get(
       this.componentId,
     ).source;
     const master = source.kind === "asset" ? source : source.document;
+    const data=this._read(),modelWorld=layerTransform(document._read(),this.id)!;
+    if(mask.plane||activePerspective(data.perspective)){
+      this.filterMask=LayerMask._fromJSON(relinkMaskPlane(mask.toJSON(),maskOwnerPose(data,modelWorld,master),linked,{kind:'pixels',width:master.width,height:master.height},true));return;
+    }
     const nativeWorld = layerTransform(document._read(), this.id)!.multiply(
       AffineTransform.scale(
         this.width / master.width,

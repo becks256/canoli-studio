@@ -14,7 +14,7 @@ export function PerspectiveControls({layer,selected,disabled,editing,canEdit,onT
   return <InspectorSection title="Perspective">
     <Button disabled={disabled||!canEdit} aria-pressed={editing} onClick={onToggleEditing}>{editing?'Done editing corners':'Edit perspective corners'}</Button>
     {editing&&<p className="muted">Drag a corner on the canvas. Focus a corner and use arrow keys for 1 canvas pixel, or Shift for 10. Escape cancels a drag.</p>}
-    <p className="muted">Image corners in layer pixels. Original pixels and existing paint are retained. Reset perspective to paint on this image or edit its linked mask.</p>
+    <p className="muted">Image corners in layer pixels. Original pixels, paint and editable mask geometry are retained.</p>
     {['Top left','Top right','Bottom right','Bottom left'].map((label,index)=><div className="field-grid" key={label}>
       {(['x','y'] as const).map(axis=><NumberField layout="stacked" key={axis} label={`${label} ${axis.toUpperCase()}`} value={corners[index][axis]*(axis==='x'?width:height)} min={-Number.MAX_SAFE_INTEGER} max={Number.MAX_SAFE_INTEGER} step="any" disabled={disabled}
         onPreview={coordinate=>onAttempt(()=>onPreview(coordinate===corners[index][axis]*(axis==='x'?width:height)?null:{type:'layer.update',id:selected.id,patch:{perspective:value(index,axis,coordinate).toJSON()}}))}

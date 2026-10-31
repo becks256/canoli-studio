@@ -64,7 +64,7 @@ test('placed wet painting extends past the original quad and survives perspectiv
   // Locate the retained native mark using the public projective value itself;
   // source-to-quad numeric accuracy is covered by independent NumPy fixtures.
   const{perspectiveMatrix}=await import(/* @vite-ignore */ String('/src/core/perspective.ts'));
-  const native=perspectiveMatrix(64,48,operation.placement.perspective.toJSON()).inverse().point({x:80.5,y:20.5}),reset=await sample(Math.floor(native.x),Math.floor(native.y));
+  if(!operation.placement?.perspective)throw Error('Expected captured perspective placement');const native=perspectiveMatrix(64,48,operation.placement.perspective.toJSON()).inverse().point({x:80.5,y:20.5}),reset=await sample(Math.floor(native.x),Math.floor(native.y));
   layer.width=128;layer.height=96;const at={x:Math.floor(native.x*2),y:Math.floor(native.y*2)},resized=await sample(at.x,at.y);
   const out=await editor.renderer.render(editor.document.toJSON(),editor.assetStore,{cache:false,readback:true});let expected:number[];try{expected=[...out.getContext('2d')!.getImageData(0,0,220,120).data];}finally{out.width=out.height=0;}
   const svg=await editor.export({format:'svg'}),url=URL.createObjectURL(svg.blob),image=new Image(),canvas=document.createElement('canvas');canvas.width=220;canvas.height=120;let svgPixel:number[];try{await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=reject;image.src=url;});canvas.getContext('2d')!.drawImage(image,0,0);svgPixel=[...canvas.getContext('2d')!.getImageData(at.x,at.y,1,1).data];}finally{URL.revokeObjectURL(url);canvas.width=canvas.height=0;}

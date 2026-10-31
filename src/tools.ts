@@ -1,5 +1,7 @@
 import {retainedDocuments,captureRetainedHistory} from './core/history';
 import {maskPathMapping,type PointMapping} from './core/mask-path';
+import {captureMaskMappedPlacement} from './core/mask-plane-brush';
+import {maskOwnerPose} from './core/mask-plane';
 import {hitTestProjectivePath} from './core/projective-bezier';
 import {ProjectiveTransform} from './core/projective';
 import {activePerspective} from './core/perspective';
@@ -444,7 +446,8 @@ export class ToolController {
       const mask = filter ? record?.kind === 'smart-object' ? record.filterMask : null : record?.mask;
       if (selected && mask) {
         let plane = layerTransform(snapshot, selected.id)!;
-        if(activePerspective(record?.perspective)&&mask.linked!==false)world=plane;
+        if(mask.plane)world=mask.linked!==false?plane:new AffineTransform();
+        else if(activePerspective(record?.perspective)&&mask.linked!==false)world=plane;
         else {
         if (filter && selected instanceof SmartObjectLayer) {
           const source = snapshot.components!.find(component=>component.id === selected.componentId)!.source;
@@ -940,8 +943,8 @@ export class ToolController {
       if(maskData&&((maskData.strokes?.length??0)>=2048||maxPoints<1))throw new Error('This mask has reached its stroke or point budget.');
       let world=selected?layerTransform(doc._read(),selected.id)!:new AffineTransform();
       if(target==='filter-mask'&&selected instanceof SmartObjectLayer){const master=doc.getComponent(selected.componentId);world=world.multiply(AffineTransform.scale(selected.width/master.width,selected.height/master.height));}
-      const image=findLayer(doc._read(),selected?.id??''),placed=!!image&&activePerspective(image.perspective)&&(!maskData||maskData.linked!==false);
-      if(placed&&selected)world=layerTransform(doc._read(),selected.id)!;else if(maskData)world=maskTransform(maskData,world);
+      const image=findLayer(doc._read(),selected?.id??''),retained=!!maskData?.plane,placed=retained||!!image&&activePerspective(image.perspective)&&(!maskData||maskData.linked!==false);
+      if(retained&&selected)world=maskData!.linked!==false?layerTransform(doc._read(),selected.id)!:new AffineTransform();else if(placed&&selected)world=layerTransform(doc._read(),selected.id)!;else if(maskData)world=maskTransform(maskData,world);
       const inputTransform=world.inverse();
       const first=this.point(point,{x:0,y:0},modifiers.pressure,inputTransform,modifiers.tilt),abort=new AbortController();
       const dynamics=settings[tool],symmetry=this.symmetryIn(inputTransform);
@@ -1072,9 +1075,14 @@ export class ToolController {
         maskWorld = maskTransform(data, nativeWorld);
         placementBasis=maskTransform(data,AffineTransform.scale(selected.width/master.width,selected.height/master.height));
       }
-      const image=findLayer(doc._read(),selected.id),placed=!!image&&activePerspective(image.perspective)&&data.linked!==false;
-      const placement=placed&&(image.kind==='raster'||image.kind==='smart-object')?{width:image.width,height:image.height,perspective:filterMask?image.perspective!:maskPlacedPerspective(image.perspective!,image.width,image.height,data),basis:placementBasis.toJSON()}:undefined;
-      const inputTransform = placement?layerTransform(doc._read(),selected.id)!.inverse():maskWorld.inverse();
+      const image=findLayer(doc._read(),selected.id)!,placed=!!image&&activePerspective(image.perspective)&&data.linked!==false;
+      const world=layerTransform(doc._read(),selected.id)!,authoring=data.linked!==false?world:new AffineTransform();
+      const master=filterMask&&selected instanceof SmartObjectLayer?doc.getComponent(selected.componentId):undefined;
+      const imageFrame=image.kind==='raster'||image.kind==='smart-object';
+      const placement=data.plane?captureMaskMappedPlacement(data,maskOwnerPose(image,world,master),authoring,
+        data.linked!==false&&imageFrame?image.width:doc.width,data.linked!==false&&imageFrame?image.height:doc.height,filterMask):
+        placed&&imageFrame?{width:image.width,height:image.height,perspective:filterMask?image.perspective!:maskPlacedPerspective(image.perspective!,image.width,image.height,data),basis:placementBasis.toJSON()}:undefined;
+      const inputTransform = data.plane?authoring.inverse():placement?world.inverse():maskWorld.inverse();
       const stroke = new (tool === "pencil" ? PencilStroke : BrushStroke)({
         points: [this.point(point, origin, modifiers.pressure, inputTransform,modifiers.tilt)],
         size: this.state.settings.size,

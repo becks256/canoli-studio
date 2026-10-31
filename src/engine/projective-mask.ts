@@ -42,6 +42,7 @@ export function capturePerspectiveMask(
   control:FloatProjectionControl={},textures?:BrushTextureSampler,
 ):CapturedPerspectiveMask {
   const mask=freeze(layerMaskSchema.parse(input)),options=optionsSchema.parse(settings),linked=mask.linked!==false;
+  if(mask.plane)throw new Error('Retained mask planes require captureMaskPlane with their model owner.');
   const nativeMask=linked?withoutMaskPlacedOffset(mask):mask;
   const local=maskTransform(nativeMask,new AffineTransform()),mapping=linked?AffineTransform.scale(options.sourceWidth/options.layerWidth,options.sourceHeight/options.layerHeight).multiply(local):local;
   const post=options.postTransform??new AffineTransform(),dx=linked?post.a*(mask.placedX??0)+post.c*(mask.placedY??0):0,dy=linked?post.b*(mask.placedX??0)+post.d*(mask.placedY??0):0;

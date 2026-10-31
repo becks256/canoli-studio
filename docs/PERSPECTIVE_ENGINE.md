@@ -1,5 +1,14 @@
 # Native perspective engine — application integration in progress
 
+## Retained mask-plane increment
+
+Schema 56 extends the retained scalar map with original grid/source provenance,
+immutable plane values and mapped complete Brush/Wet fields. Preserving-position
+relinking and document selection/path capture use retained planes. Original
+mask geometry and native/document filter phase remain. Broader acceptance remains
+open; [current contract and verification](MASK_PLANES.md).
+
+
 ## Retained scalar pull maps
 
 The private `FieldMapping` transport retains exact homogeneous coefficients plus

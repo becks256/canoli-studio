@@ -1,6 +1,7 @@
+import {mappedMaskBrushBounds} from './mask-plane-brush';
 import {AffineTransform,type AffineBounds} from './affine';
 import {strokeBounds,selectionRegionTransform} from './drawing';
-import type {LayerMaskData} from './masks';
+import {maskNativeEditIndex,type LayerMaskData} from './masks';
 import {captureFieldBounds,compileProjectiveField} from './projective-field';
 import {perspectiveLocalQuad,perspectiveRect} from './perspective';
 import {ProjectiveTransform} from './projective';
@@ -13,7 +14,8 @@ export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,b
   // Prepared wet coverage reconstructs the whole mask on its own pixel grid
   // before affine sampling. Its interpolation support grows with that mapping.
   let unbounded=false;
-  const nativeWet=!!mask.strokes?.some(entry=>entry.mode==='wet'&&entry.stroke.opacity>0);
+  const nativeStart=maskNativeEditIndex(mask),prefix=nativeStart<0?mask.strokes:mask.strokes?.slice(0,nativeStart);
+  const nativeWet=!!prefix?.some(entry=>entry.mode==='wet'&&entry.stroke.opacity>0);
   const basis=nativeWet?new AffineTransform():transform;
   const rects:AffineBounds[]=[];
   const add=(bounds:AffineBounds,matrix=basis)=>rects.push(matrix.bounds(bounds));
@@ -46,7 +48,9 @@ export function maskFieldGeometry(mask:LayerMaskData,transform:AffineTransform,b
   for(const entry of mask.strokes??[]){
     if(entry.mode==='wet'){if(entry.stroke.opacity===0)continue;try{add(strokeBounds(entry.stroke));}catch{unbounded=true;}continue;}
     if(!entry.placement){add(strokeBounds(entry.stroke));continue;}
-    const p=entry.placement,width=Math.ceil(p.width),height=Math.ceil(p.height),sx=width/p.width,sy=height/p.height,stroke=strokeBounds(entry.stroke);
+    const p=entry.placement;
+    if('geometry'in p){const box=mappedMaskBrushBounds(p,strokeBounds(entry.stroke));if(box)add(box);else unbounded=true;continue;}
+    const width=Math.ceil(p.width),height=Math.ceil(p.height),sx=width/p.width,sy=height/p.height,stroke=strokeBounds(entry.stroke);
     try{
       // Bound the complete captured raster and its bilinear neighbors, then
       // invert in a corner-relative frame. A horizon intersection has genuinely

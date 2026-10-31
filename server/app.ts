@@ -51,10 +51,10 @@ import {
   revisionSchema,
 } from "../src/core/validation";
 
-/** Legacy raster/clone DTO references remain metadata-only; authored textures require a session source. */
-function validateTextureSources(document:DocumentData,assets:AssetStore){
+/** Legacy raster/clone DTO references remain metadata-only; authored textures and mask grids require a session source. */
+function validateAuthoredSources(document:DocumentData,assets:AssetStore){
   const trees=[document.children,...(document.components??[]).flatMap(definition=>definition.source.kind==='document'?[definition.source.document.children]:[])];
-  for(const tree of trees)for(const layer of allLayers(tree))visitLayerAssets(layer,(reference,role)=>{if(role==='texture')assets.get(reference.assetId);});
+  for(const tree of trees)for(const layer of allLayers(tree))visitLayerAssets(layer,(reference,role)=>{if(role==='texture'||role==='geometry')assets.get(reference.assetId);});
 }
 
 function safeTokenCompare(
@@ -682,7 +682,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
         let layer!:ReturnType<Document['applyTonalSculpt']>;
         document.transaction('Tonal sculpt',()=>{
           layer = document.applyTonalSculpt(parsed.path,parsed.mode,parsed.range,parsed.exposure,parsed.options);
-          validateTextureSources(document._read(),session.assets);
+          validateAuthoredSources(document._read(),session.assets);
         });
         send(response, 200, { ...snapshot(document), layerId: layer.id });
         return;
@@ -714,7 +714,7 @@ export function createApiServer(options: ApiServerOptions = {}) {
         }
         const result=navigateHistory(document,()=>document.transaction(parsed.label ?? "REST transaction", () => {
           commands.forEach((command) => document._dispatch(command));
-          validateTextureSources(document._read(),session.assets);
+          validateAuthoredSources(document._read(),session.assets);
         }));
         send(response, 200, result);
         return;

@@ -96,8 +96,22 @@ export function getExportCapabilityReport(
   const smart=options.format==='svg'?planSvgSmart(document):undefined;
   return describeExport(document,options,smart,smart?planSvgComposition(smart.document):undefined);
 }
+function hasRetainedMaskPlanes(document:DocumentData):boolean {
+  const definitions=new Map((document.components??[]).map(value=>[value.id,value.source])),seen=new Set<string>();
+  const visit=(nodes:DocumentData['children']):boolean=>{
+    for(const layer of allLayers(nodes)){
+      if(layer.mask?.plane||layer.kind==='smart-object'&&layer.filterMask?.plane)return true;
+      if(layer.kind==='smart-object'&&!seen.has(layer.componentId)){
+        seen.add(layer.componentId);const source=definitions.get(layer.componentId);
+        if(source?.kind==='document'&&visit(source.document.children))return true;
+      }
+    }
+    return false;
+  };
+  return visit(document.children);
+}
 function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSmartPlan,composition?:SvgCompositionPlan):ExportCapabilityReport{
-  const authored=document;
+  const authored=document,retainedMasks=hasRetainedMaskPlanes(document);
   const hasParagraphStyleMetadata=!!document.paragraphStyles?.length||!!document.components?.some(definition=>definition.source.kind==='document'&&definition.source.document.paragraphStyles?.length);
   if(composition)document=composition.document;else if(smart)document=smart.document;
   const format = options.format;
@@ -224,10 +238,11 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
       const rasterPlans=planSvgImages(document).filter(plan=>plan.layer.kind==='raster'&&!plan.prefix);
       if(composition?.prefixes){
         featuresPreserved.push('Native adjustment layers, pass-through groups and Blend If in document-resolution PNG prefixes');
-        warnings.push(`SVG renders ${composition.prefixes} affected sibling stack(s) through the last visible perspective image, clipping layer, adjustment, pass-through group or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.`);
+        warnings.push(`SVG renders ${composition.prefixes} affected sibling stack(s) through the last visible perspective image, retained mask plane, clipping layer, adjustment, pass-through group or Blend If layer. Their content, masks, styles and blending are baked into document-resolution PNG pixels clipped to expanded output support. Later artwork and parent settings remain separate. Source-file metadata is excluded. Save a project for complete editability and off-support data.`);
         warnings.push(`Native backdrop stacks end at: ${composition.stacks.map(name=>JSON.stringify(name)).join(', ')}.`);
         warnings.push('Native frame rebasing and SVG mask/filter/edge sampling can change edge pixels. Choose PNG for the flattened native reference.');
         featuresDegradedOrOmitted.push('Editable adjustment/Blend If settings and artwork/masks/styles inside native backdrop prefixes');
+        if(retainedMasks)featuresDegradedOrOmitted.push('Editable retained mask planes, native grids and filter mixing controls');
         if(composition.wetPaint){
           featuresPreserved.push('Prepared wet-paint color and transparency in native PNG backdrop prefixes');
           featuresDegradedOrOmitted.push('Editable wet-paint operations and preceding artwork inside native backdrop prefixes');
@@ -318,6 +333,10 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
         "Embedded ICC color profile (sRGB)",
         "Merged preview with transparency",
       );
+      if(retainedMasks){
+        warnings.push('Retained mask planes and their native/document filter mixing phases are baked into rendered layer pixels. Original mask geometry, native-grid references, linkage and mixing controls are not editable in Photoshop delivery. Save a native project to retain them.');
+        featuresDegradedOrOmitted.push('Editable retained mask planes, native grids and filter mixing controls');
+      }
       if (document.width > (format==='psb'?300000:30000) || document.height > (format==='psb'?300000:30000))
         warnings.push(format==='psb'?'PSB dimensions cannot exceed 300,000 pixels per side. Choose another output or save a native project.':'PSD dimensions cannot exceed 30,000 pixels per side. Choose PSB, PNG or save a native project.');
       if(format==='psb')warnings.push('PSB uses large-document lengths and requires a PSB-compatible reader. This remains an 8-bit RGB pixel-layer, folder and pixel-mask subset, not editable Photoshop text, vector paths, adjustment parameters or effects. Real multi-GiB and broader reader/device/memory acceptance remain unverified.');
@@ -344,8 +363,8 @@ function describeExport(document:DocumentData,options:ExportOptions,smart?:SvgSm
           featuresDegradedOrOmitted.push('Internal layer separation and adjustment controls in merged group prefixes');
         }
         if(plan.bakedGroups.length){
-          warnings.push(`Styled group contents are rendered into one pixel child inside their retained folder: ${plan.bakedGroups.map(name=>`“${name}”`).join(', ')}. Their original children, masks, fill controls and effects are baked; hidden descendants inside those contents are omitted.`);
-          featuresDegradedOrOmitted.push('Original child editability and controls inside styled groups');
+          warnings.push(`Groups with styles or retained mask planes are rendered into one pixel child inside their retained folder: ${plan.bakedGroups.map(name=>`“${name}”`).join(', ')}. Their original children, masks, fill controls and effects are baked; hidden descendants inside those contents are omitted.`);
+          featuresDegradedOrOmitted.push('Original child editability and controls inside rendered groups');
         }
         if(plan.foldedGroupFill.length){
           warnings.push(`Photoshop groups expose overall opacity without a separate Fill control. Canoli group fill is folded into exported group opacity: ${plan.foldedGroupFill.map(name=>`“${name}”`).join(', ')}. Save a native project for the original separate controls.`);

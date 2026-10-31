@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import {mappedMaskPlacementSchema,maskMappedFieldMapping,type MappedMaskPlacementData} from './mask-plane-brush';
 import { AffineTransform, type AffineData } from './affine';
 import type { BrushStrokeData, Rect } from './drawing';
 import { affineSchema } from './transform-schema';
@@ -8,11 +9,13 @@ import {ProjectiveTransform} from './projective';
 
 /** Tile pixels live in a placed authoring plane. Pull them through this captured
  * image mapping before the owner's current affine/perspective placement. */
-export interface WetPaintPlacementData {width:number;height:number;perspective:PerspectiveData;basis:AffineData}
-export const wetPaintPlacementSchema=z.object({width:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),height:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),perspective:perspectiveSchema,basis:affineSchema}).strict().superRefine((value,context)=>{
+export interface WetPerspectivePlacementData {width:number;height:number;perspective:PerspectiveData;basis:AffineData}
+export type WetPaintPlacementData=WetPerspectivePlacementData|MappedMaskPlacementData;
+const wetPerspectivePlacementSchema=z.object({width:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),height:z.number().finite().positive().max(Number.MAX_SAFE_INTEGER),perspective:perspectiveSchema,basis:affineSchema}).strict().superRefine((value,context)=>{
  try{perspectiveLocalQuad(Math.ceil(value.width),Math.ceil(value.height),value.perspective);}catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}
 });
-export function assertWetPaintVersion(stroke:{kind?:string;placement?:unknown},version:number){if(stroke.kind==='wet'&&stroke.placement!==undefined&&version<55)throw new Error('Placed wet paint requires schema version 55.');}
+export const wetPaintPlacementSchema=z.union([wetPerspectivePlacementSchema,mappedMaskPlacementSchema]);
+export function assertWetPaintVersion(stroke:{kind?:string;placement?:unknown},version:number){if(stroke.kind!=='wet'||stroke.placement===undefined)return;if(version<55)throw new Error('Placed wet paint requires schema version 55.');if(version<56&&stroke.placement&&typeof stroke.placement==='object'&&'geometry'in stroke.placement)throw new Error('Mapped wet paint requires schema version 56.');}
 
 export interface WetPaintTileData extends Rect { assetId: string; coverage: { assetId: string }; }
 /** Inert prepared metadata must not select a different pixel reconstruction. */
@@ -51,7 +54,13 @@ export function wetPaintOperationSchema(brush: z.ZodType<BrushStrokeData>) {
 export function wetPaintBounds(stroke: WetPaintStrokeData): Rect {
   const transform = AffineTransform.fromJSON(stroke.nativeTransform);
   let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
-  const placement=stroke.placement,matrix=placement?ProjectiveTransform.fromAffine(AffineTransform.fromJSON(placement.basis).inverse()).multiply(perspectiveMatrix(placement.width,placement.height,placement.perspective).inverse()).multiply(ProjectiveTransform.fromAffine(transform)):undefined;
+  const placement=stroke.placement;
+  if(placement&&'geometry'in placement){
+    let x=Infinity,y=Infinity,right=-Infinity,bottom=-Infinity;for(const tile of stroke.tiles){x=Math.min(x,tile.x);y=Math.min(y,tile.y);right=Math.max(right,tile.x+tile.width);bottom=Math.max(bottom,tile.y+tile.height);}const field={x,y,width:right-x,height:bottom-y};
+    const mapping=maskMappedFieldMapping(placement,field,transform),relative={x:field.x-1-mapping.sourceOrigin.x,y:field.y-1-mapping.sourceOrigin.y,width:field.width+2,height:field.height+2},box=perspectiveRect(new ProjectiveTransform(mapping.matrix).inverse(),relative).bounds;
+    return{...box,x:box.x+mapping.inputOrigin.x,y:box.y+mapping.inputOrigin.y};
+  }
+  const matrix=placement?ProjectiveTransform.fromAffine(AffineTransform.fromJSON(placement.basis).inverse()).multiply(perspectiveMatrix(placement.width,placement.height,placement.perspective).inverse()).multiply(ProjectiveTransform.fromAffine(transform)):undefined;
   for (const tile of stroke.tiles) {
     // Bilinear sampling includes source neighbors outside the stored rectangle.
     // A horizon is genuinely unbounded; mask callers retain streaming coverage,

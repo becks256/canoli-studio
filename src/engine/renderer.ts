@@ -1,5 +1,8 @@
+import {layerTransform as maskModelTransform} from '../core/spatial';
 import {ProjectedErasureCaptures,captureProjectedErasure} from './projected-erasure';
 import {capturePerspectiveMask} from './projective-mask';
+import {captureMaskPlane,maskPlaneCanvas,type MaskPlaneCaptureOptions} from './mask-plane';
+import {maskOwnerPose,type MaskPlanePoseData} from '../core/mask-plane';
 import {activePerspective,perspectiveLocalQuad} from '../core/perspective';
 import {intrinsicLocalBounds} from '../core/spatial';
 import {drawPerspectiveContent} from './perspective-content';
@@ -124,6 +127,8 @@ export interface RenderOptions {
   outputSize?: { width: number; height: number };
 }
 interface CanvasRenderOptions extends RenderOptions {
+  /** Model-space owner retained across intrinsic image rendering. */
+  maskPlaneOwner?:{id:string;pose:MaskPlanePoseData;filterPose?:MaskPlanePoseData;documentTransform?:AffineTransform;rootTransform?:AffineTransform};
   /** Bounded sharing within one render only, including uncached reference/export work. */
   frequencyScratch?:FilterTileCache;
   /** Shared by recursive layers and native tiles for input/cancellation. */
@@ -242,6 +247,7 @@ export class CanvasRenderer implements DocumentRenderer {
       try{check();applyMaskSettings(canvas,mask);const bytes=canvas.getContext('2d')!.getImageData(0,0,space.width,space.height).data,coverage=new Float32Array(space.width*space.height);for(let i=0;i<coverage.length;i++)coverage[i]=bytes[i*4+3]/255;check();return coverage;}finally{release(canvas);}
     };
     service.perspective=(mask,options,check)=>this.capturePerspectiveMask(mask,options,assets,{isCancelled:()=>{check();return!!isCancelled?.();}});
+    service.plane=(mask,owner,check)=>this.captureMaskPlane(mask,owner,assets,{isCancelled:()=>{check();return!!isCancelled?.();}});
     service.erasure=(entry,check)=>captureProjectedErasure(entry,assets,this.processor,{isCancelled:()=>{check();return!!isCancelled?.();}},this.brushTextures);
     return service;
   }
@@ -278,6 +284,18 @@ export class CanvasRenderer implements DocumentRenderer {
     const epoch=this.epoch,isCancelled=control.isCancelled;
     return capturePerspectiveMask(mask,options,assets,this.processor,{...control,isCancelled:()=>{if(this.epoch!==epoch)throw new Error('Perspective mask renderer was cleared.');return!!isCancelled?.();}},this.brushTextures);
   }
+  captureMaskPlane(mask:LayerMaskData,owner:MaskPlanePoseData,assets:AssetStore,control:import('./float-projection').FloatProjectionControl={},options:MaskPlaneCaptureOptions={}){
+    const epoch=this.epoch,isCancelled=control.isCancelled;
+    return captureMaskPlane(mask,owner,assets,this.processor,{...control,isCancelled:()=>{if(this.epoch!==epoch)throw new Error('Retained mask-plane renderer was cleared.');return!!isCancelled?.();}},options,this.brushTextures);
+  }
+  private captureNativeFilterMask(mask:LayerMaskData,assets:AssetStore,options:CanvasRenderOptions){
+    const owner=options.maskPlaneOwner!;
+    return this.captureMaskPlane(mask,owner.filterPose!,assets,{isCancelled:options.isCancelled},{filterMask:true,nativeTarget:true,documentTransform:owner.documentTransform,rootTransform:owner.rootTransform});
+  }
+  private async retainedMaskCanvas(mask:LayerMaskData,owner:MaskPlanePoseData,assets:AssetStore,space:RenderSpace,options:CanvasRenderOptions,extra:MaskPlaneCaptureOptions={}){
+    const captured=this.captureMaskPlane(mask,owner,assets,{isCancelled:options.isCancelled},{documentTransform:mask.linked===false?options.documentTransform:options.rootTransform,...extra});
+    try{return await maskPlaneCanvas(captured,space,this.processor,options.isCancelled);}finally{captured.dispose();}
+  }
 
   async renderMaskCoverage(
     mask: LayerMaskData,
@@ -290,6 +308,7 @@ export class CanvasRenderer implements DocumentRenderer {
     assets?: AssetStore,
     isCancelled?:()=>boolean,
   ) {
+    if(mask.plane)throw new Error('Retained mask planes require their model owner; use captureMaskPlane or render the document.');
     const epoch = this.epoch,lifetime=assets?.captureLifetime();
     const source=mask.kind==='bitmap'&&assets?.has(mask.assetId)?assets.get(mask.assetId):undefined;
     const bitmap=source?.bitmap;
@@ -422,14 +441,14 @@ export class CanvasRenderer implements DocumentRenderer {
       }
       check();return pixels;
     };
-    const unlinked=layer.kind==='smart-object'&&layer.filterMask?.linked===false&&layer.filterMask.enabled&&layer.filterMask.density>0;
+    const unlinked=layer.kind==='smart-object'&&!!layer.filterMask&&(layer.filterMask.plane?layer.filterMask.plane.phase==='document':layer.filterMask.linked===false)&&layer.filterMask.enabled&&layer.filterMask.density>0;
     const filtered=unlinked?{...layer,filterMask:null}:layer;
     await drawPerspectiveContent({...filtered,perspective:layer.perspective!},native,intrinsicLocalBounds(layer)!,target,space,world,this.processor,b=>read(filtered,b),options.isCancelled);
     if(unlinked&&layer.kind==='smart-object'){
       const original=createCanvas(space.width,space.height,true);let mask:HTMLCanvasElement|undefined;
       try{
         const base={...layer,smartFilters:[],filterMask:null};await drawPerspectiveContent({...base,perspective:layer.perspective!},native,intrinsicLocalBounds(base)!,original,space,world,this.processor,b=>read(base,b),options.isCancelled);
-        mask=await this.perspectiveMaskCanvas(layer.filterMask!,layer,native,assets,space,world,options);
+        mask=layer.filterMask!.plane?await this.retainedMaskCanvas(layer.filterMask!,options.maskPlaneOwner!.filterPose!,assets,space,options,{filterMask:true}):await this.perspectiveMaskCanvas(layer.filterMask!,layer,native,assets,space,world,options);
         const out=target.getContext('2d')!,input=original.getContext('2d')!,coverage=mask.getContext('2d')!;
         for(let y=0;y<space.height;y+=512)for(let x=0;x<space.width;x+=512){
           const width=Math.min(512,space.width-x),height=Math.min(512,space.height-y),mixed=await this.processor.mixFilteredOwned(input.getImageData(x,y,width,height).data,out.getImageData(x,y,width,height).data,coverage.getImageData(x,y,width,height).data,1,false);
@@ -446,12 +465,13 @@ export class CanvasRenderer implements DocumentRenderer {
     if(!effects.length)return;
     const preview=options.paintPreview,mask=layer.filterMask&&preview?.filterMask&&preview.maskMode&&preview.layerId===layer.id?{...layer.filterMask,strokes:[...(layer.filterMask.strokes??[]),{mode:preview.maskMode,stroke:preview.stroke,...(preview.maskPlacement?{placement:preview.maskPlacement}:{})}]}:layer.filterMask;
     let coverage:HTMLCanvasElement|undefined;
+    const planeCapture=mask?.plane?.phase==='native'?this.captureNativeFilterMask(mask,assets,options):undefined;
     try{
-      if(mask?.enabled&&mask.density>0){
+      if(mask?.enabled&&mask.density>0&&mask.plane?.phase!=='document'){
         const source=registry.get(layer.componentId).source,width=source.kind==='asset'?source.width:source.document.width,height=source.kind==='asset'?source.height:source.document.height;
         const nativeWorld=world.multiply(AffineTransform.scale(layer.width/width,layer.height/height)),offset=maskTransform(mask,new AffineTransform());
         const basis=mask.linked===false?nativeWorld.inverse().multiply(options.documentTransform??new AffineTransform()).multiply(offset):offset;
-        coverage=await projectNativeMask(space,nativeWorld,region=>{const origin=basis.point({x:0,y:0});return this.renderMaskCoverage(regionalFilterMask(mask,region,basis),{...region,sx:1,sy:1},origin.x,origin.y,`document-tone-mask:${layer.id}`,options.cache!==false,basis,assets,options.isCancelled);},options.isCancelled);
+        coverage=await projectNativeMask(space,nativeWorld,region=>{if(planeCapture)return maskPlaneCanvas(planeCapture,{...region,sx:1,sy:1},this.processor,options.isCancelled,false);const origin=basis.point({x:0,y:0});return this.renderMaskCoverage(regionalFilterMask(mask,region,basis),{...region,sx:1,sy:1},origin.x,origin.y,`document-tone-mask:${layer.id}`,options.cache!==false,basis,assets,options.isCancelled);},options.isCancelled);
       }
       const c=target.getContext('2d')!;
       for(let ty=0;ty<space.height;ty+=1024)for(let tx=0;tx<space.width;tx+=1024){
@@ -460,7 +480,21 @@ export class CanvasRenderer implements DocumentRenderer {
         if(coverage&&original&&mask)pixels=await this.processor.mixFilteredOwned(original,pixels,coverage.getContext('2d')!.getImageData(tx,ty,w,h).data,mask.density,mask.inverted);
         checkRenderCurrent(options.isCancelled);const adjusted=c.createImageData(w,h);adjusted.data.set(pixels);c.putImageData(adjusted,tx,ty);
       }
-    }finally{if(coverage)release(coverage);}
+    }finally{if(coverage)release(coverage);planeCapture?.dispose();}
+  }
+
+  private async documentFilterPlane(layer:SmartObjectInstanceData,registry:ComponentRegistry,assets:AssetStore,target:HTMLCanvasElement,space:RenderSpace,world:AffineTransform,options:CanvasRenderOptions){
+    const mask=layer.filterMask;if(!mask?.enabled||mask.density===0||mask.plane?.phase!=='document')return;
+    const original=createCanvas(space.width,space.height,true);let coverage:HTMLCanvasElement|undefined;
+    try{
+      await this.smart({...layer,smartFilters:[],filterMask:null},registry,assets,original,space,world,options);
+      coverage=await this.retainedMaskCanvas(mask,options.maskPlaneOwner!.filterPose!,assets,space,options,{filterMask:true});
+      const output=target.getContext('2d')!,before=original.getContext('2d')!,alpha=coverage.getContext('2d')!;
+      for(let y=0;y<space.height;y+=512)for(let x=0;x<space.width;x+=512){
+        const width=Math.min(512,space.width-x),height=Math.min(512,space.height-y),pixels=await this.processor.mixFilteredOwned(before.getImageData(x,y,width,height).data,output.getImageData(x,y,width,height).data,alpha.getImageData(x,y,width,height).data,1,false);
+        checkRenderCurrent(options.isCancelled);const image=output.createImageData(width,height);image.data.set(pixels);output.putImageData(image,x,y);
+      }
+    }finally{release(original);if(coverage)release(coverage);}
   }
 
   private async smart(
@@ -516,14 +550,17 @@ export class CanvasRenderer implements DocumentRenderer {
             : offset;
         })()
       : new AffineTransform();
+    const planeCapture=filterMask?.plane?.phase==='native'?this.captureNativeFilterMask(filterMask,assets,options):undefined;
+    try {
     const mask =
-      filterMask?.enabled && filterMask.density > 0
+      filterMask?.enabled && filterMask.density > 0 && filterMask.plane?.phase!=='document'
         ? {
             density: filterMask.density,
             inverted: filterMask.inverted,
             constant: (region: RenderRegion) =>
-              uniformFilterMaskCoverage(filterMask, region, maskBasis),
+              planeCapture?undefined:uniformFilterMaskCoverage(filterMask, region, maskBasis),
             render: (region: RenderRegion) => {
+              if(planeCapture)return maskPlaneCanvas(planeCapture,{...region,sx:1,sy:1},this.processor,options.isCancelled,false);
               return maskCoverage(
                 filterMask,
                 { ...region, sx: 1, sy: 1 },
@@ -571,6 +608,7 @@ export class CanvasRenderer implements DocumentRenderer {
                     signature: (region: RenderRegion) =>
                       JSON.stringify([
                         filterSignature,
+                        planeCapture?options.maskPlaneOwner:undefined,
                         maskBasis,
                         maskSignature(regionalFilterMask(filterMask, region, maskBasis)),
                       ]),
@@ -715,6 +753,7 @@ export class CanvasRenderer implements DocumentRenderer {
           context.restore();
         }
       }
+    } finally {planeCapture?.dispose();}
   }
 
   async render(
@@ -824,6 +863,10 @@ export class CanvasRenderer implements DocumentRenderer {
         checkRenderCurrent(options.isCancelled);
         if (!layer.visible || layer.opacity === 0) continue;
         const world = parent.multiply(localTransform(layer));
+        const retainedOwner=layer.mask?.plane||(layer.kind==='smart-object'&&layer.filterMask?.plane)?maskModelTransform(document,layer.id):null;
+        const master=retainedOwner&&layer.kind==='smart-object'&&registry?registry.get(layer.componentId).source:undefined;
+        const masterSize=master?(master.kind==='asset'?master:master.document):undefined;
+        const layerOptions:CanvasRenderOptions=retainedOwner?{...options,maskPlaneOwner:{id:layer.id,pose:maskOwnerPose(layer,retainedOwner),filterPose:masterSize?maskOwnerPose(layer,retainedOwner,masterSize):undefined,documentTransform:options.documentTransform,rootTransform:options.rootTransform}}:options;
         const style = layer.styles ?? defaultStyle(),
           shadow = style.dropShadow;
         if (layer.blendMode === 'pass-through') {
@@ -850,8 +893,8 @@ export class CanvasRenderer implements DocumentRenderer {
               const maskWorld = maskData.linked === false && options.documentTransform
                 ? options.documentTransform.multiply(rawWorld) : rawWorld;
               const origin = maskWorld.point({x:0,y:0});
-              coverage = await this.renderMaskCoverage(maskData,current,origin.x,origin.y,`${scope}:pass:${layer.id}`,!!cache,maskWorld,assets,options.isCancelled);
-              applyMaskSettings(coverage,maskData);
+              coverage = maskData.plane?await this.retainedMaskCanvas(maskData,layerOptions.maskPlaneOwner!.pose,assets,current,layerOptions):await this.renderMaskCoverage(maskData,current,origin.x,origin.y,`${scope}:pass:${layer.id}`,!!cache,maskWorld,assets,options.isCancelled);
+              if(!maskData.plane)applyMaskSettings(coverage,maskData);
               const c = coverage.getContext('2d')!;
               c.globalCompositeOperation='destination-in';c.globalAlpha=opacity;c.fillStyle='#fff';c.fillRect(0,0,current.width,current.height);
             } else {
@@ -1041,7 +1084,7 @@ export class CanvasRenderer implements DocumentRenderer {
           if (!cacheable || !cache?.read(key, signature, content)) {
             let textInk: ReturnType<typeof drawText>;
             if((layer.kind==='raster'||layer.kind==='smart-object')&&activePerspective(layer.perspective)){
-              await this.perspectiveContent(layer,assets,content,padded,world,options,registry);
+              await this.perspectiveContent(layer,assets,content,padded,world,layerOptions,registry);
             } else if (layer.kind === "smart-object") {
               if (!registry) throw new Error("Missing smart-object registry.");
               await this.smart(
@@ -1051,9 +1094,10 @@ export class CanvasRenderer implements DocumentRenderer {
                 content,
                 padded,
                 world,
-                options,
+                layerOptions,
               );
-              await this.documentTone(layer,registry,assets,content,padded,world,options);
+              await this.documentTone(layer,registry,assets,content,padded,world,layerOptions);
+              if(layer.filterMask?.plane?.phase==='document')await this.documentFilterPlane(layer,registry,assets,content,padded,world,layerOptions);
             } else if ((layer.kind === 'raster' || layer.kind === 'paint') && (needsNativeRasterContent(layer)||preview?.layerId===layer.id&&!!preview.erasurePlacement)) {
               await drawNativeWetContent(layer, assets, content, padded, world, this.processor, options.isCancelled, options.cache === false ? undefined : this.brushTextures, nativeWetPreview);
             } else if (layer.kind === "raster") {
@@ -1392,8 +1436,8 @@ export class CanvasRenderer implements DocumentRenderer {
               padded,
               maskWorld,
             ]);
-            const projected=(layer.kind==='raster'||layer.kind==='smart-object')&&activePerspective(layer.perspective);
-            let mask = projected?await this.perspectiveMaskCanvas(maskData,layer as RasterLayerData|SmartObjectInstanceData,this.perspectiveNativeSize(layer as RasterLayerData|SmartObjectInstanceData,assets,registry),assets,padded,world,options):cache
+            const projected=!!maskData.plane||(layer.kind==='raster'||layer.kind==='smart-object')&&activePerspective(layer.perspective);
+            let mask = maskData.plane?await this.retainedMaskCanvas(maskData,layerOptions.maskPlaneOwner!.pose,assets,padded,layerOptions):projected?await this.perspectiveMaskCanvas(maskData,layer as RasterLayerData|SmartObjectInstanceData,this.perspectiveNativeSize(layer as RasterLayerData|SmartObjectInstanceData,assets,registry),assets,padded,world,options):cache
               ? createCanvas(padded.width, padded.height)
               : undefined;
             if (!projected&&(!mask || !cache!.read(maskKey, maskSignature, mask))) {

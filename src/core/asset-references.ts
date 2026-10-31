@@ -3,7 +3,7 @@ import type { PaintOperationData } from './drawing';
 import type { LayerMaskData } from './masks';
 
 export type AssetReference={assetId:string};
-export type AssetVisitor=(reference:AssetReference,role:'image'|'texture')=>void;
+export type AssetVisitor=(reference:AssetReference,role:'image'|'texture'|'geometry')=>void;
 export function visitBrushAssets(stroke:PaintOperationData,visit:AssetVisitor){
   if(stroke.kind==='fill')return;
   if(stroke.kind==='wet'){visitBrushAssets(stroke.brush,visit);for(const tile of stroke.tiles){visit(tile,'image');visit(tile.coverage,'image');}return;}
@@ -12,6 +12,7 @@ export function visitBrushAssets(stroke:PaintOperationData,visit:AssetVisitor){
 }
 export function visitMaskAssets(mask:LayerMaskData|null|undefined,visit:AssetVisitor){
   if(!mask)return;
+  if(mask.plane?.reference.kind==='asset')visit(mask.plane.reference,'geometry');
   if(mask.kind==='bitmap')visit(mask,'image');
   if(mask.kind==='raster-erasures')for(const entry of mask.erasures)visitBrushAssets(entry.stroke,visit);
   for(const entry of mask.strokes??[])visitBrushAssets(entry.stroke,visit);

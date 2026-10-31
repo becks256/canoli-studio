@@ -4,6 +4,7 @@ import {findLayer,type DocumentData} from './model';
 import {layerTransform} from './spatial';
 import {activePerspective,perspectiveMatrix} from './perspective';
 import {ProjectiveTransform} from './projective';
+import {compileMaskPlane,maskOwnerPose,maskPlaneDisplaySteps} from './mask-plane';
 import type {Point} from './drawing';
 
 export interface PointMapping {point(value:Point):Point}
@@ -28,6 +29,11 @@ export class MaskPathMapping implements PointMapping {
 
 export function maskPathMapping(document:DocumentData,id:string,mask:LayerMaskData){
   const world=layerTransform(document,id)!,layer=findLayer(document,id)!;
+  if(mask.plane){
+    const plane=mask.plane,compiled=compileMaskPlane(plane,{width:plane.pose.width,height:plane.pose.height},maskPlaneDisplaySteps(mask,maskOwnerPose(layer,world)));
+    const geometry=new ProjectiveTransform(compiled.mapping.matrix).inverse().multiply(ProjectiveTransform.fromAffine(compiled.basis));
+    return new MaskPathMapping(AffineTransform.translation(compiled.mapping.inputOrigin.x,compiled.mapping.inputOrigin.y),geometry);
+  }
   if(mask.linked!==false&&(layer.kind==='raster'||layer.kind==='smart-object')&&activePerspective(layer.perspective))
     return new MaskPathMapping(world.multiply(AffineTransform.translation(mask.placedX??0,mask.placedY??0)),perspectiveMatrix(layer.width,layer.height,layer.perspective)
       .multiply(ProjectiveTransform.fromAffine(maskTransform(mask,new AffineTransform(),false))));

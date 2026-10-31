@@ -71,7 +71,13 @@ export class FloatPixelProcessor{
   const result=new Float32Array(new Float32Array(kernel.memory.buffer,output,count));validateFloatAlpha(result,count);return result;
  }
  projectiveWet(alpha:Float32Array,input:ProjectiveFieldOptions):Float32Array<ArrayBuffer>{
-  this.owner();const {options,values}=compileProjectiveField(input);validateWetField(alpha,options.source.width*options.source.height);
+  this.owner();return this.sampleWet(alpha,compileProjectiveField(input));
+ }
+ mappedWet(alpha:Float32Array,input:MappedFieldOptions):Float32Array<ArrayBuffer>{
+  this.owner();const compiled=compileMappedField(input);if(compiled.options.background!==0)throw new Error('Wet fields require zero background.');return this.sampleWet(alpha,compiled);
+ }
+ private sampleWet(alpha:Float32Array,{options,values}:{options:{source:{width:number;height:number};output:{width:number;height:number}};values:Float64Array}):Float32Array<ArrayBuffer>{
+  validateWetField(alpha,options.source.width*options.source.height);
   const source=alpha.slice(),count=options.output.width*options.output.height*5,kernel=this.owner();
   if(typeof kernel.sampleProjectiveWetFloat!=='function')throw new Error('Native projective field sampler is unavailable.');
   const at=Math.ceil(kernel.bufferOffset()/8)*8,output=at+source.byteLength,settings=Math.ceil((output+count*4)/8)*8,required=settings+values.byteLength;

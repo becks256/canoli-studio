@@ -1,3 +1,5 @@
+import {pullMaskPlaneThrough,affineMaskPose} from '../core/mask-plane';
+import {maskMappedFieldMapping} from '../core/mask-plane-brush';
 import {isImmutable,freeze} from '../core/immutable';
 import {paintOperationSchema} from '../core/drawing';
 import {AffineTransform} from '../core/affine';
@@ -8,7 +10,7 @@ import type {ProjectiveQuad} from '../core/projective';
 import {validateWetField} from '../core/wet-field';
 import {validateWetPaintTile,type WetAssetProvider} from '../core/wet-assets';
 import type {WetPaintStrokeData} from '../core/wet-operation';
-import {projectPerspectiveFieldWindow,type ProjectiveFieldSource} from './projective-field';
+import {projectPerspectiveFieldWindow,projectMappedFieldWindow,type ProjectiveFieldSource} from './projective-field';
 import {createCanvas,release,renderTransform,type RenderSpace} from './canvas';
 import type {PixelProcessor} from './processor';
 import {checkRenderCurrent} from './render-control';
@@ -35,8 +37,9 @@ export async function compositeProjectedWetPaint(
  const bounds=captureFieldBounds({x:left,y:top,width:right-left,height:bottom-top}),native=AffineTransform.fromJSON(stroke.nativeTransform),inverseNative=native.inverse();
  const frame=renderTransform(space,world),linear=new AffineTransform(frame.a,frame.b,frame.c,frame.d).inverse();
  const width=Math.ceil(placement.width),height=Math.ceil(placement.height);
- const input=AffineTransform.scale(width/placement.width,height/placement.height).multiply(AffineTransform.fromJSON(placement.basis)).multiply(linear);
- const corners=perspectiveLocalQuad(placement.width,placement.height,placement.perspective).map(p=>inverseNative.point(p))as unknown as ProjectiveQuad;
+ const mapped='geometry'in placement?pullMaskPlaneThrough(maskMappedFieldMapping(placement,bounds,native),{pose:affineMaskPose(frame),inverse:false}):undefined;
+ const input='basis'in placement?AffineTransform.scale(width/placement.width,height/placement.height).multiply(AffineTransform.fromJSON(placement.basis)).multiply(linear):new AffineTransform();
+ const corners='perspective'in placement?perspectiveLocalQuad(placement.width,placement.height,placement.perspective).map(p=>inverseNative.point(p))as unknown as ProjectiveQuad:undefined;
  let deadline=performance.now()+2;
  const source:ProjectiveFieldSource={width,height,channels:5,bounds,background:0,direction:'source-to-quad',input:{origin:{x:frame.e,y:frame.f},matrix:input.toJSON()},
   readWindow:async area=>{
@@ -68,7 +71,7 @@ export async function compositeProjectedWetPaint(
  };
  const context=target.getContext('2d')!;
  for(let y=0;y<target.height;y+=512)for(let x=0;x<target.width;x+=512){
-  const w=Math.min(512,target.width-x),h=Math.min(512,target.height-y),field=await projectPerspectiveFieldWindow(source,processor,corners,{x,y,width:w,height:h},{isCancelled:()=>{check();return false;}});check();
+  const w=Math.min(512,target.width-x),h=Math.min(512,target.height-y),field=mapped?await projectMappedFieldWindow(source,processor,mapped,{x,y,width:w,height:h},{isCancelled:()=>{check();return false;}}):await projectPerspectiveFieldWindow(source,processor,corners!,{x,y,width:w,height:h},{isCancelled:()=>{check();return false;}});check();
   // Sampling remains on the complete canonical grid. Only the pointwise byte
   // composition can be bounded afterward: zero removal coverage implies zero
   // replacement alpha/RGB, including transparent pigment that clears artwork.

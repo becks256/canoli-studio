@@ -41,7 +41,7 @@ export function assertFloatSources(document:DocumentData,assets:Pick<AssetStore,
  const checkByteRole=(id:string)=>{if(assets.get(id).tiff?.editingPrecision==='float32')throw new Error('This operation requires native byte pixels. A float source thumbnail is display-only; use the float document renderer.');};
  const visit=(layers:LayerData[])=>{for(const layer of layers){
   if(layer.kind==='raster'&&float){const asset=assets.get(layer.assetId);if(!asset.tiff||!asset.tiffColor)throw new Error('Float documents require retained original high-precision TIFF raster sources.');}
-  visitLayerAssets(layer,reference=>{if(!(float&&layer.kind==='raster'&&reference===layer))checkByteRole(reference.assetId);});
+  visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'){assets.get(reference.assetId);return;}if(!(float&&layer.kind==='raster'&&reference===layer))checkByteRole(reference.assetId);});
   if(layer.kind==='group')visit(layer.children);
  }};
  visit(document.children);

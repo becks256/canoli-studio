@@ -1,5 +1,17 @@
 # Scripting API
 
+## Retained mask-plane increment (schema 56)
+
+`MaskPlane`, `LayerMask.plane`, mapped `MaskPaintPlacement` and mapped
+`WetPaintStroke.placement` are implemented in schema 56, with broader release
+acceptance still pending. Projected `setMaskLinked`, `setFilterMaskLinked`, document
+selection/path capture and placed Brush/Wet authoring preserve native geometry
+through retained planes. See [exact constructors, signatures, defaults, errors,
+examples, isolation and verification limits](MASK_PLANES.md). Older sections
+below describe the preceding affine/perspective-only contracts; their reset
+requirements are superseded for retained-plane operations by this increment.
+
+
 ## Float tonal retouching
 
 Existing `TonalStroke`, `AdjustmentLayer.addTonalStroke` and

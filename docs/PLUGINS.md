@@ -1,5 +1,17 @@
 # Plugins and extensions
 
+## Retained mask planes and mapped fields (schema 56)
+
+The isolated constructor set includes immutable `MaskPlane` values. Mask edits,
+projective relinking and prepared mapped Brush/Wet DTOs retain original geometry,
+source-grid references and native/document filter phase. Installation remains
+inert; existing document/source grants, shared revision/Undo and strict native
+PNG/alpha validation still apply. Geometry references do not grant source pixels,
+workers, files, network or host wet preparation. Zero-opacity mapped metadata does
+not select a new reconstruction path. Broader integration acceptance remains open;
+[exact contracts, defaults, examples and current limits](MASK_PLANES.md).
+
+
 ## Captured wet fields (document schema 55)
 
 The existing isolated `WetPaintStroke` constructor accepts optional captured

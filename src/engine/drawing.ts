@@ -1,3 +1,4 @@
+import {maskNativeEditIndex} from '../core/masks';
 import {PlacedMaskCaptures} from './placed-mask';
 import {ProjectedErasureCaptures,drawProjectedErasure} from './projected-erasure';
 import {nativeVectorFootprint} from './native-vector-footprint';
@@ -676,15 +677,19 @@ export async function paintedMask(
   nativeWetResolved=false,
   borrowedPlaced?:PlacedMaskCaptures,
 ): Promise<HTMLCanvasElement> {
-  if(!nativeWetResolved&&hasWetMask(mask)){if(!assets)throw new Error('Prepared wet mask coverage requires its image asset store.');return nativeWetMask(mask,space,processor,world,bitmap,assets,textures,isCancelled,borrowedPlaced);}
-  const output =
+  const nativeStart=maskNativeEditIndex(mask),wet=!nativeWetResolved&&hasWetMask(mask);
+  if(wet&&!assets)throw new Error('Prepared wet mask coverage requires its image asset store.');
+  if(wet&&nativeStart<0)return nativeWetMask(mask,space,processor,world,bitmap,assets!,textures,isCancelled,borrowedPlaced);
+  const prefix=wet&&nativeStart>0?{...mask,strokes:mask.strokes!.slice(0,nativeStart)}as LayerMaskData:undefined;
+  const seeded=prefix&&hasWetMask(prefix)?await nativeWetMask(prefix,space,processor,world,bitmap,assets!,textures,isCancelled,borrowedPlaced):undefined;
+  const output = seeded ?? (
     mask.kind === "selection"
       ? await selectionMask(mask.selection, space, x, y, processor, world)
       : mask.kind === "vector"
         ? vectorMask(mask, space, x, y, world)
         : mask.kind === "bitmap" && bitmap
           ? await bitmapMask(bitmap, space, x, y, world,isCancelled)
-          : createCanvas(space.width, space.height);
+          : createCanvas(space.width, space.height));
   const projected=mask.kind==='raster-erasures'&&mask.erasures.some(entry=>entry.placement);
   if(projected&&!assets){release(output);throw new Error('Projected erasure coverage requires its asset store.');}
   const captures=projected?new ProjectedErasureCaptures(assets!,processor,{isCancelled},textures):undefined;
@@ -696,7 +701,7 @@ export async function paintedMask(
     : undefined;
   try {
     const target = output.getContext("2d")!;
-    if (mask.kind === "raster-erasures") {
+    if (!seeded&&mask.kind === "raster-erasures") {
       target.fillStyle="#ffffff";target.fillRect(0,0,space.width,space.height);
       for(const entry of mask.erasures){
         if(entry.placement){await drawProjectedErasure(captures!.get(entry),output,space,world,mask.width,mask.height);continue;}
@@ -704,13 +709,13 @@ export async function paintedMask(
           world.multiply(AffineTransform.scale(mask.width/entry.width,mask.height/entry.height)),processor,undefined,undefined,undefined,undefined,isCancelled,textures);
       }
     }
-    if (mask.kind === "paint") {
+    if (!seeded&&mask.kind === "paint") {
       target.fillStyle = "#ffffff";
       target.globalAlpha = mask.base;
       target.fillRect(0, 0, space.width, space.height);
       target.globalAlpha = 1;
     }
-    for (const entry of mask.strokes ?? []) {
+    for (const entry of seeded?mask.strokes!.slice(nativeStart):mask.strokes??[]) {
       if(entry.mode!=='wet'&&entry.placement){await placed!.draw(entry,output,space,world);continue;}
       await drawMaskStroke(
         entry,

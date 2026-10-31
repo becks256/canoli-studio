@@ -18,6 +18,9 @@ import{validateDocument}from'../core/model';
 import{floatSceneIssue,assertFloatSources}from'../core/float-document';
 import{visitLayerAssets}from'../core/asset-references';
 import type{AssetStore,ImageAsset}from'../core/assets';
+import {captureAssetSource} from '../core/assets';
+import {maskOwnerPose,type MaskPlanePoseData} from '../core/mask-plane';
+import type {CapturedMaskPlane} from './mask-plane';
 import{freeze,isImmutable}from'../core/immutable';
 import{FloatRasterSource}from'../core/float-source/source';
 import{validateWindow,type FloatSourceControl,type FloatSourceWindow}from'../core/float-source/types';
@@ -35,7 +38,7 @@ import{validateFloatWorkerWindow}from'./float-pixels';
 import type{ColorProof}from'../core/color/color-settings';
 
 export interface FloatSceneControl extends FloatSourceControl,FloatProjectionControl{}
-export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask;erasure?(entry:import('../core/drawing').RasterErasureData,check:()=>void):import('./projected-erasure').CapturedProjectedErasure};
+export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{plane?(mask:LayerMaskData,owner:MaskPlanePoseData,check:()=>void):CapturedMaskPlane;perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask;erasure?(entry:import('../core/drawing').RasterErasureData,check:()=>void):import('./projected-erasure').CapturedProjectedErasure};
 export type FloatStrokeService=(brush:BrushStrokeData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>;
 export interface CapturedFloatScene {
  readonly document:DocumentData;
@@ -101,16 +104,18 @@ export class FloatSceneRenderer {
   const shadowCache=new FloatShadowCache();
   const erasureCaptures=new Map<object,import('./projected-erasure').CapturedProjectedErasure>();
   const perspectiveMasks=new Map<string,CapturedPerspectiveMask>();
+  const planeMasks=new Map<string,CapturedMaskPlane>(),gridPins=new Map<string,ReturnType<typeof captureAssetSource>>();
   const whiteBalances=new Map<string,readonly number[]|null>();
   const lookups=new Map<string,FloatLookupLease>();
   const abort=new AbortController(),incoming=control.signal,cancel=()=>abort.abort(incoming?.reason);incoming?.addEventListener('abort',cancel,{once:true});if(incoming?.aborted)cancel();this.captures.add(abort);control={...control,signal:abort.signal};
   const check=()=>{control.signal?.throwIfAborted();checkRenderCurrent(control.isCancelled);if(closed||this.closed||epoch!==this.epoch)throw new Error('Float scene capture is closed or superseded.');lifetime();
    for(const[id,value]of sources)if(!assets.has(id)||assets.get(id)!==value.asset||value.asset.blob!==value.source.original||value.asset.width!==value.source.width||value.asset.height!==value.source.height||value.asset.tiff!==value.tiff||value.asset.tiffColor!==value.color)throw new Error('Float scene source changed.');
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
+   for(const pin of gridPins.values())pin.check();
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
-   visitLayerAssets(layer,reference=>{if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
+   visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'){if(!gridPins.has(reference.assetId))gridPins.set(reference.assetId,captureAssetSource(assets,reference.assetId));return;}if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
    if(layer.kind==='group')visit(layer.children);else if(layer.kind==='raster'&&!sources.has(layer.assetId)){const asset=assets.get(layer.assetId);sources.set(asset.id,{asset,source:this.source(assets,asset),tiff:asset.tiff,color:asset.tiffColor});}
    else if(layer.kind==='adjustment'&&layer.adjustment.kind==='white-balance')whiteBalances.set(layer.id,compileFloatWhiteBalance(layer.adjustment));
   }};
@@ -132,6 +137,9 @@ export class FloatSceneRenderer {
     check();const bounds=validateWindow(input),full:RenderSpace={x:0,y:0,width:document.width,height:document.height,sx:1,sy:1},root=new AffineTransform();
     const spaceFor=(area:FloatSourceWindow):RenderSpace=>({x:area.x,y:area.y,width:area.width,height:area.height,sx:1,sy:1});
     const mask=async(layer:LayerData,world:AffineTransform,area:FloatSourceWindow=bounds)=>{
+     if(layer.mask?.plane&&layer.mask.enabled&&layer.mask.density>0){
+      let capture=planeMasks.get(layer.id);if(!capture){if(!maskService.plane)throw new Error('Retained mask-plane capture is unavailable.');capture=maskService.plane(layer.mask,maskOwnerPose(layer,world),check);planeMasks.set(layer.id,capture);}const result=await capture.read(area);check();return result;
+     }
      if(layer.kind==='raster'&&activePerspective(layer.perspective)&&layer.mask?.enabled&&layer.mask.density>0){
       let capture=perspectiveMasks.get(layer.id);
       if(!capture){

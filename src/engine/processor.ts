@@ -184,6 +184,12 @@ export class PixelProcessor {
     const result=await this.request(new Uint8ClampedArray(0),{floatMappedField:{alpha:captured,options}});
     validateFloatAlpha(result,length);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Mapped field worker result differs from captured output geometry.');return result;
   }
+  async floatMappedWet(alpha:Float32Array,input:MappedFieldOptions):Promise<Float32Array>{
+    const {options}=compileMappedField(input);if(options.background!==0)throw new Error('Wet fields require zero background.');validateWetField(alpha,options.source.width*options.source.height);
+    const captured=alpha.slice(),length=options.output.width*options.output.height*5;
+    const result=await this.request(new Uint8ClampedArray(0),{floatMappedWet:{alpha:captured,options}});
+    validateWetField(result,length/5);if(result.byteOffset!==0||result.byteLength!==result.buffer.byteLength)throw new Error('Mapped wet worker result differs from captured output geometry.');return result;
+  }
   async floatProjectiveWet(alpha:Float32Array,input:ProjectiveFieldOptions):Promise<Float32Array>{
     const {options}=compileProjectiveField(input);validateWetField(alpha,options.source.width*options.source.height);
     const captured=alpha.slice(),length=options.output.width*options.output.height*5;
@@ -462,6 +468,7 @@ export class PixelProcessor {
       floatAffine?:{pixels:Float32Array;matrix:number[]};
       floatProjective?:{pixels:Float32Array;options:ProjectiveSampleOptions};
       floatProjectiveField?:{alpha:Float32Array;options:ProjectiveFieldOptions};
+      floatMappedWet?:{alpha:Float32Array;options:MappedFieldOptions};
       floatMappedField?:{alpha:Float32Array;options:MappedFieldOptions};
       floatProjectiveWet?:{alpha:Float32Array;options:ProjectiveFieldOptions};
       floatTone?:{pixels:Float32Array;options:FloatToneOptions};
@@ -570,6 +577,7 @@ export class PixelProcessor {
     if(payload.floatAffine)tryTransfer(payload.floatAffine.pixels.buffer);
     if(payload.floatProjective)tryTransfer(payload.floatProjective.pixels.buffer);
     if(payload.floatProjectiveField)tryTransfer(payload.floatProjectiveField.alpha.buffer);
+    if(payload.floatMappedWet)tryTransfer(payload.floatMappedWet.alpha.buffer);
     if(payload.floatMappedField)tryTransfer(payload.floatMappedField.alpha.buffer);
     if(payload.floatProjectiveWet)tryTransfer(payload.floatProjectiveWet.alpha.buffer);
     if(payload.floatTone)tryTransfer(payload.floatTone.pixels.buffer);
