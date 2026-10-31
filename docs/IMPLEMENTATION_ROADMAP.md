@@ -9820,3 +9820,45 @@ process-memory F14 and every other unfinished original professional, AI,
 workflow, ChatGPT/live identity, commercial, specialist and motion gate remain
 required. No performance-clearance, paid call, upload or browser/REST
 synchronization claim follows from this increment.
+
+### 2026-10-31 — F03/F10 retained owners and native appearance consistency
+
+Owner: implementation agent; bounded increment from `f4cc4cf`; classification:
+progress. Source-replacement and root/document Image Size controls passed, then
+a broader reset/cache audit reproduced stale float appearance. The cache had
+used only the original rectangle after retained-mask linkage and perspective
+reset. The old production build displays 12,616 wrong normalized RGBA samples;
+an independent PNG-alpha reader confirms 3,561 wrong coverage samples.
+
+Completed appearance keys now include full captured plane data and actual native
+geometry-grid dimensions. The corrected native and production paths match their
+uncached/file controls after reset, basis/pose edits and same-ID native-grid
+replacement. The existing bounded cache still reuses unchanged linked repeats,
+unrelated metadata and eligible integer moves, with zero new native compositions
+in those four tested controls. Original sources, shared commands, schema,
+private services and extension authority retain their existing contracts.
+
+Specific owner acceptance now covers both ordinary-mask link states through
+shared master replacement at double source resolution; projects saved without
+history retain exact former originals solely as mask-grid geometry. Six Image
+Size cases match independent root/document frames for ordinary and both filter
+phases. Six further cases retain pixels through two nested conversions and a
+doubled embedded-master Image Size, including cache parity, Undo and reopening.
+Those nested outer instances are affine, with active child perspective, zero
+feather and full density; broader nested-projective behavior remains required.
+
+The complete affected browser matrix passes all 83 cases across five files,
+including 15 new cases and existing genuine 50 MP, float tools, smart-frame,
+proof and cancellation regressions. All 3,216 unit/API/native tests across 312
+files pass; all three stated normal-production workflows pass without debug
+globals. Product and test sources remain frozen through acceptance. Independent
+readers verify native project checksums/source closure and every stored cache,
+resize and nested pixel comparison. Earlier failures and raw old-build foreground
+are retained. [Findings and compact evidence](benchmarks/mask-plane-owner-2026-10-31.md).
+
+The full original goal stays active. Wider source/master formats and replacement,
+nested-projective/feather/horizon/lifetime behavior, all-kind mapped editing,
+general warp, native float wet tools, photographic/device/sustained F14 memory
+and performance, and every unfinished original professional, AI, workflow,
+ChatGPT/live identity, commercial, specialist and motion gate remain required.
+No latency improvement, speedup or continuous-60fps clearance is inferred.

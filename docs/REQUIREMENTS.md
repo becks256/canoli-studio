@@ -1,5 +1,13 @@
 # Canoli Studio editor requirements
 
+## Retained-mask appearance invalidation
+
+Cached float previews must match uncached rendering after perspective reset,
+retained-plane basis/pose edits and native geometry-grid changes. The same asset
+ID with different valid native dimensions must not reuse old coverage. Keep
+completed appearance reuse for unchanged linked masks, unrelated metadata and
+eligible integer moves, with source/proof/cancellation checks before publication.
+
 ## Float mask tool access
 
 Selecting a masked layer in a float document must make Brush and Pencil reachable

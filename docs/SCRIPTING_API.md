@@ -1,5 +1,14 @@
 # Scripting API
 
+## Retained-mask preview consistency
+
+Existing `LayerMask.with({plane})`, `MaskPlane` constructors, mask linkage and
+perspective setters retain their documented signatures and shared Undo. Float
+previews invalidate their bounded native appearance when captured geometry or
+the native reference grid changes, including after perspective reset. Geometry
+references still grant no source pixels or host services. [Exact mask-plane
+values and current verification boundary](MASK_PLANES.md).
+
 ## Retained mask-plane increment (schema 56)
 
 `MaskPlane`, `LayerMask.plane`, mapped `MaskPaintPlacement` and mapped

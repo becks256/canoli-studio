@@ -186,8 +186,32 @@ globals. Independent libtiff checks verify actual linear-sRGB float samples,
 reduced alpha, unchanged visible HDR RGB, fractional alpha and every reopened
 output word. [Follow-up evidence](benchmarks/mask-plane-float-2026-10-31.md).
 
+### Owner changes and completed native appearance
+
+Ordinary masks now have specific source-replacement acceptance: shared smart
+contents change from a 192x144 red source to a 384x288 blue source while linked
+and independent retained masks preserve every alpha byte. A project deliberately
+saved without history retains the former source solely as mask-grid geometry,
+with exact original bytes and no remaining artwork reference to it.
+
+Image Size matches an independent root/document-frame control for ordinary masks
+and both filter phases, in both linkage states. Two nested smart conversions and
+a doubled embedded-master Image Size preserve tested pixels, cache parity,
+shared Undo and project reopening. These six nested cases use affine outer
+instances, active child perspective, zero feather and full density; wider nested
+projective/feather/resource behavior remains required.
+
+The float appearance cache includes complete retained-plane data and actual
+native grid dimensions. Previously a perspective reset could reuse the original
+rectangle and produce stale coverage. Pose/basis/reference/grid edits rebuild
+that appearance; unchanged repeats, unrelated metadata and eligible integer
+moves retain native reuse. The former production build reproduces stale viewport
+pixels after reset; the corrected production workflow matches PNG references
+through reset, basis edits, Undo/Redo and reopening.
+[Owner/cache findings, independent readers and compact evidence](benchmarks/mask-plane-owner-2026-10-31.md).
+
 This increment does not complete the broader roadmap. Remaining acceptance
-includes geometry-source swapping, wider copied/nested/recipe/workspace ownership,
+includes wider ordinary/filter/master source swapping and copied/nested/recipe/workspace ownership,
 wider owner/master/pose changes, all-kind mapped tool edits,
 broader float/horizon/cache/resource behavior and photographic/physical-device /
 sustained process-memory quality. General warp and native float wet tools remain

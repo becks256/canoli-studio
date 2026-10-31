@@ -1,5 +1,15 @@
 # Float document editing
 
+## Retained-mask preview invalidation
+
+The bounded native appearance cache now keys retained mask planes and actual
+geometry-grid dimensions, including when perspective has been reset. Changes to
+captured basis/pose/reference or a valid source lattice rebuild the appearance;
+unchanged eligible linked repeats, metadata changes and integer moves retain
+reuse. This corrects stale viewport coverage without changing original color,
+document commands, native export, schema or cache allocation limits. Broader
+precision/tool/performance acceptance remains required. [Mask-plane contract](MASK_PLANES.md).
+
 Schema 49 adds an explicit `float32` / `linear-srgb` working mode alongside the
 default sRGB8 document. Original unsigned 16-bit and float32 TIFF samples, raster
 transformations, Normal and normalized artistic composition, groups, masks, linear tone, continuous Curves/Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map/Color Lookup and editable linear Dodge/Burn adjustments use this

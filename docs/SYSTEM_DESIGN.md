@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Completed float appearance dependencies
+
+A retained selection's raw rectangular shape does not identify its completed
+appearance. Include its captured mask-plane reference, basis, pose, ordered
+steps and phase, plus actual native geometry-source width/height, in the bounded
+appearance key. A source ID alone does not identify a lattice across replacement.
+Keep geometry-only sources separate from sampled artwork. Integer linked moves
+and unrelated metadata may reuse completed pixels only after the normal current
+scene/source/proof/lifetime checks; source resolution and cache budgets stay
+independent. [Current mask-plane contract](MASK_PLANES.md).
+
 ## Retained mask-plane increment (schema 56)
 
 The current implementation retains native grid/source provenance and editable

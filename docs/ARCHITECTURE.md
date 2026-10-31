@@ -1,5 +1,15 @@
 # Architecture
 
+## Retained masks in the float appearance cache
+
+The bounded native appearance key includes complete retained-plane data and the
+native dimensions of an asset-backed geometry grid. Raw rectangle coordinates
+alone are insufficient after a captured perspective is reset. Grid pixels and
+thumbnails do not enter this geometry dependency. The existing eligible linked
+rectangle path still reuses completed float pixels for unchanged metadata and
+integer moves; normal scene capture validates current sources and lifetime
+before any hit. This changes private invalidation, not document data or grants.
+
 ## Float mask tool selection
 
 `ToolController.canChooseTool` distinguishes selecting a tool from starting a
