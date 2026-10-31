@@ -1,4 +1,7 @@
 import {retainedDocuments,captureRetainedHistory} from './core/history';
+import {maskPathMapping,type PointMapping} from './core/mask-path';
+import {hitTestProjectivePath} from './core/projective-bezier';
+import {ProjectiveTransform} from './core/projective';
 import {activePerspective} from './core/perspective';
 import {brushSymmetrySchema,symmetryMatrices,type BrushSymmetryData} from './core/brush-symmetry';
 import {brushTipSchema,transformPenTilt,interpolatePenTilt,samePenTilt,type BrushTipData,type PenTiltData} from './core/brush-tip';
@@ -155,6 +158,7 @@ interface ToolState {
   drawing: boolean;
 }
 interface BaseGesture {
+  stopChanges?:()=>void;
   document: Document;
   revision: number;
   generation: number;
@@ -253,7 +257,6 @@ interface FillGesture extends BaseGesture {
   fill: PaintFill;
 }
 interface MaskPaintGesture extends BaseGesture {
-  stopChanges?:()=>void;
   placement?:import('./core/masks').MaskPlacementData;
   inputTransform: AffineTransform;
   kind: "mask-paint";
@@ -266,7 +269,8 @@ interface MaskPaintGesture extends BaseGesture {
   mode: "hide" | "reveal";
 }
 interface MaskPenGesture extends BaseGesture {
-  inputTransform: AffineTransform;
+  inputTransform: PointMapping;
+  inputOffset?:Point;
   kind: "mask-pen";
   layer: Layer;
   mask: LayerMask;
@@ -280,8 +284,8 @@ interface MaskPenGesture extends BaseGesture {
   changed: boolean;
 }
 interface MaskContourDraft extends BaseGesture {
-  inputTransform: AffineTransform;
-  world: AffineTransform;
+  inputTransform: PointMapping;
+  world: ReturnType<typeof maskPathMapping>;
   pathIndex: number;
   layer: Layer;
   mask: LayerMask;
@@ -415,7 +419,7 @@ export class ToolController {
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
     if(tool==='dodge'||tool==='burn')return true;
     if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer;
-    if(tool==='pen')return this.state.settings.penEditTarget==='mask';
+    if(tool==='pen')return this.state.settings.penEditTarget==='mask'||this.editor.document.selectedLayer?.mask?.kind==='vector';
     return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');
   }
   toolUnavailableReason(tool:Tool):string|null {
@@ -424,7 +428,7 @@ export class ToolController {
   }
   private perspectiveToolBlocked(tool:Tool):boolean {
     const document=this.editor.document,selected=document.selectedLayer;
-    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&(['smudge','mixer'].includes(tool)||(tool==='pen'&&this.state.settings.penEditTarget==='mask'));
+    return !!selected&&activePerspective(findLayer(document._read(),selected.id)?.perspective)&&['smudge','mixer'].includes(tool);
   }
   /** Current gestures may begin before React flushes a selection preference reset. */
   get hasCurrentWetGesture(){const gesture=this.gesture;if(gesture?.kind!=='wet'||gesture.abort.signal.aborted||gesture.document!==this.editor.document)return false;return gesture.document.getSnapshot().revision===gesture.revision&&(gesture.document.selectedLayer?.id??null)===gesture.selectionId;}
@@ -596,7 +600,8 @@ export class ToolController {
     this.publish({ settings: { ...this.state.settings, ...patch } });
   }
   cancel() {
-    if(this.gesture?.kind==='mask-paint')this.gesture.stopChanges?.();
+    this.gesture?.stopChanges?.();
+    this.maskContour?.stopChanges?.();
     if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
     this.state.wetPreview?.dispose();
     this.quickAbort?.abort();this.quickAbort=null;
@@ -623,7 +628,8 @@ export class ToolController {
     });
   }
   reset() {
-    if(this.gesture?.kind==='mask-paint')this.gesture.stopChanges?.();
+    this.gesture?.stopChanges?.();
+    this.maskContour?.stopChanges?.();
     this.textPathPoint = null;
     if(this.gesture?.kind==='wet')this.releaseWet(this.gesture);
     this.state.wetPreview?.dispose();
@@ -662,6 +668,7 @@ export class ToolController {
     const draft = this.maskContour;
     if (draft) {
       this.assertMaskContour(draft);
+      draft.stopChanges?.();
       if (draft.points.length) {
         const path = new VectorPath({ points: draft.points, closed: true });
         draft.document.transaction("Add mask contour", () => {
@@ -772,26 +779,18 @@ export class ToolController {
   }
   nudgeMaskPoint(x: number, y: number) {
     if (this.maskContour) return;
-    const layer = this.editor.document.selectedLayer;
+    const doc=this.editor.document,layer=doc.selectedLayer,target=this.maskPoint;
     if (layer?.mask) {
-      const inverse = this.maskWorld(
-        this.editor.document,
-        layer,
-        layer.mask.toJSON(),
-      ).inverse();
-      const dx = inverse.a * x + inverse.c * y;
-      y = inverse.b * x + inverse.d * y;
-      x = dx;
+      const world=maskPathMapping(doc._read(),layer.id,layer.mask.toJSON());
+      if(world.projection&&target?.layerId===layer.id){
+        const anchor=layer.mask.paths[target.pathIndex]?.points[target.index];if(!anchor)return;
+        const placed=world.point(anchor),next=world.inverse().point({x:placed.x+x,y:placed.y+y});x=next.x-anchor.x;y=next.y-anchor.y;
+      }else{
+        const inverse=world.world.inverse(),dx=inverse.a*x+inverse.c*y;
+        y=inverse.b*x+inverse.d*y;x=dx;
+      }
     }
-    this.editMaskPoint((points, index) => {
-      const p = points[index];
-      p.x += x;
-      p.y += y;
-      p.in.x += x;
-      p.in.y += y;
-      p.out.x += x;
-      p.out.y += y;
-    });
+    this.editMaskPoint((points,index)=>{const p=points[index];p.x+=x;p.y+=y;p.in.x+=x;p.in.y+=y;p.out.x+=x;p.out.y+=y;});
   }
   private unlocked() {
     const doc = this.editor.document,
@@ -906,6 +905,7 @@ export class ToolController {
     cropHandle?: CropHandle,
   ) {
     if(!this.canUseTool(tool))throw new Error(this.toolUnavailableReason(tool)!);
+    if(tool==='pen'&&this.editor.document.precision==='float32'&&this.state.settings.penEditTarget!=='mask')throw new Error('Choose Mask paths to edit a vector mask in this float document.');
     if (tool === "lasso" && this.state.settings.lassoMode === "polygon") {
       this.beginPolygonLasso(point, modifiers, zoom);
       return;
@@ -1324,11 +1324,20 @@ export class ToolController {
       mask,
       pathIndex: data.paths.length,
       origin: maskOrigin(data, position.x, position.y),
-      world: this.maskWorld(doc, selected, data),
-      inputTransform: this.maskWorld(doc, selected, data).inverse(),
+      world: maskPathMapping(doc._read(),selected.id,data),
+      inputTransform: maskPathMapping(doc._read(),selected.id,data).inverse(),
       points: [],
     };
+    if(this.maskContour.world.projection)this.watchMaskPath(this.maskContour);
     this.publish({});
+  }
+  private watchMaskPath(owner:BaseGesture){
+    const doc=owner.document,selection=[...doc.getSnapshot().selectedIds];
+    owner.stopChanges=doc.subscribe(()=>{
+      if(this.gesture!==owner&&this.maskContour!==owner)return;
+      const state=doc.getSnapshot();
+      if(state.revision!==owner.revision||state.selectedIds.length!==selection.length||state.selectedIds.some((id,i)=>id!==selection[i]))this.cancel();
+    });
   }
   private assertMaskContour(draft: MaskContourDraft) {
     try {
@@ -1408,7 +1417,7 @@ export class ToolController {
       layer.id,
     )!;
     const origin = maskOrigin(data, layerPosition.x, layerPosition.y);
-    const world = this.maskWorld(base.document, layer, data);
+    const world = maskPathMapping(base.document._read(),layer.id,data);
     const inputTransform = world.inverse();
     const local = inputTransform.point(point);
     for (let pathIndex = data.paths.length - 1; pathIndex >= 0; pathIndex--) {
@@ -1419,11 +1428,9 @@ export class ToolController {
             p = mode === "anchor" ? anchor : anchor[mode];
           if (mode !== "anchor" && p.x === anchor.x && p.y === anchor.y)
             continue;
-          if (
-            Math.hypot(world.point(p).x - point.x, world.point(p).y - point.y) >
-            7 / zoom
-          )
-            continue;
+          let placed:Point;try{placed=world.point(p);}catch{continue;}
+          if(Math.hypot(placed.x-point.x,placed.y-point.y)>7/zoom)continue;
+          const inputOffset=world.projection?{x:placed.x-point.x,y:placed.y-point.y}:undefined;
           this.maskPoint = { layerId: layer.id, pathIndex, index };
           this.gesture = {
             ...base,
@@ -1435,20 +1442,23 @@ export class ToolController {
             index,
             mode,
             original: structuredClone(anchor),
-            start: local,
+            start: inputOffset?inputTransform.point({x:point.x+inputOffset.x,y:point.y+inputOffset.y}):local,
+            inputOffset,
             origin,
             inputTransform,
             changed: false,
           };
+          if(world.projection)this.watchMaskPath(this.gesture);
           this.publish({ drawing: true });
           return;
         }
     }
     this.maskPoint = null;
-    let hit: (CurveHit & { pathIndex: number }) | null = null;
+    const nearest:{hit:(CurveHit & {pathIndex:number})|null}={hit:null};
     const budget = { remaining: 65536 };
     for (let pathIndex = data.paths.length - 1; pathIndex >= 0; pathIndex--) {
-      const candidate = hitTestPath(
+      const candidate:CurveHit|null = world.projection?hitTestProjectivePath(data.paths[pathIndex].points,true,
+        ProjectiveTransform.fromAffine(AffineTransform.scale(zoom)).multiply(world.relativeTo(point)),nearest.hit?.distance??7,budget):hitTestPath(
         data.paths[pathIndex].points.map((p) => ({
           ...p,
           ...world.point(p),
@@ -1458,18 +1468,18 @@ export class ToolController {
         true,
         point,
         zoom,
-        hit?.distance ?? 7,
+        nearest.hit?.distance ?? 7,
         budget,
       );
-      if (candidate && (!hit || candidate.distance < hit.distance))
-        hit = { ...candidate, pathIndex };
+      if (candidate && (!nearest.hit || candidate.distance < nearest.hit.distance))
+        nearest.hit = { ...candidate, pathIndex };
     }
-    if (!hit) return;
+    if (!nearest.hit) return;
     if (data.paths.reduce((sum, path) => sum + path.points.length, 0) >= 20000)
       throw new Error("This mask has reached its 20,000-anchor limit.");
-    const path = data.paths[hit.pathIndex];
-    path.points = splitPathSegment(path.points, true, hit.index, hit.t);
-    const index = hit.index + 1,
+    const path = data.paths[nearest.hit.pathIndex];
+    path.points = splitPathSegment(path.points, true, nearest.hit.index, nearest.hit.t);
+    const index = nearest.hit.index + 1,
       original = path.points[index];
     this.gesture = {
       ...base,
@@ -1477,7 +1487,7 @@ export class ToolController {
       layer,
       mask,
       data,
-      pathIndex: hit.pathIndex,
+      pathIndex: nearest.hit.pathIndex,
       index,
       mode: "insert",
       original,
@@ -1486,6 +1496,7 @@ export class ToolController {
       inputTransform,
       changed: true,
     };
+    if(world.projection)this.watchMaskPath(this.gesture);
     this.publish({
       drawing: true,
       preview: {
@@ -1725,7 +1736,7 @@ export class ToolController {
     if (gesture.kind === "mask-contour") {
       if (gesture.close) return;
       const anchor = gesture.points.at(-1)!;
-      const local = gesture.draft.inputTransform.point(point);
+      let local:Point;try{local=gesture.draft.inputTransform.point(point);}catch(error){this.cancel();throw error;}
       anchor.out = local;
       anchor.in = { x: 2 * anchor.x - local.x, y: 2 * anchor.y - local.y };
       if (this.paintFrame === null)
@@ -1738,7 +1749,8 @@ export class ToolController {
     }
     if (gesture.kind === "mask-pen") {
       if (gesture.mode === "insert") return;
-      const local = gesture.inputTransform.point(point);
+      const offset=gesture.inputOffset;
+      let local:Point;try{local=gesture.inputTransform.point(offset?{x:point.x+offset.x,y:point.y+offset.y}:point);}catch(error){this.cancel();throw error;}
       const anchor =
         gesture.data.paths[gesture.pathIndex].points[gesture.index];
       if (gesture.mode === "anchor") {
@@ -2087,7 +2099,7 @@ export class ToolController {
     if (!gesture) return;
     if(gesture.kind==='wet'){await this.endWet(gesture);return;}
     this.gesture = null;
-    if(gesture.kind==='mask-paint')gesture.stopChanges?.();
+    gesture.stopChanges?.();
     // Keep the displayed frame, but stop source work for previews that can no
     // longer be updated. Durable capture owns its own sampling resources.
     if (gesture.kind === "paint") gesture.cloneSource?.dispose();

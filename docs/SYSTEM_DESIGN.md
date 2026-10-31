@@ -1009,3 +1009,8 @@ The existing Delete action now resolves document selection into the affine layer
 ## Continuous placed mask fields (schema 53)
 
 Placed ordinary/filter-mask brush coverage evaluates captured perspective and mask basis over original mask coordinates. Current mask and image transforms then place that retained field; clipping, symmetry, tip/tilt and texture remain part of the complete brush field. Preserve existing geometry sampling, operation order and post-composition feather/settings. Finite inverse support is conservatively bounded with interpolation padding; support crossing the inverse horizon streams unknown-support windows without an image-frame clip. Private forward sampling accepts a validated relative-origin affine input, while unknown-support inverse sampling supplies complete per-packet neighborhoods through the existing native ABI. Request-owned captures guard copied metadata, source lifetime and cancellation. Shared constructors/commands/history, separate REST sessions and inert plugin installation remain. Wet input, mask paths, dragging/relinking, warp and broad acceptance remain required.
+
+
+## Perspective mask path editing
+
+Direct perspective mask path input resolves mask basis → image homography → layer/ancestor affine placement. Native cubic values remain authoritative. Presentation and hit testing use homogeneous rational curves with viewport/work budgets, not polynomial control-point transformation. Projected gestures and drafts observe revision/ordered-selection authority synchronously; shared mask commands remain the only publication path.

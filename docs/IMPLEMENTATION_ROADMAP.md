@@ -9033,3 +9033,72 @@ acceptance remain required. This slice does not close F03 or the overall goal.
 The receipt includes reports, command logs, source/release identities, raw
 comparison fields and the independent oracle results. Selected browser checks
 do not replace the remaining full quality/performance/device gates.
+
+
+### 2026-10-30 — F03 perspective Bézier mask path editing
+
+Owner: implementation agent. Previous turn: progress, committed as `0836215`.
+Extends the original perspective editing workflow through native mask Pen
+anchors/handles, rational outlines and curve hit tests, canvas-pixel nudges,
+new contours, insertion, deletion, previews, cancellation and shared Undo.
+Native mask cubics/settings/refinements and image originals remain retained.
+The main production build passed. The complete unit/REST suite passed **3,137
+tests across 304 files**; all **14 selected production checks** passed with no
+skips/retries. All **110 affected source-browser checks** also passed, including legacy affine
+Pen/text baselines, projected and ordinary masks, float rendering, coverage and
+50 MP workflows. Accepted browser runs have zero failures, skips or retries.
+Runtime/test/documentation sources remained identical throughout all accepted
+checks, and all **145 served release resources** retain their recorded hashes.
+Wet input, mask dragging and
+preserving-position relinking, selection/path capture, general warp and all
+unfinished professional/AI/workflow/commercial, photographic/interchange,
+editor-wide sustained performance and physical-device gates remain required.
+This increment does not close F03 or the complete original roadmap.
+
+The accepted new browser cases establish:
+
+- Actual raster, smart-object and genuine float-TIFF Pen drags retain native
+  anchors under a rotated mask basis and sheared parent. Captured previews are
+  byte-identical to committed rendering and visibly change the pixels; each
+  gesture shares one Undo/redo. Native project reopening retains document data,
+  brush refinements and exact original bytes.
+- Independent dense native-cubic sampling measures maximum projected-outline
+  deviation **0.134834 CSS pixels**, within the **0.2-pixel** display bound.
+  At equal native parameters, the incorrect transformed-control polynomial
+  differs by **113.545530 pixels** on the same witness; that comparison is not
+  a Hausdorff curve distance. Curve insertion uses the original cubic parameter;
+  Undo restores the exact native path.
+- Contour drafts preserve mirrored native handles, Shift+Arrow moves the
+  selected anchor by **10 canvas pixels**, and selection-away/back or revision
+  changes retire real pointer/draft work synchronously. Unit checks additionally
+  cover independent Alt handles, unlinked coordinates, locks, inverse-horizon
+  cancellation and corner-relative arithmetic around **2^40**.
+- A real projected **20,000-anchor / 40,000-handle** mask retains all controls
+  without a display-budget error. Horizon-crossing outlines stay finite;
+  independent unit geometry retains both branches without bridging infinity.
+- A genuine **10000 × 5000 PNG** keeps exact dimensions and original SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`.
+  The edited native contour changes a distant original-pixel alpha **128 → 0**
+  with exact one-step Undo/redo. This checks a bounded native window, not the
+  full 50 MP output or a process-memory bound.
+- The built app has no development globals. Its real pointer workflow runs
+  the documented mask example through the isolated script transaction, retains
+  originals and exact Undo/redo, changes PNG pixels, and reopens with identical
+  document/PNG output. Float Pen admission selects the supported mask target;
+  unsupported float layer-path creation remains unavailable.
+
+The first browser pilot exposed empty OffscreenCanvas fixtures without a
+rendering context and the unreachable float Pen target. Fixtures now initialize
+their actual context and float tool admission now selects Mask paths. Corrected
+pilots pass without loosening geometry, pixel, history or timeout assertions.
+
+[Complete evidence](benchmarks/perspective-mask-pen-2026-10-30.json.gz),
+**907,524 bytes**, SHA-256
+`06ef512ec66edad6d50e63da3ef3c232aad439e07a2fac3bac3e67368376581b`.
+The receipt retains complete reports/logs, source/release identities, independent
+geometry results, actual native project/PNG witnesses and development-pilot
+diagnostics. Native pixel WASM is unchanged, SHA-256
+`bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+These selected checks do not establish full F03, photographic/interchange
+quality, sustained editor-wide latency, whole-process memory or physical-device
+acceptance; every unfinished original roadmap requirement remains active.

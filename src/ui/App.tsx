@@ -547,6 +547,7 @@ export function App({ editor }: { editor: EditorApplication }) {
   ),[viewDocument.width,viewDocument.height,viewportSize,zoom,pan]);
 
   function chooseTool(next: Tool) {
+    if(next==='pen'&&dom.precision==='float32'&&dom.selectedLayer?.mask?.kind==='vector')editor.tools.configure({penEditTarget:'mask'});
     if(!editor.tools.canUseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
     if(gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;}
     setPerspectiveTarget(null);setPerspectiveIssue(null);

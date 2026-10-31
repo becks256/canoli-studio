@@ -561,3 +561,8 @@ Schema-51 placed eraser records and `RasterLayer.erase(stroke,{space:"placed"})`
 ## Placed mask brushes use existing grants (schema 53)
 
 `Layer.paintMask` and immutable `LayerMask.paint` placement values emit existing shared mask updates. Isolated code captures geometry without reading source pixels or obtaining a new host call. Host commit still validates strict mask DTOs, schema, sources, locks, revisions and atomic Undo. Placement is limited to Hide/Reveal brush/pencil entries; prepared Wet entries reject it. Existing package/lifecycle/permission formats and inert installation remain unchanged. No pixel/file/network/export capability is added.
+
+
+## Perspective mask path editing
+
+Perspective mask path authoring uses existing native LayerMask/VectorPath values and shared layer updates. It adds no permission or host service: installation stays inert and third-party code remains inside the existing isolated scripting boundary.

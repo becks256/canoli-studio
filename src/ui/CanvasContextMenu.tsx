@@ -273,7 +273,7 @@ export function CanvasContextMenu({
                 value={settings.penEditTarget}
                 disabled={disabled}
                 options={[
-                  { value: "layer", label: "Layer paths" },
+                  { value: "layer", label: "Layer paths", disabled:floatEditing },
                   { value: "mask", label: "Mask paths" },
                 ]}
                 onChange={(value) =>

@@ -1378,7 +1378,7 @@ provides direct perspective corners: drag with a pointer or focus a corner and
 use Arrow/Shift+Arrow for 1/10 canvas pixels. A valid drag commits once; stale,
 cancelled or folded placements do not commit. This UI uses the same constructor
 and setter; it adds no scripting method.
-Placed raster erasing, selection clearing and ordinary/filter-mask Brush/Pencil/Eraser input now retain captured perspective coverage. Reset perspective before wet painting, mask path editing, linked-mask dragging/relinking or `maskFromSelection` / `maskFromPaths`; those paths still reject while active. Default local constructors remain available. See the placed-mask contract below. Smart rasterization bakes the
+Placed raster erasing, selection clearing and ordinary/filter-mask Brush/Pencil/Eraser input now retain captured perspective coverage. Reset perspective before wet painting, linked-mask dragging/relinking or `maskFromSelection` / `maskFromPaths`; those paths still reject while active. Default local constructors remain available. See the placed-mask contract below. Smart rasterization bakes the
 projected appearance and linked mask; SVG/Photoshop delivery bakes placement.
 See [PERSPECTIVE_ENGINE.md](PERSPECTIVE_ENGINE.md) for sampling and remaining
 F03 acceptance requirements.
@@ -2376,7 +2376,7 @@ With `space:"placed"`, a linked mask on an active RasterLayer/SmartObjectLayer p
 
 Later image corner edits/reset and mask offset/basis changes retain the captured field. Existing mask geometry keeps its own resolution and coordinate plane; no raster conversion or clipping to the image frame is introduced. A stroke near the inverse horizon can have unbounded pullback support. Its field streams bounded native windows instead of storing a guessed finite extent or imposing an image limit. Mask-wide feather, inversion and density remain after ordered stroke composition, with the existing byte mask role. Float image RGB remains original-derived; masks affect alpha through the existing float pipeline.
 
-The UI captures the document selection and pen/symmetry input through the affine inverse in this placed plane. Cursors use that same plane. Preview and commit carry the same metadata; a completed gesture creates one Undo. Actual revision or ordered layer-selection changes, Escape, tool changes and owner changes cancel rather than retarget the gesture; an equivalent selection remains valid. Mask Pen paths, projected wet input, dragging/relinking and complete F03 quality/performance/device acceptance remain required.
+The UI captures the document selection and pen/symmetry input through the affine inverse in this placed plane. Cursors use that same plane. Preview and commit carry the same metadata; a completed gesture creates one Undo. Actual revision or ordered layer-selection changes, Escape, tool changes and owner changes cancel rather than retarget the gesture; an equivalent selection remains valid. Projected wet input, dragging/relinking and complete F03 quality/performance/device acceptance remain required.
 
 <!-- example: placed-mask -->
 ```js
@@ -4271,3 +4271,43 @@ The authenticated local Node API separately inspects/adopts original high-precis
 ## Perspective authoring remains pending
 
 The private homogeneous geometry and native perspective sampler are not isolated globals or public layer setters. Existing AffineTransform/Layer.transform contracts, constructors, permissions and Undo remain unchanged. Do not use internal worker methods as a public scripting mutation API. [Dependency and remaining integration](PERSPECTIVE_ENGINE.md).
+
+
+### Perspective mask path editing
+
+The existing `LayerMask({paths})`, `mask.with({paths})` and `layer.mask` assignment
+signatures remain unchanged. Paths and their cubic handles use native mask
+coordinates, including on perspective raster/smart-object instances. Pen → Mask
+paths projects that geometry for direct editing: drag anchors/handles, hold
+Alt/Option for independent handles, click curves or Insert midpoint to subdivide,
+and use Arrow/Shift+Arrow for 1/10 canvas pixels. New contour/Enter and existing
+Delete operations retain mask settings and paint refinements. Each completion
+uses the shared mask update and one Undo. Unlinked masks remain in their existing
+document plane. Preview never mutates attached data; projected gestures/drafts
+cancel on actual revision or ordered-selection changes, Escape or owner/tool
+changes. Inverse-horizon pointer input cancels rather than committing a partial
+edit. Rational outlines are clipped for display at 0.2 CSS-pixel error, with
+explicit bounded-work/precision errors; native data and file rendering are not
+approximated by the overlay. General warp, mask dragging/relinking, wet input and
+full F03 quality/performance/device acceptance remain required.
+
+<!-- example: perspective-mask-path -->
+```js
+const layer = document.selectedLayer;
+if (!(layer instanceof RasterLayer || layer instanceof SmartObjectLayer)) {
+  throw new Error("Select an image layer.");
+}
+layer.mask = new LayerMask({paths: [new VectorPath({
+  closed: true,
+  points: [
+    {x: 8, y: 8, out: {x: 24, y: 0}},
+    {x: 56, y: 8, in: {x: 40, y: 16}},
+    {x: 56, y: 40},
+    {x: 8, y: 40},
+  ],
+})]});
+```
+
+The example explicitly replaces the selected image's mask. Image perspective and
+original assets remain unchanged. It runs through the existing isolated script
+transaction; it exposes no canvas, pixel, file or worker access.

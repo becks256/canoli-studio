@@ -35,8 +35,8 @@ plane. Completed coverage is subsequently sampled onto the viewport. Bounds,
 hit testing and selection outlines use projected geometry. Active perspective
 uses the standard Canvas/float path instead of the affine WebGPU compositor.
 
-Interactive erasing/wet painting on the projected image, interactive mask
-painting/path editing, linked-mask dragging, preserving-position mask relinking,
+Interactive wet painting on the projected image, linked-mask dragging,
+preserving-position mask relinking,
 and capturing document selections/paths as linked masks currently require
 resetting perspective. Those operations reject with an explicit message instead
 of writing an affine approximation. Local-coordinate constructor/API operations
@@ -264,3 +264,36 @@ Ordinary and smart-filter mask Brush/Pencil/Eraser gestures now author complete 
 Private forward scalar sampling precomposes a strict affine mapping after subtracting an explicit input origin. Raw brush fields remain on their fixed captured ceil-sized image-pixel lattice. Existing mask geometry is not resampled onto a new mask grid. Conservative inverse bounds include raster/interpolation support; if a support rectangle crosses the inverse horizon, the mask capture marks `unbounded:true` and streams original-mask windows. Its `bounds` then describes only finite diagnostic/base support, not a clip. Unknown-support sources use inverse sampling and per-packet finite neighborhoods with fixed matrix origins, preserving partition identity without allocating an infinite grid. Exact horizon samples keep the existing background convention; image artwork itself retains its finite, validated support.
 
 Captures pin byte mask/texture sources, own copied metadata and release request/scene resources on cancellation/disposal. Mask-wide feather/inversion/density follow complete ordered composition. Preview and commit share placement; actual revision/ordered-selection changes retire mask gestures synchronously, with equivalent selection allowed. Schema 53 gates placement on Hide/Reveal brush/pencil entries in all mask/history/embedded contexts. Public constructors, existing commands/Undo, project/workspace formats and plugin grants remain. No pixel WASM ABI or REST route is added. Projected Wet input, mask Pen/dragging/relinking, general warp and full photographic/performance/device acceptance remain required.
+
+
+## Perspective Bézier mask paths
+
+Pen → Mask paths now edits linked vector masks through the complete mask basis,
+image perspective and layer/ancestor affine placement. Native anchors and cubic
+handles stay in mask coordinates. Dragging preserves the canvas grab offset;
+anchor moves translate native handles, handle moves mirror their native opposite
+unless Alt/Option is held. Arrow/Shift+Arrow moves the selected anchor by 1/10
+canvas pixels using a positional inverse, rather than an affine vector. Unlinked
+masks retain document-plane behavior. In float documents, choosing Pen on a
+vector-masked layer selects Mask paths; unsupported layer-path creation stays
+unavailable. Existing contour drafting, closure,
+midpoint/curve insertion, deletion, mask refinements and one-command Undo remain.
+
+The projected outline is a rational cubic. Private homogeneous De Casteljau
+subdivision bounds its display error to 0.2 CSS pixels and clips to the padded
+visible viewport. It never rewrites native path values or substitutes transformed
+polynomial controls. The same rational geometry supplies the seven-CSS-pixel
+curve hit test and its original native parameter for exact subdivision. Both
+sides of an off-image horizon remain separate; finite controls stay editable and
+controls exactly at infinity have no finite canvas target. Explicit display/hit
+work budgets and unresolved numeric precision report an error instead of silently
+changing geometry. Pointer inverse-horizon failures cancel the active drag.
+
+Projected anchor gestures and multi-click contour drafts observe actual revision
+and ordered-selection changes synchronously, including away/back changes;
+equivalent selection values remain valid. Escape, tool/owner changes and existing
+pointer cancellation discard previews. The same existing mask updates preserve
+locks, native project/workspace/history, originals, isolation and REST contracts.
+No schema, public constructor signature, worker ABI or plugin grant is added.
+Wet input, mask dragging/relinking, document-selection/path capture, general warp
+and full photographic/performance/device acceptance remain required.

@@ -1,3 +1,5 @@
+import {maskPathMapping} from '../core/mask-path';
+import {ProjectivePenControls} from './ProjectivePenControls';
 import {symmetryMatrices} from '../core/brush-symmetry';
 import {activePerspective,perspectiveLocalQuad} from '../core/perspective';
 import {BrushSymmetryGuides} from './BrushSymmetryDialog';
@@ -39,7 +41,9 @@ export function CanvasOverlays({
   const editingMask = state.settings.penEditTarget === "mask";
   const editingTextPath = !editingMask && selected?.kind === 'text' && !!selected.textPath;
   const mask = selected?.mask;
-  const pathTransform =
+  const maskMapping=editingMask&&mask&&selected?maskPathMapping(document,selected.id,mask):null;
+  const nonlinear=!!maskMapping?.projection;
+  const pathTransform = nonlinear?world:
     editingMask && mask && world ? maskTransform(mask, world) : world;
   // SVG implementations may round local coordinates and translations
   // separately to float precision. Keep the former absolute-coordinate path
@@ -58,6 +62,8 @@ export function CanvasOverlays({
       : [];
   const penWindow=tool==="pen"&&pathTransform&&localPaths.length>0?viewportWindow:null;
   const clipOffsetX=sharePenTranslation?pathTransform?.e??0:0,clipOffsetY=sharePenTranslation?pathTransform?.f??0:0;
+  const penProjection=nonlinear&&maskMapping?maskMapping.relativeTo({x:clipOffsetX,y:clipOffsetY}):null;
+  const projectedClip=penWindow?{x:penWindow.x-clipOffsetX,y:penWindow.y-clipOffsetY,width:penWindow.width,height:penWindow.height}:{x:-clipOffsetX-32/zoom,y:-clipOffsetY-32/zoom,width:document.width+64/zoom,height:document.height+64/zoom};
   const selectedAnchor = controller.selectedMaskAnchor;
   const selectedTextAnchor = controller.selectedTextPathAnchor;
   return (
@@ -212,7 +218,8 @@ export function CanvasOverlays({
       )}
       {tool === "pen" && pathTransform && localPaths.length > 0 && (
         <g data-testid="pen-controls" data-viewport-x={penWindow?.x} data-viewport-y={penWindow?.y} data-viewport-width={penWindow?.width} data-viewport-height={penWindow?.height} transform={`translate(${sharePenTranslation ? pathTransform.e : 0} ${sharePenTranslation ? pathTransform.f : 0})`}>
-          {localPaths.map((path, pathIndex) => (
+          {localPaths.map((path, pathIndex) => penProjection?<ProjectivePenControls key={path.id} points={path.points} matrix={penProjection} clip={projectedClip} zoom={zoom} contour={pathIndex===controller.maskContourIndex}
+            active={selectedAnchor?.layerId===selected?.id&&selectedAnchor?.pathIndex===pathIndex?selectedAnchor.index:-1} onError={onError}/>: (
             <PenPathControls key={path.id} points={path.points}
               clipLeft={penWindow?penWindow.x-clipOffsetX:undefined} clipTop={penWindow?penWindow.y-clipOffsetY:undefined}
               clipRight={penWindow?penWindow.x+penWindow.width-clipOffsetX:undefined} clipBottom={penWindow?penWindow.y+penWindow.height-clipOffsetY:undefined}

@@ -452,7 +452,7 @@ export function ToolOptions({
           value={settings.penEditTarget}
           disabled={disabled}
           options={[
-            { value: "layer", label: hasTextPath ? 'Text baseline' : "Layer paths" },
+            { value: "layer", label: hasTextPath ? 'Text baseline' : "Layer paths", disabled:floatEditing },
             { value: "mask", label: "Mask paths" },
           ]}
           onChange={(value) =>

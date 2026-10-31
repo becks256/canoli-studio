@@ -1004,3 +1004,8 @@ The existing raster erasure DTO also admits placed clear fills (`stroke.kind:"fi
 ## Placed mask refinements (schema 53)
 
 Existing `layer.update` mask/filterMask DTOs now accept optional strict `placement:{width,height,perspective:{corners},basis:{a,b,c,d,e,f}}` on Hide/Reveal brush/pencil entries. It captures image dimensions, normalized perspective and the mask-local-to-image basis, including smart-master scale for filter masks. Stroke coordinates follow the affine image plane after perspective. Invalid constructors/geometry, singular bases, unsupported Wet placement, false old labels, locks and asset/revision conflicts reject atomically. The OO surface is `layer.paintMask(stroke,mode?,{space?,filterMask?})`; local/ordinary defaults remain. Existing history/project/workspace transport and independent headless sessions preserve the DTO; no composed REST renderer, browser synchronization or new route is added. [Public contract and example](SCRIPTING_API.md#placed-ordinary-and-filter-mask-brushes-schema-53).
+
+
+## Perspective mask path editing
+
+Perspective Pen editing commits existing strict native vector-mask DTOs through layer.update. Independent REST retains shared validation/locks/revisions/Undo but supplies no browser pointer service, composed renderer or synchronization. Public constructors and isolated scripting signatures remain unchanged.

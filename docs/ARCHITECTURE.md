@@ -2251,3 +2251,8 @@ mask tool mapping remains required. No pixel/worker or additional plugin authori
 Filter-region uniform-coverage detection and culling use the captured pullback support for placed strokes. Unbounded or unproven support stays in the region; authored point bounds cannot safely decide its native influence.
 
 Large/feathered placed-mask surfaces retain existing canvas budgets while scalar reads split into at most 512-square output windows with one shared input frame. This preserves crop parity without treating the scalar working limit as a mask/image size limit.
+
+
+## Perspective mask path editing
+
+`core/mask-path.ts` keeps world translation outside native-mask projective arithmetic and supplies positional inverses. `core/projective-bezier.ts` uses homogeneous rational subdivision, viewport half-space hull culling and exact native parameter hit candidates. `ui/ProjectivePenControls.tsx` presents bounded rational outlines/handles; legacy affine Pen presentation stays on its existing path. ToolController captures mapping/grab offsets and projected path/draft authority, then commits ordinary native mask updates. No renderer/schema/worker or grant boundary changes.
