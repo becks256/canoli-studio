@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Wet footprint resource fidelity
+
+Reusing private footprint storage must preserve every native coverage byte,
+including soft/pencil edges, reflected and distant cell boundaries, texture alpha,
+pressure/tilt/symmetry, selection and mask output. Clear prior pixels and state,
+retain the existing native raster grid and independent original sources, and
+never release an in-use surface beneath pending texture work. Finish/failure /
+cancellation/disposal must release idle and retired borrowed surfaces; completed
+coverage arrays remain independently readable. Measure actual production feedback
+without treating this allocation reduction as full F06/F14 acceptance.
+
 ## Native wet feedback fidelity
 
 Reduce live preparation/viewport overhead while preserving every accepted

@@ -2267,7 +2267,11 @@ captured support and admit ready tool prefixes directly to the viewport queue.
 This preserves the existing local/placed coordinates, prepared pixels, source
 ownership, cancellation and one-Undo contracts. It changes no public signature,
 model/container version, isolated capability or source-resolution limit. Private
-working storage geometry is not a portable document format. Timing evidence
+working storage geometry is not a portable document format. Default native
+coverage may reuse one idle session-owned footprint surface while preserving the
+same raster grid/AA/texture pixels and independently owned arrays; cancellation
+retires borrowed surfaces after pending texture work. Custom coverage callbacks
+keep their existing behavior. Timing evidence
 and remaining sustained/device performance gates are tracked in the roadmap.
 
 ## Maintaining this contract

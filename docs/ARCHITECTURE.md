@@ -1,5 +1,16 @@
 # Architecture
 
+## Private wet footprint surfaces
+
+Native wet sessions own a lazily allocated 260×260 coverage surface, reused on
+the same fixed native cell/gutter grid. Borrow resets transform/compositing state
+and clears all pixels; drawing and texture sampling remain unchanged. Keep at
+most one idle surface per session. Concurrent borrows cannot share live pixels;
+disposal closes idle storage and rejects late output while borrowed textures
+retire through finally. Custom coverage callbacks keep their existing behavior.
+The session cleanup owns the pool; prepared array snapshots do not reference it.
+No public model, command/history, source geometry or extension boundary changes.
+
 ## Wet feedback and compact native pigment
 
 Live wet sessions retain each carried float cell's complete intersection with

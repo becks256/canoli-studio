@@ -9431,3 +9431,63 @@ device/process-memory F14, native float wet tools, projective relinking, broader
 photographic quality and every other unfinished original professional/AI/workflow/
 ChatGPT/live identity/commercial/specialist/motion gate remain required. The
 complete implementation goal remains active.
+
+
+### 2026-10-31 — F06/F14 private wet footprint surfaces verified
+
+Owner: implementation engineer; estimate M across coverage parity, resource
+lifetime and actual production feedback. Starting from `68a6c0f`, default native
+wet sessions reuse at most one idle 260×260 footprint canvas on the original
+256-pixel cell/two-pixel-gutter grid. Reset the touched drawing state and clear
+all pixels before reuse; shape/gradient/AA, texture sampling, destination/source
+geometry, numerical replay, input counts and prepared output remain unchanged.
+Custom coverage callbacks retain their existing path. Concurrent borrowed
+surfaces remain independent; disposal closes idle storage, rejects late output
+and lets held texture reads retire before releasing their borrowed surface.
+The existing session cleanup owns finish/failure/abort/disposal release, while
+complete coverage arrays and earlier snapshots remain independently readable.
+
+All 90 complete fresh/reused native coverage comparisons pass, including soft /
+hard / pencil footprints, reflection/shear/nonuniform bases, negative boundaries
+and distant origins. The fresh reference allocates 306 native cells; reuse
+allocates one surface for the same draws and releases it on disposal. Eight
+actual-WASM textured pressure/tilt/symmetry/selection outputs remain exact across
+two tile sizes, two cache budgets and reflected frames, with unchanged source
+bytes. Held concurrent texture reads reject late output and release every
+surface. Actual sessions release their single footprint on finish, abort,
+injected processor failure and disposal; earlier native snapshots stay exact.
+
+The complete build and all 3,181 unit/API/native tests across 309 files pass.
+The unchanged affected native/browser matrix plus three coverage cases passes
+all 119 cases in one run. Four final coverage cases add one session-lifecycle
+check: 120 distinct native browser cases across the accepted runs, including
+real 50 MP source preservation, masks, cache/quota/storage, source/cancellation,
+selection authority and renderer admission. No accepted run retries, skips or
+flakes. All 145 rebuilt release files retain their earlier tested identities
+except the generated scripting guide; every application/runtime byte is exact.
+Initial new-fixture missing constructor points/texture fields and their corrected
+typed runs remain in the evidence; no tolerance, sample or timeout was relaxed.
+
+The first unprofiled normal-production pair passes all six affine/projected
+raster/ordinary-mask/filter-mask workflows, preserving 72 complete foreground
+hashes, six final PNGs, original sources, twelve accepted inputs and exact one
+Undo/Redo. Median event-to-matching-artwork feedback changes from
+84.4→70.4 / 94.6→70.7 / 139.2→72.3 ms for affine targets and
+157.3→94.3 / 158.8→119.0 / 166.1→119.2 ms for projected targets. All p95s decrease
+in that pair but remain above 33 ms. The final counterbalanced pair, complete
+raw timings, exact outputs, resource witnesses and all checks are retained in
+[readable findings and compact evidence](benchmarks/wet-surfaces-2026-10-31.md).
+The reverse-order pair improves five medians, while projected filter-mask median
+is essentially flat at 119.8→120.3 ms. Affine/projected filter-mask p95s worsen
+slightly to 105.4/202.0 ms. Both complete pairs remain recorded; no universal
+latency claim follows. Small headless/readback measurements and allocation counts
+do not establish physical/sustained/editor-wide performance or total process-memory
+acceptance.
+
+The original ≤33 ms live-input p95 / <50 ms routine-task targets, full sustained
+all-tool/device/process-memory F14, native float wet tools, projective relinking,
+photographic/interchange quality and every other unfinished professional/AI /
+workflow/ChatGPT/live identity/commercial/specialist/motion requirement remain
+required. The complete implementation goal stays active. This increment changes
+no public constructor/command, schema/container, source-resolution limit,
+isolated/plugin grant, REST/browser separation, paid operation or account.

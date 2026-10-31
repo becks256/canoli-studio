@@ -1,5 +1,15 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Wet footprint lease invariant
+
+A session may retain one idle native footprint surface. Each active operation
+owns its borrowed surface until finally; a second active borrow gets a different
+surface. Clear complete native pixels and reset the touched drawing state before
+reuse. Closing the pool cannot mutate held work, permit late output or invalidate
+completed owned arrays. The session's existing cancellation/source/storage checks
+and shared publication/Undo remain authoritative. Native grid/AA/texture/output
+and full source resolution are independent of this private allocation policy.
+
 ## Wet carried-cell and viewport handoff invariants
 
 Store the complete native cell/dab intersection for carried pigment; keep its

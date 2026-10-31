@@ -5,7 +5,7 @@ import { paintStampAlpha, paintStampGeometry, paintStampSize, strokeStamps } fro
 import { wetPaintLoadSchema, wetPaintMixSchema } from '../core/wet-paint';
 import { BrushTextureSampler } from './brush-texture';
 import { yieldTask } from './task-yield';
-import { wetDabCoverage } from './wet-coverage';
+import { createWetDabCoverage, wetDabCoverage } from './wet-coverage';
 import { validateWetCarried, validateWetCoverage, validateWetPixels } from './wet-paint';
 import { sampleWetField, wetRegion, wetTileKey, wetFieldStorageKey, type WetField, type WetFieldTile } from './wet-spatial';
 import { createWetTileStore, type WetTileStore, type WetTileChange } from './wet-store';
@@ -56,6 +56,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
   private readonly projected = new Map<string, { raw: string; pixels?: string }>();
   private readonly issued = new WeakSet<WetTileStore>();
   private textures?: BrushTextureSampler;
+  private coverage?: ReturnType<typeof createWetDabCoverage>;
   private serial: Promise<unknown> = Promise.resolve();
   private cleanupPromise?: Promise<void>;
   private disposal?: Promise<void>;
@@ -76,6 +77,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
     this.config = config; this.strokeData = config.stroke; this.reservedPoints = config.stroke.points.length;
     this.cache = createWetWorkingCache(store, config.cacheBudget,this.check); this.issued.add(store);
     this.textures = config.stroke.texture ? new BrushTextureSampler(config.processor) : undefined;
+    if (config.coverage === wetDabCoverage) this.coverage = createWetDabCoverage();
     config.signal?.addEventListener('abort', this.abort, { once: true });
   }
   get stroke(): BrushStrokeData { return structuredClone(this.strokeData); }
@@ -149,7 +151,7 @@ class RetainedWetStrokeSession implements WetStrokeSession {
         for(let row=0;row<working.height;row++){const start=((offsetY+row)*tileSize+offsetX)*4;workingPixels.set(pixels.subarray(start,start+rowLength),row*rowLength);}
         const pigment = previous ? await sampleWetField(previous, frame, working, tileSize, carried, check) : await processor.loadWetPaint(workingPixels, load);
         check(); validateWetCarried(pigment, workingPixels.length);
-        const mask = await coverage(stroke, frame, working, check, assets, textures); check(); validateWetCoverage(mask, workingPixels.length);
+        const mask = await (this.coverage?.sample ?? coverage)(stroke, frame, working, check, assets, textures); check(); validateWetCoverage(mask, workingPixels.length);
         const output = await processor.mixWetPaint(workingPixels, pigment, mask, { ...mix, flow }); check();
         validateWetPixels(output.pixels); validateWetCarried(output.carried, workingPixels.length);
         if (output.pixels.length !== workingPixels.length) throw new Error('Wet-paint processor returned a wrong destination extent.');
@@ -277,7 +279,8 @@ class RetainedWetStrokeSession implements WetStrokeSession {
   }
   private releaseProcessing() {
     this.config?.signal?.removeEventListener('abort', this.abort);
-    try { this.textures?.dispose(); } finally {
+    try { this.coverage?.dispose(); this.textures?.dispose(); } finally {
+      this.coverage = undefined;
       this.textures = undefined; this.cache.discard(); this.current.clear(); this.originals.clear(); this.fields.clear(); this.projected.clear(); this.config = undefined;
       const release = this.releaseSources; this.releaseSources = undefined; release?.();
     }
