@@ -1,5 +1,15 @@
 # Canoli Studio editor requirements
 
+## Native Node worker compatibility
+
+Native services must load their TypeScript runtime from an ordinary JavaScript
+parent without inherited loader flags. Keep registration local to each trusted
+worker; reject registration in the API parent. Verify native RAW/TIFF outputs,
+original bytes, source-window validation/repair, cancellation/retry and the
+existing independent REST/command/history contracts across supported Node
+versions. This does not change browser/script/plugin authority or document data.
+
+
 ## Smart-master independent mask planes
 
 Converting groups/selections must preserve unlinked ordinary/filter masks and

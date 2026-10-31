@@ -1,5 +1,16 @@
 # REST and scripting APIs
 
+## Native worker runtime
+
+The source API host uses the existing tsx dependency to load its TypeScript
+entrypoint. Private native workers bootstrap their own loader; they do not depend
+on inheriting a parent's `--import`/loader flags. This covers RAW/TIFF sources,
+PNG validation, fonts, preflight and native selection/matting/vector jobs. Each
+worker retains its current strict request/result contract, cancellation and
+source validation. No new endpoint, permission, composed renderer or browser
+synchronization is added. See [worker startup](ARCHITECTURE.md#native-node-worker-startup).
+
+
 ## Private coverage transport keeps API boundaries
 
 The native scalar engine now supports both sampling directions for original and

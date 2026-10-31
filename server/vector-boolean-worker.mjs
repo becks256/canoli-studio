@@ -1,6 +1,6 @@
 import { parentPort, workerData } from 'node:worker_threads';
-import { tsImport } from 'tsx/esm/api';
+import './typescript-worker.mjs';
 try {
- const {calculateVectorBoolean}=await tsImport('../src/engine/vector-boolean-kernel.ts',import.meta.url);
+ const {calculateVectorBoolean}=await import('../src/engine/vector-boolean-kernel.ts');
  parentPort.postMessage({result:calculateVectorBoolean(workerData,progress=>parentPort.postMessage({progress}))});
 }catch(error){parentPort.postMessage({error:error instanceof Error?error.message:String(error)});}

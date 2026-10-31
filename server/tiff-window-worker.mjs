@@ -1,10 +1,10 @@
 import {parentPort} from 'node:worker_threads';
-import {tsImport} from 'tsx/esm/api';
-const {FloatTileWindowReader}=await tsImport('../src/core/float-source/window-reader.ts',import.meta.url);
-const {decodeTile}=await tsImport('../src/core/float-source/codec.ts',import.meta.url);
-const {validateManifest,validateTileMeta,floatSourceDescriptorSchema,FLOAT_TILE_BATCH_SIZE}=await tsImport('../src/core/float-source/types.ts',import.meta.url);
-const {freeze}=await tsImport('../src/core/immutable.ts',import.meta.url);
-const {readTiffFileWindow}=await tsImport('./tiff-files.ts',import.meta.url);
+import './typescript-worker.mjs';
+const {FloatTileWindowReader}=await import('../src/core/float-source/window-reader.ts');
+const {decodeTile}=await import('../src/core/float-source/codec.ts');
+const {validateManifest,validateTileMeta,floatSourceDescriptorSchema,FLOAT_TILE_BATCH_SIZE}=await import('../src/core/float-source/types.ts');
+const {freeze}=await import('../src/core/immutable.ts');
+const {readTiffFileWindow}=await import('./tiff-files.ts');
 const reader=new FloatTileWindowReader(),sources=new Map(),cancelled=new Set(),known=new Set();let serial=Promise.resolve();
 parentPort.on('message',data=>{
   const id=data?.id;if(data?.kind==='cancel'){if(known.has(id))cancelled.add(id);return;}

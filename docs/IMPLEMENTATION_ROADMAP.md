@@ -9247,3 +9247,69 @@ The archive retains full reports/commands/logs, 36 raw RGBA arrays, native
 project/PNG witnesses, source/release identities and diagnostics. Native pixel
 WASM/ABI remains unchanged. This accepts the independent smart-master mask
 plane correction; all unfinished F03 and original roadmap gates remain active.
+
+
+### 2026-10-31 — F12/T17 native Node worker loading repair
+
+Owner: implementation engineer; estimate S within native source/API acceptance.
+The preceding goal turn makes progress by committing independent smart-master
+mask planes as `12960ed`. Its verification records Node 26 RAW/TIFF failures.
+A fresh unchanged-parent reproduction confirms the same original RAW inspects
+as 64 × 48 on Node 24.0.1 but fails on Node 26.13.0 because scoped `tsImport`
+turns `node:fs` into a file path with a namespace query.
+
+All twelve trusted native Node entrypoints now register the existing ESM loader
+inside their worker and dynamically import fixed runtime modules. A shared guard
+rejects parent-thread registration. Each worker owns one module graph/cache.
+No parent flags, dependency upgrade, Node-version branch, native pixel change,
+public signature/schema, plugin grant or source-resolution limit is introduced.
+Originals, strict IPC, queue admission, termination/cancellation, isolated
+third-party execution and independent REST sessions retain their existing
+contracts. Standalone plain-JavaScript native execution and parent-thread
+rejection have direct regression tests. Full cross-version/native/browser
+verification follows; all unfinished original roadmap requirements stay active.
+
+
+Final acceptance: full default Node **26.13.0** build/typecheck passes with 43
+developer guides. The complete serial `npm test -- --maxWorkers=1` passes
+**3,153 tests across 307 files**. All **164 affected native/API checks across
+15 files** pass under Node **24.0.1**. Both standalone native-worker/parent-guard
+checks also pass under Node **22.22.1** and Node 24; this is not a claim of full
+Node 22 application acceptance. All three normal-production Node 26 REST TIFF
+browser workflows pass without skips/retries/flakes/failures.
+
+Independent output readers verify all **41,396 float32 words for each of eight
+orientations** exactly, retaining complete profiles and original bytes with
+independent browser/API Undo. The genuine **10000 × 5000** original retains all
+2,150,238 bytes and SHA-256
+`51db60ac1377c69a75fc49328cbcca09a62e663dd277e08c967f85a3c792ac1c`.
+All **200,000,000 source float samples** match the independent native reference.
+After the shared exposure edit, actual project reopening and browser TIFF
+export match **200,000,000 output float32 words exactly**, with zero maximum
+error, exact complete output profile and 68,645,155 extended samples. The
+79,312,008-byte output hash and full reader result are retained; original-bearing
+projects are embedded in the evidence archive. The guide remains linked and
+readable at 390 px without JavaScript.
+
+All 145 final release resource identities are retained. Every non-developer
+browser resource is byte-identical to `12960ed`; only five developer pages change.
+Native source/WASM, browser runtime, schema, public signatures and grants stay
+unchanged. One architecture sentence was clarified after the complete Node 26
+suite to distinguish worker bootstrap from the host's existing TypeScript setup;
+its exact documentation-only difference is recorded, and the final build,
+Node 24 native checks and production-browser checks use that wording. No test
+threshold or timeout is relaxed and no failed acceptance run is hidden.
+
+[Verification record](benchmarks/node-workers-2026-10-31.md) and
+[sealed evidence](benchmarks/node-workers-2026-10-31.json.gz), **4,931,097 bytes**,
+SHA-256 `3b0393f386176b6c9d8c0061189edfb4668cfa4811eabfeee74a9fb2ba8eb224`.
+The archive retains the original cross-version failure, all full logs/reports/
+commands, tested source/release identities, exact source reconstruction and
+38 native/project/reader artifacts. The large delivered TIFF remains in the
+recorded task artifact path with actual size/hash and the complete independent
+sample comparison instead of being duplicated inside the archive.
+
+This closes the observed native Node 26 module-loading defect. It does not close
+projective relinking/wet tools, broad color/device/interchange conformance,
+sustained all-tool latency/process-memory, other operating systems or any other
+unfinished original roadmap gate. The full implementation goal remains active.

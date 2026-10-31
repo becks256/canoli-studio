@@ -1,5 +1,24 @@
 # Architecture
 
+## Native Node worker startup
+
+Trusted REST native workers share `server/typescript-worker.mjs`. It rejects
+main-thread registration and registers the existing tsx ESM loader within the
+worker before dynamic TypeScript imports. Each worker owns its module graph and
+cache; parent startup flags are unnecessary. This avoids scoped `tsImport`
+namespace queries on Node builtins, which fail as file reads on Node 26.
+[tsx registration contract](https://tsx.hirok.io/dev-api/register-esm).
+
+All twelve native entrypoints use this boundary: RAW, TIFF preparation/window
+reading, PNG validation, font preparation, preflight, vector Boolean operations,
+selection modification, Color Range, Quick Selection, Select Subject and matting.
+Existing worker requests/results, native code, queues, termination/cancellation,
+source ownership and shared OO commands/history remain unchanged. This is trusted
+host module loading; third-party scripts/plugins keep their separate isolated
+execution boundary and grants. This bootstrap adds no loader to the API parent;
+the host keeps its existing TypeScript entrypoint setup.
+
+
 ## Independent masks inside smart masters
 
 Smart conversion rebases unlinked ordinary/filter masks into the containing

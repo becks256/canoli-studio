@@ -1,5 +1,16 @@
 # Verified high-precision TIFF sources in the local REST API
 
+## Native worker startup
+
+TIFF inspection/preparation and its long-lived window reader load TypeScript
+inside their own trusted Node worker. No inherited parent loader flags are
+required. This removes the Node 26 scoped-loader builtin-path failure while
+retaining the existing source receipts, tile verification/cache repair, native
+precision, cancellation, teardown and original ownership. The shared API parent
+and isolated scripting host receive no additional module-loading capability.
+[Implementation boundary](ARCHITECTURE.md#native-node-worker-startup).
+
+
 The local Node API can inspect and admit original unsigned 16-bit and float32
 RGB/grayscale TIFF pages into independent headless documents. Native row decoding
 and the pinned Little CMS WASM engine produce linear-sRGB float32 source tiles.

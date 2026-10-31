@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Worker-owned TypeScript loading
+
+Native Node services register their existing ESM TypeScript loader once inside
+each trusted worker, with a main-thread guard, and import their fixed runtime
+modules dynamically. Parent CLI hooks and scoped module-query namespaces are
+unnecessary. Native requests and replies retain existing validation, queues,
+source ownership, cancellation and termination. The API parent, browser editor
+and third-party isolated script runtime keep their existing boundaries. Document
+schemas, permissions, source resolution and separate REST sessions do not change.
+
+
 ## Independent masks inside smart masters
 
 Smart conversion rebases unlinked ordinary/filter masks into the containing

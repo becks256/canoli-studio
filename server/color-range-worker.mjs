@@ -1,10 +1,10 @@
 import { parentPort,workerData } from 'node:worker_threads';
 import { readFile } from 'node:fs/promises';
-import { tsImport } from 'tsx/esm/api';
+import './typescript-worker.mjs';
 try{
-  const {openPngRows}=await tsImport('./png-rows.ts',import.meta.url);
-  const {instantiateKernel,applyColorRange}=await tsImport('../src/engine/wasm.ts',import.meta.url);
-  const {SelectionRows}=await tsImport('../src/core/selection-rows.ts',import.meta.url);
+  const {openPngRows}=await import('./png-rows.ts');
+  const {instantiateKernel,applyColorRange}=await import('../src/engine/wasm.ts');
+  const {SelectionRows}=await import('../src/core/selection-rows.ts');
   const image=openPngRows(new Uint8Array(workerData.png)),source=workerData.options.source;
   if(image.width!==workerData.assetWidth||image.height!==workerData.assetHeight)throw new Error('PNG source dimensions do not match the uploaded asset.');
   if(!Number.isSafeInteger(source.x+image.width)||!Number.isSafeInteger(source.y+image.height))throw new Error('Color Range source bounds exceed safe integer placement.');

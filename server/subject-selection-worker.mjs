@@ -1,10 +1,10 @@
 import {parentPort,workerData} from 'node:worker_threads';
 import {readFile} from 'node:fs/promises';
-import {tsImport} from 'tsx/esm/api';
+import './typescript-worker.mjs';
 try{
-  const {openPngRows}=await tsImport('./png-rows.ts',import.meta.url);
-  const {instantiateKernel}=await tsImport('../src/engine/wasm.ts',import.meta.url);
-  const {selectNativeSubject}=await tsImport('../src/engine/subject-selection.ts',import.meta.url);
+  const {openPngRows}=await import('./png-rows.ts');
+  const {instantiateKernel}=await import('../src/engine/wasm.ts');
+  const {selectNativeSubject}=await import('../src/engine/subject-selection.ts');
   const image=openPngRows(new Uint8Array(workerData.png));
   if(image.width!==workerData.width||image.height!==workerData.height)throw new Error('PNG dimensions do not match the uploaded source.');
   const count=image.width*image.height;

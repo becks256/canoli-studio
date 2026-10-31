@@ -1,10 +1,10 @@
 import { parentPort,workerData } from 'node:worker_threads';
 import { readFile } from 'node:fs/promises';
-import { tsImport } from 'tsx/esm/api';
+import './typescript-worker.mjs';
 try{
-  const {openPngRows}=await tsImport('./png-rows.ts',import.meta.url);
-  const {instantiateKernel}=await tsImport('../src/engine/wasm.ts',import.meta.url);
-  const {growQuickSelection}=await tsImport('../src/engine/quick-selection.ts',import.meta.url);
+  const {openPngRows}=await import('./png-rows.ts');
+  const {instantiateKernel}=await import('../src/engine/wasm.ts');
+  const {growQuickSelection}=await import('../src/engine/quick-selection.ts');
   const image=openPngRows(new Uint8Array(workerData.png)),source=workerData.options.source;
   if(image.width!==workerData.assetWidth||image.height!==workerData.assetHeight)throw new Error('PNG dimensions do not match the uploaded source.');
   if(!Number.isSafeInteger(source.x+image.width)||!Number.isSafeInteger(source.y+image.height))throw new Error('Quick Selection source bounds exceed safe placement.');
