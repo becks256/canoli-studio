@@ -28,7 +28,7 @@ export class ProjectedErasureCaptures {
   dispose(){for(const capture of this.entries.values())capture.dispose();this.entries.clear();}
 }
 
-/** A placed brush is authored on a fixed, captured layer-pixel lattice. First
+/** Placed coverage is authored on a fixed, captured layer-pixel lattice. First
  * pull its complete coverage through the captured H onto the original plane;
  * only then sample that field through the current size/affine placement. Neither
  * a subsequent perspective edit nor a different viewport retargets the stroke.
@@ -37,11 +37,14 @@ export class ProjectedErasureCaptures {
  * allocated: both transports read bounded native windows. */
 export function captureProjectedErasure(input:RasterErasureData,assets:AssetStore,processor:PixelProcessor,control:FloatProjectionControl={},textures?:BrushTextureSampler):CapturedProjectedErasure {
   const entry=freeze(rasterErasureSchema.parse(input)),placement=entry.placement;
-  if(!placement||entry.stroke.kind!=='eraser')throw new Error('Projected erasure requires captured eraser placement.');
+  if(!placement||(entry.stroke.kind!=='eraser'&&!(entry.stroke.kind==='fill'&&entry.stroke.erase)))throw new Error('Projected erasure requires captured eraser or clear placement.');
   const width=Math.ceil(entry.width),height=Math.ceil(entry.height),sx=width/entry.width,sy=height/entry.height;
   const footprint=AffineTransform.scale(sx,sy).bounds(placement.bounds),x=Math.floor(footprint.x),y=Math.floor(footprint.y);
   const bounds=captureFieldBounds({x,y,width:Math.ceil(footprint.x+footprint.width)-x,height:Math.ceil(footprint.y+footprint.height)-y});
-  const captured=capturePerspectiveMask({kind:'paint',base:1,enabled:true,inverted:false,density:1,strokes:[{mode:'hide',stroke:{...entry.stroke,kind:'brush'}}]},
+  const raw:import('../core/masks').LayerMaskData=entry.stroke.kind==='eraser'
+    ?{kind:'paint',base:1,enabled:true,inverted:false,density:1,strokes:[{mode:'hide',stroke:{...entry.stroke,kind:'brush'}}]}
+    :{kind:'raster-erasures',width:entry.width,height:entry.height,enabled:true,inverted:false,density:1,erasures:[{width:entry.width,height:entry.height,stroke:entry.stroke}]};
+  const captured=capturePerspectiveMask(raw,
     {sourceWidth:width,sourceHeight:height,layerWidth:entry.width,layerHeight:entry.height,corners:perspectiveLocalQuad(width,height,placement.perspective),direction:'source-to-quad'},assets,processor,control,textures);
   const source:ProjectiveFieldSource={width,height,bounds,background:1,readWindow:async input=>{
     captured.check();const area=validateWindow(input),out=new Float32Array(area.width*area.height).fill(1);

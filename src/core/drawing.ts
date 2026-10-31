@@ -405,7 +405,12 @@ export const rasterErasureSchema: z.ZodType<RasterErasureData> = z.object({
 }).strict().superRefine((entry,context)=>{
   if(!entry.placement)return;
   try{
-    if(entry.stroke.kind!=='eraser')throw new Error('Placed coverage requires an eraser stroke.');
+    if(entry.stroke.kind!=='eraser'&&!(entry.stroke.kind==='fill'&&entry.stroke.erase))throw new Error('Placed coverage requires an eraser or clear operation.');
     perspectiveRect(perspectiveMatrix(entry.width,entry.height,entry.placement.perspective),entry.placement.bounds);
   }catch(error){context.addIssue({code:'custom',message:error instanceof Error?error.message:String(error)});}
 });
+export function assertRasterErasureVersion(entry:RasterErasureData,version:number):void {
+  if(!entry.placement)return;
+  const required=entry.stroke.kind==='fill'?52:51;
+  if(version<required)throw new Error(`Placed ${entry.stroke.kind==='fill'?'clears':'erasures'} require document schema version ${required}.`);
+}

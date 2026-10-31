@@ -553,3 +553,7 @@ Native perspective sampling is trusted engine work, outside the isolated command
 ## Placed erasing uses existing document grants
 
 Schema-51 placed eraser records and `RasterLayer.erase(stroke,{space:"placed"})` use the existing isolated OO/shared-command path. The pure method captures current perspective and content geometry without host pixel reads. Host commit still validates commands, schema, locks, assets, revision and atomic Undo. Raster-erasure masks retain captured placement through ordinary constructors. Installation remains inert; there is no new permission, package version, network/file access, pixel export or host-call capability. Mask/wet projective input and full F03 acceptance remain required.
+
+## Placed clear fills (schema 52)
+
+`RasterLayer.clear(selectionOrNull,{space:"placed"})` and its strict captured clear DTO use existing isolated document grants and shared validation/Undo. Schema 52 admits placed `PaintFill` records only when `erase:true`; schema-51 placed erasers remain valid. The pure method reads geometry and constructs commands without obtaining pixel/file/network access. Host commit still checks revision, assets, locks and atomic publication. No permission, package/lifecycle change or install-time execution is introduced.

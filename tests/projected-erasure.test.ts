@@ -28,7 +28,7 @@ it('rejects invalid options, constructors and locked ancestry atomically',()=>{
 });
 it('strictly validates projected eraser records including finite captured content',()=>{
   const{layer}=setup();layer.erase(stroke(),{space:'placed'});const entry=(layer.toJSON() as import('../src/core/model').RasterLayerData).erasures![0];
-  expect(()=>rasterErasureSchema.parse({...entry,stroke:new PaintFill({bounds:{x:0,y:0,width:100,height:80},erase:true}).toJSON()})).toThrow(/eraser stroke/);
+  expect(()=>rasterErasureSchema.parse({...entry,stroke:new PaintFill({bounds:{x:0,y:0,width:100,height:80},erase:false}).toJSON()})).toThrow(/eraser/);
   expect(()=>rasterErasureSchema.parse({...entry,placement:{...entry.placement,extra:1}})).toThrow();
   expect(()=>rasterErasureSchema.parse({...entry,placement:{...entry.placement,bounds:{x:0,y:0,width:Infinity,height:80}}})).toThrow();
   // The horizon of this valid image quad lies above its frame.

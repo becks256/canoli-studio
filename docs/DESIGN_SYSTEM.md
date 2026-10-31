@@ -14,8 +14,7 @@ areas fixed across zoom; the projected outline follows the quad. Preserve grab
 offset and parent transforms. Live preview remains detached; release commits
 once, invalid folds show a correction message, and cancellation restores the
 authored state. Scope Arrow/Shift+Arrow to the focused corner for 1/10 canvas
-pixels. No new default global chord is introduced. Projective brush/mask pointer
-mapping remains required; affected tools still explain the reset requirement.
+pixels. No new default global chord is introduced. Placed raster erasing and selection Delete now use captured perspective coverage and one Undo. Delete with a raster selection retains the layer and selection, including under affine parents. Mask/wet pointer mapping remains required; those affected tools still explain the reset requirement.
 
 
 ## Float tonal controls

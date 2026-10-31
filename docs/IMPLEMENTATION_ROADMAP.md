@@ -8896,3 +8896,82 @@ general warp, photographic/interchange quality, sustained editor-wide
 performance and physical-device acceptance remain required. Every unfinished
 original roadmap requirement remains active; this slice does not close F03 or
 the overall goal.
+
+
+### 2026-10-30 — F03: projected selection Delete and placed clear
+
+Connected the existing raster Delete/clear action to captured perspective
+coverage. Document selection transforms through the affine layer/parent inverse
+into the plane after perspective. `RasterLayer.clear(selectionOrNull,
+{space:"placed"})` captures current perspective, dimensions and finite intrinsic
+support in an ordinary clear-fill record. Rectangle, ellipse, pixel/Boolean and
+fractional coverage travel together through the existing forward and affine
+scalar-field transports. Original byte/float sources remain unchanged; retained
+clears follow later corner edits/reset and resizing. The layer and selection
+remain, and each completed action creates one shared Undo.
+
+Decision: preserve default/local clear semantics and add an explicit placed
+option. Fill bounds include the placed footprint's interpolation neighbors so a
+whole-image clear works even for a subpixel quad. Existing off-frame intrinsic
+wet content is represented in captured support; this does not enable wet tool
+input on projected images. Reuse the existing raw clear rasterizer and byte,
+float and mask replay rather than adding a new native ABI or pixel mutation
+API. No full source/coverage grid is allocated and no import limit is added.
+
+Schema 52 gates placed clear fills while schema-51 placed erasers remain valid.
+Raster and mask validation share the version rule; non-clear fills and invalid
+placements reject atomically. Constructor-based scripting, independent REST
+revisions/Undo, mask values/refinements and existing project/workspace/history/
+embedded transport retain the capture. Existing container versions, plugin
+grants and inert installation remain unchanged. The signature/defaults, errors,
+coordinate plane and executable guide example are documented in the same slice.
+
+Final frozen verification:
+
+- `npm run build` passes actual native WASM, isolated runtime, TypeScript and
+  **43 developer guides**. All **3,109 unit/API tests in 301 files**, **79
+  selected source-browser checks** and **12 selected production checks** pass
+  without skips, retries, flakes or failures. These selected matrices do not
+  prove full production/device/performance acceptance.
+- Actual Delete under an affine parent retains the raster and selection and
+  creates one Undo. Undo/redo reproduce the exact document. Native project
+  reopening retains exact document data and original source hashes. The real
+  production UI runs the documented clear example in the isolated worker and
+  exports the expected cleared/retained PNG pixels without developer globals.
+- Two **131 × 79** outputs each compare **41,396 RGBA float words** with an
+  independent NumPy forward homography over established byte selection
+  coverage. The byte witness includes final byte quantization; the genuine
+  high-precision TIFF witness multiplies original float alpha once. Transformed
+  pixel coverage and a Boolean ellipse subtraction survive. Both outputs match
+  every reference word with **zero retained-RGB differences**. **5,220 byte
+  alpha samples** and **4,189 float alpha samples** decrease. SHA-256 values:
+  byte `a5c514307df7103084d49d0407fb218071e7a4c815fe1fcee556c2059c358311`;
+  float `87392663f639cea7b49cd5219609a3348e5e17b8e3a5fd9c793353dd25584c3b`.
+  Partitioned float reads are word-identical; retained byte erasure-mask replay
+  matches raster clear coverage exactly.
+- A **0.1 × 0.1 pixel** placed quad clears completely after resetting perspective,
+  retaining its **32 × 24** original. This verifies the interpolation-neighbor
+  padding rather than assuming a projected footprint always covers a pixel.
+- A genuine **10000 × 5000 PNG** retains exact source SHA-256
+  `b457af22024ac92524b87f06ada74fd652484835edbaafbb20470a8a9bb3897f`.
+  Actual selection Delete changes distant native alpha **128 → 64**, retains
+  its transparent neighbor and shares exact one-step Undo/redo. This checks a
+  bounded distant window, not all transformed pixels or process-memory bounds.
+- REST verifies shared placed-clear DTOs, strict atomic rejection, stale-revision
+  conflicts and Undo/redo in its separate headless session. Unit checks retain
+  schema-51 erasers, reject falsely old placed clears in raster/mask contexts,
+  preserve mask values/refinements, reject invalid options/locks and capture
+  existing off-frame wet geometry without enabling projected wet tools.
+- Product sources remain identical through the final checks, and all **145
+  served release resources** retain recorded hashes. The native pixel WASM/ABI
+  remains unchanged, SHA-256
+  `bd8e933aeee525fea97b19b14ebeebefc3124aced93d739dcd5bc808d5b56a1b`.
+
+[Complete evidence](benchmarks/projected-clear-2026-10-30.json.gz),
+**1,098,319 bytes**, SHA-256
+`981a01c0fd6224a5b82d3587209916c75e028dbf589f7bd418a795a9cf3b0e16`.
+
+Mask/wet tool mapping, mask relinking, general warp, photographic/interchange
+quality, sustained editor-wide performance and physical-device acceptance remain
+required. All unfinished original roadmap requirements remain active; this
+selection-clearing slice does not close F03 or the overall goal.

@@ -2388,9 +2388,8 @@ export class ToolController {
   fillSelection(erase = false) {
     const { doc, selected } = this.unlocked();
     if (erase && selected instanceof RasterLayer) {
-      if(activePerspective(selected.toJSON().perspective))throw new Error('Reset perspective before clearing document-selected pixels on this image.');
       const local = transformSelection(doc.selection?.toJSON(), layerTransform(doc._read(), selected.id)!.inverse());
-      doc.transaction("Clear selected pixels", () => selected.clear(local ? new MarqueeSelection(local) : null));
+      doc.transaction("Clear selected pixels", () => selected.clear(local ? new MarqueeSelection(local) : null,{space:'placed'}));
       return;
     }
     if (erase && !(selected instanceof PaintLayer))

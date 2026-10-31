@@ -1,0 +1,15 @@
+import {test,expect} from '@playwright/test';
+import {readFile} from 'node:fs/promises';
+import {PngRowEncoder} from '../src/core/png-stream';
+import {historyProject,historyScript,historyPng} from './helpers/history-inspector';
+
+test('production perspective selection Delete and isolated clear guide retain Undo, original projects and exported pixels',async({page},info)=>{
+ const encoder=new PngRowEncoder(64,48);await encoder.append(Uint8Array.from({length:64*48*4},(_,i)=>i%4===0||i%4===3?255:0),48);const blob=await encoder.finish();await page.goto('/');expect(await page.evaluate(()=>'luma'in window)).toBe(false);
+ await page.getByTestId('import-input').setInputFiles({name:'Projected clear.png',mimeType:'image/png',buffer:Buffer.from(await blob.arrayBuffer())});await page.getByRole('button',{name:'Select Projected clear.png',exact:true}).click();
+ await historyScript(page,'document.selectedLayer.perspective=new PerspectiveTransform({corners:[{x:0,y:0},{x:1,y:0},{x:.75,y:1},{x:.25,y:1}]});document.selection=new MarqueeSelection({shape:"rectangle",x:24,y:24,width:16,height:16});','Projected clear ready');
+ const before=await historyProject(page,info,'clear-before.luma');await page.keyboard.press('Delete');const cleared=await historyProject(page,info,'clear-delete.luma'),raster=cleared.value.document.children[0];if(raster.kind!=='raster')throw Error('Missing raster');expect(raster.erasures).toHaveLength(1);expect(raster.erasures![0].stroke).toMatchObject({kind:'fill',erase:true});expect(raster.erasures![0].placement?.perspective).toEqual(raster.perspective);
+ await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();expect((await historyProject(page,info,'clear-undo.luma')).value.document).toEqual(before.value.document);await page.getByRole('button',{name:'Redo (Mod+Shift+Z)',exact:true}).click();expect((await historyProject(page,info,'clear-redo.luma')).value.document).toEqual(cleared.value.document);await page.getByRole('button',{name:'Undo (Mod+Z)',exact:true}).click();
+ const example=(await readFile('docs/SCRIPTING_API.md','utf8')).match(/<!-- example: placed-clear -->\s*```js\n([\s\S]*?)\n```/)?.[1];expect(example).toBeTruthy();await historyScript(page,example!,'Projected clear guide complete');await page.getByRole('button',{name:'Reset perspective',exact:true}).click();
+ const saved=await historyProject(page,info,'clear-native.luma');expect(new Uint8Array(await saved.value.entries[0].blob.arrayBuffer())).toEqual(new Uint8Array(await blob.arrayBuffer()));
+ const png=await historyPng(page,info,'clear-native.png'),pixels=await page.evaluate(async bytes=>{const bitmap=await createImageBitmap(new Blob([new Uint8Array(bytes)],{type:'image/png'})),canvas=new OffscreenCanvas(64,48),c=canvas.getContext('2d')!;try{c.drawImage(bitmap,0,0);return{cleared:[...c.getImageData(32,24,1,1).data],retained:[...c.getImageData(2,2,1,1).data]};}finally{bitmap.close();}},[...await readFile(png.path)]);expect(pixels).toEqual({cleared:[0,0,0,0],retained:[255,0,0,255]});
+});

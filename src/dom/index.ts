@@ -1,6 +1,7 @@
 import{isFloatDocument,assertFloatSources}from'../core/float-document';
 import {PerspectiveTransform} from './perspective';
-import {activePerspective} from '../core/perspective';
+import {activePerspective,perspectiveMatrix,perspectiveRect} from '../core/perspective';
+import {captureFieldBounds} from '../core/projective-field';
 export {PerspectiveTransform} from './perspective';
 import {textWritingSchema} from '../core/text-writing';
 export type {WritingMode,TextOrientation,TextWritingInput} from '../core/text-writing';
@@ -1690,8 +1691,20 @@ export class RasterLayer extends Layer {
     this.appendErasure(stroke);
   }
   /** Clear a local-coordinate selection, or the complete image when omitted. */
-  clear(selection: MarqueeSelection | null = null): void {
+  clear(selection: MarqueeSelection | null = null, options: {space?:'local'|'placed'} = {}): void {
     if (selection !== null && !(selection instanceof MarqueeSelection)) throw new Error("Use a MarqueeSelection value.");
+    if(!options||typeof options!=='object'||Array.isArray(options)||Object.keys(options).some(key=>key!=='space')||options.space!==undefined&&!['local','placed'].includes(options.space))throw new Error('Clear space must be local or placed.');
+    const layer=this._read() as RasterLayerData;
+    if(options.space==='placed'&&activePerspective(layer.perspective)){
+      const support=intrinsicLocalBounds(layer)!,placed=perspectiveRect(perspectiveMatrix(layer.width,layer.height,layer.perspective),support).bounds;
+      // Cover every interpolation neighbor of the placed image, including a
+      // subpixel-sized quad. The actual selection still clips the clear field.
+      const x=Math.floor(placed.x)-1,y=Math.floor(placed.y)-1;
+      const bounds=captureFieldBounds({x,y,width:Math.ceil(placed.x+placed.width)+1-x,height:Math.ceil(placed.y+placed.height)+1-y});
+      const stroke=new PaintFill({bounds,erase:true,clip:selection}).toJSON();
+      this.update({erasures:[...(layer.erasures??[]),{width:this.width,height:this.height,stroke,placement:{perspective:layer.perspective,bounds:support}}]});
+      return;
+    }
     this.appendErasure(new PaintFill({ bounds: { x: 0, y: 0, width: this.width, height: this.height }, erase: true, clip: selection }));
   }
   private appendErasure(operation: PaintOperation): void {
