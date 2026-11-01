@@ -1,5 +1,17 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Native text preparation ownership
+
+Capture whole normalized native text chunks, original font definitions and exact
+axis tuples and font leases before bitmap creation. The original styled-text renderer and
+future precision work share this owner. Source-linear colors and native character
+metadata are optional private preparation; addressable characters are not glyph
+IDs or paint primitives. Do not split shaping chunks or infer an alpha-correct
+float paint from a single union coverage field. Retain immutable metadata,
+checked source/asset lifetime, reentrant cleanup and cancellation through native
+reads and bitmap publication. Full float text integration remains required.
+[Contract](FLOAT_TEXT.md#source-owned-native-preparation).
+
 ## Native linear Patch and Spot Healing
 
 Schema 59 adds explicitly native corrected TIFF values, linear private repair

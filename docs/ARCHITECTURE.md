@@ -1,5 +1,16 @@
 # Architecture
 
+## Source-owned native text preparation — float glyph painting remains open
+
+Private `captureStyledTextPlan` snapshots whole native shaping chunks, captures
+original font definitions/leases and line geometry, and supplies the existing
+styled bitmap renderer. Optional source-linear color/addressable-character
+metadata creates no new spans and reads no pixels. It does not identify glyph
+paint primitives or enable float TextLayer. Checked source ownership survives
+model/history removal and rejects retirement, invalid geometry and cancellation.
+The ordinary renderer skips the extra metadata work.
+[Contract and remaining paint work](FLOAT_TEXT.md#source-owned-native-preparation).
+
 ## Native text color dependency — float text remains in progress
 
 Private `engine/float-text-color.ts` captures authored CSS source colors as

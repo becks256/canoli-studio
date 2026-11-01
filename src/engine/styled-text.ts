@@ -1,3 +1,4 @@
+import {captureLinearTextColors,type LinearTextColor} from './float-text-color';
 import {textWritingSchema,verticalWriting,applyNativeTextWriting,type TextWriting} from '../core/text-writing';
 import {z} from 'zod';
 import {PATH_POINT_LIMIT} from '../core/drawing';
@@ -57,6 +58,38 @@ export interface StyledTextSurface {
   release():void;
 }
 
+/** Native addressable-character metadata is not a glyph ID or a paint primitive.
+ * Coordinates remain in the original SVG text element's local coordinate space. */
+export interface StyledTextCharacterGeometry {
+  readonly index:number;
+  readonly start:Readonly<{x:number;y:number}>;
+  readonly end:Readonly<{x:number;y:number}>;
+  readonly extent:Readonly<Rect>;
+  readonly rotation:number;
+}
+export interface StyledTextNativePaint {
+  readonly colors:readonly (readonly LinearTextColor[])[];
+  readonly characters:readonly (readonly StyledTextCharacterGeometry[])[];
+}
+export interface StyledTextPlan {
+  readonly scene:StyledTextScene;
+  readonly metrics:readonly StyledTextLineMetrics[];
+  readonly paint?:StyledTextNativePaint;
+  /** Constructed markup with captured original font definitions; check ownership
+   * before every use. Retired plans no longer expose an executable source. */
+  readonly markup:string;
+  /** End native measurement after its consumer finishes preparation. The source
+   * font lease and immutable metadata remain valid until release. */
+  retireMeasurement():void;
+  check():void;
+  release():void;
+}
+export interface StyledTextPlanControl extends StyledTextControl {
+  /** Capture source-linear colors and native addressable-character metadata.
+   * The ordinary byte renderer does not request this additional work. */
+  captureLinearPaint?:boolean;
+}
+
 /** Snapshot before any await; parser budgets apply to text metadata, not fonts
  * or document geometry. Width/height describe a caller-selected work window. */
 export function normalizeStyledTextScene(input:StyledTextSceneInput):StyledTextScene{
@@ -108,20 +141,23 @@ export function applyStyledSpanStyle(node:SVGTSpanElement,style:Readonly<Charact
   applyNativeCharacterStyle(node,style,wordSpacingDelta);
 }
 
-/** Prepare native whole-line SVG text in one pixel work window.
- * Path baselines are private render geometry; public path editing is separate. */
-export async function prepareStyledTextSurface(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}):Promise<StyledTextSurface>{
+/** Capture whole native shaping chunks, original sources and their lifecycle.
+ * No character spans are introduced and no pixel colors enter the native plan.
+ * Paint metadata does not establish glyph/cluster paint decomposition. */
+export async function captureStyledTextPlan(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextPlanControl={}):Promise<StyledTextPlan>{
   control={...control};
   const alive=assets.captureLifetime();
   const cancelled=()=>{control.signal?.throwIfAborted();if(control.isCancelled?.())throw new DOMException('Styled text preparation superseded.','AbortError');alive();};cancelled();
   const scene=normalizeStyledTextScene(input);cancelled();
-  if(typeof globalThis.document==='undefined'||typeof Image==='undefined'||typeof createImageBitmap!=='function')throw new Error('Native styled text preparation requires a browser SVG host.');
+  if(typeof globalThis.document==='undefined')throw new Error('Native styled text preparation requires a browser SVG host.');
   let fonts:ReturnType<typeof captureStyledTextFonts>|undefined;
-  let host:HTMLDivElement|undefined,image:HTMLImageElement|undefined,url:string|undefined,bitmap:ImageBitmap|undefined,released=false,handedOff=false;
-  const release=()=>{if(released)return;released=true;bitmap?.close();fonts?.release();};
-  const check=()=>{if(released)throw new Error('The styled text surface was released.');cancelled();fonts?.check();if(host&&!host.isConnected)throw new Error('The styled text measurement host was removed.');if(bitmap&&(bitmap.width!==scene.width||bitmap.height!==scene.height))throw new Error('The styled text bitmap was closed or changed.');};
+  let host:HTMLDivElement|undefined,markup:string|undefined,released=false,handedOff=false;
+  const retireMeasurement=()=>{host?.remove();host=undefined;};
+  const release=()=>{if(released)return;released=true;markup=undefined;retireMeasurement();fonts?.release();fonts=undefined;};
+  const check=()=>{if(released)throw new Error('The styled text plan was released.');cancelled();fonts?.check();if(host&&!host.isConnected)throw new Error('The styled text measurement host was removed.');};
   try{
     fonts=captureStyledTextFonts(scene.lines.flatMap(line=>line.spans.map(span=>span.style)),document,assets);
+    const linear=control.captureLinearPaint?await captureLinearTextColors(scene.lines.flatMap(line=>line.spans.map(span=>span.style.color)),{signal:control.signal,check}):undefined;
     check();const context=globalThis.document.createElement('canvas').getContext('2d')!;
     host=globalThis.document.createElement('div');host.setAttribute('data-canoli-styled-text-probe','');host.setAttribute('aria-hidden','true');host.setAttribute('inert','');host.style.cssText='position:fixed;left:-100000px;top:0;width:1px;height:1px;visibility:hidden;pointer-events:none;contain:strict';
     const shadow=host.attachShadow({mode:'closed'}),svg=globalThis.document.createElementNS(SVG_NS,'svg');
@@ -153,8 +189,41 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
       group.append(text);elements.push({text,line,...(path?{path}:{})});
     }
     const metrics=Object.freeze(elements.map(({text,line,path})=>{const box=text.getBBox(),advance=text.getComputedTextLength(),pathLength=path?.getTotalLength();if(![box.x,box.y,box.width,box.height,advance].every(Number.isFinite))throw new Error('The native styled-text geometry is not finite.');if(pathLength!==undefined&&(!Number.isFinite(pathLength)||pathLength<=0))throw new Error('Native text requires a finite, positive baseline length.');return Object.freeze({advance,ink:Object.freeze({x:box.x+(path?line.x:0),y:box.y+(path?line.y:0),width:box.width,height:box.height}),...(pathLength===undefined?{}:{pathLength})});}));
+    let paint:StyledTextNativePaint|undefined;
+    if(linear){
+      const characters:(readonly StyledTextCharacterGeometry[])[]=[],colors:(readonly LinearTextColor[])[]=[];let offset=0;
+      for(const {text,line} of elements){
+        colors.push(Object.freeze(linear.slice(offset,offset+line.spans.length)));offset+=line.spans.length;
+        if(['getNumberOfChars','getStartPositionOfChar','getEndPositionOfChar','getExtentOfChar','getRotationOfChar'].some(name=>typeof (text as unknown as Record<string,unknown>)[name]!=='function'))throw new Error('Native text character geometry is unavailable.');
+        const count=text.getNumberOfChars();check();if(!Number.isInteger(count)||count<0||count>10000)throw new Error('The native text character count is invalid.');
+        const current:StyledTextCharacterGeometry[]=[];
+        for(let index=0;index<count;index++){
+          check();const a=text.getStartPositionOfChar(index);check();const b=text.getEndPositionOfChar(index);check();const box=text.getExtentOfChar(index);check();const rotation=text.getRotationOfChar(index);check();
+          if(![a.x,a.y,b.x,b.y,box.x,box.y,box.width,box.height,rotation].every(Number.isFinite)||box.width<0||box.height<0)throw new Error('The native text character geometry is invalid.');
+          current.push(Object.freeze({index,start:Object.freeze({x:a.x,y:a.y}),end:Object.freeze({x:b.x,y:b.y}),extent:Object.freeze({x:box.x,y:box.y,width:box.width,height:box.height}),rotation}));
+          if(performance.now()>=deadline){await yieldTask();check();deadline=performance.now()+8;}
+        }
+        characters.push(Object.freeze(current));
+      }
+      paint=Object.freeze({colors:Object.freeze(colors),characters:Object.freeze(characters)});
+    }
     const definitions=await fonts.definitions(check);check();
-    const markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);
+    markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);
+    check();handedOff=true;return Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,check,release});
+  }finally{if(!handedOff)release();}
+}
+
+/** Rasterize a source-owned native plan in the caller's pixel work window.
+ * The byte renderer requests no extra linear-color or character-geometry work. */
+export async function prepareStyledTextSurface(input:StyledTextSceneInput,document:DocumentData,assets:AssetStore,control:StyledTextControl={}):Promise<StyledTextSurface>{
+  control={...control};
+  let plan:StyledTextPlan|undefined,image:HTMLImageElement|undefined,url:string|undefined,bitmap:ImageBitmap|undefined,released=false,handedOff=false;
+  const release=()=>{if(released)return;released=true;bitmap?.close();plan?.release();};
+  const check=()=>{if(released)throw new Error('The styled text surface was released.');plan?.check();if(bitmap&&(bitmap.width!==plan!.scene.width||bitmap.height!==plan!.scene.height))throw new Error('The styled text bitmap was closed or changed.');};
+  try{
+    plan=await captureStyledTextPlan(input,document,assets,control);check();
+    if(typeof Image==='undefined'||typeof createImageBitmap!=='function')throw new Error('Native styled text preparation requires a browser SVG host.');
+    const markup=plan.markup;
     url=URL.createObjectURL(new Blob([markup],{type:'image/svg+xml'}));image=new Image();
     // decode() alone can resolve before SVG fallback-font resources finish
     // loading. Wait for the actual load event before decoding/capturing; an
@@ -166,6 +235,6 @@ export async function prepareStyledTextSurface(input:StyledTextSceneInput,docume
       control.signal?.addEventListener('abort',abort,{once:true});image!.src=url!;if(control.signal?.aborted)abort();
     });
     check();await image.decode();check();bitmap=await createImageBitmap(image);check();
-    handedOff=true;return Object.freeze({bitmap,metrics,check,release});
-  }finally{host?.remove();host=undefined;if(image)image.src='';if(url)URL.revokeObjectURL(url);if(!handedOff)release();}
+    handedOff=true;return Object.freeze({bitmap,metrics:plan.metrics,check,release});
+  }finally{plan?.retireMeasurement();if(image)image.src='';if(url)URL.revokeObjectURL(url);if(!handedOff)release();}
 }

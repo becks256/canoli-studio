@@ -16,6 +16,21 @@ Preparation captures the asset-store lifetime, independent font leases and refer
 
 This requires a browser SVG/DOM host. Isolated scripts cannot invoke the renderer directly; their awaited public methods request finite native metrics through the private host broker. Final host commands remeasure independently. Omitted-range legacy text retains its Canvas path; headless REST retains explicit estimates and independent sessions. Source ownership and plugin isolation remain intact.
 
+## Shared source preparation (F08/F10 groundwork)
+
+Private `captureStyledTextPlan` now owns normalized chunks, original font
+capture, native line metrics and checked serialized markup before bitmap
+creation. `prepareStyledTextSurface` consumes that owner and retains its
+existing bitmap contract. The measurement DOM remains checked through native image/bitmap preparation
+and retires at the existing raster publication boundary; font leases remain
+owned through output checks/release. Optional
+`captureLinearPaint` captures exact authored linear colors and native
+addressable-character metadata without introducing spans or reading pixels.
+The ordinary bitmap path skips that metadata work and its extra browser
+capabilities. Native character indices/boxes are not glyph IDs or paint
+primitives. Full float text painting remains gated and required; see
+[FLOAT_TEXT.md](FLOAT_TEXT.md#source-owned-native-preparation).
+
 ## Native curve preparation (internal F08 dependency)
 
 Explicit visual lines may carry a private `path` baseline with cubic `points` using the existing vector anchor form (`x`, `y`, `in`, `out`). `closed` and `reverse` default to false; signed `startOffset` and `baselineOffset` default to zero in local user units. The baseline is captured and deeply frozen before any await. Degenerate/nonfinite paths reject. A scene shares the existing 20,000-anchor vector editing budget across its baselines, independently of document/font dimensions and the caller's bitmap window.

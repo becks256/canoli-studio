@@ -10401,3 +10401,62 @@ or completion; the whole original roadmap stays active.
 source/release identities, tests, the failed/corrected pilot and native probes.
 No account, upload, paid call, font permission or new isolated capability is
 introduced.
+
+
+### 2026-11-01 — F08/F10 source-owned native text preparation connected
+
+Previous goal turn: progress, authored Float32 CSS colors accepted at 3ebb0df.
+The full original roadmap remains active. Native probes show that even whole-
+grapheme tspan splitting changes tightly tracked Latin/combining layouts. This
+slice therefore preserves original native shaping chunks and extracts their
+preparation owner from the existing styled bitmap renderer.
+
+The same checked owner now retains immutable normalized source text/styles,
+complete original font definitions, font leases and exact authored variable-font tuples and native line
+metrics. Optional precision metadata adds source-linear colors and native
+addressable-character start/end/extent/rotation without reading pixels or
+introducing spans. Character indices remain native API indices, not glyph IDs,
+source ranges or proof of independently paintable clusters. Ordinary byte text
+requests no additional color/character work. The owner survives model/history
+removal, rejects retired/tampered fonts and cancels/cleans up stale native reads;
+bitmap preparation retains its existing load/decode/publication checks.
+
+Full native paint decomposition, color-glyph sources, exact authored-alpha
+composition and connected float TextLayer scene/tool/export/shared API/source-
+bearing persistence/50 MP acceptance remain required. Current float text gates
+stay in place. This is connected source ownership groundwork, not a substitute
+for the requested native float typography or evidence of roadmap completion.
+[Contract and remaining work](FLOAT_TEXT.md#source-owned-native-preparation).
+
+
+### 2026-11-01 — F08/F10 native preparation owner verified; full float paint remains required
+
+Full build/typecheck with 51 guides and all 3,357 unit/API cases across 331 files
+pass. One complete final source-browser run passes 137 cases across 11 files;
+four production workflows cover path, character, vertical editing/reopening and
+the no-JavaScript 390px guide. Independent decoding compares every RGBA sample
+in both complete 50 MP path/vertical outputs with its native reference: exact.
+Complete original image bytes/hash and bounded work windows remain unchanged.
+These are ordinary native text regressions, not float TextLayer acceptance.
+
+The six new owner cases preserve whole shaping chunks and exact source-linear
+colors/native geometry, frozen requests/results, original variable-font source
+ownership after live model/history removal, explicit measurement retirement,
+cancellation, reentrant/nonfinite cleanup/retry and zero optional metadata work
+for ordinary byte rasterization. The first broad run passed 136 of 137 and
+caught early measurement-host retirement. Keeping native DOM ownership through
+bitmap publication restores the existing fault contract; the assertion remains
+unchanged and the complete corrected run passes. Raw harness pilots and the
+actual lifecycle failure/correction remain in the receipt. All 3,516 frozen
+code/configuration/fixture/test inputs retain their hashes; original WASM release
+resources are unchanged.
+
+[Findings](benchmarks/native-text-plan-2026-11-01.md) and
+[compact source/release/results/large-output receipt](benchmarks/native-text-plan-2026-11-01.json.gz)
+record the evidence. Native addressable characters are not glyph paint IDs or
+independent primitives. Exact native paint decomposition, intrinsic color-glyph
+sources, authored-alpha composition and the complete float scene/tool/export/
+shared API/source-bearing persistence/50 MP text acceptance remain required.
+The full original professional/AI/provider/workflow/device/performance/commercial
+roadmap stays active. No new public mutation, grant, account, upload, paid call,
+REST/browser synchronization or arbitrary original-resolution limit is added.
