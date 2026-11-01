@@ -5,7 +5,7 @@ import{createHash}from'node:crypto';
 import{FloatPixelProcessor}from'../src/engine/float-pixels';
 import{instantiateKernel}from'../src/engine/wasm';
 import{compileFloatColor}from'../src/core/float-color';
-import{Document,RasterLayer,AdjustmentLayer,VectorLayer}from'../src/dom';
+import{Document,RasterLayer,AdjustmentLayer,TextLayer}from'../src/dom';
 
 const directory='tests/fixtures/float-color/',manifest=JSON.parse(await readFile(directory+'manifest.json','utf8'));
 const floats=(b:Uint8Array)=>new Float32Array(new Uint8Array(b).buffer),words=(v:Float32Array)=>new Uint32Array(v.buffer,v.byteOffset,v.length),hash=(b:Uint8Array)=>createHash('sha256').update(b).digest('hex');
@@ -37,7 +37,7 @@ it('complete native windows and awkward partitions retain all color samples acro
 it('all three float color kinds share conversion, strict atomic edits, ownership, locking and exact history',()=>{
  const document=new Document(),raster=document.layers.add(new RasterLayer({assetId:'native-original',width:10,height:10}));for(const kind of['hsl','color-balance','vibrance']){const row=manifest.cases.find((r:any)=>r.adjustment.kind===kind&&!r.neutral);document.layers.add(new AdjustmentLayer({adjustment:row.adjustment}));}
  const byte=document.toJSON();document.convertToFloat();const converted=document.toJSON();expect(Document.fromJSON(converted).toJSON()).toEqual(converted);document.undo();expect(document.toJSON()).toEqual(byte);document.redo();expect(document.toJSON()).toEqual(converted);
- expect(()=>document.transaction('Rejected color edit',()=>{raster.opacity=.5;document.layers.add(new VectorLayer());})).toThrow();expect(document.toJSON()).toEqual(converted);const layer=document.layers.at(1)!;layer.locked=true;const locked=document.toJSON();expect(()=>layer.update({adjustment:{kind:'vibrance',vibrance:25,saturation:0}}as any)).toThrow(/lock/i);expect(document.toJSON()).toEqual(locked);
+ expect(()=>document.transaction('Rejected color edit',()=>{raster.opacity=.5;document.layers.add(new TextLayer());})).toThrow();expect(document.toJSON()).toEqual(converted);const layer=document.layers.at(1)!;layer.locked=true;const locked=document.toJSON();expect(()=>layer.update({adjustment:{kind:'vibrance',vibrance:25,saturation:0}}as any)).toThrow(/lock/i);expect(document.toJSON()).toEqual(locked);
 });
 
 it('the independent corpus and every expected native word stream bind their declared bounds and inputs',async()=>{

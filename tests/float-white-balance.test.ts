@@ -5,7 +5,7 @@ import{createHash}from'node:crypto';
 import{compileFloatWhiteBalance}from'../src/core/float-white-balance';
 import{FloatPixelProcessor}from'../src/engine/float-pixels';
 import{instantiateKernel}from'../src/engine/wasm';
-import{Document,RasterLayer,AdjustmentLayer,VectorLayer}from'../src/dom';
+import{Document,RasterLayer,AdjustmentLayer,TextLayer}from'../src/dom';
 
 const directory='tests/fixtures/float-white-balance/',manifest=JSON.parse(await readFile(directory+'manifest.json','utf8'));
 const hash=(pixels:Uint8Array)=>createHash('sha256').update(pixels).digest('hex');
@@ -30,7 +30,7 @@ it('float White Balance uses strict shared commands, precision conversion, locki
  const byte=document.toJSON();document.convertToFloat();const converted=document.toJSON();expect(document.precision).toBe('float32');expect(Document.fromJSON(converted).toJSON()).toEqual(converted);document.undo();expect(document.toJSON()).toEqual(byte);document.redo();expect(document.toJSON()).toEqual(converted);
  const settings={kind:'white-balance' as const,temperature:10000,tint:100};balance.adjustment=settings;settings.tint=-100;expect(balance.adjustment).toMatchObject({tint:100});const edited=document.toJSON();document.undo();expect(document.toJSON()).toEqual(converted);document.redo();expect(document.toJSON()).toEqual(edited);
  for(const invalid of [{kind:'white-balance',temperature:1999,tint:0},{kind:'white-balance',temperature:25001,tint:0},{kind:'white-balance',temperature:6504,tint:101},{kind:'white-balance',temperature:NaN,tint:0},{kind:'white-balance',temperature:6504,tint:0,unexpected:true}]){expect(()=>balance.update({adjustment:invalid}as any)).toThrow();expect(document.toJSON()).toEqual(edited);}
- expect(()=>document.transaction('Rejected float edit',()=>{raster.opacity=.5;balance.adjustment={kind:'white-balance',temperature:2000,tint:100};document.layers.add(new VectorLayer());})).toThrow();expect(document.toJSON()).toEqual(edited);
+ expect(()=>document.transaction('Rejected float edit',()=>{raster.opacity=.5;balance.adjustment={kind:'white-balance',temperature:2000,tint:100};document.layers.add(new TextLayer());})).toThrow();expect(document.toJSON()).toEqual(edited);
  balance.locked=true;const locked=document.toJSON();expect(()=>{balance.adjustment={kind:'white-balance',temperature:6504,tint:0};}).toThrow(/lock/i);expect(document.toJSON()).toEqual(locked);
 });
 

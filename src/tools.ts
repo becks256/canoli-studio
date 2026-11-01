@@ -445,7 +445,7 @@ export class ToolController {
       return target==='layer'?!selected||selected instanceof RasterLayer||selected instanceof PaintLayer:target.startsWith('mask-')&&!!selected?.mask;
     }
     if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer||this.editor.document.selectedLayer instanceof PaintLayer;
-    if(tool==='pen')return this.state.settings.penEditTarget==='mask'||this.editor.document.selectedLayer?.mask?.kind==='vector';
+    if(tool==='pen')return true;
     return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');
   }
   toolUnavailableReason(tool:Tool):string|null {
@@ -930,7 +930,6 @@ export class ToolController {
     cropHandle?: CropHandle,
   ) {
     if(!this.canUseTool(tool))throw new Error(this.toolUnavailableReason(tool)!);
-    if(tool==='pen'&&this.editor.document.precision==='float32'&&this.state.settings.penEditTarget!=='mask')throw new Error('Choose Mask paths to edit a vector mask in this float document.');
     if (tool === "lasso" && this.state.settings.lassoMode === "polygon") {
       this.beginPolygonLasso(point, modifiers, zoom);
       return;

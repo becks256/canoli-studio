@@ -1,5 +1,22 @@
 # Scripting API
 
+## Recorded vector appends
+
+Recipe v1 action `{type:"path.add", path:VectorPathData}` appends to a semantic
+vector-layer target with strict existing geometry/paint validation, fresh path
+and contour IDs, ordinary lock/atomic Undo behavior and portable package values.
+The recorder now captures `path.add`, including creation-result targets.
+Updates/removals/Boolean replacement recording remain explicitly unsupported.
+[Defaults, limits, errors and recording behavior](FLOAT_VECTORS.md#recorded-path-appends).
+
+## Editable native float vectors
+
+Existing VectorLayer/VectorPath commands now support linear solid and continuous
+gradient color with separate canonical fill/stroke coverage, native compositing,
+ancestry, masks, clipping and styles. Pen, shape and Boolean controls use the same
+editable geometry/history. No schema, grant or REST/browser synchronization
+change is introduced. [Signatures, defaults, paint rules and current verification](FLOAT_VECTORS.md).
+
 ## Native float clone values (schema 58)
 
 Explicit `CloneStroke.precision:"float32"` retains unmasked canonical linear

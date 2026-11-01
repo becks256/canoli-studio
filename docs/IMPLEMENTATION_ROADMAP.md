@@ -10187,3 +10187,64 @@ The complete original roadmap remains active, including wider float tools/
 layers/spaces, warp/master breadth, photographic/device quality, sustained F14
 and unfinished professional/AI/workflow/ChatGPT/live identity/commercial/
 specialist/motion requirements.
+
+
+### 2026-11-01 — F03/F07/F10 native editable vector integration in progress
+
+Owner: implementation agent. Estimate L. Previous goal turn: progress (native
+float Clone accepted at e7e88a1). The GitHub push check verifies both rejected
+large ZIPs are absent from reachable history and preserved locally; no push was
+performed. The complete original implementation roadmap remains the objective.
+
+Current float validation rejects all vector artwork despite existing editable
+Pen/shape/gradient/Boolean geometry. This increment connects that complete native
+vector path to linear solid/gradient color, continuous stop alpha and native
+WASM source-over, separately sampling existing canonical fill/stroke geometry.
+Keep ancestry, masks, clipping, styles, source ownership, private drafts and
+shared Undo/revision/isolation/REST/project/workspace/recipe boundaries. Existing
+byte gradients and geometry retain their operators. Text/smart/other unsupported
+float content must still reject, using TextLayer for prior negative controls that
+used the formerly unsupported VectorLayer. No check tolerance is weakened.
+
+Native tests and build, actual browser controls, continuous complete sample
+references, crop partition equality, source-bearing 50 MP window/original
+checks, independent file decoding, production no-global workflows and final
+sealed evidence are required before acceptance. The wider F03/F07/F10/F14 and
+all other unfinished original professional/AI/workflow/collaboration/commercial/
+specialist/motion and live external gates remain required.
+
+### 2026-11-01 — F03/F07/F10 native float vectors and canonical mask replay verified
+
+Owner: implementation agent; delivered the L increment above. Existing editable
+VectorLayer/VectorPath geometry, Pen/shape/Boolean controls, continuous linear
+solid/gradient color and native WASM composition now connect through masks,
+clipping, Fill/styles, affine ancestry, source-preserving projects, shared
+OO/isolated/plugin/independent REST/history and recipe/workspace boundaries.
+Recipe `path.add` records semantic outputs and fresh path/contour identities;
+path update/remove/Boolean recording remains unsupported. No schema, package,
+permission or REST/browser synchronization boundary changes.
+
+Canonical float mask cells remove ROI-dependent feather sampling; their private
+4 MiB cache uses immutable identities, pose/current-source guards, owned outputs
+and disposal cleanup. Native gradient cells remove placement before adding
+half-pixel offsets, retaining exact values at `2**52+32` and across affine crops.
+
+Verified build/typecheck, **3,325 unit/API/native tests in 327 files**, **111
+accepted distinct source-browser cases in 13 files** (70 affected rechecks plus
+41 unchanged matrix passes), and **10 production cases in three files**. Full
+linear/radial native streams, actual Pen/private preview/one-Undo, gradient
+controls, source-bearing project/reopen, isolation/inert plugin grants, semantic
+recipes/redo-only workspace and independent REST revisions/locks pass. Native
+libtiff/NumPy verifies every 41,396 Float32 sample in each complete production
+TIFF and the exact linear ICC profile. A genuine 50 MP source retains original
+bytes/geometry and all 12,288 words in its native vector edit window match
+separate composition math. This is not full-image vector performance proof.
+
+The receipt retains failed pilots, the initial broad matrix's 49 dangling-output
+symlink failures and one obsolete Pen-disabled expectation, successful affected
+rechecks, the reproduced/fixed half-pixel error, complete new native production
+outputs and the seven-file amendment. Numeric assertions/tolerances remain.
+[Exact evidence, remaining scope and limitations](benchmarks/float-vectors-2026-11-01.md).
+The complete original professional/AI/workflow/collaboration/commercial/specialist/
+motion roadmap and unfinished photographic/device/sustained all-tool F14, float
+text/smart/other tools/spaces/HDR/CMYK and warp/master gates remain active.

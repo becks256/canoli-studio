@@ -1,5 +1,13 @@
 # Canoli Studio feature strategy: a professional editor with inspectable AI
 
+## Editable native float vectors
+
+Existing VectorLayer/VectorPath commands now support linear solid and continuous
+gradient color with separate canonical fill/stroke coverage, native compositing,
+ancestry, masks, clipping and styles. Pen, shape and Boolean controls use the same
+editable geometry/history. No schema, grant or REST/browser synchronization
+change is introduced. [Signatures, defaults, paint rules and current verification](FLOAT_VECTORS.md).
+
 ## Direct image perspective authoring increment (2026-10-30)
 
 Raster/smart-object instances now have numeric and direct pointer/touch/keyboard

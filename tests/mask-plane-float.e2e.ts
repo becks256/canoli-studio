@@ -75,8 +75,8 @@ test('float mask tools are reachable from shortcuts and the command palette alon
   }, [...await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif')]);
   await expect(page.getByRole('button', {name: 'Brush tool (B)', exact: true})).toBeEnabled();
   await expect(page.getByRole('button', {name: 'Pencil tool (N)', exact: true})).toBeEnabled();
-  for (const name of ['Text tool (T)', 'Vector pen (P)'])
-    await expect(page.getByRole('button', {name, exact: true})).toBeDisabled();
+  await expect(page.getByRole('button', {name: 'Text tool (T)', exact: true})).toBeDisabled();
+  await expect(page.getByRole('button', {name: 'Vector pen (P)', exact: true})).toBeEnabled();
   await page.keyboard.press('b');
   await expect(page.getByRole('combobox', {name: 'Paint target', exact: true})).toHaveValue('layer');
   await page.getByRole('combobox', {name: 'Paint target', exact: true}).selectOption('mask-hide');

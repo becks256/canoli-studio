@@ -1,5 +1,13 @@
 # Canoli Studio editor requirements
 
+## Editable native float vectors
+
+Existing VectorLayer/VectorPath commands now support linear solid and continuous
+gradient color with separate canonical fill/stroke coverage, native compositing,
+ancestry, masks, clipping and styles. Pen, shape and Boolean controls use the same
+editable geometry/history. No schema, grant or REST/browser synchronization
+change is introduced. [Signatures, defaults, paint rules and current verification](FLOAT_VECTORS.md).
+
 ## Native float clone values (schema 58)
 
 Explicit `CloneStroke.precision:"float32"` retains unmasked canonical linear

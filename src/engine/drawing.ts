@@ -432,8 +432,8 @@ function vectorFill(context:CanvasRenderingContext2D,value:VectorGradientData,ru
   context.fillStyle=gradient;context.fill(rule);
  }finally{context.restore();}
 }
-function drawVectorsNative(
-  layer: VectorLayerData,
+export function drawVectorsNative(
+  layer: Pick<VectorLayerData,'paths'>,
   target: HTMLCanvasElement,
   space: RenderSpace,
   world: AffineTransform,

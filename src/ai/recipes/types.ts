@@ -89,6 +89,7 @@ export interface PlannedRawDevelopment {
 export type RecipeAction =
   | {type:"layer.place";reference:SemanticTarget|null;placement:"before"|"after"|"inside";preservePosition:boolean}
   | {type:"paint.add";stroke:import("../../core/drawing").PaintOperationData}
+  | {type:"path.add";path:import("../../core/drawing").VectorPathData}
   | {type:'layer.align';targets:SemanticTarget[];alignment:import('../../core/layer-layout').LayerAlignment;reference?:{type:'selection'}|{type:'canvas'}|{type:'layer';layer:SemanticTarget}}
   | {type:'font.file.add';id:string}
   | {type:'font.file.rename';id:string;name:string}

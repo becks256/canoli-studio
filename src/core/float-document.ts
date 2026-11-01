@@ -25,6 +25,8 @@ export function floatSceneIssue(document:DocumentData):string|null {
       }else if(layer.kind==='paint'){
         if(layer.strokes.some(stroke=>stroke.kind==='clone'&&stroke.precision!=='float32'))return 'Float clone strokes require explicit native float sources.';
         if(layer.strokes.some(stroke=>stroke.kind==='wet'&&stroke.precision!=='float32'))return 'Float paint replacements require explicit HDR wet paint; byte prepared pixels are not float originals.';
+      }else if(layer.kind==='vector'){
+        // Existing strict paths and paint transforms are native geometry.
       }else if(layer.kind==='adjustment'){
         if(layer.adjustment.kind==='tonal'){try{for(const {brush:_brush,...options} of layer.adjustment.strokes)floatTonalOptionsSchema.parse(options);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='curves'||layer.adjustment.kind==='levels'){try{compileFloatTransfer(layer.adjustment);}catch(error){return String(error);}}
@@ -33,7 +35,7 @@ export function floatSceneIssue(document:DocumentData):string|null {
         else if(layer.adjustment.kind==='gradient-map'){try{compileFloatGradient(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind==='lut'){try{captureLutHeader(layer.adjustment);}catch(error){return String(error);}}
         else if(layer.adjustment.kind!=='tone')return 'Float adjustment layers currently support Tone, Curves, Levels, White Balance, HSL, Color Balance, Vibrance, Gradient Map and Color Lookup and editable Dodge/Burn only.';
-      }else return 'This float document mode currently supports original high-precision TIFF raster layers, editable brush/pencil/eraser/solid-fill paint layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup and editable Dodge/Burn adjustments. Other layer types require their float integration.';
+      }else return 'This float document mode currently supports original high-precision TIFF raster layers, editable paint and vector layers, groups, masks and Tone/Curves/Levels/White Balance/HSL/Color Balance/Vibrance/Gradient Map/Color Lookup and editable Dodge/Burn adjustments. Other layer types require their float integration.';
     }
     return null;
   };

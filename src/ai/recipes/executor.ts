@@ -1,4 +1,4 @@
-import {paintOperationSchema} from '../../core/drawing';
+import {paintOperationSchema,pathSchema} from '../../core/drawing';
 import {recipeFontFiles,recipeFontIds} from './fonts';
 import {documentFontFiles} from '../../core/font-files';
 import {sameFontResource} from '../../fonts/resources';
@@ -474,6 +474,15 @@ export function compileEditPlan(
             stepCommands.push(command);simDoc=apply(command);
             if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:true}};stepCommands.push(command);simDoc=apply(command);}
             layersModified++;affectedLayerNames.add(targetLayer.name);visualChange=`Add ${stroke.kind} stroke to '${targetLayer.name}'`;break;
+          }
+          case "path.add": {
+            if(!targetLayer||targetLayer.kind!=='vector')throw new Error(`Step '${step.name}' requires a vector layer.`);
+            const path=pathSchema.parse(actionValue(step.action.path)),wasLocked=targetLayer.locked,unlock=step.target?.ignoreLocked&&wasLocked;
+            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:false}};stepCommands.push(command);simDoc=apply(command);}
+            const command:EditorCommand={type:'path.add',id:targetLayer.id,path:{...path,id:id(),...(path.subpaths?{subpaths:path.subpaths.map(contour=>({...contour,id:id()}))}:{})}};
+            stepCommands.push(command);simDoc=apply(command);
+            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:true}};stepCommands.push(command);simDoc=apply(command);}
+            layersModified++;affectedLayerNames.add(targetLayer.name);visualChange=`Add path to '${targetLayer.name}'`;break;
           }
           case "layer.update": {
             if (!targetLayer) {

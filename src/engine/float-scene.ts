@@ -1,4 +1,5 @@
 import {renderFloatPaint,type FloatPaintCoverage,type FloatCloneRead} from './float-paint';
+import {renderFloatVector} from './float-vector';
 import {captureFloatClone,type CapturedFloatClone} from './float-clone';
 import{applyFloatStyle}from'./float-style';
 import {activePerspective,perspectiveLocalQuad,perspectiveMatrix,perspectiveRect} from '../core/perspective';
@@ -44,7 +45,7 @@ import{validateFloatWorkerWindow}from'./float-pixels';
 import type{ColorProof}from'../core/color/color-settings';
 
 export interface FloatSceneControl extends FloatSourceControl,FloatProjectionControl{}
-export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{plane?(mask:LayerMaskData,owner:MaskPlanePoseData,check:()=>void):CapturedMaskPlane;perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask;erasure?(entry:import('../core/drawing').RasterErasureData,check:()=>void):import('./projected-erasure').CapturedProjectedErasure};
+export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{clear?():void;plane?(mask:LayerMaskData,owner:MaskPlanePoseData,check:()=>void):CapturedMaskPlane;perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask;erasure?(entry:import('../core/drawing').RasterErasureData,check:()=>void):import('./projected-erasure').CapturedProjectedErasure};
 export type FloatStrokeService=((brush:BrushStrokeData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{paint?:FloatPaintCoverage;clonePreview?:{layerId:string;id:string;read:FloatCloneRead}};
 export interface CapturedFloatScene {
  readonly document:DocumentData;
@@ -121,7 +122,7 @@ export class FloatSceneRenderer {
    for(const[id,pin]of masks)if(!assets.has(id)||assets.get(id)!==pin.asset||pin.asset.bitmap!==pin.bitmap||pin.asset.blob!==pin.blob||pin.asset.width!==pin.width||pin.asset.height!==pin.height||pin.bitmap.width!==pin.width||pin.bitmap.height!==pin.height)throw new Error('Float scene mask source changed.');
    for(const pin of gridPins.values())pin.check();
   };
-  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();for(const capture of cloneCaptures.values())capture.dispose();cloneCaptures.clear();shadowCache.clear();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
+  const dispose=()=>{if(closed)return;closed=true;abort.abort(new Error('Float scene capture is closed.'));incoming?.removeEventListener('abort',cancel);this.captures.delete(abort);for(const value of sources.values())value.source.dispose();sources.clear();masks.clear();gridPins.clear();for(const capture of planeMasks.values())capture.dispose();planeMasks.clear();for(const capture of perspectiveMasks.values())capture.dispose();perspectiveMasks.clear();for(const capture of erasureCaptures.values())capture.dispose();erasureCaptures.clear();for(const capture of wetCaptures.values())capture.dispose();wetCaptures.clear();for(const capture of cloneCaptures.values())capture.dispose();cloneCaptures.clear();shadowCache.clear();maskService.clear?.();whiteBalances.clear();for(const lookup of lookups.values())lookup.dispose();lookups.clear();};
   const visit=(layers:LayerData[])=>{for(const layer of layers){
    const hdrReferences=floatPaintAssetReferences(layer);
    visitLayerAssets(layer,(reference,role)=>{if(role==='geometry'||hdrReferences.has(reference)){if(!gridPins.has(reference.assetId))gridPins.set(reference.assetId,captureAssetSource(assets,reference.assetId));return;}if(reference===layer&&layer.kind==='raster')return;if(!masks.has(reference.assetId)){const asset=assets.get(reference.assetId);masks.set(reference.assetId,{asset,bitmap:asset.bitmap,blob:asset.blob,width:asset.width,height:asset.height});}});
@@ -276,6 +277,7 @@ export class FloatSceneRenderer {
       const readIntrinsic=async(region:FloatSourceWindow):Promise<Float32Array>=>{
        check();validateWindow(region);
        if(layer.kind==='raster')return raster(layer,world,region);
+       if(layer.kind==='vector')return renderFloatVector(layer,region,world,this.processor,check);
        if(layer.kind==='paint'){
         if(!strokeService?.paint)throw new Error('Float paint coverage service is unavailable.');const preview=strokeService.clonePreview?.layerId===layer.id?strokeService.clonePreview:undefined;
         const clone:FloatCloneRead=(stroke,region,world)=>stroke.id===preview?.id?preview.read(stroke,region,world):cloneCaptures.get(stroke)!.read(region,world);clone.previewId=preview?.id;
@@ -307,7 +309,7 @@ export class FloatSceneRenderer {
       if(clipped.length){
        // A pass-through base supplies isolated intrinsic coverage; member
        // pass-through groups still see this stack's working color plane.
-       const intrinsic=layer.kind==='raster'||layer.kind==='paint'||layer.kind==='group'?await readIntrinsic(area):null;
+       const intrinsic=layer.kind==='raster'||layer.kind==='paint'||layer.kind==='vector'||layer.kind==='group'?await readIntrinsic(area):null;
        if(!intrinsic)throw new Error('A clipping base requires intrinsic pixels.');
        const prepared=await prepareFloatClipping(intrinsic,layer.fillOpacity??1,check),colors=await paint(clipped,prepared.plane,parent,true,area),pixels=await restoreFloatClipping(colors,prepared.shape,check);
        backdrop=await compositeStyled(pixels,1);
@@ -316,7 +318,7 @@ export class FloatSceneRenderer {
         if(layer.opacity===1&&!coverage)backdrop=await paint(layer.children,backdrop,world,false,area);
         else{const after=await paint(layer.children,backdrop.slice(),world,false,area);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
        }else{const pixels=await readIntrinsic(area);backdrop=await compositeStyled(pixels,layer.fillOpacity??1);}
-      }else if(layer.kind==='raster'||layer.kind==='paint'){
+      }else if(layer.kind==='raster'||layer.kind==='paint'||layer.kind==='vector'){
        const fill=layer.fillOpacity??1,pixels=directRaster&&fill===0?undefined:await readIntrinsic(area);check();backdrop=await compositeStyled(pixels,fill);
       }else if(layer.kind==='adjustment'&&layer.adjustment.kind==='tonal'){
        let after=backdrop;

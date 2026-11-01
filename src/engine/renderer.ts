@@ -47,6 +47,7 @@ import { ComponentRegistry } from "../core/smart/manager";
 import { resolveSmartDocument } from "../core/smart/resolve";
 import type { DodgeBurnOptions } from "../core/retouch/types";
 import {renderFloatPaintCoverage} from './float-paint';
+import {FloatMaskRaster} from './float-mask';
 import { renderTonalStroke, renderRetouchCoverage } from "./retouch";
 import { blendAdjustedTile } from "./adjustment-blend";
 import { localTransform, localBounds } from "../core/spatial";
@@ -248,10 +249,15 @@ export class CanvasRenderer implements DocumentRenderer {
     return{...document,children:visit(document.children)};
   }
   private floatMasks(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatMaskService{
+    const raster=new FloatMaskRaster();
     const service:import('./float-scene').FloatMaskService=async(mask,space,world,check)=>{
-      check();const origin=world.point({x:0,y:0}),canvas=await this.renderMaskCoverage(mask,space,origin.x,origin.y,'float-mask',false,world,assets,()=>{check();return!!isCancelled?.();});
-      try{check();applyMaskSettings(canvas,mask);const bytes=canvas.getContext('2d')!.getImageData(0,0,space.width,space.height).data,coverage=new Float32Array(space.width*space.height);for(let i=0;i<coverage.length;i++)coverage[i]=bytes[i*4+3]/255;check();return coverage;}finally{release(canvas);}
+      check();if(space.sx!==1||space.sy!==1)throw new Error('Float mask coverage requires the native document lattice.');const origin=world.point({x:0,y:0});
+      return raster.read(mask,{x:space.x,y:space.y,width:space.width,height:space.height},world,async area=>{
+       const canvas=await this.renderMaskCoverage(mask,{...area,sx:1,sy:1},origin.x,origin.y,'float-mask',false,world,assets,()=>{check();return!!isCancelled?.();});
+       try{check();applyMaskSettings(canvas,mask);const bytes=canvas.getContext('2d')!.getImageData(0,0,area.width,area.height).data,coverage=new Float32Array(area.width*area.height);for(let i=0;i<coverage.length;i++)coverage[i]=bytes[i*4+3]/255;check();return coverage;}finally{release(canvas);}
+      },check);
     };
+    service.clear=()=>raster.clear();
     service.perspective=(mask,options,check)=>this.capturePerspectiveMask(mask,options,assets,{isCancelled:()=>{check();return!!isCancelled?.();}});
     service.plane=(mask,owner,check)=>this.captureMaskPlane(mask,owner,assets,{isCancelled:()=>{check();return!!isCancelled?.();}});
     service.erasure=(entry,check)=>captureProjectedErasure(entry,assets,this.processor,{isCancelled:()=>{check();return!!isCancelled?.();}},this.brushTextures);

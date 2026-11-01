@@ -551,7 +551,6 @@ export function App({ editor }: { editor: EditorApplication }) {
     if(!editor.tools.canChooseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
     if(dom.precision==='float32'&&(next==='brush'||next==='pencil')&&!editor.tools.canUseTool(next))editor.tools.configure({paintTarget:'mask-hide'});
     if(dom.precision==='float32'&&(next==='smudge'||next==='mixer')&&!editor.tools.canUseTool(next))editor.tools.configure({paintTarget:'layer'});
-    if(next==='pen'&&dom.precision==='float32'&&dom.selectedLayer?.mask?.kind==='vector')editor.tools.configure({penEditTarget:'mask'});
     if(!editor.tools.canUseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
     if(gesture.current?.kind==='perspective'){gesture.current=null;pointerDocument.current=null;capturedPointer.current=null;}
     setPerspectiveTarget(null);setPerspectiveIssue(null);
@@ -1023,7 +1022,7 @@ export function App({ editor }: { editor: EditorApplication }) {
     {id:'clipping-mask',label:selected?.clipped?'Release clipping mask':'Create clipping mask',keys:[],
       run:()=>selectedAction(layer=>{layer.clipped=!layer.clipped;}),
       enabled:()=>!busy&&!locked&&!!selected&&(!!selected.clipped||!!clippingBaseFor(state.document.children,selected.id))},
-    {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>dom.precision!=='float32'&&!busy},
+    {id:'combine-vector-paths',label:'Combine vector paths…',keys:[],run:()=>{editor.tools.cancel();setShowVectorBoolean(true);},enabled:()=>!busy},
     {
       id: "undo",
       label: "Undo",

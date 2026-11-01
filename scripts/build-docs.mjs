@@ -68,6 +68,7 @@ const generatedPages = [
   ["FLOAT_DOCUMENTS", "Float document editing"],
   ["FLOAT_PAINT", "Editable linear float paint"],
   ["FLOAT_CLONE", "Native float clone paint"],
+  ["FLOAT_VECTORS", "Editable linear float vectors"],
   ["FLOAT_PROOFING", "Float device soft proofing"],
 ];
 const pageDescriptions = {

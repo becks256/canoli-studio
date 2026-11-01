@@ -308,6 +308,11 @@ export class RecipeRecorder {
         this.steps.push({id:`step-${id()}`,name:`Add ${command.stroke.kind} stroke to ${layer.name}`,target:targetFromLayer(layer),action:{type:'paint.add',stroke:structuredClone(command.stroke)}});
         this.lastCommandTargetLayerId=null;this.notify();break;
       }
+      case "path.add": {
+        const layer=findLayer(beforeDoc,command.id);if(!layer)return;
+        this.steps.push({id:`step-${id()}`,name:`Add path to ${layer.name}`,target:targetFromLayer(layer),action:{type:'path.add',path:structuredClone(command.path)}});
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
       case "layer.update": {
         const layer = findLayer(beforeDoc, command.id);
         if (!layer) return;
