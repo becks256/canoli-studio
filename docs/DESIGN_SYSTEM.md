@@ -1,13 +1,22 @@
 # Canoli Studio design system
 
+## Editable native float paint
+
+Float PaintLayers now replay Brush, Pencil, Eraser and solid Fill commands using
+native linear color, shared canonical scalar coverage and once-only unquantized
+stroke opacity. Ordered editable strokes, private previews, affine placement,
+masks/appearance, Undo and source-bearing persistence use existing boundaries.
+Layer is a valid Brush/Pencil target; preserve an existing ordinary mask choice.
+Clone and prepared wet operations in float PaintLayers remain unsupported.
+[Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
+
+
 ## Float mask tool targeting
 
 When a masked layer is selected in a float document, enable Brush and Pencil in
-the existing rail and command registry. Choosing either defaults an incompatible
-target to Mask Hide; retain an existing Mask Hide/Reveal choice. Keep the target
+the existing rail and command registry. Layer is a valid color target; retain an existing Mask Hide/Reveal choice. Keep the target
 visible in the existing Tool options selector. Reuse the existing B/N bindings,
-cursor, controls, cancellation and one-Undo gesture. Color Brush/Pencil painting
-remains unavailable. Float Smudge/Mixer support raster color and ordinary mask
+cursor, controls, cancellation and one-Undo gesture. Color Brush/Pencil painting uses editable linear PaintLayers. Float Smudge/Mixer support raster color and ordinary mask
 coverage; preserve a valid mask target and default an incompatible target to
 Layer only for a selected raster. Vector-mask Pen keeps its existing
 Mask paths targeting behavior. No new shortcut or component is introduced.

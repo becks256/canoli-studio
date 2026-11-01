@@ -1,3 +1,4 @@
+import {paintOperationSchema} from '../../core/drawing';
 import {recipeFontFiles,recipeFontIds} from './fonts';
 import {documentFontFiles} from '../../core/font-files';
 import {sameFontResource} from '../../fonts/resources';
@@ -454,6 +455,26 @@ export function compileEditPlan(
             break;
           }
 
+          case "layer.place": {
+            if(!targetLayer)throw new Error(`Step '${step.name}' requires a layer.`);
+            let targetId:string|null=null;
+            if(step.action.reference){const resolved=resolveTargets(step.action.reference,simDoc,selectedId,stepOutputs,params,outputGroups);if(resolved.error||resolved.layers.length!==1)throw new Error('Placement reference must resolve to exactly one layer.');targetId=resolved.layers[0].id;}
+            const unlock=step.target?.ignoreLocked&&targetLayer.locked;
+            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:false}};stepCommands.push(command);simDoc=apply(command);}
+            const command:EditorCommand={type:'layer.place',id:targetLayer.id,targetId,placement:step.action.placement,preservePosition:step.action.preservePosition};stepCommands.push(command);simDoc=apply(command);
+            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:true}};stepCommands.push(command);simDoc=apply(command);}
+            layersModified++;affectedLayerNames.add(targetLayer.name);visualChange=`Place '${targetLayer.name}' ${step.action.placement} its semantic reference`;break;
+          }
+          case "paint.add": {
+            if(!targetLayer||targetLayer.kind!=='paint')throw new Error(`Step '${step.name}' requires a paint layer.`);
+            const stroke=paintOperationSchema.parse(actionValue(step.action.stroke)),wasLocked=targetLayer.locked;
+            const unlock=step.target?.ignoreLocked&&wasLocked;
+            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:false}};stepCommands.push(command);simDoc=apply(command);}
+            const command:EditorCommand={type:'paint.add',id:targetLayer.id,stroke:{...stroke,id:id()}};
+            stepCommands.push(command);simDoc=apply(command);
+            if(unlock){const command:EditorCommand={type:'layer.update',id:targetLayer.id,patch:{locked:true}};stepCommands.push(command);simDoc=apply(command);}
+            layersModified++;affectedLayerNames.add(targetLayer.name);visualChange=`Add ${stroke.kind} stroke to '${targetLayer.name}'`;break;
+          }
           case "layer.update": {
             if (!targetLayer) {
               throw new Error(`Step '${step.name}' requires a target layer.`);

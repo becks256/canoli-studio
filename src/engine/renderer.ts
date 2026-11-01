@@ -45,6 +45,7 @@ import { createDocument, createRaster } from "../core/model";
 import { ComponentRegistry } from "../core/smart/manager";
 import { resolveSmartDocument } from "../core/smart/resolve";
 import type { DodgeBurnOptions } from "../core/retouch/types";
+import {renderFloatPaintCoverage} from './float-paint';
 import { renderTonalStroke, renderRetouchCoverage } from "./retouch";
 import { blendAdjustedTile } from "./adjustment-blend";
 import { localTransform, localBounds } from "../core/spatial";
@@ -230,10 +231,11 @@ export class CanvasRenderer implements DocumentRenderer {
         });
         const children=visit(document.children);if(!found)throw new Error('Float tonal preview target is unavailable.');return{...document,children};
       }
-      if(preview.stroke.kind!=='eraser')throw new Error('Color painting requires its float document integration.');
+      if(!['brush','pencil','eraser'].includes(preview.stroke.kind))throw new Error('This color preview requires its float integration.');
       let found=false;
       const visit=(layers:LayerData[]):LayerData[]=>layers.map(layer=>{
-        if(layer.id===preview.layerId){if(layer.kind!=='raster')throw new Error('Float eraser preview requires an original raster layer.');found=true;return{...layer,erasures:[...(layer.erasures??[]),{width:layer.width,height:layer.height,stroke:preview.stroke,...(preview.erasurePlacement?{placement:preview.erasurePlacement}:{})}]};}
+        if(layer.id===preview.layerId&&layer.kind==='paint'){found=true;return{...layer,strokes:[...layer.strokes,preview.stroke]};}
+        if(layer.id===preview.layerId){if(preview.stroke.kind!=='eraser'||layer.kind!=='raster')throw new Error('Float eraser preview requires an original raster layer.');found=true;return{...layer,erasures:[...(layer.erasures??[]),{width:layer.width,height:layer.height,stroke:preview.stroke,...(preview.erasurePlacement?{placement:preview.erasurePlacement}:{})}]};}
         return layer.kind==='group'?{...layer,children:visit(layer.children)}:layer;
       });
       const children=visit(document.children);if(!found)throw new Error('Float eraser preview target is unavailable.');return{...document,children};
@@ -252,10 +254,12 @@ export class CanvasRenderer implements DocumentRenderer {
     return service;
   }
   private floatStrokes(assets:AssetStore,isCancelled?:()=>boolean):import('./float-scene').FloatStrokeService{
-    return async(brush,space,world,check)=>{
+    const service:import('./float-scene').FloatStrokeService=async(brush,space,world,check)=>{
       check();const bytes=await renderRetouchCoverage(brush,space,this.processor,world,assets,this.brushTextures,()=>{check();return!!isCancelled?.();});check();
       const coverage=new Float32Array(bytes.length);for(let i=0;i<bytes.length;i++)coverage[i]=bytes[i]/255;return coverage;
     };
+    service.paint=(operation,space,world,check)=>renderFloatPaintCoverage(operation,space,world,this.processor,assets,this.brushTextures,()=>{check();checkRenderCurrent(isCancelled);});
+    return service;
   }
   async captureFloatScene(document:DocumentData,assets:AssetStore,control:FloatSceneControl={}):Promise<CapturedFloatScene>{
     if(!isFloatDocument(document))throw new Error('Native float scene output requires a float32 linear-sRGB document.');

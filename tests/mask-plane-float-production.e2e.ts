@@ -21,7 +21,7 @@ test('production float mask Brush and Pencil retain HDR delivery, original sourc
   };
   const originalTiff = await tiff('float-mask-before.tif');
   await page.getByRole('button', {name: 'Brush tool (B)', exact: true}).click();
-  await expect(page.getByRole('combobox', {name: 'Paint target', exact: true})).toHaveValue('mask-hide');
+  await page.getByRole('combobox', {name: 'Paint target', exact: true}).selectOption('mask-hide');
   await page.keyboard.press('Control+1');
   const size = page.getByRole('spinbutton', {name: 'Size value', exact: true}); await size.fill('12'); await size.press('Enter');
   let box = (await page.locator('.canvas-wrap').boundingBox())!;

@@ -429,12 +429,13 @@ export class ToolController {
   canUseTool(tool:Tool):boolean{
     if(this.editor.document.precision!=='float32')return true;
     if(['move','hand','marquee','lasso','artboard','crop'].includes(tool))return true;
-    if(tool==='dodge'||tool==='burn')return true;
+    if(tool==='dodge'||tool==='burn'||tool==='fill')return true;
+    if(tool==='brush'||tool==='pencil')return this.state.settings.paintTarget==='layer'||this.state.settings.paintTarget.startsWith('mask-')&&!!this.editor.document.selectedLayer?.mask;
     if(tool==='smudge'||tool==='mixer'){
       const target=this.state.settings.paintTarget,selected=this.editor.document.selectedLayer;
       return target==='layer'?selected instanceof RasterLayer:target.startsWith('mask-')&&!!selected?.mask;
     }
-    if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer;
+    if(tool==='eraser'&&this.state.settings.paintTarget==='layer')return this.editor.document.selectedLayer instanceof RasterLayer||this.editor.document.selectedLayer instanceof PaintLayer;
     if(tool==='pen')return this.state.settings.penEditTarget==='mask'||this.editor.document.selectedLayer?.mask?.kind==='vector';
     return ['brush','pencil','eraser'].includes(tool)&&this.state.settings.paintTarget.startsWith('mask-');
   }

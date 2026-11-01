@@ -49,10 +49,10 @@ export function assetBitmapMatches(asset:ImageAsset):boolean{
 
 /** Pins immutable bytes and geometry, plus a real surface when this host has one. */
 export function captureAssetSource(assets:AssetStore,assetId:string){
-  const alive=assets.captureLifetime(),asset=assets.get(assetId),blob=asset.blob,raw=asset.raw,width=asset.width,height=asset.height;
+  const alive=assets.captureLifetime(),asset=assets.get(assetId),blob=asset.blob,raw=asset.raw,tiff=asset.tiff,color=asset.tiffColor,avif=asset.avif,width=asset.width,height=asset.height;
   const bitmap=encodedRecords.has(asset)?null:asset.bitmap;
   const check=()=>{
-    alive();if(!assets.has(assetId)||assets.get(assetId)!==asset||asset.blob!==blob||asset.raw!==raw||asset.width!==width||asset.height!==height||
+    alive();if(!assets.has(assetId)||assets.get(assetId)!==asset||asset.blob!==blob||asset.raw!==raw||asset.tiff!==tiff||asset.tiffColor!==color||asset.avif!==avif||asset.width!==width||asset.height!==height||
       bitmap&&(asset.bitmap!==bitmap||!assetBitmapMatches(asset)))throw new Error('Source image asset changed.');
   };
   check();return{asset,check};

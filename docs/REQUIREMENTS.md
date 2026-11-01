@@ -1,5 +1,16 @@
 # Canoli Studio editor requirements
 
+## Editable native float paint
+
+Float PaintLayers now replay Brush, Pencil, Eraser and solid Fill commands using
+native linear color, shared canonical scalar coverage and once-only unquantized
+stroke opacity. Ordered editable strokes, private previews, affine placement,
+masks/appearance, Undo and source-bearing persistence use existing boundaries.
+Layer is a valid Brush/Pencil target; preserve an existing ordinary mask choice.
+Clone and prepared wet operations in float PaintLayers remain unsupported.
+[Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
+
+
 ## Prepared HDR raster wet edits
 
 Schema 57 retains explicit float32 prepared pigment/removal TIFF pairs through
@@ -26,10 +37,9 @@ eligible integer moves, with source/proof/cancellation checks before publication
 ## Float mask tool access
 
 Selecting a masked layer in a float document must make Brush and Pencil reachable
-through the rail, existing shortcuts and command palette. Choosing either tool
-switches an incompatible paint target to Mask Hide and preserves an existing
-Mask Hide/Reveal choice. Gesture admission must still reject color painting on
-float artwork. Retained projected masks must preserve native HDR RGB, float
+through the rail, existing shortcuts and command palette. Layer now supports editable float color painting; choosing either tool preserves
+a valid Layer or Mask Hide/Reveal choice. Gesture admission checks the current
+actual target. Retained projected masks must preserve native HDR RGB, float
 alpha, preview/commit parity, cancellation and shared Undo through editing and
 source-bearing persistence. See [the mask-plane contract](MASK_PLANES.md).
 

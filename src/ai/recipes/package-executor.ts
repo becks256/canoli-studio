@@ -1,6 +1,6 @@
 import {retainedDocuments,captureRetainedHistory} from '../../core/history';
 import { AssetStore } from "../../core/assets";
-import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
+import {visitBrushAssets,visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
 import { id,referencedAssets } from "../../core/model";
 import {Document} from "../../dom";
 import {captureAssetSource} from "../../core/assets";
@@ -29,6 +29,7 @@ function remapSources(recipe: Recipe, ids: Map<string, string>): void {
       node.children.forEach(layer);
   };
   for (const step of recipe.steps) {
+    if(step.action.type==='paint.add')visitBrushAssets(step.action.stroke,remap);
     if (step.action.type === "layer.add") layer(step.action.layerTemplate);
     if (step.action.type === "layer.update") {
       visitLayerPatchAssets(step.action.patch,remap);

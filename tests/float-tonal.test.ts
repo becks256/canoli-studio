@@ -6,7 +6,7 @@ import {FloatPixelProcessor} from '../src/engine/float-pixels';
 import {applyFloatTonal} from '../src/engine/float-tonal';
 import {instantiateKernel} from '../src/engine/wasm';
 import {floatTonalOptionsSchema, type FloatTonalOptions} from '../src/core/float-tonal';
-import {Document, RasterLayer, AdjustmentLayer, TonalStroke, BrushStroke, PaintLayer} from '../src/dom';
+import {Document, RasterLayer, AdjustmentLayer, TonalStroke, BrushStroke, VectorLayer} from '../src/dom';
 import {parseCommands} from '../src/core/validation';
 import {RecipeRecorder} from '../src/ai/recipes/recorder';
 
@@ -79,7 +79,7 @@ it('existing OO tonal constructors share float conversion, exact Undo, lock vali
   const layer=document.layers.add(new AdjustmentLayer({adjustment:{kind:'tonal',strokes:[]}})),stroke=new TonalStroke({brush:new BrushStroke({points:[{x:8,y:8,pressure:.5}],size:12}),mode:'dodge',range:'midtones',exposure:.5});
   layer.addTonalStroke(stroke);const byte=document.toJSON();document.convertToFloat();const before=document.toJSON();expect(Document.fromJSON(before).toJSON()).toEqual(before);
   layer.addTonalStroke(stroke);const after=document.toJSON();document.undo();expect(document.toJSON()).toEqual(before);document.redo();expect(document.toJSON()).toEqual(after);
-  expect(()=>document.transaction('Rejected float edit',()=>{raster.opacity=.5;document.layers.add(new PaintLayer());})).toThrow();expect(document.toJSON()).toEqual(after);
+  expect(()=>document.transaction('Rejected float edit',()=>{raster.opacity=.5;document.layers.add(new VectorLayer());})).toThrow();expect(document.toJSON()).toEqual(after);
   layer.locked=true;const locked=document.toJSON();expect(()=>layer.addTonalStroke(stroke)).toThrow(/lock/i);expect(document.toJSON()).toEqual(locked);
   document.undo();document.undo();document.undo();expect(document.toJSON()).toEqual(byte);
 });

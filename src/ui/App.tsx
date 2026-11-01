@@ -549,7 +549,7 @@ export function App({ editor }: { editor: EditorApplication }) {
 
   function chooseTool(next: Tool) {
     if(!editor.tools.canChooseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
-    if(dom.precision==='float32'&&(next==='brush'||next==='pencil')&&!editor.tools.getSnapshot().settings.paintTarget.startsWith('mask-'))editor.tools.configure({paintTarget:'mask-hide'});
+    if(dom.precision==='float32'&&(next==='brush'||next==='pencil')&&!editor.tools.canUseTool(next))editor.tools.configure({paintTarget:'mask-hide'});
     if(dom.precision==='float32'&&(next==='smudge'||next==='mixer')&&!editor.tools.canUseTool(next))editor.tools.configure({paintTarget:'layer'});
     if(next==='pen'&&dom.precision==='float32'&&dom.selectedLayer?.mask?.kind==='vector')editor.tools.configure({penEditTarget:'mask'});
     if(!editor.tools.canUseTool(next)){notify(editor.tools.toolUnavailableReason(next)!);return;}
@@ -1087,7 +1087,7 @@ export function App({ editor }: { editor: EditorApplication }) {
       label: "New layer",
       keys: SHORTCUT_BINDINGS["new-layer"],
       run: addLayer,
-      enabled:()=>dom.precision!=='float32'&&!busy,
+      enabled:()=>!busy,
     },
     {
       id: "group",

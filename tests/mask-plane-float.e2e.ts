@@ -65,7 +65,7 @@ for (const initiallyLinked of [true, false]) {
   }
 }
 
-test('float mask tools are reachable from shortcuts and the command palette while color painting stays rejected', async ({page}, info) => {
+test('float mask tools are reachable from shortcuts and the command palette alongside editable color painting', async ({page}, info) => {
   await page.goto('/'); await page.waitForFunction(() => !!window.luma?.editor);
   await page.evaluate(async bytes => {
     const {editor, LayerMask} = window.luma;
@@ -75,10 +75,11 @@ test('float mask tools are reachable from shortcuts and the command palette whil
   }, [...await readFile('tests/fixtures/tiff-float/rgba-raw-le.tif')]);
   await expect(page.getByRole('button', {name: 'Brush tool (B)', exact: true})).toBeEnabled();
   await expect(page.getByRole('button', {name: 'Pencil tool (N)', exact: true})).toBeEnabled();
-  for (const name of ['Mixer brush', 'Smudge tool', 'Text tool (T)', 'Vector pen (P)'])
+  for (const name of ['Text tool (T)', 'Vector pen (P)'])
     await expect(page.getByRole('button', {name, exact: true})).toBeDisabled();
   await page.keyboard.press('b');
-  await expect(page.getByRole('combobox', {name: 'Paint target', exact: true})).toHaveValue('mask-hide');
+  await expect(page.getByRole('combobox', {name: 'Paint target', exact: true})).toHaveValue('layer');
+  await page.getByRole('combobox', {name: 'Paint target', exact: true}).selectOption('mask-hide');
   await page.getByRole('combobox', {name: 'Paint target', exact: true}).selectOption('mask-reveal');
   await page.getByRole('button', {name: 'Move tool (V)', exact: true}).click();
   await page.keyboard.press('n');
@@ -95,11 +96,11 @@ test('float mask tools are reachable from shortcuts and the command palette whil
     editor.tools.configure({paintTarget: 'layer'}); let rejected = '';
     try {editor.tools.begin('brush', {x: 40, y: 25}, {alt: false, shift: false, pressure: 1}, 1);} catch (error) {rejected = String(error);}
     return {rejected, unchanged: JSON.stringify(before) === JSON.stringify(editor.document.toJSON()),
-      historyUnchanged: past === editor.document.getSnapshot().past.length, preview: editor.tools.getSnapshot().paintPreview,
+      historyUnchanged: past === editor.document.getSnapshot().past.length, preview: !!editor.tools.getSnapshot().paintPreview,
       chooseBrush: editor.tools.canChooseTool('brush'), useColorBrush: editor.tools.canUseTool('brush')};
   });
-  expect(result).toMatchObject({unchanged: true, historyUnchanged: true, preview: null, chooseBrush: true, useColorBrush: false});
-  expect(result.rejected).toMatch(/float document integration/);
+  expect(result).toMatchObject({unchanged: true, historyUnchanged: true, preview: true, chooseBrush: true, useColorBrush: true});
+  expect(result.rejected).toBe('');await page.keyboard.press('Escape');
   await writeFile(info.outputPath('float-mask-tool-targets.json'), JSON.stringify(result, null, 2));
 });
 

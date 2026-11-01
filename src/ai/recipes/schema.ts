@@ -1,3 +1,4 @@
+import {paintOperationSchema} from '../../core/drawing';
 import {recipeDeliverySchema} from './delivery';
 import { z } from "zod";
 import type { Recipe } from "./types";
@@ -139,6 +140,8 @@ export const recipeRawDevelopmentSchema=z.object({
 }).strict();
 
 export const recipeActionSchema = z.discriminatedUnion("type", [
+  z.object({type:z.literal("layer.place"),reference:semanticTargetSchema.nullable(),placement:z.enum(["before","after","inside"]),preservePosition:z.boolean()}).strict(),
+  z.object({type:z.literal("paint.add"),stroke:paintOperationSchema}).strict(),
   z.object({type:z.literal('layer.align'),targets:z.array(semanticTargetSchema).min(1),alignment:layerAlignmentSchema,reference:z.discriminatedUnion('type',[
     z.object({type:z.literal('selection')}).strict(),z.object({type:z.literal('canvas')}).strict(),z.object({type:z.literal('layer'),layer:semanticTargetSchema}).strict(),
   ]).optional()}).strict(),

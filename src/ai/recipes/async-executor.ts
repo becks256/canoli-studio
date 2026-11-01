@@ -1,3 +1,5 @@
+import {validateWetPaintAssets} from '../../core/wet-assets';
+import {wetBrowserAssets} from '../../engine/wet-composite';
 import {recipeFontFiles} from './fonts';
 import {documentFontFiles} from '../../core/font-files';
 import type {FontSourceLease} from '../../fonts/store';
@@ -30,6 +32,11 @@ export async function executeRecipeAsync(
     for(const pin of pins.values())pin.check();for(const pin of fontPins)pin.check();
   };
   const staging=new AssetStore(),promoted:string[]=[];
+  const simulate=()=>{
+    for(const resource of staging.fonts.values())staging.fonts.activate(resource.id);
+    try{let candidate=document.toJSON();for(const command of plan.resolvedCommands)candidate=execute(candidate,command);return candidate;}
+    finally{for(const resource of staging.fonts.values())staging.fonts.deactivate(resource.id);}
+  };
   try{
     current();
     const files=[...documentFontFiles(document.toJSON()),...recipeFontFiles(captured)];
@@ -41,7 +48,8 @@ export async function executeRecipeAsync(
     if(!plan.valid)return {success:false,plan,error:`Recipe '${captured.name}' validation failed: ${plan.errors.join('; ')}`};
     if(assets){
       const outputs=new Set(plan.rawDevelopments?.map(value=>value.assetId)??[]);
-      const sources=new Set([...referencedAssets(document.toJSON()),...(plan.rawDevelopments??[]).map(value=>value.sourceAssetId).filter(value=>!outputs.has(value))]);
+      const prospective=simulate();
+      const sources=new Set([...referencedAssets(document.toJSON()),...referencedAssets(prospective),...(plan.rawDevelopments??[]).map(value=>value.sourceAssetId)].filter(value=>!outputs.has(value)));
       for(const assetId of sources)pins.set(assetId,captureAssetSource(assets,assetId));
     }
     for(const request of plan.rawDevelopments??[]){
@@ -65,11 +73,17 @@ export async function executeRecipeAsync(
     plan.steps=plan.steps.map(step=>step.resolvedCommand?{...step,resolvedCommand:repair(step.resolvedCommand)}:step);
     // Native faces are registered only for synchronous simulation/publication,
     // never across asynchronous RAW work or user progress callbacks.
-    for(const resource of staging.fonts.values())staging.fonts.activate(resource.id);
-    let final=document.toJSON();for(const command of plan.resolvedCommands)final=execute(final,command);
+    const final=simulate();
     for(const assetId of referencedAssets(final))if(!assets?.has(assetId)&&!staging.has(assetId))throw new Error(`Recipe source asset is unavailable: ${assetId}`);
+    const validation=new AssetStore();
+    try{
+      for(const asset of assets?.values()??[])assets!.shareTo(validation,asset.id,asset.id);
+      for(const asset of staging.values())staging.shareTo(validation,asset.id,asset.id);
+      await validateWetPaintAssets(final,wetBrowserAssets(validation,current));current();
+    }finally{validation.dispose();}
     current();
     for(const asset of staging.values()){staging.shareTo(assets!,asset.id,asset.id);promoted.push(asset.id);}
+    for(const resource of staging.fonts.values())staging.fonts.activate(resource.id);
     return commitRecipePlan(captured,document,plan,origin);
   }catch(error){return {success:false,plan,error:error instanceof Error?error.message:String(error)};}
   finally{

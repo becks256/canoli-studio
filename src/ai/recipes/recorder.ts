@@ -298,6 +298,16 @@ export class RecipeRecorder {
             :{type:'text.paragraphOverrides.clear',keys:command.keys?structuredClone(command.keys):undefined}});
         this.lastCommandTargetLayerId=null;this.notify();break;
       }
+      case "layer.place": {
+        const layer=findLayer(beforeDoc,command.id),reference=command.targetId?findLayer(beforeDoc,command.targetId):null;if(!layer)return;
+        this.steps.push({id:`step-${id()}`,name:`Place ${layer.name}`,target:targetFromLayer(layer),action:{type:'layer.place',reference:reference?targetFromLayer(reference):null,placement:command.placement,preservePosition:command.preservePosition}});
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
+      case "paint.add": {
+        const layer=findLayer(beforeDoc,command.id);if(!layer)return;
+        this.steps.push({id:`step-${id()}`,name:`Add ${command.stroke.kind} stroke to ${layer.name}`,target:targetFromLayer(layer),action:{type:'paint.add',stroke:structuredClone(command.stroke)}});
+        this.lastCommandTargetLayerId=null;this.notify();break;
+      }
       case "layer.update": {
         const layer = findLayer(beforeDoc, command.id);
         if (!layer) return;

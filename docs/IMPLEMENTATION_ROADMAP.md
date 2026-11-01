@@ -10093,3 +10093,35 @@ quality, sustained F14 performance and every unfinished original professional,
 AI, workflow, ChatGPT/live identity, commercial, specialist and motion gate
 remain required. Small native windows on 50 MP sources do not establish
 full-image wet performance, continuous 60fps or a physical pigment model.
+
+
+### 2026-10-31 — F03/F10 editable native linear paint
+
+Owner: implementation agent; increment from `6c48365`; classification: progress.
+PaintLayer Brush/Pencil/Eraser/solid Fill now have ordered native linear replay,
+canonical scalar coverage, unquantized once-only stroke opacity, private live
+previews and existing command/history/source-bearing transport. New layer and
+Color settings conversion admit supported editable paint and blank documents;
+Layer and ordinary mask targets stay explicit. Clone/wet PaintLayer integration
+and the wider original roadmap remain required. [Contract](FLOAT_PAINT.md).
+The initial transport check exposed missing paint.add recording. The connected
+recipe increment adds literal append and relative placement actions, fresh
+identities, semantic created-layer/group targets, portable source remapping and
+complete asynchronous wet-pair/source validation.
+Verified: **3,294 unit/API/native tests across 321 files; 53 source-browser cases across 11 files; 17 selected production cases across 6 files**. Final runs have zero failures, skips, retries, flakes or
+runner errors. Independent native libtiff/NumPy matches all 41,396 words in each
+production paint/reopened TIFF. Actual pointer/recorder/replay, precise opacity,
+eraser/fill/styles/clipping, affine crop parity, isolated/plugin/REST commands,
+source-bearing recipes and redo-only workspace recovery pass. A genuine 50 MP
+original retains an independently checked 64x48 native paint window; separate
+full native tone/precision controls preserve their scope. Native font privacy,
+wet-pair validation and existing byte/HDR mask/tool workflows remain green.
+Build/typecheck, frozen source/fixture inputs and exact final runtime identities
+pass; production-only test amendments and initial recorder/harness failures stay
+disclosed. [Findings and compact evidence](benchmarks/float-paint-2026-10-31.md).
+
+The complete original roadmap remains active, including wider float tools/layers/
+spaces, clone/wet PaintLayers, warp/master coverage, photographic/device quality,
+sustained F14 and all unfinished professional/AI/workflow/ChatGPT/live identity/
+commercial/specialist/motion gates. No complete F03/F10/F14 or roadmap acceptance
+is inferred.

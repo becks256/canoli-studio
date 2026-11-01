@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Editable native float paint
+
+Float PaintLayers now replay Brush, Pencil, Eraser and solid Fill commands using
+native linear color, shared canonical scalar coverage and once-only unquantized
+stroke opacity. Ordered editable strokes, private previews, affine placement,
+masks/appearance, Undo and source-bearing persistence use existing boundaries.
+Layer is a valid Brush/Pencil target; preserve an existing ordinary mask choice.
+Clone and prepared wet operations in float PaintLayers remain unsupported.
+[Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
+
+
 ## HDR native document composition
 
 Versioned HDR prepared strokes retain original raster geometry independently of

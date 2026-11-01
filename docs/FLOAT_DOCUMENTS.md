@@ -1102,3 +1102,12 @@ serve real Smudge/Mixer raster gestures. Ordinary mask preparation remains byte
 coverage. [Current signatures, defaults, ownership and remaining acceptance](HDR_WET_DOCUMENTS.md#trusted-native-authoring-and-tools)
 supersede the earlier unavailable-tool status. Physical/photographic/device,
 sustained performance and the unfinished wider roadmap remain required.
+
+## Editable float PaintLayers
+
+Brush, Pencil, Eraser and solid Fill now replay as editable native linear paint.
+Blank/supported paint documents can convert through Color settings without a
+TIFF raster. Retained raster originals still need their existing precision/source
+checks. [Current tool/API/persistence contract](FLOAT_PAINT.md) supersedes earlier
+PaintLayer and color Brush/Pencil exclusions; wider unsupported operations and
+original roadmap gates remain required.

@@ -1,5 +1,16 @@
 # Scripting API
 
+## Editable native float paint
+
+Float PaintLayers now replay Brush, Pencil, Eraser and solid Fill commands using
+native linear color, shared canonical scalar coverage and once-only unquantized
+stroke opacity. Ordered editable strokes, private previews, affine placement,
+masks/appearance, Undo and source-bearing persistence use existing boundaries.
+Layer is a valid Brush/Pencil target; preserve an existing ordinary mask choice.
+Clone and prepared wet operations in float PaintLayers remain unsupported.
+[Current signatures, coordinates, defaults, errors and isolation](FLOAT_PAINT.md).
+
+
 ## Prepared HDR raster wet edits (schema 57)
 
 `WetPaintStroke` accepts optional `precision:"float32"` and exposes read-only
@@ -4525,3 +4536,18 @@ The pure OO method uses existing layer updates/locks/history inside isolated
 scripts. It adds no file/pixel/worker/network access or plugin grant. REST
 accepts the strict mask DTO through existing layer updates in its independent
 headless session; it does not synchronize with the browser.
+
+
+## Recorded editable paint appends
+
+Recipe action `paint.add` accepts a complete strict PaintOperationData DTO and a
+semantic PaintLayer target. It appends with a fresh stroke ID, preserving prior
+strokes, existing command validation/locks and one-transaction Undo. Portable
+packages retain original texture/clone/wet sources; asynchronous host admission
+validates complete wet pairs and source identities before publication. Stroke
+fields are literal; removal recording remains unsupported.
+[Exact supported float/byte operation and trust boundaries](FLOAT_PAINT.md#recorded-paint-appends).
+
+Recorded `layer.place` uses semantic reference/null, before/after/inside and the
+existing preservePosition boolean. Shared affine/topology/lock validation and
+created-step targets retain actual fresh-brush placement in a replay.

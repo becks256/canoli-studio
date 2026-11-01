@@ -66,6 +66,7 @@ const generatedPages = [
   ["HDR_WET_DOCUMENTS", "Prepared HDR wet document edits"],
   ["FLOAT_SOURCES", "Owned float originals and derived tiles"],
   ["FLOAT_DOCUMENTS", "Float document editing"],
+  ["FLOAT_PAINT", "Editable linear float paint"],
   ["FLOAT_PROOFING", "Float device soft proofing"],
 ];
 const pageDescriptions = {

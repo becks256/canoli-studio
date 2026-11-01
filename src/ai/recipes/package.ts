@@ -1,7 +1,7 @@
 import {readDeliveryPreset} from '../batch/delivery-preset';
 import {rawSourceMetadataSchema,rawSourceMetadata,ownRawSource,verifyRawSource,type RawImageSource} from "../../core/interchange/raw/source";
 import { z } from "zod";
-import {visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
+import {visitBrushAssets,visitLayerTemplateAssets,visitLayerPatchAssets} from '../../core/asset-references';
 import {avifDecodeOptionsSchema,type AvifDecodeSettings} from "../../core/interchange/avif/types";
 import {tiffDecodeOptionsSchema,type TiffDecodeSettings} from "../../core/interchange/tiff/types";
 import type { Recipe } from "./types";
@@ -68,6 +68,7 @@ export function recipeAssetIds(recipe: Recipe): Set<string> {
       node.children.forEach(layer);
   };
   for (const step of recipe.steps) {
+    if(step.action.type==='paint.add')visitBrushAssets(step.action.stroke,reference=>add(reference.assetId));
     if (step.action.type === "layer.add") layer(step.action.layerTemplate);
     if (step.action.type === "layer.update") {
       visitLayerPatchAssets(step.action.patch,reference=>add(reference.assetId));

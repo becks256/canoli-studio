@@ -1,3 +1,4 @@
+import {replayFloatPaint,type FloatPaintCoverage} from './float-paint';
 import{applyFloatStyle}from'./float-style';
 import {activePerspective,perspectiveLocalQuad,perspectiveMatrix,perspectiveRect} from '../core/perspective';
 import {ProjectiveTransform,type ProjectiveQuad} from '../core/projective';
@@ -43,7 +44,7 @@ import type{ColorProof}from'../core/color/color-settings';
 
 export interface FloatSceneControl extends FloatSourceControl,FloatProjectionControl{}
 export type FloatMaskService=((mask:LayerMaskData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{plane?(mask:LayerMaskData,owner:MaskPlanePoseData,check:()=>void):CapturedMaskPlane;perspective?(mask:LayerMaskData,options:PerspectiveMaskOptions,check:()=>void):CapturedPerspectiveMask;erasure?(entry:import('../core/drawing').RasterErasureData,check:()=>void):import('./projected-erasure').CapturedProjectedErasure};
-export type FloatStrokeService=(brush:BrushStrokeData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>;
+export type FloatStrokeService=((brush:BrushStrokeData,space:RenderSpace,world:AffineTransform,check:()=>void)=>Promise<Float32Array>)&{paint?:FloatPaintCoverage};
 export interface CapturedFloatScene {
  readonly document:DocumentData;
  readonly signal:AbortSignal;
@@ -263,6 +264,7 @@ export class FloatSceneRenderer {
       const readIntrinsic=async(region:FloatSourceWindow):Promise<Float32Array>=>{
        check();validateWindow(region);
        if(layer.kind==='raster')return raster(layer,world,region);
+       if(layer.kind==='paint'){if(!strokeService?.paint)throw new Error('Float paint coverage service is unavailable.');return replayFloatPaint(layer.strokes,region,world,strokeService.paint,this.processor,check);}
        if(layer.kind==='group')return paint(layer.children,new Float32Array(region.width*region.height*4),world,false,region);
        throw new Error('A shadow requires intrinsic artwork pixels.');
       };
@@ -289,7 +291,7 @@ export class FloatSceneRenderer {
       if(clipped.length){
        // A pass-through base supplies isolated intrinsic coverage; member
        // pass-through groups still see this stack's working color plane.
-       const intrinsic=layer.kind==='raster'||layer.kind==='group'?await readIntrinsic(area):null;
+       const intrinsic=layer.kind==='raster'||layer.kind==='paint'||layer.kind==='group'?await readIntrinsic(area):null;
        if(!intrinsic)throw new Error('A clipping base requires intrinsic pixels.');
        const prepared=await prepareFloatClipping(intrinsic,layer.fillOpacity??1,check),colors=await paint(clipped,prepared.plane,parent,true,area),pixels=await restoreFloatClipping(colors,prepared.shape,check);
        backdrop=await compositeStyled(pixels,1);
@@ -298,8 +300,8 @@ export class FloatSceneRenderer {
         if(layer.opacity===1&&!coverage)backdrop=await paint(layer.children,backdrop,world,false,area);
         else{const after=await paint(layer.children,backdrop.slice(),world,false,area);backdrop=await interpolateFloatBackdrops(backdrop,after,layer.opacity,coverage,check);}
        }else{const pixels=await readIntrinsic(area);backdrop=await compositeStyled(pixels,layer.fillOpacity??1);}
-      }else if(layer.kind==='raster'){
-       const fill=layer.fillOpacity??1,pixels=directRaster&&fill===0?undefined:await raster(layer,world,area);check();backdrop=await compositeStyled(pixels,fill);
+      }else if(layer.kind==='raster'||layer.kind==='paint'){
+       const fill=layer.fillOpacity??1,pixels=directRaster&&fill===0?undefined:await readIntrinsic(area);check();backdrop=await compositeStyled(pixels,fill);
       }else if(layer.kind==='adjustment'&&layer.adjustment.kind==='tonal'){
        let after=backdrop;
        for(const {brush,...options} of layer.adjustment.strokes){

@@ -1,5 +1,5 @@
 import{it,expect}from'vitest';
-import{Document,RasterLayer,LayerGroup,ToneAdjustment,PaintLayer,AdjustmentLayer}from'../src/dom';
+import{Document,RasterLayer,LayerGroup,ToneAdjustment,VectorLayer,AdjustmentLayer}from'../src/dom';
 import{BLEND_MODES,SCHEMA_VERSION,validateDocument}from'../src/core/model';
 import{parseCommands}from'../src/core/validation';
 it('float precision is versioned OO document state with an atomic shared command and exact Undo',()=>{
@@ -10,10 +10,10 @@ it('float constructor and old schema validation reject contradictory precision i
 });
 it('unsupported operations and mixed transactions reject before changing a float document or its history',()=>{
  const document=new Document({precision:'float32'}),raster=new RasterLayer({assetId:'float-original',width:10,height:10});document.layers.add(raster);const before=document.toJSON(),revision=document.getSnapshot().revision;
- expect(()=>document.layers.add(new PaintLayer())).toThrow('Other layer types');expect(()=>document.transaction('Unsupported float edit',()=>{raster.opacity=.25;document.layers.add(new PaintLayer());})).toThrow();expect(document.toJSON()).toEqual(before);expect(document.getSnapshot().revision).toBe(revision);
+ expect(()=>document.layers.add(new VectorLayer())).toThrow('Other layer types');expect(()=>document.transaction('Unsupported float edit',()=>{raster.opacity=.25;document.layers.add(new VectorLayer());})).toThrow();expect(document.toJSON()).toEqual(before);expect(document.getSnapshot().revision).toBe(revision);
 });
 it('conversion gates unsupported legacy content and wire commands remain strict',()=>{
- const document=new Document();document.layers.add(new PaintLayer());const before=document.toJSON();expect(()=>document.convertToFloat()).toThrow('Other layer types');expect(document.toJSON()).toEqual(before);expect(parseCommands([{type:'document.precision.float'}])).toEqual([{type:'document.precision.float'}]);expect(()=>parseCommands([{type:'document.precision.float',force:true}])).toThrow();
+ const document=new Document();document.layers.add(new VectorLayer());const before=document.toJSON();expect(()=>document.convertToFloat()).toThrow('Other layer types');expect(document.toJSON()).toEqual(before);expect(parseCommands([{type:'document.precision.float'}])).toEqual([{type:'document.precision.float'}]);expect(()=>parseCommands([{type:'document.precision.float',force:true}])).toThrow();
 });
 
 it('float tone parameters share ordinary OO transactions, strict limits and exact Undo',()=>{
