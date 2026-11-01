@@ -9,7 +9,7 @@ direction, including zero-width and negative tracked advances. Verify complete
 original/candidate ink before publishing any fields; mismatch must not return
 partial paint. Pin property-source versions/hashes and retain Unicode notices.
 The private dependency passes its affected regression matrix. Owned fallback,
-cross-span mixed-bidi colored ordering and connected public Float32 text remain
+broader native bidi itemization/ordering and connected public Float32 text remain
 required; no public Float32 text is admitted.
 [Current evidence and limits](FLOAT_TEXT.md#original-script-and-native-direction-items-private).
 

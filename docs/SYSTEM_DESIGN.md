@@ -1,5 +1,16 @@
 # Canoli Studio System Design & Architecture Specification
 
+## Original cluster provenance and complete native paint order
+
+Retain original UTF-16 cluster provenance through private glyph projections.
+Rank complete horizontal styled lines by captured native visual metadata while
+preserving shaped order within a cluster and ties. Source metadata supplies no
+new glyph positions or colors. Native positional extent may supply an additional
+path anchor when summed measured advances differ; cache immutable source ranges
+only. Complete per-item/line ink and per-color ownership still gate publication.
+No provenance field enters the public document model, grants or persistence.
+[Verification and remaining scope](FLOAT_TEXT.md#cross-span-native-paint-order-private).
+
 ## Native source-item interpretation
 
 Original spans are immutable layout sources, not mandatory shaping-run units.

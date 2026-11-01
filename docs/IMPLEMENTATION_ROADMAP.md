@@ -11023,3 +11023,73 @@ persistence and every unfinished original professional-editor, photographic,
 precision/workflow, quality/device/performance, provider/installed ChatGPT/live
 identity/commercial and other roadmap gate remain required. No public model,
 schema, grants, source-resolution or REST/browser synchronization changes.
+
+
+### 2026-11-01 — F08/F10 cross-span native paint ordering in progress
+
+Owner: implementation agent; estimate M within T16/T17. Starting from accepted
+1f6271f, a 64-layout diagnostic records forty exact matches and twenty-four
+negative-tracking rejections across colored Latin/Hebrew/Arabic, native font/size
+boundaries, both paragraph directions, straight/curved and affine layouts. The
+first failure has exact complete union ink but incorrect per-color ownership;
+publication remains rejected. Original source-cluster provenance and whole-line
+native ordering are under investigation. Preserve shaped within-cluster order,
+original spans/fonts/colors/poses, full context and exact native ink/ownership
+checks. No public Float32 text, model/schema/grant or transport change is admitted.
+Owned fallback, missing/intrinsic paint, wider native layout/host/extents, connected
+Float32 text workflows and every unfinished original roadmap gate remain required.
+
+The first complete asserted 64-layout ordering pilot now matches 63 cases. The
+remaining mixed-font RTL negative curve fails its per-span geometry before
+whole-line ordering. Temporary source-only Vite instrumentation retains all
+placement-trial errors and original native caret/path metadata; no production
+observer or partial-field exception is added. A native range-based anchoring
+candidate and nine independent colored Float32 references are under verification.
+Complete source/production/unit/build/large-image acceptance of this next increment
+remains pending; accepted baseline 1f6271f is unchanged.
+
+The native positional-range anchor resolves that final curve exactly. Corrected
+preflight passes all eight cases: every 64-layout target, nine independent colored
+Float32 compositions, the prior 72 styled layouts/twelve Float32 compositions and
+ownership/fault controls. Signed/HDR RGB, alpha 1e-8 and every partition word remain
+exact. Full verification is next; the production fixture is being expanded to
+exercise emitted original-cluster Hebrew ordering alongside the existing Latin
+case. No full-roadmap or public Float32 text completion is claimed.
+
+
+### 2026-11-01 — F08/F10 complete styled native bidi paint order verified
+
+Owner: implementation agent; estimate M within T16/T17. Starting from 1f6271f,
+original source-cluster provenance now survives private glyph projections and
+complete horizontal styled lines retain captured native paint ranking, stable
+shaped cluster order and exact per-color ownership. Native positional-range path
+anchoring resolves a measured-advance/extent difference for negative fragments;
+no inverse curve or reference-pixel fitting supplies poses. Original spans,
+fonts/tuples, source-linear colors and public authority remain unchanged.
+
+Full build/typecheck and all 3,415 unit/API cases across 341 files pass. One
+complete affected source run passes 203 cases across 24 files; fifteen production
+cases pass, all without retries/skips/flakes. All 64 new styled bidi layouts and
+nine independent colored Float32 compositions pass, retaining alpha/RGB and every
+partition word, signed/HDR color and alpha 1e-8. Prior 96 original script layouts,
+72 styled layouts, vertical/path/numerical and ownership/fault regressions remain.
+The emitted production styled test retains the existing Latin workflow and adds
+overlapping Hebrew with reversed original source-cluster order through the actual
+matcher/worker/ownership code. Full capture/lifetime remains source-browser scope.
+
+Independent readers compare every RGBA sample in both complete ordinary 50 MP
+curve and vertical outputs against complete native SVG references: 200 million
+samples each, zero error and identical PNGs. The RAW case retains its exact
+100,000,672-byte original, complete 600 × 200 text reference and preceding accepted
+full PNG bytes. These are ordinary byte regressions. [Findings and limits](benchmarks/native-styled-bidi-2026-11-01.md)
+and [compact source/release/run/reference receipt](benchmarks/native-styled-bidi-2026-11-01.json.gz)
+retain the 40/64 diagnostic, 63/64 initial ordering attempt, geometry-only probes,
+harness corrections and final exact evidence. Raw benchmark ZIPs remain local.
+
+Owned fallback, missing/intrinsic paint, broader scripts/vertical/native/legacy/
+optical itemization/layouts/extents/hosts, connected public Float32 TextLayer
+editing/tools/scenes/export/shared transport/persistence and every unfinished
+original professional-editor, photographic, precision/workflow, device/quality/
+performance, provider/installed ChatGPT/live identity/commercial and other roadmap
+gate remain required. The complete original goal remains active. Public model,
+schema, grants, source resolution and REST/browser session contracts are unchanged.

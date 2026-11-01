@@ -1,12 +1,14 @@
 # Native float text — implementation in progress
 
-The private original-script/native-direction glyph dependency is verified by
-3,412 unit/API tests, 201 affected native-browser cases across 22 files and fifteen
-production cases. All 96 mixed-script layouts retain exact native ink; nine
-independent original-font Float32 compositions retain HDR/tiny alpha and every
-partition word. Prior styled, vertical, path and complete ordinary 50 MP
-regressions also pass. This remains private groundwork; float TextLayer/tool
-gates below still apply. [Verification and limits](benchmarks/native-text-items-2026-11-01.md).
+The private original-script and complete styled paint-order dependencies are
+verified by 3,415 unit/API tests across 341 files, 203 affected native-browser cases
+across 24 files and fifteen production cases. All 96 mixed-script layouts and 64
+styled bidi layouts match complete native ink; the styled cases also retain exact
+per-color ownership. Nine independent colored bidi Float32 compositions retain
+signed/HDR color, tiny alpha and every partition word. Prior original-font,
+styled, vertical, path and complete ordinary 50 MP regressions also pass. This
+remains private groundwork; float TextLayer/tool gates below still apply.
+[Verification and limits](benchmarks/native-styled-bidi-2026-11-01.md).
 
 TextLayer integration remains required for the full F08/F10 roadmap. Float
 documents still reject text and the text tool remains unavailable. The private
@@ -67,10 +69,10 @@ clean up and permit retry. Invalid paint spacing rejects before compositing.
 Six focused pure units include independent property checks for all 1,114,112
 Unicode code points, all 128 brackets and the existing 10,000-character budget.
 
-Full build/typecheck, all 3,412 unit/API cases across 340 files and fifteen
+Full build/typecheck, all 3,415 unit/API cases across 341 files and fifteen
 production cases pass. The production path case includes nine transform/tracking
 variants; it uses prepared source adapters and does not establish complete native
-source capture. The complete affected 201-case source run across 22 files passes
+source capture. The complete affected 203-case source run across 24 files passes
 without retries, skips or flakes. Independent readers compare every RGBA sample in both
 complete ordinary 50 MP curve and vertical outputs against complete native SVG
 references: 200 million samples each, zero error and identical PNGs. The separate
@@ -86,7 +88,7 @@ Hebrew letters where Arabic was intended: the passing Hebrew numerical control
 is retained, and mixed Arabic/Hebrew and GPOS cases expand the final matrix to
 nine. The current complete targets all remain required.
 
-Owned fallback-font selection, cross-span mixed-bidi colored paint ordering,
+Owned fallback-font selection, broader mixed-bidi itemization and paint ordering,
 intrinsic/missing paint, broader script/vertical/host itemization and connected
 public Float32 text remain required. This private increment does not admit public
 TextLayer authoring, scenes, export, shared transport or persistence.
@@ -95,6 +97,49 @@ The design follows the separate shaping-run properties described in the
 [HarfBuzz manual](https://harfbuzz.github.io/text-runs.html), native character
 geometry in [SVG 2](https://www.w3.org/TR/SVG/text.html), and the native rectangle
 conventions visible in [Chromium's character queries](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/layout/svg/svg_text_query.cc).
+
+## Cross-span native paint order (private)
+
+Original UTF-16 source-cluster provenance travels with private SVG glyph
+primitives through horizontal, path and vertical projections. It supplies no
+position or color and is not public document data or persisted state. Complete
+horizontal line assembly ranks original clusters using captured native visual
+metadata, retaining shaped order inside a cluster and preserving ties. Missing
+or out-of-range provenance and nonfinite ordering reject before publication.
+Exact per-item and whole-line native ink plus per-color ownership remain required
+at both opacity samples. Original spans, fonts/tuples, source colors and glyph
+poses remain unchanged.
+
+A native positional-range candidate handles path anchoring when summed advances
+differ from the native extent. It uses original unfolded caret metadata, cached
+only for immutable arrays; original negative fragment allocation and source
+GPOS remain. It follows the range-based anchor rule in
+[Chromium's SVG layout](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/core/layout/svg/svg_text_layout_algorithm.cc).
+A mixed-font RTL negative curve reports advance 68 while its native unfolded
+extent is 62. Using that extent resolves the remaining case exactly. No inverse
+curve-distance or reference-pixel fitting supplies paint coordinates.
+
+All 64 original color/font/size, Latin/Hebrew/Arabic/CJK, paragraph-direction,
+straight/curved, identity/affine and ordinary/negative-tracking layouts retain
+complete native ink and color ownership. Nine independent original-font colored
+Float32 references retain exact alpha/RGB, overlapping colors, signed/HDR values,
+alpha 1e-8 and every partition word. These references verify coverage/composition
+at separately verified poses; they do not independently discover native poses.
+The emitted production matcher also retains original source clusters and actual
+native paint order in overlapping Latin and Hebrew cases, using prepared source
+adapters. Complete capture/lifetime runs in the source browser matrix.
+
+The initial diagnostic matched 40/64 layouts. The first asserted complete-line
+ordering attempt matched 63/64; the remaining per-span curve already failed in
+the baseline. Temporary diagnostic-only instrumentation retained original native
+geometry and every projection error. An SVGPoint serialization error was fixed
+in a separate diagnostic run. Geometry-only curve inversion was investigated
+and not shipped. No target, exact-ink assertion or ownership gate was removed.
+Full 3,415-unit/203-source/15-production/build and independent large-image checks
+pass; [findings and compact evidence](benchmarks/native-styled-bidi-2026-11-01.md)
+retain boundaries and corrections. Owned fallback, missing/intrinsic paint,
+broader native itemization/hosts/extents, public Float32 text integration and all
+unfinished original roadmap gates remain required.
 
 ## Authored CSS color capture
 

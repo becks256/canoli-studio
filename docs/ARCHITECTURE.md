@@ -1,5 +1,15 @@
 # Architecture
 
+## Cross-span source-cluster paint provenance (private)
+
+Private SVG primitives retain original source clusters across projections.
+`native-paint-order.ts` ranks complete horizontal styled lines using captured
+native ordering metadata, preserving original shaped order inside clusters.
+Exact whole-line ink and per-color ownership remain publication gates. The current corpus is verified; positional-range path anchors retain original
+unfolded metadata when measured advance differs from extent. No public document
+field or extension authority is added.
+[Current evidence and remaining scope](FLOAT_TEXT.md#cross-span-native-paint-order-private).
+
 ## Original script and resolved native direction items
 
 The private `native-text-items.ts` selects grapheme-safe script/direction ranges
@@ -12,7 +22,7 @@ native visual order/direction only, independently of original paint poses.
 Tracked SVG fragment allocation can retain original font metrics through private
 paint spacing. Signed tracked advances, native visual order and original GPOS
 fragment allocation pass the focused complete-ink and Float32 matrices. The
-complete affected source regression passes; cross-span mixed-bidi colored paint
+complete affected source regression passes; broader native bidi paint
 ordering, owned font fallback and connected public Float32 text remain required.
 [Current evidence and limits](FLOAT_TEXT.md#original-script-and-native-direction-items-private).
 

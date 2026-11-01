@@ -2,6 +2,7 @@ import {characterFormatSchema} from '../core/character-format';
 import {fontFamilyNames} from '../core/font-families';
 import type {FontFileData} from '../core/font-files';
 import {yieldTask} from '../core/task-yield';
+import {nativeSvgPaintOrder} from './native-paint-order';
 import type {FloatGlyph} from './float-glyph';
 import type {OwnedFontRun} from '../fonts/shaping-types';
 import type {NativeGlyphFont,NativeGlyphFontControl} from './native-glyph-font';
@@ -34,6 +35,7 @@ export async function matchNativeStyledSvgLine(plan:StyledTextPlan,index:number,
   }
  }
 
- const paint=await compareNativeSvgGlyphPaint(plan,index,captureNativeSvgLineRoot(plan,index),glyphs,{...options,check},budget),ownership=paint.error?undefined:await compareNativeSvgPaintOwnership(plan,index,glyphs,paint.bounds,{...options,check},budget),evidence=Object.freeze({projection:'styled'as const,hiddenGlyphs:hidden,svgAdvance:plan.metrics[index].advance,svgPixelsCompared:paint.pixels,svgMaxAlphaError:paint.error,sourceGlyphs:runs.reduce((n,r)=>n+r.glyphs.length,0),sourceClusters:runs.reduce((n,r)=>n+new Set(r.glyphs.map(g=>g.cluster)).size,0),opacitySamples:Object.freeze([1,.5]),bounds:paint.bounds,paintOwnership:ownership});
- if(paint.error||ownership?.error)return Object.freeze({status:'mismatch',reason:'The complete native styled ink or paint ownership differs from source-font glyph paint.',evidence});check();return Object.freeze({status:'matched',run:runs[0],runs:Object.freeze(runs),glyphs:Object.freeze(glyphs),evidence});
+ const visual=plan.paint.visual?.[index],ordered=visual?nativeSvgPaintOrder(glyphs,visual):Object.freeze(glyphs);
+ const paint=await compareNativeSvgGlyphPaint(plan,index,captureNativeSvgLineRoot(plan,index),ordered,{...options,check},budget),ownership=paint.error?undefined:await compareNativeSvgPaintOwnership(plan,index,ordered,paint.bounds,{...options,check},budget),evidence=Object.freeze({projection:'styled'as const,hiddenGlyphs:hidden,svgAdvance:plan.metrics[index].advance,svgPixelsCompared:paint.pixels,svgMaxAlphaError:paint.error,sourceGlyphs:runs.reduce((n,r)=>n+r.glyphs.length,0),sourceClusters:runs.reduce((n,r)=>n+new Set(r.glyphs.map(g=>g.cluster)).size,0),opacitySamples:Object.freeze([1,.5]),bounds:paint.bounds,paintOwnership:ownership});
+ if(paint.error||ownership?.error)return Object.freeze({status:'mismatch',reason:'The complete native styled ink or paint ownership differs from source-font glyph paint.',evidence});check();return Object.freeze({status:'matched',run:runs[0],runs:Object.freeze(runs),glyphs:ordered,evidence});
 }

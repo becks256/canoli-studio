@@ -14,6 +14,8 @@ import type {PixelProcessor} from './processor';
 
 /** A resolved paint primitive, not a text shaper or public mutation DTO. */
 export interface FloatGlyph {
+ /** Original UTF-16 cluster; private line assembly provenance, never a pose. */
+ readonly sourceCluster?:number;
  readonly font:NativeGlyphFont;readonly glyphId:number;
  readonly surface?:'svg';
  readonly origin?:Readonly<{x:number;y:number}>;
