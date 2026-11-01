@@ -1,5 +1,16 @@
 # Architecture
 
+## Private native glyph paint dependency — full float text remains required
+
+Captured styled-text plans own private glyph-selector fonts and ordered native
+Float32 glyph fields. The small isolated binary worker preserves original glyph
+payloads/maps, host validation compares complete retained tables, and native
+faces retire with source/parent ownership. Per-glyph scalar coverage and actual
+WASM retain HDR color/source alpha. This does not identify whole native glyph
+runs or enable float TextLayer. Compressed sources, glyph zero, intrinsic paint
+and full scene/tool/interchange acceptance remain required.
+[Current contract and limits](FLOAT_TEXT.md#owned-glyph-selection-and-native-float-paint-private).
+
 ## Source-owned native text preparation — float glyph painting remains open
 
 Private `captureStyledTextPlan` snapshots whole native shaping chunks, captures

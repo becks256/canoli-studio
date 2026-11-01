@@ -55,3 +55,17 @@ Isolated Scripts and internal plugins receive only currently declared selected r
 Raster exports render with owned native faces. Referenced source/native identities are pinned before progress callbacks and rechecked through rendering/encoding; loss rejects even when another document retains the same native face. Explicit host SVG delivery includes complete selected native font bytes referenced by visible editable text in inline `@font-face` resources, with strict generated family/descriptor values. It excludes hidden/unused faces, unselected collection faces and system font files. Text rendered into SVG image portions retains source lifetime checks without adding editable font binaries. Viewer support, shaping and Canvas/SVG differences remain explicit; save a project for originals and use native raster output for the editor's rendered pixels. Supported SVG embedded-font and horizontal-text reimport is documented in [SVG_FONT_IMPORT.md](SVG_FONT_IMPORT.md); broader CSS/viewer acceptance remains unfinished.
 
 Character runs, arbitrary axis authoring, path text, broader shaping/font/device quality, broader automation and mixed-source acceptance, and sustained editor-wide performance remain required.
+
+
+## Private glyph paint sources
+
+Native text preparation may retain an independent private glyph-selector face
+for a captured uncompressed selected SFNT source. Temporary fonts preserve
+original glyph/hint/metric/axis/paint tables and authored mappings; extra private
+selectors do not replace the original file or its document identity. Worker jobs
+share the font parser queue, complete derived-byte validation and cancellation;
+parent/source retirement removes private registrations. No alias, derived font,
+source chooser or new operation is exposed to isolated scripts/plugins. Existing
+source formats/imports, originals and native persistence remain unchanged.
+This is private resolved-glyph paint groundwork with explicit remaining source/
+shaping/color limitations, described in [FLOAT_TEXT.md](FLOAT_TEXT.md#owned-glyph-selection-and-native-float-paint-private).

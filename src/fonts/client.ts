@@ -8,7 +8,7 @@ import {fontDigest,fontFaceId,fontInspectionSchema,fontInspectOptionsSchema,font
 let active=false;
 const waiting:{start():void}[]=[];
 const pump=()=>{if(!active)waiting.shift()?.start();};
-function acquire(signal?:AbortSignal):Promise<()=>void>{
+export function acquireFontWorkerSlot(signal?:AbortSignal):Promise<()=>void>{
   signal?.throwIfAborted();
   return new Promise((resolve,reject)=>{
     const cancel=()=>{const at=waiting.indexOf(entry);if(at>=0)waiting.splice(at,1);signal?.removeEventListener('abort',cancel);reject(signal?.reason??new Error('Font source operation cancelled.'));pump();};
@@ -78,10 +78,10 @@ function run(blob:Blob,mode:'inspect'|'prepare',options:FontInspectOptions|FontP
   });
 }
 export async function inspectFontFile(blob:Blob,options:FontInspectOptions={},control:FontSourceControl={}):Promise<FontInspection>{
-  const settings=fontInspectOptionsSchema.parse(options),release=await acquire(control.signal);
+  const settings=fontInspectOptionsSchema.parse(options),release=await acquireFontWorkerSlot(control.signal);
   try{return await run(blob,'inspect',settings,control);}finally{release();}
 }
 export async function prepareFontFile(blob:Blob,options:FontPrepareOptions={},control:FontSourceControl={}):Promise<PreparedFontSource>{
-  const settings=fontPrepareOptionsSchema.parse(options),release=await acquire(control.signal);
+  const settings=fontPrepareOptionsSchema.parse(options),release=await acquireFontWorkerSlot(control.signal);
   try{return await run(blob,'prepare',settings,control);}finally{release();}
 }

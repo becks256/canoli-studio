@@ -51,12 +51,12 @@ test('font host rejects response corruption, worker timeout and throwing observe
 });
 
 test('closing the font inspector cancels blocked parsing and a later source can be inspected',async({page})=>{
-  let blocked=0,hold=false,release=()=>{};await page.route('**/src/generated/font-source-worker.js*',async route=>{blocked++;if(hold)await new Promise<void>(resolve=>{release=resolve;});await route.abort('aborted').catch(()=>{});});
+  let blocked=0,hold=false,release=()=>{};await page.route('**/font-source-worker.js*',async route=>{blocked++;if(hold)await new Promise<void>(resolve=>{release=resolve;});await route.abort('aborted').catch(()=>{});});
   await page.goto('/');await page.getByRole('button',{name:'Move tool (V)',exact:true}).click();
   const {openFontManager}=await import('./helpers/font-management');const dialog=await openFontManager(page);await dialog.locator('summary').filter({hasText:'Inspect font files'}).click();await dialog.getByTestId('font-source-input').setInputFiles('tests/fixtures/fonts/Regular.ttf');
   await expect(dialog.getByRole('alert')).toContainText('Font parser worker failed');expect(blocked).toBe(1);
   hold=true;await dialog.getByRole('button',{name:'Inspect again',exact:true}).click();await expect.poll(()=>blocked).toBe(2);
-  await dialog.locator('summary').filter({hasText:'Inspect font files'}).click();await expect(dialog.getByTestId('font-source-input')).toHaveCount(0);release();await page.unroute('**/src/generated/font-source-worker.js*');
+  await dialog.locator('summary').filter({hasText:'Inspect font files'}).click();await expect(dialog.getByTestId('font-source-input')).toHaveCount(0);release();await page.unroute('**/font-source-worker.js*');
   await dialog.locator('summary').filter({hasText:'Inspect font files'}).click();await dialog.getByTestId('font-source-input').setInputFiles('tests/fixtures/fonts/Regular.woff2');await expect(dialog.getByText('WOFF2 · 1 face · Showing 1–1',{exact:true})).toBeVisible();await dialog.getByRole('button',{name:'Done',exact:true}).click();
 });
 

@@ -63,6 +63,45 @@ This owner is required groundwork, not completed native float glyph painting.
 Paint decomposition, intrinsic color-glyph sources and exact authored-alpha
 composition still need an implementation. The float TextLayer/tool gates remain.
 
+## Owned glyph selection and native float paint (private)
+
+A captured text plan can now retain `captureGlyphFont(id,settings,control)` for
+one of its captured original font files and `renderGlyphs(primitives,window,
+processor,check)` for glyph resources owned by that plan. These are private
+renderer operations, not scripting methods or a second document mutation API.
+They consume already-resolved glyph IDs/poses; they do not discover native glyph
+runs, perform fallback or replace whole-chunk shaping.
+
+A separate small worker copies selected uncompressed TTF/OTF glyph, hint,
+metric, variation and intrinsic paint tables. It adds collision-free private
+Unicode selectors while retaining the original mappings that native hinting can
+rely on. Already-resolved glyph paint removes layout/substitution tables from
+the temporary font; originals remain unchanged in the source store, native
+project and authored SVG. Complete retained-table bytes, mappings, selector IDs
+and SFNT checksums validate before private native registration. Validation yields
+between bounded groups. Original and derived faces have independent lifetimes;
+private aliases never enter document data. Worker parsing shares the existing
+single active font-job queue and cancellation/deadline boundary.
+
+Monochrome glyphs now supply independent canonical native alpha coverage on the
+fixed world lattice. Actual WASM composes their source-linear Float32 colors and
+unquantized source alpha in paint order. Overlapping half-alpha glyphs reach
+0.75 rather than a union-mask alpha of 0.5; two opaque-coveraged glyphs at source
+alpha 1e-8 retain approximately 2e-8. Signed/HDR RGB never enters Canvas. Window
+partitions retain exact output words. Parent/source/native-face retirement and
+cancellation reject without publishing a field, and parent release retires its
+child registrations.
+
+This dependency currently requires selected uncompressed SFNT bytes and supported
+Unicode cmap formats 0/4/6/10/12/13. It explicitly rejects glyph zero, exhausted
+private selector space, unsupported compressed glyph preparation and intrinsic
+color-font float paint. Existing font imports and ordinary rendering are not
+restricted. Full compressed-source/native fallback/glyph-run identification,
+missing-glyph and intrinsic color painting remain required, together with the
+connected float TextLayer tool/scene/export/transport/persistence acceptance.
+The float document and tool gates remain in place. This is actual private
+per-glyph float painting, not completed float typography.
+
 ## Required native paint work
 
 The current ordinary renderer uses whole-line Canvas text; character-formatted,
@@ -126,3 +165,19 @@ and limitations](../docs/benchmarks/native-text-plan-2026-11-01.md) and
 [compact receipt](../docs/benchmarks/native-text-plan-2026-11-01.json.gz) retain
 successful runs, failed pilots, source/release identities and complete large
 outputs. Full native glyph painting and the original roadmap remain required.
+
+
+## Private glyph paint verification (2026-11-01)
+
+Full build/typecheck, 3,366 unit/API cases across 332 files, one complete final
+37-case source-browser run and four ordinary production regressions pass. Native
+TTF/CFF/exact variable glyph pixels match the original in 18 size/affine cases.
+Actual WASM retains signed HDR RGB, ordered overlap and alpha 1e-8, with exact
+window partitions. Independent FontTools checks original glyph order, retained
+source tables/maps and added selectors. Ownership, cleanup, cancellation, timeout
+and retry are checked. [Findings and remaining scope](../docs/benchmarks/glyph-paint-2026-11-01.md)
+and [compact receipt](../docs/benchmarks/glyph-paint-2026-11-01.json.gz) retain raw
+runs, the failed/corrected worker-route harness and native cmap probes. This is
+private resolved-glyph paint acceptance; full native text matching, missing and
+intrinsic color glyphs, compressed preparation and float TextLayer integration
+remain required. No 50 MP float text or universal font/performance claim follows.

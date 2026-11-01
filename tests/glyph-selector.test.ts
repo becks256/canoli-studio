@@ -1,0 +1,47 @@
+import {it,expect,beforeAll} from 'vitest';
+import {readFile} from 'node:fs/promises';
+import {create} from 'fontkit';
+import {compileGlyphSelectors,validateGlyphSelectors} from '../src/fonts/glyph-sfnt';
+import {renderFloatGlyphs,type FloatGlyph} from '../src/engine/float-glyph';
+import {AffineTransform} from '../src/core/affine';
+import {FloatPixelProcessor} from '../src/engine/float-pixels';
+import {instantiateKernel} from '../src/engine/wasm';
+import type {NativeGlyphFont} from '../src/engine/native-glyph-font';
+interface Font {glyphForCodePoint(cp:number):{id:number;path:{toSVG():string};advanceWidth:number};characterSet:number[]}
+for(const path of ['fonts/Regular.ttf','fonts/CFF.otf','font-variations/Axes.ttf','vertical-font/Vertical.ttf'])it('retains every authored Unicode mapping, glyph outline and advance: '+path,async()=>{
+ const original=new Uint8Array(await readFile('tests/fixtures/'+path)),before=Uint8Array.from(original),result=compileGlyphSelectors(original);validateGlyphSelectors(original,result);
+ const source=create(original)as Font,derived=create(result.bytes)as Font;
+ expect(original).toEqual(before);for(const cp of source.characterSet){const a=source.glyphForCodePoint(cp),b=derived.glyphForCodePoint(cp);expect(b.id).toBe(a.id);expect(b.path.toSVG()).toBe(a.path.toSVG());expect(b.advanceWidth).toBe(a.advanceWidth);}
+ for(let glyph=1;glyph<result.glyphCount;glyph++)expect(derived.glyphForCodePoint(result.selectors[glyph]).id).toBe(glyph);
+});
+it('rejects malformed and compressed input, corrupt worker selectors and changed source tables',async()=>{
+ const source=new Uint8Array(await readFile('tests/fixtures/fonts/Regular.ttf'));
+ for(const input of [new Uint8Array(),source.subarray(0,50),new Uint8Array(await readFile('tests/fixtures/fonts/Regular.woff'))])expect(()=>compileGlyphSelectors(input)).toThrow();
+ const a=compileGlyphSelectors(source);a.selectors[1]=a.selectors[2];expect(()=>validateGlyphSelectors(source,a)).toThrow('map differs');
+ const b=compileGlyphSelectors(source);b.bytes[b.bytes.length-1]^=1;expect(()=>validateGlyphSelectors(source,b)).toThrow();
+ expect(()=>compileGlyphSelectors(source,()=>{throw new Error('Cancelled native selectors');})).toThrow('Cancelled native selectors');
+});
+let native:FloatPixelProcessor;beforeAll(async()=>{native=new FloatPixelProcessor(await instantiateKernel(new Uint8Array(await readFile('public/wasm/pixels.wasm'))));});
+const processor={floatComposite:async(...args:Parameters<FloatPixelProcessor['composite']>)=>native.composite(...args)};
+const font:NativeGlyphFont=Object.freeze({family:'PrivateGlyph',glyphCount:3,settings:'normal',monochrome:true,character:()=>String.fromCodePoint(0xf0000),check(){},release(){}});
+const primitive=(color:readonly[number,number,number,number]):FloatGlyph=>({font,glyphId:2,style:{fontSize:40,fontWeight:'400',fontStyle:'normal'},color,transform:new AffineTransform()});
+const area={x:0,y:0,width:1,height:1};
+it('native glyph paint keeps signed HDR RGB and per-glyph alpha in actual WASM, including sub-byte overlap',async()=>{
+ for(const alpha of [.5,.64123012345,1e-8]){const color=[4,-.25,1.5,alpha]as const,a=Math.fround(alpha),result=await renderFloatGlyphs([primitive(color),primitive(color)],area,processor,()=>{},async()=>new Float32Array([1]));expect(result).toEqual(new Float32Array([4,-.25,1.5,a+a*(1-a)]));}
+ const a=.375,b=.625,actual=await renderFloatGlyphs([primitive([4,-.25,1.5,a]),primitive([-.5,3,.125,b])],area,processor,()=>{},async()=>new Float32Array([1])),alpha=b+a*(1-b);expect(actual).toEqual(new Float32Array([(-.5*b+4*a*(1-b))/alpha,(3*b-.25*a*(1-b))/alpha,(.125*b+1.5*a*(1-b))/alpha,alpha]));
+});
+it('coverage and source alpha multiply once, caller mutations cannot retarget a captured primitive',async()=>{
+ const source=[primitive([4,-.25,1.5,.64123])],mask=Math.fround(17/255),expected=new Float32Array([4,-.25,1.5,Math.fround(.64123)*mask]);let changed=false;
+ const result=await renderFloatGlyphs(source,area,processor,()=>{},async()=>{if(!changed){changed=true;source[0]=primitive([0,0,0,0]);}return new Float32Array([mask]);});expect(result).toEqual(expected);
+});
+it('invalid coverage, retired owners, unsupported intrinsic color and malformed worker output cannot publish',async()=>{
+ for(const mask of [new Float32Array(),new Float32Array([NaN]),new Float32Array([1.1])])await expect(renderFloatGlyphs([primitive([1,0,0,1])],area,processor,()=>{},async()=>mask)).rejects.toThrow();
+ await expect(renderFloatGlyphs([primitive([1,0,0,1])],area,{floatComposite:async()=>new Float32Array(8)},()=>{},async()=>new Float32Array([1]))).rejects.toThrow('geometry');
+ await expect(renderFloatGlyphs([{...primitive([1,0,0,1]),font:{...font,monochrome:false}}],area,processor,()=>{})).rejects.toThrow('intrinsic color-font');
+ let cancelled=false;await expect(renderFloatGlyphs([primitive([1,0,0,1])],area,processor,()=>{if(cancelled)throw new Error('Owner retired');},async()=>{cancelled=true;return new Float32Array([1]);})).rejects.toThrow('Owner retired');
+});
+
+it('never overwrites existing private Unicode mappings when choosing glyph selectors',async()=>{
+ const original=compileGlyphSelectors(new Uint8Array(await readFile('tests/fixtures/fonts/Regular.ttf'))),next=compileGlyphSelectors(original.bytes);validateGlyphSelectors(original.bytes,next);const font=create(next.bytes)as Font;
+ for(let glyph=1;glyph<original.glyphCount;glyph++){expect(font.glyphForCodePoint(original.selectors[glyph]).id).toBe(glyph);expect(font.glyphForCodePoint(next.selectors[glyph]).id).toBe(glyph);expect([...original.selectors]).not.toContain(next.selectors[glyph]);}
+});

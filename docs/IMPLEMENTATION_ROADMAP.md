@@ -10460,3 +10460,52 @@ shared API/source-bearing persistence/50 MP text acceptance remain required.
 The full original professional/AI/provider/workflow/device/performance/commercial
 roadmap stays active. No new public mutation, grant, account, upload, paid call,
 REST/browser synchronization or arbitrary original-resolution limit is added.
+
+
+### 2026-11-01 — F08/F10 native glyph-ID paint dependency implemented
+
+Previous goal turn: progress, native text preparation accepted at d3174f1.
+The complete original roadmap remains active. Captured plans now own temporary
+native glyph-selector faces and ordered private Float32 glyph painting, without
+splitting authored text spans or mutating original font/document data. Complete
+native glyph payloads and authored mappings remain; an early probe demonstrated
+that replacing the original cmap changes real-font raster pixels. Augmenting it instead
+retains exact native pixels in the recorded comparisons. Source-table checks,
+private-ID bounds, leases, queue/deadline/cancellation and parent-owned cleanup
+apply before and through painting. Independent scalar glyph masks now preserve
+source alpha/overlap, signed HDR RGB and exact window partitions through actual
+WASM. [Contract, defaults and explicit limits](FLOAT_TEXT.md#owned-glyph-selection-and-native-float-paint-private).
+
+This does not identify whole native shaped glyph runs or enable float TextLayer.
+Full compressed-source preparation, native fallback/paint matching, glyph zero,
+intrinsic color-font painting and connected scene/tool/export/shared transport/
+persistence/50 MP text acceptance remain required. These limits are private
+preparation boundaries, not new import limits or a narrower definition of the
+original requested typography/editor objective. No schema/public scripting API,
+plugin grant, account, upload, paid call or REST/browser synchronization changes.
+
+
+### 2026-11-01 — F08/F10 private native glyph paint verified; full typography remains open
+
+Full build/typecheck with 51 guides and all 3,366 unit/API cases across 332 files
+pass. One complete final 37-case source run across four files and four ordinary
+production regressions pass. Native TTF/CFF/variable glyphs match original hinted/
+affine pixels in 18 comparisons. Actual WASM fields retain signed/HDR source RGB,
+ordered alpha overlap (0.75 at half alpha; approximately 2e-8 for two glyphs at
+1e-8) and exact window partitions. FontTools independently verifies original
+glyph order, retained table bytes, authored maps and collision-free selectors.
+Private face/source/model/history ownership, cancellation, timeout, collection
+and retry remain checked. The small separate glyph worker is 6,913 bytes with
+no external imports. The corrected existing inspector route matches the worker
+basename through the workspace's generated-directory symlink; its error, blocked-
+request counts and recovery assertions are unchanged. Raw 36/37, corrected and
+final runs, cmap design probes and independent output identities are preserved.
+
+[Findings](benchmarks/glyph-paint-2026-11-01.md) and
+[compact evidence](benchmarks/glyph-paint-2026-11-01.json.gz) separate the actual
+private paint increment from unfinished native shaped-run/fallback/hint matching,
+glyph zero, compressed glyph-source preparation, intrinsic color paint, complete
+float TextLayer scene/tool/export/shared transport/persistence/50 MP acceptance
+and every other unfinished original professional/AI/provider/workflow/device/
+performance/commercial gate. Model/tool validation remains gated; this does not
+substitute a narrower typography objective or complete the full roadmap.

@@ -1,3 +1,8 @@
+import {AffineTransform} from '../core/affine';
+import type {FloatGlyph} from './float-glyph';
+import type {FloatSourceWindow} from '../core/float-source/types';
+import type {PixelProcessor} from './processor';
+import type {NativeGlyphFont,NativeGlyphFontControl} from './native-glyph-font';
 import {captureLinearTextColors,type LinearTextColor} from './float-text-color';
 import {textWritingSchema,verticalWriting,applyNativeTextWriting,type TextWriting} from '../core/text-writing';
 import {z} from 'zod';
@@ -81,6 +86,8 @@ export interface StyledTextPlan {
   /** End native measurement after its consumer finishes preparation. The source
    * font lease and immutable metadata remain valid until release. */
   retireMeasurement():void;
+  captureGlyphFont(id:string,settings?:string,control?:NativeGlyphFontControl):Promise<NativeGlyphFont>;
+  renderGlyphs(glyphs:readonly FloatGlyph[],area:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,check?:()=>void):Promise<Float32Array>;
   check():void;
   release():void;
 }
@@ -152,9 +159,21 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
   if(typeof globalThis.document==='undefined')throw new Error('Native styled text preparation requires a browser SVG host.');
   let fonts:ReturnType<typeof captureStyledTextFonts>|undefined;
   let host:HTMLDivElement|undefined,markup:string|undefined,released=false,handedOff=false;
+  const glyphs=new Set<NativeGlyphFont>();
   const retireMeasurement=()=>{host?.remove();host=undefined;};
-  const release=()=>{if(released)return;released=true;markup=undefined;retireMeasurement();fonts?.release();fonts=undefined;};
+  const release=()=>{if(released)return;released=true;markup=undefined;retireMeasurement();for(const glyph of glyphs)glyph.release();glyphs.clear();fonts?.release();fonts=undefined;};
   const check=()=>{if(released)throw new Error('The styled text plan was released.');cancelled();fonts?.check();if(host&&!host.isConnected)throw new Error('The styled text measurement host was removed.');};
+  const captureGlyphFont=async(id:string,settings='normal',input:NativeGlyphFontControl={}):Promise<NativeGlyphFont>=>{
+    const child={...input};check();if(!fonts!.document.fontFiles?.some(file=>file.id===id))throw new Error('The glyph font is outside this captured text source.');
+    const {captureNativeGlyphFont}=await import('./native-glyph-font');check();
+    const value=await captureNativeGlyphFont(assets,id,settings,{...child,check(){check();child.check?.();check();}});
+    try{check();glyphs.add(value);return value;}catch(error){value.release();throw error;}
+  };
+  const renderGlyphs=async(input:readonly FloatGlyph[],window:FloatSourceWindow,processor:Pick<PixelProcessor,'floatComposite'>,current:()=>void=()=>{}):Promise<Float32Array>=>{
+    const primitives=input.map(glyph=>({...glyph,style:{...glyph.style},color:[...glyph.color]as unknown as FloatGlyph['color'],transform:AffineTransform.fromJSON(glyph.transform)})),area={...window};
+    const active=()=>{check();current();check();};active();if(primitives.some(glyph=>!glyphs.has(glyph.font)))throw new Error('The glyph primitive is outside this captured text source.');
+    const {renderFloatGlyphs}=await import('./float-glyph');active();return renderFloatGlyphs(primitives,area,processor,active);
+  };
   try{
     fonts=captureStyledTextFonts(scene.lines.flatMap(line=>line.spans.map(span=>span.style)),document,assets);
     const linear=control.captureLinearPaint?await captureLinearTextColors(scene.lines.flatMap(line=>line.spans.map(span=>span.style.color)),{signal:control.signal,check}):undefined;
@@ -209,7 +228,7 @@ export async function captureStyledTextPlan(input:StyledTextSceneInput,document:
     }
     const definitions=await fonts.definitions(check);check();
     markup=new XMLSerializer().serializeToString(svg).replace(/(<svg\b[^>]*>)/,`$1${definitions}`);
-    check();handedOff=true;return Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,check,release});
+    check();handedOff=true;return Object.freeze({scene,metrics,...(paint?{paint}:{}),get markup(){check();return markup!;},retireMeasurement,captureGlyphFont,renderGlyphs,check,release});
   }finally{if(!handedOff)release();}
 }
 
